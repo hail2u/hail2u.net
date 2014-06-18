@@ -1,0 +1,79 @@
+/* jshint node:true */
+'use strict';
+
+module.exports = function (grunt) {
+  var taskName = 'generate_sitemap';
+  var taskDescription = 'Generate a sitemap XML file.';
+
+  grunt.registerMultiTask(taskName, taskDescription, function () {
+    var xml2js = require('xml2js');
+
+    var file = this.data.file;
+    var domain = 'http://hail2u.net';
+    var urls = [
+      '/',
+      '/about/',
+      '/about/style-guide/',
+      '/blog/',
+      '/blog/blog/',
+      '/blog/blosxom/',
+      '/blog/coding/',
+      '/blog/gadget/',
+      '/blog/game/',
+      '/blog/internet/',
+      '/blog/media',
+      '/blog/misc/',
+      '/blog/rss/',
+      '/blog/software/',
+      '/blog/sports/',
+      '/blog/webdesign/',
+      '/documents/',
+      '/projects/'
+    ];
+
+    urls = addDocuments('documents/', urls);
+    urls = addArticles('.grunt/weblog/plugins/state/articles.json', urls);
+    grunt.file.write(file, createSitemap(domain, urls));
+    grunt.log.writeln('File "' + file + '" created.');
+
+    function addDocuments(dir, to) {
+      var documents = grunt.file.expand({
+        cwd: dir
+      }, [
+        '*.html',
+        '!index.html'
+      ]).map(function (file) {
+        return '/' + dir + file;
+      });
+
+      return to.concat(documents);
+    }
+
+    function addArticles(data, to) {
+      var articles = [];
+      grunt.file.readJSON(data).forEach(function (article) {
+        articles.push(article.link);
+      });
+
+      return to.concat(articles);
+    }
+
+    function createSitemap(domain, urls) {
+      var sitemap = {
+        urlset: {
+          $: {
+            xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9'
+          },
+          url: []
+        }
+      };
+      urls.forEach(function (url) {
+        sitemap.urlset.url.push({
+          loc: domain + url
+        });
+      });
+
+      return new xml2js.Builder().buildObject(sitemap);
+    }
+  });
+};

@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>Module Checker</title>
+<style type="text/css">
+body {
+	font-family:Verdana, sans-serif;
+	font-size:small;
+}
+
+form, input {
+	font-family:Verdana, sans-serif;
+}
+
+pre {
+	font-family:'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+<h1>Module Checker</h1>
+<form method="get" action="#">
+<div>
+<label for="module">Module:</label>
+<input type="text" name="module" size="24" value="Jcode" id="module" />
+<input type="submit" value="Check" />
+</div>
+</form>
+<p>Succeed to load &quot;Jcode v0.85&quot;.</p>
+<pre>NAME
+    Jcode - Japanese Charset Handler
+
+SYNOPSIS
+     use Jcode;
+     # 
+     # traditional
+     Jcode::convert(\$str, $ocode, $icode, &quot;z&quot;);
+     # or OOP!
+     print Jcode-&gt;new($str)-&gt;h2z-&gt;tr($from, $to)-&gt;utf8;
+
+DESCRIPTION
+    Jcode.pm supports both object and traditional approach. With object
+    approach, you can go like;
+
+    $iso_2022_jp = Jcode-&gt;new($str)-&gt;h2z-&gt;jis;
+
+    Which is more elegant than;
+
+    $iso_2022_jp = &amp;jcode::convert(\$str,'jis',jcode::getcode(\str), &quot;z&quot;);
+
+    For those unfamiliar with objects, Jcode.pm still supports getcode() and
+    convert().
+
+Methods
+    Methods mentioned here all return Jcode object unless otherwise
+    mentioned.
+
+    $j = Jcode-&gt;new($str [, $icode]);
+        Creates Jcode object $j from $str. Input code is automatically
+        checked unless you explicitly set $icode. For available charset, see
+        the getcode manpage below.
+
+        The object keeps the string in EUC format enternaly. When the object
+        itself is evaluated, it returns the EUC-converted string so you can
+        &quot;print $j;&quot; without calling access method if you are using EUC
+        (thanks to function overload).
+
+    Passing Reference
+        Instead of scalar value, You can use reference as
+
+        Jcode-&gt;new(\$str);
+
+        This saves time a little bit. In exchange of the value of $str being
+        converted. (In a way, $str is now &quot;tied&quot; to jcode object).
+
+    $j-&gt;set($str [, $icode]);
+        Sets $j's internal string to $str. Handy when you use Jcode object
+        repeatedly (saves time and memory to create object).
+
+         # converts mailbox to SJIS format
+         my $jconv = new Jcode;
+         $/ = 00;
+         while(&amp;lt;&amp;gt;){
+             print $jconv-&gt;set(\$_)-&gt;mime_decode-&gt;sjis;
+         }
+
+    $j-&gt;append($str [, $icode]);
+        Appends $str to $j's internal string.
+
+    $j = jcode($str [, $icode]);
+        shortcut for Jcode-&gt;new() so you can go like;
+
+        $sjis = jcode($str)-&gt;sjis;
+
+    $euc = $j-&gt;euc;
+    $jis = $j-&gt;jis;
+    $sjis = $j-&gt;sjis;
+        What you code is what you get :)
+
+    $iso_2022_jp = $j-&gt;iso_2022_jp
+        Same as $j-&gt;z2h-&gt;jis. Hankaku Kanas are forcibly converted to
+        Zenkaku.
+
+    [@lines =] $jcode-&gt;jfold([$bytes_per_line, $newline_str]);
+        folds lines in jcode string every $bytes_per_line (default: 72) in a
+        way that does not clobber the multibyte string. (Sorry, no Kinsoku
+        done!) with a newline string spified by $newline_str (default: \n).
+
+    $length = $jcode-&gt;jlength();
+        returns character length properly, rather than byte length.
+
+  Methods that use MIME::Base64
+
+    To use methods below, you need MIME::Base64. To install, simply
+
+       perl -MCPAN -e 'CPAN::Shell-&gt;install(&quot;MIME::Base64&quot;)'
+
+    $mime_header = $j-&gt;mime_encode([$lf, $bpl]);
+        Converts $str to MIME-Header documented in RFC1522. When $lf is
+        specified, it uses $lf to fold line (default: \n). When $bpl is
+        specified, it uses $bpl for the number of bytes (default: 76; this
+        number must be smaller than 76).
+
+    $j-&gt;mime_decode;
+        Decodes MIME-Header in Jcode object.
+
+        You can retrieve the number of matches via $j-&gt;nmatch;
+
+  Methods implemented by Jcode::H2Z
+
+    Methods below are actually implemented in Jcode::H2Z.
+
+    $j-&gt;h2z([$keep_dakuten]);
+        Converts X201 kana (Hankaku) to X208 kana (Zenkaku). When
+        $keep_dakuten is set, it leaves dakuten as is (That is, &quot;ka +
+        dakuten&quot; is left as is instead of being converted to &quot;ga&quot;)
+
+        You can retrieve the number of matches via $j-&gt;nmatch;
+
+    $j-&gt;z2h;
+        Converts X208 kana (Zenkaku) to X201 kana (Hankaku).
+
+        You can retrieve the number of matches via $j-&gt;nmatch;
+
+  Methods implemented in Jcode::Tr
+
+    Methods here are actually implemented in Jcode::Tr.
+
+    $j-&gt;tr($from, $to);
+        Applies tr on Jcode object. $from and $to can contain EUC Japanese.
+
+        You can retrieve the number of matches via $j-&gt;nmatch;
+
+  Methods implemented in Jcode::Unicode
+
+    If your perl does not support XS (or you can't &quot;perl Makefile.PL&quot;,
+    Jcode::Unicode::NoXS will be used.
+
+    See the Jcode::Unicode manpage and the Jcode::Unicode::NoXS manpage for
+    details
+
+    $ucs2 = $j-&gt;ucs2;
+        Returns UCS2 (Raw Unicode) string.
+
+    $ucs2 = $j-&gt;utf8;
+        Returns utf8 String.
+
+  Instance Variables
+
+    If you need to access instance variables of Jcode object, use access
+    methods below instead of directly accessing them (That's what OOP is all
+    about)
+
+    FYI, Jcode uses a ref to array instead of ref to hash (common way) to
+    optimize speed (Actually you don't have to know as long as you use
+    access methods instead; Once again, that's OOP)
+
+    $j-&gt;r_str
+        Reference to the EUC-coded String.
+
+    $j-&gt;icode
+        Input charcode in recent operation.
+
+    $j-&gt;nmatch
+        Number of matches (Used in $j-&gt;tr, etc.)
+
+Subroutines
+    ($code, [$nmatch]) = getcode($str);
+        Returns char code of $str. Return codes are as follows
+
+         ascii   Ascii (Contains no Japanese Code)
+         binary  Binary (Not Text File)
+         euc     EUC-JP
+         sjis    SHIFT_JIS
+         jis     JIS (ISO-2022-JP)
+         ucs2    UCS2 (Raw Unicode)
+         utf8    UTF8
+
+        When array context is used instead of scaler, it also returns how
+        many character codes are found. As mentioned above, $str can be
+        \$str instead.
+
+        jcode.pl Users: This function is 100% upper-conpatible with
+        jcode::getcode() -- well, almost;
+
+         * When its return value is an array, the order is the opposite;
+           jcode::getcode() returns $nmatch first.
+
+         * jcode::getcode() returns 'undef' when the number of EUC characters
+           is equal to that of SJIS.  Jcode::getcode() returns EUC.  for
+           Jcode.pm there is no in-betweens. 
+
+    Jcode::convert($str, [$ocode, $icode, $opt]);
+        Converts $str to char code specified by $ocode. When $icode is
+        specified also, it assumes $icode for input string instead of the
+        one checked by getcode(). As mentioned above, $str can be \$str
+        instead.
+
+        jcode.pl Users: This function is 100% upper-conpatible with
+        jcode::convert() !
+
+BUGS
+    Unicode support by Jcode is far from efficient!
+
+IN FUTURE
+    Hopefully Jcode will be superceded by Encode module that is part of the
+    standard module on Perl 5.7 and up
+
+ACKNOWLEDGEMENTS
+    This package owes a lot in motivation, design, and code, to the jcode.pl
+    for Perl4 by Kazumasa Utashiro &lt;utashiro@iij.ad.jp&gt;.
+
+    Hiroki Ohzaki &lt;ohzaki@iod.ricoh.co.jp&gt; has helped me polish regexp from
+    the very first stage of development.
+
+    And folks at Jcode Mailing list &lt;jcode5@ring.gr.jp&gt;. Without them, I
+    couldn't have coded this far.
+
+SEE ALSO
+    the Jcode::Unicode manpage
+
+    the Jcode::Unicode::NoXS manpage
+
+    http://www.iana.org/assignments/character-sets
+
+    the Encode manpage
+
+COPYRIGHT
+    Copyright 1999 Dan Kogai &lt;dankogai@dan.co.jp&gt;
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+</pre>
+</body>
+</html>

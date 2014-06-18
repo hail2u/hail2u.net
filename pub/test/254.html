@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja"> 
+  <head>
+    <meta charset="UTF-8">
+
+    <title>jquery.harmonize-text.js</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Vollkorn">
+    <style>
+      html {
+        height: 100%;
+      }
+
+      body {
+        margin-bottom: 1px;
+        height: 100%;
+        font-family: "Vollkorn", "Baskerville", "Times New Roman", serif;
+      }
+
+      .line {
+        margin: 0;
+        padding: 0;
+        font-size: 16px;
+        line-height: 1;
+        text-align: justify;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script>
+(function ($) {
+  $.fn.harmonizeText = function () {
+    return this.each(function () {
+      var target = $(this);
+
+      var harmonizer = function () {
+        var fontSize = parseInt(target.css("font-size"), 10);
+
+        var temp = $("<div/>").css({
+          "display":     "none",
+          "font-family": target.css("font-family"),
+          "font-size":   fontSize
+        }).text(target.text()).appendTo("body");
+
+        var targetWidth = target.width();
+        var tempWidth = temp.width();
+
+        while (tempWidth < targetWidth) {
+          fontSize *= (targetWidth / tempWidth);
+          temp.css("font-size", fontSize + "px");
+          tempWidth = temp.width();
+        }
+
+        while (tempWidth >= targetWidth) {
+          fontSize--;
+          temp.css("font-size", fontSize + "px");
+          tempWidth = temp.width();
+        }
+
+        target.css("font-size", fontSize + "px");
+        temp.remove();
+      };
+
+      harmonizer();
+
+      $(window).resize(harmonizer);
+    });
+  };
+})(jQuery);
+</script>
+    <script>
+      $(window).load(function () {
+        $(".line").harmonizeText();
+      });
+    </script>
+  </head>
+
+  <body>
+    <h1>jquery.harmonize-text.js</h1>
+
+    <p class="line">Typography</p>
+    <p class="line">is the art</p>
+    <p class="line">and technique of</p>
+    <p class="line">arranging type</p>
+  </body>
+</html>

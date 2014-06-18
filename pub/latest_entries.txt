@@ -1,0 +1,80 @@
+# Blosxom Plugin: latest_entries
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2004-07-17
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package latest_entries;
+
+use strict;
+use vars qw($list);
+
+# --- Configurable variables -----------
+
+# data file path
+my $datafile = "$blosxom::plugin_state_dir/latest_entries.dat";
+
+# number to display
+my $num = 10;
+
+# --- Plug-in package variables --------
+
+my $reindex = 0;
+
+# --------------------------------------
+
+use CGI qw(:standard);
+use FileHandle;
+
+my $fh = new FileHandle;
+
+sub start {
+  $reindex = 1 if param('reindex');
+
+  return 1;
+}
+
+sub filter {
+  my($pkg, $files_ref) = @_;
+
+  if ($reindex) {
+    my @files = sort {$files_ref->{$b} <=> $files_ref->{$a}} keys %$files_ref;
+    $list .= qq!<ul>\n!;
+
+    for (my $i = 0; $i < $num; $i++) {
+      my($url, $title) = &getinfo($files[$i]);
+      $list .= qq!<li><a href="$url" title="$title">$title</a></li>\n!;
+    }
+
+    $list .= qq!</ul>\n!;
+
+    if ($fh->open("> $datafile")) {
+      print $fh $list;
+      $fh->close;
+    }
+  } elsif ($fh->open("< $datafile")) {
+    foreach (<$fh>) {
+      $list .= $_;
+    }
+
+    $fh->close;
+  }
+
+  return 1;
+}
+
+sub getinfo {
+  my $file = shift;
+
+  my($path, $fn) = $file =~ m!^$blosxom::datadir/(?:(.*)/)?(.*)\.$blosxom::file_extension!;
+  my $url = "$blosxom::url/$path/$fn.$blosxom::flavour";
+  my $title = '';
+
+  if (-f $file && $fh->open("< $file")) {
+    chomp($title = <$fh>);
+    $fh->close;
+  }
+
+  return($url, $title);
+}
+
+1;

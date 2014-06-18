@@ -1,0 +1,438 @@
+/* jshint node: true */
+'use strict';
+
+module.exports = function (grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+
+    clean: {
+      css: {
+        src: [
+          '.grunt/tmp/**/*.css',
+          '.grunt/tmp/**/*.css.map'
+        ]
+      },
+
+      js: {
+        'src': [
+          '.grunt/tmp/**/*.js',
+          '.grunt/tmp/**/*.js.map'
+        ]
+      }
+    },
+
+    concat: {
+      options: {
+        seperator: ';'
+      },
+
+      js: {
+        files: {
+          '.grunt/tmp/about/style-guide.js': [
+            '.grunt/js/bower_components/unutm/unutm.js',
+            '.grunt/js/async-print-css/async-print-css.js',
+            '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
+            '.grunt/js/bower_components/google-code-prettify/src/lang-go.js',
+            '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
+            '.grunt/js/bower_components/google-code-prettify-language-handlers/*.js',
+            '.grunt/js/prettify/prettify-loader.js',
+            '.grunt/js/debug/show-column.js',
+            '.grunt/js/debug/toggle-class-permalink.js',
+            '.grunt/js/debug/version.js'
+          ],
+          '.grunt/tmp/blog.js': [
+            '.grunt/js/bower_components/unutm/unutm.js',
+            '.grunt/js/async-print-css/async-print-css.js',
+            '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
+            '.grunt/js/bower_components/google-code-prettify/src/lang-go.js',
+            '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
+            '.grunt/js/bower_components/google-code-prettify-language-handlers/*.js',
+            '.grunt/js/prettify/prettify-loader.js'
+          ],
+          '.grunt/tmp/html5shiv.js': ['.grunt/js/bower_components/html5shiv/dist/html5shiv.js'],
+          '.grunt/tmp/main.js': [
+            '.grunt/js/bower_components/unutm/unutm.js',
+            '.grunt/js/async-print-css/async-print-css.js'
+          ]
+        }
+      }
+    },
+
+    connect: {
+      main: {
+        options: {
+          port: 0,
+          hostname: '127.0.0.1',
+          keepalive: true,
+          open: true
+        }
+      }
+    },
+
+    copy: {
+      css: {
+        expand: true,
+        cwd: '.grunt/tmp/',
+        src: [
+          '*.css',
+          '*.css.map'
+        ],
+        dest: 'styles/'
+      },
+
+      js: {
+        expand: true,
+        cwd: '.grunt/tmp/',
+        src: [
+          '**/*.js',
+          '**/*.js.map'
+        ],
+        dest: 'scripts/'
+      },
+
+      styleGuide: {
+        src: '.grunt/css/test.html',
+        dest: 'about/style-guide/index.html'
+      }
+    },
+
+    css_mqpacker: {
+      options: {
+        map: true
+      },
+
+      main: {
+        expand: true,
+        cwd: '.grunt/tmp/',
+        src: [
+          '**/*.css',
+          '!**/*.min.css'
+        ],
+        dest: '.grunt/tmp/',
+        ext: '.min.css'
+      }
+    },
+
+    csslint: {
+      options: {
+        'important': false,
+        'box-sizing': false,
+        'box-model': false,
+        'bulletproof-font-face': false,
+        'compatible-vendor-prefixes': false,
+        'regex-selectors': false,
+        'font-sizes': false,
+        'font-faces': false,
+        'outline-none': false,
+        'qualified-headings': false,
+        'unique-headings': false,
+        'universal-selector': false,
+        'unqualified-attributes': false
+      },
+
+      main: {
+        src: [
+          '.grunt/css/**/*.css',
+          '!.grunt/css/bower_components/**/*.css'
+        ]
+      }
+    },
+
+    csswring: {
+      options: {
+        map: true
+      },
+
+      main: {
+        expand: true,
+        cwd: '.grunt/tmp/',
+        src: [
+          '**/*.min.css'
+        ],
+        dest: '.grunt/tmp/'
+      }
+    },
+
+    htmlhint: {
+      options: {
+        'src-not-empty': true,
+        'doctype-html5': true,
+        'id-class-value': true
+      },
+
+      main: {
+        src: [
+          '**/index.html',
+        ]
+      }
+    },
+
+    jshint: {
+      main: {
+        src: [
+          '.grunt/js/**/*.js',
+          '!.grunt/js/bower_components/**/*.js',
+        ]
+      }
+    },
+
+    sass: {
+      options: {
+        unixNewlines: true,
+        precision: 3
+      },
+
+      main: {
+        options: {
+          cacheLocation: '.grunt/css/.sass-cache/'
+        },
+        expand: true,
+        cwd: '.grunt/css/',
+        src: ['*.scss'],
+        dest: '.grunt/tmp/',
+        ext: '.css'
+      }
+    },
+
+    uglify: {
+      options: {
+        beautify: {
+          ascii_only: true
+        },
+        sourceMap: true,
+        preserveComments: false
+      },
+
+      main: {
+        expand: true,
+        cwd: '.grunt/tmp/',
+        src: [
+          '**/*.js',
+          '!**/*.min.js'
+        ],
+        dest: '.grunt/tmp/',
+        ext: '.min.js'
+      }
+    },
+
+    blosxom: {
+      options: {
+        datadir: '.grunt/weblog/entries/',
+        root: '.grunt/weblog/',
+        static_dir: 'blog/'
+      },
+
+      article: {
+        file: grunt.option('file')
+      },
+
+      category: {
+        file: grunt.option('file')
+      },
+
+      feed: {
+        options: {
+          reindex: true
+        },
+
+        file: 'index.rss'
+      }
+    },
+
+    generate: {
+      main: {
+        expand: true,
+        cwd: '.grunt/html/',
+        src: [
+          '**/*.mustache',
+          '!shared/*',
+          '!blog/theme.mustache'
+        ],
+        ext: '.html'
+      },
+
+      blog: {
+        expand: true,
+        cwd: '.grunt/html/',
+        src: [
+          'index.mustache',
+          'blog/index.mustache'
+        ],
+        ext: '.html'
+      },
+
+      blog_theme: {
+        expand: true,
+        cwd: '.grunt/html/',
+        src: ['blog/theme.mustache'],
+        dest: '.grunt/weblog/entries/themes/html/',
+        rename: function (dest, src) {
+          return dest + 'page';
+        }
+      },
+
+      home: {
+        expand: true,
+        cwd: '.grunt/html/',
+        src: ['index.mustache'],
+        ext: '.html'
+      }
+    },
+
+    generate_sitemap: {
+      main: {
+        file: 'sitemap.xml'
+      }
+    },
+
+    gitcommit: {
+      options: {
+        push: true
+      },
+
+      publish: {
+        options: {
+          message: 'Publish',
+          subtree: 'weblog',
+          subtree_root: '.grunt/weblog/'
+        },
+
+        file: grunt.option('file')
+      },
+
+      update: {
+        options: {
+          message: 'Update',
+          subtree: 'weblog',
+          subtree_root: '.grunt/weblog/'
+        },
+
+        file: grunt.option('file')
+      }
+    },
+
+    pubsubhubbub_publish: {
+      blog: {
+        hubUrl: 'http://hail2u.net/blog/feed'
+      },
+
+      home: {
+        hubUrl: 'http://hail2u.net/feed'
+      }
+    },
+
+    rsync: {
+      options: {
+        remote: 'hail2u@s44.xrea.com:~/public_html/hail2u.net/'
+      },
+
+      main: {
+        options: {
+          dry_run: false,
+          sync: true
+        }
+      }
+    }
+  });
+  grunt.util.linefeed = '\n';
+
+  for (var devDependency in grunt.config.data.pkg.devDependencies) {
+    if (devDependency.match(/^grunt-/)) {
+      grunt.loadNpmTasks(devDependency);
+    }
+  }
+
+  grunt.loadTasks('.grunt/task/');
+
+  grunt.registerTask('rebuild', [
+    'rebuild:css',
+    'rebuild:js',
+    'rebuild:html',
+    'rebuild:sitemap'
+  ]);
+
+  grunt.registerTask('rebuild:css', [
+    'clean:css',
+    'sass',
+    'css_mqpacker',
+    'csswring',
+    'copy:css',
+    'copy:styleGuide',
+  ]);
+
+  grunt.registerTask('rebuild:js', [
+    'clean:js',
+    'concat:js',
+    'uglify',
+    'copy:js',
+  ]);
+
+  grunt.registerTask('rebuild:html', [
+    'generate:main',
+    'generate:blog_theme'
+  ]);
+
+  grunt.registerTask('rebuild:sitemap', [
+    'generate_sitemap'
+  ]);
+
+  grunt.registerTask('deploy', [
+    'rebuild',
+    'rsync'
+  ]);
+
+  grunt.registerTask('deploy:css', [
+    'rebuild:css',
+    'rsync'
+  ]);
+
+  grunt.registerTask('deploy:js', [
+    'rebuild:js',
+    'rsync'
+  ]);
+
+  grunt.registerTask('deploy:html', [
+    'rebuild:html',
+    'rsync'
+  ]);
+
+  grunt.registerTask('deploy:sitemap', [
+    'rebuild:sitemap',
+    'rsync'
+  ]);
+
+  grunt.registerTask('publish:home', [
+    'generate:home',
+    'rebuild:sitemap',
+    'rsync',
+    'pubsubhubbub_publish:home'
+  ]);
+
+  grunt.registerTask('publish:blog', [
+    'gitcommit:publish',
+    'blosxom:feed',
+    'blosxom:article',
+    'blosxom:category',
+    'generate:blog',
+    'rebuild:sitemap',
+    'rsync',
+    'pubsubhubbub_publish:blog'
+  ]);
+
+  grunt.registerTask('update:blog', [
+    'gitcommit:update',
+    'blosxom:feed',
+    'blosxom:article',
+    'blosxom:category',
+    'generate:blog',
+    'rsync'
+  ]);
+
+  grunt.registerTask('test', [
+    'csslint',
+    'jshint',
+    'htmlhint'
+  ]);
+
+  grunt.registerTask('default', ['test']);
+};

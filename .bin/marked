@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var fs = require('fs');
+var marked = require('marked');
+
+var renderer = new marked.Renderer();
+renderer.heading = function (text, level) {
+  return '<h' + level + '>' + text + '</h' + level + '>\n';
+};
+
+var file = process.argv[2];
+var contents = fs.readFileSync(file, 'UTF-8').split('\n');
+var title = contents.shift();
+var body = contents.join('\n');
+
+if (!/<\/\w+>\s*$/.test(body)) {
+  body = marked(body, {
+    renderer: renderer,
+    langPrefix: 'language-'
+  });
+  body = body.replace(/\/pre></g, '/pre>\n<');
+  body = body.replace(/<hr>\n</g, '<hr>\n\n<');
+  body = body.replace(/(<\/\w+>)\n(<(pre|blockquote|h[1-6r]|[uo]l|p|table)([ >]))/g, '$1\n\n$2');
+  fs.writeFileSync(file, [title, body].join('\n\n'));
+}

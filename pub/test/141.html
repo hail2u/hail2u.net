@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>iine! Gallery</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript">
+$(function () {
+  var t = $("#iine").empty();
+  $("<p/>").append($("<em/>").append("データを取得中……")).appendTo(t);
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from rss where url='http://feeds.feedburner.com/hail2u/iine'",
+    format: "json"
+  }, function (data) {
+    t.empty();
+
+    if (data.query.results && data.query.results.item) {
+      var ul = $("<ul/>");
+      $.each(data.query.results.item, function (i, item) {
+        var description = item.description.split("\n");
+        var li = $(description[0].replace(/p>/g, "li>"));
+        ul.append(li);
+      });
+      ul.appendTo(t);
+    } else {
+      $("<p/>").append("データを取得できませんでした。").appendTo(t);
+    }
+  });
+});
+    </script>
+    <style type="text/css">
+      #iine ul {
+        margin: 0 0 0 320px;
+        padding: 0;
+        line-height: 1;
+        list-style-type: none;
+      }
+
+      #iine li {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        list-style-type: none;
+      }
+
+      #iine ul li a {
+        margin: 0 0 24px 0;
+        padding: 4px;
+        border: 1px solid rgb(204, 204, 204);
+        display: block;
+        width: 80px;
+        height: 45px;
+        overflow: hidden;
+        line-height: 1;
+        background-color: rgb(255, 255, 255);
+        list-style-type: none;
+        -webkit-transition-duration: 1s;
+        -moz-transition-duration: 1s;
+      }
+
+      #iine ul li a:hover {
+        margin-left: -240px;
+        width: 320px;
+        height: 180px;
+        border-color: rgb(51, 51, 51);
+        background-color: rgb(238, 238, 238);
+        -webkit-transition-duration: 1s;
+        -moz-transition-duration: 1s;
+      }
+
+      #iine ul li a img {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        image-rendering: optimizeQuality;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>iine! Gallery</h1>
+    <div id="iine">iine!</div>
+  </body>
+</html>

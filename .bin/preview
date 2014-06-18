@@ -1,0 +1,105 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var exec = require('child_process').exec;
+var fs = require('fs');
+var marked = require('marked');
+var path = require('path');
+
+var preview_file = path.normalize(process.env.TEMP + '/__preview.html');
+var preview = (function () {/*
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title><%TITLE%> - Weblog - hail2u.net</title>
+
+    <base href="http://hail2u.net/">
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" media="only all" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic|Source+Code+Pro:400,600|Alegreya:400,400italic,700,700italic">
+    <link rel="stylesheet" href="/styles/style.min.css">
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+      <a href="/" id="logo"><img src="/images/logo.min.svg" alt="Hail2u.net"></a>
+
+      <h1>A Weblog Article.</h1>
+
+      <nav>
+        <ul>
+          <li><a href="/blog/"><mark>Weblog</mark></a></li>
+          <li><a href="/documents/">Documents</a></li>
+          <li><a href="/projects/">Projects</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main role="main">
+      <article id="<%FN%>">
+        <h1><%TITLE%></h1>
+
+        <footer>
+          <p>Posted on <time pubdate datetime="1976-07-23">Jul 23, 1976</time> under <a href="#" class="tag"><span>Preview</span></a></p>
+        </footer>
+
+        <%BODY%>
+      </article>
+    </main>
+
+    <aside class="searchbox" role="search">
+      <!-- Google Custom Search Engine -->
+      <form action="http://www.google.com/cse">
+        <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+        <input type="hidden" name="ie" value="UTF-8">
+        <input type="search" name="q" size="32">
+        <input type="submit" name="sa" value="Search">
+      </form>
+    </aside>
+
+    <footer role="contentinfo">
+      <address class="byline">
+        <p class="vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <a rel="author" href="/about/" class="url" itemprop="url"><span class="fn" itemprop="name">Kyo Nagashima</span></a>.</p>
+      </address>
+
+      <section class="elsewhere">
+        <ul class="elsewhere">
+          <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+          <li><a href="https://github.com/hail2u">GitHub</a></li>
+          <li><a href="https://pinboard.in/u:hail2u">Pinboard</a></li>
+        </ul>
+      </section>
+
+      <section class="footlinks">
+        <ul>
+          <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC</a></li>
+          <li><a type="application/rss+xml" href="/feed">Home RSS</a></li>
+          <li><a rel="alternate" type="application/rss+xml" href="/blog/feed">Weblog RSS</a></li>
+        </ul>
+      </section>
+    </footer>
+
+    <script src="/scripts/blog.js"></script>
+  </body>
+</html>
+*/}).toString().split('\n').slice(1, -1).join('\n');
+
+var entry_file = process.argv[2];
+var fn = path.basename(entry_file, '.txt');
+var entry = fs.readFileSync(entry_file, 'UTF-8').split('\n');
+var title = entry.shift();
+var body = entry.join('\n');
+
+if (!/<\/\w+>\s*$/.test(body)) {
+  body = marked(body, {
+    langPrefix: 'language-'
+  });
+}
+
+preview = preview.replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
+fs.writeFileSync(preview_file, preview);
+exec(preview_file);

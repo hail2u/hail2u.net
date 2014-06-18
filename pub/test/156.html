@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Scribble your tweet</title>
+    <style type="text/css">
+      @import url("156.css");
+
+      #twitter {
+        margin: 96px 48px;
+        padding: 36px;
+        position: relative;
+        width: 360px;
+        color: rgb(57, 54, 48);
+        background-color: rgb(237, 234, 228);
+        font-family: "Worstveld Sling Oblique", sans-serif;
+        font-style: italic;
+        -webkit-transform: rotate(-7deg);
+        -moz-transform: rotate(-7deg);
+        -webkit-transform-origin: left top;
+        -moz-transform-origin: left top;
+        -webkit-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+      }
+
+      #twitter h1 {
+        margin: 0;
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        width: auto;
+        height: 48px;
+        line-height: 48px;
+        font-size: 36px;
+        -webkit-transform: rotate(3deg);
+        -moz-transform: rotate(3deg);
+      }
+
+      #twitter h1 a {
+        padding: 0 24px;
+        border: 1px solid rgb(234, 230, 224);
+        display: block;
+        position: relative;
+        left: -50%;
+        color: inherit;
+        background-color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+      }
+
+      #twitter p {
+        margin: 0;
+        font-size: 36px;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+$(function () {
+  var user = "twitter";
+  var t = $("#twitter").empty().append($("<p/>").append("Loading..."));
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from json where url='http://twitter.com/users/" + user + ".json'",
+    format: "json"
+  }, function (data) {
+    if (data.query.results && data.query.results.json) {
+      var d = data.query.results.json;
+      t.empty();
+      $("<h1/>").append($("<a/>").attr({
+        href: "http://twitter.com/#!/" + user
+      }).append("@" + user)).appendTo(t);
+      $("<p/>").append(d.status.text).appendTo(t);
+    }
+  });
+});
+    </script>
+  </head>
+  <body>
+    <h1>Scribble your tweet</h1>
+    <section id="twitter"></section>
+  </body>
+</html>

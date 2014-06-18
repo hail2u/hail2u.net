@@ -1,0 +1,86 @@
+# Blosxom Plugin: rss
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2005-02-11
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package rss;
+
+use strict;
+use vars qw($name $url $email $rights $last_build_date $last_build_date_w3cdtf $pub_date $excerpt $encoded_body);
+
+# --- Configurable variables -----------
+
+$name   = 'Kyo Nagashima';
+$url    = 'http://hail2u.net/';
+$email  = 'kyo@hail2u.net';
+$rights = 'Copyright (c) 2002-2006, Kyo Nagashima';
+
+my $tzd_rfc = "+0900";
+my $tzd_w3cdtf = "+09:00";
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  # return 0 if $blosxom::flavour ne "xml";
+
+  return 1;
+}
+
+sub head {
+  my $now = time;
+  $last_build_date = &format_time_rfc($now);
+  $last_build_date_w3cdtf = &format_time_w3cdtf($now);
+}
+
+sub story {
+  my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+
+  my $file = "$blosxom::datadir$path/$fn.$blosxom::file_extension";
+
+  $pub_date = &format_time_rfc($blosxom::files{$file});
+
+  $excerpt = $$body_ref;
+  $excerpt =~ tr!\x0D\x0A!!d;
+  $excerpt =~ s!^.*?<p>(.*?)</p>.*?$!$1!;
+  $excerpt =~ s!<.*?>!!g;
+
+  $encoded_body = $$body_ref;
+
+  return 1;
+}
+
+sub format_time_rfc {
+  my $time = shift;
+
+  my($ss, $nn, $hh, $dd, $mm, $yy, $ww) = localtime($time);
+  $yy = $yy + 1900;
+  $dd = sprintf "%02d", $dd;
+  $hh = sprintf "%02d", $hh;
+  $nn = sprintf "%02d", $nn;
+  $ss = sprintf "%02d", $ss;
+  my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  my @wdays  = qw(Sun Mon Tue Wed Thu Fri Sat);
+  $time = "$wdays[$ww], $dd $months[$mm] $yy $hh:$nn:$ss $tzd_rfc";
+
+  return $time;
+}
+
+
+sub format_time_w3cdtf {
+  my $time = shift;
+
+  my($ss, $nn, $hh, $dd, $mm, $yy, $ww) = localtime($time);
+  $yy = $yy + 1900;
+  $mm = sprintf "%02d", ($mm + 1);
+  $dd = sprintf "%02d", $dd;
+  $hh = sprintf "%02d", $hh;
+  $nn = sprintf "%02d", $nn;
+  $ss = sprintf "%02d", $ss;
+  my $T = "T";
+  $time = "$yy-$mm-$dd$T$hh:$nn:$ss$tzd_rfc";
+
+  return $time;
+}
+1;
