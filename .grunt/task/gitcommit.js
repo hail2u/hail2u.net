@@ -36,6 +36,10 @@ module.exports = function (grunt) {
       },
 
       commit: function (next) {
+        if (options.subtree && options.subtree_root) {
+          file = path.relative(options.subtree_root, file).replace(/\\/g, '/');
+        }
+
         grunt.util.spawn({
           cmd: cmd,
           args: ['commit', '-m', options.message + ' ' + file],
