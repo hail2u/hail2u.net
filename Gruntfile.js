@@ -90,7 +90,7 @@ module.exports = function (grunt) {
         dest: 'scripts/'
       },
 
-      styleGuide: {
+      style_guide: {
         src: '.grunt/css/test.html',
         dest: 'about/style-guide/index.html'
       }
@@ -186,6 +186,7 @@ module.exports = function (grunt) {
         options: {
           cacheLocation: '.grunt/css/.sass-cache/'
         },
+
         expand: true,
         cwd: '.grunt/css/',
         src: ['*.scss'],
@@ -199,6 +200,7 @@ module.exports = function (grunt) {
         beautify: {
           ascii_only: true
         },
+
         sourceMap: true,
         preserveComments: false
       },
@@ -357,7 +359,7 @@ module.exports = function (grunt) {
     'css_mqpacker',
     'csswring',
     'copy:css',
-    'copy:styleGuide',
+    'copy:style_guide',
   ]);
 
   grunt.registerTask('rebuild:js', [
