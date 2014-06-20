@@ -28,7 +28,7 @@ module.exports = function (grunt) {
 
       js: {
         files: {
-          '.grunt/tmp/about/style-guide.js': [
+          '.grunt/tmp/debug.js': [
             '.grunt/js/bower_components/unutm/unutm.js',
             '.grunt/js/async-print-css/async-print-css.js',
             '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
@@ -40,7 +40,8 @@ module.exports = function (grunt) {
             '.grunt/js/debug/toggle-class-permalink.js',
             '.grunt/js/debug/version.js'
           ],
-          '.grunt/tmp/blog.js': [
+          '.grunt/tmp/html5shiv.js': ['.grunt/js/bower_components/html5shiv/dist/html5shiv.js'],
+          '.grunt/tmp/main.js': [
             '.grunt/js/bower_components/unutm/unutm.js',
             '.grunt/js/async-print-css/async-print-css.js',
             '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
@@ -48,11 +49,6 @@ module.exports = function (grunt) {
             '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
             '.grunt/js/bower_components/google-code-prettify-language-handlers/*.js',
             '.grunt/js/prettify/prettify-loader.js'
-          ],
-          '.grunt/tmp/html5shiv.js': ['.grunt/js/bower_components/html5shiv/dist/html5shiv.js'],
-          '.grunt/tmp/main.js': [
-            '.grunt/js/bower_components/unutm/unutm.js',
-            '.grunt/js/async-print-css/async-print-css.js'
           ]
         }
       }
