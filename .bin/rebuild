@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+var spawn = require('child_process').spawn;
+
+var async = require('async');
+
+var fileCache = path.resolve(__dirname, '../.grunt/weblog/plugins/state/files_index.dat');
+var dirData = path.resolve(__dirname, '../.grunt/weblog/entries/');
+var dirRoot = path.resolve(__dirname, '../.grunt/weblog/');
+var dirStatic = path.resolve(__dirname, '../blog/');
+
+var cache = fs.readFileSync(fileCache, 'utf-8');
+var files = cache.split(/\r?\n/).filter(function (v) {
+  if (v === '') {
+    return false;
+  }
+
+  return true;
+});
+var i = 0;
+var l = files.length;
+async.eachLimit(files, 16, function (line, next) {
+  var file = line.split('=>')[0];
+
+  if (!fs.existsSync(file)) {
+    console.log('File "' + file + '" not found.');
+
+    return next();
+  }
+
+  file = path.relative(dirData, file).replace(/\.txt$/, '.html').replace(/\\/g, '/');
+  var blosxom = spawn('C:/strawberry/perl/bin/perl', [
+    'blosxom.cgi',
+    'path=/' + file
+  ], {
+    cwd: dirRoot,
+    env: {
+      BLOSXOM_CONFIG_DIR: path.resolve(dirRoot)
+    }
+  });
+  var html;
+
+  blosxom.stdout.on('data', function (data) {
+    html += data;
+  });
+
+  blosxom.stdout.on('end', function (data) {
+    html = html.replace(/^[\s\S]*?\r?\n\r?\n/, '');
+    fs.writeFileSync(path.join(dirStatic, file), html);
+  });
+
+  blosxom.on('error', function (error) {
+    next(error);
+  });
+
+  blosxom.on('exit', function (code) {
+    i = i + 1;
+    console.log('File "' + file + '" rebuild. (' + i + '/' + l + ')');
+    next();
+  });
+}, function (error) {
+  if (error) {
+    throw error;
+  }
+});
