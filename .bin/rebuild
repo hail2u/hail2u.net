@@ -20,13 +20,21 @@ var files = cache.split(/\r?\n/).filter(function (v) {
   }
 
   return true;
-});
+}).concat(fs.readdirSync(dirData).filter(function (v) {
+  if (v === 'themes') {
+    return false;
+  }
+
+  return true;
+}).map(function (v) {
+  return path.join(dirData, v, '/index.txt');
+}));
 var i = 0;
 var l = files.length;
 async.eachLimit(files, 16, function (line, next) {
   var file = line.split('=>')[0];
 
-  if (!fs.existsSync(file)) {
+  if (!/index\.txt$/.test(file) && !fs.existsSync(file)) {
     console.log('File "' + file + '" not found.');
 
     return next();
