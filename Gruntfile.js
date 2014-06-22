@@ -29,13 +29,6 @@ module.exports = function (grunt) {
       js: {
         files: {
           '.grunt/tmp/debug.js': [
-            '.grunt/js/bower_components/unutm/unutm.js',
-            '.grunt/js/async-print-css/async-print-css.js',
-            '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
-            '.grunt/js/bower_components/google-code-prettify/src/lang-go.js',
-            '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
-            '.grunt/js/bower_components/google-code-prettify-language-handlers/*.js',
-            '.grunt/js/prettify/prettify-loader.js',
             '.grunt/js/debug/show-column.js',
             '.grunt/js/debug/toggle-class-permalink.js',
             '.grunt/js/debug/version.js'
@@ -198,6 +191,9 @@ module.exports = function (grunt) {
         },
 
         sourceMap: true,
+        sourceMapName: function (dest) {
+          return dest + '.map';
+        },
         preserveComments: false
       },
 
