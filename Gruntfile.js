@@ -309,6 +309,18 @@ module.exports = function (grunt) {
       }
     },
 
+    merge_feeds: {
+      main: {
+        options: {
+          file: './feed',
+          into: './index.rss',
+          feeds: [
+            './blog/feed'
+          ]
+        }
+      }
+    },
+
     pubsubhubbub_publish: {
       blog: {
         hubUrl: 'http://hail2u.net/blog/feed'
@@ -400,6 +412,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('publish:home', [
+    'merge_feeds:main',
     'generate:home',
     'rebuild:sitemap',
     'rsync',
@@ -411,10 +424,12 @@ module.exports = function (grunt) {
     'blosxom:feed',
     'blosxom:article',
     'blosxom:category',
+    'merge_feeds:main',
     'generate:blog',
     'rebuild:sitemap',
     'rsync',
-    'pubsubhubbub_publish:blog'
+    'pubsubhubbub_publish:blog',
+    'pubsubhubbub_publish:home'
   ]);
 
   grunt.registerTask('update:blog', [
@@ -422,6 +437,7 @@ module.exports = function (grunt) {
     'blosxom:feed',
     'blosxom:article',
     'blosxom:category',
+    'merge_feeds:main',
     'generate:blog',
     'rsync'
   ]);

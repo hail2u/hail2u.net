@@ -84,7 +84,7 @@ module.exports = function (grunt) {
 
       switch (file) {
         case '.grunt/html/index.mustache': {
-          data.updates = _loadRSS('feed');
+          data.updates = _loadRSS('index.rss');
           data.updates.item = data.updates.item.slice(0, 5);
           data.articles = _loadRSS('blog/feed');
           data.articles.item = data.articles.item.slice(0, 6);
