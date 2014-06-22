@@ -191,9 +191,6 @@ module.exports = function (grunt) {
         },
 
         sourceMap: true,
-        sourceMapName: function (dest) {
-          return dest + '.map';
-        },
         preserveComments: false
       },
 
