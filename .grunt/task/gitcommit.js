@@ -28,7 +28,10 @@ module.exports = function (grunt) {
       add: function (next) {
         grunt.util.spawn({
           cmd: cmd,
-          args: ['add', file],
+          args: [
+	    'add',
+	    file
+	  ],
           opts: opts
         }, function (error, result, code) {
           next(error);
@@ -36,13 +39,38 @@ module.exports = function (grunt) {
       },
 
       commit: function (next) {
-        if (options.subtree && options.subtree_root) {
-          file = path.relative(options.subtree_root, file).replace(/\\/g, '/');
+        if (options.subtree) {
+          file = path.relative(options.subtree.root, file).replace(/\\/g, '/');
         }
 
         grunt.util.spawn({
           cmd: cmd,
-          args: ['commit', '-m', options.message + ' ' + file],
+          args: [
+	    'commit',
+	    '-m',
+	    options.message + ' ' + file
+	  ],
+          opts: opts
+        }, function (error, result, code) {
+          next(error);
+        });
+      },
+
+      split: function (next) {
+	if (!options.push || !options.subtree) {
+          return next();
+	}
+
+        grunt.util.spawn({
+          cmd: cmd,
+          args: [
+	    'subtree',
+	    'split',
+	    '-P',
+	    options.subtree.root,
+	    '-b',
+	    options.subtree.branch
+	  ],
           opts: opts
         }, function (error, result, code) {
           next(error);
@@ -54,15 +82,17 @@ module.exports = function (grunt) {
           return next();
         }
 
-        var args = ['push', 'origin', 'master'];
+        var args = [
+	  'push',
+	  'origin',
+	  'master'
+	];
 
-        if (options.subtree && options.subtree_root) {
+        if (options.subtree) {
           args = [
-            'subtree',
             'push',
-            '--prefix=' + options.subtree_root,
-            options.subtree,
-            'master'
+            options.subtree.remote,
+            options.subtree.branch + ':master'
           ];
         }
 
