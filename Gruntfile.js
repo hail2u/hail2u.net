@@ -412,9 +412,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('publish:blog', [
     'gitcommit:publish',
-    'blosxom:feed',
     'blosxom:article',
     'blosxom:category',
+    'blosxom:feed',
     'merge_feeds:main',
     'generate:blog',
     'rebuild:sitemap',
@@ -425,9 +425,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('update:blog', [
     'gitcommit:update',
-    'blosxom:feed',
     'blosxom:article',
     'blosxom:category',
+    'blosxom:feed',
     'merge_feeds:main',
     'generate:blog',
     'rsync'
