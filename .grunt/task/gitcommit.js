@@ -24,6 +24,7 @@ module.exports = function (grunt) {
     };
 
     file = path.relative(options.root, file).replace(/\\/g, '/');
+
     async.series({
       add: function (next) {
         grunt.util.spawn({
@@ -39,10 +40,6 @@ module.exports = function (grunt) {
       },
 
       commit: function (next) {
-        if (options.subtree) {
-          file = path.relative(options.subtree.root, file).replace(/\\/g, '/');
-        }
-
         grunt.util.spawn({
           cmd: cmd,
           args: [
@@ -56,49 +53,18 @@ module.exports = function (grunt) {
         });
       },
 
-      split: function (next) {
-	if (!options.push || !options.subtree) {
-          return next();
-	}
-
-        grunt.util.spawn({
-          cmd: cmd,
-          args: [
-	    'subtree',
-	    'split',
-	    '-P',
-	    options.subtree.root,
-	    '-b',
-	    options.subtree.branch
-	  ],
-          opts: opts
-        }, function (error, result, code) {
-          next(error);
-        });
-      },
-
       push: function (next) {
         if (!options.push) {
           return next();
         }
 
-        var args = [
-	  'push',
-	  'origin',
-	  'master'
-	];
-
-        if (options.subtree) {
-          args = [
-            'push',
-            options.subtree.remote,
-            options.subtree.branch + ':master'
-          ];
-        }
-
         grunt.util.spawn({
           cmd: cmd,
-          args: args,
+          args:  [
+	    'push',
+	    'origin',
+	    'master'
+	  ],
           opts: opts
         }, function (error, result, code) {
           next(error);

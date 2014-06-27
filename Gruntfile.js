@@ -284,11 +284,7 @@ module.exports = function (grunt) {
       publish: {
         options: {
           message: 'Publish',
-          subtree: {
-            root: '.grunt/weblog/',
-            branch: 'weblog',
-            remote: 'weblog'
-          }
+          root: '.grunt/weblog/',
         },
 
         file: grunt.option('file')
@@ -297,11 +293,7 @@ module.exports = function (grunt) {
       update: {
         options: {
           message: 'Update',
-          subtree: {
-            root: '.grunt/weblog/',
-            branch: 'weblog',
-            remote: 'weblog'
-          }
+          root: '.grunt/weblog/',
         },
 
         file: grunt.option('file')
