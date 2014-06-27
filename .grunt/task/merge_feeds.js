@@ -29,6 +29,7 @@ module.exports = function (grunt) {
       'xmlns:creativeCommons': 'http://backend.userland.com/creativeCommonsRssModule',
       'xmlns:content': 'http://purl.org/rss/1.0/modules/content/'
     };
+    home.channel.lastBuildDate = home.channel.item[0].pubDate;
     grunt.file.write(options.file, new xml2js.Builder({
       rootName: 'rss',
       xmldec: {
