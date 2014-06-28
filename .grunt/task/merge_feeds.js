@@ -6,7 +6,6 @@ module.exports = function (grunt) {
   var taskDescription = 'Merge Weblog feed into Home feed.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
-    var _ = require('lodash');
     var xml2js = require('xml2js');
 
     var options = this.options();
@@ -18,9 +17,11 @@ module.exports = function (grunt) {
       home.channel.item = home.channel.item.concat(f.channel.item);
     });
 
-    home.channel.item = _.sortBy(home.channel.item, function (item) {
-      var d = new Date(item.pubDate);
-      return d.getTime();
+    home.channel.item.sort(function (itemA, itemB) {
+      var dateA = new Date(itemA.pubDate).getTime();
+      var dateB = new Date(itemB.pubDate).getTime();
+
+      return dateA - dateB;
     }).reverse();
     home.$ = {
       version: '2.0',

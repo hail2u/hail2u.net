@@ -6,7 +6,6 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate files.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
-    var _ = require('lodash');
     var async = require('async');
     var fs = require('fs');
     var hbs = require('handlebars');
@@ -75,11 +74,11 @@ module.exports = function (grunt) {
     }
 
     function _extendData(file) {
-      var data = _.extend({}, metadataBase);
+      var data = _extendObject({}, metadataBase);
       var fileMetadata = file.replace(/\.\w+$/, '.json');
 
       if (grunt.file.isFile(fileMetadata)) {
-        _.extend(data, grunt.file.readJSON(fileMetadata));
+        _extendObject(data, grunt.file.readJSON(fileMetadata));
       }
 
       switch (file) {
@@ -108,6 +107,18 @@ module.exports = function (grunt) {
       }
 
       return data;
+    }
+
+    function _extendObject(dest, src) {
+      if (dest !== Object(dest)) {
+        return dest;
+      }
+
+      for (var prop in src) {
+        dest[prop] = src[prop];
+      }
+
+      return dest;
     }
 
     function _loadRSS(file) {
@@ -165,7 +176,7 @@ module.exports = function (grunt) {
 
           line = line.split('=>');
           var file = path.relative(process.cwd(), line[0]);
-          var date = new Date(parseInt(line[1]) * 1000);
+          var date = new Date(parseInt(line[1], 10) * 1000);
           var yy = date.getFullYear();
           var mm = date.getMonth();
           var dd = date.getDate();
@@ -192,7 +203,9 @@ module.exports = function (grunt) {
           );
 
           articles.unshift(article);
-          articles = _.sortBy(articles, 'unixtime').reverse();
+          articles.sort(function (a, b) {
+            return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
+          }).reverse();
           grunt.file.write(cache, JSON.stringify(articles));
         });
       }
@@ -208,7 +221,9 @@ module.exports = function (grunt) {
       });
       articles[0].isFirstInYear = true;
       articles[articles.length - 1].isLastInYear = true;
-      _.filter(articles, 'isLastInYear')[0].isLastInLatestYear = true;
+      articles.filter(function (article) {
+        return article.isLastInYear;
+      })[0].isLastInLatestYear = true;
 
       return articles;
     }
