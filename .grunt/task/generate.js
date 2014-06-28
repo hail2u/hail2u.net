@@ -176,6 +176,8 @@ module.exports = function (grunt) {
 
           line = line.split('=>');
           var file = path.relative(process.cwd(), line[0]);
+          var category = path.dirname(file).split(path.sep).pop();
+          var fn = path.basename(file, '.txt');
           var date = new Date(parseInt(line[1], 10) * 1000);
           var yy = date.getFullYear();
           var mm = date.getMonth();
@@ -183,29 +185,28 @@ module.exports = function (grunt) {
           var hh = date.getHours();
           var nn = date.getMinutes();
           var ss = date.getSeconds();
-          var article = {};
-          article.title = grunt.file.read(file).split(/\n/)[0];
-          article.link = '/blog/' +
-            path.dirname(file).split(path.sep).pop() + '/' +
-            path.basename(file).replace(/\.txt$/, '.html');
-          article.unixtime = date.getTime();
-          article.year = yy;
-          article.month = mm + 1;
-          article.day = dd;
-          article.hour = hh;
-          article.minute = nn;
-          article.second = ss;
-          article.tz = '+09:00';
-          article.strPubDate = monthNames[mm] + ' ' + dd + ', ' + yy;
-          article.html5PubDate = sprintf(
-            '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
-            yy, mm + 1, dd, hh, nn, ss
-          );
-
+          var article = {
+            title: grunt.file.read(file).split(/\n/)[0],
+            link: '/blog/' + category + '/' + fn  + '.html',
+            unixtime: date.getTime(),
+            year: yy,
+            month: mm + 1,
+            day: dd,
+            hour: hh,
+            minute: nn,
+            second: ss,
+            tz: '+09:00',
+            strPubDate: monthNames[mm] + ' ' + dd + ', ' + yy,
+            html5PubDate: sprintf(
+              '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
+              yy, mm + 1, dd, hh, nn, ss
+            )
+          };
           articles.unshift(article);
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
+          grunt.log.writeln('File "' + cache + '" updated.');
           grunt.file.write(cache, JSON.stringify(articles));
         });
       }
