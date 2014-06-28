@@ -285,6 +285,7 @@ module.exports = function (grunt) {
         options: {
           message: 'Publish',
           root: '.grunt/weblog/',
+          submodule: true
         },
 
         file: grunt.option('file')
@@ -294,6 +295,7 @@ module.exports = function (grunt) {
         options: {
           message: 'Update',
           root: '.grunt/weblog/',
+          submodule: true
         },
 
         file: grunt.option('file')
