@@ -53,7 +53,26 @@ module.exports = function (grunt) {
         });
       },
 
-      update: function (next) {
+      sm_add: function (next) {
+        if (!options.submodule) {
+          return next();
+        }
+
+        grunt.util.spawn({
+          cmd: cmd,
+          args: [
+	    'add',
+            options.root
+	  ],
+          opts: {
+            stdio: 'inherit'
+          }
+        }, function (error, result, code) {
+          next(error);
+        });
+      },
+
+      sm_commit: function (next) {
         if (!options.submodule) {
           return next();
         }
