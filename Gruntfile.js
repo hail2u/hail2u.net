@@ -246,8 +246,8 @@ module.exports = function (grunt) {
         expand: true,
         cwd: '.grunt/html/',
         src: [
-          'index.mustache',
-          'blog/index.mustache'
+          'blog/index.mustache',
+          'index.mustache'
         ],
         ext: '.html'
       },
@@ -417,8 +417,8 @@ module.exports = function (grunt) {
     'blosxom:article',
     'blosxom:category',
     'blosxom:feed',
-    'merge_feeds:main',
     'generate:blog',
+    'merge_feeds:main',
     'rebuild:sitemap',
     'rsync',
     'pubsubhubbub_publish:blog',
@@ -430,8 +430,8 @@ module.exports = function (grunt) {
     'blosxom:article',
     'blosxom:category',
     'blosxom:feed',
-    'merge_feeds:main',
     'generate:blog',
+    'merge_feeds:main',
     'rsync'
   ]);
 
