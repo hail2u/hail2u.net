@@ -214,6 +214,10 @@ module.exports = function (grunt) {
       },
 
       article: {
+        options: {
+          reindex: true
+        },
+
         file: grunt.option('file')
       },
 
@@ -222,10 +226,6 @@ module.exports = function (grunt) {
       },
 
       feed: {
-        options: {
-          reindex: true
-        },
-
         file: 'index.rss'
       }
     },
