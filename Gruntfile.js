@@ -166,6 +166,16 @@ module.exports = function (grunt) {
       }
     },
 
+    pubsubhubbub_publish: {
+      blog: {
+        hubUrl: 'http://hail2u.net/blog/feed'
+      },
+
+      home: {
+        hubUrl: 'http://hail2u.net/feed'
+      }
+    },
+
     sass: {
       options: {
         unixNewlines: true,
@@ -312,16 +322,6 @@ module.exports = function (grunt) {
             './blog/feed'
           ]
         }
-      }
-    },
-
-    pubsubhubbub_publish: {
-      blog: {
-        hubUrl: 'http://hail2u.net/blog/feed'
-      },
-
-      home: {
-        hubUrl: 'http://hail2u.net/feed'
       }
     },
 
