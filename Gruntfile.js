@@ -167,12 +167,12 @@ module.exports = function (grunt) {
     },
 
     pubsubhubbub_publish: {
-      blog: {
-        hubUrl: 'http://hail2u.net/blog/feed'
+      main: {
+        hubUrl: 'http://hail2u.net/feed'
       },
 
-      home: {
-        hubUrl: 'http://hail2u.net/feed'
+      blog: {
+        hubUrl: 'http://hail2u.net/blog/feed'
       }
     },
 
@@ -409,7 +409,7 @@ module.exports = function (grunt) {
     'generate:home',
     'rebuild:sitemap',
     'rsync',
-    'pubsubhubbub_publish:home'
+    'pubsubhubbub_publish:main'
   ]);
 
   grunt.registerTask('publish:blog', [
@@ -421,8 +421,7 @@ module.exports = function (grunt) {
     'merge_feeds:main',
     'rebuild:sitemap',
     'rsync',
-    'pubsubhubbub_publish:blog',
-    'pubsubhubbub_publish:home'
+    'pubsubhubbub_publish'
   ]);
 
   grunt.registerTask('update:blog', [
