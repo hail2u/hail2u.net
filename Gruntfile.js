@@ -176,6 +176,19 @@ module.exports = function (grunt) {
       }
     },
 
+    rsync: {
+      options: {
+        remote: 'hail2u@s44.xrea.com:~/public_html/hail2u.net/'
+      },
+
+      main: {
+        options: {
+          dry_run: false,
+          sync: true
+        }
+      }
+    },
+
     sass: {
       options: {
         unixNewlines: true,
@@ -321,19 +334,6 @@ module.exports = function (grunt) {
           feeds: [
             './blog/feed'
           ]
-        }
-      }
-    },
-
-    rsync: {
-      options: {
-        remote: 'hail2u@s44.xrea.com:~/public_html/hail2u.net/'
-      },
-
-      main: {
-        options: {
-          dry_run: false,
-          sync: true
         }
       }
     }
