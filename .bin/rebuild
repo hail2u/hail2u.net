@@ -2,45 +2,43 @@
 
 'use strict';
 
+var async = require('async');
 var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 
-var async = require('async');
-
-var fileCache = path.resolve(__dirname, '../.grunt/weblog/plugins/state/files_index.dat');
-var dirData = path.resolve(__dirname, '../.grunt/weblog/entries/');
 var dirRoot = path.resolve(__dirname, '../.grunt/weblog/');
+var dirData = path.resolve(dirRoot, 'entries/');
 var dirStatic = path.resolve(__dirname, '../blog/');
+var fileCache = path.resolve(dirRoot, 'plugins/state/files_index.dat');
 
-var cache = fs.readFileSync(fileCache, 'utf-8');
-var files = cache.split(/\r?\n/).filter(function (v) {
-  if (v === '') {
+var files = fs.readFileSync(fileCache, 'utf-8').split(/\r?\n/).filter(function (file) {
+  if (file === '') {
     return false;
   }
 
   return true;
-}).concat(fs.readdirSync(dirData).filter(function (v) {
-  if (v === 'themes') {
+}).map(function (file) {
+  return file.split('=>')[0];
+}).concat(fs.readdirSync(dirData).filter(function (dir) {
+  if (dir === 'themes') {
     return false;
   }
 
   return true;
-}).map(function (v) {
-  return path.join(dirData, v, '/index.txt');
+}).map(function (dir) {
+  return path.join(dirData, dir, '/index.txt');
 }));
-var i = 0;
-var l = files.length;
-async.eachLimit(files, 16, function (line, next) {
-  var file = line.split('=>')[0];
 
-  if (!/index\.txt$/.test(file) && !fs.existsSync(file)) {
+async.eachLimit(files, 16, function (file, next) {
+  if (!/\\index\.txt$/.test(file) && !fs.existsSync(file)) {
     console.log('File "' + file + '" not found.');
 
     return next();
   }
 
   file = path.relative(dirData, file).replace(/\.txt$/, '.html').replace(/\\/g, '/');
+  var html = '';
   var blosxom = spawn('C:/strawberry/perl/bin/perl', [
     'blosxom.cgi',
     'path=/' + file
@@ -50,7 +48,6 @@ async.eachLimit(files, 16, function (line, next) {
       BLOSXOM_CONFIG_DIR: path.resolve(dirRoot)
     }
   });
-  var html;
 
   blosxom.stdout.on('data', function (data) {
     html += data;
@@ -62,12 +59,11 @@ async.eachLimit(files, 16, function (line, next) {
   });
 
   blosxom.on('error', function (error) {
-    next(error);
+    return next(error);
   });
 
   blosxom.on('exit', function (code) {
-    i = i + 1;
-    console.log('File "' + file + '" rebuild. (' + i + '/' + l + ')');
+    console.log('File "' + file + '" rebuild.');
     next();
   });
 }, function (error) {
