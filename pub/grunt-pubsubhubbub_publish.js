@@ -22,7 +22,7 @@ module.exports = function (grunt) {
       }
 
       if (response.statusCode !== 204) {
-        return done(new Error('Error (' + response.statusCode + ')'));
+        return done(new Error('Hub returned ' + response.statusCode + '.'));
       }
 
       grunt.log.writeln('Feed "' + hubUrl + '" published.');
