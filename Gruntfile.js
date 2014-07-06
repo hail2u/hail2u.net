@@ -2,6 +2,7 @@
 'use strict';
 
 module.exports = function (grunt) {
+  grunt.util.linefeed = '\n';
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -337,7 +338,6 @@ module.exports = function (grunt) {
       }
     }
   });
-  grunt.util.linefeed = '\n';
 
   for (var devDependency in grunt.config.data.pkg.devDependencies) {
     if (devDependency.match(/^grunt-/)) {
