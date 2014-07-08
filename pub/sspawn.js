@@ -1,5 +1,6 @@
-/**
+/*!
  * sspawn(command, [args], [options], callback)
+ *
  * var grep = sspawn('grep', ['ssh'], {
  *   stdio: inherit
  * }, function (error, result, code) {
@@ -11,10 +12,9 @@
  * });
  */
 var spawn = require('child_process').spawn;
-var util = require('util');
 
 var sspawn = function (cmd, args, options, done) {
-  if (!util.isArray(args)) {
+  if (!Array.isArray(args)) {
     done = options;
     options = args;
     args = [];
