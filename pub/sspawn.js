@@ -2,9 +2,9 @@
  * sspawn(command, [args], [options], callback)
  * var grep = sspawn('grep', ['ssh'], {
  *   stdio: inherit
- * }, function (err, result, code) {
- *   if (err) {
- *     throw err;
+ * }, function (error, result, code) {
+ *   if (error) {
+ *     throw error;
  *   }
  *
  *   console.log('Child process exited with: ' + code);
