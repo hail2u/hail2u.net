@@ -9,18 +9,10 @@ var spawn = require('child_process').spawn;
 
 var dirRoot = path.resolve(__dirname, '../.grunt/weblog/');
 var dirData = path.resolve(dirRoot, 'entries/');
-var dirStatic = path.resolve(__dirname, '../blog/');
 var fileCache = path.resolve(dirRoot, 'plugins/state/files_index.dat');
+var dirStatic = path.resolve(__dirname, '../blog/');
 
-var files = fs.readFileSync(fileCache, 'utf-8').split(/\r?\n/).filter(function (file) {
-  if (file === '') {
-    return false;
-  }
-
-  return true;
-}).map(function (file) {
-  return file.split('=>')[0];
-}).concat(fs.readdirSync(dirData).filter(function (dir) {
+var files = fs.readdirSync(dirData).filter(function (dir) {
   if (dir === 'themes') {
     return false;
   }
@@ -28,7 +20,19 @@ var files = fs.readFileSync(fileCache, 'utf-8').split(/\r?\n/).filter(function (
   return true;
 }).map(function (dir) {
   return path.join(dirData, dir, '/index.txt');
-}));
+});
+
+if (process.argv[2] === '--all') {
+  files = files.concat(fs.readFileSync(fileCache, 'utf-8').split(/\r?\n/).filter(function (file) {
+    if (file === '') {
+      return false;
+    }
+
+    return true;
+  }).map(function (file) {
+    return file.split('=>')[0];
+  }));
+}
 
 async.eachLimit(files, 16, function (file, next) {
   if (!/\\index\.txt$/.test(file) && !fs.existsSync(file)) {
