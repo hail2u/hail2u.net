@@ -4,4 +4,4 @@ document.body.addEventListener('dblclick', function () {
   } else {
     this.className += ' debug';
   }
-});
+}, false);

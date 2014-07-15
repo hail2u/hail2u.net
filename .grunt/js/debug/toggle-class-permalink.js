@@ -8,4 +8,4 @@ document.getElementById('logo').addEventListener('click', function (e) {
 
     e.preventDefault();
   }
-});
+}, false);
