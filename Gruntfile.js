@@ -153,6 +153,7 @@ module.exports = function (grunt) {
       main: {
         src: [
           '**/index.html',
+          '!node_modules/**/*'
         ]
       }
     },
