@@ -6,6 +6,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate a sitemap XML file.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
+    var path = require('path');
     var xml2js = require('xml2js');
 
     var file = this.data.file;
@@ -32,7 +33,7 @@ module.exports = function (grunt) {
     ];
 
     urls = addDocuments('documents/', urls);
-    urls = addArticles('.grunt/weblog/plugins/state/articles.json', urls);
+    urls = addArticles(path.join(__dirname, '.cache', 'articles.json'), urls);
     grunt.file.write(file, createSitemap(domain, urls));
     grunt.log.writeln('File "' + file + '" created.');
 
