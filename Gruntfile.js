@@ -37,7 +37,7 @@ module.exports = function (grunt) {
           '.grunt/tmp/html5shiv.js': ['.grunt/js/bower_components/html5shiv/dist/html5shiv.js'],
           '.grunt/tmp/main.js': [
             '.grunt/js/bower_components/unutm/unutm.js',
-            '.grunt/js/async-print-css/async-print-css.js',
+            '.grunt/js/async-csses/async-csses.js',
             '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
             '.grunt/js/bower_components/google-code-prettify/src/lang-go.js',
             '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
