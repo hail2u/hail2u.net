@@ -103,31 +103,6 @@ module.exports = function (grunt) {
       }
     },
 
-    csslint: {
-      options: {
-        'important': false,
-        'box-sizing': false,
-        'box-model': false,
-        'bulletproof-font-face': false,
-        'compatible-vendor-prefixes': false,
-        'regex-selectors': false,
-        'font-sizes': false,
-        'font-faces': false,
-        'outline-none': false,
-        'qualified-headings': false,
-        'unique-headings': false,
-        'universal-selector': false,
-        'unqualified-attributes': false
-      },
-
-      main: {
-        src: [
-          '.grunt/css/**/*.css',
-          '!.grunt/css/bower_components/**/*.css'
-        ]
-      }
-    },
-
     csswring: {
       options: {
         map: true
@@ -140,30 +115,6 @@ module.exports = function (grunt) {
           '**/*.min.css'
         ],
         dest: '.grunt/tmp/'
-      }
-    },
-
-    htmlhint: {
-      options: {
-        'src-not-empty': true,
-        'doctype-html5': true,
-        'id-class-value': true
-      },
-
-      main: {
-        src: [
-          '**/index.html',
-          '!node_modules/**/*'
-        ]
-      }
-    },
-
-    jshint: {
-      main: {
-        src: [
-          '.grunt/js/**/*.js',
-          '!.grunt/js/bower_components/**/*.js',
-        ]
       }
     },
 
@@ -436,11 +387,5 @@ module.exports = function (grunt) {
     'rsync'
   ]);
 
-  grunt.registerTask('test', [
-    'csslint',
-    'jshint',
-    'htmlhint'
-  ]);
-
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['connect']);
 };
