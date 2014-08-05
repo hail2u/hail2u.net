@@ -34,7 +34,6 @@ module.exports = function (grunt) {
             '.grunt/js/debug/toggle-class-permalink.js',
             '.grunt/js/debug/version.js'
           ],
-          '.grunt/tmp/html5shiv.js': ['.grunt/js/bower_components/html5shiv/dist/html5shiv.js'],
           '.grunt/tmp/main.js': [
             '.grunt/js/bower_components/unutm/unutm.js',
             '.grunt/js/async-csses/async-csses.js',
