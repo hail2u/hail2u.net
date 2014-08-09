@@ -30,18 +30,18 @@ module.exports = function (grunt) {
       js: {
         files: {
           '.grunt/tmp/debug.js': [
-            '.grunt/js/debug/show-column.js',
-            '.grunt/js/debug/toggle-class-permalink.js',
-            '.grunt/js/debug/version.js'
+            'src/js/debug/show-column.js',
+            'src/js/debug/toggle-class-permalink.js',
+            'src/js/debug/version.js'
           ],
           '.grunt/tmp/main.js': [
-            '.grunt/js/bower_components/unutm/unutm.js',
-            '.grunt/js/async-csses/async-csses.js',
-            '.grunt/js/bower_components/google-code-prettify/src/prettify.js',
-            '.grunt/js/bower_components/google-code-prettify/src/lang-go.js',
-            '.grunt/js/bower_components/google-code-prettify/src/lang-yaml.js',
-            '.grunt/js/bower_components/google-code-prettify-language-handlers/*.js',
-            '.grunt/js/prettify/prettify-loader.js'
+            'src/js/bower_components/unutm/unutm.js',
+            'src/js/async-csses/async-csses.js',
+            'src/js/bower_components/google-code-prettify/src/prettify.js',
+            'src/js/bower_components/google-code-prettify/src/lang-go.js',
+            'src/js/bower_components/google-code-prettify/src/lang-yaml.js',
+            'src/js/bower_components/google-code-prettify-language-handlers/*.js',
+            'src/js/prettify/prettify-loader.js'
           ]
         }
       }
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
       },
 
       style_guide: {
-        src: '.grunt/css/test.html',
+        src: 'src/css/test.html',
         dest: 'about/style-guide/index.html'
       }
     },
@@ -149,11 +149,11 @@ module.exports = function (grunt) {
 
       main: {
         options: {
-          cacheLocation: '.grunt/css/.sass-cache/'
+          cacheLocation: 'src/css/.sass-cache/'
         },
 
         expand: true,
-        cwd: '.grunt/css/',
+        cwd: 'src/css/',
         src: ['*.scss'],
         dest: '.grunt/tmp/',
         ext: '.css'
@@ -184,8 +184,8 @@ module.exports = function (grunt) {
 
     blosxom: {
       options: {
-        datadir: '.grunt/weblog/entries/',
-        root: '.grunt/weblog/',
+        datadir: 'src/weblog/entries/',
+        root: 'src/weblog/',
         static_dir: 'blog/'
       },
 
@@ -209,7 +209,7 @@ module.exports = function (grunt) {
     generate: {
       main: {
         expand: true,
-        cwd: '.grunt/html/',
+        cwd: 'src/html/',
         src: [
           '**/*.mustache',
           '!shared/*',
@@ -220,7 +220,7 @@ module.exports = function (grunt) {
 
       blog: {
         expand: true,
-        cwd: '.grunt/html/',
+        cwd: 'src/html/',
         src: [
           'blog/index.mustache',
           'index.mustache'
@@ -230,9 +230,9 @@ module.exports = function (grunt) {
 
       blog_theme: {
         expand: true,
-        cwd: '.grunt/html/',
+        cwd: 'src/html/',
         src: ['blog/theme.mustache'],
-        dest: '.grunt/weblog/entries/themes/html/',
+        dest: 'src/weblog/entries/themes/html/',
         rename: function (dest, src) {
           return dest + 'page';
         }
@@ -240,7 +240,7 @@ module.exports = function (grunt) {
 
       home: {
         expand: true,
-        cwd: '.grunt/html/',
+        cwd: 'src/html/',
         src: ['index.mustache'],
         ext: '.html'
       }
@@ -260,7 +260,7 @@ module.exports = function (grunt) {
       publish: {
         options: {
           message: 'Publish',
-          root: '.grunt/weblog/',
+          root: 'src/weblog/',
           submodule: true
         },
 
@@ -270,7 +270,7 @@ module.exports = function (grunt) {
       update: {
         options: {
           message: 'Update',
-          root: '.grunt/weblog/',
+          root: 'src/weblog/',
           submodule: true
         },
 
@@ -281,7 +281,7 @@ module.exports = function (grunt) {
     merge_feeds: {
       main: {
         options: {
-          into: './.grunt/feed/index.rss',
+          into: 'src/feed/index.rss',
           feeds: [
             './blog/feed'
           ],
