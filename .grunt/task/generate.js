@@ -82,8 +82,8 @@ module.exports = function (grunt) {
       }
 
       switch (file) {
-        case '.grunt/html/index.mustache': {
-          data.updates = _loadRSS('index.rss');
+        case 'src/html/index.mustache': {
+          data.updates = _loadRSS('src/feed/index.rss');
           data.updates.item = data.updates.item.slice(0, 5);
           data.articles = _loadRSS('blog/feed');
           data.articles.item = data.articles.item.slice(0, 6);
@@ -99,8 +99,8 @@ module.exports = function (grunt) {
           break;
         }
 
-        case '.grunt/html/blog/index.mustache': {
-          data.articles = _loadArticles('.grunt/weblog/plugins/state/files_index.dat');
+        case 'src/html/blog/index.mustache': {
+          data.articles = _loadArticles('src/weblog/plugins/state/files_index.dat');
 
           break;
         }
