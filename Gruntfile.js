@@ -370,7 +370,7 @@ module.exports = function (grunt) {
     'blosxom:category',
     'blosxom:feed',
     'generate:blog',
-    'merge_feeds:main',
+    'merge_feeds',
     'rebuild:sitemap',
     'rsync',
     'pubsubhubbub_publish'
