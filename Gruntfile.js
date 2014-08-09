@@ -281,11 +281,11 @@ module.exports = function (grunt) {
     merge_feeds: {
       main: {
         options: {
-          file: './feed',
-          into: './index.rss',
+          into: './.grunt/feed/index.rss',
           feeds: [
             './blog/feed'
-          ]
+          ],
+          file: './feed'
         }
       }
     }
