@@ -18,10 +18,6 @@ module.exports = function (grunt) {
       file = path.relative(datadir, file);
     }
 
-    if (this.target === 'category') {
-      file = path.dirname(file) + '/index.html';
-    }
-
     file = file.replace(/\.txt$/, '.html').replace(/\\/g, '/');
     args.push('path=/' + file);
 
