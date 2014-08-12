@@ -198,7 +198,7 @@ module.exports = function (grunt) {
       },
 
       category: {
-        file: grunt.option('file').replace(/[^/]*$/, 'index.html')
+        file: (grunt.option('file') ? grunt.option('file').replace(/[^/]*$/, 'index.html') : grunt.option('file'))
       },
 
       feed: {
