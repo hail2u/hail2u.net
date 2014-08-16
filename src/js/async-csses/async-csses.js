@@ -24,7 +24,7 @@
     var link = d.createElement('link');
     link.rel = 'stylesheet';
 
-    if (location.protocol === 'file:') {
+    if (/^https?:/.test(css.href) !== 0 && location.protocol === 'file:') {
       css.href = '../..' + css.href;
     }
 
