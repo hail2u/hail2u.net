@@ -17,7 +17,7 @@ exec('git rev-parse --show-toplevel', function (err, stdout, stderr) {
     throw err;
   }
 
-  var gitroot = path.normalize(stdout.replace(/[\r\n]*$/, ''));
+  var gitroot = path.normalize(stdout.trim());
   var p = JSON.parse(fs.readFileSync(path.join(gitroot, 'package.json'), 'utf-8'));
 
   if (!p.repository || p.repository.type !== 'git' || !/\bgithub\.com\//.test(p.repository.url)) {
