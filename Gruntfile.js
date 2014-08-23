@@ -143,7 +143,9 @@ module.exports = function (grunt) {
     sass: {
       options: {
         sourcemap: 'none',
-        unixNewlines: true
+        unixNewlines: true,
+        precision: 3,
+        update: true
       },
 
       main: {
