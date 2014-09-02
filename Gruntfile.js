@@ -40,7 +40,8 @@ module.exports = function (grunt) {
             'src/js/bower_components/google-code-prettify/src/lang-go.js',
             'src/js/bower_components/google-code-prettify/src/lang-yaml.js',
             'src/js/bower_components/google-code-prettify-language-handlers/*.js',
-            'src/js/prettify/prettify-loader.js'
+            'src/js/prettify/prettify-loader.js',
+            'src/js/toggle-logo-action/toggle-logo-action.js'
           ]
         }
       }
