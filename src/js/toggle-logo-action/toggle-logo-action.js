@@ -40,6 +40,7 @@ document.addEventListener('readystatechange', function () {
       logo.addEventListener('click', scrollToTop, false);
 
       if (logo.tagName === 'A' && !originalHref) {
+        logo.setAttribute('class', 'to-top');
         logo.setAttribute(store, logo.href);
         logo.href = '#top';
       }
@@ -52,6 +53,7 @@ document.addEventListener('readystatechange', function () {
     if (logo.tagName === 'A' && originalHref) {
       logo.href = originalHref;
       logo.removeAttribute(store);
+      logo.removeAttribute('class');
     }
   };
 
