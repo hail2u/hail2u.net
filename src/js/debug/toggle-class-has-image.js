@@ -5,7 +5,7 @@ document.getElementById('introduction').addEventListener('click', function (e) {
 
     if (/\bhas-image\b/.test(body.className)) {
       eyecatch.style.display = 'none';
-      body.className = body.className.replace(/ \bhas-image\b/, '');
+      body.className = body.className.replace(/\s?\bhas-image\b/, '');
     } else {
       eyecatch.style.display = 'block';
       body.className += ' has-image';

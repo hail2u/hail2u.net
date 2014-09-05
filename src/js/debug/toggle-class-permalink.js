@@ -3,7 +3,7 @@ document.getElementById('logo').addEventListener('click', function (e) {
     var body = document.body;
 
     if (/\bpermalink\b/.test(body.className)) {
-      body.className = body.className.replace(/ \bpermalink\b/, '');
+      body.className = body.className.replace(/\s?\bpermalink\b/, '');
     } else {
       body.className += ' permalink';
     }
