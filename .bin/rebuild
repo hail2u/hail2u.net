@@ -5,6 +5,7 @@
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
+var progress = require('progress');
 var spawn = require('child_process').spawn;
 
 var dirRoot = path.resolve(__dirname, '../src/weblog/');
@@ -34,9 +35,14 @@ if (process.argv[2] === '--all') {
   }));
 }
 
+var bar = new progress('Rebuilding [:bar] :percent :elapsed', {
+  total: files.length,
+  width: 32
+});
+
 async.eachLimit(files, 16, function (file, next) {
   if (!/\\index\.txt$/.test(file) && !fs.existsSync(file)) {
-    console.log('File "' + file + '" not found.');
+    console.error('File "' + file + '" not found.');
 
     return next();
   }
@@ -67,7 +73,7 @@ async.eachLimit(files, 16, function (file, next) {
   });
 
   blosxom.on('exit', function (code) {
-    console.log('File "' + file + '" rebuild.');
+    bar.tick();
     next();
   });
 }, function (error) {
