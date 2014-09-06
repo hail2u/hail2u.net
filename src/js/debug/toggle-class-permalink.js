@@ -1,4 +1,4 @@
-document.getElementById('logo').addEventListener('click', function (e) {
+document.querySelector('#introduction h1').addEventListener('click', function (e) {
   if (e.which === 1) {
     var body = document.body;
 

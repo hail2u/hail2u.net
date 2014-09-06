@@ -1,4 +1,4 @@
-document.getElementById('introduction').addEventListener('click', function (e) {
+document.querySelector('#introduction footer p').addEventListener('click', function (e) {
   if (e.which === 1 && e.target.tagName.toLowerCase() !== 'a') {
     var body = document.body;
     var eyecatch = document.getElementById('eyecatch');
