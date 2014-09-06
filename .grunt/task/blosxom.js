@@ -29,7 +29,7 @@ module.exports = function (grunt) {
     }
 
     grunt.util.spawn({
-      cmd: 'C:/strawberry/perl/bin/perl',
+      cmd: 'C:/perl/bin/perl',
       args: args,
       opts: {
         cwd: options.root,
