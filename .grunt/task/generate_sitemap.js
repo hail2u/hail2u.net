@@ -28,7 +28,8 @@ module.exports = function (grunt) {
       '/blog/sports/',
       '/blog/webdesign/',
       '/documents/',
-      '/projects/'
+      '/projects/',
+      '/search/'
     ];
 
     urls = addDocuments('documents/', urls);
