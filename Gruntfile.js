@@ -30,8 +30,9 @@ module.exports = function (grunt) {
         files: {
           '.grunt/tmp/debug.js': [
             'src/js/debug/show-column.js',
+            'src/js/debug/toggle-class-has-image.js',
             'src/js/debug/toggle-class-permalink.js',
-            'src/js/debug/toggle-class-has-image.js'
+            'src/js/debug/toggle-tagline.js'
           ],
           '.grunt/tmp/main.js': [
             'src/js/bower_components/unutm/unutm.js',
