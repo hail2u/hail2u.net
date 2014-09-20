@@ -38,6 +38,9 @@ module.exports = function (grunt) {
             'src/js/bower_components/unutm/unutm.js',
             'src/js/async-csses/async-csses.js',
             'src/js/toggle-logo-action/toggle-logo-action.js'
+          ],
+          '.grunt/tmp/search.js': [
+            'src/js/popular-pages/popular-pages.js'
           ]
         }
       }

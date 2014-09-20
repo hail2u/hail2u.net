@@ -42,7 +42,10 @@
     }
 
     buf.push(
-      '</ol>'
+      '</ol>',
+      '<nav class="seemore">',
+        '<p><a href="http://b.hatena.ne.jp/entrylist?sort=count&amp;url=http%3A%2F%2Fhail2u.net%2F">\u3082\u3063\u3068\u898B\u308B\u000A</a></p>',
+      '</nav>'
     );
     placeholder.innerHTML = buf.join('');
     delete window.displayPopularPages;
