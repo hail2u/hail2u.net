@@ -358,7 +358,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('publish:home', [
     'merge_feeds:main',
-    'generate:home',
+    'rebuild:html',
     'rebuild:sitemap',
     'rsync',
     'pubsubhubbub_publish:main'
