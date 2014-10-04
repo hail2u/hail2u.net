@@ -48,6 +48,9 @@ module.exports = function (grunt) {
       rootName: 'rss',
       xmldec: {
         encoding: 'UTF-8'
+      },
+      options: {
+        allowSurrogateChars: true
       }
     }).buildObject(into));
     grunt.log.writeln('File "' + options.file + '" created.');
