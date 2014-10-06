@@ -286,6 +286,7 @@ module.exports = function (grunt) {
       main: {
         options: {
           branch: 'gh-pages',
+          dry_run: true,
           force: true,
           root: 'build/'
         }
@@ -347,34 +348,41 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', [
     'rebuild',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('deploy:css', [
     'rebuild:css',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('deploy:js', [
     'rebuild:js',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('deploy:html', [
     'rebuild:html',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('deploy:sitemap', [
     'rebuild:sitemap',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('publish:home', [
     'merge_feeds:main',
     'rebuild:html',
     'rebuild:sitemap',
-    'rsync'
+    'rsync',
+    'gitpush:main',
+    'pubsubhubbub_publish:main'
   ]);
 
   grunt.registerTask('publish:blog', [
@@ -385,7 +393,9 @@ module.exports = function (grunt) {
     'generate:blog',
     'merge_feeds',
     'rebuild:sitemap',
-    'rsync'
+    'rsync',
+    'gitpush:main',
+    'pubsubhubbub_publish'
   ]);
 
   grunt.registerTask('update:blog', [
@@ -395,7 +405,8 @@ module.exports = function (grunt) {
     'blosxom:feed',
     'generate:blog',
     'merge_feeds:main',
-    'rsync'
+    'rsync',
+    'gitpush:main'
   ]);
 
   grunt.registerTask('default', ['connect']);
