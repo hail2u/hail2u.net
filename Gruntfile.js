@@ -282,6 +282,16 @@ module.exports = function (grunt) {
       }
     },
 
+    gitpush: {
+      main: {
+        options: {
+          branch: 'gh-pages',
+          force: true,
+          root: 'build/'
+        }
+      }
+    },
+
     merge_feeds: {
       main: {
         options: {
