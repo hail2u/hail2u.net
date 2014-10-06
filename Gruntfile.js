@@ -127,7 +127,7 @@ module.exports = function (grunt) {
 
     rsync: {
       options: {
-        remote: 'hail2u@s44.xrea.com:~/public_html/hail2u.net/'
+        remote: '~/Sites/new.hail2u.net/'
       },
 
       main: {
