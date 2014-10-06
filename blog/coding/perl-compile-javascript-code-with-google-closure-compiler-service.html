@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/open_html_by_mozilla_in_wsh.html">
+
+    
+
+    
+
+    
+      <meta content="Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html" itemprop="url">
+
+        <h1 itemprop="name">Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト</h1>
+
+        <footer>
+          <p>on <time datetime="2009-12-13T14:08:00+09:00" itemprop="datePublished">Dec 13, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">最近になってGoogleの<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を良く使うようになった。今まで使っていた<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>と比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、<a href="http://code.google.com/intl/ja/closure/compiler/docs/gettingstarted_api.html">REST API</a>を利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！</p>
+
+<pre><code class="language-perl">#!/usr/bin/perl
+
+# gccs.pl - Compile your JavaScript code with Google Closure Compiler Service
+# Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;
+# Author:   Kyo Nagashima &lt;kyo@hail2u.net&gt;, http://hail2u.net/
+# License:  MIT license (http://opensource.org/licenses/mit-license.php)
+# Modified: 2009-12-12T00:57:02+09:00
+
+use strict;
+use warnings;
+
+use JSON;
+use LWP::UserAgent;
+
+my @params = (
+  &quot;output_info&quot;,   &quot;compiled_code&quot;,
+  &quot;output_format&quot;, &quot;json&quot;,
+);
+
+&amp;main;
+exit;
+
+sub main {
+  my @code = &lt;STDIN&gt;;
+  push @params, &quot;js_code&quot;, join(&quot;&quot;, @code);
+  my $idx = 0;
+  my $found_metadata = 0;
+
+  while (my $line = $code[$idx++]) {
+    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
+      $found_metadata = 1;
+      last;
+    }
+  }
+
+  if ($found_metadata) {
+    while (my $line = $code[$idx++]) {
+      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
+        last;
+      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
+        push @params, $1, $2;
+      }
+    }
+  }
+
+  &amp;compile(@params);
+}
+
+sub compile {
+  my $ua = LWP::UserAgent-&gt;new;
+  my $res = $ua-&gt;post(&quot;http://closure-compiler.appspot.com/compile&quot;, \@_);
+
+  if ($res-&gt;is_success) {
+    my $c = from_json($res-&gt;decoded_content);
+
+    if (defined $c-&gt;{&quot;serverErrors&quot;}) {
+      foreach (@{$c-&gt;{&quot;serverErrors&quot;}}) {
+        warn &quot;Error(&quot; . $_-&gt;{&quot;code&quot;} . &quot;): &quot; . $_-&gt;{&quot;error&quot;};
+      }
+
+      die &quot;Failed to compile&quot;;
+    } else {
+      print $c-&gt;{&quot;compiledCode&quot;};
+    }
+  } else {
+    die $res-&gt;status_line;
+  }
+}
+</code></pre>
+
+<p>使い方は、</p>
+
+<pre><samp>$ <kbd>gccs.pl &lt; original.js &gt; compiled.js</kbd>
+</samp></pre>
+
+<p>コンパイルするfoobar.jsにはコンパイル設定を書くこともできる(設定を書かなくても圧縮される)。設定は以下のようにコメントとして記述(ウェブUIと同じ)。</p>
+
+<pre><code class="language-js">// ==ClosureCompiler==
+// @code_url          http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
+// @compilation_level ADVANCED_OPTIMIZATIONS
+// ==/ClosureCompiler==
+ 
+$(function () {
+  var who = &quot;Google Closure Compiler Service&quot;;
+  alert(&quot;Hello &quot; + who + &quot;!&quot;);
+});
+</code></pre>
+
+<p>細かい設定は<a href="http://code.google.com/intl/ja/closure/compiler/docs/api-ref.html">APIリファレンス</a>を参照。<code>code_url</code>はいくつでも指定できる。<code>compilation_level</code>はデフォルトで<code>SIMPLE_OPTIMIZATIONS</code>に設定されているので省略可能。パラメータは丸投げなのでリファレンスに載っていない適当なパラメータなども設定できてしまうが、実害はないと思う。結果がJSONで返ってくるとみなしてパースしているので、<code>output_format</code>は指定しない方が良い。また警告やエラーの出力にはまったく対応していないので<code>output_info</code>や<code>warning_level</code>を指定しても無意味。</p>
+
+<p>foobar.jsには設定だけ書いても構わない。その場合は<code>code_url</code>が必須になる。</p>
+
+<pre><code class="language-js">// ==ClosureCompiler==
+// @code_url          http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js
+// @code_url          http://hail2u.net/scripts/prettify/lang-css.js
+// @code_url          http://hail2u.net/scripts/prettify/loader.js
+// ==/ClosureCompiler==
+</code></pre>
+
+<p>以上のように書いただけでもちゃんとコンパイルされる。</p>
+
+<hr>
+
+<p>Vimから簡単に使えるように<code>$MYVIMRC</code>には以下のように書いた。</p>
+
+<pre><code class="language-vim">&quot; Compile JavaScript file with Google Closure Compiler Service
+&quot; :GCCS [&lt;path&gt;]
+command! -nargs=? -complete=file GCCS :call s:CompileScript(&#39;&lt;args&gt;&#39;)
+
+function! s:CompileScript(file)
+  if a:file == &#39;&#39;
+    silent normal ggVG
+    &#39;&lt;,&#39;&gt;!perl -S gccs.pl
+    silent normal V
+  else
+    execute &#39;!perl -S gccs.pl &lt; &#39; . expand(&#39;%&#39;) . &#39; &gt; &#39; . a:file
+  endif
+endfunction
+</code></pre>
+
+<p>コマンド<code>GCCS</code>にファイルのパスが渡されたらそのファイルに出力、そうでない場合は全選択して差し替えるというもの。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/open_html_by_mozilla_in_wsh.html">
+  <p>WSHを使ってMozillaでHTMLファイルを開く</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

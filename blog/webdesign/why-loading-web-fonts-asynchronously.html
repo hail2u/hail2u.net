@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Webフォントを非同期に読むテクニックはいくつかあるけど、その理由についてまとめられた文章は少ない。僕は非同期に読み込むのは3つのそれぞれ違う分野での問題を解決するためだと考えている。どの問題も致命的なものではないので、非同期に読み込むべきかどうかはそれらをどう捉えるかで変わってくる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>なぜWebフォントを非同期に読み込むのか - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/why-loading-web-fonts-asynchronously.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/scss-functions-tests.html">
+
+    
+
+    
+
+    
+      <meta content="なぜWebフォントを非同期に読み込むのか" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Webフォントを非同期に読むテクニックはいくつかあるけど、その理由についてまとめられた文章は少ない。僕は非同期に読み込むのは3つのそれぞれ違う分野での問題を解決するためだと考えている。どの問題も致命的なものではないので、非同期に読み込むべきかどうかはそれらをどう捉えるかで変わってくる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/why-loading-web-fonts-asynchronously.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/why-loading-web-fonts-asynchronously.html" itemprop="url">
+
+        <h1 itemprop="name">なぜWebフォントを非同期に読み込むのか</h1>
+
+        <footer>
+          <p>on <time datetime="2014-01-02T12:39:00+09:00" itemprop="datePublished">Jan 2, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Webフォントを非同期に読むテクニックはいくつかあるけど、その理由についてまとめられた文章は少ない。僕は非同期に読み込むのは3つのそれぞれ違う分野での問題を解決するためだと考えている。どの問題も致命的なものではないので、非同期に読み込むべきかどうかはそれらをどう捉えるかで変わってくる。</p>
+
+<h2>Webフォントのファイルサイズ</h2>
+
+<p>最もわかりやすいのはファイルサイズ、つまり転送量の問題。日本語フォントを例に上げるまでもなく、そこそこの範囲のユニコード記号や絵文字をサポートするだけでもかなりのサイズになる。カーニングやリガチャなどを加えれば更に大きくなるだろう。非同期に読み込むことにより、ダウンロードが終了するまでページの読み込みが終わらないなどということは避けられる。</p>
+
+<p>しかし、これは日本語フォントでもたかだか3–5MBほどなので、それほど気にすることではない。モバイルのことを考慮してようやく「できれば」や「なるべくなら」と付く程度の基準になるのではないかと思う。キャッシュに残せるので、何度もダウンロードするわけではないこともあり、これだけでは非同期に読み込む理由としては弱い。</p>
+
+<h2>レンダリング開始までの時間</h2>
+
+<p>ページの速度は読み込み完了までの時間だけではなく、レンダリング開始までの時間も大きなファクター。<a href="http://t32k.me/mol/log/reduce-http-requests-datauri/">MOLではDataURIの文脈でCSSの遅延読み込みについて</a>書かれているけど、この記事の通りレンダリングをブロックしてしまうCSSのパースを、非同期に読み込むことで解決するというのは優れた解だと思う。Webフォントのホスティング・サービスを利用するケースでは、HTTPリクエストを消費することと相まってバカにならないコストになり得る。そしてそのケースはWebフォントの利用シーンではメジャーなケース。</p>
+
+<p>もちろんDataURIを含むCSSに比べればパースにかかる時間は少ないので、微々たるものとも言える。とは言うものの動的にサブセッティングを行った後DataURI化してCSSに埋め込み配信したいなどということもないことはない。そういう時はこの理由は重要度を増すだろう。</p>
+
+<h2>Chromeで空白になる</h2>
+
+<p>Chrome 31までではWebフォントを指定している部分は、そのWebフォントの読み込みが完了するまで空白になる。仮にWebフォントを置いているサーバーが落ちたとすると、Chromeでは接続がタイムアウトするまで文章がまったく表示されないことになる。Internet Explorer 11やFirefox 25では代替フォントを利用して表示しておき、読み込みが完了した時点で差し替わるようになっている。遅延読み込みを行わせることにより、ChromeでもIE11やFx25と同じような挙動にすることが可能になる。</p>
+
+<p>ソーシャルボタンが非同期に読み込むようになっている理由と似てはいるが、問題は外部サーバーのダウンという非常にマイナーである(あるべき)事象が起こった時に表面化するだけ。そのため優先度としては低い。まず安定してWebフォントを配信してくれるサービスやサーバーを選択するべき。</p>
+
+<hr>
+
+<p>Webフォントを非同期に読み込む目的は、以上に挙げた理由を総合的に評価した上でのもの。そういう意味でベスト・プラクティスになりうるような手段ではないので、とりあえず非同期に読み込んでおけば良いやという話ではない。「配信元が安定しないが、どうしても使いたいWebフォントがある」などというケースでは3つ目の理由を重視して、非同期に読み込むという決断をすることになるかもしれない。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/scss-functions-tests.html">
+  <p>Sassユーザー定義関数のテスト</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

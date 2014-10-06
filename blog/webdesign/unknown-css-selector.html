@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="ブラウザーがCSSをパースする際、不明なセレクターに遭遇するとどうなると思いますか？実はそのセレクターを含むルール全体が無視されます。何を当たり前のことを言っているんだと思われるかもしれませんが、そのルールが複数のセレクターを持っていて、そのうちひとつだけが不明なものだとしてもルール全体が無視されるということはあまり知られていないような気がします。知られていないというよりも意識する必要があまりなかったという方が近いですかね。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>不明なCSSセレクター - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/unknown-css-selector.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/chrome-breakes-button-aa.html">
+
+    
+
+    
+
+    
+      <meta content="不明なCSSセレクター" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="ブラウザーがCSSをパースする際、不明なセレクターに遭遇するとどうなると思いますか？実はそのセレクターを含むルール全体が無視されます。何を当たり前のことを言っているんだと思われるかもしれませんが、そのルールが複数のセレクターを持っていて、そのうちひとつだけが不明なものだとしてもルール全体が無視されるということはあまり知られていないような気がします。知られていないというよりも意識する必要があまりなかったという方が近いですかね。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/unknown-css-selector.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/unknown-css-selector.html" itemprop="url">
+
+        <h1 itemprop="name">不明なCSSセレクター</h1>
+
+        <footer>
+          <p>on <time datetime="2011-12-03T01:20:00+09:00" itemprop="datePublished">Dec 3, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">ブラウザーがCSSをパースする際、不明なセレクターに遭遇するとどうなると思いますか？実はそのセレクターを含むルール全体が無視されます。何を当たり前のことを言っているんだと思われるかもしれませんが、そのルールが複数のセレクターを持っていて、そのうちひとつだけが不明なものだとしてもルール全体が無視されるということはあまり知られていないような気がします。知られていないというよりも意識する必要があまりなかったという方が近いですかね。</p>
+
+<p>つまり以下のようなCSSコードは無意味です。</p>
+
+<pre><code class="language-css">:-moz-any(article, aside, nav, section) h1,
+:-webkit-any(article, aside, nav, section) h1,
+:matches(article, aside, nav, section) h1 {
+  color: red;
+}
+</code></pre>
+
+<p>CSS4の<code>:matches()</code>セレクター、そしてその元ネタとなった<code>:-moz-any()</code>とそれに追随した<code>:-webkit-any()</code>を指定して幅広く対応しようとするとこう書いてしまいそうです。ですが、Firefoxでは<code>:-webkit-any()</code>や<code>:matches()</code>で、Chromeでは<code>:-moz-any()</code>と<code>:matches()</code>でそれぞれエラーになるので、結果としてこのルール全体が無効になります。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/314.html">Unknown Selector</a></p>
+
+<p>上記コードのデモです。<code>:-*-any()</code>が実装済みのFirefoxとChromeの現行バージョンでも文字が赤くならないのがわかると思います。このことについては<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">CSS 2.1の仕様書でもちゃんと触れられており</a>、仕様通りの挙動です。この仕様を利用すると以下のような比較的安全なCSSハックを色々と作ることが可能です。</p>
+
+<pre><code class="language-css">x::-moz-selection, .test {
+  color: red;
+}
+
+:-webkit-any(x), .test {
+  color: green;
+}
+
+x:-o-prefocus, .test {
+  color: blue;
+}
+</code></pre>
+
+<p class="seealso">View Demo: <a href="/pub/test/315.html">Unknown Selector Hack</a></p>
+
+<p>どうしてもCSSハックを使わざるを得ないような状況に追い込まれた場合には一考の価値はあるかもしれませんね。比較的安全な……というのはブラウザーのバグを利用したものではないということに過ぎません。今のところ各ブラウザーベンダーはベンダー拡張プリフィックス付きのセレクター(やプロパティー)からプリフィックスを外すことにあまり積極的ではないので、CSSハックとして成立しやすいような気はしますが、将来に渡って安全なものではないでしょう。他のCSSハックと同様に過信は禁物でしょうね。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/chrome-breakes-button-aa.html">
+  <p>Chromeでbutton要素のアンチエイリアスが壊れる</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

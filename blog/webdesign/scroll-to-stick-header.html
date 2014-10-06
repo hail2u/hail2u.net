@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="最初は普通に表示されているけど、スクロールしてヘッダーが画面の外になると上端固定に切り替わる奴の話。今年になって異様に増殖してる。別に嫌いではないし、なんとか的にアレ……みたいなところもない(と思う)んだけど、実装するとなると結構色々気になるところがある。というかうまく作れる気がしない。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>﻿スクロールすると固定に切り替わるヘッダー - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/scroll-to-stick-header.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/combine-multiple-images-with-svg.html">
+
+    
+
+    
+
+    
+      <meta content="﻿スクロールすると固定に切り替わるヘッダー" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="最初は普通に表示されているけど、スクロールしてヘッダーが画面の外になると上端固定に切り替わる奴の話。今年になって異様に増殖してる。別に嫌いではないし、なんとか的にアレ……みたいなところもない(と思う)んだけど、実装するとなると結構色々気になるところがある。というかうまく作れる気がしない。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/scroll-to-stick-header.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/scroll-to-stick-header.html" itemprop="url">
+
+        <h1 itemprop="name">﻿スクロールすると固定に切り替わるヘッダー</h1>
+
+        <footer>
+          <p>on <time datetime="2012-06-27T04:38:00+09:00" itemprop="datePublished">Jun 27, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">最初は普通に表示されているけど、スクロールしてヘッダーが画面の外になると上端固定に切り替わる奴の話。今年になって異様に増殖してる。別に嫌いではないし、なんとか的にアレ……みたいなところもない(と思う)んだけど、実装するとなると結構色々気になるところがある。というかうまく作れる気がしない。</p>
+
+<h2>固定したヘッダーが使用する数十ピクセルの価値</h2>
+
+<p>まずは上端に固定したヘッダーが占有する画面領域の価値という問題がある。モバイル機器のブラウザーではそもそも固定するのがまだちょっと不安な状況なのでそれらにおいてでの話ではないけど、モバイル機器ではより考慮すべき問題にはなりそう。横長のディスプレイが主流になり、ウィンドウの最大化という呪縛から解き放たれつつある昨今、各ブラウザーベンダーが死ぬ気で削った価値ある数十ピクセルを、たかがWebサイトのグローバル・ナビゲーション程度に割く理由はあるのか？</p>
+
+<p>例えばこのWebサイトのようなほぼ文章のみでそれを読んだあとに他のページに移動する必要がない場合は、その数十ピクセルをコンテンツに割いた方が良いのではないか。コンテンツの領域が広がるということだけではなく、コンテンツへの集中が可能になるので。逆にポートフォリオ・サイトのようにWebサイト内を横断的に閲覧して欲しいような場合は、常にロゴやグローバル・ナビゲーションが見えるのはユーザビリティーの向上につながる。</p>
+
+<h2>固定していない時と固定している時のヘッダーのサイズ</h2>
+
+<p>常に固定した場合、常に一定の領域を専有することになるため、ヘッダーのサイズを大きくしづらくなる。Webサイトにおいてヘッダーは本の表紙に近いものがあるので、ロゴやグローバル・ナビゲーションは多くのリソースをつぎ込んで凝ったものを作りたいし、座りの良さを考えるとファットに作ることが良いケースが圧倒的に多い。</p>
+
+<p>ただ、Webアプリケーションやそれに準じるWebサイトの場合は、その操作と閲覧を一定のパターンに落とし込めるのでそれほどヘッダーに凝る必要はなくなる。FacebookやTwitterなどのヘッダーがその良い例。つまりそういったケースで固定したい場合は途中から……などとは考えずに、コンパクトに作り最初から固定してしまえば良い。</p>
+
+<p>普通のWebサイトでは間を取って途中でコンパクトなものに切り替えるといった形が増えつつあるわけだけど、スクロールにしたがって自然にコンパクトに切り替わるように工夫する必要があるんじゃないかと思う。単にスクロールアウトしたらコンパクトなものにザクッと切り替えれば良いというものではない。</p>
+
+<h2>切り替えるタイミングとビヘイビア</h2>
+
+<p>消えたあとに上からナビゲーションが降ってくるとかは初見だと「おっ」と思うけど、不自然なので飽きる。ロゴやナビゲーションが最初はセンタリングでどーんと置かれていて、切り替わった後は左右に振り分けられコンパクトなものになるというような例も散見されるけど、視線を奪いやすいので問題がある。</p>
+
+<ul>
+<li>スクロール方向と向きの違うアニメーションは避ける</li>
+<li>各項目の位置関係を変えない</li>
+<li>大きさが変わってもおおまかな印象を変化させないようにする</li>
+</ul>
+
+<p>などを基本に、「スクロールしている時はコンテンツを閲覧している時」ということを意識し、それをいかに妨げずかつコンテンツとの差別化を自然に行うかということになりそう。</p>
+
+<hr>
+
+<p>パララックスと同じで途中から固定に切り替わるヘッダーが効果的なケースはかなり限られていると思う。多くの場合は固定しない方が良いし、固定するのが良い場合なら最初から固定しておいた方が良い。あえてどういうものが良いと思うか挙げるとすると、<a href="http://animade.tv">Animade</a>のように大きめのロゴをコンパクトにするだけに使うとか、<a href="http://corp.ign.com/">IGN Entertainment</a>のように比較的低い位置にあるナビゲーションをそのまま残すとか、こういったさりげない感じのがバランスが良くて好き。</p>
+
+<p>似たようなのにスクロールすると関連エントリーや前後のエントリーへのリンクがぶわっと出てくる奴があるけど、あれは今すぐ死滅すれば良いのにと思っている。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/combine-multiple-images-with-svg.html">
+  <p>SVGで複数の画像をまとめる</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>VimのSassでのgfを改善する - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/vim-sass-goto-file.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/meaningless-grunt-task.html">
+
+    
+
+    
+
+    
+      <meta content="VimのSassでのgfを改善する" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/vim-sass-goto-file.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/vim-sass-goto-file.html" itemprop="url">
+
+        <h1 itemprop="name">VimのSassでのgfを改善する</h1>
+
+        <footer>
+          <p>on <time datetime="2014-02-14T11:06:00+09:00" itemprop="datePublished">Feb 14, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Vimの標準ランタイムに入っている<code>ftplugin/sass.vim</code>では<code>includeexpr</code>や<code>suffixesadd</code>が適切に設定されているので、多くの場合はそのままで快適に<code>gf</code>できる。けれど同じディレクトリに<code>foo</code>というディレクトリと<code>_foo.scss</code>というファイルがある場合、<code>@import &quot;foo&quot;;</code>で<code>gf</code>するとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、<code>_foo.scss</code>を優先させようという試み。</p>
+
+<p class="seealso">Download: <a href="/pub/sass-goto-file.vim">sass-goto-file.vim</a></p>
+
+<p>インストールは<code>~/.vimrc</code>にコピペするだけ。以下のような順で開くべきファイルを探している。</p>
+
+<ol>
+<li>普通に<em>ファイル</em>を探す</li>
+<li><code>_</code>を頭に付けて<em>ファイル</em>を探す</li>
+<li>普通に<em>ディレクトリ</em>を探す</li>
+<li>見つからなかったらエラー</li>
+</ol>
+
+<p>タブで開きたい場合は、最後に<code>edit</code>を使って開いているところを<code>tabedit</code>にする。</p>
+
+<p><code>includeexpr</code>によるファイル探索の強化は、普通に探して見つからなかった場合にのみ発動するという仕様なので、先述のようなディレクトリが先に見つかってしまうケースには対応できない(と思う)。<code>suffixesadd</code>を考慮する<code>findfile()</code>や<code>finddir()</code>関数が組み込みであるので、ラッパー関数を書くのはそんなに難しくない。頭に<code>_</code>を付けるのも<code>includeexpr</code>と同じで良かった。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/meaningless-grunt-task.html">
+  <p>つまらないGruntタスク</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

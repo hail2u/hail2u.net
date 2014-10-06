@@ -1,0 +1,68 @@
+# Blosxom Plugin: amip
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 1.0
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package amip;
+
+use strict;
+use vars qw($stat $artist $title $track $album $year $comment $genre);
+
+# --- Configurable variables -----------
+
+my $datafile = "$blosxom::plugin_state_dir/amip.dat";
+
+# --- Plug-in package variables --------
+
+$stat    = "null";
+$artist  = "null";
+$title   = "null";
+$track   = "null";
+$album   = "null";
+$year    = "null";
+$comment = "null";
+$genre   = "null";
+
+# --------------------------------------
+
+sub start {
+  if (open(AMIP, "$datafile")) {
+    foreach (<AMIP>) {
+      $stat    = &escape($1) if (/^stat=(.*)$/);
+      $artist  = &escape($1) if (/^artist=(.*)$/);
+      $title   = &escape($1) if (/^title=(.*)$/);
+      $track   = &escape($1) if (/^track=(.*)$/);
+      $album   = &escape($1) if (/^album=(.*)$/);
+      $year    = &escape($1) if (/^year=(.*)$/);
+      $comment = &escape($1) if (/^comment=(.*)$/);
+      $genre   = &escape($1) if (/^genre=(.*)$/);
+    }
+
+    close AMIP;
+  }
+
+  return 0;
+}
+
+sub escape {
+  my $str = shift;
+
+  chomp $str;
+  $str =~ s/^\s*(.*?)\s*$/$1/;
+  $str =~ s/&amp;/&/g;
+  $str =~ s/&lt;/</g;
+  $str =~ s/&gt;/>/g;
+  $str =~ s/&quot;/"/g;
+  $str =~ s/&apos;/'/g;
+  $str =~ s/&#39;/'/g;
+  $str =~ s/&/&amp;/g;
+  $str =~ s/</&lt;/g;
+  $str =~ s/>/&gt;/g;
+  $str =~ s/"/&quot;/g;
+  $str =~ s/'/&#39;/g;
+  $str =~ s/&amp;#(\d+);/&#$1;/g;
+
+  return $str;
+}
+
+1;

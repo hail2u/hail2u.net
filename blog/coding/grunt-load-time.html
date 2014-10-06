@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニックはすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。Qiitaの記事が参照しているIssueでも似たようなことが推奨されている。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Gruntのロード時間 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/grunt-load-time.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/image-map-and-css-scaling.html">
+
+    
+
+    
+
+    
+      <meta content="Gruntのロード時間" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニックはすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。Qiitaの記事が参照しているIssueでも似たようなことが推奨されている。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/grunt-load-time.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/grunt-load-time.html" itemprop="url">
+
+        <h1 itemprop="name">Gruntのロード時間</h1>
+
+        <footer>
+          <p>on <time datetime="2014-01-07T05:01:00+09:00" itemprop="datePublished">Jan 7, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://qiita.com/makotot/items/bf7e8a4d704b2e977fed">必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニック</a>はすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。<a href="https://github.com/gruntjs/grunt/issues/975">Qiitaの記事が参照しているIssue</a>でも似たようなことが推奨されている。</p>
+
+<p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する(昔どこかで読んだ気がするけど見つからなかった)ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.registerMultiTask(&#39;example&#39;, &#39;Grunt multi task example.&#39;, function () {
+    // Loading Node packages inside taskFunction
+    var _ = require(&#39;lodash&#39;);
+    var async = require(&#39;async&#39;);
+    var foo = require(&#39;foo&#39;);
+    var bar = require(&#39;./bar.js&#39;);
+
+    // Do whatever you want.
+  });
+};
+</code></pre>
+
+<p>こういう形で<code>grunt.registerMultiTask()</code>の第三引数であるタスク関数内で呼ぶなら、タスクのロード時間に影響を与えない。普通に<code>require()</code>せずにプロクシー的な関数を噛ませた方が良いかもしれないが、そこまでのこともないような気がする。仮に全てのタスクがこのように書かれていたなら、それらを全部ロードしたとしても目に見えるほどロード時間は落ちないはず。同じタスクを複数回呼ぶようなタスクの場合、タスクの実行時間に無駄ができるけど、それはマイナーなケースだと思う。</p>
+
+<p>JavaScript的にはアンチ・パターン？</p>
+
+<hr>
+
+<p>Grunt v5.0では<a href="https://github.com/gruntjs/grunt/issues/907"><code>grunt.util.async</code>や<code>grunt.async._</code>などが削除されること</a>になっており、それぞれのタスクで個別に依存パッケージをロードしなくてはならなくなる。そのこともあって今後はタスクでパッケージを読み込む機会も増えるし、それを見据えた効率的なタスクの書き方みたいなのも考えた方が良さそう。そうでないと<a href="http://gulpjs.com/">魅力的で高速な対抗勢力</a>に勝てるのはプラグインの豊富さで優っている今だけなどということになりそう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/image-map-and-css-scaling.html">
+  <p>イメージマップとCSSによるスケーリング</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

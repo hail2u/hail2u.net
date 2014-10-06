@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="レスポンシブ・ウェブ・デザインとその設計を語る時にdisplay: noneが引き合いに出されることが多いなと感じる。その多用は設計ミスというような具合だ。そういうところは確かになくはないが、多用自体はCSSの貧弱さからくるHTMLの複雑さを意味するだけなのではないかと思う。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>display: noneとレスポンシブ・ウェブ・デザイン - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/display-none.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/gadget/pga-pg-psi5sgc.html">
+
+    
+
+    
+
+    
+      <meta content="display: noneとレスポンシブ・ウェブ・デザイン" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="レスポンシブ・ウェブ・デザインとその設計を語る時にdisplay: noneが引き合いに出されることが多いなと感じる。その多用は設計ミスというような具合だ。そういうところは確かになくはないが、多用自体はCSSの貧弱さからくるHTMLの複雑さを意味するだけなのではないかと思う。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/display-none.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/display-none.html" itemprop="url">
+
+        <h1 itemprop="name">display: noneとレスポンシブ・ウェブ・デザイン</h1>
+
+        <footer>
+          <p>on <time datetime="2014-04-17T16:03:00+09:00" itemprop="datePublished">Apr 17, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">レスポンシブ・ウェブ・デザインとその設計を語る時に<code>display: none</code>が引き合いに出されることが多いなと感じる。その多用は設計ミスというような具合だ。そういうところは確かになくはないが、多用自体はCSSの貧弱さからくるHTMLの複雑さを意味するだけなのではないかと思う。</p>
+
+<p>レスポンシブ・ウェブ・デザインはコンテンツを様々なデバイスで「収まる」ようにレイアウトを調整することではない。実装としてはそうなることは多いが、実際には多様なデバイスでのコンテンツの一貫性を確保するアプローチであると考えた方が適切なはずだ。その一貫性とはほぼコンテンツへのアクセス性と言って良い。様々な画面でそれを同じように確保するためには、レイアウトの調整だけではなく、構成部品の間引きや移動などが必要となる。</p>
+
+<p>そういった一貫性の確保を同じHTMLを通して行う、とすると実装はほぼCSSに限られることになる。そして今のCSS実装には残念ながらそういったコンテンツの一貫性を保証できるような柔軟な仕組みは少ない。具体的にはFlexboxくらいで、他にはせいぜい<code>text-overflow</code>プロパティーや<code>vw</code>単位くらいだ。つまり実装中であって利用が難しいか、限られたものにしか効力を発揮しないものだ。</p>
+
+<p>そのためHTMLに様々な形でCSSで利用するためだけの要素を追加し、それらをCSSから<code>display: none</code>を駆使して出したり隠したりするような実装にせざるを得ない。その多用はウェブサイトの設計の問題というよりも、CSSの策定・実装状況があまり芳しくないことを示すに過ぎないということだろう。</p>
+
+<hr>
+
+<p>フロントエンド界隈では、<code>display: none</code>であるとか設定の書きづらさといった局所的な視点のみでウェブサイトの設計やツールの思想のような全体的な点を評価する傾向が強い。世界の移り変わりが早く、エバンジェリストによるメリットの拡散は誤解やデメリットに目をつぶったまま行われる。それに影響されたユーザーは実装方や利用方などの局所的な視点で評価してしまう。</p>
+
+<p>あまりうまく回っていない。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/gadget/pga-pg-psi5sgc.html">
+  <p>PGA 液晶保護ガラス PG-PSI5SGC</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

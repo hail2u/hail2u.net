@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Google AJAX Search APIのJSONPを利用したサイト内検索 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/firefox-usercontent-css-tricks-3.html">
+
+    
+
+    
+
+    
+      <meta content="Google AJAX Search APIのJSONPを利用したサイト内検索" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" itemprop="url">
+
+        <h1 itemprop="name">Google AJAX Search APIのJSONPを利用したサイト内検索</h1>
+
+        <footer>
+          <p>on <time datetime="2006-09-27T13:49:00+09:00" itemprop="datePublished">Sep 27, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://code.google.com/apis/ajaxsearch/">Google AJAX Search API</a>は、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通に<code>GwebSearch</code>クラスの<code>setSiteRestriction()</code>メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。</p>
+
+<p>Google AJAX Search APIの<code>GwebSearch</code>クラスによる検索は、</p>
+
+<pre>http://www.google.com/uds/GwebSearch?callback=<em>{コールバック関数名}</em>&amp;context=0&amp;lstkp=0&amp;hl=ja&amp;q=<em>{検索文字列}</em>&amp;key=<em>{Google AJAX Search API key}</em>&amp;v=0.1
+</pre>
+
+<p>というURLへリクエストすることによって検索結果を取得している。また、<code>setSiteRestriction()</code>メソッドによるサイト内検索は特別なURLへのリクエストではなく、検索文字列に<em>site:{ドメイン名}</em>を追加しているだけ(ここらへんのことは<a href="http://livehttpheaders.mozdev.org/">Live HTTP Headers</a>なんかでリクエストを監視していれば直ぐにわかる)。つまり、簡単な文字列の連結でリクエストするURLが作成できるので、コールバック関数さえ定義してやれば簡単にサイト内検索をすることができる。というわけで<a href="/pub/test/086.html">Google AJAX Search APIのJSONPを利用したサイト内検索のサンプル</a>を作成してみた。</p>
+
+<p>上記サンプルでは<a href="/scripts/google/sitesearch.js">google-sitesearch.js</a>という外部JavaScriptファイルで実現している(<a href="http://prototype.conio.net/">prototype.js</a>やJSONPにリクエストするための<a href="/scripts/odj.js">odj.js</a>とかいう自作ライブラリも使ってるけど)。google-sitesearch.jsでは、</p>
+
+<pre><code class="language-js">var url = &#39;http://www.google.com/uds/GwebSearch?&#39; + $H({
+  lstkp:   0,
+  context: 0,
+  rsz:     &#39;small&#39;,
+  hl:      &#39;ja&#39;,
+  q:       $F(&#39;q&#39;) + &#39; site:hail2u.net&#39;,
+  key:     apikey,
+  v:       0.1
+}).toQueryString();
+</code></pre>
+
+<p>とprototype.jsを使ってJSONPへのリクエストURLを作成しているが、もちろん文字列の連結とかでも問題ない(<code>encodeURIComponent()</code>する必要はあるけど)。コールバック関数は、</p>
+
+<pre><code class="language-js">function handleGwebSearchResults(i, r, n, m) {
+  r.results.each(function (result) {
+    // 各検索結果に対する処理
+  });
+}
+</code></pre>
+
+<p>と四つ引数があることと第二引数に検索結果が格納されていることを意識して作れば良い。prototype.jsの<code>Array</code>クラスに対する拡張の<code>each()</code>メソッドとか使ってるけど、普通に<code>for</code>ループでも書ける。各検索結果は、</p>
+
+<pre><code class="language-js">{
+  GsearchResultClass:&quot;GwebSearch&quot;,
+  unescapedUrl : &quot;http://hail2u.net/archives/bsk.html&quot;,
+  url : &quot;http://hail2u.net/archives/bsk.html&quot;,
+  visibleUrl : &quot;hail2u.net&quot;,
+  cacheUrl : &quot;http://www.google.com/search?q=cache:2EslMvGB3FEJ:hail2u.net&quot;,
+  title : &quot;hail2u.net - Archives - &lt;b&gt;blosxom&lt;/b&gt; starter kit&quot;,
+  titleNoFormatting : &quot;hail2u.net - Archives - blosxom starter kit&quot;,
+  content : &quot;できることならこれを利用���、&lt;b&gt;blosxom&lt;/b&gt;の挙動を知った上で、一から&lt;b&gt;blosxom&lt;/b&gt;を構築すること&lt;br&gt;  をお薦めします。 &lt;b&gt;...&lt;/b&gt; オリジナルの&lt;b&gt;blosxom&lt;/b&gt;の使い方については説明する気はないです。&lt;br&gt;  公式サイトで公開されているプラグインも、オリジナルで使うときと同様に利用 &lt;b&gt;...&lt;/b&gt;&quot;
+}
+</code></pre>
+
+<p>という明快な構造になっているので、あとは適当にHTMLを作って吐き出すだけ。特に難しいところはない。ただ、Google AJAX Search APIでは最高でも8件までしか検索結果を取得することができないので、8件以上検索結果がありそうな場合は、最後にGoogleのサイトへ誘導するリンクを付け足すようにした(<code>start</code>パラメータを利用して検索結果を重ならないようにしてある)。このサイトくらいの規模ならば8件とかでも充分だったりするのだけれども。</p>
+
+<p>実際にこういった検索結果を動的に挿入云々をサイトで実装したい場合は、公式にJSON(P)がサポートされている<a href="http://developer.yahoo.com/search/web/V1/webSearch.html">Yahoo! Search Web ServicesのWeb Search</a>を利用するべき(<a href="/pub/test/087.html">Yahoo! Search Web ServicesのJSONPを利用したサイト内検索のサンプル</a>)。ただ、サイト内検索なんかではGoogleの方が明らかに検索結果が優秀なイメージがあって悩ましい。とりあえず<a href="http://siteexplorer.search.yahoo.com/">Yahoo!のSite Explorer</a>でサイトマップ送信してみた。改善したらうれしい。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/firefox-usercontent-css-tricks-3.html">
+  <p>FirefoxのuserContent.cssネタ #3</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

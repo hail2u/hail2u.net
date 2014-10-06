@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JavaScriptで配列をシャッフル - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/shuffle-array-in-javascript.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blosxom/interpolate_fancy-tricks.html">
+
+    
+
+    
+
+    
+      <meta content="JavaScriptで配列をシャッフル" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。" property="og:description">
+      <meta content="http://ecx.images-amazon.com/images/I/51FHW5B8GQL._SL160_.jpg" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/shuffle-array-in-javascript.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/coding/shuffle-array-in-javascript.html" itemprop="url">
+
+        <h1 itemprop="name">JavaScriptで配列をシャッフル</h1>
+
+        <footer>
+          <p>on <time datetime="2006-08-28T07:11:00+09:00" itemprop="datePublished">Aug 28, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、<a href="http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:sort" title="Core JavaScript 1.5 Reference:Global Objects:Array:sort - MDC"><code>sort</code>メソッド</a>を使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたら<a href="http://d.hatena.ne.jp/secondlife/" title="川o・-・）＜2nd life">はてのくん</a>がコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。</p>
+
+<p>最初に書いたコードは、</p>
+
+<pre><code class="language-js">var a = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+a.sort(
+  function (a, b) {
+    return Math.ceil(Math.random() * 3) - 2;
+  }
+);
+</code></pre>
+
+<p>というもの。<code>sort</code>メソッドは、パラメータに与えられた関数が負の値・0・正の値を返すことによって要素の順序を決定するので、その関数がランダムに値を返せばランダムにソートされるであろうというコード。結果は偏るというか、アルゴリズムがおかしいと予想される結果になった。何気にInternet Explorer 6ではシャッフルされているっぽい感じになるのだけど。</p>
+
+<p>その後、ランダムにsortした後reverseしてまたランダムにsortとかもやってみたりと、いろいろ考えたけど、結局頭がこんがらがるだけでちゃんとシャッフルされているという確信が得られない。</p>
+
+<p>はてのくんがCode Snippetsから見つけてくれた<a href="http://www.bigbold.com/snippets/posts/show/849" title="Array Shuffle //JavaScript Function [javascript] [array] [shuffle] [randomize]">Array Shuffle //JavaScript Function</a>では、Fisher-Yatesなるアルゴリズムを利用しているらしい。このコードは理解しづらかった(シャッフルされることは確認したけど)ので、Fisher-Yatesについて調べてみると、どうやら<a href="http://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22%26link_code=xm2%26camp=2025%26creative=165953%26path=http://www.amazon.co.jp/gp/redirect.html%253fASIN=4873112028%2526tag=hail2unet-22%2526lcode=xm2%2526cID=2025%2526ccmID=165953%2526location=/o/ASIN/4873112028%25253FSubscriptionId=08PWFCAAQ5TZJT30SKG2">Perlクックブック〈VOLUME1〉</a>にも載っている有名なアルゴリズムだそうで。記憶に無いです。</p>
+
+<p>Perlクックブックのレシピ4.18 配列の要素をランダムに並べ替えるでは、</p>
+
+<pre><code class="language-perl">sub fisher_yates_shuffle {
+  my $array = shift;
+  my $i;
+  for ($i = @$array; --$i; ) {
+    my $j = int rand ($i+1);
+    next if $i == $j;
+    @$array[$i,$j] = @$array[$j,$i];
+  }
+}
+</code></pre>
+
+<p>という風になっている。拙い理解でJavaScriptに移植すると、</p>
+
+<pre><code class="language-js">function shuffle(list) {
+  var i = list.length;
+
+  while (--i) {
+    var j = Math.floor(Math.random() * (i + 1));
+    if (i == j) continue;
+    var k = list[i];
+    list[i] = list[j];
+    list[j] = k;
+  }
+
+  return list;
+}
+</code></pre>
+
+<p>となる(と思う)。<a href="/pub/test/065.html" title="配列をシャッフル">サンプル・ページ</a>を作成して試したところ、ちゃんとシャッフルされているようだ。並べ替えるというよりも、入れ替えるという形。</p>
+
+<p>最終的にはどうやら解決した(と思う)ので、勉強にもなったし良かったのだけど、こういうアルゴリズム的なお話はやっぱり知っているといないでは雲泥。アルゴリズム系の勉強のためにもPerlクックブックをちゃんと読み直そう。重いんだよな、アレ。</p>
+
+<div class="asamashi"><figure><a href="http://www.amazon.co.jp/Perl%E3%82%AF%E3%83%83%E3%82%AF%E3%83%96%E3%83%83%E3%82%AF%E3%80%88VOLUME1%E3%80%89-%E3%83%88%E3%83%A0-%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%81%E3%83%A3%E3%83%B3%E3%82%BB%E3%83%B3/dp/4873112028%3FSubscriptionId%3D08PWFCAAQ5TZJT30SKG2%26tag%3Dhail2unet-22%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D4873112028"><img alt="Perlクックブック〈VOLUME1〉" src="http://ecx.images-amazon.com/images/I/51FHW5B8GQL._SL160_.jpg" itemprop="image"></a></figure><div class="detail"><p class="title"><a href="http://www.amazon.co.jp/Perl%E3%82%AF%E3%83%83%E3%82%AF%E3%83%96%E3%83%83%E3%82%AF%E3%80%88VOLUME1%E3%80%89-%E3%83%88%E3%83%A0-%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%81%E3%83%A3%E3%83%B3%E3%82%BB%E3%83%B3/dp/4873112028%3FSubscriptionId%3D08PWFCAAQ5TZJT30SKG2%26tag%3Dhail2unet-22%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D4873112028">Perlクックブック〈VOLUME1〉</a></p><ul><li>トム クリスチャンセン,ネイザン トーキントン</li><li>オライリージャパン</li><li>Book</li><li>4873112028</li></ul><p class="powered">Powered by <a href="http://hail2u.github.io/asamashi09/">Asamashi09</a>.</figure></div></div>
+
+<h2>追記</h2>
+
+<p><a href="http://b.hatena.ne.jp/entry/http://hail2u.net/blog/coding/shuffle-array-in-javascript.html" title="はてなブックマーク - hail2u.net - Weblog - JavaScriptで配列をシャッフル">はてブのコメント</a>での指摘を参考にコードをちょっと直した。</p>
+
+<ul>
+<li><code>parseInt()</code>から<code>Math.floor()</code>に変更</li>
+<li><code>var k = list[i]; list[i] = list[j]; list[j] = k;</code>と少し省略</li>
+</ul>
+
+<p>コメントくれた方々に感謝。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blosxom/interpolate_fancy-tricks.html">
+  <p>interpolate_fancyプラグインの使い方</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

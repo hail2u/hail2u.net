@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="前回のエントリで触れたJSONP。初出はRemote JSON - JSONPというMochiKitの中の人によるエントリ(多分。一言で言うなら「JSONデータを括弧でくくった上でこっちが指定した文字列を頭につけて返してね？」というもの。文章で説明するとわけわからん。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JSONP - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/jsonp.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/jsonscriptrequest.html">
+
+    
+
+    
+
+    
+      <meta content="JSONP" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="前回のエントリで触れたJSONP。初出はRemote JSON - JSONPというMochiKitの中の人によるエントリ(多分。一言で言うなら「JSONデータを括弧でくくった上でこっちが指定した文字列を頭につけて返してね？」というもの。文章で説明するとわけわからん。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/jsonp.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/jsonp.html" itemprop="url">
+
+        <h1 itemprop="name">JSONP</h1>
+
+        <footer>
+          <p>on <time datetime="2006-08-05T20:26:00+09:00" itemprop="datePublished">Aug 5, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">前回のエントリで触れたJSONP。初出は<a href="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/" title="from __future__ import * » Remote JSON - JSONP">Remote JSON - JSONP</a>という<a href="http://mochikit.com/" title="MochiKit - A lightweight Javascript library">MochiKit</a>の中の人によるエントリ(多分。一言で言うなら「JSONデータを括弧でくくった上でこっちが指定した文字列を頭につけて返してね？」というもの。文章で説明するとわけわからん。</p>
+
+<p>つまり、</p>
+
+<pre>http://example.com/data.json?jsonp=beverly_hills
+</pre>
+
+<p>とリクエストしたら、</p>
+
+<pre><code class="language-js">beverly_hills({
+  foo:    &#39;This is foo.&#39;,
+  bar:    &#39;This is bar.&#39;,
+  foobar: &#39;This is foobar.&#39;
+});
+</code></pre>
+
+<p>と返す。また、</p>
+
+<pre>http://example.com/data.json?jsonp=beverly_hills%5B90210%5D
+</pre>
+
+<p>とリクエストしたら、</p>
+
+<pre><code class="language-js">beverly_hills[90210]({
+  foo:    &#39;This is foo.&#39;,
+  bar:    &#39;This is bar.&#39;,
+  foobar: &#39;This is foobar.&#39;
+});
+</code></pre>
+
+<p>と返すってこと。クライアント側は前回のエントリで触れたjsr_class.jsなんかを使って上記URLにリクエストしてやれば良い。JSONScriptRequestと触れる順序が逆だったことに今さら思った。</p>
+
+<p>動的に作成した<code>script</code>要素によるJSONデータの読み込みというアプローチにはもってこいであることは言うまでもない。サーバー側でcallback関数名が決め打ちな場合とは違って、多重リクエストもやりやすい。前回のエントリの場合はまさにその「決め打ちな場合」であったので、JSONデータの読み込みは順番に処理してやるしかない(僕のアサマシツールみたいな小さなアプリケーションなら決め打ちでもあまり困らないけど)が、アウトプットするためのデータやUIを構築するためのデータやらいろいろ一気に必要になるという十分考えられるケースの場合、JSONP poweredであればあまりややこしく考えずにシンプルにアプローチすることが出来るはず。</p>
+
+<p>そもそも動的に作成した<code>script</code>要素によるJSONデータの読み込みは結構前からある。それに対してクロス・ブラウザの実現や利便性などを追求した結果、サーバー側(データ提供側)の少しの労力でクライアント側に高い利便性(とてもべんり)を与えることの出来るJSONPを思いつくに至ったのだと思う。ような？JSONScriptRequestと触れる順序が逆だったとか上で書いたけど、この順序で良かった気がする。</p>
+
+<p>クロス・ドメイン間でのデータのやり取りをJavaScriptコードの実行という形で行うことによるセキュリティの問題については割愛。というかきちんと問題を明確に把握して無いから書けないとも言う。</p>
+
+<p>そういえば僕もどこかのどなたかと同じくZIPコードと言われてパッと思いつくのが90210だけ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/jsonscriptrequest.html">
+  <p>JSONScriptRequest</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="next-updateパッケージは、Node.jsパッケージが依存しているパッケージを一時的に最新バージョンに更新し、設定済みのテストを走らせるツール。これによりd(evD)ependenciesを上げても大丈夫かどうかをほぼ確実に確認できる。グローバルにインストールしてコマンドラインから利用する。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Node.jsパッケージ: next-update - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/node-next-update.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/kerning-and-ellipsis.html">
+
+    
+
+    
+
+    
+      <meta content="Node.jsパッケージ: next-update" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="next-updateパッケージは、Node.jsパッケージが依存しているパッケージを一時的に最新バージョンに更新し、設定済みのテストを走らせるツール。これによりd(evD)ependenciesを上げても大丈夫かどうかをほぼ確実に確認できる。グローバルにインストールしてコマンドラインから利用する。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/node-next-update.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/node-next-update.html" itemprop="url">
+
+        <h1 itemprop="name">Node.jsパッケージ: next-update</h1>
+
+        <footer>
+          <p>on <time datetime="2014-07-07T07:45:00+09:00" itemprop="datePublished">Jul 7, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://github.com/bahmutov/next-update">next-update</a>パッケージは、Node.jsパッケージが依存しているパッケージを一時的に最新バージョンに更新し、設定済みのテストを走らせるツール。これにより<code>d(evD)ependencies</code>を上げても大丈夫かどうかをほぼ確実に確認できる。グローバルにインストールしてコマンドラインから利用する。</p>
+
+<p>Node.jsパッケージのリポジトリで実行するだけであとは勝手にやってくれる。実行すると以下の様に一つずつ最新バージョンをインストール→テスト→元のバージョンに戻すを繰り返してくれる。</p>
+
+<pre><samp>next-update - Tests if module&#39;s dependencies can be updated to latest version
+  version: 0.4.5
+  author: {&quot;name&quot;:&quot;Gleb Bahmutov&quot;,&quot;email&quot;:&quot;gleb.bahmutov@gmail.com&quot;}
+checking if the current state works
+  npm test
+current state works
+module&#39;s current dependencies:
+package   available
+--------  ---------
+js-yaml   2.1.3
+nodeunit  0.8.2
+
+checking NPM registry
+
+available updates:
+package   available
+--------  ---------
+js-yaml   3.0.2
+nodeunit  0.9.0
+
+update stats from http://next-update.herokuapp.com
+
+testing js-yaml@3.0.2
+could not get update stats js-yaml
+  installing js-yaml@3.0.2
+js-yaml@3.0.2 installed successfully
+  npm test
+js-yaml@3.0.2 works
+  installing js-yaml@2.1.3
+js-yaml@2.1.3 installed successfully
+
+testing nodeunit@0.9.0
+could not get update stats nodeunit
+  installing nodeunit@0.9.0
+nodeunit@0.9.0 installed successfully
+  npm test
+nodeunit@0.9.0 works
+  installing nodeunit@0.8.2
+nodeunit@0.8.2 installed successfully
+
+next updates:
+js-yaml 3.0.2
+nodeunit 0.9.0
+Use the following command to install working versions
+npm install --save js-yaml@3.0.2
+npm install --save-dev nodeunit@0.9.0
+</samp></pre>
+
+<p>最後に更新可能ならインストールのコマンドを<code>dependencies</code>と<code>devDependencies</code>に分けて表示してくれる。それらをコピペで実行すれば最新バージョンのインストールと<code>package.json</code>の更新が完了。</p>
+
+<hr>
+
+<p>Node.jsパッケージの依存パッケージが古いかどうかを教えてくれるコマンドやサービスはあるけど、上げても大丈夫かの確認は自分で面倒を見ないとならない。next-updateはその作業を大幅に軽減してくれそうで、機会があったら是非使ってみたい。とはいうものの<code>d(evD)ependencies</code>は動いてるならそれで良くて、どうしても必要でなければ上げなくても良いと考えているので、なかなか出番はなさそうではある。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/kerning-and-ellipsis.html">
+  <p>font-feature-settingsの罠</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

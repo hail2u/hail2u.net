@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="blosxomのプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、one_year_agoなんかがそうですね。その判定はどうやるのかということですよ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>BPT #1: エントリごとのページの閲覧かどうかを判定する方法 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/blosxom/bpt_1_how_to_decide_viewing_per_entry_or_not.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blog/blog_hacks_5.html">
+
+    
+
+    
+
+    
+      <meta content="BPT #1: エントリごとのページの閲覧かどうかを判定する方法" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="blosxomのプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、one_year_agoなんかがそうですね。その判定はどうやるのかということですよ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/blosxom/bpt_1_how_to_decide_viewing_per_entry_or_not.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/blosxom/bpt_1_how_to_decide_viewing_per_entry_or_not.html" itemprop="url">
+
+        <h1 itemprop="name">BPT #1: エントリごとのページの閲覧かどうかを判定する方法</h1>
+
+        <footer>
+          <p>on <time datetime="2004-08-24T15:37:00+09:00" itemprop="datePublished">Aug 24, 2004</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/blosxom/">Blosxom</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description"><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、<a href="/archives/blugins.html#one_year_ago" title="hail2u.net - Archives - blosxom plugins">one_year_ago</a>なんかがそうですね。その判定はどうやるのかということですよ。</p>
+<p>プラグインの挙動にもよりますが、大抵の場合は<code>start</code>サブルーチンで、<code>$blosxom::path_info</code>をチェックすることによって判定することになると思います。<code>$blosxom::path_info</code>にはエントリごとのページを閲覧している場合、</p>
+<pre>foo/bar.html
+</pre>
+<p>というようなものになるので、</p>
+<pre><code class="language-perl">sub start {
+  if ($blosxom::path_info !~ /\./) {
+    return 0;
+  }
+
+  return 1;
+}
+</code></pre>
+<p>一番単純に考えると、こんな感じでしょう。<code>$blosxom::path_info</code>にピリオド(.)が含まれるかどうかをチェックしており、含まれなかった場合は0を返し、プラグインを停止させています。コレは単純明快で良いのですが、場合によっては不具合があります。具体的な例を挙げると、「.を含むディレクトリでカテゴリを掘っている場合」です。例えば、</p>
+<pre>$datadir/programming/ms.net
+</pre>
+<p>などという、<a href="http://www.microsoft.com/japan/net/" title="Microsoft .NET">Microsoft .NET</a>関連のエントリを格納するカテゴリとして、ディレクトリを掘ったとすると、このカテゴリごとのページを閲覧している場合でも<code>$blosxom::path_info</code>にピリオド(.)が含まれることになります。</p>
+<pre>programming/ms.net
+</pre>
+<p>などとなり、一見してエントリごとのページを閲覧している場合と判別できません。この判定には<code>.$blosxom::flavour</code>で終わるかどうかというチェックが必要になります。</p>
+<p>また、<code>$blosxom::path_info</code>は<code>$ENV{PATH_INFO}</code>をちょっと加工したものなので、この両者は似て非なるものです。その違いはindex.htmlなどは含まれないことや最初と最後のスラッシュ(/)が削除されることなどで、そのあたりのチェックは無用だったりします。</p>
+<p>以上を踏まえると、エントリごとのページを閲覧している場合かどうかを判定するコードは、</p>
+<pre><code class="language-perl">sub start {
+  if ($blosxom::path_info !~ /\.$blosxom::flavour$/) {
+    return 0;
+  }
+
+  return 1;
+}
+</code></pre>
+<p>となると思います。これでも万能ではなく、いろいろ考えるとメンドウなので、最初に書いたコードでも良いかも知れません。</p>
+<p>おもむろに連載物になりそうなものを始めてみる。BPTは「blosxom plugin tips」の頭字語。「#1」とか付けたので、引っ込みがつかなさそうな気がするけど、流れが速いので書かなければバレナイ気がする。経験則100%で書いているので、ツッコミは大歓迎です。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blog/blog_hacks_5.html">
+  <p>Blog Hacks: Hack #5</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

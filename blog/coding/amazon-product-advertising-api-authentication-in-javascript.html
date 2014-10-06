@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3ヵ月後には認証を要求するようになるという変更は、Pipes(やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Amazon Product Advertising APIの認証をJavaScriptで - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/amazon-product-advertising-api-authentication-in-javascript.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/nsifilepicker-appendfilters.html">
+
+    
+
+    
+
+    
+      <meta content="Amazon Product Advertising APIの認証をJavaScriptで" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3ヵ月後には認証を要求するようになるという変更は、Pipes(やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/amazon-product-advertising-api-authentication-in-javascript.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/amazon-product-advertising-api-authentication-in-javascript.html" itemprop="url">
+
+        <h1 itemprop="name">Amazon Product Advertising APIの認証をJavaScriptで</h1>
+
+        <footer>
+          <p>on <time datetime="2009-05-13T06:52:00+09:00" itemprop="datePublished">May 13, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">既に色々なところで話題になっている<a href="http://affiliate-blog.amazon.co.jp/2009/05/amazon-%E3%82%A2%E3%82%BD%E3%82%B7%E3%82%A8%E3%82%A4%E3%83%88-web-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E5%90%8D%E7%A7%B0%E5%A4%89%E6%9B%B4%E3%81%8A%E3%82%88%E3%81%B3%E7%BD%B2%E5%90%8D%E8%AA%8D%E8%A8%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B.html">AmazonのECSがProduct Advertising APIに名称変更され、3ヵ月後には認証を要求するようになる</a>という変更は、<a href="http://pipes.yahoo.com/pipes/">Pipes</a>(や<a href="http://developer.yahoo.com/yql/">YQL</a>)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえず<a href="http://github.com/hail2u/asamashi09/tree/authen-test">Asamashi09を対応させた</a>けど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。</p>
+
+<p>使ってみる場合は適当な場所にダウンロード(↓downloadとかいうボタンから)して、適当な場所に展開後、asamashi09.jsの11行目と12行目を自分のAccess Key IDとSecret Access Keyに置き換え、index.htmlをブラウザで開けば動く(はず)。</p>
+
+<p>使ったライブラリは、</p>
+
+<ul>
+<li><a href="http://blog.livedoor.jp/dankogai/archives/51067688.html">base64.js</a></li>
+<li><a href="http://point-at-infinity.org/jssha256/">jssha256.js</a></li>
+</ul>
+
+<p>の2つ。</p>
+
+<p><a href="http://github.com/hail2u/asamashi09/blob/7f8ae9b8dc4a6c7eaa3cf16e9cecd73f1853e10d/asamashi09.js">asamashi09.js</a>の110-127行目と192-221行目あたりが実装になる。とりあえず動くものを作ろうとダラダラ書いたので再利用できなさそうなものになった。ちゃんと書き直す。</p>
+
+<p>以下ははまった所と注意した方が良さそうな所のメモ。</p>
+
+<dl>
+<dt>シグネチャ作る時のドメインもecs.amazonaws.jpに変える</dt>
+<dd>最初コピペでwebservices.amazon.comのままで生成しててはまった</dd>
+<dt>URLエンコード絡み</dt>
+<dd>二重にエンコードしてしまったり、するべきところでしていなかったりで認証キーが一致しないことが多々</dd>
+<dt>SubscriptionIdでは認証通らない</dt>
+<dd>AWSAccessKeyIdじゃないとダメっぽい(多分)</dd>
+<dt>AWSAccessKeyIdはAssociateTagより前</dt>
+<dd>Windowsっぽいソートに慣れてしまってて素で間違えた</dd>
+<dt>TimestampはExpiredがある</dt>
+<dd>Timestampで指定した時間から15分くらいで期限切れ扱いになるので、適当な時間を投げるのはダメ</dd>
+<dt>URLエンコードはRFC 3986準拠</dt>
+<dd><code>encodeURIComponent()</code>だといくつか足らない</dd>
+</dl>
+
+<hr>
+
+<p>Secret Access Keyを隠す方法とか思いつかないんだけど……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/nsifilepicker-appendfilters.html">
+  <p>nsIFilePicker.appendFilters()</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

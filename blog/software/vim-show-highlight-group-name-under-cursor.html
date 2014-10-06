@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Vimの構文強調は強力なんだけど、修正するとなるとなかなかの茨の道だったりもする。単に単語を追加とかなら良いけど、間違った強調がなされている場合は、まずどのハイライト・グループに間違えて入っているかを知らなければならない。synID()系の関数を頑張って使うとなんとなくわかる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Vimでカーソル下のハイライト・グループ名を知る - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/vim-show-highlight-group-name-under-cursor.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/svg-animatetransform.html">
+
+    
+
+    
+
+    
+      <meta content="Vimでカーソル下のハイライト・グループ名を知る" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Vimの構文強調は強力なんだけど、修正するとなるとなかなかの茨の道だったりもする。単に単語を追加とかなら良いけど、間違った強調がなされている場合は、まずどのハイライト・グループに間違えて入っているかを知らなければならない。synID()系の関数を頑張って使うとなんとなくわかる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/vim-show-highlight-group-name-under-cursor.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/vim-show-highlight-group-name-under-cursor.html" itemprop="url">
+
+        <h1 itemprop="name">Vimでカーソル下のハイライト・グループ名を知る</h1>
+
+        <footer>
+          <p>on <time datetime="2013-11-30T12:37:00+09:00" itemprop="datePublished">Nov 30, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Vimの構文強調は強力なんだけど、修正するとなるとなかなかの茨の道だったりもする。単に単語を追加とかなら良いけど、間違った強調がなされている場合は、まずどのハイライト・グループに間違えて入っているかを知らなければならない。<code>synID()</code>系の関数を頑張って使うとなんとなくわかる。</p>
+
+<pre><code class="language-vim">&quot; VimShowHlGroup: Show highlight group name under a cursor
+command! VimShowHlGroup echo synIDattr(synIDtrans(synID(line(&#39;.&#39;), col(&#39;.&#39;), 1)), &#39;name&#39;)</code></pre>
+
+<p>このカスタム・コマンドで返ってきた名前から構文強調ファイルのソース辿って修正を試みる。割りと複雑なものでも<code>contains</code>や<code>nextgroup</code>に含まれていないとかならすぐわかる。空文字が返ってきた場合はどのグループにも属していないということなので、新たにハイライト・グループへ追加する。実際には<code>keyword</code>の優先順位や独特のネスト機構とかの仕様の影響で、アドホックな修正が難しかったり不可能だったりして簡単にはいかないのだけど。最悪だとビルトインの構文強調ファイルにパッチを当てざるを得なかったりする。</p>
+
+<hr>
+
+<p>僕は構文強調は読むためのものじゃなくて書くためのもの、つまり簡単なリアルタイムの文法チェッカーと考えているので、ちょっとおかしいけどいいか的なのがすごい気になる。構文強調ファイルを何回か書くことを経験して、なんとなくわかってきたので、気になる所はバンバン修正して取り込まれるようにプル・リクエストしたりMLに投げたりしたい。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/svg-animatetransform.html">
+  <p>SVGのanimateTransform要素</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

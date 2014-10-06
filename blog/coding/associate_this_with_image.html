@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Associate This (with image)! - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/associate_this_with_image.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blosxom/blosxom_starter_kit_17.html">
+
+    
+
+    
+
+    
+      <meta content="Associate This (with image)!" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/associate_this_with_image.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/associate_this_with_image.html" itemprop="url">
+
+        <h1 itemprop="name">Associate This (with image)!</h1>
+
+        <footer>
+          <p>on <time datetime="2004-07-01T20:51:00+09:00" itemprop="datePublished">Jul 1, 2004</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していた<a href="http://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtでは<code>event.src</code>とかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースの<code>img</code>要素を全部調べ、<code>src</code>属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。</p>
+<p>Amazonの個別商品ページには画像があればかならず正しいURLで画像へのリンクが張られている(と思う)ので、<code>document.images</code>で拾うことができる<code>img</code>要素でループを回してやり、正規表現でMZZZZZZZが含まれているかどうかチェックするというわけ。</p>
+<p>JavaScriptのコードは以下のような構造になってます。</p>
+<pre><code class="language-js">var aid  = &#39;hail2unet-22&#39;;
+var t    = document.title;
+var u    = document.location.href;
+var i    = u.indexOf(&#39;ASIN&#39;);
+var asin = u.substring(i+5,i+15);
+u        = &#39;http://www.amazon.co.jp/exec/obidos/ASIN/&#39;+asin+&#39;/&#39;+aid;
+var img;
+
+for (i=0; i &lt; document.images.length; i++) {
+  if (document.images[i].src.match(/MZZZZZZZ/)) {
+    img = document.images[i].src;
+    break;
+  }
+}
+
+prompt(&#39;Associate This (with image)!&#39;,
+  &#39;&lt;a href=&quot;&#39; + u + &#39;&quot; title=&quot;&#39; + t + &#39;&quot;&gt;&lt;img src=&quot;&#39; + img + &#39;&quot; alt=&quot;&#39; + t +
+  &#39;&quot; /&gt;&lt;/a&gt;&#39;);
+</code></pre>
+<p>Bookmarkletはこちら。</p>
+<p>Bookmarklet: <em><a href="javascript:var aid=&#39;hail2unet-22&#39;;var t=document.title;var u=document.location.href;var i=u.indexOf(&#39;ASIN&#39;);var asin=u.substring(i+5,i+15); u=&#39;http://www.amazon.co.jp/exec/obidos/ASIN/&#39;+asin+&#39;/&#39;+aid;var img;for(i=0;i&lt;document.images.length;i++){if(document.images[i].src.match(/MZZZZZZZ/)){img=document.images[i].src;break;}}prompt(&#39;Associate This (with image)!&#39;, &#39;&lt;a href=&quot;&#39;+u+&#39;&quot; title=&quot;&#39;+t+&#39;&quot;&gt;&lt;img src=&quot;&#39;+img+&#39;&quot; alt=&quot;&#39;+t+&#39;&quot; /&gt;&lt;/a&gt;&#39;);" title="Associate This (with image)!">Associate This (with image)!</a></em></p>
+<p>使い方は、上記リンクをBookmarks Toolbarにドラッグ・アンド・ドロップし、Amazonの個別商品ページを開いた状態でそれをクリックするだけ！すると、</p>
+<pre><code class="language-html">&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22&quot; title=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot;&gt;&lt;img src=&quot;http://images-jp.amazon.com/images/P/B00028G7J8.01.MZZZZZZZ.jpg&quot; alt=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot; /&gt;&lt;/a&gt;
+</code></pre>
+<p>というコードがプロンプトで出てきます。hail2unet-22となっているアソシエイトIDは自分のアソシエイトIDに書き換えましょう。</p>
+<p>コピーするのメンドイ(なんてズボラな・・・)。</p>
+<h2>追記@2004/07/02</h2>
+<p>BookmarkletのURL内に含まれる&quot;の実体参照化をミスってまして、正常なURLになっていなかったのを修正しました。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blosxom/blosxom_starter_kit_17.html">
+  <p>blosxom starter kit #17</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

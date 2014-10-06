@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="CSSWringに同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSのルールセットから重複する定義の削除 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/remove-duplicate-declarations-from-css-ruleset.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/view-submodule-log-from-its-parent.html">
+
+    
+
+    
+
+    
+      <meta content="CSSのルールセットから重複する定義の削除" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="CSSWringに同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/remove-duplicate-declarations-from-css-ruleset.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/remove-duplicate-declarations-from-css-ruleset.html" itemprop="url">
+
+        <h1 itemprop="name">CSSのルールセットから重複する定義の削除</h1>
+
+        <footer>
+          <p>on <time datetime="2014-07-05T14:33:00+09:00" itemprop="datePublished">Jul 5, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://github.com/hail2u/node-csswring">CSSWring</a>に同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。</p>
+
+<p><a href="https://github.com/ai/postcss">PostCSS</a>でCSSをパースすると、各定義は以下のような構造になる(一部省略)。</p>
+
+<pre><code class="language-javascript">{
+  type: &#39;decl&#39;,
+  before: &#39;\n  &#39;,
+  prop: &#39;color&#39;,
+  between: &#39;: &#39;,
+  value: &#39;white&#39;
+}
+</code></pre>
+
+<p><code>type</code>に定義であることが明記されていて、<code>prop</code>でプロパティー名、<code>value</code>で値が拾える。また<code>before</code>にプロパティー名の前にある文字列、<code>between</code>にプロパティーと値の間の文字列が入ってる。</p>
+
+<p>一致のチェックは<code>prop</code>と<code>value</code>を単純に連結させ、それをキーにしてその定義のインデックスをオブジェクトに格納していき、<code>hasOwnProperty</code>で探すという形で良さそう。見つかったら重複しているとみなし、格納したインデックスを使って古い方を削除し、新しい方のみ残すようにする。</p>
+
+<p>PostCSSでは全定義をなめるイテレータ(<code>eachDecl()</code>)もあるけど、この場合はルールセット単位で作業するべきなので<code>eachRule()</code>の方で行う。</p>
+
+<pre><code class="language-javascript">var postcss = require(&#39;postcss&#39;);
+var css = fs.readFileSync(&#39;test.css&#39;, &#39;utf-8&#39;);
+var root = postcss.parse(css);
+root.eachRule(function (rule) {
+  var d = &#39;&#39;;
+  var decls = {};
+  rule.each(function (decl, index) {
+    d = decl.prop + decl.value;
+
+    if (decls.hasOwnProperty(d)) {
+      decl.parent.remove(decls[d]);
+    }
+
+    decls[d] = index;
+  });
+});
+</code></pre>
+
+<p>通常はこのように<code>prop</code>と<code>value</code>が一致すれば良いけど、CSSWringには一部CSSハックを維持する設定がある。この設定がONの時にこれでは判別できない。対応しているCSSハックが格納されているのは<code>before</code>と<code>between</code>なので、それらも含めて完全一致させる必要があった。空白の違いにより重複が判別できなくなりそうだけど、CSSWringでは空白文字の圧縮は事前に行われているのでそこは考えなくて良さそう。上記コードだと8行目を以下のようにするだけ。</p>
+
+<pre><code class="language-javascript">d = decl.before + decl.prop + decl.between + decl.value;
+</code></pre>
+
+<p>最初<code>hasOwnProperty</code>ではなく<code>decls[d]</code>で存在チェックをしていて、インデックスが0の定義が重複していた時にちゃんとチェックできてないみたいなのやらかした……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/view-submodule-log-from-its-parent.html">
+  <p>Gitのsubmoduleのログを親リポジトリから見る</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

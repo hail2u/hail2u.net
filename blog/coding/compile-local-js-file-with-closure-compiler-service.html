@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="前に作って愛用しているClosure Compiler ServiceのREST APIを叩くPerlスクリプトにローカルのJavaScriptファイルを読み込んでコンパイルに含められる機能を付けた。Closure CompilerのJARファイルを使ってローカルで動かしても良かったんだけど、APIやWeb UIのコメントでオプション設定を書く方法(Greasemonkey的な奴)が気に入っているので@code_pathというパラメーターを追加する形にした。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>ローカルのJavaScriptファイルをClosure Compiler ServiceのREST APIでコンパイルできるように - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/compile-local-js-file-with-closure-compiler-service.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/gadget/fusion-51-vs-quattro4.html">
+
+    
+
+    
+
+    
+      <meta content="ローカルのJavaScriptファイルをClosure Compiler ServiceのREST APIでコンパイルできるように" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="前に作って愛用しているClosure Compiler ServiceのREST APIを叩くPerlスクリプトにローカルのJavaScriptファイルを読み込んでコンパイルに含められる機能を付けた。Closure CompilerのJARファイルを使ってローカルで動かしても良かったんだけど、APIやWeb UIのコメントでオプション設定を書く方法(Greasemonkey的な奴)が気に入っているので@code_pathというパラメーターを追加する形にした。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/compile-local-js-file-with-closure-compiler-service.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/compile-local-js-file-with-closure-compiler-service.html" itemprop="url">
+
+        <h1 itemprop="name">ローカルのJavaScriptファイルをClosure Compiler ServiceのREST APIでコンパイルできるように</h1>
+
+        <footer>
+          <p>on <time datetime="2012-01-05T00:20:00+09:00" itemprop="datePublished">Jan 5, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">前に作って愛用している<a href="/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html">Closure Compiler ServiceのREST APIを叩くPerlスクリプト</a>にローカルのJavaScriptファイルを読み込んでコンパイルに含められる機能を付けた。<a href="http://code.google.com/p/closure-compiler/">Closure Compiler</a>の<a href="http://code.google.com/p/closure-compiler/downloads/detail?name=compiler-latest.zip&amp;can=2&amp;q=">JARファイル</a>を使ってローカルで動かしても良かったんだけど、APIやWeb UIのコメントでオプション設定を書く方法(<a href="http://www.greasespot.net/">Greasemonkey</a>的な奴)が気に入っているので<code>@code_path</code>というパラメーターを追加する形にした。</p>
+
+<p>コンパイルするJavaScriptファイルでは</p>
+
+<pre><code class="language-js">// ==ClosureCompiler==
+// @code_path foo.js
+// @code_path bar.js
+// @code_url  http://example.com/js/buz.js
+// ==/ClosureCompiler==
+</code></pre>
+
+<p>というように<code>@code_path</code>で取り込むJavaScriptファイルのパスを指定するだけ。<code>@code_url</code>等の他のオプションとはバッティングしないけど、依存関係によって書く順序には注意する必要がある。これらに続けて普通にJavaScriptコードも書けるとかそこらへんはWeb UIと一緒。</p>
+
+<p>コンパイル方法は前のと同じで標準入力と出力で。</p>
+
+<pre><samp>$ <kbd>gccs.pl &lt;test.js &gt;test.min.js</kbd>
+</samp></pre>
+
+<p>肝心のgccs.plは以下の通り。</p>
+
+<pre><code class="language-perl">#!/usr/bin/env perl
+
+# gccs.pl - Compile your JavaScript code with Google Closure Compiler Service
+# Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;
+# License:  http://hail2u.mit-license.org/2009
+# Modified: 2012-01-04T18:43:15+09:00
+
+use strict;
+use warnings;
+
+use JSON;
+use LWP::UserAgent;
+use Path::Class qw();
+
+my @params = (
+  "output_info",   "compiled_code",
+  "output_format", "json",
+);
+
+&amp;main;
+exit;
+
+sub main {
+  my @code = &lt;STDIN&gt;;
+  push @params, "js_code", join("", @code);
+  my $idx = 0;
+  my $found_metadata = 0;
+
+  while (my $line = $code[$idx++]) {
+    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
+      $found_metadata = 1;
+      last;
+    }
+  }
+
+  if ($found_metadata) {
+    while (my $line = $code[$idx++]) {
+      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
+        last;
+      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
+        if ($1 eq "code_path" &amp;&amp; -e $2) {
+          my $js_code = ";" . Path::Class::File-&gt;new($2)-&gt;slurp() . ";";
+          push @params, "js_code", $js_code;
+        } else {
+          push @params, $1, $2;
+        }
+      }
+    }
+  }
+
+  &amp;compile(@params);
+}
+
+sub compile {
+  my $ua = LWP::UserAgent-&gt;new;
+  my $res = $ua-&gt;post("http://closure-compiler.appspot.com/compile", \@_);
+
+  if ($res-&gt;is_success) {
+    my $c = from_json($res-&gt;decoded_content);
+
+    if (defined $c-&gt;{"serverErrors"}) {
+      foreach (@{$c-&gt;{"serverErrors"}}) {
+        warn "Error(" . $_-&gt;{"code"} . "): " . $_-&gt;{"error"};
+      }
+
+      die "Failed to compile";
+    } else {
+      binmode STDOUT;
+      print $c-&gt;{"compiledCode"};
+    }
+  } else {
+    die $res-&gt;status_line;
+  }
+}
+</code></pre>
+
+<p>一応セミコロンの無いダメなJavaScriptファイルのことも考慮して前後にセミコロンを挟んでやったりはしておいた。ちょっと美しくないけどClosure CompilerをSIMPLE_OPTIMIZATIONS以上で通せば消えるのでまぁ良いかなとか。</p>
+
+<p>普通にバラバラにスクリプトを書いて、Makefile的なJavaScriptファイルで<code>@code_path</code>を使って参照し、それをコンパイルとかで使ってください。<code>cat</code>よりはマシ程度ですけどね！</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/gadget/fusion-51-vs-quattro4.html">
+  <p>Fusion 5+1 vs. Quattro4</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

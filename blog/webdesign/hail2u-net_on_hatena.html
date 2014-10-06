@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="リファラから拾ったChepooka::cssでfloatの振る舞いにトラブってる感じだったので、はてなダイアリーでもうちのサイトみたいなのできないもんかと移植してみました。こちらのエントリの内容は気にしてはいけません。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSをはてなに移植してみた - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/hail2u-net_on_hatena.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/code_snippets.html">
+
+    
+
+    
+
+    
+      <meta content="CSSをはてなに移植してみた" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="リファラから拾ったChepooka::cssでfloatの振る舞いにトラブってる感じだったので、はてなダイアリーでもうちのサイトみたいなのできないもんかと移植してみました。こちらのエントリの内容は気にしてはいけません。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/hail2u-net_on_hatena.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/hail2u-net_on_hatena.html" itemprop="url">
+
+        <h1 itemprop="name">CSSをはてなに移植してみた</h1>
+
+        <footer>
+          <p>on <time datetime="2005-04-07T09:02:00+09:00" itemprop="datePublished">Apr 7, 2005</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">リファラから拾った<a href="http://css.g.hatena.ne.jp/chepooka/" title="はてなCSS - Chepooka::css">Chepooka::css</a>で<code>float</code>の振る舞いにトラブってる感じだったので、<a href="http://d.hatena.ne.jp/" title="はてなダイアリー - キーワードでつながる面白ブログ">はてなダイアリー</a>でもうちのサイトみたいなのできないもんかと<a href="http://d.hatena.ne.jp/h2u/" title="hail2u.net - Diary">移植してみました</a>。こちらのエントリの内容は気にしてはいけません。</p>
+<p>あるボックスの内容物が<code>float</code>されているボックスのみの場合、そのボックスの枠線や背景色、背景画像は内容物の高さに合わせて自動的に高さが調節されないという<code>float</code>によるレイアウトでまず間違いなく遭遇するトラブルをどうやって解決するかということになります。</p>
+<p>うちのサイトでは<code>html</code>と<code>body</code>でそれぞれ背景画像を指定することによって、2カラムのベースを作成し、ヘッダやコンテンツの背景画像をその上に重ねることによって、上記トラブルを解決せずに擬似的に実現しています。が、はてなダイアリーでは<code>html</code>に背景画像を仕込むのは不可能らしいので別のアプローチが必要になります。</p>
+<p>そこで、<a href="http://www.quirksmode.org/css/clearing.html" title="CSS - Clearing floats">QuirksMode - CSS - Clearing floats</a>で詳しく解説されている、<code>overflow</code>を利用したテクニックを利用してみました。このテクニックは、内容物が<code>float</code>されているボックスのみのボックスに、</p>
+<pre><code class="language-css">div#container {
+  width: 100%;
+  overflow: hidden;
+  background-color: #f0f;
+}
+</code></pre>
+<p>と指定すると、内容物の高さに合わせてきちんと背景色で塗りつぶされるというモノ。</p>
+<p>はてなダイアリーでは、</p>
+<pre><code class="language-html">&lt;body&gt;
+  &lt;table&gt;
+    &lt;!-- はてなのヘッダ --&gt;
+  &lt;/table&gt;
+  &lt;h1&gt;ダイアリーのタイトル&lt;/h1&gt;
+  &lt;div class=&quot;hatena-body&quot;&gt;
+    &lt;div class=&quot;main&quot;&gt;
+      &lt;!-- 本文 --&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;sidebar&quot;&gt;
+      &lt;!-- サイドバー --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
+<p>という構成になっているので、<code>div.hatena-body</code>に上記のような指定をしてやれば、本文とサイドバーの長さに関わらずキレイに下まで背景色や背景画像で埋めることが出来ます。</p>
+<p>上記の僕のはてなダイアリーでは、本文があまりにも短すぎたりとか何とか色々あって、微妙なところで不具合があったりしますが、ベース的にはあんな感じでいけると思います。もうこれ以上はやる気はないんですが。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/code_snippets.html">
+  <p>Code Snippets</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

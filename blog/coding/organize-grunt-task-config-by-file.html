@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Gruntタスクの設定をファイルで管理 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/vim-css3-syntax-v0.10.0.html">
+
+    
+
+    
+
+    
+      <meta content="Gruntタスクの設定をファイルで管理" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html" itemprop="url">
+
+        <h1 itemprop="name">Gruntタスクの設定をファイルで管理</h1>
+
+        <footer>
+          <p>on <time datetime="2014-03-06T12:53:00+09:00" itemprop="datePublished">Mar 6, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><code>Gruntfile.js</code>の大半を占めるのはタスク設定の部分だ。そこを分割してやれば<code>Gruntfile/js</code>を小さく出来るわけで、そういうNode.jsパッケージはいくつかある。<a href="http://creynders.github.io/load-grunt-configs/">load-grunt-configs</a>がその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。</p>
+
+<p>以下のGruntプラグインをインストールして使う<code>Gruntfile.js</code>を例にする。</p>
+
+<ul>
+<li><a href="https://github.com/gruntjs/grunt-contrib-clean">grunt-contrib-clean</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-copy">grunt-contrib-copy</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-cssmin">grunt-contrib-cssmin</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-uglify">grunt-contrib-uglify</a></li>
+</ul>
+
+<h2>Gruntfile.jsの書き方</h2>
+
+<p><code>grunt.file.expand()</code>を使って<code>.grunt/config/*.json</code>をグロブし、それぞれのファイル名をキーにして、ファイルの中身を値にして設定を組み立てていく。最後に<code>grunt.initConfig()</code>して読み込む。</p>
+
+<pre><code class="language-javascript">&#39;use strcit&#39;;
+
+var path = require(&#39;path&#39;);
+
+module.exports = function (grunt) {
+  var config = {
+    pkg: grunt.file.readJSON(&#39;package.json&#39;)
+  };
+
+  grunt.file.expand(&#39;.grunt/config/*.json&#39;).forEach(function (file) {
+    config[path.basename(file, &#39;.json&#39;)] = grunt.file.readJSON(file);
+  });
+
+  grunt.initConfig(config);
+
+  grunt.loadNpmTasks(&#39;grunt-contrib-clean&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-copy&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-cssmin&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-uglify&#39;);
+
+  grunt.registerTask(&#39;rebuild:css&#39;, [
+    &#39;clean:css&#39;,
+    &#39;copy:css&#39;,
+    &#39;cssmin&#39;
+  ]);
+
+  grunt.registerTask(&#39;rebuild:js&#39;, [
+    &#39;clean:js&#39;,
+    &#39;copy:js&#39;,
+    &#39;uglify&#39;
+  ]);
+};
+</code></pre>
+
+<p>プラグイン名から設定ファイルを拾えたりすると、ロードしつつ設定の組み立てというもうちょっとスマートな実装になりそうだ。しかし実際にはプラグイン名とタスク名が一致しないことは良くあるので、それは無理がある。そうできるようにするためには設定の書き方の工夫か対応表みたいなのが必須になるだろう。</p>
+
+<p>エイリアスの部分も切り離して良さそうだけど、そのエイリアスに対しての設定をまとめたりは出来ないので、切り離してもあまり意味はない。</p>
+
+<h2>タスク設定の書き方</h2>
+
+<p>タスク設定は<code>.grunt/config/</code>以下に<code>taskname.json</code>という形で置く。特に何もしないので<code>Gruntfile.js</code>に書く時とほぼ同じだ。ただしJSONとして読み込みパースされるので、キーと値は二重引用符で括ることと最後のカンマには気を付ける必要がある。</p>
+
+<p>例えば<code>.grunt/config/uglify.json</code>は以下のようになる。</p>
+
+<pre><code class="language-javascript">{
+  &quot;options&quot;: {
+    &quot;beautify&quot;: {
+      &quot;ascii_only&quot;: true
+    },
+    &quot;preserveComments&quot;: &quot;some&quot;
+  },
+  &quot;main&quot;: {
+    &quot;expand&quot;: true,
+    &quot;cwd&quot;: &quot;.grunt/tmp/&quot;,
+    &quot;src&quot;: [&quot;*.js&quot;],
+    &quot;dest&quot;: &quot;scripts/&quot;,
+    &quot;ext&quot;: &quot;.min.js&quot;
+  }
+}
+</code></pre>
+
+<p>JSONを普通に書くのは面倒なので<code>*.coffee</code>許容させたりすると良さそうではある。</p>
+
+<hr>
+
+<p>このような形で10ほどのプラグインをインストールした状態で色々やってみたが、分割すると<code>Gruntfile.js</code>は短くなるものの、それが特に設定のしやすさ・わかりやすさにはつながらなかった。少なくとも<em>プラグイン単位での設定の分割は無意味</em>と感じる。Gruntの設定の辛さは長くなって読みづらくて辛いではなくて、あるタスクの設定をあっちで書きこっちで参照しという書く辛さと、あるタスクの設定を調べる時にあっちを見てこっちを辿ってという読む辛さの組み合わせということだと結論づけた。つまり<em>やりたいこと</em>や<em>やっていること</em>の設定を一括して管理・参照する術がないということだ。</p>
+
+<p>タスクごとまたはエイリアスごと、例えばデプロイ用の設定とかテスト用の設定とかで分割するなら、やりたいことの設定をまとめて管理でき、やっていることの設定を一気に参照できる。これなら意味がある気がするけど、そうなるとGruntに渡される引数を調べて……とか、Gruntのラッパーを作って……など、まぁまぁ大変なコードを書いてやらないと実現できないので、あまり現実的ではない。</p>
+
+<p>ただ多くの人はGruntプラグインの作るタスクを直接叩くことはなく、エイリアス単位で実行するであろうし、設定の修正もエイリアス単位でまとめて行ったりするだろう。そのため、完全にエイリアス単位で管理できるようなら、挑戦する価値はありそうとも感じる。そのようなプラグインが既にあるようだが、<a href="https://github.com/gruntjs/grunt-next">大幅な変化が模索されている現在</a>、そういったものに依存したら後が怖く、導入には二の足を踏む。</p>
+
+<hr>
+
+<p>結局普通に書くしかないことになるわけだ。その前に<a href="/blog/software/meaningless-grunt-task.html">タスクを使われるタイミングで絞ったり</a>、<a href="http://havelog.ayumusato.com/develop/others/e586-suitable_grunt.html">Gruntの使い方を考え直したり</a>して<code>Gruntfile.js</code>が破綻しないように常に意識すると良い。回り道だけど、安全で安心な道だろう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/vim-css3-syntax-v0.10.0.html">
+  <p>vim-css3-syntax v0.10.0</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

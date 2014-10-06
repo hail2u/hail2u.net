@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JSONScriptRequest - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/jsonscriptrequest.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/labs-hail2u-net-amazon-asamashi.html">
+
+    
+
+    
+
+    
+      <meta content="JSONScriptRequest" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/jsonscriptrequest.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/jsonscriptrequest.html" itemprop="url">
+
+        <h1 itemprop="name">JSONScriptRequest</h1>
+
+        <footer>
+          <p>on <time datetime="2006-08-04T17:26:00+09:00" itemprop="datePublished">Aug 4, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">動的に<code>script</code>要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox</a>の場合は動的に追加する<code>script</code>要素の<code>onload</code>属性で読み込んだJavaScriptファイルを処理する<code>function</code>を指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつが<a href="http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html" title="XML.com: JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript">JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript</a>で取り上げられているJSONScriptRequest。<code>XmlHttpRequest</code>と比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。</p>
+
+<p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
+
+<pre><code class="language-js">callback({
+  foo:    &#39;This is foo.&#39;,
+  bar:    &#39;This is bar.&#39;,
+  foobar: &#39;This is foobar.&#39;
+});
+</code></pre>
+
+<p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
+
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var oJsr = new JSONscriptRequest(&#39;http://example.com/json/data.json?dummy=1&#39;);
+oJsr.buildScriptTag();
+oJsr.addScriptTag();
+
+function callback(data) {
+  alert(data.foo);
+  alert(data.bar);
+  alert(data.foobar);
+  oJsr.removeScriptTag();
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>HTML(やJavaScript)ファイル側でcallback関数を定義しておく必要もある(<a href="/pub/test/054.html" title="JSONScriptRequest Test">サンプル</a>)。</p>
+
+<p>つまるところ、Webサービス側でJSONPに対応していないと使い道がない。<a href="http://developer.yahoo.com/search/index.html" title="Yahoo! Search Web Services">Yahoo! Search Web Services</a>などでは対応しているが、やはり絶対数は少ない。</p>
+
+<p>しかし、<a href="http://aws.amazon.com/" title="Amazon.com Amazon Web Services Store: Amazon Web Services">Amazon Web Services</a>のXSLTサービスなどの場合は、XSLファイルを工夫すればJavaScriptファイルを自由に作り上げることができるので、XSLファイル側で対処できる。labs.hail2u.net/amazon/やlabs.hail2u.net/amazon/asamashi/では実際に対処してみた。それぞれのHTMLファイル内のJavaScriptコードや利用しているXSLファイルを見てくれればどういう感じなのかわかるかもしれない。無闇にコードが長いので読みづらいけど。</p>
+
+<p>jsr_class.jsは<code>removeScriptTag()</code>とか長くて書くの面倒な感じなので、テキトウに書き直すのが良いかも。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/labs-hail2u-net-amazon-asamashi.html">
+  <p>labs.hail2u.net/amazon/asamashi/</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

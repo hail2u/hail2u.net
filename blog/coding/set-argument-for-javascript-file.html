@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="前回のエントリで触れたscript要素のsrc属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元はscript.aculo.usで、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JavaScriptファイルに引数を渡す - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/set-argument-for-javascript-file.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/easy-format-amazon-associate.html">
+
+    
+
+    
+
+    
+      <meta content="JavaScriptファイルに引数を渡す" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="前回のエントリで触れたscript要素のsrc属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元はscript.aculo.usで、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/set-argument-for-javascript-file.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/set-argument-for-javascript-file.html" itemprop="url">
+
+        <h1 itemprop="name">JavaScriptファイルに引数を渡す</h1>
+
+        <footer>
+          <p>on <time datetime="2006-08-07T12:46:00+09:00" itemprop="datePublished">Aug 7, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">前回のエントリで触れた<code>script</code>要素の<code>src</code>属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元は<a href="http://script.aculo.us/" title="script.aculo.us - web 2.0 javascript">script.aculo.us</a>で、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。</p>
+
+<p>asamashi.jsでは以下のようなコードで引数に指定したASINコードを取得している。</p>
+
+<pre><code class="language-js">$A(document.getElementsByTagName(&quot;script&quot;)).findAll(function(s) {
+  return (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/))
+}).each(function(s) {
+  asin = s.src.replace(/http:\/\/hail2u\.net\/pub\/test\/056_asamashi\.js\#/, &#39;&#39;);
+});
+</code></pre>
+
+<p><code>$A()</code>や<code>findAll()</code>など<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>を利用したコードなので短くまとまっている。</p>
+
+<pre><code class="language-js">var ss1 = document.getElementsByTagName(&quot;script&quot;);
+var ss2 = new Array();
+
+for (var i = 0; i &lt; ss1.length; i++) {
+  var s = ss1[i];
+  if (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/)) ss2.push(s);
+}
+
+for (var i = 0; i &lt; ss2.length; i++) {
+  var s = ss2[i];
+  asin = s.src.replace(/http:\/\/labs\.hail2u\.net\/amazon\/asamashi\/asamashi\.js\#/, &#39;&#39;);
+}
+</code></pre>
+
+<p>普通に書くとこんな感じ(あんまりチェックしてないので多分)。つまり<code>script</code>要素を列挙して、<code>src</code>属性をチェック。自分自身への参照でかつ引数があれば配列に格納し、正規表現の置換で引数をゲットというわけ。</p>
+
+<p>実際には、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  var asin = &quot;4844322222&quot;;
+&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;asamashi.js&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;
+</code></pre>
+
+<p>などという形(<a href="http://www.google.com/adsense/" title="Google AdSense">Google AdSense</a>なんかみたいなスタイル)で良いことが多い(と思う)。そのためこういった引数を与えるというテクニックは使う場所が限られそう。もちろんscript.aculo.usのような動的ロードの仕組みなどはその限られた場所のひとつで、大いに力を発揮するだろう。前回のエントリでやったような仕組みを汎用的にし、第三者に積極的に利用してもらう場合にも良いアプローチだと思う。上記のようなコードよりも、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://hail2u.net/pub/test/056_asamashi.js#4844322222&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;
+</code></pre>
+
+<p>の方がすっきりしてて気持ちが良いし、利用する第三者に優しいと思うので。コーダー的なメリット(アプリケーションにおいて引数を渡すことができるというメリット)よりも、ユーザー的なメリット(JavaScriptファイルの呼び出しが簡略化できたりするメリット)という面でポイントが高いテクニックかなとかいう印象。</p>
+
+<p>例えばGoogle AdSenseが、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://pagead2.googlesyndication.com/pagead/show_ads.js#pub-8712792805045949:Seaside&quot;&gt;
+&lt;/script&gt;
+</code></pre>
+
+<p>という感じだったとしたらすっきりしてて良くない？みたいな。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/easy-format-amazon-associate.html">
+  <p>簡単な記述でアサマシ</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

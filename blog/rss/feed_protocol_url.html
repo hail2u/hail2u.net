@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="feed:で始まるURLをa要素のhref属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: feed and rss protocols format)わけですが、Bloglinesは対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>feed protocol URL - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/rss/feed_protocol_url.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/misc/info_at_040102.html">
+
+    
+
+    
+
+    
+      <meta content="feed protocol URL" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="feed:で始まるURLをa要素のhref属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: feed and rss protocols format)わけですが、Bloglinesは対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/rss/feed_protocol_url.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/rss/feed_protocol_url.html" itemprop="url">
+
+        <h1 itemprop="name">feed protocol URL</h1>
+
+        <footer>
+          <p>on <time datetime="2004-01-02T16:26:00+09:00" itemprop="datePublished">Jan 2, 2004</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/rss/">RSS</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">feed:で始まるURLを<code>a</code>要素の<code>href</code>属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: <a href="http://www.brindys.com/winrss/feedformat.html" title="feed and rss protocols format">feed and rss protocols format</a>)わけですが、<a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>は対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。</p>
+<p>まずは何はともあれ、VBScriptを作成します。こんなんで、引数からBloglinesにsubscribeするためのURLを作り、</p>
+<pre>Dim ObjArgs, StrPath, WshShell
+
+Set ObjArgs = WScript.Arguments
+
+StrPath = ObjArgs(0)
+StrPath = StrPath
+StrPath = Replace(StrPath, &quot;feed:&quot;, &quot;&quot;)
+If Left(StrPath, 2) = &quot;//&quot; Then
+  If Left(StrPath, 6) &lt;&gt; &quot;//http&quot; Then
+    StrPath = &quot;http:&quot; &amp; StrPath
+  Else
+    StrPath = Replace(StrPath, &quot;//http&quot;, &quot;http&quot;)
+  End If
+ElseIf Left(StrPath, 4) &lt;&gt; &quot;http&quot; Then
+  StrPath = &quot;http://&quot; &amp; StrPath
+End If
+
+Set WshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+WshShell.Run &quot;http://www.bloglines.com/sub/&quot; &amp; StrPath
+
+Set ObjArgs = Nothing
+Set WshShell = Nothing
+WScript.Quit
+</pre>
+<p>SubscribeFeed.vbsと名前を付けて、パスの通ったフォルダに保存します。</p>
+<p>次に、feed:で始まるリンクをクリックした場合、SubscribeFeed.vbsを起動するように、レジストリへの登録を行います。以下のようなレジストリファイルを作成し登録します。</p>
+<pre>REGEDIT4
+
+[HKEY_CLASSES_ROOT\feed]
+@=&quot;URL:Feed Protocol&quot;
+&quot;URL Protocol&quot;=&quot;&quot;
+
+[HKEY_CLASSES_ROOT\feed\shell]
+@=&quot;open&quot;
+
+[HKEY_CLASSES_ROOT\feed\shell\open]
+
+[HKEY_CLASSES_ROOT\feed\shell\open\command]
+@=&quot;wscript.exe SubscribeFeed.vbs %1&quot;
+</pre>
+<p>これで、feed:で始まるリンクをクリックすると、BloglinesにRSSが登録され、のMyBlogsのページが開きます。</p>
+<p>正直、無意味に近いです。feed protocolは広まってないですしね。ちなみに、引数にRSSのURLを渡すとSubscribeできるRSSリーダーなら、</p>
+<pre>WshShell.Run &quot;http://www.bloglines.com/sub/&quot; &amp; StrPath
+</pre>
+<p>の部分を、適当に編集してやれば対応できるはず。試す気ないですが。</p>
+<h2>追記@2004/01/05</h2>
+<p>feed protocol URLのシンタックスをかなり誤解しており、うまくhttp:で始まるURLに変換できないっぽいので、VBScriptを更新しました。この更新によって、</p>
+<ul>
+<li>feed:example.com/rss.xml</li>
+<li>feed://example.com/rss.xml</li>
+<li>feed:http://example.com/rss.xml</li>
+<li>feed://http://example.com/rss.xml</li>
+</ul>
+<p>などの記述に対応しました。<a href="http://www.brindys.com/winrss/feedext.html" title="feed protocol extensions">feed protocol extensions</a>へも対応してみようかな・・・。面倒すぎる・・・。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/misc/info_at_040102.html">
+  <p>お知らせ@040102</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="VimでCSSを編集中に色をインライン・プレビューしてくれるCSS color previewというスクリプトをrgb()に対応させてみた。一応rgba()にも対応しているような感じで、透明度を無視してプレビューされる。hsl()とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。hsl()とか使わねーよ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSS color previewをrgb()に対応させた - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/add-support-for-rgb-func-syntax-to-css-color-preview.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/support-slash-started-relative-url-in-vim-gf.html">
+
+    
+
+    
+
+    
+      <meta content="CSS color previewをrgb()に対応させた" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="VimでCSSを編集中に色をインライン・プレビューしてくれるCSS color previewというスクリプトをrgb()に対応させてみた。一応rgba()にも対応しているような感じで、透明度を無視してプレビューされる。hsl()とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。hsl()とか使わねーよ。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/css-color-preview-mod.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/add-support-for-rgb-func-syntax-to-css-color-preview.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/software/add-support-for-rgb-func-syntax-to-css-color-preview.html" itemprop="url">
+
+        <h1 itemprop="name">CSS color previewをrgb()に対応させた</h1>
+
+        <footer>
+          <p>on <time datetime="2009-11-10T09:38:00+09:00" itemprop="datePublished">Nov 10, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://www.vim.org/">Vim</a>でCSSを編集中に色をインライン・プレビューしてくれる<a href="http://vim.sourceforge.net/scripts/script.php?script_id=2150">CSS color preview</a>というスクリプトを<code>rgb()</code>に対応させてみた。一応<code>rgba()</code>にも対応しているような感じで、透明度を無視してプレビューされる。<code>hsl()</code>とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。<code>hsl()</code>とか使わねーよ。</p>
+
+<p class="seealso">Download: <a href="/pub/css.vim">rgb()/rgba()に対応したCSS color preview</a></p>
+
+<p>インストールは$HOME/.vim/after/ftplugin(Windowsでは$HOME/vimfiles/after/ftplugin)にcss.vimとしてコピーするだけ。インストールしてCSSファイルを開くと、</p>
+
+<figure><img src="/images/blog/css-color-preview-mod.png" alt="rgb()/rgba()に対応したCSS color previewのプレビュー画像" itemprop="image"></figure>
+
+<p>というように背景色でインライン・プレビューされる。プレビューの通り<code>rgba()</code>の透明度は反映されない。<code>matchlist()</code>で書こうとしたのだけどよくわからなかったので<code>eval()</code>で書いた……。</p>
+
+<p>元のスクリプトで<code>set ut=100</code>とかなっていたところがちょっと気になったので削除して、<code>autocmd InsertLeave</code>で更新するようにした。改行の時とか;を入力した時にも更新できるともっと良いような気もするけど書き方わからない……。ついでに<code>autocmd</code>もグルーピングして*.cssに対してのみ行うようにした。<code>rgb()</code>対応以外の変更点はこれだけ。カーソル行の強調表示が有効な時に場合によっては文字が見づらくなる不具合も直したかったのだけど、うまい方法を思いつかなかった。</p>
+
+<hr>
+
+<p>最近、</p>
+
+<pre>set guifont=DejaVu_Sans_Mono:h12:w6
+</pre>
+
+<p>でgVimを使っているのだけどなかなか良い。上のプレビュー画像もこれ。デフォルトでは幅広すぎてちょっとかっこ悪い感じだけど<code>w6</code>にするとスマート。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/support-slash-started-relative-url-in-vim-gf.html">
+  <p>Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

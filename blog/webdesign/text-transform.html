@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Webフォント人気に引きずられるようにtext-transoformプロパティもよく使われるようになってきました。SteelfishやFranchiseをヘッダや見出しで使って大文字にするとかよく見かけますね。そしてかっこいい。ですがその実装に違いがいくつかあることはあまり知られていないような気がします。ひとつはcapitalizeの挙動で、もうひとつはコピーした時の挙動です。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>text-transform - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/text-transform.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/paging-arrow.html">
+
+    
+
+    
+
+    
+      <meta content="text-transform" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Webフォント人気に引きずられるようにtext-transoformプロパティもよく使われるようになってきました。SteelfishやFranchiseをヘッダや見出しで使って大文字にするとかよく見かけますね。そしてかっこいい。ですがその実装に違いがいくつかあることはあまり知られていないような気がします。ひとつはcapitalizeの挙動で、もうひとつはコピーした時の挙動です。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/text-transform.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/text-transform.html" itemprop="url">
+
+        <h1 itemprop="name">text-transform</h1>
+
+        <footer>
+          <p>on <time datetime="2011-11-06T04:06:00+09:00" itemprop="datePublished">Nov 6, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Webフォント人気に引きずられるように<code>text-transoform</code>プロパティもよく使われるようになってきました。<a href="http://new.myfonts.com/fonts/larabie/steelfish/">Steelfish</a>や<a href="http://derekweathersbee.com/franchise/">Franchise</a>をヘッダや見出しで使って大文字にするとかよく見かけますね。そしてかっこいい。ですがその実装に違いがいくつかあることはあまり知られていないような気がします。ひとつは<code>capitalize</code>の挙動で、もうひとつはコピーした時の挙動です。</p>
+
+<p>まず<code>text-transform</code>プロパティの取りうる値について。</p>
+
+<dl>
+<dt><code>none</code></dt><dd>何もしない。デフォルトの値。</dd>
+<dt><code>capitalize</code></dt><dd>語頭を大文字にする。</dd>
+<dt><code>uppercase</code></dt><dd>全て大文字にする。</dd>
+<dt><code>lowercase</code></dt><dd>全て小文字にする。</dd>
+</dl>
+
+<p>CSS3ではこれらに加えて<code>full-width</code>と<code>full-width-kana</code>という半角全角切り替えのための値を同時に指定することが出来るようになっていますが、今のところ実装がないので気にする必要はないでしょう。</p>
+
+<h2><code>capitalize</code>の扱いの違い</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/290.html">Test page for <code>text-transform</code> #1</a></p>
+
+<p>違いが現れるのは単語同士をハイフンでつなげた場合です。ChromeやSafariのWebKit系とInternet Explorerではハイフンに続く文字も大文字になるのに対して、FirefoxとOperaでは大文字になりません。</p>
+
+<p>語頭を大文字にする曲名や本のタイトルではハイフンに続く文字も大文字にしているケースが多いので、FirefoxとOperaの挙動がマイナーなようですね。</p>
+
+<h2>コピーされる文字列</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/291.html">Test page for <code>text-transform</code> #2</a></p>
+
+<p><code>text-transform</code>プロパティを適用した文字列をコピーした時に、クリップボードに入る文字列に違いが出ます。ChromeやSafariのWebKit系では見たまま、つまり<code>uppercase</code>なら全て大文字化された文字列が入り、FirefoxとOpera、Internet Explorerでは元の状態の文字列が入ります。</p>
+
+<p>こちらは表示には差が出ないのでもっと気づくことが少ないです。どちらかというと見たままコピーされるWebKit系の挙動の方がユーザーに優しいような気がします。</p>
+
+<p>ちなみに<code>font-variant</code>プロパティで<code>small-caps</code>を指定した文字列は似たような見た目にはなりますが、全てのブラウザで元の状態の文字列がコピーされます。</p>
+
+<hr>
+
+<p>こういった基礎知識以上ベスト・プラクティス未満なネタをまとめたサイトを作ろうと画策しいるようなしていないような。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/paging-arrow.html">
+  <p>ページめくりの矢印</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

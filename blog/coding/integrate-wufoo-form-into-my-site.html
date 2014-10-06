@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Wufooのフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といってもdocument.write()なJavaScriptコードやiframe要素を張り付けて使うEmbed Form Code等やREST APIを利用したものではなく、決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良いようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Wufooのフォームを自分のサイトに統合 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/integrate-wufoo-form-into-my-site.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/vim-install-pathogen.html">
+
+    
+
+    
+
+    
+      <meta content="Wufooのフォームを自分のサイトに統合" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Wufooのフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といってもdocument.write()なJavaScriptコードやiframe要素を張り付けて使うEmbed Form Code等やREST APIを利用したものではなく、決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良いようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/integrate-wufoo-in-my-site-1.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/integrate-wufoo-form-into-my-site.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/coding/integrate-wufoo-form-into-my-site.html" itemprop="url">
+
+        <h1 itemprop="name">Wufooのフォームを自分のサイトに統合</h1>
+
+        <footer>
+          <p>on <time datetime="2011-01-11T11:50:00+09:00" itemprop="datePublished">Jan 11, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://wufoo.com/">Wufoo</a>のフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といっても<code>document.write()</code>なJavaScriptコードや<code>iframe</code>要素を張り付けて使う<a href="http://wufoo.com/docs/code-manager/">Embed Form Code等</a>や<a href="http://wufoo.com/docs/api/">REST APIを利用したもの</a>ではなく、<a href="http://wufoo.com/docs/api/external-post-to-wufoo/">決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良い</a>ようだ。</p>
+
+<p>まずはWufooにログインしてフォームを作成しておく必要がある。作成したら管理画面からCodeをクリックしてForm Code Managerを開く。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-1.png" alt="Form Code Managerへのリンク" itemprop="image"></figure>
+
+<p>Form Code Managerのページの右上にあるAPI Informationをクリックして、作成したフォームのAPI情報ページを開く。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-2.png" alt="API Informationのリンク"></figure>
+
+<p>このページにフォームの作成に必要なものは揃っている。必要なものはAPI IDとPOST Keyだけで、API KeyやHashは必要ない。ドキュメントではForm Code ManagerからXHTML/CSS Codeをダウンロードしてそれに入っているHTMLを書き換えろと支持されているが、そのHTMLはかなり読みづらいので、API IDとPOST Keyをコピーして一から書いた方が楽だと思う。</p>
+
+<p>API IDは以下のような表で記載されている。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-3.png" alt="API ID"></figure>
+
+<p>POST Keyはページ右下にちょこんと記載されている。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-4.png" alt="POST Key"></figure>
+
+<p>以上の情報を元に以下のような点に気をつけてフォームを作成すれば良い。</p>
+
+<ul>
+<li><code>form</code>要素の<code>action</code>には作成したフォームのURLを記入する</li>
+<li>各フォームの入力要素の<code>name</code>と<code>id</code>に<em>Field{API ID}</em>(API IDが174ならField174)を指定する</li>
+<li><code>type=&quot;hidden&quot;</code>の<code>input</code>要素の<code>name</code>と<code>id</code>に<code>idstamp</code>を割り当て、<code>value</code>でPOST Keyを指定する</li>
+</ul>
+
+<p>つまり以下のようなフォームを作成することになる。</p>
+
+<pre><code class="language-html">&lt;form action=&quot;http://username.wufoo.com/forms/formname/&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;
+  &lt;label&gt;
+    Name
+    &lt;input type=&quot;text&quot; name=&quot;Field6&quot; id=&quot;Field6&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Email
+    &lt;input type=&quot;text&quot; name=&quot;Field119&quot; id=&quot;Field119&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Website
+    &lt;input type=&quot;text&quot; name=&quot;Field126&quot; id=&quot;Field126&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Summary
+    &lt;input type=&quot;text&quot; name=&quot;Field229&quot; id=&quot;Field229&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Message
+    &lt;textarea rows=&quot;10&quot; cols=&quot;50&quot; name=&quot;Field115&quot; id=&quot;Field115&quot;&gt;&lt;/textarea&gt;
+  &lt;/label&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;idstamp&quot; value=&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot; id=&quot;idstamp&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot; name=&quot;saveForm&quot; id=&quot;saveForm&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>あとはサイトのデザインに合わせてCSSで飾り付けるのみ。Wufooは<a href="http://wufoo.com/2010/08/30/use-over-150-fonts-on-your-forms-with-wufoos-new-typography-features/">Webフォント</a>が使えたりと元々かなり強力なデザイン機能を持っているが、やはり一からフォームを構築できると自己満足度は高い。Wufooのドキュメントで<em>公式にサポートしていない</em>と明言されており、突然停止することもありうるということには注意が必要だが、それに目をつぶっても使う価値があると個人的には感じた。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/vim-install-pathogen.html">
+  <p>pathogenのインストール</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

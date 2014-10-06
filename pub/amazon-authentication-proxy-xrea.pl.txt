@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use CGI;
+use Digest::SHA::PurePerl qw(hmac_sha256_base64);
+use LWP::Simple;
+use URI::Escape;
+
+
+my $access_key_id     = "00000000000000000000";
+my $secret_access_key = "0000000000000000000000000000000000000000";
+my $associate_tag     = "hail2unet-22";
+
+
+my $endpoint = "ecs.amazonaws.jp";
+my $unsafe   = "^A-Za-z0-9\-_.~";
+
+
+my $q = CGI->new;
+
+$q->param("AWSAccessKeyId", $access_key_id);
+
+if (!$q->param("AssociateTag")) {
+  $q->param("AssociateTag", $associate_tag);
+}
+
+if (!$q->param("Timestamp")) {
+  $q->param("Timestamp", sprintf("%04d-%02d-%02dT%02d:%02d:%02d.000Z", sub {
+    ($_[5]+1900, $_[4]+1, $_[3],  $_[2], $_[1], $_[0] )
+  }->(gmtime(time))));
+}
+
+my @p = $q->param();
+
+foreach (@p) {
+  $_ = escape($_) . "=" . escape($q->param($_));
+}
+
+my $qs = join("&", sort(@p));
+my $signature = hmac_sha256_base64("GET\n$endpoint\n/onca/xml\n$qs", $secret_access_key) . "=";
+my $signed_url = "http://$endpoint/onca/xml?$qs&Signature=" . escape($signature);
+
+print $q->header(
+  -type    => "text/xml",
+  -charset => "UTF-8"
+);
+getprint($signed_url);
+
+exit;
+
+
+sub escape {
+  my $s = shift;
+
+  $s =~ s/([^\0-\x7F])/do {
+    my $o = ord($1);
+    sprintf("%c%c", 0xc0 | ($o >> 6), 0x80 | ($o & 0x3f));
+  }/ge;
+
+  return uri_escape($s, $unsafe);
+}

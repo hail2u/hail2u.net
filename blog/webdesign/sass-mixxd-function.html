@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="rgba()のエミュレートにはadjust-rgb()だけでは不十分なので、ちゃんと背景色と混ぜるmixxd()という関数を作りました。mix()の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>mixxd()というSassの関数を作った - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/sass-mixxd-function.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/internet/pinterest-2.html">
+
+    
+
+    
+
+    
+      <meta content="mixxd()というSassの関数を作った" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="rgba()のエミュレートにはadjust-rgb()だけでは不十分なので、ちゃんと背景色と混ぜるmixxd()という関数を作りました。mix()の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/sass-mixxd-function.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/sass-mixxd-function.html" itemprop="url">
+
+        <h1 itemprop="name">mixxd()というSassの関数を作った</h1>
+
+        <footer>
+          <p>on <time datetime="2011-12-27T05:24:00+09:00" itemprop="datePublished">Dec 27, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><code>rgba()</code>のエミュレートには<a href="/blog/webdesign/sass-adjust-rgb-function.html"><code>adjust-rgb()</code></a>だけでは不十分なので、ちゃんと背景色と混ぜる<code>mixxd()</code>という関数を作りました。<code>mix()</code>の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。</p>
+
+<pre><code class="language-scss">@function mixxd($color-1, $color-2, $weight: 0.5) {
+  $percentage: percentage(1 - $weight);
+
+  @return mix($color-1, $color-2, $percentage);
+}
+</code></pre>
+
+<p><code>rgba()</code>や<code>transparentize()</code>と同じ小数を引数に取ることが出来るので、%を引数に取る<code>mix()</code>よりも混乱しにくいんじゃないかと思います。</p>
+
+<pre><code class="language-scss">$bg: #f9f6f0;
+
+body {
+  background-color: $bg;
+
+  &gt; footer {
+    background-color: mix(black, $bg, 0.9);
+    background-color: transparentize(black, 0.9);
+    // background-color: rgba(0, 0, 0, 0.9);
+  }
+}
+</code></pre>
+
+<p>第一引数でベースになる色、第二引数で混ぜる対象の背景色、第三引数で混ぜる割合を指定して使います。割合は0に近づくほどベースになる色に近づき、1に近づくほど混ぜる対象の背景色に近づくので、<code>rgba()</code>の透過率とほぼ同じと考えてください。小数点以下の扱いがSass任せなので完全に一致はしませんが、ほぼ同じような色合いになると思います。背景画像と混ぜる場合は……まぁ頑張って工夫してください。</p>
+
+<hr>
+
+<p><code>mix()</code>で小数が通るということに気づいて「うわ無駄なことした……」とか一瞬思ったんですが、そんなことはなかったので良かったです。</p>
+
+<pre><samp>$ <kbd>sass -i</kbd>
+&gt;&gt; <kbd>mix(black, white, 0.1)</kbd>
+#fefefe
+&gt;&gt; <kbd>mix(black, white, 0.1%)</kbd>
+#fefefe
+&gt;&gt; <kbd>mix(black, white, 0.9)</kbd>
+#fcfcfc
+&gt;&gt; <kbd>mix(black, white, 0.9%)</kbd>
+#fcfcfc
+</samp></pre>
+
+<p>インタラクティブ・モードで試すとこういう感じなので、通ることは通るんですが%とみなされている感じですね。エラー吐かないのはバグでしょう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/internet/pinterest-2.html">
+  <p>Pinterest #2</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

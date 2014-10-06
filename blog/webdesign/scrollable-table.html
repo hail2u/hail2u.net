@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="表をかっこよくスクロール可能にするテクニックについてのResponsive scrollable tablesという記事を読んだ。この記事ではJavaScriptで表をdiv要素で括って、それから溢れたらスクロールバーを表示(+α)という形でやっている。これをいじってて気づいたんだけど、JavaScriptで追加マークアップをする代わりにtable要素のdisplayプロパティーをいじってやると簡単にスクロール可能な表になるようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>スクロールできる表 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/scrollable-table.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/media/gf.html">
+
+    
+
+    
+
+    
+      <meta content="スクロールできる表" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="表をかっこよくスクロール可能にするテクニックについてのResponsive scrollable tablesという記事を読んだ。この記事ではJavaScriptで表をdiv要素で括って、それから溢れたらスクロールバーを表示(+α)という形でやっている。これをいじってて気づいたんだけど、JavaScriptで追加マークアップをする代わりにtable要素のdisplayプロパティーをいじってやると簡単にスクロール可能な表になるようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/scrollable-table.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/scrollable-table.html" itemprop="url">
+
+        <h1 itemprop="name">スクロールできる表</h1>
+
+        <footer>
+          <p>on <time datetime="2013-09-24T11:04:00+09:00" itemprop="datePublished">Sep 24, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">表をかっこよくスクロール可能にするテクニックについての<a href="http://www.456bereastreet.com/archive/201309/responsive_scrollable_tables/">Responsive scrollable tables</a>という記事を読んだ。この記事ではJavaScriptで表を<code>div</code>要素で括って、それから溢れたらスクロールバーを表示(+α)という形でやっている。これをいじってて気づいたんだけど、JavaScriptで追加マークアップをする代わりに<code>table</code>要素の<code>display</code>プロパティーをいじってやると簡単にスクロール可能な表になるようだ。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/502.html">Scrollable Table</a></p>
+
+<p>表を自動幅調整なし(幅固定)にするには<code>table-layout</code>プロパティーを、各セルで折り返しなしにするには<code>white-space</code>プロパティーをそれぞれ使う。それと<code>display: block</code>を組み合わせると、<code>pre</code>要素で文字がはみ出す時にスクロールさせるような感じになる。</p>
+
+<pre><code class="language-css">table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  table-layout: fixed;
+}
+
+th,
+td {
+  white-space: nowrap;
+}</code></pre>
+
+<p>スクリーン・リーダーが<code>display: block</code>な表をどう解釈するか微妙な感じがあるけど、こっちの方がお手軽。表じゃなくなるので<code>border-collapse</code>プロパティー等に影響があるけど、子の<code>td</code>要素等にはその影響は波及しないのであまり問題もなさそう。</p>
+
+<p>スクロールバーが、表の大きさ的な理由で気づかない、またはブラウザーのUI的な理由で見えないことが多いので、パッと見て横にはみ出してスクロールすると全部見える表なのかどうかがわかりづらい。ウェブページは横にはみ出さないもの的な先入観を持つ人も多いしそれで普通だと思うので、表の表示の仕方としては適切ではない気もする。元記事の実装のようにはみ出したら影というような補助が必要で、そうできればすごく良さそうだけどCSSだけでは難しそう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/media/gf.html">
+  <p>G.F.</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

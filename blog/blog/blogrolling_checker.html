@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="前回のエントリを受けて、BlogRollingをチェックするPerlスクリプトを作ってみる。今回はクイック起動というか、デスクトップのツール バーで実装してみました。何はともあれ実行結果。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>BlogRolling checker - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/blog/blogrolling_checker.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/about_msnmsgr_tab.html">
+
+    
+
+    
+
+    
+      <meta content="BlogRolling checker" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="前回のエントリを受けて、BlogRollingをチェックするPerlスクリプトを作ってみる。今回はクイック起動というか、デスクトップのツール バーで実装してみました。何はともあれ実行結果。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/blogrolling_checker.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/blog/blogrolling_checker.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/blog/blogrolling_checker.html" itemprop="url">
+
+        <h1 itemprop="name">BlogRolling checker</h1>
+
+        <footer>
+          <p>on <time datetime="2003-10-25T15:13:00+09:00" itemprop="datePublished">Oct 25, 2003</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/blog/">Blog</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">前回のエントリを受けて、<a href="http://www.blogrolling.com/" title="BlogRolling">BlogRolling</a>をチェックするPerlスクリプトを作ってみる。今回はクイック起動というか、デスクトップのツール バーで実装してみました。何はともあれ実行結果。</p>
+<figure><img src="/images/blog/blogrolling_checker.png" alt="BlogRolling on your desktop" itemprop="image"></figure>
+<p>スクリプトの動作は以下のような感じです。</p>
+<ul>
+<li>自分のBlogRollingの登録状況をOPMLで拾ってくる</li>
+<li>ループで回して各登録サイトの情報を個別に取得
+<ul>
+<li>ファイル名に使えない文字列を全角にエスケープ</li>
+<li>BlogRollingの腐った更新時刻をHTTPフォーマットに直し、更にunix timeに</li>
+<li>スクリプトの実行時刻と比較して、6時間以内の更新かどうかでによって、違うアイコンのインターネット・ショートカットを作成</li>
+</ul>
+</li>
+</ul>
+<p>BlogRollingの腐った更新時刻というのは、</p>
+<blockquote>
+<p>21:10:41 GMT on Wednesday, October 22</p>
+</blockquote>
+<p>とか、こんなんです。要はmachine readableじゃない(と思う)ので、unix timeに変換しづらいわけで。これに関する処理以外は特に何も言うところはないような。</p>
+<p><a href="/pub/blogrolling_checker.zip" title="blogrolling_checker.zip">ソース・ファイルとアイコンのセットをまとめたZIPファイル</a>をアップロードしておきます。</p>
+<p>スクリーン・ショット取りにくいので、フロートさせた状態のものですが、デスクトップの右端にドッキングさせて、常に手前に表示&amp;自動的に隠すにしておけば邪魔にならず、チェックしやすいと思います。</p>
+<p>最後になりましたが、Windows専用です(当たり前。</p>
+<h2>追記</h2>
+<p>ファイルをアップロードするのが若干遅れた(単に忘れてた)ので、ファイルが見つかりませんとなってたかもしれません。修正しておきました。<a href="http://www2s.biglobe.ne.jp/%7Echic/pilot.html" title="お笑いパソコン日誌">お笑いパソコン日誌</a>に指摘されていたので、追記。</p>
+<h2>追記</h2>
+<p>ファイル名に使えない文字があるサイトタイトルの場合の処理に大いに至らないところがあったので、修正。ついでに、lastmodが無いoutline要素が出てくる場合に対応しました。BlogRollingにpingを打っていないサイトの場合は、どうやらlastmodが入らないようなので。この場合は常に更新されていないとみなして出力してます。スクリーン・ショットも更新しました。ファイル名はそのままで上書きしたので、キャッシュを無視して再読み込みしないと表示されないと思います。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/about_msnmsgr_tab.html">
+  <p>MSN Messengerのタブについて</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

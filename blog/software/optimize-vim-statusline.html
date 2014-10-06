@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="FuzzyFinderのbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、statuslineにも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Vimのstatuslineを最適化する - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/optimize-vim-statusline.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/vim-settings-for-web-development.html">
+
+    
+
+    
+
+    
+      <meta content="Vimのstatuslineを最適化する" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="FuzzyFinderのbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、statuslineにも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/optimize-vim-statusline-default.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/optimize-vim-statusline.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/software/optimize-vim-statusline.html" itemprop="url">
+
+        <h1 itemprop="name">Vimのstatuslineを最適化する</h1>
+
+        <footer>
+          <p>on <time datetime="2009-11-02T09:49:00+09:00" itemprop="datePublished">Nov 2, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://www.vim.org/scripts/script.php?script_id=1984">FuzzyFinder</a>のbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、<code>statusline</code>にも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。</p>
+
+<p>Vimのデフォルトの<code>statusline</code>は以下のようなもの。</p>
+
+<figure><img src="/images/blog/optimize-vim-statusline-default.png" alt="デフォルトのstatuslineのスクリーンショット" itemprop="image"></figure>
+
+<p>これにファイルの種類や文字コード・改行コードなどあると便利な情報を追加した上で、ファイル名を先頭に持ってきて、残りのパスを<code>%&lt;</code>を利用して省略させるようにすると、</p>
+
+<figure><img src="/images/blog/optimize-vim-statusline-customized.png" alt="ビルトインの省略機能を利用したカスタマイズ済みのstatuslineのスクリーンショット"></figure>
+
+<p>こんな感じになる。この<code>statusline</code>のコードは、</p>
+
+<pre><code class="language-vim">set statusline=%{expand(&#39;%:p:t&#39;)}\ %&lt;\(%{expand(&#39;%:p:h&#39;)}\)%=\ %m%r%y%w%{&#39;[&#39;.(&amp;fenc!=&#39;&#39;?&amp;fenc:&amp;enc).&#39;][&#39;.&amp;ff.&#39;]&#39;}[%3l,%3c]
+</code></pre>
+
+<p>というもので、しばらくこれを使っていた。悪くはないが、パスの先頭を省略するような書き方なのでドライブレターが見えなくなってしまいWindowsだとちょっとアレ。これをベースにFuzzyFinderから長いパスの中間を省略する関数をパクって最適化すると、</p>
+
+<figure><img src="/images/blog/optimize-vim-statusline-optimized.png" alt="最適化されたstatuslineのスクリーンショット"></figure>
+
+<p>こうなる。ドライブレターも見えるし、ファイルのあるフォルダ名も大体見えるのでわかりやすい！</p>
+
+<pre><code class="language-vim">set statusline=%{expand(&#39;%:p:t&#39;)}\ %&lt;\(<em>%{SnipMid(expand(&#39;%:p:h&#39;),80-len(expand(&#39;%:p:t&#39;)),&#39;...&#39;)}</em>\)%=\ %m%r%y%w%{&#39;[&#39;.(&amp;fenc!=&#39;&#39;?&amp;fenc:&amp;enc).&#39;][&#39;.&amp;ff.&#39;]&#39;}[%3l,%3c]
+
+function! SnipMid(str, len, mask)
+  if a:len &gt;= len(a:str)
+    return a:str
+  elseif a:len &lt;= len(a:mask)
+    return a:mask
+  endif
+
+  let len_head = (a:len - len(a:mask)) / 2
+  let len_tail = a:len - len(a:mask) - len_head
+
+  return (len_head &gt; 0 ? a:str[: len_head - 1] : &#39;&#39;) . a:mask . (len_tail &gt; 0 ? a:str[-len_tail :] : &#39;&#39;)
+endfunction
+</code></pre>
+
+<p><code>SnipMid()</code>はFuzzyFinderからコピペしただけ(<a href="http://bitbucket.org/ns9tks/vim-fuzzyfinder/src/tip/autoload/fuf.vim#cl-505">autoload/fuf.vimの505行目</a>あたりにある)。切り詰める長さは<code>SnipMid()</code>の第二引数で指定する。ここでは、</p>
+
+<pre>80-len(expand(&quot;%:p:h&quot;))
+</pre>
+
+<p>と80からファイル名を引いた数で切り詰めているが、ターミナルの横幅や<code>columns</code>にあわせて要調節。<code>set columns=120</code>な環境だとこれくらいが丁度良かった。頑張れば環境に合わせてフレキシブルに切り詰める長さを調節できそうだけど面倒なので……。</p>
+
+<p><code>titlestring</code>に使っても良い。</p>
+
+<pre><code class="language-vim">set titlestring=%{expand(&#39;%:p:t&#39;)}%(\ %m%r%w%)\ %&lt;\(%{SnipMid(expand(&#39;%:p:h&#39;),80-len(expand(&#39;%:p:t&#39;)),&#39;...&#39;)}\)\ -\ Vim
+</code></pre>
+
+<hr>
+
+<p>Vimはどうにかしようと思うと大抵はどうにかできて幸せ……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/vim-settings-for-web-development.html">
+  <p>Web開発周りのVimの設定</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

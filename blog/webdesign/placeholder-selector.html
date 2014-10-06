@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="フォームのプレースホルダー周りのセレクターは、今のところウェブ標準では:placeholder-shown擬似クラスとして定義されている。つまりプレースホルダー文字列が表示されているかどうかという状態を反映するもの。どうやらInternet Explorer 11はこれを踏襲した実装のようだ。対してChrome 31やFirefox 25では擬似要素として実装されており、プレースホルダーそのものを表現するセレクターになっている。できることはあまり変わらないのだけど、例えば背景画像の開始位置とかでズレが生じる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>プレースホルダー周りのセレクター - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/placeholder-selector.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/git-release-js.html">
+
+    
+
+    
+
+    
+      <meta content="プレースホルダー周りのセレクター" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="フォームのプレースホルダー周りのセレクターは、今のところウェブ標準では:placeholder-shown擬似クラスとして定義されている。つまりプレースホルダー文字列が表示されているかどうかという状態を反映するもの。どうやらInternet Explorer 11はこれを踏襲した実装のようだ。対してChrome 31やFirefox 25では擬似要素として実装されており、プレースホルダーそのものを表現するセレクターになっている。できることはあまり変わらないのだけど、例えば背景画像の開始位置とかでズレが生じる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/placeholder-selector.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/placeholder-selector.html" itemprop="url">
+
+        <h1 itemprop="name">プレースホルダー周りのセレクター</h1>
+
+        <footer>
+          <p>on <time datetime="2013-12-30T11:17:00+09:00" itemprop="datePublished">Dec 30, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">フォームのプレースホルダー周りのセレクターは、今のところウェブ標準では<a href="http://www.w3.org/TR/2013/WD-selectors4-20130502/#placeholder"><code>:placeholder-shown</code>擬似クラス</a>として定義されている。つまりプレースホルダー文字列が表示されているかどうかという状態を反映するもの。どうやらInternet Explorer 11はこれを踏襲した実装のようだ。対してChrome 31やFirefox 25では擬似要素として実装されており、プレースホルダーそのものを表現するセレクターになっている。できることはあまり変わらないのだけど、例えば背景画像の開始位置とかでズレが生じる。</p>
+
+<p>以下のようなスタイルがあたっている入力ボックスにプレースホルダーが表示されているとする。</p>
+
+<pre><code class="language-css">input[type=&quot;text&quot;] {
+  padding-left: 1em;
+}
+</code></pre>
+
+<p>左に<code>1em</code>の余白を取っているだけ。この場合、入力文字列は<code>1em</code>のところから表示されることになる。プレースホルダー文字列もそれに習う。こういった要素にプレースホルダー周りのセレクターを使って、何も入力されていない時だけウォーターマークを背景画像として表示しようとすると以下のようなCSSになる。</p>
+
+<pre><code class="language-css">input[type=&quot;text&quot;]::-moz-placeholder {
+  background-image: url(&quot;watermark.png&quot;);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+input[type=&quot;text&quot;]::-webkit-input-placeholder {
+  background-image: url(&quot;watermark.png&quot;);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+input[type=&quot;text&quot;]:-ms-input-placeholder {
+  background-image: url(&quot;watermark.png&quot;);
+  background-repeat: no-repeat;
+  background-position: 1em center;
+}
+
+input[type=&quot;text&quot;]:placeholder-shown {
+  background-image: url(&quot;watermark.png&quot;);
+  background-repeat: no-repeat;
+  background-position: 1em center;
+}
+</code></pre>
+
+<p>Firefox 25やChrome 31ではプレースホルダーそのものを指すので、背景画像は<code>padding</code>プロパティーの内側に配置される。対してInternet Explorer 10では擬似クラスのようなので、背景画像は<code>padding</code>プロパティーの外側に配置されるため、両者を揃えようとする場合は<code>padding</code>プロパティーの値と同じだけ<code>background-position</code>プロパティーで位置を調節する必要がある。ウェブ標準でも多分同じだろう。</p>
+
+<p>Internet Explorer 10については<code>background-origin</code>プロパティーで<code>content-box</code>を指定してやると揃えることができたので、CSSのコードは増えるもののそっちの方が素直かもしれない。ウェブ標準でも多分これで大丈夫。</p>
+
+<p><code>background-position</code>プロパティー以外にもいくつか互換性のないプロパティー等があるので、そのままコピペは通用しない。まだ人類には早いセレクターと言えるかもしれない。とは言うものの<code>input</code>要素は置換要素で擬似要素を適用できなかったりするので、早いところ統一されて使えるようになってくれないとどうにもしようがなかったりもする。</p>
+
+<hr>
+
+<p>なお、プレースホルダー周りのセレクターを使うルールセットは、プリフィックス付きであったり未実装のセレクターを使うことになるのでまとめることはできない。いわゆる<a href="/blog/webdesign/unknown-css-selector.html">不明なセレクター</a>というアレ。こういうの見るとベンダー拡張プリフィックスなくす派に改宗したくなる気もする。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/git-release-js.html">
+  <p>git-release.js</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

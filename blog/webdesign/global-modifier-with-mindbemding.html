@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろんbody要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>BEMでグローバルなモディファイア - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/global-modifier-with-mindbemding.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html">
+
+    
+
+    
+
+    
+      <meta content="BEMでグローバルなモディファイア" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろんbody要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/global-modifier-with-mindbemding.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/global-modifier-with-mindbemding.html" itemprop="url">
+
+        <h1 itemprop="name">BEMでグローバルなモディファイア</h1>
+
+        <footer>
+          <p>on <time datetime="2014-03-07T11:13:00+09:00" itemprop="datePublished">Mar 7, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろん<code>body</code>要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.body--permalink .article__title {
+}
+</code></pre>
+
+<p>書きにくい。そしてBEMの、ブロックが相互に依存しない利点と矛盾する。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.article__title--permalink {
+}
+</code></pre>
+
+<p>グローバルなモディファイアをやめるとスッキリする。けれどこのコンテキストのモディファイアじゃないので気持ち悪い。</p>
+
+<pre><code class="language-scss">.article {
+  .title {
+
+    .permalink &amp; {
+    }
+  }
+}
+</code></pre>
+
+<p>ここのCSSでは、Sassでネストでエレメント・<code>&amp;</code>を使うとモディファイアというルールにしているのでこれで良い。BEMとSassに対する広範な知識を持つことを前提にすれば良い着地点な気がするけど、コンセンサスは取れなそうで実用的でじゃない。</p>
+
+<p><del>結論なし</del>追記した。</p>
+
+<hr>
+
+<p>少し前にパーマリンクだけタイトルを大きく目立つようにした絡みでこんなことを考えていた。太字じゃない方が良い気もするのと、太字の文だけ余白を調節した方が良さそうとかちょっと気になるところがまだある。本当は.HiraKakuInterface-W2や游ゴシック Lightを使った細字でのタイトルにしようかと考えていたんだけど、細字のない環境での違和感がものすごいので諦めた。</p>
+
+<h2>追記</h2>>
+
+<p>2番目のコンテキストのモディファイアで<code>in-</code>などの接頭詞を使うのが、単純で良いのかなと考えた。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.article__title--<mark>in-permalink</mark> {
+}
+</code></pre>
+
+<p>多少反則気味だけど、落とし所としては申し分なさそう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html">
+  <p>Gruntタスクの設定をファイルで管理</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

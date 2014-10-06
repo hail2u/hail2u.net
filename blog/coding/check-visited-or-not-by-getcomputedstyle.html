@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="COLLECTION &amp; COPYのそのリソースを訪問済みか判定するやHatebu Addictionなどで使われている既読チェック。これらとは違う、getComputedStyle()メソッドを利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、Jeremiah Grossman: I know where you&#39;ve beenというページを見つけた。FirefoxやSafariなどではこれで既読チェックが可能。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>getComputedStyle()を利用した既読チェック - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/check-visited-or-not-by-getcomputedstyle.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/asterisk-hack.html">
+
+    
+
+    
+
+    
+      <meta content="getComputedStyle()を利用した既読チェック" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="COLLECTION &amp; COPYのそのリソースを訪問済みか判定するやHatebu Addictionなどで使われている既読チェック。これらとは違う、getComputedStyle()メソッドを利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、Jeremiah Grossman: I know where you&#39;ve beenというページを見つけた。FirefoxやSafariなどではこれで既読チェックが可能。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/check-visited-or-not-by-getcomputedstyle.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/check-visited-or-not-by-getcomputedstyle.html" itemprop="url">
+
+        <h1 itemprop="name">getComputedStyle()を利用した既読チェック</h1>
+
+        <footer>
+          <p>on <time datetime="2006-08-25T11:51:00+09:00" itemprop="datePublished">Aug 25, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://d.hatena.ne.jp/brazil/20060812/1155388762" title="Collection &amp; Copy - そのリソースを訪問済みか判定する">COLLECTION &amp; COPYのそのリソースを訪問済みか判定する</a>や<a href="http://lab.rails2u.com/hatebu_addiction/" title="Hatebu Addiction">Hatebu Addiction</a>などで使われている既読チェック。これらとは違う、<a href="http://developer.mozilla.org/en/docs/DOM:window.getComputedStyle" title="DOM:window.getComputedStyle - MDC"><code>getComputedStyle()</code>メソッド</a>を利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、<a href="http://jeremiahgrossman.blogspot.com/2006/08/i-know-where-youve-been.html" title="Jeremiah Grossman: I know where you&#39;ve been">Jeremiah Grossman: I know where you&#39;ve been</a>というページを見つけた。<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox</a>や<a href="http://www.apple.com/jp/macosx/features/safari/" title="アップル - Mac OS X - Safari RSS">Safari</a>などではこれで既読チェックが可能。</p>
+
+<p><code>getComputedStyle()</code>メソッドは<code>style</code>属性やJavaScriptで設定されたスタイル<em>以外</em>のスタイル情報をまとめて取得するメソッドで、<code>ComputedCSSStyleDeclaration</code>オブジェクトを返す。そして、<code>ComputedCSSStyleDeclaration</code>オブジェクトの<code>getPropertyValue()</code>メソッドで各スタイル情報を文字列で取得できる。既読チェックでは<code>color</code>をチェックすれば良い。</p>
+
+<p>というわけで簡単な<a href="/pub/test/064.html" title="既読チェック">サンプル・ページ</a>を作ってみた。リンクのリスト(<a href="http://b.hatena.ne.jp/hotentry" title="はてなブックマーク - 人気エントリー">はてなブックマークのホッテントリ</a>から拝借した)を調べて、既読の場合は「既」という文字列を前に付け、何件のリンクが既読か表示するというだけのもの。ソースを見てもらえばわかる通り、</p>
+
+<pre><code class="language-js">var links = $(&#39;linklist&#39;).getElementsByTagName(&#39;a&#39;);
+var i = 0;
+
+$A(links).each(function (link) {
+  var color = document.defaultView.getComputedStyle(link, null).getPropertyValue(&quot;color&quot;);
+
+  if (color == &quot;rgb(128, 0, 0)&quot;) {
+    new Insertion.Before(link, &#39;既 &#39;);
+    i++;
+  }
+});
+
+new Insertion.Before(&#39;linklist&#39;, &#39;&lt;p&gt;全 50 件のリンク中 &#39; + i + &#39; 件のリンクが既読です。&lt;/p&gt;&#39;);
+</code></pre>
+
+<p>と簡単に書ける(半分以上<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>のおかげだけど)。<code>a</code>要素を動的に生成するのに比べ、拾って比較するだけなので動作自体も軽いと思う。<a href="http://greasemonkey.mozdev.org/" title="mozdev.org - greasemonkey: index">Greasemonkey</a>なんかではこっちを使った方が効率的な気がする。コード的にもわかりやすいし。</p>
+
+<p><code>getComputedStyle()</code>はいろいろと遊べそうな気がする。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/asterisk-hack.html">
+  <p>アスタリスクをプロパティ名の頭につけるというCSSハック</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

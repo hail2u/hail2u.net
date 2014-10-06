@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="blosxomのプラグイン同士には相性というものがあります。これはblosxomの仕様上の制限に基づくものですが、プラグイン側で対応することは可能です。なんですが、blosxomユーザーの多くは(僕を含め)ライトなユーザーが多く、あまり自分の環境以外での挙動を詰めるということはやりません(やれよ)。ので、しばしばプラグインがバッティングしてしまうと言うことは良くあります。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>BPT #4: プラグインの相性 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/blosxom/bpt_4_plugin_compatibility.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blog/rss_ping.html">
+
+    
+
+    
+
+    
+      <meta content="BPT #4: プラグインの相性" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="blosxomのプラグイン同士には相性というものがあります。これはblosxomの仕様上の制限に基づくものですが、プラグイン側で対応することは可能です。なんですが、blosxomユーザーの多くは(僕を含め)ライトなユーザーが多く、あまり自分の環境以外での挙動を詰めるということはやりません(やれよ)。ので、しばしばプラグインがバッティングしてしまうと言うことは良くあります。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/blosxom/bpt_4_plugin_compatibility.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/blosxom/bpt_4_plugin_compatibility.html" itemprop="url">
+
+        <h1 itemprop="name">BPT #4: プラグインの相性</h1>
+
+        <footer>
+          <p>on <time datetime="2005-08-18T03:44:00+09:00" itemprop="datePublished">Aug 18, 2005</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/blosxom/">Blosxom</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description"><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグイン同士には相性というものがあります。これはblosxomの仕様上の制限に基づくものですが、プラグイン側で対応することは可能です。なんですが、blosxomユーザーの多くは(僕を含め)ライトなユーザーが多く、あまり自分の環境以外での挙動を詰めるということはやりません(やれよ)。ので、しばしばプラグインがバッティングしてしまうと言うことは良くあります。</p>
+<p>プラグイン同士の相性の最大の原因は、ひとつのblosxomで排他的にしか利用できないプラグイン・サブルーチンがいくつかあるという仕様によるものがほとんどです。排他的にしか利用できないプラグイン・サブルーチンは、</p>
+<ul>
+<li><code>template</code></li>
+<li><code>entries</code></li>
+<li><code>skip</code></li>
+<li><code>interpolate</code></li>
+<li><code>sort</code></li>
+</ul>
+<p>以上の5つで、プラグイン内でこれらのサブルーチンを利用し、かつそのサブルーチンで<code>undef</code>以外を返すと、blosxomはその他のプラグインのそのサブルーチンを二度と呼ばないので、プラグインは複数利用できないということです。</p>
+<p>例えば、<code>template</code>サブルーチンは、</p>
+<pre><code class="language-perl">foreach my $plugin ( @plugins ) {
+  $plugins{$plugin} &gt; 0
+    and $plugin-&gt;can(&#39;template&#39;)
+    and defined($tmp = $plugin-&gt;template())
+    and $template = $tmp
+    and last;
+}
+</code></pre>
+<p>というように呼び出されます。上記のコードの断片の4行目でプラグインの<code>template</code>サブルーチンが返す値を受け取り、チェックする仕組みになっており、<code>undef</code>以外が返ってきた場合はデフォルトのテンプレートを上書きし、ループを抜けるということになっているわけです。つまり最初に呼び出されたプラグインの<code>template</code>サブルーチン以外は呼び出されることは無いわけで、排他的な利用ということになるわけです。</p>
+<p>多くの場合は、排他的な利用しか出来ないプラグイン・サブルーチンを使うプラグインを複数利用することは無い(そういったプラグイン・サブルーチンはある目的に特化したものとして提供されているので)のですが、稀にそういうケースはあります。ので、プラグイン作者の方は気をつけましょうとかそういう話。「お前が気をつけろ」とか言わない。</p>
+<p><a href="/archives/blugins.html#paging" title="hail2u.net - Archives - blosxom plugins">paging</a>が<a href="/archives/bsk.html" title="hail2u.net - Archives - blosxom starter kit">blosxom starter kit</a>に導入されていない理由はこれだったりします。pagingをきちんと書き直せば良い(ソートしたエントリのリストをプラグイン内で保存してやれば良い)話なので、さっさとやれば良い話。</p>
+<p>BPTとか激しく企画倒れ<del>済み</del>なネタを久々に続けてみた！</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blog/rss_ping.html">
+  <p>RSS Ping</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

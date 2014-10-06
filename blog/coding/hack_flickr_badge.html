@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="ちょくちょくFlickrを使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？みたいな。ね。それはともかく、Flickr badgeの吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいからulが良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Hack Filckr badge - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/hack_flickr_badge.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/site_search_powered_by_y.html">
+
+    
+
+    
+
+    
+      <meta content="Hack Filckr badge" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="ちょくちょくFlickrを使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？みたいな。ね。それはともかく、Flickr badgeの吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいからulが良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/recent_photos.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/hack_flickr_badge.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/coding/hack_flickr_badge.html" itemprop="url">
+
+        <h1 itemprop="name">Hack Filckr badge</h1>
+
+        <footer>
+          <p>on <time datetime="2005-03-11T03:10:00+09:00" itemprop="datePublished">Mar 11, 2005</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><figure><img src="/images/blog/recent_photos.png" alt="Recent photos in sidebar" itemprop="image"></figure>
+<p itemprop="description">ちょくちょく<a href="http://www.flickr.com/" title="Welcome to Flickr!">Flickr</a>を使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？みたいな。ね。それはともかく、<a href="http://www.flickr.com/help.gne#53" title="Flickr: Help">Flickr badge</a>の吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいから<code>ul</code>が良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。</p>
+<p>サイドバーの幅が250pxなので、FlickrのThumbnailだとちょっと大きい(幅100pxを基準にリサイズされる)ため、正方形で気持ちの良いSquareにしました。こちらだと必ず正方形なので収まりが良いという利点もある気がします。</p>
+<p>表示の制御はCSSに任せて、</p>
+<pre><code class="language-css">dl#menu dd ul#flickr {
+  line-height:1;
+  list-style-type:none;
+}
+
+dl#menu dd ul#flickr li {
+  margin:5px 5px 0 0;
+  float:left;
+  width:77px;
+  height:77px;
+}
+
+dl#menu dd ul#flickr li img {
+  border:1px solid #333333;
+  width:75px;
+  height:75px;
+}
+</code></pre>
+<p>と、<code>float</code>でサイドバーの幅である250pxに収まるように並べました。75px(画像の横幅)+2px(画像のボーダー)+5px(画像のマージン)=82pxが3つで246px。マージンを6pxにしなかったのはよくわからない。続くFlickrのトップ・ページへのリンクを含む<code>p</code>要素に<code>clear:both;</code>を指定して完璧(多分)。</p>
+<p>てなわけでRecent albumsの方もFlickrのSquareに合わせて75*75*9にしてみた。揃ってて気持ちが良い。CSSのコードは上と同じ(<code>id</code>が違うだけ)。</p>
+<p>こちらの方の画像が微妙に汚いのは、手抜きで画像のリサイズをブラウザに任せているので仕様です。前にも書いた気がする。</p>
+<p>Recent albumsの方はAmazon Check Listとか言う謎CGIでゴニョゴニョJavaScriptファイルを生成しています。Amazon Check Listは普通にCGIにアクセスするとHTMLでリスト表示(HTMLでのリスト表示のサンプルはNo Music, No Life.で見ることが可能)、新規アイテム追加時にはRSSファイルとJavaScriptファイルを制的に生成とかいうシロモノで、大体作り終わったんだけど新規アイテム追加のUIを作るのがメンドウで放置しているダメCGIです。なんとなく続き作りたくなってきたような気がしないでもない。</p>
+<h2>追記@2005/03/12</h2>
+<p>でかくて邪魔なのでひとつに戻した。飽きるの早すぎ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/site_search_powered_by_y.html">
+  <p>Yahoo! Search Web Servicesでサイト内検索機能</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

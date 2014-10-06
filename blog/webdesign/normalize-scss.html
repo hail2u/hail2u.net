@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="normalize.cssをルールごとに分離させて、必要なルールだけをSassのpartialとして@importできるようにしたnormalize.scssを作った。各ルールには特に手を入れず、normalize.cssのセクションごとにディレクトリを切って整理しただけ。それぞれのpartialは特にSassに依存してるわけではないので普通にcatで連結しても使える。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>normalize.scss: Modularized and Sassy normalize.css - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/normalize-scss.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/cut-a-triangle-from-an-image-with-css.html">
+
+    
+
+    
+
+    
+      <meta content="normalize.scss: Modularized and Sassy normalize.css" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="normalize.cssをルールごとに分離させて、必要なルールだけをSassのpartialとして@importできるようにしたnormalize.scssを作った。各ルールには特に手を入れず、normalize.cssのセクションごとにディレクトリを切って整理しただけ。それぞれのpartialは特にSassに依存してるわけではないので普通にcatで連結しても使える。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/normalize-scss.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/normalize-scss.html" itemprop="url">
+
+        <h1 itemprop="name">normalize.scss: Modularized and Sassy normalize.css</h1>
+
+        <footer>
+          <p>on <time datetime="2012-01-30T09:57:00+09:00" itemprop="datePublished">Jan 30, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://necolas.github.com/normalize.css/">normalize.css</a>をルールごとに分離させて、必要なルールだけを<a href="http://sass-lang.com/">Sass</a>のpartialとして<code>@import</code>できるようにした<a href="https://github.com/hail2u/normalize.scss">normalize.scss</a>を作った。各ルールには特に手を入れず、normalize.cssのセクションごとにディレクトリを切って整理しただけ。それぞれのpartialは特にSassに依存してるわけではないので普通に<code>cat</code>で連結しても使える。</p>
+
+<p>今のところはそのまま切り分けただけで、新たなルールの追加とかはこれらを<code>@import</code>するSCSSファイル側でやるという形にしておいた。具体的には<a href="https://github.com/hail2u/normalize.scss/blob/master/_my_normalize.scss">_my_normalize.scss</a>を見てくれるとわかるんじゃないかと。<a href="http://code.google.com/p/html5shiv/">html5shiv</a>を使っている場合に必要なくなるHTML5新要素のためのルールとかを消したり、<code>hr</code>要素の<code>box-sizing</code>プロパティーの違いを吸収するルールを追加したりしてる。<code>@import</code>する順番を変更するとまずいかもしれないのでそこらへんは注意が必要だと思う。</p>
+
+<p>新たなルールの追加の方法とかはちゃんと考えないと破綻しそう。<code>extensions</code>などという名前でディレクトリを作って、それ以下にGitHubユーザー名などでprefix付けて置くのが良さそうかなと思ってる。</p>
+
+<pre>extensions/_hail2u-hr.scss
+</pre>
+
+<p>とか。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/cut-a-triangle-from-an-image-with-css.html">
+  <p>CSSで画像を三角に切り抜く</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

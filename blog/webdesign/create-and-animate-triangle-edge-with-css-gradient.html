@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="擬似要素とborderプロパティーを組み合わせてCSSで三角形を作る方法はかなり市民権を得ているように思う。ちょくちょく見かけるようになった。しかしこのテクニックには欠点がいくつかある。例えばbox-shadowがうまくつかないこととか。それ以外にもWebKitでCSS Transitionによるアニメーションが起こらないという欠点もある。それを回避するために三角を作る新たな方法を発明したという話。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSグラデーションで三角を作ってアニメーションさせる - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/create-and-animate-triangle-edge-with-css-gradient.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/border-and-css-transform-bug-on-opera.html">
+
+    
+
+    
+
+    
+      <meta content="CSSグラデーションで三角を作ってアニメーションさせる" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="擬似要素とborderプロパティーを組み合わせてCSSで三角形を作る方法はかなり市民権を得ているように思う。ちょくちょく見かけるようになった。しかしこのテクニックには欠点がいくつかある。例えばbox-shadowがうまくつかないこととか。それ以外にもWebKitでCSS Transitionによるアニメーションが起こらないという欠点もある。それを回避するために三角を作る新たな方法を発明したという話。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/create-and-animate-triangle-edge-with-css-gradient.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/create-and-animate-triangle-edge-with-css-gradient.html" itemprop="url">
+
+        <h1 itemprop="name">CSSグラデーションで三角を作ってアニメーションさせる</h1>
+
+        <footer>
+          <p>on <time datetime="2012-01-24T09:24:00+09:00" itemprop="datePublished">Jan 24, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">擬似要素と<code>border</code>プロパティーを組み合わせてCSSで三角形を作る方法はかなり市民権を得ているように思う。ちょくちょく見かけるようになった。しかしこのテクニックには欠点がいくつかある。例えば<code>box-shadow</code>がうまくつかないこととか。それ以外にもWebKitでCSS Transitionによるアニメーションが起こらないという欠点もある。それを回避するために三角を作る新たな方法を発明したという話。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/348.html">なんかしゅるしゅる動く奴</a></p>
+
+<p>よくある感じでメニューを例に作った。左端に三角で背景を切り取る形にして、<code>:hover</code>でしゅるしゅるっと上に三角を動かすようなアニメーションをさせる。まずは三角の作り方から。</p>
+
+<p>枠線は使えない。<code>transform()</code>なども考慮したが擬似要素を使わないとなるとマークアップ依存になりそうなので諦めた。ということで最終兵器とも言えるCSSグラデーションでドット打ち的なことを行うテクニックを利用した。</p>
+
+<p>縦方向にアニメーションさせたいので、うまいこと縦に繰り返しになるように三角を作ろうと頑張って考えると、以下のようなコードになる。</p>
+
+<pre><code class="language-css">.test a {
+  background-image:
+    ...
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  3px, white  3px, white 29px, rgb(221, 50, 47) 29px, rgb(221, 50, 47) 32px),
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  4px, white  4px, white 28px, rgb(221, 50, 47) 28px, rgb(221, 50, 47) 32px),
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  6px, white  6px, white 26px, rgb(221, 50, 47) 26px, rgb(221, 50, 47) 32px),
+    ...
+  ;
+  background-position:
+    ...
+     3px 0,
+     4px 0,
+     5px 0,
+    ...
+  ;
+  background-repeat: repeat-y;
+  background-size: 1px 32px;
+}
+</code></pre>
+
+<p>それぞれのCSSグラデーションは<em>背景色で塗り白に戻しもう一度背景色で塗る</em>というもの。その白い部分を徐々に少なくしていくようにたくさん作り、それを<code>bakcground-position</code>プロパティーで<code>1px</code>ずつずらして並べていく。すると徐々に白い部分が先細りになるわけなので三角形になる。大切なのは<code>background-position</code>と<code>background-size</code>プロパティーで、この2つのプロパティーでそれぞれのグラデーションが重ならないようにしながら縦方向は繰り返しになるように調節する。デモのケースでは16のCSSグラデーションで三角を完成させた。三角の向きを逆にする場合はグラデーションの並びをひっくり返せば良い。向きを90度変更したい場合はグラデーションのキーワードを<code>left</code>から<code>top</code>に変更するだけ(多分)。</p>
+
+<p>アニメーションは背景を動かすことになるので、<code>background-position</code>プロパティーをいじる。あとは<code>transition-duration</code>プロパティーで等でアニメーションを調節するだけ。</p>
+
+<pre><code class="language-css">.test a:hover {
+  background-position:
+    ...
+     3px -320px,
+     4px -320px,
+     5px -320px,
+    ...
+  ;
+  transition-duration: 1s;
+}
+</code></pre>
+
+<p>これでデモのようなしゅるしゅる動く奴が完成。</p>
+
+<p>汎用性は微妙。<code>box-shadow</code>が効かないのも同じだし、アンチエイリアスもかからないのでデモのようなシャッキリしたものにしか使えない。ただCSSグラデーションとアニメーションの組み合わせはそこそこ面白いと思う。何かにシャッターの様に重ねておいて、オンマウスで上下左右に開くみたいなのも多分出来る。クリックできないじゃん……と思ったそこのあなた、<code>pointer-events</code>プロパティーをご用意させていただいております。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/border-and-css-transform-bug-on-opera.html">
+  <p>borderとCSS Transformを組み合わせるとOperaでバグる</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

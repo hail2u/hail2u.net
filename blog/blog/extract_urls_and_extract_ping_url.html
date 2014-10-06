@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>ファイルからURLを抽出し、そのURLからPing送信先を探してみる - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/blog/extract_urls_and_extract_ping_url.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blog/memo_for_auto_trackback.html">
+
+    
+
+    
+
+    
+      <meta content="ファイルからURLを抽出し、そのURLからPing送信先を探してみる" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/blog/extract_urls_and_extract_ping_url.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/blog/extract_urls_and_extract_ping_url.html" itemprop="url">
+
+        <h1 itemprop="name">ファイルからURLを抽出し、そのURLからPing送信先を探してみる</h1>
+
+        <footer>
+          <p>on <time datetime="2003-10-12T02:34:00+09:00" itemprop="datePublished">Oct 12, 2003</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/blog/">Blog</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。</p>
+<p>引数に渡されたファイルから、URLを抽出するサブルーチン。<a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ってすごいな。</p>
+<pre><code class="language-perl">sub extract_urls {
+  my $entry_path = $_[0];
+  my @urls;
+
+  my $p = HTML::LinkExtor-&gt;new(\&amp;callback);
+  sub callback {
+    my($tag, %attr) = @_;
+    if ($tag eq &#39;a&#39; and ($attr{&#39;href&#39;} =~ m!^http://!)) {
+      push(@urls, $attr{&#39;href&#39;});
+    }
+  }
+  $p-&gt;parse_file($entry_path);
+
+  return @urls;
+}
+</code></pre>
+<p>引数に渡されたURLから、Ping送信先URLを探すサブルーチン。Ping送信先URLを見つけると、Ping送信先URLと1が返ってきます。</p>
+<pre><code class="language-perl">sub extract_ping_url {
+  my $url = $_[0];
+  my $flag = 0;
+
+  my $ua = LWP::UserAgent-&gt;new(
+    agent =&gt; &quot;TrackBack/1.1&quot;,
+    timeout =&gt; 15,
+    parse_head =&gt; 0,
+  );
+  my $req = HTTP::Request-&gt;new(GET =&gt; $url);
+  my $res = $ua-&gt;request($req);
+  if ($res-&gt;is_success) {
+    my $content = $res-&gt;content;
+    $url =~ s/#.*$//;
+    while ($content =~ m!(&lt;rdf:RDF.*?&lt;/rdf:RDF&gt;)!sg) {
+      my $rdf = $1;
+      my($perm_url) = $rdf =~ m!dc:identifier=&quot;([^&quot;]+)&quot;!;
+      if ($perm_url eq $url) {
+        if ($rdf =~ m!trackback:ping=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+        elsif ($rdf =~ m!about=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+      }
+    }
+  }
+
+  return($url, $flag);
+}
+</code></pre>
+<p>ネスト深すぎですよ。</p>
+<p>とりあえず、自動的にTrackBack Pingを送るスクリプトはほとんど完成したので、実験をどうやってやろうかと考え中。自分のblogのエントリでやるべきだな(当たり前)。</p>
+<p>うげ。<a href="http://search.cpan.org/search?module=Net::TrackBack" title="search.cpan.org: Net::TrackBack - A modularized implementation of core TrackBack 1x functionality.">Net::TrackBack</a>モジュールにTrackBack ping URL auto discoveryの機能あったよ！2番目のコードは考える必要なかった・・・。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blog/memo_for_auto_trackback.html">
+  <p>自動TrackBack実装ためのメモ</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

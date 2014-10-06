@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Google Web FontsのHTMLが大幅に変わったため動かなくなっていたGoogle Web Fonts PreviewをGoogle Web Fonts APIを使って書き直しました。だいたい動いてる感じ。便利ですよねー(棒読み)。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Google Web Fonts Previewを更新した - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/update-google-web-fonts-preview.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blosxom/blosxom-info-was-closed.html">
+
+    
+
+    
+
+    
+      <meta content="Google Web Fonts Previewを更新した" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Google Web FontsのHTMLが大幅に変わったため動かなくなっていたGoogle Web Fonts PreviewをGoogle Web Fonts APIを使って書き直しました。だいたい動いてる感じ。便利ですよねー(棒読み)。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/update-google-web-fonts-preview.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/update-google-web-fonts-preview.html" itemprop="url">
+
+        <h1 itemprop="name">Google Web Fonts Previewを更新した</h1>
+
+        <footer>
+          <p>on <time datetime="2011-10-07T17:47:00+09:00" itemprop="datePublished">Oct 7, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://www.google.com/webfonts">Google Web Fonts</a>のHTMLが大幅に変わったため動かなくなっていた<a href="http://hail2u.github.io/google-webfonts-preview.html">Google Web Fonts Preview</a>を<a href="http://code.google.com/apis/webfonts/docs/developer_api.html">Google Web Fonts API</a>を使って書き直しました。だいたい動いてる感じ。便利ですよねー(棒読み)。</p>
+
+<p>APIが返すJSONの読み込みは馬鹿のひとつ覚えでYQLを使いました。Webフォントの情報は、</p>
+
+<pre><code class="language-js">{
+  &quot;kind&quot;: &quot;webfonts#webfont&quot;,
+  &quot;family&quot;: &quot;Anonymous Pro&quot;,
+  &quot;variants&quot;: [
+    &quot;regular&quot;,
+    &quot;italic&quot;,
+    &quot;bold&quot;,
+    &quot;bolditalic&quot;
+  ],
+  &quot;subsets&quot;: [
+    &quot;cyrillic&quot;,
+    &quot;cyrillic-ext&quot;,
+    &quot;greek&quot;,
+    &quot;greek-ext&quot;,
+    &quot;latin&quot;,
+    &quot;latin-ext&quot;
+  ]
+}
+</code></pre>
+
+<p>こういったシンプルな構造で、Webフォントを参照するためのCSSのURLとかは自前で生成する必要があるようです。と言っても<code>family</code>の半角空白を<code>+</code>に置換するくらいですけど。<code>variants</code>や<code>subsets</code>は1つしかない場合でもちゃんとArrayですけど、YQL経由で読むとArrayじゃなくなったりする落とし穴があるので気をつけましょう(落ちました)。</p>
+
+<hr>
+
+<p>検索結果の画面もそうだけど、最近のGoogleはリッチな体験とリッチな見た目を混同しているんじゃないでしょうか。みたいなネタで誰か素晴らしい考察をしてください。</p>
+
+<hr>
+
+<p>こんな感じにライトに書いてきますよ。すぐ息切れするくらいな感じで。</p>
+
+<h2>追記</h2>
+
+<p><a href="http://hail2u.github.io/google-webfonts-ampersands.html">&amp;</a>も更新しておいた。</p>
+
+<p>良いフォント増えてるなーと思うものの、そのほとんど全てがメイリオと組み合わせるとあら不思議。メイリオがフォントとして悪いわけじゃないんだけどなんていうか排他的な所がありますよね。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blosxom/blosxom-info-was-closed.html">
+  <p>blosxom.infoの閉鎖</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

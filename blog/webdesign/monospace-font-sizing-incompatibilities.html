@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="少し前にFixing browsers’ broken monospace font handlingをNice Web Type経由で読んだんだけど、「単純に初期設定が違うだけだろ……%指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。font-size: 100%がうまく動かなかったり、pre要素はともかくcode要素辺りでの実装のずれとか、monospaceだけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/monospace-font-sizing-incompatibilities.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/translation-of-learn-you-a-flexbox.html">
+
+    
+
+    
+
+    
+      <meta content="等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="少し前にFixing browsers’ broken monospace font handlingをNice Web Type経由で読んだんだけど、「単純に初期設定が違うだけだろ……%指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。font-size: 100%がうまく動かなかったり、pre要素はともかくcode要素辺りでの実装のずれとか、monospaceだけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/monospace-font-sizing-incompatibilities.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/monospace-font-sizing-incompatibilities.html" itemprop="url">
+
+        <h1 itemprop="name">等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</h1>
+
+        <footer>
+          <p>on <time datetime="2012-02-19T16:16:00+09:00" itemprop="datePublished">Feb 19, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">少し前に<a href="http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/">Fixing browsers’ broken monospace font handling</a>を<a href="http://nicewebtype.com/">Nice Web Type</a>経由で読んだんだけど、「単純に初期設定が違うだけだろ……<code>%</code>指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。<code>font-size: 100%</code>がうまく動かなかったり、<code>pre</code>要素はともかく<code>code</code>要素辺りでの実装のずれとか、<code>monospace</code>だけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。</p>
+
+<p>記事で最初に挙げられているコードでも良いのだけど、<a href="http://necolas.github.com/normalize.css/">normalize.css</a>ではこの問題への対処がちゃんとなされているので、細かいことは余り考えずにnormalize.css使うのが手っ取り早い。記事の最後に挙げられているコードのように、ラテン系の言語に設定されているブラウザーでの挙動(等幅フォントを1段階小さいフォント・サイズにする)に合わせる場合は、normalize.cssのコードも混ぜた上である程度ネストへも対処するように書く必要がある。</p>
+
+<pre><code class="language-css">html {
+  font-size: 100%;
+}
+
+pre,
+code,
+var,
+samp,
+kbd,
+tt {
+  font-family: monospace, serif;
+  _font-family: 'courier new', monospace;
+  font-size: 0.8125em;
+}
+
+pre code,
+pre var,
+pre samp,
+pre kbd,
+pre tt {
+  font-size: 100%;
+}
+</code></pre>
+
+<p><code>rem</code>単位さえ使えれば……という感じだ。と、対処を書いた所でどういう問題があって、どうすれば解決でき、なぜ今まであまり表面化しなかったのかということをちょっと書く。</p>
+
+<h2>存在する問題</h2>
+
+<p>問題はだいたい以下の4つに分けることができる。</p>
+
+<dl>
+  <dt>素の<code>pre</code>要素</dt>
+  <dd>初期サイズはブラウザー間で殆ど差はないと言って良い。ので、このまま何もいじらないならあまり問題は起きない……わけだが、ユーザー設定と言語設定により結構な差があるのでやはり少しはいじりたい。</dd>
+
+  <dt><code>font-size: 100%</code></dt>
+  <dd>地の文とフォント・サイズを合わせる目的で指定するわけだが、Internet Explorer 9とOpera 11でしか期待通りに動かない。どうもFirefox 10やChrome 17、Safari 5ではフォント・ファミリーを指定してやらないと<code>font-size</code>プロパティーによるサイズ指定が有効にならないようだ。</dd>
+
+  <dt><code>font-family: monospace</code></dt>
+  <dd>フォント・ファミリーを指定する場合も1つだけではダメで、<code>monospace, serif</code>などもう1つ必要。normalize.cssで<code>serif</code>が使われているのは単にジェネリック・ネームの中で一番短いからだと思う。</dd>
+
+  <dt><code>code</code>要素他</dt>
+  <dd><code>code</code>要素など等幅フォントで表示される他のインライン要素でも似たような問題が発生する。こちらは<code>pre</code>要素にネストされることがあるので更に厄介。親での<code>em</code>単位でのフォント・サイズ指定を継承するかどうかという点でIE9/Op11陣営とFx10/Ch17/Sf5陣営の間に壁があり簡単には統一できない。</dd>
+</dl>
+
+<h2>解決するための条件</h2>
+
+<p>現時点では以下の3つの条件が統一のために必須ということになりそう。</p>
+
+<ol>
+<li>ユーザー設定や言語設定の違いを吸収するために<code>font-size</code>を指定する</li>
+<li>Firefox 10とChrome 17、Safari 5のために<code>font-family</code>プロパティーで二種類以上指定する</li>
+<li>親要素での<code>font-size</code>プロパティーの値として<code>em</code>単位を使わず<code>%</code>単位を使用する</li>
+</ol>
+
+<p>で、上記コードのような形になるわけ。</p>
+
+<h2>問題が表面化しない理由</h2>
+
+<p>多くの場合<code>body</code>要素でベースとなるフォント・サイズを指定し、<code>pre</code>を始め<code>h1</code>要素などあらゆる要素でそれに対する相対的な値(<code>%</code>や<code>em</code>)を使うことが多い。ベースとなるフォント・サイズは慣例的に<code>%</code>か<code>px</code>を使う人が多く、かなりの確率で条件3はクリアされる。ジェネリック・ネームのみでフォント・ファミリーを指定する人はまずいないので、条件2でハマることはまずないだろう。</p>
+
+<p>問題になるのは条件1で、これはフォント・サイズを指定するかどうかにかかっており、ここでハマる可能性はかなり高い。が、そもそもこのバグがうまくフォント・サイズが反映されないというバグなので、指定しない場合はこの問題は発生しているが表面化しない。</p>
+
+<hr>
+
+<p>僕の場合は長らく<a href="http://yuilibrary.com/yui/docs/cssfonts/">YUI CSS Fonts</a>を使っていたというのが、この問題に対して無知だった理由だと思う。YUI CSS Fontsを使うだけで条件1と3はクリアできるので、上記CSSコードを自分なりに書き換えて使っても良いけど、YUI CSS Fontsでも事足りる。YUI CSS Fontsはちょっとな……というのならnormalize.cssがお手軽かつ無難。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/translation-of-learn-you-a-flexbox.html">
+  <p>Learn You a Flexbox for Great Good!を訳した</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

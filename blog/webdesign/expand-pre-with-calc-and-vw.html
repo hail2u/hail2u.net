@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>calc()とvw単位を使った飛び出すpre要素 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/expand-pre-with-calc-and-vw.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/color-management-in-sass.html">
+
+    
+
+    
+
+    
+      <meta content="calc()とvw単位を使った飛び出すpre要素" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/expand-pre-with-calc-and-vw.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/expand-pre-with-calc-and-vw.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/webdesign/expand-pre-with-calc-and-vw.html" itemprop="url">
+
+        <h1 itemprop="name">calc()とvw単位を使った飛び出すpre要素</h1>
+
+        <footer>
+          <p>on <time datetime="2014-07-25T11:11:00+09:00" itemprop="datePublished">Jul 25, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<figure>
+  <img src="/images/blog/expand-pre-with-calc-and-vw.png" alt="pre要素の背景をビューポートの幅まで拡大する" itemprop="image">
+</figure>
+
+<p itemprop="description">飛び出す<code>pre</code>要素っていうのは昔書いた<a href="/blog/webdesign/expand-pre-background.html">描画領域一杯に<code>pre</code>要素の幅を拡大するテクニック</a>と目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それを<code>vw</code>単位を使ってビューポートの幅を取り、それと<code>calc()</code>を組み合わせることでどうにかしようという試み。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/583.html">Expand pre Element #2</a></p>
+
+<p><code>pre</code>要素の左右が<code>#f0f</code>の矩形で埋められている。Chrome 35、Firefox 30、そしてInternet Explorer 11で確認できる。Mobile Safari 7ではうまく動かない(多分<code>vw</code>単位の問題のような気がする)。わかりやすいように左右に追加する擬似要素の背景の色を変えておいたけど、同じ色にすればあたかも<code>pre</code>要素が飛び出すように見えるはず。</p>
+
+<pre><code class="language-css">.test {
+  margin-right: auto;
+  margin-left: auto;
+  position: relative;
+  width: 480px;
+}
+
+.test:before,
+.test:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  <mark>width: calc((100vw - 100%) / 2);</mark>
+  height: 100%;
+  content: &quot;&quot;;
+  background-color: #f0f;
+}
+
+.test:before {
+  right: 100%;
+}
+
+.test:after {
+  left: 100%;
+}
+</code></pre>
+
+<p><code>vw</code>単位は<code>1vw</code>でビューポートの幅の<em>1/100</em>なので、<code>100vw</code>がビューポートの幅になる。<code>calc()</code>では<code>%</code>も使え、<code>width</code>プロパティーで<code>calc(100%)</code>とすると<em>その要素の幅</em>になる。つまり<code>calc(100vw - 100%)</code>で<em>ビューポート幅からその要素の幅を引いた余り</em>を計算できることになる。デモでは<code>pre</code>要素は真ん中寄せなので単純にこれを半分にし、左右に追加する擬似要素の幅にすれば良い。高さは<code>100%</code>で自動的に揃うので計算不要。</p>
+
+<p>左右に追加する擬似要素の位置調整は<code>position</code>プロパティーを使った相対配置内での絶対配置で行う。</p>
+
+<hr>
+
+<p>だいたい問題なくてどんな状況でも使える解だと思ったんだけど、<code>vw</code>単位にスクロールバーの幅が含まれてしまうことによって起こる問題が解決できなそう。WindowsのChrome 35やInternet Explorer 11 (デスクトップ版)などスクロールバーが浮いていないブラウザーでは、その幅分ずれてしまい水平スクロールバーが出るようになる。この<code>vw</code>単位などにおけるスクロールバーの解釈については、仕様に以下のように注意書きがある。</p>
+
+<figure>
+  <blockquote>
+    <p>Note that the initial containing block&#39;s size is affected by the presence of scrollbars on the viewport.</p>
+  </blockquote>
+
+  <figcaption>— <a href="http://www.w3.org/TR/css3-values/#viewport-relative-lengths"><cite>5.1.2. Viewport-percentage lengths: the ‘vw’, ‘vh’, ‘vmin’, ‘vmax’ units</cite></a></figcaption>
+</figure>
+
+<p>スクロールバーの有無に<em>影響を受ける</em>となっているので、実装バグのような気がする。この辺りの扱いが直るまではスクロールバーの幅を決め打ちである程度確保して<code>calc()</code>内で更に引く必要がありそう。</p>
+
+<p>ただしInternet Explorer 11以降では<code>-ms-overflow-style</code>独自プロパティーでオーバーレイのスクロールバーに変更できるのでなんとか解決できる。</p>
+
+<pre><code class="language-css">html {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+</code></pre>
+
+<p><code>overflow-style</code>プロパティー自体は一時期いくつかの標準仕様に存在したんだけど、今は<code>overflow</code>プロパティーへ統合された。元々<code>overflow</code>した時の内容物の扱われ方を定義するプロパティーだったようなので、スクロールバーの表示形式の変更に使うのは間違ってたりとかすることもあるので、独自プロパティーであることに目をつぶったとしても使わない方が良さそう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/color-management-in-sass.html">
+  <p>Sassでの色管理</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

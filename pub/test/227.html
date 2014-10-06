@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Scribble Your Tweet #3</title>
+    <style type="text/css">
+      @import url("227.css");
+
+      body {
+        color: rgb(51, 51, 51);
+        background-color: rgb(255, 252, 246);
+      }
+
+      #twitter {
+        margin: 1em 0;
+        padding: 27px;
+        width: 360px;
+        color: rgb(51, 51, 51);
+        background-color: rgb(237, 234, 228);
+        background-image: url("227.png");
+        background-position: right bottom;
+        background-repeat: no-repeat;
+        font: 27px/1.5 "Kiloji P", sans-serif;
+        /* font: 27px/1.5 "ArmedBanana", sans-serif; */
+        -moz-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        -webkit-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        word-wrap: break-word;
+        -moz-transform: rotate(-7deg);
+        -webkit-transform: rotate(-7deg);
+        -o-transform: rotate(-7deg);
+        -ms-transform: rotate(-7deg);
+        transform: rotate(-7deg);
+        -moz-transform-origin: right top;
+        -webkit-transform-origin: right top;
+        -o-transform-origin: right top;
+        -ms-transform-origin: right top;
+        transform-origin: right top;
+      }
+
+      #twitter:before {
+        margin: -45px auto 0 auto;
+        border: 1px solid rgb(234, 230, 224);
+        display: block;
+        width: 90px;
+        height: 36px;
+        background-color: rgba(255, 255, 255, 0.3);
+        content: "";
+        -moz-transform: rotate(3deg);
+        -webkit-transform: rotate(3deg);
+        -o-transform: rotate(3deg);
+        -ms-transform: rotate(3deg);
+        transform: rotate(3deg);
+      }
+
+      #twitter h1 {
+        margin: 0 0 0.5em 0;
+        font-size: 100%;
+      }
+
+      #twitter h1 a {
+        color: rgb(153, 0, 0);
+        text-decoration: none;
+      }
+
+      #twitter p {
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      #twitter p a {
+        color: rgb(0, 153, 0);
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        $("#username").val("hell2u");
+        $("button").click(function () {
+          loadTweet($("#username").val());
+        }).click();
+      });
+
+      function loadTweet (username) {
+        var t = $("#twitter").empty().append($("<p/>").append("Loading..."));
+
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+          q:      "select * from json where url='https://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username + "&trim_user=true&include_rts=true'",
+          format: "json"
+        }, function (data) {
+          t.empty();
+
+          if (data.query.results && data.query.results.json) {
+            var status = data.query.results.json.json[0];
+            $("<h1/>").append("Tweet from ").append($("<a/>", {
+              href: "http://twitter.com/" + username
+            }).append(username)).appendTo(t);
+            $("<p/>", {
+              id: "status"
+            }).append(status.text).appendTo(t);
+
+            $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+              q:      "SELECT * FROM yahoojp.jlp.furigana.furigana WHERE appid='fvFniIOxg65wd_4u77dXLQUPXkLcmKb7pKjGg77IBP49oWE.TzSNdpc-' and sentence='" + status.text + "'",
+              format: "json",
+              env:    "store://datatables.org/alltableswithkeys"
+            }, function (d2) {
+              if (d2.query.results) {
+                var s = "";
+                $.each(d2.query.results.Result.WordList.Word, function () {
+                  if (this.Furigana) {
+                    s += this.Furigana;
+                  } else {
+                    s += this.Surface;
+                  }
+                });
+                $("#status").empty().append(s.replace(/(https?:\/\/.+?)( |\n|$)/g, "<a href=\"$1\">$1</a>$2").replace(/(@)(\w+)/g, "<a href=\"http://twitter.com/$2\">$1$2</a>").replace(/\n/g, "<br>"));
+              }
+            });
+          } else {
+            t.append($("<p/>").append("Oops, failed to fetch data."));
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Scribble Your Tweet #3</h1>
+
+    <section>
+      <p><input type="text" id="username"> <button>Show</button></p>
+    </section>
+
+    <section id="twitter">
+      <p>Display my last teet here.</p>
+    </section>
+  </body>
+</html>

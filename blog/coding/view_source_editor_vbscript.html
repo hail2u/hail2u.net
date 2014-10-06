@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Internet Explorerのソースの表示に使われるエディタを指定するには、レジストリの、">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>ViewSourcEditor.vbs - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/view_source_editor_vbscript.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/internet/alltheweb.html">
+
+    
+
+    
+
+    
+      <meta content="ViewSourcEditor.vbs" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Internet Explorerのソースの表示に使われるエディタを指定するには、レジストリの、" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/view_source_editor_vbscript.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/view_source_editor_vbscript.html" itemprop="url">
+
+        <h1 itemprop="name">ViewSourcEditor.vbs</h1>
+
+        <footer>
+          <p>on <time datetime="2003-10-18T12:09:00+09:00" itemprop="datePublished">Oct 18, 2003</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">Internet Explorerのソースの表示に使われるエディタを指定するには、レジストリの、</p>
+<pre>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\View Source Editor
+</pre>
+<p>というキーに、</p>
+<pre>Editor Name
+</pre>
+<p>というキーを作成し、その標準のデータに任意のエディタのパスを指定してするわけなのですが、キャッシュの場合はファイルに拡張子がなかったりするので、拡張子を元にして色分けをするエディタの場合(そうじゃないエディタを探す方が難しいですが)は、色分けできなかったりするわけで。いくつかのエディタだとInternet ExplorerのキャッシュフォルダのファイルはHTMLファイルとみなすとかやってくれたりもする(これはこれで面倒なことになったりする)んですが、<a href="http://hide.maruo.co.jp/software/hidemaru.html" title="秀まるおのホームページ－ソフトウェア－秀丸エディタ">秀丸エディタ 3.19</a>までにはそういう設定はありません。</p>
+<p>ので、無理やりHTMLファイルとして開いてやるために、こんなVBScriptを作ってやってました。</p>
+<pre>Dim Cmd, ObjArgs, StrPath, WshShell
+
+Cmd = Chr(34) &amp; &quot;C:\Program Files\Hidemaru\Hidemaru.exe&quot; &amp; Chr(34) &amp; &quot; /c.html &quot;
+
+Set ObjArgs = WScript.Arguments
+StrPath = Chr(34) &amp; ObjArgs(0) &amp; Chr(34)
+
+Set WshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+WshShell.Run Cmd &amp; StrPath
+
+Set ObjArgs = Nothing
+Set WshShell = Nothing
+WScript.Quit
+</pre>
+<p>このVBScriptをどっかに保存して、上記のレジストリのデータに、任意のエディタのパスの替わりに、このVBScriptのパスを指定するだけ。<code>Cmd</code>を、使っているエディタのパスとそのエディタでHTMLファイルとみなして開くために必要な引数の組み合わせに書き換えてやればどんなエディタでも大丈夫。試してないですが。</p>
+<p><a href="http://hide.maruo.co.jp/software/hidemaru400.html" title="秀まるおのホームページ－ソフトウェア－秀丸エディタ Ver4.00β">秀丸エディタ 4.00 β</a>ではInternet ExplorerのキャッシュフォルダのファイルはHTMLファイルとみなすように設定できるようになったので、存在意義がなくなった罠。4.00 βに移行したのに、なぜかまだ使いつづけてますが。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/internet/alltheweb.html">
+  <p>AllTheWeb</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="CSSで文字のアウトラインを描く方法を考えていて、text-shadowプロパティを使って強引に描いてみました。WebKit系で可能な-webkit-text-storkeと-webkit-text-fill-colorプロパティによるものと比べて二重にできるとか多色展開も簡単とかが利点でしょうか。CSS-Trickで一年以上前に話題になってました……。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>白抜き文字をtext-shadowで - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/outline-text-with-text-shadow.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/list-colors-bookmarklet-3.html">
+
+    
+
+    
+
+    
+      <meta content="白抜き文字をtext-shadowで" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="CSSで文字のアウトラインを描く方法を考えていて、text-shadowプロパティを使って強引に描いてみました。WebKit系で可能な-webkit-text-storkeと-webkit-text-fill-colorプロパティによるものと比べて二重にできるとか多色展開も簡単とかが利点でしょうか。CSS-Trickで一年以上前に話題になってました……。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/outline-text-with-text-shadow.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/outline-text-with-text-shadow.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/webdesign/outline-text-with-text-shadow.html" itemprop="url">
+
+        <h1 itemprop="name">白抜き文字をtext-shadowで</h1>
+
+        <footer>
+          <p>on <time datetime="2011-10-30T20:15:00+09:00" itemprop="datePublished">Oct 30, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<figure><img src="/images/blog/outline-text-with-text-shadow.png" alt="Arial Double Outline" itemprop="image"></figure>
+
+<p itemprop="description">CSSで文字のアウトラインを描く方法を考えていて、<code>text-shadow</code>プロパティを使って強引に描いてみました。WebKit系で可能な<code>-webkit-text-storke</code>と<code>-webkit-text-fill-color</code>プロパティによるものと比べて二重にできるとか多色展開も簡単とかが利点でしょうか。<a href="http://css-tricks.com/7405-adding-stroke-to-web-text/">CSS-Trickで一年以上前に話題に</a>なってました……。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/285.html">Outline Text with <code>text-shdow</code></a></p>
+
+<p>二重を例にとると</p>
+
+<pre><code class="language-css">.double {
+  text-shadow:
+    -1px -1px black, 1px -1px black, 1px 1px black, -1px 1px black,
+    -2px -2px white, 2px -2px white, 2px 2px white, -2px 2px white,
+    -3px -3px black, 3px -3px black, 3px 3px black, -3px 3px black;
+}
+</code></pre>
+
+<p>というCSSコードになっており、単に三回4方向に影を付けてやるだけです。ぼかしを付けないくらいが注意するところでしょうか。</p>
+
+<p>二重(実際には三重ですが)くらいまではフォントを選べばそこそこ見られる感じです。虹の七重になるとズレが顕著になってくるので、デモのように影を8方向に増やしてやると多少改善されます(tの上やwの右上がおかしいですけど)。また、普通に書くと<code>text-shadow</code>プロパティに非対応なブラウザ(まぁないと思いますけどねー)で文字が読めなくなってしまう(ことがある)ので、条件付きコメントでクラスを振ってやり前景色を差し替えています(<a href="http://html5boilerplate.com/">HTML5 Boilerplate</a>とかで使われている方法です)。</p>
+
+<p>今のところ標準にはないですが、どうなるんでしょうね？白抜きになっているフォントをWebフォントとして使えとかが想定されてるんでしょうか。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/list-colors-bookmarklet-3.html">
+  <p>List Colors #3</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

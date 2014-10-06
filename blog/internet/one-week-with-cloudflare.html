@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="CloudFlare経由にして一週間。予想していた通り静的なファイルをコロコロ更新するようなケースではちょっと面倒な感じがある。感想やわかったところ、気になったところなどのメモ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CloudFlareとの一週間 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/internet/one-week-with-cloudflare.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/sass-adjust-font-size-mixin.html">
+
+    
+
+    
+
+    
+      <meta content="CloudFlareとの一週間" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="CloudFlare経由にして一週間。予想していた通り静的なファイルをコロコロ更新するようなケースではちょっと面倒な感じがある。感想やわかったところ、気になったところなどのメモ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/internet/one-week-with-cloudflare.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/internet/one-week-with-cloudflare.html" itemprop="url">
+
+        <h1 itemprop="name">CloudFlareとの一週間</h1>
+
+        <footer>
+          <p>on <time datetime="2012-06-23T02:25:00+09:00" itemprop="datePublished">Jun 23, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/internet/">Internet</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://www.cloudflare.com/">CloudFlare</a>経由にして一週間。予想していた通り静的なファイルをコロコロ更新するようなケースではちょっと面倒な感じがある。感想やわかったところ、気になったところなどのメモ。</p>
+
+<h2>リクエスト数と転送量の削減効果</h2>
+
+<p>Security ProfileをMedium、Performance profileをCDN Onlyというほぼデフォルトの設定で、リクエスト数は4割程、転送量だと4割5分程削減できていた。リピーターメインなコンスタントにアクセスがあるタイプのWebサイトだとこの程度で、飛び抜けて集中する時間帯があるような一見メインのWebサイトだともっと効果があるんじゃないかと思う。</p>
+
+<h2>Always Online機能</h2>
+
+<p>Webサーバーが落ちたという場合には対応できるけど、ソフトウェア側で500エラーが起きたなどというケースには対応できない。つまり過負荷でCMSが落ちまくるというような状況を回避できるようなものではない。</p>
+
+<h2>Page Rules機能</h2>
+
+<p>Page Rulesという機能を使うと、指定したURLのパターンにマッチした場合にデフォルトの設定とは別の設定を適用したりできる。例えば<a href="http://blosxom.sourceforge.net/">Blosxom</a>のような動的に生成するブログ・ツールやCMSを使っている場合に、Custom CachingでCache Everythingなどとすると負荷対策になる。通常はキャッシュしてくれないHTMLもキャッシュしてくれるようになるので。Freeプランでも3つまでルールを作れる。</p>
+
+<p>Page Rulesには他にmod_rewriteライクなURL書き換え機能らしきものもある。</p>
+
+<h2>メールアドレスのクローキング</h2>
+
+<p>JavaScriptでの簡単な実装だった。JavaScript実行環境が豊富な現在、どれほどの効果があるのかはよくわからない。なさそう。</p>
+
+<h2>静的なファイルへのクッキーの付与</h2>
+
+<p>何に使うのかよくわからないけど、画像やCSSにCloudFlareがクッキーを発行する。ここの場合は静的なファイルのドメインを分けたりしておらず、かつ<a href="http://www.google.com/analytics/">Google Analytics</a>でクッキーを使用済みなので影響は少ないだろうけど、ちゃんと色々考えてやっている場合は逆にアレなことにもなりそう。</p>
+
+<h2>画像の欠落</h2>
+
+<p>ランダムに画像がうまく表示されない現象が起こった。画像を多用するようなWebサイトではないので致命的ではないのだけど、問題はある。ググった感じではCSS経由で参照している画像が欠落しやすい傾向があるようだ。</p>
+
+<hr>
+
+<p>そもそもCloudFlareを使おうと思った目的が達成できなかったとかそういうのもあるので、週明けに元に戻そうと思う。向いているのは集中的なアクセスが起こりやすいWebサイトなのかなーという感想。他は<code>.htaccess</code>等で地道に設定し無くてはならない細々としたことや、HTMLやJavaScript、CSSの圧縮やメールアドレスのクローキングなど一手間かかるところを手軽に自動化できること、というようなセキュリティやCDNというより便利ツール的な側面に魅力を感じる人とかにも向いてそう。Google Analyticsのコードを一括挿入とかも便利そう(使わなかったけど)。あとはファイルの配布所に使うとか？</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/sass-adjust-font-size-mixin.html">
+  <p>Sass: adjust-font-sizeミックスイン</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

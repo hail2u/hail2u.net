@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>jQueryプラグイン: Highlight Search Terms - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/jquery-highlight-search-terms-plugin.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/highlight-search-terms.html">
+
+    
+
+    
+
+    
+      <meta content="jQueryプラグイン: Highlight Search Terms" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/jquery-highlight-search-terms-plugin.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/jquery-highlight-search-terms-plugin.html" itemprop="url">
+
+        <h1 itemprop="name">jQueryプラグイン: Highlight Search Terms</h1>
+
+        <footer>
+          <p>on <time datetime="2009-06-04T11:26:00+09:00" itemprop="datePublished">Jun 4, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="/blog/coding/highlight-search-terms.html">前回のエントリ</a>で取り上げたスクリプトをjQueryプラグイン化した。だけ。<a href="http://github.com/hail2u/jquery.highlight-search-terms">GitHubにリポジトリを作って公開しておいた</a>。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装は<code>highlight-1</code>とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。</p>
+
+<p>使い方は多くのjQueryプラグインと同じで、</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms();
+</code></pre>
+
+<p>と検索語のハイライトを行いたい要素からつなげて使う。プラグイン側でインライン・スタイルを付加したりはしないので、デフォルトの<code>em.highlight</code>に対してスタイル指定をあらかじめしておく必要がある。</p>
+
+<p><code>highlightSearchTerms()</code>にはオプションとして、</p>
+
+<pre><code class="language-js">
+$(&quot;body&quot;).highlightSearchTerms({
+  className: &quot;search-keyword&quot;,
+  referrerPatterns: [
+    &quot;^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$&quot;
+  ],
+  unsafeChars: &quot;[!-*,-/:-@[-`{-~]&quot;
+});
+</code></pre>
+
+<p>このように指定することができる。</p>
+
+<p><code>className</code>は強調する時に使用する<code>em</code>要素に指定される<code>class</code>属性。デフォルトは<code>highlight</code>。</p>
+
+<p><code>referrerPatters</code>はリファラを評価する正規表現のパターン。配列なので複数指定可能。デフォルトでGoogle(comとco.jp)・Yahoo!(comとco.jp)・Bingの計5つが設定されており、オプションで指定されたものとマージされる。オプションで指定したものが先に評価され、マッチした時点で評価のループを抜けるので、デフォルトのパターンよりも優先されることになる(上書きではないが、近い挙動になる)。例えば自分のサイト内検索のリファラを拾うようにするためには、</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+  referrerPatterns: [
+    &quot;^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$&quot;
+  ]
+});
+</code></pre>
+
+<p>とかしてやれば良い(これはこのサイトの場合の例)。</p>
+
+<p><code>unsafeChars</code>は検索語から削除する文字列の正規表現パターン。デフォルトではほとんど全ての半角記号を削除するようになっている。なので、記号が強調されることはない。あまり指定する必要はないと思うが一応。むしろデフォルトの削除パターンをもっと充実させたい。このオプション指定は追加ではなく上書きなので注意が必要。</p>
+
+<p>また、デバッグ用に<code>referrer</code>というオプションがある。</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+  referrer: &quot;http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet&quot;
+});
+</code></pre>
+
+<p>とすることによって<code>document.referrer</code>の代わりに<code>referrer</code>で指定されたURL(URLじゃなくても通っちゃうけど)が検索語の取り出し元になる。なので、色々なリファラを想定して試すことができる。</p>
+
+<p>ビルトインのリファラ・パターンはパブリックにしてあるので上書きしてしまうことも可能。だが、オプションで優先して評価させることができるのでそっちを使った方が無難だと思う。コードも汚くなっちゃうし。</p>
+
+<p>中身のコードはあまり変わっていない。変えたところは<code>$(&quot;*&quot;).not(&quot;iframe&quot;)</code>というような感じで書いていた部分を<code>find()</code>と<code>:not()</code>セレクタを使うようにしたことくらい。</p>
+
+<pre><code class="language-js">this.find(&quot;:not(iframe)&quot;).contents().each();
+</code></pre>
+
+<p>という感じになっている。jQueryのここらへんの柔軟性はすごくて、XPathなんか目じゃないね(おおげさ)。</p>
+
+<p>検索サイトのURLパターンとか調べて書くのがちょっと面倒だったので、こういうのはオープンなデータベースがあったら便利かもしれないなと思った。パラメータごとにきちんと分けてデータベース化すれば、こういうリファラから検索語を強調するスクリプト(ユーザー・スクリプトも含め)とかに使う以外にも、アクセスログ解析とかは勿論、逆に検索を投げるためにも使えそう。「言うだけならタダだよね」。ですよねー。てか知らないだけで既にありそうな気もする(検索してない)。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/highlight-search-terms.html">
+  <p>検索語の強調</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="タスクトレイに鎮座しているGoogle Talkのアイコンにカーソルを合わせての未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードにはfullcountとかいう要素があったりしたので簡単っぽい。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JScriptでGmailの未読メール数を取得 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/get-gmail-unread-mail-count-by-jscript.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/change-msn-messenger-display-picture-by-vbscript.html">
+
+    
+
+    
+
+    
+      <meta content="JScriptでGmailの未読メール数を取得" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="タスクトレイに鎮座しているGoogle Talkのアイコンにカーソルを合わせての未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードにはfullcountとかいう要素があったりしたので簡単っぽい。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/get-gmail-unread-mail-count-by-jscript.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/get-gmail-unread-mail-count-by-jscript.html" itemprop="url">
+
+        <h1 itemprop="name">JScriptでGmailの未読メール数を取得</h1>
+
+        <footer>
+          <p>on <time datetime="2006-07-28T20:35:00+09:00" itemprop="datePublished">Jul 28, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">タスクトレイに鎮座している<a href="http://www.google.com/talk/" title="Google Talk">Google Talk</a>のアイコンにカーソルを合わせて<a href="http://mail.google.com/" title="Gmail"></a>の未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードには<code>fullcount</code>とかいう要素があったりしたので簡単っぽい。</p>
+
+<p>こういう場合はAtomフィードをパースしてうんたらかんたらとか考えるとバカになりそうなので、JScriptでサクッとXSLT。</p>
+
+<p>JScriptのコードは、</p>
+
+<pre><code class="language-js">var url = &quot;http://username:password@mail.google.com/mail/feed/atom&quot;;
+
+var xml = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xml.async = false;
+xml.load(url);
+
+var xsl = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xsl.async = false;
+xsl.load(&quot;tcgmail.xsl&quot;);
+
+WScript.Echo(xml.transformNode(xsl));
+</code></pre>
+
+<p>XSLのコードは、</p>
+
+<pre><code class="language-xsl">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+  xmlns:atom=&quot;http://purl.org/atom/ns#&quot;
+  version=&quot;1.0&quot;&gt;
+
+  &lt;xsl:output method=&quot;text&quot; encoding=&quot;Shift_JIS&quot;/&gt;
+
+  &lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;xsl:value-of select=&quot;//atom:feed/atom:fullcount&quot;/&gt;
+  &lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+
+<p>これ等をgmail.jsとgmail.xslとしてどっかに保存し、gmail.jsを実行してやれば未読数がダイアログでポップアップしてきます。実際にはもっと表示の仕方を工夫するべき。僕はもちろんT(略。まぁT(略も飽きてきたので、今日見つけた<a href="http://k23productions.com/haiku/snarl.html" title="full phat products : snarl">Snarl</a>使いになろうかなとか(SnarlはMacの<a href="http://growl.info/" title="Welcome to Growl!">Growl</a>っぽい何かを通知するためだけにあるアプリケーション)。</p>
+</div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/change-msn-messenger-display-picture-by-vbscript.html">
+  <p>VBScriptでMSN Messengerの表示アイコンを変更する</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

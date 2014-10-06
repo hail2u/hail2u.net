@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="主にHTMLの生成を行うGruntタスクの話。色々なテンプレート・システムの利用を考えたんだけど、Handlebars.jsにした。よく使うからというのもあるし、いざとなったらデータの再構成を待たずにその場しのぎでテンプレートにロジックを混ぜてお茶を濁せるのが好き。その場しのぎ、お茶を濁す、良い言葉だ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Handlebars.jsを使ったファイル生成Gruntタスク - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/generate-files-grunt-task-using-handlebars-js.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/internet/build-with-jekyll-like-system-and-wordpress-like-system.html">
+
+    
+
+    
+
+    
+      <meta content="Handlebars.jsを使ったファイル生成Gruntタスク" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="主にHTMLの生成を行うGruntタスクの話。色々なテンプレート・システムの利用を考えたんだけど、Handlebars.jsにした。よく使うからというのもあるし、いざとなったらデータの再構成を待たずにその場しのぎでテンプレートにロジックを混ぜてお茶を濁せるのが好き。その場しのぎ、お茶を濁す、良い言葉だ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/generate-files-grunt-task-using-handlebars-js.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/generate-files-grunt-task-using-handlebars-js.html" itemprop="url">
+
+        <h1 itemprop="name">Handlebars.jsを使ったファイル生成Gruntタスク</h1>
+
+        <footer>
+          <p>on <time datetime="2013-08-24T12:10:00+09:00" itemprop="datePublished">Aug 24, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://gist.github.com/hail2u/6310613">主にHTMLの生成を行うGruntタスク</a>の話。色々なテンプレート・システムの利用を考えたんだけど、<a href="http://handlebarsjs.com/">Handlebars.js</a>にした。よく使うからというのもあるし、いざとなったらデータの再構成を待たずにその場しのぎでテンプレートにロジックを混ぜてお茶を濁せるのが好き。その場しのぎ、お茶を濁す、良い言葉だ。</p>
+
+<p>このGruntタスクは指定されたHandlebars.jsテンプレート(例えば<code>foo.hbs</code>)をレンダリングするだけのもの。レンダリングに使うデータは、基本のメタデータ(<code>metadata.json</code>の中味)とテンプレート・ファイルごとに指定できるメタデータ(<code>foo.json</code>の中味)をGruntに含まれる<a href="http://lodash.com/">Lo-Dash</a>の<code>extend()</code>を使ってマージしたものを使う。Gistのサンプルにあるように基本のメタデータにないものを自由に追加できるし、基本のメタデータを上書きすることも出来る。</p>
+
+<p>コアの<code>generate.js</code>では<code>include</code>というヘルパー関数を作って共通部分を別に切り出せるようにした。ほぼSSIのインクルードと同じようなもの。Handlebars.jsが優秀なので、取り込むテンプレートでも普通にデータの利用は可能。</p>
+
+<p>テンプレートと出力が1対1なシステムなので、コンテンツ部分は直接テンプレートに混ぜている。僕の場合は大体HTMLで配信するものはHTMLで書くので、<a href="http://daringfireball.net/projects/markdown/">Markdown</a>で書いたコンテンツを外から取り込んで……とかそういうのを機能として作っちゃうまではやらなかった。これまたHandlebars.jsが優秀なので、別にMarkdownで書いたものをHTMLに変換してコンテンツとして取り込むなどもたぶんメタデータに関数書くだけでいける。コアでの変更はMarkdownをHTMLに変換するための<a href="https://github.com/chjj/marked">Marked</a>等を<code>require()</code>しておくくらい。</p>
+
+<p>あとは<a href="http://gruntjs.com/">Grunt</a>の動的マッピングや柔軟なタスク構成にお任せ。サンプルの<code>Gruntfils.js</code>のように動的マッピングで指定ディレクトリ以下の<code>*.hbs</code>を一気に処理するのが基本で、指定したファイルのリビルドだけを行うのを作っておいたりとか、ウェブログの更新に伴いいくつかのファイルの更新だけを行うのを作っておいたりとか環境に合わせて色々タスク設定を作る。例えば指定したファイルのリビルドなら以下の様な設定を作ってやると良い。</p>
+
+<pre><code class="language-javascript">generate: {
+  file: {
+    expand: true,
+    cwd: &#39;.grunt/html/&#39;,
+    src: <mark>grunt.option(&#39;file&#39;)</mark>,
+    filter: &#39;isFile&#39;,
+    dest: &#39;./&#39;,
+    ext: &#39;.html&#39;
+  }
+}</code></pre>
+
+<p>これで<code>--file</code>オプションを見て生成できる。</p>
+
+<pre><samp>$ <kbd>grunt generate:file <mark>--file=index.hbs</mark></kbd>
+</samp></pre>
+
+<p>面倒くさいテンプレートと出力のマッピングや、コマンド(やボタン)一発で作業を一気にこなすというようなCMSの基本的な部分をGruntによっかかっている。するとこのような数十行のJavaScriptでウェブサイトの管理……とまではいかないけど、効率的な運営くらいは可能になる。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/internet/build-with-jekyll-like-system-and-wordpress-like-system.html">
+  <p>JekyllみたいなのとWordPressみたいなのの組み合わせ</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

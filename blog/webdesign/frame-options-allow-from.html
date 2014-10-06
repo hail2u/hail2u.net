@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="iframe要素での参照等を制御できる(X-)Frame-Optionsヘッダーでは常に拒否するDENYと他者からの参照のみを拒否するSAMEORIGINが定められており、多くの現行ブラウザーで実装済み。それに加えて許可するドメインを指定できるALLOW-FROMが定められようとしている。もう実装はあるのかな……と2012/04/25現在での現行ブラウザーでざっと調べた感じでは、Internet Explorer 9(と10)だけ対応していた。他のブラウザーはALLOW-FROMを使うとどこからでも参照できるようになる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Frame-OptionsのALLOW-FROM - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/frame-options-allow-from.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/fixed-sidebar-with-media-queries.html">
+
+    
+
+    
+
+    
+      <meta content="Frame-OptionsのALLOW-FROM" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="iframe要素での参照等を制御できる(X-)Frame-Optionsヘッダーでは常に拒否するDENYと他者からの参照のみを拒否するSAMEORIGINが定められており、多くの現行ブラウザーで実装済み。それに加えて許可するドメインを指定できるALLOW-FROMが定められようとしている。もう実装はあるのかな……と2012/04/25現在での現行ブラウザーでざっと調べた感じでは、Internet Explorer 9(と10)だけ対応していた。他のブラウザーはALLOW-FROMを使うとどこからでも参照できるようになる。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/x-frame-options-error-on-ie9.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/frame-options-allow-from.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/webdesign/frame-options-allow-from.html" itemprop="url">
+
+        <h1 itemprop="name">Frame-OptionsのALLOW-FROM</h1>
+
+        <footer>
+          <p>on <time datetime="2012-04-26T00:32:00+09:00" itemprop="datePublished">Apr 26, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><code>iframe</code>要素での参照等を制御できる(X-)Frame-Optionsヘッダーでは常に拒否する<em><code>DENY</code></em>と他者からの参照のみを拒否する<em><code>SAMEORIGIN</code></em>が定められており、多くの現行ブラウザーで実装済み。それに加えて許可するドメインを指定できる<em><code>ALLOW-FROM</code></em>が定められようとしている。もう実装はあるのかな……と2012/04/25現在での現行ブラウザーでざっと調べた感じでは、Internet Explorer 9(と10)だけ対応していた。他のブラウザーは<code>ALLOW-FROM</code>を使うとどこからでも参照できるようになる。</p>
+
+<p>以下は未来の自分へのメモ。</p>
+
+<pre><code class="language-apache">Header set X-Frame-Options "SAMEORIGIN"
+
+&lt;FilesMatch "^foo.html$"&gt;
+  Header set X-Frame-Options "ALLOW-FROM http://screenqueri.es/"
+&lt;/FilesMatch&gt;
+</code></pre>
+
+<p>これで基本は他者からの参照を拒否しておいて、<a href="http://screenqueri.es/">Screenqueri.es</a> (手軽にMedia QueriesをテストすることができるWebサイト)からのみ<code>foo.html</code>を<code>iframe</code>経由で表示できるようになる。今のところ実装はないので、こうすると<code>foo.html</code>はどこからでも<code>iframe</code>経由で参照できるようになる。</p>
+
+<hr>
+
+<figure>
+  <img src="/images/blog/x-frame-options-error-on-ie9.png" alt="Internet Explorerでは(X-)Frame-Optionsヘッダーにより読み込みが拒否された場合、このようなエラー画面が代わりに表示される。" itemprop="image">
+  <figcaption>IE9's (X-)Frame-Options Error Message</figcaption>
+</figure>
+
+<p>(X-)Frame-Optionsヘッダーでの他者からの参照を拒否した場合、多くのブラウザーでは空白になっちゃう(<code>iframe</code>要素の内容が代わりに表示されたりもしない)のはちょっとアレかなーと思っている。Internet Explorer 9のこのエラー画面はそこそこわかりやすいし、参照されているページを開き直す方法もわかりやすくユーザーには優しそうな気はする。Opera 11も似た感じのエラー画面が表示されて良い感じ。ただこの画面をパクってフィッシング・サイトへ誘導とかも簡単に可能なので、微妙なところなのかもしれない。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/fixed-sidebar-with-media-queries.html">
+  <p>位置固定サイドバーはMedia Queriesと一緒に</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="TypeKitとかがやってるWebフォントの読み込みが終わったらhtml要素にクラス名を振るアレの話。TypeKitがオープンソースでリリースしているWebFont Loaderを使う方法が安全で安定。Googleがホスティングしているのもあるので手軽でもある。でも読み込み完了の検知以外にも機能があってパワフルすぎる気がするので、Adobe Blankを使って自前で書いてみることにした。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>フォントの読み込み完了を検知する - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/detect-font-loading.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/vim-sass-compiler-plugin-for-3.3.html">
+
+    
+
+    
+
+    
+      <meta content="フォントの読み込み完了を検知する" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="TypeKitとかがやってるWebフォントの読み込みが終わったらhtml要素にクラス名を振るアレの話。TypeKitがオープンソースでリリースしているWebFont Loaderを使う方法が安全で安定。Googleがホスティングしているのもあるので手軽でもある。でも読み込み完了の検知以外にも機能があってパワフルすぎる気がするので、Adobe Blankを使って自前で書いてみることにした。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/detect-font-loading.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/detect-font-loading.html" itemprop="url">
+
+        <h1 itemprop="name">フォントの読み込み完了を検知する</h1>
+
+        <footer>
+          <p>on <time datetime="2013-08-22T11:45:00+09:00" itemprop="datePublished">Aug 22, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://typekit.com/">TypeKit</a>とかがやってるWebフォントの読み込みが終わったら<code>html</code>要素にクラス名を振るアレの話。TypeKitがオープンソースでリリースしている<a href="https://github.com/typekit/webfontloader">WebFont Loader</a>を使う方法が安全で安定。<a href="https://developers.google.com/speed/libraries/devguide#webfont">Googleがホスティング</a>しているのもあるので手軽でもある。でも読み込み完了の検知以外にも機能があってパワフルすぎる気がするので、<a href="http://blogs.adobe.com/typblography/2013/03/introducing-adobe-blank.html">Adobe Blank</a>を使って自前で書いてみることにした。</p>
+
+<h2>Adobe Blankのサイズ削減</h2>
+
+<p>Adobe Blankはそのまま使うと30KB以上ある。読み込み完了検知だけなら幅0のグリフが1つあればそれで良いので、まずはサブセット化してサイズを抑えることから。<code>a</code>だけのWOFFなAdobe Blankを作ればちょうど1KBくらいになる。</p>
+
+<p class="seealso">Download: <a href="/pub/adobe-blank.woff">adobe-blank.woff</a></p>
+
+<h2><code>@font-face</code>定義の追加</h2>
+
+<p>外部リクエストにすると意味が薄れるのでDataURIを使って既存のCSSに混ぜ込む。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &#39;Adobe Blank&#39;;
+  src: url(&#39;data:application/font-woff;base64,d09GRgAB...&#39;) format(&#39;woff&#39;);
+}</code></pre>
+
+<h2>読み込み完了を検知するためのHTML要素</h2>
+
+<p>これを<code>font-family</code>に指定した要素では、<code>a</code>しかテキストのない場合に幅が<code>0</code>になる。なので以下の様な要素を作っておくとWebフォント(Source Sans Proを例にする)の読み込みが完了すると幅が増えることになる。つまりこの要素の幅を監視すれば読み込み完了の検知が出来る。</p>
+
+<pre><code class="language-html">&lt;div style=&quot;font-family:&#39;Source Sans Pro&#39;, &#39;Adobe Blank&#39;;
+  position: absolute;
+  top: -100px;&quot;&gt;a&lt;/div&gt;</code></pre>
+
+<h2>JavaScriptで監視</h2>
+
+<p>要素の生成から監視までを全てJavaScriptでやると良い。タイマー使わない方法も模索したい所だけどまずは普通のアプローチで。</p>
+
+<pre><code class="language-javascript">function detectFontLoading(fontName) {
+  var tester = document.createElement(&#39;span&#39;);
+  tester.style.fontFamily = &#39;&quot;&#39; + fontName + &#39;&quot;, &quot;Adobe Blank&quot;&#39;;
+  tester.style.position = &#39;absolute&#39;;
+  tester.style.top = &#39;-100px&#39;;
+  tester.appendChild(document.createTextNode(&#39;a&#39;));
+  document.body.appendChild(tester);
+
+  var timerId = setInterval(checkWidth, 500);
+
+  function checkWidth() {
+    if (tester.offsetWidth &gt; 0) {
+      clearInterval(timerId);
+      document.documentElement.className += &#39; &#39; + fontName.toLowerCase().replace(/\s/g, &#39;_&#39;);
+      tester.parentNode.removeChild(tester);
+    }
+  }
+}
+
+detectFontLoading(&quot;Source Sans Pro&quot;);</code></pre>
+
+<p>これでSource Sans Proの読み込みが完了すると、<code>html</code>要素に<code>source_sans_pro</code>というクラス名が振られる。どのブラウザーでも読み込みの完了前から文字は表示され読めるという前提の話になっているので、特に急がずに500ミリ秒間隔とかでチェックすれば良さそう。もっとゆっくりでも良いかも。ずっとチェックし続けるのでタイムアウトは設定できるようにするべきだけどやってない。</p>
+
+<h2>CSSでのフォントの切り替え</h2>
+
+<p>あとはCSSをこれに見合った形で書いてやるだけ。</p>
+
+<pre><code class="language-css">body {
+  font-family: &quot;Helvetica Neue&quot;, &quot;Calibri&quot;, sans-serif;
+}
+
+.source_sans_pro body {
+  font-family: &quot;Source Sans Pro&quot;, sans-serif;
+}</code></pre>
+
+<p>Source Sans Proの読み込みが完了するまではHelvetica NeueまたはCalibriでとりあえず表示され、読み込みが完了するとSource Sans Pronに置き換わる。</p>
+
+<hr>
+
+<p>Webフォントの読み込み完了の検知はつまるところ<a href="/blog/webdesign/fout.html">FOUT</a>対策なわけだけど、今後どうなるんだろう。Firefoxの挙動が一番素直でマシだと感じているので、それに揃うといいなぁと思っている。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/vim-sass-compiler-plugin-for-3.3.html">
+  <p>Sass 3.3向けVimコンパイラー・プラグイン</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

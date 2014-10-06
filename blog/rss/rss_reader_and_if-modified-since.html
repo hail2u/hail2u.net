@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="ココの転送量の半分以上は配信しているRSSに占められているわけですが、最近、巡回間隔1分で常にGETとか、かなりきっついアクセスの仕方をする方が増えてきたような気がします。共用サーバーなので、酷いものは弾くようにしてますが、ちっと調べるのがかったるくなってきたりする罠。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>RSSリーダーとIf-Modified-Since - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/rss/rss_reader_and_if-modified-since.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/mac_ie_crash_by_css.html">
+
+    
+
+    
+
+    
+      <meta content="RSSリーダーとIf-Modified-Since" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="ココの転送量の半分以上は配信しているRSSに占められているわけですが、最近、巡回間隔1分で常にGETとか、かなりきっついアクセスの仕方をする方が増えてきたような気がします。共用サーバーなので、酷いものは弾くようにしてますが、ちっと調べるのがかったるくなってきたりする罠。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/rss/rss_reader_and_if-modified-since.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/rss/rss_reader_and_if-modified-since.html" itemprop="url">
+
+        <h1 itemprop="name">RSSリーダーとIf-Modified-Since</h1>
+
+        <footer>
+          <p>on <time datetime="2004-02-11T07:12:00+09:00" itemprop="datePublished">Feb 11, 2004</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/rss/">RSS</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description">ココの転送量の半分以上は<a href="/syndications.html" title="hail2u.net - Syndications">配信しているRSS</a>に占められているわけですが、最近、巡回間隔1分で常にGETとか、かなりきっついアクセスの仕方をする方が増えてきたような気がします。共用サーバーなので、酷いものは弾くようにしてますが、ちっと調べるのがかったるくなってきたりする罠。</p>
+<p>そこで気になったので、生ログからRSSリーダーを抽出し、それらをIf-Modified-Sinceを送ってきてくれるっぽいものとそうでないものに分けてみました。真面目に調べてないので、信憑性に欠けます。それと最新版ではちゃんとサポートしていたりとかあるかもしれません。あくまでもうちで配信しているRSSに対してアクセスしてきたUserAgentから類推しているに過ぎませんので、参考程度のものということでひとつ。</p>
+<ul>
+<li>送ってるような気がする
+<ul>
+<li><a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a></li>
+<li><a href="http://www.bradsoft.com/feeddemon/" title="Bradbury Software - FeedDemon RSS newsfeed Reader for Windows">FeedDemon</a></li>
+<li><a href="http://www.feedreader.com/" title="Feedreader | new.media.tool">Feedreader</a></li>
+<li><a href="http://glucose.dip.jp/Zope" title="glucose">glucose</a></li>
+<li><a href="http://ranchero.com/netnewswire/" title="Ranchero Software: NetNewsWire">NetNewsWire</a></li>
+<li><a href="http://ranchero.com/netnewswire/#lite" title="Ranchero Software: NetNewsWire">NetNewsWire Lite</a></li>
+<li><a href="http://www.newsgator.com/" title="NewsGator - the RSS news aggregator for Outlook">NewsGator</a></li>
+<li><a href="http://testesca.at.infoseek.co.jp/hoka/sonota.htm#Rreader" title="その他のダウンロード">RReader</a></li>
+<li><a href="http://fls.moo.jp/moz/rssreader.html" title="Firebird Ext. - RSS Reader Panel">RSS Reader Panel</a></li>
+<li><a href="http://www.rssbandit.org/" title="RSS Bandit - Rss Bandit">Rss Bandit</a></li>
+<li><a href="http://www.geocities.jp/nao_rssgate/" title="RSSGate">RSSGate</a></li>
+<li><a href="http://www.rssreader.com/" title="RssReader - free RSS reader displays any RSS news feeds XML">RssReader</a></li>
+<li><a href="http://www.sharpreader.net/" title="SharpReader RSS Aggregator">SharpReader</a></li>
+<li><a href="http://www.fondantfancies.com/shrook/" title="Shrook: RSS for MacOS X">Shrook</a></li>
+<li><a href="http://www.nongnu.org/straw/" title="Straw, the GNOME 2 desktop news aggregator">Straw</a></li>
+<li><a href="http://www1.mirai.ne.jp/%7Egyo/xyzzy/rss-mode.html" title="xyzzy &gt; rss-mode">rss-mode</a></li>
+</ul>
+</li>
+<li>送ってないような気がする
+<ul>
+<li><a href="http://www.desktopsidebar.com/" title="Desktop Sidebar Home Page">Desktop Sidebar</a></li>
+<li><a href="http://www.infomaker.jp/headline/" title="『RSSリーダー』 Headline-Reader (ヘッドライン リーダー) の紹介">Headline-Reader</a></li>
+<li><a href="http://www.witha.jp/HepCat/" title="ウィザ システム - Witha System, LTD.">HepCat</a></li>
+<li><a href="http://www.student.uni-oldenburg.de/frerich.raabe/knewsticker/" title="Frerich Raabe&#39;s Homepage - KNewsTicker">KNewsTicker</a></li>
+<li><a href="http://www.work-at.co.jp/rabbit/" title="RSSリーダー Rabbit Ticker">Rabbit Ticker</a></li>
+<li><a href="http://www.readone.net/" title="ReadOne ニュースマイニングRSSリーダー">ReadOne</a></li>
+<li><a href="http://www.doubleslit.net/rectenna/" title="Layser Rectenna">Layser Rectenna</a></li>
+<li><a href="http://www.semblog.org/wiki/?rna" title="rna - RSSベースのアンテナ「RNA」">RNA</a></li>
+<li><a href="http://testesca.at.infoseek.co.jp/hoka/sonota.htm#Rreader" title="その他のダウンロード">RThReader</a></li>
+<li><a href="http://www.kumalab.com/soft/000001.html" title="パラボナミニ v1.1.9 [RSSリーダー]">パラボナミニ</a></li>
+</ul>
+</li>
+</ul>
+<p>うーん。送ってないような気がするものに、和製が多いような。海外製の有名どころのものはちゃんと送ってきているような感じ。まーそのうちほとんどのものが送るようになるでしょう。多分。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/mac_ie_crash_by_css.html">
+  <p>CSSでMac IEがクラッシュ</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

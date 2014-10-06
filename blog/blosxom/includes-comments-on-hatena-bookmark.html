@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="はてなブックマークエントリー情報取得APIを利用して、blosxomのエントリ個別ページにはてなブックマークでそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>はてなブックマークでつけられたコメントをblosxomにインクルード - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/blosxom/includes-comments-on-hatena-bookmark.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/font-in-css.html">
+
+    
+
+    
+
+    
+      <meta content="はてなブックマークでつけられたコメントをblosxomにインクルード" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="はてなブックマークエントリー情報取得APIを利用して、blosxomのエントリ個別ページにはてなブックマークでそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/blosxom/includes-comments-on-hatena-bookmark.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/blosxom/includes-comments-on-hatena-bookmark.html" itemprop="url">
+
+        <h1 itemprop="name">はてなブックマークでつけられたコメントをblosxomにインクルード</h1>
+
+        <footer>
+          <p>on <time datetime="2006-09-20T04:02:00+09:00" itemprop="datePublished">Sep 20, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/blosxom/">Blosxom</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://d.hatena.ne.jp/keyword/%a4%cf%a4%c6%a4%ca%a5%d6%a5%c3%a5%af%a5%de%a1%bc%a5%af%a5%a8%a5%f3%a5%c8%a5%ea%a1%bc%be%f0%ca%f3%bc%e8%c6%c0API?kid=184075">はてなブックマークエントリー情報取得API</a>を利用して、<a href="http://www.blosxom.com/">blosxom</a>のエントリ個別ページに<a href="http://b.hatena.ne.jp/">はてなブックマーク</a>でそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。</p>
+
+<p>プラグインは特に必要は無い。プラグインにする必要も無いとも言える。必要なのはflavourへのコードの追加とJavaScriptファイル。</p>
+
+<h2>head.html</h2>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/prototype.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/hatena/bookmark.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+
+<p><a href="http://prototype.conio.net/">prototype.js</a>が必要。インクルードするだけ。</p>
+
+<h2>stoy.html</h2>
+
+<pre><code class="language-html">&lt;?$path_info like=&quot;\.html$&quot;&gt;
+  &lt;div class=&quot;story&quot; id=&quot;comments&quot;&gt;
+    &lt;h3&gt;Comments&lt;/h3&gt;
+    &lt;p&gt;JavaScriptに対応または有効な環境の場合、ここに&lt;a href=&quot;http://b.hatena.ne.jp/&quot;&gt;はてなブックマーク&lt;/a&gt;でのこのエントリに対するコメントが表示されます。&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/?&gt;
+</code></pre>
+
+<p><a href="http://www.blosxom.com/plugins/interpolate/interpolate_fancy.htm">interplate_fancy</a>が必要。<code>$path_info</code>を利用して、エントリ個別ページかどうかを判別し、そうだった場合にコメントを流し込むためのノードを作っておくという感じ。</p>
+
+<h2>コメント表示スクリプト</h2>
+
+<p><a href="/scripts/hatena/bookmark.js">bookmark.js</a>のみ。ソースが全てを物語る。はてなブックマークエントリー情報取得APIに対して一回リクエストすれば良いだけなので、単純な実装にした。HTMLの出力も<code>innerHTML</code>でガンガンぶっこんでいく形(今のところは)。</p>
+
+<hr>
+
+<p>細かいことはあとで書く。かもしれない。とか書いておく時は大抵書かない。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/font-in-css.html">
+  <p>CSSで指定するフォント</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

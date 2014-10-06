@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Firefoxの拡張でツールバー・ボタンはtoolbarbutton要素で作る。これをドロップダウンにするにはtype属性にmenuを指定してやり、子にmenupopupを作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Firefoxの拡張のドロップダウンなツールバー・ボタン - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/dropdown-toolbarbutton-in-firefox-extension.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/change-profile-pr.html">
+
+    
+
+    
+
+    
+      <meta content="Firefoxの拡張のドロップダウンなツールバー・ボタン" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Firefoxの拡張でツールバー・ボタンはtoolbarbutton要素で作る。これをドロップダウンにするにはtype属性にmenuを指定してやり、子にmenupopupを作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/dropdown-toolbarbutton-sample.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/dropdown-toolbarbutton-in-firefox-extension.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/coding/dropdown-toolbarbutton-in-firefox-extension.html" itemprop="url">
+
+        <h1 itemprop="name">Firefoxの拡張のドロップダウンなツールバー・ボタン</h1>
+
+        <footer>
+          <p>on <time datetime="2009-05-02T00:17:00+09:00" itemprop="datePublished">May 2, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://mozilla.jp/firefox/">Firefox</a>の拡張でツールバー・ボタンは<a href="https://developer.mozilla.org/en/XUL/toolbarbutton"><code>toolbarbutton</code></a>要素で作る。これをドロップダウンにするには<code>type</code>属性に<code>menu</code>を指定してやり、子に<code>menupopup</code>を作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。</p>
+
+<p>繰り返しになるけどドロップダウンなツールバー・ボタンは、</p>
+
+<pre><code class="language-xml">&lt;toolbarbutton id=&quot;dropdown-test&quot;
+  label=&quot;ドロップダウン&quot;
+  type=&quot;menu&quot;&gt;
+  &lt;menupoup&gt;
+    &lt;menuitem label=&quot;項目 #1&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #2&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #3&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #4&quot;/&gt;
+  &lt;/menupoup&gt;
+&lt;/toolbarbutton&gt;
+</code></pre>
+
+<p>このように作る。この<code>dropdown-test</code>のスタイルに<code>list-style-image</code>で画像を与えてやるとそれがアイコンになり、</p>
+
+<figure><img src="/images/blog/dropdown-toolbarbutton-sample.png" alt="ドロップダウンなツールバー・ボタンの例" itemprop="image"></figure>
+
+<p>といったように右に(ロケールによるけど)矢印付きで表示される。まるで問題ないように見えるのだが、ちょっとアレな感じになるのは、大きいアイコン表示でかつテキストも表示する場合。わかりやすいように他の普通のツールバー・ボタンと並べてみると、こんな感じになる。</p>
+
+<figure><img src="/images/blog/big-dropdown-toolbarbutton-with-label-sample.png" alt="大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタンの例"></figure>
+
+<p>普通のツールバー・ボタンのラベルが下に来ているのに対して、ドロップダウンの方はラベルが右に来てしまう。<code>toolbarbutton</code>要素に対して、<code>class</code>属性で<code>toolbarbutton-1</code>を指定してやるとラベルは下に来るが、今度は矢印も下に来てしまう(上記画像のHomeというラベルの更に下に矢印が出る感じ)。見た目が悪いうえにツールバーが太くなってしまう。また、<code>type</code>で<code>menu-button</code>を指定した場合は、ラベルは下、矢印は右に来るのだけどアイコン部分をクリックした時の動作をきちんとコーディングしなければならなくなる。</p>
+
+<p>これを<code>type=&quot;menu&quot;</code>の挙動のままラベルは下、矢印は右にするには<code>toolbarbutton</code>へのスタイル指定で、</p>
+
+<pre><code class="language-css">#dropdown-test {
+  -moz-binding: url(&quot;chrome://global/content/bindings/toolbarbutton.xml#menu-vertical&quot;);
+}
+</code></pre>
+
+<p>と<code>menu-vertical</code>というビルトインのスタイルを適用してやれば良い。</p>
+
+<figure><img src="/images/blog/perfect-big-dropdown-toolbarbutton-with-label.png" alt="menu-verticalな大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタン"></figure>
+
+<p>この<code>menu-vertical</code>はFirefoxのデフォルトのテーマでは使われていないからか、あまりメジャーじゃない模様。ゴリゴリCSSを書いて無理やり矢印を右に持っていこうとしてた苦労はいったい……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/change-profile-pr.html">
+  <p>Firefox extension: Change Profile 0.1</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

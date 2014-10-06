@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>grunt-task-helperが良さそう - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/grunt-task-helper.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/media/hollow-icons.html">
+
+    
+
+    
+
+    
+      <meta content="grunt-task-helperが良さそう" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/grunt-task-helper.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/grunt-task-helper.html" itemprop="url">
+
+        <h1 itemprop="name">grunt-task-helperが良さそう</h1>
+
+        <footer>
+          <p>on <time datetime="2013-08-26T10:40:00+09:00" itemprop="datePublished">Aug 26, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://npmjs.org/package/grunt-task-helper">grunt-task-helper</a>というGruntプラグインを使っている。ざっと言うと<code>src</code>と<code>dest</code>を比較してフィルターをかけた結果を<em>他のタスク</em>で使えるようになったりするもの。例えばビルトインの比較機能である<code>newFile</code>を使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。</p>
+
+<p><a href="https://npmjs.org/package/grunt-contrib-concat">grunt-contrib-concat</a>を使っているとして、そのタスク設定が以下のようになっているとする。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &#39;;&#39;
+  },
+  prettify: {
+    src: [
+      &#39;scripts/prettify/prettify.js&#39;,
+      &#39;scripts/prettify/lang-config.js&#39;,
+      &#39;scripts/prettify/lang-css.js&#39;,
+      &#39;scripts/prettify/lang-scss.js&#39;,
+      &#39;scripts/prettify/lang-vim.js&#39;,
+      &#39;scripts/prettify/prettify-loader.js&#39;
+    ],
+    dest: &#39;scripts/prettify.js&#39;
+  }
+}</code></pre>
+
+<p>この場合は順番が重要なのでグロブでまとめて拾っていない以外は普通なマルチタスク設定。これをgrunt-task-helperを挟むように書きかえるとこうなる。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &#39;;&#39;
+  },
+  prettify: {
+    files: <mark>&#39;&lt;%= taskHelper.prettify.options.filesArray %&gt;&#39;</mark>
+  }
+},
+
+taskHelper: {
+  prettify: {
+    options: {
+      <mark>handlerByFile: &#39;newFile&#39;,</mark>
+      <mark>filesArray: []</mark>
+    },
+    src: [
+      &#39;scripts/prettify/prettify.js&#39;,
+      &#39;scripts/prettify/lang-config.js&#39;,
+      &#39;scripts/prettify/lang-css.js&#39;,
+      &#39;scripts/prettify/lang-scss.js&#39;,
+      &#39;scripts/prettify/lang-vim.js&#39;,
+      &#39;scripts/prettify/loader.js&#39;
+    ],
+    dest: &#39;scripts/prettify.js&#39;
+  }
+}</code></pre>
+
+<p><code>src</code>と<code>dest</code>をtaskHelperタスクに移して、concatタスクの<code>files</code>で<a href="http://gruntjs.com/configuring-tasks#templates">テンプレート</a>を使ってフィルター結果が格納される<code>filesArray</code>を参照してやる。ここではビルトインの<code>newFile</code>を使っていて、<code>src</code>に指定されたファイルのうち一つでも<code>dest</code>で指定されたファイルより新しい場合にのみ<code>filesArray</code>に<code>src</code>と<code>dest</code>がコピーされる。そうでない場合は空になるのでconcatタスクは何もせず完走する(エラーにはならない)。</p>
+
+<p>比較に使った<code>newFile</code>の代わりにサイズで比較する<code>size</code>を使うこともできるし、自前で<code>false</code>を返して除外していく関数を書いたりもできる。自前で色々やると誰にも読めなくなる<code>Gruntfile.js</code>の出来上がりなので、公の場では控えた方が良さそう。</p>
+
+<p><code>src</code>と<code>dest</code>の比較だけじゃなくて、<code>src</code>の中味をちょっといじって<code>dest</code>に吐くみたいなことも出来る<code>handlerByContent</code>というオプションなどもある。READMEの例ではSSIのインクルードみたいなことやってて、そういったファイルをちょっと弄るだけのタスクなら自前でファイルの読み書きとかをすることなく簡単に書けるようだ。</p>
+
+<p>まだ公開されたばかりのGruntプラグインなので、いろいろな変更や機能の追加がありそうでどういうものになるかはなんとも言えない。けどGruntのとりあえず全部やる的な大雑把さを効率化させるのに役に立ちそうで期待している。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/media/hollow-icons.html">
+  <p>空白の多いアイコン</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

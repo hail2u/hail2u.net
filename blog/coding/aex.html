@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Amazon Product Advertising APIのItemSearchオペレーションのパラメータとしてSearchIndex=Allが日本でも利用できるようになったらしいので、とりあえずAexという名前でAmazon.co.jpの検索サイトを作ってみた。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Aex: Amazon.co.jpの全商品から検索するよ！ - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/aex.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/gadget/samsung-syncmaster-2494hs.html">
+
+    
+
+    
+
+    
+      <meta content="Aex: Amazon.co.jpの全商品から検索するよ！" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Amazon Product Advertising APIのItemSearchオペレーションのパラメータとしてSearchIndex=Allが日本でも利用できるようになったらしいので、とりあえずAexという名前でAmazon.co.jpの検索サイトを作ってみた。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/aex.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/aex.html" itemprop="url">
+
+        <h1 itemprop="name">Aex: Amazon.co.jpの全商品から検索するよ！</h1>
+
+        <footer>
+          <p>on <time datetime="2009-07-31T15:16:00+09:00" itemprop="datePublished">Jul 31, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=5">Amazon Product Advertising API</a>の<code>ItemSearch</code>オペレーションのパラメータとして<a href="http://affiliate-blog.amazon.co.jp/2009/07/paapi_maintenance_aug2009.html">SearchIndex=Allが日本でも利用できるようになったらしい</a>ので、とりあえず<a href="http://hail2u.github.io/aex.html">Aexという名前でAmazon.co.jpの検索サイトを作ってみた</a>。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。</p>
+
+<p><code>SearchIndex=All</code>を指定すると全商品からKeywordsに指定した文字列で検索してくれる。<code>SearchIndex=Blended</code>とはまったく違い、カテゴリごとに検索結果が分けられて返ってきたりはしない。色々検索してみたところ、Amazon.co.jpでの検索と同じ結果で、概ね期待通りの検索結果が返ってくるようだ(<code>ItemSearch</code>オペレーションのデフォルトでは<code>Condition=New</code>なので中古商品などが含まれないというような違いはあったりもする)。</p>
+
+<ul>
+<li><a href="http://hail2u.github.io/aex.html#q=jQuery">jQuery を検索した結果</a></li>
+<li><a href="http://hail2u.github.io/aex.html#q=jQuery;p=2">jQuery を検索した結果の2ページ目</a></li>
+<li><a href="http://hail2u.github.io/aex.html#q=%E5%86%85%E6%9D%91%E3%81%95%E3%81%BE%E3%81%81%EF%BD%9E%E3%81%9A">内村さまぁ～ず を検索した結果</a></li>
+</ul>
+
+<p><code>SearchIndex=All</code>のみの制限として、検索結果のページングに使用する<code>ItemPage</code>の最大値が<em>5</em>(<code>SearchIndex=Books</code>などの場合は<em>400</em>)までというのがあるようだ。また<code>Sort</code>に指定できる値も、</p>
+
+<ol>
+<li><code>price</code></li>
+<li><code>-price</code></li>
+<li><code>relevancerank</code></li>
+<li><code>salesrank</code></li>
+</ol>
+
+<p>の4つだけになっており、名前順でソートなどは不可能。他にも何か制限ありそう……。</p>
+
+<p><code>ItemAttributes/ProductGroup</code>の値の一覧が(できれば対訳も)欲しい。今までは<code>SearchIndex</code>でカテゴリを絞っていたので<code>ProductGroup</code>の値を意識しないでも何とかなったけど、全カテゴリから検索できるようになるとどのカテゴリの商品かを<code>ProductGroup</code>から類推することになるが、ローカライズされていないのでCEとか言われてもわからない。</p>
+
+<p>Amazon アソシエイト・プログラム（アフィリエイト） 公式ブログではProduct Advertising APIをPAAPIって略してるんだな。ぱーぴ！！1</p>
+
+<h2>追記@2009-08-01T20:44:44+09:00</h2>
+
+<p>IE8では<code>onhashchange</code>、それ以外のブラウザでは古の<code>setInterval()</code>を使った簡単なjQueryプラグインを書いて、ブラウザの戻る・進むに対応させた。普通に<a href="http://www.mikage.to/jquery/jquery_history.html">jQuery history plugin</a>を使えば良かったという……。Firefox 3.xでは、</p>
+
+<pre><code class="language-js">location.watch(&quot;hash&quot;, function (obj, oldVal, newVal) {
+  $(window).trigger(&quot;hashchange&quot;);
+});
+</code></pre>
+
+<p>とか初めて<code>Object.watch()</code>を使ってやってみたんだけど、<code>location.hash</code>に値をセットしようとすると<code>#undefined</code>とかなってわけがわからなくなった。どうせ3.6で<code>onhashchange</code>導入されるから良いか。</p>
+
+<h2>追記2009-08-02T15:27:24+09:00</h2>
+
+<p>クエリの方式を<code>#q=foo;p=3</code>という形に変えたり、スタイルをモノクロにしたり、バグ直したり。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/gadget/samsung-syncmaster-2494hs.html">
+  <p>Samsung SyncMaster 2494HSを買った</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Amazon E-Commerce Service 4.0のXSLTサービスを利用してJSONに整形するというひとつ前のエントリでのアイディアを利用した和書ストアのAmazon.co.jpを検索をするSIXTY-SIXってものを作ってみました。作ってみただけ・・・ですが、一応あまりメジャーでない感じのJavaScriptテクニックも使ったりしたのでそれの紹介も兼ねてエントリってみた。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>SIXTY-SIXとかいうの - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sixty-six.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/ecs4_to_feed_and_json.html">
+
+    
+
+    
+
+    
+      <meta content="SIXTY-SIXとかいうの" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Amazon E-Commerce Service 4.0のXSLTサービスを利用してJSONに整形するというひとつ前のエントリでのアイディアを利用した和書ストアのAmazon.co.jpを検索をするSIXTY-SIXってものを作ってみました。作ってみただけ・・・ですが、一応あまりメジャーでない感じのJavaScriptテクニックも使ったりしたのでそれの紹介も兼ねてエントリってみた。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sixty-six.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sixty-six.html" itemprop="url">
+
+        <h1 itemprop="name">SIXTY-SIXとかいうの</h1>
+
+        <footer>
+          <p>on <time datetime="2005-08-27T11:00:00+09:00" itemprop="datePublished">Aug 27, 2005</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description"><a href="http://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>のXSLTサービスを利用してJSONに整形するという<a href="/blog/coding/ecs4_to_feed_and_json.html" title="hail2u.net - Weblog - Amazon ECS 4.0のXMLからフィードやJSONに">ひとつ前のエントリ</a>でのアイディアを利用した<del>和書ストアの</del>Amazon.co.jpを検索をするSIXTY-SIXってものを作ってみました。作ってみただけ・・・ですが、一応あまりメジャーでない感じのJavaScriptテクニックも使ったりしたのでそれの紹介も兼ねてエントリってみた。</p>
+<p><a href="http://www.crockford.com/JSON/" title="Introducing JSON">JSON</a>への変換は<a href="http://www.w3.org/TR/xslt" title="XSL Transformations (XSLT)">XSLT</a>がなんとなくわかってれば簡単です。注意するのはちゃんと値が帰ってきているかチェックしてやることくらい。前回のエントリでも言及したように、<code>ContentType</code>パラメータで<code>text-javascript</code>も指定するのも忘れずに。</p>
+<p>問題はどうやってそのJSONに整形された検索結果を動的に(フォームに入力されたキーワードに合わせて)受け取ってやるかってことです。どうやるかというとJSONに整形されているので<code>script</code>要素で読み込んでやれば良いわけです。つまり、</p>
+<pre><code class="language-js">var s = document.createElement(&quot;script&quot;);
+s.setAttribute(&#39;type&#39;, &#39;text/javascript&#39;);
+s.setAttribute(&#39;src&#39;, &#39;http://webservices.amazon.co.jp/...&amp;Keywords=&#39; + q);
+document.body.appendChild(s);
+showResults();
+</code></pre>
+<p>とまあこんな感じ。</p>
+<p>しかし、このままではJSONに整形された結果を受け取る前に結果をHTMLとして表示する関数、<code>showResults()</code>が実行されてしまいます。そこで上記コードを、</p>
+<pre><code class="language-js">var s = document.createElement(&quot;script&quot;);
+s.setAttribute(&#39;type&#39;, &#39;text/javascript&#39;);
+s.setAttribute(&#39;src&#39;, &#39;http://webservices.amazon.co.jp/...&amp;Keywords=&#39; + q);
+<em>s.addEventListener(&#39;load&#39;, showResults, true);</em>
+document.body.appendChild(s);
+</code></pre>
+<p>と、<code>script</code>要素の<code>load</code>イベントに、結果をHTMLとして表示する関数を登録してやると、JSONに整形された結果を受け取った後に<code>showResults()</code>が実行されるようになります。<a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>では。このテクニックは<a href="http://tokyoenvious.xrea.jp/b/" title="weblog | 東京嫉妬">JavaScriptマイスターの人</a>のスクリプトを見て知りました。モテメン！モテメン！</p>
+<p>Amazonの検索ならXSLT+JavaScriptでガンガン作れちゃいますよ？とかそういう話でした。</p>
+<h2>追記</h2>
+<p><code>SearchIndex</code>を<code>Blended</code>にして、なんとなく全体から検索できるようにしたつもり。ていうかBlendedダメダメすぎてヤバイ。他にもハッシュにクエリをプットしたり、HTMLを読み込んだ時にハッシュに何か文字列が指定されていたら自動的にその検索を実行したりするようにとか。XSLTスタイルシートもBlended用に書き換えてみたりもしました。JSONの出力の仕方は、アーティスト(Artist)とか著者(Author)とかその他諸々の情報をいちいち考えるのが面倒なので、見つかった重要そうな情報を添え字なしで<code>Details</code>というリストに放り込んでみました。ちょっとずるい感じ。</p>
+<h2>追記 #2</h2>
+<p>Blendedはダメすぎるのでストアごとに検索できるようにしました。そのついでに<code>location.hash</code>にクエリを保存するようにして、ハッシュ付きでHTMLにアクセスがあった場合は検索を実行するようにとか。なので、</p>
+<ul>
+<li>和書から&quot;Perl&quot;を検索</li>
+<li>エレクトロニクスから&quot;iPod&quot;を検索</li>
+</ul>
+<p>といったように検索結果をブックマークできます。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/ecs4_to_feed_and_json.html">
+  <p>Amazon ECS 4.0のXMLからフィードやJSONに</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

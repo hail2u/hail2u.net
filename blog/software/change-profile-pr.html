@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Firefoxでメニューまたはツールバー・ボタンからプロファイルの切り替えを行う拡張を作ってみた。普段は滅多にプロファイルを切り替えてFirefoxを使ったりはしないんだけど、たまに切り替える必要がある時はものすごく頻繁に切り替えることになるので、あったら良さそうと思ったので。インストールはXPI置き場からchange-profile-0.1.xpiをダウンロードして、Firefoxにドラッグ・アンド・ドロップで。ソースが読みたい人はChange Profileのリポジトリ・ページを参照。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Firefox extension: Change Profile 0.1 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/change-profile-pr.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/update-firefox-extensions-2009-04-29.html">
+
+    
+
+    
+
+    
+      <meta content="Firefox extension: Change Profile 0.1" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Firefoxでメニューまたはツールバー・ボタンからプロファイルの切り替えを行う拡張を作ってみた。普段は滅多にプロファイルを切り替えてFirefoxを使ったりはしないんだけど、たまに切り替える必要がある時はものすごく頻繁に切り替えることになるので、あったら良さそうと思ったので。インストールはXPI置き場からchange-profile-0.1.xpiをダウンロードして、Firefoxにドラッグ・アンド・ドロップで。ソースが読みたい人はChange Profileのリポジトリ・ページを参照。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/close-firefox-dialog.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/change-profile-pr.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/software/change-profile-pr.html" itemprop="url">
+
+        <h1 itemprop="name">Firefox extension: Change Profile 0.1</h1>
+
+        <footer>
+          <p>on <time datetime="2009-05-01T17:09:00+09:00" itemprop="datePublished">May 1, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://mozilla.jp/firefox/">Firefox</a>でメニューまたはツールバー・ボタンからプロファイルの切り替えを行う拡張を作ってみた。普段は滅多にプロファイルを切り替えてFirefoxを使ったりはしないんだけど、たまに切り替える必要がある時はものすごく頻繁に切り替えることになるので、あったら良さそうと思ったので。インストールは<a href="/archives/xpi/">XPI置き場</a>からchange-profile-0.1.xpiをダウンロードして、Firefoxにドラッグ・アンド・ドロップで。ソースが読みたい人は<a href="http://github.com/hail2u/change-profile">Change Profileのリポジトリ・ページ</a>を参照。</p>
+
+<p>作り始めた時はFirefoxから直接プロファイル・マネージャ呼べるんじゃないかとか考えてたのだけど、どうもFirefoxでは呼べないらしい(SeaMonkeyでは呼べるとか)。</p>
+
+<p>次に考えたのはFirefoxが起動時に読んでいるProfiles.iniをプロファイル・マネージャが立ち上がるように書き換えて、再起動してやるという手法。Profiles.iniは、</p>
+
+<pre>[General]
+StartWithLastProfile=1
+
+[Profile0]
+Name=default
+IsRelative=1
+Path=Profiles/xxxxxxxx.default
+Default=1
+
+[Profile1]
+Name=development
+IsRelative=1
+Path=Profiles/xxxxxxxx.development
+</pre>
+
+<p>という感じになっていて、GeneralセクションのStartWithLastProfileキーの値が0で、各プロファイルのセクションにDefaultキーがない場合プロファイル・マネージャが立ち上がる。なので、ベタベタにファイルの内容を全部読み込んで正規表現で置換という方法で書き換えて再起動させるものを作ったのだけど、<a href="https://developer.mozilla.org/En/NsIAppStartup"><code>nsIAppStartup</code></a>インターフェイスの<code>quit()</code>メソッドを<code>eRestart</code>フラグを立てて呼び出した場合、<em>同じプロファイルで再起動する</em>という仕様(明記されてたが読んでなかった)のため実現不可能だった。</p>
+
+<p>最終的に<em>-P -no-remote</em>をコマンド・ライン・オプションに付けてもうひとつFirefoxを立ち上げて、元のFirefoxをこっそり終了させるという方法に辿りついた。0.1はこれで実装されている。OSによって実行ファイル名を少し変えてあげる手間以外はほとんど考えずに実装できた(実行ファイルのある場所自体は共通のインターフェイスで取得できる<a href="https://developer.mozilla.org/ja/Code_snippets/File_I%2f%2fO#.e7.89.b9.e6.ae.8a.e3.83.95.e3.82.a1.e3.82.a4.e3.83.ab.e3.82.92.e5.8f.96.e5.be.97.e3.81.99.e3.82.8b">実行ファイルのある場所自体は共通のインターフェイスで取得できる</a>)。最初にこれに気づいていれば……。</p>
+<p>が、この拡張でプロファイルを切り替えた後に外部アプリケーションからURLを開こうとすると、「Firefoxが動いてるけど応答しない！ちゃんと閉じて再起動しろ！」とかいうダイアログで怒られてしまう。</p>
+
+<figure><img src="/images/blog/close-firefox-dialog.png" alt="Firefoxの終了を促されるダイアログ" itemprop="image"></figure>
+
+<p>どうも裏でこっそりFirefoxを終了させているのがまずいようだ。そこが肝なのに！これをなんとかどうにかしてAMOに公開できるようなものにしたいが、もう飽きてきた。最初からうまくいかないならともかく、うまくいったかなと思った時に致命的な不具合を発見しちゃうと絶望するよね！</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/update-firefox-extensions-2009-04-29.html">
+  <p>Firefox Extensions更新@2009/04/29</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

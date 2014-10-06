@@ -1,0 +1,54 @@
+# Blosxom Plugin: similarity
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 1.1a
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package similarity;
+
+use strict;
+use vars qw($code);
+
+# --- Configurable variables -----------
+
+my $charcode = 'utf-8';
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  return 0 unless $blosxom::path_info =~ /\./;
+
+  return 1;
+}
+
+sub story {
+  my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+
+  my $url = escape("$blosxom::url$path/$fn.$blosxom::default_flavour");
+  $code = <<"_SIMILARITY_";
+<div class="similarity">
+<script type="text/javascript" src="http://bulkfeeds.net/app/similar.js?url=$url&amp;n=5&amp;style=lite&amp;oe=$charcode"></script>
+<noscript>
+<div class="bulkfeedsSimilarity">
+<div class="bulkfeedsSimilarityHeader"><a href="http://bulkfeeds.net/app/similar?url=$url">Similarity Search powered by Bulkfeeds</a></div>
+<div class="bulkfeedsSimilarityItems">Bulkfeeds&#39; Similarity Search will not be available to you without JavaScript support in your browser.</div>
+</div>
+</noscript>
+</div>
+_SIMILARITY_
+  chomp $code;
+
+  return 1;
+}
+
+sub escape {
+  my $str = shift;
+
+  $str =~ s/([^\w ])/sprintf("%%%02X", ord($1))/eg;
+  $str =~ tr/ /+/;
+
+  return $str;
+}
+
+1;

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="GruntのMultiタスクはまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>GruntのMultiタスクの実行順 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/grunt-multi-task-running-order.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/internet/for-28-minutes.html">
+
+    
+
+    
+
+    
+      <meta content="GruntのMultiタスクの実行順" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="GruntのMultiタスクはまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/grunt-multi-task-running-order.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/grunt-multi-task-running-order.html" itemprop="url">
+
+        <h1 itemprop="name">GruntのMultiタスクの実行順</h1>
+
+        <footer>
+          <p>on <time datetime="2013-08-15T06:22:00+09:00" itemprop="datePublished">Aug 15, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://gruntjs.com/creating-tasks#multi-tasks">GruntのMultiタスク</a>はまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。</p>
+
+<p><a href="https://github.com/gruntjs/grunt/blob/71e631c054cb073dc9d81b911694b4e62eb9dc98/lib/grunt/task.js#L281-L295">GruntのMultiタスクの一括実行</a>は<code>Object.keys</code>で返ってくる配列を<code>forEach()</code>してその中で各ターゲットを実行している。なので実行環境である<a href="http://nodejs.org/">Node.js</a>というか、それで使われているV8がそれらをどう解釈するかに依存していることになる。そして<a href="https://code.google.com/p/v8/issues/detail?id=164">V8では<code>Object.keys</code>で返ってくる配列(や<code>for...in</code>の順番)が勝手にソートされるケース</a>があることもわかった。</p>
+
+<p>タスクを実行すると設定されたデータを吐くだけのMultiタスクを例にする。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.initConfig({
+    order: {
+      5: 5,
+      1: 1,
+      4: 4,
+      3: 3,
+      2: 2
+    }
+  });
+
+  grunt.registerMultiTask(&#39;order&#39;, function () {
+    grunt.log.writeln(this.data);
+  });
+};</code></pre>
+
+<p>以上のように数字をMultiタスクのターゲット名にしてしまうと書いた順にタスクが実行されない。</p>
+
+<pre><samp>$ <kbd>grunt order</kbd>
+Running &quot;order:1&quot; (order) task
+1
+
+Running &quot;order:2&quot; (order) task
+2
+
+Running &quot;order:3&quot; (order) task
+3
+
+Running &quot;order:4&quot; (order) task
+4
+
+Running &quot;order:5&quot; (order) task
+5
+
+Done, without errors.
+</samp></pre>
+
+<p>あー……。</p>
+
+<hr>
+
+<p>アルファベット始まりならば経験上は書いた順に実行されてたので、横着して<code>concat</code>をチェインさせるのをターゲットを書く順番でごまかしてたけど止めた。タスクの実行順が重要な場合はMultiタスクの一括実行に期待せず、ひとつひとつターゲットを指定して書くようにしないと危険。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/internet/for-28-minutes.html">
+  <p>28分間</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

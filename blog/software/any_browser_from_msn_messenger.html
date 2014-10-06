@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="MSN MessengerがURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>MSN Messengerから任意のブラウザを起動 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/any_browser_from_msn_messenger.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/firefox_from_msn_messenger.html">
+
+    
+
+    
+
+    
+      <meta content="MSN Messengerから任意のブラウザを起動" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="MSN MessengerがURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/any_browser_from_msn_messenger.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/any_browser_from_msn_messenger.html" itemprop="url">
+
+        <h1 itemprop="name">MSN Messengerから任意のブラウザを起動</h1>
+
+        <footer>
+          <p>on <time datetime="2004-07-09T03:56:00+09:00" itemprop="datePublished">Jul 9, 2004</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description"><a href="http://messenger.msn.co.jp/" title="MSN Messenger">MSN Messenger</a>がURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。</p>
+<p>MSN MessengerはURLを開く時、以下のような感じでレジストリを参照してました。</p>
+<ol>
+<li><code>HKEY_CLASSES_ROOT\.htm</code>の標準の値を読む
+<ol>
+<li><code>htmlfile</code>だった場合
+<ol>
+<li>IE強制(多分)</li>
+</ol>
+</li>
+<li><code>htmlfile</code>でない場合
+<ol>
+<li><code>HKEY_CURRENT_USER\http</code>をチェック(普通は無い)</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>をチェック(普通はある)</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>の関連付けに従ってURLを開く</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>というわけで、やることは、</p>
+<ul>
+<li><code>HKEY_CLASSES_ROOT\htm.dummy</code>などダミーのキーを作る</li>
+<li><code>HKEY_CLASSES_ROOT\.htm</code>の標準の値を上記のキー名にする</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>の関連付けを起動したいブラウザにする</li>
+</ul>
+<p>ということになります。これでMSN Messengerから任意のブラウザを起動することができるはずです。</p>
+<p>こんな感じのレジストリファイルを作成し、ダブル・クリックしてやれば良いはず。</p>
+<pre>REGEDIT4
+
+[HKEY_CLASSES_ROOT\htm.dummy]
+
+[HKEY_CLASSES_ROOT\.htm]
+@=&quot;htm.dummy&quot;
+
+[HKEY_CLASSES_ROOT\http\shell]
+@=&quot;Moon&quot;
+
+[HKEY_CLASSES_ROOT\http\shell\Moon]
+@=&quot;Moon&quot;
+
+[HKEY_CLASSES_ROOT\http\shell\Moon\command]
+@=&quot;\&quot;C:\\Program Files\\Moon Browser\\mb.exe\&quot; \&quot;%1\&quot;&quot;
+</pre>
+<p>責任持たないけど。もちろん実行ファイルのパスなどは環境に合わせて、自分の起動したいブラウザのパスなどにしてやる必要はあります。</p>
+<p>以上の作業で、自分の環境では問題なく<a href="http://www.mozilla.org/products/firefox/" title="Firefox - The Browser, Reloaded">Firefox</a>と<a href="http://www.geocities.co.jp/SiliconValley-Cupertino/8986/" title="Moon Browser">Moon Browser</a>、<a href="http://www.opera.com/" title="Opera Web Browser">Opera</a>、よくわからない自作のJScriptファイルなどどんなものでも起動できる様になりました。</p>
+<p>Firefoxの場合は、どうやら設定から標準のブラウザにしてやれば問題なくFirefoxで開かれるようになるのであまり意味は無いですが(手動で関連付けを設定してたりする人には意味はある)、Moon Browserや<a href="http://www.atmark.gr.jp/~s2000/r/" title="Donut RAPT 配布所">Donut RAPT</a>などで開けないものかと苦労していた方は試してみる価値はあると思います。</p>
+<p>間違ってるかもしれないですけどね。</p>
+<h2>追記@2004/07/11</h2>
+<p>大体この手順で良さそうな感じですね。<a href="http://sleipnir.pos.to/software/sleipnir/index.html" title="BearFactory | Sleipnir">Sleipnir</a>や<a href="http://donutp.com/" title="Donutカスタム所">DonutP</a>とかでも問題なく起動したようです。</p>
+<p>補足ですが、普通にこれやると拡張子がhtmなファイルをダブルクリックしても、ブラウザで開けなくなります。まぁ滅多に困ることはないと思いますが念のため。元のような挙動にしたい場合は、自分でガリガリレジストリを編集するか、フォルダオプションなんかで改めて設定する必要があります。</p>
+<p>ここでは説明の簡略化のためにそこらへんはすっ飛ばしました。</p>
+<h2>追記@2004/07/13</h2>
+<p>MSN MessengerからURLをhttpプロトコルの関連付けで開くバイナリ・パッチが<a href="http://pc5.2ch.net/test/read.cgi/win/1088504912/277/" title="MSN Messenger Windows Messenger Part17">MSN Messenger Windows Messenger Part17の277</a>にありました。スバラシイ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/firefox_from_msn_messenger.html">
+  <p>MSN MessengerからFirefox</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

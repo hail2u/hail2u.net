@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Facebookに買われたという話で知ったLightboxという写真共有サービスのLive Streamの見せ方が良いなと思ったのでCSS Transitionsを使ったもどきっぽいのを作った。Pure CSSではない。良い名前思い浮かばなかった。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>ところてんスクローラー - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/tokoroten-scroller.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/chrome-20-override-device-metrics.html">
+
+    
+
+    
+
+    
+      <meta content="ところてんスクローラー" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Facebookに買われたという話で知ったLightboxという写真共有サービスのLive Streamの見せ方が良いなと思ったのでCSS Transitionsを使ったもどきっぽいのを作った。Pure CSSではない。良い名前思い浮かばなかった。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/tokoroten-scroller.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/tokoroten-scroller.html" itemprop="url">
+
+        <h1 itemprop="name">ところてんスクローラー</h1>
+
+        <footer>
+          <p>on <time datetime="2012-05-18T01:22:00+09:00" itemprop="datePublished">May 18, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Facebookに買われたという話で知った<a href="http://lightbox.com/">Lightbox</a>という写真共有サービスの<a href="http://lightbox.com/stream">Live Stream</a>の見せ方が良いなと思ったので<a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>を使った<a href="/pub/test/407.html">もどきっぽいのを作った</a>。Pure CSSではない。良い名前思い浮かばなかった。</p>
+
+<p>つまりはどんどん画像を押し出していくのをディレイとアニメーションを組み合わせて見せるというもので、ディレイをJavaScriptで、アニメーションをCSSで実装した。</p>
+
+<pre><code class="language-js">var container = document.getElementById("scroller");
+
+window.setInterval(function () {
+  var img = document.createElement("img"),
+    li = document.createElement("li");
+
+  img.src = "http://lorempixel.com/120/160/";
+  img.addEventListener("load", function () {
+    this.className = "loaded";
+  });
+
+  li.appendChild(img);
+
+  container.insertBefore(li, container.firstChild);
+}, 3000);
+</code></pre>
+
+<p>ディレイは普通に<code>window.setInterval()</code>で3秒ごとに画像を先頭に追加していく。後にアニメーションのトリガーに使うために画像に読み込み完了で<code>loaded</code>というクラス名を振る処理も付けておく。</p>
+
+<pre><code class="language-css">#scroller img {
+  height: 0px;
+}
+
+#scroller .loaded {
+  height: 160px;
+  transition: height 0.2s ease;
+}
+</code></pre>
+
+<p><code>img</code>をデフォルトで<code>height: 0px</code>にしておき、画像の読み込み完了時に付くクラス名<code>.loaded</code>で高さを戻す。その時に同時にCSS Transitionsを使うことによってアニメーションさせる。Firefox 12でCSS Transitionsが動いてないのはよくわからない。能動的なアクションしかトリガーにできないとかなんか制限ありそう。</p>
+
+<hr>
+
+<p>有限数の画像をどんどん追加していくというのならCSSだけでもできそう。トリガーは<code>:target</code>擬似クラスしかなさそうで、そこがアレだけど、ディレイは有限個なのでそれを考慮すれば<code>transition-delay</code>プロパティーで大丈夫。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/chrome-20-override-device-metrics.html">
+  <p>Override device metrics</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

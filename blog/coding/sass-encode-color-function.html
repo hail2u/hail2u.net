@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Sassで色をURLエンコードする関数 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sass-encode-color-function.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html">
+
+    
+
+    
+
+    
+      <meta content="Sassで色をURLエンコードする関数" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sass-encode-color-function.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sass-encode-color-function.html" itemprop="url">
+
+        <h1 itemprop="name">Sassで色をURLエンコードする関数</h1>
+
+        <footer>
+          <p>on <time datetime="2013-07-29T09:20:00+09:00" itemprop="datePublished">Jul 29, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Sass 3.3で導入される予定のものではなんといっても<code>--sourcemap</code>オプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探す<code>str-index()</code>関数とか文字列から一部切り出す<code>str-slice()</code>関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。</p>
+
+<p>以下はSass 3.3.0.alpha.218 (Bleeding Edge)での話なので、3.3の正式リリースでは動く保証はない。</p>
+
+<pre><code class="language-scss">// encode-color() - Encode color by percent encoding
+//
+// @param {color} $color Color that you want to encode
+// @return {string}
+@function encode-color($color) {
+  $str_color: "" + $color;
+
+  @if (str-index($str_color, "#") == 1) {
+    $str_color: "%23" + str-slice($str_color, 2);
+  }
+
+  @if (str-index($str_color, "rgba") == 1) {
+    $str_color: "rgba(" + red($color) + "%2C" + green($color) + "%2C" + blue($color) + "%2C" + alpha($color) + ")";
+  }
+
+  @return $str_color;
+}
+</code></pre>
+
+<p><code>str-index()</code>や<code>str-slice()</code>関数は文字列専用で色を投げるとエラーになるので、まずは色に空文字を連結することによって型をキャストすることろから。今までは型キャストが必要なケースはほとんど無かったけど、これからは使う機会増えそう。</p>
+
+<p>Sassで色は大体<code>#</code>で始まる16進数のRGBで扱われる(<code>hsl()</code>とかで定義しても)ので、まずはそれをチェック。<code>str-index()</code>関数は一文字目を<code>1</code>として見つかった位置を返す(見つからなかったら<code>0</code>)ので、<code>#</code>が一文字目にあるかどうかで確認する。見つかった場合は2文字目以降を切り出して<code>#</code>をURLエンコードした<code>%23</code>をくっつける。</p>
+
+<p>透明度付きの場合は<code>rgba()</code>で扱われるので、<code>rgba</code>を探す。見つかったらRGBそれぞれとalphaをビルトイン関数で1つずつ取り出し、URLエンコードが必要な<code>,</code>を<code>%2C</code>にして連結している。</p>
+
+<p>これらにマッチしなかった場合は色キーワードなのでそのまま返す。</p>
+
+<pre><code class="language-scss">.test {
+  content: "#{encode-color(#336699)}"; // %23369
+  content: "#{encode-color(rgb(51, 102, 153))}"; // %23369
+  content: "#{encode-color(rgba(51, 102, 153, 0.2))}"; // rgba(51%2C102%2C153%2C0.2)
+  content: "#{encode-color(beige)}"; // beige
+}
+</code></pre>
+
+<p>このテストはうまくいったのでこれでだいたい大丈夫そう。</p>
+
+<hr>
+
+<p>CSSではそもそも数値や色を主に扱うので、Sass 3.3からの<code>str-*()</code>関数はあまりダイレクトには役には立たなそう。だけど自前で関数を書く時などには大きな力を発揮しそうな感じだ。<a href="https://github.com/nex3/sass/blob/85f7ca624f2fb7d19320e107d518d3376952bf16/doc-src/SASS_CHANGELOG.md">3.3のCHANGELOG</a>に書いてある通り、他に文字列に文字を挿入する<code>str-insert()</code>や文字列を大文字(小文字)に変換する<code>to-upper(lower)-case()</code>関数なんかがある。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html">
+  <p>URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

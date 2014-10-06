@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="有名ライブラリ、例えばjQueryを利用する時GoogleのCDNを使うことが多いけど、どうせ依存するなら単にcatしてまとめても良い(はず)。つまりHTTPリクエストがひとつ増えるデメリットと転送量の低下を期待するメリットのどちらがそのWebサイトにとって効果的かを考えなくてはならない。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>GoogleのCDNを使うか単にcatするか - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/use-google-cdn-or-just-cat.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/call-ctrlp-vim-based-on-git-status.html">
+
+    
+
+    
+
+    
+      <meta content="GoogleのCDNを使うか単にcatするか" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="有名ライブラリ、例えばjQueryを利用する時GoogleのCDNを使うことが多いけど、どうせ依存するなら単にcatしてまとめても良い(はず)。つまりHTTPリクエストがひとつ増えるデメリットと転送量の低下を期待するメリットのどちらがそのWebサイトにとって効果的かを考えなくてはならない。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/use-google-cdn-or-just-cat.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/use-google-cdn-or-just-cat.html" itemprop="url">
+
+        <h1 itemprop="name">GoogleのCDNを使うか単にcatするか</h1>
+
+        <footer>
+          <p>on <time datetime="2012-01-11T10:51:00+09:00" itemprop="datePublished">Jan 11, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">有名ライブラリ、例えば<a href="http://jquery.com/">jQuery</a>を利用する時<a href="http://code.google.com/apis/libraries/">GoogleのCDN</a>を使うことが多いけど、どうせ依存するなら単にcatしてまとめても良い(はず)。つまりHTTPリクエストがひとつ増えるデメリットと転送量の低下を期待するメリットのどちらがそのWebサイトにとって効果的かを考えなくてはならない。</p>
+
+<p>Webサイトの規模が大きくハードウェア性能に余裕があるなら、転送量が増えることはデメリットには成り得ないのでcatする方がメリットが大きそう。そしてWebサイトにアクセスできればそのライブラリに依存したスクリプトが動くことをかなりの確率で保証できる。対して規模が小さいなら転送量の増加はコストの増加につながりやすく厳しい。HTTPリクエストの増加はユーザーに負担を求めることになるが、Google CDNのようなキャッシュが大いに期待できるものならなんとかメリットが上回りそう。</p>
+
+<p>というのが僕のイメージなんだけど、あくまでもこれは有名ライブラリと自分で書いたスクリプトという構成においての話で、その他ゴミみたいなライブラリやスクリプト(<a href="https://developers.facebook.com/docs/reference/plugins/like/">FacebookのLikeボタン</a>とか)のことまでも考慮に入れると、HTTPリクエストばらまいた方がメンテナンス性の面で大きく優る気がする。特にFacebookのLikeボタンはURLにハッシュをつけてキャッシングとバージョン管理を両立させている感じで、そのままURLの中身をcatさせてもちゃんと動く保証がなさそうだったりとかそういうのもあり、非常に面倒くさい。これに限らず自分でcatするためにダウンロードした3rdパーティー製のライブラリやスクリプトの将来に渡る保証のことや、それ以前にUAにより中身が変わっているかどうかとか、頻繁でかつ破壊的な変更へどう対応するかとか……。</p>
+
+<p>今のところこのWebサイトはGoogle CDNと自分の書いたスクリプトをcatした(Closure Compilerで)もの、その他3rdパーティー製のスクリプトのハイブリッドな構成にしているけど別にちゃんと説明できる理由があるわけではない。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/call-ctrlp-vim-based-on-git-status.html">
+  <p>Git配下のファイルかどうかでCtrlPを切り替える</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="CSSの圧縮を行うCLIツール兼モジュール、CSSWringをPostCSSを使って書いた。PostCSSの内蔵機能＋正規表現でゴリ押しみたいな感じなので、テストあるけど不安しか無い……。CLIに至ってはテスト書いてない。意義的にはPostCSSを使った最適化の一角を担える圧縮ツールというもの。CLIの方は少し前にちょっと書いたminimistを使ってる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSWring - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/node-csswring.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/misc/payment-mismatch-on-atbilling.html">
+
+    
+
+    
+
+    
+      <meta content="CSSWring" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="CSSの圧縮を行うCLIツール兼モジュール、CSSWringをPostCSSを使って書いた。PostCSSの内蔵機能＋正規表現でゴリ押しみたいな感じなので、テストあるけど不安しか無い……。CLIに至ってはテスト書いてない。意義的にはPostCSSを使った最適化の一角を担える圧縮ツールというもの。CLIの方は少し前にちょっと書いたminimistを使ってる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/node-csswring.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/node-csswring.html" itemprop="url">
+
+        <h1 itemprop="name">CSSWring</h1>
+
+        <footer>
+          <p>on <time datetime="2014-04-13T15:38:00+09:00" itemprop="datePublished">Apr 13, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">CSSの圧縮を行うCLIツール兼モジュール、<a href="https://github.com/hail2u/node-csswring">CSSWring</a>を<a href="https://github.com/ai/postcss">PostCSS</a>を使って書いた。PostCSSの内蔵機能＋正規表現でゴリ押しみたいな感じなので、テストあるけど不安しか無い……。CLIに至ってはテスト書いてない。意義的にはPostCSSを使った最適化の一角を担える圧縮ツールというもの。CLIの方は少し前にちょっと書いた<a href="https://github.com/substack/minimist">minimist</a>を使ってる。</p>
+
+<ul>
+<li>空白文字の削除</li>
+<li><code>/*!</code>と<code>/*#</code>で始まるコメント以外の削除</li>
+<li>ルールセット最後のセミコロンの削除</li>
+<li>不要なセミコロンの削除</li>
+<li>空のルールセットの削除</li>
+<li><code>0</code>の値から単位の削除</li>
+<li>小数の先頭にある不要な<code>0</code>の削除</li>
+<li><code>@charset</code>を最初のひとつに制限</li>
+<li>色の圧縮</li>
+</ul>
+
+<p>以上を行っている。空白文字とコメント、セミコロン、空のルールセットの削除のみをデフォルトにして、それ以外はオプションにしても良い気がする。</p>
+
+<hr>
+
+<p>CSSに限らずJavaScriptも含めて最終的にgzipするという前提ならば、圧縮する作業コストが無駄だという論理は成り立つ。デメリットはあまりないが、<a href="http://gruntjs.com/">Grunt</a>や<a href="http://gulpjs.com/">gulp.js</a>がある今はメリットもあまりない。一方少しでも配信サイズを小さくするというのはフロントエンドにおいては絶対とも言われてきたルールのひとつだ。デメリットは圧縮された時に混入したバグを探査しづらいこと。僕は圧縮時にバグが混入する可能性は低いと考えているので、できるかぎり圧縮した方が良いと考えていた。</p>
+
+<p>JavaScriptにおいては<a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a>があり、CSSには<a href="https://github.com/buildingblocks/grunt-combine-media-queries">grunt-combine-media-queries</a>や<a href="https://github.com/addyosmani/grunt-uncss">grunt-uncss</a>がある。こういったminify (圧縮)ではなくoptimize (最適化)を主眼において、空白の削除を始めとした圧縮それ自体は補助的なものと捉え直した方が良いのかなと今は考えている。</p>
+
+<p>CSSにおいてそういった最適化ツール(達)がPostCSSで提供されたと仮定し、その補助を目的としてCSSWringは作った。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/misc/payment-mismatch-on-atbilling.html">
+  <p>@ビリングにおける請求額の不一致</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

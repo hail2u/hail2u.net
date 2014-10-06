@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Sassの変数スコープと!global - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sass-variable-scope-and-bang-global.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/blog/blo-g-crastination.html">
+
+    
+
+    
+
+    
+      <meta content="Sassの変数スコープと!global" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sass-variable-scope-and-bang-global.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sass-variable-scope-and-bang-global.html" itemprop="url">
+
+        <h1 itemprop="name">Sassの変数スコープと!global</h1>
+
+        <footer>
+          <p>on <time datetime="2014-03-11T12:03:00+09:00" itemprop="datePublished">Mar 11, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://sass-lang.com/">Sass</a>の変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。<a href="http://lesscss.org/">LESS</a>では多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、<code>!global</code>フラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。</p>
+
+<p>Sassではローカル・コンテキストでグローバル変数を上書きでき、そのスコープを抜けてもそのままになる。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #0f0
+}
+</code></pre>
+
+<p>対してLESSでは上書きされない。</p>
+
+<pre><code class="language-less">@color: #f00;
+
+.test-local {
+  @color: #0f0;
+  color: @var; // #0f0
+}
+
+.test-global {
+  color: @color; // #f00 yay!
+}
+</code></pre>
+
+<p>Sass 3.3では<a href="https://github.com/nex3/sass/blob/bd8d8db2eb2ec57b1ef851816a95ef23e68abbe9/doc-src/SASS_CHANGELOG.md#backwards-incompatibilities----must-read#">グローバル変数をローカル・コンテキストで変更しようとした時に警告(Backwards Incompatibilitiesの12個目の項目を参照)</a>が出るようになった。具体的には以下のような警告メッセージをSassコンパイラが吐く。</p>
+
+<pre><samp>$ <kbd>scss test.scss test.css</kbd>
+DEPRECATION WARNING on line 4 of test.scss:
+Assigning to global variable &quot;$color&quot; by default is deprecated.
+In future versions of Sass, this will create a new local variable.
+If you want to assign to the global variable, use &quot;$color: #0f0 !global&quot; instead.
+Note that this will be incompatible with Sass 3.2.
+</samp></pre>
+
+<p>この警告を出さないようにするには<code>!global</code>フラグを使う。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0 !global;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #0f0
+}
+</code></pre>
+
+<p>警告が出るのみで、そのメッセージの通り実際にはまだ挙動は変わらない。しかし、将来的にはローカル変数を新しく作成する(this wil create a new local variable)と書かれているので、挙動はLESSと同じになるのだろう。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #f00 gotcha!
+}
+</code></pre>
+
+<p>つまり<code>!global</code>フラグを使うことにより<em>今までの挙動を維持したまま警告は出なくなるが、それは一時しのぎに過ぎない</em>ということだ。そこそこ大きな互換性のない変更なので、その「一時」はかなり長い間ではありそうだが。元々ローカル・コンテキストでグローバル変数を上書きするのは、そのルールセットの順番を変えるだけで破綻するようなあまり行儀の良い書き方ではないので、なるべくなら仕様の変更を見据えて書き直した方が良いだろう。</p>
+
+<hr>
+
+<p>現状の仕様だとグローバル変数で全てやった方が効率的なので、世のSassコードはだいたいそうなっている。しかしグローバル変数を多用する場合、変数へ厳しい命名規則を適用しないと、保守性があからさまに落ちる。例えば<a href="http://bem.info/">BEM</a>を応用するのはひとつの手で、そのようなことを行っている人もちらほら聞くし、僕も使ったりしている。ただ、そういった厳しい命名規則は、長い変数名や特殊な言い回しとセットと言って良いので、書きやすさや導入しやすさに大きく欠ける。</p>
+
+<p>LESSのようにローカル変数が新しく作成されるようになれば、ローカル・スコープでの衝突のみを考慮すれば良くなる。そうすれば命名規則が随分とゆるやかになるか、ほとんどいらなくなるだろう。特殊な言い回しに至っては害悪ということにすらなるかもしれない。ただ<a href="http://www.w3.org/TR/css-variables-1/">CSS Variables</a>との兼ね合いから考えると、SassにしろLESSにしろ、カスケーディングを考慮しない変数システムは将来性に欠けるところもある。少なくとも<code>!global</code>が不要なように書き直す必要はあるが、それ以上にSassべったりな形での変数の取り扱いへ移行するのは、まだ自重するべき段階だと言えるだろう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/blog/blo-g-crastination.html">
+  <p>Blo(g)crastination</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

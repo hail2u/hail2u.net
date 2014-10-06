@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="GruntでいちいちloadNpmTasks()しなくて済むようになるload-grunt-tasksパッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクはpackage.jsonのdevDependenciesに必ず書いてあり、Gruntfile.js内ではどこでもそれを利用することが可能なので、grunt-で始まるNodeパッケージだけを自動でloadNpmTasks()するようなコードを書くと簡単に自動読み込みを実装できる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Gruntタスクの自動読み込み - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/grunt-load-npm-tasks-automatically.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/increase-developer-tools-font.html">
+
+    
+
+    
+
+    
+      <meta content="Gruntタスクの自動読み込み" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="GruntでいちいちloadNpmTasks()しなくて済むようになるload-grunt-tasksパッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクはpackage.jsonのdevDependenciesに必ず書いてあり、Gruntfile.js内ではどこでもそれを利用することが可能なので、grunt-で始まるNodeパッケージだけを自動でloadNpmTasks()するようなコードを書くと簡単に自動読み込みを実装できる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/grunt-load-npm-tasks-automatically.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/grunt-load-npm-tasks-automatically.html" itemprop="url">
+
+        <h1 itemprop="name">Gruntタスクの自動読み込み</h1>
+
+        <footer>
+          <p>on <time datetime="2014-02-08T05:04:00+09:00" itemprop="datePublished">Feb 8, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Gruntでいちいち<code>loadNpmTasks()</code>しなくて済むようになる<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>パッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクは<code>package.json</code>の<code>devDependencies</code>に必ず書いてあり、<code>Gruntfile.js</code>内ではどこでもそれを利用することが可能なので、<code>grunt-</code>で始まるNodeパッケージだけを自動で<code>loadNpmTasks()</code>するようなコードを書くと簡単に自動読み込みを実装できる。</p>
+
+<pre><code class="language-javascript">&#39;use strict&#39;;
+
+module.exports = function (grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON(&#39;package.json&#39;)
+  });
+
+  for (var devDependency in grunt.config.data.pkg.devDependencies) {
+    if (devDependency.match(/^grunt-/)) {
+      grunt.loadNpmTasks(devDependency);
+    }
+  }
+};
+</code></pre>
+
+<p><code>Gruntfile.js</code>では<a href="http://gruntjs.com/getting-started#an-example-gruntfile">サンプル・コード</a>でもそうなっているように<code>package.json</code>の中身を読み込ませることが多い。これは主にGruntタスクの設定においてテンプレートを使ってプロジェクト名やバージョン番号などを参照できるようにする目的でそうする。こうして読み込んだ<code>package.json</code>の中身は<code>grunt.config.data</code>以下に保存されるので、実際はどこからでも参照できる。ので上記のように<code>for...in</code>などを使って調べつつ、<code>grunt-</code>で始まるなら<code>loadNpmTasks()</code>を呼ぶだけ。</p>
+
+<p>一度書いたら終わりという点ではload-grunt-tasksとほぼ同じで、起動コストという点ではこの5行のコードが勝るけど、保守性という点ではload-grunt-tasksの方が良い。ので、複数人が触るようなプロジェクトではload-grunt-taskの方が良さそう。</p>
+
+<hr>
+
+<p>load-grunt-tasksは確かに便利だけど、僕はわざわざNodeパッケージを別途インストールする程ではないという感じ。また、できればちゃんと個別にロードした方が良いとも考えてて、実際にこういったコードでやるのは、頻繁にGruntプラグインを入れ替える実験的な性格の強いプロジェクトでだけ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/increase-developer-tools-font.html">
+  <p>Chromeのデベロッパーツールのフォントを大きく</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

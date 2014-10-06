@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="表にインクリメンタル・サーチで行を絞り込むフォームを付けるjQueryプラグイン、TableFilterを作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>jQueryプラグイン: TableFilter - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/jquery-tablefilter-plugin.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/view-as-xml-bookmarklet.html">
+
+    
+
+    
+
+    
+      <meta content="jQueryプラグイン: TableFilter" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="表にインクリメンタル・サーチで行を絞り込むフォームを付けるjQueryプラグイン、TableFilterを作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/jquery-tablefilter-plugin.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/jquery-tablefilter-plugin.html" itemprop="url">
+
+        <h1 itemprop="name">jQueryプラグイン: TableFilter</h1>
+
+        <footer>
+          <p>on <time datetime="2009-05-28T00:53:00+09:00" itemprop="datePublished">May 28, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">表にインクリメンタル・サーチで行を絞り込むフォームを付ける<a href="http://jquery.com/">jQuery</a>プラグイン、<a href="https://github.com/hail2u/jquery.table-filter">TableFilter</a>を作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。</p>
+
+<p>使い方は、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.tablefilter.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+$(function () {
+  $(&quot;table&quot;).addTableFilter({
+    labelText: &quot;絞込み: &quot;,
+    size:      48
+  });
+});
+&lt;/script&gt;
+</code></pre>
+
+<p>という感じで、他のjQueryプラグインと変わらない(と思う)。以下はサンプル。</p>
+
+<table id="tablefilter-sample">
+  <caption>セ・リーグで4勝以上している投手(2009/05/27時点)</caption>
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>チーム</th>
+      <th>勝利数</th>
+      <th>利き腕</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>石川 雅規</td>
+      <td>ヤクルト</td>
+      <td>6</td>
+      <td>左</td>
+    </tr>
+    <tr>
+      <td>館山 昌平</td>
+      <td>ヤクルト</td>
+      <td>5</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>三浦 大輔</td>
+      <td>横浜</td>
+      <td>5</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>朝倉 健太</td>
+      <td>中日</td>
+      <td>5</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>グライシンガー</td>
+      <td>巨人</td>
+      <td>5</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>大竹 寛</td>
+      <td>広島</td>
+      <td>4</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>山口 鉄也</td>
+      <td>巨人</td>
+      <td>4</td>
+      <td>左</td>
+    </tr>
+    <tr>
+      <td>ゴンザレス</td>
+      <td>巨人</td>
+      <td>4</td>
+      <td>右</td>
+    </tr>
+    <tr>
+      <td>吉見 一起</td>
+      <td>中日</td>
+      <td>4</td>
+      <td>右</td>
+    </tr>
+  </tbody>
+</table>
+<script type="text/javascript">
+/*
+ jQuery Plugin: Table Filter v0.2.3
+
+ LICENSE: http://hail2u.mit-license.org/2009
+*/
+(function(a){a.fn.addTableFilter=function(d){var b=a.extend({},a.fn.addTableFilter.defaults,d),c,e;this.is("table")&&(this.attr("id")||this.attr({id:"t-"+Math.floor(99999999*Math.random())}),c=this.attr("id"),d=c+"-filtering",e=a("<label/>").attr({"for":d}).append(b.labelText),b=a('<input type="search"/>').attr({id:d,size:b.size}).on("click",function(){a(this).keyup()}),a("<p/>").addClass("formTableFilter").append(e).append(b).insertBefore(this),a("#"+d).delayBind("keyup",function(b){var d=a(this).val().toLowerCase().split(" ");
+a("#"+c+" tbody tr").each(function(){var b=a(this).html().toLowerCase().replace(/<.+?>/g,"").replace(/\s+/g," "),c=0;a.each(d,function(){if(0>b.indexOf(this))return c=1,!1});c?a(this).hide():a(this).show()})},300));return this};a.fn.addTableFilter.defaults={labelText:"Keyword(s): ",size:32};a.fn.delayBind=function(d,b,c,e){a.isFunction(b)&&(e=c,c=b,b=void 0);var g=this,f=null;return this.bind(d,b,function(b){clearTimeout(f);f=setTimeout(function(){c.apply(g,[a.extend({},b)])},e)})}})(jQuery);
+</script>
+<script type="text/javascript">
+$(function () {
+  $("#tablefilter-sample").addTableFilter({
+    labelText: "フィルタ: ",
+    size:      24
+  });
+});
+</script>
+
+<p>阪神でフィルタかけるとショボーン。</p>
+
+<p><code>addTableFilter()</code>に渡すjQueryオブジェクトが<code>table</code>の時だけフォームを付けるので、<code>$(&quot;body&quot;).addTableFilter();</code>とかはダメ。そこらへんはCSSセレクタを使って<code>$(&quot;#content table&quot;).addTableFilter()</code>とするとか、目的の<code>table</code>要素に<code>id</code>属性(<code>class</code>属性でも良いけど)を振ってやる必要がある。他の注意点は<code>tbody</code>要素が必須なことくらい(のはず)。</p>
+
+<p>フィルタに「&gt; 200」とか入力して、数値での比較によるフィルタリングとかを使えたりしたら面白いかも。表以外に使えても良さそう。とか書くだけはタダ。</p>
+
+<h2>追記@2009/06/05</h2>
+
+<p>Gistページから<a href="http://github.com/hail2u/jquery.table-filter">GitHubにリポジトリを作って移動させた</a>。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/view-as-xml-bookmarklet.html">
+  <p>Bookmarklet: View as XML</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

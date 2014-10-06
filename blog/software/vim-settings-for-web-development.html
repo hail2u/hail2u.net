@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Web開発周りのVimの設定 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/vim-settings-for-web-development.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/redesign-and-border-radius-and-text-shadow.html">
+
+    
+
+    
+
+    
+      <meta content="Web開発周りのVimの設定" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/vim-settings-for-web-development.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/vim-settings-for-web-development.html" itemprop="url">
+
+        <h1 itemprop="name">Web開発周りのVimの設定</h1>
+
+        <footer>
+          <p>on <time datetime="2009-10-31T10:58:00+09:00" itemprop="datePublished">Oct 31, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。</p>
+
+<h2>HTMLファイルを<code>:make</code>で文法チェック</h2>
+
+<p>tidy.vimが用意されているので、<a href="http://tidy.sourceforge.net/">HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。</p>
+
+<pre><code class="language-vim">autocmd FileType html :compiler tidy
+autocmd FileType html :setlocal makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \&quot;%\&quot;
+</code></pre>
+
+<p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</p>
+
+<h2>HTMLファイルのインデントをやり直す</h2>
+
+<pre>gg=G
+</pre>
+
+<p>ノーマルモードでは<kbd>gg</kbd>でファイルの先頭に移動して<kbd>=G</kbd>でファイル全体をインデントし直すことができる。選択範囲のみをインデントし直す場合は、適当にビジュアルモードで選択した状態で<kbd>=</kbd>を押すだけ。1000行とかあるHTMLファイルだと結構時間がかかる。デフォルトではJavaScriptファイルでやると残念な結果に……。</p>
+
+<h2>HTMLファイルをブラウザで開く(Windows)</h2>
+
+<p>FirefoxやSafari、Chromeは普通にインストールするとApp Pathsに登録されるので、</p>
+
+<pre>:! start chrome.exe %
+:! start firefox.exe %
+:! start IEXPLORE.EXE %
+:! start Safari.exe %
+</pre>
+
+<p>でブラウザで開くことができる。<code>! start</code>と間に半角スペースがあることに注意。</p>
+
+<p>OperaのインストーラはApp Pathsに登録しないので、</p>
+
+<pre>REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\opera.exe]
+@=&quot;C:\\Program Files\\Opera\\opera.exe&quot;
+&quot;Path&quot;=&quot;C:\\Program Files\\Opera&quot;
+</pre>
+
+<p>といったレジストリファイルをインポートして登録してやると<code>:! start opera.exe %</code>で開くことができるようになる。</p>
+
+<h2>選択範囲を文字参照に変換</h2>
+
+<p>以下のPerlスクリプトをパスの通った場所に置いておく。</p>
+
+<pre><code class="language-perl">#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use HTML::Entities;
+
+print encode_entities(join(&#39;&#39;, &lt;STDIN&gt;), &#39;&amp;&lt;&gt;&quot;\&#39;&#39;);
+</code></pre>
+
+<p>その上でコマンドを作成。</p>
+
+<pre><code class="language-vim">command! -range EncodeEntities :&#39;&lt;,&#39;&gt;!perl -S encode-entities.pl
+</code></pre>
+
+<h2>W3CDTFで日付と時刻の挿入</h2>
+
+<pre><code class="language-vim">command! InsertDateTime :execute &quot;normal! i&quot;.strftime(&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;)
+</code></pre>
+
+<p>必要な人は少ないだろうけど。</p>
+
+<h2>CSSファイルを<code>:make</code>で文法チェック</h2>
+
+<p><a href="http://www.vim.org/scripts/script.php?script_id=1577">css.vim</a>をダウンロードしてインストールする。</p>
+
+<pre><code class="language-vim">autocmd FileType css :compiler css
+</code></pre>
+
+<p>同梱のPerlスクリプト(validate_css)はパスの通ったディレクトリにコピーする必要がある。</p>
+
+<h2>JavaScriptファイルを<code>:make</code>で文法チェック</h2>
+
+<p><a href="http://www.javascriptlint.com/">JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code> (Windowsでは<code>$HOME/vimfiles/compiler</code>)以下に作成する。</p>
+
+<pre><code class="language-vim">
+if exists(&quot;current_compiler&quot;)
+  finish
+endif
+
+let current_compiler = &quot;javascriptlint&quot;
+
+if exists(&quot;:CompilerSet&quot;) != 2
+  command -nargs=* CompilerSet setlocal &lt;args&gt;
+endif
+
+let s:cpo_save = &amp;cpo
+set cpo-=C
+
+CompilerSet makeprg=jsl\ -nologo\ -nofilelisting\ -nosummary\ -nocontext\ -process\ %
+
+CompilerSet errorformat=%f(%l):\ %m
+
+let &amp;cpo = s:cpo_save
+unlet s:cpo_save
+</code></pre>
+
+<p>そして.vimrcに以下のように書く。</p>
+
+<pre><code class="language-vim">autocmd FileType javascript :compiler javascriptlint
+</code></pre>
+
+<h2>JavaScriptファイルのインデントの改善</h2>
+
+<p>デフォルトのインデント・スクリプトは<a href="http://jquery.com/">jQuery</a>を利用してJavaScriptを書いているとかなり酷いことになる。</p>
+
+<ul>
+<li><code>foo(function () {</code>の次の行のインデント</li>
+<li><code>foo({</code>の次の行のインデント</li>
+<li><code>})</code>でのアンインデント</li>
+</ul>
+
+<p>あたりがメジャーなインデントがおかしくなる箇所で、「コード書くよりインデントの修正の方が大変！」というくらい(おおげさ)。</p>
+
+<p><a href="http://www.vim.org/scripts/script.php?script_id=1936">あれ</a>や<a href="http://www.vim.org/scripts/script.php?script_id=1840">これ</a>やJavaScriptのインデント・スクリプトは見つかるが、<a href="http://www.vim.org/scripts/script.php?script_id=2765">Better Javascript Indentation</a>が一番良かった。普通にインストールするだけで特に設定等は必要ない。</p>
+
+<p>インストールすると以下のような典型的なPowered by jQueryのJavaScriptファイルがすんなりインデントされるようになる。気持ち良い！</p>
+
+<pre><code class="language-js">$(function () {
+  var num = 32;
+
+  $(&quot;#monthly_archives &gt; li&quot;).each(function (i, li) {
+    if (i === num) {
+      $(li).before($(&quot;&lt;li/&gt;&quot;).append($(&quot;&lt;a/&gt;&quot;).attr({
+        href: &quot;#archives-by-month&quot;
+      }).append(&quot;» more&quot;).click(function () {
+        $(this).hide();
+        $(&quot;#monthly_archives .folded&quot;).show();
+      }))).addClass(&quot;folded&quot;).hide();
+    } else if (i &gt; num) {
+      $(li).addClass(&quot;folded&quot;).hide();
+    }
+  });
+});
+</code></pre>
+
+<p>気付いた範囲では、</p>
+
+<pre><code class="language-js">var foo = {
+  bar:
+    function () {
+</code></pre>
+
+<p>と書いた時に、</p>
+
+<ul>
+<li>次の行がインデントされない</li>
+<li>その後<code>}</code>で2段階アンインデントされてしまう</li>
+</ul>
+
+<p>といったラベル絡みでの不具合があった。<code>function</code>の前で改行しない場合は問題ないと思う(そう書けという意味ではない)。</p>
+
+<p>また、これをインストールすると<code>gg=G</code>によるインデントのやり直しも改善される(当たり前だけど)。ただし複数行コメント内の行頭の空白が消えてしまうので、</p>
+
+<pre><code class="language-js">/*!
+ * foobar
+ * hogehoge
+ */
+</code></pre>
+
+<p>といった<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>向けなコメントなどは、</p>
+
+<pre><code class="language-js">/*!
+* foobar
+* hogehoge
+*/
+</code></pre>
+
+<p>となってしまうので注意が必要。</p>
+
+<hr>
+
+<p>他にはMarkdownやTextileなどでHTMLに変換するコマンドを作っておいていたりするくらい。あとはひたすら<a href="http://www.vim.org/scripts/script.php?script_id=1879">AutoComplPop</a>でOmni補完！</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/redesign-and-border-radius-and-text-shadow.html">
+  <p>リデザインとborder-radiusとtext-shadow</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

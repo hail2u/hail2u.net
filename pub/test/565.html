@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>G.F.</title>
+
+    <style>
+      ::-moz-selection {
+        color: inherit;
+        background-color: transparent;
+      }
+
+      ::selection {
+        color: inherit;
+        background-color: transparent;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        line-height: 1;
+        font-family: "Hoefler Text", "Constantia", serif;
+        text-align: center;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      header {
+        padding: 1em;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10000;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 100%;
+      }
+
+      header h1 a {
+        border: 0.375em solid;
+        display: block;
+        width: 3em;
+        height: 3em;
+        line-height: 3;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        color: #000;
+        background-color: #fff;
+      }
+
+      .preview,
+      .to-top,
+      .to-right,
+      .to-bottom,
+      .to-left {
+        -webkit-transition: all 0.6s ease-in-out;
+        transition: all 0.6s ease-in-out;
+      }
+
+      .to-top {
+        top: -100%;
+      }
+
+      .to-right {
+        left: 100%;
+      }
+
+      .to-bottom {
+        top: 100%;
+      }
+
+      .to-left {
+        left: -100%;
+      }
+
+      .preview p {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        height: 1em;
+        line-height: 1;
+        font-size: 300%;
+        white-space: nowrap;
+      }
+
+      @media (min-width: 40em) {
+        font-size: 600%;
+      }
+
+      .preview a {
+        display: block;
+        position: relative;
+        left: -50%;
+        text-decoration: none;
+      }
+
+      #help {
+        padding: 1em;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10000;
+        cursor: help;
+      }
+
+      #help p {
+        margin: 0;
+        border: 0.125em solid;
+        border-radius: 50%;
+        display: block;
+        width: 1em;
+        height: 1em;
+        font-size: 150%;
+        opacity: 0.2;
+      }
+
+      #help p:hover {
+        opacity: 1;
+      }
+
+      #help ul {
+        margin: 0;
+        display: none;
+        line-height: 1.4;
+        font-size: 75%;
+        text-align: left;
+      }
+
+      @media (min-width: 40em) {
+        #help {
+          font-size: 100%;
+        }
+      }
+
+      #help input {
+        border: none;
+        color: inherit;
+        background-color: transparent;
+        font-family: "Menlo", "Consolas", monospace;
+      }
+
+      #help.show p {
+        display: none;
+      }
+
+      #help.show ul {
+        display: block;
+      }
+
+      footer {
+        position: absolute;
+        bottom: 3.8em;
+        width: 100%;
+        height: 0;
+        line-height: 1.4;
+        z-index: 10000;
+      }
+
+      @media (min-width: 40em) {
+        footer {
+          bottom: 2em;
+          line-height: 1;
+        }
+      }
+
+      footer address {
+        display: inline-block;
+        font-style: normal;
+      }
+
+      footer em {
+        color: #c33;
+        font-style: normal;
+      }
+
+      @media (min-width: 30em) {
+        footer br {
+          display: none;
+        }
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="http://hail2u.github.io/js/jquery.query-yql.min.js"></script>
+    <script>
+      var statement = 'select * from json where url="https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyApMgI8vW2EfAFAeVa4hDvaLoaW9A3WY94"';
+      var colors = shuffle([
+        {'fg': 'rgb(185, 190, 168)', 'bg': 'rgb(96, 128, 126)'},
+        {'fg': 'rgb(53, 131, 179)', 'bg': 'rgb(226, 223, 208)'},
+        {'fg': 'rgb(139, 194, 188)', 'bg': 'rgb(214, 225, 193)'},
+        {'fg': 'rgb(194, 218, 179)', 'bg': 'rgb(125, 176, 165)'},
+        {'fg': 'rgb(225, 223, 208)', 'bg': 'rgb(45, 126, 179)'},
+        {'fg': 'rgb(169, 197, 210)', 'bg': 'rgb(221, 230, 161)'},
+        {'fg': 'rgb(212, 217, 184)', 'bg': 'rgb(175, 171, 151)'},
+        {'fg': 'rgb(222, 231, 127)', 'bg': 'rgb(217, 112, 67)'},
+        {'fg': 'rgb(218, 203, 38)', 'bg': 'rgb(223, 229, 172)'},
+        {'fg': 'rgb(176, 179, 170)', 'bg': 'rgb(226, 229, 220)'},
+        {'fg': 'rgb(129, 127, 160)', 'bg': 'rgb(159, 157, 198)'},
+        {'fg': 'rgb(169, 236, 242)', 'bg': 'rgb(104, 197, 204)'},
+        {'fg': 'rgb(214, 159, 90)', 'bg': 'rgb(214, 209, 190)'},
+        {'fg': 'rgb(104, 209, 230)', 'bg': 'rgb(204, 214, 181)'},
+        {'fg': 'rgb(230, 179, 154)', 'bg': 'rgb(139, 158, 155)'},
+        {'fg': 'rgb(76, 73, 56)', 'bg': 'rgb(217, 208, 163)'},
+        {'fg': 'rgb(77, 84, 56)', 'bg': 'rgb(189, 196, 184)'},
+        {'fg': 'rgb(170, 106, 153)', 'bg': 'rgb(78, 81, 124)'},
+        {'fg': 'rgb(242, 192, 44)', 'bg': 'rgb(241, 244, 215)'},
+        {'fg': 'rgb(146, 203, 197)', 'bg': 'rgb(226, 222, 186)'},
+        {'fg': 'rgb(199, 109, 22)', 'bg': 'rgb(204, 183, 67)'},
+        {'fg': 'rgb(104, 80, 90)', 'bg': 'rgb(165, 157, 175)'},
+        {'fg': 'rgb(2, 40, 64)', 'bg': 'rgb(102, 160, 165)'},
+        {'fg': 'rgb(237, 240, 245)', 'bg': 'rgb(170, 194, 222)'}
+      ]);
+      var animateClasses = ['to-top', 'to-right', 'to-bottom', 'to-left'];
+
+      $(function () {
+        $("#help").on('click', function (e) {
+          if (e.target.nodeName === 'INPUT') {
+            return;
+          }
+
+          $(this).toggleClass('show');
+        });
+
+        $('.preview p').html('<a>Loading...</a>')
+
+        $.queryYQL(statement, function (d) {
+          if (!d.query.results) {
+            $('.preview p').css({
+              'height': '2.8em',
+              'line-height': '1.4',
+              'font-size': '100%',
+              'white-space': 'pre'
+            }).text('Oops, failed to fetch data\nfrom Google Fonts API via YQL.')
+
+            return;
+          }
+
+          var fonts = shuffle(d.query.results.json.items);
+          var previews = [];
+          var result = $('#result')
+
+          for (var i = 0, l = fonts.length; i < l; i++) {
+            if (i > 12) break;
+
+            var font = fonts[i];
+            var fontEncoded = font.family.replace(/ /g, '+');
+            var fontVariants = $.isArray(font.variants) ? font.variants.join(',') : font.variants;
+            var fontURL = 'http://fonts.googleapis.com/css?family=' + fontEncoded + ':' + fontVariants;
+            var fontSpecURL = 'http://www.google.com/fonts/family?family=' + fontEncoded;
+            var color = colors[i % colors.length];
+            var previewText = font.family;
+            var preview = $('<section/>', {
+              'class': 'preview',
+              'data-animate-class': animateClasses[i % animateClasses.length]
+            }).css({
+              'font-family': '"' + font.family + '", sans-serif',
+              'color': color.fg,
+              'background-color': color.bg,
+              'display': 'none'
+            }).append(
+              $('<p/>').append(
+                $('<a/>', {
+                  href: fontSpecURL
+                }).text(previewText)
+              )
+            );
+            $('head').append(
+              $('<link/>').attr({
+                rel: 'stylesheet',
+                href: fontURL
+              })
+            );
+            previews.push(preview);
+          }
+
+          result.append(previews).find('.preview').on('click', function (e) {
+            var self = $(this);
+
+            if (e.target.nodeName === 'A') {
+              return;
+            }
+
+            var fgColor = self.prev().css('color');
+            var bgColor = self.prev().css('background-color');
+
+            if (!e.shiftKey) {
+              self.addClass(self.attr('data-animate-class')).prev().prev().show();
+            } else if (!self.is(':last-child')) {
+              self.next().removeClass(animateClasses.join(' ')).next().show();
+            }
+
+            $('#fg').val(fgColor);
+            $('#bg').val(bgColor);
+          }).bind('webkitTransitionEnd MSTranstionEnd transitionend', function (e) {
+            var self = $(this);
+
+            if (self.attr('class') === 'preview') {
+              self.prev().prev().hide();
+            } else {
+              self.next().hide();
+            }
+          });
+          var last = result.find('.preview:last-child');
+          last.show().prev().show();
+          $('#fg').val(last.css('color'));
+          $('#bg').val(last.css('background-color'));
+        });
+      });
+
+      function shuffle(list) {
+        var i = list.length;
+
+        while (--i) {
+          var j = Math.floor(Math.random() * (i + 1));
+          if (i == j) continue;
+          var k = list[i];
+          list[i] = list[j];
+          list[j] = k;
+        }
+
+        return list;
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1><a href="./google-fonts.html">G.F.</a></h1>
+    </header>
+
+    <main id="result">
+      <section class="preview">
+        <p><a>Hoefler Text/Constantia</a></p>
+      </section>
+    </main>
+
+    <aside id="help">
+      <p>?</p>
+
+      <ul>
+        <li><strong>Click Empty Area</strong>: Display next font</li>
+        <li><strong>Shift+Click Empty Area</strong>: Display previous font</li>
+        <li><strong>Click Font Name</strong>: Go to Google Fonts specimen page</li>
+        <li>Foreground Color: <input type="text" value="rgb(0, 0, 0)" id="fg"></li>
+        <li>Background Color: <input type="text" value="rgb(255, 255, 255)" id="bg"></li>
+      </ul>
+    </aside>
+
+    <footer>
+      <address>Made by <a href="http://hail2u.net/">Kyo Nagashima</a><br>
+        with <a href="http://www.google.com/fonts">Google Fonts</a>, <a href="http://jquery.com/">jQuery</a>, and <em>&#x2764;</em>.</address>
+    </footer>
+  </body>
+</html>

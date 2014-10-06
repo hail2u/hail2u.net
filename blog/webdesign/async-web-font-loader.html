@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Webフォントの非同期読み込み - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/async-web-font-loader.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/grunt-init-creates-crlf-files-on-windows.html">
+
+    
+
+    
+
+    
+      <meta content="Webフォントの非同期読み込み" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/async-web-font-loader.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/async-web-font-loader.html" itemprop="url">
+
+        <h1 itemprop="name">Webフォントの非同期読み込み</h1>
+
+        <footer>
+          <p>on <time datetime="2013-12-25T13:14:00+09:00" itemprop="datePublished">Dec 25, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Webフォントの読み込みは<code>@import</code>だと色々まずいので、主に<code>link</code>要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。</p>
+
+<p>非同期化することによりWebフォント定義の含まれるCSSファイルのリクエストとパースが、ページのレンダリングと並行して行われるようになる。<code>head</code>要素内で<code>link</code>要素を直接書いた場合は、Webフォント定義の含まれるCSSのリクエストとパース後にページのレンダリングが始まることが多いので、体感速度(ページのレンダリングの開始までの所要時間)は向上する可能性が高い。</p>
+
+<h2>動的なlink要素の追加</h2>
+
+<p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
+
+<pre><code class="language-javascript">(function (d, f) {
+  var l = d.createElement(&#39;link&#39;);
+  l.rel = &#39;stylesheet&#39;;
+  l.href = f;
+  var s = d.getElementsByTagName(&#39;script&#39;)[0];
+  s.parentNode.insertBefore(l, s);
+})(document, &#39;http://example.com/font/foo.css&#39;);</code></pre>
+
+<p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
+
+<h2>rel=&quot;stylesheet&quot;の後付け</h2>
+
+<p>とりあえずWebフォントのURLを<code>link</code>要素として仕込んでおいて、後で<code>rel=&quot;stylesheet&quot;</code>を追加させることにより非同期化する手法。</p>
+
+<pre><code class="language-html">&lt;link
+  href=&quot;http://example.com/font/foo.css&quot;
+  class=&quot;async-web-fonts&quot;&gt;
+&lt;script&gt;
+  (function () {
+    var webfonts = document.querySelectorAll(&#39;link.async-web-fonts&#39;);
+
+    for (var i = 0, l = webfonts.length; i &lt; l; i++) {
+      webfonts[i].rel = &#39;stylesheet&#39;;
+    }
+  })();
+&lt;/script&gt;</code></pre>
+
+<p><code>rel=&quot;stylesheet&quot;</code>がなければ読みに行かないので、これでも非同期になる。複数のWebフォントのURLを参照するようなケースでも拡張しやすい。見た感じのままDOM操作を最小限に抑えられているけど、総合的なパフォーマンスは動的に<code>link</code>要素を突っ込むのとさほど変わらなそう。単体のJavaScriptファイルとして切り出せないのが欠点。</p>
+
+<hr>
+
+<p>ただし、どちらの非同期読み込み手法でもフォントの読み込み中は他のフォントで表示されるので、<a href="/blog/webdesign/fout.html">FOUT</a>を強制するということになる。フォントのロード完了後にすり替える実装をこのウェブサイトで採用していた時に同じ様にFOUTを強制していて、無視できない程度の数の気になる・戻して欲しいといった意見を貰ったので、この非同期読み込みも採用は慎重に行った方が良さそう。</p>
+
+<p>問題の系統としては、ソーシャルボタンのスクリプトを非同期読込させてページの表示までの速度は上がったけど、遅れて実行されるスクリプトのせいでスクロールがつっかかって悪影響みたいなのとちょっと似てる。こういったページの読み込み速度という面からのみの調整だと漏れてしまう事象について、ユーザーテスト以外のテスト手法があると良いとよく考える。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/grunt-init-creates-crlf-files-on-windows.html">
+  <p>grunt-initがWindowsでCR+LFなファイルを作ってしまう</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Amazon E-Commerce Service 4.0は「&quot;」や「&#39;」をそのまま返してくれる(XML的にはまぁOKなんだけど)ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>SIXTY-SIXとかいうの #2 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sixty-six-2.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/kill-ctfmon.html">
+
+    
+
+    
+
+    
+      <meta content="SIXTY-SIXとかいうの #2" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Amazon E-Commerce Service 4.0は「&quot;」や「&#39;」をそのまま返してくれる(XML的にはまぁOKなんだけど)ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sixty-six-2.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sixty-six-2.html" itemprop="url">
+
+        <h1 itemprop="name">SIXTY-SIXとかいうの #2</h1>
+
+        <footer>
+          <p>on <time datetime="2005-09-19T11:19:00+09:00" itemprop="datePublished">Sep 19, 2005</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody"><p itemprop="description"><a href="http://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>は「&quot;」や「&#39;」をそのまま返してくれる(XML的にはまぁOKなんだけど)ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。</p>
+<p>「&#39;」のエスケープは、<code>translate()</code>では出来ないので、</p>
+<pre><code class="language-xsl">&lt;xsl:template name=&quot;replace&quot;&gt;
+  &lt;xsl:param name=&quot;str&quot;/&gt;
+  &lt;xsl:param name=&quot;from&quot;&gt;&amp;#39;&lt;/xsl:param&gt;
+  &lt;xsl:param name=&quot;to&quot;&gt;\&amp;#39;&lt;/xsl:param&gt;
+  &lt;xsl:choose&gt;
+    &lt;xsl:when test=&quot;contains($str, $from)&quot;&gt;
+      &lt;xsl:value-of select=&quot;substring-before($str, $from)&quot;/&gt;
+      &lt;xsl:value-of select=&quot;$to&quot;/&gt;
+      &lt;xsl:call-template name=&quot;replace&quot;&gt;
+        &lt;xsl:with-param name=&quot;str&quot; select=&quot;substring-after($str, $from)&quot;/&gt;
+      &lt;/xsl:call-template&gt;
+    &lt;/xsl:when&gt;
+    &lt;xsl:otherwise&gt;
+      &lt;xsl:value-of select=&quot;$str&quot;/&gt;
+    &lt;/xsl:otherwise&gt;
+  &lt;/xsl:choose&gt;
+&lt;/xsl:template&gt;
+</code></pre>
+<p>こんな形の文字列の置換として実装することになります。SIXTY-SIXのケースでは「&#39;」を「\&#39;」にエスケープするだけなので、<code>xsl:param</code>でデフォルトとしてそれらを指定しておき、呼び出しが書きやすいようにしました。呼び出しは、</p>
+<pre><code class="language-xsl">&lt;xsl:call-template name=&quot;replace&quot;&gt;
+  &lt;xsl:with-param name=&quot;str&quot;&gt;
+    &lt;xsl:value-of select=&quot;aws:ItemAttributes/aws:Title&quot;/&gt;
+  &lt;/xsl:with-param&gt;
+&lt;/xsl:call-template&gt;
+</code></pre>
+<p>てな具合。</p>
+<p>これでAmazonのXSLTサービスがXMLまんまを返すとかいう寝ぼけたことをしない限り、正常に処理できるようになったような気がする。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/kill-ctfmon.html">
+  <p>詳細なテキスト サービスをオフにする</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

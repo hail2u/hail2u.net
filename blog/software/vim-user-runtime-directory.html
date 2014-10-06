@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Vimのシステムのランタイム・ディレクトリは$VIMRUNTIMEで拾えるけど、ユーザーのはない。なのでポータブルなvimrcを書けるようにWindowsとかでも$HOME/.vimに揃えてた。Vim 7.4から(だと思う)ユーザーのランタイム・ディレクトリにvimrcを置けるようになったので、そこに置けばvimrcから&lt;sfile&gt;を使って簡単に探せるようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Vimのユーザー・ランタイム・ディレクトリを探す - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/software/vim-user-runtime-directory.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/source-sans-pro-otf-windows-chrome.html">
+
+    
+
+    
+
+    
+      <meta content="Vimのユーザー・ランタイム・ディレクトリを探す" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Vimのシステムのランタイム・ディレクトリは$VIMRUNTIMEで拾えるけど、ユーザーのはない。なのでポータブルなvimrcを書けるようにWindowsとかでも$HOME/.vimに揃えてた。Vim 7.4から(だと思う)ユーザーのランタイム・ディレクトリにvimrcを置けるようになったので、そこに置けばvimrcから&lt;sfile&gt;を使って簡単に探せるようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/software/vim-user-runtime-directory.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/software/vim-user-runtime-directory.html" itemprop="url">
+
+        <h1 itemprop="name">Vimのユーザー・ランタイム・ディレクトリを探す</h1>
+
+        <footer>
+          <p>on <time datetime="2013-09-29T12:10:00+09:00" itemprop="datePublished">Sep 29, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Vimのシステムのランタイム・ディレクトリは<code>$VIMRUNTIME</code>で拾えるけど、ユーザーのはない。なのでポータブルな<code>vimrc</code>を書けるようにWindowsとかでも<code>$HOME/.vim</code>に揃えてた。Vim 7.4から(だと思う)ユーザーのランタイム・ディレクトリに<code>vimrc</code>を置けるようになったので、そこに置けば<code>vimrc</code>から<code>&lt;sfile&gt;</code>を使って簡単に探せるようだ。</p>
+
+<p><code>vimrc</code>をVim 7.4で置けるようになったところに置き(先頭のドットはいらない)、<code>vimrc</code>に以下のように書いておく。</p>
+
+<pre><code class="language-vim">let $VIMRUNTIME_USER = expand(&#39;&lt;sfile&gt;:p:h&#39;)</code></pre>
+
+<p>これで<code>vimrc</code>や<code>gvimrc</code>で<code>$VIMRUNTIME_USER</code>を使って手軽にアクセスできる。行儀悪いけど環境変数にしておくと、<code>set</code>とかでも気軽に使えて良い。古い環境向けに<code>$HOME/.vim</code>にフォールバックさせておくとなお良さそう。</p>
+
+<p>ベスト・プラクティスありそうな気がすると思って、netrwの<code>NetrwHome()</code>の実装とか見たらものすごくひどい感じだった……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/source-sans-pro-otf-windows-chrome.html">
+  <p>Source Sans Pro・OpenType・Windows・Chrome</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

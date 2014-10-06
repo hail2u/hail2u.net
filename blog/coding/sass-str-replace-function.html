@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Sass 3.3で入る予定の文字列関数の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Sassで文字列の置換を行うユーザー定義関数 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/sass-str-replace-function.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/grunt-multi-task-running-order.html">
+
+    
+
+    
+
+    
+      <meta content="Sassで文字列の置換を行うユーザー定義関数" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Sass 3.3で入る予定の文字列関数の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/sass-str-replace-function.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/sass-str-replace-function.html" itemprop="url">
+
+        <h1 itemprop="name">Sassで文字列の置換を行うユーザー定義関数</h1>
+
+        <footer>
+          <p>on <time datetime="2013-08-16T17:19:00+09:00" itemprop="datePublished">Aug 16, 2013</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://github.com/nex3/sass/blob/0ef77dc0e3cff821aadca09aca98cac46354093d/lib/sass/script/value/string.rb">Sass 3.3で入る予定の文字列関数</a>の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。</p>
+
+<pre><code class="language-scss">// str-replace() - Replace in a string
+//
+// @param {string}  $string    String that you want to replace
+// @param {string}  $substr    String that is to be replaced by `$newsubstr`
+// @param {string}  $newsubstr String that replaces `$substr`
+// @param {number*} $all       Flag for replacing all (1+) or not (0)
+// @return {string}
+@function str-replace($string, $substr, $newsubstr, $all: 0) {
+  $position-found: str-index($string, $substr);
+  $processed: ();
+
+  @while ($position-found &gt; 0) {
+    $length-substr: str-length($substr);
+    $processed: append($processed, str-slice($string, 0, $position-found - 1));
+    $processed: append($processed, $newsubstr);
+    $string: str-slice($string, $position-found + $length-substr);
+    $position-found: 0;
+
+    @if ($all &gt; 0) {
+      $position-found: str-index($string, $substr);
+    }
+  }
+
+  $processed: append($processed, $string);
+  $string: &quot;&quot;;
+
+  @each $s in $processed {
+    $string: #{$string}#{$s};
+  }
+
+  @return $string;
+}</code></pre>
+
+<p><code>str-index()</code>で置換対象文字列<code>$substr</code>見つけたら、<code>$substr</code>までを抜き出したのと置換後文字列<code>$newstr</code>をリストである<code>$processed</code>に追加していくという作業を行うだけ。最後に<code>$processed</code>を連結して返す。<code>$all</code>は全置換を行うかどうかのフラグで、<code>0</code>か省略した場合は最初の１つだけ置換する。</p>
+
+<pre><code class="language-scss">.test {
+  margin: str-replace(&quot;1em 2em&quot;, &quot;em&quot;, &quot;rem&quot;, 1);
+}</code></pre>
+
+<p>と書くと、</p>
+
+<pre><code class="language-css">.test {
+  margin: 1rem 2rem; }</code></pre>
+
+<p>となる。この利用例にまったく意味はない。</p>
+
+<hr>
+
+<p>こういう<a href="https://github.com/hail2u/scss-functions">汎用的であることを意識したユーザー定義関数</a>を作っておいて<code>@import</code>するというのもそれほど悪くはなさそう。しかし、ミックスインのように即戦力ではないので、別に分けて管理してもメリットを得る機会はほとんどなさそう。かといって毎回一から書くのでは面倒臭いので、コアの部分をコード・スニペットとしてどっかに置いといて、複雑な特化型ユーザー定義関数を書く時に引っ張り出してきて使うというのが理にかなっている。と感じた。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/grunt-multi-task-running-order.html">
+  <p>GruntのMultiタスクの実行順</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

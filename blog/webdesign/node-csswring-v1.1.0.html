@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Source Maps対応のCSS圧縮ツールであるCSSWringをようやくメジャー・リリースした。特に使い方は変わってない。中身的には圧縮力はそこそこ向上したけど、まだ「もうすこしがんばりましょう」程度。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSWring v1.1.0 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/node-csswring-v1.1.0.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/my-.scss-lint.yml.html">
+
+    
+
+    
+
+    
+      <meta content="CSSWring v1.1.0" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Source Maps対応のCSS圧縮ツールであるCSSWringをようやくメジャー・リリースした。特に使い方は変わってない。中身的には圧縮力はそこそこ向上したけど、まだ「もうすこしがんばりましょう」程度。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/node-csswring-v1.1.0.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/node-csswring-v1.1.0.html" itemprop="url">
+
+        <h1 itemprop="name">CSSWring v1.1.0</h1>
+
+        <footer>
+          <p>on <time datetime="2014-08-22T12:51:00+09:00" itemprop="datePublished">Aug 22, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Source Maps対応のCSS圧縮ツールである<a href="https://github.com/hail2u/node-csswring/">CSSWring</a>をようやくメジャー・リリースした。特に使い方は変わってない。中身的には圧縮力はそこそこ向上したけど、まだ「もうすこしがんばりましょう」程度。</p>
+
+<p>ちょくちょくフロントエンド統合ツールに使われるようになってたりして、Source Mapsを吐くCSS圧縮ツールの需要はそこそこあるのかなと感じている。他のCSS圧縮ツールとは<a href="http://goalsmashers.github.io/css-minification-benchmark/">圧縮力で全敗</a>みたいな感じなので、どこらへんに差があるのか調べて改善していきたい。</p>
+
+<p>v1系に入ってから、以下のような点で圧縮力の向上に手を入れた。</p>
+
+<ul>
+<li>セレクター内の連続した空白の切り詰め</li>
+<li>メディア・クエリーのパラメーター内の空白の切り詰め</li>
+<li><code>font-weight</code>プロパティーで<code>normal</code>を<code>400</code>に、<code>bold</code>を<code>700</code>へ変換</li>
+<li><code>margin</code>や<code>border-style</code>プロパティーなどでの省略</li>
+<li><code>font-family</code>プロパティーでの引用符の削除(と適切な追加)</li>
+<li><code>@font-face</code>ルール内でデフォルトのままの定義の削除</li>
+</ul>
+
+<p>あとは<code>#f00</code>を<code>red</code>にするとかになるんだけど、茨の道っぽくてやりたくない……。やってることをサンプル付きでまとめるべきっぽいくらいには色々やるようになった。Wikiに書くかGitHub Pages作るか迷う。</p>
+
+<hr>
+
+<p>良さそうな機会なので<code>font-family</code>プロパティーの引用符の削除について少しだけ書く。このプロパティーの値は、フォント名が空白を含むと引用符が必要というわけじゃない。</p>
+
+<figure>
+  <blockquote>
+    <p>Font family names must either be given quoted as strings, or unquoted as a sequence of one or more identifiers.</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/css-fonts-3/#font-family-prop">3.1 Font family: the font-family property</a></cite></figcaption>
+</figure>
+
+<p>CSS Fonts Module Level 3の仕様(<a href="http://www.w3.org/TR/CSS2/fonts.html#font-family-prop">CSS 2.1</a>から同じ)ではこのように定義されているので、<em>一文字以上の識別子(identifiers)の連続ならば引用符は必要ない</em>ということになる。そしてその識別子は以下のように決められている。</p>
+
+<figure>
+  <blockquote>
+    <p>In CSS, identifiers (including element names, classes, and IDs in selectors) can contain only the characters [a-zA-Z0-9] and ISO 10646 characters U+00A0 and higher, plus the hyphen (-) and the underscore (_); they cannot start with a digit, two hyphens, or a hyphen followed by a digit.</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier">4.1.3 Characters and case</a></cite></figcaption>
+</figure>
+
+<p>結果としては以下のものは識別子として不正になる。</p>
+
+<ul>
+<li>ハイフンとアンダースコア以外の記号を含むもの</li>
+<li>数字で始まるもの</li>
+<li>ハイフン2つで始まるもの</li>
+<li>ハイフンに続いて数字で始まるもの</li>
+</ul>
+
+<p>つまりフォント名を空白区切りでチェックして、どれか一つでもこの不正なリストに該当した場合は引用符が必要になる。そして以下のような正規表現でチェックできるんじゃないかと思う。</p>
+
+<pre><code class="language-javascript">var reIdentifier = /([\x21-\x2c\x2e\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x9f]|^([0-9]|-(-|[0-9])))/;
+</code></pre>
+
+<p>自分で書いたのに読めない。</p>
+
+<p>でも実はこの部分を正確に仕様を読めているのかずっと自信がないので、間違ってたりしたら是非教えて欲しい。普段はとりあえず引用符で括っておく派でやり過ごしてきた。そういう人も多いと思うので、CSS圧縮ツールが仕様(と実装)通りにうまいことやってくれるのが良いかなと思う。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/my-.scss-lint.yml.html">
+  <p>~/.scss-lint.yml</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

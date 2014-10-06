@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。@cho45が書いたのを見て重い腰が上がった。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>Data URIに変換するPerlスクリプト - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/perl-convert-to-data-uri.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/sass-identity.html">
+
+    
+
+    
+
+    
+      <meta content="Data URIに変換するPerlスクリプト" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。@cho45が書いたのを見て重い腰が上がった。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/perl-convert-to-data-uri.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/perl-convert-to-data-uri.html" itemprop="url">
+
+        <h1 itemprop="name">Data URIに変換するPerlスクリプト</h1>
+
+        <footer>
+          <p>on <time datetime="2012-03-19T16:10:00+09:00" itemprop="datePublished">Mar 19, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。<a href="https://github.com/cho45/dotfiles/blob/master/bin/data-scheme">@cho45が書いたの</a>を見て重い腰が上がった。</p>
+
+<pre><code class="language-perl">#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use MIME::Base64;
+use MIME::Types;
+use Path::Extended qw(file);
+
+my $mt = MIME::Types-&gt;new();
+my @r;
+
+foreach (@ARGV) {
+  my $f = file($_);
+  my $t = $mt-&gt;mimeTypeOf($file-&gt;stringify);
+  push(@r, 'data:' . ($t ? $t : 'text/plain') . ';base64,' . encode_base64(scalar($f-&gt;slurp(binmode =&gt; 1)), ''));
+}
+
+print join("\n", @r);
+
+exit;
+</code></pre>
+
+<p><a href="https://metacpan.org/module/URI">URI</a>モジュールでの<code>new('data:')</code>だとBase64でエンコードするかどうかよしなにしてくれちゃうので、普通に<a href="https://metacpan.org/module/MIME::Base64">MIME::Base64</a>を使った。メディアタイプ判別のモジュールはいくつか試したけど、未知の時に例外吐いて死ぬ奴とか常に配列で返す奴とか色々アレなのが多くて、未知の場合は空で返ってくる<a href="https://metacpan.org/module/MIME::Types">MIME::Types</a>が結局一番ましな感じだった。</p>
+
+<p>右クリックから使う場合は、</p>
+
+<pre><code class="language-bat">@echo off
+
+perl -S convert-to-data-uri.pl %* | clip
+</code></pre>
+
+<p>というようなバッチファイルを送るに置いておくとクリップボードに即コピーとかできる。</p>
+
+<p><a href="http://sass-lang.com/">Sass</a>でコンパイル時にData URIに変換する関数とか書いて使ってたことも少しあったけど、コンパイルが遅くなりがちで辛いので直ぐに止めた……。</p>
+
+<h2>追記</h2>
+
+<p>Windowsだとバイナリ・ファイルがうまくいかないので<a href="https://metacpan.org/module/Path::Extended">Path::Extended</a>に変えて明示的に<code>binmode</code>を指定して読むようにした。<a href="/blog/coding/perl-load-binary-file-with-path-class.html">自分で書いて</a>て、<a href="http://b.hatena.ne.jp/charsbar/20100102#bookmark-18079992">id:charsbarに教えてもらった</a>のをきれいさっぱり忘れてた……。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/sass-identity.html">
+  <p>Sassの存在意義</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

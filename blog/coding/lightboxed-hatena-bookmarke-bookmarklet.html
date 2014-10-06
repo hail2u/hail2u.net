@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="はてなブックマークのデフォルトのブックマークレットはiframeでオーバーレイ表示されるが、サイズ的にも位置的にも見づらい気がするので、ユーザースタイルシートをいくつか書いてみた。最初はオーバーレイ表示ではない旧バージョンのブックマークレットを使い、そのページのスタイルシートを書き換えてみたのだけど、見やすいことは見やすいがイマイチな感じだった。そこでもっと単純にオーバーレイ表示のサイズと位置を変更するだけのものを書いたりしてみたが、これもイマイチ。最終的にlightboxっぽく表示してやれば良いんじゃないかと思い、試してみたらなかなか良さそうな感じだった。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>はてなブックマークのブックマークレットをlightbox化 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/lightboxed-hatena-bookmarke-bookmarklet.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/use-shift-key-to-toggle-alphanumeric-mode-in-google-ime.html">
+
+    
+
+    
+
+    
+      <meta content="はてなブックマークのブックマークレットをlightbox化" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="はてなブックマークのデフォルトのブックマークレットはiframeでオーバーレイ表示されるが、サイズ的にも位置的にも見づらい気がするので、ユーザースタイルシートをいくつか書いてみた。最初はオーバーレイ表示ではない旧バージョンのブックマークレットを使い、そのページのスタイルシートを書き換えてみたのだけど、見やすいことは見やすいがイマイチな感じだった。そこでもっと単純にオーバーレイ表示のサイズと位置を変更するだけのものを書いたりしてみたが、これもイマイチ。最終的にlightboxっぽく表示してやれば良いんじゃないかと思い、試してみたらなかなか良さそうな感じだった。" property="og:description">
+      <meta content="http://hail2u.net/images/blog/lightboxed-hatena-bookmark-bookmarklet-s.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/lightboxed-hatena-bookmarke-bookmarklet.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/coding/lightboxed-hatena-bookmarke-bookmarklet.html" itemprop="url">
+
+        <h1 itemprop="name">はてなブックマークのブックマークレットをlightbox化</h1>
+
+        <footer>
+          <p>on <time datetime="2009-12-10T10:00:00+09:00" itemprop="datePublished">Dec 10, 2009</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://b.hatena.ne.jp/register">はてなブックマークのデフォルトのブックマークレット</a>は<code>iframe</code>でオーバーレイ表示されるが、サイズ的にも位置的にも見づらい気がするので、ユーザースタイルシートをいくつか書いてみた。最初はオーバーレイ表示ではない旧バージョンのブックマークレットを使い、<a href="/pub/hatena-bookmark-bookmarklet.user.css">そのページのスタイルシートを書き換えてみた</a>のだけど、見やすいことは見やすいがイマイチな感じだった。そこでもっと単純にオーバーレイ表示のサイズと位置を変更するだけのものを書いたりしてみたが、これもイマイチ。最終的にlightboxっぽく表示してやれば良いんじゃないかと思い、試してみたらなかなか良さそうな感じだった。</p>
+
+<figure><a href="/images/blog/lightboxed-hatena-bookmark-bookmarklet-l.png"><img src="/images/blog/lightboxed-hatena-bookmark-bookmarklet-s.png" alt="Lightbox化したはてなブックマークのブックマークレットのプレビュー" itemprop="image"></a></figure>
+
+<p>投稿フォームはブラウザ・ウィンドウのど真ん中に表示される。調節するのが面倒だったのでサイズの変更はしていない。ユーザースタイルシートのコードは以下の通り。</p>
+
+<pre><code class="language-css">.hatena-bookmark-bookmarklet-container {
+  padding: 0 !important;
+  display: table !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: transparent !important;
+}
+
+.hatena-bookmark-bookmarklet-container div {
+  padding: 0 !important;
+  background-image: none !important;
+  text-align: center !important;
+}
+
+.hatena-bookmark-bookmarklet-header {
+  display: none !important;
+}
+
+.hatena-bookmark-bookmarklet-header + div {
+  display: table-cell !important;
+  vertical-align: middle !important;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.hatena-bookmark-bookmarklet-container iframe {
+  padding: 0 !important;
+  background-image: none !important;
+}
+</code></pre>
+
+<p>あらゆるサイトに表示される可能性があるので、<code>@-moz-document domain()</code>等は使わ(え)ない。このユーザースタイルシートで元々の投稿フォームのヘッダにある閉じるボタン(やシェードボタン)が機能しなくなってしまうので、投稿フォームを閉じるにはリロードする必要がある(ヘッダは残してやっても意味が無いようなので削除した)。これだと非常に操作性が悪いので、投稿フォーム以外の半透明な部分をクリックするとフォームが消え、再度ブックマークレットを実行すると再表示されるブックマークレットは書いてみた。表示・非表示のトグル以外はデフォルトのものと同じ。非表示にするだけなのでフォームに入力した内容とかは維持される。</p>
+
+<p>Bookmarklet: <a href="javascript:(function(){function%20c(n){return%20document.getElementsByClassName(n)}if(typeof%20c('hatena-bookmark-bookmarklet-container')[0]!='undefined'){c('hatena-bookmark-bookmarklet-container')[0].style.visibility='visible'}else{var%20d=(new%20Date);var%20s=document.createElement('script');s.charset='UTF-8';s.src='http://b.hatena.ne.jp/js/Hatena/Bookmark/let.js?'+d.getFullYear()+d.getMonth()+d.getDate();(document.getElementsByTagName('head')[0]||document.body).appendChild(s);var%20t=setInterval(function(){if(typeof%20c('hatena-bookmark-bookmarklet-container')[0]!='undefined'){clearInterval(t);c('hatena-bookmark-bookmarklet-container')[0].onclick=function(){this.style.visibility='hidden'};}},100);}})()">ブックマークする</a></p>
+
+<p>あんまり試してないのでちゃんと動くかわからない……。単純にタイマーで投稿フォームが作成されたかどうか監視して、作成されたら投稿フォームをトグルするコードを仕込むというだけのもの(なのにやたら長い)。もちろん上記ユーザースタイルシートと共に使わないと意味はない。</p>
+
+<p>拡張使え！拡張使え！拡張使え！Chromeで！！１<a href="http://hatena.g.hatena.ne.jp/hatenabookmark/20091209/1260314705">はてなブックマークのGoogle Chrome拡張はベータテスト中です</a>。</p>
+
+<h2>追記@2009-12-10T13:03:41+09:00</h2>
+
+<p>Chromeにはユーザースタイルシート的なものがないので、<a href="/pub/lightboxed-hatena-bookmark-bookmarklet.user.js">スタイルを追加する簡単なユーザースクリプトを書いてみた</a>。現在の最新ベータ版(4.0.249.30)ではrawをクリックすると拡張としてインストールされる。試してみた限りでは<a href="http://www.flickr.com/photos/hail2u/4172849297/">うまく動いている模様</a>。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/use-shift-key-to-toggle-alphanumeric-mode-in-google-ime.html">
+  <p>Google日本語入力でShiftキーで英数モードに</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xml:lang="ja-JP"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Weblog - Hail2u.net</title>
+    <link>http://hail2u.net/blog/</link>
+    <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
+    <language>ja-JP</language>
+    <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
+    <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
+    <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
+    <lastBuildDate>Mon, 6 Oct 2014 10:00:44 +0900</lastBuildDate>
+    <generator>blosxom v2.1.2+dev</generator>
+    <atom:link rel="self" type="application/rss+xml" href="http://hail2u.net/blog/feed"/>
+    <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+    <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
+
+
+    <item>
+      <title>カラースキーム</title>
+      <link>http://hail2u.net/blog/software/colorscheme-2014-10-06.html</link>
+      <description>カラースキームはPhotoshopのスウォッチで管理する事がほとんど。多くのツールで対応されている業界標準というだけの理由で、特にこの形式そのものがすごく便利というわけじゃない。とりあえずどう表示させても潰れることがまずないSVGで作ってみたけど、あまり意味なさそう。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/colorscheme-2014-10-06.html</guid>
+      <pubDate>Mon, 06 Oct 2014 10:00:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <img alt="2014/10/06現在のこのウェブサイトのカラースキーム" src="http://hail2u.net/images/blog/colorscheme-2014-10-06.svg">
+</figure>
+
+<p>カラースキームはPhotoshopのスウォッチで管理する事がほとんど。多くのツールで対応されている業界標準というだけの理由で、特にこの形式そのものがすごく便利というわけじゃない。とりあえずどう表示させても潰れることがまずないSVGで作ってみたけど、あまり意味なさそう。</p>
+
+<p><code>rect</code>要素の幅・高さ・水平位置・垂直位置の全てで<code>%</code>を使って自在に拡大縮小できるようにした上で、<code>shape-rendering</code>プロパティーで<code>crispEdges</code>を指定することで境界のシャープさを維持させ、色が潰れないように。</p>
+
+<pre><code>&lt;svg&gt;
+  &lt;defs&gt;
+    &lt;style&gt;&lt;![CDATA[
+      rect {
+        shape-rendering: crispEdges;
+      }
+    ]]&gt;&lt;/style&gt;
+  &lt;/defs&gt;
+  &lt;rect style=&quot;fill:#3C3330&quot; width=&quot;20%&quot; height=&quot;12.5%&quot;  x=&quot;0%&quot;  y=&quot;0%&quot;/&gt;
+  ...
+&lt;/svg&gt;
+</code></pre>
+
+<hr>
+
+<p>簡単なHTMLにインライン・スタイルで表を作って、開発者ツールで開くとかのが良さそうな気がしてきた。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>xml2jsと絵文字</title>
+      <link>http://hail2u.net/blog/coding/xml2js-and-emoji.html</link>
+      <description>簡単便利なxml2jsは、パーサーにsax-jsが、ジェネレーターにxmlbuilderが使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/xml2js-and-emoji.html</guid>
+      <pubDate>Sun, 05 Oct 2014 11:01:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>簡単便利な<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>は、パーサーに<a href="https://github.com/isaacs/sax-js/">sax-js</a>が、ジェネレーターに<a href="https://github.com/oozcitak/xmlbuilder-js/">xmlbuilder</a>が使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。</p>
+
+<p>xmlbuilderでは絵文字辺りを扱うためには、<code>create()</code>関数の第4引数で<code>allowSurrogateChars</code>オプションを有効にしてやる必要がある。</p>
+
+<pre><code>var xml = require(&#39;xmlbuilder&#39;).create(
+  &#39;root&#39;,
+  {
+    encoding: &#39;UTF-8&#39;
+  },
+  {},
+  {
+    allowSurrogateChars: true
+  }
+).ele(&#39;child&#39;, &#39;<a href="http://www.fileformat.info/info/unicode/char/1f476/index.htm">\uD83D\uDC76</a>&#39;);
+console.log(xml);
+</code></pre>
+
+<p>これで落ちない。しかし、xml2jsではこのオプションを有効にできないので、自前でジェネレーター関数を作り直す必要がある。</p>
+
+<p>今はxml2jsの<code>Builder()</code>をパクってお茶を濁しているけど、どうにかしないと今後辛そう。プルリクエストを投げたいけど、CoffeeScriptという難敵が。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Terms of Services; Didn’t Read</title>
+      <link>http://hail2u.net/blog/software/tosdr.html</link>
+      <description>利用規約(ToS)やプライバシー・ポリシーはまじめに読むにはかなり長いことがよくある。日本語でもかなりの辛さだが、英語だと更に厳しい。その利用規約を簡単なレーティングと重要そうなポイントのリストで概要を把握できるようにしてくれるブラウザー拡張がTerms of Service; Didn’t Readだ。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/tosdr.html</guid>
+      <pubDate>Sat, 04 Oct 2014 07:50:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <img src="http://hail2u.net/images/blog/tosdr.png" alt="Terms of Services; Didn’t Read">
+</figure>
+
+<p>利用規約(ToS)やプライバシー・ポリシーはまじめに読むにはかなり長いことがよくある。日本語でもかなりの辛さだが、英語だと更に厳しい。その利用規約を簡単なレーティングと重要そうなポイントのリストで概要を把握できるようにしてくれるブラウザー拡張が<a href="https://tosdr.org/">Terms of Service; Didn’t Read</a>だ。</p>
+
+<p><a href="https://chrome.google.com/webstore/detail/terms-of-service-didn%E2%80%99t-r/hjdoplcnndgiblooccencgcggcoihigg">Chrome拡張をインストールするページ</a>にあるスクリーンショットのように、URLバーに表示されるアイコンでレーティングが表示される。さらにそのアイコンをクリックする事で利用規約のポイントの一覧がポップアップで表示されるようになっている。</p>
+<figure>
+  <img src="http://hail2u.net/images/blog/tosdr-duckduckgo.png" alt="DuckDuckGoではURLバーに表示されたAというアイコンをクリックすると、ポップアップでトラッキングをしないことを利用規約で明言していることが確認できる">
+
+  <figcaption>ToS;DR on DuckDuckGo</figcaption>
+</figure>
+
+<p>例えば<a href="https://duckduckgo.com/">DuckDuckGo</a>はクラスAとレーティングされているので、URLバーにアイコンがこのように表示される。このレーティングはラフに開発者が付けた上で、コミュニティーで議論されることになっているようだ。</p>
+
+<p>ポップアップでは利用規約のポイントが列挙される。例えば<a href="https://github.com/">GitHub</a>では、GitHubへプロジェクトの特別な権利を付与しない事が明言されているが、アカウントの削除やデータの削除はいつでも行われる可能性があるということも書かれていることがすぐわかるようになっている。これらのポイントがポジティブなものかネガティブなものかも👍か👎のアイコンと色で容易に判別がつく。</p>
+
+<hr>
+
+<p>現時点では100に満たない数のウェブサービスにしか対応していないので、これを元に使うウェブサービスを決定するのはまだ無理がある。しかし、自分の使っているメジャーなウェブサービスがどのようなものなのかを改めて確認したりするにはそこそこ使えるし、今後に期待できそうだ。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>DuckDuckGo</title>
+      <link>http://hail2u.net/blog/internet/duckduckgo.html</link>
+      <description>iOS 8のMobile SafariでもDuckDuckGoを使えるようになったので、良い機会かなとデスクトップ等でも検索にDuckDuckGoを使うようにした。Googleプロダクトのウェブサービスで使うのはGmailだけにしたい野望にまた一歩近づいた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/duckduckgo.html</guid>
+      <pubDate>Fri, 03 Oct 2014 07:01:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <img src="http://hail2u.net/images/blog/duckduckgo.png" alt="DuckDuckGo">
+</figure>
+
+<p>iOS 8のMobile Safariでも<a href="https://duckduckgo.com/">DuckDuckGo</a>を使えるようになったので、良い機会かなとデスクトップ等でも検索にDuckDuckGoを使うようにした。Googleプロダクトのウェブサービスで使うのはGmailだけにしたい野望にまた一歩近づいた。</p>
+
+<p>DuckDuckGoはとにかく欠点が少ない。でもGoogleのようないっぱい便利機能があるものと比べてしまうと、物足りなくもある。少なくとも僕は以下のようなGoogleの便利機能に依存して、検索生活を営んでいたことがわかった。</p>
+
+<ul>
+<li>非英語での画像検索</li>
+<li>スペル自動修正</li>
+<li>時間指定</li>
+<li>広告</li>
+</ul>
+
+<p>広告は邪魔かなーと思ってたけど、(技術的な話題ではない)普通の検索してる時にはちょくちょく利用してたんだなと、改めて思った。検索結果ページの広告は、お金で検索結果順位を上げるというネガティブな感じで捉えていたけど、それがオークションだとそれなりに自浄作用があるので、機械判別では行き届かないページを表示させられるという検索クオリティの向上に役立ってるのかな。</p>
+
+<p>便利機能以外の点だと、検索結果の要約部分の出来で大きく差があった。特に日本語の場合にGoogleの方が圧倒的に上なように感じる。DuckDuckGoが単に検索語の前後を抜き出しているだけに見えるのに対して、Googleは検索語の前後の文脈も考慮しているようで、開くべきページと開く必要のなさそうなページの判別がしやすい。</p>
+
+<hr>
+
+<p>でもまだしばらくはDuckDuckGoを使ってみようと思っている。Googleに比べると便利さに欠けるだけで、特にフラストレーションが溜まるというほどじゃない。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>違和感</title>
+      <link>http://hail2u.net/blog/misc/a-sense-of-incongruity.html</link>
+      <description>違和感は明確に自分が意識していない感覚に物事が触れた時に感じられるものだ。ただし自分が違和感を感じたことを大々的に「変だ！気持ち悪い！」などと感情的に表現してしまうとおかしな人になってしまう。そこで論理的に批判したくなるわけだが、大体において理論武装には穴や見落としがあるので、これまたおかしな人になってしまう。かといって違和感を感じたという事実を封印してしまうと、ストレスでおかしな人になってしまう。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Misc.</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/misc/a-sense-of-incongruity.html</guid>
+      <pubDate>Thu, 02 Oct 2014 07:27:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <img src="http://hail2u.net/images/blog/a-sense-of-incongruity.png" alt="A Sense of Incongruity">
+</figure>
+
+<p>違和感は明確に自分が意識していない感覚に物事が触れた時に感じられるものだ。ただし自分が違和感を感じたことを大々的に「変だ！気持ち悪い！」などと感情的に表現してしまうとおかしな人になってしまう。そこで論理的に批判したくなるわけだが、大体において理論武装には穴や見落としがあるので、これまたおかしな人になってしまう。かといって違和感を感じたという事実を封印してしまうと、ストレスでおかしな人になってしまう。</p>
+
+<p>違和感を感じるための感覚は自分の今までの経験に基づいて構成されたものなので、その否定は自分の存在意義を一部崩してしまう。しかし、そういった自分の存在意義を維持するため、延いては自身を守るために理論武装すると、説得したい相手を押さえつけるだけの結果に終わってしまう。</p>
+
+<p>違和感を感じたことを大切にしつつ、かといってそれに<em>自分だけが納得のいくような理由付けを行わない</em>ようにすると良さそうだ。つまり違和感を論理的に説明できないことを常に意識し、感じたことそれ自体は忘れないようにするということだ。</p>
+
+<hr>
+
+<p>どうもウェブ制作周りの様々なテクニックに寛容になりつつある。新しい物事を古い感覚で否定しないようにしたいという意識もあるが、<a href="http://bem.info/">BEM</a>を受け入れてしまった辺りからその傾向は顕著になっている。違和感を感じるための感覚が狂った、というか大きく変化した。</p>
+
+<p>もうちょっと違和感とうまく付き合っていきたい。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>古いバージョンのChromeが残ること</title>
+      <link>http://hail2u.net/blog/webdesign/samsung-chrome.html</link>
+      <description>あるプロジェクトへのモバイル・アクセスの統計によると、Chromeのうち実に25%がSamsung製で古いバージョンのものとなっていたみたいだ。こういった古いバージョンのChromeが残ることは、Internet Explorer 6の再来的な意味も多少持つけど、それだけではない気がする。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/samsung-chrome.html</guid>
+      <pubDate>Wed, 01 Oct 2014 04:33:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="http://www.quirksmode.org/blog/archives/2014/09/25_of_mobile_ch.html"><img src="http://hail2u.net/images/blog/samsung-chrome.png" alt="Samsung Chrome"></a>
+</figure>
+
+<p>あるプロジェクトへのモバイル・アクセスの統計によると、<a href="http://www.quirksmode.org/blog/archives/2014/09/25_of_mobile_ch.html">Chromeのうち実に25%がSamsung製で古いバージョンのもの</a>となっていたみたいだ。こういった古いバージョンのChromeが残ることは、Internet Explorer 6の再来的な意味も多少持つけど、それだけではない気がする。</p>
+
+<p>Chromeのラピッド・リリースは、強制的にアップデートされることで成立しているはず。そう考えると、アップデートされない、されにくいChromeが存在してしまうことは、その世界観を破壊してしまう。Chrome (や今のFirefox)には安定版<em>らしきもの</em>しか存在しないので、そこに別の概念、<em>安定していない安定版</em>とでも言うべきものが混ざると、非常にややこしい世界になってしまう。</p>
+
+<p>このデータは多少煽り気味ではあるけれども示唆に富むもので、ウェブ開発者達の何らかのアクションが必要なことを意味している。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>ぶどうパン</title>
+      <link>http://hail2u.net/blog/misc/raisin-bread.html</link>
+      <description>レーズン入りの食パン、いわゆる「ぶどうパン」という感じのやつが好き。レーズン入りのバターロールとかデニッシュじゃなくて、とにかく普通の山形食パンにレーズンがこれでもかと入ってるのが好きだ。上に砂糖がかかってないとなお良い。そのまま食べても、焼いて食べても、バターを塗っても好き。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Misc.</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/misc/raisin-bread.html</guid>
+      <pubDate>Tue, 30 Sep 2014 04:25:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>レーズン入りの食パン、いわゆる「ぶどうパン」という感じのやつが好き。レーズン入りのバターロールとかデニッシュじゃなくて、とにかく普通の山形食パンにレーズンがこれでもかと入ってるのが好きだ。上に砂糖がかかってないとなお良い。そのまま食べても、焼いて食べても、バターを塗っても好き。</p>
+
+<p>数年前くらいに地元のスーパーが改装した時に入った町のパン屋的なとこのレーズンブレッドがツボで、毎週のように買って食べてる。春に消費税上がった後に、値段据え置きで外税化みたいなトリッキーな値上げされたけど、まだ買って食べてる。最近になって、レーズンの量が少し減った。小麦も乳製品も高いみたいだし、パン屋は大変なのかな。</p>
+
+<p>焼いたレーズンブレッドにカルピスバターを塗って食べながらコーヒー飲むと幸せなので、潰れずに頑張って欲しい。また明日買いに行こう。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>The All-Inclusive Guide to Web Typography Best Practicesの日本語訳</title>
+      <link>http://hail2u.net/blog/webdesign/web-typography-best-practices.html</link>
+      <description>ここ最近のウェブデザインにおけるタイポグラフィーについてのThe All-inclusive Guide to Web Typography Best Practicesという記事をウェブ・タイポグラフィーのベスト・プラクティスとして訳した。翻訳の元記事はSmashing Magazineの記事を2014年現在を考慮して少し補足を加えつつ、柔らかい文章でサラッと書かれていて読みやすかった。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/web-typography-best-practices.html</guid>
+      <pubDate>Mon, 29 Sep 2014 11:20:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="http://hail2u.net/documents/web-typography-best-practices.html"><img src="http://hail2u.net/images/blog/web-typography-best-practices.png" alt="ウェブ・タイポグラフィーのベスト・プラクティス"></a>
+</figure>
+
+<p>ここ最近のウェブデザインにおけるタイポグラフィーについての<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-inclusive Guide to Web Typography Best Practices</a>という記事を<a href="http://hail2u.net/documents/web-typography-best-practices.html">ウェブ・タイポグラフィーのベスト・プラクティス</a>として訳した。翻訳の元記事は<a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineの記事</a>を2014年現在を考慮して少し補足を加えつつ、柔らかい文章でサラッと書かれていて読みやすかった。</p>
+
+<p>コンパクトにまとめる過程で、一部すっ飛ばしすぎて適当な感じになってたりしてはいた。例えば見出しがResponsive Typographyとなっている章では、レスポンシブ・デザインの話ばかりでタイポグラフィーの話が全然なかったりする。Smashing Magazineの記事ではビューポートのサイズで微妙に平均値が変化していて、何らかの相関性があること示唆されてる。</p>
+
+<p>本当に強く興味を持ったならSmashing Magazineの記事を読んだ方が良いと思うけど、こちらも読んで損はないはず。</p>
+
+<hr>
+
+<p>あわせてほぼ同じ時期に書かれた<a href="http://designmodo.com/text-readability/">DesignmodoのDesigning Website Text for Readability</a>も読むとなお、ウェブ・タイポグラフィーについてある程度はっきりしたイメージを持てる。こっちも訳せば良かったなとか思っているところ。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Wunderlist</title>
+      <link>http://hail2u.net/blog/internet/wundelist.html</link>
+      <description>タスク管理には、GoogleのToDoリストとiCloudのリマインダーを併用していた。少し前にToDoリストはGoogle、URLで管理できるものはPinboardとPinterestに分散というような感じに変えたけど、どこに何があるか間違えやすいのでWunderlistにまとめることにした。iOSアプリはそこそこ、ウェブ・アプリは(URLがアレだけど)使いやすい。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/wundelist.html</guid>
+      <pubDate>Sun, 28 Sep 2014 05:02:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>タスク管理には、GoogleのToDoリストとiCloudのリマインダーを併用していた。少し前にToDoリストはGoogle、URLで管理できるものは<a href="https://pinboard.in/">Pinboard</a>と<a href="http://www.pinterest.com/">Pinterest</a>に分散というような感じに変えたけど、どこに何があるか間違えやすいので<a href="https://www.wunderlist.com/">Wunderlist</a>にまとめることにした。iOSアプリはそこそこ、ウェブ・アプリは(URLがアレだけど)使いやすい。</p>
+
+<p>Wunderlistにしたのは以下の3つを条件にいろいろ試した結果。</p>
+
+<ul>
+<li>URLを比較的手軽に扱えること</li>
+<li>写真の添付ができること</li>
+<li>リストを俯瞰できるビューがあること</li>
+</ul>
+
+<p>URLの添付はブラウザー拡張でも良いみたいだけど、タイトルにURLをそのまま入れるのがお手軽で良さそう。iOS 8で最新版のWunderlistアプリを入れていると、Mobile SafariのAction App Extensionも用意されてる。手軽だけど、オンライン・ブックマークのように整理できないことを考えると、検索性が悪いタスクが出来てしまって微妙な感じがする。</p>
+
+<p>写真、というか添付ファイルにはサイズ制限あるっぽいけど、まず困らないと思う。</p>
+
+<p>リストを俯瞰するビューはiOSのリマインダーになくて、これが一番欲しかった。期限が近づいているタスクや優先度の高いタスクなどをスマートリストで一覧できる。スマートリストは表示するタスクが無い時は自動的に隠れるようにできる(デフォルトでなっている)のもポイント高かった。</p>
+
+<hr>
+
+<p>Pro版にはまだしていないけど、だいたい困ってない。たまに使って便利だったiOSのリマインダーにあるGPS連携が欲しいかなーくらい。</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>安易なコピー</title>
+      <link>http://hail2u.net/blog/software/the-scourge-of-helvetica-neue-light.html</link>
+      <description>Appleがその利用を拡大しているHelvetica Neue Lightが他でも使われるようになっていることについての記事、The Scourge of Helvetica Neue Lightを読んだ。直訳すると「Helvetica Neue Lightという悪」。大意としては文章に使うにしろUIに使うにしろOS XやiOSのDynamic Type機能のようなものがあって光るものなので、そのまま利用しても害にしかならないというような話。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/the-scourge-of-helvetica-neue-light.html</guid>
+      <pubDate>Sat, 27 Sep 2014 17:42:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="http://clagnut.com/blog/2379/"><img src="http://hail2u.net/images/blog/the-scourge-of-helvetica-neue-light.png" alt="The Scourge of Helvetica Neue Light"></a>
+</figure>
+
+<p>Appleがその利用を拡大しているHelvetica Neue Lightが他でも使われるようになっていることについての記事、<a href="http://clagnut.com/blog/2379/">The Scourge of Helvetica Neue Light</a>を読んだ。直訳すると「Helvetica Neue Lightという悪」。大意としては文章に使うにしろUIに使うにしろOS XやiOSのDynamic Type機能のようなものがあって光るものなので、そのまま利用しても害にしかならないというような話。</p>
+
+<p>これは特にフォントに限った話ではなく、デザインの安易なコピーが逆効果をもたらすというと近そう。ちゃんとオリジナルのデザインの意図がどのようなものかを考え抜いた上で、そのエッセンスを盗もうということにつながるような話なんじゃないかと思う。</p>
+
+<p>デザインを模作することそれ自体は良いことだけど、それをそのまま実用化するのは大変に危険。このHelvetica Neue Lightのケースのようにまず間違いなく機能しないようなケースはもちろん、単体ではうまく機能しそうなケースでも他との食い合わせが悪い場合も。デザインの意図を理解しきちんと消化していれば、どのような場合に馴染むのかがわかるはず。</p>]]></content:encoded>
+    </item>
+
+  </channel>
+</rss>

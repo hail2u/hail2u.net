@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="CSS LintのCLIはNodeやRhinoから使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこでPhantomJSからCSS Lintを使うスクリプトを書いてみました。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>PhantomJSからCSS Lintを使う - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/using-csslint-from-phantomjs.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/whitespace-jp.html">
+
+    
+
+    
+
+    
+      <meta content="PhantomJSからCSS Lintを使う" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="CSS LintのCLIはNodeやRhinoから使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこでPhantomJSからCSS Lintを使うスクリプトを書いてみました。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/using-csslint-from-phantomjs.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/using-csslint-from-phantomjs.html" itemprop="url">
+
+        <h1 itemprop="name">PhantomJSからCSS Lintを使う</h1>
+
+        <footer>
+          <p>on <time datetime="2011-10-21T15:55:00+09:00" itemprop="datePublished">Oct 21, 2011</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://csslint.net/">CSS Lint</a>のCLIは<a href="http://nodejs.org/">Node</a>や<a href="http://www.mozilla.org/rhino/">Rhino</a>から使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこで<a href="http://www.phantomjs.org/">PhantomJS</a>からCSS Lintを使うスクリプトを書いてみました。</p>
+
+<pre><code class="language-js">var fs = require("fs"),
+  f = phantom.args[0],
+  css = fs.read(f);
+
+if (phantom.injectJs("csslint.js")) {
+  var i,
+    r = CSSLint.verify(css),
+    l = r.messages.length;
+
+  if (l > 0) {
+    for (i = 0; i &lt; l; i++) {
+      var e = r.messages[i];
+
+      if (!e.rollup) {
+        console.log([f, e.line, e.col, e.message].join(":"));
+      }
+    }
+  }
+}
+
+phantom.exit();
+</code></pre>
+
+<p>今のPhantomJSにはfsモジュールがあり、ファイルの読み書きができるようになっています。CommonJS由来のやつですね。実装済みのfsモジュールのプロパティや関数は<a href="http://code.google.com/p/phantomjs/wiki/ReleaseNotes">ReleaseNotes</a>に載っています。</p>
+
+<p>CSS LintのJavaScriptライブラリを読み込むには<code>phantom</code>オブジェクトの<code>injectJs()</code>を使います。読み込みに成功した場合だけ<code>true</code>が返るようになっているので普通に<code>if</code>文で使ってやります。</p>
+
+<p>あとは<code>CSSLint.verify()</code>するだけ！オプションを指定する場合はここで指定してやればいいので、引数でオプションを設定できるようにするのもそんなに難しくない……というかNode向けのCLIスクリプトからコピペするだけで動きそうです。</p>
+
+<pre><samp>$ <kbd>phantomjs /path/to/csslint-phantomjs.js style.css</kbd>
+</samp></pre>
+
+<p>あとはこのようにCSSファイルを引数にして実行してやれば叱ってくれます。</p>
+
+<pre><samp>style.css:7:1:Don't use IDs in selectors.
+style.css:15:1:Don't use IDs in selectors.
+style.css:21:1:Don't use IDs in selectors.
+style.css:30:1:Don't use IDs in selectors.
+style.css:35:1:Don't use IDs in selectors.
+</samp></pre>
+
+<p>うるさいよ。</p>
+
+<p>PhantomJSは実行ファイルだけで動きますし、WindowsにおけるCSS Lintや<a href="http://www.jslint.com/">JSLint</a>の実行環境としてなかなか良いんじゃないかと思いました。</p>
+
+<h2>追記</h2>
+
+<p><code>rollup</code>が<code>true</code>の時はまとめメッセージのようなので出力には含めないようにしました。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/webdesign/whitespace-jp.html">
+  <p>A List ApartのWhitespaceという記事を訳した</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

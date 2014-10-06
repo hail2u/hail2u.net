@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="簡単便利なxml2jsは、パーサーにsax-jsが、ジェネレーターにxmlbuilderが使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>xml2jsと絵文字 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/xml2js-and-emoji.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/tosdr.html">
+
+    
+
+    
+
+    
+      <meta content="xml2jsと絵文字" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="簡単便利なxml2jsは、パーサーにsax-jsが、ジェネレーターにxmlbuilderが使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/xml2js-and-emoji.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/xml2js-and-emoji.html" itemprop="url">
+
+        <h1 itemprop="name">xml2jsと絵文字</h1>
+
+        <footer>
+          <p>on <time datetime="2014-10-05T11:01:00+09:00" itemprop="datePublished">Oct 5, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">簡単便利な<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>は、パーサーに<a href="https://github.com/isaacs/sax-js/">sax-js</a>が、ジェネレーターに<a href="https://github.com/oozcitak/xmlbuilder-js/">xmlbuilder</a>が使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。</p>
+
+<p>xmlbuilderでは絵文字辺りを扱うためには、<code>create()</code>関数の第4引数で<code>allowSurrogateChars</code>オプションを有効にしてやる必要がある。</p>
+
+<pre><code class="language-javascript">var xml = require(&#39;xmlbuilder&#39;).create(
+  &#39;root&#39;,
+  {
+    encoding: &#39;UTF-8&#39;
+  },
+  {},
+  {
+    allowSurrogateChars: true
+  }
+).ele(&#39;child&#39;, &#39;<a href="http://www.fileformat.info/info/unicode/char/1f476/index.htm">\uD83D\uDC76</a>&#39;);
+console.log(xml);
+</code></pre>
+
+<p>これで落ちない。しかし、xml2jsではこのオプションを有効にできないので、自前でジェネレーター関数を作り直す必要がある。</p>
+
+<p>今はxml2jsの<code>Builder()</code>をパクってお茶を濁しているけど、どうにかしないと今後辛そう。プルリクエストを投げたいけど、CoffeeScriptという難敵が。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/tosdr.html">
+  <p>Terms of Services; Didn’t Read</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

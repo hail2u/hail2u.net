@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>HTML -> CSS -> SVG -> CSS - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/from-html-to-css-to-svg-to-css.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/software/inkscape-move-object-not-translate.html">
+
+    
+
+    
+
+    
+      <meta content="HTML -> CSS -> SVG -> CSS" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/from-html-to-css-to-svg-to-css.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/from-html-to-css-to-svg-to-css.html" itemprop="url">
+
+        <h1 itemprop="name">HTML -> CSS -> SVG -> CSS</h1>
+
+        <footer>
+          <p>on <time datetime="2012-05-29T00:52:00+09:00" itemprop="datePublished">May 29, 2012</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/417.html">HTML -> CSS -> SVG -> CSS</a></p>
+
+<p>SVGでCSSを使う方法は簡単で、<code>&lt;?xml-stylesheet?&gt;</code>を使うだけ。CSSでスタイルを書きやすくするため<code>id</code>属性を指定しておくと良い。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+<mark>&lt;?xml-stylesheet type="text/css" href="test.css"?&gt;</mark>
+&lt;svg <mark>id="foo"</mark> .../&gt;
+  ...
+&lt;/svg&gt;
+</code></pre>
+
+<p>これでまぁSVGを直接書き換えることなく簡単な変更、例えば<code>fill</code>プロパティーの調節とかそういった事ならCSSで行えるようになるわけだけど、HTTPリクエストが1つ増えることになる。そこでHTML側で参照しているCSSにSVGのスタイルも混ぜ込んで、SVG側からもHTMLと同じCSSを参照してやれば良いのではないかと考えた。CSSを統合すると<a href="http://sass-lang.com/">Sass</a>等を使っているのならカラースキームの流用などもできることになるのでより便利では！</p>
+
+<p>として上記デモを書いて実験してみたら思わぬ結果に終わった……。期待通りに動いたのはOpera 11だけという結果に。Chrome 19とFirefox 12ではスタイルが反映されず(SVG単体で表示した場合は反映されるのでCSSの問題では無さそう)、<del>Internet Explorer 9ではスタイルは反映されるもののCSSのが二回リクエストされるバグがあった</del>。Ch19とFx12の挙動はバグなのかどうなのかわからない。想像できる理由はいくつかあるけど単なる憶測なので書かない。</p>
+
+<p>仕様がどうなっているにせよHTML文書とSVG画像でCSSを共有するというのは期待通りにいかなそうなので避けた方が無難という感想。ライフ・チェンジングするアイディアだと思ったのにな……。</p>
+
+<h2>追記</h2>
+
+<p>IE9での重複リクエストされるバグがあるというのは嘘だった。開発者ツールで<em>そう見える</em>というだけで実際にはHTTPリクエストは飛んでないと<a href="https://twitter.com/mayuki">@mayuki</a>に指摘されたので、Fiddlerとサーバー立てて調べてみたところリクエストは飛んでこないことが確認できた。ごめんなさい。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/software/inkscape-move-object-not-translate.html">
+  <p>Inkscapeでちゃんと移動させる</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

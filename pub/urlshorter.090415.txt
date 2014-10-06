@@ -1,0 +1,156 @@
+# Blosxom Plugin: urlshorter
+# Author(s): Kyo Nagashima <kyo@hail2u.net>, http://hail2u.net/
+# Version: 2009-04-15
+# Documentation: See the bottom of this file or type: perldoc urlshorter
+
+package urlshorter;
+
+use strict;
+use vars qw($link_element);
+
+# --- Configurable variables -----------
+
+# Do you want to use rel="shorter" instead of rev="canonical"?
+my $use_rel = 0;
+
+# Do you want to output as XHTML?
+my $as_xhtml = 1;
+
+# --- Plug-in package variables --------
+
+my $attr  = $use_rel  ? 'rel="shorturl"' : 'rev="canonical"';
+my $xhtml = $as_xhtml ? ' /' : '';
+
+my @file_info;
+
+# --------------------------------------
+
+sub start {
+  return 1;
+}
+
+
+sub filter {
+  my($pkg, $files_ref) = @_;
+
+  @file_info = sort {$files_ref->{$a} <=> $files_ref->{$b}} keys %$files_ref;
+
+  return 1;
+}
+
+sub skip {
+  my $path = $blosxom::path_info;
+
+  # redirect to canonical URL
+  if ($path =~ m!^p$!) {
+    my $index = $blosxom::path_info_yr;
+
+    if ($path = $file_info[$index]) {
+      $path =~ s/^$blosxom::datadir//;
+      $path =~ s/\..+?$/.$blosxom::default_flavour/;
+      $blosxom::header->{-status} = '301 Moved Permanently';
+      $blosxom::header->{-Location} = "$blosxom::url$path";
+      $blosxom::output = '';
+      # skip! skip! skip!
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+sub head {
+  my($pkg, $path, $head_ref) = @_;
+
+  # generate shortened URL only if individual page
+  if ($path =~ s/\.$blosxom::flavour$/\.$blosxom::file_extension/) {
+    my %path2idx = map { $file_info[$_] => $_ } 0..$#file_info;
+    my $index = $path2idx{"$blosxom::datadir/$path"};
+    # create link element for specifying shotened URL
+    $link_element = qq!<link $attr href="$blosxom::url/p/$index"$xhtml>!;
+    # output Link HTTP header
+    $blosxom::header->{-Link} = "<$blosxom::url/p/$index>; $attr";
+  }
+
+  return 1;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Blosxom Plug-in: urlshorter
+
+=head1 SYNOPSIS
+
+provide URL shortening ability and template component for shortened URL to your "lovely" blosxom.
+
+=head1 VERSION
+
+2009-04-13
+
+=head1 AUTHOR
+
+Kyo Nagashima <kyo@hail2u.net>, http://hail2u.net/
+
+=head1 INSTALLATION
+
+Drop urlshorter into your plugins directory, and put a code below to head.html:
+
+$urlshorter::link_element
+
+=head1 SEE ALSO
+
+=over
+
+=item Blosxom Home/Docs/Licensing
+
+http://www.blosxom.com/
+
+=item Blosxom Plugin Docs
+
+http://www.blosxom.com/documentation/users/plugins.html
+
+=back
+
+=head1 BUGS
+
+Address bug reports and comments to:
+
+=over
+
+=item blosxom ML
+
+http://groups.yahoo.com/group/blosxom/
+
+=item all about blosxom ML
+
+http://www.freeml.com/info/blosxom@freeml.com
+
+=back
+
+all about blosxom ML: http://www.freeml.com/info/blosxom@freeml.com
+
+=head1 LICENSE
+
+Copyright 2009, Kyo Nagashima <kyo@hail2u.net>, http://hail2u.net/
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

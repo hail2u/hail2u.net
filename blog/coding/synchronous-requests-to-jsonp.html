@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない(Opera除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>JSONPに同期リクエスト - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/synchronous-requests-to-jsonp.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/list-of-inbound-links.html">
+
+    
+
+    
+
+    
+      <meta content="JSONPに同期リクエスト" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない(Opera除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/synchronous-requests-to-jsonp.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/synchronous-requests-to-jsonp.html" itemprop="url">
+
+        <h1 itemprop="name">JSONPに同期リクエスト</h1>
+
+        <footer>
+          <p>on <time datetime="2006-09-25T13:46:00+09:00" itemprop="datePublished">Sep 25, 2006</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">コールバック関数を指定する形のJSONPへ<code>for</code>ループなどで複数回リクエストする場合、コールバック関数の実行される順は<code>for</code>ループで回した順と一致するとは限らない(<a href="http://www.opera.com/products/desktop/">Opera</a>除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。</p>
+
+<p>同期リクエストするためには、<code>for</code>ループなどでJSONPへのリクエストを一気に処理するのではなく、リクエストをひとつに留めてコールバック関数内で次に進むといった形で実装するが良さそう・・・とアイディアを<a href="http://la.ma.la/blog/">バソキヤ求めて三千里の人</a>に貰った。</p>
+
+<p>つまり、</p>
+
+<pre><code class="language-js">var urls = [
+  &#39;http://del.icio.us/feeds/json/cho45&#39;,
+  &#39;http://del.icio.us/feeds/json/drawnboy&#39;,
+  &#39;http://del.icio.us/feeds/json/gorou&#39;,
+  &#39;http://del.icio.us/feeds/json/hail2u&#39;,
+  &#39;http://del.icio.us/feeds/json/miyagawa&#39;,
+  &#39;http://del.icio.us/feeds/json/nagayama&#39;,
+  &#39;http://del.icio.us/feeds/json/typester&#39;,
+  &#39;http://del.icio.us/feeds/json/yoko&#39;
+];
+</code></pre>
+
+<p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
+
+<pre><code class="language-js">addScript(<em>urls[0]</em> + &#39;?callback=diplayPosts&#39;);
+
+function addScript(url) {
+  var script = document.createElement(&#39;script&#39;);
+  script.setAttribute(&#39;type&#39;, &#39;text/javascript&#39;);
+  script.setAttribute(&#39;src&#39;, url);
+  script.setAttribute(&#39;charset&#39;, &#39;UTF-8&#39;);
+  document.getElementsByTagName(&#39;head&#39;).item(0).appendChild(script);
+}
+
+function diplayPosts(posts) {
+  // JSONフィードに含まれるブックマークのJSONデータに対する処理色々
+
+  <em>loadNext()</em>;
+}
+
+function loadNext() {
+  if (urls.length &lt;= 1) return;
+  urls.shift();
+  addScript(<em>urls[0]</em> + &#39;?callback=diplayPosts&#39;);
+}
+</code></pre>
+
+<p>という感じに、コールバック関数(<code>displayPosts()</code>)内で次に進む関数(<code>loadNext()</code>)を呼び出すように<a href="/pub/test/082.html">実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある(ネットワーク状態に依存)し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>
+
+<p>あえて同期リクエストすることにより、非同期であることからスムースに処理できる(ことが多い)というJSONPの長所を失う上に、処理に時間がかかってしまうという欠点もある。それでもあえて非同期でリクエストしないことによって、得られるものがいくつかあるわけで、場合によってはあえて並行リクエストをしないという選択はアリなのかもしれない。</p>
+
+<p>少し前に作った指定したdel.icio.usのユーザーのnetworkに登録しているユーザーのブックマークを並べるモノは誰のブックマークやらわからない状態でずらっとブックマークが並べられていたが、同期リクエストに変更することによってユーザー名付きでブックマークを並べられるようになった。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/list-of-inbound-links.html">
+  <p>インバウンド・リンクのリスト</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
