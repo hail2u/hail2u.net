@@ -128,7 +128,7 @@ module.exports = function (grunt) {
     rsync: {
       main: {
         options: {
-          remote: '~/Sites/new.hail2u.net/',
+          remote: '~/Sites/deploy.hail2u.net/',
           dry_run: false,
           sync: true
         }
