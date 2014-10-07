@@ -10,28 +10,32 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var options = this.options({
-      root: './',
+      branch: 'master',
       message: 'Commit',
       push: false,
+      remote: 'origin',
+      root: './',
       submodule: false
     });
-    var file = this.data.file;
+    var file = '--all';
     var cmd = 'git';
     var opts = {
       cwd: options.root,
       stdio: 'inherit'
     };
 
-    file = path.relative(options.root, file).replace(/\\/g, '/');
+    if (this.data.file) {
+      file = path.relative(options.root, this.data.file).replace(/\\/g, '/');
+    }
 
     async.series({
       add: function (next) {
         grunt.util.spawn({
           cmd: cmd,
           args: [
-	    'add',
-	    file
-	  ],
+            'add',
+            file
+          ],
           opts: opts
         }, function (error, result, code) {
           next(error);
@@ -42,10 +46,10 @@ module.exports = function (grunt) {
         grunt.util.spawn({
           cmd: cmd,
           args: [
-	    'commit',
-	    '-m',
-	    options.message + ' ' + file
-	  ],
+            'commit',
+            '-m',
+            options.message + ' ' + file
+          ],
           opts: opts
         }, function (error, result, code) {
           next(error);
@@ -60,9 +64,9 @@ module.exports = function (grunt) {
         grunt.util.spawn({
           cmd: cmd,
           args: [
-	    'add',
+            'add',
             options.root
-	  ],
+          ],
           opts: {
             stdio: 'inherit'
           }
@@ -79,10 +83,10 @@ module.exports = function (grunt) {
         grunt.util.spawn({
           cmd: cmd,
           args: [
-	    'commit',
-	    '-m',
-	    'Update submodules'
-	  ],
+            'commit',
+            '-m',
+            'Update submodules'
+          ],
           opts: {
             stdio: 'inherit'
           }
@@ -99,10 +103,10 @@ module.exports = function (grunt) {
         grunt.util.spawn({
           cmd: cmd,
           args:  [
-	    'push',
-	    'origin',
-	    'master'
-	  ],
+            'push',
+            options.remote,
+            options.branch
+          ],
           opts: opts
         }, function (error, result, code) {
           next(error);

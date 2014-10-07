@@ -257,13 +257,18 @@ module.exports = function (grunt) {
     },
 
     gitcommit: {
-      options: {
-        push: true
+      deploy: {
+        options: {
+          branch: 'gh-pages',
+          message: 'Deploy',
+          root: 'build/'
+        }
       },
 
       publish: {
         options: {
           message: 'Publish',
+          push: true,
           root: 'src/weblog/',
           submodule: true
         },
@@ -274,22 +279,12 @@ module.exports = function (grunt) {
       update: {
         options: {
           message: 'Update',
+          push: true,
           root: 'src/weblog/',
           submodule: true
         },
 
         file: grunt.option('file')
-      }
-    },
-
-    gitpush: {
-      main: {
-        options: {
-          branch: 'gh-pages',
-          dry_run: true,
-          force: true,
-          root: 'build/'
-        }
       }
     },
 
@@ -349,31 +344,31 @@ module.exports = function (grunt) {
   grunt.registerTask('deploy', [
     'rebuild',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:css', [
     'rebuild:css',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:js', [
     'rebuild:js',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:html', [
     'rebuild:html',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:sitemap', [
     'rebuild:sitemap',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('publish:home', [
@@ -381,7 +376,7 @@ module.exports = function (grunt) {
     'rebuild:html',
     'rebuild:sitemap',
     'rsync',
-    'gitpush:main',
+    'gitcommit:deploy',
     'pubsubhubbub_publish:main'
   ]);
 
@@ -394,7 +389,7 @@ module.exports = function (grunt) {
     'merge_feeds',
     'rebuild:sitemap',
     'rsync',
-    'gitpush:main',
+    'gitcommit:deploy',
     'pubsubhubbub_publish'
   ]);
 
@@ -406,7 +401,7 @@ module.exports = function (grunt) {
     'generate:blog',
     'merge_feeds:main',
     'rsync',
-    'gitpush:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('default', ['connect']);
