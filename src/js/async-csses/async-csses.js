@@ -10,13 +10,13 @@
       media: 'print'
     },
     {
-      href: '/fonts/megrim.css'
+      href: '/fonts/megrim.min.css'
     },
     {
-      href: '/fonts/source-code-pro.css'
+      href: '/fonts/source-code-pro.min.css'
     },
     {
-      href: '/fonts/source-sans-pro.css'
+      href: '/fonts/source-sans-pro.min.css'
     }
   ];
   var links = d.createDocumentFragment();
@@ -24,7 +24,7 @@
     var link = d.createElement('link');
     link.rel = 'stylesheet';
 
-    if (/^https?:/.test(css.href) !== 0 && location.protocol === 'file:') {
+    if (!/^https?:/.test(css.href) && location.protocol === 'file:') {
       css.href = '../..' + css.href;
     }
 
