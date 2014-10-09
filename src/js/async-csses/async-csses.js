@@ -10,10 +10,13 @@
       media: 'print'
     },
     {
-      href: 'http://fonts.googleapis.com/css?family=Megrim&text=%26'
+      href: '/fonts/megrim.css'
     },
     {
-      href: 'http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,700,200italic,400italic,700italic|Source+Code+Pro:400,700'
+      href: '/fonts/source-code-pro.css'
+    },
+    {
+      href: '/fonts/source-sans-pro.css'
     }
   ];
   var links = d.createDocumentFragment();
@@ -21,7 +24,7 @@
     var link = d.createElement('link');
     link.rel = 'stylesheet';
 
-    if (!/^https?:/.test(css.href) && location.protocol === 'file:') {
+    if (/^https?:/.test(css.href) !== 0 && location.protocol === 'file:') {
       css.href = '../..' + css.href;
     }
 
