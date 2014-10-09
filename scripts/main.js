@@ -34,10 +34,13 @@
       media: 'print'
     },
     {
-      href: 'http://fonts.googleapis.com/css?family=Megrim&text=%26'
+      href: '/fonts/megrim.min.css'
     },
     {
-      href: 'http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,700,200italic,400italic,700italic|Source+Code+Pro:400,700'
+      href: '/fonts/source-code-pro.min.css'
+    },
+    {
+      href: '/fonts/source-sans-pro.min.css'
     }
   ];
   var links = d.createDocumentFragment();
