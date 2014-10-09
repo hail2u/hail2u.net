@@ -261,6 +261,7 @@ module.exports = function (grunt) {
         options: {
           branch: 'gh-pages',
           message: 'Deploy',
+          push: true,
           root: 'build/'
         }
       },
