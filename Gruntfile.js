@@ -373,8 +373,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('publish:home', [
-    'merge_feeds:main',
     'rebuild:html',
+    'merge_feeds:main',
     'rebuild:sitemap',
     'rsync',
     'gitcommit:deploy',
