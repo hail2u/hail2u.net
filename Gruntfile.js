@@ -386,8 +386,7 @@ module.exports = function (grunt) {
     'merge_feeds:main',
     'rebuild:sitemap',
     'rsync',
-    'gitcommit:deploy',
-    'pubsubhubbub_publish:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('publish:blog', [
@@ -399,8 +398,7 @@ module.exports = function (grunt) {
     'merge_feeds',
     'rebuild:sitemap',
     'rsync',
-    'gitcommit:deploy',
-    'pubsubhubbub_publish'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('update', [
