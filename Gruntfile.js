@@ -266,7 +266,7 @@ module.exports = function (grunt) {
         }
       },
 
-      publish: {
+      publish_blog: {
         options: {
           message: 'Publish',
           push: true,
@@ -278,6 +278,15 @@ module.exports = function (grunt) {
       },
 
       update: {
+        options: {
+          branch: 'gh-pages',
+          message: 'Update',
+          push: true,
+          root: 'build/'
+        }
+      },
+
+      update_blog: {
         options: {
           message: 'Update',
           push: true,
@@ -382,7 +391,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('publish:blog', [
-    'gitcommit:publish',
+    'gitcommit:publish_blog',
     'blosxom:article',
     'blosxom:category',
     'blosxom:feed',
@@ -394,8 +403,13 @@ module.exports = function (grunt) {
     'pubsubhubbub_publish'
   ]);
 
+  grunt.registerTask('update', [
+    'rsync',
+    'gitcommit:update'
+  ]);
+
   grunt.registerTask('update:blog', [
-    'gitcommit:update',
+    'gitcommit:update_blog',
     'blosxom:article',
     'blosxom:category',
     'blosxom:feed',
