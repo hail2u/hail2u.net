@@ -7,6 +7,7 @@ var fs = require('fs');
 var marked = require('marked');
 var path = require('path');
 
+var root = 'file:///' + path.resolve(__dirname, '../').replace(/\\/g, '/') + '/';
 var preview_file = path.normalize(process.env.TEMP + '/__preview.html');
 var preview = (function () {/*
 <!DOCTYPE html>
@@ -16,22 +17,25 @@ var preview = (function () {/*
 
     <title><%TITLE%> - Weblog - hail2u.net</title>
 
-    <base href="http://hail2u.net/">
+    <base href="<%ROOT%>">
 
-    <link rel="icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/styles/style.min.css">
+    <link rel="icon" href="./favicon.ico">
+    <link rel="stylesheet" href="./styles/style.min.css">
+    <link rel="stylesheet" href="./fonts/megrim.min.css">
+    <link rel="stylesheet" href="./fonts/source-code-pro.min.css">
+    <link rel="stylesheet" href="./fonts/source-sans-pro.min.css">
   </head>
 
   <body class="permalink">
     <header role="banner">
-      <h1><a id="logo" href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+      <h1><a id="logo" href="./"><img src="./images/logo.min.svg" alt="Hail2u.net"></a></h1>
 
       <nav>
         <ul>
-          <li><a href="/blog/"><mark>Weblog</mark></a></li>
-          <li><a href="/documents/">Documents</a></li>
-          <li><a href="/projects/">Projects</a></li>
-          <li><a href="/about/">About</a></li>
+          <li><a href="./blog/"><mark>Weblog</mark></a></li>
+          <li><a href="./documents/">Documents</a></li>
+          <li><a href="./projects/">Projects</a></li>
+          <li><a href="./about/">About</a></li>
         </ul>
       </nav>
     </header>
@@ -62,14 +66,12 @@ var preview = (function () {/*
       <section class="footlinks">
         <ul>
           <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC</a></li>
-          <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+          <li><a rel="alternate" type="application/rss+xml" href="./feed">RSS</a></li>
         </ul>
       </section>
 
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="./about/" itemprop="url">Kyo Nagashima</a></span>.</p>
     </footer>
-
-    <script src="/scripts/main.min.js"></script>
   </body>
 </html>
 */}).toString().split('\n').slice(1, -1).join('\n');
@@ -86,6 +88,7 @@ if (!/<\/\w+>\s*$/.test(body)) {
   });
 }
 
-preview = preview.replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
+body = body.replace(/="\//g, '="./');
+preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
 fs.writeFileSync(preview_file, preview);
 exec(preview_file);
