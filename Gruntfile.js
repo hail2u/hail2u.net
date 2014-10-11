@@ -277,15 +277,6 @@ module.exports = function (grunt) {
         file: grunt.option('file')
       },
 
-      update: {
-        options: {
-          branch: 'gh-pages',
-          message: 'Update',
-          push: true,
-          root: 'build/'
-        }
-      },
-
       update_blog: {
         options: {
           message: 'Update',
@@ -353,66 +344,57 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', [
     'rebuild',
-    'rsync',
-    'gitcommit:deploy'
+    'upload'
   ]);
 
-  grunt.registerTask('deploy:css', [
-    'rebuild:css',
-    'rsync',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:js', [
-    'rebuild:js',
-    'rsync',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:html', [
-    'rebuild:html',
-    'rsync',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:sitemap', [
-    'rebuild:sitemap',
-    'rsync',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('publish:home', [
-    'rebuild:html',
-    'merge_feeds:main',
-    'rebuild:sitemap',
-    'rsync',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('publish:blog', [
-    'gitcommit:publish_blog',
+  grunt.registerTask('deploy:blog', [
     'blosxom:article',
     'blosxom:category',
     'blosxom:feed',
     'generate:blog',
     'merge_feeds',
     'rebuild:sitemap',
-    'rsync',
-    'gitcommit:deploy'
+    'upload'
   ]);
 
-  grunt.registerTask('update', [
-    'rsync',
-    'gitcommit:update'
+  grunt.registerTask('deploy:css', [
+    'rebuild:css',
+    'upload'
+  ]);
+
+  grunt.registerTask('deploy:js', [
+    'rebuild:js',
+    'upload'
+  ]);
+
+  grunt.registerTask('deploy:home', [
+    'rebuild:html',
+    'merge_feeds:main',
+    'rebuild:sitemap',
+    'upload'
+  ]);
+
+  grunt.registerTask('deploy:html', [
+    'rebuild:html',
+    'upload'
+  ]);
+
+  grunt.registerTask('deploy:sitemap', [
+    'rebuild:sitemap',
+    'upload'
+  ]);
+
+  grunt.registerTask('publish:blog', [
+    'gitcommit:publish_blog',
+    'deploy:blog'
   ]);
 
   grunt.registerTask('update:blog', [
     'gitcommit:update_blog',
-    'blosxom:article',
-    'blosxom:category',
-    'blosxom:feed',
-    'generate:blog',
-    'merge_feeds:main',
+    'deploy:blog'
+  ]);
+
+  grunt.registerTask('upload', [
     'rsync',
     'gitcommit:deploy'
   ]);
