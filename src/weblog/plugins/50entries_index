@@ -1,0 +1,158 @@
+# Blosxom Plugin: entries_index
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2014-06-02
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+# This plugin is modified version of "entries_index" plugin.
+# "entries_index" plugin maybe found at:
+# http://www.blosxom.com/plugins/indexing/entries_index.htm
+
+package entries_index;
+
+use strict;
+use vars qw($response);
+
+# --- Configurable variables -----------
+
+# cache filename for %files
+my $files_index  = "$blosxom::plugin_state_dir/files_index.dat";
+
+# cache filename for %others
+my $others_index = "$blosxom::plugin_state_dir/others_index.dat";
+
+# --- Plug-in package variables --------
+
+my $reindex = 0;
+
+# --------------------------------------
+
+use CGI qw/:standard/;
+use File::Find;
+use File::stat;
+use FileHandle;
+
+my $fh = new FileHandle;
+
+sub start {
+  $reindex = 1 if param('reindex');
+  $reindex = 1 if ($blosxom::static_or_dynamic eq "static");
+
+  return 1;
+}
+
+sub entries {
+  return sub {
+    my(%files, %indexes, %others);
+
+    # load cache file for %files
+    if (-f "$files_index" and $fh->open("< $files_index")) {
+      flock($fh, 1);
+
+      while (my $line = <$fh>) {
+        if ($line =~ /^(.*?)=>(\d*)$/) {
+          $files{$1} = $2;
+        }
+      }
+
+      $fh->close();
+    } else {
+      $reindex = 1;
+    }
+
+    # load cache file for %others
+    if (-f "$others_index" and $fh->open("< $others_index")) {
+      flock($fh, 1);
+
+      while (my $line = <$fh>) {
+        if ($line =~ /^(.*?)=>(\d*)$/) {
+          $others{$1} = $2;
+        }
+      }
+
+      $fh->close();
+    } else {
+      $reindex = 1;
+    }
+
+    if ($reindex) {
+      # check and delete unexist file
+      for my $file (keys %files) {
+        -f $file or do {
+          delete $files{$file};
+        };
+      }
+
+      find(
+        sub {
+          my $d;
+          my $curr_depth = $File::Find::dir =~ tr[/][];
+
+          if ( $blosxom::depth and $curr_depth > $blosxom::depth ) {
+            $files{$File::Find::name} and delete $files{$File::Find::name};
+            return;
+          }
+
+          if (
+            $File::Find::name =~ m!^$blosxom::datadir/(?:(.*)/)?(.+)\.$blosxom::file_extension$!
+            and $2 ne 'index'
+            and $2 !~ /^\./
+            and (-r $File::Find::name)
+          ) {
+            # to show or not to show future entries
+            (
+              $blosxom::show_future_entries
+              or stat($File::Find::name)->mtime <= time
+            )
+              and ($files{$File::Find::name} || ++$reindex)
+                and ($files{$File::Find::name} = $files{$File::Find::name} || stat($File::Find::name)->mtime)
+                  # Static
+                  and (
+                    param('-all')
+                    or !-f "$blosxom::static_dir/$1/index." . $blosxom::static_flavours[0]
+                    or stat("$blosxom::static_dir/$1/index." . $blosxom::static_flavours[0])->mtime < stat($File::Find::name)->mtime
+                  )
+                    and $indexes{$1} = 1
+                      and $d = join('/', (blosxom::nice_date($files{$File::Find::name}))[5,2,3])
+                        and $indexes{$d} = $d
+                          and $blosxom::static_entries and $indexes{($1 ? "$1/" : '') . "$2.$blosxom::file_extension"} = 1;
+          } else {
+            !-d $File::Find::name and -r $File::Find::name and $others{$File::Find::name} = stat($File::Find::name)->mtime;
+          }
+        }, $blosxom::datadir
+      );
+
+      # save cache file for %files
+      if (-f $files_index and $fh->open("+< $files_index")) {
+        flock($fh, 2);
+        seek($fh, 0, 0);
+
+        foreach (keys %files) {
+          print $fh "$_=>$files{$_}\n";
+        }
+
+        truncate($fh, tell($fh));
+        $fh->close();
+      }
+
+      # save cache file for %others
+      if (-f $others_index and $fh->open("+< $others_index")) {
+        flock($fh, 2);
+        seek($fh, 0, 0);
+
+        foreach (keys %others) {
+          print $fh "$_=>$others{$_}\n";
+        }
+
+        truncate($fh, tell($fh));
+        $fh->close();
+      }
+    }
+
+    $response = $reindex ? "reindex" : "cache";
+
+    return(\%files, \%indexes, \%others);
+  };
+}
+
+1;
+# vim:ft=perl

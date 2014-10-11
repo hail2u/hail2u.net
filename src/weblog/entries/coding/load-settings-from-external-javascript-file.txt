@@ -1,0 +1,40 @@
+設定を外部JavaScriptファイルから読み込む
+
+<p>JSONで記述した設定ファイルをどこかのサーバーに置き、それを動的に<code>script</code>要素を追加するアレで読み込み、適用するという試み。タイトルまんま。設定を保存するということは難しいので、使いどころはとても限られる。Bookmarkletでゴニョゴニョするサイトなんかで細かい指定パラメータの代わりに使うとかが唯一に近い光明。</p>
+
+<p>とりあえず設定ファイルを指定するとデフォルトの設定とマージして適用するサンプルを作った。</p>
+
+<ol>
+<li>設定ファイル指定無し</li>
+<li>設定ファイル指定有り</li>
+</ol>
+
+<p>二番目のようにクエリで<code>file</code>パラメータの値に設定ファイルのURLを指定すると、デフォルトの設定</p>
+
+<pre><code class="language-js">{
+  &quot;username&quot; : &quot;anonymous&quot;,
+  &quot;top&quot; : &quot;0px&quot;,
+  &quot;left&quot; : &quot;0px&quot;,
+  &quot;width&quot; : &quot;320px&quot;,
+  &quot;height&quot; : &quot;240px&quot;,
+  &quot;color&quot; : &quot;#ffffff&quot;,
+  &quot;bgcolor&quot; : &quot;#336699&quot;
+}
+</code></pre>
+
+<p>と、設定ファイルで指定した設定</p>
+
+<pre><code class="language-js">{
+  &quot;username&quot; : &quot;Kitty&quot;,
+  &quot;left&quot; : &quot;80px&quot;,
+  &quot;width&quot; : &quot;240px&quot;,
+  &quot;color&quot; : &quot;#ffffff&quot;,
+  &quot;bgcolor&quot; : &quot;#996633&quot;
+}
+</code></pre>
+
+<p>がマージされて適用される。ここではユーザー名・X方向の位置・幅・背景色を設定ファイルで変更している(マージなので指定されていない設定はデフォルトの設定が適用される)。JSONのマージは、<a href="http://prototype.conio.net/">prototype.js</a>の<code>Hash</code>オブジェクトの<code>merge</code>メソッドを利用して行った(考えるのが面倒だったので)。</p>
+
+<p>アサマシHTML作成ツールで似たようなことを既にやっているのだけど、これがテンプレート・ファイルの読み込み限定なのに対して、こちらはWindowsのINIファイルっぽく扱える感じ。セクション作れないけど。</p>
+
+<p>単体で機能するライブラリにして、設定のロードをもっと手軽に扱えるような形にすればそこそこ利用価値のあるものになりそうだけど、所詮は読み込み限定なのでライブラリ化するほどのモノでもない気がする。そもそも使い道思いつかないし。</p>

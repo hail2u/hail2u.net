@@ -1,0 +1,52 @@
+はてなブックマークエントリー情報取得APIははてなスクリーンショットAPI(でもある)
+
+<p><a href="http://b.hatena.ne.jp/">はてなブックマーク</a>の<a href="http://d.hatena.ne.jp/keyword/%a4%cf%a4%c6%a4%ca%a5%d6%a5%c3%a5%af%a5%de%a1%bc%a5%af%a5%a8%a5%f3%a5%c8%a5%ea%a1%bc%be%f0%ca%f3%bc%e8%c6%c0API?kid=184075">エントリー情報取得API</a>は任意のURLに対するブックマークを返してくれるAPIなだけでなく、事実上<a href="http://screenshot.hatena.ne.jp/">はてなスクリーンショット</a>のAPIとしても機能している。正確には、はてなスクリーンショットによるスクリーンショット画像のURLも返してくれるというだけ話なのだけど。</p>
+
+<p>例としてlabs.hail2u.net/hatena/screenshot/を作成してみた。ここでは、</p>
+
+<pre><code class="language-js">var sites = [
+  &#39;http://hail2u.net/blog/&#39;,
+  &#39;http://la.ma.la/blog/&#39;,
+  &#39;http://lowreal.net/blog/&#39;,
+  &#39;http://tokyoenvious.xrea.jp/b/&#39;
+];
+</code></pre>
+
+<p>というURLの配列から、</p>
+
+<pre><code class="language-html">&lt;p&gt;&lt;img
+  src=&quot;http://screenshot.hatena.ne.jp/images/120x90/0/1/6/3/8/3c63fbe3a76655390497a260a44ec509d2f.jpg&quot;
+  height=&quot;90&quot;
+  width=&quot;120&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&quot;http://screenshot.hatena.ne.jp/images/120x90/7/4/2/d/6/b497e3edc6d9badd41bac03419b4822e758.jpg&quot;
+  height=&quot;90&quot;
+  width=&quot;120&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&quot;http://screenshot.hatena.ne.jp/images/120x90/notfound.jpg&quot;
+  height=&quot;90&quot;
+  width=&quot;120&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&quot;http://screenshot.hatena.ne.jp/images/120x90/9/d/d/0/0/0992b943b07310949f8428ce82472381659.jpg&quot;
+  height=&quot;90&quot;
+  width=&quot;120&quot; /&gt;&lt;/p&gt;
+
+</code></pre>
+
+<p>というHTMLを生成することができている。</p>
+
+<p>APIへのリクエストは<a href="/blog/coding/jsonscriptrequest.html">動的にスクリプト要素を生成してやる例のアレ</a>をベースにしたもので、<a href="http://la.ma.la/blog/">まららん</a>や<a href="http://d.hatena.ne.jp/secondlife/">はてのくん</a>が書いたりしてたのを参考にまたちょっと手が入っている(ソースを参照)。APIのリクエストを除いたスクリーンショットのURLを拾うコードは正味一行。</p>
+
+<pre><code class="language-js">var ss = (bookmarkData == null) ? &#39;http://screenshot.hatena.ne.jp/images/120x90/notfound.jpg&#39; : bookmarkData.screenshot;
+</code></pre>
+
+<p>はてなブックマークエントリー情報取得APIが迅速にレスポンスを返してくれるので、想像していたよりも軽快にHTMLが生成できた。もちろんスクリーンショットが欲しいURLがブックマークされている数が多ければそれだけレスポンスが遅くなるので、HTMLの生成も重くなるのだろうだけど。</p>
+
+<p>ブックマークされていないとスクリーンショットのURLを取得することが<em>絶対に</em>できないことなどいわゆるサムネイル取得APIと比較して劣るところはあるけれども、スクリーンショット取得APIとしてそこそこ使えるのではないかと思う。</p>
+
+<p>また、Perlではてなブックマークエントリー情報取得APIを利用したスクリーンショット画像へのリダイレクタとかも作った。これはスクリーンショットがあった場合はそのURLにリダイレクトという仕組みになっているので、</p>
+
+<pre><code class="language-html">&lt;img src=&quot;http://example.com/hatena_screenshot_redirector.cgi?url=http%3A%2F%2Fexample.org%2F&quot; /&gt;
+</code></pre>
+
+<p>みたいに使うことができる。とりあえずリダイレクトさせることだけを目標に作った短いものなので、キャッシュ作らないで常にはてなにGETかけるとかヒドイCGI。使う人はちゃんと作り直してください。愛するはてなのために！</p>

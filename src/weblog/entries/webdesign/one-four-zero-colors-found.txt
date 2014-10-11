@@ -1,0 +1,35 @@
+140 Colors Found
+
+<figure><img src="/images/blog/peru-found.png" alt="ペルーって言われてもなぁ"></figure>
+
+<p><a href="http://hail2u.github.io/140-colors-found.html">140 Colors Found</a>というCSSで使える色キーワードをランダムにちょっとかっこよく表示するツールを作った。<a href="http://hail2u.github.io/css-color-keywords.html">CSS Color Keywords</a>のアレンジ。実用性はまったくない。本当にない。</p>
+
+<p>リロードごとにランダムに色が変わる。<code>body</code>要素に<code>transition-duration</code>を付けているので、対応ブラウザではフェードインされる。フォントはGeorgiaでも良かったけど、マイブーム中の<a href="http://www.google.com/webfonts/family?family=Vollkorn">Vollkorn</a>にした。tの頭とか一部のグリフの端が斜めにカットされてるとこがお気に入り。</p>
+
+<h2>色のフォーマットの変換で手抜きをしてハマった話</h2>
+
+<p>色キーワードから<code>rgb(R, G, B)</code>か<code>#RRGGBB</code>に変換するために、その色キーワードを指定した要素の計算済みスタイルを拾おうとした。どんな色のフォーマットでも計算済みスタイルでは統一されている記憶があった(Operaは<code>#RRGGBB</code>で返ってきてしまうけど)ので利用したが、あえなく失敗。</p>
+
+<pre><code class="language-js">document.body.style.backgroundColor = &quot;Red&quot;;
+var c = window.getComputedStyle(document.body, null).getPropertyValue(&quot;background-color&quot;);
+// rgba(0, 0, 0, 0) or transparent
+</code></pre>
+
+<p>このコード自体にはあまり問題はない。<code>rgba(0, 0, 0, 0)</code>等が返ってきてしまう理由は<code>body</code>要素のスタイルに<code>transition</code>プロパティがあったことで、色を変更した直後だとアニメーション中なため正確な値が拾えなかった。当たり前ですよねー。<code>transition</code>プロパティがなければ意図した通りに変換される。</p>
+
+<p><code>transition</code>が原因なので、そういった余計なスタイルが付かないダミーの要素を作ってそこから拾えばいいんじゃないかとやってみたら、今度は一部ブラウザで空文字列が返された。</p>
+
+<pre><code class="language-js">var span = document.createElement(&quot;span&quot;);
+span.style.backgroundColor = &quot;Red&quot;;
+var c = window.getComputedStyle(span, null).getPropertyValue(&quot;background-color&quot;);
+// Chrome, Safari and Opera: empty string
+// Internet Explorer and Firefox: rgb(255, 0, 0)
+</code></pre>
+
+<p>ChromeやSafari・Operaでは<code>appendChild()</code>等をしていない要素の計算済みスタイルを参照できないようだ。パフォーマンス上の理由でこうなってるんだろうか。</p>
+
+<p>色々ゴニョゴニョすれば変換できることはわかったのだけど、それだとコードが読みづらくなるので、データとして色キーワードとその色の<code>rgb(R, G, B)</code>を持たせることにしました……。最初からそうしていればよかったですね！</p>
+
+<hr>
+
+<p>URLのハッシュで色キーワードを指定すると、その色で必ず表示する機能とか付けようかな。</p>

@@ -1,0 +1,25 @@
+Vimで#RRGGBBからrgb(r,g,b)に変換
+
+<p>CSSで<code>rgba()</code>を使うようになったので、<code>#RRGGBB</code>で書いていた色も<code>rgb()</code>で書き直すことにした。手作業でやるのはとても面倒なので、Vimスクリプトの勉強がてら<code>#RRGGBB</code>から<code>rgb(r, g, b)</code>に変換する関数を作って変換した。</p>
+
+<pre>function! HexToFunc(hex)
+  let color = matchlist(a:hex, &#39;\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)&#39;)
+  return &#39;rgb(&#39; . printf(&#39;%d&#39;, &#39;0x&#39; . color[1]) . &#39;, &#39; . printf(&#39;%d&#39;, &#39;0x&#39; . color[2]) . &#39;, &#39; . printf(&#39;%d&#39;, &#39;0x&#39; . color[3]) . &#39;)&#39;
+endfunction
+</pre>
+
+<p><code>matchlist()</code>で2桁づつ区切ってやり、それぞれを<code>printf()</code>で10進数に変換するというもの。<code>matchlist()</code>の使い方がなんとなくわかった気がする。面倒だったので<code>#RGB</code>とかいう3桁の書き方には対応してない。</p>
+
+<p>あとはCSSファイルを開いて置換でこの関数を呼んでやる。</p>
+
+<pre>:%s/\(#[0-9A-F]\{6\}\)/\=HexToFunc(submatch(1))/gi
+</pre>
+
+<p><code>\=</code>で関数を呼ぶ場合はサブマッチを<code>submatch()</code>で拾うことを知らなくて、最初は<code>\=HexToFunc(\1)</code>とか書いて全然動かなかった……。</p>
+
+<p>あとでワンライナーでも書けるかなとちょっと頑張ってみたら結構簡単にできた。Vimすごい！</p>
+
+<pre>:%s/#\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)/\=&#39;rgb(&#39;.printf(&#39;%d&#39;,&#39;0x&#39;.submatch(1)).&#39;, &#39;.printf(&#39;%d&#39;,&#39;0x&#39;.submatch(2)).&#39;, &#39;.printf(&#39;%d&#39;,&#39;0x&#39;.submatch(3)).&#39;)&#39;/gi
+</pre>
+
+<p>こんなワンライナーがさっと書けるようになりたい。</p>

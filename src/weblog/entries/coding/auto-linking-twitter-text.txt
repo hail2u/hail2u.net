@@ -1,0 +1,52 @@
+Twitterのテキストのリンク張り
+
+<p>Twitterではツイートの表示にいくつか規制がある。例えばTwitterの鳥さんを表示しなければならないとかユーザーのプロフィールへのリンクでは#!/のアレはダメだったりとか<a href="http://dev.twitter.com/pages/display_guidelines">かなり細かい</a>。ということでユーザー名やURL、ハッシュタグにまとめてリンクを張るJavaScriptを<a href="/pub/test/232.html">jQueryで普通に書いてみた</a>。</p>
+
+<p>まず正規表現の定義。</p>
+
+<pre><code class="language-js">var url     = &quot;https?://\\S+&quot;;
+var mention = &quot;@[0-9a-zA-Z_]{1,15}&quot;;
+var hashtag = &quot;#[0-9a-zA-Z]+&quot;;
+
+var re_url     = new RegExp(&quot;^&quot; + url);
+var re_mention = new RegExp(&quot;^&quot; + mention);
+var re_hashtag = new RegExp(&quot;^&quot; + hashtag);
+
+var re_token = new RegExp(&quot;(&quot; + url + &quot;|&quot; + mention + &quot;|&quot; + hashtag + &quot;)&quot;, &quot;g&quot;);
+</code></pre>
+
+<p>テキストで定義して連結する。URLを優先した。</p>
+
+<pre><code class="language-js">var tokens = input.split(re_token);
+</code></pre>
+
+<p>入力(=ツイート)を分割。</p>
+
+<pre><code class="language-js">for (var i = 0, l = tokens.length; i &lt; l; i++) {
+  var token = tokens[i];
+ 
+  if (re_url.test(token)) {
+    console.log(&quot;URL: &quot; + token);
+    output.append($(&quot;&lt;a/&gt;&quot;, {
+      href: token 
+    }).append(token));
+  } else if (re_mention.test(token)) {
+    console.log(&quot;Mention: &quot; + token);
+    output.append($(&quot;&lt;a/&gt;&quot;, {
+      href: &quot;http://twitter.com/&quot; + encodeURIComponent(token.replace(/^@/, &quot;&quot;))
+    }).append(token));
+  } else if (re_hashtag.test(token)) {
+    console.log(&quot;Hashtag: &quot; + token);
+    output.append($(&quot;&lt;a/&gt;&quot;, {
+      href: &quot;http://twitter.com/search?q=&quot; + encodeURIComponent(token)
+    }).append(token));
+  } else {
+    console.log(&quot;Plain: &quot; + token);
+    output.append(token.replace(/[\r\n]/g, &quot;&lt;br&gt;&quot;));
+  }
+}
+</code></pre>
+
+<p>あとはトークンごとに中身をチェックしそれに応じて適切なそうなURLにリンクを張る。URLのエスケープ他はある程度はjQueryが勝手にやってくれるので、それになんとなく任せた。</p>
+
+<p>というかTwitter本家の行うHTML化と同じ結果を返してくれるパラメーターとかあれば良いのに。ガイドラインを厳しくするならその分サービス側で使う人が手抜きできる仕組みを用意して欲しい。<a href="http://dev.twitter.com/pages/tweet_entities">Tweet Entities</a>使って分割しながらリンクにして連結しろってことなのかもしれないけど、面倒な気がしてしょうがない。ということを書きたかったのでエントリにした。</p>

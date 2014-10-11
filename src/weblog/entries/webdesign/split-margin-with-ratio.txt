@@ -1,0 +1,38 @@
+余白を割合で分割
+
+<p>余白を特定の比率で分割したいなとちょっと考えていた。つまり<code>margin-left</code>と<code>margin-right</code>プロパティーの計算済みの値が3:2とかの比率で自動調節されるように、ということ。そのようなことをTwitterでちょっと書いたら、<a href="https://twitter.com/o_ti/status/487922228835516416">@o_tiが<code>calc()</code>を使う方法</a>を考えてくれた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/580.html">Split margins 1 to 3</a></p>
+
+<p>最初のデモの幅は<code>320px</code>、二つ目のデモの幅は<code>480px</code>になっている。<code>margin-left</code>プロパティーで<code>calc()</code>を使い、<code>100%</code>から要素の幅を引いた残りを4で割っている。<code>margin-right</code>プロパティーは<code>auto</code>で自動調節すれば良い。</p>
+
+<pre><code class="language-css">.test {
+  margin-right: auto;
+  margin-left: calc((100% -320px) / 4);
+  width: 320px;
+}
+</code></pre>
+
+<figure>
+  <img src="/images/blog/split-margin-with-ratio.png" alt="320pxの要素では260pxと780px、480pxの要素では220pxと660px、と1:3で余白が分割されている">
+
+  <figcaption>Inspect <code>margin-left: calc((100% - width) / 3)</code></figcaption>
+</figure>
+
+<p>開発者ツールを使って検証すると、それぞれの要素でちゃんと1:3になっていることが確認できる。残念ながら<code>calc()</code>でその要素の幅を参照するような仕組みはない(CSS Variables待ちだろうか)ので、それぞれで<code>calc()</code>を書かないとならないけど、やりたいことはこれで出来た。</p>
+
+<hr>
+
+<p>どうも僕は<code>calc()</code>を使うという発想に欠けている気がする。欲しがっていた割になかなか安心して使えるようにならなかったため、使わないで済むようにCSSを書くという教育されてきたからなのかも。現在<code>calc()</code>はデスクトップのブラウザーならほぼ自由に使えると言っていい状況。主に複雑なレイアウトの時に使うため、モバイル・ブラウザーでは必要性が少ないであろうと考えられるので、積極的に使うように意識改革してももう大丈夫なんじゃないかと思う。</p>
+
+<hr>
+
+<p><code>calc()</code>の中で<code>calc()</code>みたいなことしたいとかできなかったっけとかできないな……とか混乱した。落ち着いて考えた感じ、<code>calc()</code>内に<code>calc()</code>は書けないけど、<code>calc()</code>内の<code>(...)</code>は事実上<code>calc()</code>と同等なので、<code>calc()</code>内で<code>calc()</code>出来ると言って良さそう。</p>
+
+<pre>&lt;calc()&gt; = calc( &lt;calc-sum&gt; )
+&lt;calc-sum&gt; = &lt;calc-product&gt; [ [ &#39;+&#39; | &#39;-&#39; ] &lt;calc-product&gt; ]*
+&lt;calc-product&gt; = &lt;calc-value&gt; [ &#39;*&#39; &lt;calc-value&gt; | &#39;/&#39; &lt;number&gt; ]*
+&lt;calc-value&gt; = &lt;number&gt; | &lt;dimension&gt; | &lt;percentage&gt; | ( &lt;calc-sum&gt; )
+</pre>
+
+<p><a href="http://dev.w3.org/csswg/css-values/">2014/06/22付けの開発版のCSS Values and Units Modules Level 3仕様</a>ではこのように<code>calc()</code>の計算が<code>()</code>でネストできることが、その文法の解説で明示されている。</p>

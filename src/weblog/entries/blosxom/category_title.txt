@@ -1,0 +1,37 @@
+category_title plugin
+<p>カテゴリ単位での閲覧の時に、<code>title</code>要素や<code>h2</code>要素にそのカテゴリの名前を潜り込ませることが出来るように、category_titleというプラグインを作りました。月単位での閲覧の時は、<a href="/blog/blosxom/list_title_at_month.html" title="hail2u.net - Weblog - list_title_at_month plugin">list_title_at_month</a>で実装してるので、カテゴリ単位での閲覧の時にも実装しないのは片手落ちかなとか突然思い至ったので。</p>
+<p><a href="/blog/blosxom/" title="hail2u.net - Weblog - blosxom">blosxomカテゴリにアクセスすると、<code>title</code>要素や<code>h2</code>要素にblosxomという文字列が追加されてるのを見て</a></p>
+<p>ソースは短いので直接書いてみる。</p>
+<pre><code class="language-perl">package category_title;
+
+use strict;
+use vars qw($title);
+
+sub start {
+  if (!$blosxom::path_info or $blosxom::path_info_yr or ($blosxom::path_info =~ m|.*?/?\w+\.\w+$|)) {
+    return 0;
+  }
+
+  return 1;
+}
+
+sub head {
+  $title = &quot; - $blosxom::path_info&quot;;
+
+  return 1;
+}
+
+1;
+</code></pre>
+<p>flavourに書くのは$category_title::titleになります。仕組みは、<code>start</code>で<code>$blosxom::path_info</code>あたりをチェックし、カテゴリ単位での閲覧である場合はプラグインを実行してやり、<code>$title</code>という変数に<code>$blosxom::path_info</code>をぶち込んでやると。if文は3つの条件で判断しています。最初の条件は「<code>$blosxom::path_info</code>があるかどうか」で、これによってトップ・ページにアクセスした場合を弾きます。2番目の条件は「<code>$blosxom::path_info_yr</code>があるかどうか」で、これによって年・月・日単位での閲覧の場合を弾きます。最後の条件は「<code>$blosxom::path_info</code>にピリオドが含まれているかどうか」で、これによってエントリ単位での閲覧(このサイトの場合はPramanent linkに使用している)を弾きます。最後の条件がかなり適当なので、ピリオドのあるカテゴリを作ってたりすると、そのカテゴリでは表示されないとか言う不具合がありますが、気にしない。</p>
+<p>このサイトではまだサブカテゴリを使ってないので、これだけにしてありますが、サブカテゴリの区切り文字を任意のものに変えたい場合は、<code>head</code>を、</p>
+<pre><code class="language-perl">sub head {
+  my $sep = &quot;区切りに使う任意の文字列&quot;;
+  $title = &quot;$blosxom::path_info&quot;;
+  $title =~ s!/!$sep!g;
+  $title = $sep . $title;
+
+  return 1;
+}
+</code></pre>
+<p>こんな感じでいいと思います。試してないので知りませんが（ぉ。</p>

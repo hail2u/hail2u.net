@@ -1,0 +1,18 @@
+BPT #3: エントリを読み込む
+<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグインから、任意のエントリを読みたい時はままあります。僕の作成したプラグインだと<a href="/archives/blugins.html#back_and_forth" title="hail2u.net - Archives - blosxom plugins">back_and_forth</a>などですね。blosxom本体で<a href="http://search.cpan.org/search?module=FileHandle" title="search.cpan.org: FileHandle - supply object methods for filehandles">FileHandle</a>というモジュールを使っているので、それを使って書くのが手っ取り早いです。</p>
+<p>単にエントリのタイトルと本文を分けて取得する場合は、</p>
+<pre><code class="language-perl">my $fh = new FileHandle;
+my $file = &#39;/home/nagashima/www/blosxom/entries/foo/bar.txt&#39;;
+my($title, $body);
+
+if (-f $file and $fh-&gt;open($file)) {
+  chomp($title = &lt;$fh&gt;);
+  chomp($body = join &#39;&#39;, &lt;$fh&gt;);
+  $fh-&gt;close;
+}
+</code></pre>
+<p>こんな感じのコードでOK(blosxom本体まんまでOKとも言う)。</p>
+<p>実際にこういうコードを利用する場合、鍵になるのは読み込みたいエントリのパスを取得する部分です。なので、基本的にはこんなコードをサブルーチンにして再利用しまくるのが手間が減って良い感じです。</p>
+<p>例えば、前後のエントリのタイトルを拾ってくるback_and_forthの元となった<a href="http://blog.bulknews.net/mt/archives/000181.html" title="Blosxom: prevnextentry: blog.bulknews.net">prevnextentry</a>では、まず<code>filter</code>サブルーチンで時間順にソートされた全エントリのパスの配列を取得しておき、次に<code>head</code>サブルーチンで基準となるエントリのパスを取得します。そして、全エントリの配列から基準となるエントリを探し出し、その前後を参照することによって読み込みたいエントリのパスを取得しています。</p>
+<p>また、一年前の同じ日に書いたエントリの一覧をリストにする<a href="/archives/blugins.html#one_year_ago" title="hail2u.net - Archives - blosxom plugins">one_year_ago</a>では、まず<code>filter</code>サブルーチンで時間順にソートされた全エントリのパスのハッシュをコピー(mtime情報も利用するので)しておき、次に<code>date</code>サブルーチンで基準となるエントリの一年前の日付けの午前0時と午後23時59分59秒のunixtimeを取得します。そして、全エントリのハッシュを走査し、ハッシュの値が一年前の日付けの午前0時と午後23時59分59秒の間の場合にそのキーをファイルのパスとして取得しています。</p>
+<p>本来、<code>filter</code>サブルーチンは「通常はエントリとしてみなされるファイルを削除または通常はエントリとみなされないファイルを追加」というフィルター(まんま)の役割りを持たせられているサブルーチンなのですが、以上の例からもわかるように、エントリの一覧を容易に取得できる貴重なサブルーチンでもあります。<del>怪しげ</del><ins>クール(!)</ins>なプラグインを作ろうとすると、使う機会が多くなるんじゃないかなと。</p>

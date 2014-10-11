@@ -1,0 +1,71 @@
+Firefox 3.6以降でＭＳ Ｐゴシックを無効にする
+
+<p>CSSの<code>@font-face</code>ではユーザーがインストールしていないフォントをウェブ上に用意してやりそれをダウンロードさせてページ上で利用することを主眼としているが、ローカルのフォントを置換、つまりＭＳ Ｐゴシックをメイリオに置換するなどということもできる。Firefoxでは3.6から可能になった(Beta版でももちろん可能)。ユーザー・スタイルシートでの利用が中心になると思う。</p>
+
+<p>ＭＳ Ｐゴシックをメイリオに置換する場合は以下のようにuserContent.cssに記述する(userChrome.cssではない)。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;ＭＳ Ｐゴシック&quot;;
+  src: local(&quot;メイリオ&quot;), local(&quot;Meiryo&quot;), local(&quot;ＭＳ Ｐゴシック&quot;);
+}
+
+@font-face {
+  font-family: &quot;MS PGothic&quot;;
+  src: local(&quot;メイリオ&quot;), local(&quot;Meiryo&quot;), local(&quot;ＭＳ Ｐゴシック&quot;);
+}
+</code></pre>
+
+<p>日本語で書く必要があるので、userContent.cssの先頭に<code>@charset &quot;UTF-8&quot;;</code>と書かれていることとuserContent.cssの文字コードがUTF-8であることは確認しておく。それぞれの<code>src</code>プロパティの最後に<code>local(&quot;ＭＳ Ｐゴシック&quot;)</code>も書いてあるのは一応念のため。これであらゆるウェブページでＭＳ Ｐゴシックがメイリオで表示されるようになる。</p>
+
+<p><code>src</code>で指定するフォントは複数のフォントを混ぜ合わせることもできる。例えば、</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;ＭＳ Ｐゴシック&quot;;
+  src: local(&quot;Calibri&quot;), local(&quot;メイリオ&quot;), local(&quot;Meiryo&quot;), local(&quot;ＭＳ Ｐゴシック&quot;);
+}
+</code></pre>
+
+<p>とするとＭＳ Ｐゴシックが英字部分は<a href="http://en.wikipedia.org/wiki/Calibri">Calibri</a>で日本語部分はメイリオで表示されるようになる(ちょっと正確ではないけど)。</p>
+
+<p>ＭＳ ゴシックには良い代替フォントはあまりないが、やるなら<a href="http://www.geocities.jp/ep3797/modified_fonts_01.html">UmePlusやUmePlus CL</a>とかが良いと思う。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;ＭＳ ゴシック&quot;;
+  src: local(&quot;UmePlus Gothic&quot;), local(&quot;ＭＳ ゴシック&quot;);
+}
+
+@font-face {
+  font-family: &quot;MS Gothic&quot;;
+  src: local(&quot;UmePlus Gothic&quot;), local(&quot;ＭＳ ゴシック&quot;);
+}
+</code></pre>
+
+<p>また、Windows 7(や<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=a1314285-3185-49e7-b5a2-fbe08809877e&amp;DisplayLang=ja">メイリオのアップデータ</a>をインストールしたWindows Vista)では、</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;MS UI Gothic&quot;;
+  src: local(&quot;Meiryo UI&quot;), local(&quot;MS UI Gothic&quot;);
+}
+</code></pre>
+
+<p>こんな風に書いておくとMS UI GothicがMeiryo UIに置換される。ClearType大好きっ子にオススメ。</p>
+
+<hr>
+
+<p>ローカル・フォントの置換の欠点は置換するフォントをまったく利用することができなくなることとそれらのフォントを前提にデザインされたウェブページでデザインやレイアウト崩れてしまうかもしれないこと。特にＭＳ Ｐゴシックをメイリオに置換する場合は、フォントの横幅がかなり広くなってしまうのでよくレイアウトが崩れることになると思う。</p>
+
+<p>デメリットは少なからずあるが、解像度の向上した現在ではClearType(やアンチエイリアス)の効いた大きめのフォントでウェブページを閲覧する方が快適と感じる人が多いと思うので、設定して損はないと思う。</p>
+
+<h2>追記@2009-11-23T05:45:24+09:00</h2>
+
+<p>Firefox 3.6以降というのは正確ではなかったみたいで、条件さえ満たせば3.5でもローカルのフォントを置換することができるようだ(3.5.5で確認)。条件は<em><code>font-family</code>や<code>src</code>にマルチバイト文字を使わないこと</em>(多分)。なので、userContent.cssに以下のように書いた場合は3.5でもMS UI Gothicがメイリオに置換される。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;MS UI Gothic&quot;;
+  src: local(&quot;Meiryo&quot;), local(&quot;MS UI Gothic&quot;);
+}
+</code></pre>
+
+<p>試してみたい人はuserContent.cssに上記コードを加えて、<a href="http://www.itmedia.co.jp/">とてつもなく酷いフォント指定がなされているITmedia</a>を開いてみると良い。</p>
+
+<p>ただ、MS PGothicに対する置換はFx 3.5でも可能だが、ＭＳ Ｐゴシックに対する置換は不可能だし、MS PGothicに置換をかけてもＭＳ Ｐゴシックと<code>font-family</code>で指定されている場分は置換してくれない(ややこしい！)。つまりＭＳ Ｐゴシックを無効にするというようなことは3.5では無理で、3.6である必要がある。</p>

@@ -1,0 +1,23 @@
+text-overflow: ellipsisとリンク
+
+<p><code>text-overflow: ellipsis</code>プロパティを使った三点リーダーによる省略は、テキストを格納するコンテナー要素に対して指定することが多い。例えば<code>p</code>要素であったり<code>li</code>要素であったり。ただしその中味がすべて<code>a</code>要素のようなケースの場合、Chrome 29とInternet Explorer 10では三点リーダーがクリックできなくなるので、<code>a</code>要素を<code>inline-block</code>にしてそこで<code>text-overflow</code>プロパティを<del>使った方が良い</del><ins>使うとクリックできるようになるけどアレ(追記あり)</ins>。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/489.html"><code>text-overflow: ellipsis</code> and Link</a></p>
+
+<p>Firefox 23ではいずれのケースでも三点リーダーの部分もリンクになる。対してChrome 29とInternet Explorer 10では<code>p</code>要素に仕込んだ前者はリンクにならず、<code>a</code>要素に仕込んだ後者ではリンクになる。現在の最新である<a href="http://www.w3.org/TR/2012/WD-css3-ui-20120117/#text-overflow">2012-01-17の仕様</a>では特に規定<del>はないのでどっちが正しいとかはなさそう</del><ins>があり、どのようなケースであれクリックできるのは間違い</ins>。Firefox 23の挙動は開発者に優しい気はするけど、直感的ではないという印象。<del>いずれにしても三点リーダーもクリックできた方が良いので、<code>a</code>要素に仕込むのが良い。</del></p>
+
+<p>どのブラウザーでもリンクになってる場合に下線が引かれないのはちょっとアレな感じある。そしてどうやっても下線引けなさそうで辛い……。Chromiumでは<a href="https://code.google.com/p/chromium/issues/detail?id=241073">EllipsisBox does not respect all CSS text properties</a>としてイシューが立っており、パッチもあるので下線引かれるようになるのかもしれない。</p>
+
+<hr>
+
+<p>あんまり関係ないけど、三点リーダーでの省略が発動した場合に<em>のみ</em>省略された文字がわかるようにツールチップを出したい。ネイティブ・アプリケーションではだいたいそうなってるし。<code>ellipsis</code>検知して<code>title</code>属性仕込むJavaScript書けば良いのだろうけど、ポーリングせずに検知する良い方法が思いつかない。<code>text-overflow</code>プロパティはUI絡みのプロパティということになっていることだし、ブラウザー側でどうにかして欲しい気がする。</p>
+
+<h2>追記</h2>
+
+<p><a href="http://www.hatena.ne.jp/vantguarde/">id:vantguarde</a>に<a href="http://b.hatena.ne.jp/vantguarde/20130831#bookmark-159658658">はてブで<q>EDでは……</q></a>と指摘されたので読み直した所、</p>
+
+<blockquote>
+  <p>Ellipsing only affects rendering and must not affect layout nor dispatching of pointer events.</p>
+</blockquote>
+
+<p>となってるのを完全に読んでなかった(WD-css3-ui-20120117でもそうだった)。となるとクリックできないようにした上で、一部プロパティは継承しないというのが正しい実装ということになりそう。<code>text-decoration</code>プロパティはレンダリングに入りそうなので継承して良い気がするけど、クリックできないようにするのであえて継承しないというような実装の方が混乱しなくて良いのかもしれない。</p>

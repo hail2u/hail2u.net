@@ -1,0 +1,18 @@
+git-release.jsでのsubmoduleのサポート
+
+<p>自分で作った、バージョンのインクリメントからコミット、タグ付け、最後に<code>push</code>する(こともできる)git-release.jsが使い勝手良いので愛用してる。ただ<code>.git</code>ディレクトリがあることを前提としているので、このままではsubmoduleのディレクトリではリリースできなかった。そこをちゃんとするようにしたり、<a href="https://www.npmjs.org/package/ini">iniパッケージ</a>を使うようにしたりした。</p>
+
+<p class="seealso">Download: <a href="/pub/git-release.js">git-release.js</a></p>
+
+<p><code>git rev-parse --git-dir</code>で普通のリポジトリでもsubmoduleでも適切なGitディレクトリのパスを返してくれる。submoduleの場合は親の<code>.git/modules/submodule_name</code>になる。今までは2回Gitを呼ぶのが面倒だったので、<code>git rev-parse --show-toplevel</code>でリポジトリのルートを拾って、決め打ちで<code>.git/config</code>を加えて設定ファイルを探していたけどやめた。</p>
+
+<p>submoduleのディレクトリには<code>.git</code>ディレクトリの代わり<code>.git</code>ファイルがあり、これに以下の様な形でGitディレクトリへの相対パスが記録されているので、これを見てもできそうに見える。</p>
+
+<pre><code>gitdir: ../../.git/modules/submodule_name
+</code></pre>
+
+<p>しかし<code>.git</code>ファイルがどのような構造でどのようなデータが記録されるかが明文化されていないので、これを見るのは良くなさそう。</p>
+
+<hr>
+
+<p><code>git config --local --get-regexp release.*</code>とかで拾った方が良いのかな。けどどっちにしろリポジトリのルートは必要だし、パースしやすさも考えるとINIファイルな<code>$GIT_DIR/config</code>を直接読んだ方が良さそうな気がする。</p>

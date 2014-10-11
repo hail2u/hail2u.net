@@ -1,0 +1,26 @@
++1向けにMicrodataの修正
+
+<p><a href="http://www.google.com/+1/button/">Google +1ボタン</a>は<a href="http://www.w3.org/TR/microdata/">Microdata</a>を読んでくれるんだけど、HTMLありきでメタデータの注釈をつけてあとはお任せでなんとなかなるわけではない。例えば<a href="http://schema.org/Blog">Blog</a>と<a href="http://schema.org/BlogPosting">BlogPosting</a>を組み合わせた形でMicrodataによる注釈を行って、それを一覧ページとpermalinkで使いまわすと+1ボタンからは両者の区別がつかなくなる。そりゃそうか。</p>
+
+<p>このウェブログではpermalinkではArticleに切り替えるようにして、うまく解釈して貰えるようにはした。ただそもそもセクション単位でメタデータを管理できるMicrodataとURL単位でメタデータを解釈しようとする+1ボタン(やいいね！ボタン)は相性が良くないと思うので、どちらかを捨てる方が精神衛生上良さそう。</p>
+
+<p>マークアップする段階で<code>itemprop="description"</code>とか<code>img</code>要素に<code>itemprop="image"</code>とかは面倒すぎるので、<a href="http://blosxom.sourceforge.net/">Blosxom</a>側で</p>
+
+<pre><code class="language-perl">sub story {
+  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  $$body_ref =~ s/&lt;p&gt;/&lt;p itemprop="description"&gt;/;
+  $has_image = 0;
+
+  if ($$body_ref =~ m!&lt;img!) {
+    $has_image = 1;
+    $$body_ref =~ s/&lt;img (.*?)&gt;/&lt;img $1 itemprop="image"&gt;/;
+  }
+
+  return 1;
+}
+</code></pre>
+
+<p>とかして最初の段落を<code>description</code>にしたり、画像のあるエントリーの場合は<code>image</code>を割り当てるようにした。単独のプラグイン化する程ではなかったので、いろんな機能をとりあえずぶち込んでる便利プラグインに混ぜてる。こんなの作って誤魔化すことが多いのでflavourがロジックだらけの魔窟でひどい。</p>
+
+<p>メタデータ絡みのことやってると徒労感が……という一方で妙な達成感があってタチ悪い。</p>

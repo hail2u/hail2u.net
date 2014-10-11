@@ -1,0 +1,56 @@
+ファイルからURLを抽出し、そのURLからPing送信先を探してみる
+<p>自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。</p>
+<p>引数に渡されたファイルから、URLを抽出するサブルーチン。<a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ってすごいな。</p>
+<pre><code class="language-perl">sub extract_urls {
+  my $entry_path = $_[0];
+  my @urls;
+
+  my $p = HTML::LinkExtor-&gt;new(\&amp;callback);
+  sub callback {
+    my($tag, %attr) = @_;
+    if ($tag eq &#39;a&#39; and ($attr{&#39;href&#39;} =~ m!^http://!)) {
+      push(@urls, $attr{&#39;href&#39;});
+    }
+  }
+  $p-&gt;parse_file($entry_path);
+
+  return @urls;
+}
+</code></pre>
+<p>引数に渡されたURLから、Ping送信先URLを探すサブルーチン。Ping送信先URLを見つけると、Ping送信先URLと1が返ってきます。</p>
+<pre><code class="language-perl">sub extract_ping_url {
+  my $url = $_[0];
+  my $flag = 0;
+
+  my $ua = LWP::UserAgent-&gt;new(
+    agent =&gt; &quot;TrackBack/1.1&quot;,
+    timeout =&gt; 15,
+    parse_head =&gt; 0,
+  );
+  my $req = HTTP::Request-&gt;new(GET =&gt; $url);
+  my $res = $ua-&gt;request($req);
+  if ($res-&gt;is_success) {
+    my $content = $res-&gt;content;
+    $url =~ s/#.*$//;
+    while ($content =~ m!(&lt;rdf:RDF.*?&lt;/rdf:RDF&gt;)!sg) {
+      my $rdf = $1;
+      my($perm_url) = $rdf =~ m!dc:identifier=&quot;([^&quot;]+)&quot;!;
+      if ($perm_url eq $url) {
+        if ($rdf =~ m!trackback:ping=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+        elsif ($rdf =~ m!about=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+      }
+    }
+  }
+
+  return($url, $flag);
+}
+</code></pre>
+<p>ネスト深すぎですよ。</p>
+<p>とりあえず、自動的にTrackBack Pingを送るスクリプトはほとんど完成したので、実験をどうやってやろうかと考え中。自分のblogのエントリでやるべきだな(当たり前)。</p>
+<p>うげ。<a href="http://search.cpan.org/search?module=Net::TrackBack" title="search.cpan.org: Net::TrackBack - A modularized implementation of core TrackBack 1x functionality.">Net::TrackBack</a>モジュールにTrackBack ping URL auto discoveryの機能あったよ！2番目のコードは考える必要なかった・・・。</p>

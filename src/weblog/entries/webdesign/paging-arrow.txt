@@ -1,0 +1,39 @@
+ページめくりの矢印
+
+<figure><img src="/images/blog/paging-arrow.png" alt="ページめくりの矢印を作ってみましたが、各ブラウザで結構違う感じでして……"></figure>
+
+<p>定期的に発症する画像使いたくなくなる病のため、ページめくりの矢印を画像じゃなくしたいなといろいろ考えているんですけど、なかなか良い物ができません。ユニコードの<a href="http://en.wikipedia.org/wiki/Arrow_(symbol)">Arrow</a>や<a href="http://en.wikipedia.org/wiki/Dingbat">Dingbats</a>などにはいわゆる矢印的なもの(→みたいなもの)はいくつもあるので、そういうのが良いのならそれで良いと思うんですけど、自分のイメージではあんまり矢印々々してないのが良いかなというのがあるので、それらはちょっと使いづらかったです。いろいろ作った中では<code>border</code>と<code>transform</code>プロパティを使ったものがそこそこまともに見えるような気がしました。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/289.html">Paging Arrow</a></p>
+
+<p>最初のスクリーンショットはこのデモを各ブラウザで表示したもので、左からChrome 15・Safari 5.1.1・Firefox 7.0.1・Opera 11.52・Internet Explorer 9.0.3です。各ブラウザで<code>border</code>プロパティの描画が違うことに加えて<code>transform</code>プロパティによる変化も微妙に違うため、並べて見ると結構違う感じになってしまいました。Operaで全体的に薄くなるのはどういうことですか……。</p>
+
+<p>CSSは単純で<code>::before</code>擬似要素で上と右に枠線を持つ矩形を作ってやり、それを45度回転させるというものです。</p>
+
+<pre><code class="language-css">a[rel="next"]::before {
+  margin: 24px auto 24px 22px;
+  border-top: 8px solid white;
+  border-right: 8px solid white;
+  display: block;
+  width: 16px;
+  height: 16px;
+  content: "";
+  transform: rotate(45deg);
+}
+</code></pre>
+
+<p>位置合わせは<code>margin</code>プロパティで行いますが、枠線の幅分中心がずれるので多少X方向の位置を調整する必要があります。二番目のデモは<code>border</code>プロパティのスタイルを<code>double</code>にしたものです。ちょっと変わった感じ……というか不恰好ですね。三番目は<code>::after</code>擬似要素も使って2つの矢印を重ねてみました。</p>
+
+<p>四番目と五番目は<code>border</code>プロパティの代わりに<code>box-shadow</code>プロパティを使っています。この場合は2つの矢印にするにも</p>
+
+<pre><code class="language-css">.e a[rel="next"]::before {
+  box-shadow:
+    8px   -8px 0 white,
+    14px -14px 0 #369,
+    22px -22px 0 white;
+}
+</code></pre>
+
+<p>と途中で背景色と同じ色で影をカットアウトするだけでいけますね。3つでも4つでもいくらでも増やせます。<code>box-shadow</code>プロパティを利用したものの方が概ね良好にレンダリングされるのですが、残念ながらFirefox 7.0.1で微妙にゴミが出てしまいます……。</p>
+
+<p>あんまりこだわらないなら<a href="http://www.rsaquo.net/">Right Single Arrow Quote (&#x203a;)</a>で良い気もしますが、これはこれでフォントによって形や位置が微妙に違うという事情があり、縦方向の位置合わせがちょっと面倒くさい感じです。Webフォントを使うならばそこらへんの事情は解決できることが多いので、こういった細かい装飾はWebフォントに取って代わられていくのかもしれませんね。</p>

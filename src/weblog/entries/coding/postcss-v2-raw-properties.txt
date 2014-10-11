@@ -1,0 +1,19 @@
+PostCSS v2系のRaw Properties
+
+<p>オーガニゼーション化されてロゴもできた<a href="https://github.com/postcss/postcss">PostCSS</a>のv2系では<a href="https://github.com/postcss/postcss#raw-properties">元データの値を格納するキー</a>が追加されている。これのおかげで何もしないと完全に元のCSSと同じCSSを出力できるようになった。ただそれと同時にPostCSSのクリーンアップ機能をそのまま使いたいみたいな時にこの元データを格納するキーを削除する必要があるようにもなった。</p>
+
+<p>例えばプロパティーの値にコメントが含まれるようなケースで気を付ける必要がある。</p>
+
+<pre><code class="language-css">.test {
+  display: block /* comment */;
+}
+</code></pre>
+
+<p>この場合、PostCSSは<code>decl.value</code>にクリーンアップ(前後の空白やコメントなどの削除)した<code>block</code>しか格納しない。そして元データは<code>decl._value.raw</code>に格納される。<code>decl.value</code>を見てきれいなのでこのままで良しとして何もしないと、出力されるCSSは上記CSSと同じ、コメントが含まれたものになってしまう。</p>
+
+<p>PostCSSがクリーンアップした値(<code>block</code>のみ)を出力する場合、以下のように明示的に元データを削除する必要がある。</p>
+
+<pre><code class="language-javascript">delete decl._value;
+</code></pre>
+
+<p>セレクター(<code>rule.selector</code>)やメディア・クエリーのパラメーター(<code>atRule.params</code>)でも同じ。つまりそれらをゴニョゴニョして変更する場合、元データを必ず<code>delete</code>することになる。ちょっと直感的でない感じの挙動がするけど、多分後方互換性のためこうなったんだと思う。</p>

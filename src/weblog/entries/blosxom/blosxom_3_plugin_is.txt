@@ -1,0 +1,19 @@
+blosxom 3.0のプラグインは
+<p>blosxom 3.0のプラグインはどうなのか？とか適当に羅列してみる。あくまでも3.0+3iで適当にプラグインを書いた上での話ですので、将来に渡ってこの内容が「blosxom 3.0のプラグインはこういうものだ」ということを言っているとは保証しません。よくわからん序文だな。</p>
+<p>まずは全般的な疑問として誰もが持つかもしれない、「2.0のプラグインと比べて使いやすいの？」というユーザーの立場からの疑問。これへの答えは「比較にならないほどややこしい」ということに尽きます。2.0のプラグインは多くの場合、プラグイン・ディレクトリに置くだけ(+プラグイン内の設定の書き換え)で利用できるわけですが、3.0ではそうはいきません。少なくともhandlers.flowもしくはhandlers.entryのどちらかを書き換える必要があります。</p>
+<p>例として、とりあえず作ってみた<a href="/pub/blosxom3/Paging.pm" title="Blosxom 3.0 Plugin: Paging">Paging</a>というページめくりを実現するプラグインを挙げると、設定は多岐に渡ります。順に羅列すると、</p>
+<ol>
+<li>プラグイン・ディレクトリにPaging.pmを置く</li>
+<li>テンプレート・ディレクトリ(*1)にflavourを置く</li>
+<li>handlers.flowの<code>Blosxom::sort_entries</code>の後で、かつ<code>Blosxom::run_entries</code>の前に<code>Blosxom::Plugin::Paging::initialize</code>を挿入</li>
+<li>handlers.flowの<code>Blosxom::run_entries</code>の後で、かつ<code>Blosxom::render_response</code>の前に<code>Blosxom::Plugin::Paging::build_navigation</code>を挿入</li>
+<li>handlers.entryの<code>Blosxom::filter_entry_by_date</code>の後で、かつ<code>Blosxom::shortcut_max_entries</code>の前に<code>Blosxom::Plugin::Paging::filter_entry_by_page</code>を挿入</li>
+<li>テンプレート・ディレクトリのflavourに<code>Plugin::Paging::next::rendered</code>など実際に表示するためのコードを挿入</li>
+</ol>
+<p>と、実際に動かすだけでこれだけの作業になります。「うえーっ」て感じすね。更には他のプラグインとの兼ね合いも考えて、handlers.*の調整もしなくてはならないでしょう。</p>
+<p>このように、プラグインの導入は非常に煩雑なものになってます。2.0より更に柔軟なシステムがあだになった格好ですね。</p>
+<p>しかし、<a href="http://www.movabletype.org/" title="movabletype.org">Movable Type</a>のようにパッケージングしたものをリリースする予定もあるらしいですし、「それをそのまま使えば？」みたいな感じで、こういったことは解消できることかもしれません(それに無いものを導入する時に敷居がとんでもなく高くなるでしょうが)。それに柔軟でどうにでもできることは2.0以上なので、プラグインをガシガシ作っていじり倒す人(少ないけど)には良いとは思います。</p>
+<p>次に「2.0のプラグインと比べて書きやすいの？」というプラグイン作者的な疑問。これは微妙ですね。アロー演算子の羅列になるPerlのOoは評価の分かれるところ(アロー演算子書くだけで幸せなので、個人的には好き)ですしね。全般的には書きやすい部類に入るんではないかと思います。ハッシュの構造も慣れればどうってことは無いですし、<code>Blosxom::dump</code>すれば一目瞭然(ちょっと大げさで、けっこうややこしい)なので、2.0よりアプローチの幅が広がっただけでも書きやすくなったんではないかと(とっちらかるかもという危険はありますが)。それに加えて相変わらす作法的なものはあまりないので(<code>start()</code>とかもなくなりました)、自由に書けるという点もそのままです。そして、インチキ臭いRSS出力機能とか、HTTPヘッダ出力機能の固定とかそういう制限も無くなったので、そういう柔軟さの向上も評価に値すると思います。</p>
+<p>最後に「2.0のプラグインを3.0に書き直すのはどうよ？」という疑問。これはけっこう簡単です。ほとんど機械的に出来るかもしれないです。2.0のプラグインを実行する3.0のプラグイン(ややこしい)も出るかもしれないですしね。プラグイン内のみのサブルーチンはほとんどそのまま(場合によってはハッシュを渡す処理を追加しなければなりませんけど)、2.0での<code>head()</code>や<code>story()</code>などもhandlers.*に書く位置(実行される順番)に注意してやれば、ほぼそのままでいけると思います。ややこしいのは<code>start()</code>と<code>filter()</code>かな。<code>start()</code>は3.0+3iで<code>get_plugins()</code>が最初に呼ばれるようになったので、それなりに楽になりましたが、<code>filter()</code>はけっこうきついです。2.0の<code>filter()</code>は、3.0では<code>filter_entries_by_path()</code>と<code>filter_entries_by_date</code>に分かれていることがちょっと混乱するかも。ひとつ作ってみるとなんとなくわかるかもしれません(肝は<code>$self-&gt;{state}-&gt;{stop}-&gt;{handlers}-&gt;{entry}</code>あたり)。なので<a href="http://www.blosxom.com/plugins/archives/archives.htm" title="blosxom :: the zen of blogging :: plugins/archives/archives.txt">archives</a>とか<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.txt">writeback</a>みたいなのは簡単、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>とか<a href="http://www.blosxom.com/plugins/display/paginate.htm" title="blosxom :: the zen of blogging :: plugins/display/paginate.txt">paginate</a>みたいなのは辛いということになると思います。</p>
+<p>長。</p>
+<p>*1: 3.0+3iからテンプレートはサブ・ディレクトリに分けることも可能になりました。(2.0と同じようにエントリと同じディレクトリに置くことも可能です)。</p>

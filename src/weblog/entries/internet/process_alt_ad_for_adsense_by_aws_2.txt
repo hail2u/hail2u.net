@@ -1,0 +1,24 @@
+AdSenseの代替広告をAWSで #2
+<p><a href="/blog/internet/process_alt_ad_for_adsense_by_aws.html" title="hail2u.net - Weblog - AdSenseの代替広告をAWSで">AdSenseの代替広告をAWSで</a>の続き。このエントリの追記で、ページ自体のランダム化はできたのですが、これでは各ページの最初のアイテムしか出てこないので、どうにかしてランダムの順位のアイテムを出そうといろいろいじってました。XSLファイル内ではどうにかできそうもないので、各順位を取り出すXSLファイルを10用意し(1ページに付き10アイテムなので)、<a href="https://www.google.com/adsense/" title="Google AdSense">AdSense</a>のJavaScriptコードの方でランダムにそれを呼んでやるという手段になりました。</p>
+<p>まずは1.xsl～10.xslというXSLファイルを作ります。中味は特に凝ったものではなく、4.xslなら、</p>
+<pre><code class="language-xsl">&lt;xsl:for-each select=&quot;ProductInfo/Details&quot;&gt;
+  &lt;xsl:if test=&quot;position() = 4&quot;&gt;
+    ...
+  &lt;/xsl:if&gt;
+&lt;/xsl:for-each&gt;
+</code></pre>
+<p>というように4番目の<code>Details</code>のみから出力してるだけ。他はAWSのXSL変換サービスでAdSenseライクに整形するためのXSLとほとんど同じ。</p>
+<p>そしてAdSenseのJavaScriptコードの方で、1.xsl～10.xslのXSLファイルをランダムに呼んでやると。</p>
+<pre><code class="language-js">var google_alternate_ad_url = &quot;http://xml.amazon.co.jp/onca/xml3&quot;;
+google_alternate_ad_url += &quot;?t=hail2unet-22&quot;;
+google_alternate_ad_url += &quot;&amp;dev-t=XXXXXXXXXXXXXX&quot;;
+google_alternate_ad_url += &quot;&amp;mode=music-jp&quot;;
+google_alternate_ad_url += &quot;&amp;type=lite&quot;;
+google_alternate_ad_url += &quot;&amp;f=http%3A%2F%2Fhail2u.net%2Fstyles%2Faws%2F&quot;;
+google_alternate_ad_url += Math.ceil(Math.random() * 10) + &quot;.xsl&quot;;
+google_alternate_ad_url += &quot;&amp;page=&quot; + Math.ceil(Math.random() * 5);
+google_alternate_ad_url += &quot;&amp;locale=jp&quot;;
+google_alternate_ad_url += &quot;&amp;BrowseNodeSearch=564624&quot;;
+</code></pre>
+<p>これで<a href="http://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=tg/browse/-/564624/" title="Amazon.co.jp：ミュージック / 輸入盤">輸入盤ストア</a>のベストセラー50位までのアイテムからランダムに拾えます(多分)。</p>
+<p>てか、クリック数はそこそこなんだけど、まったく売れないすね。ま、公共広告がダサいのでこんなもの作っているだけなんですが。</p>

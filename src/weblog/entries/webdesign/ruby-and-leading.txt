@@ -1,0 +1,28 @@
+ルビと行間
+
+<p>ルビありの文章を作っていて、ルビのある行とない行で行間がずれるのを防ぐにはどうしようかと考えていた。どうもInternet ExplorerとChrome共に<code>rt</code>の表示はCSSで制御できないみたい。それならと論理的な計算で行間を確保すればいけるかと思ったけれども、それもダメそう。アバウトに<code>line-height: 2</code>という結論は出たけれども……。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/541.html">Sizing Ruby</a></p>
+
+<p><code>rt</code>のフォント・サイズは<code>50%</code>で<code>line-height</code>プロパティーは<code>normal</code>なので、その高さは<code>0.5 * 1.25 = 0.625</code>と計算できる。例えば親のフォント・サイズが<code>16px</code>とすると<code>16px * 0.625 = 10px</code>となる。これが行間に収まれば良いので、<code>line-height: 1.625</code>あれば十分そうだが、フォントによっては<code>1.85</code>程度必要になる。アセンダラインとディセンダラインの影響なんだと思う。</p>
+
+<p>これにブラウザー側の最小フォントサイズ設定の影響が加わる。Chromeでは<code>9px</code>がデフォルトだったような気がするので、単純に<code>50%</code>と考えて計算はできないことになる。</p>
+
+<p>結果ワークアラウンド的な対処にならざるを得なそう。僕の結論としては<code>line-height: 2</code>くらいでそこそこ安定してルビが振れるということになった。徒労感しか残らない結論だ。</p>
+
+<hr>
+
+<p>以下のような感じにできると、行ボックスから独立させられるので良さそうだけど、今のところ出来ない。</p>
+
+<pre><code class="language-css">ruby {
+  position: relative;
+}
+
+ruby rt {
+  display: block;
+  position: absolute;
+  bottom: 100%;
+}
+</code></pre>
+
+<p>逆に行間に合わせてルビのフォント・サイズを自動調整できるという形でも良さそうだけど、どっちにしろ出来ないことには変わりない。今のところはおとなしく<code>line-height: 2</code>くらいの、可能な限り小さな値を指定するしかなさそう。</p>

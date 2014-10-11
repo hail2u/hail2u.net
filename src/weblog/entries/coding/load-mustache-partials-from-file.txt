@@ -1,0 +1,44 @@
+mustacheのパーシャルをファイルから読み込む
+
+<p>何かしらテンプレート使う時は、実行には<a href="http://handlebarsjs.com/">Handlebars.js</a>を使いつつ、<a href="http://mustache.github.io/">mustache</a>の仕様に沿った形のみで書くみたいな感じで大体やってる。前に書いた<a href="/blog/coding/handlebars-js-include-helper.html">Handlebars.jsのincludeヘルパー</a>だけ便利だったのでちょっと使ったりしてたけど、パーシャルを使って書き直すことにした。パーシャルそのままなのでネストでき、他の実行環境でもだいたいそのままで動く反面、相対パスで見に行くみたいなことは出来なくなった。</p>
+
+<p>特定のパスにまとめたパーシャル(<code>*.partial.mustache</code>)を読み込み、オブジェクトに拡張子を抜いたファイル名をキーにして、その中身を値に格納していくだけ。</p>
+
+<pre><code class="language-javascript">function _loadSharedPartials(dir) {
+  var partials = {};
+
+  var files = fs.readDirSync(dir);
+
+  for (var i = 0, l = files.length; i &lt; l; i++) {
+    var file = files[i];
+
+    if (file.match(/\.partial\.mustache$/)) {
+      var name = path.basename(file, &#39;.partial.mustache&#39;);
+      partials[name] = fs.readFileSync(path.join(dir, file), {
+        encoding: &#39;utf8&#39;
+      });
+    }
+  }
+
+  return partials;
+}
+</code></pre>
+
+<p>Handlebars.jsで使う場合は以下のようにテンプレートの実行関数の第2引数のオブジェクトの子で指定する。</p>
+
+<pre><code class="language-javascript">var hbs = require(&#39;handlebars&#39;);
+
+var render = hbs.compile(template);
+var rendered = render(data, {
+  partials: _loadSharedPartials(&#39;./&#39;)
+});
+</code></pre>
+
+<p><a href="https://github.com/janl/mustache.js">mustache.js</a>では<code>render()</code>の第3引数に<em>直接</em>指定する。</p>
+
+<pre><code class="language-javascript">var mustache = require(&#39;mustache&#39;);
+
+var rendered = mustache.render(template, data, _loadSharedPartials(&#39;./&#39;));
+</code></pre>
+
+<p>SSIのインクルードとはちょっと違う挙動になるけど、mustache的には素直な実装なので、Handlebars.jsの柔軟さを利用して変なことするよりもこうやった方が良さそう。</p>

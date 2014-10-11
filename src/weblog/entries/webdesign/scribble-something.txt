@@ -1,0 +1,98 @@
+CSSとJavaScriptで文章をメモ書き風に
+
+<figure><img src="/images/blog/scribble-something.png" alt="おれ ここ めも かき なぐる"></figure>
+
+<p>または和文フォントから仮名部分のみ抜き出してサブセット化したものと<a href="http://developer.yahoo.co.jp/webapi/jlp/furigana/v1/furigana.html">Yahoo! Japanのルビ振りAPI</a>を組み合わせて、ユーザー環境やサーバー性能に左右されずに比較的自由なフォント表現を行うためのイロハ。おれ ここ めも かき なぐる！</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/227.html">Scribble My Tweet #3</a></p>
+
+<h2>フォントのサブセット化</h2>
+
+<p>ここでいうサブセット化とはつまりフォントから必要な部分のみ抜き出して再構築すること。Webフォントとして使えるからといって、サブセット化までは許されていないことがあったりするので、それには気をつける必要がある。例として新BSDライセンスで提供されている、<a href="http://www.ez0.net/distribution/font/kiloji/">きろ字 プロポーショナル</a>を取り上げる。</p>
+
+<p>サブセット化に留まらないWebフォントのジェネレーターとして<a href="http://www.fontsquirrel.com/fontface/generator">Font Squirrelの@font-face Generator</a>が利用できるが、アップロードするフォントのサイズ制限が厳しいため和文フォントにはほぼ使うことができない。なので<a href="http://fontforge.sourceforge.net/">FontForge</a>を使う。Windowsの場合は<a href="http://www.geocities.jp/meir000/fontforge/">unofficial fontforge-cygwin</a>を利用するのが速いだろう。</p>
+
+<p>作業はそれほど難しくはない。</p>
+
+<ol>
+<li>きろ字 プロポーショナルを開く</li>
+<li>英数字部分と仮名部分だけをShiftを押しながらドラッグで選択する</li>
+<li>編集→選択→選択範囲の反転</li>
+<li>エンコーディング→グリフの切り離し・削除(仮名部分以降が削除される)</li>
+<li>フォントを出力でTrueTypeとして名前を付けて保存(エラーは無視)</li>
+</ol>
+
+<p>FontForgeのGUIは慣れないと気持ち悪いので、操作しててちょっと不安になる……。これで5MBオーバーの元のフォントからサブセット化された70KB程のTrueTypeフォントが出来上がる。Windowsのエクスプローラーのサムネイルで見ると以下のように漢字が欠けていることがわかるだろう。</p>
+
+<figure><img src="/images/blog/kiloji-p-before-after.png" alt="豆腐になった"></figure>
+
+<p>このままWebフォントとして使っても良いがWOFFに変換する。</p>
+
+<h2>WOFFへの変換とスタイルシートの編集</h2>
+
+<p>WebフォントにはTrueTypeフォントを始めSVGフォントやら色々なフォーマットが乱立しており、様々な環境をサポートするにはそれぞれのフォントを作成した上で<a href="http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax">気持ち悪いCSS</a>を書かなくてはならない。そういうのは嫌なので、あえて無視して業界標準になるであろうWOFF (Web Open FOnt Format)に絞って扱うことにする。</p>
+
+<p>WOFFへの変換には先ほどURLを挙げたFont Squirrel(フォント・スクワール)のジェネレーターを使う。サブセット化したので今度はサイズ制限には引っかからない。色々細かく設定できるが、サブセット化してあることだしCSSはあとで書き直すので、Basicでサクっと変換すれば良い。暫く待つとダウンロードされるのでそれを展開し、中にある*.woffと*.cssをコピーする。WOFFファイルは40KB程になった。</p>
+
+<p>CSSファイルは全てのフォーマットに対応したものになっているが、WOFFのみ使うつもりなので以下のように書き換える。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;Kiloji P&quot;;
+  src: url(&quot;kiloji-p-kana.woff&quot;) format(&quot;woff&quot;);
+  font-weight: normal;
+  font-style: normal;
+}
+</code></pre>
+
+<p>併せてコメントとしてCSSファイルにライセンス条項を書いておくと良いだろう。あとはWOFFファイルとCSSファイルをFTPなりでサーバー上にアップロードすればWebフォントの使用準備は整う。</p>
+
+<h2>HTMLファイルやCSSファイルからのWebフォントの参照</h2>
+
+<p>書くまでもなさそうだが一応書いておく。HTMLファイルからは<code>link</code>要素を、</p>
+
+<pre><code class="language-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;kiloji-p-kana.css&quot;&gt;
+</code></pre>
+
+<p>CSSファイルからは<code>@import</code>を利用して参照する。</p>
+
+<pre><code class="language-css">@import url(&quot;kiloji-p-kana.css&quot;);
+</code></pre>
+
+<p>あとはCSSで<code>font-family: &quot;Kiloji P&quot;</code>とすれば、<em>英数字と仮名だけ</em>がきろ字 プロポーショナルで表示されるようになる。</p>
+
+<h2>文章のひらがな化</h2>
+
+<p>このフォントを使うために文章をひらがな(やカタカナ)で書くというのは馬鹿げているので、Yahoo! Japanのルビ振りAPIを利用する。都合の良いことに<a href="http://developer.yahoo.com/yql/">YQL</a>のCommunity Tableとして提供されているので、JavaScriptからあまり苦労せずに利用することが出来る。ただし無制限に使えるわけではなく、アプリケーションIDが必要になるので登録して取得しておく必要はある。</p>
+
+<p>jQueryで書くと以下のようになる。</p>
+
+<pre><code class="language-js">var appid = &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;;
+var text = &quot;振り仮名を振りたい文章です。&quot;;
+var result = &quot;&quot;;
+
+$.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
+  q:      &quot;SELECT * FROM yahoojp.jlp.furigana.furigana WHERE appid=&#39;&quot; + appid + &quot;&#39; and sentence=&#39;&quot; + text + &quot;&#39;&quot;,
+  format: &quot;json&quot;,
+  env:    &quot;store://datatables.org/alltableswithkeys&quot;
+}, function (d) {
+  $.each(d.query.results.Result.WordList.Word, function () {
+    if (this.Furigana) {
+      result += this.Furigana;
+    } else {
+      result += this.Surface;
+    }
+  });
+});
+
+// result: ふりがなをふりたいぶんしょうです。
+</code></pre>
+
+<p>結果として返される<code>WordList.Word</code>では振り仮名を振れる単語(というか区切り)には<code>Furigana</code>プロパティが出現する。なので<code>Furigana</code>があればそれを使い、なければ元の単語が入っている<code>Surface</code>プロパティを使って文章を再構成していけば良い。</p>
+
+<hr>
+
+<p>以上を組み合わせると冒頭に挙げたデモになる。固定文章では面白く無いので、自分のツイートを表示するようにしてある。メモっぽくするためにCSS Transformや<code>rgba()</code>を駆使してみた。</p>
+
+<p>和文フォントは主にサイズの問題から使い辛いが、このようにサブセット化と文章の平仮名化を組み合わせることによって限定的な利用をするなど工夫の余地はある。ロゴやナビゲーションで使う文字に限定してサブセット化を行い、Webフォントでそれらを描画するなどという工夫もそのひとつだろう(やっている人は見たことないけど)。海外に比べると日本はWebフォントにおいて周回遅れな感じな上、海外からの輸入知識では和文フォント特有の事象には対応できない(主にサイズの問題だが、他にも英数字と日本語の間のスペースの問題等もある)ので、色々みんなであれこれ工夫して失敗するべき。僕はアルファベットに仮名が割り当てられているいわゆる1バイト仮名フォントなどと呼ばれているものでこのエントリーのようなことをやろうとして失敗したりした……。</p>
+
+<p>きろ字かわいい！ライセンスもかわいいのでオススメ！</p>

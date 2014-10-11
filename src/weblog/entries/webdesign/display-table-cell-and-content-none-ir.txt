@@ -1,0 +1,11 @@
+display: table-cellとcontent: ""による画像置換
+
+<p><code>display: table-cell</code>した要素の中で疑似要素を使った画像置換を<code>content: ""</code>(空文字指定)でやると、Internet Explorer 9以外の現行ブラウザーでは謎の空白が出来てしまう現象に遭遇した。説明難しい。IE9以外で同じ挙動なので多分仕様に従ったものなんじゃないかなーとは想像できるんだけど、どうしてこうなるのかよくわからないのでメモがてら書いておく。直す方法だけは一応発見した。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/389.html"><code>display: table-cell</code> and <code>content: ""</code> for image replacement</a></p>
+
+<p>デモでは<code>display: table-cell</code>とした<code>div</code>要素の中で、疑似要素を使ってテキストを追い出す形の画像置換を行なっている。<code>content</code>プロパティーで空文字を指定している場合画像置換で表示した画像の下に空白が(一行分？)できている。<code>.ir</code>というクラス名を付けた画像置換する要素は意図したサイズになっていて、特におかしくはなさそう。</p>
+
+<p>色々試した結果、直す方法は<code>table-cell</code>をやめるか<code>content: "\00a0"</code>にするかのどちらか。<code>\00a0</code>は非改行スペース。普通のスペース(<code>\0020</code>)とかではダメだったけど、他にも垂直タブ(<code>\000b</code>)とかでもいけるみたい。<code>table-cell</code>でブロックを横に並べてかつセンタリングみたいなことをやってるところ(具体的にはページング・ナビゲーション)で起きた現象だったので、ここでは<code>\00a0</code>で逃げた。</p>
+
+<p>本当は<code>content</code>プロパティーで直接画像を指定しちゃえばいいんだけど、SVG画像だとうまくリサイズされないケースがあって頭が混乱してきたのでこういう形で逃げてる……。SVGの<code>viewbox</code>と<code>width</code>、<code>height</code>属性の指定の仕方によって微妙にブラウザー間で表示に違いが出たり、CSS経由だとまた<a href="/pub/test/390.html">別の違い</a>が出たり、CSSで使うケースでの情報がそもそも少なすぎたり、CSSでSVGは魔窟感ある。</p>

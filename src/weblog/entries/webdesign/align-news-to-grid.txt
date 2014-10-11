@@ -1,0 +1,47 @@
+ホームの記事一覧をグリッド表示に
+
+<p>味も素っ気もないリストから既に廃れ始めた感のあるグリッドに変えてみました。一覧性があるようなないような微妙な感じですね。すぐ戻しそう。</p>
+
+<p>普通に<code>float</code>プロパティを使って作りました。<a href="/pub/test/299.html">モックアップ</a>のコードで解説すると、各記事のHTMLが、</p>
+
+<pre><code class="language-html">&lt;section class="sub-news"&gt;
+  &lt;h3&gt;&lt;a href="http://example.com/blog/entry"&gt;Entry Title&lt;/a&gt;&lt;/h3&gt;
+  &lt;p&gt;Entry Summary&lt;/p&gt;
+&lt;/section&gt;
+</code></pre>
+
+<p>となっているので、この<code>section</code>要素の高さをうまく固定して並べます。</p>
+
+<pre><code class="language-css">.sub-news {
+  margin: 0 0.7%;
+  float: left;
+  width: 32%;
+  font-size: 75%;
+}
+
+.sub-news h3 {
+  margin: 24px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sub-news p {
+  margin: 24px 0;
+  height: 84px;
+  display: block;
+  overflow: hidden;
+}
+</code></pre>
+
+<p>並べるのは幅を適当に指定して<code>float</code>プロパティで良いですが、ちゃんと高さを揃えてやらないとうまく並ばなかったりすることがあります。そのために<code>h3</code>要素では<code>white-space</code>と<code>overflow</code>プロパティを使って複数行にならないようにし、<code>p</code>要素では<code>height</code>と<code>overflow</code>プロパティで4行以上にならないようにします。実際のCSSは他のルールとの兼ね合いなどもあって、もうちょっと複雑になっています。高さの計算などはSassでやってたりとかするので、書くのは面倒ではないですけどね。</p>
+
+<p>もっと手軽に<a href="http://masonry.desandro.com/">jQuery Masonry</a>とか<a href="https://github.com/yoko/brickmaker-js">Brickmaker-js</a>など敷き詰める系のJavaScriptライブラリを使っても良いかもしれないですね。文字だとちょっと読みづらいかもしれませんが。</p>
+
+<p>狭い画面では今までと同じようにリスト表示にしてます。HTMLはそのままで<code>h3</code>で<code>list-item</code>にしてやってます。</p>
+
+<p><a href="http://www.w3.org/TR/css3-multicol/">CSS Multi-column Layout Module</a>を使った奴も<a href="/pub/test/300.html">書いてみました</a>。Opera 11で普通にずれました……。カラム切り替えのタイミングがちょっと違うようなので、ちゃんと<code>column-break-before</code>等で制御しないとダメそうですね。まぁそれよりもそもそもカラム・レイアウトのためのもので、グリッド・レイアウトのためのものではないので、読まれる方向と並び方が噛み合っていないですね。<a href="http://www.w3.org/TR/css3-grid-layout/">Grid Layout</a>さん……。</p>
+
+<h2>追記</h2>
+
+<p>そのままだと空白がバラバラでなんか揃っているのに揃っていない感じだったので薄い半透明の背景をちょっと加えました。ボタンっぽいイメージになると思うので、ついでに<code>a</code>要素で括って全体をクリックできるようにも。最初はなんかいまいちだなーとか作っときながら思ってましたが、段々気に入ってきました！</p>

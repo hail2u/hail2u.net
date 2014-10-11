@@ -1,0 +1,22 @@
+xml2jsと絵文字
+
+<p>簡単便利な<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>は、パーサーに<a href="https://github.com/isaacs/sax-js/">sax-js</a>が、ジェネレーターに<a href="https://github.com/oozcitak/xmlbuilder-js/">xmlbuilder</a>が使われている。指定された文字コードさえ適切なら、パーサー側は何もせずに絵文字あたりをパース可能なので問題ない。しかし、ジェネレーター側では適切なオプションが立ってないので、絵文字を含むXMLを作ろうとすると例外で落ちる。</p>
+
+<p>xmlbuilderでは絵文字辺りを扱うためには、<code>create()</code>関数の第4引数で<code>allowSurrogateChars</code>オプションを有効にしてやる必要がある。</p>
+
+<pre><code class="language-javascript">var xml = require(&#39;xmlbuilder&#39;).create(
+  &#39;root&#39;,
+  {
+    encoding: &#39;UTF-8&#39;
+  },
+  {},
+  {
+    allowSurrogateChars: true
+  }
+).ele(&#39;child&#39;, &#39;<a href="http://www.fileformat.info/info/unicode/char/1f476/index.htm">\uD83D\uDC76</a>&#39;);
+console.log(xml);
+</code></pre>
+
+<p>これで落ちない。しかし、xml2jsではこのオプションを有効にできないので、自前でジェネレーター関数を作り直す必要がある。</p>
+
+<p>今はxml2jsの<code>Builder()</code>をパクってお茶を濁しているけど、どうにかしないと今後辛そう。プルリクエストを投げたいけど、CoffeeScriptという難敵が。</p>

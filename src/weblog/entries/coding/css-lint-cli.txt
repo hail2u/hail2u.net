@@ -1,0 +1,24 @@
+CSS LintのCLI
+
+<p>npmの<a href="http://csslint.net/">CSS Lint</a>を使うようにしようかなと思って入れたけどCLIがなんかうまく動かない。動くようにちゃんと直すにも色々よくわからないので、CSSファイルを受け取ってチェックするだけのオレオレCLIを書いて使うことにした。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var fs = require('fs');
+var cl = require('csslint');
+var cssfile = process.argv.slice(2)[0];
+
+var results = cl.CSSLint.verify(fs.readFileSync(cssfile, 'UTF-8'));
+
+for (i = 0, l = results.messages.length; i &lt; l; i++) {
+  var m = results.messages[i];
+
+  if (!m.rollup) {
+    console.log([cssfile, m.line, m.col, m.message].join(':'));
+  }
+}
+</code></pre>
+
+<p>コマンドラインに渡された最初の引数をCSSファイルのパスとみなして、それを開いてチェックするだけ。出力は<a href="http://www.gnu.org/prep/standards/standards.html#Errors">GNU Coding Standardsの4.4 Formatting Error Messages</a>に従ってコロン区切り。まとめメッセージ(<code>font-size</code>プロパティーの指定が多過ぎとか文句言う奴)は捨ててる。</p>
+
+<p>グローバルにインストールされたcsslintモジュールを使う場合は<code>NODE_PATH</code>環境変数の設定も必要。そうでない場合は同じディレクトリにインストールすれば良い。</p>

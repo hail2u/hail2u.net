@@ -1,0 +1,19 @@
+mod_gzipでのCSSとJavaScriptファイルの圧縮転送設定
+
+<figure><img src="/images/blog/gzipped.png" alt="gzip圧縮されて転送されるようになりました"></figure>
+
+<p>そんなに表示が遅いわけではないですけど、動的生成なので少しでも早くするために重い腰を上げて.htaccessに設定を追加しました。今時mod_gzipを利用している古いサーバーでの話なので、多くの人にはかなりどうでもいい話です。</p>
+
+<pre><code class="language-config">&lt;IfModule mod_gzip.c&gt;
+  mod_gzip_item_include file "\.css$"
+  mod_gzip_item_include file "\.js$"
+  mod_gzip_item_include mime "^application/"
+&lt;/IfModule&gt;</code></pre>
+
+<p>JavaScriptファイルに対して拡張子の指定だけではダメだったのでどう指定すればいいのかちょっと悩みましたが、レスポンスヘッダを見たら<code>Content-type: application/x-javascript</code>だったので、MIME側の設定も必要だっただけでした。</p>
+
+<p>デフォルトでこれらを圧縮しない設定になっているのはNetscape 4の負の遺産だというどうでも良さそうな知識を得たり有意義な30分でした。</p>
+
+<h2>追記</h2>
+
+<p>JavaScriptファイルで圧縮が効かなくなっていたので、ついでにRSSファイル等でも圧縮が効くように、MIME設定を更新しておいた。</p>

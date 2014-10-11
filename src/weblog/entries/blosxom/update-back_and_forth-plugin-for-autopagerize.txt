@@ -1,0 +1,19 @@
+back_and_forthプラグインをAutoPagerize対応に
+
+<p>back_and_forthプラグインでは<code>prev</code>で時系列的に古いエントリを、<code>next</code>で時系列的に新しいエントリを参照していた。そのため<a href="http://userscripts.org/scripts/show/8551">AutoPagerize</a>はSITEINFOをちゃんと書いてやらないと動作しなかった。このサイトをAutoPagerizeへSITEINFOを書かずに対応させるため<a href="http://github.com/hail2u/blosxom-plugins/raw/0c1a89f3bf2c35ce439d3efc8be4756ab9b4615d/back_and_forth/back_and_forth">back_and_forthプラグインを更新</a>して、<code>prev</code>と<code>next</code>が参照するエントリを逆にしてみた。このバージョンのback_and_forthプラグインに差し替えた上で適切な要素の<code>class</code>属性に<code><em>autopagerize_page_element</em></code>を加えてやれば、SITEINFOを用意してやらなくてもAutoPagerizeが動作するようになるはず。</p>
+
+<p>既にこのサイトでは稼動させている。が、キャッシュの関係で途中でterminatedになることもある(既に古いエントリを閲覧していた場合にキャッシュが残っていてnextが見つからなかったりするので)。</p>
+
+<p>「prev」と「next」は日本語の感覚で「前」と「次」をイメージすると、今までの参照の仕方のが自然な気がするけど、実際のところはどうなんだろ。ぶっちゃけセマンティクスはまったく考えずにAutoPagerizeへの簡単な対応だけを考えてゴリゴリ書き換えてしまった。<a href="http://www.w3.org/TR/html401/types.html#h-6.12">HTML 4.01仕様書のLink types</a>では「線上に並んだドキュメント(<a href="http://www.asahi-net.or.jp/%7Esd5a-ucd/rec-html401j/types.html#h-6.12">邦訳</a>では、続き物とされている文書群)」としか書かれていないので、その並び方の基準が時系列である(または他の何かである)とは明記されていない。</p>
+
+<p>ここらへんのことは日本語脳で考えるとまずそうなので、海外で有名なフォーラム・ソフトウェアとか色々見てみたところ、多くはnextで古いスレッドを参照しているようだ。時系列的にnextとは捉えておらず、ページ的にnextみたいな捉え方をしている。対して<a href="http://annevankesteren.nl/">Anne先生のサイト</a>などではnextで時系列的に新しいエントリを参照するようになっている(今までのこのサイトの挙動と同じ)。Web標準界隈のサイトはこっち系のが多いような印象(20くらいのサイトしか見てないけど)。</p>
+
+<p>戻したくなった。戻すかも。戻す時にはSITEINFOちゃんと書こう。</p>
+
+<p>AutoPagerizeへの対応関連とは関係ないが、他にXHTMLで出力するかどうかを選択できるオプション設定とかもさりげなく追加しておいた。<code>link</code>要素の出力の時に参照される。</p>
+
+<h2>追記</h2>
+
+<p>戻した。SITEINFOを書きたくないがために……というのは理由として貧弱すぎる。十分納得した上での変更なら良いと思うけど、かなり軽い感じで変更してしまったので元に戻してもうちょっと考えてみようと思う。とはいってもAutoPagerizeへは対応したいので、SITEINFOを書いてデータベースに<a href="http://wedata.net/items/29017">追加しておいた</a>。</p>
+
+<p>ページによって辿って貰う対象を制御してやるために<code>autopagerize_follow_location</code>というクラス名を割り振ることにし、エントリ個別のページでは<code>rel=&quot;prev&quot;</code>な<code>a</code>要素に振り、ウェブログのトップやカテゴリごとのページの場合は<code>rel=&quot;next</code>な<code>a</code>要素に振った。AutoPagerizeのキャッシュをクリアして、ざっと確認したところ意図したとおりに動いている模様。</p>

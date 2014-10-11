@@ -1,0 +1,35 @@
+CSV2HTML
+<pre><code class="language-js">var objArgs = WScript.Arguments;
+var objFileSys = new ActiveXObject(&quot;Scripting.FileSystemObject&quot;);
+var aryData = new Array();
+
+var fInNam  = objArgs(0);
+var fOutNam = fInNam + &quot;.html&quot;;
+
+var fIn = objFileSys.OpenTextFile(fInNam, 1);
+var fOut = objFileSys.OpenTextFile(fOutNam, 2, true);
+
+fOut.WriteLine(&quot;&lt;table&gt;&quot;);
+while(!fIn.AtEndOfStream){
+  try{
+    var strLine = fIn.ReadLine();
+    if(strLine == &quot;&quot;){
+      continue;
+    }
+    aryData = strLine.split(&quot;,&quot;);
+    fOut.WriteLine(&quot;\t&lt;tr&gt;&quot;);
+    for(var i = 0; i &lt; aryData.length; i++){
+      fOut.WriteLine(&quot;\t\t&lt;td&gt;&quot; + aryData[i] + &quot;&lt;/td&gt;&quot;);
+    }
+    fOut.WriteLine(&quot;\t&lt;/tr&gt;&quot;);
+  }
+  catch(e){
+    WScript.Echo(&quot;エラー: &quot; + e.description);
+  }
+}
+fOut.WriteLine( &quot;&lt;/table&gt;&quot; );
+
+fIn.Close();
+fOut.Close();
+</code></pre>
+<p>ということでCSVファイルからテーブルにするスクリプトを。いや、そこらにあるフリーソフトだと、一行にズラーッとtrの中身が書かれたりして、見にくいので。みりゃわかりますが、JScriptです。使う時は拡張子をjsにしましょう。</p>

@@ -1,0 +1,117 @@
+pointer-eventsで画像ギャラリーやLightbox
+
+<p>画像表示でよくあるフェードして切り替えとかLightboxっぽい全画面表示とかも<code>pointer-events</code>プロパティと<code>:target</code>擬似要素の組み合わせで「っぽいもの」なら簡単に出来ます。最近はCSSで出来そうだなーと思うと、普通に出来るようになってて幸せですね！</p>
+
+<h2>ギャラリー</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/278.html">Image Gallery by <code>pointer-events</code></a></p>
+
+<p>まずは画像を並べるHTMLから。</p>
+
+<pre><code class="language-html">&lt;ol&gt;
+  &lt;li id="img1"&gt;&lt;a href="#img2"&gt;&lt;img src="img1.png"&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li id="img2"&gt;&lt;a href="#img3"&gt;&lt;img src="img2.png"&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li id="img3"&gt;&lt;a href="#img4"&gt;&lt;img src="img3.png"&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li id="img4"&gt;&lt;a href="#img5"&gt;&lt;img src="img4.png"&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li id="img5"&gt;&lt;a href="#img1"&gt;&lt;img src="img5.png"&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</code></pre>
+
+<p>ごく普通の序列付きリストです。各画像には次の画像へのリンクが張ってあり、クリックで次の画像に進むというのをフェードインでの切り替えにするのが目標になります。</p>
+
+<p>CSSもそれほどややこしいわけではなく、ほとんと<a href="/blog/webdesign/pure-css-modal-window.html">モーダル・ウィンドウ</a>と同じです。<code>pointer-events</code>プロパティで操作不能に、<code>opacity</code>プロパティで隠しておいて、<code>:target</code>擬似要素で両者を復活させるというわけです。本当に同じですね！画像のマークアップに<code>li/a/img</code>と色々HTML要素を使っているので<code>display</code>プロパティで<code>table</code>を利用する方法にしました(<a href="http://www.456bereastreet.com/archive/201110/using_displaytable_has_semantic_effects_in_some_screen_readers/"><code>display</code>プロパティで<code>table</code>を指定すると「表ですよ～」と読みあげてしまう読み上げブラウザがあるらしい</a>のでご利用は計画的に)。</p>
+
+<pre><code class="language-css">ol li {
+  display: table;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition-duration: 1.5s;
+  pointer-events: none;
+}
+
+ol li:target {
+  opacity: 1;
+  pointer-events: auto;
+  transition-duration: 3s;
+}
+
+ol li a {
+  display: table-cell;
+  width: 320px;
+  height: 180px;
+  vertical-align: middle;
+  text-align: center;
+}
+</code></pre>
+
+<p>理論上は何千枚でもCSSはこのままでいけるはずです。またここでは普通にフェードイン(アウト)させてるだけですが、<code>width</code>プロパティを0にしておいたりすればスライドっぽい動きとかにもなるんじゃないかなーとか思います。ここらへんはCSSの工夫(主にTransition系の工夫)だけでいろいろ出来ると思います。</p>
+
+<h2>Lightbox</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/279.html">Lightbox by <code>pointer-events</code></a></p>
+
+<p>全画面で画像をズームするLightboxも、「っぽいもの」程度なら簡単にいけます。デモは新しいタブやウィンドウで開かないとうまく動かないので注意してください。</p>
+
+<p>HTMLはちょっとアレです。閉じるためだけに<code>onclick</code>属性でJavaScriptを発火させざるを得ない感じでした。</p>
+
+<pre><code class="language-html">&lt;figure onclick="javascript:history.back()" id="img1"&gt;
+  &lt;a href="#img1"&gt;&lt;img src="http://lorempixel.com/320/180/"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>ここらへんが「CSSで～」とかキャッチーなタイトルがつかなかった理由ですね！</p>
+
+<p>Lightboxはまずサムネイル画像を表示させておいて、クリックで全画面に、更にクリックで元に戻るという感じのUIなので、普通に画像を格納している要素の<code>pointer-events</code>を切り替えるだけではダメです。うまく動かすためには格納している要素(ここでは<code>figure</code>要素)とリンクになる<code>a</code>要素の<code>pointer-events</code>プロパティを<code>:target</code>プロパティでスワップさせるようにします。</p>
+
+<pre><code class="language-css">figure {
+  pointer-events: none;
+}
+
+figure a {
+  pointer-events: auto;
+}
+
+figure:target {
+  background-color: rgba(0, 0, 0, 0.8);
+  pointer-events: auto;
+}
+
+figure:target a {
+  pointer-events: none;
+}
+
+figure:target a img {
+  width: 80%;
+  height: auto;
+}
+</code></pre>
+
+<p>あとはほとんどギャラリーと同じですが、全画面の時に背景を暗くしてた上で幅に合わせてリサイズしてやるとらしくなります(<code>height</code>プロパティを<code>auto</code>にすれば縦横比は維持されます)。</p>
+
+<p>更にHTMLが汚くなりますが、背景画像として大きいサイズの画像を持っておけば<a href="/pub/test/280.html">全画面時に大きいサイズに切り替える</a>とかも可能です。</p>
+
+<pre><code class="language-html">&lt;figure onclick="javascript:history.back()" id="img1"&gt;
+  &lt;a href="#img1"
+    style="background-image: url('http://lorempixel.com/640/360/nightlife/4/');"&gt;
+    &lt;img src="http://lorempixel.com/320/180/nightlife/4/"&gt;
+  &lt;/a&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>全画面表示の時は右クリックから画像が保存できないというオプション付きです！こういうのは将来的にはHTMLの<code>data-*</code>属性と超強化されるCSSの<code>attr()</code>関数でゴニョゴニョできるようになるはずなので期待して待ってましょう。</p>
+
+<hr>
+
+<p>世間には<a href="http://caniuse.com/pointer-events">いろいろ事情がある</a>ので<code>pointer-events</code>プロパティのブームはまだ来ないでしょうね……。</p>
+
+<h2>追記</h2>
+
+<p><code>history.back()</code>と<code>:target</code>での状態の切り替えを組み合わせると、どうやら<code>pointer-events</code>の有効化の方がクリックイベントの終了より先に起こってしまうようです(多分)。なので履歴がある場合、Lightboxが開かれた直後に<code>history.back()</code>が発動してしまい、うまくLightboxが表示されません。ということで<a href="/pub/test/281.html"><code>history.back()</code>の代わりに<code>location.hash='#close'</code>するようにしたデモ</a>も作ってみました。</p>
+
+<p>CSSだけでできないかなーと色々考えていますが、<code>a</code>要素のネストとか文法的にも実装的にもできない(WebKitでは閉じタグが補完される)のでなかなか難しそうな感じですね。<code>img</code>要素を2つもたせたりすれば出来るかもしれないですが、そんなHTML書きたくないし……。</p>

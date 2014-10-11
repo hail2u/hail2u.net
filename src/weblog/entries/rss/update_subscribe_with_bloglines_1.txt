@@ -1,0 +1,25 @@
+Subscribe with Bloglines更新
+<p>12時間前に書いた<a href="/blog/rss/subscribe_with_bloglines.html" title="hail2u.net - Weblog - Subscribe with Bloglines">Subscribe with Bloglines</a>が、RSSファイルへのリンクが画像に張ってあると、<code>event.srcElement.tagName</code>が<code>img</code>になるので、RSSファイルへのリンクが取得できないことに気づいた。とりあえず、親要素までを辿ってみることにする。単純に、その要素か親要素の<code>tagName</code>が、<code>A</code>だったらsubscribeするように。</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;script type=&quot;text/javascript&quot; defer&gt;
+&lt;!--
+  var pWin = external.menuArguments;
+  if (pWin.event.srcElement.tagName == &quot;A&quot;) {
+    var uri = new String(pWin.event.srcElement.href);
+  }
+  else if (pWin.event.srcElement.parentElement.tagName == &quot;A&quot;) {
+    var uri = new String(pWin.event.srcElement.parentElement.href);
+  }
+  if (uri) {
+    uri = &quot;http://www.bloglines.com/sub/&quot; + uri;
+    pWin.window.open(uri, &quot;bloglines&quot;, &quot;&quot;);
+  }
+//--&gt;
+&lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+<p>最初、</p>
+<pre><code class="language-js">pWin.event.srcElement.tagName == &quot;a&quot;
+</code></pre>
+<p>とか書いて動かなかったのは秘密です。</p>
+<p>てか、<a href="http://www.methodize.org/quicksub/" title="quickSub">quickSub</a>改造すれば、汎用的なRSSファイル購読MenuExt作れたり？するかも、しれないかも。でも、新しいウィンドウ開いて、さらにそのウィンドウで操作しなきゃならなそうだから使い勝手悪そうだ。</p>

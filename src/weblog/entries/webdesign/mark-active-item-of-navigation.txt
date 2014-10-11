@@ -1,0 +1,81 @@
+ナビゲーションのアクティブな項目をマークする
+
+<figure><img src="/images/blog/mark-active-item-of-navigation.png" alt="三角や丸でアクティブな項目をマークする"></figure>
+
+<p>ウェブサイトのナビゲーションでよくある、アクティブ、つまりユーザーが閲覧中のページに対応する項目にマークを付ける場合、画像ファイルでやることが多い。最近はCSSグラデーションを使ってアクティブな時にへこませたような効果を与えたりすることもあるが、よく見かける三角のマークを付けるとなるとやはり画像で……となってしまう。しかし、単純な形に限ってなら<a href="/blog/webdesign/bordered-speech-bubble.html">枠線付きの吹き出し</a>でも利用した<code>:before</code>又は<code>:after</code>擬似要素を使えば実現できる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/181.html">Pure CSS Navigation Indicator</a></p>
+
+<p>CSSのコードは吹き出しとほとんど変わらない。ただし、位置合わせの方法が異なる。</p>
+
+<pre><code class="language-css">nav #example1 li a:after {
+  margin: -8px auto 0 auto;
+  border-top-width: 0px;
+  border-right-width: 8px;
+  border-bottom-width: 8px;
+  border-left-width: 8px;
+  border-style: solid;
+  border-color: transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}
+
+nav #example1 li a.active:after {
+  border-color: yellow transparent;
+}
+</code></pre>
+
+<p>吹き出しと違い<code>position</code>プロパティによる細かい位置調整を行わなくて良い。というよりもナビゲーション項目の幅が不定 &mdash; 項目のテキストの長さによって変化する &mdash; 場合が多いので、<code>px</code>単位による絶対配置で中揃えを行うことが難しい。代わりに<code>margin</code>プロパティを使ってナビゲーション項目の下端中央に揃うようにする。</p>
+
+<p><code>:before</code>(<code>:after</code>)擬似要素は指定した要素の前後ではなく、<em>そのコンテンツの前後</em>に<code>content</code>で指定した文字列(や画像等)を挿入するものなので、<code>display: block;</code>した上で左右のマージンを自動調整にすれば、ブロック要素の中揃えと同じように親要素にあたるナビゲーション項目の中央に揃う。</p>
+
+<pre><code class="language-css">margin: -8px auto 0 auto;
+display: block;
+</code></pre>
+
+<p>と、あとは上のマージンを枠線、つまり三角の高さ分マイナスすることでナビゲーション項目の下端に配置される。</p>
+
+<p>三角のマークを付ける場合はこうやって吹き出しと同じように<code>border</code>プロパティを使うが、最近(僕の中だけで)流行っているユニコード・グリフを利用してマークを付けることもできる。スクリーンショットの丸の方は「&bullet;<code>(=U+2022)</code>」でマークを付けている。</p>
+
+<pre><code class="language-css">nav #example2 li a:after {
+  margin-top: -1em;
+  color: transparent;
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  content: &quot;\2022&quot;;
+}
+
+nav #example2 li a.active:after {
+  color: yellow;
+}
+</code></pre>
+
+<p><code>border</code>プロパティでやる場合と違い<code>em</code>単位で調節すると楽。<code>height</code>プロパティと<code>line-height</code>プロパティを揃えて縦方向に中揃えしてやり(この場合は高さが<code>1em</code>なのであまり意味はないが)、<code>text-align</code>プロパティで横方向に中揃えする。<code>:after</code>擬似要素を<code>display: block;</code>し、<code>width</code>を指定せずにおけば、その幅はナビゲーション項目と揃うので<code>text-align</code>プロパティで中揃えがうまくいく。<code>margin</code>プロパティでは左右を<code>auto</code>にする必要はないので、上方向に<code>1em</code>マイナスするだけで良い。</p>
+
+<p><code>content</code>プロパティではユニコードのエスケープを使う。Windowsでは文字コード表、Macでは文字パレットを使えば簡単に調べられる。</p>
+
+<p><img src="/images/blog/charmap.png" alt="文字コード表"></p>
+
+<p>最後の半円も丸と同じく&bullet;で実現できる。親要素であるナビゲーション項目で<code>overflow: hidden;</code>しておき、フォントサイズを三倍にして半分切れるように<code>em</code>単位を使って上のマージンを調節してやるだけ。</p>
+
+<pre><code class="language-css">nav #example3 li a:after {
+  margin-top: -1.5em;
+  color: transparent;
+  display: block;
+  height: 3em;
+  line-height: 3em;
+  font-size: 3em;
+  text-align: center;
+  content: "\2022";
+}
+</code></pre>
+
+<p>簡単！</p>
+
+<hr>
+
+<p><code>:before</code>・<code>:after</code>擬似要素では追加マークアップなしでちょっとした飾りを付けることができるので色々遊べる。例えば<a href="/pub/test/183.html">「続きを読む」を矢印っぽくデザイン</a>してみたりとか。CSS Transitionと組み合わせると……<a href="http://code.google.com/p/chromium/issues/detail?id=54699">WebKitのバグ(というか未実装)</a>にぶち当たるのはご愛嬌。</p>

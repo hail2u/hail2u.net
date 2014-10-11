@@ -1,0 +1,36 @@
+Amazonの画像を引用
+<p>いくつか<a href="http://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで(あるならばですがね)、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、<code>event.srcElement</code>で<code>img</code>要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。</p>
+<p>てなわけで画像付きのAmazonアソシエイトリンクを作成するMenuExtのコードを書いてみる。</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;script type=&quot;text/javascript&quot; defer&gt;
+&lt;!--
+  var aid = &#39;hail2unet-22&#39;;
+
+  var pWin = external.menuArguments;
+
+  if (pWin.event.srcElement.tagName == &#39;IMG&#39;) {
+    var uri = pWin.location.href;
+    var i = uri.indexOf(&#39;ASIN&#39;);
+    var asin = uri.substring(i + 5, i + 15);
+    var uri = &quot;http://www.amazon.co.jp/exec/obidos/ASIN/&quot; + asin + &quot;/&quot; + aid;
+    var imguri = new String(pWin.event.srcElement.src);
+    var title = pWin.document.title;
+    pWin.clipboardData.setData(&quot;text&quot;, &quot;&lt;a href=\&quot;&quot; + uri + &quot;\&quot; title=\&quot;&quot; +
+      title + &quot;\&quot;&gt;&lt;img src=\&quot;&quot; + imguri + &quot;\&quot; alt=\&quot;&quot; + title + &quot;\&quot; /&gt;&lt;/a&gt;&quot;);
+  }
+//--&gt;
+&lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+<p>これを適当なフォルダに保存して、<a href="http://www.uryusoft.com/software/IEMenuExt/" title="IE MenuExt">IE MenuExt</a>で「Associate this!」などというタイトルで登録するだけ。登録時には忘れずに、表示方法のところで画像上にチェックを入れておきましょう。</p>
+<p>で、Amazonの各商品のページの*画像上で*右クリックし、Associate this!を選択すると、</p>
+<pre><code class="language-html">&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22&quot;
+  title=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;&gt;
+  &lt;img src=&quot;http://images-jp.amazon.com/images/P/B00021LRWM.09.MZZZZZZZ.jpg&quot;
+    alt=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot; /&gt;
+&lt;/a&gt;
+</code></pre>
+<p>というようなコードがクリップボードにコピーされます(見やすいように改行を入れていますが、実際には一行で)。</p>
+<p>お、なかなか良いかも。</p>
+<p>Bookmarkletには移植できるかな？各商品ページではユニークっぽい「vspace=3 hspace=5 align=left border=0」とかいう文字列をキーにして探すこともできないことは無さそうだけど、かなり力技になりそう。興味がある方は作ってみたらどうでしょう？人気者になれるかも！</p>
+<p>僕？メンドイ。</p>

@@ -1,0 +1,26 @@
+writebackプラグインについて #3
+<p>どこを改造したのかはっきりと覚えてないので、備忘録がてらにうちで使ってる<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.txt">writeback</a>の変更点をメモ。そのまんま持っていく人は結構いるみたいなので、その人たちへの解説も兼ねて。順不同。</p>
+<dl>
+<dt>__mode=rssの実装</dt>
+<dd>あんまり気にしないでください（w。まーあって困るもんじゃないので、半分シャレで実装してます。</dd>
+<dt>メールで通知</dt>
+<dd>コメントやTrackBackがあった時、メールで通知するように。sendmail利用。スパム対策などの意味も含め、User AgentやRemote Hostなんかも併せて通知するようになってます。</dd>
+<dt>サニタイズ処理</dt>
+<dd>HTMLタグの削除やエスケープ、改行の削除などなど。そのついでに、URLやメール・アドレスに自動的にリンクを張ったり、改行をbr要素に変換する処理をしてます。</dd>
+<dt>文字コード統一処理</dt>
+<dd>思いっきりハードコーディングで、UTF-8に無理やり変換してます。この処理は投稿時のみで、表示時はそのまま。</dd>
+<dt>長すぎるTrackBackの切り詰め</dt>
+<dd>TrackBackの場合は、妙に長くて困ることが結構あるので、*表示の時に*256文字に切り詰めてます(データ・ファイルには完全な形で残るということです)。コメントは切り詰めてません。</dd>
+<dt>クッキー機能の追加</dt>
+<dd>デフォルトで実装されているcokkieプラグインとの連携がうまく出来なかったので、ガリガリと実装。強制とかいうヒドイ仕様。</dd>
+<dt>コメントとTrackBackを切り分け</dt>
+<dd>別のフレーバー(comment.flavourとtrackback.flavourで独自に作れます)を適用したり、いろいろ処理してます。story.flavourには、$writeback::commentsと$writeback::trackbacksと記述すると、それぞれが表示されるようになってます。混ざってるのはわかりにくいかなぁと。ここらへんの絡みで、titleやnameが空の場合はNo TitlteとかAnonymousなどで埋めるようにもしてます。</dd>
+<dt>nameかblog_nameに自動リンク</dt>
+<dd>デフォルトだとメール・アドレスの場合は、mailto:つけなくちゃいけなかったり、空の時に嫌なa要素作ってしまうので、プラグイン側でurlパラメータの内容を解析(というほどのものではないですが)して、自動リンクを張るようにしてます。ゆえに$writeback::nameと$writeback::blog_nameがデフォルトとは違い、a要素コミで出力されます(このままで良い場合は$writeback::urlなどを書く必要が無いということ)。</dd>
+<dt>コメント数とTrackBack数</dt>
+<dd>$writeback::cm_countと$writeback::tb_countで、それぞれの数を表示できます。個人的な趣味で、これらを利用して$writeback::cm_statusと$writeback::tb_statusという文字列(No Commentとか1 TrackBackとか10 TrackBacksとかになる)も表示できるようになってたり。</dd>
+<dt>コメント投稿とTrackBack受信時間</dt>
+<dd>ま、やっぱりいつのものかは表示した方が良さげなので。comment.flavourとtrackback.flavourには、$writeback::dateとか書くことになります。</dd>
+</dl>
+<p>具体的なものは、こんなもんかな。これ以外にも、処理的な都合からいろいろ変えてたりもします(writebackのデータ・ファイルに混入する半角スペースの削除とか)。あと、このサイト専用な処理が入ってる(put_formsと連携させること前提な処理とか)ので、流用する場合はかなり気をつけたほうがいいです。<del>あんまり</del><ins>まるで</ins>誰かに使ってもらうことは意識してません。</p>
+<p>誰か、これらの機能を実装したwriteback互換のプラグイン作らないかな。僕ですか？僕はもうこれでいいのでメンドウです。</p>

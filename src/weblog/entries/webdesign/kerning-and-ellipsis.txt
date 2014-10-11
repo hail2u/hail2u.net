@@ -1,0 +1,23 @@
+font-feature-settingsの罠
+
+<p>Chrome 35で<code>font-feature-settings</code>プロパティーで<code>&quot;kern&quot; 1</code>を使いカーニングを有効にしている時、<code>text-overflow</code>プロパティーで<code>ellipsis</code>を指定しはみ出した文字を三点リーダーで省略しようとした場合に、追加される三点リーダーがコンテント・エリアをはみ出すバグがあることに気づいた。立て続けに<code>font-feature-settings</code>プロパティーでハマってキツい。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/576.html">&quot;kern&quot; 1 and ellipsis on Chrome 35</a></p>
+
+<p>Chrome 35ではカーニングを有効にすると、三点リーダーがはみ出し途中で切れる。<code>padding</code>プロパティーによる内側の余白がある場合は切れずに一応表示されるが、コンテント・エリアからははみ出す。もしかするとOSによるかもしれない。Internet Explorer 11やFirefox 30では問題ない。</p>
+
+<figure>
+  <img src="/images/blog/kerning-and-ellipsis-on-chrome-35.png" alt="Chrome 35ではカーニングを有効にすると(上)三点リーダーが欠けることが多くなるが、無効のまま(下)だと問題ない">
+
+  <figcaption>Kerning and Ellipsis on Chrome 35</figcaption>
+</figure>
+
+<p>この問題はChrome 37では既に修正済みなので、近い未来に解決される。</p>
+
+<hr>
+
+<p><code>font-feature-settings</code>プロパティーで立て続けに問題が起こってしまったので、ちょっと使いづらいプロパティーという印象が強くなりつつある。しかも一見して問題がなさそうに見えるところも厄介。継承で指定し直しというような実装の面倒さも含め、もうちょっとこなれないと実戦投入しづらいかなと感じる。今のところ<code>text-rendering: optimizeLegibitilty</code>並に罠が多いと思っておいた方が良さそう。</p>
+
+<p>この辺りは<code>font-feature-settings</code>プロパティーのChromeにおける実装の問題というよりも、もっと根が深いというかフォントのレンダリングにおける問題なような印象も受ける。そうだとするとChromeでDirectWriteによるレンダリングがデフォルトで有効になる辺りで劇的に改善されたりする可能性は高い。</p>
+
+<p>これからはこういった実装の奥の違いが影響を与えそうなCSSプロパティーかどうかとかも軽く意識しながらCSSを書いていく必要もありそう。</p>

@@ -1,0 +1,24 @@
+Path::Class(::File)のslurp()でバイナリ・ファイルががが
+
+<p>添付ファイル付きのメールを作成・送信するオレオレスクリプトを作ってて、ファイル名とかの扱いが簡単そうだったので<a href="http://search.cpan.org/dist/Path-Class/lib/Path/Class.pm">Path::Class</a>を使ってみた。添付ファイルの読み込みもPath::Class(::File)の<code>slurp()</code>でやろうとしたのだけど、バイナリ・ファイルを添付する時に<code>binmode</code>して読み込む方法がわからなくちょっと困った。そしてどうやるのが正解なのかまだわからない……。</p>
+
+<p>Path::Class(::File)の<code>slurp()</code>を含む<code>open()</code>関連のメソッドは<a href="http://search.cpan.org/dist/IO/lib/IO/File.pm">IO::File</a>を使っているようなので、こういう風に書けばとりあえず目的は達成できるらしい。</p>
+
+<pre><code class="language-perl">use Path::Class;
+
+my $file = file(&quot;foo.png&quot;);
+my $fh = $file-&gt;openr();
+$fh-&gt;binmode();
+local $/;
+my $content = &lt;$fh&gt;;
+</code></pre>
+
+<p><code>slurp()</code>のコード読んで一行追加しただけ。</p>
+
+<pre><code class="language-perl">use Path::Class;
+
+my $file = file(&quot;foo.png&quot;);
+my $content = $file-&gt;slurp(binmode =&gt; 1);
+</code></pre>
+
+<p>とか書きたい。</p>

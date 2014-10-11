@@ -1,0 +1,33 @@
+CSSで画像を三角に切り抜く
+
+<figure><img src="/images/blog/cut-a-triangle-from-an-image-with-css.png" alt="四角い画像を三角に成形したもののプレビュー"></figure>
+
+<p>要素の一部を切り抜く<a href="http://www.w3.org/TR/CSS2/visufx.html#clipping"><code>clip</code>プロパティー</a>(CSS3では<a href="http://www.w3.org/TR/2003/WD-css3-content-20030514/#the-crop"><code>crop</code>にリネームされる予定</a>)で使える関数に<code>tri()</code>とか欲しい所だけどないものはないし、追加されるとも思えないのでどうにかする話。空前のCSSで三角にするブーム。丸いサムネイルとかアキマシタヨネー。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/352.html">Cut a Triangle from an Image with CSS</a></p>
+
+<p>簡単そうなので<code>border</code>プロパティーを使ってやった。コンテナである<code>figure</code>要素に<code>::before</code>擬似要素で透過する三角をまず作る。<a href="/blog/webdesign/pure-css-speech-bubble.html">CSSで作る吹き出し</a>の逆バージョンと考えると割りと近いかも。</p>
+
+<pre><code class="language-css">.test::before {
+  border-top: 0;
+  border-right: 160px solid white;
+  border-bottom: 240px solid transparent;
+  border-left: 160px solid white;
+  content: "";
+}
+</code></pre>
+
+<p>このままでは画像の横に見えない三角が置かれるだけなので、<code>position</code>プロパティーを組み合わせて重なるようにしてやる。</p>
+
+<pre><code class="language-css">.test {
+  position: relative;
+}
+
+.test::before {
+  position: absolute;
+}
+</code></pre>
+
+<p>だいたいのブラウザで意図した通りに表示される(と思う)。</p>
+
+<p><code>border-bottom</code>プロパティーの色を<code>transparent</code>ではなくうっすらと色がつく透過色にするとか、<code>transform</code>プロパティーで少し回転させたりとか、ソリッドな色の代わりに<code>border-image</code>プロパティーを使ってちょっとラフな線にしたりするとか、もうちょっと見栄えを良くする方法はいくつかあるんじゃないかと思う。WebKitでの<code>transform</code>プロパティーが<code>border</code>プロパティーと相性が悪かったりするし、だいたいのブラウザで<code>border-image</code>プロパティーは魔窟な感じだったりするので、実用性のあるものを作るのはかなり大変そうですけどね。</p>

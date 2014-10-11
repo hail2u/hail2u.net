@@ -1,0 +1,59 @@
+grunt-task-helperが良さそう
+
+<p><a href="https://npmjs.org/package/grunt-task-helper">grunt-task-helper</a>というGruntプラグインを使っている。ざっと言うと<code>src</code>と<code>dest</code>を比較してフィルターをかけた結果を<em>他のタスク</em>で使えるようになったりするもの。例えばビルトインの比較機能である<code>newFile</code>を使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。</p>
+
+<p><a href="https://npmjs.org/package/grunt-contrib-concat">grunt-contrib-concat</a>を使っているとして、そのタスク設定が以下のようになっているとする。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &#39;;&#39;
+  },
+  prettify: {
+    src: [
+      &#39;scripts/prettify/prettify.js&#39;,
+      &#39;scripts/prettify/lang-config.js&#39;,
+      &#39;scripts/prettify/lang-css.js&#39;,
+      &#39;scripts/prettify/lang-scss.js&#39;,
+      &#39;scripts/prettify/lang-vim.js&#39;,
+      &#39;scripts/prettify/prettify-loader.js&#39;
+    ],
+    dest: &#39;scripts/prettify.js&#39;
+  }
+}</code></pre>
+
+<p>この場合は順番が重要なのでグロブでまとめて拾っていない以外は普通なマルチタスク設定。これをgrunt-task-helperを挟むように書きかえるとこうなる。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &#39;;&#39;
+  },
+  prettify: {
+    files: <mark>&#39;&lt;%= taskHelper.prettify.options.filesArray %&gt;&#39;</mark>
+  }
+},
+
+taskHelper: {
+  prettify: {
+    options: {
+      <mark>handlerByFile: &#39;newFile&#39;,</mark>
+      <mark>filesArray: []</mark>
+    },
+    src: [
+      &#39;scripts/prettify/prettify.js&#39;,
+      &#39;scripts/prettify/lang-config.js&#39;,
+      &#39;scripts/prettify/lang-css.js&#39;,
+      &#39;scripts/prettify/lang-scss.js&#39;,
+      &#39;scripts/prettify/lang-vim.js&#39;,
+      &#39;scripts/prettify/loader.js&#39;
+    ],
+    dest: &#39;scripts/prettify.js&#39;
+  }
+}</code></pre>
+
+<p><code>src</code>と<code>dest</code>をtaskHelperタスクに移して、concatタスクの<code>files</code>で<a href="http://gruntjs.com/configuring-tasks#templates">テンプレート</a>を使ってフィルター結果が格納される<code>filesArray</code>を参照してやる。ここではビルトインの<code>newFile</code>を使っていて、<code>src</code>に指定されたファイルのうち一つでも<code>dest</code>で指定されたファイルより新しい場合にのみ<code>filesArray</code>に<code>src</code>と<code>dest</code>がコピーされる。そうでない場合は空になるのでconcatタスクは何もせず完走する(エラーにはならない)。</p>
+
+<p>比較に使った<code>newFile</code>の代わりにサイズで比較する<code>size</code>を使うこともできるし、自前で<code>false</code>を返して除外していく関数を書いたりもできる。自前で色々やると誰にも読めなくなる<code>Gruntfile.js</code>の出来上がりなので、公の場では控えた方が良さそう。</p>
+
+<p><code>src</code>と<code>dest</code>の比較だけじゃなくて、<code>src</code>の中味をちょっといじって<code>dest</code>に吐くみたいなことも出来る<code>handlerByContent</code>というオプションなどもある。READMEの例ではSSIのインクルードみたいなことやってて、そういったファイルをちょっと弄るだけのタスクなら自前でファイルの読み書きとかをすることなく簡単に書けるようだ。</p>
+
+<p>まだ公開されたばかりのGruntプラグインなので、いろいろな変更や機能の追加がありそうでどういうものになるかはなんとも言えない。けどGruntのとりあえず全部やる的な大雑把さを効率化させるのに役に立ちそうで期待している。</p>

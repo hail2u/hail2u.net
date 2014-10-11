@@ -1,0 +1,31 @@
+configプラグイン動かねぇ！
+<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のパワフルなプラグインのひとつに、<a href="http://www.blosxom.com/plugins/general/config.htm" title="blosxom :: the zen of blogging :: plugins/general/config.txt">configプラグイン</a>という、グローバルな設定(<code>$blog_title</code>とか)を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、<a href="http://groups.yahoo.com/group/blosxom/message/990" title="Yahoo! Groups : blosxom Messages : Message 990 of 7272">設定の説明がMLのアーカイブにしかない</a>ことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。</p>
+<p>どうにかこうにか、</p>
+<pre><code class="language-perl">package blosxom;
+
+$blog_title = &#39;FooBarBlosxom&#39;;
+
+1;
+</code></pre>
+<p>とか書いて、configとかconfig.htmlとかいうファイル名でファイルを作ってやれば良いということまでは理解できました。</p>
+<p>しかし、動きません。</p>
+<p>まず第一の原因は、どうやら<code>head</code>サブルーチンで設定ファイルを読んでいることにあるようです。プラグインを読み込む順番によっては、うまく読んでくれないことがあるかもしれないとか。これに対しての解は<code>head</code>サブルーチンから<code>filter</code>サブルーチンに変更してやるか、configプラグインを最初に読み込むように00configなどと名前を変更してやるだけです。</p>
+<p>次の原因は、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>との兼ね合いっぽいです。blosxomはエントリのファイルをリストアップする際に、エントリ・ファイルとみなす拡張子以外のファイルを<code>%others</code>というハッシュに格納するので、configプラグインの設定ファイルはこちらに格納されることになります。また、configプラグインでは、その<code>%others</code>に格納されているかどうかで、設定ファイルの存在を確認しています。通常はこれで問題ないのですが、entries_indexでは、この<code>%others</code>をまるごと吹っ飛ばしているっぽいので、configプラグインで設定ファイルの存在を検知できていないような。なので、その部分をちょっと書き換えてやる必要があるかもないかも。本格的な対策はentries_indexを書き換えるべきなんでしょうけど、あれのコードはかなりトリッキーで僕にはちょっと正確に読めないです。configプラグインの</p>
+<pre><code class="language-perl">$blosxom::others{&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;}
+  and eval { require &quot;$blosxom::datadir$path/config.$blosxom::flavour&quot; }
+  and ( $@ ? warn $@ : last );
+$blosxom::others{&quot;$blosxom::datadir$path/config&quot;}
+  and eval { require &quot;$blosxom::datadir$path/config&quot; }
+  and ( $@ ? warn $@ : last );
+</code></pre>
+<p>となっている部分を、</p>
+<pre><code class="language-perl">-e $blosxom::datadir$path/config.$blosxom::flavour
+  and eval { require &quot;$blosxom::datadir$path/config.$blosxom::flavour&quot; }
+  and ( $@ ? warn $@ : last );
+-e $blosxom::datadir$path/config
+  and eval { require &quot;$blosxom::datadir$path/config&quot; }
+  and ( $@ ? warn $@ : last );
+</code></pre>
+<p>と、ファイルテスト演算子で存在確認するようにしたらちゃんと動作するようになりました。適当過ぎな改造ですので、あまり参考にしないほうが良いです。ていうか、正確に挙動をつかめてないですしね。</p>
+<p>ちなみに、entries_indexを大幅に拡張した<a href="http://www.blosxom.com/plugins/indexing/entries_cache.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_cache.txt">entries_cache</a>の方では、<code>%others</code>をきちんと扱っているようなので、そのままでうまく動くような気がします。entries_indexはパフォーマンス的にも機能的にもちょっと落ちるので、entries_cacheが使える環境の場合はこちらを使った方が良いような気も。</p>
+<p>blosxomの抱える大きな問題のひとつは、こういったプラグイン同士の相性かなぁ。基本的に多くのプラグインを使うことが多いでしょうしね。まぁ、大概はよーくコードを眺めてみれば解決できたりするわけなんですが(構造上巨大なプラグインというのはそう無いですし)。</p>

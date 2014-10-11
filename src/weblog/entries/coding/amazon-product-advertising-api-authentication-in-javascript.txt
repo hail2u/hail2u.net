@@ -1,0 +1,37 @@
+Amazon Product Advertising APIの認証をJavaScriptで
+
+<p>既に色々なところで話題になっている<a href="http://affiliate-blog.amazon.co.jp/2009/05/amazon-%E3%82%A2%E3%82%BD%E3%82%B7%E3%82%A8%E3%82%A4%E3%83%88-web-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E5%90%8D%E7%A7%B0%E5%A4%89%E6%9B%B4%E3%81%8A%E3%82%88%E3%81%B3%E7%BD%B2%E5%90%8D%E8%AA%8D%E8%A8%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B.html">AmazonのECSがProduct Advertising APIに名称変更され、3ヵ月後には認証を要求するようになる</a>という変更は、<a href="http://pipes.yahoo.com/pipes/">Pipes</a>(や<a href="http://developer.yahoo.com/yql/">YQL</a>)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえず<a href="http://github.com/hail2u/asamashi09/tree/authen-test">Asamashi09を対応させた</a>けど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。</p>
+
+<p>使ってみる場合は適当な場所にダウンロード(↓downloadとかいうボタンから)して、適当な場所に展開後、asamashi09.jsの11行目と12行目を自分のAccess Key IDとSecret Access Keyに置き換え、index.htmlをブラウザで開けば動く(はず)。</p>
+
+<p>使ったライブラリは、</p>
+
+<ul>
+<li><a href="http://blog.livedoor.jp/dankogai/archives/51067688.html">base64.js</a></li>
+<li><a href="http://point-at-infinity.org/jssha256/">jssha256.js</a></li>
+</ul>
+
+<p>の2つ。</p>
+
+<p><a href="http://github.com/hail2u/asamashi09/blob/7f8ae9b8dc4a6c7eaa3cf16e9cecd73f1853e10d/asamashi09.js">asamashi09.js</a>の110-127行目と192-221行目あたりが実装になる。とりあえず動くものを作ろうとダラダラ書いたので再利用できなさそうなものになった。ちゃんと書き直す。</p>
+
+<p>以下ははまった所と注意した方が良さそうな所のメモ。</p>
+
+<dl>
+<dt>シグネチャ作る時のドメインもecs.amazonaws.jpに変える</dt>
+<dd>最初コピペでwebservices.amazon.comのままで生成しててはまった</dd>
+<dt>URLエンコード絡み</dt>
+<dd>二重にエンコードしてしまったり、するべきところでしていなかったりで認証キーが一致しないことが多々</dd>
+<dt>SubscriptionIdでは認証通らない</dt>
+<dd>AWSAccessKeyIdじゃないとダメっぽい(多分)</dd>
+<dt>AWSAccessKeyIdはAssociateTagより前</dt>
+<dd>Windowsっぽいソートに慣れてしまってて素で間違えた</dd>
+<dt>TimestampはExpiredがある</dt>
+<dd>Timestampで指定した時間から15分くらいで期限切れ扱いになるので、適当な時間を投げるのはダメ</dd>
+<dt>URLエンコードはRFC 3986準拠</dt>
+<dd><code>encodeURIComponent()</code>だといくつか足らない</dd>
+</dl>
+
+<hr>
+
+<p>Secret Access Keyを隠す方法とか思いつかないんだけど……。</p>

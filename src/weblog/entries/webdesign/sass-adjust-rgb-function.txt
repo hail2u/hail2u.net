@@ -1,0 +1,27 @@
+adjust-rgb()というSassの関数を作った
+
+<p><a href="http://sass-lang.com/">Sass</a>には色調節の関数が色々用意されています。その中に<a href="http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#adjust_color-instance_method"><code>adjust-color()</code></a>というRGBとHSLで色を割合ではなく指定量だけ調節できる汎用関数があるんですが、RGBをそれぞれ同じ量だけ明るく(暗く)したい時の引数指定が面倒です。というわけでそれをラップする<code>adjust-rgb()</code>という関数を作ってみました。</p>
+
+<pre><code class="language-scss">@function adjust-rgb($color, $dec: 1) {
+  $num: 255 * $dec;
+
+  @return adjust-color($color, $red: $num, $green: $num, $blue: $num);
+}
+</code></pre>
+
+<p>第一引数で色を、第二引数で係数を指定します。係数は-1から1の間で、負の値を指定すると黒に近くなり、正の値を指定すると白に近くなります。</p>
+
+<pre><code class="language-scss">.test {
+  color: adjust-rgb(#369, 0.2); // returns #69c
+}
+</code></pre>
+
+<p><code>transparentize()</code>と引数を共通にしたので、<code>transparentize()</code>の(返す<code>rgba()</code>の)フォールバックに使うと便利です。というかそのために考えました。</p>
+
+<pre><code class="language-scss">.test {
+  background-color: adjust-rgb(#090909, 0.9);
+  background-color: transparentize(#090909, 0.9);
+}
+</code></pre>
+
+<p>背景色が白(か黒)に近くないと意味無いのでもうちょっとなんとかしたいんですが、面倒になったところです。</p>

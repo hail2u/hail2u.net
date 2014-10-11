@@ -1,0 +1,13 @@
+IEでフロートさせたボックスのマージンが倍になるバグ
+<p>WindowsのIE5.5や6など(5とか5.01は知らない)には<code>float</code>させたボックスへ指定した左右の<code>margin</code>が正常に反映されない(倍になる)という<a href="http://members.at.infoseek.co.jp/cssbug/detail/winie/b107.html" title="Internet Explorer (Windows) CSSバグリスト">バグがあります</a>。最近は<code>float</code>を使ってゴニョゴニョする機会も多いと思うので厄介に考えている人も多いでしょう。実は<code>display: inline;</code>とか指定してやると回避できちゃったりとかします。ネタ元は<a href="http://positioniseverything.net/explorer/doubled-margin.html" title="IE Doubled Float-Margin Bug - CSS fixes and workarounds">The IE Doubled Float-Margin Bug</a>だったような気がしますが、別なところで見つけたような気もする。</p>
+<p>バグの状況自体は上記CSSバグリストのURLを参照していただければわかりやすいです。と言いつつ回避手段の使用前/後を並べてみた<a href="/pub/test/033.html" title="IE Doubled Margin Bug">HTMLを用意してみました</a>。IEで見れば一目瞭然で、1つ目のコンテナ内のフロートさせたボックスの左のマージンは倍(80px)になっているのに対し、2つ目のコンテナ内のフロートさせたボックスの左のマージンは指定どおり(40px)です。</p>
+<p>コードは<code>float: left;</code>(<code>float: right:</code>)と同時に<code>display: inline;</code>を指定するというだけで、HTMLに特に手を加える必要も、IE用にCSSコードを切り分ける必要もありません。</p>
+<pre><code class="language-css">#floatbox {
+  margin-left: 40px;
+  float: left;
+  width: 160px;
+  display: inline;
+}
+</code></pre>
+<p>FirefoxやOperaではCSS2の仕様に従って<code>float</code>を指定した要素への<code>display</code>の指定を無視してくれる(See Also: <a href="http://www.w3.org/TR/REC-CSS2/visuren.html#float-position" title="Visual formatting model">Positioning the float: the &#39;float&#39; property</a>)ということもあるので、将来的にも<code>display: inline;</code>という意味の無い指定による誤作動は起こらないんじゃないかなと。</p>
+<p>バッド・ノウハウ。</p>

@@ -1,0 +1,45 @@
+カスケーディングとSassの@extend
+
+<p><a href="http://sass-lang.com/">Sass</a>の<code>@extend</code>を駆使すると出力されるCSSを効率化することができます。ただ<code>@extend</code>は様々な場所に書かれている複数のセレクタを<em>なんとなく</em>まとめるものなので、CSSのカスケーディング順位も入れ替わってしまう。あまりハマることは無さそう……なんですけど、僕はばっちりハマりました……。</p>
+
+<p>簡略化したハマるコードがうまく思いつかなかったので、実際にハマったコードをちょっと略して書きます。具体的にはMobile firstでMedia Queriesを使ったケース。</p>
+
+<pre><code class="lang-scss">.column {
+  @media screen and (min-width: 768px) {
+    padding: 0;
+    display: block;
+    float: left;
+    width: 50%;
+  }
+}
+
+.news {
+  padding-left: 40px;
+  display: list-item;
+  @extend .column;
+}
+</code></pre>
+
+<p>更新情報が含まれる<code>.news</code>の表示をブラウザの幅が狭い時はリスト、広い時はカラム分けに切り替えようという意図で、定義済みのカラムを<code>@extend</code>で利用して以上のように書いた。ベースとして単純なカラム(やグリッド)を定義しておいて、特定のパーツで少し追加でスタイルを書くというような使い方で、あんまり変でもないと思います。</p>
+
+<pre><code class="lang-css">@media screen and (min-width: 768px) {
+  .column,
+  .news {
+    padding: 0;
+    display: block;
+    float: left;
+    width: 50% }
+}
+
+.news {
+  padding-left: 40px;
+  display: list-item }
+</code></pre>
+
+<p>出力CSSはこうなるので、<code>@media</code>ブロックのルールよりも後に書かれた普通のルールが優先される。つまり、ブラウザ幅が広い時にも左のマージンとリスト表示のままで、それに加えて<code>float</code>されるということになってしまう。</p>
+
+<p>サンプルが悪くてエッジケースにしか見えないんだけど、<code>@extend</code>を使うとSassのコードを書いた順序の通りにカスケーディング順位が決まるわけではなくなってしまうことには注意が必要なんじゃないかと。CSSに慣れ親しんでいる人程ハマりそう。</p>
+
+<hr>
+
+<p>ゆるい文体書けなくなってる。とか意識するのが悪そうなのでもっと適当な感じで書く。あ、あと年男です、祝え。</p>

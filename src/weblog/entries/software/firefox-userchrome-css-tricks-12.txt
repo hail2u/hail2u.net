@@ -1,0 +1,82 @@
+FirefoxのuserChrome.cssネタ #12
+
+<p>久々。Firefox 3になったときにずいぶん減らしたんだけど、だんだん増えてきたので整理しつつここではまだ書いてなかったものだけ。別のところで書いたやつもあるけど、ここでは初出ということで。</p>
+
+<h2>ロケーションバーや検索バーでIMEをオフにする</h2>
+
+<pre><code class="language-css">#urlbar input,
+#FindToolbar input {
+  ime-mode: inactive !important;
+}
+</code></pre>
+
+<p>「g 検索語」などキーワード検索機能を多用する場合、IMEがオンだと悲しいことになるので設定。検索バーでもオフにするかどうかは好みで。</p>
+
+<h2>進むボタンを無効な時は隠す</h2>
+
+<pre><code class="language-css">#forward-button[disabled=&quot;true&quot;] {
+  display: none !important;
+}
+</code></pre>
+
+<figure><img src="/images/blog/hide-forward-botton.png" alt="進むボタンを隠すとすっきりする"></figure>
+
+<p>進むは戻るを使った時にしか有効にならないので、ほとんどの時間は無効。そのためにスペースを割くのはもったいないので無効なときは削除するとすっきり。そもそも戻るに比べて進むは使用頻度が低い(と思う)ので、完全に非表示でも良いかもしれない。</p>
+
+<h2>ロケーションバーのドロップダウンの高さを変更する</h2>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult {
+  height: 514px !important;
+}
+</code></pre>
+
+<p>デフォルトでは6件分の高さ(テーマ依存)。僕の環境では上記サイズで12件分表示されている(もちろんシステムのUIフォント設定などさまざまなものに依存するので12件分とは限らない)。各候補の高さが一様ではない(アイコンが表示されたりするとずれるっぽい)ので、丁度○○件分の高さにするとかは難しそう。またデフォルトではリストアップする最大数が12になっているので、about:configから<code>browser.urlbar.maxRichResults</code>を変更するとより多くの候補が表示される(多くしすぎると重くなるので注意)。</p>
+
+<p>残念ながら候補が少ない場合、ドロップダウンに空白ができてしまいものすごいかっこ悪い。これを解決する方法は今のところ見つかっていない……。</p>
+
+<h2>ロケーションバーでの絞り込みのハイライトを赤く</h2>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult span.ac-emphasize-text {
+  color: #cc0000 !important;
+  font-weight: normal !important;
+}
+</code></pre>
+
+<figure><img src="/images/blog/highlight-richresult-in-red.png" alt="絞込みのキーワードを赤でハイライト"></figure>
+
+<p>デフォルトでは太字+下線で色は変わらない。見づらいというほどではないのだけど、色を変えたほうが見やすかった。赤文字はちょっと気持ち悪いかもしれないので、テーマに合わせて調節すると良いと思う。</p>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult span.ac-emphasize-text {
+  color: #000000 !important;
+  background-color: #ff8000 !important;
+}
+</code></pre>
+
+<p>というように背景を変更してもなかなか見やすい。</p>
+
+<h2>ブックマークツールバーをシンプルに</h2>
+
+<pre><code class="language-css">#bookmarksBarContent &gt; .bookmark-item {
+  padding: 3px 12px !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-icon {
+  display: none !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-menu-dropmarker {
+  display: -moz-box !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-menu-dropmarker &gt; .dropmarker-icon {
+  display: -moz-box !important;
+}
+</code></pre>
+
+<figure><img src="/images/blog/simple-bookmark-toolbar.png" alt="シンプルなブックマークツールバー"></figure>
+
+<p>Safariっぽくアイコンを非表示にして、フォルダにはドロップダウンのマーカーをつける。<code>.bookmark-item</code>のスタイルで<code>-moz-border-radius</code>を使ったり、もっと細くなるように調節したりすればもっとSafariに近づけることができる……が、子要素の<code>.bookmark-item</code>でスタイルを戻さないとならないので非常に面倒なことになるのでオススメしない。素直に<a href="https://addons.mozilla.org/ja/firefox/addon/12782">MacOSX Theme</a>などをインストールした方が良い。</p>
+
+<hr>
+
+<p>Google Chromeもこんな感じで簡単にUIカスタマイズできたら良いなぁ……。</p>

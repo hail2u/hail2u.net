@@ -1,0 +1,120 @@
+枠線付きの吹き出し
+
+<figure><img src="/images/blog/bordered-speech-bubble.png" alt="枠線付き吹き出しの完成！"></figure>
+
+<p>ミニブログの隆盛以降ウェブ上でよく見かける吹き出しをCSSで作るお話。単色のものは<a href="/blog/webdesign/pure-css-speech-bubble.html">かなり前に書いた</a>。今回はそれに枠線をつけてみよう！みよう！みよう！</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/179.html">Bordered Speech Bubble</a></p>
+
+<p>枠線は単なる<code>solid</code>な<code>border</code>で少し角を丸めただけ。</p>
+
+<h2>尻尾を付ける</h2>
+
+<p><code>:before</code>擬似要素を使う。デモの3番目のサンプルのように、まず枠線と同じ色で三角形を作る。三角形は以前のエントリで書いた手法と同じで、左右の<code>border</code>を<code>transparent</code>にすることによって作る。</p>
+
+<pre><code class="language-css">.speech-bubble:before {
+  border-top-width: 16px;
+  border-right-width: 16px;
+  border-bottom-width: 0;
+  border-left-width: 16px;
+  border-color: #369 <em>transparent</em>;
+  border-style: solid;
+  display: block;
+  position: absolute;
+  bottom: <em>-16px</em>;
+  left: 16px;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}
+</code></pre>
+
+<p><code>bottom</code>に負の値を指定して下方向にずらせば下に尻尾がつくようになる。</p>
+
+<h2>尻尾の中をくり抜く</h2>
+
+<p><code>:before</code>擬似要素で作った三角と同じものを今度は<code>:after</code>擬似要素で背景色と同じ色で作る。</p>
+
+<pre><code class="language-css">.speech-bubble:after {
+  border-top-width: 16px;
+  border-right-width: 16px;
+  border-bottom-width: 0;
+  border-left-width: 16px;
+  border-color: <em>#9cf</em> transparent;
+  border-style: solid;
+  display: block;
+  position: absolute;
+  bottom: <em>-10px</em>;
+  left: 16px;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}
+</code></pre>
+
+<p>コードはほとんど同じ。内側をくり抜くようにするため<code>bottom</code>で指定する負の値を控えめ(<code>borderWidth - Math.sqrt(Math.pow(borderWidth, 2) * 2)</code>)にするだけ。具体的には以下の様な位置に配置する。</p>
+
+<figure><img src="/images/blog/cut-tail-inner.png" alt="尻尾のくり抜き"></figure>
+
+<p>わかりやすいように色を変えておいたが、これを背景色と合わせればきれいにくり抜かれることになる。</p>
+
+<hr>
+
+<p>以上を組み合わせるとポストモダンブラウザ(要出典)では最初に挙げたスクリーンショットのような枠線付き吹き出しが完成する。</p>
+
+<h2>おまけ</h2>
+
+<p>長いのでSCSSのpartialを作っておいたりすると便利な気がする。</p>
+
+<pre><code class="language-scss">@mixin bordered-speech-bubble($background-color: #9cf, $border-color: #369) {
+  border: 4px solid $border-color;
+  position: relative;
+  background-color: $background-color;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+
+  &amp;:before {
+    border-top-width: 16px;
+    border-right-width: 16px;
+    border-bottom-width: 0;
+    border-left-width: 16px;
+    border-color: $border-color transparent;
+    border-style: solid;
+    display: block;
+    position: absolute;
+    bottom: -16px;
+    left: 16px;
+    width: 0;
+    height: 0;
+    content: &quot;&quot;;
+  }
+
+  &amp;:after {
+    border-top-width: 16px;
+    border-right-width: 16px;
+    border-bottom-width: 0;
+    border-left-width: 16px;
+    border-color: $background-color transparent;
+    border-style: solid;
+    display: block;
+    position: absolute;
+    bottom: -10px;
+    left: 16px;
+    width: 0;
+    height: 0;
+    content: &quot;&quot;;
+  }
+}
+</code></pre>
+
+<p>というミックスインを含んだSCSSファイルを<code>_bordered-speech-bubble.scss</code>という名前で作っておけば、</p>
+
+<pre><code class="language-scss">@import &quot;bordered-speech-bubble&quot;;
+
+.speech-buble {
+  @include bordered-speech-bubble(#9cf, #369);
+}
+</code></pre>
+
+<p>と書くだけで使える。大抵作っても使わないんですけども！</p>

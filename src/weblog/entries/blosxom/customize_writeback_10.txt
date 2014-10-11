@@ -1,0 +1,22 @@
+Customize writeback plugin #10
+<p>久々に本腰を入れて<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writeback</a>をいじり始めてみる。ローカルでホニャララしつつ、アップロードして確認。そしてうっかり500エラー。以上の繰り返しでいろいろやってみる。<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>本体に<a href="http://search.cpan.org/search?module=CGI::Carp" title="search.cpan.org: CGI::Carp - CGI routines for writing to the HTTPD (or other) error log">CGI::Carp</a>の<code>fatalsToBrowser</code>を追加して簡易チェックという手抜きっぷりで！</p>
+<p>やったことは</p>
+<ol>
+<li>cookieヘッダの追加を<code>foot</code>から<code>last</code>に移動した</li>
+<li>整理した</li>
+<li>put_formsとかいうアレなプラグインの機能を内包させた</li>
+<li>整理した</li>
+<li>strictにした</li>
+<li>整理した</li>
+</ol>
+<p>てな感じ。strictにして整理したのに読みにくくなった気がするのは、きっと気のせい。</p>
+<p>put_formsの機能は、</p>
+<pre><code class="language-perl">if ($blosxom::path_info =~ /\.$blosxom::flavour$/) {
+  my $tmpl = &amp;$blosxom::template($path, &#39;story.permalink&#39;, $blosxom::flavour);
+  $$story_ref = $tmpl if $tmpl;
+}
+</code></pre>
+<p>というコードを<code>story</code>サブルーチンに仕込んで、<code>$datadir</code>にstory.permalink.htmlというファイルにフォームやら何やらを突っ込むという感じにしましたよ。中々良い。</p>
+<p>あとは微妙に<a href="http://search.cpan.org/search?module=Jcode" title="search.cpan.org: Jcode - Japanese Charset Handler">Jcode</a>回りのコードを変えて、メモリ節約されたりするといいなぁとかなんとか。</p>
+<p>並行して一から作り直してもいる(ヒマすぎ)んですが、writebackのデータファイル形式にこだわると碌なことにならないとかいう。そして投げ気味。</p>
+<p>続いてスパム対策関連のコードをもっと綺麗にまとめようかなとかー。あんまり考えないで作ったから手を入れるのがめんどくさいなー。別プラグインにするって言う手もありそうだなー。とか、書くと誰か作ってくれたりして！りして！して！て！</p>

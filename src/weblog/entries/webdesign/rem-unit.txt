@@ -1,0 +1,40 @@
+rem単位
+
+<p>ルート要素の文字サイズを基準にする長さの単位<code>rem</code>に<a href="http://www.opera.com/">Opera</a>が11.6で対応した。これで5大ブラウザの最新安定バージョン全てで使えるようになったことになる。主に見出しのマージンの指定などで威力を発揮するんじゃないかと思うし、<code>em</code>よりもグリッドシステムに向いてそうな気配がある。ただ<code>rem</code>単位をサポートしていないブラウザではガン無視されるので、書き方には工夫が必要になる。</p>
+
+<p>一番使いそうな<code>margin</code>プロパティーでの利用を考えてみる。まずまとめて指定するケース。</p>
+
+<pre><code class="language-css">h1 {
+  margin: 3rem 0 0 0;
+  font-size: 250%;
+}
+</code></pre>
+
+<p>これだと<code>margin</code>プロパティーで指定した値全てが無視されてしまう。非対応ブラウザでのフォールバックを考えると先に<code>em</code>等で書いておいて、<code>rem</code>で上書きする必要がありそう。</p>
+
+<pre><code class="language-css">h1 {
+  margin: 1.2em 0 0 0; /* 1.2 = 3 / 2.5 */
+  margin-top: 3rem;
+  font-size: 250%;
+}
+</code></pre>
+
+<p>単なる計算なので<a href="http://sass-lang.com/">Sass</a>があるなら<code>$ratio</code>とかいう変数を用意して書くとメンテナンスしやすそう。</p>
+
+<pre><code class="language-scss">h1 {
+  $ratio: 2.5;
+  margin: (3em / $ratio) 0 0 0;
+  margin-top: 3rem;
+  font-size: percentage($ratio);
+}
+</code></pre>
+
+<p><code>rem</code>使う意味ない……。</p>
+
+<p>フォールバックを考えない、つまりIE8以下を無視する場合では便利で見通しの良いCSSを書けるようになることは確かなんだけど、<code>rgba()</code>などとは違って所詮は計算でどうにかなる程度のものでしかないことを考えると……。ブラウザーのデフォルト・スタイルシートですら使われてないし、まだちょっと使用には踏み切れない感じかなぁ。</p>
+
+<hr>
+
+<p>ということ(？)で<a href="https://github.com/hail2u/vim-css3-syntax">vim-css3-syntax</a>を更新して、<code>rem</code>を始めとした新単位等に対応したりしました。これで<a href="http://www.w3.org/TR/2011/WD-css3-values-20110906/">css3-values-20110906</a>には追いついたと思う。正直忘れてた。<a href="http://www.w3.org/TR/2011/WD-css3-values-20110906/#cycle"><code>cycle()</code></a>とかなにこれカッコイイ。この更新でcss3-functions.vimからcss3-values.vimにファイル名を変えたので、HTMLやSassにシンタックス定義を追加している人はそちらも合わせて更新する必要がある。空で残しておこうかと思ったけどそれもアレなので消した。</p>
+
+<p>コミット・メッセージにつづりミスを発見するのはなぜいつも<code>push</code>した後なのだろう……。</p>

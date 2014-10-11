@@ -1,0 +1,65 @@
+calc()とvw単位を使った飛び出すpre要素
+
+<figure>
+  <img src="/images/blog/expand-pre-with-calc-and-vw.png" alt="pre要素の背景をビューポートの幅まで拡大する">
+</figure>
+
+<p>飛び出す<code>pre</code>要素っていうのは昔書いた<a href="/blog/webdesign/expand-pre-background.html">描画領域一杯に<code>pre</code>要素の幅を拡大するテクニック</a>と目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それを<code>vw</code>単位を使ってビューポートの幅を取り、それと<code>calc()</code>を組み合わせることでどうにかしようという試み。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/583.html">Expand pre Element #2</a></p>
+
+<p><code>pre</code>要素の左右が<code>#f0f</code>の矩形で埋められている。Chrome 35、Firefox 30、そしてInternet Explorer 11で確認できる。Mobile Safari 7ではうまく動かない(多分<code>vw</code>単位の問題のような気がする)。わかりやすいように左右に追加する擬似要素の背景の色を変えておいたけど、同じ色にすればあたかも<code>pre</code>要素が飛び出すように見えるはず。</p>
+
+<pre><code class="language-css">.test {
+  margin-right: auto;
+  margin-left: auto;
+  position: relative;
+  width: 480px;
+}
+
+.test:before,
+.test:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  <mark>width: calc((100vw - 100%) / 2);</mark>
+  height: 100%;
+  content: &quot;&quot;;
+  background-color: #f0f;
+}
+
+.test:before {
+  right: 100%;
+}
+
+.test:after {
+  left: 100%;
+}
+</code></pre>
+
+<p><code>vw</code>単位は<code>1vw</code>でビューポートの幅の<em>1/100</em>なので、<code>100vw</code>がビューポートの幅になる。<code>calc()</code>では<code>%</code>も使え、<code>width</code>プロパティーで<code>calc(100%)</code>とすると<em>その要素の幅</em>になる。つまり<code>calc(100vw - 100%)</code>で<em>ビューポート幅からその要素の幅を引いた余り</em>を計算できることになる。デモでは<code>pre</code>要素は真ん中寄せなので単純にこれを半分にし、左右に追加する擬似要素の幅にすれば良い。高さは<code>100%</code>で自動的に揃うので計算不要。</p>
+
+<p>左右に追加する擬似要素の位置調整は<code>position</code>プロパティーを使った相対配置内での絶対配置で行う。</p>
+
+<hr>
+
+<p>だいたい問題なくてどんな状況でも使える解だと思ったんだけど、<code>vw</code>単位にスクロールバーの幅が含まれてしまうことによって起こる問題が解決できなそう。WindowsのChrome 35やInternet Explorer 11 (デスクトップ版)などスクロールバーが浮いていないブラウザーでは、その幅分ずれてしまい水平スクロールバーが出るようになる。この<code>vw</code>単位などにおけるスクロールバーの解釈については、仕様に以下のように注意書きがある。</p>
+
+<figure>
+  <blockquote>
+    <p>Note that the initial containing block&#39;s size is affected by the presence of scrollbars on the viewport.</p>
+  </blockquote>
+
+  <figcaption>— <a href="http://www.w3.org/TR/css3-values/#viewport-relative-lengths"><cite>5.1.2. Viewport-percentage lengths: the ‘vw’, ‘vh’, ‘vmin’, ‘vmax’ units</cite></a></figcaption>
+</figure>
+
+<p>スクロールバーの有無に<em>影響を受ける</em>となっているので、実装バグのような気がする。この辺りの扱いが直るまではスクロールバーの幅を決め打ちである程度確保して<code>calc()</code>内で更に引く必要がありそう。</p>
+
+<p>ただしInternet Explorer 11以降では<code>-ms-overflow-style</code>独自プロパティーでオーバーレイのスクロールバーに変更できるのでなんとか解決できる。</p>
+
+<pre><code class="language-css">html {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+</code></pre>
+
+<p><code>overflow-style</code>プロパティー自体は一時期いくつかの標準仕様に存在したんだけど、今は<code>overflow</code>プロパティーへ統合された。元々<code>overflow</code>した時の内容物の扱われ方を定義するプロパティーだったようなので、スクロールバーの表示形式の変更に使うのは間違ってたりとかすることもあるので、独自プロパティーであることに目をつぶったとしても使わない方が良さそう。</p>

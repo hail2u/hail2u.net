@@ -1,0 +1,34 @@
+Opera 11とサブセット化したフォント
+
+<figure>
+  <img src="/images/blog/opera-11-and-subsetted-font.png" alt="サブセット化したフォントを指定するとOpera 11では一文字目にしかフォントが反映されていない">
+</figure>
+
+<p>ナビゲーションとロゴをサブセット化したフォントを使うようにしたのだけど、Opera 11で一文字目にしか反映されないというなかなか意味不明なバグにハマった。Nextでも起こるので当面直らなそう。こういう現象も起こるよ……というメモにしとこうかと思ったけど、どうやら<code>text-transform</code>プロパティーとの組み合わせでおかしくなっているっぽい。</p>
+
+<p>ここのナビゲーションは、</p>
+
+<pre><code class="language-html">&lt;header role="banner"&gt;
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href="/about"&gt;About&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</code></pre>
+
+<p>とHTMLではなっていて、</p>
+
+<pre><code class="language-css">[role="banner"] nav {
+  font-family: "Nav", sans-serif;
+  text-transform: uppercase;
+}
+</code></pre>
+
+<p>でキャピタライズしている。サブセット化したフォントは大文字しか含めていない。この両者が良くないようでグリフの有無をキャピタライズする<em>前</em>の文字列で判断しているらしく、Opera 11はグリフが無いと判断してしまうようだ。そして残りは<a href="/blog/webdesign/opera-and-web-fonts.html">持ってないグリフが明朝体になるバグ</a>が発火して<code>sans-serif</code>にすらならないという……。</p>
+
+<p>他にも色々テストしていたら<a href="/pub/test/402.html">存在しないグリフ以降でおかしくなるみたいなバグ</a>も見つけた。Operaのことを考えるとWebフォント使えない……みたいなのは嫌なのでなんかうまい方法考えることにしよう。</p>
+
+<h2>追記</h2>
+
+<p>うまい修正方法考えつくまで放っておこうかと思ったけど、あまりにも気持ち悪いのでとりあえず小文字も含めてサブセット化することによって修正した。<code>text-transform</code>プロパティーとの組み合わせで起こるバグは<a href="/pub/test/403.html">別にテスト・ページを作成しておいた</a>。</p>

@@ -1,0 +1,34 @@
+CSSグラデーションによるリンクの下線
+
+<p>CSSグラデーションを使った太くならないリンクの下線は、<a href="https://medium.com/designing-medium/crafting-link-underlines-on-medium-7c03a9274f9">Mediumの詳細な記事</a>や<a href="http://terkel.jp/archives/2014/04/link-underline/">terkel.jpのその解説とも言える記事</a>を見てそのうちやってみようと思っていた。フォントサイズが大きい時に下線が<code>2px</code>や場合によっては<code>4px</code>くらいで引かれるようになるのは見た目に結構な負荷を与えるので、常に<code>1px</code>で引きたいといった希望を持ってる人は多いはずだ。</p>
+
+<p>このウェブサイトでは以下の要件を満たすような感じで実装した。</p>
+
+<ul>
+<li>常に<code>1px</code>で下線を引く</li>
+<li>文字サイズに依存しない</li>
+<li>なるべくシンプルな実装</li>
+</ul>
+
+<pre><code class="language-css">a {
+  background-image: linear-gradient(
+    transparent 0,
+    transparent 50%,
+    rgb(91, 172, 208) 50%
+  );
+  background-position: 0 1.1em;
+  background-repeat: repeat-x;
+  background-size: 2px 2px;
+  text-decoration: none;
+}
+</code></pre>
+
+<p><code>1px</code>の下線にするには<code>2px</code>の背景画像の半分だけ塗るCSSグラデーションを作る。メディア・クエリーで分岐する必要はない(と思う)。下線の位置はフォント・サイズに合わせて可変になるように<code>em</code>単位を使って指定した。フォントとそのグリフの高さで多少のずれが起こるので要調整だが、だいたい<code>1.05–1.15em</code>だと思われる。</p>
+
+<hr>
+
+<p>この記事を書いた時点では、上記スタイルに加えて<code>color</code>を<code>inherit</code>にしているので、下線のみ色が変わる。この形だと読みやすさそのものは向上するが、リンクの視認性はかなり下がるような印象も持った。<code>text-decoration-color</code>プロパティーでも同じことが言えると思うので、このプロパティーが気軽に使えるようになってもこういった点には注意を払った方が良いだろう。</p>
+
+<p>CSSグラデーションを使うのは、フォントサイズが大きくなるにつれて下線が太くなるという<a href="http://www.w3.org/TR/css-text-decor-3/"><code>text-decoration-*</code>プロパティー</a>では解決できない点への解だ。下線の太さはその色の印象を強めるということにもつながるので、倍の太さになると倍以上の印象をあたえると考えた方が良い。</p>
+
+<p>下線が太くなるのはフォントに依存するが、概ね<code>24px</code>前後で太くなる。昨今は<code>24px</code>どころか<code>40px</code>かそれ以上の大きさで文字を表示することもあるので、そういったサイズに<code>text-decoration</code>プロパティーで下線を引いている場合は、こういったテクニックを利用して下線の、延いてはリンク全体の印象を和らげる必要もあるだろう。</p>

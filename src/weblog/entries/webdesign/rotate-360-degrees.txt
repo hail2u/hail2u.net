@@ -1,0 +1,37 @@
+rotate(360deg)
+
+<figure><img src="/images/blog/rotate-360-degrees.png" alt="一周回すとぼかしがかかる"></figure>
+
+<p>WindowsのGoogle ChromeでWebフォントを使うと、その縁がギザギザになることが多い(もちろん非ClearTypeのフォントならローカルフォントでも)。今まではそれの解消のために<code>text-shadow</code>プロパティで軽く文字色と同じ影をつけてやって誤魔化していたが、<code>-webkit-transform</code>プロパティで<code>rotate(360deg)</code>として一周回すといい感じにフォントにアンチエイリアスっぽいぼかしがかかることを発見した。少し前に書いた<a href="/blog/webdesign/font-transforming-with-css3-transform.html">CSS3のtransformを使ったフォントの変形</a>の派生。テクニックというよりもハック寄り。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/209.html">Beautify MS PMincho on Google Chrome</a></p>
+
+<p>デモではWebフォントではなく、常にギザギザで悲しいＭＳ Ｐ明朝を使ってさしあげた(グリフが細かいためぼかしのかかり方がよく見え、わかりやすいので)。</p>
+
+<p><code>scaleY(1.1)</code>ではぼかしがかからない。<code>skewX(1deg)</code>はそこそこ綺麗にぼかしがかかるが、<code>rotate(0.01deg)</code>の方が自然な感じがする。双方共にブロックの矩形が変形してしまうので、ピクセルパーフェクトなデザインには向かない。<code>rotate(360deg)</code>ならぴったり一周するだけなので、ブロックの矩形を変化させずにぼかしだけがかけられ、最も優秀。参考に載せておいた<code>text-shadow</code>によるぼかしは少しぼかしのかかりが強いように見えるが、それは影の色の透明度を調節すれば良いだけなので出力的には互角だと思う。</p>
+
+<p>使い方も何もないが一応書いておくと、使いたいセレクタで、</p>
+
+<pre><code class="language-css">.foo {
+  -webkit-transform: rotate(360deg);
+}
+</code></pre>
+
+<p>とするだけ。このギザギザはGoogle Chrome(とSafariでフォントの滑らかさをWindows 標準した時)固有の癖(仕様)に過ぎないので、他のベンダー拡張プリフィックスまで書く必要はない。</p>
+
+<h2>ユーザースタイルシートで使う</h2>
+
+<p>このハックをGoogle Chromeのユーザースタイルシートで使うと、全てのウェブページで文字にアンチエイリアスっぽくぼかしが加わる。</p>
+
+<pre><code class="language-css">body {
+  -webkit-transform: rotate(360deg);
+}
+</code></pre>
+
+<p>なんとなく綺麗に見えるような気がするが、そんなでもない。ＭＳ Ｐゴシックとメイリオのフォント置換等と違って文字幅が変化しないのでその点ではポイント高い。一部ウェブページ等で表示がぐちゃぐちゃになるので常用は危険。TweetDeck for Chromeでは全てのカラムがまったく見えなくなった。</p>
+
+<hr>
+
+<p><code>rotate(360deg)</code>のように、元の状態とまったく同じに状態になるCSS Transformでアンチエイリアスっぽくぼかしがかかるか否かは実装次第だと思うので、そのうちうまく動かなくなったりするんじゃないかという危惧はある。そういう意味では<code>rotate(0.01deg)</code>でのレンダリングはそう変わることはない(と思う)ので、こっちの方が安全な気がする。他にも<code>text-rendering</code>との兼ね合いやSafariにおける<code>-webkit-font-smoothing</code>との組み合わせとかもちゃんと考慮する必要がありそう。</p>
+
+<p>気に入ったのでロゴをこのハックを利用してアンチエイリアス(っぽい何か)をかけるようにした。フォントも<a href="http://www.google.com/webfonts/family?family=Vollkorn">Vollkorn</a>のBold Italicに変更。</p>

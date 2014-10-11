@@ -1,0 +1,48 @@
+Sitelinks Search Box
+
+<p>ページ下部に検索フォームを復活させて、<a href="https://developers.google.com/webmasters/richsnippets/sitelinkssearch">GoogleのSitelinks Search Box</a>に対応させたつもり。本当は検索ページを別に作ってそっちに寄せようかと思ったけど面倒になってきたので、とりあえずGoogleカスタム検索を復活させてMicrodataを仕込んだ。</p>
+
+<p>Sitelinks Search Boxの注意点はウェブサイトの<em>ホームページ</em>にのみ仕込むこととUTF-8でしか機能しないことくらい。例を見る限りはサードパーティの検索システムを利用するのも問題ないように見える。仕込んだからといって使ってくれるわけではないらしい。</p>
+
+<p>最終的に以下のようなマークアップになった。</p>
+
+<pre><code class="language-html">&lt;html
+  itemscope
+  itemtype=&quot;http://schema.org/WebSite&quot;&gt;
+  &lt;body&gt;
+    &lt;aside role=&quot;search&quot;&gt;
+      &lt;form
+        action=&quot;http://www.google.com/cse&quot;
+        itemprop=&quot;potentialAction&quot;
+        itemscope
+        itemtype=&quot;http://schema.org/SearchAction&quot;&gt;
+        &lt;meta
+          content=&quot;https://www.google.com/cse?cx=partner-pub-8712792805045949:3747342316&amp;amp;ie=UTF-8&amp;amp;q=<mark>{q}</mark>&amp;amp;sa=Search&quot;
+          itemprop=&quot;target&quot;&gt;
+        &lt;input
+          type=&quot;hidden&quot;
+          name=&quot;cx&quot;
+          value=&quot;partner-pub-8712792805045949:3747342316&quot;&gt;
+        &lt;input
+          type=&quot;hidden&quot;
+          name=&quot;ie&quot;
+          value=&quot;UTF-8&quot;&gt;
+        &lt;input
+          type=&quot;search&quot;
+          name=&quot;q&quot;
+          <mark>itemprop=&quot;query-input&quot;</mark>&gt;
+        &lt;input
+          type=&quot;submit&quot;
+          name=&quot;sa&quot;
+          value=&quot;Search&quot;&gt;
+      &lt;/form&gt;
+    &lt;/aside&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>ややこしいのは<code>target</code>と<code>query-input</code>の指定。<code>target</code>では検索結果ページになるURLにクエリを<code>{…}</code>で仕込むけど、その文字列は<code>itemprop=&quot;query-input&quot;</code>を指定したフォーム要素の<code>name</code>属性の値と一致する必要がある。ここでは<code>q</code>なので<code>{q}</code>になる。</p>
+
+<hr>
+
+<p>最近ちょくちょく見かけるようになったJSON-LDでも書けるけれども、これくらいならMicrodataで良さそう。SearchActionではないもうちょっと複雑なアクションになると<code>meta</code>要素をいくつも書かなくちゃならなくなって精神衛生上良くない感じがするので、そうなるとJSON-LDの出番なのかも。</p>

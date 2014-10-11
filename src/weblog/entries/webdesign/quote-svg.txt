@@ -1,0 +1,27 @@
+引用符をSVGに
+
+<p><code>blockquote</code>要素に付けている飾りの引用符をSVGでやることにした。フォントだとサイズ(特に横幅)を合わせるのが難しいので。アイコンみたいなコンテナー要素のサイズに合わせてぴったりサイズを縮小拡大したい場合はSVGが最適解だと思う。もののついでに<code>hr</code>要素もSVGで書き直した。</p>
+
+<p>View Demo: <a href="/pub/test/387.html">Quote SVG</a></p>
+
+<p>デモでは黒の不透明にした。<code>path</code>要素の<code>style</code>属性で<code>fill</code>と<code>opacity</code>プロパティーを使って色は調整できる。あとはこれをData URIスキームを使ってCSSに埋め込めば良い。</p>
+
+<pre><code class="language-css">blockquote::before {
+  margin-right: 1em;
+  display: block;
+  position: absolute;
+  right: 100%;
+  width: 2em;
+  height: 2em;
+  background-image: url("data:image/svg+xml;base64,...");
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: "";
+}
+</code></pre>
+
+<p>Opera 11にもまだ<code>background-size</code>プロパティーでの<code>contain</code>キーワードがうまくリサイズされないバグがある気がする……けど見なかったことにする。</p>
+
+<hr>
+
+<p>こういうものはアイコン・フォントでやるのが時代の潮流な感じではある。Unicodeのプライベート領域を使うようになりつつあってアクセシビリティー上の問題は減りつつあるし。ただサイズの調節が結構難しいというかもどかしい感じなんじゃないかと思う。横幅についてはまぁなんとなくは合わせられるけど、ブロックのサイズに合わせて拡大縮小とか無理だし、縦位置をきれいに揃えたいとかもフォントの作られ方に依存してしまうので場合によっては結構な手間になるし、何より再利用できない。作り方や使い方のノウハウが蓄積されれば解決しそうな話なので、現状はちょっと……程度ではあるけど。</p>

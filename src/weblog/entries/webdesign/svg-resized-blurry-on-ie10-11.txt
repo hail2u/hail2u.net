@@ -1,0 +1,17 @@
+Internet Explorer 10や11でSVGがぼやけてリサイズされる(ことがある)
+
+<figure>
+  <a href="/pub/test/514.html"><img src="/images/blog/svg-resized-blurry-on-ie10-11.png" alt="同じSVG画像にも関わらず、左のピクセル・パーフェクトでリサイズしたものがシャープさを維持しているのに比べ、右はぼやけてしまっている"></a>
+</figure>
+
+<p><a href="http://blogs.msdn.com/b/ie/archive/2013/11/07/ie11-for-windows-7-globally-available-for-consumers-and-businesses.aspx">Windows 7向けのInternet Explorer 11</a>が出たので、早速インストールした。おかしいところも特になく、F12ツールもずいぶん使いやすくなってるし最高かと思ったら、このウェブサイトのSVGのリサイズがちょっと変だった。11だけかと思ったら10もだった。少し前までのFirefoxみたいにCSSの<code>background-image</code>プロパティー経由だとアレなのかとか色々調べてたみたけど、どうも違う。どうやらリサイズ後の縦横サイズが小数点以下を含むようなケースでぼやけるようだ。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/514.html">SVG Resizing Bug on IE10–11</a></p>
+
+<p>デモのように<code>64.5px</code>のように小数点以下を含むサイズにリサイズすると、Internet Explorer 11 (10も)では参考のスクリーンショットのようにぼやける。整数ピクセルでのリサイズやFirefox 25やChrome 30ではシャープなまま。せっかくのSVGが……。</p>
+
+<p>これは<a href="http://www.w3.org/TR/css3-cascade/#computed">計算済みの値</a>が小数点以下を含む場合にほぼ確実に起こるので、<code>px</code>単位で小数点以下を使わないだけでは避けられない。例えば<code>3.78em</code>とかでもほぼ確実にぼやけるし、<code>10%</code>とかでも大体ぼやける。技術的な詳細は不明だけど、ラスタライズされるタイミングや処理順序等の内部的な問題なんじゃないかと思う。なんか考えてみようとは思うけど、どうにもできなそうな予感しかしない。</p>
+
+<hr>
+
+<p>懸案だった、FirefoxでSVGを<code>background-image</code>プロパティーで使うとぼやけるバグが解消されて、「これでようやくSVG元年だ！」とか思ったけど、そうは問屋がおろさないらしい。</p>

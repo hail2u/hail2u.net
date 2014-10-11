@@ -1,0 +1,44 @@
+レギュラー書式を持たないGoogle Webフォントの読み込み
+
+<p><a href="http://www.google.com/webfonts">Google Web Fonts</a>で提供されているWebフォントの中にはレギュラー書式の無いものが幾つかあります。具体的には<a href="http://www.google.com/webfonts/specimen/Allan">Allan</a>がそうです(他にもあります)。これらを利用する場合、必ずURLパラメータに書式の情報も付け加えなければなりません。WebのUIでコツコツ選んで利用する場合は既に加えられているので問題にならないのですが、API経由でURLを組み立てる場合は少し注意が必要になります。</p>
+
+<p>API経由でWebフォントの一覧を取るとその中でAllanは以下のような形で返ってきます。</p>
+
+<pre><code class="language-js">{
+  "kind": "webfonts#webfont",
+  "family": "Allan",
+  "variants": [
+    "bold"
+  ],
+  "subsets": [
+    "latin"
+  ]
+},
+</code></pre>
+
+<p><code>variants</code>を見ればわかるようにregularが含まれていません。このことを無視して以下のようなURLでリクエストするとWebフォントのロードに失敗します。</p>
+
+<pre>http://fonts.googleapis.com/css?family=Allan
+</pre>
+
+<p>具体的には以下のような<em>親切な</em>エラーメッセージのCSSファイルが返ってきてしまいます。</p>
+
+<pre><code class="language-css">/* Allan (style: normal, weight: 400) is not available */
+/* However, style: normal, weight: bold is available */
+/* Not supported. */
+</code></pre>
+
+<p>Allanが正常にロードされるようにするためには以下のようにコロン(:)に続けて書式も指定します。</p>
+
+<pre>http://fonts.googleapis.com/css?family=Allan:bold
+</pre>
+
+<p>書式として指定するのは当然<code>variants</code>の値の1つ(以上)になります。<code>variants</code>の各要素は、太字だからといってboldとは限らず700であったり、italicのみであったり、はたまたregularではなく400だったりと、様々な文字列なので決め打ちすることはできません。とは言うもののあまり難しく考える必要はなく、JavaScriptで書くなら、</p>
+
+<pre><code class="language-js">var url = "//fonts.googleapis.com/css?family="
+  + font.family.replace(/ /g, "+")
+  + ":"
+  + font.variants.join(","); 
+</code></pre>
+
+<p>などとして<code>variants</code>の各要素をカンマでつなげて付け加えれば良いでしょう。</p>

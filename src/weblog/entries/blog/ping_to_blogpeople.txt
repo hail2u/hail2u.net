@@ -1,0 +1,24 @@
+BlogPeopleへのping
+<p><a href="http://www.blogpeople.net/" title="BlogPeopleホームページ">BlogPeople</a>へ更新通知pingをローカルから発射すると弾かれる(多分登録されているURLから登録されているURLを送信しないとダメ？)ような気がするので、<a href="http://search.cpan.org/search?module=LWP::Simple" title="search.cpan.org: LWP::Simple - simple procedural interface to LWP">LWP::Simple</a>使って直接更新通知URLを開いて通知してやることにしました。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+use LWP::Simple;
+
+my $ping_url = &quot;http://www.blogpeople.net/weblogUpdates.jsp?key=自分のサイトの登録key&quot;;
+
+my $response = LWP::Simple::get($ping_url);
+
+if (!$response) {
+  print &quot;Error: Server is busy or down.\n&quot;;
+}
+
+print &quot;\n&quot;;
+
+exit;
+</code></pre>
+<p>こんなんで。Bookmarkletとかメンドイ。はてなアンテナもこんなようなスクリプトで通知できます。</p>
+<pre><code class="language-perl">$ping_url = &quot;http://a.hatena.ne.jp/check?url=自分のサイトのURL&quot;;
+</code></pre>
+<p>と変えてやるだけでOK。わざわざPerlスクリプトでやる利点はバッチファイルで複数の処理を一気にできるからということのみ。</p>

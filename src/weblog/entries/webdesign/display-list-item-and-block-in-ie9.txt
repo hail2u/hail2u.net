@@ -1,0 +1,32 @@
+リストにした要素の子にブロックがあるとIE9で……
+
+<p><code>display: list-item</code>とした要素の中にブロックがあると要素の上に消すことのできない余白が現れることがあるという<del>バグ</del><ins>問題</ins>で、IE9と書いたけど残念なことにIE10 PP4でも起こった。必ず起こるというわけではなくて、<code>list-item</code>な要素と<code>block</code>な要素の間に<code>a</code>要素などが挟まる場合という条件がある。<code>margin</code>や<code>padding</code>プロパティーを<code>0</code>にしてもこの謎の余白は消えない。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/384.html"><code>list-item</code>, <code>a</code> element and <code>block</code> bug in IE9</a></p>
+
+<p>デモのように<code>section</code>要素内全体を<code>a</code>要素で括っている場合に<code>section</code>要素を<code>list-item</code>にすると起こりやすい……という風に書いてもほとんど説明になっていない。</p>
+
+<pre><code class="language-html">&lt;section class="news"&gt;
+  &lt;a href="/news?id=10"&gt;
+    &lt;h1&gt;10th News!&lt;/h1&gt;
+    &lt;p&gt;This is a 10th news.&lt;/p&gt;
+  &lt;/a&gt;
+&lt;/section&gt;
+...
+&lt;section class="news"&gt;
+  &lt;a href="/news?id=1"&gt;
+    &lt;h1&gt;1st News!&lt;/h1&gt;
+    &lt;p&gt;This is a 1st news.&lt;/p&gt;
+  &lt;/a&gt;
+&lt;/section&gt;
+</code></pre>
+
+<p>こういった概要付きのニュースの羅列をカラム分けして並べるとかよくあるケースを想像するとわかりやすいかもしれない。これを狭い画面で読みやすいように概要は削除してタイトルのリストにしようかな……と思って、<code>.news</code>を<code>display: list-item</code>とすると発生するということ。マージンの相殺絡みかなーとか思ったけどそういうわけでもなさそうで、かなり意味不明な<del>バグ</del><ins>問題</ins>という感じ。</p>
+
+<p>子のブロックを<code>display: inline</code>にするとなんとか消えてくれる。<code>inline-block</code>だと<a href="/pub/test/383.html">行ボックスの上にはみ出すように配置される</a>ので、リストのブレット位置が下寄せになってしまうのでアレ(<code>vertical-align</code>で調節できるけど)。別解としては<code>display: list-item</code>するのを止めて、擬似要素でリストのブレットらしき文字列を挿入するとかもある。</p>
+
+<h2>追記</h2>
+
+<p>Firefox 10(や12)でも発生してた。Chrome 17とOpera 11は発生しない。バグじゃない可能性もありそうなのでもうちょっと調べてみる。</p>
+
+<p><code>a</code>要素などの間に挟まっている要素を<code>display: block</code>とするともちろん回避できるんだけど、<code>a</code>要素の場合は余白の部分までリンクになってしまう(クリックできてしまう)ようになるのでちょっと問題ある。</p>

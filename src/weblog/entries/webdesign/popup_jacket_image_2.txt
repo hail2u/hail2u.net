@@ -1,0 +1,48 @@
+ジャケット画像のポップアップ #2
+<p>昔書いた<a href="/blog/webdesign/popup_jacket_image.html" title="hail2u.net - Weblog - ジャケット画像のポップアップ">ジャケット画像のポップアップ</a>は、今も愛用していたりするわけですが、デカイ画像をブラウザに拡大・縮小してもらってたりするので微妙に汚かったりとかします。<code>:hover</code>擬似クラスを適用する要素を工夫すると、小さい画像と大きい画像を切り替えてポップアップさせることが出来たりしました。</p>
+<figure><img src="/images/blog/popup_jacket_image_2.jpg" alt="ぽぷあぷ！ぽぷあぷ！"></figure>
+<p><a href="/pub/test/042.html" title="Pop-up Jacket Image #2">動作サンプル</a>でマウスを画像に乗っけてやれば安定した画像(=Amazon提供のサムネイル・サイズと中サイズの画像)でポップアップしてくれるのがわかると思います。</p>
+<p>元となるHTMLコードは、</p>
+<pre><code class="language-html">&lt;ul&gt;
+  &lt;li&gt;
+    &lt;ul&gt;
+      &lt;li class=&quot;small&quot;&gt;&lt;img src=&quot;{小さい画像のURL}&quot; ... /&gt;&lt;li&gt;
+      &lt;li class=&quot;medium&quot;&gt;&lt;img src=&quot;{大きな画像のURL}&quot; ... /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;...&lt;/li&gt;
+  &lt;li&gt;...&lt;/li&gt;
+  &lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<p>という様な、小さい画像と大きい画像を組にした<code>ul</code>要素を<code>ul</code>要素でリスト化したものです。CSSコードは、</p>
+<pre><code class="language-css">ul li ul {
+  margin: 0;
+  padding: 0;
+  width: 77px;
+  height: 77px;
+  list-style-type: none;
+}
+
+ul li ul li.small {
+  display: block;
+}
+
+ul li ul li.medium {
+  display: none;
+}
+
+ul li ul:hover li.small {
+  display: none;
+}
+
+ul li ul:hover li.medium {
+  display: block;
+  position: relative;
+  top: -43px;
+  left: -43px;
+}
+</code></pre>
+<p>という様な感じ。無駄に複雑ですが、なんとなくわかるんじゃないかと(適当すぎ)。まず、小さい画像と大きい画像を組にした<code>ul</code>要素を縦横を小さい画像の大きさで決め打ちします。通常はサムネイルで表示したいので、小さい画像を格納している<code>li.small</code>を<code>display: block;</code>、大きい画像を格納している<code>li.medium</code>を<code>display: none;</code>としてやります。マウスが乗っかったらポップアップさせたいので、上記<code>display</code>の値をひっくり返してやります。ここで、<code>:hover</code>擬似クラスを小さい画像と大きい画像を組にした<code>ul</code>要素に指定してやるのがポイント。このままではポップアップにならないので、以前のエントリと同じ様に<code>position: relative;</code>を使ってポップアップらしくしてやって終了。</p>
+<p><code>ul</code>要素に<code>:hover</code>擬似クラスを適用していたりするので、Internet Explorer 6(もちろん5とかも)なんかではポップアップしません。Opera 8では概ね動いている感じですが、ポップアップを手前に持ってくるのがうまくいかないです(あんまり考えてないけど)。Firefoxでは完璧！愛してる！</p>
+<p>ロール・オーバーにも応用できそう。あんまり意味なさそうだけど。</p>

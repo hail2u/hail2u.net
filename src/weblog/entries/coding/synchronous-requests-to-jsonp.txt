@@ -1,0 +1,50 @@
+JSONPに同期リクエスト
+
+<p>コールバック関数を指定する形のJSONPへ<code>for</code>ループなどで複数回リクエストする場合、コールバック関数の実行される順は<code>for</code>ループで回した順と一致するとは限らない(<a href="http://www.opera.com/products/desktop/">Opera</a>除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。</p>
+
+<p>同期リクエストするためには、<code>for</code>ループなどでJSONPへのリクエストを一気に処理するのではなく、リクエストをひとつに留めてコールバック関数内で次に進むといった形で実装するが良さそう・・・とアイディアを<a href="http://la.ma.la/blog/">バソキヤ求めて三千里の人</a>に貰った。</p>
+
+<p>つまり、</p>
+
+<pre><code class="language-js">var urls = [
+  &#39;http://del.icio.us/feeds/json/cho45&#39;,
+  &#39;http://del.icio.us/feeds/json/drawnboy&#39;,
+  &#39;http://del.icio.us/feeds/json/gorou&#39;,
+  &#39;http://del.icio.us/feeds/json/hail2u&#39;,
+  &#39;http://del.icio.us/feeds/json/miyagawa&#39;,
+  &#39;http://del.icio.us/feeds/json/nagayama&#39;,
+  &#39;http://del.icio.us/feeds/json/typester&#39;,
+  &#39;http://del.icio.us/feeds/json/yoko&#39;
+];
+</code></pre>
+
+<p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
+
+<pre><code class="language-js">addScript(<em>urls[0]</em> + &#39;?callback=diplayPosts&#39;);
+
+function addScript(url) {
+  var script = document.createElement(&#39;script&#39;);
+  script.setAttribute(&#39;type&#39;, &#39;text/javascript&#39;);
+  script.setAttribute(&#39;src&#39;, url);
+  script.setAttribute(&#39;charset&#39;, &#39;UTF-8&#39;);
+  document.getElementsByTagName(&#39;head&#39;).item(0).appendChild(script);
+}
+
+function diplayPosts(posts) {
+  // JSONフィードに含まれるブックマークのJSONデータに対する処理色々
+
+  <em>loadNext()</em>;
+}
+
+function loadNext() {
+  if (urls.length &lt;= 1) return;
+  urls.shift();
+  addScript(<em>urls[0]</em> + &#39;?callback=diplayPosts&#39;);
+}
+</code></pre>
+
+<p>という感じに、コールバック関数(<code>displayPosts()</code>)内で次に進む関数(<code>loadNext()</code>)を呼び出すように<a href="/pub/test/082.html">実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある(ネットワーク状態に依存)し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>
+
+<p>あえて同期リクエストすることにより、非同期であることからスムースに処理できる(ことが多い)というJSONPの長所を失う上に、処理に時間がかかってしまうという欠点もある。それでもあえて非同期でリクエストしないことによって、得られるものがいくつかあるわけで、場合によってはあえて並行リクエストをしないという選択はアリなのかもしれない。</p>
+
+<p>少し前に作った指定したdel.icio.usのユーザーのnetworkに登録しているユーザーのブックマークを並べるモノは誰のブックマークやらわからない状態でずらっとブックマークが並べられていたが、同期リクエストに変更することによってユーザー名付きでブックマークを並べられるようになった。</p>

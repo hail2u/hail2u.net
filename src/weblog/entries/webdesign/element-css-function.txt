@@ -1,0 +1,52 @@
+CSSのelement()関数
+
+<p>せめてWebKitに実装されてからとか思ってたけど、<a href="http://www.w3.org/TR/css3-images/">CSS Image Values and Replaced Content Module Level 3</a>がLast Callになったのでいい機会ということにして<a href="http://www.w3.org/TR/css3-images/#element-reference"><code>element()</code>関数</a>についてエントリを書く。<code>element()</code>関数は任意のIDを引数に取ることができ、その要素を<em>画像として</em>参照できるというなかなかの荒業な関数。具体的には画像のサムネイルを簡単に作成できるとかそういうものをイメージするとわかりやすいと思う。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/350.html">Filmstrip View</a></p>
+
+<p>いわゆる「フィルムストリップ」のようなものを作るデモだけど、<code>element()</code>はまだFirefox 4以降でしかサポートされていないので、ChromeやSafariなどでは意図した通りに動かない。Firefoxなら下に並んだサムネイルをクリックすると大きな画像が表示される。切り替えやアニメーションについては<code>element()</code>の力ではなく、<code>:target</code>擬似クラスの力なので特に解説はしない。</p>
+
+<p><code>element()</code>では既に書いたようにIDで参照する。</p>
+
+<pre><code class="language-css">.test {
+  background-image: element(#foo);
+  background-size: contain;
+}
+</code></pre>
+
+<p>Firefoxでも完全な実装ではなく、背景でしか使えないように制限されているので、今のところはこういった使い方になるだろう(<code>list-style-image</code>や<code>content</code>プロパティーで使えるようになると便利そう)。サムネイル化する場合に限らずそのままのサイズで表示しようということはまずないと思うので、<code>background-size</code>プロパティーを使ってサイズを調整してやると良い。<code>contain</code>で納まるように調節してくれるはずなので、大体はこれだけで意図した通りに表示されるだろう(勿論<code>.test</code>への幅と高さの指定は必要)。</p>
+
+<p>ただレンダリングされていない要素は参照しても表示されない。</p>
+
+<pre><code class="language-css">#foo {
+  display: none;
+}
+
+.test {
+  background-image: element(#foo);
+  background-size: contain;
+}
+</code></pre>
+
+<p><code>display</code>に限らず、<code>visibility</code>や<code>height</code>プロパティーで見えなくしても同様に表示されない。デモではどうやっているかというと、<code>position</code>プロパティーで見えない位置に吹っ飛ばすことによって元画像は隠すがサムネイルは見えるようにしている。</p>
+
+<pre><code class="language-css">#foo {
+  position: absolute;
+  top: -100%;
+}
+
+.test {
+  background-image: element(#foo);
+  background-size: contain;
+}
+</code></pre>
+
+<p>つまりレンダリングはされるものの見えないような状態を工夫すれば良いわけで、ネガティブ・マージンなどでも可能。</p>
+
+<p>参照先、つまり引数に指定したIDを持つ要素は画像である必要は無いので、<a href="/pub/test/351.html">Webページ全体のプレビューを右に表示する</a>などということもできる。表示しているエリアをハイライトするような感じになれば実用性は有りそうだけど、CSSだけでうまくやる方法は思いつかなかった。描画エリア内のみを覆う白いレイヤーを最背面に配置して、他は暗くするとかやってみたけど<code>element()</code>で作られた画像は全部白くなってしまった。実装の不備かそういう仕様なのかはわからない。単に表示するだけのもの、例えば印刷プレビュー的なものなら結構簡単に作れるんじゃないかと思う(CSSを丸ごと差し替えるだけ)。</p>
+
+<p>さっさと他のブラウザも実装しろやみたいな。あとこの関数名の検索ビリティの低さは異常なので、どうにかならなかったのかとかちょっと思ってる。</p>
+
+<h2>追記</h2>
+
+<p>最後にちょっと書いたWebページのプレビューで表示しているところをハイライトは<a href="http://jsdo.it/xl1/vSVh/fullscreen"><code>background-attachment: fixed</code>でいける</a>と@<a href="https://twitter.com/xl1blue">xl1blue</a>が考えてくれた。思いつかなかった。なんかに使えそう。</p>

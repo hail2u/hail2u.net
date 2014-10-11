@@ -1,0 +1,20 @@
+末尾のスラッシュ補完
+
+<p><a href="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</a>で<a href="http://blosxom.sourceforge.net/">Blosxom</a>にリクエストされたパスをパラメーターとして渡すようにしている関係で、カテゴリーや年月ごとのページで<a href="http://httpd.apache.org/docs/current/mod/mod_dir.html">mod_dir</a>のような末尾のスラッシュ補完が効かないことに今さら気づいたので直した。いろいろ今さら。</p>
+
+<pre><code class="language-conf">RewriteEngine On
+
+RewriteBase /blog/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([-/0-9A-Z_a-z]+[^/])$ $1/ [R=301,L]
+</code></pre>
+
+<p>通常は<code>RewriteBase</code>が必須で、無いと<code>$1</code>がサーバーのファイルシステムの絶対パスになってしまう。勿論Blosxomに渡す<code>RewriteRule</code>より前に書く。クソみたいな正規表現なのはApache 1.3系のmod_rewriteだから。</p>
+
+<p>mod_rewriteの書き方は一生覚えないまま、なんとなく付き合っていきそう。</p>
+
+<hr>
+
+<p>ここらへんはBlosxomのプラグインで扱うともっと柔軟に書けるので、拡張子なしのpermalinkを作れるようになったり色々素晴らしそうなんだけど、<code>blosxom.cgi</code>を二回通す羽目になったりしそうでやらない方が良さそう。今ならもしかして<code>replaceState()</code>を使ってクライアント側で補完したりすれば良いのかな。あとで試してみよう。</p>

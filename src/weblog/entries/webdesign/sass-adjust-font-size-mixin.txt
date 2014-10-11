@@ -1,0 +1,38 @@
+Sass: adjust-font-sizeミックスイン
+
+<p>ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめ<a href="http://sass-lang.com/">Sass</a>のミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。</p>
+
+<pre><code class="language-scss">$safe-for-content: 4.5em;
+$safe-for-full: 66em;
+
+@mixin adjust-font-size($sizes) {
+  @each $size in $sizes {
+    $ratio: $size / 16px;
+    $feature: min-width;
+    $value: $safe-for-full * $ratio * $ratio;
+
+    @if ($ratio &lt; 1) {
+      $feature: max-width;
+      $value: $safe-for-content * $ratio * $ratio;
+    }
+
+    @media screen and ($feature: $value) {
+      font-size: percentage($ratio);
+    }
+  }
+}
+
+html {
+  font-size: 100%;
+
+  @include adjust-font-size(<mark>(14px, 18px, 21px, 24px, 27px, 30px)</mark>);
+}
+</code></pre>
+
+<p>引数で使うフォントサイズを<code>px</code>単位でリスト指定し、ミックスイン側で<code>16px</code>からの比率(<code>px</code>を<code>px</code>で割るとユニットレスにちゃんとなる)を基準に切り替えていく<code>@media</code>ルールを吐くというもの。ミックスインの引数でリストを使いたい場合は括弧を使ってまとめる。リストにしておくとミックスインでは<code>@each</code>ルールでサクッと参照できるので繰り返し処理に強く、覚えておくとベンダー拡なんとかとかなんとか張プリフィックスとかフォールバック処理を書く時とかに便利だったりする。</p>
+
+<p><code>max-width</code>と<code>min-width</code>の切り替えは<code>@if</code>ルールでやる。Sassにはスコープはないけど局所変数はあるので、<code>@else</code>も使って完全に分岐してその内側で変数を定義してしまうと、その外で吐く<code>@media</code>ルールで参照できなくなる。ここをシンプルにしたいなら最小のフォント・サイズをデフォルトにするとかCSSの工夫が必要になる。そうすると適用された結果は同じでも、CSS自体が少し直感的なものではなくなるので、多少複雑でもCSSの簡明さを優先した方が良いと思う。</p>
+
+<p>Sass 3.2から<code>@media</code>ルールのクエリー部分でも変数を使えるようになったので、それを使うとこのように普通に書ける。3.2はもうそこそこ安定しているので余程の理由がない限り移行したほうがいいんじゃないかと思う。インタラクティブ・シェルも速くなって普通に使える感じになってるとか、Sassの文法の拡充以外にもいくつか利点ある。</p>
+
+<p><code>html</code>要素でやってるのは<code>rem</code>単位を見据えてなので、今のところあんまり意味は無い。</p>

@@ -1,0 +1,65 @@
+セクションや段落の区切り線
+
+<figure><img src="/images/blog/section-divider.png" alt="セクション記号と罫線を利用した区切り線のスクリーンショット"></figure>
+
+<p>段落の区切りに使う<code>hr</code>要素をちょっと凝ったデザインにするという話は<a href="/blog/webdesign/swap-hr-element-with-characters.html">以前書きました</a>。似たような話は<a href="http://css-tricks.com/15135-simple-styles-for-horizontal-rules/">CSS-Tricksでも最近取り上げられていますね</a>。しかしこれらは<code>hr</code>要素でのテクニックです。では、例えば<code>section</code>要素の最後にこういったちょっと凝った感じの区切り線をつけるにはどうすれば良いのでしょうか？</p>
+
+<p>結論としては<code>::before</code>と<code>::after</code>擬似要素を組み合わせて頑張るということになります。例えば上記CSS-Tricksのサンプルの最後の例や<a href="http://cekerholic.com/">Cekerholic</a>などで見られるセクション記号(&#x00a7;)の左右に罫線がつくようなデザインを作ってみます。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/316.html">Section/Paragraph Divider</a></p>
+
+<p><code>hr</code>要素の場合は結構簡単なものです。</p>
+
+<pre><code class="language-css">hr {
+  border: none;
+  border-top: 1px dotted #666;
+  position: relative;
+  height: 0;
+}
+
+hr::before {
+  margin-left: -32px;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 64px;
+  height: 48px;
+  line-height: 48px;
+  content: "\00a7";
+  color: #999;
+  background-color: #fff;
+  font-family: "Georgia", serif;
+  font-style: italic;
+  font-size: 48px;
+  text-align: center;
+}
+</code></pre>
+
+<p>このようにまず<code>hr</code>要素を罫線のみにし(ここでは点線にしました)、<code>::before</code>擬似要素でセクション記号を挟むということです。セクション記号の位置揃えは<code>relative</code>した中での<code>absolute</code>でやります。上に<em>フォントサイズの半分</em>ずらし、左には50%分移動させ、更に<code>margin-left</code>で<em>余白を含めた幅の半分</em>戻すことによって中央揃えします。幅に余裕を持たせて背景をコンテンツの背景と合わせることによって、罫線とセクション記号の間に少し余白をとったりもすると良いでしょう。色は好みですが、コントラストが強いと主張がすごいので控えめにするとすっきりすると思います。<code>border-bottom</code>や<code>text-shadow</code>プロパティーを駆使することによって、このエントリの最初に載せた画像のような<a href="/pub/test/317.html">少し凹んだデザインも可能です</a>。</p>
+
+<p><code>section</code>要素の最後につける場合は少し工夫が必要です。区切り線を置くためにパディングを確保したり、罫線を横幅いっぱいにしないようにするために複数の擬似要素を使ったりですね。コードの多くは<code>hr</code>要素へのスタイルと変わらない部分も多いので、違う部分のみ抜粋します。</p>
+
+<pre><code class="language-css">section {
+  padding-bottom: 96px;
+  position: relative;
+}
+
+section::before {
+  border-top: 1px dotted #666;
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  height: 48px;
+  line-height: 48px;
+  content: "";
+}
+
+section::after {
+  bottom: 24px;
+}
+</code></pre>
+
+<p><code>section</code>要素ではこの区切り線を配置するためのスペースを<code>padding-bottom</code>を使って確保します。確保するサイズは要調整ですが、だいたい<code>::before</code>擬似要素の高さの1.5～2倍が適当そうです。そして<code>::before</code>擬似要素で罫線を作ります。これの高さは好みで、周囲のコンテンツと余裕を持たせたいなら大きめにするという感じです。幅で区切り線のサイズを決めますが、あまり考えずに<code>left</code>でセンタリングされるようにするにはそれぞれ<code>%</code>を使って指定するのが良いでしょう。<code>px</code>単位で幅を決めたい場合は、手作業で調節するか<code>left: 50%</code>から<code>margin-left</code>で半分戻すというテクニックを使えば大丈夫だと思います。最後のセクション記号の配置に使う<code>::after</code>擬似要素のコードは<code>hr</code>要素でのコードとほぼ同じです。違うのは<code>top</code>の代わりに<code>bottom</code>を使って<code>section</code>要素の下端を基準に配置している点のみです。</p>
+
+<p>セクショニング要素に対して擬似要素をこういう形でフルに使ってしまうと、それらに対して使うことが多い(私見ですが)clearfixがうまく機能しなくなってしまうことがあるので、実際に利用する時にはそこそこ注意が必要です。こういったデメリットと画像と追加マークアップが不要というメリットを比較して、後者のメリットが上回ると感じるなら一考の価値はありそうです。早い所、<a href="http://www.w3.org/TR/css3-content/#nesting"><code>::after::after</code></a>とか<a href="http://www.w3.org/TR/css3-content/#inserting0"><code>::before(2)</code></a>とかできるようになると良いですね！</p>

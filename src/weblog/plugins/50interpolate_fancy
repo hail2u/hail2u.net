@@ -1,0 +1,378 @@
+# Blosxom Plugin: interpolate_fancy
+# Author(s): Rael Dornfest <rael@oreilly.com> 
+# Version: 2003-09-09:12:10
+# Documentation: See the bottom of this file or type: 
+# perldoc interpolate_fancy
+
+package interpolate_fancy;
+
+# --- Configurable variables -----
+
+# Do you want me to recursively interpolate into the story $title
+# and $body?  Consider and reconsider carefully before turning this
+# on as if anyone other than you has the ability to post stories,
+# there's a chance of some tomfoolery, exposing variables and calling
+# actions/subroutines you might not want called.
+# 0 = No (default),  1 = Yes
+my $recurse_into_story = 0;
+
+# --------------------------------
+
+sub start {
+  return 1;
+}
+
+sub interpolate {
+  return sub {
+
+    package blosxom;
+
+    # Halt recursive interpolation of story $body
+    # by mangling interpolation tags (to be unmangled in a moment)
+    unless ($recurse_into_story) {
+      $blosxom::title =~ s/<(\@|\??\$)/<#INTERPOLATE_FANCY_DEFANG#$1/gsi;
+      $blosxom::body =~ s/<(\@|\??\$)/<#INTERPOLATE_FANCY_DEFANG#$1/gsi;
+    }
+
+    my $template = shift;
+
+    # Backward Compatibility with core Blosxom style interpolation
+    $template =~ s#(?<!<)(?<!<\?)(?<!<\?!)(\$\w+(?:::)?\w*)#<$1 />#gs; 
+
+    # Defined
+    # e.g. <?$var>display if defined</?>
+    $template =~ s#<\?(\$\w+(?:::)?\w*)>(.*?)<\/\?>#"defined $1 ? \$2 : undef"#gsee;
+
+    # Undefined 
+    # e.g. <?!$var>display if not defined</?>
+    $template =~ s#<\?!(\$\w+(?:::)?\w*)>(.*?)<\/\?>#"!defined $1 ? \$2 : undef"#gsee;
+
+    # Tests 
+    # eq (eq), ne (ne), lt (<), gt (>), like (=~), unlike (!~)
+    # e.g. <?$var lt="123">display if $var less than 123</?>
+    $template =~ s#<\?(\$\w+(?:::)?\w*)\s+?(.+?)>(.*?)<\/\?>#"interpolate_fancy::_test(qq{$1}, q{$2}, q{$3})"#gsee;
+
+    # Unconditional, Recursive 
+    # e.g. <$var />
+    while( $template =~ s/<\$([a-zA-Z?]\w+(?:::)?\w*)\s+?\/>/"defined \$$1 ? \$$1 : undef"/gsee ) { }
+
+    # Actions 
+    # e.g. <@plugin.subroutine arg1="a" output="no" />
+    # e.g. <@plugin.subroutine encoding="Latin1" output="yes">pass content</@> 
+    $template =~ s#<\@(\w+?)\.(\w+?)\s+?(.+?)?(?:>(.*?)<\/\@\1\.\2>|\s+?\/>)#&interpolate_fancy::_action($1,$2,$3,$4)#gse;
+
+    # Unmangle mangled interpolation tags in story $title and $body
+    # (by now in the template itself)
+    unless ($recurse_into_story) {
+      $template =~ s/<#INTERPOLATE_FANCY_DEFANG#(\@|\??\$)/<$1/gsi;
+    }
+
+    return $template;
+
+  };  
+}
+
+sub _test {
+  my($variable, $attr, $content) = @_;
+
+  my $result;
+
+  my $attributes = interpolate_fancy::_attributes($attr);
+
+  defined $attributes->{eq} and return $variable eq $attributes->{eq} ? $content : undef;
+  defined $attributes->{ne} and return $variable ne $attributes->{ne} ? $content : undef;
+  defined $attributes->{gt} and return $variable > $attributes->{gt} ? $content : undef;
+  defined $attributes->{lt} and return $variable < $attributes->{lt} ? $content : undef;
+  defined $attributes->{like} and return $variable  =~ /$attributes->{like}/ ? $content : undef;
+  defined $attributes->{unlike} and return $variable  !~ /$attributes->{unlike}/ ? $content : undef;
+
+  return undef;
+}
+
+sub _action {
+  my($plugin, $action, $attr, $content) = @_;
+
+  $content =~ s#<\@(\w+?)\.(\w+?)\s+?(.+?)?(?:>(.*?)<\/\@\1\.\2>|\s+?\/>)#&interpolate_fancy::_action($1,$2,$3,$4)#gse;
+
+  my $attributes = interpolate_fancy::_attributes($attr);
+  
+  $blosxom::plugins{$plugin} 
+    and $plugin->can($action) 
+      and $result = $plugin->$action($attributes, $content);
+
+  return $attributes->{'output'} =~ /yes/i ? $result : undef;
+}
+
+sub _attributes {
+  my $attr = shift;
+
+  my $attributes = {};
+  while ( $attr =~ /\b(\w+?)\s*?=\s*?(["'])(.*?)\2/g ) {
+    $attributes->{$1} = $3;
+  }
+
+  return $attributes;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Blosxom Plug-in: interpolate_fancy
+
+=head1 SYNOPSIS
+
+Overrides Blosxom's far simpler to use, but more limited, default interpolate() 
+subroutine.
+
+Include bits of text and template variable values in templates, either 
+conditionally or unconditionally:
+
+Perform actions (i.e. call plug-in subroutines) at any point in your page, 
+whether to act on current content and return results or no.
+
+=head2 Includes
+
+  * Unconditionally and recursively
+
+    e.g. include a link to the story's path using various template variables.
+
+    <a href="<$url /><$path />"><$path /></a>
+
+    Limited by the $recurse_into_story configuration directive (see
+    the CONFIGURATION below).
+
+  * Unconditionally and recursively (backward compatibility with Blosxom's standard interpolation)
+
+    e.g. include a link to the story's path using various template variables.
+
+    <a href="$url$path">$path</a>
+
+    Limited by the $recurse_into_story configuration directive (see
+    the CONFIGURATION below).
+
+  * The template variable has a value (i.e. is defined)
+
+    e.g. include a hyperlink to the story's path if it has a path (i.e.
+    $path is defined).
+
+    <?$path><a href="<$url /><$path />"><$path /></a></?>
+
+  * The template variable doesn't have a value (i.e. is NOT defined)
+
+    e.g. include a hyperlink to home if path is undefined.
+
+    <?!$path><a href="<$url />">home</a></?>
+
+  * The template variable is equal (=) to a particular value
+
+    e.g. include "1 writeback" (singular) if the value of writeback count is 1
+
+    <$writeback::count /> <?$writeback::count eq="1">writeback</?>
+
+  * The template variable is not equal (!=) to a particular value
+
+    e.g. include "x writebacks" (plural) if the value of writeback 
+         count (x) is not 1
+
+    <$writeback::count /> <?$writeback::count ne="1">writebacks</?>
+
+  * The template variable is less than (<) a particular value
+
+    e.g. include "no writebacks" if the value of writeback count is < 1
+
+    <?$writeback::count lt="1">no writebacks</?>
+
+  * The template variable is greater than (>) a particular value
+
+    e.g. include "oodles of writebacks" if the value of writeback count is > 50
+
+    <?$writeback::count gt="50">oodles of writebacks</?>
+
+  * The template variable is like (=~) a particular regular expression
+
+    e.g. Greet a visitor properly, depending on their courtesy title
+
+    Howdy, 
+    <?$user::courtesy like="^(Mr\.?|Sir)$">Sir</?>
+    <?$user::courtesy like="^(Mr?s\.?|Miss)$">M'am</?>
+
+  * The template variable is unlike (!~) a particular regular expression
+
+    e.g. The posting is neither a film nor a book
+
+    <?$path unlike="/(Film|Literature)">no review</?>
+
+=head2 Actions
+
+Perform an action (i.e. call a plug-in's subroutine) at any point in your page.
+Optionally pass arguments as key/value pairs stated as XML-style attributes.
+For example: 
+
+  <@plugin.subroutine arg1="a" arg2="bee" />
+
+calls &plugin::subroutine( {'arg1'=>'a', 'arg2'=>'bee' } ).
+
+Specify that results should be sent to the browser using the output="yes" 
+attribute like so:
+  
+  <@plugin.subroutine arg1="a" arg2="bee" output="yes" />
+
+Otherwise, subroutines will still have their effect, but the results will 
+be tossed out.
+
+Content wrapped in the action call is sent as another argument to the 
+subroutine:
+
+  <@plugin.subroutine encoding="Latin1" output="yes">
+  pass this content
+  </@plugin.subroutine> 
+
+This calls &plugin::subroutine( {'encoding'=>'Latin1', 'output'=>'yes' }, "pass this content" ).
+
+Actions are recursive, meaning that you can embed an action inside another, 
+and so on and so on and so on.  Actions are unfolded from the inside out,
+with the most deeply embedded first, second deepest second, and so forth until
+the outermost action is performed last.
+
+Recursion is limited by the $recurse_into_story configuration directive (see
+the CONFIGURATION below).
+
+=head3 An Example
+
+For those of you interested in writing plugin actions or using some of the
+more advanced features in your Blosxom blog templates, here are a couple of
+sample actions:
+
+--
+
+# For the sake of this example, assume these actions live in a "myplugin"
+# plugin
+
+# This action strips HTML from its content
+sub strip_html {
+  my($self, $attributes, $content) = @_;
+  $content =~ s!</?.+?>!!g;
+  return $content;
+}
+
+# This action foreshortens its content to a length specified in the call to
+# action's length attribute
+sub foreshorten {
+  my($self, $attributes, $content) = @_;
+  my $default_length = 144;
+  return substr($content, 0, $attributes{'length'}||$default_length);
+}
+
+--
+
+Calling these individually in a Blosxom flavour template looks something like:
+
+The following bit of text is devoid of HTML:
+<@myplugin.strip_html output="Yes">
+Silly <a href="http://www.raelity.org/">me</a>, I plumb 
+<em>forgot</em> to remove the HTML.
+</@myplugin.strip_html>
+
+The following bit of text is only 20 characters in length:
+<@myplugin.foreshorten output="Yes">
+This text is far longer than 20 characters on the page, 
+but will only appear as "This text is far lon" in the
+resulting page.
+</@myplugin.foreshorten>
+
+And in combination, stripping the HTML _before_ foreshortening (notice
+the strip_html action is embedded inside the foreshorten action and
+thus is run first):
+
+The following bit of text is only 20 characters in length and devoid of HTML:
+<@myplugin.foreshorten output="Yes">
+<@myplugin.strip_html output="Yes">
+Silly <a href="http://www.raelity.org/">me</a>, I plumb 
+<em>forgot</em> to remove the HTML.
+This text is far longer than 20 characters on the page, 
+but will only appear as "This text is far lon" in the
+resulting page.
+</@myplugin.strip_html>
+</@myplugin.foreshorten>
+
+=head1 INSTALLATION
+
+Drop the interpolate_fancy plug-in into your Blosxom plugins folder.
+
+=head1 CONFIGURATION
+
+None necessary; interpolate_fancy will run out of the box with no need
+of additional configuration or fiddling on your part (caveat: see 
+BACKWARD COMPATILITY below).
+
+The interpolate_fancy plugin does sport one configuration directive
+which you should very much consider leaving alone.  
+
+# 0 = No (default),  1 = Yes
+my $recurse_into_story = 0;
+
+$recurse_into_story decides whether or not the interpolation engine 
+should respect and interpolate (swap for the associated value) 
+variables and actions embedded in story $title and $body themselves.
+
+Off by default, you should consider and reconsider carefully before 
+turning this on as if anyone other than you has the ability to post 
+stories to your blog, there's a chance of some tomfoolery, exposing 
+variables and calling actions/subroutines you might not want called.
+
+=head1 BACKWARD COMPATIBILITY
+
+If you've been using core Blosxom's interpolation style 
+(e.g. $title), this plugin will provide backward compatibility,
+requiring no template rewriting on your part.
+
+If you've been using the interpolate_conditional plugin,
+the conditional bits won't be respected by default.  You should
+run your templates through the interpolate2fancy utility
+[http://www.blosxom.com/downloads/utilities/interpolate2fancy.py].
+
+=head1 VERSION
+
+2003-09-09:12:10
+
+=head1 AUTHOR
+
+Rael Dornfest  <rael@oreilly.com>, http://www.raelity.org/
+
+=head1 SEE ALSO
+
+Blosxom Home/Docs/Licensing: http://www.raelity.org/apps/blosxom/
+
+Blosxom Plugin Docs: http://www.raelity.org/apps/blosxom/plugin.shtml
+
+=head1 BUGS
+
+Address bug reports and comments to the Blosxom mailing list 
+[http://www.yahoogroups.com/group/blosxom].
+
+=head1 LICENSE
+
+Blosxom and this Blosxom Plug-in
+Copyright 2003, Rael Dornfest 
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+# vim:ft=perl

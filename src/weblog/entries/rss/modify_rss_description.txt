@@ -1,0 +1,17 @@
+RSSファイルのdescriptionを調節
+<p>RSSファイルの各<code>item</code><code>description</code>と<code>content:encoded</code>が、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、<code>description</code>は最初の段落のみ、<code>content:encoded</code>はこれまで通りエントリの内容のフルコピーというようにしました。</p>
+<p>最近のRSSリーダーは<code>content:encoded</code>優先というものが多いと思うので、あんまり問題ない(今までどおりとも言う)んじゃないかと思ってます。RSSファイルのサイズがかなり減るという利点も。</p>
+<p>実装は単純明快に、</p>
+<pre><code class="language-perl">sub make_excerpt {
+  my $out = $_[0];
+
+  $out =~ s!\x0D\x0A|\x0D|\x0A!!g;
+  $out =~ s!^(.*?)&lt;/p&gt;.*$!$1!g;
+  $out =~ s!&lt;.*?&gt;!!g;
+
+  return $out;
+}
+</code></pre>
+<p>最初の<code>p</code>要素の閉じタグまで抜き出すとしました。substrでうまく切る方法を思いつかなかったので、こんな実装になったのは秘密です。utf8モジュールないしなぁ、ここ。かといって、要約生成するためにJcodeモジュールで一旦EUC-JPに変換して処理するとかもなんか手間がかかるわりに報われないかなと。ざっと自分のエントリを眺めたところ、大体はタイトルと最初の段落で概要はつかめそうだったので、これで良い事にします。</p>
+<p>うちで配っているRSS関連スクリプトは、軒並みcontent:encoded非対応だったりするわけですが。そろそろ対応しようかなとか思うんですが、HTML出力限定という作りになっていないので、なかなか対応しづらいんですよね。</p>
+<p>もし、<code>description</code>がエントリ内容のフルコピーであるRSSファイルがどうしても必要という場合は、別のflavour作って対応しますので、ヨコセとコメントで要求してください。</p>

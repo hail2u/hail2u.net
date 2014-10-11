@@ -1,0 +1,116 @@
+Sassの!defaultフラグの使い方と使われ方
+
+<figure><img src="/images/blog/how-to-use-bang-default-flag-in-sass-and-how-it-works.png" alt="!default"></figure>
+
+<p><a href="http://sass-lang.com/">Sass</a>を書く時には変数を多用することと思います。それら変数は自分で定義して自分で使うので、同じプロジェクト内で再定義する必要はあまりありません。しかし他人や自分の作ったSassファイルを流用する場合、その中で使われている変数の値を最適化する必要が出てきます。もしその変数がハード・コーディングされているだけだとしたらどうでしょうか？その場合変数を直接書き換えることになるでしょう。こういったSassファイルの再利用における問題を解決するためにSassには<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_defaults_"><code>!default</code></a>というフラグが用意されています。</p>
+
+<p><a href="http://atnd.org/events/21919">Less &amp; Sass Advent Calendar 2011</a>もついに18日目ですね。ゴールまであと少しです。</p>
+
+<hr>
+
+<p>まずはSassリファレンスの<code>!default</code>を扱っている部分を読んでみましょう。参考にざっと以下に訳してみました。</p>
+
+<blockquote>
+  <h2>変数のデフォルト値: <code>!default</code></h2>
+
+  <p>変数の値を指定する時、<code>!default</code>というフラグを付けておくことにより、変数にまだ値が割り当てられていない時のみ値を割り当てるようにすることができます。どういうことかというと、もし変数に既に値が割り当てられていた場合は再割当てされることはありませんが、まだ値が割り当てられていない場合は指定された値がセットされるということです。</p>
+
+  <p>例えば以下のように書くと:</p>
+
+  <pre><code class="language-scss">$content: "First content";
+$content: "Second content?" !default;
+$new_content: "First time reference" !default;
+
+#main {
+  content: $content;
+  new-content: $new_content;
+}
+</code></pre>
+
+  <p>以下のようにコンパイルされます:</p>
+
+  <pre><code class="language-css">#main {
+  content: "First content";
+  new-content: "First time reference"; }
+</code></pre>
+</blockquote>
+
+<p>&#x2014; <cite><a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_defaults_">Variable Defaults: <code>!default</code></a></cite></p>
+
+<h2>その具体的な利用</h2>
+
+<p>リファレンスの例はその機能の説明にはなっていますが、何のために使うのかイメージしにくいのではないかと思います。<code>!default</code>フラグが威力を発揮するのはSassの<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#partials">partial</a> (わかりづらいので以下ライブラリとします)を書き、それを複数のプロジェクトで使い回すといったケースです。つまり他人に使われることを意識したSassファイルを書く時、ということですね。</p>
+
+<h2><code>!default</code>を利用しないライブラリ</h2>
+
+<p>ライブラリで<code>!default</code>フラグを使わなかった場合にどうなるのでしょうか？例えば以下のようなデフォルトのフォント設定を定義するライブラリを<code>_font.scss</code>というファイル名で作成したとします。</p>
+
+<pre><code class="language-scss">$font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+
+body {
+  font: 16px/1.5 $font-family;
+}
+</code></pre>
+
+<p>この小さなライブラリを利用した上でフォント・ファミリだけを変えたいという場合、以下のようにすることが多いでしょう。</p>
+
+<pre><code class="language-scss">@import "font";
+
+body {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+}
+</code></pre>
+
+<p>SCSSファイルとしては特に悪いと言えるところはありません(良いとも言えませんが)。しかしコンパイルすると以下のようなCSSになってしまいます。</p>
+
+<pre><code class="language-css">body {
+  font: 16px/1.5 "Helvetica Neue", "Helvetica", "Arial", sans-serif; }
+
+body {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif; }
+</code></pre>
+
+<p>CSSとしては無駄が多く美しくないですよね？</p>
+
+<h2><code>!default</code>を使った柔軟なライブラリ</h2>
+
+<p>それでは<code>_font.scss</code>を<code>!default</code>フラグを使って再利用しやすいように書き直してみましょう。</p>
+
+<pre><code class="language-scss">$font-size: 16px !default;
+$line-height: 1.5 !default;
+$font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif !default;
+
+body {
+  font: $font-size/#{$line-height} $font-family;
+}
+</code></pre>
+
+<p>このようにライブラリ側で適切に<code>!default</code>が使われていれば、先程の例と同じようにフォント・ファミリを変更するとすると、利用先では以下のように書くことができます。</p>
+
+<pre><code class="language-scss">$font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+
+@import "font";
+</code></pre>
+
+<p><code>$font-family</code>を<em><code>@import</code>の前で</em>設定してやることに注意してください。こうすることによってライブラリが変数が設定済みであることを認識し、ライブラリ側での変数設定が行われないようになります。</p>
+
+<pre><code class="language-css">body {
+  font: 16px/1.5 "Lucida Grande", "Lucida Sans Unicode", sans-serif; }
+</code></pre>
+
+<p>コンパイルするとこのような綺麗なCSSが出力されるようになるでしょう。<code>$font-size</code>や<code>$line-height</code>も同様にして設定することが可能です。勿論何も設定しなければ<code>_font.scss</code>で指定されている値が利用されます。</p>
+
+<hr>
+
+<p>このようにライブラリ内で利用する変数を<code>!default</code>フラグを使って定義しておくことによって、</p>
+
+<ul>
+<li>出力の最適化</li>
+<li>再利用性の向上</li>
+</ul>
+
+<p>という2つの効果を得ることができます。</p>
+
+<p>SassをはじめとしたCSSメタ言語の魅力のひとつとして、原始的なコピー・アンド・ペーストではなくライブラリやオブジェクトとして柔軟に再利用できるものを記述できるようになることが挙げられると思います。Sassにおいては記述時におけるその機能性から<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins">ミックスイン</a>や<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend"><code>@extend</code></a>がその柱として取り上げられることが多いですが、<code>!default</code>フラグもまたそれを支える重要な柱のひとつです。</p>
+
+<p>既存のCSSをSassで書き直すというような作業によりSassに慣れている途中の人達はまだ使うことはあまりないだろうと思いますが、みんなでSassを使い倒すためには必ず必要になってくる知識です。是非マスターして<code>!default</code>をうまく使ったライブラリを作ってみてください。</p>

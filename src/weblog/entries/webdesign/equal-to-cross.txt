@@ -1,0 +1,63 @@
+二本線からバツ印へ
+
+<figure>
+  <a href="/pub/test/596.html"><img src="/images/blog/equal-to-cross.png" alt="═✕"></a>
+</figure>
+
+<p>Appleの新ウェブサイト(2014年9月)では狭い画面の時にグローバル・ナビゲーションを出す二本線のアイコンが表示される。それをタッチするとナビゲーションが表示されると同時に回転しながらバツ印に変化する。同じようなアニメーションをCSSでやってみると意外に面倒くさかった。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/596.html">Sandwich</a></p>
+
+<p>二本線は以下のように擬似要素を2つ使って作った。コンテナーに対して幅を半分のサイズ、高さを6%とした。サイズと位置は全て<code>%</code>で統一したので、コンテナーの幅と高さを指定すれば以下のCSSは変えることなくスケールする。</p>
+
+<pre><code class="language-css">.sandwich::before,
+.sandwich::after {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  <mark>left: 25%;</mark>
+  <mark>width: 50%;</mark>
+  <mark>height: 6%;</mark>
+  content: &quot;&quot;;
+  background-color: #333;
+  <mark>transition: all 0.8s ease-in-out;</mark>
+}
+
+.sandwich::before {
+  <mark>top: 30%;</mark>
+}
+
+.sandwich::after {
+  <mark>top: 64%;</mark>
+}
+</code></pre>
+
+<p>二本線にするために<code>top</code>プロパティーの位置だけ変える。デモなのでアニメーションは<code>:hover</code>をトリガーに<code>transition</code>プロパティーで行わせた。<code>ease-in-out</code>を指定して、バツ印に変わる最後にちょっとブレーキが掛かるようにしておくとより近づく。</p>
+
+<p>アニメーションは回転の中心と幅を調節しながら315度別方向に回す。</p>
+
+<pre><code class="language-css">.sandwich:hover::before,
+.sandwich:hover::after {
+  top: 47%;
+  left: 15%;
+  width: 70%;
+}
+
+.sandwich:hover::before {
+  transform: rotate(<mark>315deg</mark>);
+}
+
+.sandwich:hover::after {
+  transform: rotate(<mark>-315deg</mark>);
+}
+</code></pre>
+
+<p><code>70%</code>の根拠は、元が<code>50%</code>なので<a href="https://www.google.com/search?q=50*%E2%88%9A2">それに<code>√2</code>を掛けたもの</a>。<code>left</code>プロパティーも<code>70%</code>に合わせて<code>25%</code>から<code>15%</code>に減らしておく。バツ印の1辺の高さは<code>6%</code>なので、中央に配置するには<code>(100% - 6%) / 2 = 47%</code>を<code>top</code>プロパティーに指定すれば良い。</p>
+
+<p>これでオンマウスで二本線からバツ印に変わる。Appleのもののように切替型にするなら<code>:target</code>をトリガーにするのがコストが低い。その場合は両セレクターに<code>transition</code>プロパティーを指定することになる。URLにフラグメント識別子(<code>location.hash</code>)を追加したくないならJavaScriptでクラスを切り替えるようにして、それをトリガーにすることになる。</p>
+
+<hr>
+
+<p>作ってからAppleのウェブサイトをもう一回確認したら、二本線から一本線にして、90度時計回りに回転させ、それから45度別方向に回転させているみたいだった。<code>animation</code>プロパティーを使ってならできそうだけど、同じプロパティー(ここでは<code>transform</code>プロパティー)を二回に分けてアニメーションさせられない<code>transition</code>プロパティーでは無理そう。</p>
+
+<p>とにかく<code>calc()</code>で平方根を計算できる定数的なの欲しい。という感想。工夫すればできたりしそう。</p>

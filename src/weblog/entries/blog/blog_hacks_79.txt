@@ -1,0 +1,27 @@
+Blog Hacks: Hack #79
+<p>もう第二刷！な、ぶろがーのますとあいてむ<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873111749/hail2unet-22" title="Amazon.co.jp： 本: Blog Hacks ―プロが教えるテクニック&amp;ツール100選">Blog Hacks</a>のHack #79ではPerlで<a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>の新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在は<a href="http://www.bloglines.com/about/notifier#moz" title="Bloglines | Bloglines Notifier">Mozilla Extensionとして動作するもの</a>や<a href="http://www.bloglines.com/about/notifier#kde" title="Bloglines | Bloglines Notifier">KDE上で動作するもの</a>が公開されています。ので、通常はこちらを使った方が良いと思います。</p>
+<p>と、するとこのHackが無意味なモノになってしまうのでいろいろと誤魔化してみる。子見出しと違う形になってしまいますが、いろいろなプログラムからBloglinesの新着は取得できるんだよ！みたいなHackとして受け取ってもらえれば幸いです。Hackの前半で書いているように、ごく簡単な手続きでパースしやすい文字列が返ってくるってわけです。</p>
+<p>Windowsだと、簡単なスクリプトが動かせたりする<a href="http://www.samurize.com/modules/news/" title="Samurize.com - News">Samurize</a>や<a href="http://www.coolmon.org/" title="CoolMon - system stats on your desktop">CoolMon</a>、<a href="http://kapsules.shellscape.org/" title="Kapsules">Kapsules</a>などでBloglinesのNotifierを作ることができるでしょう(使ってないので僕は作りませんけど)。また、TClock Lightのユーザー定義文字列を引数でセットできる機能を利用して、WSHで新着記事数を取得して<a href="http://homepage1.nifty.com/kazubon/tclocklight/index.html" title="TClock Light">TClock Light</a>に渡し、タスクトレイに表示するなんてことも可能です。</p>
+<figure><img src="/images/blog/bloglines_and_tclockl.png" alt="TClock Lightを利用してBloglinesの新着記事数をタスクトレイに表示"></figure>
+<p>これを実現するためには以下のようなVBScriptファイルでOK。</p>
+<pre><code class="language-vbs">sMail = &quot;&lt;登録したメールアドレス&gt;&quot;
+sTClock = &quot;C:\Program Files\TClock Light\tclock.exe&quot;
+
+Set oXmlHttp  = CreateObject(&quot;Msxml2.XMLHTTP.3.0&quot;)
+Set oWshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+
+sTClock = Chr(34) &amp; sTClock &amp; Chr(34)
+
+oXmlHttp.open &quot;GET&quot;, &quot;http://www.bloglines.com/update?user=&quot; &amp; sMail, False
+oXmlHttp.send
+sRes = oXmlHttp.responseText
+
+aRes = Split(sStr, &quot;|&quot;, -1, 0)
+
+oWshShell.Run sTClock &amp; &quot; /ustr9 &quot; &amp; aRes(1)
+</code></pre>
+<p>あとはTClock Lightの書式設定に<code>USTR9</code>と書いてやればこのVBScriptを実行するたびにタスクトレイの表示が更新されます。定期的にこのVBScriptを実行したい場合は、同じくTClock Lightのアラーム設定で適度な間隔を指定してやれば良いです。さらにはTClock Lightのマウス操作設定で、タスクトレイのダブルクリックをファイルを開くにしてやり、ファイルに、</p>
+<pre>http://www.bloglines.com/myblogs
+</pre>
+<p>を指定すると、タスクトレイのダブルクリックからMy Blogsが開けて完璧！</p>
+<p>まぁ僕は<a href="/blog/rss/tcbloglines.html" title="hail2u.net - Weblog - tcbloglines">tcbloglines</a>を使っているんですけどね。</p>

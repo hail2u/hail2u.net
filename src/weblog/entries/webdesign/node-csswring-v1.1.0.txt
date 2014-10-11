@@ -1,0 +1,58 @@
+CSSWring v1.1.0
+
+<p>Source Maps対応のCSS圧縮ツールである<a href="https://github.com/hail2u/node-csswring/">CSSWring</a>をようやくメジャー・リリースした。特に使い方は変わってない。中身的には圧縮力はそこそこ向上したけど、まだ「もうすこしがんばりましょう」程度。</p>
+
+<p>ちょくちょくフロントエンド統合ツールに使われるようになってたりして、Source Mapsを吐くCSS圧縮ツールの需要はそこそこあるのかなと感じている。他のCSS圧縮ツールとは<a href="http://goalsmashers.github.io/css-minification-benchmark/">圧縮力で全敗</a>みたいな感じなので、どこらへんに差があるのか調べて改善していきたい。</p>
+
+<p>v1系に入ってから、以下のような点で圧縮力の向上に手を入れた。</p>
+
+<ul>
+<li>セレクター内の連続した空白の切り詰め</li>
+<li>メディア・クエリーのパラメーター内の空白の切り詰め</li>
+<li><code>font-weight</code>プロパティーで<code>normal</code>を<code>400</code>に、<code>bold</code>を<code>700</code>へ変換</li>
+<li><code>margin</code>や<code>border-style</code>プロパティーなどでの省略</li>
+<li><code>font-family</code>プロパティーでの引用符の削除(と適切な追加)</li>
+<li><code>@font-face</code>ルール内でデフォルトのままの定義の削除</li>
+</ul>
+
+<p>あとは<code>#f00</code>を<code>red</code>にするとかになるんだけど、茨の道っぽくてやりたくない……。やってることをサンプル付きでまとめるべきっぽいくらいには色々やるようになった。Wikiに書くかGitHub Pages作るか迷う。</p>
+
+<hr>
+
+<p>良さそうな機会なので<code>font-family</code>プロパティーの引用符の削除について少しだけ書く。このプロパティーの値は、フォント名が空白を含むと引用符が必要というわけじゃない。</p>
+
+<figure>
+  <blockquote>
+    <p>Font family names must either be given quoted as strings, or unquoted as a sequence of one or more identifiers.</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/css-fonts-3/#font-family-prop">3.1 Font family: the font-family property</a></cite></figcaption>
+</figure>
+
+<p>CSS Fonts Module Level 3の仕様(<a href="http://www.w3.org/TR/CSS2/fonts.html#font-family-prop">CSS 2.1</a>から同じ)ではこのように定義されているので、<em>一文字以上の識別子(identifiers)の連続ならば引用符は必要ない</em>ということになる。そしてその識別子は以下のように決められている。</p>
+
+<figure>
+  <blockquote>
+    <p>In CSS, identifiers (including element names, classes, and IDs in selectors) can contain only the characters [a-zA-Z0-9] and ISO 10646 characters U+00A0 and higher, plus the hyphen (-) and the underscore (_); they cannot start with a digit, two hyphens, or a hyphen followed by a digit.</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier">4.1.3 Characters and case</a></cite></figcaption>
+</figure>
+
+<p>結果としては以下のものは識別子として不正になる。</p>
+
+<ul>
+<li>ハイフンとアンダースコア以外の記号を含むもの</li>
+<li>数字で始まるもの</li>
+<li>ハイフン2つで始まるもの</li>
+<li>ハイフンに続いて数字で始まるもの</li>
+</ul>
+
+<p>つまりフォント名を空白区切りでチェックして、どれか一つでもこの不正なリストに該当した場合は引用符が必要になる。そして以下のような正規表現でチェックできるんじゃないかと思う。</p>
+
+<pre><code class="language-javascript">var reIdentifier = /([\x21-\x2c\x2e\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x9f]|^([0-9]|-(-|[0-9])))/;
+</code></pre>
+
+<p>自分で書いたのに読めない。</p>
+
+<p>でも実はこの部分を正確に仕様を読めているのかずっと自信がないので、間違ってたりしたら是非教えて欲しい。普段はとりあえず引用符で括っておく派でやり過ごしてきた。そういう人も多いと思うので、CSS圧縮ツールが仕様(と実装)通りにうまいことやってくれるのが良いかなと思う。</p>

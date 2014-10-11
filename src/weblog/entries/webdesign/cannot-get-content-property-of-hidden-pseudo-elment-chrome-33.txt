@@ -1,0 +1,14 @@
+Chrome 33で隠された擬似要素のcontentプロパティーの値が拾えない
+
+<p><a href="/blog/coding/content-property-and-getcomputedstyle.html">contentプロパティーの値とgetComputedStyle()</a>の最後で触れたように擬似要素なら<code>content</code>プロパティーの値を<code>getComputedStyle()</code>経由で拾えていた。Chrome 33でちょうどこの辺りに変更が加わったのか、擬似要素が<code>display: none</code>の場合に<code>content</code>プロパティーの計算済みスタイルが空になるようになった。<a href="https://code.google.com/p/chromium/issues/detail?id=236603">らしきIssue</a>は見つけた。</p>
+
+<p><code>display: none</code>の場合に限った挙動の様なので、スタイル・ガイドでは<code>position</code>プロパティーで画面外にふっ飛ばしてとりあえずごまかした。</p>
+
+<pre><code class="language-css">html::after {
+  position: absolute;
+  bottom: 100%;
+  content: &quot;6.52.3&quot;;
+}
+</code></pre>
+
+<p>利用が制限されることが多い<code>content</code>プロパティーの計算済みスタイルを使うのはダメそうなので、何か別の手段を考えた方が良さそう。どうしても<code>getComputedStyle()</code>を使うのなら<code>font-family</code>プロパティーを使うのが無難で、実績もある。<code>id</code>属性を振った<code>link</code>要素で参照しているCSSの最後(か最初)のルールセットに仕込んで、うまいこと拾ってくるとかのが素直な感じか。</p>

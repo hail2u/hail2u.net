@@ -1,0 +1,40 @@
+CSSの新しい単位とFuture Friendly
+
+<p>CSSにはちょくちょく新しい単位が導入・実装されている。<a href="http://caniuse.com/#feat=rem"><code>rem</code></a>などは広まりきった感じはあるけど、これからも新たな単位が追加されるだろう。そういった時に<a href="http://yuilibrary.com/yui/docs/cssreset/">YUI CSS Reset</a>を始めとしたCSSリセットを利用していると、常に厳密なフォールバックが必要になってしまう。<a href="http://necolas.github.io/normalize.css/">Normalize.css</a>ならば、フォールバックを書かなくてもとりあえずデフォルト・スタイルシートで表示してくれるため、大幅に見た目が崩れるということは少なくなる。</p>
+
+<p>例えば<code>rem</code>単位を使って<code>h1</code>要素のマージンを調節することにしたとする。</p>
+
+<pre><code class="language-css">h1 {
+  margin: 2rem 0;
+}
+</code></pre>
+
+<p>CSSリセットを使う場合、このルールセットより前に<code>margin</code>プロパティーをリセットするコードがあることになる。</p>
+
+<pre><code class="language-css">h1 {
+  margin: 0;
+}
+
+h1 {
+  margin: 2rem 0;
+}
+</code></pre>
+
+<p>これだと<code>rem</code>単位をサポートしていないブラウザーではマージンが<code>0</code>になってしまう。一方、Normalize.cssでは<code>margin</code>プロパティーの値を<code>0</code>にしたりはしないので、デフォルト・スタイルシートの値がそのまま使われる。</p>
+
+<pre><code class="language-css">h1 {
+  display: block;
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+  page-break-after: avoid;
+}
+</code></pre>
+
+<p>例えば<code>rem</code>単位をサポートしていないInternet Explorer 8では、<code>h1</code>要素にはこのようなデフォルト・スタイルシートが当たる。つまりマージンは<code>(2 * 0.67)</code>で<code>1.34em</code>確保されることが期待できる。<code>0</code>になるよりはかなりマシなはず。</p>
+
+<hr>
+
+<p>もちろんこうメチャクチャにしないために「フォールバックを必ず書きましょう」などということになるわけだけど、CSSリセットを使っていなければ省略しても大丈夫そうなケースは結構ある。また<code>rem</code>のような単位ならば容易にフォールバックを記述することが可能だけど、<code>vw</code>や<code>vh</code>のようにフォールバックを書くのが難しいことがある単位もある。そういう時にはNormalize.cssを使うことによりデフォルト・スタイルシートを期待して、フォールバックを行わないという決断もありだと思う。</p>
+
+<p>HTMLをCSSで整形して表示することができる何かは増え続けるし、CSSの単位も増え続ける。CSSリセットは<em>それらを無視してリセットする</em>ことにより刹那的な安定をもたらしてくれるが、<a href="http://futurefriendlyweb.com/">Future Friendly</a>にすることは難しくなる。増え続けるものの邪魔をせず、Future Friendlyさを壊さないようにするには、Normalize.cssのような現状を活かしたアプローチを意識する必要があるだろう。</p>

@@ -1,0 +1,35 @@
+PhantomJSからJSLintを使う
+
+<p><a href="http://csslint.net/">CSS Lint</a>を<a href="http://www.phantomjs.org/">PhantomJS</a>から利用して<a href="/blog/coding/using-csslint-from-phantomjs.html">CSSをチェックするスクリプト</a>とほとんど同じの<a href="http://www.jslint.com/">JSLint</a>を利用してJavaScriptをチェックするスクリプトです。書けよとか言われたので書きます。</p>
+
+<pre><code class="language-js">var f = phantom.args[0],
+  fs = require("fs"),
+  js = fs.read(f);
+
+if (phantom.injectJs("jslint.js")) {
+  var i,
+    r = JSLINT(js),
+    l = JSLINT.errors.length;
+
+  if (!r) {
+    for (i = 0; i &lt; l; i++) {
+      var e = JSLINT.errors[i];
+
+      if (e) {
+        console.log([f, e.line, e.character, e.reason].join(":"));
+      }
+    }
+  }
+}
+
+phantom.exit();
+</code></pre>
+
+<p>あんまり関係ない話ですけど、JSLintでスペース4つでインデントがデフォルトなのは、</p>
+
+<pre><code class="language-js">var foo = "hoge",
+    bar = "hage",
+    buz = "hige";
+</code></pre>
+
+<p>とか<code>var</code>でまとめて宣言する時に二行目以降が揃うからなんですかね？</p>

@@ -1,0 +1,47 @@
+Bloglines checkerコンソール版
+<p><a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>の未読記事数を得る方法をずいぶん前に発見したのですが、Windows版のNotifierの使い勝手が良いので、特にこれを利用して何かをやろうとは思わなかったんですよね。なんとなく気が向いたので、方法の公開と共に簡単なPerlスクリプトを組んでみました。</p>
+<p>未読記事数を得るには、</p>
+<blockquote>
+<p>http://www.bloglines.com/update?user=&lt;登録したメール・アドレス&gt;</p>
+</blockquote>
+<p>というURLにアクセスするだけです。これで<samp>|17||</samp>などという一行が返ってくるので、これを適当にパースするだけ。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+use LWP::Simple;
+
+my $email = shift;
+my $url = &quot;http://www.bloglines.com/update?user=$email&quot;;
+
+if (is_success(mirror($url, &#39;cache.dat&#39;))) {
+  open (FH, &quot;&lt; cache.dat&quot;) or die &quot;Failed to open cache file.\n\n&quot;;
+  my $content = &lt;FH&gt;;
+  close(FH);
+  chomp($content);
+
+  if ($content =~ m!^\|(.*?)\|(.*?)\|$!) {
+    my $count = $1;
+
+    if ($count &gt; 1) {
+      print &quot;You have $1 new items.\n\n&quot;;
+    }
+    elsif ($count == 1) {
+      print &quot;You have 1 new item.\n\n&quot;;
+    }
+    else {
+      print &quot;You don&#39;t have new items.\n\n&quot;;
+    }
+  }
+  else {
+    print &quot;Failed to parse cache file.\n\n&quot;;
+  }
+}
+else {
+  print &quot;Failed to mirror $url.\n\n&quot;;
+}
+
+exit;
+</code></pre>
+<p>簡単なPerlスクリプトはこんな感じ。新着記事があると標準出力に<samp>You have 17 new items.</samp>などと出力します。</p>
+<p>今はもう<a href="http://www.bloglines.com/notifier" title="Bloglines | New Entries">Web VersionのNotifier</a>でも新着記事数がチェックできるのであんまり意味は無いのですけど、Notifierアプリケーションの無いUnix系OSの場合は役に立つ知識かもしれません。いや別に「誰か作れよ」とか言っているわけではありません。</p>

@@ -1,0 +1,147 @@
+CSSグラデーションのちょっとしたテクニック #2
+
+<p><a href="/blog/webdesign/css-gradients-technique-1.html">前回のエントリ</a>のような応用するための基本というものではなく、CSSグラデーションはこういう使い方もできるよ的なもので３つ。普通のグラデーションの作り方は<a href="http://hacks.mozilla.org/2009/11/css-gradients-firefox-36/">css gradients in Firefox 3.6</a>とかで。#3はない。</p>
+
+<p>以下プレビュー画像のリンク先がデモ・ページになっているのでそちらも参照のこと。もちろん対応ブラウザのFirefox 3.6とSafari 4やChrome 4以降でないと動作デモは確認できない。</p>
+
+<h2>Vista風のテカってるボタン</h2>
+
+<figure><a href="/pub/test/133.html"><img src="/images/blog/vista-style-glossy-button.png" alt="テカテカボタン"></a></figure>
+
+<p>ありがちだけど作れたらなかなか便利そうなので挑戦してみたら、意外に簡単だった。実は<code>double</code>な<code>border</code>が重要で、これが無いとちょっと間抜けな感じになる。コード的には難しいことはなく、上半分に<code>rgb(138, 138, 138)</code>から<code>rgb(102, 102, 102)</code>、下半分に<code>rgb(36, 36, 36)</code>から<code>rgb(0, 0, 0)</code>と、2つに分けてグラデーションをかけているだけ。</p>
+
+<pre><code class="language-css">background-color: rgb(102, 102, 102);
+background-image: -moz-linear-gradient(
+  top,
+  rgb(138, 138, 138)    0,
+  rgb(102, 102, 102)  50%,
+  rgb( 36,  36,  36)  50%,
+  rgb(  0,   0,   0) 100%
+);
+background-image: -webkit-gradient(
+  linear,
+  left top,
+  left bottom,
+  color-stop(  0, rgb(138, 138, 138)),
+  color-stop(0.5, rgb(102, 102, 102)),
+  color-stop(0.5, rgb( 36,  36,  36)),
+  color-stop(1.0, rgb(  0,   0,   0))
+);
+</code></pre>
+
+<p>テカりをうまく出すのは結構大変だけど、腐るほどあるPhotoshop向けのチュートリアルとかが大いに参考になるので読みあさると良い。</p>
+
+<figure><a href="/pub/test/133.html"><img src="/images/blog/vista-style-glossy-button-hover.png" alt="テカピカボタン"></a></figure>
+
+<p>Firefoxでは<code>-moz-radial-gradient</code>を使って<code>:hover</code>の時に枠の上下がちょっと光るエフェクトも付けてみた。かなりコードはややこしい。上下の光をまとめて作るのはできないことはなさそうだけど面倒なことは間違いないので、それぞれ別々に指定する。以下のコードで下の光が作れる。</p>
+
+<pre><code class="language-css">background-image: -moz-radial-gradient(
+  /* 開始位置を中央下に =&gt; 半楕円のグラデーションになる */
+  center bottom,
+  /* デフォルト値と同じなので未指定でも良い */
+  ellipse farthest-side,
+  /* rgba()を使って光っぽく */
+  rgba(255, 255, 255, 0.8)    0,
+  rgba(255, 255, 255,   0) 100%
+);
+/* 繰り返しはしない */
+background-repeat: no-repeat;
+/* 位置をボックスの下端中央に */
+background-position: center bottom;
+/* サイズを横80%・縦2pxに */
+-moz-background-size: 80% 2px;
+</code></pre>
+
+<p>普通に(楕)円状のグラデーションを置いただけでは光っぽくならないので、開始位置をずらしてやることによって半(楕)円状にしてやり光が拡散している感じを出す。上の光もほぼコードは一緒だが、幅を100%にして光を強めてある。SafariやChromeでは楕円のグラデーションを作るのが大変そうだったので諦めた。</p>
+
+<p><code>double</code>な<code>border</code>の隙間を意図した色で塗るためには<code>background-color</code>が必須。それでもSafariやChromeでは<code>border</code>が<code>double</code>の時の隙間が変に塗られるのでちょっと汚い(Firefoxもちょっと変だけど、サンプルでは<code>-moz-border-*-colors</code>で制御した)。変というか挙動をはっきりと理解していないのでうまく塗れないだけかも。</p>
+
+<h2><code>-moz-border-*-colors</code></h2>
+
+<p><code>-moz-border-*-colors</code>は複数の色をボーダーに使用するためのMozillaの独自拡張プロパティ。SafariやChromeには同等のプロパティはない。以下のように空白区切り(カンマ区切りではないので注意)で複数の色を指定する。</p>
+
+<pre><code class="language-css">-moz-border-top-colors: none rgb(255, 0, 0) rgb(0, 255, 0) rgb(0, 0, 255) transparent;
+</code></pre>
+
+<p><code>none</code>の場合は<code>border-color</code>で塗られ、<code>transparent</code>の場合は<code>background-color</code>で塗られる……はずだが挙動不審なので使う場合はきっちり色を指定した方が良さそう。</p>
+
+<h2><code>pre</code>要素で行ごとに色を変える</h2>
+
+<figure><a href="/pub/test/134.html"><img src="/images/blog/coloring-every-other-line-of-pre.png" alt="行ごとに色が違うpre"></a></figure>
+
+<p>シンタックス・ハイライトするJavaScriptライブラリに良くあるデザインだが、これもCSSグラデーションでいける。CSSグラデーションは複数の色で単純に塗り分けるというようなことも可能だということは覚えておくと良い。</p>
+
+<pre><code class="language-css">background-image: -moz-linear-gradient(
+  top,
+  rgb(255, 255, 255)    0,
+  rgb(255, 255, 255) 18px,
+  rgb(243, 246, 252) 18px,
+  rgb(243, 246, 252) 36px
+);
+-moz-background-size: 1px 36px;
+</code></pre>
+
+<p>上端から18pxまでは<code>rgb(255, 255, 255)</code>で塗り、18pxから36pxまでは<code>rgb(243, 246, 252)</code>で塗るように指定する。あとはこれが並ぶはず……と思いきや並ばず、<code>pre</code>要素の下端まで<code>rgb(243, 246, 252)</code>で塗られてしまう。Firefoxで<code>background-repeat</code>を有効にするためには<code>background-size</code>で明示的に背景画像のサイズをしてやる必要がある。本来は<code>-moz-repeating-linear-gradient</code>を使うべきなのかもしれないがSafariやChromeには無いので、同じようなアプローチで記述できる<code>background-repeat</code>と<code>-moz-background-size</code>で書いた方が混乱しない。</p>
+
+<pre><code class="language-css">background-image: -webkit-gradient(
+  linear,
+  left top,
+  left bottom,
+  color-stop(  0, rgb(255, 255, 255)),
+  color-stop(0.5, rgb(255, 255, 255)),
+  color-stop(0.5, rgb(243, 246, 252)),
+  color-stop(1.0, rgb(243, 246, 252))
+);
+-webkit-background-size: 1px 36px;
+</code></pre>
+
+<p>一方SafariやChromeではピクセル単位でグラデーションを制御することはできないので一見無理そうだが、こちらも<code>background-size</code>を明示的にしてやれば計算でピクセル単位で制御できるようになる。#1の最後でちょっと触れてたが、このアプローチで問題なく上手くいく。整数にならない場合の丸め方が一定ではないので、確実に整数値になるように計算できるサイズと割合に調節した方が良い。</p>
+
+<p>ここではわかりやすく<code>px</code>でゴリゴリ指定したが、それぞれの単位は<code>em</code>でも良いのでフォントサイズに合わせて柔軟に変化するようにも書くことができる。今時のブラウザなら<code>px</code>で良さそうではあるけど、<code>em</code>とかを使った方がメンテナンス性が高い。</p>
+
+<h2>テーブルクロスっぽいチェックの背景</h2>
+
+<figure><a href="/pub/test/135.html"><img src="/images/blog/check-background.png" alt="赤いチェック模様"></a></figure>
+
+<p>もはやCSSを読んでも何をやっているのか解らない……。書いた自分ですらもう一度書けといわれても難しい感じ。こんなこともできるよということで。</p>
+
+<pre><code class="language-css">background-color: rgb(180, 30, 30);
+background-image:
+  -moz-linear-gradient(
+    top,
+    rgba(  0,   0,   0, 0.2)  0px,
+    rgba(  0,   0,   0, 0.2)  4px,
+    rgba(255, 255, 255, 0.5)  4px,
+    rgba(255, 255, 255, 0.5)  8px,
+    transparent               8px,
+    transparent              28px,
+    rgba(255, 255, 255, 0.5) 28px,
+    rgba(255, 255, 255, 0.5) 32px
+  ),
+  -moz-linear-gradient(
+    left,
+    rgba(  0,   0,   0, 0.2)  0px,
+    rgba(  0,   0,   0, 0.2)  4px,
+    rgba(255, 255, 255, 0.5)  4px,
+    rgba(255, 255, 255, 0.5)  8px,
+    transparent               8px,
+    transparent              28px,
+    rgba(255, 255, 255, 0.5) 28px,
+    rgba(255, 255, 255, 0.5) 32px
+  )
+;
+</code></pre>
+
+<p>複数の背景画像を使って格子を形成する。1つ目が横方向の縞で、2つ目が縦方向の縞。普通に四角を並べる感じで作れそうな気がするが(多分)無理で、<code>rgba()</code>をうまく使って濃淡をつけるしか方法を思いつかなかった。ベースとなる部分は<code>transparent</code>で塗っておいて、<code>background-color</code>でそのベースの色を指定。WebKit向けのコードも似たような感じで、読みづらい以外は特に変わったところも無いため割愛。斜めのチェック模様とかもFireとSafariやChromeと挙動を合わせるための計算が面倒なだけで、それほど難しくはないと思う。</p>
+
+<p>本当はもっとタータンチェックっぽくドットを組み合わせたものにしようと思ってたけど面倒すぎる(無理かも)ので簡単に作った。<code>-moz-diamond-gradient</code>とかがあればタータンチェックも簡単に出来そう。</p>
+
+<hr>
+
+<p><code>linear</code>なグラデーションを書く場合は<code>-webkit-gradient</code>の方がPhotoshopとかのグラデーション製作フローをそのままコードにした感じでまだ読みやすい。Firefoxの開始位置と方向の角度でグラデーションの向きを決めるってあんまり直感的ではない気がする。デフォルトでそんな操作させるペイント・ソフトとか触ったことないし。</p>
+
+<p>一方、<code>radial</code>なグラデーションの場合は<code>-webkit-gradient</code>はもはや人間には読めない。その分<code>-moz-radial-gradient</code>よりも複雑(怪奇)なことができるけど。<code>-moz-radial-gradient</code>では単純な(楕)円状グラデーションしか作れない反面、お馴染みのワードで指定できる開始位置と単純な2つの形状・直感的な呼称の終了位置の3つを指定して作成するのでイメージしやすく、ペイント・ソフトの挙動と似ていて馴染みやすい。</p>
+
+<p>Mozillaの……というかCSS3の文法の方がまだマシな感じではあるので、WebKitが合わせてくれると良いな。<code>-webkit-gradient</code>はそのまま残せば良いわけだし。</p>
+
+<p>それぞれエントリにすれば良かった……。</p>

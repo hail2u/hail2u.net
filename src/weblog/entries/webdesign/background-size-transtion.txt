@@ -1,0 +1,38 @@
+bakcground-sizeをtransition
+
+<figure><img src="/images/blog/background-size-transition.png" alt="background-sizeを制限してから敷き詰めるとTimelapseっぽくてカッコイイ"></figure>
+
+<p>背景画像を<code>background-size</code>プロパティーで縦横サイズを制限して敷き詰めるというのは昔<a href="http://www.hatena.ne.jp/hitode909/">id:hitode909</a>がやってた。それを<a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>で元のサイズに戻したらどうなるかなーとやってみたらそこそこ面白かった。きっかけは<a href="http://96x96.net/">96x96.net</a>を見たことで、こっちは<code>border-image</code>プロパティーを組み合わせていて、<code>width</code>プロパティーをtransitionしている。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/374.html"><code>background-size</code> Transition</a></p>
+
+<p>CSSは至って普通。<code>background-position</code>プロパティーでセンタリングすると中央からブワッとなる。どちらかというと縦に並べた方がカッコイイ気がする。</p>
+
+<pre><code class="language-css">.test {
+  width: 640px; /* 背景画像の横幅 */
+  height: 360px; /* 背景画像の縦幅 */
+  background-image: url("http://example.com/img/bg.png");
+  background-size: 100% 0.001%;
+  background-repeat: repeat-y;
+  background-position: center;
+  transition-duration: 1s;
+}
+
+.test:hover {
+  background-size: 100% 100%;
+  transition-duration: 1s;
+}
+</code></pre>
+
+<p>CSS Transitionsのサポートがマチマチなこと以外にもいろいろダメな所が多い。</p>
+
+<ul>
+<li>Chromeでは<code>px</code>単位から<code>%</code>単位へのTransitionsができない</li>
+<li>上記仕様を考慮して<code>background-size: 100% 0.001%</code>とかちょっと苦しい指定をすると、小数の丸め方がブラウザーにより違うため敷き詰めることができるものとそうでないものに分かれる</li>
+<li>Firefoxでは敷き詰めが想像以上におかしくなる(参考: <a href="http://d.hatena.ne.jp/rikuo/20120214">background-sizeで1ピクセルにした時の各ブラウザの挙動の違い</a>)</li>
+<li>Operaでは<code>transition-property</code>プロパティーで<code>background-size</code>プロパティーが<a href="http://www.opera.com/docs/specs/presto2.10/css/transitions/#anima">サポートされていない</a>のでアニメーションできない</li>
+<li>Internet Explorerはアンチエイリアスがきついような……など微妙にブラウザー間で違いがある</li>
+<li>運が良いとブルースクリーンを召喚できる</li>
+</ul>
+
+<p>小数の丸め(や<code>%</code>単位の<code>px</code>への変換における丸め)はそろそろ統一して欲しい。<code>%</code>ベースのグリッド・レイアウトの採用が進まない理由のひとつにこれがあるんじゃないかと思う。</p>

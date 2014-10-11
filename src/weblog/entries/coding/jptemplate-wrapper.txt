@@ -1,0 +1,30 @@
+JPTemplateのラッパーを書いた
+
+<figure><img src="/images/blog/jptemplate-wrapper.png" alt="JPTemplateのスニペットを補完メニューで選択出来るようになりました"></figure>
+
+<p><a href="http://www.vim.org/">Vim</a>のスニペット系のプラグインとして<a href="http://www.lunar-linux.org/~jannis/jptemplate/">JPTemplate</a>を愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、<a href="https://github.com/mattn/template-vim">template-vim</a>の補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。</p>
+
+<pre><code class="language-vim">let g:jpTemplateKey = '&lt;C-S-F12&gt;'
+
+function! s:JPTemplateWrapper()
+  let templdir_ft = g:jpTemplateDir.'/'.&amp;ft
+  let templdir_general = g:jpTemplateDir.'/general'
+  let cword = matchstr(strpart(getline('.'), -1, col('.')), '[-0-9a-zA-Z_]*$')
+
+  if filereadable(templdir_ft.'/'.cword) || filereadable(templdir_general.'/'.cword)
+    call jp:InsertTemplate()
+  else
+    let templates = split(globpath(templdir_ft, '*'), "\n")
+    let templates += split(globpath(templdir_general, '*'), "\n") 
+    call complete(col('.') - strlen(cword), map(filter(templates, 'v:val =~ "'.cword.'"'), 'fnamemodify(v:val, ":t:r")'))
+  endif
+
+  return ''
+endfunc
+
+inoremap &lt;C-Tab&gt; &lt;C-R&gt;=&lt;SID&gt;JPTemplateWrapper()&lt;CR&gt;
+</code></pre>
+
+<p>挿入モードで<code>Ctrl+Tab</code>(デフォルトのマッピング)を押すと、カーソル位置のファイル名っぽい文字列(<code>[-0-9a-zA-Z_]</code>)を拾い、もしその文字列でスニペットがあったらJPTemplateを呼んでやってます。スニペットが見つからなかったら全スニペット候補からその文字列で絞り込んで補完メニューを出すので、選択して確定後もう一回<code>Ctrl+Tab</code>でスニペットが挿入されます。</p>
+
+<p>補完メニューで確定したら即スニペット補完とかは難しくて出来ませんでした！</p>

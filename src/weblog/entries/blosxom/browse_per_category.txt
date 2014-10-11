@@ -1,0 +1,23 @@
+カテゴリ単位で古いエントリを辿る
+<p>この機能は実現できたっぽいです。多分（ぉ。paginateプラグインの<code>start</code>を、</p>
+<pre><code class="language-perl">sub start {
+  $path_info = &quot;$blosxom::datadir/$blosxom::path_info&quot;;
+  if (-d $path_info and $blosxom::path_info ne &#39;&#39;) {
+    return 1;
+  }
+  if ($ENV{&#39;PATH_INFO&#39;} ne &#39;&#39;) {
+    return 0;
+  }
+  return 1;
+}
+</code></pre>
+<p>として、普通に閲覧またはカテゴリ単位での閲覧の場合のみpaginateプラグインをロードするっぽいように(ちと、怪しげ)して、<code>filter</code>の中で、</p>
+<pre><code class="language-perl">foreach (keys %$files_ref) {
+  if ($blosxom::path_info ne &#39;&#39; and $_ !~ m!/$blosxom::path_info!) {
+    delete $files_ref-&gt;{$_};
+  }
+}
+</code></pre>
+<p>とすることによって、当該カテゴリ以外のエントリを出力対象ファイルから外してやってます。</p>
+<p>paginateプラグインで、月単位とかで辿るのが非常におかしいのは<code>filter</code>で適切に出力対象ファイルを取捨選択してないからということみたいですね。</p>
+<p>でも、<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>はいろいろな閲覧パスの指定方法があるので、思ってもみないところで不具合があるかもしれません。何か見つけたら教えてください。</p>

@@ -1,0 +1,47 @@
+blosxom 3.0 plugin
+<p>とりあえず手始めにExcerptという、要約になってない短文を作り出すプラグインを作りました。動いた！とか感動してみる。半日くらいかかりました。2.0のプラグインのことは忘れましょう。まったく今までの知識は役に立たないと思われます。</p>
+<p>まずはコード。</p>
+<pre><code class="language-perl">
+# Blosxom 3.0 Plugin: Excerpt
+# Kyo Nagashima &lt;kyo@hail2u.net&gt;
+
+package Blosxom::Plugin::Excerpt;
+
+use strict;
+
+sub run {
+  my $self = shift;
+
+  my $body = $self-&gt;{state}-&gt;{current_entry}-&gt;{body};
+
+  my $excerpt = $body;
+  $excerpt =~ s/&lt;.*?&gt;//g;
+  $excerpt .= &quot;...&quot;;
+
+  $self-&gt;{state}-&gt;{current_entry}-&gt;{Plugin}-&gt;{Excerpt}-&gt;{excerpt} = $excerpt;
+
+  return 1;
+}
+
+1;
+</code></pre>
+<p>これをデフォルトだとpluginsディレクトリにExcerpt.pmという名前で保存します。</p>
+<p>次にこれはエントリごとの処理なので、handlers.entryを更新。</p>
+<pre><code class="language-perl"># Entry Handlers
+
+Blosxom::filter_entry_by_path
+Blosxom::build_entry_date
+Blosxom::filter_entry_by_date
+Blosxom::read_entry_file
+Blosxom::shortcut_max_entries
+
+Blosxom::Plugin::Excerpt::run
+
+Blosxom::render_entry
+</code></pre>
+<p>多分、Blosxom::render_entryの前にBlosxom::Plugin::Excerpt::runを書かないとダメです(ここで子一時間詰まった)。</p>
+<p>その上でentry.flavournameに<code>$Plugin::Excerpt::excerpt</code>と書くと要約になってない短文が出てくるようになります。</p>
+<p>これで良いのかまるでわかんないので信用しないほうが良いです。リファレンスのプラグインが公開されることを祈って・・・。</p>
+<p>とりえあずはこう書くものという前提での感想。ユーザビリティ的には改悪な気がします。プラグインを置けば何も考えずに利用できるとかそういうことがなくなった(handlers.flowまたはhandlers.entryの編集必須)と思うので。一方、ハッシュのハッシュのハッシュの(以下続く)というデータ構造を一発で全部取れるので、素晴らしく楽しいです(改変や追加が自由自在)。</p>
+<h2>追記@2004/05/03</h2>
+<p>リファレンス・プラグインに従って、適当にコードを改変しました。あんまり気にしなくても良い気がする。</p>

@@ -1,0 +1,144 @@
+# Blosxom Plugin: categories
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2014-06-07
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package categories;
+
+use strict;
+use vars qw($enabled $title $title_sep $tagline $name);
+
+# --- Configuration Variables ----------
+
+# separator string between $blog_title and $categories::title
+my $str_title_sep = " - ";
+
+# friendly name of directories
+my $friendly_name = {
+  'blog' => 'Blog',
+  'blosxom' => 'Blosxom',
+  'coding' => 'Coding',
+  'gadget' => 'Gadget',
+  'game' => 'Game',
+  'internet' => 'Internet',
+  'media' => 'Media',
+  'misc' => 'Misc.',
+  'rss' => 'RSS',
+  'software' => 'Software',
+  'sports' => 'Sports',
+  'webdesign' => 'Web Design',
+};
+
+# separater string between each name of category
+my $name_sep = "/";
+
+# tagline
+$tagline = 'Thoughts, impressions &amp; words over 10 years.';
+
+# --- Plug-in package variables --------
+
+$enabled = 0;
+$title = "";
+my $flavour = $blosxom::default_flavour;
+my $flavour_prefix = "categories_";
+my $cache = {};
+
+# --------------------------------------
+
+sub start {
+  if (!$blosxom::path_info_yr and $blosxom::path_info and ($blosxom::path_info !~ m!.*?/?\w+\.\w+$!)) {
+    $enabled = 1;
+
+    foreach (split(/\//, $blosxom::path_info)) {
+      next if !$_;
+      $_ = $friendly_name->{$_} if $friendly_name->{$_};
+      $title .= "$name_sep$_";
+    }
+
+    $title =~ s!^$name_sep!!;
+    $title_sep = $str_title_sep;
+    $tagline =~ s/\.$/ about $title./;
+    $blosxom::num_entries = 9999;
+  }
+
+  $flavour = $blosxom::flavour;
+
+  return 1;
+}
+
+sub head {
+  my($pkg, $path, $head_ref) = @_;
+
+  my $chunk = $flavour_prefix . 'head';
+  $cache->{$chunk} = &$blosxom::template($path, $chunk, $flavour);
+
+  if ($cache->{$chunk}) {
+    $$head_ref = $cache->{$chunk};
+
+    return 1;
+  }
+
+  return 0;
+}
+
+sub date {
+  my ($pkg, $path, $date_ref, $mtime, $dw, $mo, $mo_num, $da, $ti, $yr) = @_;
+
+  my $chunk = $flavour_prefix . 'date';
+  $cache->{$chunk} = &$blosxom::template($path, $chunk, $flavour);
+
+  if ($cache->{$chunk}) {
+    $$date_ref = $cache->{$chunk};
+
+    return 1;
+  }
+
+  return 0;
+}
+
+sub story {
+  my ($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+
+  if (!$enabled) {
+    $name = '';
+
+    foreach (split(/\//, $path)) {
+      next if !$_;
+      $_ = $friendly_name->{$_} if $friendly_name->{$_};
+      $name .= qq!$name_sep$_!;
+    }
+
+    $name =~ s!^$name_sep!!;
+
+    return 1;
+  }
+
+  my $chunk = $flavour_prefix . 'story';
+  $cache->{$chunk} = &$blosxom::template($path, $chunk, $flavour);
+
+  if ($cache->{$chunk}) {
+    $$story_ref = $cache->{$chunk};
+
+    return 1;
+  }
+
+  return 0;
+}
+
+sub foot {
+  my ($pkg, $path, $foot_ref) = @_;
+
+  my $chunk = $flavour_prefix . 'foot';
+  $cache->{$chunk} = &$blosxom::template($path, $chunk, $flavour);
+
+  if ($cache->{$chunk}) {
+    $$foot_ref = $cache->{$chunk};
+
+    return 1;
+  }
+
+  return 0;
+}
+
+1;
+# vim:ft=perl:

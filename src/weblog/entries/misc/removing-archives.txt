@@ -1,0 +1,35 @@
+/archives/の削除
+
+<p>こう言うと「過去ログ消したの……」みたいな感じだけど、そうではなくて過去ログへのアクセスのために使っていた<code>/archives/</code>を<code>/blog/</code>に移動させたというだけ。逆に言うとブログのトップページが一覧ページじゃなくなって、月ごとやカテゴリーごとのアーカイブ・ページへのリンクのリストになったという感じ。CoolなURIもたまには変わる。</p>
+
+<p>もちろん<code>/archives/</code>のような過去ログへのアクセスを提供するページは必要不可欠だと思うんだけど、実態がブログ(<code>/blog/</code>)のアーカイブ一覧なのに<code>/archives/</code>にあるのは良くないなぁとずっと思っていた。せめて<code>/blog/archives/</code>にするべきかなと思って、気が向いたので作業を始めた。</p>
+
+<p>途中で気が変わって、最近感じている「記事が全文で並んでるページって読みづらいよね？」みたいな感覚の元、一覧ページをやめて上記のような形にした。同じ内容が色々なページに散在するような形になるのもどうなのかな……とも最近考えている。もっとpermalinkを全面に押し出す形でブログを構成したい。</p>
+
+<p>まぁそういうわけでブログのトップページが一覧じゃなくなったわけだけど、もうちょっと良い方法がありそうな気がするので色々考えてみる。全エントリーのタイトル並べようかなー。</p>
+
+<p>ついでに<code>/archives/</code>にだけ置いてあって、アクセス性が非常に悪かった検索フォームも全てのページに追加するようにもしておいた。</p>
+
+<hr>
+
+<p>リンクのリストは単なる静的なHTMLファイルにした。一応エントリーを書いた時に必要ならリビルドする感じになってる。これを<code>index.html</code>とでもすればだいたい完了なんだけど、それだけではページングに使っているクエリーなどもこのHTMLファイルに食われてしまうので、いつも通りmod_rewriteで逃げた。</p>
+
+<pre><code class="language-conf">DirectoryIndex blosxom.cgi
+
+&lt;IfModule mod_rewrite.c&gt;
+  RewriteEngine On
+
+  RewriteBase /blog/
+
+  # Call index.html if QUERY_STRING does not exist
+  RewriteCond %{QUERY_STRING} ^$
+  RewriteRule ^$ index.html [L]
+
+  # Call Blosxom
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ blosxom.cgi/$1 [L,QSA]
+&lt;/IfModule&gt;
+</code></pre>
+
+<p><code>Directoryindex</code>では<code>blosxom.cgi</code>を指定しておき、<code>%{QUERY_STRING}</code>が空でかつ<code>/blog/</code>へのリクエストの時だけ静的なHTMLファイルを返すようにした。</p>

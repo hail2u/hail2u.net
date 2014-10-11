@@ -268,10 +268,7 @@ module.exports = function (grunt) {
 
       publish_blog: {
         options: {
-          message: 'Publish',
-          push: true,
-          root: 'src/weblog/',
-          submodule: true
+          message: 'Publish'
         },
 
         file: grunt.option('file')
@@ -279,10 +276,7 @@ module.exports = function (grunt) {
 
       update_blog: {
         options: {
-          message: 'Update',
-          push: true,
-          root: 'src/weblog/',
-          submodule: true
+          message: 'Update'
         },
 
         file: grunt.option('file')

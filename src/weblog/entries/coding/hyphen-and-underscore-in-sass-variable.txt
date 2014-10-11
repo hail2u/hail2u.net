@@ -1,0 +1,58 @@
+Sassの変数名での-と_
+
+<p>SassでBEMを利用して変数名を付けようとして、今までハイフンのみでどうにかしていた変数名を書き換えていた時に気づいたんだけど、Sassの変数名ではハイフン(<code>-</code>)とアンダースコア(<code>_</code>)が同一視される。バグだと思って<a href="https://github.com/nex3/sass/issues/1114">Issue</a>立てたら、<a href="https://github.com/nex3/sass/blob/5d8ebb94aede08fef4ea2ed6fc575ef070760557/doc-src/SASS_CHANGELOG.md#variable-and-mixin-names">3.0.0でSCSS記法を追加した時に入れた仕様</a>だという返事だった。</p>
+
+<p><code>-</code>と<code>_</code>が同一視されるということはどういうことかというと、以下の変数はすべて同じとみなされるということで、すべての変数の値は最後に定義した変数の値になる。</p>
+
+<pre><code class="language-scss">$foo--bar: &quot;foo--bar&quot;;
+$foo-_bar: &quot;foo-_bar&quot;;
+$foo_-bar: &quot;foo_-bar&quot;;
+$foo__bar: &quot;foo__bar&quot;;
+
+.test-foo--bar {
+  content: $foo--bar;
+}
+
+.test-foo-_bar {
+  content: $foo-_bar;
+}
+
+.test-foo_-bar {
+  content: $foo_-bar;
+}
+
+.test-foo__bar {
+  content: $foo__bar;
+}
+</code></pre>
+
+<p>コンパイルすると以下のように全て<code>&quot;foo__bar&quot;</code>になる。</p>
+
+<pre><code class="language-css">.test-foo--bar {
+  content: &quot;foo__bar&quot;; }
+
+.test-foo-_bar {
+  content: &quot;foo__bar&quot;; }
+
+.test-foo_-bar {
+  content: &quot;foo__bar&quot;; }
+
+.test-foo__bar {
+  content: &quot;foo__bar&quot;; }
+</code></pre>
+
+<p>またエラーや警告も出ないので、間違えて参照してもエラーに気付くのは難しい。例えばBEMのモディファイアの区切りを<code>--</code>にしていたとして、参照する時に間違えて<code>__</code>で参照しても運良くコンパイルされる。</p>
+
+<pre><code class="language-scss">$menu__item: #69c;
+$menu__item--current: #369;
+
+.menu__item {
+  color: $menu__item;
+
+  &amp;.current {
+    color: $menu__item__current;
+  }
+}
+</code></pre>
+
+<p>後方互換性のため、わざとこうしたらしい。余程のことがないとこの後方互換性が捨てられることはなさそうなので、かなり気をつけた方が良い。パッと見は間違っているコードなのに、問題なく動くのがすごく怖い。変数名でBEMを使おうとするとわりと致命的な感じあるけど、そこはIDEやエディタの補完で乗り越えるしかなさそう。もしくはアンダースコアだけを使うように宗旨変えするか。</p>

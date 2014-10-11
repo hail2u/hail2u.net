@@ -1,0 +1,29 @@
+@charsetを先頭へ
+
+<p>CSSの仕様では<code>@charset</code>は先頭に置かれたものしか効果を発揮しない。最近は共にUTF-8でHTMLとCSSを書くだろうと思うので、あまり使われず、気にすることはもうあまりない。ただ何かしらの事情があって使う場合、カジュアルにファイルを連結してプロダクション用のCSSを作成すると、無意味な場所に<code>@charset</code>が出てきて無駄が多くなる。</p>
+
+<p>ちゃんと書かれていることを前提にすると、ブラウザーの処理の仕方と同じように先頭以外の<code>@charset</code>を問答無用に削除しても良い。しかし、Normalize.cssのような最初に読ませる必要があるライブラリと<code>@charset</code>が必要なCSSファイルを連結するケースではそれではダメになる。最初に見つけた<code>@charset</code>を先頭へ移動させるというような形が一番マシだろう。</p>
+
+<p>異なる<code>@charset</code>が指定されたCSSファイルを連結する時におかしなことになるが、そのCSSは壊れてるので気にする必要はない。</p>
+
+<hr>
+
+<p><a href="https://github.com/hail2u/node-csswring">CSSWring</a>には結構前から<code>@charset</code>を最初に見つけたものだけにしてそれを先頭へ持っていく機能がある。今まではグローバル変数として<code>@charset</code>が既出かどうかのフラグを持たせて処理してたけど、以下のように書き換えた。</p>
+
+<pre><code class="language-javascript">if (atRule.name === &#39;charset&#39;) {
+  atRule.removeSelf();
+  var first = atRule.parent.first;
+
+  if (first.type !== &#39;atrule&#39; &amp;&amp; first.name !== &#39;charset&#39;) {
+    atRule.parent.prepend(atRule);
+  }
+
+  return;
+}
+</code></pre>
+
+<p>とりあえず削除して、もし親の最初のルール(<code>aRule.parent.first</code>)が<code>@charset</code>でなかったら追加するという形にした。こうするとグローバル変数を使ったフラグ管理をしなくて済む。</p>
+
+<hr>
+
+<p>このあたりのことを色々調べてて知ったんだけど、<a href="/blog/webdesign/at-import-syntax.html">先日書いた通り</a><code>@import</code>では直後の空白類を削除できるけど、<code>@charset</code>では削除できないことになっていた(<code>&quot;@charset<mark> </mark>&quot; {return CHARSET_SYM;}</code>となっている)。文字コードを括る引用符を省略できるわけでもないし、なんでなんだろうか。歴史的な事情はありそう。</p>

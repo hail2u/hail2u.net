@@ -1,0 +1,33 @@
+Query YQLプラグインでOpen Data Tableをサポートした
+
+<p><a href="http://developer.yahoo.com/yql/">YQL</a>ではデフォルト多くのテーブルが組み込まれているのだけど、自由に拡張できる仕組みとして<a href="http://developer.yahoo.com/yql/guide/yql-opentables-chapter.html">Open Data Table</a>というものがある。<a href="http://developer.yahoo.com/yql/console/">YQL Console</a>ではShow Community Tablesをクリックして有効にすると、<a href="http://www.datatables.org/">Community Open Data Tables</a>に登録されているGitHubやTwitterのためのテーブルを試すことができる。これらのOpen Data Tableを実際に利用するためにはYQLへのリクエストへ<code>env</code>パラメータとしてenvironmentファイルを指定しなければならない。最近よく利用するようになったので<a href="http://github.com/hail2u/jquery.query-yql">Query YQLプラグイン</a>でもそれらを利用できるように更新した。</p>
+
+<p>引数の互換性を維持したまま引数を増やしたので気持ち悪いコードになった。<code>statement</code>以外はオブジェクトにして渡すとかの方が良かったかもしれないけど、これ以上増えることも無いだろうと思うのでまぁ良し。びっちり書く場合は以下のようになる。</p>
+
+<pre><code class="language-js">var statement = &quot;select * from twitter.user.timeline where id=&#39;hail2u_&#39;&quot;;
+$.queryYQL(statement, &quot;json&quot;, &quot;http://datatables.org/alltables.env&quot;, function (data) {
+  // do something with &quot;data&quot;.
+});
+</code></pre>
+
+<p>第三引数にenvironmentファイルのURLを指定する。Community Open Data Tablesのテーブルを全てインポートする場合のみ<code>all</code>というキーワードでも可で、第二引数は省略すると<code>json</code>になるので、上記コードは以下のようにも書くことができる。</p>
+
+<pre><code class="language-js">var statement = &quot;select * from twitter.user.timeline where id=&#39;hail2u_&#39;&quot;;
+$.queryYQL(statement, &quot;all&quot;, function (data) {
+  // do something with &quot;data&quot;.
+});
+</code></pre>
+
+<p>Open Data Tableの利用はGoogle検索やTwitterのテーブルの利用が主なのだけど、他にもいくつか面白いものがある。</p>
+
+<ul>
+<li><code>auth.oauth.*</code>: おおーすって読む奴</li>
+<li><code>data.html.cssselect</code>: XPathではなくCSSのセレクタで要素を切り出す</li>
+<li><code>ip.location</code>: IPアドレスから地域を調べる</li>
+<li><code>query.multi</code>: 複数のクエリをまとめて投げる(resultsが複数返ってくる)</li>
+<li><code>yahoo.siteexplorer.inlinks</code>: <a href="https://siteexplorer.search.yahoo.com/mysites">Yahoo!のSite Explorer</a>を利用してインバウンドリンクを調査する</li>
+</ul>
+
+<p>そのうちテーブル書いてみたい。</p>
+
+<p>そのうちとか言う時は大抵やらないよね。</p>

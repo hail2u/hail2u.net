@@ -1,0 +1,66 @@
+blockとtable-cellの組み合わせ
+
+<p><code>display</code>プロパティーの値のひとつである<code>table-cell</code>は、通常<code>table</code>や<code>inline-table</code>と組み合わせて使う。リストに使うと空白を作らずに各項目を並べられ、かつ<code>float</code>プロパティーを使うより色々面倒くさくない。その場合に<code>table</code>や<code>inline-table</code>ではなく<code>block</code>と組み合わせると、<code>table-cell</code>の幅の自動調整が行われなかったり、他にもマークアップ上での制約や組み合わせ必須なプロパティーなどがないという特徴があり、スタイリングの自由度が上がる。</p>
+
+<pre><code class="language-css">ul {
+  margin: 0 auto;
+  padding: 0;
+  display: table;
+  width: 80%;
+}
+
+li {
+  display: table-cell;
+}
+</code></pre>
+
+<p><code>table</code>と組み合わせる場合、幅の自動調整によりリスト項目の内容により幅がまちまちになってしまうので、<code>width</code>プロパティーを使うのが難しくなる。キレイに等分させるというのなら別に問題はないのだけど、リスト項目の幅は必要最小限で左(または右、中央でも)に詰めたいなどというナビゲーションでよくあるケースに対応できない。</p>
+
+<pre><code class="language-css">nav {
+  text-align: center;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  display: inline-table;
+}
+
+li {
+  display: table-cell;
+}
+</code></pre>
+
+<p><code>inline-table</code>では、センタリングするにはその親で<code>text-align: center</code>などとすることになる。リストへのスタイルだけで完結しないので、マークアップに依存してしまうことになる。スタイリングの自由度自体は高く、ナビゲーションでやりたい場合は親に<code>nav</code>要素等があるので、大体はこれで良かったりもする。</p>
+
+<pre><code class="language-css">ul {
+  margin: 0 auto;
+  padding: 0;
+  display: block;
+  width: 80%;
+}
+
+li {
+  display: inline;
+}
+</code></pre>
+
+<p>古くから使われている<code>inline</code>を使うものは、空白ができてしまう有名なアレを解消するのが面倒くさい。改行か項目の終了タグを消したり<code>font-size: 0</code>にしたり。前者ではHTMLの大幅な編集作業が必要になり、後者では<code>em</code>単位が使用できなくなる上、フォント・サイズの相対指定も不可能になる。</p>
+
+<pre><code class="language-css">ul {
+  margin: 0 auto;
+  padding: 0;
+  display: block;
+  width: 80%;
+}
+
+li {
+  display: table-cell;
+}
+</code></pre>
+
+<p><code>table-cell</code>だけ使うというのは、横並びリストの空白を消すという目的で多用されているため知っている人は多い。けどポイントはそこじゃなくて、<code>table-cell</code>を指定する以外にほとんど制約とデメリットがないという点。</p>
+
+<hr>
+
+<p>多くのCSSテクニックにはデメリットが付きものだけど、そのことまで言及されることはあまりない。<code>overflow: hidden</code>を使ったclearfixでは<code>box-shadow</code>プロパティーによる影がカットされる可能性があるとかそういうの。デメリットを調査・理解して使う必要があるということなんだけど、それと同時にアンテナを伸ばして様々なテクニックを知り、デメリットのない(より少ない)テクニックを選択するということが重要。</p>

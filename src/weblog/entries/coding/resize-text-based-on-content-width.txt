@@ -1,0 +1,58 @@
+親要素の幅に収まるようにフォントサイズを変更する
+
+<figure><img src="/images/blog/resize-text-based-on-content-width.png" alt="Typography is the art and technique of arranging type"></figure>
+
+<p>Webフォント(<code>@font-face</code>)や均等割付(<code>text-align: justify;</code>)、日本語と英語の間のスペース調節(<code>text-autospace</code>)などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまり<code>img</code>要素に<code>width: 100%;</code>を指定した時のようにはCSSではできない(少なくとも思いつかなかった)。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/240.html">Resize Font Based on Content Width #6</a> </p>
+
+<p>フォントレンダリングの関係上、Firefoxの方が綺麗なのでスクリーンショットはFirefoxで撮影した。</p>
+
+<pre><code class="language-js">$(window).load(function () {
+  var start = $.now();
+
+  $(&quot;.line&quot;).each(function () {
+    var target = $(this);
+    var fontSize = parseInt(target.css(&quot;font-size&quot;), 10);
+
+    var temp = $(&quot;&lt;div/&gt;&quot;).css({
+      &quot;display&quot;:     &quot;none&quot;,
+      &quot;font-family&quot;: target.css(&quot;font-family&quot;),
+      &quot;font-size&quot;:   fontSize
+    }).text(target.text()).appendTo(&quot;body&quot;);
+
+    var targetWidth = target.width();
+    var tempWidth = temp.width();
+
+    while (tempWidth &lt; targetWidth) {
+      fontSize *= (targetWidth / tempWidth);
+      temp.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+      tempWidth = temp.width();
+    }
+
+    while (tempWidth &gt;= targetWidth) {
+      fontSize--;
+      temp.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+      tempWidth = temp.width();
+    }
+
+    target.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+    temp.remove();
+  });
+
+  var time = $.now() - start;
+  $(&quot;body&quot;).append($(&quot;&lt;p/&gt;&quot;).text(&quot;Elapsed Time: &quot; + time));
+});
+</code></pre>
+
+<p>まず非表示の<code>div</code>要素を作成し、そこにテキストとスタイルをコピーすることによって文を複製する。<code>display: none;</code>だとその要素の幅は<code>font-size</code>に応じて変化するので、幅の割合から大まかに当たりをつけてチェックしていき、元の要素の幅を超えたところでフォントサイズを一旦決定している。その後微調整するために1pxづつ下げていき、ちょうど収まるところで決定という仕組み。2passでやらないとうまく収まらなかったり色々不具合が多かった。</p>
+
+<p>幅の割合から当たりを付けるというアイディアは<a href="http://twitter.com/ofk">@ofk</a>に貰った。それに幅のキャッシュと微調整を付けて、大体20ms以下で終了するようになった。OperaとInternet Explorerが安定して高速で、次いでFirefox、ChromeとSafariが若干遅い。</p>
+
+<p><code>window.onload</code>で発火している理由は、Webフォントを利用している場合への対策。<code>window.onload</code>前の場合はWebフォントを適用した状態で要素の幅を計算してくれない(ブラウザの実装依存？)ので、ロードが完了してから発火させるようにした。</p>
+
+<p>リサイズに追随しないので<code>img</code>要素に<code>width: 100%;</code>を指定した時と同一とはいかないが、そこそこ満足のいくものになった。</p>
+
+<hr>
+
+<p><code>display: inline-block;</code>な要素を<code>transform: scale(100%);</code>とかで親と同じ大きさに綺麗に拡大してくれないかなーと妄想して始めたら、全然そんなことはできなかったのでJavaScriptで書いた。</p>

@@ -1,0 +1,40 @@
+マークアップをかなり変えた
+
+<p>思うところがあったのでマークアップを変更していた。背景画像として表示されるべきではないものを背景画像として表示しているのは良くないのではないか？みたいな夢を見た後、じゃあまず変えてみよう！みたいな。なんか変だなと思ったらF5すれば直る(はず)。</p>
+
+<ul>
+  <li>ロゴを<code>h1</code>でマークアップしてたのをやめ、<code>a</code>または<code>mark</code>と<code>img</code>要素でマークアップするようにした</li>
+  <li>代わりにそれぞれのページにふさわしい見出しをちゃんと付けた</li>
+  <li>でもその見出しを<code>display: none</code>しててひどい</li>
+  <li><code>main</code>要素さん、こんにちは！</li>
+  <li><code>h2</code>で始まっていたコンテンツ部分の見出しレベルを一段階繰り上げた</li>
+</ul>
+
+<p>ロゴは見出しなのどうなのみたいなのは深く考えると眠れなくなるので、あんまり考えない方が良い。変えたのはロゴは画像で背景じゃないので<code>img</code>要素使うようにしたかったみたいなのがあって、ついでにページの見出しちゃんと書くかと考え、ロゴに見出し要素使えなくなったので外したみたいな経緯でこうなった。ちゃんと見出し作っておいて隠すのなんなのみたいな感じだけど、うまく収める方法が思いつかなかったことによる暫定的な処置の予定。</p>
+
+<p><code>main</code>要素についてはやっぱり<code>role=&quot;main&quot;</code>も書かなくちゃならなそうな感じで、早まった気がしないでもない。</p>
+
+<p>見出しレベルの調整は最初、<code>h2</code>とかをただ単にgrepしてレベルをひとつ減らすように置換したので、h2uがh1uになったりした……。稀に必要になるHTMLの要素の置換とかで誤爆させない正規表現考えるの面倒くさいので、ちゃんとHTMLをパースしてゴニョゴニョできる簡単なツールが欲しい。<a href="http://jquery.com/">jQuery</a>依存で良さそうなので、DOM (の断片)をjQuery使って書いたスクリプトでいじった結果で上書き保存できるみたいなのを<a href="http://phantomjs.org/">PhantomJS</a>で動かすのとかで良さそう。どっかにありそう。</p>
+
+<p>グローバル・ヘッダーについては以下のようなマークアップになっている。</p>
+
+<pre><code class="language-html">&lt;header role=&quot;banner&quot;&gt;
+  &lt;a href=&quot;/&quot; id=&quot;logo&quot;&gt;&lt;img src=&quot;/images/logo.v6.svg&quot; alt=&quot;Hail2u.net&quot;&gt;&lt;/a&gt;
+
+  &lt;h1&gt;Weblog Archives&lt;/h1&gt;
+
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;mark&gt;Weblog&lt;/mark&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;/documents/&quot;&gt;Documents&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;/projects/&quot;&gt;Projects&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;/about/&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</code></pre>
+
+<p><a href="http://www.w3.org/TR/html5/dom.html#sec-strong-native-semantics">HTML5では<code>body</code>要素直下の<code>header</code>要素はstrong native semantics持ち</a>なので<code>role=&quot;banner&quot;</code>は必要ないけど、<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#table-aria-strong">HTML Standardsではそうなっていない</a>ので書いてる。<code>main</code>要素も似たような感じだけど、またちょっと違う理由で<code>role=&quot;main&quot;</code>を書いておいた方が良さそう。そういう意味でHTML Standardsでもstrong native semantics持ちな<code>nav</code>要素には<code>role=&quot;navigation&quot;</code>は必要ない(ので外した)。なんで書いてたのか思い出せない。</p>
+
+<hr>
+
+<p>あとはサブセクションをちゃんと<code>section</code>で括って、そこでも見出しに<code>h1</code>要素を使うようにすると「HTML5！」って感じになる。そうしたいんだけど、700以上あったので面倒になってやってない。こういうのもHTMLをパースしてゴニョゴニョして保存するツールとかあれば良いのか。</p>

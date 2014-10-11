@@ -1,0 +1,27 @@
+OperaでWebフォントを使うと日本語が明朝体になる
+
+<p>タイトルはかなり不正確。Webフォントを使用した場合、そのフォントが持っていないグリフは<code>font-family</code>での指定に従って適切にフォールバックされるべきところだが、<a href="http://www.opera.com/">Opera</a>では強制的に<code>serif</code>系のフォントが選択されてしまうというと正確。確認したバージョンは11.60(と11.61)。サブセット化されているためグリフを一部しか持っていない欧文フォントやアイコン・フォントで、持ってないグリフがTimes New Roman等になってしまうということでもあるので、意外に影響範囲は大きそう。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/358.html">Opera and Web Fonts</a></p>
+
+<p>デモでは<a href="http://www.theleagueofmoveabletype.com/junction">Junction</a>というフォントをWebフォントとして使った。フォーマットによって違う可能性も指摘されたので、TTFとEOT、WOFF、SVGの4つのフォーマットで試している。</p>
+
+<pre><code class="language-css">.test {
+  font-family: "Junction &lt;format&gt;", "Helvetica Neue", "Arial", sans-serif;
+}
+</code></pre>
+
+<p>という指定なので、対応しているフォーマットだった場合は英数字がJunction、それ以外がブラウザーの設定に従って<code>sans-serif</code>で表示される……はずだが、Operaでは日本語の部分が明朝体、WindowsだとＭＳ Ｐ明朝(多分)になってしまう。</p>
+
+<p>Webフォントの扱いにバグがあり、まったくフォールバックされないということみたい。</p>
+
+<pre><code class="language-css">.test {
+  font-family: "Junction &lt;format&gt;", "Meiryo", "メイリオ", "Helvetica Neue", "Arial", sans-serif;
+}
+</code></pre>
+
+<p>などとして、メイリオを期待しても無駄でＭＳ Ｐ明朝御大がファンブル召喚される。</p>
+
+<hr>
+
+<p>今、このサイトでは本文のフォントに<a href="http://www.google.com/webfonts/specimen/Open+Sans">Open Sans</a>を使っているので、ばっちりこのバグを踏んでる……。どうにかしてあげたいところだけどどうにもならないのでバグレポートだけした。適切にフォールバックされないというのは非常に困るので今すぐたちどころに直ってほしい。</p>

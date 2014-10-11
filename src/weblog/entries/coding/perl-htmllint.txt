@@ -1,0 +1,49 @@
+HTML LintのAPIを叩くPerlスクリプト
+
+<p><a href="http://lint.brihten.com/html/">HTML Lint</a>にはAPIが用意されているので<a href="http://www.vim.org/">Vim</a>からいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。<a href="http://search.cpan.org/perldoc?WebService::Validator::HTML::W3C">WebService::Validator::HTML::W3C</a>も使って<a href="http://validator.w3.org/">Markup Validation Service</a>にまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。</p>
+
+<pre><code class="language-perl">#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use JSON;
+use LWP::UserAgent;
+
+my $file = shift;
+
+my $ua = LWP::UserAgent-&gt;new();
+my $res = $ua-&gt;post("http://lint.brihten.com/html/lint/",
+  Content_type =&gt; "form-data", 
+  Content      =&gt; [
+    filesource           =&gt; [$file],
+    tags_closeoptional   =&gt; 1,
+    tags_lowercase       =&gt; 1,
+    tags_closeempty      =&gt; 0,
+    attrs_quoted         =&gt; 1,
+    attrs_lowercase      =&gt; 1,
+    attrs_simplebooleans =&gt; 1,
+    tags_whitespace      =&gt; 0,
+    response_format      =&gt; "json"
+  ]
+);
+
+if ($res-&gt;is_success) {
+  my $result = from_json($res-&gt;decoded_content);
+  my $errors = $result-&gt;{mistakes};
+
+  if (scalar(@$errors) &gt; 0) {
+    foreach my $e (@$errors) {
+      print join(":", $file, $e-&gt;{line}, $e-&gt;{message}), "\n";
+    }
+  }
+} else {
+  die $res-&gt;status_line;
+}
+
+exit;
+</code></pre>
+
+<p>空要素を閉じてない場合の警告をオフっている以外はデフォルトです。</p>
+
+<p>Web UIからでも使ってみるとわかると思いますけど、本当にイマイチです。ソースが公開されたりしてからが本番ということでしょうか。期待している人はすごく多いと思うので頑張って欲しいですね。</p>

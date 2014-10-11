@@ -1,0 +1,157 @@
+Node.jsで書いたJS圧縮ツール
+
+<p>というか<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>のREST APIを叩くスクリプト。<a href="http://validator.nu/">Validator.nu</a>と違って<code>application/x-www-form-urlencoded</code>に対応してるのでQuery Stringモジュールで良く、コア・モジュールだけでいける。けどローカル・ファイルへの対応を加える時にコールバック地獄に堕ちそうなので、<a href="https://github.com/caolan/async/">asyncモジュール</a>でガッとまとめてやるようにした。</p>
+
+<p>まず元になるJavaScriptファイルへのコメントに書かれた<code>@compilation_level</code>などを解釈してオブジェクトにキーを追加していく。<code>@code_url</code>と独自に追加したローカルのJavaScriptファイルのパスを指定する<code>@code_path</code>だけを特別視し、JavaScriptファイルをURLやローカルのパスから読み込む。URLもこちらで読み込んでるのはClosure Compiler Service側のキャッシュが結構強く、問題が起きることがあるため。最後にQuery Stringモジュールでパラメーターに組み立ててPOSTするだけ。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var async = require('async');
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var path = require('path');
+var url = require('url');
+
+var jsfile = process.argv.slice(2)[0];
+var js = fs.readFileSync(jsfile, 'utf8').split(/\n/);
+var found = false;
+var matches = [];
+var loadJSFiles = [];
+var options = {
+  'output_info': 'compiled_code',
+  'output_format': 'json'
+};
+var jscode = [];
+
+for (var i = 0, l = js.length; i &lt; l; i++) {
+  var line = js[i];
+
+  if (/^\/\/ ==ClosureCompiler==$/.test(line)) {
+    found = true;
+  } else if (/^\/\/ ==\/ClosureCompiler==$/.test(line)) {
+    found = false;
+  } else if (found &amp;&amp; (matches = /^\/\/ @(\S+)\s*(.*)$/.exec(line))) {
+    var param = matches[1];
+    var value = matches[2];
+
+    if (param === 'code_path') {
+      loadJSFiles.push(loadFromPath(value));
+    } else if (param === 'code_url') {
+      loadJSFiles.push(loadFromURL(url.parse(value)));
+    } else {
+      options[param] = value;
+    }
+  } else {
+    jscode.push(line);
+  }
+}
+
+async.parallel(loadJSFiles, function (error, results) {
+  if (error) {
+    throw error;
+  }
+
+  var querystring = require('querystring');
+
+  results.push(jscode.join('\n'));
+  options.js_code = results;
+  var data = querystring.stringify(options);
+
+  var request = http.request({
+    host: 'closure-compiler.appspot.com',
+    path: '/compile',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  }, function (response) {
+    var chunks = '';
+
+    response.setEncoding = 'UTF-8';
+
+    response.on('data', function (chunk) {
+      chunks += chunk;
+    });
+
+    response.on('end', function () {
+      console.log(JSON.parse(chunks).compiledCode);
+    });
+  });
+
+  request.on('error', function (error) {
+    throw error;
+  });
+
+  request.write(data);
+  request.end();
+});
+
+function loadFromPath(jspath) {
+  return function (callback) {
+    fs.readFile(path.resolve(path.dirname(jsfile), jspath), 'utf8', function (error, data) {
+      if (error) {
+        throw error;
+      }
+
+      callback(null, data);
+    });
+  };
+}
+
+function loadFromURL(jsurl) {
+  return function (callback) {
+    if (jsurl.protocol === 'https:') {
+      https.get(jsurl, gatherResponse).on('error', function (error) {
+        throw error;
+      });
+    } else {
+      http.get(jsurl, gatherResponse).on('error', function (error) {
+        throw error;
+      });
+    }
+
+    function gatherResponse(response) {
+      var chunks = '';
+
+      response.setEncoding = 'UTF-8';
+
+      response.on('data', function (chunk) {
+        chunks += chunk;
+      });
+
+      response.on('end', function () {
+        callback(null, chunks);
+      });
+    }
+  };
+}
+</code></pre>
+
+<p>ファイルの読み込みは順序良く実行される必要はないので、<code>async.parallel()</code>で実行するようにした。ローカルからの読み込みはパスの解決を忘れずに行わないと死ぬ。URLからの読み込みの時はHTTPかHTTPSかをちゃんとチェックするだけ。</p>
+
+<h2><code>js_code</code>パラメーター</h2>
+
+<p>Closure Comiler Serviceでは<code>js_code</code>というパラメーターでJavaScriptのコードを渡す。これは複数渡すことができるので、Query Stringモジュールの仕様に従い配列にしてやると良い。ここで適当に<code>;</code>で連結したりしてしまうと残すコメントの位置がおかしくなったりと、コンパイル結果がアレになるので注意が必要。</p>
+
+<pre><code class="language-js">var querystring = require('querystring');
+
+querystring.stringify({
+  'js_code': [
+    'var foo;',
+    'var bar;',
+    'var buz;'
+  ]
+})
+</code></pre>
+
+<p>で、</p>
+
+<pre>js_code=var+foo%3B&amp;js_code=var+bar%3B&amp;js_code=var+buz%3B
+</pre>
+
+<p>になる。実際のコードでは<code>async.pararell()</code>のコールバックでファイルやURLのJavaScriptコードの配列が返ってくるようにしたので、それに元JavaScriptファイルに書かれているコードを<code>push()</code>してやるだけで良い。</p>
+
+<hr>
+
+<p>はー。</p>

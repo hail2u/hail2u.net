@@ -1,0 +1,16 @@
+blosxom plugin template
+<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグイン・アーキテクチャは結構わかりやすいと思うので、書きやすいとは思うのですけど、<a href="http://www.blosxom.com/documentation/developers/plugins.html" title="blosxom :: the zen of blogging :: documentation/developers/plugins.html">プラグインのドキュメント</a>がひたすら読みづらく、「このサブルーチンはどんな変数を渡してくれるんだっけ？」とか忘れると読むのが非常にメンドウです。しかも、一部間違ってたりする。なので、僕はあまり考えずにプラグインを書き始めることができる様に、<a href="/pub/plugin_tmpl" title="plugin_tmpl">テンプレート</a>を作ってます(本当はもっと日本語でコメントを入れてあったりする)。</p>
+<p>こんなものを作っておくときっとプラグインの生産性が上がるでしょう。英語ばっかでわかりづらい場合は、それぞれのサブルーチンの各変数がどんなデータを参照しているリファレンスなのかを日本語で書いておくと良いと思います(日本語でコメントを入れておき、blosxomで使っている文字コードで保存しておくと、プラグイン・ファイルの文字コードにまつわるトラブルも避けやすかったりします)。</p>
+<pre><code class="language-perl">sub head {
+  my($pkg, $currentdir, $head_ref) = @_;
+  # $currentdir: $blosxom::path_infoと等価
+  # $head_ref:   head.flavourの生成結果
+
+  return 1;
+}
+</code></pre>
+<p>とか、こんな感じ。</p>
+<p>見通しが悪くなるのと、書き換えづらくなるので僕はやっていませんが、blosxomのグローバル変数の説明なんかもまとめて書いておいたりしても良いかもしれない。</p>
+<p>プラグインのドキュメントで間違ってるところは、<code>date</code>サブルーチンの例とか。第二引数の<code>$currentdir</code>が無いので、この例をコピペするとうまく動きません。他にも<code>entries</code>サブルーチンの例で、<code>\%others</code>を返していないところとかも。あと、<code>end</code>→<code>last</code>という順番でドキュメントには記載されていますが、呼ばれる順序的には<code>last</code>→<code>end</code>です。<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873111749/hail2unet-22" title="Amazon.co.jp： 本: Blog Hacks-プロが使うテクニック &amp; ツール 100選">Blog Hacks</a>のHack #65にはそんな感じで書いてありますね。</p>
+<p>それぞれのサブルーチンの利用例などは、blosxom plugin registryで探しても良いですけど、<a href="http://www.google.com/" title="Google">Google</a>で<a href="http://www.google.com/search?lr=&amp;q=blosxom+%22sub+entries%22" title="Google 検索: blosxom &quot;sub entries&quot;">blosxom &quot;sub entries&quot;</a>などと全言語のページから検索したりすると見つけやすいかと。</p>
+<p>あとはもう経験則的なblosxomプラグインの書き方とか、Perlのお話なので、そこらへんはまぁ数をこなしてどうよ？とかそんな感じで。</p>

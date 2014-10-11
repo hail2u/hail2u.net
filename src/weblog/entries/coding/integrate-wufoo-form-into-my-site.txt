@@ -1,0 +1,59 @@
+Wufooのフォームを自分のサイトに統合
+
+<p><a href="http://wufoo.com/">Wufoo</a>のフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といっても<code>document.write()</code>なJavaScriptコードや<code>iframe</code>要素を張り付けて使う<a href="http://wufoo.com/docs/code-manager/">Embed Form Code等</a>や<a href="http://wufoo.com/docs/api/">REST APIを利用したもの</a>ではなく、<a href="http://wufoo.com/docs/api/external-post-to-wufoo/">決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良い</a>ようだ。</p>
+
+<p>まずはWufooにログインしてフォームを作成しておく必要がある。作成したら管理画面からCodeをクリックしてForm Code Managerを開く。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-1.png" alt="Form Code Managerへのリンク"></figure>
+
+<p>Form Code Managerのページの右上にあるAPI Informationをクリックして、作成したフォームのAPI情報ページを開く。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-2.png" alt="API Informationのリンク"></figure>
+
+<p>このページにフォームの作成に必要なものは揃っている。必要なものはAPI IDとPOST Keyだけで、API KeyやHashは必要ない。ドキュメントではForm Code ManagerからXHTML/CSS Codeをダウンロードしてそれに入っているHTMLを書き換えろと支持されているが、そのHTMLはかなり読みづらいので、API IDとPOST Keyをコピーして一から書いた方が楽だと思う。</p>
+
+<p>API IDは以下のような表で記載されている。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-3.png" alt="API ID"></figure>
+
+<p>POST Keyはページ右下にちょこんと記載されている。</p>
+
+<figure><img src="/images/blog/integrate-wufoo-in-my-site-4.png" alt="POST Key"></figure>
+
+<p>以上の情報を元に以下のような点に気をつけてフォームを作成すれば良い。</p>
+
+<ul>
+<li><code>form</code>要素の<code>action</code>には作成したフォームのURLを記入する</li>
+<li>各フォームの入力要素の<code>name</code>と<code>id</code>に<em>Field{API ID}</em>(API IDが174ならField174)を指定する</li>
+<li><code>type=&quot;hidden&quot;</code>の<code>input</code>要素の<code>name</code>と<code>id</code>に<code>idstamp</code>を割り当て、<code>value</code>でPOST Keyを指定する</li>
+</ul>
+
+<p>つまり以下のようなフォームを作成することになる。</p>
+
+<pre><code class="language-html">&lt;form action=&quot;http://username.wufoo.com/forms/formname/&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;
+  &lt;label&gt;
+    Name
+    &lt;input type=&quot;text&quot; name=&quot;Field6&quot; id=&quot;Field6&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Email
+    &lt;input type=&quot;text&quot; name=&quot;Field119&quot; id=&quot;Field119&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Website
+    &lt;input type=&quot;text&quot; name=&quot;Field126&quot; id=&quot;Field126&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Summary
+    &lt;input type=&quot;text&quot; name=&quot;Field229&quot; id=&quot;Field229&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Message
+    &lt;textarea rows=&quot;10&quot; cols=&quot;50&quot; name=&quot;Field115&quot; id=&quot;Field115&quot;&gt;&lt;/textarea&gt;
+  &lt;/label&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;idstamp&quot; value=&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot; id=&quot;idstamp&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot; name=&quot;saveForm&quot; id=&quot;saveForm&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>あとはサイトのデザインに合わせてCSSで飾り付けるのみ。Wufooは<a href="http://wufoo.com/2010/08/30/use-over-150-fonts-on-your-forms-with-wufoos-new-typography-features/">Webフォント</a>が使えたりと元々かなり強力なデザイン機能を持っているが、やはり一からフォームを構築できると自己満足度は高い。Wufooのドキュメントで<em>公式にサポートしていない</em>と明言されており、突然停止することもありうるということには注意が必要だが、それに目をつぶっても使う価値があると個人的には感じた。</p>

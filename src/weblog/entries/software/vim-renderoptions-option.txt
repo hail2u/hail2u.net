@@ -1,0 +1,19 @@
+Vimのrenderoptionsオプション
+
+<figure>
+  <a href="/images/blog/vim-renderoptions-option.png"><img src="/images/blog/vim-renderoptions-option.png" alt="renderoptionsオプションを使うと、デフォルトのGDI環境下(右)できれいに表示されないMigMix 1Mのようなフォントも、DirectWriteを利用してアンチエイリアスがかかった表示に切り替えることができる"></a>
+</figure>
+
+<p>最近のKaoriYa版のWindows向けgVimではどうやら<code>renderoptions</code>オプションを適切に設定すると、DirectWriteを使った描画に切り替えられるようだ。一年ほど前から<a href="http://www.kaoriya.net/blog/2013/05/05/">パッチとして含められるように</a>なっていたらしい。</p>
+
+<p>有効にしただけではあまり劇的な効果を上げることは出来ないようだけど、追加で細かく設定を行える。例えば上のスクリーンショットのようにブワッとアンチエイリアスをかけたい場合は<code>~/vimfiles/gvimrc</code>などで以下のようにすれば良い。</p>
+
+<pre><code class="language-vim">set encoding=utf-8
+
+if has(&#39;win32&#39;)
+  set guifont=MigMix_1M:h12
+  set renderoptions=type:directx,renmode:5
+endif
+</code></pre>
+
+<p>わかりやすそうなので<a href="http://mix-mplus-ipa.sourceforge.jp/migmix/#migmix1m">MigMix 1M</a>を例にした。デフォルトのGDI下では、上のスクリーンショットの様に特に縦方向に残念な感じで、ところどころにゴミが出たりする。それがさっぱりと消えてくれるようになる。本当は<code>renmode:6,taamode:0</code>としてアウトライン・モードにしたかったんだけど、うまくいかなかったので<code>renmode:5</code>にしておいた。他のパラメーターをいじるのは結構大変なので、とりあえずは<code>renmode:5</code>で良いんじゃないかと思う。</p>

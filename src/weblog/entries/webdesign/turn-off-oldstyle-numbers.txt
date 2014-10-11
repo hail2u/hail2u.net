@@ -1,0 +1,49 @@
+オールドスタイルな数字を普通のものに
+
+<p>オールドスタイルな数字っていうのはGeorgiaとかで見るオシャレなあの数字のこと。<a href="http://en.wikipedia.org/wiki/Corbel_(typeface)">Corbel</a>というx-heightが高めでオープン・カウンターという読みやすさ重視のなかなか優秀なサンセリフ体もオールドスタイル。ただ和文とは相性が良くないので、どうにかして数字だけ普通のものに差し替えてみようという試み。</p>
+
+<h2><code>unicode-range</code>プロパティー</h2>
+
+<p><code>@font-face</code>ディレクティブの<code>unicode-range</code>プロパティーでカスタム・フォントを作成するテクニックを使ってCorbelの数字をCalibriに置き換えてみる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/442.html">Use non oldstyle numbers for Corbel</a></p>
+
+<p>Chrome 20とInternet Explorer 9で反映される。それ以外では<code>unicode-range</code>プロパティーが無視されるので、アルファベットや記号も含めて<em>完全にCalibriになる</em>。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: "Corbel-Mod";
+  src: local("Corbel");
+}
+
+@font-face {
+  font-family: "Corbel-Mod";
+  src: local("Calibri");
+  unicode-range: U+0030-0039;
+}
+
+.test {
+  font-family: "Corbel-Mod", sans-serif;
+}
+</code></pre>
+
+<p>という形で<code>local()</code>で読むのでパフォーマンスに影響は殆どない。CorbelもCalibriもないOS Xなどではどうなんの……みたいな感じだけど、そもそもどこの誰でもCorbelを使わせようみたいな話ではないので関係ない。</p>
+
+<h2><code>font-feature-settings</code>プロパティー</h2>
+
+<p>リガチャで脚光を浴びつつある<a href="http://www.w3.org/TR/css3-fonts/#font-feature-settings-prop"><code>font-feature-settings</code></a>プロパティーでも<code>lnum</code>を有効にしてやることでChrome 20やFirefox 14 (多分4以降)、Internet Explorer 10では可能。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/443.html">Use non oldstyle numbers for Corbel #2</a></p>
+
+<p>ちゃんと設計されたグリフが採用されるのと概ね直感的なプロパティーの記述で済むのが良いところ。</p>
+
+<pre><code class="language-css">.test {
+  font-family: "Corbel", sans-serif;
+  font-feature-settings: "lnum" 0;
+}
+</code></pre>
+
+<p>最初<code>font-feature-settings</code>プロパティーで<code>onum</code>を明示的に無効にしたら普通の数字になるんじゃないかと思って試したんだけどダメだった。それで<code>unicode-range</code>プロパティーのを窮余の策として考えだしたんだけど、やり方が全然間違っていただけだった……。OpenTypeの仕様も読まないとなぁ……。</p>
+
+<hr>
+
+<p>後者の<code>font-feature-settings</code>プロパティーを使う方が将来的に安全で字形的に安定だと思う。<code>unicode-range</code>プロパティーだとInternet Explorer 9で反映されるというメリットはあるので、条件付きコメントとかで切り分けたりするとかも良いかも。今度どこかでCorbel使おう。</p>

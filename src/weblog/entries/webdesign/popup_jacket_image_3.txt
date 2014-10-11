@@ -1,0 +1,48 @@
+ジャケット画像のポップアップ #3
+<p><a href="/blog/webdesign/popup_jacket_image.html" title="hail2u.net - Weblog - ジャケット画像のポップアップ">およそ9ヶ月前</a>と<a href="/blog/webdesign/popup_jacket_image_2.html" title="hail2u.net - Weblog - ジャケット画像のポップアップ #2">ついこの間</a>に書いたジャケット画像のポップアップをInternet Explorerに対応させてみました。対応させたといってもHTMLコードを書き直さなきゃならないので、CSSハックというわけではありません。Internet Explorerに対応させるための鍵になったのは<code>overflow</code>プロパティと<code>visibility</code>プロパティでした。</p>
+<figure><img src="/images/blog/popup_jacket_image_3.jpg" alt="Internet Explorerでもぽぷあぷ！"></figure>
+<p><a href="/pub/test/043.html" title="Pop-up Jacket Image #3">Internet ExplorerとFirefoxそれぞれで動く(Operaでもそれなりですが怪しい)動作サンプル</a>以外に語る術を持たない。というわけにもいかないので、もうひとつ<a href="/pub/test/044.html" title="Pop-up Jacket Image #3.1">Internet Explorer向けのサンプル</a>を作ってみました。このページのHTMLコードとCSSコードが基本になります。</p>
+<p>HTMLの方は、</p>
+<pre><code class="language-html">&lt;p&gt;
+  &lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B0009AJK5M/hail2unet-22&quot;&gt;
+    &lt;img src=&quot;{小さい画像のURL}&quot; ... class=&quot;small&quot; /&gt;
+    &lt;img src=&quot;{大きい画像のURL}&quot; ... class=&quot;medium&quot; /&gt;
+  &lt;/a&gt;
+&lt;/p&gt;
+</code></pre>
+<p>と、<code>a</code>要素に小さい画像と大きい画像を並べてやるというもの。一方、CSSの方は、</p>
+<pre><code class="language-css">p a {
+  width: 77px;
+  height: 77px;
+  overflow: hidden;
+  display: block;
+}
+
+p a:hover img {
+  border: 1px solid #333333;
+}
+
+p a:hover {
+  width: 162px;
+  height: 162px;
+}
+
+p a:hover img.small {
+  visibility: hidden;
+}
+
+p a:hover img.medium {
+  position: relative;
+  top: -77px;
+  left: 0;
+}
+</code></pre>
+<p>という感じ。まず、<code>a</code>要素に<code>overflow</code>プロパティと共に<code>width</code>プロパティと<code>height</code>プロパティを小さい画像の大きさと同じだけ指定してやることによって小さい画像以外が見えない(表示されないではなく見えないだけ)ようにしてやります(1-6行目)。対して、<code>a</code>要素の<code>:hover</code>擬似クラスでは、大きい画像の大きさに変えてやります(12-15行目)。その上で、小さい画像の<code>visibility</code>プロパティを<code>hidden</code>で隠してやり、大きい画像の<code>position</code>プロパティを<code>relative</code>と指定した上で上に小さい画像の高さの分だけずらす(<code>top: -77px;</code>)わけです。</p>
+<p>このアプローチはFirefoxでも何とか動くんですが、微妙にアレなのでFirefox用には以前のエントリの方法でやった方が良さそうです。ので、上記のInternet ExplorerとFirefoxで動く動作サンプルは、<a href="http://www.w3.org/TR/REC-CSS2/selector.html#child-selectors" title="Selectors">child selector(子セレクタ)</a>によるハック(See Also: <a href="/blog/webdesign/css_tips_1.html" title="hail2u.net - Weblog - 子セレクタ">子セレクタ</a>)でどうにかしてやってます。</p>
+<p>ジャケット画像のポップアップということになってますが、画像なら何でもポップアップ可能です。読めばわかるはずですが。</p>
+<h2>追記</h2>
+<p>サンプルへのリンクを張るのを忘れていました！ADT！</p>
+<h2>追記 #2</h2>
+<p><a href="/blog/#nmnl" title="Latest albums">Weblogのサイドバーのジャケット画像のサムネイル</a>や、AboutのNo Music, No Life.のサムネイルもInternet Explorerでポップアップするようにしました。上記の例とはちょっとHTMLコードが違いますが、CSSコード自体はあまり変わりません。</p>
+<h2>追記 #3</h2>
+<p><code>z-index</code>をきちんと指定したらOpera 8でもちゃんと動きました。わーい。Opera 7とかは知らん。</p>

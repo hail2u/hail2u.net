@@ -1,0 +1,39 @@
+二つの文字列の融合
+
+<p>融合っていうのは、「あいうえお」と「うえおかき」を混ぜて足して「あいうえおかき」にするケースのこと。後者の先頭の「うえお」を前者へ融かし合わせるので融合と言ったけど、それで良いのかよくわからない。ちゃんとしたアルゴリズムありそうだけど、見つけることができなかったので、後方から検索していくみたいな感じで書いた。</p>
+
+<pre><code class="language-javascript">function fuse(a, b) {
+  var i = 0;
+  var s = &#39;&#39;;
+  var j = 0;
+
+  for (i = b.length; i &gt; 0; i--) {
+    s = b.substring(0, i);
+    j = a.lastIndexOf(s);
+
+    if (j &gt;= 0 &amp;&amp; j + s.length === a.length) {
+      break;
+    }
+  }
+
+  return a + b.substring(i);
+}
+
+console.log(&#39;abcde + efg   =&#39;, fuse(&#39;abcde&#39;, &#39;efg&#39;));
+console.log(&#39;abcde + cdefg =&#39;, fuse(&#39;abcde&#39;, &#39;cdefg&#39;));
+console.log(&#39;abcde + fg    =&#39;, fuse(&#39;abcde&#39;, &#39;fg&#39;));
+console.log(&#39;abcde + abcde =&#39;, fuse(&#39;abcde&#39;, &#39;abcde&#39;));
+console.log(&#39;abcde + bcd   =&#39;, fuse(&#39;abcde&#39;, &#39;bcd&#39;));
+</code></pre>
+
+<p>文字列<var>b</var>を一文字ずつ減らしながら文字列<var>a</var>の後ろから検索していく。正規表現だとコストが高そうだったので<code>lastIndexOf()</code>でやってる。このままだと途中に出てきてもOKになってしまうので、インデックスに検索した文字列の長さを足して文字列<var>a</var>の長さになるかどうかをチェックすることで、文字列<var>a</var>の最後に出てきているかどうかもちゃんと確認する。減らしながら探しているので、見つかったらそこで終了すれば良い。最後のインデックスを使って文字列<var>b</var>を切り詰め連結すれば融合した文字列が作り出せる。</p>
+
+<pre><samp>$ <kbd>node fuse.js</kbd>
+abcde + efg   = abcdefg
+abcde + cdefg = abcdefg
+abcde + fg    = abcdefg
+abcde + abcde = abcde
+abcde + bcd   = abcdebcd
+</samp></pre>
+
+<p>大丈夫そう。</p>

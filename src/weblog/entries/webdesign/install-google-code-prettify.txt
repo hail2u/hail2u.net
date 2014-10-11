@@ -1,0 +1,37 @@
+google-code-prettifyを導入した
+
+<p>どっかのサイトがシンタックス・ハイライトを導入していたので真似した。ローカルでやろうかと思ったけどフィードに<code>&lt;span class=&quot;kwd&quot;&gt;function&lt;/span&gt;</code>とかがたくさん入るのが嫌だったので、JavaScriptでハイライトしてくれる<a href="http://code.google.com/p/google-code-prettify/">google-code-prettify</a>にした。正式名称はJavascript code prettifierらしい。</p>
+
+<p>google-code-prettifyにしたのは、必要な機能がシンタックス・ハイライト<em>だけ</em>でできればフォーマットの自動判定があれば良いかなーくらいだったので。自動判定に頑張って貰おうとして、</p>
+
+<pre><code class="language-js">$(function () {
+  $(&quot;pre&quot;).addClass(&quot;prettyprint&quot;);
+  prettyPrint();
+});
+</code></pre>
+
+<p>とか書いて全ての<code>pre</code>要素を自動的にハイライトさせてみたんだけど、非対応なものとかでアレなことになってしまったので、結局半手作業でハイライトさせたい<code>pre</code>要素のクラス名に<code>prettyprint</code>を振ってやった……。</p>
+
+<p>CSSのシンタックス・ハイライトはコアに含まれていないので、利用したい場合は以下のように書く必要があった。</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;prettify.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;lang-css.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+
+<p>順序が重要でlang-css.jsはprettify.jsより後ろに書かなくてはならない。当たり前といえば当たり前なんだけどうっかり逆の順序で書いてしまってはまった……。<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を使えば複数のJavaScriptファイルをまとめたりもできるので、まとめてしまうとそういう間違も起こさず良いかもしれない。流行りのHTTPリクエストの節約にもなる(この場合は1つだけどね！)。実際にこのサイトで使用しているprettify.min.jsはClosure Compiler Serviceでコンパイルしたもの。</p>
+
+<pre><code class="language-js">// ==ClosureCompiler==
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// @output_file_name prettify.min.js
+// @code_url http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js
+// @code_url http://hail2u.net/scripts/prettify/lang-css.js
+// ==/ClosureCompiler==
+
+$(function () {
+  prettyPrint();
+});
+</code></pre>
+
+<p>Closure Compiler Serviceのフォームには上記のように入力してコンパイルした。<a href="/scripts/prettify/lang-css.js">lang-css.js</a>は<code>rgba()</code>や<code>hsla?()</code>をサポートさせたりプロパティ名のハイライト色を変更したかったので、このサイトにカスタマイズしたものを置いてそれを読み込ませている。ついでにjQueryを使って<code>prettyPrint()</code>が自動的に呼ばれるようにして、<code>&lt;body onload=&quot;prettyPrint()&quot;&gt;</code>とか書かなくて済むようにもした。</p>
+
+<p>CSSテーマはir_blackを適当にカスタマイズしたものでwidget.cssに書いてある。一応ir_black.cssやh2u_black.cssとかも書いたけど使ってない……。</p>

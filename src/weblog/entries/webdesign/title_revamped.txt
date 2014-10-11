@@ -1,0 +1,70 @@
+タイトル改造
+<p>CSSの実験も兼ねて、タイトルをいじってみました。こういう角丸のデザインはtableを使うとかなり簡単に出来るわけですが、CSSとなると結構ややこしいかも・・・と思ったので、とりあえずやってみようかと。意外に簡単な罠。</p>
+<figure><img src="/images/blog/title_040208.png" alt="2004/02/08時点のタイトルのキャプチャ"></figure>
+<p>考え方自体は<a href="http://www.1976design.com/blog/archive/2003/11/14/49/" title="Easy CSS drop shadows | Blog | 1976design.com">Easy CSS drop shadows</a>で、これの「大きさ的にかなり余裕のある画像をベースとなるブロックの背景画像にする」を応用したものです。といってもCSSのコードはかなり違ってしまってますが。言葉にすると、</p>
+<ol>
+<li>ベースとなる角丸の画像を作成</li>
+<li>ベースとなるブロック要素に、その画像の真ん中の繰り返し部分と右端を連結した背景画像を指定</li>
+<li>前面に位置するブロック要素にその画像の左端の部分のみを背景画像に指定</li>
+</ol>
+<p>と、こういうことになります。わかりにく。</p>
+<p>CSSのコードはこんな感じ。</p>
+<pre><code class="language-css">div#header {
+  margin:12px 0;
+  color:#333333;
+  background-color:transparent;
+  background-image:url(&quot;../images/titlebg_rb.png&quot;);
+  background-repeat:no-repeat;
+  background-position:right bottom;
+}
+
+div#header h1 {
+  background-image:url(&quot;../images/titlebg_rt.png&quot;);
+  background-repeat:no-repeat;
+  background-position:right top;
+}
+
+div#header h1 a {
+  padding:18px;
+  display:block;
+  width:auto;
+  height:72px;
+  overflow:hidden;
+  background-image:url(&quot;../images/titlebg_lt.png&quot;);
+  background-repeat:no-repeat;
+  font-size:2.5em;
+  text-align:center;
+  letter-spacing:8px;
+}
+
+div#header h1 &gt; a {
+  height:36px;
+}
+
+div#header h1 a:link,
+div#header h1 a:visited,
+div#header h1 a:hover,
+div#header h1 a:active {
+  color:#333333;
+  background-color:transparent;
+  text-decoration:none;
+}
+
+div#header h2 {
+  margin:0 0 12px 0;
+  padding:6px;
+  background-image:url(&quot;../images/titlebg_lb.png&quot;);
+  background-repeat:no-repeat;
+  height:37px;
+  overflow:hidden;
+  font-size:1.5em;
+  text-align:center;
+  letter-spacing:2px;
+}
+
+div#header &gt; h2 {
+  height:24px;
+}
+</code></pre>
+<p>ベースとなる画像を4つに分割し、<code>div#header</code>でタイトルの下端及び右下端の画像、<code>h1</code>で上端及び右上端の画像、<code>h1 a</code>をブロックにしてで左上端の画像、<code>h2</code>で左下端の画像をそれぞれ背景に指定しています。下端及び右下端の画像と上端及び右上端の画像はブラウザの横幅によって必要な幅が変わってしまうので、<del>1280</del><ins>2560</ins>pixelの横幅になっています(=ブラウザの幅が<del>1600</del><ins>3200</ins>pixelとかだと途中で切れる)。<code>h1 &gt; a</code>と<code>div#header &gt; h2</code>はMozillaやOperaとInternet Explorerで<code>height</code>の解釈が違うのを回避するため。また、<code>div#header h1 a</code>と<code>div#header h2</code>に指定してある<code>overflow</code>は、文字サイズを変えた時もタイトル自体の高さが変化しないようにするためです。</p>
+<p>HTMLマークアップに依存する(<code>h1</code>内に<code>a</code>がないと実現するのは難しい)アレなCSSの書き方ですが、作ってる分にはオモシロカッタです。</p>

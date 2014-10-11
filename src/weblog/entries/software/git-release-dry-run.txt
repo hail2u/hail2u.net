@@ -1,0 +1,30 @@
+$ git-release --dry-run
+
+<p>動作の確認のみできる<code>--dry-run</code>モードを<a href="https://github.com/hail2u/node-git-release">git-release</a>に付けた。<code>--verbose</code>と組み合わせて、設定の確認に使う。ついでに<code>--help</code>や<code>--version</code>も付けたので、<a href="https://github.com/substack/minimist">minimist</a>を使うようにした。</p>
+
+<pre><code>$ git release --verbose --dry-run patch
+Inspecting increment part: patch
+Finding Git root: c:\Users\Kyo\Sites\hail2u.net\src\css
+Getting target configuration: done
+Getting push configuration: true
+Incrementing version in &quot;style.scss:2&quot;: done (dry-run)
+Saving &quot;style.scss&quot;: done (dry-run)
+Incrementing version in &quot;test.html:72&quot;: done (dry-run)
+Saving &quot;test.html&quot;: done (dry-run)
+Staging files: done (dry-run)
+Commiting changes: done (dry-run)
+Tagging commit: done (dry-run)
+Pushing commit &amp; tag: done (dry-run)
+
+Bumped to 6.58.19, without errors (dry-run).
+</code></pre>
+
+<p><code>--verbose</code>なしだと最後の行のみ出力される。minimistが優秀なので<code>--verbose --dry-run</code>は<code>-v -n</code>でも<code>-nv</code>でもどちらでも大丈夫。</p>
+
+<p>他にはCRやCR+LFのファイルへの対応とかも追加した。UTF-8以外のファイルへの対応は、設定増やしたりしなくちゃならない割りに自分が得るところがないのでやめた。ステージングとコミットを分けて、対象ファイルだけコミットされるようにしたり、<code>git push origin HEAD v0.1.2</code>などとしてカレント・ブランチと新しいタグだけ<code>push</code>するようにしたりも。</p>
+
+<hr>
+
+<p>同じようなものとして<a href="https://github.com/peritus/bumpversion">bumpversion</a>というものがあった。こちらはGitに依存せず、独自の設定ファイルを使っていて、直接ファイルやバージョンを指定してインクリメントできたりと高機能だった。GitとMercurialを自動判別するのもすごい。ファイル全体からなんとなく探してインクリメントしてくれる仕様も楽そう。</p>
+
+<p>特定のプログラミング言語に依存しない汎用のバージョン番号を上げるツールはあんまりない。需要はある気がするんだけれども、それぞれの言語にフィットしたものの方があまり考えずに使えるので良いのかな。かぶってるパッケージ名を変えたらリリースしてみようという気になってきた。</p>

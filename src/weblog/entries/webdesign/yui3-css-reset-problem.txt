@@ -1,0 +1,23 @@
+YUI 3: CSS Resetの問題
+
+<p>ブラウザごとのデフォルト・スタイルシートの違いを吸収するためのスタイルシートをメンテするのが面倒になったので、<a href="http://developer.yahoo.com/yui/3/cssreset/">YUI 3のCSS Reset</a>を使うことにした。が、このサイトではちょっとした問題が起こった。少し前にTwitterでつぶやいたりした<a href="http://www.w3.org/TR/CSS21/colors.html#background"><code>html</code>要素に<code>background-color</code>や<code>background-image</code>を指定した場合、<code>body</code>要素の背景が描画エリアいっぱいにならなくなるというCSSの仕様</a>絡みの問題。</p>
+
+<p>この仕様によって<code>body</code>要素に指定していたヘッダの背景画像がずれてしまった(<a href="/pub/test/118.html">ずれるサンプル</a>)。ずれる理由は上記仕様により<code>body</code>要素の上下で<code>margin</code>の相殺が起こり、<code>margin</code>の相殺が起こった部分は透明(親である<code>html</code>要素)が透けて見える)ようになり、背景画像の開始点はそれに続く<code>body</code>要素のコンテント・エリアになるから。</p>
+
+<pre><code class="language-css">html {
+  color: #000;
+  background: #FFF;
+}
+</code></pre>
+
+<p>問題になるのは以上の部分なので、reset(-min).cssより後に読み込まれるCSSファイル内で、</p>
+
+<pre><code class="language-css">html {
+  background-color: transparent;
+  background-image: none;
+}
+</code></pre>
+
+<p>とすればとりあえず回避できる。</p>
+
+<p>YUI 2.4.0で<code>body</code>要素から<code>html</code>要素に<code>color</code>プロパティと<code>background-color</code>プロパティが移動されたようなんだけど、理由書いてない……。</p>

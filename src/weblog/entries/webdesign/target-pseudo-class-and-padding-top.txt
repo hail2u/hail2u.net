@@ -1,0 +1,47 @@
+:targetでpadding-top
+
+<p>ちょっと何を言っているのかよくわからないですね。つまり<code>:target</code>擬似クラスで<code>padding-top</code>を使うことによって、アンカーでページ内ジャンプ(<code>&lt;a href="#foo"&gt;...&lt;/a&gt;</code>とかで飛ぶやつです)した時に上部に余白をとってやろうというアイディアです。こうすることによって上部にメニューを固定していても重ならなくすることができるでしょうし、そうでなくても多くの場合ジャンプした先のコンテンツに対してキレイに余白が確保できるんではないかと。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/311.html">Refine Anchor Jump with <code>:target</code></a></p>
+
+<p>Section #4に飛ぶリンクはデフォルトのもので、描画領域の上端に見出しが来てしまっています。Section #7に飛ぶリンクが<code>:target</code>を使って改良したもので、上部に少し余白が確保されていることと思います。</p>
+
+<pre><code class="language-css">#test7:target {
+  padding-top: 1em;
+}
+</code></pre>
+
+<p>CSSではこのようにしただけ(<code>1em</code>以上確保されているのはマージンの相殺が解除されるからです)ですが、想像以上に効果的な気がします。上部に固定メニューがある場合もデザイン全体を弄る必要はなく、そのメニューの高さ分多めに確保するだけでしょう。またここではデモなので<code>#test7</code>に対してのみ指定しましたが、実際に使う場合は以下のようにすると良いのではないかと思います。</p>
+
+<pre><code class="language-css">section:target,
+article:target {
+  padding-top: 1em;
+}
+</code></pre>
+
+<p>このままだと<code>:target</code>だけ余白が変わってしまうので、元のマージンを減らしてやるなどの工夫もすると良いかもしれませんね。</p>
+
+<pre><code class="language-css">section,
+article {
+  margin: 2em 0;
+}
+
+section:target,
+article:target {
+  margin-top: 1em;
+  padding-top: 1em;
+}
+</code></pre>
+
+<p>指定する要素(ここでは<code>secion</code>と<code>article</code>要素)で<code>border</code>や<code>background</code>プロパティーを使いづらくなるなどといった問題が浮上してきたりもすることには注意が必要そうです。</p>
+
+<p><code>padding-top</code>を使う以外にも<code>secion</code>要素の先頭に<code>:before</code>擬似要素を使ってスペーサーを埋め込むなどでも可能です。</p>
+
+<pre><code class="language-css">section:target::before {
+  display: block;
+  height: 1em;
+  content: "";
+}
+</code></pre>
+
+<p>実際に使う場合はマージンの相殺が解除されることやセクションに対する枠線やパディング、さらにはセクションに含まれる最初の要素のマージンなど考慮すべきことが数多くあるので、このまま流用できるというものではないと思います。が、CSSルールのセレクターで<code>:target</code>擬似クラスを利用することによってスタイルのセットにわかりやすい意味を持たせることができるので、単にアンカーでジャンプしてくることがある要素に余白を予め確保しておくよりはわかりやすいCSSが書けるんじゃないでしょうか。</p>

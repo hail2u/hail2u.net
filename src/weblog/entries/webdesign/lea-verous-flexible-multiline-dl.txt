@@ -1,0 +1,43 @@
+Lea Verouのフレシキブルな複数行定義リスト
+
+<p><a href="http://lea.verou.me/2012/02/flexible-multiline-definition-lists-with-2-lines-of-css/">Lea Verouの編み出したフレキシブルな複数行定義リスト</a>は目からウロコだった。このテクニックを知るまでは<code>float</code>を使うと長い時(コンテンツ幅に収まらない時)に途中で改行とかうまくできないけどまぁしょうがないか……みたいな感じで我慢していた。LF (やCR)を擬似要素経由で挿入して<code>white-space: pre</code>で改行させてしまうというのは頭良い。ただ複数の<code>dd</code>要素を持つケースにはうまく対応できないのでちょっと変えて使い始めた。</p>
+
+<p>このテクニックはつまり<code>dt</code>要素とそれとセットになった<code>dd</code>要素を一行に並べるというもの。表的なものならばそれは単にマークアップが間違っているので<code>table</code>要素でマークアップし直した方が適切だけど、<code>dl</code>要素のが適切なケースも多くあるのでこのテクニックが生かされる場面は多い。</p>
+
+<pre><code class="language-css">dt,
+dd {
+  display: inline;
+}
+
+dd + dt:before {
+  content: "\000a";
+  white-space: pre;
+}
+</code></pre>
+
+<p>Lea Verouのオリジナルは<em><code>dd</code>要素の後</em>に改行を追加するけど、変更したやつでは<em><code>dt</code>要素の前</em>に追加するようにした。それだけでは最初の<code>dt</code>要素の前に空行ができるので、隣接セレクターで<code>dd</code>要素の次に来る<code>dt</code>要素に絞る。</p>
+
+<p><code>:first-child</code>擬似クラスを使っても書ける。</p>
+
+<pre><code class="language-css">dt,
+dd {
+  display: inline;
+}
+
+dt:before {
+  content: "\000a";
+  white-space: pre;
+}
+
+dt:first-child:before {
+  content: "";
+}
+</code></pre>
+
+<p>こっちの方が直感的な気もする。けどセレクターの節約が身についてきたので隣接セレクターを使うことにした。隣接セレクターも<code>:first-child</code>擬似クラスもInternet Explorer 7以降での対応だし、そもそも<code>:before</code>擬似要素が8以降なので互換性という点ではあまり変わらない。</p>
+
+<hr>
+
+<p><code>white-space</code>プロパティーと改行コードを組み合わせて改行をさせるテクニックは<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>と相性いいんじゃないかと思う。狭い画面では<code>white-space: pre</code>を使って改行させて、余裕のある広い画面では<code>white-space: normal</code>でいっぱいいっぱいに表示するとか(もちろん逆でも良い)。</p>
+
+<p>また、普通にマークアップする場合にはちゃんと考えて<code>br</code>要素を使うべきところでは使うべきだと思う(レスポンシブにしたいなら<code>display: none</code>すれば改行されなくなるし)けど、JavaScriptで吐くコンポーネントでなるべくHTMLを使いたくないなどというケースではうまくこういうテクニックを使って安全側に倒した実装にできるんじゃないかとかなんとか。</p>

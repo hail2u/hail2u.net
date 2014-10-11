@@ -1,0 +1,154 @@
+(S)CSSの書き方メモ
+
+<p>HTML5時代に向いていそうな(S)CSSの書き方を模索しています。<a href="http://sass-lang.com/">SCSS</a>で書くのでモジュール式に色々分割した方が良さそうだな……とか色々試してますが、なかなかこれ！というものに辿りつけません……。ということで、ここ最近の書き方をメモがてら晒してみる試みです。</p>
+
+<p>実際にこのサイトで使っているSCSSファイルを抜粋しつつ列記していきます。</p>
+
+<h2>style.scss</h2>
+
+<p>style.cssになるSCSSファイルではCSSは書かないようにします。ただし例外としてCSS文法での<code>@import</code>ルールはその必要性からここに書きます。Webフォントなんかで使いますね。それ以外はSCSSの<code>@import</code>でモジュール化した各種SCSSファイルを読み込んでいきます。</p>
+
+<pre><code class="language-scss">@import url("http://fonts.googleapis.com/css?family=Pacifico");
+
+@import "vars";
+
+@import "reset";
+@import "clearfix";
+@import "vendor-extension";
+
+@import "basics";
+@import "layout";
+@import "widget";
+@import "print";
+</code></pre>
+
+<h2>_vars.scss</h2>
+
+<p>以降のSCSSファイルで使用するグローバル変数を定義するSCSSファイルです。これにもCSSは書きません。フォントファミリのショートカットや基本となる幾つかの色、グリッド定義などはここに書いて再利用しやすくします。対してブログパーツ的なもののスタイル指定等で必要になる変数はここで定義する必要が無いので、混乱を避けるためにここには書きません。</p>
+
+<pre><code class="language-scss">// Font
+$sans-serif: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+$monospace:  "Monaco", "Andale Mono", monospace;
+
+// Color
+$dark:   rgb(115, 143, 153);
+$normal: rgb(136, 187, 204);
+$light:  rgb(172, 215, 230);
+
+$link:  $dark;
+$hover: $normal;
+
+// Size
+$font-size:    16px;
+$icon-size:    32px;
+$favicon-size: 16px;
+
+// Layout
+$gutter: 16px;
+$column: $gutter * 3;
+$cwidth: ($column + $gutter) * 12 - $gutter;
+</code></pre>
+
+<p>繰り返し使うならばSVGグラデーションのData URIスキーム化したものなどもここにあると良さそうです。</p>
+
+<h2><em>reset.scssや</em>clearfix.scss、_vendor-extension.scss</h2>
+
+<p>これらはサイト単位で一々作ると面倒な気がします。なので<a href="https://github.com/hail2u/scss-partials">自分なりのベース</a>を作って、それのシンボリック・リンクを張っておくのが良いのではないかと。</p>
+
+<h2>_basics.scss</h2>
+
+<p>HTMLの各要素に対するCSSを書きます。中身は<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">WHATWGのHTML仕様</a>に従ってSectionsやGrouping content、Text-level semanticsなどのカテゴリごとにまとめておくと修正する時に楽でしょう。思い切ってそのカテゴリ毎に分割してしまうのもありかもしれません。スタイル指定はトップレベルで指定してあっても後で困らないように、なるべくシンプルなものにしておきます。<a href="http://necolas.github.com/normalize.css/">normalize.css</a>や<a href="http://noscope.com/vanilla-css">vanilla.css</a>の類いを自分のサイト向けにカスタマイズした程度のものだけ書くというのが近いでしょうか。</p>
+
+<pre><code class="language-scss">// Root
+html {
+  overflow-y: scroll;
+}
+
+// Sections
+body {
+  line-height: 1.75;
+  color: $fg;
+  background-color: $bg;
+  background-image: url("../images/bg-body.png");
+  font-family: $sans-serif;
+}
+
+section, article {
+  @include clearfix;
+}
+
+h2 {
+  margin: ($font-size * 6) 0 ($font-size * 3) 0;
+  line-height: normal;
+  font-size: 150%; // 24px
+  text-shadow: 0 1px 0 $bg;
+}
+
+// Grouping content
+p {
+  margin: ($font-size * 2) 0;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+// Text-level semantics
+a {
+  color: $link;
+  text-decoration: none;
+
+  &amp;:hover {
+    color: $hover;
+  }
+}
+
+em {
+  font-weight: bold;
+}
+
+// Embedded content
+img {
+  max-width: 100%;
+  vertical-align: text-bottom;
+}
+</code></pre>
+
+<p>見出しのマージン調節とか全体的な色の調整などが中心になります。</p>
+
+<p>ここまでのスタイルでだいたいページが読めるものになります。</p>
+
+<h2>_layout.scss</h2>
+
+<p>レイアウト関係のCSSです。ヘッダーやフッターの配置の仕方などを決定するCSSをここに書きます。<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>による分岐もレイアウト絡みのものなのでここへ。SCSSではネストした中でクエリを書けますが、<a href="http://www.abookapart.com/products/mobile-first">Moble First</a>の書き方とはあまり相性が良くない気がするので、普通にトップレベルで書いた方が良いと思います。</p>
+
+<pre><code class="language-scss">// Header
+body &gt; header {
+  border-top: ($font-size * 0.25) solid $lightest;
+  color: lighten($fg, 20%);
+  text-shadow: 0 1px 0 $bg;
+}
+
+// Contents
+#contents {
+  margin: 0 auto;
+  padding: 0 $gutter;
+  max-width: $cwidth;
+}
+</code></pre>
+
+<p>グリッド絡みの変数はグローバルではなくここに置いた方がメンテナンス性が高いような気がしています。</p>
+
+<h2>_widgets.scss</h2>
+
+<p>ごく一部で使う部品のスタイル指定をまとめておくSCSSファイルです。クラス指定をせざるを得ないようになった要素に対するスタイルはだいたいここに放り込まれることになるでしょう。これより前のSCSSファイルではセレクタでクラス指定が出てこないのが理想です(そう現実は甘く無いですが)。</p>
+
+<p>このサイトでは<a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>やフッターの並んでいるアイコンのためのスタイルなどがここに含まれています。ぶっちゃけると、コンテンツ的になくても良いスタイル指定を置いておくSCSSファイルです。</p>
+
+<h2>_print.scss</h2>
+
+<p>印刷向けスタイルシートですが、これはちょっと保留気味です。最近になって別にするのをやめたんですが、早計だったかもしれません。</p>
+
+<hr>
+
+<p>CSSファイルの効率的な編集というのは多くの人の悲願らしく、CMS界隈では既に様々な方法で効率化が図られています。逆にWebデザイン界隈ではあまり話題にならないというか、「そんなことよりCSS3ですよねー」的な感じで見なかったふりをされているような気がします。HTML5への切り替えやSCSSの導入、Media Queriesの採用等、リデザインにならないまでもCSSファイルを見直すタイミングが数多くあると思うので、そういった機会にCSSファイルそのものの書き方みたいなものを色々模索してみるのも良いのではないかと思います。</p>

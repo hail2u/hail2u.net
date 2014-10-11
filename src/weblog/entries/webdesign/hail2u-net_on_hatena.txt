@@ -1,0 +1,30 @@
+CSSをはてなに移植してみた
+<p>リファラから拾った<a href="http://css.g.hatena.ne.jp/chepooka/" title="はてなCSS - Chepooka::css">Chepooka::css</a>で<code>float</code>の振る舞いにトラブってる感じだったので、<a href="http://d.hatena.ne.jp/" title="はてなダイアリー - キーワードでつながる面白ブログ">はてなダイアリー</a>でもうちのサイトみたいなのできないもんかと<a href="http://d.hatena.ne.jp/h2u/" title="hail2u.net - Diary">移植してみました</a>。こちらのエントリの内容は気にしてはいけません。</p>
+<p>あるボックスの内容物が<code>float</code>されているボックスのみの場合、そのボックスの枠線や背景色、背景画像は内容物の高さに合わせて自動的に高さが調節されないという<code>float</code>によるレイアウトでまず間違いなく遭遇するトラブルをどうやって解決するかということになります。</p>
+<p>うちのサイトでは<code>html</code>と<code>body</code>でそれぞれ背景画像を指定することによって、2カラムのベースを作成し、ヘッダやコンテンツの背景画像をその上に重ねることによって、上記トラブルを解決せずに擬似的に実現しています。が、はてなダイアリーでは<code>html</code>に背景画像を仕込むのは不可能らしいので別のアプローチが必要になります。</p>
+<p>そこで、<a href="http://www.quirksmode.org/css/clearing.html" title="CSS - Clearing floats">QuirksMode - CSS - Clearing floats</a>で詳しく解説されている、<code>overflow</code>を利用したテクニックを利用してみました。このテクニックは、内容物が<code>float</code>されているボックスのみのボックスに、</p>
+<pre><code class="language-css">div#container {
+  width: 100%;
+  overflow: hidden;
+  background-color: #f0f;
+}
+</code></pre>
+<p>と指定すると、内容物の高さに合わせてきちんと背景色で塗りつぶされるというモノ。</p>
+<p>はてなダイアリーでは、</p>
+<pre><code class="language-html">&lt;body&gt;
+  &lt;table&gt;
+    &lt;!-- はてなのヘッダ --&gt;
+  &lt;/table&gt;
+  &lt;h1&gt;ダイアリーのタイトル&lt;/h1&gt;
+  &lt;div class=&quot;hatena-body&quot;&gt;
+    &lt;div class=&quot;main&quot;&gt;
+      &lt;!-- 本文 --&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;sidebar&quot;&gt;
+      &lt;!-- サイドバー --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
+<p>という構成になっているので、<code>div.hatena-body</code>に上記のような指定をしてやれば、本文とサイドバーの長さに関わらずキレイに下まで背景色や背景画像で埋めることが出来ます。</p>
+<p>上記の僕のはてなダイアリーでは、本文があまりにも短すぎたりとか何とか色々あって、微妙なところで不具合があったりしますが、ベース的にはあんな感じでいけると思います。もうこれ以上はやる気はないんですが。</p>

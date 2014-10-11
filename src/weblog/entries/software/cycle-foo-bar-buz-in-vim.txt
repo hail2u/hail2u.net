@@ -1,0 +1,39 @@
+Vimでメタ構文変数を簡単入力
+
+<p>メタ構文変数とか呼ばれてるらしい<code>foo</code>とか<code>bar</code>とかのアレがまったく覚えられない。のでVimに<a href="http://en.wikipedia.org/wiki/Metasyntactic_variable#English">一般的なメタ構文変数のリスト</a>を覚えさせておいて、<code>foo</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>bar</code>に、<code>bar</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>buz</code>に、と順に次の(<kbd>&lt;C-x&gt;</kbd>だと前の)を選択してくれるように関数とマッピングを書いて使うことにした。</p>
+
+<pre><code class="language-vim">&quot; Cycle metasyntactic variables
+function! s:CycleMetasyntacticVariables(num)
+  if type(a:num) != type(0)
+    return
+  endif
+
+  let vars = [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;, &#39;qux&#39;, &#39;quux&#39;, &#39;corge&#39;, &#39;grault&#39;, &#39;garply&#39;, &#39;waldo&#39;, &#39;fred&#39;, &#39;plugh&#39;, &#39;xyzzy&#39;, &#39;thud&#39;]
+  let i = index(vars, expand(&#39;&lt;cword&gt;&#39;))
+
+  if (i == -1)
+    if (a:num &gt; 0)
+      execute &quot;normal! \&lt;C-a&gt;&quot;
+    else
+      execute &quot;normal! \&lt;C-x&gt;&quot;
+    endif
+
+    return
+  endif
+
+  let i += a:num
+
+  if (i == -1)
+    let i = len(vars) - 1
+  elseif (i == len(vars))
+    let i = 0
+  endif
+
+  let @w = vars[i]
+  execute &quot;normal! viw\&quot;wp&quot;
+endfunction
+
+nnoremap &lt;C-a&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(1)&lt;Enter&gt;
+nnoremap &lt;C-x&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(-1)&lt;Enter&gt;</code></pre>
+
+<p>レジスターを使ってることに注意。<kbd>&lt;C-a&gt;</kbd>と<kbd>&lt;C-x&gt;</kbd>にマッピングする前提で書いたので、数字の上とかだとデフォルトと同じようにインクリメント・デクリメントする。あんまり行儀よくない気もするのでフォールバックさせるのやめて、<kbd>&lt;Leader&gt;a</kbd>とかにマッピングさせるように書いた方が良さそう……な気もするけど、自分で使う分には良いか。</p>

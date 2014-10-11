@@ -1,0 +1,11 @@
+RSS Headline Grabberのバグ
+<p>RSS Headline Grabberが止まってたので、スクリプトをチェックしなおしたら、XMLパーサーのエラーで異常終了していました。evalでエラーメッセージをキャッチして、ループを次に進ませようとして、</p>
+<pre><code class="language-perl">eval{
+  $rss-&gt;parse($content);
+}
+if($@){
+  print &quot;error : parse error.&quot;;
+  next;
+}
+</code></pre>
+<p>とか書いてしまった罠。evalの最後のセミコロンは忘れないようにしましょう。syntax errorとか言われても理解できなくて、バグか！とか一人で切れてた。遠くから「セミコロン抜けてるよ。eval{}の後ろに。」とか突っ込まれた。ありがとうよ。</p>

@@ -1,0 +1,85 @@
+Pure JavaScriptなサイト内検索アプリケーション
+
+<p>ここのところいろいろやっていた、動的に<code>script</code>要素を追加してクロス・ドメインのJavaSriptファイルを読み込むという手法を使ったYahoo!によるサイト内検索アプリケーション、labs.hail2u.net/yahoo/を作った。<a href="http://aws.amazon.com/" title="Amazon.com Amazon Web Services Store: Amazon Web Services">Amazon Web Services</a>と違い、<a href="http://developer.yahoo.com/search/" title="Yahoo! Search Web Services">Yahoo! Search Web Services</a>では<a href="http://developer.yahoo.com/common/json.html" title="Using JSON with Yahoo! Web Services">JSONを出力する機能</a>及び<a href="http://developer.yahoo.com/common/json.html#callbackparam" title="Using JSON with Yahoo! Web Services">コールバック関数名を指定できる機能(JSONP)</a>を備えているので、HTMLファイル単体で機能するようにすることができた。</p>
+
+<ul>
+<li>hail2u.net から rss を検索した結果の4ページ目</li>
+<li>hail2u.net から blosxom kit を検索した結果</li>
+</ul>
+
+<p>といったように、URLのハッシュにドメイン・キーワード・ページ数を指定して検索を行う。</p>
+
+<p>実装において特にややこしいところはなく、コード的にもややこしいところは無いと思う。</p>
+
+<p>強いて言うならページング処理が面倒だったくらい。Yahoo! Search Web Servicesでは<code>totalResultsAvailable</code>で検索結果の件数はわかるものの、実際にはその数まで検索結果として出るわけではないので、総ページ数はわからない(AWSでは<code>TotalPages</code>というそのものずばりなデータがある)。ただ、<code>totalResultsReturned</code>とリクエストで<code>results</code>パラメータとして送った数値(検索結果として返ってくる数)が同じであれば、次のページがあるということは大体わかるので、それを利用すればページングのリンクを作成するべきかどうかは判断できた。<a href="http://www.google.com/" title="Google">Google</a>のようなページングのリンクのリストを作るのは難しそうだ。</p>
+
+<p>ハイライトはかなりテキトウ。prototype.jsの<code>getElementsByClassName()</code>や<code>each()</code>を使って書いてみた。使ってみたかったから。</p>
+
+<p>また、動的に<code>script</code>要素を追加してクロス・ドメインのJavaSriptファイルを読み込むという手法のために、</p>
+
+<pre><code class="language-js">// jsr.js - jsonScriptRequest
+//
+// This class based on jsr_class.js.
+// See Also: http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html
+//
+// Copyright (c) 2006 Kyo Nagashima &lt;kyo@hail2u.net&gt;
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// &quot;Software&quot;), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var jsonScriptRequest = Class.create();
+
+jsonScriptRequest.prototype = {
+  initialize: function () {
+    this.head = document.getElementsByTagName(&#39;head&#39;).item(0);
+  },
+
+  counter: 0,
+
+  build: function (url) {
+    if (!url.match(/\?/)) url += &#39;?dummy=1&#39;;
+    this.scriptElement = document.createElement(&quot;script&quot;);
+    this.scriptElement.setAttribute(&quot;type&quot;,    &quot;text/javascript&quot;);
+    this.scriptElement.setAttribute(&quot;charset&quot;, &quot;UTF-8&quot;);
+    this.scriptElement.setAttribute(&quot;src&quot;,     url + &#39;&amp;nocache=&#39; + (new Date()).getTime());
+    this.scriptElement.setAttribute(&quot;id&quot;,      &#39;scriptid&#39; + this.counter);
+    this.counter++;
+  },
+
+  add: function () {
+    this.head.appendChild(this.scriptElement);
+  },
+
+  remove: function () {
+    this.head.removeChild(this.scriptElement);
+  }
+};
+</code></pre>
+
+<p>というクラスを書いたけど、テキトウすぎるので書き直す。ていうかJSONScriptRequestという名称が気に食わないので、何かちゃんとした名前が欲しい。動的に<code>script</code>要素を追加・削除するという機能だけを受け持つクラスなので、DynamicScriptElementとかがイメージに近い名前だけど、いまいち・・・。</p>
+
+<p>このサイトのサイト内検索を、labs.hail2u.net/yahoo/をアレンジしたものに置き換えようか・・・とか考えてみたけど、結局このまま。数カ月おきにサイト内検索の置き換えは考えているけど、いつもGoogleで良いかなーとかいう結論に。</p>
+
+<h2>追記@2006/08/12</h2>
+
+<p>とりあえずWeblogの各ページにおいてある検索フォームを差し替えてみた。</p>
+
+<h2>追記@2006/08/15</h2>
+
+<p>やっぱりGoogle検索の方が良さそう(全サイトからの検索にすぐ切り替えられるし)なので、戻した。Pure JavaScriptなサイト内検索の方はlabs.hail2u.net/yahoo/で試して欲しい。</p>

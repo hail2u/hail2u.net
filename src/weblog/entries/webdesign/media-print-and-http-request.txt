@@ -1,0 +1,17 @@
+media=printとHTTPリクエスト
+
+<p>スクリーン向けスタイルシートと印刷向けスタイルシートを分けるように戻そうかと考えてた。過去ログ検索すると<a href="https://www.google.com/search?q=site%3Ahail2u.net+%E5%8D%B0%E5%88%B7+%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%B7%E3%83%BC%E3%83%88">何度か切り替えてること</a>がわかる。最近印刷向けとかに注意を向けてなかったので忘れてたけど、<code>media=print</code>としてもHTTPリクエストは常に書いたところで走る。ので、別ファイルにするとHTTPリクエストがほぼ無駄な形で増えてしまう。</p>
+
+<p>HTTPリクエストを無駄に増やさず印刷向けスタイルシートを別にするには、印刷前にJavaScriptでスタイルシート読んでやれば良さそう。スタイルシートの読み込みを待ってから<code>print()</code>するボタンを用意するみたいのなら簡単そうだけど、印刷はブラウザーの機能を使ってもらいたい。となると<a href="http://www.w3.org/TR/html5/webappapis.html#printing"><code>beforeprint</code>イベント</a>を使うのが王道のようだ。</p>
+
+<pre><code class="language-html">&lt;link id=&quot;print-css&quot; media=&quot;only print&quot; href=&quot;/css/print.css&quot;&gt;
+&lt;script&gt;
+  window.addEventListner(&#39;<mark>beforeprint</mark>&#39;, function () {
+    document.getElementById(&#39;print-css&#39;).rel = &#39;stylesheet&#39;;
+  });
+&lt;/script&gt;
+</code></pre>
+
+<p>Internet Explorer 11では<a href="/pub/550.html">期待通り</a>動いた。しかしFirefox 28では印刷向けスタイルシートのリクエストは走るもののスタイルは反映されない。また<code>beforeprint</code>にはChrome 34とSafari 7が対応してないので、これらではこのやり方ではどうにもならない。</p>
+
+<p>単純な解はなさそうなので、問題を見つめ直してからアプローチ方法を練る必要があるようだ。</p>

@@ -1,0 +1,29 @@
+Bookmarklet: View as XML
+
+<p>閲覧中のページをXMLとして見るブックマークレットを作った。ウェブ・ページのソースを<a href="http://mozilla.jp/firefox/">Firefox</a>のツリー表示なXMLビューワーで見るという意味。タイトルは適当。良い名前を思いつかなかった。<a href="https://addons.mozilla.org/ja/firefox/addon/1843">Firebug</a>使えって感じではある。</p>
+
+<p>Install Bookmarklet: <a href="javascript:(function(){var%20o=new%20XMLSerializer();location.href=&quot;data:application/xml,&quot;+encodeURIComponent(o.serializeToString(document.documentElement).replace(/&gt;&lt;/g,&quot;&gt;\n&lt;&quot;));})();">View as XML</a></p>
+
+<p>うちのサイトでやるとツリーにならない。原因がまるでわかってないので直せそうかもわからない。<a href="http://www.w3.org/html/">W3C HTML</a>や<a href="http://mozilla.jp/">Mozilla Japan</a>とかで試すと良い。以下、ちょっと便利なところ。</p>
+
+<ul>
+<li>ツリー表示で折りたためる</li>
+<li>コメントもインデントされる</li>
+<li>Well-formedかどうかをチェックしてくれる(XMLとしてだけど)</li>
+<li>スクリプト実行後のソースが表示される</li>
+</ul>
+
+<p>中身は簡単でソースも短い。見やすく整形すると以下のようになる。</p>
+
+<pre><code class="language-js">var xmlSerializer = new XMLSerializer();
+var html = document.documentElement;
+var src = xmlSerializer.serializeToString(html).replace(/&gt;&lt;/g, &quot;&gt;\n&lt;&quot;);
+var dataURI = &quot;data:application/xml,&quot; + encodeURIComponent(src);
+location.href = dataURI;
+</code></pre>
+
+<p>まず<a href="https://developer.mozilla.org/ja/XMLSerializer"><code>XMLSerializer</code></a>を使ってソース全体を取得する。そして、&quot;data&quot; URLスキームを利用して強制的に<code>application/xml</code>として開いてやる。これだけ。最初<code>XMLSerializer</code>を知らなくて、<code>body</code>以下で妥協しようとしてた。</p>
+
+<p>Internet Explorer対応とかは<a href="http://developer.yahoo.com/yql/">YQL</a>使ってURLからソースを取得とかすると出来るかも。</p>
+
+<p>ブックマークレット熱が再燃してる。もうネタ無いけど。</p>

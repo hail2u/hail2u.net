@@ -1,0 +1,28 @@
+transitionとmax-widthプロパティー
+
+<p><a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>を使って<code>width</code>プロパティーをアニメーションさせる時に<code>max-width</code>プロパティーがあるとどうアニメーションされるのかというのが気になったので調べてみたら、Chrome 18と20、Opera 11、12でアニメーションがおかしくなるバグにぶち当たった。Internet Explorer 10とFirefox 11(及び13)では大丈夫そう。</p>
+
+<p>See Demo: <a href="/pub/test/397.html"><code>max-width</code> and <code>transition</code></a></p>
+
+<p>WebKit系では一旦幅が0になってからアニメーションが始まり、10秒で<code>max-width</code>プロパティーの値である<code>400px</code>で止まる。逆方向のアニメーションもつけた場合、<code>max-width</code>プロパティーの値を無視して<code>600px</code>から<code>100px</code>へ10秒かけてアニメーションするようになるが、<code>400px</code>から<code>600px</code>の間のアニメーションは描画されない。Opera系ではとにかくアニメーションさせようとした要素が消える。</p>
+
+<p>WebKit系では、デモのような一方向のアニメーションなら<code>transition</code>と<code>max-width</code>プロパティーを同時に指定しなければ回避できる。</p>
+
+<pre><code class="language-css">.test {
+  width: 100px;
+  <mark>max-width: 400px;</mark>
+}
+
+.test:hover {
+  width: 600px;
+  transition: all 10s linear;
+}
+</code></pre>
+
+<p>両方向でアニメーションさせる場合は……あとで考えるけど無理そう。</p>
+
+<p>調べたかった<code>max-width</code>プロパティーが考慮されたアニメーションなるのかというのの答えは、一応<em>なる</em>ということで良さそう。</p>
+
+<h2>追記</h2>
+
+<p><a href="https://twitter.com/#!/t_ashula/status/193236335505588226">@t_ashulaにOpera Nextの1372では直っていると指摘された</a>のでNextを更新してみたところ、ちゃんとFirefoxと同じようにアニメーションするようになっていた。</p>

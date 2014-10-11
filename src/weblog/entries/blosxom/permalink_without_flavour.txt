@@ -1,0 +1,20 @@
+flavour無しpermalink
+<p><a href="http://groups.yahoo.com/group/blosxom/" title="Yahoo! Groups : blosxom">本家ML</a>の方で、<a href="http://groups.yahoo.com/group/blosxom/message/8600" title="Yahoo! Groups : blosxom Messages : Message 8600 of 8604">flavour無しpermalinkを実現するパッチが投稿</a>されたんですが、これはちょっと微妙かなと。まぁ確かに実現できているといえば実現できているのですが、うまいこと<code>$default_flavour</code>を利用してくれはしないような感じなので、別の方法をとにかく考えてみようかと。前に考えた時はうまく思いつかなかったんですが、今日は数分で思いついたりした。</p>
+<p>結局のところ<code>$path_info</code>という変数に入っている値が、エントリ・ファイルのパスとflavourを示すことになっているようなので、これを適切にセットしてやればうまくいくわけです。</p>
+<p>なので、改造すべき部分は、<code>PATH_INFO</code>環境変数から<code>$path_info</code>を生成する一連の処理のうちの一部分(112行目から118行目あたり)。</p>
+<pre><code class="language-perl">if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
+  $flavour = $2;
+  $1 ne &#39;index&#39; and $path_info .= &quot;/$1.$2&quot;;
+  pop @path_info;
+} elsif (!-d &quot;$datadir$path_info&quot;) {
+  $path_info .= &quot;.$default_flavour&quot;;
+  $flavour = param(&#39;flav&#39;) || $default_flavour;
+} else {
+  $flavour = param(&#39;flav&#39;) || $default_flavour;
+}
+</code></pre>
+<p>以上のように、<code>elsif</code>のブロックを追加するだけでうまくいきました。<code>!-d</code>でディレクトリの存在チェックをしているのは、カテゴリ単位での閲覧の場合かどうかを判別するためです。</p>
+<p>というわけで<a href="/blog/blosxom/permalink_without_flavour" title="hail2u.net - Weblog - flavour無しpermalink">flavour無しpermalink</a>が機能するようになりました。ビジターへの利便性は皆無に等しいけど、自己満足度は高い。Cool URI！</p>
+<p>ちょっとチェックしきれていないので、思ってもみない不具合があるかもしれない。てか、MLに投稿しようかと思ったけど、英語書くのメンドイよ・・・。</p>
+<h2>追記@2004/08/04</h2>
+<p>MLに投稿したところ、blosxomの謎機能である「カテゴリ名の先頭数文字でも閲覧できる機能(See Also: <a href="/blog/blosxom/various_url_of_blosxom.html" title="hail2u.net - Weblog - blosxomのURL">blosxomのURL</a>)」が無効になるというツッコミを貰った。確かに。同時に「blosxom.cgiを改造するではなく、pluginでいけるのでは？」というツッコミも。確かに。</p>

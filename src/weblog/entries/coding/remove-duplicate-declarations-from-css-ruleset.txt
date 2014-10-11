@@ -1,0 +1,45 @@
+CSSのルールセットから重複する定義の削除
+
+<p><a href="https://github.com/hail2u/node-csswring">CSSWring</a>に同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。</p>
+
+<p><a href="https://github.com/ai/postcss">PostCSS</a>でCSSをパースすると、各定義は以下のような構造になる(一部省略)。</p>
+
+<pre><code class="language-javascript">{
+  type: &#39;decl&#39;,
+  before: &#39;\n  &#39;,
+  prop: &#39;color&#39;,
+  between: &#39;: &#39;,
+  value: &#39;white&#39;
+}
+</code></pre>
+
+<p><code>type</code>に定義であることが明記されていて、<code>prop</code>でプロパティー名、<code>value</code>で値が拾える。また<code>before</code>にプロパティー名の前にある文字列、<code>between</code>にプロパティーと値の間の文字列が入ってる。</p>
+
+<p>一致のチェックは<code>prop</code>と<code>value</code>を単純に連結させ、それをキーにしてその定義のインデックスをオブジェクトに格納していき、<code>hasOwnProperty</code>で探すという形で良さそう。見つかったら重複しているとみなし、格納したインデックスを使って古い方を削除し、新しい方のみ残すようにする。</p>
+
+<p>PostCSSでは全定義をなめるイテレータ(<code>eachDecl()</code>)もあるけど、この場合はルールセット単位で作業するべきなので<code>eachRule()</code>の方で行う。</p>
+
+<pre><code class="language-javascript">var postcss = require(&#39;postcss&#39;);
+var css = fs.readFileSync(&#39;test.css&#39;, &#39;utf-8&#39;);
+var root = postcss.parse(css);
+root.eachRule(function (rule) {
+  var d = &#39;&#39;;
+  var decls = {};
+  rule.each(function (decl, index) {
+    d = decl.prop + decl.value;
+
+    if (decls.hasOwnProperty(d)) {
+      decl.parent.remove(decls[d]);
+    }
+
+    decls[d] = index;
+  });
+});
+</code></pre>
+
+<p>通常はこのように<code>prop</code>と<code>value</code>が一致すれば良いけど、CSSWringには一部CSSハックを維持する設定がある。この設定がONの時にこれでは判別できない。対応しているCSSハックが格納されているのは<code>before</code>と<code>between</code>なので、それらも含めて完全一致させる必要があった。空白の違いにより重複が判別できなくなりそうだけど、CSSWringでは空白文字の圧縮は事前に行われているのでそこは考えなくて良さそう。上記コードだと8行目を以下のようにするだけ。</p>
+
+<pre><code class="language-javascript">d = decl.before + decl.prop + decl.between + decl.value;
+</code></pre>
+
+<p>最初<code>hasOwnProperty</code>ではなく<code>decls[d]</code>で存在チェックをしていて、インデックスが0の定義が重複していた時にちゃんとチェックできてないみたいなのやらかした……。</p>

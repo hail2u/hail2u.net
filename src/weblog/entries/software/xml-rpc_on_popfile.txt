@@ -1,0 +1,30 @@
+XML-RPC on POPFile
+<p><a href="http://popfile.sourceforge.net/" title="POPFile - Automatic Email Classification">POPFile</a>の0.22.0よりサポートされているはずの<a href="http://popfile.sourceforge.net/cgi-bin/wiki.pl?POPFileModules/XmlRpc" title="POPFile: POPFileModules/XmlRpc">XML-RPCによるAPI</a>ですが、これを設定で有効にすると起動に失敗してしまいます。少し調べてみたところ、どうやらWindows版のインストーラーでは<a href="http://search.cpan.org/search?module=Scalar::Util" title="search.cpan.org: Scalar::Util - A selection of general-utility scalar subroutines">Scalar::Util</a>というモジュールがインストールされないことに原因があるようです。CPANからダウンロードしてlibフォルダに置いてみたらきちんと動作しました。</p>
+<p>ドキュメントを読む限りではXML-RPC APIをメーラーから叩いて、微妙に使いづらいHTMLインターフェイスを利用せずに大概のことができるはずな感じじゃないかなぁとか。とりあえず鶴亀マクロは作る。</p>
+<p>まぁとりあえず適当に書いた実験スクリプトは動いた。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+use XMLRPC::Lite;
+
+my $proxy = &quot;http://localhost:8081/RPC2&quot;;
+
+my $sk = XMLRPC::Lite-&gt;proxy($proxy)
+  -&gt;call(&#39;POPFile/API.get_session_key&#39;, &#39;admin&#39;, &#39;&#39;)
+  -&gt;result;
+
+my $buckets = XMLRPC::Lite-&gt;proxy($proxy)
+  -&gt;call(&#39;POPFile/API.get_buckets&#39;, $sk)
+  -&gt;result;
+
+print &quot;$_\n&quot; foreach (@$buckets);
+
+XMLRPC::Lite-&gt;proxy($proxy)
+  -&gt;call(&#39;POPFile/API.release_session_key&#39;, $sk);
+
+exit;
+</code></pre>
+<p>XML-RPC APIは上記のようにPOPFile自体の操作もできるのですが、任意のテキスト・ファイルを渡してスパムかどうかチェックできるので、なんか遊べそうな気がします。<a href="http://www.raelity.org/Blagg.html" title="raelity bytes">blagg</a>などと組み合わせてスパム・フィルタ付きのRSSアグリゲーターとかですかね。</p>
+<h2>追記@2004/10/07</h2>
+<p>あんまり色々できるわけではないことが理解できました。基本的にはPOPFileのデータベースを外部アプリケーションで利用してホニャララみたいな利用法をイメージされているような、そうでもないような。</p>
+<p>RSSリーダーのスパム・フィルタとして実装するのは、ちょっとやってみた限りではなかなか面白いのですが、結局はそれ用にデータベースを鍛えなければならない(と思う)ので、んーむーという感じ。</p>

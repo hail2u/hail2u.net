@@ -1,0 +1,29 @@
+こんにちは！SVGグラデーション！
+
+<p>複雑でないCSSグラデーションの代わりにSVGグラデーション(をData URIスキーム化したもの)を利用するようにしました。懸念していたFirefoxのバグも直る(直った？)みたいだし、ちょっとやってみたかったので。</p>
+
+<p>SVGの作成はエディタでやってます。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" version="1.0"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient x1="0" y1="0" x2="0" y2="100%" id="gradient"&gt;
+      &lt;stop offset="0%" style="stop-color: ${from:rgb()}; stop-opacity: 1;"/&gt;
+      &lt;stop offset="100%" style="stop-color: ${to:rgb()}; stop-opacity: 1;"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect x="0" y="0" fill="url(#gradient)" width="100%" height="100%"/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>こんなテンプレートを作っといて色を指定しているだけ！これは縦方向のグラデーションのテンプレートです。横方向にしたい場合は<code>linearGradient</code>要素の<code>x2</code>プロパティの値を<code>100%</code>、<code>y2</code>プロパティの値を<code>0</code>に入れ替えるだけです。色の透明度は<code>stop-opacity</code>プロパティで調整できます(CSSの<code>opacity</code>プロパティと同じで、1で不透明、0で完全透明になります)。</p>
+
+<p>手書きできる程度のものならData URIスキーム化してCSSにぶち込んでも大したサイズではないです。単純な二点間グラデーションなら、ベンダー拡張付きのを並べるのとあまり変わらない程度のサイズで済むでしょう。</p>
+
+<p>他にもベンダー拡張プリフィックス付きのプロパティをだいたい追放したりもしました。SCSSで書いているのでさほど面倒でもないんですけど、使ってたのはだいたい対応されたような感じなのでもう良いかなとか。</p>
+
+<p><del>Operaでなんかうまく表示できないのは後で直します。</del></p>
+
+<h2>追記</h2>
+
+<p>うまく再現できないんですがOperaのバグっぽいので直すのは無理そうな感じです。ページロード時にクライアントエリア外にある要素への背景画像が表示されないことがあるとかそんな感じのバグです。半年くらい前によくわかんなくて投げてたのにまたぶつかるという……。</p>

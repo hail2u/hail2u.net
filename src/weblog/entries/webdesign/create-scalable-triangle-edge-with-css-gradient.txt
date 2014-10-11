@@ -1,0 +1,68 @@
+スケーラブルな三角形をCSSグラデーションで作る
+
+<p><a href="/blog/webdesign/create-and-animate-triangle-edge-with-css-gradient.html">ひとつ前のエントリで書いたやり方</a>だとスケーラブルじゃないので著しく生産性に欠ける。真っ当にCSSグラデーションを書いてうまく重ねてやるとスケーラブルな三角形を作ることができるようだ。変な書き方を知っているのも良し悪しですね！</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/349.html">しゅるしゅる動く奴 #2</a></p>
+
+<pre><code class="language-css">.test {
+  background-color: red;
+  background-image:
+    linear-gradient(top right, red   0, red   50%, transparent 50%, transparent 100%),
+    linear-gradient(top  left, white 0, white 50%, red         50%, red         100%)
+  ;
+}
+</code></pre>
+
+<p>これがベースでCSSグラデーションを使って斜めのグラデーションを作り重ねてやるというもの。複数の背景画像を指定した場合は先に書いた背景画像が手前に来るので、そっちでは<code>transparent</code>キーワードを使ってやることにより三角形になるように整えてやる。</p>
+
+<p>三角形のサイズは<code>height</code>と<code>background-size</code>プロパティーで調節する。</p>
+
+<pre><code class="language-css">.test {
+  height: 32px;
+  background-size: 32px 32px;
+}
+</code></pre>
+
+<p>これでひとつ前のエントリで作った三角形と同じ大きさになる。</p>
+
+<pre><code class="language-css">.test {
+  height: 48px;
+  background-size: 48px 48px;
+}
+</code></pre>
+
+<p>全てのサイズを大きくすれば三角形のサイズが大きくなる。小さくしたければ同じように全てのサイズを小さくするのみ。</p>
+
+<p>小さくしてインジケーター風に三角形を配置する場合(デモの最後のやつ)は、<code>bakcground-position</code>プロパティーも使う。</p>
+
+<pre><code class="language-css">.test {
+  height: 32px;
+  background-position: 8px center; /* 8px = (32px - 16px) / 2 */
+  background-size: 16px 16px;
+}
+</code></pre>
+
+<p>インジケーター風のを更に応用すると吹き出しの尻尾の部分も作ることができる(デモの付録のようなやつ)。</p>
+
+<pre><code class="language-css">.test {
+  background-image:
+    /* 尻尾になる部分 */
+    linear-gradient(top left, red   0, red    50%, white 50%, white 100%),
+    /* 背景色をブロックする部分 */
+    linear-gradient(left,     white 0, white 100%)
+  ;
+  background-position:
+    /* 尻尾の位置 */
+    64px bottom,
+    left bottom
+  ;
+  background-repeat: no-repeat;
+  background-size:
+    /* 尻尾の大きさ */
+    16px 16px,
+    100% 16px
+  ;
+}
+</code></pre>
+
+<p>もうちょっと工夫すれば<code>linear-gradient()</code>ひとつで作れそうな気がしないでもない。</p>

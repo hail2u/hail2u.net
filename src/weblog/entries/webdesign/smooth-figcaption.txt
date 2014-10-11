@@ -1,0 +1,79 @@
+快い図のキャプション
+
+<figure><img src="/images/blog/smooth-figcaption.png" alt="キャプション付きの犬の画像"></figure>
+
+<p>画像に続けて<code>figcaption</code>をそのまま普通に表示するといまいちなことが多いです。それでも英語ならイタリック体にするとかでなんとなくその文字列が<code>figure</code>要素に係っているものだということが表現できるような気がしますが、日本語の斜体はいろいろアレなので使いたくないです(よね！)。そこで画像にキャプションを綺麗に重ねる方法を模索してみました。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/330.html">Smooth Caption</a></p>
+
+<p>まずは画像のHTMLです。</p>
+
+<pre><code class="language-html">&lt;figure&gt;
+  &lt;a href="http://example.com/"&gt;
+    &lt;img src="http://example.com/images/logo.png"&gt;
+  &lt;/a&gt;
+  &lt;figcaption&gt;Example.com's Logo&lt;/figcaption&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>このHTMLに対してどんなサイズの画像にも対応できるようにCSSを書いていきます。<code>a</code>要素には依存しませんが、入っていてもいなくても大丈夫なようにもします。</p>
+
+<pre><code class="language-css">figure {
+  display: inline-block;
+  position: relative;
+  line-height: 1;
+  overflow: hidden;
+}
+</code></pre>
+
+<p>まずは<code>figure</code>要素を<code>inline-block</code>にします。こうすることによって内包される画像に合わせて<code>figure</code>要素のサイズが変化します。そして<code>position</code>や<code>overflow</code>プロパティーで効率的に<code>figcaption</code>をレイアウトできるようにしておきます。<code>line-height</code>プロパティーはなくてもうまくいくことがありますが、なるべく<code>1</code>にしておいたほうが良いでしょう。</p>
+
+<pre><code class="language-css">figure img {
+  vertical-align: text-bottom;
+}
+</code></pre>
+
+<p>次に画像の行ボックスに対する位置決めを行います。デフォルト値である<code>baseline</code>だと<code>figure</code>要素の下端に数ピクセルの隙間ができてしまいますが、<code>text-bottom</code>にすることによってその隙間を消すことができます。</p>
+
+<p>最後に<code>figcaption</code>のデザインです。</p>
+
+<pre><code class="language-css">figure figcaption {
+  padding: 0 1em;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  line-height: 3;
+  color: white;
+  background-color: black;
+  text-align: right;
+  opacity: 0.75;
+}
+</code></pre>
+
+<p>幅は<code>width</code>プロパティーで<code>100%</code>を指定すると<code>figure</code>要素の幅一杯になります。つまり画像の幅と揃うことになりますね。<code>padding</code>プロパティーで左右に余白を確保しているので、実際には飛び出してしまいますが、<code>figure</code>要素で<code>overflow: hidden</code>となっているので問題ありません。高さは<code>line-height</code>プロパティーでやると、高さと同時に縦方向のセンタリングも行えるのでお手軽でしょう。</p>
+
+<p>テキストを右寄せにしているので、全体の位置は<code>right</code>と<code>bottom</code>プロパティーで右下に合わせます。<code>overflow</code>で隠しているのでわかりませんが、実際には左に少し飛び出しています。左寄せにする場合は<code>left</code>を代わりに使いましょう。</p>
+
+<p>色は普通に指定して<code>opacity</code>プロパティーで半透明にしていますが、このあたりは好みで良いでしょう。勿論背景画像を使っても大丈夫です。</p>
+
+<p>これで最初にあげたスクリーンショットのような派手すぎないけど少しだけ凝ったキャプションになります。周囲のコンテンツとのマージンを工夫したりフォントや前景色を変更したりして、図のキャプションかそうでないかを判断できるようにするのが王道だと思いますが、フォントの自由さが足りない日本語のページではこういう方法もまぁ悪くないんじゃないかと思います。</p>
+
+<p>やり過ぎると図が読み手に与えるイメージが揺らいでしまうので、キャプションが図よりも目立つような形にはするべきではないでしょう。図が主でキャプションが従になるように気をつけてデザインすると良いと思います。</p>
+
+<h2>おまけ</h2>
+
+<p>オンマウスでスルッとキャプションを隠す場合は位置をいじるよりも<code>line-height</code>プロパティーをいじった方がアニメーションさせやすいと思います。</p>
+
+<pre><code class="language-css">.test figcaption {
+  overflow: hidden;
+  transition-duration: 0.5s;
+}
+
+.test:hover figcaption {
+  line-height: 0;
+  transition-duration: 0.5s;
+}
+</code></pre>
+
+<p><code>bottom</code>いじる場合はキャプションの高さを知らなくちゃいけないのでちょっと面倒なので。まぁ吹っ飛ぶくらいの量を適当に指定するとかで逃げるという手もありますけどね。</p>

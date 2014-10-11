@@ -1,0 +1,28 @@
+contentプロパティーの値とgetComputedStyle()
+
+<p>CSSの<code>content</code>プロパティーを使ってCSSのバージョン番号を仕込み、それを<code>window.getComputedStyle()</code>メソッドを使って表示してやろうと考えた(<a href="https://github.com/hail2u/hail2u.net-styles/commit/d01330f3b78c3cb9c5c02e984f66ac2eb04f6c74#diff-1">スタイル・ガイド用</a>)。Chrome 32やFirefox 27では期待通りに動いたんだけど、Internet Explorer 11ではうまく拾えず、初期値である<code>normal</code>が返ってきた。どうやらIE11は擬似要素以外に指定した<code>content</code>プロパティーの値を<code>getComputedStyle()</code>でうまく読めないようだ。バグではなさそう。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/537.html">content property and getComputedStyle()</a></p>
+
+<p>Chrome 32やFirefox 27ではYesとなる(引用符が付いたり付かなかったりはする)が、Internet Explorer 11ではnormalとなる。</p>
+
+<p>デモでは<code>html</code>要素に直接<code>content</code>プロパティーで<code>Yes</code>という値を仕込んでいる。</p>
+
+<pre><code class="language-css">html {
+  content: &quot;Yes&quot;;
+}
+</code></pre>
+
+<p>これを<code>getComputedStyle()</code>を使って以下のようにして読み、指定要素の文字として追加しようとしている。</p>
+
+<pre><code class="language-javascript">var s = window.getComputedStyle(
+  document.querySelector(&#39;html&#39;), null
+).getPropertyValue(&#39;content&#39;);
+document.getElementById(&#39;result&#39;).textContent += s;
+</code></pre>
+
+<p>特にエラーにはならず、CSSの解釈のズレがそのまま結果に反映され、Internet Explorer 11では初期値の<code>normal</code>になってしまう。</p>
+
+<hr>
+
+<p>擬似要素に指定された<code>content</code>プロパティーの値なら、<code>window.getComputedStyle()</code>の第2引数で<code>::before</code>や<code>::after</code>をちゃんと指定すれば読める。<code>content</code>プロパティー以外に仕込むと正規化されちゃう可能性が高いので、結局これしか方法はなさそう。</p>

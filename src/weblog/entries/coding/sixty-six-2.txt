@@ -1,0 +1,30 @@
+SIXTY-SIXとかいうの #2
+<p><a href="http://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>は「&quot;」や「&#39;」をそのまま返してくれる(XML的にはまぁOKなんだけど)ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。</p>
+<p>「&#39;」のエスケープは、<code>translate()</code>では出来ないので、</p>
+<pre><code class="language-xsl">&lt;xsl:template name=&quot;replace&quot;&gt;
+  &lt;xsl:param name=&quot;str&quot;/&gt;
+  &lt;xsl:param name=&quot;from&quot;&gt;&amp;#39;&lt;/xsl:param&gt;
+  &lt;xsl:param name=&quot;to&quot;&gt;\&amp;#39;&lt;/xsl:param&gt;
+  &lt;xsl:choose&gt;
+    &lt;xsl:when test=&quot;contains($str, $from)&quot;&gt;
+      &lt;xsl:value-of select=&quot;substring-before($str, $from)&quot;/&gt;
+      &lt;xsl:value-of select=&quot;$to&quot;/&gt;
+      &lt;xsl:call-template name=&quot;replace&quot;&gt;
+        &lt;xsl:with-param name=&quot;str&quot; select=&quot;substring-after($str, $from)&quot;/&gt;
+      &lt;/xsl:call-template&gt;
+    &lt;/xsl:when&gt;
+    &lt;xsl:otherwise&gt;
+      &lt;xsl:value-of select=&quot;$str&quot;/&gt;
+    &lt;/xsl:otherwise&gt;
+  &lt;/xsl:choose&gt;
+&lt;/xsl:template&gt;
+</code></pre>
+<p>こんな形の文字列の置換として実装することになります。SIXTY-SIXのケースでは「&#39;」を「\&#39;」にエスケープするだけなので、<code>xsl:param</code>でデフォルトとしてそれらを指定しておき、呼び出しが書きやすいようにしました。呼び出しは、</p>
+<pre><code class="language-xsl">&lt;xsl:call-template name=&quot;replace&quot;&gt;
+  &lt;xsl:with-param name=&quot;str&quot;&gt;
+    &lt;xsl:value-of select=&quot;aws:ItemAttributes/aws:Title&quot;/&gt;
+  &lt;/xsl:with-param&gt;
+&lt;/xsl:call-template&gt;
+</code></pre>
+<p>てな具合。</p>
+<p>これでAmazonのXSLTサービスがXMLまんまを返すとかいう寝ぼけたことをしない限り、正常に処理できるようになったような気がする。</p>

@@ -1,0 +1,48 @@
+googlebot plugin
+<p><a href="http://www.vwmarshall.net/" title="V. W. Marshall">V. W. Marshall</a>の<a href="http://www.vwmarshall.net/archives/000998.php" title="V. W. Marshall: In Which the Fly Invites the Spider Into His Parlor">In Which the Fly Invites the Spider Into His Parlor</a>と言うエントリにinspireされて(inspireとはパクったのを誤魔化したい時に使う言葉です)、<a href="http://www.google.com/bot.html" title="Googlebot">Googlebot</a>が自分が設置した<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。</p>
+<p>以下、コード。</p>
+<pre><code class="language-perl"># Blosxom Plugin: googlebot
+# Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 1.0
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package googlebot;
+
+use strict;
+
+# --- Configurable variables -----------
+
+my $sendmail = &#39;/usr/sbin/sendmail&#39;;
+my $from     = &#39;googlebot@example.com&#39;;
+my $to       = &#39;john.doe@example.com&#39;;
+my $subject  = &#39;Welcome Googlebot.&#39;;
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  if (
+    $ENV{&#39;HTTP_USER_AGENT&#39;} =~ /Googlebot/ and
+    open(MAIL, &quot;| $sendmail -t&quot;)
+  ) {
+    print MAIL &lt;&lt;&quot;_MAIL_&quot;;
+From: $from
+To: $to
+Subject: $subject
+Content-Type: text/plain; charset=ISO-2022-JP
+
+Googlebot tries to index the following page:
+http://example.com$ENV{&#39;REQUEST_URI&#39;}
+_MAIL_
+    close(MAIL);
+  }
+
+  return 0;
+}
+
+1;
+</code></pre>
+<p>てか、使ってないので動くかどうかは知りませんけど。</p>
+<p>なんて奴だ。</p>
+<p>inspire元のエントリにもあるように、いろいろな検索エンジンのロボットをトラッキングすると面白いかもしれないですね。</p>

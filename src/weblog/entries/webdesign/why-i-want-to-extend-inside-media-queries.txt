@@ -1,0 +1,75 @@
+Media Queries内で@extend使いたくなった
+
+<p><a href="http://sass-lang.com/">Sass</a> 3.2では様々な機能強化が図られているけど、その一方で削除された機能もある。そのひとつが既に安定版である3.1でも警告が出るようになった<code>@extend</code>ディレクテイブが<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>内等で使えていた機能。ざっと削除に至った経緯を辿ってみたけど、実装と出力上の都合っぽい。まぁそういうもんか……とこの仕様変更を受け入れて書き直したりしてたけど、最近になってやっぱり必要なんじゃないかなーと思うようになった。</p>
+
+<p>Media Queries内で<code>@extend</code>が使えない場合と使える場合で、ここの記事の情報(日付けやカテゴリを表示している部分)がどうなるかを例にしてみる。この記事の情報は狭い画面では一列でずらっとタイトルの直ぐ下に表示されるが、広い画面では本文の左にくっつくような形で表示されるもの。</p>
+
+<h2>使えない場合</h2>
+
+<pre><code class="language-scss">%hanging-block {
+  @media screen and (min-width: 66em) {
+    margin-right: 2em;
+    position: absolute;
+    right: 100%;
+    width: 9em;
+  }
+}
+
+article {
+  position: relative;
+
+  h2 + footer {
+    @extend %hanging-block;
+
+    br {
+      display: none;
+    }
+
+    @media screen and (min-width: 66em) {
+      br {
+        display: inline;
+      }
+    }
+  }
+}
+</code></pre>
+
+<p>プレースホルダー・セレクターを使って書くと、だいたいこんな感じになる。本来なら<em>ブロックを左にぶら下げる</em>という<em>振る舞い</em>を設計し、<em>広い画面(<code>66em</code>)</em>という条件を満たした時にそれを呼び出すという設計にしたいにもかかわらず、「ブロックを左にぶら下げる、ただし広い画面なら」という条件が後付けされる形にならざるをえない。生成されるCSSではほとんど違いは出ないのでどっちでもそう変わらないとも言えるけど、設計としてはかなりおかしい。</p>
+
+<p>また、同じ条件分岐のMedia Queriesと混ぜることが出来ないので、同じコンテキストに属する同じ条件のMedia Queriesを場所を分けて書かなくてはならなくなる。これは生成されるCSSのサイズにも影響を与える(後述)。</p>
+
+<h2>使える場合</h2>
+
+<pre><code class="language-scss">%hanging-block {
+  margin-right: 2em;
+  position: absolute;
+  right: 100%;
+  width: 9em;
+}
+
+article {
+  position: relative;
+
+  h2 + footer {
+    br {
+      display: none;
+    }
+
+    @media screen and (min-width: 66em) {
+      @extend %hanging-block;
+
+      br {
+        display: inline;
+      }
+    }
+  }
+}
+</code></pre>
+
+<p><code>@extend</code>ディレクティブがMedia Queries内で利用できると、プレースホルダー・セレクターはその振る舞いのスタイルだけを書けば良くなり、他の同じ条件分岐のスタイルともスムーズに混ぜることが出来る。</p>
+
+<p>Media Queriesについては前述のように混ぜられないことにより増える……ということはなくなるので、この例示したコードでは生成されるCSSのサイズは減る。しかしその一方で<code>@extend</code>した同士でのMedia Queriesの条件の共有はできなくなる(できるように実装することはまず無理)ので、生成されるCSSのサイズはどっちもどっち。むしろ積極的に<code>@extend</code>を使うケースでは増える。</p>
+
+<hr>
+
+<p>Sass 3.2で導入されるプレースホルダー・セレクターは通常のクラスよりも抽象化すべきものだと思うので、その中でMedia Queriesのようなロジックは書くべきではないはず。ロジックは実際にCSSで出力されるセレクター側で定義して、その条件にあったプレースホルダー・セレクターを<code>@extend</code>するという構成にできたらベストなんじゃないかと思う。<code>@mixin</code>でやれってことなのかなぁ……。</p>

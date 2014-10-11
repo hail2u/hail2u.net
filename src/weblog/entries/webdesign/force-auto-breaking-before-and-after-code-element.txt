@@ -1,0 +1,33 @@
+code要素の直前・直後で自動折り返しを発動させる
+
+<figure>
+  <img src="/images/blog/force-auto-breaking-before-and-after-code-element.png" alt="自動折り返し時に上が対策済み、下がデフォルト">
+</figure>
+
+<p><code>code</code>要素の中身には途中で折返しされない長い文字列が入ることが多い。例えば<code>insertAdjacentHTML()</code>であるとか。こういった文字列が行をまたぐ時、その手前にある文字(上記スクリーンショットでは「は」の文字)まで次の行に送られることがある。これはブラウザーにより挙動が違うが、CSSで大体のブラウザーで巻き込まないように調節することができる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/493.html">Force Auto-Breaking Before/After <code>code</code> Element</a></p>
+
+<p>Chrome 29の場合<code>code</code>要素の前の「は」が次の行に送られてしまう。<code>code</code>要素の前に句読点やカギ括弧などが来るとそれらとその前の文字までが次の行に送られたりもするので、場合によってはとても美しくない感じになってしまう。デモを見てもあまり違いがわからない感じではあるが、もっと極端な例を考えるのが面倒だった。</p>
+
+<pre><code class="language-css">code::before,
+code::after {
+  content: &quot;\0020&quot;;
+  font-size: 0;
+}</code></pre>
+
+<p>対策はCSSで擬似要素を使って前後に半角スペースを挿入し、明示的に折り返せる位置をブラウザーに指示するというだけのもの。<code>font-size</code>プロパティーの指定は好みだけど、<code>0</code>が良いと思う。<code>code</code>要素の話として書いたけど、<code>abbr</code>や<code>var</code>・<code>samp</code>・<code>kbd</code>要素辺りにも指定しておくともっと幸せになれる。</p>
+
+<hr>
+
+<p>ブラウザーによってはそもそも起こらない現象だし、前後に半角スペースを手作業で入れている場合とかは大丈夫だったりする。そのため修正するプライオリティーは低いと考えられるけど、採用することによる負の効果も無いと思うのでノーマライズ的な感じで気軽に使っても大丈夫だと思う。</p>
+
+<h2>追記</h2>
+
+<p><a href="http://www.w3.org/TR/2012/WD-css3-text-20121113/#line-break"><code>line-break</code>プロパティー</a>が自動折り返し(soft wrap)の制御に関するプロパティーなんだけど、このプロパティーで制御できるとされている部分の話ではなく、これでは解決できない。実装の基本的な部分での<a href="https://code.google.com/p/chromium/issues/detail?id=234668">至らなさ</a>なので、こっちの修正が完了するまでは上記のようなCSSで一部ごまかすしかなさそう。</p>
+
+<del><p>擬似要素で追加する文字列は<a href="http://en.wikipedia.org/wiki/Zero-width_space"><code>\200B</code> (Zero-width Space)</a>でも良いかもしれない。その場合は<code>font-size</code>プロパティーの指定は不要になる。</p></del>
+
+<h2>追記 #2</h2>
+
+<p><a href="https://twitter.com/kerotaa/status/379068219035635713">Twitterで行ボックスの高さがおかしくなることがあるという指摘</a>を受けた。再現できないのでなんとも言えないけど、注意は必要そう。あとデモのリンク先の修正とZero-width Spaceについての話の削除をした。CSSの<code>content</code>プロパティーでZero-width Spaceを挿入した場合は改行起こらなかった(HTMLで数値文字参照を使って挿入した場合は改行される)。</p>

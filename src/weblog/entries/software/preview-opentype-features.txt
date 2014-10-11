@@ -1,0 +1,19 @@
+OpenTypeのfeaturesをプレビューする
+
+<figure>
+  <img src="/images/blog/preview-opentype-features.png" alt="AdobeのGaramond Premier Proをドロップしてプレビューするとsmcp featureを持っているので、スモールキャプスでThe Quick Brown Fox Jumps Over The Lazy Dogs.が表示される">
+</figure>
+
+<p>あるフォント・ファイルがオールドスタイルの数字とかスモールキャプスとかのOpenTypeのfeaturesを持つかどうか確認する方法は色々ある。Photoshopでもいいし、FontForgeでもいい。ただ、あるfeatureを有効にした状態が手軽にプレビューできるものとなるとあまりない気がする。ググってもらしきものを見つけることが出来なかったので、<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/dnd.html">Drag and Drop</a>と<a href="http://www.w3.org/TR/FileAPI/">FileReader</a>を使ってfeatureを一覧プレビューするページを作った。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/483.html">Preview OpenType Features</a></p>
+
+<p>適当なOpenTypeフォントをページにドロップすればフォントが変更されて確認できる。TrueTypeフォント・ファイルでもプレビューできたりする。WOFFも大丈夫なはず(単なるコンテナーなので)だけど、多くのWOFFはOpenTypeのfeaturesを軽量化のために削除してることが多いので意味ないかも。なにがあるかわからないのでシステムのフォントはドロップしない方が無難。</p>
+
+<p>主にオールドスタイル数字(<code>onum</code>)とかスタイルセット(<code>ss03</code>)とかスモールキャプス(<code>smcp</code>)を確認のために作ったので、プレビュー文字列が適切でない気がする。また<code>swsh</code>のような複数の値を持てるやつには対応していない。</p>
+
+<p>現行ブラウザーでは大体動く感じなんだけど、落ちるとかはないけど表示は挙動不審。Chrome 28が一番素直な感じで、Firefox 23はまったく別のfeatureが適用されたりする。Internet Explorer 10はfeatureによって対応してたり対応してなかったりするような感じだけどよくわからない。</p>
+
+<hr>
+
+<p>OpenTypeのfeature一覧は<a href="https://en.wikipedia.org/wiki/List_of_typographic_features">WikipediaのList of typographic features</a>からもらった。それをリストにして、機械的にfeaturesのプレビューのためのCSSを仕込みながらHTMLを吐いていくだけで準備完了。あとはドロップされたフォントをFileReaderでData URIとして読み取り、それを<code>src</code>プロパティーに指定した<code>@font-face</code>定義を作って参照するだけ。</p>

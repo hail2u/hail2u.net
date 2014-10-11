@@ -1,0 +1,38 @@
+適切に改行を行う
+
+<p>ブラウザーはviewportによって折り返しを自動で行なってくれるわけだけど、場合によっては適切ではない位置で行われてしまうのをコントロールしたいという話。見出しをセンタリングしているようなケースで幅によっては一文字だけ次の行になってかっこ悪い！みたいなのを解消したいということであったり、逆にびろ～んと間延びしないようによさそうな位置で改行を入れたいということであったり。一年くらい前に<a href="http://danielmall.com/articles/responsive-line-breaks/">Responsive Line Breaks</a>と呼ばれるようになった。</p>
+
+<p>具体的なものはResponsive Line Breaksにあるデモやこのウェブログの日付表示の部分とかがそれ。ここではviewportの幅が広い時に良い位置で改行が入るようになっている。</p>
+
+<pre><code class="language-css">article footer br {
+  display: none;
+}
+
+@media (min-width: 60em) {
+  article footer br {
+    display: inline;
+  }
+}
+</code></pre>
+
+<p>実装はこういった感じの簡単なもの。デフォルトでは一行で表示されるようにしておいて、広い画面では(サイドバー的に横にっひっつくので)よさそうな所で改行が入るようになる。センタリングは使ってないので日本語でデモを作ったが、単語を区切るスペースというものがない日本語により向いていると思えるはず。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/464.html">日本語でResponsive Line Breaks</a></p>
+
+<hr>
+
+<p><code>br</code>要素を使うことの是非みたいなものも当然ある。本来的に必要そうな<code>br</code>要素ではないので、<code>span</code>要素で固まりを作って擬似要素で改行を挿入してやった方が良い。</p>
+
+<pre><code class="language-css">@media (min-width: 60em) {
+  article footer <mark>.rlb::before</mark> {
+    content: "\000a"; /* Line Feed */
+    white-space: pre-line;
+  }
+}
+</code></pre>
+
+<p>とかで良いので、そんなに難しくもない。マークアップが煩雑になるみたいな作業的な難点はあるけど。</p>
+
+<hr>
+
+<p>英文ならば<a href="http://adobe-webplatform.github.io/balance-text/">BalanceText</a>というJavaScriptライブラリがあって、加えて均等割付(<code>text-align: justify</code>)時には行ごとに均等割付になるように単語間の空白が調節されるのではなく、各行の単語量を調節して段落全体で単語間の空白のサイズが一定になるように調節してくれる機能もあったりしてかなりすごい。</p>

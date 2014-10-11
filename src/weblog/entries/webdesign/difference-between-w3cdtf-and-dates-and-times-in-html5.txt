@@ -1,0 +1,31 @@
+W3CDTFとHTML5の日付と時刻の違い
+
+<p>てっきり<a href="http://www.w3.org/TR/html5/common-microsyntaxes.html#dates-and-times">HTML5の<code>time</code>要素の<code>datetime</code>属性などで使われる日付と時刻のフォーマット</a>は<a href="http://www.w3.org/TR/NOTE-datetime">W3CDTF</a>だと思い込んでいたんだけど、違った。<a href="http://ja.wikipedia.org/wiki/ISO_8601">ISO 8601</a>というわけでも、W3CDTFのようにそのサブセットというわけでもないので、パースする時はそこそこ気をつける必要がありそう。知らなければ幸せだったような気がしないでもない。</p>
+
+<h2>日付けと時刻の間の<code>T</code></h2>
+
+<figure>
+  <blockquote>
+    <p>A "T" (U+0054) character or a U+0020 SPACE character</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/html5/common-microsyntaxes.html#valid-local-date-and-time-string">valid local date and time string</a></cite></figcaption>
+</figure>
+
+<p><code>T</code>の代わりに半角スペースでも良い。ISO 8601では許可されないので、ISO 8601のパーサーではエラーが起こる可能性が高い。</p>
+
+<h2>タイムゾーンの<code>:</code></h2>
+
+<figure>
+  <blockquote>
+    <p>Optionally, a ":" (U+003A) character</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/html5/common-microsyntaxes.html#valid-time-zone-offset-string">valid time-zone offset string</a></cite></figcaption>
+</figure>
+
+<p>コロンは省略可能になっている。これはISO 8601と同じ。<a href="http://validator.w3.org/nu/">Nu Validator</a>とかは非対応なのでエラーになる。</p>
+
+<hr>
+
+<p><code>T</code>の代わりに半角スペースを使えるのは書きやすいし扱いやすいんだけど、そのおかげでISO 8601との互換性が失われているのが惜しい。W3CDTFは適切なHTML5の日付と時刻のフォーマットではあるので、吐く方はW3DTFで吐いてやれば安全そう。読む方は上記二点に気をつけてW3CDTFっぽく整形してやるのが一番手軽そう。最初の空白をTに置換して、最後が数字四桁と+/-ならコロン挟む……とか考えて嫌になってきた。</p>

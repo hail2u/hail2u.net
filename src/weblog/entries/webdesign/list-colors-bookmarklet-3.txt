@@ -1,0 +1,17 @@
+List Colors #3
+
+<figure><img src="/images/blog/list-colors-bookmarklet-3.png" alt="rgba()もなんとなくわかりますよね？"></figure>
+
+<p><a href="/blog/webdesign/list-colors-bookmarklet-2.html">かなり昔に書いた</a>ページ内で使われている色をリストアップするブックマークレットを<code>querySelectorAll()</code>と<code>getComputedStyle()</code>を使って書き直しました。Chromeでも動くように適当に手直しして使ってたんですが、<code>hsla?()</code>等に対応したとこなどツギハギだらけで色々アレだったので……。表示の仕方も右肩にちょっと出るとかではなくて、起動したページ全体を差し替えるように変わっています。Google Chrome 15.0.874.102 mではちゃんと動いているようです。</p>
+
+<p>Bookmarklet: <a href="javascript:(function(f){var d=f.querySelectorAll(&quot;*&quot;),g=d.length,b,h=[],i,e,a,c={},j=f.styleSheets,k=&quot;&lt;ul style=&#39;margin: 0 auto; padding: 0; width: 768px;&#39;&gt;&quot;;for(b=0;b&lt;g;b++){h=getComputedStyle(d[b]).cssText.match(/rgba?\(\d{1,3}, \d{1,3}, \d{1,3}(, \d(\.\d+)?)?\)/g);i=h.length;for(e=0;e&lt;i;e++)a=h[e],c[a]?c[a]++:c[a]=1}for(b=0,g=j.length;b&lt;g;b++)j[0].disabled=true;for(a in c)c.hasOwnProperty(a)&amp;&amp;(d=[&quot;&lt;li style=&#39;margin: 8px; padding: 0; border: 1px solid #ccc; display: block; float: left; box-shadow: 0 0 4px #ccc; background-image: url(\&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAQHRrUGdUa1BORyAgQ29weVJpZ2h0IFRha2kgQWxsIFJpZ2h0IFJlc2VydmVkAI0AAA0AAABSREhJmDlXAOa9SQCQkWg2mDWMHgAAAB5JREFUKM9j+H9jL3aEAzCMaqCNBlwAh0GjGmiiAQBn/cifTDaT1wAAAABJRU5ErkJggg==\&quot;);&#39;&gt;&lt;div style=&#39;width: 238px; height: 100px; background-color:&quot;, a,&#39;;\&#39;&gt;&lt;/div&gt;&lt;div style=\&#39;border-top: 1px solid #ccc; width: 238px; line-height: 32px; overflow: hidden; color: #000; background-color: #eee; font-family: &quot;Monaco&quot;, &quot;Andale Mono&quot;, monospace; font-size: 14px; text-align: center; white-space: nowrap;\&#39;&gt;&#39;,a,&quot;&lt;/div&gt;&lt;/li&gt;&quot;].join(&quot;&quot;),k+=d);f.body.innerHTML=k+&quot;&lt;/ul&gt;&quot;})(document);">List Colors</a></p>
+
+<p>例えばこのサイトで起動してみると、<a href="/pub/list-colors-bookmarklet-3.html">「わぁ色少ないかと思ったら意外に使って……ない」という普通の結果</a>が表示されます。</p>
+
+<p>Bookmarkletへの変換には<a href="http://closure-compiler.appspot.com/home">Clousure Compiler Tool</a>を使いました。<code>rgba()</code>の時に透けて見える画像はData URIスキーム化したPNG画像です。また、色を拾う正規表現が</p>
+
+<pre>/rgba?\(\d{1,3}, \d{1,3}, \d{1,3}(, \d(\.\d+)?)?\)/g</pre>
+
+<p>となっているので、計算済みスタイルで色がこういう形にならないブラウザでは動かないです。つまりあーあーあーきーこーえーなーいー。</p>
+
+<p>できればうまい具合にソートしたいんですが、良い方法がまったく思いつきません……。</p>

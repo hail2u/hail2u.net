@@ -1,0 +1,13 @@
+はてなブックマークの新着ブックマークとlivedoor Reader
+
+<p>このサイト全体の<a href="http://b.hatena.ne.jp/">はてなブックマーク</a>での被ブックマークをトラッキングしようとsitemap.txtを元にしたPipeを作ったのだけど、<a href="http://d.hatena.ne.jp/antipop/">あんちぽさん</a>に「<a href="http://b.hatena.ne.jp/bookmarklist?url=http%3A%2F%2Fhail2u.net%2F">URLで絞り込んで新着ブックマークのトラッキングできるよ</a>」と教えてもらった。はてなにはなんでもあるな。この機能にはフィードも用意されているので、これを<a href="http://reader.livedoor.com/">livedoor Reader</a>で購読すればOK……と思いきや、明らかに被ブックマーク情報が飛び飛びでしか閲覧できなかった。原因はフィード側ではなく、LDR側の仕様によるものみたいだ。</p>
+
+<p>LDRではフィードの記事は<code>link</code>要素の値で管理されているようで、<code>link</code>要素の値が同じ<code>item</code>要素が複数存在するフィードの場合、常に新しい<code>item</code>の方で上書きされてしまう。そのため場合によって、LDRのクローラーが巡回する合間に複数のユーザーにより同じURLがブックマークされた時など、は記事が欠落することになる。</p>
+
+<p>はてブの新着ブックマークのフィードの各<code>item</code>要素の<code>link</code>要素の値は<em>ブックマークされたURL</em>になっているので、LDRでは常に一番新しいブックマークで上書きされ続けてしまう。これでは被ブックマークをトラッキングできない。フィードでは各<code>item</code>のユニークなIDになり得る各ブックマークのpermalinkが<code>item</code>要素の<code>rdf:about</code>属性として設定されているので、これを<code>link</code>要素の値として設定しなおしてやれば良さそう。</p>
+
+<p>ということで、<a href="http://pipes.yahoo.com/pipes/pipe.info?_id=Rjbiw8tF3hGnJZ9z6icw5g">LDRのためにはてブの新着ブックマークのフィードの<code>link</code>要素の値をユニークにするPipe</a>を書いた。多くの人は自分のコンテンツへの被ブックマークをトラッキングするために使うと思うので、必要がないと思われる(コンテンツの中身知ってるから)<code>blockquote</code>要素を削除したりしてある。</p>
+
+<hr>
+
+<p>エントリのペース上がってきたな。</p>

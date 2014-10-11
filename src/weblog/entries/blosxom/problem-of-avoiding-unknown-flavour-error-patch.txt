@@ -1,0 +1,56 @@
+不明なflavour回避パッチの問題点
+
+<p>かなり前に書いた<a href="/blog/blosxom/unknown_flavour.html">不明なflavour</a>というエントリで<a href="http://agilitynerd.com/index.cgi/tech/web/blogging/blosxom/UnknownFlavourError.html">紹介したパッチ</a>は概ねうまく機能しているのだけど、検索エンジンなどで意図しないURLが検索結果に出てきてしまうことがあるという問題が。通常は多くのページでリンクを張られている.htmlで終わるURLの方が圧倒的に強く、Web全体からの検索などではあまり問題にならないが、サイト内検索などではかなりゴミとして目立ってしまう。ので、<a href="http://tokyoenvious.xrea.jp/b/blog/blosxom/redirectif_noflavour.html">redirectif_noflavour</a>を使い、存在しないflavourの場合は.htmlで終わるURLにリダイレクトさせることにした。</p>
+
+<p>redirectif_noflavourはflavourが見つからなかった場合、設定で指定したflavourのURLに302 Foundでリダイレクトさせるというプラグイン。301 Moved Permanentlyを使いたかったり、設定させなくても<code>$blosxom::default_flavour</code>使えば良さそうと思ったので、</p>
+
+<pre><code class="language-perl"># Blosxom Plugin: redirectif_noflavour
+# Author(s): motormean, Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 2006-10-04
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package redirectif_noflavour;
+
+use strict;
+
+# --- Configurable variables -----------
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  1;
+}
+
+sub skip {
+  my $path = $blosxom::path_info;
+
+  do {
+    return 0 if -e &quot;$blosxom::datadir/$path/story.$blosxom::flavour&quot;;
+  } while ($path =~ s/(\/*[^\/]*)$// and $1);
+
+  $path = $blosxom::path_info;
+  $path =~ s/\..+?$/.$blosxom::default_flavour/;
+  $blosxom::header-&gt;{-status} = &#39;301 Moved Permanently&#39;;
+  $blosxom::header-&gt;{-Location} = &quot;$blosxom::url/$path&quot;;
+  $blosxom::output = &#39;&#39;;
+
+  return 1;
+}
+
+1;
+</code></pre>
+
+<p>と、少しだけ改造した。自前でflavourを漁らなくても何とかなりそうな気はする。けどコード考えるのがめんどくさい。303 See Otherのが良いかな？微妙だ。移動させたわけじゃないから303 See Otherのほうが妥当かもしれない。</p>
+
+<p>こういうケースは404 Not Foundでももちろん良いと思う。というか本来は404 Not Foundであるべきなのだけど、301 Moved Permanently(などのリダイレクトするHTTPステータスコード)を使った方が訪問者を逃さないので、サイト・オーナー的にはプラスだと思う。訪問者にも(多くの場合は)プラスになるはず。</p>
+
+<p>redirectif_noflavourは使いたくないけどerror flavourなページを検索エンジンに拾わせたくないなどという場合は、blosxom.cgiの最後のに書いてあるerror flavourの定義に、</p>
+
+<pre><code class="language-html">&lt;meta name=&quot;robots&quot; content=&quot;noindex, nofollow&quot; /&gt;
+</code></pre>
+
+<p>といったロボット対策の<code>meta</code>要素を追加するとかが良さそう。</p>
+
+<div class="asamashi"><figure><a href="http://www.amazon.co.jp/%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%B7%E3%83%BC%E3%83%88-%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%80%E3%83%BC%E3%83%89%E3%83%BB%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%AC%E3%82%A4%E3%83%89%E2%80%95SEO-%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3-%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B7%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3%E3%82%92%E8%80%83%E6%85%AE%E3%81%97%E3%81%9F%E5%AE%9F%E8%B7%B5%E7%9A%84HTML-CSS%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E8%A1%93/dp/4839915016%3FSubscriptionId%3D08PWFCAAQ5TZJT30SKG2%26tag%3Dhail2unet-22%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D4839915016"><img alt="スタイルシート スタンダード・デザインガイド―SEO/ユーザビリティ/アクセシビリティを考慮した実践的HTML&amp;CSSデザイン術" src="http://ecx.images-amazon.com/images/I/5154QAQFKFL._SL160_.jpg"></a></figure><div class="detail"><p class="title"><a href="http://www.amazon.co.jp/%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%82%B7%E3%83%BC%E3%83%88-%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%80%E3%83%BC%E3%83%89%E3%83%BB%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%AC%E3%82%A4%E3%83%89%E2%80%95SEO-%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3-%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B7%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3%E3%82%92%E8%80%83%E6%85%AE%E3%81%97%E3%81%9F%E5%AE%9F%E8%B7%B5%E7%9A%84HTML-CSS%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E8%A1%93/dp/4839915016%3FSubscriptionId%3D08PWFCAAQ5TZJT30SKG2%26tag%3Dhail2unet-22%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D4839915016">スタイルシート スタンダード・デザインガイド―SEO/ユーザビリティ/アクセシビリティを考慮した実践的HTML&amp;CSSデザイン術</a></p><ul><li>エ・ビスコム・テック・ラボ</li><li>毎日コミュニケーションズ</li><li>Book</li><li>4839915016</li></ul><p class="powered">Powered by <a href="http://hail2u.github.io/asamashi09/">Asamashi09</a>.</figure></div></div>

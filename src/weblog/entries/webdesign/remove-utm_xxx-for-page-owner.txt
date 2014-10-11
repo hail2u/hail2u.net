@@ -1,0 +1,32 @@
+utm_xxxを削除してURLの分散をちょっとだけ防ぐ
+
+<figure>
+  <img src="/images/blog/remove-utm_xxx-for-page-owner.png" alt="utm_foobars">
+</figure>
+
+<p>utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、<code>replaceState()</code>を使ってURLだけ書きかえるという話。</p>
+
+<p>正規化する関数を発火させるタイミングの制御には色々アプローチがあると思うけど、素で書くといろいろ面倒そうなので<a href="http://www.google.com/analytics/">Google Analytics</a>のコードに混ぜることにした。</p>
+
+<pre><code class="language-js">var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXX-X']);
+_gaq.push(['_trackPageview']);
+<mark>_gaq.push(function() {
+  var h = history, l = location, u;
+  if (!l.search || !h.replaceState) return;
+  u = l.pathname + l.search.replace(/[?&amp;]utm_[^&amp;]+/g, '').replace(/^&amp;/, '?') + l.hash;
+  h.replaceState(null, '', u);
+});</mark>
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</code></pre>
+
+<p>まだちゃんと運用していないけど、複数のutm_xxxがあるケースや他のパラメーターがある場合、更にはハッシュ付きだった場合なども含めた<a href="/pub/test/449.html">簡単なテスト</a>を行った限りでは大丈夫そう。もしかしたらAnalyticsのutm_xxx解析は維持したままURLを綺麗にできるかなと思ったけど、これだとダメな気もする。Analyticsの解析完了で発火するとかだと確実だと思うんだけど、まだ調べてない。</p>
+
+<h2>追記</h2>
+
+<p><code>location.search</code>が空じゃない時だけ書きかえるように修正した。</p>

@@ -1,0 +1,30 @@
+Amazonの画像置換 #3
+<p><a href="http://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>をガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと(今さら)気づいた。ので、画像置換のためのチェック方法には<code>Content-Type</code>を利用する方法もあるわけ。てか<a href="http://www.amazon.co.jp/exec/obidos/ASIN/4873111811/hail2unet-22" title="Amazon.co.jp： 本: Amazon Hacks 世界最大のショッピングサイト完全活用テクニック100選">Amazon Hacks</a>に載ってるらしいです(持ってない)。</p>
+<p><code>Content-Type</code>がimage/jpegな場合はちゃんと画像がある(はず)なので、チェックするためのコードはこんなシンプルなものでOKなはず。</p>
+<pre><code class="language-perl">use LWP::Simple;
+
+sub check_image {
+  my $url = shift;
+
+  my $header = head($url);
+
+  return 1 if $header-&gt;content_type eq &quot;image/jpeg&quot;;
+  return 0;
+}
+</code></pre>
+<p>とか書いたけど、ちゃんとした画像がimage/gifだったりすることもあるかもなぁ。いまいち一貫性に欠けるところがあるので信用できない(偉そう)。</p>
+<p><code>Content-Length</code>でチェックする場合はこんなコード。</p>
+<pre><code class="language-perl">use LWP::Simple;
+
+sub check_image {
+  my $url = shift;
+
+  my $header = head($url);
+
+  return 1 if $header-&gt;content_length &gt; 807;
+  return 0;
+}
+</code></pre>
+<p>どっちにしても、失敗する時は失敗する気がする。しかも結構頻繁に。</p>
+<p>そもそもAWSがきちんとしたURLを返さないのが悪い。とか、いつも思うわけで。</p>
+<p>ちなみに、アメリカからの輸入盤CDの画像は01で取れますが、イギリスからの輸入盤CDの画像は09だったり(ドイツからの輸入版CDとかは知らない)。マメ知識。輸入版なら01に置換すれば安牌というわけではないってこった。<code>Content-Type</code>か<code>Content-Length</code>でチェックしたほうが良いすね(コストかかるけど)。そもそもAWSが(以下略。</p>

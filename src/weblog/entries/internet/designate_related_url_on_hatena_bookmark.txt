@@ -1,0 +1,29 @@
+はてなブックマークの関連URLを指定(出来たら良いな)
+<p>みんな大好きな<a href="http://b.hatena.ne.jp/" title="はてなブックマーク - ソーシャルブックマーク">はてなブックマーク</a>には、関連URLという機能があります。が、現状では気が向いた人が人力で入力するという感じみたいです。これをブックマークされる側で指定できたら幸せなんじゃないかなとか。そうなれば、ある英語のサービスについての紹介とかいうエントリを書いた時にはそのサービスのURLとか、ある英語のページの翻訳を書いた場合は元のページのURLとかをブックマークのページに表示でき、ブックマークを漁って行動する人にはちょっと便利だったりしそうとか。ある本の感想を書いた時にアサマシURLを仕込んだりとかも出来そう(むしろこれがメイン)！</p>
+<p>以下はこの妄想を実現するという仮定に従って書いてます。</p>
+<p>既にはてなブックマークはページの概要(らしきもの)の取得やAccout Auto-discoveryのために、ブックマークされた時にそのページをHTTP GETするので、どうやって関連URLの情報を埋め込むかという話になります。</p>
+<h2>リンクに<code>rel=&quot;related&quot;</code></h2>
+<p>僕がまず初めに思いついた方法は<code>a</code>要素に<code>rel=&quot;related&quot;</code>と、「このリンクは関連したURLを参照しているよ」という意味付けをしてやる方法。例えば、<a href="/blog/internet/dodgeit.html" title="hail2u.net - Weblog - dodgeit">dodgeitというエントリ</a>では、<a href="http://www.dodgeit.com/" title="dodgeit - free. receive-only. email. no set up. rss.">dodgeit</a>というWeb上のサービスについて書いています。このエントリではもちろんdodgeitのサイトへのリンクを書いているので、そのリンクに<code>rel=&quot;related&quot;</code>を追加してやるということになります。具体的には、dodgeitのサイトへのリンクを、</p>
+<pre><code class="language-html">&lt;a rel=&quot;related&quot; href=&quot;http://www.dodgeit.com/&quot;&gt;dodgeit&lt;/a&gt;
+</code></pre>
+<p>と書くということです。はてなブックマーク側は<code>rel=&quot;related&quot;</code>を含むリンクを抜き出してやって関連URLとして登録してやるだけで、特に実装が難しいということは無いと思います。ブックマークされる側も多少タイプするだけなので簡単。</p>
+<p>実際には<a href="http://www.gmpg.org/xmdp/" title="XMDP - XHTML Meta Data Profiles">Xhtml Meta Data Profiles</a>などで<code>related</code>が意味するものを定義したプロファイルへの参照を<code>head</code>要素の<code>profile</code>属性を使って書くべきだったりとかいろいろありますが、まーそれはそれ(適当すぎ)として比較的手軽なアプローチなんじゃないかなと。</p>
+<p><code>link</code>要素に<code>rel=&quot;related&quot;</code>でももちろん構わないわけなんですが、そうなると多くの場合は結構凝った事をしないと実装できない気がするので、<code>a</code>要素に仕込む方が良さそう。</p>
+<h2>RDFで！！！</h2>
+<p>次にIRCで<a href="http://antipop.gs/" title="antipop.gs">Windows大好きな人</a>とこの話をちょっと振ってみたら、「RDFでなうせまんてぃっく！」とか言われました(かなり捏造)。数十分、あーでもないこーでもないとやり取りした後、<a href="http://dublincore.org/documents/dces/" title="Dublin Core Metadata Element Set, Version 1.1: Reference Description">Dublin Core</a>の<code>relation</code>要素を利用した書き方が良さそうという結論になりました。具体的には上記と同じくdodgeitというエントリを例にとると、</p>
+<pre><code class="language-html">&lt;rdf:RDF xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+  xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;&gt;
+  &lt;rdf:Description rdf:about=&quot;http://hail2u.net/blog/internet/dodgeit.html&quot;&gt;
+    &lt;dc:relation rdf:resource=&quot;http://www.dodgeit.com/&quot;/&gt;
+  &lt;/rdf:Description&gt;
+&lt;/rdf:RDF&gt;
+</code></pre>
+<p>こんな感じでしょうか(定かではない)。RDFを使った場合は、TrackBack Auto-discoveryやAccount Auto-discoveryなどと併せて記述することが出来、まさにページのメタ・データになり得ます(多分ね)。</p>
+<p>こちらの方ははてなブックマーク側の実装はともかく、ブックマークされる側はツールによる対応が必須だったりしそうでなかなか敷居が高いかも。blosxomでの実装を考えてみようとしたんですが、頭が痛くなったのでやめました。</p>
+<hr>
+<p>いろいろな意味で前者の方が楽です。後者はそれならちゃんとそのページのメタ・データをきちんと定義すればいいんじゃないの云々とかいう感じ。世のしがらみとか考えると、どうもお手軽な前者をプッシュしたい感じ。</p>
+<p>実際には、ブックマークのページからのトラフィックが減る可能性があったりとかマイナスな面がなきにしもあらずなので、関連URLを指定したいと思う人がいるかどうかは謎です(大抵の場合はリンクを張っているわけだし)。</p>
+<p>以上の話とはあまり関係ないんですが、はてなブックマークのタグ(やキーワード)もブックマークされる側で制御(この場合は推薦に限定した方が良さそう)できたりすると面白いかも。こっちの場合は、<code>meta</code>要素を使って、</p>
+<pre><code class="language-html">&lt;meta name=&quot;keyword&quot; content=&quot;foo, bar, buzz&quot; /&gt;
+</code></pre>
+<p>とかで良さげ。これは既に実装されてたりはしそう。わかんないけど。</p>

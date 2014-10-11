@@ -1,0 +1,48 @@
+CSSのみでスライドして画像を切り替えるギャラリーを作る
+
+<p>ポートフォリオとかでよく見かけるクリックすると横にスライドしながら画像を切り替えるギャラリーUIをCSS3だけで作ってみた。最終的に、エフェクト的には満足のいかないところがあるもののすごくシンプルに作成できたのでまぁ満足。<code>:target</code>擬似クラスと<code>transition</code>プロパティ(と<code>transform</code>プロパティ)の組み合わせは色々できて楽しい。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/161-2.html#first">CSS Sliding Image Gallery</a></p>
+
+<p>ギャラリー全体のマークアップは以下のような単純なもの。</p>
+
+<pre><code class="language-html">&lt;ul id=&quot;gallery&quot;&gt;
+  &lt;li class=&quot;image&quot; id=&quot;first&quot;&gt;&lt;a href=&quot;#second&quot;&gt;&lt;img src=&quot;161-1.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li class=&quot;image&quot; id=&quot;second&quot;&gt;&lt;a href=&quot;#third&quot;&gt;&lt;img src=&quot;161-2.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li class=&quot;image&quot; id=&quot;third&quot;&gt;&lt;a href=&quot;#first&quot;&gt;&lt;img src=&quot;161-3.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+
+<p>HTML的にも不自然なところはない。画像の数を増やす時にはリンクを適宜書き換えなくてはならないという欠点はあるが、リストの画像をクリックして次々に見ていくというものなので、避けようがない作業だと思う。</p>
+
+<p>CSSは以下のようなコードになる。</p>
+
+<pre><code class="language-css">#gallery .image {
+  display: block;
+  float: left;
+  width: 0px;
+  height: 450px;
+  overflow: hidden;
+  -moz-transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  transition-duration: 1s;
+}
+
+#gallery .image:target {
+  width: 450px;
+  -moz-transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  transition-duration: 1s;
+}
+
+#gallery .image a img {
+  width: 100%;
+  height: 100%;
+}
+</code></pre>
+
+<p><code>.image</code>で<code>width: 0px;</code>を指定して通常は見えないようにしておき、それを<code>:target</code>擬似クラスを利用して画像へのリンクを踏んだ時に<code>width: 450px;</code>に変更して見えるようにする。この変化を<code>transition</code>プロパティを使ってアニメーションさせるというただそれだけのもの。CSS自体に難しいところはまったく無く、不自然なところもあまり無い。強いて注意すべき点を挙げるとするなら画像のリサイズはコンテナ(<code>.image</code>)に任せて<code>img</code>要素では<code>100%</code>にすること。こうすることによって<code>.image</code>の<code>width</code>プロパティの変化によるアニメーションが綺麗に反映される。</p>
+
+<p><code>:target</code>擬似クラスと<code>transition</code>プロパティのどちらにも対応しているブラウザはChromeとSafariはかなり前からで、Firefoxは4以降、Operaは10.5以降だと思う。</p>

@@ -1,0 +1,26 @@
+Chrome 31での@font-face定義
+
+<p>Chrome 31で<code>@font-face</code>定義で<code>unicode-range</code>プロパティーを使った時の挙動が変わった。今までは<code>@font-face</code>定義を使ってローカルにあるフォントの一部を<code>unicode-range</code>プロパティーで差し替える場合、差し替えるグリフ以外はローカルのフォントが維持されていたんだけど、一部差し替えるだけだと他のグリフが全部失われるようになった。この挙動はInternet Explorer 11と同じで、仕様通りになった。</p>
+
+<figure>
+  <blockquote>
+    <p>指定したフォント・ファミリーの名前と同じ名前のフォント・ファミリーがユーザーの環境に存在している場合、そのスタイルシートが使われている文書では(ユーザーの環境に存在している)フォントは事実上使われないことになります。これによりウェブ制作者は、ユーザーの環境にあるフォント・ファミリーの名前との衝突を気にすることなく、自由にフォント・ファミリー名を選択することができるでしょう。</p>
+  </blockquote>
+
+  <figcaption>— <cite><a href="http://www.w3.org/TR/css3-fonts/#font-family-desc">4.2 Font family: the font-family descriptor - CSS Fonts Module Level 3</a></cite></figcaption>
+</figure>
+
+<p>正確には<code>@font-face</code>定義における<code>font-family</code>プロパティーの取り扱いが仕様通りに変わったということのようだ。</p>
+
+<p>具体的な例だと、以前書いた<a href="/blog/software/arial+plus+segoe-ui-symbol-via-unicode-range.html">unicode-rangeを使ってArialにSegoe UI Symbolを混ぜる</a>で挙げたような書き方だと、Arialがぶっ壊れてしまうことになる。修正は簡単で、一旦ArialをArialで定義してから一部差し替えるだけ。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &quot;Arial&quot;;
+  src: local(&quot;Arial&quot;);
+}
+
+@font-face {
+  font-family: &quot;Arial&quot;;
+  src: local(&quot;Segoe UI Symbol&quot;);
+  unicode-range: U+20E3-2B55, U+1F004-1F6C0;
+}</code></pre>

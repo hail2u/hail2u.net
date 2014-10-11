@@ -1,0 +1,47 @@
+AdSenseの広告切り替え
+
+<p><a href="https://www.google.com/adsense/">Google AdSense</a>が<a href="http://adsense-ja.blogspot.jp/2013/06/blog-post.html">公式にいくつかのケースに限って広告コードの改変を許可した</a>ので、後に手を入れることも考えて効率的なコードを考えている最中のメモ。</p>
+
+<p>切り替えるそれぞれの広告スロット番号(や幅、高さの設定)はAdSenseで取得できるコードからコピペするようにしないと、コードの間違いなどミスを起こしそう。本当は外部JavaScriptファイルにそれぞれの広告の設定を保存しておいて、viewportでどれかひとつを読んでやるみたいなのがスッキリして良い気がするけどそこまでして良いのかわからない。</p>
+
+<p><a href="https://support.google.com/adsense/answer/1354736?hl=ja&amp;topic=1271508&amp;ctx=topic">ヘルプ</a>にある<code>document.documentElement.clientWidth</code>で切り替えるのは、広告のサイズと切り替えの条件文で比較する数字にずれができるのでメンテナンス性が悪そう。なので広告を貼る位置の要素の幅を取得し、ウェブサイトごとに余白や枠線分を適当に引いておいた数字と比較するのが良さそう。</p>
+
+<pre><code class="language-javascript">var w = d.querySelector('[role="main"] &gt; .adsense').clientWidth - ((1 + 7) * 2);
+</code></pre>
+
+<p>このサイトでは<code>[role="main"]</code>直下の<code>adsense</code>というクラスを振った<code>aside</code>要素をAdSenseのコンテナにしており、<code>1px</code>の枠線と<code>7px</code>の<code>padding</code>があったのでその分引いて広告を置けるサイズを計算していた。そうすれば<code>if</code>文の条件式で使いたい広告幅をコピペするだけで良くなる。</p>
+
+<pre><code class="language-javascript">google_ad_client = "pub-xxxxxxxxxxxxxxxx";
+/* 250x250 */
+google_ad_slot = "xxxxxxxxxx";
+google_ad_width = 300;
+google_ad_height = 250;
+
+(function (d) {
+  if (!d.querySelector) return;
+  var w = d.querySelector('[role="main"] &gt; .adsense').clientWidth - ((1 + 7) * 2);
+
+  if (w &gt;= 970) {
+    /* (970x90) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 970;
+    google_ad_height = 90;
+  } else if (w &gt;= 728) {
+    /* (728x90) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 728;
+    google_ad_height = 90;
+  } else if (w &gt;= 468) {
+    /* (468x60) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 468;
+    google_ad_height = 60;
+  }
+})(document);
+</code></pre>
+
+<p>これはキレイじゃないな。</p>
+
+<p>デフォルトのサイズは<a href="https://support.google.com/adsense/answer/68727?hl=ja">モバイル広告に対応しているもの</a>にしておくと安全そう。<code>documen.querySelector()</code>に対応していないブラウザーでは切り替えが起こらないので、効果が高いとされてる300x250にしておくのが安定か。サイズを切り替えるのではなく、効果が高いとされている300x250を置く数を幅によって増やすみたいなのもアリなのかな？と思って聞いてみたけど梨の礫……。</p>
+
+<p>AdSense側で広告の組み合わせを定義できて、貼った場所の幅によって適当に切り替えてくれる……みたいなのが理想だけど、そううまくはいかないか。今後に期待して、とりあえずはこれを使ってみている。</p>

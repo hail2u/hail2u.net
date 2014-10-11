@@ -1,0 +1,45 @@
+border-style: doubleの間のスペース
+
+<p><code>border-style</code>プロパティーで<code>solid</code>以外が使われることは滅多にないけど、<code>double</code>はそこそこ使われるんじゃないかと思う。他は大体残念な感じになることが多いが、<code>double</code>は安定しているので。その<code>double</code>では2本の線が引かれその間にスペースが出来る。一体このスペースはどうなってるのかみたいな<del>どうでも良さそうな</del>話。</p>
+
+<p>まずその大きさだが、<code>px</code>単位系だと3で割った余りが1の場合は間のスペースが増え、余りが2の場合は枠線の太さが増える。仕様では決められてないが、大体どの実装でも同じようだ。</p>
+
+<table>
+  <tr>
+    <th>全体の太さ</th><th>枠線の太さ</th><th>間のスペース</th>
+  </tr>
+  <tr>
+    <td><code>3px</code></td><td><code>1px</code></td><td><code>1px</code></td>
+  </tr>
+  <tr>
+    <td><code>4px</code></td><td><code>1px</code></td><td><mark><code>2px</code></mark></td>
+  </tr>
+  <tr>
+    <td><code>5px</code></td><td><mark><code>2px</code></mark></td><td><code>1px</code></td>
+  </tr>
+</table>
+
+<p>間のスペースが大きい状態(3で割った余りが1の時)は不恰好になりがちなので、調整できるなら3で割り切れる数にするのが無難。</p>
+
+<p>次は間のスペースの色の話。こちらも仕様では特に触れられていないが、どの実装も<code>transparent</code>になっている。ただし枠線と同時に<code>background-color</code>プロパティーで背景色も指定されていた場合、スペースの色は背景色と同じになる……というより枠線の下まで背景色で塗られるのでそれが見える。そのため背景色を塗りつつ枠線の間を透過させるというようなことは<a href="/pub/test/361.html">そのままではできない</a>。</p>
+
+<del>
+<p>が、背景<em>画像</em>の場合は<code>background-origin</code>プロパティーのデフォルトが<code>padding-box</code>になっていることもあり、間のスペースから背景画像が見えることはない。つまり<code>linear-gradient()</code>を使って単色の背景画像を作ってやれば、上記URLの2番目の例のように間のスペースを透過させつつ背景を単色で塗りつぶすことができる。</p>
+
+<pre><code class="language-css">.test {
+  background-image: linear-gradient(
+    top,
+    #396 0,
+    #396 100%
+  );
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+</code></pre>
+
+<p>サイズと繰り返し指定も必須。このテクニックに背景色を追加すれば間のスペースの色と要素の背景色を違うものにすることができたりもする。</p>
+</del>
+
+<ins>
+<p><code>background-clip</code>プロパティーが<a href="http://b.hatena.ne.jp/vantguarde/20120205#bookmark-79593669">あった</a>(他多数)のでそっち使ってください……。こうやるにはどうしたらいいだろうで考えるとどうもダメだなぁ。</p>
+</ins>

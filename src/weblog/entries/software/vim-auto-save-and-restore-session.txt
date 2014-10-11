@@ -1,0 +1,31 @@
+Vimでセッションの自動保存と復帰
+
+<figure><img src="/images/blog/vim-auto-save-and-restore-session.png" alt="セッション復帰を確認するダイアログ(アイコン……)"></figure>
+
+<p><code>VimLeave</code>で<code>mksession</code>を発動させるセッションの自動保存は結構前からやっていたけど、自動復帰はやってなかった(必要な時だけ<code>:source</code>してた)のでちょろっと書いた。ライフ・チェンジング……という程ではなかった。でもまぁそこそこ必要そう。</p>
+
+<pre><code class="language-vim">augroup SessionAutocommands
+  autocmd!
+
+  autocmd VimEnter * nested call &lt;SID&gt;RestoreSessionWithConfirm()
+  autocmd VimLeave * execute 'SaveSession'
+augroup END
+
+command! RestoreSession :source ~/.vim/.session
+command! SaveSession    :mksession! ~/.vim/.session
+
+" Restore session with confirm
+function! s:RestoreSessionWithConfirm()
+  let msg = 'Do you want to restore previous session?'
+
+  if !argc() &amp;&amp; confirm(msg, "&amp;Yes\n&amp;No", 1, 'Question') == 1
+    execute 'RestoreSession'
+  endif
+endfunction
+</code></pre>
+
+<p>最初<code>autocmd</code>の<a href="http://vimdoc.sourceforge.net/htmldoc/autocmd.html#autocmd-nested"><code>nested</code>フラグ</a>の存在を知らなくて、セッション復活で開かれたファイルのシンタックス・ハイライトがされないという壁にあたったけどヘルプ読んだらちゃんと書いてありました。<code>autocmd</code>で発動させたコマンドで開かれたりしたバッファーでは<code>BufRead</code>等が発動しないので、自然<code>filetype</code>の設定等それらのイベントに依存する処理が行われないということだった。</p>
+
+<p>セッション保存/復活は「ちょっとここで保存したい」とか「起動時にキャンセルしたけどやっぱ復帰したい」とか思った時にあると便利そうなので、別にコマンドとして定義しておいた。セッションの自動保存/復帰以上の機能を求める場合(ワークスペースの切り替え的に使ったりとか)ならセッション管理プラグインを探した(作った)方が良さそう。</p>
+
+<p>確認するための関数では確認と同時に<code>argc()</code>でVim起動時に引数でファイルが指定されているかどうかをチェックしているので、ファイルを渡して起動した時はセッション復活の確認はされない。</p>

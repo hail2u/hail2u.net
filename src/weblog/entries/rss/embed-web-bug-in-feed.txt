@@ -1,0 +1,36 @@
+Web Bugをフィードに埋め込む
+
+<p>ひとつ前のエントリで取り上げたように、エントリ内の画像を利用するとエントリの閲覧者数を大雑把に知ることが可能で、リファラを数え上げるなどをすればいろいろなサービス経由での閲覧者数を大雑把に把握することも可能。しかし、フィードの本当の購読者数にはそのまま応用することは出来ない。そこで古くからある<a href="http://en.wikipedia.org/wiki/Web_bug">Web Bug</a>(あるいはWebビーコン)と呼ばれる手法を使ってやってみようとかそんな話。</p>
+
+<p>Web Bugは小さな画像をWebページに埋め込んで、その画像へのアクセス・ログを閲覧して<del>ニヤニヤするという</del><ins>ある程度正確なページ・ビューを割り出すという</ins>類のもの。Webページへのアクセス・ログによる統計と違い、いわゆるグラフィカルなブラウザのアクセスだけを対象にできるので、より価値のあるデータを得ることが出来る。</p>
+
+<p>これをフィードに応用する場合も特に難しいことはなく、適当に各エントリにあたる部分に小さな画像を埋め込むようにしてやれば良いだけ。具体的に<a href="http://www.sixapart.com/movabletype/">Movable Type</a>の<a href="http://www.sixapart.com/movabletype/default_templates_32/atom_index.txt">Atom Indexテンプレート</a>を例にすると、</p>
+
+<pre><code class="language-xml">&lt;entry&gt;
+  &lt;title&gt;&lt;$MTEntryTitle remove_html=&quot;1&quot; encode_xml=&quot;1&quot;$&gt;&lt;/title&gt;
+  &lt;link rel=&quot;alternate&quot; type=&quot;text/html&quot; href=&quot;&lt;$MTEntryPermalink encode_xml=&quot;1&quot;$&gt;&quot; /&gt;
+  &lt;link rel=&quot;service.edit&quot; type=&quot;application/atom+xml&quot; href=&quot;&lt;$MTCGIPath$&gt;&lt;$MTAtomScript$&gt;/weblog/blog_id=&lt;$MTBlogID$&gt;/entry_id=&lt;$MTEntryID$&gt;&quot; title=&quot;&lt;$MTEntryTitle encode_html=&quot;1&quot;$&gt;&quot; /&gt;
+  &lt;id&gt;&lt;$MTEntryAtomID$&gt;&lt;/id&gt;
+
+  &lt;published&gt;&lt;$MTEntryDate utc=&quot;1&quot; format=&quot;%Y-%m-%dT%H:%M:%SZ&quot;$&gt;&lt;/published&gt;
+  &lt;updated&gt;&lt;$MTEntryModifiedDate utc=&quot;1&quot; format=&quot;%Y-%m-%dT%H:%M:%SZ&quot;$&gt;&lt;/updated&gt;
+
+  &lt;summary&gt;&lt;$MTEntryExcerpt remove_html=&quot;1&quot; encode_xml=&quot;1&quot;$&gt;&lt;/summary&gt;
+  &lt;author&gt;
+    &lt;name&gt;&lt;$MTEntryAuthorDisplayName encode_xml=&quot;1&quot;$&gt;&lt;/name&gt;
+    &lt;MTIfNonEmpty tag=&quot;MTEntryAuthorURL&quot;&gt;&lt;uri&gt;&lt;$MTEntryAuthorURL encode_xml=&quot;1&quot;$&gt;&lt;/uri&gt;&lt;/MTIfNonEmpty&gt;
+  &lt;/author&gt;
+  &lt;MTEntryCategories&gt;
+    &lt;category term=&quot;&lt;$MTCategoryLabel encode_xml=&quot;1&quot;$&gt;&quot; /&gt;
+  &lt;/MTEntryCategories&gt;
+  &lt;content type=&quot;html&quot; xml:lang=&quot;&lt;$MTBlogLanguage ietf=&quot;1&quot;$&gt;&quot; xml:base=&quot;&lt;$MTBlogURL encode_xml=&quot;1&quot;$&gt;&quot;&gt;
+    &lt;$MTEntryBody encode_xml=&quot;1&quot;$&gt;
+    &lt;$MTEntryMore encode_xml=&quot;1&quot;$&gt;
+    <em>&lt;div&gt;&lt;img src=&quot;http://example.com/images/web-bug.png?id=&lt;$MTEntryID$&gt;&quot; alt=&quot;Web Bug&quot; width=&quot;1&quot; height=&quot;1&quot; /&gt;&lt;/div&gt;</em>
+  &lt;/content&gt;
+&lt;/entry&gt;
+</code></pre>
+
+<p>こんな感じに<code>contents</code>要素の最後にWeb Bug画像を追加するだけで良い。各エントリ固有のIDをWeb Bug画像のクエリとして追加しておく必要はある。他のblogツールでもこの程度の手間で実現できるはず。あとはWebサーバーのログを閲覧して<del>ニヤニヤすれば</del><ins>フィードの購読者数を割り出せば</ins>良い。このケースでは、フィードのみにWeb Bug画像を追加しているので、Web Bug画像へのアクセス数とフィードの購読者数はほぼ一致するはず。</p>
+
+<p>このサイトのフィードにはまだWeb Bug画像は埋め込んでいない。やろうかなーとかやってみたいなーとは思うけど、Web Bug画像に嫌悪感を抱く人もいるらしいので躊躇。</p>

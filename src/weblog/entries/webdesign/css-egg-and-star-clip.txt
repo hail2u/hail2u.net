@@ -1,0 +1,110 @@
+CSSで卵形と星形に切り抜く
+
+<figure>
+  <img src="/images/blog/css-egg-and-star-clip.png" alt="ほしのたまご">
+</figure>
+
+<p>CSSグラデーションを使った画像切り抜きの続編。卵形と星形では六角形みたいな三角形で端をカットすれば切り抜ける形と違ってもうちょっと工夫が必要になる。その工夫というのは<code>background-size</code>プロパティーでのサイズの制限。</p>
+
+<h2>卵形</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/569.html">CSS Egg Clip</a></p>
+
+<p><code>radial-gradient()</code>では楕円は描くことができるけど、それを歪めるようなことはできない(と思う)。ので、径の違う楕円を半分ずつ組み合わせて卵形を作ることになる。基本的な部分は<a href="/blog/webdesign/css-hex-clip.html">六角形のもの</a>と同じ。</p>
+
+<pre><code class="language-css">background-image:
+  radial-gradient(
+    ellipse farthest-corner at 50% 100%,
+    transparent 0,
+    transparent 70%,
+    #fff 70%,
+    #fff 100%
+  ),
+  radial-gradient(
+    ellipse farthest-corner at 50% 0%,
+    transparent 0,
+    transparent 70%,
+    #fff 70%,
+    #fff 100%
+  ),
+  linear-gradient(
+    to right,
+    #fff 0,
+    #fff 15%,
+    transparent 15%,
+    transparent 85%,
+    #fff 85%,
+    #fff 100%
+  )
+;
+background-size:
+  70% 65%,
+  70% 35%,
+  100% 100%
+;
+background-position:
+  center top,
+  center bottom,
+  center center
+;
+</code></pre>
+
+<p>理解しやすいように省略できるプロパティーも省略していない。楕円のサイズは長さでも指定できるが、<code>farthest-corner</code>を使うと、楕円に歪む方向(潰れた細い方向)にできうる限り大きく描かれるようになるのでそれを使う。伏せた形の半分の楕円にしたいので、グラデーションの中心は<code>50% 100%</code>と下端の中央に設定。(楕)円グラデーションでは常に中心からグラデーションが開始されるので、<code>transparent</code>から始め、70%あたりで背景色に切り替わるように止めるとまず正方形に綺麗に収まるような楕円になる。</p>
+
+<figure>
+  <img src="/images/blog/css-egg-clip-progress.png" alt="伏せた半分の楕円で画像が切り抜かれている様子">
+
+  <figcaption>Clip with Half Ellipse</figcaption>
+</figure>
+
+<p>このままでは卵形に近づけられないので、この半分の楕円を<code>background-size</code>プロパティーで小さくしてやる。幅<code>70%</code>高さ<code>65%</code>くらいにするとちょうど良かった。併せて背景画像の開始位置も要調整。下側の半分の楕円もほとんど同じように作ることができる。ただし向きは逆なので、グラデーションの中心を<code>50% 0%</code>と上端の中央に設定する。サイズは上側の楕円と幅を合わせるときれいにつながり、高さは<code>100%</code>から上側の楕円の高さを引いた残り<code>35%</code>にするとギリギリいっぱいの卵形になる。</p>
+
+<p>最後に楕円を小さくした分、左右に残った空間を線形グラデーションで埋めるだけ。</p>
+
+<h2>星形</h2>
+
+<p>星の形の場合は線形グラデーションで三角形を作れること、それのサイズに制限を加えると台形が作れることを利用して行う。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/568.html">CSS Star Clip</a></p>
+
+<p>これも基本的な部分は六角形や卵形と同じ。角のカットは線形グラデーションで作ることができる直角三角形か台形になるような形で行っていく。デモではわかりやすいようにそれぞれの色を変えておいた。もっときれいな正星形にもできそうだけど、面倒になった(理由は後述)。</p>
+
+<pre><code class="language-css">background-image:
+  linear-gradient(115deg, #0f0 0, #0f0 43%, transparent 43%, transparent 100%),
+  linear-gradient(245deg, #f0f 0, #f0f 43%, transparent 43%, transparent 100%),
+  linear-gradient(135deg, transparent 0, transparent 80%, #0f0 80%, #0f0 100%),
+  linear-gradient(225deg, transparent 0, transparent 80%, #f0f 80%, #f0f 100%),
+  linear-gradient(122deg, #0f0 0, #0f0 20%, transparent 20%, transparent 100%),
+  linear-gradient(238deg, #f0f 0, #f0f 20%, transparent 20%, transparent 100%),
+  linear-gradient(150deg, transparent 0, transparent 50%, #f0f 50%, #f0f 100%),
+  linear-gradient(210deg, transparent 0, transparent 50%, #0f0 50%, #0f0 100%)
+;
+background-size:
+  100% 35%,
+  100% 35%,
+  100% 25%,
+  100% 25%,
+  100% 40%,
+  100% 40%,
+  50% 30%,
+  50% 30%
+;
+background-position:
+  left top,
+  left top,
+  left 47%,
+  left 47%,
+  left bottom,
+  left bottom,
+  left bottom,
+  right bottom
+;
+</code></pre>
+
+<p>角度やサイズについては要調整ということになるけど、つまりはそれぞれのツノごとに考えてやることになる。上の角ではその左右に台形を作り、真ん中の二つのツノでは直角三角形を左右の端に作る。最後の一番下のツノがややこしいが、それぞれの左右に直角三角形を作るような形で行えば良かった。</p>
+
+<p>ただ星形の場合はユニコードにグリフがある(★)ので、<code>-webkit-mask-image</code>プロパティーなりSVGのフィルターなりでやった方が手軽にきれいに切り抜け、かつ背景が透明になるので、そちらの方が良い。</p>
+
+<hr>
+
+<p>こういう図形による切り抜きは、切り抜きたい形のSVGをまず作り、それからアイコンフォントを作って、SVGのフィルターでマスクみたいな感じで安定になるのかなとちょっと思った。遠回りに感じるけど、実現の可能性は一番高そう。</p>

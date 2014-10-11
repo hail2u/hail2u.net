@@ -1,0 +1,36 @@
+CSSの非同期読み込み
+
+<p><a href="/blog/webdesign/async-print-css.html">印刷向けCSS</a>だけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。</p>
+
+<pre><code class="language-javascript">var csses = [
+  { href: &#39;/styles/print.min.css&#39;, media: &#39;print&#39;; },
+  { href: &#39;/fonts/megrim.css&#39;; },
+  { href: &#39;/fonts/source-code-pro.css&#39; },
+  { href: &#39;/fonts/source-sans-pro.css&#39; }
+];
+var links = document.createDocumentFragment();
+csses.forEach(function (css) {
+  var link = document.createElement(&#39;link&#39;);
+  link.rel = &#39;stylesheet&#39;;
+  link.href = css.href;
+
+  if (css.media) {
+    link.media = css.media;
+  }
+
+  links.appendChild(link);
+});
+document.head.appendChild(links);
+</code></pre>
+
+<p>オプションで<code>media</code>属性を指定できるようにして、印刷向けとウェブフォントのCSSを混ぜられるようにした。一応<code>DocumentFragment</code>を使ったけど、<code>body</code>要素以下にねじ込むわけじゃないのであんまり意味はなさそう。むしろ遅くなるかも。</p>
+
+<hr>
+
+<p>CSSに直接<code>@font-face</code>定義を書くと扱いが難しかったり、イニシャル・ペイントまでが遅れたりもする。後者はData URIでフォント・ファイルを埋め込んだりしてなければ気にするほどではないと思ってるけど、メンテナンス性も含めて色々問題は考えられる。</p>
+
+<p>かといって<code>head</code>要素で<code>link</code>要素を書いて読み込もうとすると、貴重なHTTPリクエスト枠を消費してしまう。このウェブサイトのようにウェブフォントが必要不可欠な要素ではない場合は、非同期で読み込むのは悪くない妥協だと思う。</p>
+
+<p>他に例えばグローバル・フッターにソーシャル・アイコンを並べ、それをアイコン・フォントで表示してる場合なんかも非同期で良いと思う。いきなりグローバル・フッターから読み始める人もいないと思うので、多少遅れて表示されても問題ないはず。クリティカルなんとか的なアレ。CSSならJavaScriptと違って非同期にしてもCPUを専有したりもしないので、スクロールがカクつくとかもない。</p>
+
+<p>やり過ぎるとわけがわからなくなる危険性が高いので、見える部分だけを優先ではなく、<em>遅れても大丈夫そうな部分を後回しにする</em>ような感じで分けてくと良さそうかなと考えてる。</p>

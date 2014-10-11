@@ -1,0 +1,27 @@
+Gruntのグロブとfilterプロパティ
+
+<p><a href="http://gruntjs.com/configuring-tasks#globbing-patterns">Gruntのグロブ</a>では普通のグロブと同じように特にファイルとディレクトリの区別はされない。Gruntプラグイン側でパスの存在チェックまではしてくれるの多いけど、間違えてディレクトリ投げると大体はエラーを吐いて止まる。のでファイルを投げるものなら<code>filter</code>プロパティも使ってファイルであることを保証してやった方が良い。</p>
+
+<p>例えば<a href="https://npmjs.org/package/grunt-contrib-sass">grunt-contrib-sass</a>のタスク設定なら以下のようにしておく。</p>
+
+<pre><code class="language-javascript">sass: {
+  options: {
+    precision: &quot;3&quot;,
+    style: &quot;compressed&quot;,
+    unixNewlines: true
+  },
+  main: {
+    expand: true,
+    src: [&#39;styles/*.scss&#39;, &#39;!styles/_*.scss&#39;],
+    filter: &#39;isFile&#39;,
+    ext: &#39;.min.css&#39;
+  }
+}</code></pre>
+
+<p>こうしておくと<code>styles/foo.scss/</code>とかいうファイルっぽいディレクトリがフィルターされる。そのためそういうディレクトリがある<a href="https://github.com/hail2u/hail2u.net-styles/tree/v6.39.1">腐った構成</a>でもSassをコンパイルするタスクが止まらないし、0バイトの変なファイルが出力されることもなくなる。</p>
+
+<p><code>filter</code>オプションには<code>isFile</code>のような<a href="http://nodejs.org/docs/latest/api/fs.html#fs_class_fs_stats"><code>fs.Stats</code></a>に生えてる真偽値を返すメソッド名以外に、<code>src</code>のパスを受け取って真偽値を返す関数を自前で書くことも出来るのでかなり複雑なことも出来る……けど、グロブを工夫するのが先。</p>
+
+<hr>
+
+<p>ディレクトリを受け取ってゴニョゴニョするタスクはほとんどないと思うので、常に<code>filter: &#39;isFile&#39;</code>を指定しておくくらいの気構えで良さそう。</p>

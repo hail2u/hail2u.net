@@ -1,0 +1,52 @@
+CSSでフォント・ファミリーのショートカットを作る
+
+<p>最近のブラウザーでは<code>local()</code>を使ってフォント・ファミリーのショートカット(的なもの)を作ることができる。CSS Fontsモジュール仕様の<a href="http://www.w3.org/TR/css3-fonts/#src-desc"><code>src</code>プロパティーの項</a>にも思いっきり書いてあるんだけど、今まではそんなに必要なかったのであまり使われていない。5ウェイト展開なヒラギノ角ゴのiOS 7へのバンドルと、3ウェイト展開の游ファミリのWindowsへのバンドルにより必要性が少し増えた気がする。</p>
+
+<p>特に游(ゴシック|明朝)はWindows 8.1とOS X 10.9でファミリ名が違う上、少し古いFirefoxでのアレとか、OS Xには細字がないとかもあるので、色々考慮すると<code>font-family</code>プロパティーではややこしいフォント指定を行う必要が出てくる。そうやって出来た長いリストの<code>font-family</code>は読みづらく、デバッグのしづらさにつながる。<code>local()</code>を使ってフォント名を作り直してやることにより、多少は読みやすくデバッグできるCSSが書けると思う。</p>
+
+<p>今後使うこともあるであろう、<code>body</code>要素でヒラギノ角ゴか游ゴシック、<code>h1</code>要素でヒラギノ角ゴか游ゴシックの細字を使うケースを例にしてみる。まずは普通に書く。</p>
+
+<h2>font-familyプロパティーによるスタック</h2>
+
+<pre><code class="language-css">body {
+  font-family: "Hiragino Kaku Gothic ProN", "游ゴシック", "Yu Gothic", sans-serif;
+}
+
+h1 {
+  font-family: ".HiraKakuInterface-W2", "游ゴシック Light", "Yu Gothic Light", sans-serif;
+  font-weight: 300;
+}</code></pre>
+
+<p>使いたいフォントをそれぞれのルールセットで直接指定するだけの普通の書き方。だが、フォント・ファイルそのものやブラウザーの実装がしっかりしていたら本来は必要のないはずの冗長なファミリー指定で、あんまり美しくないCSSだと思う。</p>
+
+<h2>@font-face定義によるファミリーの作成</h2>
+
+<pre><code class="language-css">@charset "UTF-8";
+
+@font-face {
+  font-family: "MySansSerif";
+  src: local(".HiraKakuInterface-W2"), local("游ゴシック Light"), local("Yu Gothic Light");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MySansSerif";
+  src: local("Hiragino Kaku Gothic ProN"), local("游ゴシック"), local("Yu Gothic");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: "MySansSerif", sans-serif;
+}
+
+h1 {
+  font-weight: 300;
+}</code></pre>
+
+<p><code>@font-face</code>定義でMySansSerifというフォント・ファミリーを新しく作るとすると以上のようになる。<code>local()</code>で使いたいフォントを並べて(スタックはしないので順不同)指定しておくと、<code>body</code>要素のみでファミリー指定するだけで良くなる、というわけ。<code>h1</code>要素ではウェイトの指定のみになりすっきり。<code>@font-face</code>定義は別に管理すれば良いので、<code>body</code>や<code>h1</code>要素のルールセットの読みやすさは格段に上がる。Sassユーザーならパーシャルにして使い回しすることもでき、生産性を上げるのに助けになるはず。</p>
+
+<hr>
+
+<p>読みやすいかどうかが<code>@font-face</code>定義の文法をきちんと知っているかどうかに依存するので、一般的に読みやすいかというと……。今のところは「ただダラダラと並べるだけでなく、こういう書き方も出来ますよ」程度に覚えておくくらいで良さそう。</p>

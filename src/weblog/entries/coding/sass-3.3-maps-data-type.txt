@@ -1,0 +1,73 @@
+Sass 3.3の新しいデータ型: マップ
+
+<p><a href="http://sassconf.com/">SassConf</a>に合わせたのか、<a href="http://sass-lang.com/">Sass</a>の3.3 RC.1が出た。これで3.3での追加機能も固まったようなので、<a href="https://github.com/nex3/sass/blob/05c6872a834bbf1ea92e8e7d7da05ee4222d24bd/doc-src/SASS_CHANGELOG.md">CHANGELOG</a>をちゃんと読んだところ、1ヶ月ほど前に取り込まれていた新しいデータ型であるマップについてもちゃんと入っていた。マップは、いわゆるハッシュとか連想配列とかいう名前で呼ばれるもの。</p>
+
+<p>マップの書き方はリストとほとんど同じで、リストの各要素にコロン(<code>:</code>)区切りでキーと値をワンセットで書く、というようなもの。例として、プロ野球セ・リーグの各チーム色を背景色にしたクラスを吐くもの作ってみる。</p>
+
+<pre><code class="language-scss">$team-colors: (
+  giants:   #f90,
+  tigers:   #fc0,
+  carp:     #f00,
+  dragons:  #009,
+  baystars: #269,
+  swallows: #03c
+);
+
+@each $team, $color in $team-colors {
+  .#{$team} {
+    background-color: $color;
+  }
+}</code></pre>
+
+<p>リストと違って、括弧は省略できないし、区切りもカンマに限られる。最後の要素の後ろのカンマは特別に許可されているので書いても大丈夫だけど、CSSの<code>linear-gradient()</code>関数とかとの整合性のために書かないようにした方が良さそう。値には何でも書け、データ型も問わないので、マップにマップ、マップにリストをそれぞれネストすることも可能。</p>
+
+<p>コンパイルすると、以下のようなCSSになる。</p>
+
+<pre><code class="language-css">.giants {
+  background-color: #ff9900; }
+
+.tigers {
+  background-color: #ffcc00; }
+
+.carp {
+  background-color: red; }
+
+.dragons {
+  background-color: #000099; }
+
+.baystars {
+  background-color: #226699; }
+
+.swallows {
+  background-color: #0033cc; }</code></pre>
+
+<p><code>@each</code>で使う場合は変数に代入して使え、直感的に操作できる。スッキリとキレイに書けるようだ。マップをなめるようなケースでない場合は、<code>map-get($map, $key)</code>で拾う。例として、ブレークポイントをマップで定義し、それを利用してMedia Queriesを吐くものを作ってみる。</p>
+
+<pre><code class="language-scss">$breakpoints: (
+  small:  24em,
+  medium: 42em,
+  large:  66em,
+  huge:   96em
+);
+
+@media (min-width: map-get($breakpoints, medium)) {
+  main {
+    max-width: 51em;
+  }
+}</code></pre>
+
+<p>クエリーでも普通に使える。フラットなマップならこれくらいで済むけど、ネストしたマップだと<code>map-get()</code>の中で<code>map-get()</code>する必要があり、あんまりキレイに書けなさそう。コードに<code>))))</code>とか出てきたら殴られる。</p>
+
+<p>コンパイルすると、以下のようなCSSが出来上がる。</p>
+
+<pre><code class="language-css">@media screen and (min-width: 42em) {
+  main {
+    max-width: 51em; } }</code></pre>
+
+<p><code>map-get()</code>長いし、パッと見で他の関数と区別つかない。この例のように普通の変数(<code>$breakpont-small</code>のような変数)として書けるものの代わりにマップ使うとかは、使い方の方向性としては悪くないけど、まだやめておいた方が良い気がする。キレイに書ける<code>@each</code>で使うものと制限したりする必要があるかも。</p>
+
+<hr>
+
+<p>マップはすごく便利だし、皆一度ならず「連想配列っぽい何かがあれば……」などと考えたことがあると思うので、待望と言って良い。が、CSSに似た構文で、まったくCSSと関係のないものがコードに出てくるので、マップの存在を知ったばかりの人は混乱しそう。</p>
+
+<p>Sass 3.3の開発中からCSSと似て非なるややこしい立ち位置と記述の機能が増えてきた。多くは便利に使えるんだけど、<em>CSSの感覚で読める</em>というSassのSCSS構文の良さが失われやすい。主に読み込み専用で使うライブラリ的なパーシャルで使う機能と、ほぼCSSとして読まれ編集されるSCSSファイルで使う機能とを、意識して分けた方が良さそう。ロジックを書くための制御構文や、このマップなどはライブラリ的なパーシャル向けかなと思う。</p>

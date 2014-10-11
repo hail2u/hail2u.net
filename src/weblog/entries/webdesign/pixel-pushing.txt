@@ -1,0 +1,87 @@
+ボタンの押し込みをCSSで表現する
+
+<figure><img src="/images/blog/pixel-pushing.png" alt="ボタンの文字列を1pxだけ下に動かして押しこみを表現する"></figure>
+
+<p>時代は<code>:active</code>！タッチ・デバイスに<code>:hover</code>などない！みたいになりつつあるような気がしないでもないので、ボタンの押し込みの表現を色々考えている。とは言ってもタッチ・デバイスでは<code>:active</code>擬似クラスもいまいちアレなのでまだあんまり意味なかったりするけど。三周回ってデフォルト使えみたいな感じになっている節もある。ですよねー。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/376.html">Pixel Pushing</a></p>
+
+<h2><code>padding</code></h2>
+
+<p>一番のメジャーで安定のクオリティー。</p>
+
+<pre><code class="language-css">.test {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.test:active {
+  padding-top: 11px;
+  padding-bottom: 9px;
+}
+</code></pre>
+
+<p>欠点は<code>px</code>単位で<code>padding</code>プロパティーを制御せざるを得ないのでスケーラブルにしづらくなること。</p>
+
+<h2><code>position</code></h2>
+
+<p>ボタンのテキストだけでなく全体を動かす場合は<code>position</code>で動かすと簡単。</p>
+
+<pre><code class="language-css">.test:active {
+  position: relative;
+  top: 1px;
+}
+</code></pre>
+
+<p>他のCSSプロパティーとまったく干渉しないのが素晴らしいが、そのままだとちょっと違和感があるのでデモの<code>position</code> #2の様に<code>box-shadow</code>プロパティーを使って立体感をフォローした方が良い。</p>
+
+<h2><code>line-height</code></h2>
+
+<p>ボタンの高さを指定する場合は<code>line-height</code>プロパティーでも可能。</p>
+
+<pre><code class="language-css">.test {
+  height: 2em;
+  line-height: 2;
+  overflow: hidden;
+}
+
+.test:active {
+  line-height: 2.05;
+}
+</code></pre>
+
+<p>ボタンのテキストの中央揃えに<code>height</code>と<code>line-height</code>プロパティーを使うことも多いので、意外に導入コストは低め。<code>padding</code>プロパティーに比べると多少はスケーラブルにしやすい(計算でなんとかなる)ところも良い。後続の要素の位置に影響を与えてしまうことがあるので、動作確認が面倒臭いのが難点。</p>
+
+<h2><code>text-shadow</code></h2>
+
+<p>最近考えだしたのが<code>color: transparent</code>と<code>text-shadow</code>プロパティーを組み合わせる方法。</p>
+
+<pre><code class="language-css">.test {
+  color: #999;
+}
+
+.test:active {
+  color: transparent;
+  text-shadow: 0 1px #999;
+}
+</code></pre>
+
+<p><code>box-shadow</code>プロパティーと違い、<code>text-shadow</code>プロパティーははみ出した部分のみではなく文字全体の影が完全に作られる。ので<code>color</code>プロパティーで<code>transparent</code>を指定してやると影が全部見えるようになるというわけ。プロパティーの性格上、ボタンにした要素のボックス・モデルにまったく影響を与えないというのが最大の利点。Firefox 10やChrome 17、Safari 5では問題なく動くが、Internet Explorer 9ではまだ<code>text-shadow</code>プロパティーに対応していないので動かず、Opera 11でもバグらしき挙動(後述)がありうまく動かない。</p>
+
+<hr>
+
+<p><code>text-shadow</code>プロパティーを使ったものを思いついた時に「これはいける！」とかちょっと思ったんだけど、<code>text-shadow</code>プロパティーに対応していないInternet Explorer 9はともかく、Opera 11でも<code>color: transparent</code>にすると<code>text-shadow</code>が消えるというバグらしき挙動があってうまくいかなかった……。</p>
+
+<p>というわけで今のところは、スケーラブルでなくて良いのなら<code>padding</code>プロパティーでやるのが良く、スケーラブルにしたい場合は<code>box-shadow</code>プロパティーの力を借りつつ<code>position</code>プロパティーでボタン全体を動かすのが良いというのが僕の結論になった。<code>text-shadow</code>プロパティーを使う方法は気に入ったんだけどなぁ……。</p>
+
+<h2>追記</h2>
+
+<p><a href="http://b.hatena.ne.jp/kits/20120222#bookmark-81837785">デモでボタンをクリックするとページの先頭に戻るのは良くない</a>のは確かにそうなんだけど、<code>button</code>要素で使われるネイティブUIの挙動の癖を統一するのは難しい(というか知らない)。<code>appearance</code>プロパティーがInternet Explorer 9やOpera 11でサポートされればもうちょっとなんとかなるようになるかもしれないけど、今はまだかなーと思っていて、<code>button</code>要素と特に<code>:active</code>擬似クラスの組み合わせはあまり使いたくない。</p>
+
+<p>というだけではなんなので、<a href="/pub/test/378.html"><code>button</code>要素を使ったデモ</a>も作っておいた。</p>
+
+<p>あと記事の<code>padding</code>プロパティーのコードが間違っていたのも<a href="https://twitter.com/GeckoTang">@GeckoTang</a>に<a href="https://twitter.com/GeckoTang/status/171848822870388736">教えてもらった</a>のでこっそり直してた。</p>
+
+<h2>追記 #2</h2>
+
+<p><a href="https://twitter.com/ofk">@ofk</a>に<a href="https://twitter.com/ofk/statuses/172235842155331584">セレクターも間違ってることを教えてもらった</a>のでそっちも直した。</p>

@@ -1,0 +1,39 @@
+::first-letterをぶら上げる
+
+<figure>
+  <img src="/images/blog/hanging-first-letter.png" alt="各段落の最初の位置文字をドロップキャップにしてアウトデントするというテキスト・レイアウト、たまに見る……よね？">
+</figure>
+
+<p>ぶら上げるってなんだ。段落の一文字目だけを左に飛び出して配置するというテキスト・レイアウトの話。<code>margin-left</code>プロパティーで負の値を使っても良いのだけど、文字によって要調整なので面倒くさい。<code>position: absolute</code>を使う場合は、親で<code>position: relative</code>が必須になるのでこれもちょっとアレ。他にもいくつかあったと思うけど、<code>float</code>と<code>margin-right: 100%</code>を組み合わせて行うのが一番位置合わせが簡単になる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/424.html">Hanging <code>:first-letter</code></a></p>
+
+<p>英文ではメジャーなドロップキャップをアウトデントするもの。たまに見る気がするけど気のせいな気もする程度のタイポグラフィー知識……。</p>
+
+<pre><code class="language-css">.test::first-letter {
+  margin-right: 100%;
+  margin-bottom: -999em;
+  float: right;
+  line-height: 1;
+}
+</code></pre>
+
+<p><code>float: right</code>と<code>margin-right: 100%</code>を使ってまず飛び出させる。ここで<code>float: left</code>だと<code>margin-left</code>プロパティーで負の値を使うのと同じく要調整になるので意味ない。このままでは一文字分上にずれるので<code>margin-bottom</code>プロパティーで一文字分……と思いきやIE9(多分それ以前も)でバグ(後述)があるので大雑把に<code>-999em</code>を指定して戻して揃える(一定以上は下に落ちないのでちゃんと揃う)だけ。親の<code>line-height</code>プロパティーの値を引きずらないように<code>line-height: 1</code>にするのは忘れないようにする。このままだと味も素っ気もないので、フォントを変えて大きくしたり<code>padding-right</code>プロパティーで本文との間を調節したりするとデモのような形になる。<code>text-align: right</code>も入れておいた方が良いかも。</p>
+
+<p>日本語の文章でドロップキャップは使わないことがほとんどなのでこのまま使うことはあまりないけど、擬似要素をぶら上げる時とかにも応用できてたまに使ってる。とにかく<code>float: right</code>と<code>margin-right: 100%</code> (またはその逆)の組み合わせがレイアウトに使えるという話なので、頭の隅にいれておくと結構な頻度で役に立つ。そして新しいイマドキなレイアウトを覚えず済ませることが多く……。</p>
+
+<hr>
+
+<p>IE9でのバグは<code>::first-letter</code>での<code>em</code>単位が親のフォントサイズを基準に計算されるというバグ。結構前からあるような気がする。</p>
+
+<pre><code class="language-css">p {
+  font-size: 20px;
+}
+
+p::first-letter {
+  margin-right: 1em;
+  font-size: 100px;
+}
+</code></pre>
+
+<p>そのためこう書くと<code>margin-right</code>が<code>20px</code>になってしまう。覚えていてもほとんど役に立たない割に忘れてると痛い目にあう知識。</p>

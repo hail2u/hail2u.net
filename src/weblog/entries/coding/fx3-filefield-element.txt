@@ -1,0 +1,51 @@
+Firefox 3のfilefield要素
+
+<p><a href="http://mozilla.jp/firefox/">Firefox 3</a>のオプション設定ダイアログやダウンロード・ダイアログなどに存在する<code>filefield</code>要素。<code>nsIFilePicker</code>などと組み合わせてファイルやフォルダを指定するために使うもののようだけど、<a href="https://developer.mozilla.org/">MDC</a>に書いてないので使い方が全然わからなかった。けどソースをgrepして探して読んでみたら、ファイルやフォルダの指定に特化したものだったのでそんなに難しくなかった。ということで使い方のメモ。</p>
+
+<p>よくある使い方であろうダイアログでアプリケーションを指定するようなケースでは、</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://global/skin/&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://mozapps/content/preferences/preferences.css&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://browser/skin/preferences/preferences.css&quot;?&gt;
+&lt;dialog id=&quot;filefield-test&quot;
+  title=&quot;filefield Test&quot;
+  buttons=&quot;accept, cancel&quot;
+  xmlns=&quot;http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul&quot;&gt;
+  &lt;script&gt;
+  &lt;![CDATA[
+    function browseApp () {
+      var nsIFilePicker = Components.interfaces.nsIFilePicker;
+      var filePicker = Components.classes[&quot;@mozilla.org/filepicker;1&quot;].createInstance(nsIFilePicker);
+      filePicker.init(window, &quot;Select a Application&quot;, nsIFilePicker.modeOpen);
+      filePicker.appendFilters(nsIFilePicker.filterApps);
+
+      if (filePicker.show() === nsIFilePicker.returnOK) {
+        document.getElementById(&quot;app-path&quot;).file = filePicker.file;
+      }
+    }
+  ]]&gt;
+  &lt;/script&gt;
+  &lt;vbox&gt;
+    &lt;hbox&gt;
+      &lt;label control=&quot;app-path&quot; value=&quot;Application:&quot;/&gt;
+      &lt;filefield id=&quot;app-path&quot; flex=&quot;1&quot;/&gt;
+      &lt;button label=&quot;Browse...&quot; oncommand=&quot;browseApp();&quot;/&gt;
+    &lt;/hbox&gt;
+  &lt;/vbox&gt;
+&lt;/dialog&gt;
+</code></pre>
+
+<p>こんな感じで、このダイアログを開くと、</p>
+
+<figure><img src="/images/blog/filefield-test-preview1.png" alt="filefield要素の実験ダイアログ"></figure>
+
+<p>というように、<code>filefield</code>要素は編集不可で表示される。</p>
+
+<p><code>filefield</code>要素固有のプロパティは<code>file</code>のみ。<code>file</code>プロパティには<code>nsIFile</code>オブジェクトを丸々渡すだけでOK。試しにFirefoxを選択すると、</p>
+
+<figure><img src="/images/blog/filefield-test-preview2.png" alt="filefield要素の実験ダイアログでFirefoxを選択"></figure>
+
+<p>上記画像のようにアイコンとラベルが自動的にセットされる。アイコンはmoz-icon:スキームで表示されるアイコン。ラベルはバージョン情報のあるファイルの場合(多くの実行ファイルやDLLなど)はその説明が、バージョン情報が見つからなかった場合はフルパスが表示されるようになっている(See Also: <a href="http://mxr.mozilla.org/mozilla/source/toolkit/mozapps/preferences/preferences.xml#43">_getDisplayNameForFile</a>)。</p>
+
+<p>積極的に使いたい、使って欲しい気がする。ファイルの参照ボタン付き(<code>&lt;input type=&quot;file&quot;/&gt;</code>的な)とかだともっと使いやすい気がする。</p>

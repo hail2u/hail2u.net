@@ -1,0 +1,51 @@
+CSSグラデーションで三角を作ってアニメーションさせる
+
+<p>擬似要素と<code>border</code>プロパティーを組み合わせてCSSで三角形を作る方法はかなり市民権を得ているように思う。ちょくちょく見かけるようになった。しかしこのテクニックには欠点がいくつかある。例えば<code>box-shadow</code>がうまくつかないこととか。それ以外にもWebKitでCSS Transitionによるアニメーションが起こらないという欠点もある。それを回避するために三角を作る新たな方法を発明したという話。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/348.html">なんかしゅるしゅる動く奴</a></p>
+
+<p>よくある感じでメニューを例に作った。左端に三角で背景を切り取る形にして、<code>:hover</code>でしゅるしゅるっと上に三角を動かすようなアニメーションをさせる。まずは三角の作り方から。</p>
+
+<p>枠線は使えない。<code>transform()</code>なども考慮したが擬似要素を使わないとなるとマークアップ依存になりそうなので諦めた。ということで最終兵器とも言えるCSSグラデーションでドット打ち的なことを行うテクニックを利用した。</p>
+
+<p>縦方向にアニメーションさせたいので、うまいこと縦に繰り返しになるように三角を作ろうと頑張って考えると、以下のようなコードになる。</p>
+
+<pre><code class="language-css">.test a {
+  background-image:
+    ...
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  3px, white  3px, white 29px, rgb(221, 50, 47) 29px, rgb(221, 50, 47) 32px),
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  4px, white  4px, white 28px, rgb(221, 50, 47) 28px, rgb(221, 50, 47) 32px),
+    linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  6px, white  6px, white 26px, rgb(221, 50, 47) 26px, rgb(221, 50, 47) 32px),
+    ...
+  ;
+  background-position:
+    ...
+     3px 0,
+     4px 0,
+     5px 0,
+    ...
+  ;
+  background-repeat: repeat-y;
+  background-size: 1px 32px;
+}
+</code></pre>
+
+<p>それぞれのCSSグラデーションは<em>背景色で塗り白に戻しもう一度背景色で塗る</em>というもの。その白い部分を徐々に少なくしていくようにたくさん作り、それを<code>bakcground-position</code>プロパティーで<code>1px</code>ずつずらして並べていく。すると徐々に白い部分が先細りになるわけなので三角形になる。大切なのは<code>background-position</code>と<code>background-size</code>プロパティーで、この2つのプロパティーでそれぞれのグラデーションが重ならないようにしながら縦方向は繰り返しになるように調節する。デモのケースでは16のCSSグラデーションで三角を完成させた。三角の向きを逆にする場合はグラデーションの並びをひっくり返せば良い。向きを90度変更したい場合はグラデーションのキーワードを<code>left</code>から<code>top</code>に変更するだけ(多分)。</p>
+
+<p>アニメーションは背景を動かすことになるので、<code>background-position</code>プロパティーをいじる。あとは<code>transition-duration</code>プロパティーで等でアニメーションを調節するだけ。</p>
+
+<pre><code class="language-css">.test a:hover {
+  background-position:
+    ...
+     3px -320px,
+     4px -320px,
+     5px -320px,
+    ...
+  ;
+  transition-duration: 1s;
+}
+</code></pre>
+
+<p>これでデモのようなしゅるしゅる動く奴が完成。</p>
+
+<p>汎用性は微妙。<code>box-shadow</code>が効かないのも同じだし、アンチエイリアスもかからないのでデモのようなシャッキリしたものにしか使えない。ただCSSグラデーションとアニメーションの組み合わせはそこそこ面白いと思う。何かにシャッターの様に重ねておいて、オンマウスで上下左右に開くみたいなのも多分出来る。クリックできないじゃん……と思ったそこのあなた、<code>pointer-events</code>プロパティーをご用意させていただいております。</p>

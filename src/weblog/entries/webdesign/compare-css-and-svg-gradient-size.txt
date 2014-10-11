@@ -1,0 +1,43 @@
+CSSグラデーションとSVGグラデーションのサイズの比較
+
+<p>単純なものならあまり変わらないような気がしたので実際に比較してみます。</p>
+
+<p>比較するグラデーションはCSSグラデーションで書くと</p>
+
+<pre><code class="language-css">linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%)
+</code></pre>
+
+<p>という縦方向に半透明の赤から半透明の青に変化するものです。</p>
+
+<p>CSSグラデーションでは、各ベンダー拡張プリフィックスを並べることになります。</p>
+
+<pre><code class="language-css">background-image: -moz-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -webkit-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -o-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -ms-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+</code></pre>
+
+<p>改行を含めて<em>475</em>バイトになりました。</p>
+
+<p>対してSVGグラデーションでは、以下のようになり、これを更にBase64変換してをData URIスキーム化することになります。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" version="1.0"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient x1="0" y1="0" x2="0" y2="100%" id="gradient"&gt;
+      &lt;stop offset="0%" style="stop-color: rgb(255, 0, 0); stop-opacity: 0.5;"/&gt;
+      &lt;stop offset="100%" style="stop-color: rgb(0, 0, 255); stop-opacity: 0.5;"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect x="0" y="0" fill="url(#gradient)" width="100%" height="100%"/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>これから改行や省略できる空白・文字等を削除して、Data URIスキーム化してCSSにすると以下のようになります。</p>
+
+<pre>data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjAiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxMDAlIiBpZD0iZ3JhZGllbnQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjogcmdiKDI1NSwgMCwgMCk7IHN0b3Atb3BhY2l0eTogMC41OyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMCwgMjU1KTsgc3RvcC1vcGFjaXR5OiAwLjU7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSIwIiB5PSIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPgo8L3N2Zz4K</pre>
+
+<p>最後の改行を含めると<em>595</em>バイトで、CSSグラデーションとの差は100バイト強に収まっています。元のSVGからXML宣言を削除したり、<code>id</code>を短くしたりとかすれば更に小さくすることもできるはずです。</p>
+
+<p>複雑なグラデーションになるとこのような微差に収まることはまず無くなると思いますが、今のところはこういった単純なグラデーションを使うことが多いので、SVGグラデーションでもサイズ的なデメリットは殆ど無いと言っても良さそうです。</p>

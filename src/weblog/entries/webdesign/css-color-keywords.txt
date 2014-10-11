@@ -1,0 +1,34 @@
+CSS Color Keywords
+
+<figure><img src="/images/blog/css-color-keywords.png" alt="暗い煤けた緑もDarkOliveGreenで一発！"></figure>
+
+<p>CSSでは色の値として<code>#RRGGBB</code>や<code>rgb(r, g, b)</code>等の他に<a href="http://www.w3.org/TR/CSS21/syndata.html#color-units">キーワード</a>でも指定できる。CSS3では大幅に<a href="http://www.w3.org/TR/css3-color/#svg-color">拡充され</a>、140種類のキーワードのサポートが明記された。今まであまり使ったことがなかった上に、英語力の欠如から<code>DarkOrange</code>や<code>Lavender</code>とかならまだしも<code>BlanchedAlmond</code>とか言われてもどんな色か想像すらできないので、一覧してクリックで背景色としてプレビューできる簡単なツール、<a href="http://hail2u.github.io/css-color-keywords.html">CSS Color Keywords</a>を作った。<code>DarkOliveGreen</code>とかRGBで考えるとなかなか大変だけどキーワードなら簡単！</p>
+
+<p>ページを開くと色のキーワードを背景色としたブロックが並ぶ。最初の<code>body</code>の背景色はランダムに決定されるが、その後はそれぞれの色のブロックをクリックするとその色が背景色になり、プレビュー出来る。</p>
+
+<p>見出しや色のキーワードのフォントは<a href="http://www.google.com/webfonts/family?family=Yanone+Kaffeesatz">Yanone Kaffeesatz</a>。日本語のサイトだとちょっと使いにくいフォントだけど、こういうページでは結構綺麗に見える気がする。</p>
+
+<h2>色の明るさを調べる</h2>
+
+<p>色の明るさの調査には<a href="http://www.w3.org/TR/AERT">Techniques For Accessibility Evaluation And Repair Tools</a>に掲載されている<a href="http://www.w3.org/TR/AERT#color-contrast">アルゴリズム</a>をいつも使っている。0-255で明るさが返ってくるので、127.5を境界にして明るい色と暗い色に分けた。それに応じてブロックの影や枠線、文字色などを調節している。</p>
+
+<pre><code class="language-js">function calculateBrightness (color) {
+  var c = [];
+
+  if (color.match(/^#/)) {
+    c = color.match(/#(.{2})(.{2})(.{2})/);
+    color = &quot;rgb(&quot; + parseInt(c[1], 16) + &quot;, &quot; + parseInt(c[2], 16) + &quot;, &quot; + parseInt(c[3], 16) + &quot;)&quot;;
+  }
+
+  c = color.match(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/);
+  var b = ((c[1] * 299) + (c[2] * 587) + (c[3] * 114)) / 1000;
+
+  return b;
+}
+</code></pre>
+
+<p>Operaが<code>#RRGGBB</code>で計算済みスタイルの色を返すようなので、アドホックにその対策だけちょっとした。</p>
+
+<hr>
+
+<p>色の並び順をランダムにした方が面白いかもしれない。もうちょっといじってみよう。</p>

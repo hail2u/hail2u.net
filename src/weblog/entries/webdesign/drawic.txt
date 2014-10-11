@@ -1,0 +1,54 @@
+Drawic
+
+<figure>
+  <a href="http://hail2u.github.io/drawic/"><img src="/images/blog/drawic.png" alt="なめらかに拡大・縮小できるOctocatアイコン"></a>
+</figure>
+
+<p>フッターのアイコンをSVGにした。<a href="https://github.com/hail2u/drawic">GitHubにリポジトリ</a>も作っておいた。ぴくせる・ぱーふぇくとってなんでしたっけ……。</p>
+
+<p class="seealso">Preview: <a href="http://hail2u.github.io/drawic/">Drawic</a></p>
+
+<p>暗い背景向けの白いアイコンのみだけど、まぁそこは普通のSVGなのでエディターで開いて<code>fill</code>プロパティーの値を変えれば好きな色に変更できる。二種類ある矢印系には全方位を用意しなかったけど、<code>transform</code>属性で<code>rotate()</code>関数を利用して方向を調節できるのでそれで(若干中心をずらしてあるので<code>translate()</code>も併用した方が良い)。</p>
+
+<h2><code>shape-rendering: crispEdges</code></h2>
+
+<figure>
+  <figcaption>with crispEdges (Left) vs. w/o crispEdges (Right)</figcaption>
+  <img src="/images/blog/shape-rendering-crispedges.png" alt="crispEdgesを指定したものと指定していないものの比較"></a>
+</figure>
+
+<p>Deliciousのアイコンは<code>rect</code>要素を組み合わせたものなので、そのままでは拡大・縮小すると端がぼやけることがある。そういう時はみんなが独自実装したCSSの<a href="https://developer.mozilla.org/en/CSS/image-rendering/"><code>image-rendering</code>プロパティー</a>ですよねーとか思ったら全く意味がなかったので、SVG側の<code>shape-rendering</code>プロパティーで<code>crispEdges</code>を指定してシャープになるようにした。</p>
+
+<pre><code class="language-xml">&lt;defs&gt;
+  &lt;style&gt;&lt;![CDATA[
+    rect {
+      shape-rendering: crispEdges;
+    }
+  ]]&gt;&lt;/style&gt;
+&lt;/defs&gt;
+</code></pre>
+
+<p><code>rect</code>要素の他に<code>line</code>要素にも使うと良いが、<code>path</code>や<code>circle</code>要素には使ってはいけない。でもこれ完全なピクセル等倍になるかどうかは実装依存で、例えばChrome 20なんかではシャープにはなるけど数pxずれたりする。一長一短なのでぼやけるのを受け入れて指定しないというのもアリだと思う。</p>
+
+<h2>ライセンス</h2>
+
+<p>ライセンスを決めてからエントリーにしようかと思ったけどまだ決めていない。パブリック・ドメインに捨てることはできなそうなので、面倒くさい。仮に<a href="http://creativecommons.org/">Creative Commons</a>にするとして、SVGの<code>metadata</code>要素でそのライセンスを埋め込むとしたら以下のような形になりそう。</p>
+
+<pre><code class="language-xml">&lt;metadata&gt;
+  &lt;rdf:RDF
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt;
+    &lt;cc:Work rdf:about=""&gt;
+      &lt;cc:license rdf:resource="http://creativecommons.org/licenses/by-nc/3.0/"/&gt;
+      &lt;cc:attributionName&gt;Kyo Nagashima&lt;/cc:attributionName&gt;
+      &lt;cc:attributionURL rdf:resource="http://hail2u.net/"/&gt;
+    &lt;/cc:Work&gt;
+  &lt;/rdf:RDF&gt;
+&lt;/metadata&gt;
+</code></pre>
+
+<p><a href="http://inkscape.org/">Inkscape</a>でCCライセンス埋め込むと長いのでコンパクトになるように頑張って考えて書いた。Data URI化することも考えて、少しでもサイズを減らせるように。間違ってそう！</p>
+
+<hr>
+
+<p>なんで今さらSVGなの？アイコン・フォントじゃないの？みたいな話を明日書く。書かない。</p>

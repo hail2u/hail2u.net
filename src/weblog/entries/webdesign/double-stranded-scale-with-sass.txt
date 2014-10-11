@@ -1,0 +1,62 @@
+Sassで2つの基準を元にした文字サイズのスケールを作る
+
+<p>本文とメインとなる見出しの文字サイズを決めて、その両者に黄金比を適用して他の見出しやボタンのラベル、少し小さくしたい部分(フッターとか)、アイコンの幅などの文字サイズを決定するというメモ。要改善。</p>
+
+<pre><code class="language-scss">// Ratio
+$golden-ratio: 1.61803;
+
+// Function: pow()
+@function pow($base, $exponent) {
+  $raised: 1;
+
+  @for $i from 1 through $exponent {
+    $raised: $raised * $base;
+  }
+
+  @return $raised;
+}
+
+// Standard Text Size
+$body-size:    16px;
+$heading-size: 30px;
+
+// Text Size Ratio
+$body-text-ratio:    ($body-size / 16px);
+$heading-size-ratio: ($heading-size / 16px);
+
+// Heading Ratio
+$h1-ratio: ($body-text-ratio * pow($golden-ratio, 2));
+$h2-ratio: $heading-text-ratio;
+$h3-ratio: ($body-text-ratio * $golden-ratio);
+$h4-ratio: ($heading-text-ratio / $golden-ratio);
+$h5-ratio: $body-text-ratio;
+$h6-ratio: ($heading-text-ratio / pow($golden-ratio, 2));
+</code></pre>
+
+<p>設定すべき定義は<code>$body-text-size</code>と<code>$heading-text-size</code>で、それ以外は計算で行う。この設定例では<code>42px</code>・<code>30px</code>・<code>26px</code>・<code>19px</code>・<code>16px</code>・<code>11px</code>とスケールしていく。後に直接利用することになる変数が<code>$h4-ratio</code>などと古い世代に引きずられた名称になってて嫌な感じなので、スケールダウン・スケールアップする関数とかを作った方がキレイかもしれない。これら変数は単位なしなので、<code>1em</code>などを掛けるその単位に変換できる。</p>
+
+<pre><code class="language-scss">body {
+  font-size: percentage($body-text-ratio);
+}
+
+.logo {
+  font-size: percentage($h1-ratio);
+}
+
+article h1 {
+  font-size: percentage($heading-size-ratio);
+}
+
+footer {
+  font-size: percentage($h6-ratio);
+}
+
+.icon {
+  width:  ($h4-ratio * 1em);
+  height: ($h4-ratio * 1em);
+}
+</code></pre>
+
+<p>実際の利用では<code>font-size</code>で使う場合は<code>percentage()</code>を通すのが良い。それ以外のプロパティーでは<code>1em</code>を掛けるなりする。カラム定義までこのスケールで決定するのは可能だしさほど難しくも面倒でもないけど、コンテンツを型にはめていくような結果になりがちなのであんまり良くないような気もする。</p>
+
+<p>重要なのは本文のサイズとメインの見出しを基準にすることで、うまくスケーリングするように2つ基準を決定することではない。</p>

@@ -1,0 +1,27 @@
+あるflavourだけ$num_entriesの数を変える
+<p><a href="http://tadahilo.hp.infoseek.co.jp/cgi-bin/blosxom.cgi" title="Tadahilo's Diary">Tadahilo's Diary</a>の<a href="http://tadahilo.hp.infoseek.co.jp/cgi-bin/blosxom.cgi/Blosxom/entry_list.html" title="Tadahilo's Diary">index</a>というエントリより。</p>
+<blockquote cite="http://tadahilo.hp.infoseek.co.jp/cgi-bin/blosxom.cgi/Blosxom/entry_list.html">
+<p>あるflavourだけ$num_entriesの数を変えるか無視するようにできないかなぁ。</p>
+</blockquote>
+<p>これ、結構簡単です。うちのサイトの場合、通常は5件、RSSのflavourは10件にしてます。rssでしか利用する気ないので、rss10プラグインを直接拡張してるんですけど、単独でやるんならこんな感じでよろしいかと。</p>
+<pre><code class="language-perl">package override_num_entries;
+
+use strict;
+
+my %flavours = (
+  &#39;rss&#39; =&gt; &#39;10&#39;,
+  &#39;writeback&#39; =&gt; 10,
+);
+
+sub start {
+  foreach (keys %flavours) {
+    if ($_ eq $blosxom::flavour) {
+      $blosxom::num_entries = $flavours{$_};
+    }
+  }
+  return 1;
+}
+
+1;
+</code></pre>
+<p><code>%flavours</code>っつーハッシュでflavourと上書きする<code>$num_entries</code>の値を定義するだけ。</p>

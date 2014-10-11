@@ -1,0 +1,28 @@
+SCSSファイルでAutoComplPopを有効に
+
+<p>自動補完に頼らないように頑張る度に挫折して、<a href="http://www.vim.org/scripts/script.php?script_id=1879">AutoComplPop</a>に出戻っている(5回目)。AutoComplPopはデフォルトでSCSSには対応していないので、ここだけ頑張って補完を手動で起動してたけど、重い腰を上げて<code>g:acp_behavior</code>に追加した。これでまた自動補完に頼る日々が続く。</p>
+
+<pre><code class="language-vim">let g:acp_behaviorKeywordCommand = "\&lt;C-n&gt;"
+
+let g:acp_behavior = {
+  \   'scss': [
+  \     {
+  \       'command' : g:acp_behaviorKeywordCommand,
+  \       'meets'   : 'acp#meetsForKeyword',
+  \       'repeat'  : 0,
+  \     },
+  \     {
+  \       'command' : "\&lt;C-x&gt;\&lt;C-f&gt;",
+  \       'meets'   : 'acp#meetsForFile',
+  \       'repeat'  : 1,
+  \     },
+  \     {
+  \       'command' : "\&lt;C-x&gt;\&lt;C-o&gt;",
+  \       'meets'   : 'acp#meetsForCssOmni',
+  \       'repeat'  : 0,
+  \     },
+  \   ],
+  \ }
+</code></pre>
+
+<p><a href="http://lesscss.org/">LESS</a>や<a href="http://cho45.github.com/tasscss/">TASS</a>にもまったく同じコードで対応できる。キーワードはあんまり対応する必要なさそうなので外しても良いと思う。ファイル名補完は<code>@import</code>で使いまくるので必須。</p>

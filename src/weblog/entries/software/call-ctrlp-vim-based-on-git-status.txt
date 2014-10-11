@@ -1,0 +1,20 @@
+Git配下のファイルかどうかでCtrlPを切り替える
+
+<p><a href="https://github.com/kien/ctrlp.vim">CtrlP (ctrlp.vim)</a>では上位ディレクトリを辿って<code>.git</code>とかがあったらそこを基準に起動するようにデフォルトではなっている。でもちょっと考えれば分かる通り、深い階層でかつ<a href="http://git-scm.com/">Git</a>配下ではない場合に非常に重い。ので設定でアクティブなバッファーのファイルのディレクトリを基準にしたりとかしてた。けどやはりGit配下の場合はやっぱりそれを考慮して欲しいので、Git配下かどうかを調べて適宜切り替える関数を書いて使い始めた。</p>
+
+<p><code>system()</code>でシェルのコマンドを呼ぶとその終了コードが<code>v:shell_error</code>に格納されるので、それを利用した。</p>
+
+<pre><code class="language-vim">nnoremap &lt;Leader&gt;f :call &lt;SID&gt;CallCtrlPBasedOnGitStatus()&lt;Return&gt;
+
+function! s:CallCtrlPBasedOnGitStatus()
+  let s:git_status = system("git status")
+
+  if v:shell_error == 128
+    execute "CtrlPCurFile"
+  else
+    execute "CtrlPRoot"
+  endif
+endfunction
+</code></pre>
+
+<p>Git配下じゃない場合の<code>git status</code>の終了コードは<code>128</code>固定だと思うんだけどどうなんですかね！？</p>

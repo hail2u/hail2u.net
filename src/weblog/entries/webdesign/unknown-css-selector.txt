@@ -1,0 +1,35 @@
+不明なCSSセレクター
+
+<p>ブラウザーがCSSをパースする際、不明なセレクターに遭遇するとどうなると思いますか？実はそのセレクターを含むルール全体が無視されます。何を当たり前のことを言っているんだと思われるかもしれませんが、そのルールが複数のセレクターを持っていて、そのうちひとつだけが不明なものだとしてもルール全体が無視されるということはあまり知られていないような気がします。知られていないというよりも意識する必要があまりなかったという方が近いですかね。</p>
+
+<p>つまり以下のようなCSSコードは無意味です。</p>
+
+<pre><code class="language-css">:-moz-any(article, aside, nav, section) h1,
+:-webkit-any(article, aside, nav, section) h1,
+:matches(article, aside, nav, section) h1 {
+  color: red;
+}
+</code></pre>
+
+<p>CSS4の<code>:matches()</code>セレクター、そしてその元ネタとなった<code>:-moz-any()</code>とそれに追随した<code>:-webkit-any()</code>を指定して幅広く対応しようとするとこう書いてしまいそうです。ですが、Firefoxでは<code>:-webkit-any()</code>や<code>:matches()</code>で、Chromeでは<code>:-moz-any()</code>と<code>:matches()</code>でそれぞれエラーになるので、結果としてこのルール全体が無効になります。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/314.html">Unknown Selector</a></p>
+
+<p>上記コードのデモです。<code>:-*-any()</code>が実装済みのFirefoxとChromeの現行バージョンでも文字が赤くならないのがわかると思います。このことについては<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">CSS 2.1の仕様書でもちゃんと触れられており</a>、仕様通りの挙動です。この仕様を利用すると以下のような比較的安全なCSSハックを色々と作ることが可能です。</p>
+
+<pre><code class="language-css">x::-moz-selection, .test {
+  color: red;
+}
+
+:-webkit-any(x), .test {
+  color: green;
+}
+
+x:-o-prefocus, .test {
+  color: blue;
+}
+</code></pre>
+
+<p class="seealso">View Demo: <a href="/pub/test/315.html">Unknown Selector Hack</a></p>
+
+<p>どうしてもCSSハックを使わざるを得ないような状況に追い込まれた場合には一考の価値はあるかもしれませんね。比較的安全な……というのはブラウザーのバグを利用したものではないということに過ぎません。今のところ各ブラウザーベンダーはベンダー拡張プリフィックス付きのセレクター(やプロパティー)からプリフィックスを外すことにあまり積極的ではないので、CSSハックとして成立しやすいような気はしますが、将来に渡って安全なものではないでしょう。他のCSSハックと同様に過信は禁物でしょうね。</p>

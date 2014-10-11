@@ -1,0 +1,89 @@
+CSS3のtransformを使ったフォントの変形
+
+<figure><img src="/images/blog/verdana-narrow.png" alt="Verdana &quot;Narrow&quot;?"></figure>
+
+<p>CSS3の<code>transform</code>プロパティで<code>scale()</code>(または<code>-ms-filter</code>で<code>Matrix()</code>)を使うと、ブロックの拡大と縮小ができる。これを利用するとVerdanaをCondensedなフォントっぽく細くしたり、ワープロ時代の倍角文字や縦倍角文字を実現することが簡単にできる。コンテンツ本文に使うのは無理があるが、見出しなどには良さそう。特に<code>@font-face</code>で気軽に変更できない(してもあまり効果的ではない)日本語の見出しには面白い試みなんじゃないかと思ったが、一番綺麗にしたいIE8で残念なので微妙。</p>
+
+<h2>Verdana Narrow?</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/144.html">Verdana Narrow</a></p>
+
+<p>単純に細くしたいブロックで<code>transform: scaleX(num);</code>を使えば良い。</p>
+
+<pre><code class="language-css">.narrow {
+  -webkit-transform: scaleX(0.8);
+  -moz-transform: scaleX(0.8);
+  -o-transform: scaleX(0.8);
+  transform: scaleX(0.8);
+  -webkit-transform-origin: left top;
+  -moz-transform-origin: left top;
+  -o-transform-origin: left top;
+  transform-origin: left top;
+  -ms-filter: &quot;progid:DXImageTransform.Microsoft.Matrix(M11=0.8, M12=0, M21=0, M22=1, SizingMethod=&#39;auto expand&#39;)&quot;;
+}
+</code></pre>
+
+<p><code>transform-origin</code>プロパティは省略時に<code>center center</code>とみなされるので、無指定だとセンタリングされてしまう。そのために<code>left top</code>を指定する必要がある。</p>
+
+<p><code>-ms-filter</code>プロパティで<code>Matrix()</code>でリサイズするには、<code>M11=1, M12=0, M21=0, M22=1</code>の内<code>M11</code>と<code>M22</code>を変更する。<code>M11</code>がX方向の倍率になるので、そこで0~1の数字を指定すれば細くなる。</p>
+
+<h2>縦倍角にする</h2>
+
+<p class="seealso">View Demo: <a href="/pub/test/146.html">Doule Height Caption</a></p>
+
+<p>使うのは<code>scaleY(2)</code>。</p>
+
+<pre><code class="language-css">.double-height {
+  -webkit-transform: scaleY(2);
+  -moz-transform: scaleY(2);
+  -o-transform: scaleY(2);
+  transform: scaleY(2);
+  -ms-filter: &quot;progid:DXImageTransform.Microsoft.Matrix(M11=1, M12=0, M21=0, M22=2, SizingMethod=&#39;auto expand&#39;)&quot;;
+}
+</code></pre>
+
+<p><code>transform-origin</code>プロパティは必要ない。</p>
+
+<p>IE8では非常に残念な結果になるのでやめておいた方が良さそう。</p>
+
+<h2>インライン要素に使う</h2>
+
+<p><code>strong</code>要素を倍角文字にしたいなど、インライン要素に適用したい場合は合わせて<code>display: inline-block;</code>を指定すれば良い。</p>
+
+<pre><code class="language-css">strong {
+  display: inline-block;
+  -webkit-transform: scaleX(2);
+  -moz-transform: scaleX(2);
+  -o-transform: scaleX(2);
+  transform: scaleX(2);
+  -webkit-transform-origin: left top;
+  -moz-transform-origin: left top;
+  -o-transform-origin: left top;
+  transform-origin: left top;
+  -ms-filter: &quot;progid:DXImageTransform.Microsoft.Matrix(M11=2, M12=0, M21=0, M22=1, SizingMethod=&#39;auto expand&#39;)&quot;;
+}
+</code></pre>
+
+<hr>
+
+<p><code>scale()</code>と<code>Matrix()</code>の関係を解説したエントリとしてでも読んでやってください。</p>
+
+<p>このフォントのスケーリングを利用してGDI++のように拡大してから縮小してやれば綺麗にアンチエイリアスかかるんじゃないかと考えて<a href="/pub/test/145.html">やってみた</a>が、ChとSf、Fxはそういう実装にはなってなかった。Opはそこそこ綺麗にアンチエイリアスかかる。速度とメモリ的な問題で単純な力技実装にはなってないんだと想像だけしてみた。</p>
+
+<h2>おまけ</h2>
+
+<p>メイリオの斜体を実現してみよう！</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/147.html">Meiryo Italic</a></p>
+
+<pre><code class="language-css">.transform-italic {
+  font-family: Meiryo, sans-serif;
+  -webkit-transform: skewX(-15deg);
+  -moz-transform: skewX(-15deg);
+  -o-transform: skewX(-15deg);
+  transform: skewX(-15deg);
+  -ms-filter: &quot;progid:DXImageTransform.Microsoft.Matrix(M11=1, M12=-0.26794919243112214, M21=0, M22=1, SizingMethod=&#39;auto expand&#39;)&quot;;
+}
+</code></pre>
+
+<p><code>skewX()</code>を使うだけ！</p>

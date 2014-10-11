@@ -1,0 +1,25 @@
+head要素以下でのitemprop属性
+
+<p><a href="http://www.w3.org/TR/microdata/">Microdata</a>では<code>itemprop</code>属性を使ってプロパティーを追加する。<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML標準仕様</a>の変更によって<code>body</code>要素以下でも<code>link</code>や<code>meta</code>要素を<a href="/blog/webdesign/use-link-element-outside-the-head-element.html">使えるようになった</a>ので、どうでも良いマークアップを追加してCSSで隠して誤魔化すとかしなくても大体なんとかなるようになった。しかしその一方で<code>link</code>と<code>meta</code>要素は<code>itemprop</code>属性と同時に<code>rel</code>属性や<code>name</code>属性を使うことはできない。そのため例えば<code>&lt;meta name="description"&gt;</code>タグに<code>itemprop="description"</code>を追加して<a href="http://schema.org/WebPage">WebPageスキーマ</a>のプロパティーとして追加するなどということは無理。</p>
+
+<pre><code class="language-html">&lt;html lang="ja-JP" itemscope itemtype="http://schema.org/WebPage"&gt;
+  &lt;head&gt;
+    &lt;meta content="This is a foo." name="description" <mark>itemprop="description"</mark>&gt;
+    &lt;link href="/foo" rel="canonical" <mark>itemprop="url"</mark>&gt;
+  &lt;/head&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>つまりこう書くことができないので、<code>description</code>や<code>url</code>プロパティーの追加のためには別に改めて書く必要がある。もちろん概要が<code>body</code>要素以下にあったり自身へのリンクがあったりするならそれに<code>itemprop</code>属性を付ければ良いのだけど、無いことも当然あるだろうし。</p>
+
+<pre><code class="language-html">&lt;html lang="ja-JP" itemscope itemtype="http://schema.org/WebPage"&gt;
+  &lt;head&gt;
+    &lt;meta content="This is a foo." name="description"&gt;
+    &lt;meta content="This is a foo." itemprop="description"&gt;
+    &lt;link href="/foo" rel="canonical"&gt;
+    &lt;link href="/foo" itemprop="url"&gt;
+  &lt;/head&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>うっ……。大雑把に言うと<em><code>head</code>要素内に書いたメタデータをMicrodataのプロパティーとして追加することはできない</em>ということのような気がする。<code>id</code>属性を使って<code>itemref</code>で参照すればいいのかなぁとかちょっと思ったけど全然違う。そのうちなんとかなるんだろか。</p>

@@ -1,0 +1,32 @@
+Amazon Product Advertising APIで返されるProductGroupの日本語訳
+
+<p><a href="http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=5">Amazon Product Advertising API</a>で<code>SearchIndex=All</code>を使って検索すると、複数のカテゴリの商品が検索結果として返ってくる。検索結果の各商品がどのカテゴリの商品かは<code>ItemAttributes/ProductGroup</code>の値を参照すれば良いのだが、「家電&amp;カメラ」が「CE」だったりとそのままではいまいちよくわからない。ということでAmazon.co.jpのカテゴリ分けのラベルに訳した。</p>
+
+<pre><code class="language-js">{
+  &quot;Apparel&quot;:           &quot;アパレル&amp;ファッション雑貨&quot;,
+  &quot;Baby Product&quot;:      &quot;ベビー&amp;マタニティ&quot;,
+  &quot;Book&quot;:              &quot;本・漫画・雑誌&quot;,
+  &quot;CE&quot;:                &quot;家電&amp;カメラ&quot;,
+  &quot;DVD&quot;:               &quot;DVD&quot;,
+  &quot;Grocery&quot;:           &quot;食品&amp;飲料&quot;,
+  &quot;Health and Beauty&quot;: &quot;ヘルス&amp;ビューティー&quot;,
+  &quot;Kitchen&quot;:           &quot;ホーム&amp;キッチン&quot;,
+  &quot;Music&quot;:             &quot;ミュージック&quot;,
+  &quot;Office Product&quot;:    &quot;文房具・オフィス用品&quot;,
+  &quot;Shoes&quot;:             &quot;シューズ&quot;,
+  &quot;Software&quot;:          &quot;PCソフト&quot;,
+  &quot;Sports&quot;:            &quot;スポーツ&amp;アウトドア&quot;,
+  &quot;Toy&quot;:               &quot;おもちゃ&quot;,
+  &quot;VHS&quot;:               &quot;ビデオ&quot;,
+  &quot;Video Games&quot;:       &quot;TVゲーム&quot;,
+  &quot;Watch&quot;:             &quot;時計&quot;
+}
+</code></pre>
+
+<p>和書と洋書やミュージックとクラシック音楽、TVゲームとPCゲーム、DVDとBlu-Rayなど判定したいけどそのままではできないものは色々ある。逆にシューズはAmazon.co.jpの検索結果ではアパレル&amp;ファッション雑貨でまとめられているが、Shoesで返ってくるのでシューズと細かく判定できたりする。</p>
+
+<p>また<code>ProductGroup</code>の値は<code>SearchIndex</code>に指定する文字列と同じだと、<code>SearchIndex=All</code>でとりあえず検索させて検索結果のある商品と同じカテゴリだけに絞るとか簡単にできそうで便利だと思うんだけど、そうなってはいない。<code>BrowseNodes</code>を<code>ResponseGroup</code>パラメータの値に含めればかなり正確にカテゴリ判定ができ、検索をカテゴリで絞るとかも<code>SearchIndex</code>パラメータではなく<code>BrowseNode</code>パラメータを使ってやれば良いのでやりたいことは実現できるのだけど、レスポンスの<code>BrowseNodes</code>の構造はかなり複雑で、とりあえず大まかなカテゴリ(最上位のカテゴリ)を知りたい(で絞り込みたい)とかには使いづらいような気がする。</p>
+
+<p>この訳データに<code>BrowseNodeId</code>も持たせてやれば便利かもな。</p>
+
+<p><a href="http://hail2u.github.io/aex.html#Amazon">Aex</a>には導入しておいた。</p>

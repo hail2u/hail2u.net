@@ -1,0 +1,17 @@
+使われないWebフォント
+
+<p>フォントAとフォントBの2つのWebフォントを定義したCSSファイルを<code>link</code>要素や<code>@import</code>で読み込むとする。もちろんそのCSSファイルは読み込まれるが、Chrome 28では定義されたフォントが実際に本文で使われている場合にしかフォント・ファイルの読み込みは行われないようだ。<code>url()</code>で参照される画像ファイルが遅延読み込みされるのと一緒。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/482.html">Unused Web Font and HTTP Request on Chrome 28</a></p>
+
+<p>デモではGoogle Fontsの<a href="http://www.google.com/fonts/specimen/Source+Sans+Pro">Source Sans Proファミリー</a>のうち400・400italic・700・700italicの四種を定義しているが、Source Sans Proが使われるセクションでは400と700しか使っていない。この場合、Chrome 28では400italicと700italicへのHTTPリクエストが行われない。確認した限りではFirefox 23はChrome 28と同じで、Internet Explorer 10では常に四種を読み込んでしまう。</p>
+
+<figure>
+  <blockquote>
+    <p>The <code>@font-face</code> rule is designed to allow lazy loading of font resources that are only downloaded when used within a document.</p>
+  </blockquote>
+
+  <figcaption>― <cite><a href="http://www.w3.org/TR/css3-fonts/#font-face-loading">4.8. Font loading guidelines</a></cite></figcaption>
+</figure>
+
+<p>仕様でも文書で使われた場合にのみダウンロードするようにと書かれている。Chrome 28の挙動が正しそう。</p>

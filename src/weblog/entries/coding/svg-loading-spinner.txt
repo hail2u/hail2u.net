@@ -1,0 +1,31 @@
+SVGでローディング・アイコン
+
+<figure>
+  <img src="/images/blog/svg-loading-spinner.svg" width="160" height="160" class="floatage-right">
+</figure>
+
+<p>アニメーションSVGでローディング・アイコン、画像の読み込みの時とかにグルグルする奴を作った。回るスピードやサイズの変更が簡単なのが売り。8個の丸いパスを丸く並べ、<code>g</code>要素でグルーピングし、その子の<code>animateTransform</code>要素で<code>calcMode="discrete"</code>を使えば結構簡単に出来た。</p>
+
+<pre><code class="language-xml">&lt;animateTransform
+  attributeName=&quot;transform&quot;
+  attributeType=&quot;XML&quot;
+  dur=&quot;1s&quot;
+  repeatCount=&quot;indefinite&quot;
+  calcMode=&quot;discrete&quot;
+  values=&quot;0 256 256;
+    45 256 256;
+    90 256 256;
+    135 256 256;
+    180 256 256;
+    225 256 256;
+    270 256 256;
+    315 256 256&quot;
+  type=&quot;rotate&quot;/&gt;</code></pre>
+
+<p><code>type</code>属性で<code>rotate</code>を指定することで回る。<code>values</code>属性では<code>deg x y</code>という組み合わせで回る角度と回す基準点を指定していく。角度は8個の円なので360度を8で割った45度ずつ進めていくようにするだけ。基準点は元画像のサイズに依存するので適当に真ん中を指定する(512x512で作ったのでその真ん中の<code>256 256</code>を指定している)。最後に<code>calcMode</code>属性で<code>discrete</code>を使い、よく見るローディング・アイコンのようにジャンプするようにして、<code>repeatCount</code>属性で<code>indefinite</code>を指定し無限ループするようにする。</p>
+
+<p>素の状態で2888バイト、URLエンコードでData URI化して使うとして2492バイトになった。パスの最適化はしてないのでもっと縮みそうだし、そもそも<code>circle</code>要素使えばもっと縮みそう。非円ではないのが回るやつを作るとしても同じくらいのサイズになるので、大きくても4KB前後で大体収まるという計算が成り立つと思う。</p>
+
+<hr>
+
+<p>ローディング・アイコンのようなものをマークアップを消費して実装するくらいなら画像の方が良い。現状ではアニメーションGIFが最適解。将来的には特殊なローディング、例えば既に表示されている画像を点滅させながらフェードアウトさせるみたいな読み込み待ちをさせるようなケースではCSSアニメーションを使い、スタティックなスピナーならSVGアニメーションを使うようになるのじゃないかなーと思う。使い分け。</p>

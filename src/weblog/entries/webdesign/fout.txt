@@ -1,0 +1,22 @@
+FOUT
+
+<p>Flash of Unstyled Textの頭文字をとってFOUTと呼ばれる現象がある。FirefoxでWebフォントの読み込みが完了するまで別のフォントが使われる現象のことで、後にSafariやChrome、Internet Explorerで起こるようになった読み込みの完了まで空白になる現象のことも含めてFOUTと呼ぶことが多い(気がする)。このWebサイトでも起こっていて、<a href="https://twitter.com/wozozo/statuses/181934677202976769">それについて聞かれた</a>のでさらっと書いてみる。</p>
+
+<p>この現象の原因はCSSの処理やWebページのレンダリングと並行してWebフォントのHTTPリクエストが行われることにあるので、仕様と言って良い。起こらないようにするにはWebフォントの読み込みが終わるまで他の処理をブロックするとかしないといけないため、改善される可能性はあるけどまず直ることはない。日本のWebサイトではあまり起こらないように感じるのは、Webフォント自体がまだマイナーなのと、本文とかで使うWebサイトが更に少なくてフラッシュしたり空白になっても気づかないことが多いというだけだと思う。</p>
+
+<p><a href="https://developers.google.com/webfonts/docs/webfont_loader">WebFont Loader</a>ではデフォルトのフォントで表示しておいて、Webフォントの読み込みが完了したら適用するような仕組みになっている。具体的には完了時に<code>html</code>要素に<code>.wf-active</code>というクラスがつくのでそれを利用して<code>font-family</code>を書くことになる。</p>
+
+<pre><code class="language-css">h1 {
+  font-family: sans-serif;
+}
+
+.wf-active h1 {
+  font-family: "Open Sans", sans-serif;
+}
+</code></pre>
+
+<p>つまりFirefoxでの挙動に似た形。これをGoogleと一緒に作ってる<a href="https://typekit.com/">TypeKit</a>を始めとして、多くのWebフォント提供サービスがこれかこれと同じような仕組みを採用している。他の対処法としてWebフォントの読み込みが完了するまでページ全体(やWebフォントを使っている要素)を表示しない(<code>visibility: hidden</code>にしておく)みたいなやり方もあるけど、これはちょっとアレでアレ。CSSだけで……となるとData URI化してCSSファイルに混ぜ込むくらいしかないけど、それはCSSファイルが巨大になるのでちょっと現実的ではない。</p>
+
+<p>特に何もしないというのを強く推奨したいところだけど、SafariやChromeでは読み込みの完了かエラー確定までコンテンツが読めない(空白だから)という結構致命的な問題になるので、WebFont Loaderを使うか本文にはWebフォントを使わないかのどちらかが無難だと思う。</p>
+
+<p>このWebサイトでASCIIというか<code>pre</code>要素だけ先に表示されるのは、本文や見出しではWebフォントを使っていて、<code>pre</code>要素では使っていないからというだけ。</p>

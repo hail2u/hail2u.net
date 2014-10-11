@@ -1,0 +1,174 @@
+FirefoxのuserChrome.cssネタ #11
+
+<p><a href="http://www.mozilla.com/en-US/firefox/">Firefox</a> 2のデフォルト・テーマは悪くは無い。けれども画像で作ったタブとか画像で作ったタブとか画像で作ったタブとか画像で作ったタブとか画像で作ったタブとかはなんだかなーと思ってしまう。というわけで以前書いた<a href="/blog/software/firefox_userchrome_css_tricks_5.html">フラットなタブを実現するuserChrome.cssネタ</a>をFirefox 2に対応させたりとか他にもいくつか。</p>
+
+<h2>タブをフラットなボタンにする(Firefox 2向け)</h2>
+
+<pre><code class="language-css">.tabbrowser-tabs {
+  background-image: none !important;
+}
+
+.tabbrowser-tab {
+  margin-right: 3px !important;
+}
+
+.tabbrowser-tab[selected=&quot;true&quot;] {
+  font-weight: normal !important;
+}
+
+.tabbrowser-tab &gt; .tab-image-left {
+  border-top: 1px solid threedshadow !important;
+  border-bottom: 1px solid threedhighlight !important;
+  border-left: 1px solid threedshadow !important;
+  width: 4px !important;
+  color: infotext !important;
+  background-color: infobackground !important;
+  background-image: none !important;
+  -moz-border-radius-topleft: 0px !important;
+}
+
+.tabbrowser-tab:not([selected=&quot;true&quot;]) &gt; .tab-image-left {
+  margin: 0px !important;
+  border-color: -moz-dialog !important;
+  height: 24px !important;
+  color: -moz-dialogtext !important;
+  background-color: -moz-dialog !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab:hover:not([selected=&quot;true&quot;]) &gt; .tab-image-left {
+  margin: 0px !important;
+  border-top: 1px solid threedhighlight !important;
+  border-bottom: 1px solid threedshadow !important;
+  border-left: 1px solid threedhighlight !important;
+  height: 24px !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab &gt; .tab-image-middle {
+  padding: 0px !important;
+  border-top: 1px solid threedshadow !important;
+  border-bottom: 1px solid threedhighlight !important;
+  color: infotext !important;
+  background-color: infobackground !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab:not([selected=&quot;true&quot;]) &gt; .tab-image-middle {
+  margin: 0px !important;
+  border-color: -moz-dialog !important;
+  height: 24px !important;
+  color:  -moz-dialogtext !important;
+  background-color: -moz-dialog !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab:hover:not([selected=&quot;true&quot;]) &gt; .tab-image-middle {
+  margin: 0px !important;
+  border-top: 1px solid threedhighlight !important;
+  border-bottom: 1px solid threedshadow !important;
+  height: 24px !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab &gt; .tab-image-middle &gt; .tab-icon &gt; .tab-icon-image {
+  margin-top: 0px !important;
+}
+
+.tabbrowser-tab &gt; .tab-image-middle &gt; .tab-text {
+  margin-top: 0px !important;
+  border: none !important;
+}
+
+.tabbrowser-tab &gt; .tab-image-right {
+  border-top: 1px solid threedshadow !important;
+  border-bottom: 1px solid threedhighlight !important;
+  border-right: 1px solid threedhighlight!important;
+  width: 1px !important;
+  color: infotext !important;
+  background-color: infobackground !important;
+  background-image: none !important;
+  -moz-border-radius-topright: 0px !important;
+}
+
+.tabbrowser-tab:not([selected=&quot;true&quot;]) &gt; .tab-image-right {
+  margin: 0px !important;
+  border-color: -moz-dialog !important;
+  height: 24px !important;
+  color:  -moz-dialogtext !important;
+  background-color: -moz-dialog !important;
+  background-image: none !important;
+}
+
+.tabbrowser-tab:hover:not([selected=&quot;true&quot;]) &gt; .tab-image-right {
+  margin: 0px !important;
+  border-top: 1px solid threedhighlight !important;
+  border-bottom: 1px solid threedshadow !important;
+  border-right: 1px solid threedshadow !important;
+  height: 24px !important;
+  background-image: none !important;
+}
+
+.tabs-left,
+.tabs-right,
+.tabs-bottom {
+  display: none !important;
+}
+</code></pre>
+
+<p>長い。ちょっと詰めて無いので無駄なところが多いのかもしれない。</p>
+
+<figure><img src="/images/blog/flat-tab-fx2.png" alt="フラットなタブのプレビュー"></figure>
+
+<p>という感じの表示になる。左からアクティブなタブ・カーソルでポイントした非アクティブなタブ・非アクティブなタブのプレビュー。</p>
+
+<h2>タブを選択した時に表示される点線を消す</h2>
+
+<pre><code class="language-css">.tabbrowser-tab &gt; .tab-image-middle &gt; .tab-text {
+  border: none !important;
+}
+</code></pre>
+
+<p>何気に<code>outline</code>から<code>border</code>になってる。</p>
+
+<h2>ロケーション・バーの枠線をへこませる</h2>
+
+<pre><code class="language-css">#urlbar {
+  border: 2px solid !important;
+  -moz-border-top-colors: threedshadow threeddarkshadow !important;
+  -moz-border-right-colors: threedhighlight threedlightshadow !important;
+  -moz-border-bottom-colors: threedhighlight threedlightshadow !important;
+  -moz-border-left-colors: threedshadow threeddarkshadow !important;
+}
+</code></pre>
+
+<p>なんでもフラットにすりゃー良いってモノではない。逆に何でもネイティブっぽくすりゃー良いってモノでもない。</p>
+
+<h2>ロケーション・バーのドロップダウン・ボタンを飛び出させる</h2>
+
+<pre><code class="language-css">.autocomplete-history-dropmarker {
+  border: 2px solid !important;
+  -moz-border-top-colors: threedlightshadow threedhighlight !important;
+  -moz-border-right-colors: threeddarkshadow threedshadow !important;
+  -moz-border-bottom-colors: threeddarkshadow threedshadow !important;
+  -moz-border-left-colors: threedlightshadow threedhighlight !important;
+}
+
+.autocomplete-dropmarker-bkgnd-top,
+.autocomplete-dropmarker-bkgnd-mid-top,
+.autocomplete-dropmarker-bkgnd-mid-bottom,
+.autocomplete-dropmarker-bkgnd-bottom {
+  list-style-image: none !important;
+  background-image: none !important;
+}
+</code></pre>
+
+<p>上記変更によりURL履歴を出すドロップダウン・ボタンがちょっと微妙な感じになるので、Internet Explorerっぽく修正。</p>
+
+<hr>
+
+<p>デフォルト・テーマはそこそこキレイではあると思うのだけど、デザイン重視なわけでもなく、OSとの融合重視なわけでもない微妙な位置な出来という感想。その微妙さを良いとこ取りと思えるのなら好きになれるテーマだと思う。「Firefox 1.5のデフォルト・テーマの方が良かった！！！」という人は<a href="https://addons.mozilla.org/firefox/3479/">Firefox 2向けのWinstripeが出ている</a>ので、これをインストールすれば良さそう。</p>
+
+<h2>追記</h2>
+
+<p>タブをフラットなボタンにする(Firefox 2向け)を導入した時にどんな感じにタブが表示されるかのプレビュー画像を追加しておいた。</p>

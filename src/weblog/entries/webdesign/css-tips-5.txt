@@ -1,0 +1,19 @@
+大きな画像でレイアウトがあばばばばば
+<p>大きな画像を利用するとレイアウトや見た目がメチャクチャになる場合があります。このサイトのように本文のカラム(つまり様々な画像を利用するカラム)が左でメニューのカラムが右にあるような場合や要素の内容物によりその要素のボックス幅が修正されてしまうというバグのあるInternet Explorerでは顕著です。幅固定なレイアウトの場合は、本文のカラムの幅は確実に把握できるので、それに合わせて画像をリサイズした上で利用すれば良いわけですが、幅可変なレイアウトの場合は、当然本文のカラムの幅が不定なのでそういうわけにはいきません。こういったケースには<code>overflow</code>の値に<code>hidden</code>や<code>scroll</code>を指定することでレイアウトや見た目の崩れを回避することが可能です。</p>
+<p><a href="http://www.w3.org/TR/REC-CSS2/visufx.html#overflow" title="Visual effects"><code>overflow</code></a>は要素のボックスからはみ出す内容物をどう表示するかを指定するプロパティで、値に<code>hidden</code>を指定するとはみ出した部分は表示されません。つまり、</p>
+<pre><code class="language-html">&lt;div id=&quot;contents&quot;&gt;
+  &lt;div class=&quot;image_container&quot;&gt;
+    &lt;img src=&quot;foo.png&quot; alt=&quot;でかすぎ・・・&quot; width=&quot;100000000&quot; height=&quot;100&quot; /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<p>というHTMLコードに対して、</p>
+<pre><code class="language-css">div.image_container {
+  width: 100%;
+  overflow: hidden;
+}
+</code></pre>
+<p>と、CSSのルールを書いておけば、foo.pngは<code>#contents</code>の横幅をはみ出す部分は隠されるので、<a href="/pub/test/051.html" title="大きな画像でレイアウトがあばばばばば・・・とならないように">foo.pngの幅がどんな大きさでも問題ありません</a>。</p>
+<p>「レイアウトや見た目を崩したくないけど、せっかくの画像を隠すのも嫌だ」とかいう場合には<code>hidden</code>ではなく<code>scroll</code>を使うと良いです。ブラウザによって<code>scroll</code>による表示はかなり異なるのでちょっとアレな感じですが。</p>
+<p><code>img</code>要素に対して<code>max-width</code>を指定するというアプローチの方がよりスマートかもしれません。が、Internet Explorer(以下略)。Internet Explorerでも<code>expression()</code>を使ってゴニョゴニョすれば<code>max-width</code>相当(またはそれ以上)のことが実現可能ではありますけど。</p>
+<p>以上は特に画像に限った話ではなく、<code>pre</code>要素や<code>iframe</code>要素などのボックス幅で折り返されない要素でも同じ話です。特にAdSenseで利用されている<code>iframe</code>要素では幅と高さが指定されており<code>img</code>要素とほとんど同じケースです。「AdSenseのせいでレイアウトが崩れてる！」とかあまり笑えない話なので、このように<code>overflow</code>を使ってレイアウトの崩れを回避するようにしておくと「広告うざ・・・」と思われる回数が多少は減ることでしょう。</p>

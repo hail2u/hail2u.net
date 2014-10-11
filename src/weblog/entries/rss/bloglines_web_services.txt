@@ -1,0 +1,69 @@
+Bloglines Web Services
+<p><a href="http://www.wingedpig.com/archives/000178.html" title="wingedpig.com: Bloglines Web Services">遂に来ました</a>。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。</p>
+<p><a href="http://www.bloglines.com/services/" title="Bloglines | Bloglines Services">Bloglines Web Services</a>アツイ。ちょっといじってみた感じでは、<a href="http://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>とほぼ同じ感覚で扱えるという感じ。こちらはRSS 2.0(or OPML)なので扱いも楽。</p>
+<p>中でもアツイのはSync APIでしょう。基本的にはlistsubsによりOPML形式で購読リストを拾って、siteのidを取得、それを使ってgetitemsにより未読を取得となるみたい。RSS 2.0が返ってくるので、うまく使えばRSSリーダーのバックエンド(ほとんどキャッシング・プロクシ)として利用可能で、<a href="http://www.feeddemon.com/" title="Bradbury Software - Creators of TopStyle and FeedDemon">FeedDemon</a>などは既に対応しているとな。凄いことにFeedDemonは未読情報の同期なんかも実装しているみたい。パッと見た感じでは簡単には実装できなそうな感じなので、スゲーとしか言えない。</p>
+<p>スゲー。</p>
+<p>気になるのはBloglinesのトラフィックがどれだけ増えるかということですね。エライこといなりそうな気はしないでもない。</p>
+<h2>追記</h2>
+<p>BWSには<a href="http://www.bloglines.com/services/api/notifier" title="Bloglines | Notifier API Documentation">Notifier API</a>があるので、「これは利用するべき！」みたいな。ので、Bloglines Checkerを1.3に更新し、それを利用するようにしました。機能的には何も変更がありませんが、なるべくなら更新してください。変更文字数は13文字（ぉ。今までのシステムと互換性を持たせているところがニクイ。Bloglinesマンセー！</p>
+<h2>追記</h2>
+<p>とりあえずSync APIの<a href="http://www.bloglines.com/services/api/listsubs" title="Bloglines | Listsubs Function Call">listsubs</a>を叩くPerlスクリプトを書いてみた。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+my $uname = &#39;メールアドレス&#39;;
+my $pass  = &#39;パスワード&#39;;
+
+my $loc   = &#39;rpc.bloglines.com:80&#39;;
+my $realm = &#39;Bloglines RPC&#39;;
+
+use LWP::UserAgent;
+
+my $ua = LWP::UserAgent-&gt;new();
+$ua-&gt;credentials($loc, $realm, $uname, $pass);
+
+print $ua-&gt;get(&quot;http://rpc.bloglines.com/listsubs&quot;)-&gt;as_string;
+
+exit;
+</code></pre>
+<p>遅！仕様的にキャッシュできない(未読状態が少しでも変わると中身が変わってしまう)ので辛いかも。</p>
+<p>本筋とは関係ないですけど、<a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>のPassword Managerでrealmを調べることができました(まぁ間違ったのを送った場合はレスポンスヘッダに正しいrealmが書かれているんですけどね)。Siteカラムの()で括られている部分。</p>
+<h2>追記@2004/09/29</h2>
+<p>とりあえずWSHでもlistsubsを叩いてみる。以下はVBScriptでのコード。</p>
+<pre>Set xmlHttp = WScript.CreateObject(&quot;Msxml2.XMLHTTP.3.0&quot;)
+Set xmlDoc  = WScript.CreateObject(&quot;Msxml2.DOMDocument.3.0&quot;)
+
+xmlHttp.open &quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, False, &quot;メールアドレス&quot;, &quot;パスワード&quot;
+xmlHttp.send
+
+xmlDoc.async = False
+xmlDoc.loadXML xmlHttp.responseText
+
+If xmlDoc.parseError.errorCode &lt;&gt; 0 Then
+  WScript.Echo &quot;You have error &quot; + xmlDoc.parseError.reason
+Else
+  WScript.Echo xmlDoc.xml
+End If
+
+WScript.Quit
+</pre>
+<p>続いてJScriptのコード。</p>
+<pre><code class="language-js">var xmlHttp = new ActiveXObject(&quot;Msxml2.XMLHTTP.3.0&quot;);
+var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
+
+xmlHttp.open(&quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, false, &quot;メールアドレス&quot;, &quot;パスワード&quot;);
+xmlHttp.send();
+
+xmlDoc.async = false;
+xmlDoc.loadXML(xmlHttp.responseText);
+
+if (xmlDoc.parseError.errorCode != 0) {
+  WScript.Echo(&quot;You have error &quot; + xmlDoc.parseError.reason);
+} else {
+  WScript.Echo(xmlDoc.xml);
+}
+
+WScript.Quit();
+</code></pre>
+<p>うむ、良い感じ。これをベースにして、未読をすべて取得して単一のHTMLファイルに吐くアプリケーション作るかな。DelphiでGUI用意しても良いのだけど、表示の仕組みを作るのがメンドイ。</p>

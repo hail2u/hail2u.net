@@ -1,0 +1,119 @@
+Sassのリスト
+
+<p><a href="http://sass-lang.com/">Sass</a>ではいわゆる「配列」のような複数のデータを格納するリストを作れる……というのだけど使ったことなかった。<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#lists">リファレンスでもさらっと流されてる</a>し、リストを使う<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#each-directive"><code>@each</code>の説明</a>でもベタに並べてあるだけで、どうやって作ってどうやって使うのかイメージできなかった。変数の値を空白区切りにしたらリストな変数になるということはどう考えてもリファレンスからは読み取れないと思う。</p>
+
+<h2>基本</h2>
+
+<p>特に難しいこともなく空白(かカンマ)区切りで指定するとリストになる。</p>
+
+<pre><code class="language-scss">$lists: foo bar buz;
+
+.test {
+  property: $lists;
+}
+</code></pre>
+
+<p>リストな変数であってもそのまま参照した場合は普通の変数と同じようにそのまま(空白区切りのまま)出力される。</p>
+
+<pre><code class="language-css">.test {
+  property: foo bar buz }
+</code></pre>
+
+<p>リストの特定のインデックスの値を参照するには<a href="http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#nth-instance_method"><code>nth()</code>関数</a>を使う。</p>
+
+<pre><code class="language-scss">.test {
+  property: nth($lists, 2);
+}
+</code></pre>
+
+<p>これでリストの2番目の値を参照できる。多くのプログラミング言語と違って添え字は<code>1</code>始まりなことには注意が必要。</p>
+
+<pre><code class="language-css">.test {
+  property: bar }
+</code></pre>
+
+<p>書きづらいこと以外はまぁ普通な感じ。</p>
+
+<h2>応用</h2>
+
+<p>変数をそのままリストの値にすることもできる。</p>
+
+<pre><code class="language-scss">$foo: f o o;
+$bar: b a r;
+$buz: b u z;
+$lists: $foo $bar $buz;
+
+.test {
+  property: nth($lists, 3);
+}
+</code></pre>
+
+<p>勿論(?)このようにリストをリストにぶち込むとかも出来て、こうすると多次元配列っぽいものになる。この場合は基本の最初の例のように空白区切りでの出力となる。</p>
+
+<pre><code class="language-css">.test {
+  property: b u z }
+</code></pre>
+
+<p><code>nth()</code>関数をネストすればどんどん辿れる。</p>
+
+<pre><code class="language-scss">.test {
+  property: nth(nth($lists, 3), 2);
+</code></pre>
+
+<p>これでリストに格納したリストの特定のインデックスを参照できる。</p>
+
+<pre><code class="language-css">.test {
+  property: u }
+</code></pre>
+
+<p>素晴らしい。</p>
+
+<h2>具体的な利用</h2>
+
+<p>幅とそれを利用したクラスが必要なカラム定義なんかに利用できる。</p>
+
+<pre><code class="language-scss">$column: 60px;
+$gutter: 20px;
+$gap:    10px;
+
+$colspan1:  (($column + $gutter) *  1 - $gutter);
+$colspan2:  (($column + $gutter) *  2 - $gutter);
+...
+$colspan11: (($column + $gutter) * 11 - $gutter);
+$colspan12: (($column + $gutter) * 12 - $gutter);
+$colspan: $colspan1 $colspan2 ... $colspan11 $colspan12;
+
+@for $i from 1 through 12 {
+  .colspan#{$i} {
+    margin-left: $gap;
+    margin-right: $gap;
+    float: left;
+    width: nth($colspan, $i);
+  }
+}
+</code></pre>
+
+<p>このように変数を使って変数を参照することができる。<a href="http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#append-instance_method"><code>append()</code>関数</a>も使えばもっとうまく短く書けそう。</p>
+
+<hr>
+
+<p>なんてことを<a href="https://github.com/hail2u/scss-column-equation">カラム定義を生成するSCSSパーシャル</a>を作ってて理解した。でもけっこうな魔窟っぽい予感がするので気をつけて使った方が良さそう。</p>
+
+<h2>追記</h2>
+
+<p><code>append()</code>を使うと短くはなる。空のリスト(というか変数？)も作ることができるようなので以下のような感じで書ける。</p>
+
+<pre><code class="language-scss">$column: 60px;
+$gutter: 20px;
+$gap:    10px;
+
+$colspan: ();
+
+@for $i from 1 through 16 {
+  $colspan: append($colspan, (($column + $gutter) * $i - $gutter));
+}
+</code></pre>
+
+<p>スッキリ！</p>
+
+<p>3.2のprerelease版では複数のリストを明示的に多次元リストにまとめる<code>zip()</code>とリストから検索する<code>index()</code>という関数も追加されている。駆使すると今はできない同じルールセット内の別プロパティーの値とかを参照するみたいな機能作れそう。多分誰も読めなくなるけど。</p>

@@ -1,0 +1,47 @@
+SVGのリサイズにおける端
+
+<p>SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさの<code>rect</code>要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。</p>
+
+<p>端のぼやけはChrome 34で起こりやすく、Firefox 29ではあまり起こらない。Internet Explorer 11では<code>px</code>単位でのリサイズなら起こらないかも。SVGのリサイズは実装側のパフォーマンス重視かアウトプット重視かで大きく変わってくるので、端のぼやけが起こらないようになることは期待できない。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;
+  width=&quot;1024&quot;
+  height=&quot;1024&quot;
+  viewBox=&quot;0 0 1024 1024&quot;&gt;
+  &lt;rect
+    x=&quot;0&quot;
+    y=&quot;0&quot;
+    width=&quot;1024&quot;
+    height=&quot;1024&quot;
+    style=&quot;fill:#333333&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>縦横1024のキャンバスいっぱいいっぱいの矩形を描こうとするとこうなる。このままだとリサイズした時に端がぼやける。</p>
+<figure>
+  <figcaption>Chrome 34でリサイズしたSVGのキャプチャを拡大した画像</figcaption>
+  <img src="/images/blog/svg-edge-on-resizing.png" alt="上の最適化していないSVGをリサイズした上端の拡大画像ではぼやけるが、下の最適化したSVGではリサイズしてもぼやけない(Chrome 34で)">
+</figure>
+
+<p>下のように最適化するにはキャンバスからはみ出すように矩形を描いてやる。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;
+  width=&quot;1024&quot;
+  height=&quot;1024&quot;
+  viewBox=&quot;0 0 1024 1024&quot;&gt;
+  &lt;rect
+    <mark>x=&quot;-128&quot;
+    y=&quot;-128&quot;
+    width=&quot;1536&quot;
+    height=&quot;1536&quot;</mark>
+    style=&quot;fill:#333333&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>縦横に128ずつはみ出すように矩形を描くだけ。SVGではキャンバスが基本透明で、その背景を塗るためにはこのように矩形を作成してやったりする必要があるため、そこそこの頻度でこういったきれいにリサイズされるテクニックは必要になる。</p>

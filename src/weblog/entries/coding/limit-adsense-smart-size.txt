@@ -1,0 +1,37 @@
+AdSenseのスマートサイズ広告に制限をかける
+
+<p>Google AdSenseのスマートサイズは、場所に合わせて適当に広告を提供してくれて良いのだけど、CTRはかなり下がった。画像広告のCTRは下がっていないので、テキスト広告で限界まで埋めようとするのがよく出るのがダメな感じなので、画像広告が多く出る300x250や728x90のサイズをメインに使うように制限をかけてみている。</p>
+
+<p>もちろんアドバンスで制限かけても良いのだけど、300x250や728x90が使われるようにAdSenseを置く場所の幅と高さに制限をかける方がCSSがきれいに書け、かつ広告の位置調整がしやすい。</p>
+
+<p>HTMLは<code>data-ad-format</code>属性をデフォルトの<code>auto</code>から<code>rectangle, horizontal</code>に変更する必要がある。<code>auto</code>のままだと、例えば領域を300x250に制限しても、300x600などのサイズでテキスト広告がいっぱい表示されたりする。</p>
+
+<pre><code class="language-html">&lt;div class=&quot;adsense&quot;&gt;
+  &lt;ins class=&quot;adsbygoogle&quot;
+       style=&quot;display:block&quot;
+       data-ad-client=&quot;ca-pub-xxxxxxxxxxxxxxxx&quot;
+       data-ad-slot=&quot;xxxxxxxxxx&quot;
+       data-ad-format=&quot;<mark>rectangle, horizontal</mark>&quot;&gt;&lt;/ins&gt;
+  &lt;script async src=&quot;//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  &lt;/script&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p><code>data-ad-format</code>属性をちゃんと設定してやれば、CSS側では<a href="https://support.google.com/adsense/answer/17955?hl=ja">効果的な広告サイズ</a>に合わせてサイズを制限するだけで良い。縦長の160x600をメインに使いたい場合は<code>vertical</code>にすると良い。</p>
+
+<pre><code class="language-scss">.adsense {
+  max-width: 300px;
+  max-height: 250px;
+  overflow: hidden;
+  text-align: center;
+
+  @media (min-width: 1024px) {
+    max-width: 728px;
+    max-height: 90px;
+  }
+}
+</code></pre>
+
+<p>先述の通り、CTRの低下は幅いっぱいいっぱいにテキスト広告で埋める奴が出やすいのが原因な気がするので、もう少し経ってスマートサイズ向けの画像広告が数多く揃えば改善しそうな気はする。それまでは上記のような形で300x250や728x90をメインに据え、CSSの更新のみでスマートサイズにすぐ切り替えられるようにしておくのが良いかなと。</p>

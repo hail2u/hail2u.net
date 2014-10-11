@@ -1,0 +1,38 @@
+Vimでカーソル下のファイルをData URI化する
+
+<p>Data URIネタを続ける。<a href="/blog/coding/perl-convert-to-data-uri.html">昨日書いたData URI変換スクリプト</a>をコマンドラインとかエクスプローラーから送るでクリップボードにコピーして使うだけだと<a href="http://www.vim.org/">Vim</a>で面倒くさい。Vimでは<code>&lt;cfile&gt;</code>でカーソル下のファイル名を拾えるので、それを利用してファイルのパスからData URIに変換するようなスクリプトを書いて使うことにした。</p>
+
+<pre><code class="language-vim">" Convert a file under a cursor to Data URI
+function! s:ConvertCFileToDataURI()
+  let cfile = expand('&lt;cfile&gt;')
+  call setreg('d', substitute(getline('.'), cfile, system('convert-to-data-uri.pl ' . cfile), ''))
+  normal! V"dp
+endfunction
+
+nnoremap &lt;Leader&gt;datauri :call &lt;SID&gt;ConvertCFileToDataURI()&lt;Return&gt;
+</code></pre>
+
+<p><code>system()</code>で変換スクリプトを呼んでやって、その実行結果でファイル名を置換し、行をその置換結果で差し替えるという単純な仕組み。マッピングは良いの思いつかなくて長いので、好きなのに変えるか普通にコマンド作ると良いと思う。</p>
+
+<pre><code class="language-vim">command! DataURI :call &lt;SID&gt;ConvertCFileToDataURI()
+</code></pre>
+
+<p>CSSの<code>url()</code>関数でまずは普通にファイルのパスで参照しておいて、表示を確認する。</p>
+
+<pre><code class="language-css">.test {
+  background-image: url("../images/foo.svg");
+}
+</code></pre>
+
+<p>大丈夫そうだったらファイルのパスにカーソルを持っていき<code>&lt;Leader&gt;datauri</code>で変換という感じで使う(使っている)。</p>
+
+<pre><code class="language-css">.test {
+  background-image: url("data:image/svg+xml;base64,PD94bWwKdmVyc2lv...");
+}
+</code></pre>
+
+<p>もちろん<a href="http://sass-lang.com/">Sass</a>とかでも同じ。</p>
+
+<hr>
+
+<p>レジスター汚すのがあんまよくない(と思う)けど、外部プログラムと連携しようとしたりする時はそういうもんだと諦めてる。なんかこういうののベストプラクティス的なものがあるのか調べたい気は少しだけあるんだけど、んーまーあんまりVimスクリプト覚えたくない……。</p>

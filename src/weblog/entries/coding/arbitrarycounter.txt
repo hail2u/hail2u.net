@@ -1,0 +1,58 @@
+ArbitraryCounter
+
+<p><a href="https://news.ycombinator.com/">Hacker News</a>経由で<a href="http://arbitrarycounter.com/">ArbitraryCounter</a>というのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/477.html">ArbitraryCounter Like Button</a></p>
+
+<p>いいね！と違って何回でも押せるのではてなスターに近い。こういうのがちょっとした工夫でJavaScriptだけで書ける。ArbitraryCounterのAPIは非常に単純なものなので、それの使い方というよりも<a href="http://www.datatables.org/">Open Data Tables</a>を書いて<a href="http://developer.yahoo.com/yql/">YQL</a>でPOSTする話。</p>
+
+<h2>総カウントを取得する</h2>
+
+<p>カウント数の取得は<code>GET</code>で可能なので、JSONPは用意されていないけどYQLでラップしてやれば良い。</p>
+
+<pre><a href="http://developer.yahoo.com/yql/console/#h=select%20*%20from%20json%20where%20url%3D%22http%3A//arbitrarycounter.com/vb/fruit/apples%22">select * from json where url="http://arbitrarycounter.com/vb/fruit/apples"</a>
+</pre>
+
+<p>YQLのクエリはこんな感じ。このクエリを使ってURLを組み立て、簡単にJSONPできる<code>jQuery.getJSON()</code>とかでデータを引っ張ってくるだけ。</p>
+
+<h2>カウントアップ</h2>
+
+<p>カウントアップ(ダウン)には<code>POST</code>が必須。素のYQLでは出来ないけど、以下の様な簡単なOpen Data Tablesを書いてやればいける。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;table xmlns="http://query.yahooapis.com/v1/schema/table.xsd"&gt;
+  &lt;meta&gt;
+    &lt;sampleQuery&gt;&lt;![CDATA[
+      select * from {table} where url="http://arbitrarycounter.com/vb/fruit/apples+"
+    ]]&gt;&lt;/sampleQuery&gt;
+  &lt;/meta&gt;
+  &lt;bindings&gt;
+    &lt;select&gt;
+      &lt;urls&gt;
+        &lt;url&gt;{url}&lt;/url&gt;
+      &lt;/urls&gt;
+      &lt;inputs&gt;
+        &lt;key id="url" type="xs:string" required="true" paramType="variable"/&gt;
+      &lt;/inputs&gt;
+      &lt;execute&gt;&lt;![CDATA[
+        var data = y.rest(url).accept('*').contentType('application/x-www-form-urlencoded').post().response;
+        response.object = y.xparseJson(data);
+      ]]&gt;&lt;/execute&gt;
+    &lt;/select&gt;
+  &lt;/bindings&gt;
+&lt;/table&gt;
+</code></pre>
+
+<p>最後に<code>y.xparseJson()</code>するのを忘れずに。このXMLファイルをどこかにアップロードするとYQLでPOSTを処理できるようになる。</p>
+
+<pre><a href="http://developer.yahoo.com/yql/console/#h=use%20%22http%3A//hail2u.net/pub/test/477.xml%22%20as%20post%3B%0Aselect%20*%20from%20post%20where%20url%3D%22http%3A//arbitrarycounter.com/vb/fruit/apples+%22%0A">use "http://example.com/post.xml" as post;
+select * from post where url="http://arbitrarycounter.com/vb/fruit/apples<mark>+</mark>"</a>
+</pre>
+
+<p>カウントアップする時のYQLへのクエリは、先ほどのカウント取得のURLの最後にプラス(<code>+</code>)を加えるだけ。成功するとカウントアップと共にカウント取得時と同じ構造のデータが返ってくる。</p>
+
+<p>カウントダウンはURLの最後をハイフン(<code>-</code>)に変えるだけ。</p>
+
+<hr>
+
+<p>今のところも何も多分こういういいね！ボタンのような恒久的な使い方は想定していないと思うので、将来的にこれを利用したKudosとかはてなスターっぽいのがJavaScriptだけで作れる！とかそういう話ではない。ただこういうのあったらいいなとか結構前から思ってたので、とても楽しく遊べた。</p>

@@ -1,0 +1,28 @@
+:first-letter擬似要素と各擬似クラス絡みのInternet Explorer 6のバグ
+
+<p><a href="http://blosxom.info/" title="all about blosxom">all about blosxom</a>のサイトを作った時にハマった、<code>:first-letter</code>絡みの<a href="http://www.microsoft.com/japan/windows/ie/ie6/default.mspx" title="Microsoft Internet Explorer ホーム">Internet Explorer 6</a>のバグにまたハマった(学習していない)のでまとめておいてみる。そのバグは、<code>display: block;</code>とした<code>a</code>要素に対して<code>:first-letter</code>擬似要素・<code>:hover</code>擬似クラス・<code>:hover</code>擬似クラスなどを利用してスタイルの指定をした場合、<code>:first-letter</code>擬似要素によるスタイルの指定は有効であるが、各擬似クラスによるスタイルの指定が無効になるというもの。</p>
+
+<p>何はともあれ<a href="/pub/test/047.html" title=":first-letter擬似要素と各擬似クラス絡みのInternet Explorer 6のバグ">テスト・ページ</a>を参照。例としてタブ型のナビゲーションを作成してみた(というかタブ型のナビゲーションを作っているときに遭遇した)。</p>
+
+<p>CSSのコードのバグを含む部分は、</p>
+
+<pre><code class="language-css">div#navigation ul li a:first-letter {
+  text-decoration: underline;
+}
+
+div#navigation ul li a:hover {
+  color: #ffffff;
+  background-color: #006699;
+}
+
+div#navigation ul li a:active {
+  color: #ffffff;
+  background-color: #996600;
+}
+</code></pre>
+
+<p>と、特に問題のありそうなところはなく、<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox 1.5</a>や<a href="http://www.opera.com/products/desktop/" title="Opera browser: Features">Opera 9</a>では意図した通りのスタイルの指定になる。いろいろ試してみたが、回避手段は<a href="/pub/test/047-2.html" title=":first-letter擬似要素と各擬似クラス絡みのInternet Explorer 6のバグ (2)"><code>:first-letter</code>擬似要素を使わない</a>という以外に無い模様。しかもこのバグは同じページ内の全ての擬似クラスによるスタイルの指定がおかしくなるというかなり意味不明な挙動をする模様(テスト・ページの付記を参照)。</p>
+
+<p>Internet Explorer 6において<code>a</code>要素に対する<code>:first-letter</code>擬似要素を使ったセレクタは、<a href="http://davespicks.com/crashiexp.html" title="This will crash IE6 on Windows XP">クラッシュするという致命的なバグ</a>も含めかなり挙動不審。<a href="http://www.w3.org/TR/REC-CSS2/selector.html#first-letter" title="Selectors"><code>:first-letter</code>擬似要素はブロック・レベル要素のみでしかマッチしないということになっている</a>ので、考慮外だったとかそういうことなのだろうか。つまるところ<code>:first-letter</code>擬似要素を使ったセレクタは、Internet Explorer以外だけに適用されるようにしか使うことが出来ないということになる。</p>
+
+<p><a href="http://www.microsoft.com/japan/windows/ie/ie7/about/default.mspx" title="Microsoft Internet Explorer 7: 概要">Internet Explorer 7 Beta 3</a>では直っている感じ。どうでもいいけど。</p>

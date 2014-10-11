@@ -1,0 +1,60 @@
+@silent directive coming soon to Sass?
+
+<p><a href="http://compass-style.org/">Compass</a>開発者の<a href="http://chriseppstein.github.com/">Christopher M. Eppstein</a>が<a href="http://sass-lang.com/">Sass</a>に<code>@silent</code>というディレクティブを<a href="https://github.com/chriseppstein/sass/commit/52c9084c1e1258473d00274fbf210d6c44ae14ad#diff-0">追加してた</a>。どうやら待望の出力CSSに含めないCSSルールを書けるようになるもののようで、これがマージされれば思う存分<code>@extend</code>まくれそう。</p>
+
+<p>カラム定義も</p>
+
+<pre><code class="lang-scss">$col: 60px;
+$gap: 20px;
+
+@function column-width($i) {
+  @return ($col * $num) + ($gap * ($num - 1));
+}
+
+.column {
+  <mark>@silent;</mark>
+  margin-right: ($gap / 2);
+  margin-left: ($gap /2);
+  float: left;
+}
+
+#main {
+  @extend .column;
+  width: column-width(9);
+}
+
+#sidebar {
+  @extend .column;
+  width: column-width(3);
+}
+</code></pre>
+
+<p>という感じで書け、</p>
+
+<pre><code class="lang-css">#main,
+#sidebar {
+  margin-right: 10px;
+  margin-left: 10px;
+  float: left }
+#main {
+  width: 700px }
+#sidebar {
+  width: 220px }
+</code></pre>
+
+<p>出力スッキリ！</p>
+
+<p><code>@media</code>みたいにブロック作らせるとかセレクタで明示できたりとかだとわかりやすそうかなーとか妄想していたんだけど、ルール内に書く形で実装されている。実装の都合っぽい気がするなぁ……。違和感を感じる人はかなり多そうな気がするので、きっとこのままでは実装されないんじゃないかと思う。ブロック内に書かれた一文でそのブロックの挙動が変わるのはちょっと気持ち悪い。</p>
+
+<h2>追記</h2>
+
+<p>危惧していた通り<code>@silent</code>はダメだろーという感じで取り下げられ、パーセント(<code>%</code>)を使って出力しないルールを作れるようになった。</p>
+
+<pre><code class="lang-scss"><mark>%column</mark> {
+  margin-right: ($gap / 2);
+  margin-left: ($gap /2);
+  float: left;
+}
+</code></pre>
+
+<p>というようにクラスのピリオド(<code>.</code>)やIDのナンバー(<code>#</code>)の代わりにパーセントを使って書く。わかりやすい！</p>

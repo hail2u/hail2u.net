@@ -1,0 +1,23 @@
+Google Code Prettifyのローダースクリプトを書き直した
+
+<p>単に<code>DOMContentLoaded</code>で<a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>の<code>prettyPrint()</code>を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのために<code>pre</code>要素に<code>prettyprint</code>というクラスを指定しないように方針変更したので、それに合わせて<code>code[class*=language-]</code>な要素を探してその親が<code>pre</code>だったら<code>prettyprint</code>を追加し、その後で<code>prettyPrint()</code>を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。<a href="http://rainbowco.de/">Rainbow</a>移行への布石。</p>
+
+<p>同じブラウザーかつ同じバージョンなら<code>document.querySelectorAll()</code>におけるセレクターとCSSにおけるセレクターは完全にサポート状況が同じとみなして良いのかわからない。頑張ってググりたい。</p>
+
+<p><code>language-foo</code>をクラスに持つ<code>code</code>要素を表現するセレクターは<code>code[class|=language]</code>とかでいけるかと思ったけど、そういう使い方するものではなかったしダメだった。空白区切りで複数の値を取れるプロパティーではそれぞれの値の先頭にマッチするようなセレクターが欲しい。いやいらないです。</p>
+
+<p>サポートしている言語かそうでないかはごく簡単にチェック。</p>
+
+<pre><code class="language-js">var languages = ["bsh", "c", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm",
+  "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh",
+  "xhtml", "xml", "xsl", "css", "scss", "vim"],
+  reLanguage = new RegExp("\\blanguage-(" + languages.join("|") + ")\\b");
+</code></pre>
+
+<p>追加しづらそう……。Google Code Prettifyの<code>langHandlerRegistry</code>を参照するか<code>langHandlerForExtension()</code>パクった方が良さそう。むしろ頑張ってハイライトしようとするフォールバックの部分なくしちゃえばいいのかなー。</p>
+
+<hr>
+
+<p>視認しつつマークアップの修正をしなければならなかったので<a href="http://www.vim.org/">Vim</a>のキーボードマクロでだいたい誤魔化した。普段は<code>q</code>に誤爆するとうっとうしいけど、使う時はコマンドラインにでる<code>recording</code>というメッセージがすごく可愛く見える。多分結構な数のエントリーでおかしくなってそう。気づいたら直す。</p>
+
+<p>あとRainbowに僕の書いた<code>&lt;code class="language-php"&gt;</code>とかに対応するコードが取り込まれたので<code>data-language</code>へ書きなおさなくても使えるようになった。作者のさじ加減で消えかねないのでマークアップにこだわりがないなら素直に併記した方が良さそう。</p>

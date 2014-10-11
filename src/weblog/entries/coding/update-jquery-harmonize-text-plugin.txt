@@ -1,0 +1,57 @@
+jQueryプラグイン: Harmonize Textを更新
+
+<p>jQueryプラグイン化する以前からの懸念事項だった要素の幅に影響を与えるCSSプロパティの扱いと、子にテキストノード以外が含まれる場合の2つを考慮した感じにして<a href="https://github.com/hail2u/jquery.harmonize-text/tree/v0.2">jquery.harmonize-textを0.2に更新しました</a>。Works like a charm!?</p>
+
+<h2>要素の幅に影響を与えるCSSプロパティ</h2>
+
+<p>単純に<code>clone()</code>すると<code>transform</code>プロパティや<code>transition</code>プロパティなどで変なことになりそうな気がしたので、要素の幅に影響を与えそうなプロパティを手作業でリストアップしてそれらのみをコピーすることにしました。そういう面倒なことはやりたくないって言ってたような気がしますけど、きっと気のせいです。</p>
+
+<p>要素の幅に影響を与えるCSSプロパティは</p>
+
+<ul>
+<li>border-collapse</li>
+<li>border-left-width</li>
+<li>border-right-width</li>
+<li>box-sizing</li>
+<li>display</li>
+<li>font-family</li>
+<li>font-size</li>
+<li>font-style</li>
+<li>font-variant</li>
+<li>font-weight</li>
+<li>letter-spacing</li>
+<li>padding-left</li>
+<li>padding-right</li>
+<li>text-transform</li>
+<li>white-space</li>
+<li>word-break</li>
+<li>word-spacing</li>
+<li>word-wrap</li>
+</ul>
+
+<p>位だと思います。ベンダー拡張については面倒だったので見なかったことにしました。<code>box-sizing</code>プロパティの値によっては<code>border-left(right)-width</code>プロパティも必要になるんじゃないかと思います。漏れてるっぽいのがあったら教えてくれると嬉しいです。</p>
+
+<h2>子要素のコピー</h2>
+
+<p>今までのテキストだけを拾ってコピーするという方法で大体うまくいくんですけど、以下のようなケースでずれます。</p>
+
+<pre><code class="language-html">&lt;h1&gt;Lorem &lt;em&gt;ipsum&lt;/em&gt; dolor &lt;strong&gt;sit&lt;/strong&gt; amet.&lt;/h1&gt;
+</code></pre>
+
+<p><code>em</code>要素等での幅の変化に対応できないので。他にも内側の要素のスタイルへの考慮もないので色々まずいです。</p>
+
+<pre><code class="language-html">&lt;h1&gt;This website is cool
+  &lt;span style=&quot;font-family: &#39;Palatino&#39;, &#39;Palatino Linotype&#39;, serif;&quot;&gt;&amp;amp;&lt;/span&gt;
+creative!&lt;/h1&gt;
+</code></pre>
+
+<p>例えばこういうのとかですかね？なので子要素を丸ごとコピーしてしまうことにしました。</p>
+
+<pre><code class="language-js">temp.append(target.<em>contents()</em>.<em>clone()</em>);
+</code></pre>
+
+<p><code>children()</code>だと子のテキストノード等が拾えないので、<code>contents()</code>で全部拾って<code>clone()</code>でコピー。jQueryだと町でうわさのアホの子でも書けますね。</p>
+
+<hr>
+
+<p>これでだいたいベースは完成したんじゃないかと思います。今はブラウザーの最小フォントサイズに関わる問題をもっとエレガントに解決する方法を模索中です。あと縦方向のみのリサイズの時には発火しないようにもしたいですね。今のままだとDeveloper Toolsの表示切替で発火とかかっこ悪い感じです……。</p>

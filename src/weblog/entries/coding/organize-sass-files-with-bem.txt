@@ -1,0 +1,76 @@
+BEMを使ったSassファイルの整理
+
+<p><a href="https://github.com/hail2u/hail2u.net-styles">このウェブサイトのSassファイル群</a>はずっとフラットなファイル構成でやっていた。主にSassが相対パスの修正を行うことができないことが理由だったけど、最近はポストプロセスすればどうにでも出来そうな感じなので、<a href="https://github.com/hail2u/hail2u.net-styles/commit/dd1cf941a2d3949508c8beaf20759b225829ea14">あまり気にせず整理することに</a>した。単純にカテゴリ分けするだけでも良いのだけど、<a href="http://bem.info/">BEM</a>を応用してやってみている。</p>
+
+<p>CSSのクラス名及び変数やプレースホルダー・クラスにはまだ手を付けず、まずはBEMツリーとルールセットの配置の対応を作るところから始めた。</p>
+
+<ul>
+<li>ファイル名でブロック<ul>
+<li>ディレクトリでブロックのネスト</li>
+</ul>
+</li>
+<li>セレクターの1段階のネストでエレメント</li>
+<li><code>&amp;</code>を使ったセレクターのネストでモディファイア</li>
+</ul>
+
+<p>以上のようなルール付けの元にやってる(未完成)。</p>
+
+<h2>ブロック</h2>
+
+<pre>scss/
+├ _header.scss
+└ header/
+   ├ _logo.scss
+   └ _site-navigation.scss
+</pre>
+
+<p>ファイル名がブロックになり、かつ繰り返しにならないようにディレクトリを使って配置する。CSSのクラス名で<code>.header__site-navigation</code>になるであろうルールセットが含まれるのが<code>header/_site-navigation.scss</code>になる。必要なら必要なだけネストしていけば良い。例えば<code>.header__site-navigation</code>にナビゲーションのリスト以外に検索ボックスやRSSフィードを表示するブロックがあるなら以下のようにする。</p>
+
+<pre>scss/
+├ _header.scss
+└ header/
+   ├ _logo.scss
+   ├ _site-navigation.scss
+   └ site-navigation/
+      ├ _feed.scss
+      ├ _list.scss
+      └ _searchbox.scss
+</pre>
+
+<p><code>header/</code>と<code>_header.scss</code>あるのはちょっと気持ち悪いし、ブロック単位での一括削除がしづらくなるので、<code>header/_index.scss</code>とかの方が良いのかもしれない。</p>
+
+<h2>エレメント</h2>
+
+<pre><code class="language-scss">body &gt; header nav {
+  ul {
+    display: inline-table;
+  }
+
+  li {
+    display: table-cell;
+  }
+}
+</code></pre>
+
+<p>ルールセット内で1段階ネストするとエレメントになる。先述のようにブロックは必ずファイルになるので、<code>&amp;</code>を使わないネストは必ずエレメントとすることができ、読みやすくなる。</p>
+
+<p>ブロックが分散する前提なので、ブロックをまたいだエレメント間でのルールの共有が難しい。そのためプレースホルダー・クラス頼みになるので、見通しがちょっと悪くなる。</p>
+
+<h2>モディファイア</h2>
+
+<pre><code class="language-scss">body &gt; header nav {
+  li {
+    &amp;.current {
+      border-bottom: 3px double;
+    }
+  }
+}
+</code></pre>
+
+<p><code>&amp;</code>を使ってネストさせるとモディファイアになる。ネストでモディファイアでも良さそうだけど、それだとブロックに対するモディファイアが、エレメントと同じになってしまうので混乱する。Sass(に限らないけど)のネストは深くするべきではないので、2段階のネストをモディファイアと確定させると、これ以上のネストがまず起こらないようになる。</p>
+
+<p>出力されるセレクターに無駄が出るのと、<code>&amp;</code>をSass本来の用途として使っていないところが良くない。</p>
+
+<hr>
+
+<p>BEMの命名規則を使ったクラス名は役に立つとは思うけど、好きではない。ので、ファイル構成を使ってSassのモジュール化を進めてみた。<a href="/blog/webdesign/sass-and-bem.html">前にちょっと書いたの</a>を実戦投入し始めたみたいな話。</p>

@@ -1,0 +1,11 @@
+ETag
+<p>If-Modified-SinceやらLast-Modifiedやらなんやらの絡みで、ETagなるものを調べていたわけですが、とりあえずあれば使うけどなくても別に・・・みたいなモノっぽい感じ。If-Modified-Sinceは、とりあえずLast-Modifiedを常に吐いて、受信ヘッダをチェックし適切に304を返してやるだけでOKな感じ。</p>
+<p>ていうかETagはどういう風に生成するものか調べきれなかった。リクエストされたURLや更新時刻、inodeなどを元に生成するらしいけど。そこまでしか。</p>
+<p>ブラウザは受け取ったETagの値を、次回リクエスト時にIf-None-Matchの値としてそのまんま送ってくるだけな感じなので、適当にMD5やらなにやらでハッシュを生成してやるだけ？</p>
+<p>まぁ、Last-Modified吐いて適当にIf-Modified-Since調べるだけで十分っぽい感じなので、もう<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグインには実装しないと決めたんですが。</p>
+<p><a href="http://www.movabletype.org/news/2004/08/movable_type_31_launched.shtml" title="Movable Type Publishing Platform: Movable Type 3.1 Launched">Movable Type 3.1</a>からサポートされた動的生成はどんな感じなんだろう？しいらべ手みて目から鱗だったら<del>パクろう</del><ins>参考にしよう</ins>かな。</p>
+<h2>追記@2004/09/15</h2>
+<p>しーぱん派なにぽたんさんからETagの生成方法(Apacheにおける実装に過ぎないのかもしれない)をコメントで教えてもらったので追記しておく。</p>
+<pre><code class="language-perl">my $etag = sprintf(qq{ETag: &quot;%x-%x-%x&quot;\n}, (stat($file))[1, 7, 9]);
+</code></pre>
+<p><code>$file</code>に対する<code>stat()</code>で返されるリストの、inode/size/mtimeをそれぞれ符号なし16進数でフォーマットしたものを&quot;-&quot;で連結ということみたいですね。</p>

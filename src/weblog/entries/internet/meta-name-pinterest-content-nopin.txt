@@ -1,0 +1,25 @@
+Pinterestのnopin
+
+<p>「対策しました！」みたいなニュースが普通に注目されちゃうとか<a href="http://pinterest.com/">Pinterest</a>の勢いはすごいな。「対策」っていうのはおかしい気がするけど(どちらかというとPinterest寄りの目線なので)。それはまぁともかく<code>nopin</code>は実装がおかしい気がしてしょうがない。あまり興味もなかったので<code>nopin</code>の話は読み流していたため「えっ？<code>alert()</code>？」とか思っただけだった。ちょっと追ってみたところクライアント側のJavaScriptでチェックしてるだけで、実際にはPinterestは<code>nopin</code>をチェックしていないと言って良いと思う。</p>
+
+<p>PinterestのBookamrkletでは以下のようにチェックしているだけだった(読みやすいように整形しておいた)。</p>
+
+<pre><code class="language-js">var i = document.getElementsByTagName("meta");
+
+for (var g in i) {
+  var e = i[g];
+
+  if (e.name &amp;&amp; e.name.toUpperCase() == "PINTEREST" &amp;&amp; e.content &amp;&amp; e.content.toUpperCase() == "NOPIN") {
+    window.alert("This site doesn't allow pinning to Pinterest. Please contact the owner with any questions. Thanks for visiting!");
+    return
+  }
+}
+</code></pre>
+
+<p>なのでBookmarkletの先頭で<code>meta</code>要素などをざっくり削除するだけでこの部分は通る。</p>
+
+<p>その後は<em>Pinterest側は何もチェックしない</em>ようなので<code>nopin</code>を指定しているページの画像も普通にpinできる(自分で<code>nopin</code>仕込んだページを作って試したら出来た)。Pinterestはクライアント側だけでなくサーバー側でもpin先のページをクロールして<code>nopin</code>をチェックするべきだし、そうでないのなら「pinされたくないなら<code>nopin</code>指定すれば良い」などとは言うべきではない。</p>
+
+<p>既にサードパーティ製のpinするツールはいくつかあるし、この人気ならもっと増えていくだろう。それらがちゃんと<code>nopin</code>を見ることを実装するかは誰も保証できないので、Pinterestがサーバー側で<code>nopin</code>をチェックしないままならば<code>nopin</code>は形骸化してしまう。</p>
+
+<p>そもそもクロールしないのにクロールしないとチェックできない<code>meta</code>要素で意思表示させるというアプローチが間違っている気がする。それに「Webサイト」や「ページ」ではなく「画像ファイル」に対して何らかの意思表示をさせるべきなので、HTTPヘッダーとかファイル名とか埋め込みメタデータとかのが向いてるはず。ただこれらの方法はあまりにもコンテンツ所有者には敷居が高いので、コンテンツ所有者側とPinterest側の実装コストとかを考慮すると、現実的なのは<code>robots.txt</code>的な<code>nopin.txt</code>とかを用意させるとかなんじゃないかなーと思う。</p>

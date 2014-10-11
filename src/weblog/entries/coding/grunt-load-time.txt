@@ -1,0 +1,26 @@
+Gruntのロード時間
+
+<p><a href="http://qiita.com/makotot/items/bf7e8a4d704b2e977fed">必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニック</a>はすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。<a href="https://github.com/gruntjs/grunt/issues/975">Qiitaの記事が参照しているIssue</a>でも似たようなことが推奨されている。</p>
+
+<p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する(昔どこかで読んだ気がするけど見つからなかった)ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.registerMultiTask(&#39;example&#39;, &#39;Grunt multi task example.&#39;, function () {
+    // Loading Node packages inside taskFunction
+    var _ = require(&#39;lodash&#39;);
+    var async = require(&#39;async&#39;);
+    var foo = require(&#39;foo&#39;);
+    var bar = require(&#39;./bar.js&#39;);
+
+    // Do whatever you want.
+  });
+};
+</code></pre>
+
+<p>こういう形で<code>grunt.registerMultiTask()</code>の第三引数であるタスク関数内で呼ぶなら、タスクのロード時間に影響を与えない。普通に<code>require()</code>せずにプロクシー的な関数を噛ませた方が良いかもしれないが、そこまでのこともないような気がする。仮に全てのタスクがこのように書かれていたなら、それらを全部ロードしたとしても目に見えるほどロード時間は落ちないはず。同じタスクを複数回呼ぶようなタスクの場合、タスクの実行時間に無駄ができるけど、それはマイナーなケースだと思う。</p>
+
+<p>JavaScript的にはアンチ・パターン？</p>
+
+<hr>
+
+<p>Grunt v5.0では<a href="https://github.com/gruntjs/grunt/issues/907"><code>grunt.util.async</code>や<code>grunt.async._</code>などが削除されること</a>になっており、それぞれのタスクで個別に依存パッケージをロードしなくてはならなくなる。そのこともあって今後はタスクでパッケージを読み込む機会も増えるし、それを見据えた効率的なタスクの書き方みたいなのも考えた方が良さそう。そうでないと<a href="http://gulpjs.com/">魅力的で高速な対抗勢力</a>に勝てるのはプラグインの豊富さで優っている今だけなどということになりそう。</p>

@@ -1,0 +1,24 @@
+HTML -> CSS -> SVG -> CSS
+
+<p>HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/417.html">HTML -> CSS -> SVG -> CSS</a></p>
+
+<p>SVGでCSSを使う方法は簡単で、<code>&lt;?xml-stylesheet?&gt;</code>を使うだけ。CSSでスタイルを書きやすくするため<code>id</code>属性を指定しておくと良い。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+<mark>&lt;?xml-stylesheet type="text/css" href="test.css"?&gt;</mark>
+&lt;svg <mark>id="foo"</mark> .../&gt;
+  ...
+&lt;/svg&gt;
+</code></pre>
+
+<p>これでまぁSVGを直接書き換えることなく簡単な変更、例えば<code>fill</code>プロパティーの調節とかそういった事ならCSSで行えるようになるわけだけど、HTTPリクエストが1つ増えることになる。そこでHTML側で参照しているCSSにSVGのスタイルも混ぜ込んで、SVG側からもHTMLと同じCSSを参照してやれば良いのではないかと考えた。CSSを統合すると<a href="http://sass-lang.com/">Sass</a>等を使っているのならカラースキームの流用などもできることになるのでより便利では！</p>
+
+<p>として上記デモを書いて実験してみたら思わぬ結果に終わった……。期待通りに動いたのはOpera 11だけという結果に。Chrome 19とFirefox 12ではスタイルが反映されず(SVG単体で表示した場合は反映されるのでCSSの問題では無さそう)、<del>Internet Explorer 9ではスタイルは反映されるもののCSSのが二回リクエストされるバグがあった</del>。Ch19とFx12の挙動はバグなのかどうなのかわからない。想像できる理由はいくつかあるけど単なる憶測なので書かない。</p>
+
+<p>仕様がどうなっているにせよHTML文書とSVG画像でCSSを共有するというのは期待通りにいかなそうなので避けた方が無難という感想。ライフ・チェンジングするアイディアだと思ったのにな……。</p>
+
+<h2>追記</h2>
+
+<p>IE9での重複リクエストされるバグがあるというのは嘘だった。開発者ツールで<em>そう見える</em>というだけで実際にはHTTPリクエストは飛んでないと<a href="https://twitter.com/mayuki">@mayuki</a>に指摘されたので、Fiddlerとサーバー立てて調べてみたところリクエストは飛んでこないことが確認できた。ごめんなさい。</p>

@@ -1,0 +1,28 @@
+アンカーの子要素の余白
+
+<p><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML Standards</a>では<code>a</code>要素の子に<code>h1</code>とか<code>p</code>とか果ては<code>section</code>要素まで含めることが出来る。その場合、子要素の<code>margin</code>プロパティーによる余白があったりするわけだけど、その余白部分もリンクになるかどうかはブラウザーによって違うようだ。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/494.html">Block Anchor</a></p>
+
+<p>デモに書いてあるように、余白(見出しと段落の間)がリンクになりクリックできるのはChrome 29だけ(結構な頻度でリンクにならないことがあるけど)。Internet Explorer 10とFirefox 23ではリンクにならずクリックできない。どうなるべきか根拠になりそうな仕様は見つけられなかった。</p>
+
+<p>この挙動の違いをブラウザー間で揃えるには、CSSで<code>a</code>要素に<code>display: inline-block</code>するか、<code>a</code>要素の子要素で<code>margin</code>プロパティーの代わりに<code>padding</code>プロパティーを使う必要がある。前者の方がまだマシだが、どちらの方法もそこそこコストが高いので、<code>a</code>要素が複数の子要素を保たないようにマークアップを変更する方が無難な気がする。</p>
+
+<pre><code class="language-html">&lt;a&gt;
+  &lt;section&gt;
+    &lt;h1&gt;...&lt;/h1&gt;
+    &lt;p&gt;...&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/a&gt;</code></pre>
+
+<p>デモのマークアップの場合は上記のように<code>a</code>要素で<code>section</code>要素全体を括るように修正する。これだけでどのブラウザーでも余白がリンクになりクリックできるようになる。マークアップの都合上<code>div</code>要素を使う必要があったりもするので、そういうのが気になる場合は<code>a</code>要素にクラスを振り<code>display: inline-block</code>を使うと良い。将来的には以下のように書けるようになるはずだけど今は書けないので。</p>
+
+<pre><code class="language-css">a<mark>!</mark> &gt; <mark>:matches(h1, p, hr, pre, ol, ul, dl, div)</mark> {
+  display: inline-block;
+}</code></pre>
+
+<p>セレクターの途中を選択する<code>!</code> (頭に<code>$</code>じゃなくなった)と、既にベンダー拡張プリフィックス付きで<code>:any()</code>としていくつかのブラウザーで実装されている<code>:matches()</code>の組み合わせ。わぁわかりやすい！</p>
+
+<hr>
+
+<p>いずれにしろアンカーの子要素の余白はリンクにならずクリックできないという前提の元に、どう振る舞わせるのが良いかを考える必要がありそう。</p>

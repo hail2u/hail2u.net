@@ -1,0 +1,48 @@
+CSSの簡略プロパティー
+
+<figure class="full-width">
+  <img src="/images/blog/css-shorthand-property.png" alt="簡略プロパティーでは未定義のプロパティーはその初期値にリセットされるため、まとめられるプロパティーを単純につなげただけでは効果が同じにはならない">
+</figure>
+
+<p>CSSの標準仕様では一部のプロパティーに簡略(ショートハンド)プロパティーが用意されている。<code>margin</code>や<code>background</code>、<code>font</code>プロパティーなどがそれ。うまく使うとCSSをかなり短くできるので、積極的に使いたいけど、なかなかの複雑さでそうもいかない。かといって機械的に処理するのも、CSSは人が簡単に書けることを想定して仕様が作られている節がある(根拠はない)のでまた難しい。</p>
+
+<p>先日知った<a href="http://shrthnd.volume7.io/">CSS Shorthand Generator</a>の内部で使われている<a href="https://github.com/frankmarineau/shrthnd.js">shrthnd</a>パッケージはまさに機械的に処理するためのもの。でも予想通り、全然ちゃんと機能するものではなかった。</p>
+
+<p>例えばshrthndパッケージでは複数の<code>font-*</code>プロパティーをまとめることができることになっている。</p>
+
+<pre><code class="language-css">.test {
+  font-family: serif;
+  font-size: 1.5em;
+}
+</code></pre>
+
+<p>このように書くと、以下のように変換される。</p>
+
+<pre><code class="language-css">.test {
+  font: 1.5em serif;
+}
+</code></pre>
+
+<p>簡略プロパティーの文法としては正しいけど、<a href="http://terkel.jp/archives/2012/06/problem-with-css-shorthand-propaties/">CSS ショートハンド・プロパティの問題点</a>で詳しく解説されているように、<code>font</code>プロパティーでは省略した値が継承を破棄してその初期値にリセットされることがまったく考慮されていない。</p>
+
+<p>他にも<code>background-*</code>プロパティーで同じ問題がある。更に複数の背景が指定されていたケースなどにまったく対応できていなかったりと、ごく限定的なケースのみでうまく機能するものだった。</p>
+
+<hr>
+
+<p>僕も<a href="https://github.com/hail2u/node-csswring">CSSWring</a>にこういった簡略プロパティーへの変換機能を入れようと色々考えていた。けれど、結局無駄で無理だなと諦めた。</p>
+
+<p><code>font</code>プロパティーならばそれらにまとめられるプロパティー群が全部あることを前提にすれば良い。しかしそれでは<code>font</code>プロパティーへの短縮はまず利用されることがまずない死に機能になってしまう。無いものはとりあえず<code>inherit</code>などで埋めるという対処で死に機能になるのは回避できるが、それだと今度はプロパティーの省略で減らした分よりも増える可能性が高い。</p>
+
+<p><code>margin</code>プロパティーの場合は、みんな普通に使える時は簡略プロパティーの方を使って書いてそうなのでほとんど意味がない。</p>
+
+<p><code>background</code>プロパティーでは、それにまとめられるプロパティーごとにカンマで区切られた数が違うことがある。<code>background-image</code>プロパティーではカンマ区切りで複数だけど、<code>background-size</code>プロパティーは全部まとめて指定しているなどというケースのこと。これらを適切に考慮してまとめることは不可能に近い。その上サイズ的な面でのメリットも少ない。</p>
+
+<p>実装するために越えなくてはならない壁と作業に比べて、得られる効果や結果が割に合わないという感じで間違いないと思う。</p>
+
+<hr>
+
+<p>僕はそもそもあんまり簡略プロパティーで書かないようにしてたりもする。単純に読めないし、誤解する・誤解させる自信がある。CSSプロパティーの初期値なんか覚えてるわけがない。せいぜい<code>margin</code>、<code>padding</code>と<code>border</code>プロパティーくらいしか書かないし、書いて欲しくないなと思う。</p>
+
+<p>僕はミニマルなCSSを書くのが好きだけど、それはコード量が少ないCSSとかそういう意味じゃない。そのCSSがCSSの継承やHTMLドキュメントに与える効果が必要最小限であることを良しとしたいというのが近い。だから<a href="https://github.com/hail2u/normalize.scss">Normalize.scss</a>のような<a href="http://necolas.github.io/normalize.css/">Normalize.css</a>の機能を必要なだけ組み込めるような仕組みを作るし、<code>* { box-sizing: border-box }</code>のようなテクニックはゴミだと思ってる。</p>
+
+<p>そう書くことによって簡略さではなく、可読性や理解しやすさ、そして保守性に繋がると信じてる。</p>

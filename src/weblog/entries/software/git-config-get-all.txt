@@ -1,0 +1,15 @@
+git config --get(-all)
+
+<p><a href="http://motemen.hatenablog.com/entry/2014/08/29/talked-at-yapc-asia-2014">YAPC::Asiaでの@motemenのトークのスライド</a>を見て、<code>.git/*</code>を見ないのはなるほどなと思った。愛用している<a href="https://github.com/hail2u/node-git-release">git-release</a>も前にちょっと書いたみたいに<code>config --get(--all)</code>を使って設定を拾うようにした。</p>
+
+<p><code>config --get(-all)</code>は、指定した設定が存在しない場合にエラー・コードが1で終了する。なのでオプショナルな設定(git-releaseでは<code>release.push</code>)を読みたい場合は、エラー・コードを無視して続行する必要があったけど、それ以外は特に苦労することもなかった。<code>config --get-all</code>も一行に一つというパースしやすい出力なので簡単だった。</p>
+
+<p>使い方はまったく変わってない。</p>
+
+<hr>
+
+<p>npmで<code>-g</code>で入れればすぐGitのユーザー定義サブコマンドとして使えるみたいにしたいんだけど、WindowsのGitではうまくさっくりと動かせない。理由はGitがユーザー定義サブコマンドを実行する時に、見つかった実行ファイルのパスの区切りをシェルが何かを考慮せずにバックスラッシュで常に送るようになっていること。</p>
+
+<p>MSYS上でnpmでインストールしたユーザー定義サブコマンドを実行しようとすると、そこはMSYSがバックスラッシュを何となくどうにかしてくれるので、npmが作るシェルスクリプトを見つけることまではできる。だけどそのシェルスクリプトが行う<code>`dirname &quot;$0&quot;`</code>が<code>.</code>を返してしまうので、最終的に実行される実体の実行ファイルが見つからなくなる。</p>
+
+<p>どうにもならなそう。</p>

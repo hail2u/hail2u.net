@@ -1,0 +1,53 @@
+Sassで文字列の置換を行うユーザー定義関数
+
+<p><a href="https://github.com/nex3/sass/blob/0ef77dc0e3cff821aadca09aca98cac46354093d/lib/sass/script/value/string.rb">Sass 3.3で入る予定の文字列関数</a>の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。</p>
+
+<pre><code class="language-scss">// str-replace() - Replace in a string
+//
+// @param {string}  $string    String that you want to replace
+// @param {string}  $substr    String that is to be replaced by `$newsubstr`
+// @param {string}  $newsubstr String that replaces `$substr`
+// @param {number*} $all       Flag for replacing all (1+) or not (0)
+// @return {string}
+@function str-replace($string, $substr, $newsubstr, $all: 0) {
+  $position-found: str-index($string, $substr);
+  $processed: ();
+
+  @while ($position-found &gt; 0) {
+    $length-substr: str-length($substr);
+    $processed: append($processed, str-slice($string, 0, $position-found - 1));
+    $processed: append($processed, $newsubstr);
+    $string: str-slice($string, $position-found + $length-substr);
+    $position-found: 0;
+
+    @if ($all &gt; 0) {
+      $position-found: str-index($string, $substr);
+    }
+  }
+
+  $processed: append($processed, $string);
+  $string: &quot;&quot;;
+
+  @each $s in $processed {
+    $string: #{$string}#{$s};
+  }
+
+  @return $string;
+}</code></pre>
+
+<p><code>str-index()</code>で置換対象文字列<code>$substr</code>見つけたら、<code>$substr</code>までを抜き出したのと置換後文字列<code>$newstr</code>をリストである<code>$processed</code>に追加していくという作業を行うだけ。最後に<code>$processed</code>を連結して返す。<code>$all</code>は全置換を行うかどうかのフラグで、<code>0</code>か省略した場合は最初の１つだけ置換する。</p>
+
+<pre><code class="language-scss">.test {
+  margin: str-replace(&quot;1em 2em&quot;, &quot;em&quot;, &quot;rem&quot;, 1);
+}</code></pre>
+
+<p>と書くと、</p>
+
+<pre><code class="language-css">.test {
+  margin: 1rem 2rem; }</code></pre>
+
+<p>となる。この利用例にまったく意味はない。</p>
+
+<hr>
+
+<p>こういう<a href="https://github.com/hail2u/scss-functions">汎用的であることを意識したユーザー定義関数</a>を作っておいて<code>@import</code>するというのもそれほど悪くはなさそう。しかし、ミックスインのように即戦力ではないので、別に分けて管理してもメリットを得る機会はほとんどなさそう。かといって毎回一から書くのでは面倒臭いので、コアの部分をコード・スニペットとしてどっかに置いといて、複雑な特化型ユーザー定義関数を書く時に引っ張り出してきて使うというのが理にかなっている。と感じた。</p>

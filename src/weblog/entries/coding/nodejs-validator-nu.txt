@@ -1,0 +1,42 @@
+Node.jsでValidator.Nuを叩く
+
+<p><a href="http://nodejs.org/">Node.js</a>で<a href="http://validator.nu/">Validator.nu</a>を使ってHTMLファイルをチェックするスクリプトを書いていた。<a href="https://github.com/felixge/node-form-data">form-dataモジュール</a>を見つけるのに1時間、スクリプト書くのに15分。</p>
+
+<p>form-dataモジュールは<a href="http://www.w3.org/TR/XMLHttpRequest2/">XMLHTTPRequest Level 2</a>の<a href="http://www.w3.org/TR/XMLHttpRequest2/#interface-formdata">FormDataインターフェイス</a>に似たものを提供するNode.jsモジュール。<code>append()</code>でパラメーターを追加していき、<code>submit()</code>で指定したURLにPOSTすることができる。Validator.nuは<code>application/x-www-form-urlencoded</code>に対応しておらず、Query Stringモジュールとかでポンと叩くことはできないため、このform-dataモジュールや<a href="https://github.com/coolaj86/abstract-http-request">ahr2モジュール</a>などが(面倒くさいので)必要。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var FormData = require('form-data');
+var fs = require('fs');
+
+var htmlfile = process.argv.slice(2)[0];
+
+var fd = new FormData();
+fd.append('out', 'json');
+fd.append('file', fs.createReadStream(htmlfile));
+fd.submit('http://validator.nu/', function (error, response) {
+  if (error) {
+    throw error;
+  }
+
+  var chunks = '';
+
+  response.on('data', function (chunk) {
+    chunks += chunk;
+  });
+
+  response.on('end', function () {
+    JSON.parse(chunks).messages.forEach(function (message) {
+      if (message.type === 'error') {
+        var line = (message.lastLine ? message.lastLine : 0);
+        var column = (message.firstColumn ? message.firstColumn: 0);
+        console.log([htmlfile, line, column, message.message].join(':'));
+      }
+    });
+  });
+});
+</code></pre>
+
+<p>コマンドラインに渡された最初の引数をHTMLファイルのパスとみなし、その中身を<code>multipart/form-data</code>でバリデーターにPOSTし、返ってきたJSONフォーマットの結果を<a href="http://nodejs.org/">GNUの標準エラーフォーマット</a>に整形して標準出力に吐いている。</p>
+
+<p>form-dataモジュールはHTTPモジュール決め打ちだったりなんかアレな気がするので、<code>append()</code>だけ使って<code>submit()</code>を使わずに<code>pipe()</code>でHTTP(S)モジュールに渡す形で書いた方が良いかもしれない。</p>

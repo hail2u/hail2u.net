@@ -1,0 +1,71 @@
+WebKitでのSVGを背景画像にすると起こるバグ
+
+<p>SVGはそのリサイズ(スケーリング)においてブラウザ間で差異やバグがあります。有名なのは<code>viewBox</code>がないことによる<a href="http://www.seowarp.com/blog/2011/06/svg-scaling-problems-in-ie9-and-other-browsers/">IE9やWebKitでのバグ</a>でしょうか。それでも<code>img</code>要素等でSVGを使う場合はSVG側で<code>width</code>と<code>height</code>そして<code>viewBox</code>属性を指定し、CSSなどでリサイズすれば大体問題ありません。なので背景画像で使う場合も<code>background-size</code>プロパティーを使えば……と思いきや、なかなかの落とし穴がありました。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/323.html">SVG Arrow</a></p>
+
+<p>WebKit以外では自動リサイズが期待される<code>viewBox</code>のみ指定したSVGを背景画像にすると問題なくキレイにリサイズされます。対してWebKitではリサイズされたりされなかったりです。しかもChromeとSafariでは挙動が少し違ったりもし、追求する気が失せるほど挙動不審です。どうも良きに計らってはくれそうにないので、明示的にリサイズを促す方法を探ってみました。</p>
+
+<h2><code>background-resize</code>プロパティー</h2>
+
+<pre><code class="language-css">.arrow {
+  background-size: 100% 100%;
+}
+</code></pre>
+
+<p>まずは背景画像のサイズを指定する<code>background-size</code>プロパティーを使用してみました。するとどうやらSVGをラスタライズしてからリサイズするようで、デモを見ればわかるようにぼやけます。ここでは<code>%</code>を使っていますが、<code>px</code>指定でのリサイズでも同じくぼやけます。</p>
+
+<p>最初のデモと違い、このデモではSVG画像で<code>width</code>と<code>height</code>属性を指定しています。これらの指定がないとそもそもうまくリサイズ出来なかったため、<code>viewBox</code>属性と合わせた数を指定しましたが、その結果ぼやけるという……。</p>
+
+<h2>SVGの<code>width</code>と<code>height</code>属性で<code>100%</code></h2>
+
+<pre><code class="language-xml">&lt;svg
+  viewBox="0 0 64 64"
+  width="100%"
+  height="100%"&gt;
+</code></pre>
+
+<p>CSSでのリサイズはラスタライズされてからになってしまうということだと思うので、今度はSVGのルート要素の<code>width</code>と<code>height</code>属性で<code>100%</code>を指定してリサイズさせてみました。今度はうまくいった……と思ったんですが、同じSVG画像を更に使用した場合に片一方のリサイズ結果に引きずられてしまうという現象が起こりました。デモのように左の<code>64px</code>へのリサイズ結果が<code>128px</code>へのリサイズへ影響してしまうということです。場合によっては<code>128px</code>の方が成功して、<code>64px</code>の方が失敗するなどひどく挙動不審です。</p>
+
+<h2><code>::before</code>擬似要素で！</h2>
+
+<pre><code class="language-css">.arrow {
+  width: 256px;
+  height: 256px;
+}
+
+.arrow::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  content: url("arrow.svg");
+}
+</code></pre>
+
+<p>結局のところ背景画像で使う以上どうにもならなそうな気がしたので、目先を変えて<code>::before</code>擬似要素の<code>content</code>プロパティーでSVGを指定するという方法を試したところすんなりうまく行きました。WebKit以外でも問題ありません。</p>
+
+<hr>
+
+<p>というわけでこのサイトの<a href="https://github.com/hail2u/hail2u.net-styles/commit/0c7bcf6a8514d4711edbc3bd804c2d99aaba1d96">ページング・ナビゲーションをSVGにしました</a>。デモ・ページにも載っていますが矢印は以下のような単純なものです。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;svg id="left-arrow"
+  viewBox="0 0 64 64"
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;g transform="translate(32), rotate(-45, 32, 32)"&gt;
+    &lt;g fill="none"
+      stroke="#fff"
+      stroke-width="8"&gt;
+      &lt;line x1="0" y1="4" x2="24" y2="4"/&gt;
+      &lt;line x1="4" y1="0" x2="4" y2="24"/&gt;
+    &lt;/g&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>パスで書く必要もなさそうだったので、適当に線を組み合わせてカギ型にし、それを<code>transform</code>属性で移動(<code>translate</code>)と回転(<code>rotate</code>)を使ってシンプルなページング向けの矢印を作りました。</p>
+
+<h2>追記</h2>
+
+<p>WebKit……というかブラウザのバージョンについて書いていなかったので追記しておきます。バグが起こるのはChrome 15.0.874.121 mとSafari 5.1.2です。Chrome 17.0.963.3 canaryでは完全に直っているので、デスクトップ界では結構すぐに統一されそうですね。</p>

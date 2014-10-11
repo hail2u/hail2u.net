@@ -1,0 +1,44 @@
+Webフォントの非同期読み込み
+
+<p>Webフォントの読み込みは<code>@import</code>だと色々まずいので、主に<code>link</code>要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。</p>
+
+<p>非同期化することによりWebフォント定義の含まれるCSSファイルのリクエストとパースが、ページのレンダリングと並行して行われるようになる。<code>head</code>要素内で<code>link</code>要素を直接書いた場合は、Webフォント定義の含まれるCSSのリクエストとパース後にページのレンダリングが始まることが多いので、体感速度(ページのレンダリングの開始までの所要時間)は向上する可能性が高い。</p>
+
+<h2>動的なlink要素の追加</h2>
+
+<p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
+
+<pre><code class="language-javascript">(function (d, f) {
+  var l = d.createElement(&#39;link&#39;);
+  l.rel = &#39;stylesheet&#39;;
+  l.href = f;
+  var s = d.getElementsByTagName(&#39;script&#39;)[0];
+  s.parentNode.insertBefore(l, s);
+})(document, &#39;http://example.com/font/foo.css&#39;);</code></pre>
+
+<p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
+
+<h2>rel=&quot;stylesheet&quot;の後付け</h2>
+
+<p>とりあえずWebフォントのURLを<code>link</code>要素として仕込んでおいて、後で<code>rel=&quot;stylesheet&quot;</code>を追加させることにより非同期化する手法。</p>
+
+<pre><code class="language-html">&lt;link
+  href=&quot;http://example.com/font/foo.css&quot;
+  class=&quot;async-web-fonts&quot;&gt;
+&lt;script&gt;
+  (function () {
+    var webfonts = document.querySelectorAll(&#39;link.async-web-fonts&#39;);
+
+    for (var i = 0, l = webfonts.length; i &lt; l; i++) {
+      webfonts[i].rel = &#39;stylesheet&#39;;
+    }
+  })();
+&lt;/script&gt;</code></pre>
+
+<p><code>rel=&quot;stylesheet&quot;</code>がなければ読みに行かないので、これでも非同期になる。複数のWebフォントのURLを参照するようなケースでも拡張しやすい。見た感じのままDOM操作を最小限に抑えられているけど、総合的なパフォーマンスは動的に<code>link</code>要素を突っ込むのとさほど変わらなそう。単体のJavaScriptファイルとして切り出せないのが欠点。</p>
+
+<hr>
+
+<p>ただし、どちらの非同期読み込み手法でもフォントの読み込み中は他のフォントで表示されるので、<a href="/blog/webdesign/fout.html">FOUT</a>を強制するということになる。フォントのロード完了後にすり替える実装をこのウェブサイトで採用していた時に同じ様にFOUTを強制していて、無視できない程度の数の気になる・戻して欲しいといった意見を貰ったので、この非同期読み込みも採用は慎重に行った方が良さそう。</p>
+
+<p>問題の系統としては、ソーシャルボタンのスクリプトを非同期読込させてページの表示までの速度は上がったけど、遅れて実行されるスクリプトのせいでスクロールがつっかかって悪影響みたいなのとちょっと似てる。こういったページの読み込み速度という面からのみの調整だと漏れてしまう事象について、ユーザーテスト以外のテスト手法があると良いとよく考える。</p>

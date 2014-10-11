@@ -1,0 +1,99 @@
+FirefoxのuserContent.cssネタ #2
+<p>今回は<code>url-prefix()</code>を使った奴とか書いてみたり。いろいろやってたらuserContent.cssが2000行超えたりしましたが、特にページの表示が遅くなるとかいう感じは無いので、いくらでもCSSルールを書いて良さそう。限界はあるでしょうがね。</p>
+<p><code>@-moz-document</code>と<code>url-prefix()</code>を組み合わせて使えばURLの先頭一致でルールの適用を制限できたりします。具体的には、</p>
+<pre><code class="language-css">@-moz-document url-prefix(http://www.example.com/~foobar/) {
+  body {
+    font-size: 100% !important;
+  }
+
+  p {
+    line-height: 1.5 !important;
+  }
+}
+</code></pre>
+<p>とか、こんな感じで&quot;http://www.example.com/~foobar/&quot;で始まるURLのページだけに適用されるブロックを作成できます。URLの完全一致でルールの適用を制限できる<code>url()</code>というのもありますが、大抵の場合は<code>url-prefix()</code>の方が活躍してくれそうな。</p>
+<h2>XREAのAnalogの表示を変更する</h2>
+<pre><code class="language-css">@-moz-document url-prefix(http://hail2u.net/log/) {
+  body {
+    font-family: Verdana, sans-serif;
+    font-size: 80%;
+  }
+}
+</code></pre>
+<p><a href="http://www.xrea.com/" title="XREA.COM">XREA</a>では<a href="http://www.analog.cx/" title="Analog: WWW logfile analysis">Analog</a>によって<code>/virtual/username/public_html/log</code>以下にHTMLでアクセス・ログが出力されます(生ログもありますけど)。これを利用されている人は結構多いと思うのですが、デフォルトの素っ気ないままで見やすいとはちょっと言えない感じです。ユーザー・スタイルシートでいじろうにも、<code>id</code>や<code>class</code>が無いので、普通にCSSルールを記述すると他のページで誤爆しまくってしまいます。こういったケースには<code>url-prefix()</code>で誤爆することを防ぐことが可能です。</p>
+<p>ここではフォントを変えるくらいのことしか例として提示していませんが、どこかのサイトをユーザー・スタイルシートで書き換えるというようなケースとは違いHTMLが変更されることはまず無いので、隅から隅まで好きなようにカスタマイズしてやっても問題なさそうです。</p>
+<p>また、こういったケースの様に、元々のスタイル指定を変更したいというわけではない場合は、<code>!important</code>は必要ないです。</p>
+<h2>del.icio.usをhail2u.netっぽく</h2>
+<pre><code class="language-css">@-moz-document domain(del.icio.us) {
+  body {
+    color: #333333 !important;
+    background-color: #fcf9f3 !important;
+    font-family: Verdana, sans-serif !important;
+  }
+
+  a:link {
+    color: #990000 !important;
+  }
+
+  a:visited {
+    color: #4c0000 !important;
+  }
+
+  a:hover {
+    color: #990000 !important;
+  }
+
+  a:active {
+    color: #333333 !important;
+  }
+
+  div.banner {
+    padding: 1em !important;
+    border-bottom: 1px solid #cfccc6 !important;
+    color: #fffcf6 !important;
+    background-color: #9c9993 !important;
+  }
+
+  div.banner * {
+    color: #fffcf6 !important;
+    background-color: #9c9993 !important;
+  }
+
+  div.banner h1 {
+    font-family: &#39;Trebuchet MS&#39;, sans-serif !important;
+  }
+
+  div.right {
+    border-left: 1px solid #cfccc6 !important;
+    color: #333333 !important;
+    background-color: #edeae4 !important;
+  }
+
+  div.delPage {
+    padding: 0.5em !important;
+    border-bottom: 1px solid #cfccc6 !important;
+    color: #333333 !important;
+    background-color: #edeae4 !important;
+  }
+
+  div.pager,
+  li.post {
+    margin-bottom: 1.5em !important;
+  }
+
+  li.post h3 {
+    font-family: &#39;Trebuchet MS&#39;, sans-serif !important;
+  }
+}
+</code></pre>
+<p><a href="http://del.icio.us/" title="del.icio.us">del.icio.us</a>をこのサイトのカラー・スキームとフォント指定を利用して多少見やすくしてたりとか。各Bookmarkの間隔を少し開けるだけでもかなり見やすくなる気がする。</p>
+<figure><a href="/images/blog/browned-del-icio-us-l.png" alt="browned del.icio.us"><img src="/images/blog/browned-del-icio-us-s.png" alt="browned del.icio.us"></a></figure>
+<p>この色使いが万人に見やすいというわけではないので、このコードを参考に好みに合わせて色を変更してやれば良し。</p>
+<h2>RSS広告社の広告を消す</h2>
+<pre><code class="language-css">img[src^=&quot;http://rss.rssad.jp/rss/img/&quot;] {
+  display: none !important;
+}
+</code></pre>
+<p>フィードに広告が掲載されること自体は特にどうとも思わないのですが、<a href="http://www.itmedia.co.jp/" title="IT総合情報ポータル「ITmedia」Home">ITmedia</a>や<a href="http://www.atmarkit.co.jp/" title="＠IT - アットマーク・アイティ">@IT</a>のフィードの広告は<code>description</code>が短いため広告の方が目立ってしまって邪魔な感じ。もうちょっと長い概要の方がユーザーには優しそう。<a href="http://www.rssad.jp/" title="RSS広告配信　-RSS広告社-">RSS広告社</a>自体にはなんの含みもありません(とかわざわざ書くところがいやらしい)。</p>
+<hr>
+<p>ユーザー・スタイルシートによるウェブ・サイトの見た目の変更をやりすぎると、そのウェブ・サイト側でHTMLの変更があった時に修正が面倒になります。なので、どうしても気に食わない数点の変更程度に留めておくのが良い気がします。フォント指定や色使い、大きな広告などでしょうかね。</p>

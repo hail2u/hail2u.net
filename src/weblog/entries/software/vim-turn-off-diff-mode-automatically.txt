@@ -1,0 +1,13 @@
+Vimのdiffモードを自動的に終了させる
+
+<p>Vimで<code>diffsplit</code>などで差分を見た後、片方のバッファーを閉じるとdiffモードのままなので、手動で<code>diffoff</code>しないといけない。僕はdiffモードやQuickfixの時しかウィンドウ分割を使わないみたいな感じのライトなVimユーザーなので、片方閉じたら自動的にdiffモードを終了させたい。そういう設定は特になさそうなので、自動コマンドでやってやった。</p>
+
+<pre><code class="language-vim">augroup DiffAutocommands
+  autocmd!
+
+  &quot; Turn off diff mode automatically
+  autocmd WinEnter * if (winnr(&#39;$&#39;) == 1) &amp;&amp; (getbufvar(winbufnr(0), &#39;&amp;diff&#39;)) == 1 | diffoff | endif
+augroup END
+</code></pre>
+
+<p>バッファーを閉じて他のウィンドウへ移動した時、ウィンドウの数(<code>winnr(&#39;$&#39;)</code>)が1で、diffモード(<code>&amp;diff</code>)だった場合に<code>diffoff</code>を呼んでやるようにした。手元の環境ではうまく動いてる。</p>

@@ -1,0 +1,47 @@
+位置を固定した要素のすたっきんぐ・こんてきすと？
+
+<figure>
+  <img src="/images/blog/stacking-contexts-on-fixed-element.png" alt="左がChrome 20、右がChrme 22のFixed position elements create stacking contextsを有効にした場合のスクリーンショットで、同じHTML/CSSで重なり順が変わることが確認できる">
+</figure>
+
+<p>Chrome 22で隠し設定に<code>position: fixed</code>された要素配下での<code>z-index</code>プロパティーの扱われ方を仕様に準拠する形へ変えるものが用意された……とか言われても<a href="http://www.w3.org/TR/CSS2/zindex.html">Stacking Contextsの仕様</a>を読んでもまったくわからなかったので<a href="/pub/test/425.html">簡単なテスト</a>を書いて理解した。</p>
+
+<p>HTMLは以下のような形。</p>
+
+<pre><code class="language-html">&lt;div class="red"&gt;&lt;/div&gt;
+&lt;div class="fixed"&gt;
+  &lt;div class="green"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="blue"&gt;&lt;/div&gt;
+</code></pre>
+
+<p>これをCSSで赤緑青に色分けして、<code>z-index</code>プロパティーを赤緑青の順にする。</p>
+
+<pre><code class="language-css">.red {
+  position: absolute;
+  z-index: 1;
+  background-color: red;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.green {
+  position: absolute;
+  z-index: 2;
+  background-color: green;
+}
+
+.blue {
+  position: absolute;
+  z-index: 3;
+  background-color: blue;
+}
+</code></pre>
+
+<p>Chrome 22の隠し設定を有効にしない限り<code>position: fixed</code>で新しいスタッキング・コンテキストが作成されないので、<code>z-index</code>プロパティーの値通りに下(背面)から<em>赤緑青</em>の順に並ぶ。隠し設定を有効にすると新しいスタッキング・コンテキストが作成されるようになり、その子にある<code>.green</code>への<code>z-index: 2</code>は<code>.fixed</code>内のローカルなものとみなされるようになる。というわけで<code>.red</code>や<code>.blue</code>が<code>.fixed</code>よりも前面にくることになり、スクリーンショットの右のように下(背面)から<em>緑赤青</em>の順に重なる。</p>
+
+<hr>
+
+<p>スタッキング・コンテキストの話は結構前に書いた<a href="/blog/webdesign/opacity-and-z-index.html"><code>opacity</code>と<code>z-index</code></a>でもちょろっと書いたけど、あんまり理解できていなかったので良い勉強になった。現行ブラウザーの多くは仕様通りに実装していないままずっと来たのでなんで今さら？みたいな感じだけど、<a href="https://plus.google.com/103238735625031210015/posts/PXDRAukeZvd">Mobile Safariだけ実装済み</a>なので仕様もあることだしそっちに合わせた方が良いよね！みたいなのかな。</p>

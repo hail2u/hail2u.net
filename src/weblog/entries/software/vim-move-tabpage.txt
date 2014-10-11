@@ -1,0 +1,32 @@
+Vimでタブページの位置を変更する
+
+<p><a href="http://www.vim.org/">Vim</a>でバッファーごとにタブページを開くみたいなヌルい使い方をしているみなさんこん○○は。タブページを適当に開きまくるとたまに整理してやらないとごちゃごちゃになるので、簡単に位置を変えられないかなーと<a href="http://vimdoc.sourceforge.net/htmldoc/tabpage.html">タブページのヘルプ</a>をちゃんと読んだら<code>:tabmove</code>というまんまなコマンドでできることがわかった。</p>
+
+<p>ただ<code>:tabmove</code>は引数として正の整数しか受け取れないので、<code>-1</code>で左に動かすとかそういう相対的な移動はできない。<code>1</code>で1つ右に、<code>-1</code>で1つ左にループして動かせるようなラッパー関数を書いて使うことにした。</p>
+
+<pre><code class="language-vim">" Move tabpage
+function! s:MoveTabpage(num)
+  if type(a:num) != type(0)
+    return
+  endif
+
+  let pos = tabpagenr() - 1 + a:num
+  let tabcount = tabpagenr("$")
+
+  if pos &lt; 0
+    let pos = tabcount - 1
+  elseif pos &gt;= tabcount 
+    let pos = 0
+  endif
+
+  execute "tabmove " . pos
+endfunction
+
+" TabMove: Move tabpage with reltive number
+command! -nargs=1 TabMove :call &lt;SID&gt;MoveTabpage(&lt;f-args&gt;)
+
+nnoremap &lt;C-S-Right&gt; :call &lt;SID&gt;MoveTabpage(1)&lt;Return&gt;
+nnoremap &lt;C-S-Left&gt;  :call &lt;SID&gt;MoveTabpage(-1)&lt;Return&gt;
+</code></pre>
+
+<p>そんなに使うわけではないけど悪くはなさそう。</p>

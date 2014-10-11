@@ -1,0 +1,145 @@
+SVGのanimateTransform要素
+
+<p>SVGの<a href="http://www.w3.org/TR/SVG/animate.html#AnimateTransformElement"><code>animateTransform</code>要素</a>は、その親要素をアニメーションさせながら変形したり動かしたりするためのもの。<code>from</code>と<code>to</code>要素だけでもちょっとしたことならできるけど、複雑なことをやるには<code>values</code>と<code>keyTimes</code>属性とを組み合わせるようだ。</p>
+
+<h2>Move 300px in 2s, Sleep 2s, Move -300px in 2s, Sleep 2s</h2>
+
+<figure>
+  <svg
+    version="1.1"
+    height="64"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect cx="0" cy="0" width="64" height="64" fill="#336699">
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        begin="0s"
+        dur="8s"
+        repeatCount="indefinite"
+        values="0; 300; 300; 0; 0"
+        type="translate"/>
+    </rect>
+  </svg>
+</figure>
+
+<p>均等にシーンを割り当てる場合は<code>values</code>属性を書くだけで良い。</p>
+
+<pre><code class="language-xml">&lt;animateTransform
+  attributeName=&quot;transform&quot;
+  attributeType=&quot;XML&quot;
+  begin=&quot;0s&quot;
+  dur=&quot;8s&quot;
+  repeatCount=&quot;indefinite&quot;
+  <mark>values=&quot;0; 300; 300; 0; 0&quot;</mark>
+  type=&quot;translate&quot;/&gt;</code></pre>
+
+<p><code>values</code>属性に指定した値の個数から1を引いた数で<code>dur</code>属性の値が均等に割られ、割り当てられる。</p>
+
+<h2>Move 300px in 3s, Sleep 1s, Move -300px in 3s, Sleep 1s</h2>
+
+<figure>
+  <svg
+    version="1.1"
+    height="64"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect cx="0" cy="0" width="64" height="64" fill="#336699">
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        begin="0s"
+        dur="8s"
+        repeatCount="indefinite"
+        values="0; 300; 300; 0; 0"
+        keyTimes="0; 0.375; 0.5; 0.875; 1"
+        type="translate"/>
+    </rect>
+  </svg>
+</figure>
+
+<p>シーンへの割り当てが偏る場合は<code>values</code>属性に<code>keyPoints</code>属性でタイミングを割り当てる。</p>
+
+<pre><code class="language-xml">&lt;animateTransform
+  attributeName=&quot;transform&quot;
+  attributeType=&quot;XML&quot;
+  begin=&quot;0s&quot;
+  dur=&quot;8s&quot;
+  repeatCount=&quot;indefinite&quot;
+  values=&quot;0; 300; 300; 0; 0&quot;
+  <mark>keyTimes=&quot;0; 0.375; 0.5; 0.875; 1&quot;</mark>
+  type=&quot;translate&quot;/&gt;</code></pre>
+
+<p><code>keyTimes</code>属性では<code>dur</code>属性の値を1とした相対的な数値で<code>values</code>属性と同じ数だけ刻む。</p>
+
+<h2>Jump 75px in 1s * 4, Jump -75px in 1s *4</h2>
+
+<figure>
+  <svg
+    version="1.1"
+    height="64"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect cx="0" cy="0" width="64" height="64" fill="#336699">
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        begin="0s"
+        dur="8s"
+        repeatCount="indefinite"
+        calcMode="discrete"
+        values="0; 75; 150; 225; 300; 225; 150; 75; 0"
+        type="translate"/>
+    </rect>
+  </svg>
+</figure>
+
+<p><code>calcMode="discrete"</code>にするとアニメーション過程が省略される。</p>
+
+<pre><code class="language-xml">&lt;animateTransform
+  attributeName=&quot;transform&quot;
+  attributeType=&quot;XML&quot;
+  begin=&quot;0s&quot;
+  dur=&quot;8s&quot;
+  repeatCount=&quot;indefinite&quot;
+  calcMode=&quot;discrete&quot;
+  values=&quot;0; 75; 150; 225; 300; 225; 150; 75; 0&quot;
+  type=&quot;translate&quot;/&gt;</code></pre>
+
+<p>ここでは<code>translate</code>に対して<code>discrete</code>なのでジャンプしているように見える。</p>
+
+<h2>Move 150px in 3s, Jump 150px, Sleep in 1s, Move -150px in 3s, Jump -150px, Sleep in 1s</h2>
+
+<figure>
+  <svg
+    version="1.1"
+    height="64"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect cx="0" cy="0" width="64" height="64" fill="#336699">
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        begin="0s"
+        dur="8s"
+        repeatCount="indefinite"
+        values="0; 150; 300; 300; 150; 0; 0"
+        keyTimes="0; 0.375; 0.375; 0.5; 0.875; 0.875; 1"
+        type="translate"/>
+    </rect>
+  </svg>
+</figure>
+
+<p>アニメーションとジャンプを混ぜる場合は<code>keyTimes</code>属性を同じタイミングで刻むだけで良い。ジャンプのみの場合も<code>keyTimes</code>属性を使う方が<code>discrete</code>を使うより簡単かもしれない。</p>
+
+<pre><code class="language-xml">&lt;animateTransform
+  attributeName=&quot;transform&quot;
+  attributeType=&quot;XML&quot;
+  begin=&quot;0s&quot;
+  dur=&quot;8s&quot;
+  repeatCount=&quot;indefinite&quot;
+  values=&quot;0; 150; 300; 300; 150; 0; 0&quot;
+  keyTimes=&quot;0; 0.375; 0.375; 0.5; 0.875; 0.875; 1&quot;
+  type=&quot;translate&quot;/&gt;</code></pre>
+
+<p>移動するアニメーションとジャンプするアニメーションを別々に作り、<code>end</code>イベントを使ってチェーンさせるという手もあるけど、同じ<code>translate</code>のアニメーションならまとめた方が書きやすい。</p>
+
+<hr>
+
+<p>これにアニメーション自体のタイミングが加わることになるので、手で書くのはこれくらいが限界な気がする。そこへ行くと<a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>や<a href="http://www.w3.org/TR/css3-animations/">CSS Animations</a>は書きやすい実装なんだな、と思った。</p>

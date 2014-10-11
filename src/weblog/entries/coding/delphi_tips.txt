@@ -1,0 +1,30 @@
+Delphi小ネタ
+<p>日記書くネタが無いので。ロングファイルネームをショートファイルネームにするのは、ExtractShortPathName()で一発なんですが、逆が無かったりする。で、書くわけさ。</p>
+<pre>function ExtractLongPathName(FileName: TFileName): String;
+var
+  sr : TSearchRec;
+begin
+  Result := &#39;&#39;;
+  FileName := ExpandFileName(FileName);
+  while LastDelimiter(&#39;\&#39;, FileName) &gt;= 3 do
+  begin
+    if FindFirst(FileName, faAnyFile, sr) = 0 then
+    begin
+      try
+        Result := &#39;\&#39; + sr.Name + Result;
+      finally
+        FindClose(sr);
+      end;
+    end
+    else
+    begin
+      Result := &#39;\&#39; + ExtractFileName(FileName) + Result;
+    end;
+    FileName := ExtractFilePath(FileName);
+    SetLength(FileName, Length(FileName) - 1);
+  end;
+  Result := FileName + Result;
+end;
+</pre>
+<p>実は、あんまり使い道ないんですが、ショートファイルネームかロングファイルネームのどちらが取得されるかわからない場合、とりあえずこの関数に通せば、ロングファイルネームで考えられる・・・と。どんな場合やねん。</p>
+<p>友人曰く、僕のDelphiのコードは、「begin～end書きすぎ」だそうだ。なんとなく、挟んでないと落ち着かないんだよ。</p>

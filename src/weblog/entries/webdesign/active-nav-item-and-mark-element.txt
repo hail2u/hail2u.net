@@ -1,0 +1,61 @@
+アクティブなナビゲーション項目とmark要素
+
+<p>アクティブなナビゲーション項目、つまり現在のページへのナビゲーション項目は<code>class</code>属性を使って<code>active</code>などと付けられることが多い。特に間違ってはいないんだけど、いまいちピンとこない。というかしっくりこない。大体は流されてそうしているけど、このウェブサイトでは<code>mark</code>要素を使ってる。</p>
+
+<p>HTML5仕様では<code>mark</code>要素は以下のようになってる。</p>
+
+<figure>
+<blockquote>
+<p>The mark element represents a run of text in one document marked or highlighted for reference purposes, due to its relevance <mark>in another context</mark>.</p>
+</blockquote>
+<figcaption>— <cite><a href="http://www.w3.org/TR/html5/text-level-semantics.html#the-mark-element">4.5.20 The <code>mark</code> element</a></cite></figcaption>
+</figure>
+
+<p><code>mark</code>要素が含まれる要素のコンテキストとは別のコンテキストでの関係性をハイライト等で表したい時に使うと解釈してる(同じコンテキストなら<code>em</code>や<code>strong</code>、そして<code>b</code>要素を使う)。ナビゲーション項目が現在のページへの参照かどうかというのは、その文書がウェブサイトにおいてどういう位置にあるのかというコンテキストから判断されるべきなので、文書そのものとは別のコンテキストを受けての判断。つまり<code>mark</code>要素を使うのが適切なんじゃないかなと。</p>
+
+<p>実装上でも、自身へのリンクをしないケースでちょっと収まりが良くて気に入ってる。自身へのリンクをしない場合、<code>class=&quot;active&quot;</code>を使うとおおよそ以下のようなコードになる。</p>
+
+<pre><code class="language-html">&lt;nav role=&quot;navigation&quot;&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;active&quot;&gt;Foo&lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;/bar/&quot;&gt;Bar&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;/baz/&quot;&gt;Baz&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+
+<p>アクティブな項目の<code>a</code>要素が消えるので、非アクティブなリスト項目とそのテキストの階層が一致しなくなる。対して<code>mark</code>要素を使うと以下のようになる。</p>
+
+<pre><code class="language-html">&lt;nav role=&quot;navigation&quot;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;mark&gt;Foo&lt;/mark&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;/bar/&quot;&gt;Bar&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;/baz/&quot;&gt;Baz&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+
+<p>テキストの階層が一致したまま維持できる。</p>
+
+<hr>
+
+<pre><code class="language-html">&lt;body class=&quot;foo&quot;&gt;
+  &lt;ul class=&quot;navigation&quot;&gt;
+    &lt;li class=&quot;foo&quot;&gt;&lt;a href=&quot;/foo/&quot;&gt;Foo&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;bar&quot;&gt;&lt;a href=&quot;/bar/&quot;&gt;Bar&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;baz&quot;&gt;&lt;a href=&quot;/baz/&quot;&gt;Baz&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/body&gt;
+</code></pre>
+
+<p>その昔はこう書いておいて、<code>.foo .foo</code>…<code>.bar .bar</code>をまとめて指定したルールセットでアクティブな項目を作っていた。この場合はナビゲーション項目のような所で局所分岐せずにすっきりテンプレート処理できる(いつでもどこでも同じHTMLでナビゲーション吐ける)とかがメリットだったような気がする(うろ覚え)。そこそここうやっていたウェブサイトも見かけた。これを一歩進めて<code>@document</code>を使った全自動アクティブ項目のマーク機構なんかも作ってたけど、Internet ExplorerやChromeで<code>@document</code>実装されそうな気配全くないので考えるのをやめた。</p>

@@ -1,0 +1,33 @@
+body要素でフォント・サイズを変えるのを止める？
+
+<p>フォント・サイズの変更を行う場合、<code>html</code>要素でやった方が良さそうと結構前にTwitterで<a href="https://twitter.com/terkel">@terkel</a> (多分)がつぶやいていた。<code>body</code>要素で設定しても現状は特に何か問題が起こるというわけではないのだけど、将来的に多くの人が使いたくなるであろう<code>rem</code>単位のことを考えると……という話。</p>
+
+<p><a href="http://www.w3.org/TR/css3-values/">CSS Values and Units Module Level 3</a>で定義されている<code>rem</code>単位は現在以下のようになっている。</p>
+
+<figure>
+  <blockquote cite="http://www.w3.org/TR/2011/WD-css3-values-20110906/#font-relative-lengths">
+    <p>Equal to the computed value of ‘<code>font-size</code>’ on the root element.</p>
+
+    <p>When specified on the ‘<code>font-size</code>’ property of the root element, the ‘<code>rem</code>’ units refer to the property's <em>initial value</em>.</p>
+  </blockquote>
+
+  <figcaption>&mdash; <cite><a href="http://www.w3.org/TR/2011/WD-css3-values-20110906/#font-relative-lengths">5.1.1. Font-relative lengths: the ‘<code>em</code>’, ‘<code>ex</code>’, ‘<code>ch</code>’, ‘<code>rem</code>’ units</a></cite></figcaption>
+</figure>
+
+<p>「the root element」はHTMLの場合通常<code>html</code>要素になる(<code>scoped</code>が絡むとまた変わってくるらしいけど)ので、<a href="/pub/test/409.html"><code>body</code>要素のフォント・サイズを変えても<code>rem</code>単位には反映されない</a>。</p>
+
+<pre><code class="language-css">h1 {
+  margin: <mark>2rem</mark> 0 0 0;
+  line-height: 1.25;
+  font-size: 150%;
+  letter-spacing: <mark>-0.1em</mark>;
+}
+</code></pre>
+
+<p>また<code>rem</code>は<code>em</code>を完全に置き換えるものではないので、こういう使い方になるんじゃないかと思っている。他のブロックとの兼ね合いはその要素のフォント・サイズに依存しない<code>rem</code>単位、文字間をちょっといじるなどというその要素のフォント・サイズに依存するものは<code>em</code>単位と使い分けていくということ。この場合は<code>rem</code>単位がベースのフォント・サイズに合わせて変化して欲しいだろうと思うので、<code>html</code>要素でいじるべきということになる。</p>
+
+<p>では<code>html</code>要素でフォント・サイズをいじるのがベスト・プラクティスになるのかと言えばそうでもないような気もする。具体的な例がちょっと思い浮かばないけど<code>rem</code>単位の基準がどんなフォント・サイズでも一定であると助かるというようなケースもきっとあると思う。</p>
+
+<hr>
+
+<p>あんまり試さずイメージで書いてるので嘘の可能性が高い。</p>

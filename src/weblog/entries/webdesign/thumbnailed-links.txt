@@ -1,0 +1,66 @@
+Linksをサムネイル化した
+
+<p>Linksをサムネイル化してみた。各サムネイルは<a href="http://img.simpleapi.net/">SimpleAPIのウェブサイトサムネイル作成API</a>頼みなのでNOW PRINTINGばかりだったりするけど、それはそのうち解消されるはず。無駄にポップアップとかさせてみたり。</p>
+
+<p>Simple APIのウェブサイトサムネイル作成APIが返す画像は決まったサイズなので、ポップアップはかなり前に考えた<code>position: relative;</code>を利用したテクニックでやった。CSSのコードは、</p>
+
+<pre><code class="language-css">div#contents div.story ul.thumbnail {
+  margin: 1em 0;
+  width: 100%;
+  line-height: 1;
+  list-style-type: none;
+}
+
+div#contents div.story ul.thumbnail li {
+  margin: 0 1em 1em 0;
+  float: left;
+  <em>width: 64px;
+  height: 64px;
+  overflow: hidden;</em>
+}
+
+div#contents div.story ul.thumbnail &gt; li {
+  <em>overflow: visible;</em>
+}
+
+div#contents div.story ul.thumbnail li a img {
+  <em>z-index: 1;</em>
+  width: 64px;
+  height: 64px;
+}
+
+div#contents div.story ul.thumbnail li a:hover {
+  width: 128px;
+  height: 128px;
+}
+
+div#contents div.story ul.thumbnail li a:hover img {
+  <em>position: relative;</em>
+  top: -32px;
+  left: -32px;
+  <em>z-index: 2;</em>
+  width: 128px;
+  height: 128px;
+}
+</code></pre>
+
+<p>という感じ。リスト項目を<code>float</code>で並べたりしているのと絡んだコードになっているのでややこしく見えるけど、強調したところがポイントになるところで、要は<code>:hover</code>で画像のサイズを元に戻し<code>position: relative;</code>でずらして表示させるというだけ。<code>width</code>プロパティ/<code>height</code>プロパティ/<code>top</code>プロパティ/<code>left</code>プロパティの値は画像の縦横サイズに依存するため、あらかじめ画像サイズがわかっていないとこのテクニックは利用できない。<a href="/pub/test/076.html">ものすごく単純化させたサンプル・ページ</a>も参照。Internet Explorer 6とかでもちゃんと動く。もちろんFirefox 1.5やOpera 9でも。</p>
+
+<p>最初は<a href="http://reader.livedoor.com/">livedoor Reader</a>からOPML形式のフィード購読リストを引っ張ってくることにより、完全に動的に更新させようかなと思っていたのだけど、そこまですることもないかなーと思い、定期的に<a href="/scripts/links.json">JSON形式のデータ</a>を生成してやることにした。JSON形式のデータの構造は、各サイトごとに、</p>
+
+<pre><code class="language-js">{
+  &quot;title&quot;:   &quot;hail2u.net - Weblog&quot;,
+  &quot;htmlUrl&quot;: &quot;http://hail2u.net/blog/&quot;,
+  &quot;xmlUrl&quot;:  &quot;http://feeds.feedburner.com/hail2u/blog&quot;
+}
+</code></pre>
+
+<p>というOPML形式のフィード購読リストに似た形にしておいたけど特に意味は無い。多くのフィード・リーダーで惰性で利用されている(私見)OPML形式の代わりに、こういった再利用しやすい形態の購読リストをインポート/エクスポートする仕組みが流行っても良さそうなもんだけど。</p>
+
+<h2>追記@2006/09/21</h2>
+
+<p>バックエンドがGeckoな<a href="http://mozshot.nemui.org/">MozShot</a>に変更した。エフェクトをはずしたものにしたせいか、多少キレイになった気がする。</p>
+
+<h2>追記@2006/09/21</h2>
+
+<p>キレイになったけど重すぎなのでSimpleAPIのウェブサイトサムネイル作成APIに戻した。</p>

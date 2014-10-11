@@ -1,0 +1,19 @@
+昔のFeedlyのカード・レイアウトに戻す
+
+<figure>
+  <a href="/images/blog/revert-to-old-feedly-cards-layout-large.png"><img src="/images/blog/revert-to-old-feedly-cards-layout.png" alt="Feedlyのカード・レイアウトで、画像のあるなしにより違う高さで敷き詰められるように戻した状態"></a>
+</figure>
+
+<p><a href="http://www.feedly.com/">Feedly</a>のカード・レイアウトは流し読みが出来て好きだったのだけど、結構前に画像がある場合もない場合も同じ高さで敷き詰められるように変更された。<a href="http://www.pinterest.com/">Pinterest</a>や<a href="http://masonry.desandro.com/">Masonry</a>のように違う高さでびっちりと敷き詰められていた方が、流し読みには向いていると思うので、ユーザーCSSで戻した。</p>
+
+<p>敷き詰めるためのJavaScriptコード自体は存在していたので、画像がない時は畳まれるようにCSSを書くだけで良かった。</p>
+
+<pre><code class="language-css">#feedlyCenter .visual[style*=&quot;visibility&quot;] {
+  height: 0 !important;
+}</code></pre>
+
+<p>記事の画像は<code>style</code>属性経由で背景画像により仕込まれるので、属性セレクタで<code>style</code>属性の値に<code>background-image</code>という文字列があるかどうかをチェックするのが良さそう。……だったけど、ない時には<code>visibility: hidden</code>されているようなので、そっちをチェックすることにしてユーザーCSSを簡単にした。属性セレクターのひとつである<code>[attribute<mark>*=</mark>&quot;string&quot;]</code>はattributeの値をstringで検索するもの。</p>
+
+<hr>
+
+<p>自動ページめくりと外部画像の読み込みタイミングの関係で、ちょくちょく畳まれずグレーで確保されたままになる。そのため稀にすごく遅れて畳まれ、読んでいる位置がずれちゃうけど、概ね期待通り。</p>

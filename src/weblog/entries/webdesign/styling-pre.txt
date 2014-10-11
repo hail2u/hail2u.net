@@ -1,0 +1,58 @@
+pre要素へのスタイル指定
+
+<p><a href="http://www.ideaxidea.com/archives/2006/09/post_129.html">idea * ideaでエントリになっていた</a>ので、言及されていることだしうちのサイトのことだけちょっと書こうかなとか考えてみたら結構色々あって、エントリのネタになりそうだったのでまとめてみた。どっかにもちょろっと書いたけど。</p>
+
+<p>実際にスタイル指定を書く前に抑えておくべき知識として以下のようなものが挙げられると思う。</p>
+
+<ol>
+<li>ほとんどのブラウザで<code>pre</code>は等幅フォントで表示される</li>
+<li>ほとんどのブラウザで<code>pre</code>の<code>white-space</code>は<code>pre</code>になっている</li>
+<li>フォント・ファミリを指定する場合は最後に<a href="http://www.w3.org/TR/REC-CSS2/fonts.html#generic-font-families">Generic font families</a>が必要になる</li>
+<li><code>overflow: scroll;</code>では縦横どちらにあふれた場合でも縦スクロール・バーと横スクロール・バーが両方とも出る</li>
+<li><code>overflow: auto;</code>ではあふれた方向にのみスクロール・バーが出る</li>
+<li>Internet Explorerでは<code>overflow: auto;</code>は内容があふれる場合にうまく解釈されないことがある</li>
+<li><code>height</code>を指定しなければ内容に合わせて適当に拡大してくれるので縦にはあふれない</li>
+<li><a href="http://www.microsoft.com/japan/windows/ie/default.mspx">Internet Explorer</a>では内容に合わせてボックス幅が際限なく拡大するので<code>overflow</code>と同時に<code>width</code>の指定が必要になる</li>
+<li>Internet Explorerではボックス・モデルの解釈に問題があるので<code>width</code>と同時に<code>padding</code>や<code>border</code>を指定する場合は<code>width: 90%;</code>などと余裕を持たせる必要がある</li>
+</ol>
+
+<p>他にもありそうだけど、とりあえず以上を踏まえてスタイル指定を書くと、</p>
+
+<pre><code class="language-css">pre {
+  padding: 1em;
+  border: 1px solid #000;
+  width: auto;
+  _width: 90%;
+  overflow: auto;
+  _overflow: scroll;
+  color: #000;
+  background-color: #f6f6f6;
+  font-family: 'MS Gothic', monospace;
+}
+</code></pre>
+
+<p>というようなコードになる。<a href="/pub/test/069.html">サンプル・ページ</a>も用意してみた。<a href="http://www.mozilla.com/firefox/">Firefox</a>や<a href="http://www.opera.com/products/desktop/">Opera</a>、<a href="http://www.apple.com/jp/macosx/features/safari/">Safari</a>では横にあふれる場合にのみ横スクロールバーが表示される。Internet Explorerでは常に縦スクロール・バーと横スクロール・バーが現れてしまうので美しくないが、<code>float</code>によるレイアウトを妨げたりはしなくなる(後述)。<code>overflow-x</code>を利用すれば横スクロールバーだけになるが、Internet Explorerでは<code>pre</code>の最下段の一部が隠れてしまったりすることがありオススメできない。ということで、結局は上記のようなコードになるんじゃないかと思う。</p>
+
+<p><code>overflow</code>を指定する意味は、コードを読みやすくするためではなく(むしろ読みづらくなるはず)、内容に合わせてボックス幅が際限なく拡大するというInternet Explorerの問題点に対する解決のために使っているというのが一般的だと思う。<code>overflow</code>を指定しないと、<a href="/pub/test/070.html"><code>pre</code>の内容が横に長い場合にその親のボックス幅が<code>pre</code>の幅に合わせて拡大してしまう</a>ので、<code>float</code>によるレイアウトを行っている場合などでは、レイアウトが崩れる原因になる。あとはなるべく横スクロールバーが出ないようにするためとかいう意味もあると思う。</p>
+
+<p>idea * ideaの当該エントリでは文字実体参照にどうやって変換するのかとかについても書かれているが、それは利用しているツールに依存する話だと思う。<a href="http://hatenadiary.g.hatena.ne.jp/keyword/%e5%85%a5%e5%8a%9b%e3%81%97%e3%81%9f%e3%82%b3%e3%83%bc%e3%83%89%e3%82%84%e3%81%af%e3%81%a6%e3%81%aa%e8%a8%98%e6%b3%95%e3%82%92%e3%81%9d%e3%81%ae%e3%81%be%e3%81%be%e8%a1%a8%e7%a4%ba%e3%81%99%e3%82%8b%ef%bc%88%e3%82%b9%e3%83%bc%e3%83%91%e3%83%bcpre%e8%a8%98%e6%b3%95%ef%bc%89">はてなダイアリーにはコードを書く時のためのスーパーpre記法</a>というのがあるし、他のblogツールなどでもプラグインなどであるんじゃないかとか。このサイトの場合は、パブリッシュする時にHTMLに変換するPerlスクリプトに文字実体参照に変換する機能を付けているので、書く時は何も考えずにコピペしてくるだけで良いようにしていたり。</p>
+
+<p>ちなみに、このサイトでは、</p>
+
+<pre><code class="language-css">div#contents div.story pre {
+  margin: 1.5em auto;
+  padding: 1em;
+  border: 1px solid #cfccc6;
+  clear: both;
+  width: 90%;
+  overflow: scroll;
+  color: #333333;
+  background-color: #edeae4;
+}
+
+div#contents div.story &gt; pre {
+  overflow: auto;
+}
+</code></pre>
+
+<p>というコードになっている(フォント指定は別)。アンダースコア・ハックはあまり好きではないので、子セレクタ・ハックを使ってる。</p>

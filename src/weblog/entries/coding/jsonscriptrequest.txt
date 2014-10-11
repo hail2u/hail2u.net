@@ -1,0 +1,45 @@
+JSONScriptRequest
+
+<p>動的に<code>script</code>要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox</a>の場合は動的に追加する<code>script</code>要素の<code>onload</code>属性で読み込んだJavaScriptファイルを処理する<code>function</code>を指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつが<a href="http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html" title="XML.com: JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript">JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript</a>で取り上げられているJSONScriptRequest。<code>XmlHttpRequest</code>と比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。</p>
+
+<p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
+
+<pre><code class="language-js">callback({
+  foo:    &#39;This is foo.&#39;,
+  bar:    &#39;This is bar.&#39;,
+  foobar: &#39;This is foobar.&#39;
+});
+</code></pre>
+
+<p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
+
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var oJsr = new JSONscriptRequest(&#39;http://example.com/json/data.json?dummy=1&#39;);
+oJsr.buildScriptTag();
+oJsr.addScriptTag();
+
+function callback(data) {
+  alert(data.foo);
+  alert(data.bar);
+  alert(data.foobar);
+  oJsr.removeScriptTag();
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>HTML(やJavaScript)ファイル側でcallback関数を定義しておく必要もある(<a href="/pub/test/054.html" title="JSONScriptRequest Test">サンプル</a>)。</p>
+
+<p>つまるところ、Webサービス側でJSONPに対応していないと使い道がない。<a href="http://developer.yahoo.com/search/index.html" title="Yahoo! Search Web Services">Yahoo! Search Web Services</a>などでは対応しているが、やはり絶対数は少ない。</p>
+
+<p>しかし、<a href="http://aws.amazon.com/" title="Amazon.com Amazon Web Services Store: Amazon Web Services">Amazon Web Services</a>のXSLTサービスなどの場合は、XSLファイルを工夫すればJavaScriptファイルを自由に作り上げることができるので、XSLファイル側で対処できる。labs.hail2u.net/amazon/やlabs.hail2u.net/amazon/asamashi/では実際に対処してみた。それぞれのHTMLファイル内のJavaScriptコードや利用しているXSLファイルを見てくれればどういう感じなのかわかるかもしれない。無闇にコードが長いので読みづらいけど。</p>
+
+<p>jsr_class.jsは<code>removeScriptTag()</code>とか長くて書くの面倒な感じなので、テキトウに書き直すのが良いかも。</p>

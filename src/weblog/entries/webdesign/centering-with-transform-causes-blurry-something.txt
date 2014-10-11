@@ -1,0 +1,39 @@
+transformプロパティーを使ったセンタリングで○○がぼやける
+
+<p>幅や高さがわからない要素を上下左右にセンタリングするには長らく<code>display: table-cell</code>を使ったものが主流だった。最近は、よりシンプルに実装できることから<code>transform</code>プロパティーを使って<code>50%</code>戻すというような手法がメジャーになりつつある。しかし<code>transform</code>プロパティーで動かすと常に何かがぼやけるリスクを伴う。</p>
+
+<p><code>transform</code>プロパティーによる上下左右のセンタリングは、<a href="http://css-tricks.com/centering-css-complete-guide/">CSS Tricksに書かれた記事</a>を見るのが一番わかりやすいだろう。</p>
+
+<pre><code class="language-css">.parent {
+  position: relative;
+}
+
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  <mark>transform: translate(-50%, -50%);</mark>
+}
+</code></pre>
+
+<p><code>transform</code>プロパティーの<code>translate()</code>で<code>%</code>を使う場合、その要素の幅と高さが基準になる。そのため要素の幅や高さがわからなくても、<code>%</code>を使うだけでうまくセンタリングできるというわけだ。</p>
+
+<p>では実際にぼやける例を見てみよう。下記デモはWindowsにおいて、Firefox 31では微妙に、Chrome 37では若干強くぼやける。Internet Explorer 11ではぼやけない。ブラウザーだけでなくOSやハードウェアにも依存するので、スクリーンショットも併記しておく。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/593.html">Blurry Translated Button</a></p>
+
+<figure>
+  <img src="/images/blog/centering-with-transform-causes-blurry-something.png" alt="translate()を使って移動しただけでも、button要素の左右の端がぼやけているのがわかる">
+
+  <figcaption>Screenshot on Windows Chrome 37 @5x</figcaption>
+</figure>
+
+<p>5倍に拡大すると逆にわかりづらくなるが、ボタン要素の端がぼやけている。場合によってはボタンの文字列が微妙に崩れることもある。フォーム部品で発生する確率が高く、次にSVGなどのベクター画像でよく起こる。これらはシャープな輪郭を持つので気づきやすいということだろう。通常のテキストやビットマップ画像ではあまり発生しない(か、起こっても認識できない)。</p>
+
+<p>違いは微妙なものだとも言えるが、安定した形状を持ち、無意識化にそれが意識されているフォーム部品では、強い違和感を持つユーザーもいることは無視できない。</p>
+
+<hr>
+
+<p><code>transform</code>プロパティーを使った何かしらのテクニックには常にこのぼやけるリスクをはらむ。上下左右のセンタリングにおいては万能ではあるが、安定であるとは決して言えない。特にオーバーレイでフォームを出す時などに使うことがあるので、フォーム部品でよくぼやけるというのはそこそこリスクが高いと言えるだろう。</p>
+
+<p>今さらハック的な要素を多分に含む<code>display: table-cell</code>を使った手法に戻るのは色々問題があるので、素直にFlexboxを使いつつうまくフォールバックさせるのが良いだろう。</p>

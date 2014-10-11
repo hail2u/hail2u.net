@@ -1,0 +1,52 @@
+SVGで複数の画像をまとめる
+
+<p>アイコン(<code>image/vnd.microsoft.icon</code>)のような複数解像度をまとめる仕組みを考えている。SVGを使ってアイコンとほぼ同等なんじゃないかみたいなことは比較的簡単に出来たけど、全部の画像をリクエストしてしまうので使いものにはならなそう。というメモ。メモ多い。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;svg
+  version="1.1"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;style type="text/css"&gt;
+      &lt;![CDATA[
+        image {
+          display: none;
+        }
+
+        @media screen and (-webkit-max-device-pixel-ratio: 1.999) {
+          #x1 {
+            display: inline;
+          }
+        }
+
+        @media screen and (-webkit-min-device-pixel-ratio: 2) {
+          #x2 {
+            display: inline;
+          }
+        }
+      ]]&gt;
+    &lt;/style&gt;
+  &lt;/defs&gt;
+  &lt;svg viewbox="0 0 180 180"&gt;
+    &lt;image
+      xlink:href="default.png"
+      width="180"
+      height="180"
+      id="x1"/&gt;
+  &lt;/svg&gt;
+  &lt;svg viewbox="0 0 360 360"&gt;
+    &lt;image
+      width="360"
+      height="360"
+      xlink:href="retina.png"
+      id="x2"/&gt;
+  &lt;/svg&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>PNG画像へのリンクだけを含むSVG画像を複数まとめて、<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>で分岐するというもの。<code>viewbox</code>属性を怠らなければ適切なサイズでブラウザーには表示されるはず。<code>img</code>要素でもCSSからでも使えると思う。とりあえずな感じなので<code>device-pixel-ratio</code>を使ったクエリーでやってみたけど、将来的には<code>resolution</code>と<code>dppx</code>単位の組み合わせになりそう。</p>
+
+<p>直接参照するのではなくSVGでは透明な<code>rect</code>要素で幅と高さを確保するにとどめておいて、メディアクエリー内で背景として仕込むみたいにすればリクエストも必要なものだけになるような気がする……けどもう飽きた。</p>
+
+<p>ありものでできれば<code>img</code>要素の<code>srcset</code>属性や<code>-webkit-image-set</code>関数のpolyfill的なものを作れるかなーと思ったけど、まぁそううまくはいかないか。</p>

@@ -1,0 +1,32 @@
+Associate This (with image)!
+<p>Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していた<a href="http://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtでは<code>event.src</code>とかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースの<code>img</code>要素を全部調べ、<code>src</code>属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。</p>
+<p>Amazonの個別商品ページには画像があればかならず正しいURLで画像へのリンクが張られている(と思う)ので、<code>document.images</code>で拾うことができる<code>img</code>要素でループを回してやり、正規表現でMZZZZZZZが含まれているかどうかチェックするというわけ。</p>
+<p>JavaScriptのコードは以下のような構造になってます。</p>
+<pre><code class="language-js">var aid  = &#39;hail2unet-22&#39;;
+var t    = document.title;
+var u    = document.location.href;
+var i    = u.indexOf(&#39;ASIN&#39;);
+var asin = u.substring(i+5,i+15);
+u        = &#39;http://www.amazon.co.jp/exec/obidos/ASIN/&#39;+asin+&#39;/&#39;+aid;
+var img;
+
+for (i=0; i &lt; document.images.length; i++) {
+  if (document.images[i].src.match(/MZZZZZZZ/)) {
+    img = document.images[i].src;
+    break;
+  }
+}
+
+prompt(&#39;Associate This (with image)!&#39;,
+  &#39;&lt;a href=&quot;&#39; + u + &#39;&quot; title=&quot;&#39; + t + &#39;&quot;&gt;&lt;img src=&quot;&#39; + img + &#39;&quot; alt=&quot;&#39; + t +
+  &#39;&quot; /&gt;&lt;/a&gt;&#39;);
+</code></pre>
+<p>Bookmarkletはこちら。</p>
+<p>Bookmarklet: <em><a href="javascript:var aid=&#39;hail2unet-22&#39;;var t=document.title;var u=document.location.href;var i=u.indexOf(&#39;ASIN&#39;);var asin=u.substring(i+5,i+15); u=&#39;http://www.amazon.co.jp/exec/obidos/ASIN/&#39;+asin+&#39;/&#39;+aid;var img;for(i=0;i&lt;document.images.length;i++){if(document.images[i].src.match(/MZZZZZZZ/)){img=document.images[i].src;break;}}prompt(&#39;Associate This (with image)!&#39;, &#39;&lt;a href=&quot;&#39;+u+&#39;&quot; title=&quot;&#39;+t+&#39;&quot;&gt;&lt;img src=&quot;&#39;+img+&#39;&quot; alt=&quot;&#39;+t+&#39;&quot; /&gt;&lt;/a&gt;&#39;);" title="Associate This (with image)!">Associate This (with image)!</a></em></p>
+<p>使い方は、上記リンクをBookmarks Toolbarにドラッグ・アンド・ドロップし、Amazonの個別商品ページを開いた状態でそれをクリックするだけ！すると、</p>
+<pre><code class="language-html">&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22&quot; title=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot;&gt;&lt;img src=&quot;http://images-jp.amazon.com/images/P/B00028G7J8.01.MZZZZZZZ.jpg&quot; alt=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot; /&gt;&lt;/a&gt;
+</code></pre>
+<p>というコードがプロンプトで出てきます。hail2unet-22となっているアソシエイトIDは自分のアソシエイトIDに書き換えましょう。</p>
+<p>コピーするのメンドイ(なんてズボラな・・・)。</p>
+<h2>追記@2004/07/02</h2>
+<p>BookmarkletのURL内に含まれる&quot;の実体参照化をミスってまして、正常なURLになっていなかったのを修正しました。</p>

@@ -1,0 +1,89 @@
+サブセクションにあるh1要素のフォントサイズ
+
+<p>全然<a hre="http://coding.smashingmagazine.com/2011/11/11/our-pointless-pursuit-of-semantic-value/#comment-554449">知らなかった</a>のですが、Chrome 15やFirefox 8ではベンダー拡張プリフィックス付きの<code>:any</code>擬似クラスを使ってサブセクションの<code>h1</code>要素のフォントサイズを調節するように<a href="http://codesearch.google.com/codesearch#OAMlx_jo-ck/src/third_party/WebKit/Source/WebCore/css/html.css&amp;l=155">なって</a>いる<a href="http://mxr.mozilla.org/mozilla-central/source/layout/style/html.css#195">ようです</a>。Internet Explorer 9も見た感じそうなっているようですが、UAスタイルシートによるものなのかよくわかりません……。なんか変なことやってそう(偏見)。</p>
+
+<p>Chrome 15の場合は、</p>
+
+<pre><code class="language-css">h1 {
+    display: block;
+    font-size: 2em;
+    -webkit-margin-before: 0.67__qem;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+
+:-webkit-any(article,aside,nav,section) h1 {
+    font-size: 1.5em;
+    -webkit-margin-before: 0.83__qem;
+    -webkit-margin-after: 0.83em;
+}
+
+h2 {
+    display: block;
+    font-size: 1.5em;
+    -webkit-margin-before: 0.83__qem;
+    -webkit-margin-after: 0.83em;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    font-weight: bold
+}
+</code></pre>
+
+<p>となっており、サブセクションの<code>h1</code>要素のフォントサイズが<code>h2</code>要素と同じになっていました。5階層あたりまで定義されているようですね。</p>
+
+<p>こういうUAスタイルシートのことを考えると、リセットでいろいろやってしまうのはもう本格的にまずそうです。今後UAスタイルシートも複雑さが増していくことはまず間違いないでしょうから、やはりノーマライズでUAスタイルシートを尊重する形が望ましくなっていくのではないでしょうか。</p>
+
+<p>その一方でOpera 11ではこのようなサブセクションの<code>h1</code>要素のフォントサイズを小さくしたりしないので、現在の<a href="http://necolas.github.com/normalize.css/">normalize.css</a>などではフォントサイズに少し差ができてしまいます(多分将来的にも対応されることはないでしょう)。それに対処するにはリセットの方が手軽なことは確かでしょう。差があるので手軽にリセットか、差があるのでデフォルトを尊重してノーマライズか悩ましい所ですね。</p>
+
+<h2>おまけ</h2>
+
+<p>SCSSでパクるとするとこんな感じになりそうです。</p>
+
+<pre><code class="language-scss">article, aside, nav, section {
+  h1 {
+    margin-top: .83em;
+    margin-bottom: .83em;
+    font-size: 1.5em;
+  }
+
+  article, aside, nav, section {
+    h1 {
+      margin-top: 1em;
+      margin-bottom: 1em;
+      font-size: 1.17em;
+    }
+
+    article, aside, nav, section {
+      h1 {
+        margin-top: 1.33em;
+        margin-bottom: 1.33em;
+        font-size: 1em;
+      }
+
+      article, aside, nav, section {
+        h1 {
+          margin-top: 1.67em;
+          margin-bottom: 1.67em;
+          font-size: .83em;
+        }
+
+        article, aside, nav, section {
+          h1 {
+            margin-top: 2.33em;
+            margin-bottom: 2.33em;
+            font-size: .67em;
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<p>わぁ汚い……。コンパイルするとすごくでかいCSSになるので使わない方が良いと思います。</p>
+
+<h2>さらにおまけ</h2>
+
+<p>WebKitのUAスタイルシートなどで使われている<code>__qem</code>という単位はQuirksモードでマージンの相殺を行わないようにする単位らしいです。単位にまで独自拡張の波が……。</p>

@@ -1,0 +1,220 @@
+# Blosxom Plugin: theme
+# Author(s): Rael Dornfest <rael@oreilly.com> 
+# Version: 2003-08-26
+# Documentation: See the bottom of this file or type: perldoc theme
+
+package theme;
+
+# --- Configurable variables -----
+
+# Where do your themes live?
+my $theme_dir = "$blosxom::datadir/themes";
+
+# What's the URL of your themes directory?
+# This is vital for those themes that employ images, stylesheets, or other
+# external content pulled in from outside the page itself.
+$theme_dir_url = "$blosxom::url/themes";
+
+# Should I fall back to the blosxom template system, looking in $datadir
+# and paths beyond for template components?
+# 0 = no; 1 = yes (default)
+my $fallback_to_templates = 1;
+
+# --------------------------------
+
+use FileHandle;
+my $fh = new FileHandle;
+
+my $cache = {};
+
+sub start {
+  return -r $theme_dir ? 1 : 0;
+}
+
+sub template {
+  return sub {
+    my ($path, $chunk, $flavour) = @_;
+
+    $path =~ s!^/*!!; $path = "/$path";
+
+    # Return cached chunk, if available
+    $cache->{$flavour}->{$chunk} and return $cache->{$flavour}->{$chunk};
+
+    # Glean, spindle, and cache the theme
+    if (!keys %{$cache->{$flavour}} and $fh->open("$theme_dir/$flavour/page")) {
+      my $in_chunk = '';
+      while (my $line = <$fh>) {
+        $line =~ /<!--\s*blosxom\s+(\w+)(?:\s+(.*)\b)?\s*-->/;
+        $1 and $2 and $cache->{$flavour}->{$1} = $2 and next;
+        $1 and $in_chunk = $1 and next;
+        $cache->{$flavour}->{$in_chunk} .= $line;
+      }
+
+      # Return the requested chunk
+      $cache->{$flavour}->{$chunk} and return $cache->{$flavour}->{$chunk};
+    }
+
+    # Fall back to standard blosxom templating (if $fallback_to_templates)
+    $fallback_to_templates and do {
+      $blosxom::others{"$blosxom::datadir$path/$chunk.$flavour"} and 
+        $fh->open("< $blosxom::datadir$path/$chunk.$flavour") and 
+          return join '', <$fh>;
+    } while ($path =~ s/(\/*[^\/]*)$// and $1);
+
+    # Finally, fall back to baked-in basic flavours
+    return join '', ($blosxom::template{$flavour}{$chunk} || $blosxom::template{error}{$chunk} || '');
+
+  };
+}
+  
+1;
+
+__END__
+
+=head1 NAME
+
+Blosxom Plug-in: theme
+
+=head1 SYNOPSIS
+
+Build themes or use those built by others for your Blosxom-powered weblog.
+Themes consist of a directory named for your theme (e.g. "yellowish") 
+containing a single template file ("page") and any supporting images,
+stylesheets, javascript source, etc.  A typical theme directory structure
+looks something like:
+
+$theme_dir
+          /page
+          /images
+                 /background.gif
+                 /logo.gif
+          /javascript
+                 /util.js
+
+The only bit that's required is that "page" file.
+
+The "page" file should define a content type, head, date, story, 
+and foot --just as with Blosxom's default flavour template system
+[http://blosxom.sourceforge.net/documentation/users/flavour.html], except all
+in a single file rather than individual flavour files.  Components are
+deliniated using <!-- blosxom componentname --> comments.  
+
+Here's a sample (over-simplified) page definition:
+
+  <!-- blosxom content_type text/html -->
+
+  <!-- blosxom head -->
+   <html>
+    <head>
+     <title>my blosxom blog</title>
+    </head>
+    <body>
+    <h1>my blosxom blog</h1>
+
+  <!-- blosxom date -->
+   <p><b>$dw, $da $mo $yr</b></p>
+
+  <!-- blosxom story -->
+   <p>
+   <a name="$fn"><b>$title</b></a>
+   <br />
+   $body
+   <br />
+   <a href="$url$path/$fn.$default_flavour">permanent link</a>
+   </p>
+
+  <!-- blosxom foot -->
+    </body>
+   </html>
+
+Everything after a <!-- blosxom componentname --> comment (until the
+next one) is part of the component.  Notice the only exception is the
+content_type component, the content type for the document being defined
+in the comment itself; this is to assure only a single line is used for
+content type.
+
+The theme plugin overrides Blosxom's default template() subroutine, 
+falling back to Blosxom's default flavour template system if the
+requested theme is not available.  It falls further back to Blosxom's
+baked in default HTML and RSS flavours if no theme or flavour
+templates are available for the requested theme/flavour.
+
+=head1 INSTALLATION 
+
+Drop the theme plugin into your Blosxom plugins folder.
+
+=head1 CONFIGURATION
+
+The plugin is preconfigured to assume a themes directory beneath your 
+Blosxom data directory ($datadir, as configured in the blosxom.cgi script).  
+Alter the $theme_dir configurable variable to have your themes live elsewhere.
+
+e.g. 
+  # Where do your themes live?
+  my $theme_dir = "/somewhere/else/themes";
+
+Wherever it lives, your themes directory should be Web-accessible since
+themes may (and probably do) employ images, stylesheets, and other 
+content pulled in from outside the page itself.
+
+e.g. 
+  # What's the URL of your themes directory?
+  my $theme_dir_url = "http://example.com/somewhere/else/themes";
+
+By default, the theme plugin falls back to Blosxom's built-in flavour 
+template system [http://blosxom.sourceforge.net/documentation/users/flavour.html].
+You can turn this off by setting the $fallback_to_templates variable to 0.
+
+e.g. 
+  # Should I fall back to the blosxom template system, looking in $datadir
+  # and paths beyond for template components?
+  # 0 = no; 1 = yes (default)
+  my $fallback_to_templates = 0;
+
+=head1 VERSION
+
+2003-08-26
+
+=head1 AUTHOR
+
+Rael Dornfest <rael@oreilly.com>, http://www.raelity.org/
+
+=head1 SEE ALSO
+
+Blosxom Home/Docs/Licensing: 
+  http://blosxom.sourceforge.net/
+
+Blosxom Plugin User Documentation:
+  http://blosxom.sourceforge.net/documentation/users/plugins.html
+
+Blosxom Plugin Developer Documentation: 
+  http://blosxom.sourceforge.net/documentation/developers/plugins.html
+
+=head1 BUGS
+
+Address bug reports and comments to the Blosxom mailing list 
+[http://www.yahoogroups.com/group/blosxom].
+
+=head1 LICENSE
+
+Blosxom and this Blosxom Plug-in
+Copyright 2003, Rael Dornfest 
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+# vim:ft=perl:

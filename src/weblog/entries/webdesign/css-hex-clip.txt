@@ -1,0 +1,95 @@
+CSSで画像を六角形にくり抜く
+
+<figure>
+  <img src="/images/blog/css-hex-clip.png" alt="Swarmの六角形のプロフィール画像をCSSで模した例">
+</figure>
+
+<p><a href="https://www.swarmapp.com/">Swarm</a>で使われている六角形のプロフィール画像はちょっと流行りそう。CSSだけで行えるように考えておくとなんかの時に役に立つはず。難しく考えずに<a href="/pub/test/567-2.html">擬似要素で三角形を作るテクニックを反転させて重ねるだけ</a>でも良かったけど、CSSグラデーションで重ねた方がフレキシブルに作れた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/567.html">CSS HEX Clip</a></p>
+
+<p>切り抜きはCSSグラデーションを<em>上に</em>重ねて行うので、何らかの要素で括る必要がある以外には特別なマークアップは必要ない。</p>
+
+<pre><code class="language-css">.hexclip {
+  display: inline-block;
+  position: relative;
+  line-height: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #fff 0,
+      #fff 18%,
+      transparent 18%,
+      transparent 100%
+    ),
+    linear-gradient(
+      150deg,
+      #fff 0,
+      #fff 18%,
+      transparent 18%,
+      transparent 100%
+    ),
+    linear-gradient(
+      210deg,
+      #fff 0,
+      #fff 18%,
+      transparent 18%,
+      transparent 100%
+    ),
+    linear-gradient(
+      330deg,
+      #fff 0,
+      #fff 18%,
+      transparent 18%,
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      #fff 0,
+      #fff 7%,
+      transparent 7%,
+      transparent 100%
+    ),
+    linear-gradient(
+      270deg,
+      #fff 0,
+      #fff 7%,
+      transparent 7%,
+      transparent 100%
+    ),
+    radial-gradient(
+      circle closest-side at 50% 50%,
+      transparent 0,
+      transparent 99%,
+      #fff 99%,
+      #fff 100%
+    )
+  ;
+}
+
+.hexclip img {
+  position: relative;
+  z-index: -1;
+  vertical-align: bottom;
+}
+</code></pre>
+
+<p>まず<code>line-height</code>プロパティーで行間を詰めた上で、<code>img</code>要素に対して<code>vertical-align</code>プロパティーを使って余計な空白が生まれないようにしておく必要がある。その上で括る要素を<code>inline-block</code>にして画像の大きさにフィットするようにし、更に<code>img</code>要素で<code>z-index</code>プロパティーを使って背面に回るようにすれば準備は完了。</p>
+
+<p>次に六角形を作るために角をカットするCSSグラデーションを4つ書く。正方形の画像なら、おおよそ18%くらいカットすると良い。1:2:√3の三角形でカットする(各内角を120度にするため、30度・60度・90度の直角三角形でカットする)ので、もっときちんと計算できる。更に<em>正</em>六角形に近づけるために左右を7%くらいカットする。角の丸めはいろいろ考えたけど真円のCSSグラデーションを重ねるくらいしかなさそうで、きれいに丸まらない。合計7つのCSSグラデーションを利用することになる。</p>
+
+<hr>
+
+<p><code>linear-gradient()</code>では<code>to right</code>などといったキーワードの他に<code>deg</code>単位でグラデーションの進む角度を決定できる。この単位は要素の中央を中心にした角度になるが、ちょっと混乱しやすい。<code>0deg</code>で下から上に、<code>90deg</code>で左から右にと、値を増やすと時計回りに変化する。</p>
+
+<figure>
+  <img src="/images/blog/css-gradient-deg.gif" alt="deg単位を増やすと反時計回りにグラデーションの方向が変化していく">
+
+  <figcaption><code>deg</code> Unit and Gradient Angle</figcaption>
+</figure>
+
+<p>シアンからネイビーのグラデーションの<code>deg</code>を増やしていくと、このように時計回りに変化していく。</p>
+
+<hr>
+
+<p>六角形をピッタリと敷き詰めとかやりたいので、もうちょっと考えてみよう。</p>

@@ -1,0 +1,40 @@
+横並びのリストのセンタリング
+
+<p>リストを横並びにしてセンタリングというのはよく使う。ただよく使う(われる)わりには「これ！」というようなテクニックがないような気がする。<code>inline-block</code>で並べた場合は項目の間に隙間ができ、<code>float</code>で並べた場合は<a href="/blog/webdesign/centering-floated-list.html">センタリングがトリッキーすぎる</a>。気分で色々使い分けてたけど最近は<code>display: inline-table</code>をよく使うようになって、これで良いかなーという感じ。</p>
+
+<pre><code class="language-html">&lt;nav class="paging"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="foo"&gt;Prev&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="bar"&gt;Next&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+
+<p>というようなマークアップの一般的なページング・ナビゲーションだと、</p>
+
+<pre><code class="language-css">.paging {
+  text-align: center;
+}
+
+.paging ul {
+  display: inline-table;
+}
+
+.paging li {
+  display: table-cell;
+}
+</code></pre>
+
+<p>という形で行う。<code>display: table</code>だと幅が明示されてないとセンタリングできないので<code>inline-table</code>のが手軽で良い。<code>.paging</code>のようなラッパー要素がないと実現できないのでマークアップに依存するというのが一番大きな欠点。</p>
+
+<h2><code>inline-block</code>と<code>font-size: 0</code></h2>
+
+<p>この組み合わせも簡単で一時期使っていた。これはセンタリング～ではなくて項目の隙間を消すためのテクニックということになる。<code>inline-block</code>でできる隙間はフォント・サイズ依存なので、それを<code>0</code>にしてやって見えなくするということ。ただこれには大きな問題があって、フォント・サイズの継承がここで途切れてしまう。上記マークアップ例では<code>.paging ul</code>あたりで<code>font-size: 0</code>にするわけだけど、そうすると<code>li</code>以下でフォント・サイズを元に戻すことはできない。<code>em</code>単位を使ったレイアウトを行っている場合は致命的になりうる。</p>
+
+<h2><code>float</code>と<code>position: relative</code></h2>
+
+<p>トリッキーな奴はその複雑さ自体は慣れてしまえばさほど問題にならないんだけど、今時だと<code>overflow: hidden</code>がちょっと良くないと思っている。<code>overflow</code>プロパティーはその性質上<code>box-shadow</code>(や<code>outline</code>)プロパティーに大きな影響を与えてしまうので、意図しないデザインのカットアウトが起こる可能性が高い。単なる装飾だけならまぁ目をつぶっても良いけど、リンクにフォーカスを当てた時の点線等も見えなくなるのがちょっとよろしくない。余程の理由がない限り<code>overflow</code>プロパティーは使わないというのが良いのではないかなー。僕は擬似要素で行う画像置換の時くらいに留めている。</p>
+
+<hr>
+
+<p>こういうのは徐々に<a href="http://www.w3.org/TR/css3-flexbox/">Flexible Box Layout</a>とかでやるようになっていくと思うので、数年……早ければ数ヶ月で「あーあったね、そういうのも」みたいな感じになりそう。なって欲しい。</p>

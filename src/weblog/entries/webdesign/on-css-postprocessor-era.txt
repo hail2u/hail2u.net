@@ -1,0 +1,31 @@
+「CSSポストプロセッサー時代の到来」とか
+
+<figure>
+  <a href="/documents/css-postprocessor-era.html"><img src="/images/blog/on-css-postprocessor-era.svg" alt="Write with Sass, Compile to Standard CSS, Review, Optimize with Grunt, and Publish"></a>
+</figure>
+
+<p><a href="http://www.adventar.org/calendars/62">Frontrend Advent Calendar 2013</a>の4日目の記事として、「<a href="/documents/css-postprocessor-era.html">CSSポストプロセッサー時代の到来</a>」というタイトルで寄稿した。このウェブログで書こうかと思ったけど、意識はされていないもののそこそこ浸透している概念の話で、トレンドに関わりがあるもののそれに左右はされない話でもあるので、独立した文書にした。長いかと思ったけどそんなに長くもなかった。</p>
+
+<p>CSSポストプロセッサー時代の到来ではさらっと流した、CSSプリプロセッサーのコードと標準的なCSSのコードとのギャップが大きくなりすぎてることについてちょっとだけ。</p>
+
+<p>これは危険な徴候だなーと思ってる。例えばMedia Queriesを効率的に記述するためにミックスインにするみたいなのはよく見るけど、実装の仕方は<a href="http://sass-lang.com/">Sass</a>のバージョンと人によりそれぞれで、意図とどういうコードが吐かれるかを把握するのはかなり大変。</p>
+
+<pre><code class="language-scss">.test {
+  color: green;
+
+  @include mq(480px) {
+    color: red;
+  }
+}</code></pre>
+
+<p>3.2から使える<a href="http://sass-lang.com/documentation/file.SASS_REFERENCE.html#mixin-content"><code>@content</code></a>を使ったこういうミックスインはよく見るし、増えている気がするけど、もうCSSの感覚じゃない。もちろん<code>mq()</code>だったり、<code>media()</code>だったり、<code>min-width()</code>だったり、<code>ipad()</code>だったりもする。さっさと3.3に上げて普通に<code>@media</code>で変数を使った方が誰にでもすぐ読めて明らかに良い。このように簡略化を汎用化すればするほど書かれるコードの先が見えなくなっていき、よくわからないジャーゴンの習得を強要され、また強要する日々が待っていて、誰も幸せになれない。ドキュメントをちゃんと作っても、作った端から腐敗していくのは目に見えている。</p>
+
+<p>グッド・ラッパーとなりうるのなら良いのかもしれないけど、Sassの機能は低く、グッド・ラッパーを書くのはRubyとの連携なしにはかなり難しい。やるとしたら<a href="http://compass-style.org/">Compass</a>クラスの巨大なものを作らざるをえないと思う。</p>
+
+<p>ウェブ標準でできることならなるべくそれで書いた方が望ましく、将来にわたって安定したコード・クオリティーを提供できるはず。というか泡沫のような技術で溢れるインターネットでは、ウェブ標準くらいしか信頼できる落とし所がない。DRYや楽をするという考え方は正しいけど、それだけじゃなくてウェブ標準に寄せる形で楽をするということも意識してミックスインやプレースホルダー・セレクター、そしてパーシャルを書くのが良いと思う。</p>
+
+<hr>
+
+<p>その上で機械的に行える作業はCSSポストプロセッサーに任せると更にスッキリするよね！という話。</p>
+
+<p>CSSポストプロセッサーという言葉は聞き慣れないと思うけど、やってることは機械的な最適化作業の分業化にすぎないので、似たようなことを既に実践している人も多いと思う。既に<a href="http://gruntjs.com/">Grunt</a>を使っている人はほとんどそうなはず。こういうのをある程度共有できる概念としてはっきりさせると良いのかなと思って書いた。</p>

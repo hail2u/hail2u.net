@@ -1,0 +1,29 @@
+Blosxomプラグイン: static_permalink
+
+<p>重い腰を上げてpermalinkを静的なHTMLとして吐いておくプラグインを書いて使い始めた。誰かしらがアクセスした時にHTMLが作られてなかったら作成するというシンプルなもの。振り分けはmod_rewriteに丸投げ。今までもRSSだけはそうしていたので、それをpermalinkでも使えるように深い階層でも大丈夫な感じに書き足そうと思ったけど、結局一から書き直した。これでいつでも<a href="http://blosxom.sourceforge.net/">Blosxom</a>を捨てる用意が整った。</p>
+
+<p class="seealso">Download: <a href="http://qiita.com/hail2u/items/a97d4aa3be38ade24da9">static_permalink</a></p>
+
+<p>プラグインの実行は最後に回した方が良いので、以下のように他のプラグインも含めてリネームしておくと無難。通常はそんなに問題になることはないんだけど、<code>last</code>を使って置換かけていたりするとそれが反映されなかったりする可能性がある。</p>
+
+<pre>00preferred
+50foo
+50bar
+50buz
+99static_permalink</pre>
+
+<p>ルーティングを担当するmod_rewriteの設定ではディレクトリの存在チェックを外しておくと、カテゴリごとのページや年月日ごとのページは動的なままで提供できて楽。ただしスラッシュ補完との兼ね合いにより、Blosxomの設置ディレクトリへのスラッシュなしアクセスで400 Bad Requestになる(ことがある)ので、カテゴリごとのページは捨てるか<code>-d</code>でチェックして明示的にBlosxomに渡してやる必要がある。</p>
+
+<pre><code class="language-conf">&lt;IfModule mod_rewrite.c&gt;
+  RewriteEngine On
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  # RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ blosxom.cgi/$1 [L,QSA]
+&lt;/IfModule&gt;</code></pre>
+
+<p>記事を更新した後に作り直したい時はリモートのファイルを好きな方法で消し、アクセスされて作り直されるのを待つという丸投げ運用を想定してる。mod_rewriteでクエリ文字列は低コストで調べられるので、クエリ文字列で<code>password</code>パラメーターがあったら作り直すとかでも良さそう。このあたりで迷ってるのと、<code>rel=&quot;next&quot;</code>どうするかなぁ……というところで詰まっているので、まだ<a href="https://github.com/blosxom-fanatics/plugins">墓場</a>には置かない。</p>
+
+<hr>
+
+<p>動的なCMSにオンデマンドで静的なHTMLを吐く機能を付けるというアイディアは古くからあって、結構実装している人は多い。けれども何かに依存(この場合はmod_rewrite)しないと作るのが面倒だったり、パフォーマンス的にメリットがなかったりするので、汎用的なものとなるとあんまり見ない。そして昨今はリソースを柔軟に増減できる環境で動的に頑張るか、ローカルで頑張って完全に静的にするかの二極化していて、そういったトレンドからも外れてるため新しく出てきたりもしなそう。そんな難しいことは必要ないので、個人々々がオレオレで実装するのが色んな意味で良いと思う。</p>

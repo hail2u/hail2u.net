@@ -1,0 +1,96 @@
+CSSグラデーションのちょっとしたテクニック #1
+
+<p>リリースを間近にひかえたFirefox 3.6で対応されるので、そこかしこで取り上げられているCSSによるグラデーション。基本的な書き方は<a href="http://webkit.org/blog/175/introducing-css-gradients/">Introducing CSS Gradients</a>や<a href="http://hacks.mozilla.org/2009/11/css-gradients-firefox-36/">css gradients in Firefox 3.6</a>を始めとして腐る程あるのですっ飛ばすとして、実際にボタン等で利用する時にどうすれば簡単に書けそうかということをちょっと考えてみようとかいう話。勢いで#1とかつけてしまった……。</p>
+
+<p><code>button</code>要素にCSSによるグラデーションをかけるには以下のように書くことになる。</p>
+
+<pre><code class="language-css">button {
+  background-image: <a href="http://dev.w3.org/csswg/css3-images/#linear-gradients">linear-gradient</a>(top, rgb(204, 204, 204), rgb(102, 102, 102));
+  background-image: <a href="https://developer.mozilla.org/ja/CSS/-moz-linear-gradient">-moz-linear-gradient</a>(top, rgb(204, 204, 204), rgb(102, 102, 102));
+  background-image: <a href="http://developer.apple.com/safari/library/documentation/InternetWeb/Conceptual/SafariVisualEffectsProgGuide/Gradients/Gradients.html">-webkit-gradient</a>(linear, left top, left bottom, color-stop(0, rgb(204, 204, 204)), color-stop(1, rgb(102, 102, 102)));
+  filter: <a href="http://msdn.microsoft.com/en-us/library/ms532997%28VS.85,lightweight%29.aspx">progid:DXImageTransform.Microsoft.Gradient</a>(StartColorStr=&quot;#CCCCCC&quot;, EndColorStr=&quot;#666666&quot;);
+}
+</code></pre>
+
+<p><button class="sample-1">CSS Gradient Button #1</button></p>
+
+<p>上から下に<code>rgb(204, 204, 204)</code>から<code>rgb(102, 102, 102)</code>へのグレーのグラデーションをかける例。ブラウザによって書き方がかなり違うのでちょっと読みづらいが、単純なグラデーションなのでさほど難しくはない。<code>-webkit-gradient()</code>では<code>from()</code>と<code>to()</code>でグラデーションの開始色と終了色を指定した例を良く見かけるが、CSS3の<code>linear-gradient()</code>(や<code>-moz-linear-gradient()</code>)と書き方を似せるために<code>color-stop()</code>を使った方が良さそう。特に<a href="/pub/test/129.html">複数の色停止位置を使った少し複雑なグラデーションをかけたりする場合</a>は<code>color-stop()</code>の方が相互に変換しやすい。なお<code>button</code>要素によるサンプルは以下の対応ブラウザでしか意図したとおりに表示されない。</p>
+
+<ul>
+<li>Internet Explorer 6以降 (ただし<code>:hover</code>による色の変更は7以降)</li>
+<li>Firefox 3.6 Beta 3以降</li>
+<li>Safari 4以降</li>
+<li>Chrome 4以降</li>
+</ul>
+
+<p>このボタンにカーソルを合わせた時に<code>rgb(187, 204, 221)</code>から<code>rgb(51, 102, 153)</code>というブルーグレーのグラデーションに変えるためには、単純にグラデーションの色を変えて書くとすると以下のように書くことになる。</p>
+
+<pre><code class="language-css">button:hover {
+  background-image: linear-gradient(top, rgb(187, 204, 221), rgb(51, 102, 153));
+  background-image: -moz-linear-gradient(top, rgb(187, 204, 221), rgb(51, 102, 153));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgb(187, 204, 221)), color-stop(1, rgb(51, 102, 153)));
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr=&quot;#BBCCDD&quot;, EndColorStr=&quot;#336699&quot;);
+}
+</code></pre>
+
+<p>色をちょっとだけ変えたいだけなのに、コピペしてから6ヶ所も変更しなければならなかったりと、変更や修正をするのが大変そうでちょっとアレ。</p>
+
+<p>そこでベースになるグラデーションをこれまた最近クローズアップされることが多い<code>rgba()</code>を利用して以下のように変更する。</p>
+
+<pre><code class="language-css">button {
+  background-color: rgb(102, 102, 102);
+  background-image: linear-gradient(top, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255, 255, 255, 0.7)), color-stop(1, rgba(255, 255, 255, 0)));
+  filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr=&quot;#B2ffffff&quot;, EndColorStr=&quot;#00ffffff&quot;);
+}
+</code></pre>
+
+<p><button class="sample-2">CSS Gradient Button #2</button></p>
+
+<p>ベースの背景色を<code>rgb(102, 102, 102)</code>にし、それに半透明からだんだん透明に近づくアルファ付きのグラデーションを重ねてやるというもの。IEでは色の指定に<code>rgba()</code>は利用できないが、<code>#AARRGGBB</code>という形でアルファ付きで指定できるので、FirefoxやSafariと同じようにグラデーションをかけることができる。これだとマウス・オーバーでのブルーグレーへのグラデーションへの変更は背景色の変更だけで済む。</p>
+
+<pre><code class="language-css">button:hover {
+  background-color: rgb(51, 102, 153);
+}
+</code></pre>
+
+<p>直感的でわかりやすく、なおかつ短く書きやすい。グラデーションの色や滑らかさの修正や変更も背景色の調整と透明度の修正だけで済むので比較的簡単だと思う。OperaやFx3.5以下等のCSSによるグラデーションをサポートしていないブラウザでも、<code>:hover</code>をサポートしていれば背景色が切り替わる効果だけは有効になるのもメリット(サンプル #1でも背景色も指定すれば切り替わるが更に修正・変更箇所が増えることになる)。</p>
+
+<p>同系色のグラデーションにしか利用できないテクニックではあるが、ボタンやナビゲーションの背景にちょっとグラデーションをかけたいとかいう場合にはコピペして<code>background-color</code>をちょこちょこっと変えるだけで完成なので便利。</p>
+
+<hr>
+
+<figure><img src="/images/blog/css-gradient-header-screenshot.png" alt="CSS Gradient Header (Firefox 3.6 Beta 4でのスクリーンショット)"></figure>
+
+<p>手習いに今は画像で作っているこのサイトのヘッダを<a href="/pub/test/130.html">CSSグラデーションで作ってみた</a>(Fx 3.6b3+のみ)。色停止位置を工夫すればグラデーション→単色塗りつぶし→グラデーション→単色塗りつぶし……などということもちゃんとできる。</p>
+
+<pre><code class="language-css">body {
+  background-image: -moz-linear-gradient(
+    top,
+    rgb(249, 246, 240) 0,
+    rgb(249, 246, 240) 16px,
+    rgb(102, 170,  17) 16px,
+    rgb(102, 170,  17) 18px,
+    rgb(105, 102,  96) 18px,
+    rgb(58,   55,  49) 54px,
+    rgb(102, 170,  17) 54px,
+    rgb(102, 170,  17) 56px,
+    rgb(249, 246, 240) 56px
+  );
+}
+</code></pre>
+
+<p><code>:active</code>と<code>:hover</code>時のグラデーションの変更は透明に近づくグラデーションを重ねるというこのエントリで書いたテクニックを利用した。なので現在の画像によるグラデーションとは色がちょっと違う。</p>
+
+<pre><code class="language-css">div#header ul#navigation li.active a {
+  background-color: #66aa11;
+  background-image: -moz-linear-gradient(
+    top,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.25)
+  );
+}
+</code></pre>
+
+<p>Safariでは<code>color-stop()</code>の長さに割合指定しかできないようなので、ピクセル単位でグラデーションをかけたりするのは大変そう……。<code>background-size</code>でグラデーションのサイズを指定した上で計算機で割合を計算する必要があるんだと思う(面倒になったのでまだ作ってない)。</p>

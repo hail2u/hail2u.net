@@ -1,0 +1,21 @@
+Vimで全角や行末スペースをハイライト
+
+<p>今まで<code>:match</code>で全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら<code>:2match</code>とかできるけど<code>:3match</code>までしかないから<code>matchadd()</code>使ってねと書いてあった。<code>matchadd()</code>でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。</p>
+
+<pre><code class="language-vim">scriptencoding utf-8
+
+" Additional highlights
+augroup AdditionalHighlights
+  autocmd!
+
+  " Trailing spaces
+  autocmd ColorScheme * highlight link TrailingSpaces Error
+  autocmd Syntax * syntax match TrailingSpaces containedin=ALL /\s\+$/
+
+  " Zenkaku space
+  autocmd ColorScheme * highlight link ZenkakuSpace Error
+  autocmd Syntax * syntax match ZenkakuSpace containedin=ALL /　/
+augroup END
+</code></pre>
+
+<p><code>Error</code>グループに直接ぶち込んでもいいような気もする。</p>

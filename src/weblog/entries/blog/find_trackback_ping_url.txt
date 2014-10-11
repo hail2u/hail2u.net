@@ -1,0 +1,32 @@
+Find TrackBack ping URL
+<p><a href="http://blog.bulknews.net/mt/archives/001078.html" title="blog.bulknews.net: Trackback Discovery Bookmarklet">miyagawaさんのエントリ</a>を見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、<code>innerHTML</code>とかじゃなくて、ドキュメントのノードを全てチェックし、<code>nodeType</code>が8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。</p>
+<p>JavaScriptのコードはこんな感じになっています。</p>
+<pre><code class="language-js">var tburl;
+var comments = new Array();
+getComment();
+
+for (var i = 0; i &lt; comments.length; i++) {
+  if (comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)) {
+    tburl = RegExp.$1;
+    break;
+  }
+}
+
+prompt(&#39;TrackBack ping URL&#39;, tburl);
+
+function getComment(elm) {
+  if (!elm) elm = document.documentElement;
+
+  for (var i = 0; i &lt; elm.childNodes.length; i++) {
+    if (elm.childNodes[i].nodeType == 8) {
+      comments[comments.length] = elm.childNodes[i].data;
+    } else if (elm.childNodes[i].nodeType == 1) {
+      getComment(elm.childNodes[i]);
+    }
+  }
+}
+</code></pre>
+<p><code>getComment()</code>が要素のノードを全部チェックし、定義済みの<code>comments</code>という名前の配列にコメントの中味をまとめてどんどん追加していく関数です。<code>nodeType</code>が1、すなわち要素の場合は、その要素からさらに<code>getComment()</code>をよぶといういわゆる再帰的な仕組み。この関数が終了した後、今度は<code>comments</code>でループを回し、中味を、<code>/trackback:ping=&quot;([^&quot;]+)&quot;/</code>という正規表現でチェックしていきます。で、マッチしたら<code>RegExp.$1</code>でTrackBack ping URLを抜き出して、最後にプロンプトを表示ということ。</p>
+<p>Bookmarklet: <em><a href="javascript:var tburl;var comments=new Array();function getComment(elm){if(!elm)elm=document.documentElement;for(var i=0;i&lt;elm.childNodes.length;i++){if(elm.childNodes[i].nodeType==8){comments[comments.length]=elm.childNodes[i].data;}else if(elm.childNodes[i].nodeType==1){getComment(elm.childNodes[i]);}}}getComment();for(var i=0;i&lt;comments.length;i++){if(comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)){tburl=RegExp.$1;break;}}prompt(&#39;TrackBack ping URL&#39;, tburl);" title="Extract TrackBack ping URL">Extract TrackBack ping URL</a></em></p>
+<p>FirefoxとIE6で動作を確認しました。まーこのままではあまり使い物になるとは思えないシロモノですが、これをベースに何かいろいろ出来るかも出来ないかも。</p>
+<p>僕はほらローカルからPerlでTrackBack Auto-discoveryしちゃってるので・・・。誰かスゴイの作ってください。</p>

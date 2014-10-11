@@ -1,0 +1,51 @@
+Bloglines checker
+<p>しつこく引いてみる。</p>
+<p><a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>は登録したRSSファイルが更新されていた場合、星マークのついた画像を表示するページに切り替えるという形の、 New Item Notifierという機能があります。これがまた非常に使いづらいんです。しかし、これ以外に更新通知の機能は用意されていないので、このページを利用して、比較的使いやすいチェッカーみたいなものをPerlで作ってみました。</p>
+<p>New Item Notifierは、ログインは不要で、</p>
+<blockquote>
+<p>http://www.bloglines.com/notifier?user=&lt;登録したメールアドレス&gt;</p>
+</blockquote>
+<p>というURLにアクセスするだけなので、このURLの中味を簡単に解析すれば良いわけです。更新が無い場合は、<code>title</code>要素にNo Updateという文字列が入るようなので、この文字列が無かった場合に何らかのアクションをするスクリプトを書いてやればOK。で、どうやって通知するかということをいろいろ考えたんですが、クイック起動を使うことにしました。クイック起動のフォルダに、更新があった場合は黄色のスマイリー・アイコン、更新が無い場合は灰色のスマイリー・アイコンのMy Blogsへのインターネット・ショートカットを作ってやるということです。スクリプトはこんな感じ。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+use LWP::Simple;
+
+my $lnkfile = &#39;C:\Documents and Settings\UserName\Application Data\Microsoft\Internet Explorer\Quick Launch\Bloglines.url&#39;;
+
+my $email = &#39;your@mail.address&#39;;
+
+my $content = get(&quot;http://www.bloglines.com/notifier?user=$email&quot;);
+
+if ($content) {
+  if ($content !~ /No Update/) {
+    open(LNKFILE, &quot;&gt;$lnkfile&quot;) or exit;
+    print LNKFILE &lt;&lt;&quot;_EOF_&quot;;
+[InternetShortcut]
+URL=http://www.bloglines.com/myblogs
+IconFile=C:\\Icons\\Update.ico
+IconIndex=0
+_EOF_
+    close(LNKFILE);
+  }
+  else {
+    open(LNKFILE, &quot;&gt;$lnkfile&quot;) or exit;
+    print LNKFILE &lt;&lt;&quot;_EOF_&quot;;
+[InternetShortcut]
+URL=http://www.bloglines.com/myblogs
+IconFile=C:\\Icons\\NoUpdate.ico
+IconIndex=0
+_EOF_
+    close(LNKFILE);
+  }
+}
+
+exit;
+</code></pre>
+<p>インターネット・ショートカットは、普通のショートカットと違い、INI形式の単純なテキストファイルなので、こんなんで楽勝です。アイコンはこんな感じです。</p>
+<figure><img src="/images/blog/bloglines_update.png" alt="Bloglines checker - Update"></figure>
+<figure><img src="/images/blog/bloglines_noupdate.png" alt="Bloglines checker - No Update"></figure>
+<p>あんまり深く考えること無しに作ったけどなかなか良い。</p>
+<h2>追記@2003/10/11</h2>
+<p>このスクリプトはチェックして終了してしまうので、タスク・スケジューラなんかで定期的に実行しないと、あまり意味はありません。</p>

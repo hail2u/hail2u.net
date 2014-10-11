@@ -1,0 +1,68 @@
+jQueryプラグイン: Query YQL
+
+<p><a href="http://developer.yahoo.com/yql/">Yahoo! Query Language - YDN</a>に式を指定するだけでクエリを投げられ、コールバック関数で結果を受け取れるようにする<a href="http://github.com/hail2u/jquery.query-yql">Query YQL</a>という<a href="http://jquery.com/">jQuery</a>のプラグインを作った。<code>jQuery.getJSON()</code>でもそんなに手間がかかるわけではないけど、エンドポイントとか<code>callback=?</code>とか書くのがちょっと面倒だったのでプラグインにした。実装するのに2分、名前を考えるのに15分。</p>
+
+<p>ソースを見ればわかる通り、<code>jQuery.getJSON()</code>とほぼ同じで、<code>jQuery.get()</code>のラッパー。将来を見据えてエンドポイントは設定で指定できるようにしようかと少し考えたけど、それは別にQuery YQL v2(またはQuery YQL v1)プラグインとか作ってやれば良さそうだと思ったので実装しなかった。色々オプション設定できるようにして複雑化させたらこのプラグインを書いた意味ないし。</p>
+
+<h2>使い方</h2>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;jquery-1.3.2.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.query-yql.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var statement = &quot;select * from feed where url=&#39;http://example.com/rss&#39;&quot;;
+$.queryYQL(statement, function (data) {
+  // do something with &quot;data&quot;.
+});
+&lt;/script&gt;
+</code></pre>
+
+<p>と、<code>script</code>要素で読み込んでおいて、式とコールバック関数を引数に<code>jQuery.queryYQL()</code>を呼ぶ。式は丸投げなので、<a href="http://developer.yahoo.net/blog/archives/2009/07/yql_insert.html">最近実装された<code>insert</code>や<code>update</code>、<code>delete</code></a>もちゃんと使える。ちなみに<code>jQuery.getJSON()</code>で同じものを書くと、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;jquery-1.3.2.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var statement = &quot;select * from feed where url=&#39;http://example.com/rss&#39;&quot;;
+$.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
+  format: &quot;json&quot;,
+  q: statement
+}, function (data) {
+  // do something with &quot;data&quot;.
+});
+&lt;/script&gt;
+</code></pre>
+
+<p>ちょっと読みやすく、エンドポイントのURLを調べ(覚え)なくて済むのでかなり書きやすい。</p>
+
+<p>また、第二引数に<code>xml</code>を指定すると、<a href="http://www.yqlblog.net/blog/2009/07/08/changelog-for-build-2174/">最近実装されたJSONP-X</a>モードになる。</p>
+
+<pre><code class="language-js">var statement = &quot;select * from html where url=&#39;http://example.com/&#39; and xpath=&#39;//a&#39;&quot;;
+$.queryYQL(statement, &quot;xml&quot;, function (data) {
+  // do something with &quot;data&quot;.
+});
+</code></pre>
+
+<p>最初の例のように第二引数がコールバック関数の場合や第二引数で<code>json</code>を指定した場合はJSONPを利用する。</p>
+
+<h2>YQLのJSONP-Xの返すJSONデータ</h2>
+
+<p>Query YQLプラグイン自体とはあまり関係ない話だが、テスト・コードを書いている途中で若干はまったので触れておく。YQLのJSONPとJSONP-Xでは返ってくるJSONデータの構造が微妙に違う。JSONPでは、</p>
+
+<pre><code class="language-js">{
+  &quot;query&quot;: {
+    &quot;results&quot;: {}
+  }
+}
+</code></pre>
+
+<p>と<code>results</code>が<code>query</code>の子になっているが、JSONP-Xでは、</p>
+
+<pre><code class="language-js">{
+  &quot;query&quot;: {},
+  &quot;results&quot;: []
+}
+</code></pre>
+
+<p>と双方がルートにある。単なるYQL側の実装ミスかもしれないので、今後ともこの形かどうかはわからないけど今は注意が必要。10分はまった僕が言うのだから間違いない。</p>
+
+<hr>
+
+<p>プラグインにしたらしたでプラグイン・ファイルをコピーして<code>script</code>要素を書くのが面倒な気がしてくるという……。短いコードのプラグインなのでコピペで使うとかも良いかもしれない。</p>

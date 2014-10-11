@@ -1,0 +1,36 @@
+RSS Ping
+<p>以前、weblogUpdates.pingは「更新した！」ということしかわからないので、これを元に最新記事を拾おうとかすると面倒極まりないとかいう話を<a href="http://blog.bulknews.net/mt/archives/001197.html#001197" title="weblogUpdates.ping の拡張メモ: blog.bulknews.net">miyagawaさんがしていた</a>わけですが、海の向こうでは<a href="http://rssping.com/" title="RSS Ping">RSS Ping</a>というメタ・データ付きで更新通知を送る規格が考えられているようです。</p>
+<p><a href="http://rssping.com/rssping1.html" title="RSS Ping">RSS Ping 1.0</a>の方はExampleを見れば一目瞭然なように、</p>
+<ul>
+<li><em>site_name</em>: サイトのタイトル</li>
+<li><em>site_title</em>: サイトのURL</li>
+<li><em>feed_uri</em>: フィードのURL</li>
+<li><em>item_title</em>: 最新記事のタイトル</li>
+<li><em>item_link</em>: 最新記事のURL</li>
+</ul>
+<p>をパラメータとしてHTTP GETでpingサーバーにリクエストしてやることにより更新通知をするというものみたいです。オプションとして、タグや最新記事のコピーが含まれるXML(最新記事のみを格納した<a href="http://web.resource.org/rss/1.0/spec" title="RDF Site Summary (RSS) 1.0">RSS 1.0</a>/<a href="http://blogs.law.harvard.edu/tech/rss" title="RSS 2.0 Specification">2.0</a>や<a href="http://www.atomenabled.org/developers/syndication/atom-format-spec.php" title="AtomEnabled / Developers / Syndication / Atom Syndication Format Spec (Pre-Draft)">Atom 1.0</a>)のURLを送信することも可能とか。</p>
+<p>ドラフト段階の<a href="http://rssping.com/rssping2.html" title="RSS Ping">RSS Ping 2.0</a>では、HTTP GETではなく最新記事のみを格納したRSS 1.0/2.0やAtom 1.0を下位に持つ<code>rss_ping</code>をルートとしたXMLをHTTP POSTで送ってやることにより更新通知をするというものみたいです。他に更新通知スパム対策に認証の仕組みなんかも定義されるようです。</p>
+<p>ひとつ前のエントリ、「<a href="/blog/sports/good-bye_sam_cassell.html" title="hail2u.net - Weblog - Sam Cassellサヨウナラ">Sam Cassellサヨウナラ</a>」を例にとってRSS Ping 2.0の仕様に沿った送信するXMLを作るとすると、</p>
+<pre><code class="language-xml">&lt;rss_ping version=2&gt;
+  &lt;site_name&gt;hail2u.net - Weblog&lt;/site_name&gt;
+  &lt;site_uri&gt;http://hail2u.net/blog/&lt;/site_uri&gt;
+  &lt;feed_uri type=&quot;RSS 2.0&quot;&gt;http://feeds.feedburner.com/hail2u/blog&lt;/feed_uri&gt;
+  &lt;payload type=&quot;RSS 1.0 fragment&quot;
+    encoding=&quot;UTF-8&quot;
+    xmlns=&quot;http://purl.org/rss/1.0/&quot;
+    xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+    xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;&gt;
+    &lt;item rdf:about=&quot;http://hail2u.net/blog/sports/good-bye_sam_cassell.html&quot;&gt;
+      &lt;title&gt;Sam Cassellサヨウナラ&lt;/title&gt;
+      &lt;link&gt;http://hail2u.net/blog/sports/good-bye_sam_cassell.html&lt;/link&gt;
+      &lt;description&gt;昨シーズンは怪我とフロントとの確執などで思うように実力を発揮できず、Wolvesがプレーオフ出場を逃した戦犯扱いされたSam Cassellがトレードされました。キュートな離れ目をもう見れないかと思うと悲しいですね(心を込めて)。&lt;/description&gt;
+      &lt;dc:creator&gt;Kyo Nagashima (mailto:kyo@hail2u.net)&lt;/dc:creator&gt;
+      &lt;dc:subject&gt;Sports&lt;/dc:subject&gt;
+      &lt;dc:ate&gt;2005-08-16T05:09:17+09:00&lt;/dc:ate&gt;
+    &lt;/item&gt;
+  &lt;/payload&gt;
+&lt;/rss_ping&gt;
+</code></pre>
+<p>こんな感じっぽい(ExamplesがRSS 1.0に<code>webmaster</code>要素とかあったりとかちょっとおかしいので勘)。<code>payload</code>要素の<code>type</code>属性にfragmentを含むと、RSS 1.0の<code>channel</code>要素やAtom 1.0の<code>feed</code>要素を記述しなくてもOKとか(なんか場当たり的)。あまり考えずに実装できそうではありますね(blosxomなんかだとflavourと簡単なプラグインだけでいけたりするかも)。</p>
+<p>通知する情報自体はフィードで提供する情報とほぼ等価なので、最新記事のみを格納したRSS 2.0やAtom 1.0を丸投げとかで良いような気がする。</p>
+<p>いずれにせよ単なる更新通知にしか使えないweblogUpdates.pingよりもパワフルではあると思うので、こういった規格にリプレースされていくと面白いかも。</p>

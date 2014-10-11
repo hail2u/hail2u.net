@@ -1,0 +1,25 @@
+WebKitにおける::-moz-selectionと::selection
+
+<p>間違えて同じルールセットに<code>::-moz-selection</code>と<code>::selection</code>を<a href="https://github.com/hail2u/hail2u.net-styles/blob/49efa74011235041f3ea671ea8c7663d4062b2d4/_widget.scss">並べて書いていた</a>。これ<a href="/blog/webdesign/unknown-css-selector.html">不明なセレクター</a>になってエラーになる……と思って直したんだけど、Safari 5やChrome 17(と19)ではエラーにならず素通しされてた(Firefox 11やInternet Explorer 9、Opera 11ではエラーになって無視される)。どうもこれだけ(か擬似要素すべて)が特別扱いされているかバグっているのかのどちらかな感じ。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/392.html"><code>::-moz-selection</code> and <code>::selection</code> on WebKit</a></p>
+
+<pre><code class="language-css">::-moz-selection,
+::selection {
+  color:  #000;
+  background-color: #ff0;
+}
+</code></pre>
+
+<p>みたいにベンダー拡張プリフィックス付きの<code>::selection</code>セレクターをまとめて書いてもSafari 5とChrome 17は通ってしまう。他のブラウザーは<code>::-moz-selection</code>か<code>::selection</code>のどちらかが不明なセレクターのため、エラーとしてルールセット全体が無視される。</p>
+
+<p><code>::selection</code>とかそもそもWeb標準に今はないじゃん……とかそういう話や問題ではなくて(まぁないんだけど)、不明なセレクターの解釈がCSS2.1の仕様にそぐわないものになっているという話。Developer Toolsで覗くとちょっと変な感じになっていた。</p>
+
+<pre><code class="language-css"><mark>*</mark>::-moz-selection,
+::selection {
+  color:  #fff;
+  background-color: #589;
+}
+</code></pre>
+
+<p>全称セレクターのアスタリスク(<code>*</code>)が補完されて解釈されていて、ココらへんにバグか特別扱いがありそう。試しにアスタリスクを消して選択してみようとしたらクラッシュ再現率100%でひどい……。もうちょっと詰めたらChromiumのIssuesに書きたいけど、仕様でこうこうこうだから今の便利な状態を修正して不便にしろみたいなめんどくさい人の感じになりそうで躊躇う……。</p>

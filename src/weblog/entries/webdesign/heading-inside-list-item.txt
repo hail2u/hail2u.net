@@ -1,0 +1,83 @@
+リスト項目内に見出し
+
+<p><a href="/blog/webdesign/after-actually-make-things-simple.html">2つ前のエントリ</a>で書いてしまったウェブページ全体の見出しを<code>li</code>要素にぶち込むという案に関して<a href="http://twitter.com/#!/cyokodog/status/35234521351716864">Twitterで言及されていた</a>。これについてはエントリを書いた後ちょっと考えたので、返答がてら(簡単にリプライしといたけど)エントリにする。</p>
+
+<p>まずTwitterでの言及について。HTML 4.01において<code>dt</code>要素は、</p>
+
+<blockquote cite="http://www.w3.org/TR/1999/REC-html401-19991224/struct/lists.html#h-10.2">
+<p><code>&lt;!ELEMENT DT - O (%inline;)*           -- definition term --&gt;</code></p>
+</blockquote>
+
+<p>なので、<a href="http://www.w3.org/TR/1999/REC-html401-19991224/sgml/dtd.html#inline">インライン要素</a>しか含めることが出来ない。つまり、そもそも見出しを入れることは許可されていない。対して<code>li</code>要素だと、</p>
+
+<blockquote cite="http://www.w3.org/TR/1999/REC-html401-19991224/struct/lists.html#h-10.3">
+<p><code>&lt;!ELEMENT LI - O (%flow;)*             -- list item --&gt;</code></p>
+</blockquote>
+
+<p>なので、<a href="http://www.w3.org/TR/1999/REC-html401-19991224/sgml/dtd.html#flow">だいたい何でも</a>入れることが出来る。つまり文法的な話だと<code>li</code>要素ならOKで、<code>dt</code>要素だとよろしくないとなる。これはHTML5でも似たような話で、<code>dt</code>要素の内容モデルは<a href="http://www.w3.org/TR/html5/content-models.html#phrasing-content">フレーズ</a>、<code>li</code>要素は<a href="http://www.w3.org/TR/html5/content-models.html#flow-content">フロー</a>のため結論は同じになる。でも、これはあくまでも文法上問題ないというだけのこと。</p>
+
+<p>では、アウトライン的におかしいのかというとそうでもない。HTML 4.01では見出し要素だけがアウトラインを作ることができるので、<code>h1</code>要素がどこにあってもアウトラインは問題なく構築される。しかし、これもあくまでも仕様上そうなっているというだけで、深い所に見出しを置いてしまうとHTML文書のツリー構造と文書のアウトラインのツリー構造が大きく剥離してしまうだろう。</p>
+
+<p>また、HTML5ではセクションという概念があるので話にならない。ナビゲーションに見出しを混ぜ込んだものをそのまま変換すると、</p>
+
+<pre><code class="language-html">&lt;nav&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;h1&gt;&lt;a href=&quot;http://hail2u.net/blog/&quot;&gt;Weblog&lt;/a&gt;&lt;/h1&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;http://hail2u.net/documents/&quot;&gt;Documents&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;http://hail2u.net/archives/&quot;&gt;Archives&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;http://hail2u.net/about&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+
+<p>となり、ウェブページ全体の見出しとしてマークアップしたものは<code>nav</code>要素の見出しになってしまう。これはない。</p>
+
+<p>ということで、ウェブページ全体の見出しをナビゲーションの<code>li</code>要素にぶち込むという案は、HTML5では「意図したようにアウトラインが構築されないHTML文書」になるので、今後のことを考えるとよろしくないという結論になった。</p>
+
+<hr>
+
+<p>もちろん単に見出し要素を<code>li</code>要素に入れるということ自体は文法的に問題ないので、例えばメガメニューなんかでは使っても良いと思う。</p>
+
+<pre><code class="language-html">&lt;nav&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Windows
+      &lt;nav&gt;
+        &lt;h1&gt;Windows&lt;/h1&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Windows 製品ホーム&lt;/li&gt;
+          &lt;li&gt;Windows 7&lt;/li&gt;
+          ...
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+      &lt;nav&gt;
+        &lt;h1&gt;Windows Live&lt;/h1&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Windows Live 製品ホーム&lt;/li&gt;
+          &lt;li&gt;Windows Live Hotmail&lt;/li&gt;
+          ...
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+    &lt;/li&gt;
+    &lt;li&gt;Office
+      &lt;nav&gt;
+        &lt;h1&gt;デスクトップ アプリケーション&lt;/h1&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Office.com (製品)&lt;/li&gt;
+          &lt;li&gt;Office 2010&lt;/li&gt;
+          ...
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+      &lt;nav&gt;
+        &lt;h1&gt;サービス / ソリューション&lt;/h1&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Office Web Apps&lt;/li&gt;
+          &lt;li&gt;Office Live&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+    &lt;/li&gt;
+    ...
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+
+<p>これだとアウトラインがかなり派手になり好みではないので、自分で書くとしたら普通にリストのネストで書きそう。</p>

@@ -1,0 +1,23 @@
+meta要素のcontent属性でURL
+
+<p><code>meta</code>要素の<code>content</code>属性は特にどういう値が入るものか決められていない。のでURLじゃないかもしれないし、URLとみなせる文字列なのかもしれない。<a href="http://ogp.me/">OGP</a>ではRDFaだから<code>meta</code>要素を使いましょうと書かれていて、URLを値とする<code>url</code>や<code>image</code>プロパティーも<code>meta</code>要素の<code>content</code>属性を使う。昨日見たのだと<a href="http://blogs.msdn.com/b/ie/archive/2012/06/08/high-quality-visuals-for-pinned-sites-in-windows-8.aspx">Windows 8のピンに使われる<code>msapplication-TileImage</code></a>とかもそう。</p>
+
+<p>例えば「相対URLを使った場合はどうなるのか？」とか。IEBlogで例示されているコードでは相対URL使ってるので、Windows 8はとりあえずどうにかしてくれそうだけど、「<code>base</code>要素あってもちゃんと判断してくれるの？」とか疑問を持ち始めたらキリがない。こういうのはやっぱりURLだと明示されている要素の属性で行うべきだと思う。他に使えるものがないというのならしょうがないけど、このケースでは<code>rel=&quot;canonical&quot;</code>や<code>rel=&quot;icon&quot;</code>と同じ扱いで良いと思うので、<code>link</code>要素の<code>href</code>属性の方がふさわしそう。</p>
+
+<p><code>meta</code>要素はメタデータのmetaから来ているわけだけど、だからといってメタデータは全部<code>meta</code>要素でというわけではない。<code>title</code>や<code>link</code>要素などが相応しくない場合の最後の楽園。</p>
+
+<p><code>apple-touch-icon</code>とかは<code>link</code>要素使っている。特にGoogle +1ボタンなんかはせっかくMicrodataのおかげでスキーマレスで値の判断が行えるのだから、<code>meta</code>要素を使うべきではないはず。</p>
+
+<pre><code class="language-html">&lt;head itemscope itemtype="http://schema.org/WebPage"&gt;
+  &lt;link href="/images/logo.png" rel="og:image"&gt;
+  &lt;link href="/" rel="canonical og:url"&gt;
+  &lt;link href="/images/logo.png" itemprop="image"&gt;
+  &lt;link href="/" itemprop="url"&gt;
+&lt;/head&gt;
+</code></pre>
+
+<p><code>rel</code>と<code>itemprop</code>属性は排他なのでまとめることは出来ないけど、<code>rel</code>は空白区切りで複数の値をとれるので<code>canonical</code>と<code>og:url</code>をまとめたりはできる。世のパーサーからは普通に無視されそうなので「書き直しましょう！」とかそういう話ではない。</p>
+
+<hr>
+
+<p>セマンティック期。</p>

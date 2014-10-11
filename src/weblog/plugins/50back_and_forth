@@ -1,0 +1,91 @@
+# Blosxom Plugin: back_and_forth
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2012-04-07T21:56:23+09:00
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+# This plugin is altenate version of "prevnextentry" plugin.
+# "prevnextentry" plugin maybe found at:
+# http://bulknews.net/lib/archives/prevnextentry-0.1
+
+package back_and_forth;
+
+use strict;
+use vars qw($enabled $prev $next $link_prev $link_next);
+
+# --- Configurable variables -----------
+
+# Do you want to output as XHTML?
+my $as_xhtml = 0;
+
+# --- Plug-in package variables --------
+
+$enabled = 0;
+my $xhtml = $as_xhtml ? ' /' : '';
+
+my @file_info;
+
+# --------------------------------------
+
+use FileHandle;
+
+my $fh = new FileHandle;
+
+sub start {
+  return 0 unless $blosxom::path_info =~ /\.\Q$blosxom::flavour\E$/;
+
+  $enabled = 1;
+
+  return 1;
+}
+
+sub filter {
+  my($pkg, $files_ref) = @_;
+
+  @file_info = sort {$files_ref->{$b} <=> $files_ref->{$a}} keys %$files_ref;
+
+  return 1;
+}
+
+sub head {
+  my($pkg, $path, $head_ref) = @_;
+
+  $path =~ s/\.\Q$blosxom::flavour\E/\.$blosxom::file_extension/;
+  my %path2idx = map { $file_info[$_] => $_ } 0..$#file_info;
+  my $index = $path2idx{"$blosxom::datadir/$path"};
+
+  if ($index < $#file_info) {
+    my($prev_url, $prev_title) = &get_url_and_title($file_info[$index + 1]);
+    $link_prev = qq!<link rel="prev" href="$prev_url"$xhtml>!;
+    $prev = &$blosxom::template($path, 'back_and_forth_prev', $blosxom::flavour) || '<p><a href="$back_and_forth::prev_url">$back_and_forth::prev_title</a></p>';
+    $prev =~ s/\$back_and_forth::prev_url/$prev_url/ge;
+    $prev =~ s/\$back_and_forth::prev_title/$prev_title/ge;
+  }
+
+  if ($index > 0) {
+    my($next_url, $next_title) = &get_url_and_title($file_info[$index - 1]);
+    $link_next = qq!<link rel="next" href="$next_url"$xhtml>!;
+    $next = &$blosxom::template($path, 'back_and_forth_next', $blosxom::flavour) || '<p><a href="$back_and_forth::next_url">$back_and_forth::next_title</a></p>';
+    $next =~ s/\$back_and_forth::next_url/$next_url/ge;
+    $next =~ s/\$back_and_forth::next_title/$next_title/ge;
+  }
+
+  return 1;
+}
+
+sub get_url_and_title {
+  my $file = shift;
+
+  my($path, $fn) = $file =~ m!^$blosxom::datadir(?:(/.*)/)?(.*)\.$blosxom::file_extension!;
+  my $url = "$blosxom::url$path/$fn.$blosxom::flavour";
+  my $title = '';
+
+  if (-f $file and $fh->open($file)) {
+    chomp($title = <$fh>);
+    $fh->close;
+  }
+
+  return($url, $title);
+}
+
+1;
+# vim:ft=perl

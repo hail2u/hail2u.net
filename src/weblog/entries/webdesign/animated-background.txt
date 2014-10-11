@@ -1,0 +1,24 @@
+背景画像をtransitionさせ続ける
+
+<p>JavaScriptで背景画像を動かすだけで怒られる。CSSでやればJavaScriptを無効にされても動かせるので、もっと怒られるのかもしれない。いちいちCSSアニメーションを書くのは面倒なので、<code>transition</code>プロパティーを使ってインスタントに動かせるような工夫を考えた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/560.html">Animated Background</a></p>
+
+<p>ループできない<code>transiton</code>プロパティーで擬似的に永続アニメーションを提供するには、<code>transition-duration</code>プロパティーで大きな値を指定すれば良い。またアニメーションの開始に必要になるトリガーは主に擬似クラスを利用することになるが、<code>body</code>要素に<code>:hover</code>擬似クラスを直接使うとアニメーションをうまく起こせない問題があり、<code>:target</code>擬似クラスではIDの指定とURLが限定される問題がある。ルートの<code>html</code>要素に<code>:hover</code>を指定することで、この二つの問題は解決できる。あとはどれくらいのスピードで動かすのかを考えて<code>background-position</code>プロパティーで大きな値を指定するだけで良い。</p>
+
+<pre><code class="language-css">body {
+  background-image: url(&#39;background.png&#39;);
+  background-position: 0 0;
+}
+
+html:hover body {
+  background-position: 720000px 720000px;
+  transition-property: background-position;
+  transition-timing-function: linear;
+  transition-duration: 3600s;
+}
+</code></pre>
+
+<p>デモでは800x800の画像を背景にしたので、4秒で1周するように<code>720000px</code>を指定した。アニメーションの長さは1時間確保しておけば大丈夫だろう。リニアなアニメーションなら、このようにちょっと工夫すればできるけど、拡大・縮小を繰り返すとかは<code>animation</code>プロパティーを使った本元CSSアニメーションじゃないと難しい。</p>
+
+<p>パフォーマンスとしてはInternet Explorer 11とFirefox 29ではハードウェア・アクセラレーションが何もせずに効くので問題ない。Chrome 34ではCPUを食いつくすので、なんらかの方法でハードウェア・アクセラレーションを有効にする必要がある。</p>

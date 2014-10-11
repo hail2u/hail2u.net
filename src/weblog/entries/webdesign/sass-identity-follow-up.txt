@@ -1,0 +1,96 @@
+Sassの存在意義への補足
+
+<p><a href="http://sass-lang.com/">Sass</a>の<a href="/blog/webdesign/sass-identity.html">存在意義の話</a>があんまりうまく伝わってない感じなので、3の別々に書けてSassで関連付けられるということについて少しだけ書く。抽象的な概念の話なので具体的な説明というのもなかなか難しいけど、CSSフレームワークを使う時にどうなるかみたいなことを取り上げる。</p>
+
+<p><a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a>を始めCSSフレームワークはいくつもあるが、それらはだいたいユニークなクラス名を持っている。例えばTwitter Bootstrapで2カラムレイアウトを作る場合は以下のようなHTMLに<em>しなくてはならない</em>。</p>
+
+<pre><code class="language-html">&lt;div class="row"&gt;
+  &lt;div class="span4"&gt;...&lt;/div&gt;
+  &lt;div class="span8"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p><code>div</code>要素は<code>section</code>や<code>aside</code>要素などを使っても良いが、クラス名はこうでなくてはならない。Sass(や<a href="http://lesscss.org/">LESS</a>)があるとまず変わるのはここ。</p>
+
+<pre><code class="language-html">&lt;div class="wrapper"&gt;
+  &lt;aside&gt;...&lt;/aside&gt;
+  &lt;div role="main"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>ほとんどのケースでこのようにHTML文書側では適切な要素の使用やクラス名の割り振りだけで良くなる。このことが意味するのはHTML文書のソースが(自己満足的に)キレイになるとかそういう話でもあるんだけど、もっと重要なのはコンテンツを把握できるバックエンド側で適切に<em>マークアップ</em>することができるようになるという点だと思う。クラス名の命名規則等のコーディング規約で少しは改善できるが、根本的な解決にはならない。</p>
+
+<pre><code class="language-scss">.wrapper {
+  @extend .row;
+
+  &gt; aside {
+    @extend .span4;
+  }
+}
+
+[role="main"] {
+  @extend .span8;
+}
+</code></pre>
+
+<p>CSSのHTML文書への適用はSassでCSSで定義したデザインを継承する形で行う。CSSフレームワークやOOCSSではHTMLで複数のクラスを割り当てる形なわけだけど、SassやLESSでそれを代行できると言い換えても良い。</p>
+
+<p>CSSに慣れた人ならわかると思うけど、これはCSSのセレクターの工夫でどうにかなる部分ではある。でもそれではCSSフレームワークのような汎用的なシステムは作れないし、HTMLの構造にセレクターが強く依存するのでテストすら汎用的に書けない。あらゆる点でワンオフなCSSになってしまう。</p>
+
+<p>対して、SassやLESSでデザインを継承する形で書く場合、特にHTMLの構造を考慮することなくデザインを行う(CSSを書く)ことができる。とりあえず直感的なクラス名のセレクターで好きに書けば良い。具体的に言うのならならサイトロゴやclearfixなどデザインや機能単位でそれぞれ定義してやるだけ。</p>
+
+<pre><code class="language-scss">.add-quote-mark {
+  padding-left: 48px;
+  min-height: 48px;
+  background: {
+    image: url("/img/quote.png");
+    repeat: no-repeat;
+    size: 48px 48px;
+  }
+}
+</code></pre>
+
+<p>例えば<code>blockquote</code>要素で使うために引用符の画像を背景に仕込むというようなデザインを定義するなら、こういう形でそのためのプロパティーだけを書けば良い。マージンやフォントの変更などもそれぞれ別に定義する。</p>
+
+<pre><code class="language-scss">.default-margin {
+  margin: 2em 0 0 0;
+}
+
+.quote-text {
+  font: {
+    family: "Palatino", "Palatino Linotype", serif;
+    style: italic;
+  }
+}
+</code></pre>
+
+<p>テストは個々のデザインごとにテストすれば良いので、<code>blockquote</code>要素で使われるデザインだからといってテストでも<code>blockquote</code>要素を使う必要はない。</p>
+
+<pre><code class="language-html">&lt;div class="add-quote-mark"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
+&lt;div class="default-margin"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
+&lt;span class="quote-text"&gt;Lorem ipsum dolor sit amet.&lt;/span&gt;
+</code></pre>
+
+<p>実際にはそれぞれを<code>section</code>要素で括って見出しをつけたり、テストページといえども見やすいように構造と体裁を整えた方が良いけど、基本はこんなもので良い。長い行の折り返しを省略する<code>text-overflow: ellipsis</code>を使うならサンプル文字列を長文にするとか、<em>デザインに合わせて</em>テストをちゃんと書くだけ。ここでも最終的にこのデザインが利用されるHTML文書のことを考える必要はほとんどない。</p>
+
+<p>LESSではこの定義したデザインをCSSにコンパイルすることなくほぼ直接テストできるので(<code>less.js</code>使うだけ)、その点で大きくSassに優る。Sassではテスト用のCSSを別途コンパイルする必要があるので、そこをどうにかするための環境を整えるのはかなり面倒くさい。僕はSassをCSSにコンパイルして返すCGIを作ってそれを利用してやってるけど色々アレで、もっとなんかこう<code>less.js</code>並に手軽な仕組みが欲しいところ。</p>
+
+<pre><code class="language-scss">[role="main"] blockquote {
+  @extend .default-margin;
+  @extend .add-quote-mark;
+  @extend .quote-text;
+}
+</code></pre>
+
+<p>最後にSassでこのデザインを継承する。理想的に書くことが出来ればワンオフになるのはこの<code>@extend</code>を使うファイル(とコンパイルされたCSS)だけ。</p>
+
+<pre><code class="language-html">&lt;div role="main"&gt;
+  &lt;blockquote class="add-quote-mark default-margin quote-text"&gt;...&lt;/blockquote&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>CSSフレームワークやOOCSS的なアプローチだとHTMLでこうする必要がある。CSSをよく知らないバックエンド開発者に「<code>add-quote-mark</code>と<code>default-margin</code>、<code>quote-text</code>を<code>role="main"</code>配下の<code>blockquote</code>要素のクラスに追加してください」とか「デザイン変えるためにテンプレートを更新したけどGitわからないので取り込んでください」とかお願いしているところを想像して欲しい。</p>
+
+<hr>
+
+<p><code>@extend</code>によるデザインの継承はセレクターの数の上限というとんでもないバギーなInternet Explor 9以下の仕様にぶつかりやすいとか色々SassやLESSの暗黒面については端折って書いててずるいとか、Sass 3.2では<code>@extend</code>で使えるplaceholderセレクターというものが追加されてこのあたりの話が少し変わるとか、他にも色々あるのでちゃんとまとめたい気はする。<code>@extend</code>をちゃんと使って書く方法は僕もまだまだ手探りしてたりするのでちゃんと書ける気しないけど。</p>

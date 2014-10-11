@@ -1,0 +1,26 @@
+blosxomと404 #2
+<p>やはり存在しないエントリにアクセスしようとした場合、Statusで404 Not Foundを返したい。いろいろやってみて、404 Not Foundを返しつつ、サイトの独自404ドキュメントと同じものを出力するようにできました。かなり怪しいというか強引。</p>
+<p>改造するところは<a href="/blog/blosxom/blosxom_and_404.html" title="hail2u.net - Weblog - blosxomと404">blosxomと404</a>で改造したところと同じで、オリジナルのままだと394行目辺り。そこに以下のコードを挿入します。</p>
+<pre><code class="language-perl"># No matching entries treated as a 404 Not Found
+if ($ne eq $num_entries) {
+  if (open(FH, &quot;/www_root/john/public_html/404.html&quot;)) {
+    print header(
+      -type    =&gt; &#39;text/html&#39;,
+      -charset =&gt; &#39;UTF-8&#39;,
+      -status  =&gt; &#39;404 Not Found&#39;,
+    );
+
+    foreach (&lt;FH&gt;) {
+      print $_;
+    }
+
+    close(FH);
+  } else {
+    print redirect(&quot;http://example.com/john/404.html&quot;);
+  }
+
+  exit;
+}
+</code></pre>
+<p>サイトの独自404ドキュメントを開いた後、Statusヘッダを追加してヘッダを普通に出力。その後、サイトの独自404ドキュメントの中身をそのまま出力してやるという感じ。ファイルを開くのに失敗した時は、<code>redirect</code>でフォロー。</p>
+<p>マジで強引過ぎ。てか、これで良いのか？やりたいことは出来ているので良いことにしよう。</p>

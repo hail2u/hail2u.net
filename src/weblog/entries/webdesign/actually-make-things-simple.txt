@@ -1,0 +1,119 @@
+リデザイン @ 2011-02-07
+
+<figure><img src="/images/blog/make-things-simple.png" alt="Make things simple."></figure>
+
+<p>へるべちかにゅ～！CSSが20KBオーバーと肥大化してきたのでダイエットしようと思ったらいつの間にか全部書き換えていた。でも頑張っても13KBにしかならなかった。</p>
+
+<p>以下、覚書。</p>
+
+<h2>Reset CSSの変更</h2>
+
+<p>リクエストの削減のためにYUIの<a href="http://developer.yahoo.com/yui/3/cssreset/">CSS Reset</a>と<a href="http://developer.yahoo.com/yui/3/cssfonts/">CSS Fonts</a>を使うのをやめ、CSSファイルに<a href="http://meyerweb.com/eric/tools/css/reset/">Eric MeyerのReset CSS</a>を参考にしたものをベタに書くことにした。Reset部分はパブリック・ドメイン。欲しかったらCSSのソースからコピペでどうぞ。meyerwebのReset CSSとの違いは、</p>
+
+<pre><code class="language-css">address, caption, cite, code, dfn, em, strong, th, var {
+  font-style: inherit;
+  font-weight: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: inherit;
+}
+</code></pre>
+
+<p>辺りで、フォントの見た目は親から継承するようにして、</p>
+
+<pre><code class="language-html">&lt;em&gt;&lt;code&gt;-webkit-transform&lt;/code&gt;&lt;/em&gt;
+</code></pre>
+
+<p>こういうネストで親のスタイルをちゃんと継承できるようにした。もうひとつは、</p>
+
+<pre><code class="language-css">li {
+  list-style: none;
+}
+</code></pre>
+
+<p><code>ol</code>や<code>ul</code>の代わりに<code>li</code>でリストのマーカーを消すようにした。こうしておくと、</p>
+
+<pre><code class="language-css">li {
+  list-style: inherit;
+}
+</code></pre>
+
+<p>とすればブラウザのデフォルトのマーカー設定に復帰できるので、ネストしたリストでマーカーが階層ごとに変わっていくという多くのブラウザのデフォルトの挙動を維持できる。</p>
+
+<h2>フォント指定</h2>
+
+<p>フォントはもうpx指定で良いかなと思ったのでそうした。</p>
+
+<pre><code class="language-css">body {
+  font: 16px/1.5 &quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, sans-serif;
+}
+</code></pre>
+
+<p>行間は1.5～1.75くらいが日本語(文字によってグリフの高さがほとんど変化しない言語)には良い気がする。</p>
+
+<h2>セマンティックなHTMLへ変更しようとして挫折</h2>
+
+<p>せっかく<a href="http://diveintohtml5.org/semantics.html">燃えて死ね</a>を<a href="/documents/diveintohtml5-semantics.html">翻訳した</a>ので、例としてここもセマンティックなHTMLにしようかと思っていたんだけど、他のページはともかくウェブログのエントリにあるHTMLコードの移行が激しく面倒なので諦めた。言うほど簡単じゃないよね！</p>
+
+<pre><code class="language-html">&lt;p class=&quot;image&quot;&gt;&lt;img src=&quot;http://example.com/images/foobar.png&quot; alt=&quot;Example Image&quot;&gt;&lt;/p&gt;
+</code></pre>
+
+<p>となっているのを、</p>
+
+<pre><code class="language-html">&lt;figure&gt;
+  &lt;figcaption&gt;Example Image&lt;/figcaption&gt;
+  &lt;img src=&quot;http://example.com/images/foobar.png&quot;&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>とかはまだマシな作業(確認が面倒なだけ)だけど、</p>
+
+<pre><code class="language-html">&lt;h2&gt;Heading&lt;/h2&gt;
+
+&lt;p&gt;Pellentesque nunc turpis, pellentesque quis pulvinar sit amet, facilisis in enim. Cras posuere laoreet ultricies. Aenean blandit sagittis rutrum. Sed quis arcu ligula, ut condimentum sapien.&lt;/p&gt;
+
+&lt;p&gt;Nulla pulvinar mi at odio mollis nec luctus lorem bibendum. Sed vitae ullamcorper lacus. Integer neque mauris, pretium sollicitudin feugiat id, tincidunt at ligula. Suspendisse sagittis egestas urna, eget semper odio ultrices ut. Donec ut diam id justo faucibus dignissim eu eu est. Duis auctor malesuada sagittis.&lt;/p&gt;
+</code></pre>
+
+<p>とか各エントリでたまに出てくるセクションをちゃんと考慮して、</p>
+
+<pre><code class="language-html">&lt;section&gt;
+  &lt;h1&gt;Heading&lt;/h1&gt;
+
+  &lt;p&gt;Pellentesque nunc turpis, pellentesque quis pulvinar sit amet, facilisis in enim. Cras posuere laoreet ultricies. Aenean blandit sagittis rutrum. Sed quis arcu ligula, ut condimentum sapien.&lt;/p&gt;
+
+  &lt;p&gt;Nulla pulvinar mi at odio mollis nec luctus lorem bibendum. Sed vitae ullamcorper lacus. Integer neque mauris, pretium sollicitudin feugiat id, tincidunt at ligula. Suspendisse sagittis egestas urna, eget semper odio ultrices ut. Donec ut diam id justo faucibus dignissim eu eu est. Duis auctor malesuada sagittis.&lt;/p&gt;
+&lt;/section&gt;
+</code></pre>
+
+<p>にするとかは考えただけでも気が遠くなる。セクションの終わりが機械的にわからないので。誰だよこんなHTML書いた奴。<code>&lt;div class=&quot;section&quot;&gt;...&lt;/div&gt;</code>で括っとけば良かった……。</p>
+
+<h2>ロゴタイプとヘッダー</h2>
+
+<p>使ったフォントは<a href="http://www.motzigemba.de/">lelim <del>Light</del><ins>300</ins></a>で、</p>
+
+<pre><code class="language-css">#header {
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.5);
+}
+</code></pre>
+
+<p>と同じような効果をかけただけ。</p>
+
+<p>ナビゲーションの星マークはユニコードのアレ。</p>
+
+<pre><code class="language-css">#header #navigation:after, #header #navigation li:before {
+  margin: 0 4px;
+  float: left;
+  content: &quot;\2605&quot;;
+}
+</code></pre>
+
+<h2>Media Queries</h2>
+
+<p>とりあえずなんとなく<a href="/pub/test/167.html">いくつかに分けてみた</a>。だけ。画像はサイズ指定なしにしておいて、<code>max-width: 100%;</code>なのでアスペクト比を維持したまま適当にリサイズされることと思う。</p>
+
+<hr>
+
+<p>あとはフッターのアイコンが無駄にアニメーションするくらい。なにか変なところがあったらまずは<kbd>Ctrl+F5</kbd>してそれでも治らなかったら黙ってブラウザのタブを閉じてしまうと良い。気が向いたら<a href="http://hail2u.wufoo.com/forms/feedback/">フィードバック・フォーム</a>から報告してくれると喜ぶ。</p>

@@ -1,0 +1,21 @@
+GFMの見出しリンク
+
+<p>GitHubではREADME.mdのレンダリングにはGitHub Flavored Markdownが使われている。その基本は<a href="https://github.com/vmg/redcarpet">Redcarpet</a>みたいなんだけど、見出しリンクがなんか違う気がするなーと思った。特に半角記号の辺り。<a href="https://github.com/hail2u/github-cheat-sheet/blob/master/README.ja.md">GitHubカンニング・ペーパー</a>のToCを作ろうとした時に色々面倒だった。</p>
+
+<p class="seealso">View Demo: <a href="https://gist.github.com/hail2u/10706879">GFMの見出しリンクで削除される文字列を検証</a></p>
+
+<p>Gistでも同じだろうと思うので、Gistでテストした。ほとんどはUTF-8でURLエンコードされると思って良さそうだったので、半角記号の扱いを主に重点的にチェックしている。</p>
+
+<ul>
+<li>空白は<code>-</code>に変換される</li>
+<li><code>a-zA-Z-_</code>はそのまま</li>
+<li><code>À</code>より前の半角記号は削除される<ul>
+<li>ただし<code>ªµº</code>は残る</li>
+<li>ソフトハイフンが挙動不審</li>
+</ul>
+</li>
+<li>残りはUTF-8でURLエンコード</li>
+<li><code>A-Z</code>は小文字に変換される</li>
+</ul>
+
+<p>という感じのようだ。日本語+英語となるとハイフンとアンダースコア以外の記号を削除してURLエンコード、最後に小文字化で良さそう。</p>

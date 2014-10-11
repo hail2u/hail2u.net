@@ -1,0 +1,40 @@
+Firefoxの拡張のドロップダウンなツールバー・ボタン
+
+<p><a href="http://mozilla.jp/firefox/">Firefox</a>の拡張でツールバー・ボタンは<a href="https://developer.mozilla.org/en/XUL/toolbarbutton"><code>toolbarbutton</code></a>要素で作る。これをドロップダウンにするには<code>type</code>属性に<code>menu</code>を指定してやり、子に<code>menupopup</code>を作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。</p>
+
+<p>繰り返しになるけどドロップダウンなツールバー・ボタンは、</p>
+
+<pre><code class="language-xml">&lt;toolbarbutton id=&quot;dropdown-test&quot;
+  label=&quot;ドロップダウン&quot;
+  type=&quot;menu&quot;&gt;
+  &lt;menupoup&gt;
+    &lt;menuitem label=&quot;項目 #1&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #2&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #3&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #4&quot;/&gt;
+  &lt;/menupoup&gt;
+&lt;/toolbarbutton&gt;
+</code></pre>
+
+<p>このように作る。この<code>dropdown-test</code>のスタイルに<code>list-style-image</code>で画像を与えてやるとそれがアイコンになり、</p>
+
+<figure><img src="/images/blog/dropdown-toolbarbutton-sample.png" alt="ドロップダウンなツールバー・ボタンの例"></figure>
+
+<p>といったように右に(ロケールによるけど)矢印付きで表示される。まるで問題ないように見えるのだが、ちょっとアレな感じになるのは、大きいアイコン表示でかつテキストも表示する場合。わかりやすいように他の普通のツールバー・ボタンと並べてみると、こんな感じになる。</p>
+
+<figure><img src="/images/blog/big-dropdown-toolbarbutton-with-label-sample.png" alt="大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタンの例"></figure>
+
+<p>普通のツールバー・ボタンのラベルが下に来ているのに対して、ドロップダウンの方はラベルが右に来てしまう。<code>toolbarbutton</code>要素に対して、<code>class</code>属性で<code>toolbarbutton-1</code>を指定してやるとラベルは下に来るが、今度は矢印も下に来てしまう(上記画像のHomeというラベルの更に下に矢印が出る感じ)。見た目が悪いうえにツールバーが太くなってしまう。また、<code>type</code>で<code>menu-button</code>を指定した場合は、ラベルは下、矢印は右に来るのだけどアイコン部分をクリックした時の動作をきちんとコーディングしなければならなくなる。</p>
+
+<p>これを<code>type=&quot;menu&quot;</code>の挙動のままラベルは下、矢印は右にするには<code>toolbarbutton</code>へのスタイル指定で、</p>
+
+<pre><code class="language-css">#dropdown-test {
+  -moz-binding: url(&quot;chrome://global/content/bindings/toolbarbutton.xml#menu-vertical&quot;);
+}
+</code></pre>
+
+<p>と<code>menu-vertical</code>というビルトインのスタイルを適用してやれば良い。</p>
+
+<figure><img src="/images/blog/perfect-big-dropdown-toolbarbutton-with-label.png" alt="menu-verticalな大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタン"></figure>
+
+<p>この<code>menu-vertical</code>はFirefoxのデフォルトのテーマでは使われていないからか、あまりメジャーじゃない模様。ゴリゴリCSSを書いて無理やり矢印を右に持っていこうとしてた苦労はいったい……。</p>

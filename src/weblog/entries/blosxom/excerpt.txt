@@ -1,0 +1,45 @@
+excerpt plugin
+<p>諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。中身は<a href="http://www.blosxom.com/plugins/text/foreshortened.htm" title="blosxom :: the zen of blogging :: plugins/text/foreshortened.txt">foreshortened</a>とあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。</p>
+<pre><code class="language-perl"># Blosxom Plugin: excerpt
+# Author(s): Kyo Nagashima &lt;k-n&#64;muc.biglobe.ne.jp&gt;
+# Version: 1.0
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package excerpt;
+
+use strict;
+use vars qw($body);
+
+# --- Configurable variables -----------
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  return 1;
+}
+
+sub story {
+  my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+
+  $body = $$body_ref;
+  $body =~ s!\x0D|\x0A!!g;
+  $body =~ s!^&lt;p&gt;(.*?)&lt;/p&gt;.*$!$1!;
+  $body =~ s!&lt;.*?&gt;!!g;
+
+  return 1;
+}
+
+1;
+</code></pre>
+<p>というような感じで、最初の<code>p</code>要素の中身を切り出し、タグを削除という単純明快、ぶっちゃけこのblog専用の手抜きなもの。</p>
+<p>事情というのは、rssフレーバーを<a href="http://blogs.law.harvard.edu/tech/rss" title="RSS 2.0 Specification">RSS 2.0</a>、rdfフレーバーを<a href="http://web.resource.org/rss/1.0/spec" title="RDF Site Summary (RSS) 1.0">RSS 1.0</a>に変更した事情です。特に何かセマンティックな理由(どんな理由だ)があるわけではなく、気分の問題。RSS 2.0に非対応というRSSリーダーはあんまり聞かないので、多くの人には関係の無いことだと思いますが、もしかすると一部のRSSリーダーで読めなくなっちゃったとかあるかもしれません。ゴメンナサイと謝っておきます。</p>
+<p>ということで、現在このblogのフィードは以下の4種類です。</p>
+<ul>
+<li><a href="/blog/index.rss" title="RSS 2.0 version of the contents">index.rss</a>: RSS 2.0</li>
+<li><del>index.rdf: RSS 1.0</del></li>
+<li><a href="/blog/index.atom" title="Atom 0.3 version of the contents">index.atom</a>: <a href="http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html" title="The Atom Syndication Format 0.3 (PRE-DRAFT)">Atom 0.3</a></li>
+<li><del>index.esf: <a href="http://www.aquarionics.com/article/name/esf" title="Aquarionics - Article - ESF">ESF 1.0</a></del></li>
+</ul>
+<p>アクセス増えてきたので、全て静的に出力するようにしました。動的に取得する方法もありますけど教えません。中身変わらないので。</p>

@@ -1,0 +1,11 @@
+Vimのユーザー・ランタイム・ディレクトリを探す
+
+<p>Vimのシステムのランタイム・ディレクトリは<code>$VIMRUNTIME</code>で拾えるけど、ユーザーのはない。なのでポータブルな<code>vimrc</code>を書けるようにWindowsとかでも<code>$HOME/.vim</code>に揃えてた。Vim 7.4から(だと思う)ユーザーのランタイム・ディレクトリに<code>vimrc</code>を置けるようになったので、そこに置けば<code>vimrc</code>から<code>&lt;sfile&gt;</code>を使って簡単に探せるようだ。</p>
+
+<p><code>vimrc</code>をVim 7.4で置けるようになったところに置き(先頭のドットはいらない)、<code>vimrc</code>に以下のように書いておく。</p>
+
+<pre><code class="language-vim">let $VIMRUNTIME_USER = expand(&#39;&lt;sfile&gt;:p:h&#39;)</code></pre>
+
+<p>これで<code>vimrc</code>や<code>gvimrc</code>で<code>$VIMRUNTIME_USER</code>を使って手軽にアクセスできる。行儀悪いけど環境変数にしておくと、<code>set</code>とかでも気軽に使えて良い。古い環境向けに<code>$HOME/.vim</code>にフォールバックさせておくとなお良さそう。</p>
+
+<p>ベスト・プラクティスありそうな気がすると思って、netrwの<code>NetrwHome()</code>の実装とか見たらものすごくひどい感じだった……。</p>

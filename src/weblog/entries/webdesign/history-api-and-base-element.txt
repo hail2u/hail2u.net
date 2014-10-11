@@ -1,0 +1,20 @@
+History APIとbase要素
+
+<p><code>base</code>要素の<code>href</code>要素で別のドメインのページを指し、リソースの基準となるURLを変更すると、History APIを使った履歴操作が行えなくなる。Same Origin Policyに引っかかって、セキュリティ・エラーが吐かれるようだ。</p>
+
+<pre><code class="language-html">&lt;!-- http://www.example.com/foo/bar --&gt;
+&lt;base href=&quot;http://other.example.com/&quot;&gt;
+&lt;script&gt;
+  history.replaceState(null, &#39;&#39;, &#39;/replace&#39;);
+&lt;/script&gt;
+</code></pre>
+
+<p><code>http://www.example.com/</code>上のページでURLの書き換えを行おうと以上のようにすると、ブラウザーは<code>base</code>要素の<code>href</code>属性の値を考慮して<code>http://other.exmaple.com/replace</code>に書き換えようとする。しかしSame Origin Policyが発動して例外を吐いてスクリプトの実行が止まる。Chrome 34ではコンソールに以下のようなエラーが表示される。</p>
+
+<blockquote>
+  <p>Uncaught SecurityError: Failed to execute &#39;replaceState&#39; on &#39;History&#39;: A history state object with URL &#39;http://other.example.com/push&#39; cannot be created in a document with origin &#39;http://www.example.com/&#39;.</p>
+</blockquote>
+
+<p><code>base</code>要素で別のドメインを使いつつ履歴操作……というのは不可能なようだ。</p>
+
+<p>ちゃっちゃと作ったHTML生成ツールでローカルでのパスのミスマッチなどを考慮しなくて済むように<code>base</code>要素を常に使うような実装にしたんだけど、そのままだとどうにもならなそう。履歴書き換え前に一旦<code>base</code>要素を削除するとかでもいけそうな気がしないでもないけど、それもちょっとアレな感じする。</p>

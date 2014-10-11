@@ -1,0 +1,88 @@
+入力フォームのラベルをフワッと浮かせるパターンの別解
+
+<figure>
+  <img src="/images/blog/alternative-float-label-pattern.gif" alt="入力フォームにフォーカスすると、入力フォームが拡大すると同時にラベルが斜めに動く">
+</figure>
+
+<p><a href="https://dribbble.com/shots/1254439--GIF-Mobile-Form-Interaction">Float Label Pattern</a>はかっこよくて、単にラベルをプレースホルダーにするよりはマシなので使いたくなる。しかしラベルとプレースホルダーは別に提供してやりたい。機能も違うものなので、その方がきっと良いはずだ。そこで別解として、ラベルが斜めに動くものを考えた。もちろんCSSのみで実装している。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/572.html">Alternative Float Label Pattern</a></p>
+
+<p>入力フォームにフォーカスすると、左にあるラベルが斜め右上に少し移動すると同時に入力フォームが左へ拡大する。これによりFloat Label Patternと同じような結果になるが、デフォルトの状態ではラベルとプレースホルダーを両立させることができる。</p>
+
+<p>ラベルを入力フォームのフォーカスと連携させるには、<a href="http://www.w3.org/TR/css3-selectors/#adjacent-sibling-combinators">隣接兄弟セレクター</a>を使うくらいしか方法はなさそうなので、マークアップは入力フォーム→ラベルの順にする必要がある。またそうするためには、両者の関連付けもネストではなく<code>for</code>属性を使う必要もある。</p>
+
+<pre><code class="language-html">&lt;form&gt;
+  &lt;p&gt;
+    &lt;input id=&quot;foo&quot;
+      type=&quot;text&quot;
+      placeholder=&quot;Input example for Foo&quot;&gt;
+    &lt;label for=&quot;foo&quot;&gt;Foo:&lt;/label&gt;
+  &lt;/p&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>CSSでは親要素(ここでは<code>p</code>要素)の高さと幅を制限した上で、<code>margin-left</code>や<code>top</code>プロパティーなどをうまく使ってレイアウトしてやる。</p>
+
+<p>仮に<code>18em</code>(iPhoneのportraitでも収まる幅)、ラベルで<code>6em</code>と入力フォームで<code>12em</code>を使うとすると以下の様なCSSになる。</p>
+
+<pre><code class="language-css">p {
+  width: 18em;
+  height: 2em;
+}
+
+input,
+label {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+input {
+  margin-left: 6em;
+  width: 12em;
+  height: 2em;
+  line-height: 2;
+}
+
+label {
+  position: relative;
+  top: -1.5em;
+  left: 0;
+  height: 1em;
+  line-height: 1;
+}
+</code></pre>
+
+<p>入力フォームの位置は<code>margin-left</code>プロパティーでラベルの幅分の余白を作ってやり、<code>width</code>プロパティーで<code>12em</code>を指定しておく。ラベルでは<code>position: relative</code>を使い、位置を上にずらす。両者ともに<code>height</code>と<code>line-height</code>プロパティーを使って適切な高さを指定しておくが、ラベルをちょっと重ねることを考えると、入力フォームは最低でも<code>2em</code>程度は必要になる。</p>
+
+<p>あとはこれを<code>input:focus</code>をトリガーにして、入力フォームとラベルの位置を動かしてやるだけだ。入力フォームは<code>margin-left</code>と<code>width</code>プロパティーで、ラベルは<code>top</code>と<code>left</code>プロパティーで動かす。</p>
+
+<pre><code class="language-css">input:focus {
+  margin-left: 0;
+  width: 18em;
+}
+
+input:focus + label {
+  top: -2.5em;
+  left: 0.5em;
+}
+</code></pre>
+
+<p>アニメーションは<code>transition</code>プロパティーを使って適当にやれば良い。元ネタのFloat Label Patternのように下線のみのフォーム要素の場合にはもうちょっと単純化できると思う。その一方で描画領域や親要素の大きさに合わせてフレキシブルに入力フォームの幅を調整するのは難しい(うまい方法が思いつかなかった)。</p>
+
+<hr>
+
+<p>元々のFloat Label Patternの要件は以下の通りだと考えている。</p>
+
+<ul>
+<li>入力フォームの幅を最大限に確保する</li>
+<li>ラベルをフォームに重ねて表示し、ラベルに領域を消費させない</li>
+<li>入力開始時にもラベルを消さない</li>
+</ul>
+
+<p>このパターンの問題点は、ラベルとプレースホルダーを混同させずに両立させるのが難しいことだ。入力フォームに重なって表示された文字列をラベルと解釈させるには、アイコンの追加なども含め、かなり気を使って作りこむ必要がある。もしくはそのような形でのプレースホルダーの濫用による、ユーザーの慣れを期待することになる。</p>
+
+<p>僕が考えたパターンは、元パターンの要件を満たした上でラベルとプレースホルダーの両立を実現している。</p>
+
+<p>しかし同時に、入力フォームの入力開始位置が動くという別の新たな欠点も持ってしまう。元パターンでもラベルの移動により視線を奪うことは起こりうるので、元パターンとの比較では欠点とまではならないが、ユーザビリティ的な問題を解消しようとして別のユーザービリティ上の問題を抱えることになるので、あまり良い解とは言えないかもしれない。</p>

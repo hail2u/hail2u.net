@@ -1,0 +1,48 @@
+メールでwritebackへの投稿を受信
+<p>そういや付けました。結構前に。writeback notifyというプラグインがあったんですけど、配布サイト消えてたり。なので、sendmailで適当に組んでみました。writeback最後の方に以下を追加。</p>
+<pre><code class="language-perl">sub notify {
+  my $body = $_[0];
+
+  if (open(MAIL, &quot;| /usr/lib/sendmail -t&quot;)) {
+    print MAIL &lt;&lt;&quot;_MAIL_&quot;;
+From:writeback\@blosxom.com
+To:kyo\@hail2u.net
+Subject:hail2u.net - Weblog - Comment/TrackBack
+Content-Type:text/plain
+X-Mailer:blosxom writeback plugin
+
+$body
+_MAIL_
+    close(MAIL);
+  }
+}
+</code></pre>
+<p>これは、引数に渡された文字列をsendmailで送るサブルーチンです。さらに、128行目あたりのパラメータからファイルに書き込むところを、</p>
+<pre><code class="language-perl">foreach (@fields) {
+  my $p = param($_);
+  $p =~ s/\x0D\x0A|\x0D|\x0A/\t/gm;
+  $p =~ s/^\t*(.*?)\t*$/$1/gm;
+  $p =~ s/&lt;.*?&gt;//gm;
+  $p =~ s/&amp;/&amp;amp;/gm;
+  $p =~ s/&lt;/&amp;lt;/gm;
+  $p =~ s/&gt;/&amp;gt;/gm;
+  $p =~ s/&quot;/&amp;quot;/gm;
+
+  if ($_ eq &#39;comment&#39; || $_ eq &#39;excerpt&#39;) {
+    $p =~ s/(ftp:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; ftp&lt;\/a&gt;/g;
+    $p =~ s/(h?ttp:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; http&lt;\/a&gt;/g;
+    $p =~ s/(h?ttps:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; https&lt;\/a&gt;/g;
+    $p =~ s/(^|[^\x81-\x9f])([!-~]+\@[!-~]+\.[!-~]+)/$1&lt;a href=&quot;mailto:$2&quot; title=&quot;$2&quot;&gt;&amp;#187; mailto&lt;\/a&gt;/g;
+  }
+
+  $p =~ s/\t/&lt;br \/&gt;/g;
+  $temp .= &quot;$_:$p\n&quot;;
+}
+$temp .= &quot;-----\n&quot;;
+print $fh $temp;
+$fh-&gt;close();
+$temp = &quot;$blosxom::url$path/$fn.html\n-----\n$temp&quot;; # *1
+&amp;notify($temp);
+</code></pre>
+<p>こんな風に書き換えます。タグ削除とか自動リンクとかそんなものも追加されてますが、根幹は元々各パラメータの値を順に書き加えているのを、一旦<code>$temp</code>に追加していく様にして、最後に書き込みしてます。その上で、<code>$temp</code>の先頭(後尾でも良いのですけど)ににそのエントリのParmanent linkを付け加え(*1のところ)、<code>notify</code>サブルーチンに渡してます。</p>
+<p>わかりにく。</p>

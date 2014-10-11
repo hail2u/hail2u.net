@@ -1,0 +1,56 @@
+CSS MQPacker v0.1.2
+
+<p>メディアクエリの順番が崩れることがあるバグを修正して、<a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>のv0.1.2をリリースした。CSSは順序に依存するものなので、やっぱり書いたままの順を維持した方が良いのかな……などと、このツールの根本を否定するような考えが頭をよぎった。</p>
+
+<p>これまでは、同じ条件のメディアクエリが出てきた時に、それまでにあったメディアクエリのブロックを新しく出てきたメディアクエリのブロックへマージするという実装だった。必要な物を必要なだけ動かすことになるので、良い実装と勘違いしていたんだけど、以下の様なCSSを通すと破綻する。</p>
+
+<pre><code class="language-css">.foo { color: black; }
+
+@media (min-width: 300px) {
+  .foo { color: red; }
+}
+
+@media (min-width: 600px) {
+  .foo { color: green; }
+}
+
+.bar { color: black; }
+
+@media (min-width: 300px) {
+  .bar { color: blue; }
+}
+</code></pre>
+
+<p>メディアクエリの条件が<code>(min-width: 600px)</code>のものはひとつしかないので、このメディアクエリのブロックは移動されない。そのため処理結果のCSSは以下のようになり、<code>600px</code>以上の時も<code>.foo</code>は赤色の文字になる。</p>
+
+<pre><code class="language-css">.foo { color: black; }
+
+@media (min-width: 600px) {
+  .foo { color: green; }
+}
+
+.bar { color: black; }
+
+@media (min-width: 300px) {
+  .foo { color: red; }
+  .bar { color: blue; }
+}
+</code></pre>
+
+<p>新バージョンでは、逐次メディアクエリのブロックを削除しながら別にマージしていき、最後にCSSへ追加するようにした。メディアクエリは最後にまとめられることになる。上記例を新バージョンで処理すると以下のようになり、ちゃんと<code>600px</code>以上の時に<code>.foo</code>が緑色の文字になる。</p>
+
+<pre><code class="language-css">.foo { color: black; }
+
+.bar { color: black; }
+
+@media (min-width: 300px) {
+  .foo { color: red; }
+  .bar { color: blue; }
+}
+
+@media (min-width: 600px) {
+  .foo { color: green; }
+}
+</code></pre>
+
+<p>これで大丈夫なんじゃないかと思う。</p>

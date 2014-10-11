@@ -1,0 +1,37 @@
+非screenデバイスでのスクロールできる表
+
+<p><a href="/blog/webdesign/scrollable-table.html">スクロールできる表</a>はscreenなデバイスのためのものなので、プリンターやスクリーン・リーダーではおかしなことになりうる。どうなるのかまったくわからないので、そのためのフォールバックはあった方が良さそう。Media Queriesで<code>not</code>や<code>print</code>を駆使して上書きするのが楽な感じ。</p>
+
+<p>主にスクリーン・リーダー向けに<code>screen</code>以外で<code>display</code>プロパティーを戻してやり、更にプリンター向けに表がちゃんと折り返されるようにリセットしてやることにした。</p>
+
+<pre><code class="language-css">table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  table-layout: fixed;
+}
+
+th,
+td {
+  white-space: nowrap;
+}
+
+@media not screen {
+  table {
+    display: table;
+  }
+}
+
+@media print {
+  table {
+    table-layout: auto;
+  }
+
+  th,
+  td {
+    white-space: normal;
+  }
+}
+</code></pre>
+
+<p><code>not screen</code>でまとめても良さそうだけど、目的が違うものを混ぜるのもアレな感じがあるし、明示的に別にした。こうしておくと、なんのためにあるルールセットなのか数年後でもわかりそう。</p>

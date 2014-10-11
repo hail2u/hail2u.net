@@ -1,0 +1,57 @@
+JavaScriptファイルに引数を渡す
+
+<p>前回のエントリで触れた<code>script</code>要素の<code>src</code>属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元は<a href="http://script.aculo.us/" title="script.aculo.us - web 2.0 javascript">script.aculo.us</a>で、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。</p>
+
+<p>asamashi.jsでは以下のようなコードで引数に指定したASINコードを取得している。</p>
+
+<pre><code class="language-js">$A(document.getElementsByTagName(&quot;script&quot;)).findAll(function(s) {
+  return (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/))
+}).each(function(s) {
+  asin = s.src.replace(/http:\/\/hail2u\.net\/pub\/test\/056_asamashi\.js\#/, &#39;&#39;);
+});
+</code></pre>
+
+<p><code>$A()</code>や<code>findAll()</code>など<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>を利用したコードなので短くまとまっている。</p>
+
+<pre><code class="language-js">var ss1 = document.getElementsByTagName(&quot;script&quot;);
+var ss2 = new Array();
+
+for (var i = 0; i &lt; ss1.length; i++) {
+  var s = ss1[i];
+  if (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/)) ss2.push(s);
+}
+
+for (var i = 0; i &lt; ss2.length; i++) {
+  var s = ss2[i];
+  asin = s.src.replace(/http:\/\/labs\.hail2u\.net\/amazon\/asamashi\/asamashi\.js\#/, &#39;&#39;);
+}
+</code></pre>
+
+<p>普通に書くとこんな感じ(あんまりチェックしてないので多分)。つまり<code>script</code>要素を列挙して、<code>src</code>属性をチェック。自分自身への参照でかつ引数があれば配列に格納し、正規表現の置換で引数をゲットというわけ。</p>
+
+<p>実際には、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  var asin = &quot;4844322222&quot;;
+&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;asamashi.js&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;
+</code></pre>
+
+<p>などという形(<a href="http://www.google.com/adsense/" title="Google AdSense">Google AdSense</a>なんかみたいなスタイル)で良いことが多い(と思う)。そのためこういった引数を与えるというテクニックは使う場所が限られそう。もちろんscript.aculo.usのような動的ロードの仕組みなどはその限られた場所のひとつで、大いに力を発揮するだろう。前回のエントリでやったような仕組みを汎用的にし、第三者に積極的に利用してもらう場合にも良いアプローチだと思う。上記のようなコードよりも、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://hail2u.net/pub/test/056_asamashi.js#4844322222&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;
+</code></pre>
+
+<p>の方がすっきりしてて気持ちが良いし、利用する第三者に優しいと思うので。コーダー的なメリット(アプリケーションにおいて引数を渡すことができるというメリット)よりも、ユーザー的なメリット(JavaScriptファイルの呼び出しが簡略化できたりするメリット)という面でポイントが高いテクニックかなとかいう印象。</p>
+
+<p>例えばGoogle AdSenseが、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://pagead2.googlesyndication.com/pagead/show_ads.js#pub-8712792805045949:Seaside&quot;&gt;
+&lt;/script&gt;
+</code></pre>
+
+<p>という感じだったとしたらすっきりしてて良くない？みたいな。</p>

@@ -1,0 +1,35 @@
+a要素でのitemprop属性
+
+<p><a href="http://www.w3.org/TR/microdata/">Microdata</a>では<code>itemprop</code>属性を指定された要素からどうやって値を選択するか厳密に決められていて、それに外れた書き方はできない。<code>meta</code>や<code>time</code>、<code>img</code>要素の場合はまぁそうなるよねみたいな感じなんだけど、<code>a</code>要素だけがちょっと。</p>
+
+<p>仕様では、<code>a</code>要素で<code>itemprop</code>属性を使った場合その値は<code>href</code>属性の値を絶対URLに変換したもの<a href="http://www.w3.org/TR/microdata/#values">となっている</a>。そのため以下のようには書けない。</p>
+
+<pre><code class="language-html">&lt;address itemscope
+  itemtype="http://schema.org/Person"&gt;
+  Copyright &amp;copy; 2012
+  &lt;a href="http://example.com/about/"
+    <mark>itemprop="name url"</mark>&gt;
+    John Doe
+  &lt;/a&gt;
+&lt;/address&gt;
+</code></pre>
+
+<p><a href="http://microformats.org/">Microformats</a>の<a href="http://microformats.org/wiki/hcard">hCard</a>のような感覚では書けないということで、以下のように<code>span</code>要素(など)を使って別にしないといけない。</p>
+
+<pre><code class="language-html">&lt;address itemscope
+  itemtype="http://schema.org/Person"&gt;
+  Copyright &amp;copy; 2012
+  &lt;a href="http://example.com/about/"
+    itemprop="url"&gt;
+    <mark>&lt;span itemprop="name"&gt;
+      John Doe
+    &lt;/span&gt;</mark>
+  &lt;/a&gt;
+&lt;/address&gt;
+</code></pre>
+
+<p>ボキャブラリーごとに対応しなくても良いようにHTMLの要素側で値の選択法を決定させているのだと思う。ボキャブラリー側でデータ型を決めてそれによって値の選択法を変えるというのだと、処理系でボキャブラリーをちゃんと処理しなければ正確なデータの抽出が行えない。HTML要素で値の選択法が決定されるMicrodataの実装ではデータの抽出自体はボキャブラリーを処理せずに行えることになる。HTMLがマークアップ言語なこともあって理にかなっている実装なんじゃないか(と今は思う)。</p>
+
+<hr>
+
+<p>このWebサイトはまだ直してない……けど今から直す。</p>

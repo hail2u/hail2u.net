@@ -1,0 +1,141 @@
+GoogleのボタンをCSSだけでほぼ完璧につくる
+
+<figure><img src="/images/blog/google-search-button-x5.png" alt="五倍に拡大したGoogle検索ボタン"></figure>
+
+<p><a href="http://all-web-blog.blogspot.com/2011/01/google-css.html">Google のボタンをCSSだけでつくる</a>をDelicious経由で見て、もうちょっと出来るんじゃないかなーと思ったので、<code>background-image</code>で複数の<code>linear-gradient()</code>を使ってグラデーションにプラスアルファする方法の啓蒙も兼ねてほぼ完コピするCSSの書き方を解説しようかなとか何とか。このエントリの別名は「CSSグラデーションのちょっとしたテクニック #3」になる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/157.html">Google Style Button</a></p>
+
+<p>まずはデモを参照。パッと見ではどっちか画像か分からない程度にはコピーできていることと思う。もちろんフォント(というかOS)によっては文字が違く見えることと思うが。CSSは以下のような感じになっている(簡略化するためにベンダー拡張は省略、詳しくはデモのソースを参照)。</p>
+
+<pre><code class="language-css">button {
+  padding: 1px 6px;
+  border-top: 0;
+  border-right: 1px solid rgb(231, 231, 231);
+  border-bottom: 1px solid rgb(231, 231, 231);
+  border-left: 0;
+  height: 33px;
+  background-color: rgb(204, 204, 204);
+  background-image: linear-gradient(
+    top,
+    rgb(192, 192, 192) 0px, rgb(192, 192, 192) 1px,
+    rgb(153, 153, 153) 1px, rgb(153, 153, 153) 31px
+  ),
+  linear-gradient(
+    top,
+    rgb(255, 255, 255) 0px,  rgb(255, 255, 255) 1px,
+    rgb(241, 241, 241) 1px,  rgb(223, 223, 223) 29px, 
+    rgb(215, 215, 215) 29px, rgb(215, 215, 215) 30px,
+    rgb(153, 153, 153) 30px, rgb(153, 153, 153) 31px
+  );
+  background-position: right top, 1px 1px;
+  background-size: 1px 31px, auto;
+  background-repeat: no-repeat;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+</code></pre>
+
+<p>ポイントとなる点は以下の3つ。</p>
+
+<ul>
+<li><code>background-*</code>プロパティは複数の値を取ることができる(ただし<code>background-color</code>は除く)</li>
+<li>工夫すると<code>linear-gradient()</code>でベタ塗りとグラデーションを任意に組み合わせることができる</li>
+<li><code>background-size</code>で<code>linear-gradient()</code>のサイズを制御できる</li>
+<li><code>background-position</code>で<code>linear-gradient()</code>の位置(主に開始位置)を制御できる</li>
+</ul>
+
+<p>パーツごとに分けて説明していく。</p>
+
+<h2>上端と左端</h2>
+
+<p><code>border-top</code>と<code>border-left</code>を使っても良いが、背景色をその部分の色(<code>rgb(204, 204, 204)</code>)に指定し、<code>background-position</code>で<code>1px 1px</code>とすることで、<em>背景画像(ここではグラデーション)を左上から右に1px下に1pxの位置から開始させることができる</em>。もちろん<code>background-repeat: no-repeat;</code>として背景画像を繰り返さないようにする必要がある。</p>
+
+<h2>右端と下端</h2>
+
+<p>これは<code>border-right</code>と<code>border-bottom</code>で普通に線を引けば良い。背景画像でも出来ないことはないが、次に説明する右端から1px手前のボタンの影にあたる部分の位置決めが面倒になるので<code>border</code>が良い。</p>
+
+<h2>右端から1px手前</h2>
+
+<p>ボタンの影にあたるこの部分は、最初の1pxが<code>rgb(192, 192, 192)</code>で残りが<code>rgb(153, 153, 153)</code>になっている。こういうベタ塗り→ベタ塗りの場合は上記のコードまたは以下の例のように、<em>二点間を同じ色にしてしまえば良い</em>。</p>
+
+<pre><code class="language-css">linear-gradient(
+  top,
+  red   0px, red   3px,
+  green 3px, green 6px,
+  blue  6px, blue  9px
+)
+</code></pre>
+
+<p>この例では上から1~3pxまでは赤(red)、4~6pxまでは緑(green)、7~9pxまでは青(blue)でそれぞれベタに塗られることになる。このようにグラデーションの開始と終了を同じ行に書いたりすると少しは見やすく、あとで読んでも分かりやすくなると思う。</p>
+
+<p>また<code>background-position</code>で<code>right top</code>、<code>background-size</code>で<code>1px 31px</code>をそれぞれ指定することによって右端の縦方向に1pxの線を引くような感じにする。</p>
+
+<pre><code class="language-css">background-image: linear-gradient(
+  top,
+  rgb(192, 192, 192) 0px, rgb(192, 192, 192) 1px,
+  rgb(153, 153, 153) 1px, rgb(153, 153, 153) 31px
+);
+background-position: right top;
+background-size: 1px 31px;
+</code></pre>
+
+<p>ボタンの影にあたる部分のコードをまとめると以上のようになる。</p>
+
+<h2>ボタン中央のグラデーション</h2>
+
+<p>グラデーションの構成はベタ塗り(<code>rgb(255, 255, 255)</code>)→グラデーション(<code>rgb(241, 241, 241)</code> ~ <code>rgb(223, 223, 223)</code>)→ベタ塗り(<code>rgb(215, 215, 215)</code>)→ベタ塗り(<code>rgb(153, 153, 153)</code>)なので、<code>linear-gradient()</code>のコードは以下のようになる。</p>
+
+<pre><code class="language-css">linear-gradient(
+  top,
+  rgb(255, 255, 255) 0px,  rgb(255, 255, 255) 1px,  /* 1px目(最初)はベタ塗り */
+  rgb(241, 241, 241) 1px,  rgb(223, 223, 223) 29px, /* 2~29pxがグラデーション */
+  rgb(215, 215, 215) 29px, rgb(215, 215, 215) 30px, /* 30px目はベタ塗り */
+  rgb(153, 153, 153) 30px, rgb(153, 153, 153) 31px  /* 31px目(最後)もベタ塗り */
+)
+</code></pre>
+
+<p>上端と左端で説明済みのように開始位置を左上から右に1px下に1pxにして背景色を一部見えるようにしたいので、</p>
+
+<pre><code class="language-css">background-position: 1px 1px;
+</code></pre>
+
+<p>このグラデーションのサイズはボックスのサイズに従ってフレキシブルに変化して欲しいので、</p>
+
+<pre><code class="language-css">background-size: auto;
+</code></pre>
+
+<p>これらのプロパティを既にポイントとして説明した複数の値が取れることを利用して、すぐ前の右端から1px手前でまとめたコードの<code>background-*</code>プロパティそれぞれに<code>,(カンマ)</code>で区切って追加することになる。</p>
+
+<pre><code class="language-css">background-image: linear-gradient(
+  top,
+  rgb(192, 192, 192) 0px, rgb(192, 192, 192) 1px,
+  rgb(153, 153, 153) 1px, rgb(153, 153, 153) 31px
+),
+linear-gradient(
+  top,
+  rgb(255, 255, 255) 0px,  rgb(255, 255, 255) 1px,
+  rgb(241, 241, 241) 1px,  rgb(223, 223, 223) 29px, 
+  rgb(215, 215, 215) 29px, rgb(215, 215, 215) 30px,
+  rgb(153, 153, 153) 30px, rgb(153, 153, 153) 31px
+);
+background-position: right top, 1px 1px;
+background-size: 1px 31px, auto;
+</code></pre>
+
+<p>複数の値を指定した場合に<code>先に書いた方が手前に来る</code>のは覚えていたほうが良い。つまり、</p>
+
+<pre><code class="language-css">background-image: url(&quot;front.png&quot;), url(&quot;back.png&quot;);
+</code></pre>
+
+<p>だとfront.pngがback.pngの上になる。</p>
+
+<h2>最後に</h2>
+
+<p>最後に上端と左端のコードや右端と下端のコード、その他<code>padding</code>や<code>height</code>、<code>font-*</code>などをGoogleの検索ボタンと同じようにすれば良い。</p>
+
+<hr>
+
+<p>Safari 5など古いWebKitのブラウザでは<code>-webkit-linear-gradient</code>はないので、<code>-webkit-gradient(linear)</code>を使うことになる。この場合色指定を<code>color-stop()</code>で行うのだが、これにはpx単位での位置指定が出来ないので計算機で頑張って計算してください。詳しくはデモのソースを参照。</p>
+
+<p><a href="http://www.w3.org/TR/css3-values/#calc"><code>calc(1/33)</code></a>とか<code>calc(100% - 1px)</code>とか早く気軽に使えるようになるといいな。</p>

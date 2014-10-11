@@ -1,0 +1,26 @@
+Gruntタスクの自動読み込み
+
+<p>Gruntでいちいち<code>loadNpmTasks()</code>しなくて済むようになる<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>パッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクは<code>package.json</code>の<code>devDependencies</code>に必ず書いてあり、<code>Gruntfile.js</code>内ではどこでもそれを利用することが可能なので、<code>grunt-</code>で始まるNodeパッケージだけを自動で<code>loadNpmTasks()</code>するようなコードを書くと簡単に自動読み込みを実装できる。</p>
+
+<pre><code class="language-javascript">&#39;use strict&#39;;
+
+module.exports = function (grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON(&#39;package.json&#39;)
+  });
+
+  for (var devDependency in grunt.config.data.pkg.devDependencies) {
+    if (devDependency.match(/^grunt-/)) {
+      grunt.loadNpmTasks(devDependency);
+    }
+  }
+};
+</code></pre>
+
+<p><code>Gruntfile.js</code>では<a href="http://gruntjs.com/getting-started#an-example-gruntfile">サンプル・コード</a>でもそうなっているように<code>package.json</code>の中身を読み込ませることが多い。これは主にGruntタスクの設定においてテンプレートを使ってプロジェクト名やバージョン番号などを参照できるようにする目的でそうする。こうして読み込んだ<code>package.json</code>の中身は<code>grunt.config.data</code>以下に保存されるので、実際はどこからでも参照できる。ので上記のように<code>for...in</code>などを使って調べつつ、<code>grunt-</code>で始まるなら<code>loadNpmTasks()</code>を呼ぶだけ。</p>
+
+<p>一度書いたら終わりという点ではload-grunt-tasksとほぼ同じで、起動コストという点ではこの5行のコードが勝るけど、保守性という点ではload-grunt-tasksの方が良い。ので、複数人が触るようなプロジェクトではload-grunt-taskの方が良さそう。</p>
+
+<hr>
+
+<p>load-grunt-tasksは確かに便利だけど、僕はわざわざNodeパッケージを別途インストールする程ではないという感じ。また、できればちゃんと個別にロードした方が良いとも考えてて、実際にこういったコードでやるのは、頻繁にGruntプラグインを入れ替える実験的な性格の強いプロジェクトでだけ。</p>

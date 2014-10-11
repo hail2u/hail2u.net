@@ -1,0 +1,48 @@
+モジュール一覧をリストアップするCGI
+<p>インストール済みのモジュールを調べるCGIはいくつか公開されているのですけれど、単純明快に<code>\w+\.pm</code>というファイル名をリストアップすることでざっと調べてみました。</p>
+<p><a href="/pub/modlist.html" title="\w+\.pmをリストアップしてみた結果">\w+\.pmをリストアップしてみた結果</a></p>
+<p><a href="http://www.xrea.com/" title="XREA.COM">XREA</a>のs44サーバーでの結果です。他のサーバーは違うかも違わないかも。<a href="http://search.cpan.org/search?module=XML::Atom" title="search.cpan.org: XML::Atom - Atom feed and API implementation">XML::Atom</a>キボン！</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+print &lt;&lt;&quot;_HTML_&quot;;
+Content-Type: text/html
+
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Module List&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;pre&gt;
+_HTML_
+
+foreach my $inc (@INC) {
+  scandir($inc);
+}
+
+print &lt;&lt;&quot;_HTML_&quot;;
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+_HTML_
+
+exit;
+
+sub scandir {
+  my $dir = shift;
+
+  opendir(DIR, $dir);
+  my @finds = readdir(DIR);
+  closedir DIR;
+
+  foreach my $find (@finds) {
+    if ($find =~ /\.pm$/) {
+      print &quot;$dir/$find\n&quot;;
+    } elsif (($find =~ /^\w+$/) and -d &quot;$dir/$find&quot;) {
+      scandir(&quot;$dir/$find&quot;);
+    }
+  }
+}
+</code></pre>
+<p>暴走危険。</p>

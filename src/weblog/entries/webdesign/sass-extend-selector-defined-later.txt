@@ -1,0 +1,87 @@
+後ろで定義したセレクターも@extendで参照できる
+
+<p>Sassの<code>@extend</code>ではてっきり<code>@extend</code>するまでに参照するセレクターを定義しておかなければならないと思い込んでいた(変数はそうなので)んだけど、そんなことはなかった。どこに書いたセレクターでも、例えファイルをまたがっていても<code>@extend</code>できる。</p>
+
+<pre><code class="language-scss">.bar {
+  @extend %foo;
+}
+
+.buz {
+  @extend %foo;
+
+  margin-left: 3em;
+}
+
+%foo {
+  margin: 2em 0 0 0;
+}
+</code></pre>
+
+<p>というように書くと、</p>
+
+<pre><code class="language-css">.buz {
+  margin-left: 3em; }
+
+.bar, .buz {
+  margin: 2em 0 0 0; }
+</code></pre>
+
+<p>となる。この例だと<code>.buz</code>の<code>margin-left: 3em</code>は<code>0</code>で上書きされる。言ってることがわかるけど、意味あるの？みたいな感じだけど、メディア・クエリを使ったセレクターを<code>@extend</code>するようなケースで役に立つような立たないような。</p>
+
+<hr>
+
+<p>狭い画面ではインデントしないけど広い画面ではインデントするみたいな引用のCSSを書いてて、そのインデントのサイズを他でも使うのでプレースホルダー・セレクターにまとめようとした時にこう書いた。</p>
+
+<pre><code class="language-scss">%default-indent {
+  @media (min-width: 800px) {
+    margin-left: 3em;
+  }
+}
+
+blockquote {
+  @extend %default-indent;
+
+  margin-left: 0;
+}
+</code></pre>
+
+<p>これだと、</p>
+
+<pre><code class="language-css">@media (min-width: 800px) {
+  blockquote {
+    margin-left: 3em; } }
+
+blockquote {
+  margin-left: 0; }
+</code></pre>
+
+<p>となるので、メディア・クエリで指定した<code>margin-left: 3em</code>は上書きされる。プレースホルダー・セレクターを後に書いてやると、</p>
+
+<pre><code class="language-scss">blockquote {
+  @extend %default-indent;
+
+  margin-left: 0;
+}
+
+%default-indent {
+  @media (min-width: 800px) {
+    margin-left: 3em;
+  }
+}
+</code></pre>
+
+<p>で、</p>
+
+<pre><code class="language-css">blockquote {
+  margin-left: 0; }
+
+@media (min-width: 800px) {
+  blockquote {
+    margin-left: 3em; } }
+</code></pre>
+
+<p>と意図通りの適用されるCSSになる。</p>
+
+<hr>
+
+<p>ただこれを使いはじめるとプレースホルダー・セレクターがいろんな場所に散在するようになりやすく、とてつもなく読みづらいコードになる(った)ので、最終手段として頭の片隅に追いやっておくことにした。どうにもできなかったCSSハックの類いを最後にまとめてプレースホルダー・セレクターとして書いておいて、CSSハックを使う所で<code>@extend</code>するとかそういう使い方をするのは良さそう。CSSハックを使っているコードを混ぜることなく、CSSハックを使っていることを明示できる。</p>

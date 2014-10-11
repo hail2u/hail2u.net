@@ -1,0 +1,39 @@
+JScriptでGmailの未読メール数を取得
+
+<p>タスクトレイに鎮座している<a href="http://www.google.com/talk/" title="Google Talk">Google Talk</a>のアイコンにカーソルを合わせて<a href="http://mail.google.com/" title="Gmail"></a>の未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードには<code>fullcount</code>とかいう要素があったりしたので簡単っぽい。</p>
+
+<p>こういう場合はAtomフィードをパースしてうんたらかんたらとか考えるとバカになりそうなので、JScriptでサクッとXSLT。</p>
+
+<p>JScriptのコードは、</p>
+
+<pre><code class="language-js">var url = &quot;http://username:password@mail.google.com/mail/feed/atom&quot;;
+
+var xml = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xml.async = false;
+xml.load(url);
+
+var xsl = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xsl.async = false;
+xsl.load(&quot;tcgmail.xsl&quot;);
+
+WScript.Echo(xml.transformNode(xsl));
+</code></pre>
+
+<p>XSLのコードは、</p>
+
+<pre><code class="language-xsl">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+  xmlns:atom=&quot;http://purl.org/atom/ns#&quot;
+  version=&quot;1.0&quot;&gt;
+
+  &lt;xsl:output method=&quot;text&quot; encoding=&quot;Shift_JIS&quot;/&gt;
+
+  &lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;xsl:value-of select=&quot;//atom:feed/atom:fullcount&quot;/&gt;
+  &lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+
+<p>これ等をgmail.jsとgmail.xslとしてどっかに保存し、gmail.jsを実行してやれば未読数がダイアログでポップアップしてきます。実際にはもっと表示の仕方を工夫するべき。僕はもちろんT(略。まぁT(略も飽きてきたので、今日見つけた<a href="http://k23productions.com/haiku/snarl.html" title="full phat products : snarl">Snarl</a>使いになろうかなとか(SnarlはMacの<a href="http://growl.info/" title="Welcome to Growl!">Growl</a>っぽい何かを通知するためだけにあるアプリケーション)。</p>
+

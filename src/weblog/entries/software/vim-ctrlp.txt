@@ -1,0 +1,49 @@
+Vimプラグイン: CtrlP
+
+<p>正規表現で絞込みが出来るという謳い文句にひかれて<a href="http://kien.github.com/ctrlp.vim/">CtrlP (ctrlp.vim)</a>という開いているバッファやカレント・ディレクトリのファイル、最近開いたファイル(MRU)をサクっと開ける<a href="http://www.vim.org/scripts/script.php?script_id=1984">FuzzyFinder</a>系のプラグインを入れてみました。同系統のものとして<a href="http://www.vim.org/scripts/script.php?script_id=3396">Unite</a>を使っていたのですが、主に使うのはファイル・ブラウザとMRUだったのでこれでも良さそうな気もしたので。ちょっと使った感じではなかなか好感触で、しばらくメインで使ってみる気になりました。</p>
+
+<p>一覧メニューはハイライトされたりするわけではないのでそっけない感じです。絞り込みを開始するとマッチした部分がハイライトされます。下から上に一覧が出るのはコマンド・ライン・ウィンドウから近くて良いですね。<code>&lt;C-t&gt;</code>でタブで開けたり、選択したファイルを開く時にExコマンドを実行できたり、複数のファイルをマークして行って一気に開くことが出来たり、ファイル・ブラウザとして必要そうな機能は大体揃っているような気がします。</p>
+
+<p>謳い文句の正規表現はまぁアレですね。Vimの正規表現が覚えられないという致命的な弱点を持つ僕には無意味でした……。普通に絞込みでも速くて便利だったのでよしとします。</p>
+
+<p>カレント・ディレクトリのファイルの参照はUniteのfile_recと同じ再帰探索を普通にやってるみたいなのでちょっと重いです。ここらへんはUniteの方が良く出来てるなーと思いますね。</p>
+
+<p>MRUはデフォルトの150ならそれほどでもないですが、500程にすると開くのが気持ち遅いかなという感じです。MRUの記録でつっかかるとかそういう感じはないです。</p>
+
+<p>キーマップを始め細かく設定できるようになっていますが、いまいちデフォルトがどうなっているのかがわからない……。とりあえず<code>.vimrc</code>で以下のように設定しておきました。</p>
+
+<pre><code class="language-vim">let g:ctrlp_jump_to_buffer      = 2
+let g:ctrlp_working_path_mode   = 2
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_mruf_max            = 500
+
+nnoremap &lt;Leader&gt;f :CtrlP&lt;CR&gt;
+nnoremap &lt;Leader&gt;b :CtrlPBuffer&lt;CR&gt;
+nnoremap &lt;Leader&gt;m :CtrlPMRUFiles&lt;CR&gt;
+</code></pre>
+
+<p>あと<code>.gvimrc</code>で</p>
+
+<pre><code class="language-vim">let g:ctrlp_max_height = &amp;lines
+</code></pre>
+
+<p>として目一杯に一覧が出るようにも。</p>
+
+<hr>
+
+<p><a href="http://www.vim.org/scripts/script.php?script_id=3025">Command-T</a>の対抗って感じですかね？僕のようにMRUとファイル参照メインの人には向いているんじゃないかと思います。あとMRU系のだけ探しているけどUniteはごつすぎてちょっと……とかいう人にも良さそうです。</p>
+
+<h2>追記</h2>
+
+<p>設定を少し変えたので追記しておきます。</p>
+
+<pre><code class="language-vim">let g:ctrlp_by_filename         = 1 " フルパスではなくファイル名のみで絞込み
+let g:ctrlp_jump_to_buffer      = 2 " タブで開かれていた場合はそのタブに切り替える
+let g:ctrlp_clear_cache_on_exit = 0 " 終了時キャッシュをクリアしない
+let g:ctrlp_mruf_max            = 500 " MRUの最大記録数
+let g:ctrlp_highlight_match     = [1, 'IncSearch'] " 絞り込みで一致した部分のハイライト
+let g:ctrlp_open_new_file       = 1 " 新規ファイル作成時にタブで開く
+let g:ctrlp_open_multi          = '10t' " 複数ファイルを開く時にタブで最大10まで開く
+</code></pre>
+
+<p>新規ファイル作成の挙動はUniteのが良かった感じです。</p>

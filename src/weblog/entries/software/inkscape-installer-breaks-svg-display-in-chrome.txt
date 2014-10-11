@@ -1,0 +1,16 @@
+InkscapeのインストーラーがChromeでのSVG表示を壊す
+
+<p><a href="http://inkscape.org/">Inkscape</a>のv0.91pre2が出たのでインストールしたところ、ローカルのSVGファイルがChromeで表示できなくなった。どうもInkscapeのインストーラー(多分安定版のインストーラーでは起こらない)が関連付けを変える時に間違ったContent-Typeを設定してしまうことが原因のようだ。</p>
+
+<p>修復はレジストリ・エディターで行うのが一番早そう。</p>
+
+<figure>
+  <img src="/images/blog/hkey-classes-root-svg-content-type.png" alt="レジストリ エディターを使って、application/svgになっているのをimage/svg+xmlに修正する">
+</figure>
+
+<pre>HKEY_CLASSES_ROOT\.svg
+</pre>
+
+<p>を開き、Content Typeという名前の文字列の値を<code>image/svg+xml</code>にするか削除する。</p>
+
+<p>Chromeに限らず<a href="https://twitter.com/rikuo/status/503828410754285568">Firefoxでも同様</a>のことが起こるらしい。またBracketsのような内部でWebKitを利用しているものでも似たような現象として<a href="https://github.com/adobe/brackets/issues/7208">ツールバーのアイコンが表示されなくなること</a>があるらしい。これらで困っている人も同じ手順で直る。</p>

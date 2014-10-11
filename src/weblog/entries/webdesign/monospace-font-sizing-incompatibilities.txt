@@ -1,0 +1,71 @@
+等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題
+
+<p>少し前に<a href="http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/">Fixing browsers’ broken monospace font handling</a>を<a href="http://nicewebtype.com/">Nice Web Type</a>経由で読んだんだけど、「単純に初期設定が違うだけだろ……<code>%</code>指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。<code>font-size: 100%</code>がうまく動かなかったり、<code>pre</code>要素はともかく<code>code</code>要素辺りでの実装のずれとか、<code>monospace</code>だけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。</p>
+
+<p>記事で最初に挙げられているコードでも良いのだけど、<a href="http://necolas.github.com/normalize.css/">normalize.css</a>ではこの問題への対処がちゃんとなされているので、細かいことは余り考えずにnormalize.css使うのが手っ取り早い。記事の最後に挙げられているコードのように、ラテン系の言語に設定されているブラウザーでの挙動(等幅フォントを1段階小さいフォント・サイズにする)に合わせる場合は、normalize.cssのコードも混ぜた上である程度ネストへも対処するように書く必要がある。</p>
+
+<pre><code class="language-css">html {
+  font-size: 100%;
+}
+
+pre,
+code,
+var,
+samp,
+kbd,
+tt {
+  font-family: monospace, serif;
+  _font-family: 'courier new', monospace;
+  font-size: 0.8125em;
+}
+
+pre code,
+pre var,
+pre samp,
+pre kbd,
+pre tt {
+  font-size: 100%;
+}
+</code></pre>
+
+<p><code>rem</code>単位さえ使えれば……という感じだ。と、対処を書いた所でどういう問題があって、どうすれば解決でき、なぜ今まであまり表面化しなかったのかということをちょっと書く。</p>
+
+<h2>存在する問題</h2>
+
+<p>問題はだいたい以下の4つに分けることができる。</p>
+
+<dl>
+  <dt>素の<code>pre</code>要素</dt>
+  <dd>初期サイズはブラウザー間で殆ど差はないと言って良い。ので、このまま何もいじらないならあまり問題は起きない……わけだが、ユーザー設定と言語設定により結構な差があるのでやはり少しはいじりたい。</dd>
+
+  <dt><code>font-size: 100%</code></dt>
+  <dd>地の文とフォント・サイズを合わせる目的で指定するわけだが、Internet Explorer 9とOpera 11でしか期待通りに動かない。どうもFirefox 10やChrome 17、Safari 5ではフォント・ファミリーを指定してやらないと<code>font-size</code>プロパティーによるサイズ指定が有効にならないようだ。</dd>
+
+  <dt><code>font-family: monospace</code></dt>
+  <dd>フォント・ファミリーを指定する場合も1つだけではダメで、<code>monospace, serif</code>などもう1つ必要。normalize.cssで<code>serif</code>が使われているのは単にジェネリック・ネームの中で一番短いからだと思う。</dd>
+
+  <dt><code>code</code>要素他</dt>
+  <dd><code>code</code>要素など等幅フォントで表示される他のインライン要素でも似たような問題が発生する。こちらは<code>pre</code>要素にネストされることがあるので更に厄介。親での<code>em</code>単位でのフォント・サイズ指定を継承するかどうかという点でIE9/Op11陣営とFx10/Ch17/Sf5陣営の間に壁があり簡単には統一できない。</dd>
+</dl>
+
+<h2>解決するための条件</h2>
+
+<p>現時点では以下の3つの条件が統一のために必須ということになりそう。</p>
+
+<ol>
+<li>ユーザー設定や言語設定の違いを吸収するために<code>font-size</code>を指定する</li>
+<li>Firefox 10とChrome 17、Safari 5のために<code>font-family</code>プロパティーで二種類以上指定する</li>
+<li>親要素での<code>font-size</code>プロパティーの値として<code>em</code>単位を使わず<code>%</code>単位を使用する</li>
+</ol>
+
+<p>で、上記コードのような形になるわけ。</p>
+
+<h2>問題が表面化しない理由</h2>
+
+<p>多くの場合<code>body</code>要素でベースとなるフォント・サイズを指定し、<code>pre</code>を始め<code>h1</code>要素などあらゆる要素でそれに対する相対的な値(<code>%</code>や<code>em</code>)を使うことが多い。ベースとなるフォント・サイズは慣例的に<code>%</code>か<code>px</code>を使う人が多く、かなりの確率で条件3はクリアされる。ジェネリック・ネームのみでフォント・ファミリーを指定する人はまずいないので、条件2でハマることはまずないだろう。</p>
+
+<p>問題になるのは条件1で、これはフォント・サイズを指定するかどうかにかかっており、ここでハマる可能性はかなり高い。が、そもそもこのバグがうまくフォント・サイズが反映されないというバグなので、指定しない場合はこの問題は発生しているが表面化しない。</p>
+
+<hr>
+
+<p>僕の場合は長らく<a href="http://yuilibrary.com/yui/docs/cssfonts/">YUI CSS Fonts</a>を使っていたというのが、この問題に対して無知だった理由だと思う。YUI CSS Fontsを使うだけで条件1と3はクリアできるので、上記CSSコードを自分なりに書き換えて使っても良いけど、YUI CSS Fontsでも事足りる。YUI CSS Fontsはちょっとな……というのならnormalize.cssがお手軽かつ無難。</p>

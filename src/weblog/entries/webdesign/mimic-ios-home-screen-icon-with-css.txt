@@ -1,0 +1,66 @@
+iOSのホーム・スクリーンのアイコンをCSSでパクる
+
+<figure><img src="/images/blog/mimic-ios-home-screen-icon-with-css.png" alt="iOSのホーム・スクリーンのアイコンっぽい？"></figure>
+
+<p>iOSはホーム・スクリーンにアプリケーションのアイコンを置く時、いくつかエフェクトをかけて配置する。そこら辺の話は<a href="http://developer.apple.com/library/ios/#documentation%2Fuserexperience%2Fconceptual%2Fmobilehig%2FIconsImages%2FIconsImages.html">iOS Human Interface Guidelines</a>に載っているので詳しくはそちらを参照。それぞれのエフェクトはCSS3ならできそうな感じのものだったので、パクっと。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/160-2.html">iOS Home screen icon effect with CSS</a></p>
+
+<p>デモでは左から順になし→角丸→影→反射光とエフェクトを加えていっている。</p>
+
+<p>iOSがかける(ような)エフェクトはそれぞれ、</p>
+
+<ul>
+<li>角の丸め: <code>border-radius</code></li>
+<li>影: <code>box-shadow</code></li>
+<li>反射光: <code>radial-gradient()</code></li>
+</ul>
+
+<p>で(ほぼ)実現することができる。といっても角の丸めと影については全く難しいことはなく、</p>
+
+<pre><code class="language-css">.shadow {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 1);
+}
+
+.round {
+  border-radius: 9px;
+}
+</code></pre>
+
+<p>こんな見たままの感じで十分。問題は反射光で、円形のため<code>radial-gradient()</code>を使えば良いのはわかるとは思うが、どこから始めてどう色を指定すればいいかなかなか難しい。正解(?)は以下のようなコードになる。</p>
+
+<pre><code class="language-css">.gloss {
+  background-image: radial-gradient(
+    center -60px,
+    rgba(255, 255, 255, 1)   57px,
+    rgba(255, 255, 255, 0.3) 87px,
+    rgba(255, 255, 255, 0)   89px
+  );
+}
+</code></pre>
+
+<p>つまり</p>
+
+<ol>
+<li>ボックスの外側を開始地点にして(<code>center -60px</code>)</li>
+<li>ボックスの少し外側から白でグラデーションを始め(<code>rgba(255, 255, 255, 1) 57px</code>)</li>
+<li>ボックスの中央付近で白のグラデーションを終了させ(<code>rgba(255, 255, 255, 0.3) 87px</code>)</li>
+<li>最後に若干なめらかに透明になるように調節する(<code>rgba(255, 255, 255, 0) 89px</code>)</li>
+</ol>
+
+<p>ということをやっている。グラデーションの開始位置には制限は殆ど無いので、ボックスの外側からグラデーションを始めることができる。あとは反射光っぽく白のグラデーションを透明度付きで作成するだけ。最後の<code>rgba(255, 255, 255, 0)</code>はないとグラデーションを止められないので必須。<code>transparent</code>でも良さそうだが、そうしてしまうと黒の完全透明へのグラデーションになるようで縁が少し黒っぽくなってしまった。</p>
+
+<p>更に<a href="/blog/webdesign/adding-polaroid-effects-to-img-with-box-shadow-and-radial-gradient.html">box-shadowとradial-gradientで画像をポラロイド写真風に</a>で紹介したテクニックを使って、ボックスの背景を使った効果が上にかかるように画像へ<code>z-index</code>を指定すればおしまい。</p>
+
+<pre><code class="language-css">.ios img {
+  position: relative;
+  z-index: -1;
+  width: 57px;
+  height: 57px;
+  border-radius: 9px;
+}
+</code></pre>
+
+<p><code>border-radius</code>をここでも指定する必要があるのは注意。そうしないと画像が丸めた角からはみ出してしまう。</p>
+
+<p><a href="/pub/test/160.html">Twitterのフォロワーの画像の加工</a>とかはてなのユーザー画像の加工に使うと面白いと思う。</p>

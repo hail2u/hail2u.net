@@ -1,0 +1,23 @@
+Webフォントのホスティング
+
+<p>Webフォントのホスティングのみを提供するようなサービス、つまりWebフォント専用のカスタムCDNを探していた。しかし、Webフォントがメジャーになったとはいえ、そこまでニッチなサービスはあんまりないようだ。代表的なものだと<a href="http://typefront.com/">TypeFront</a>。が、かなり制限厳しい。試してすらいないけど、$15/月は払わないとまともに機能しそうもないような仕様だった。</p>
+
+<p>Webフォント専用にこだわらずに、<a href="http://pages.github.com/">GitHub Pages</a>や<a href="https://www.dropbox.com/">Dropbox</a>を利用するという手もありそうだけど、Internet Explorer 9以降やFirefox 3.5以降における<a href="http://www.w3.org/TR/cors/">CORS</a>による制限に対応できない。また、パフォーマンスに難点があったり、<code>Content-Type</code>でトラブりそうとかも。</p>
+
+<h2><a href="https://drive.google.com/">Google Drive</a></h2>
+
+<p>Google Driveだとどうかなーとテストしてみたら、<code>Access-Control-Origin: *</code>となってて問題なく利用できた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/506.html">Hosting Web Fonts on Google Drive</a></p>
+
+<p>数多くのブログで取り上げられているような、HTMLをホスティングする方法と同じようにアップロードして、URLを調べるだけで、ちゃんと読めた。<code>.woff</code>のURLは<code>http</code>でも表示は可能だけど、リダイレクトが挟まれてしまうので、<code>https</code>の必要がある(要検証)。<code>.woff</code>の<code>Content-Type</code>は<code>application/octet-stream</code>なので、全てのブラウザーで大丈夫なはず。パフォーマンス的には遅いってほどではないけど、取り立てて速くもない。</p>
+
+<p>選択肢としてはアリなのではないかと思う。CSSの書き方とかはディレクトリ構成も特にトリッキーなことをする必要はない。同期アプリを使えばアップデートも簡単。</p>
+
+<h2><a href="http://www.cloudflare.com/">CloudFlare</a></h2>
+
+<p>もっと普通にCloudFlareを使っても良いのかもしれない。<a href="https://support.cloudflare.com/hc/en-us/articles/200172516-What-file-extensions-does-CloudFlare-cache-for-static-content-">キャッシュしてくれる静的ファイルの拡張子一覧</a>に<code>.css</code>はもちろん、<code>.woff</code>も入っているので意図した通りに機能しそう。専用のサブドメイン管理にもできるので、クッキーとかの問題もなくせ、パフォーマンスは一番期待できる。</p>
+
+<hr>
+
+<p>Webフォントは<a href="http://www.google.com/fonts">Google Fonts</a>や<a href="https://typekit.com/">TypeKit</a>に頼りがちだが、それらで提供されていないフォントとなると、なかなか敷居が高くなる。その結果、利用を諦めるという選択になりやすい。比較的手軽に管理できるGoogle Driveを利用することにより諦めずに済むかもしれない。</p>

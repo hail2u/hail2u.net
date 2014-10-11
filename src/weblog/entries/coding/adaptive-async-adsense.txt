@@ -1,0 +1,43 @@
+Async版広告コードを使ったAdSenseの広告切り替え
+
+<p>Google Adsenseの広告コードで<a href="http://adsense.blogspot.jp/2013/07/faster-more-robust-web-with-adsense.html">Async版のBETAテストが始まった</a>。広告表示時にページの読み込みをブロックしないというのが売りでそれ以上でもそれ以下でもなく、コードもそんなにスッキリするわけではないし、空要素さん……みたいな感じだけど、現行のものよりはこっちの方が良い。ということでこれを利用する場合に広告サイズの切り替えはどうするのが良いのか考えてるメモ。</p>
+
+<p>コピペするコードはHTMLの<code>style</code>属性で広告のサイズを、<code>data-*</code>属性で広告スロットとかを指定してあり、そのまま再利用するのは難しい感じ。<code>document.write()</code>でも使えば話は別だけどそれはさすがにためらう。<code>innerHTML</code>でなら広告のコンテナーである<code>ins</code>要素の部分はほぼコピペでいけるけど、マークアップ増やす必要があるのでアレ。</p>
+
+<pre><code class="language-html">&lt;ins class="adsbygoogle"
+  <mark>id="adsense-main"</mark>
+  style="display:inline-block;width:300px;height:250px"
+  data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+  data-ad-slot="xxxxxxxxxx"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+
+  (function (d) {
+    if (<mark>d.body.dataset</mark>) {
+      var p = d.getElementById('adsense-main');
+      var w = <mark>p.parentNode.clientWidth</mark>;
+
+      if (w &gt;= 728) {
+        p.style.width = '728px';
+        p.style.height = '90px';
+        p.dataset.adSlot = 'xxxxxxxxxx';
+      }
+    }
+  }(document));
+&lt;/script&gt;
+&lt;script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<ul>
+<li>なるべくデフォルトとする広告コードをいじらずにIDを振るだけに留める</li>
+<li><code>dataset</code>を読めるかどうかのチェックは必ずする</li>
+<li>ID振ったノードの<code>parentNode</code>の幅を取得してそれを見て切り替える</li>
+</ul>
+
+<p><code>display</code>プロパティーや<code>data-ad-client</code>属性の値は固定で差し替える必要はないので<a href="/pub/test/469.html">こんな感じで良さそう</a>。ID考えるのも振るのも面倒くさそうなので<code>.adsbygoogle</code>をなめてそれぞれ置き換えるとかのが複数の広告のケースにも対応出来そうだしベターかも。切り替えスクリプトは<code>body</code>要素の閉じタグの直前に置くのが良さそうだけど、Analyticsでうまく解析できるのか謎い。</p>
+
+<p>これでは切り替える広告の増減とかに安全に対応できるとは思えないし、きれいでもないのでもうちょっと別のうまい方法を考えたい。切り替えで使う広告の<code>ins</code>要素を全部貼っておいて、表示できる最大サイズのものだけ残すみたいなやり方だとコピペミスは発生しなさそうで安全だけど、Googleに目をつけられて悲惨なことになりそう。とりあえず出来そうなことはCSP対応を建前にして外部スクリプト化するくらいか。</p>
+
+<h2>追記</h2>
+
+<p>AdSenseが公式に<a href="http://adsense.blogspot.jp/2013/07/the-responsive-web-adsense.html">広告の切り替えを自動で行ってくれるユニット、Responsive ad unit</a>の提供を始めたのでこの記事の内容は無意味になった。</p>

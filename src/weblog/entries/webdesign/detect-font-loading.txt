@@ -1,0 +1,71 @@
+フォントの読み込み完了を検知する
+
+<p><a href="https://typekit.com/">TypeKit</a>とかがやってるWebフォントの読み込みが終わったら<code>html</code>要素にクラス名を振るアレの話。TypeKitがオープンソースでリリースしている<a href="https://github.com/typekit/webfontloader">WebFont Loader</a>を使う方法が安全で安定。<a href="https://developers.google.com/speed/libraries/devguide#webfont">Googleがホスティング</a>しているのもあるので手軽でもある。でも読み込み完了の検知以外にも機能があってパワフルすぎる気がするので、<a href="http://blogs.adobe.com/typblography/2013/03/introducing-adobe-blank.html">Adobe Blank</a>を使って自前で書いてみることにした。</p>
+
+<h2>Adobe Blankのサイズ削減</h2>
+
+<p>Adobe Blankはそのまま使うと30KB以上ある。読み込み完了検知だけなら幅0のグリフが1つあればそれで良いので、まずはサブセット化してサイズを抑えることから。<code>a</code>だけのWOFFなAdobe Blankを作ればちょうど1KBくらいになる。</p>
+
+<p class="seealso">Download: <a href="/pub/adobe-blank.woff">adobe-blank.woff</a></p>
+
+<h2><code>@font-face</code>定義の追加</h2>
+
+<p>外部リクエストにすると意味が薄れるのでDataURIを使って既存のCSSに混ぜ込む。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &#39;Adobe Blank&#39;;
+  src: url(&#39;data:application/font-woff;base64,d09GRgAB...&#39;) format(&#39;woff&#39;);
+}</code></pre>
+
+<h2>読み込み完了を検知するためのHTML要素</h2>
+
+<p>これを<code>font-family</code>に指定した要素では、<code>a</code>しかテキストのない場合に幅が<code>0</code>になる。なので以下の様な要素を作っておくとWebフォント(Source Sans Proを例にする)の読み込みが完了すると幅が増えることになる。つまりこの要素の幅を監視すれば読み込み完了の検知が出来る。</p>
+
+<pre><code class="language-html">&lt;div style=&quot;font-family:&#39;Source Sans Pro&#39;, &#39;Adobe Blank&#39;;
+  position: absolute;
+  top: -100px;&quot;&gt;a&lt;/div&gt;</code></pre>
+
+<h2>JavaScriptで監視</h2>
+
+<p>要素の生成から監視までを全てJavaScriptでやると良い。タイマー使わない方法も模索したい所だけどまずは普通のアプローチで。</p>
+
+<pre><code class="language-javascript">function detectFontLoading(fontName) {
+  var tester = document.createElement(&#39;span&#39;);
+  tester.style.fontFamily = &#39;&quot;&#39; + fontName + &#39;&quot;, &quot;Adobe Blank&quot;&#39;;
+  tester.style.position = &#39;absolute&#39;;
+  tester.style.top = &#39;-100px&#39;;
+  tester.appendChild(document.createTextNode(&#39;a&#39;));
+  document.body.appendChild(tester);
+
+  var timerId = setInterval(checkWidth, 500);
+
+  function checkWidth() {
+    if (tester.offsetWidth &gt; 0) {
+      clearInterval(timerId);
+      document.documentElement.className += &#39; &#39; + fontName.toLowerCase().replace(/\s/g, &#39;_&#39;);
+      tester.parentNode.removeChild(tester);
+    }
+  }
+}
+
+detectFontLoading(&quot;Source Sans Pro&quot;);</code></pre>
+
+<p>これでSource Sans Proの読み込みが完了すると、<code>html</code>要素に<code>source_sans_pro</code>というクラス名が振られる。どのブラウザーでも読み込みの完了前から文字は表示され読めるという前提の話になっているので、特に急がずに500ミリ秒間隔とかでチェックすれば良さそう。もっとゆっくりでも良いかも。ずっとチェックし続けるのでタイムアウトは設定できるようにするべきだけどやってない。</p>
+
+<h2>CSSでのフォントの切り替え</h2>
+
+<p>あとはCSSをこれに見合った形で書いてやるだけ。</p>
+
+<pre><code class="language-css">body {
+  font-family: &quot;Helvetica Neue&quot;, &quot;Calibri&quot;, sans-serif;
+}
+
+.source_sans_pro body {
+  font-family: &quot;Source Sans Pro&quot;, sans-serif;
+}</code></pre>
+
+<p>Source Sans Proの読み込みが完了するまではHelvetica NeueまたはCalibriでとりあえず表示され、読み込みが完了するとSource Sans Pronに置き換わる。</p>
+
+<hr>
+
+<p>Webフォントの読み込み完了の検知はつまるところ<a href="/blog/webdesign/fout.html">FOUT</a>対策なわけだけど、今後どうなるんだろう。Firefoxの挙動が一番素直でマシだと感じているので、それに揃うといいなぁと思っている。</p>

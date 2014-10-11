@@ -1,0 +1,142 @@
+PostCSSとCSS MQPacker
+
+<p><a href="https://github.com/ai/postcss">PostCSS</a>というCSSのパースと変更を行うNode.jsパッケージを知った。<a href="https://github.com/ai/autoprefixer">Autoprefixer</a>で使われている。名前からわかるように、主にCSSをポストプロセスするためのパッケージだけど、単にパーサーとして使っても良さそう。</p>
+
+<p>習作ということでメディアクエリをまとめるライブラリ、<a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>を作った。パース結果のオブジェクトを把握するまでがちょっと時間かかったけど、その後は特に難しいことはなく、快適にCSSポストプロセッサーを書けそうな予感がする。</p>
+
+<p>PostCSSの<code>parse()</code>を呼んだ返り値や<code>process()</code>で呼ばれる自前の関数に渡されるオブジェクトは、その子の配列<code>rules</code>の各要素にルールセット(かメディアクエリなど)が格納され、それらは以下のような構造になっている。</p>
+
+<pre><code class="language-javascript">{
+  type: &#39;rule&#39;,
+  decls: [
+    {
+      type: &#39;decl&#39;,
+      parent: [Object],
+      source: {
+        start: [Object],
+        end: [Object]
+      },
+      before: &#39; &#39;,
+      prop: &#39;color&#39;,
+      between: &#39;: &#39;,
+      _value: &#39;black&#39;
+    }
+  ],
+  parent: {
+    type: &#39;root&#39;,
+    rules: [Circular],
+    after: &#39;&#39;
+  },
+  source: {
+    start: [Object],
+    end: [Object]
+  },
+  before: &#39;&#39;,
+  _selector: &#39;.foo&#39;,
+  between: &#39; &#39;,
+  semicolon: true,
+  after: &#39; &#39;
+}
+</code></pre>
+
+<p>ほとんどは元のCSSファイルと同じ書式で出力されるように頑張るためのプロパティー。<code>before</code>や<code>between</code>、<code>after</code>を使ってCSSを整形し直すとかは既に<a href="https://github.com/hideki-a/grunt-csspretty">grunt-csspretty</a>というGruntプラグインがある。</p>
+
+<p>ルールセットの場合は<code>_selector</code>にセレクターが<em>そのまま</em>入る。複数あっても配列になったりはしない。各ルールは子の配列<code>decl</code>。<code>semicolon</code>は最後のルールがセミコロンで終わっていたら作られる(終わっていない場合はキーが作られない)。<code>parent</code>は親にあたる箇所への参照で、<code>decl</code>にもあり、多くの場合は<code>parent.append()</code>か<code>parent.prepend()</code>でルールやルールセット丸ごとを追加していくことになる。</p>
+
+<p><code>source</code>はルールの開始と終了位置で、パースする時にファイル名を渡すとそれも格納される。これを元にパース・エラーや好ましくない書き方の警告などもできるので、オレオレCSSLintや簡単な書式チェッカー(コロンの後に半角スペースが必ずあるかとかインデントの崩れとか)とか作るのに使える。</p>
+
+<p>これら以外に<a href="https://github.com/ai/postcss#iterators">破壊しながらイテレートするための<code>each()</code>を始めとする便利メソッド</a>や、<a href="https://github.com/ai/postcss#containers">ルールを追加・削除・挿入するメソッド</a>がぶら下がっている。</p>
+
+<p><code>@import</code>ルールや<code>@font-face</code>ルール、そしてメディアクエリは<code>atrule</code>、コメントは<code>comment</code>になり、構造もちょっと違う。</p>
+
+<p>ドキュメントがちょっとわかりづらいので、コード読みつつ色々やってみないとわからないかも。</p>
+
+<hr>
+
+<p>習作として作ったCSS MQPackerは散乱している同じメディアクエリのルールを後ろにまとめる。全ルールを調べて、<code>type</code>が<code>atRule</code>で<code>name</code>が<code>media</code>の場合にだけ一旦記録しておき、後で同じメディアクエリが出てきたら、そこに記録しておいたメディアクエリのルールだけを挿入し、元のメディアクエリを削除することによって後ろへ後ろへとまとめていく。</p>
+
+<p>スクリプトは以下のように<code>pack()</code>をCSSコードを引数に呼ぶだけ。PostCSSの<code>process()</code>と同じ引数を取れるようにしたので、Source Mapの作成・更新も可能だと思う(自動判別も含めて)。</p>
+
+<pre><code class="language-javascript">#!/usr/bin/env node
+
+&#39;use strict&#39;;
+
+var fs = require(&#39;fs&#39;);
+var mqpacker = require(&#39;css-mqpacker&#39;);
+
+var filenameIn = &#39;in.css&#39;;
+var filenameOut = &#39;out.css&#39;;
+
+var css = fs.readFileSync(fileNameIn, {
+  encoding: &#39;utf8&#39;
+});
+var processed = mqpacker.pack(css, {
+  from: fileNameIn,
+  to: filenameOut,
+  map: true
+});
+fs.writeFileSync(filenameOut, processed.css);
+fs.writeFileSync(filenameOut + &#39;.map&#39;, processed.map);
+</code></pre>
+
+<p>例えば以下のような<code>in.css</code>があると、</p>
+
+<pre><code class="language-css">.foo:before {
+  content: &quot;foo on small&quot;;
+}
+
+@media (min-width: 769px) {
+  .foo:before {
+    content: &quot;foo on medium&quot;;
+  }
+}
+
+.bar:before {
+  content: &quot;bar on small&quot;;
+}
+
+@media (min-width: 769px) {
+  .bar:before {
+    content: &quot;bar on medium&quot;;
+  }
+}
+</code></pre>
+
+<p>以下のようにメディアクエリが後ろにまとめられて<code>out.css</code>として吐かれる。</p>
+
+<pre><code class="language-css">.foo:before {
+  content: &quot;foo on small&quot;;
+}
+
+.bar:before {
+  content: &quot;bar on small&quot;;
+}
+
+@media (min-width: 769px) {
+  .foo:before {
+    content: &quot;foo on medium&quot;;
+  }
+  .bar:before {
+    content: &quot;bar on medium&quot;;
+  }
+}
+
+/*# sourceMappingURL=out.css.map */
+</code></pre>
+
+<p>同時にSource Mapファイルも正常に吐かれる。</p>
+
+<pre><code class="language-javascript">{
+  &quot;version&quot;: 3,
+  &quot;file&quot;: &quot;out.css&quot;,
+  &quot;sources&quot;: [&quot;in.css&quot;],
+  &quot;names&quot;: [],
+  &quot;mappings&quot;: &quot;AAAA;EACE,yBAAwB;EACzB;;AAQD;EACE,yBAAwB;EACzB;;AAED;EATE;IACE,0BAAyB;IAC1B;EAQD;IACE,0BAAyB;IAC1B;EACF&quot;
+}
+</code></pre>
+
+<p><a href="https://github.com/hail2u/grunt-css-mqpacker">このパッケージを使ったGruntプラグイン</a>も作っておいた。</p>
+
+<hr>
+
+<p>PostCSSでの既存のSource Mapファイルとの連携とかはまだちゃんと理解していないんだけど、<code>map</code>オプションで、真偽値の代わりに大元からのSource Mapファイル(例えばSassファイルと処理対象のCSSファイルとのSource Mapファイル)を読み込んで指定すると、うまいこと更新してくれたりもする。ちょっと複雑なようなので、PostCSSを使って何かポストプロセスするツールを書く場合は<code>process()</code>にそのまま通すように作り、PostCSSに丸投げすると良いような気がする。</p>

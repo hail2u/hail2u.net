@@ -1,0 +1,52 @@
+VimからHTMLHintを使う
+
+<p>HTMLの簡単な文法チェックには長らく<a href="http://validator.nu/">Validator.nu</a>のAPIを利用していたけど、Node.jsパッケージの<a href="http://htmlhint.com/">HTMLHint</a>がそこそこ使えそうだったので今はこっちを使っている。ローカルで動くと気軽に使える度が増す。ただデフォルトでインストールされるCLIプログラムはリッチな感じの出力にしか対応していないので、ちょっと扱いづらい。Vimのデフォルトの<code>errorformat</code>に応じた形でチェック結果を出力するだけのNode.jsスクリプトを書いて使ってる。</p>
+
+<p class="seealso">Download: <a href="/pub/htmlhint">htmlhint</a> and <a href="/pub/htmlhint.vim">htmlhint.vim</a></p>
+
+<p>あらかじめグローバルにHTMLHintをインストールしておく必要がある。<code>htmlhint</code>をパスの通った場所に、<code>htmlhint.vim</code>を<code>~/.vim/compiler</code>ディレクトリにコピーし、<code>~/.vim/vimrc</code>などで以下の様に設定してやるとインストール完了。</p>
+
+<pre><code class="language-vim">autocmd HTMLHint
+  autocmd!
+
+  autocmd FileType html compiler htmlhint
+  autocmd FileType html autocmd! BufWritePost &lt;buffer&gt; silent make
+autocmd END
+</code></pre>
+
+<p>これで保存するたびにHTMLHintが走ってくれる。もちろん手動で<code>make</code>しても良い。</p>
+
+<hr>
+
+<p>HTMLHintはそれ(Node.js)なりに高速な動作とJSHintライクなゆるいチェックのお陰で、利用によるストレスは少ない。要素名や属性名が小文字になっているかどうかや二重引用符だけを使っているかどうかなどというValidator.nuでは警告されないものや、<code>id</code>がユニークであるかのチェックといった一歩踏み込んだものまで、なかなか良いチェック・ルールが揃っている。今はもうないけどHTML Lintという名前でウェブサービスとして公開されていた奴に似てる。</p>
+
+<p>上記Node.jsスクリプトでは、チェックするルールは僕の好みで以下のように設定してある。</p>
+
+<pre><code class="language-javascript">var ruleset = {
+  &#39;tagname-lowercase&#39;: true,
+  &#39;attr-lowercase&#39;: true,
+  &#39;attr-value-double-quotes&#39;: true,
+  &#39;attr-no-duplication&#39;: true,
+  &#39;doctype-first&#39;: true,
+  &#39;tag-pair&#39;: true,
+  <mark>&#39;tag-self-close&#39;: false,</mark>
+  &#39;spec-char-escape&#39;: true,
+  &#39;id-unique&#39;: true,
+  &#39;src-not-empty&#39;: true,
+  <mark>&#39;head-script-disabled&#39;: false,</mark>
+  <mark>&#39;img-alt-require&#39;: false,</mark>
+  &#39;doctype-html5&#39;: true,
+  <mark>&#39;id-class-value&#39;: false,</mark>
+  &#39;style-disabled&#39;: true,
+  <mark>&#39;space-tab-mixed-disabled&#39;: false,</mark>
+  <mark>&#39;id-class-ad-disabled&#39;: false,</mark>
+  <mark>&#39;href-abs-or-rel&#39;: false,</mark>
+  <mark>&#39;attr-unsafe-chars&#39;: false,</mark>
+  <mark>&#39;csslint&#39;: false,</mark>
+  <mark>&#39;jshint&#39;: false</mark>
+};
+</code></pre>
+
+<p>書き方の都合上、空要素のスラッシュの省略(書かない)や<code>img</code>要素の<code>alt</code>属性の省略(書かなくて良い時もある)を許可したりしてる。半角空白とタブの混在を許可してるのは<code>pre</code>要素で稀に混ざることがあることへの対策で、<code>href</code>属性はData URIを使うこともあるのでチェックしないようにした。他は必要なさそうというものだけを無効にしてる。</p>
+
+<p><a href="https://github.com/yaniswang/grunt-htmlhint">Gruntプラグイン</a>もあるので、CSS LintやJSHintと同じように開発フローに組み込むのも手軽で良い。とにかくカジュアルに使えてかつ最低限のHTMLクオリティを保証できそうなツールなので、積極的に使うとみんな幸せになれそう。</p>

@@ -1,0 +1,28 @@
+::first-letter以外を隠す
+
+<figure>
+  <img src="/images/blog/hide-other-than-first-letter.png" alt="各ソーシャル・ネットワーク・サービス名を最初の一文字だけにすると、コンパクトなリンク・リストを作ることができる">
+</figure>
+
+<p>ちょっとした目的があって、文章(や単語)の最初の一文字だけ残してあとは隠すみたいなことをやりたかった。<code>::first-letter</code>擬似要素では特定のプロパティーしか利用できないので、<code>::before</code>擬似要素を使った画像置換のような手法では行えない。ちょっと悩んだけど<code>margin-right</code>プロパティーが使えたのでそれで残りを弾き出してやるという方法に落ち着いた。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/571.html">Hide Other Than ::first-letter</a></p>
+
+<p><code>::first-letter</code>擬似要素の親になる要素の幅を一文字分に制限してやり、それ以外を<code>overflow</code>と<code>white-space</code>プロパティーを組み合わせて隠している。このままだとIなど幅が狭いグリフが一文字目の場合に二文字目が見えてしまう(Wなどでは逆に切れたりもする)ので、<code>::first-letter</code>擬似要素で<code>margin-right</code>プロパティーを使って制限した幅分押し出すようにし、確実に一文字しか表示しないようにできる。</p>
+
+<pre><code class="language-css">.test .hide {
+  width: 0.5em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.test .hide:first-letter {
+  margin-right: 0.5em;
+}
+</code></pre>
+
+<p>プロポーショナル・フォントだとグリフの幅は不定なので、デモのように等幅フォントを、できればウェブフォントで採用するのが望ましい。そうすればほぼ確実な幅を知ることができ、一文字目で確保すべき幅を決定できる。等幅フォントを使えない・使いたくない場合は、一文字目に来る文字に合わせるか一番幅が広いことが多いWなどを基準にして幅を決定すると良い。</p>
+
+<hr>
+
+<p>このウェブサイトではグローバル・フッターにあるTwitterなどへのリンクで、狭い画面の時だけ使っている。TでTwitter、GでGitHub、そしてPでPinboardなんだけど、一文字じゃさすがにわからない……。</p>

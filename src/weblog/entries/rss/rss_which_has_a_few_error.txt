@@ -1,0 +1,24 @@
+ちょっとだけ問題のあるRSS
+<p><a href="http://mylog.ishinao.net/" title="ishinao.net/mylog - recent">ishinao.net/mylog</a>の<a href="http://mylog.ishinao.net/id/1174" title="ishinao.net/mylog - 微妙にinvalidなRSSを手軽にvalidにする方法">微妙にinvalidなRSSを手軽にvalidにする方法</a>で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSを<a href="http://search.cpan.org/search?module=XML::Parser" title="search.cpan.org: XML::Parser - A perl module for parsing XML documents">XML::Parser</a>を利用してゴニョゴニョする(<a href="http://search.cpan.org/search?module=XML::RSS" title="search.cpan.org: XML::RSS - creates and updates RSS files">XML::RSS</a>も含む)場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。</p>
+<p>僕はこんなコードで、この両方の問題をまとめて回避しています。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+use Jcode;
+use LWP::Simple;
+use XML::RSS;
+
+my $res = LWP::Simple::get(&#39;http://example.com/path/to/rss&#39;);
+my $content = Jcode-&gt;new($res)-&gt;utf8;
+$content =~ s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/;
+my $rss = new XML::RSS;
+eval { $rss-&gt;parse($content); };
+...
+</code></pre>
+<ol>
+<li>ファイルごとUTF-8にコンバート</li>
+<li>encoding宣言をUTF-8に書き換える</li>
+<li>その後、パース</li>
+</ol>
+<p>ということ。UTF-8に書き換えるところの処理がかなり適当。こうするとUTF-8で扱うことになるので、エンコード・マッピング・ファイルも必要ないです。</p>
+<p>いろいろなアプローチがあると思いますが、ここらへんのことはある程度RSSリーダー側で処理してやった方が良いと、僕も思います。</p>

@@ -1,0 +1,21 @@
+blosxomではてなポイントゲッター
+<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>で<a href="http://b.hatena.ne.jp/help?mode=tipjar" title="はてなブックマーク - ソーシャルブックマーク">はてなブックマークではてなポイントを贈る</a>に対応するにはflavourに記述するのが一番手っ取り早いです。</p>
+<p>具体的にはhead.flavourに、</p>
+<pre><code class="language-xml">&lt;!--
+&lt;rdf:RDF xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+  xmlns:foaf=&quot;http://xmlns.com/foaf/0.1/&quot;&gt;
+  &lt;rdf:Description rdf:about=&quot;$url/$path_info&quot;&gt;
+    &lt;foaf:maker rdf:parseType=&quot;Resource&quot;&gt;
+      &lt;foaf:holdsAccount&gt;
+        &lt;foaf:OnlineAccount foaf:accountName=&quot;h2u&quot;&gt;
+          &lt;foaf:accountServiceHomepage rdf:resource=&quot;http://www.hatena.ne.jp/&quot; /&gt;
+        &lt;/foaf:OnlineAccount&gt;
+      &lt;/foaf:holdsAccount&gt;
+    &lt;/foaf:maker&gt;
+  &lt;/rdf:Description&gt;
+&lt;/rdf:RDF&gt;
+--&gt;
+</code></pre>
+<p>と書いてやればOK。アカウント名は自分の持っているアカウントに変更しましょう。変更しないとh2uというアカウントの人に投げつけられることになります。</p>
+<p><code>$path_info</code>はflavourで利用することは滅多に無い(プラグインを書くときにはかなり使う)ので忘れられがちですが、通常は<em>$ENV{&#39;REQUEST_URI&#39;}からblosxom.cgiへの相対パスを削除し、さらに先頭のスラッシュを削除したもの</em>で、ちょこっと便利な変数です。<code>$url/$path_info</code>と実際にリクエストされたURLは一致しないケースがあったと思いますが、僕の記憶が定かならあまり問題にしなくて良いような気がします(無責任)。</p>
+<p>Account Auto-discoveryははてなブックマークではてなポイントを贈る機能のみを対象とした仕組みというわけではない(多分、はてな内サービス限定というわけでもない)ので、将来を見据えるとサービスを列記できる設定を作ったプラグインにするのが良いかもしれません。作業労力的にはプラグインを更新して設定を変更するのもflavourをゴニョゴニョ書き換えるのも大して変わらなそうですが。</p>

@@ -1,0 +1,8 @@
+jscacheとか
+<p>「<a href="http://blog.bulknews.net/mt/archives/000976.html" title="blog.bulknews.net: Similarity Search の負荷軽減に jscache">jscache作った！</a>」とかTrackBackされたので読んでみる。<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>の場合は動的生成で使っている人が多いので、これを使うとCGI(blosxom)からCGI(jscache)を呼ぶことになり、なかなかなこと(微妙な言い回し)になるかも。TTL効いている間はすぐ終わるスクリプトだし、<a href="http://bulkfeeds.net/" title="Bulkfeeds: Home - RSS Directory &amp; Search">Bulkfeeds</a>側でキャッシュされてもいるので、表示パフォーマンスやBulkfeedsへの負荷の面では問題ないとおもうので良いといえば良いのですけどね。</p>
+<p>なので、blosxomではプラグインでこのjscacheの仕組みを実装してやると良いかもしれません。<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.txt">writeback</a>のように<code>$plugin_state_dir</code>以下にsimilarityとかいうディレクトリを作成し、そこに溜め込んでいくみたいな。キャッシュ出来ていない場合はアレになってしまうので、story.flavournameに書くべき<code>script</code>要素もプラグイン側で生成してやる必要もあるでしょう。</p>
+<p>言うだけ言ってみる。やる気は0。</p>
+<p>で、とりあえずのところの<a href="/pub/similarity.txt" title="similarity">similarity</a>のjscache対応への改造なんですが、jscacheが設置を完了して完全に動作しているという前提だと、jscacheのリリースエントリに書かれていることそのまんまです。要は、31行目を、</p>
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;http://example.com/path/to/jscache?url=$url&amp;amp;n=5&amp;amp;style=lite&amp;amp;oe=$charcode&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>と書き換えるだけです。ハード・コーディングにしなければ良かった。</p>

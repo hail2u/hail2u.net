@@ -1,0 +1,19 @@
+vim-css3-syntaxのハイライト不具合について
+
+<p><a href="https://github.com/hail2u/vim-css3-syntax">vim-css3-syntax</a>でハイライトがうまくいかないことがある報告を結構初期に<a href="https://github.com/hail2u/vim-css3-syntax/issues/1">受けていた</a>んですが、うまく再現できずに放置してる感じでした。昨日さらに報告を受けたのでやっぱりかなりの確率で起きるんだなーと調べ始めた所、どうやら<code>:syntax keyword</code>が常に<code>:syntax match</code>より優先されるという仕様に絡む問題だったようです。</p>
+
+<p>まだちゃんと追いきれていないのですが、多くの場合はハイフン(<code>-</code>)をキーワードとして認識するように設定すると単語の境界が変わるので解決できます(僕はそうしていたので再現出来なかった)。ビルトインのシンタックス・ファイルはこの設定を考慮していないと思うので、別の不具合のトリガーになる危険性もあるためどうしてもこのプラグインを使いたいという人だけ設定してみてください。</p>
+
+<p>設定は、</p>
+
+<pre><code class="language-vim">setlocal iskeyword+=-
+</code></pre>
+
+<p>を<code>~/.vim/after/ftplugin/css.vim</code>に書いたり、<code>~/.vimrc/</code>で、</p>
+
+<pre><code class="language-vim">autocmd FileType css setlocal iskeyword+=-
+</code></pre>
+
+<p>と自動コマンドを使ったりすればOKです。</p>
+
+<p>ビルトインの<code>syntax/css.vim</code>を拡張する形で書いている限り避けることが出来なさそうな問題なので、ちゃんとした解決のためには一から完全なCSS3シンタックスを書き直すしかなさそうです。ファイルタイプ・プラグインで<code>iskeyword</code>を拡張して、正規表現を使わずにがしがしキーワード書けるようにしちゃえば簡単そうですが……。作法とかよくわからないので大幅に変えることに躊躇しています。</p>

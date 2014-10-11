@@ -1,0 +1,50 @@
+floatで並べたリストのセンタリング
+
+<p>ページング・ナビゲーションなどでリスト項目を<code>float: left;</code>で横に並べるというのは割りと良く使われると思う。並べること自体は特に難しいわけではないが、その並べたリスト全体をセンタリングしようとするとちょっとややこしい。<a href="http://css-eblog.com/csstechnique/display-inlineblock.html"><code>display: inline-block;</code>を使う手法</a>や<a href="http://css-tricks.com/centering-list-items-horizontally-slightly-trickier-than-you-might-think/"><code>display: table;</code>を使う手法</a>という黒魔法的(私見)な手法で実現可能だが、<code>position: relative;</code>でもいける。</p>
+
+<p>ややこしい理由は簡単で、センタリングでよく使われる<code>text-align: center;</code>や<code>margin: 0 auto;</code>といった手法が通用しないから。検索するとすぐ出てくる比較的メジャーな<code>display</code>で頑張る方法もわかりやすいし悪くはないのだけど、同一セレクタ内で複数の<code>display</code>を駆使する必要があることや<code>zoom</code>マジックなどを併用する必要があることからコードがややこしくなる。</p>
+
+<p>対して、相対的に要素の位置を移動させる<code>position: relative;</code>を複数組み合わせて実現する場合は、CSSハック・フリーで記述できるので簡潔なコードになる。ただし余り使われないので理解しづらい。以下、<a href="/pub/test/108.html">動作サンプル</a>を元に少し解説。</p>
+
+<p>リスト項目を横に並べるためのコード等を省くと、</p>
+
+<pre><code class="language-css">.centered {
+  position: relative;
+  overflow: hidden;
+}
+
+.centered ul {
+  position: relative;
+  left: 50%;
+  float: left;
+}
+
+.centered ul li {
+  position: relative;
+  left: -50%;
+  float: left;
+}
+</code></pre>
+
+<p>以上がセンタリングさせるために必要なコードで、やっていることは、</p>
+
+<ol>
+<li>リスト全体である<code>ul</code>要素を右に50%移動</li>
+<li>各リスト項目になる<code>li</code>要素を左に50%移動</li>
+</ol>
+
+<p>各リスト項目を左に移動する時の基準は<em>リスト全体のコンテナの左端から各リスト項目の左端までの距離</em>になるので、リスト全体をセンタリングしたような位置に移動することが出来る。<code>left: -50%;</code>は<code>right: 50%;</code>でもOKだが、前者の方が直感的。リスト全体を括る<code>.centered</code>への指定は横スクロールバーが出てしまうことへの対策。<code>position: relative;</code>はIEに必要。</p>
+
+<hr>
+
+<p>色々装飾をつけたりして、</p>
+
+<figure><img src="/images/blog/centering-floated-list-complete-preview.png" alt="ページング・ナビゲーションのプレビュー"></figure>
+
+<p>こんな感じにしたもののをこのウェブログのページング・ナビゲーションに採用した。</p>
+
+<h2>追記</h2>
+
+<figure><img src="/images/blog/centering-floated-list-complete-modified-preview.png" alt="端を丸めたページング・ナビゲーションのプレビュー"></figure>
+
+<p><a href="/images/bg-paging.png">背景画像</a>を書き直して、端を丸くした。ありがちな感じになった。</p>

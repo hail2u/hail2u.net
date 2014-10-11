@@ -1,0 +1,42 @@
+Data URI化した画像とその再利用性
+
+<p>Data URI化した画像はHTTPリクエストの削減に大いに役に立つので積極的に使って良いと思う。けど、CSSにおいて変数が使えないことなどの理由からその再利用性は低いため、注意して書かないと同じData URI化した画像がいくつもCSSに出てくるなどという無駄につながりかねない。極端な例では3KBくらいのData URI化した同じ画像が8–10以上出てくるCSSファイルとか見たことが何回もある。</p>
+
+<p>単なるアイコンなどは使い回しすることはあまりなく、クラス名に紐付けられるだけなのでこういう問題は起こらないけど、上記のような透過させたグラデーションのような使い回すことを意図したテクスチャを違う背景色と混ぜてアレンジするというような使い方においてData URIを利用すると重複が起こりやすい。そういう時にはOOCSS的なアプローチでData URI化した画像を使うためだけのクラスを作ってセレクターを独立させてやるとか一工夫が必要になる。<a href="http://sass-lang.com/">Sass</a>では<code>@extend</code>が活躍する。</p>
+
+<h2>CSSプリプロセッサーでの利用</h2>
+
+<p>CSSプリプロセッサーでは変数を定義できることが多く、それを利用するとData URIを比較的カジュアルに扱える。その結果としてこの重複する問題が特に表面化しづらい。例えば<code>@extend</code>ではなく<code>@mixin</code>でData URI化した画像を利用していたりすれば、SCSSのコードとしては一回しか出てこないにも関わらず生成されたCSSには何回も出てくるなどということは普通に有り得る。<a href="http://compass-style.org/">Compass</a>ではData URI化する関数とかも用意されているので便利な半面、更に表面化しづらそう。</p>
+
+<p>まぁこれはData URI化した画像を使う時に限った話ではなく、CSSプリプロセッサーの使用において生成されるCSSを強く意識して書く必要があるということに過ぎないんだけど。中でもSassは単なる便利ツールではなくなりつつあり、SCSSのコードと生成されるCSSのコードが乖離しやすいのでより重要。あんまりCSSから離れたくないとかそういう理由で<a href="http://lesscss.org/">LESS</a>を選ぶのも悪くない気がする。</p>
+
+<h2>CSS Variablesではどうなる？</h2>
+
+<p>CSSプリプロセッサーの変数では解決されないけど、<a href="http://www.w3.org/TR/css-variables/">CSS Variables</a>が多くのブラウザーで使えるようになると解決されるはず。</p>
+
+<pre><code class="language-css">:root {
+  var-subtle-noise-texture: url("data:image/png;base64,iVBORw0KGgoAAAAN...");
+}
+
+.foo {
+  background-color: #fffcf0;
+  background-image: var(subtle-noise-texture);
+}
+
+.bar {
+  background-color: #edeade;
+  background-image: var(subtle-noise-texture);
+}
+</code></pre>
+
+<p>試せないので試してないけど……。</p>
+
+<hr>
+
+<p>今までCSSで<code>url()</code>で参照していたものを単純にData URI化しちゃえばHTTPリクエストが減って快適になりやすいけど、HTTPリクエストを減らせばファイルサイズ大きくなっても良いわけではないってわけではない。もちろんHTTPリクエストの削減の方が優先度は高いけど。</p>
+
+<p>Data URI化した画像を大量に含んで肥大化したCSSファイルはキャッシングという面での再利用性に問題がある……というのは過去の問題だと思うので、多分無視して良い(要出典)。</p>
+
+<hr>
+
+<p>Data URI化するにはどんなやり方でも良いと思うんだけど、ローカルでサクッとできる何かを持ってると機械的に処理できるようになるので生産性が上がる。僕は<a href="http://qiita.com/items/d6c8e43d5d44fcded39c">自分で書いたPerlスクリプト</a>で誤魔化してる。<a href="http://pmt.sourceforge.net/pngcrush/index.html">pngcrush</a>なんかを公開している<a href="http://pmt.sourceforge.net/">PNG and MNG tools</a>でbase64やuuencodeを利用した<a href="http://pmt.sourceforge.net/png2uri/index.html">Png2uri</a>というシェルスクリプトが最近公開されてたり、探せば色々あると思うので1つくらいはローカルに何か用意しておくべき。</p>

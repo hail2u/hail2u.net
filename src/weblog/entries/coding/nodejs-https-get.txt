@@ -1,0 +1,23 @@
+Node.jsのhttps.get()
+
+<p>HTTPモジュールの<code>http.get()</code>と違いHTTPSモジュールの<code>https.get()</code>は第一引数にURLが取れない。HTTPモジュールと同じようにURLを指定すると<code>ECONNREFUSED</code>になる。ソース読んだら文字列かどうかチェックしてURLモジュールでパースする<a href="https://github.com/joyent/node/blob/master/lib/http.js#L1585">処理</a>が<a href="https://github.com/joyent/node/blob/master/lib/https.js#L90">HTTPSモジュールにはなかった</a>。1時間くらいハマりました！</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var https = require('https');
+var url = require('url');
+
+https.get(url.parse('https://example.com/'), function (response) {
+  response.on('data', function (chunk) {
+    process.stdout.write(chunk);
+  });
+}).on('error', function (error) {
+  throw error;
+});
+</code></pre>
+
+<p>とかURLモジュールでパースしてから渡すだけで問題無さそう。</p>
+
+<hr>
+
+<p>Perlで書いてたオレオレ・スクリプトをNode.jsで書きなおすという修行を行なっている。欲しいモジュールが見つからない。見つかっても使い方を理解するまで長い。のでスクリプト書き直すまでが長くて心が折れそう。</p>

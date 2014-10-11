@@ -1,0 +1,29 @@
+xml2jsでのルート・ノード
+
+<p><a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>はルート・ノードがらみが慣れないとよくわからない感じ。例えば普通にRSS 2.0のXMLを吐こうとすると、XMLへ変換するオブジェクトの方で属性を指定し、ルート・ノードの名前やXMLプロログはビルダー関数で指定する。と、コードが分断される。</p>
+
+<pre><code class="language-javascript">var xml2js = require(&#39;xml2js&#39;);
+var rss = {
+  $: {
+    version: &#39;2.0&#39;,
+    &#39;xml:lang&#39;: &#39;ja-JP&#39;,
+    &#39;xmlns:atom&#39;: &#39;http://www.w3.org/2005/Atom&#39;
+  }
+};
+var processed = new xml2js.Builder({
+  rootName: &#39;rss&#39;,
+  xmldec: {
+    encoding: &#39;UTF-8&#39;
+  }
+}).buildObject(rss);
+</code></pre>
+
+<p>これでようやくよく見るRSS 2.0のフィードのXMLらしく吐ける。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;rss version=&quot;2.0&quot;
+  xml:lang=&quot;ja-JP&quot;
+  xmlns:atom=&quot;http://www.w3.org/2005/Atom&quot;&gt;&lt;/rss&gt;
+</code></pre>
+
+<p>xml2jsはXMLをパースするにはなかなか便利だけど、出力には向いていないなと感じた。XMLを扱うNode.jsパッケージはこれ！といったのがなかなかないなぁ。</p>

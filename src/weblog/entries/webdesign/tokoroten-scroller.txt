@@ -1,0 +1,40 @@
+ところてんスクローラー
+
+<p>Facebookに買われたという話で知った<a href="http://lightbox.com/">Lightbox</a>という写真共有サービスの<a href="http://lightbox.com/stream">Live Stream</a>の見せ方が良いなと思ったので<a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>を使った<a href="/pub/test/407.html">もどきっぽいのを作った</a>。Pure CSSではない。良い名前思い浮かばなかった。</p>
+
+<p>つまりはどんどん画像を押し出していくのをディレイとアニメーションを組み合わせて見せるというもので、ディレイをJavaScriptで、アニメーションをCSSで実装した。</p>
+
+<pre><code class="language-js">var container = document.getElementById("scroller");
+
+window.setInterval(function () {
+  var img = document.createElement("img"),
+    li = document.createElement("li");
+
+  img.src = "http://lorempixel.com/120/160/";
+  img.addEventListener("load", function () {
+    this.className = "loaded";
+  });
+
+  li.appendChild(img);
+
+  container.insertBefore(li, container.firstChild);
+}, 3000);
+</code></pre>
+
+<p>ディレイは普通に<code>window.setInterval()</code>で3秒ごとに画像を先頭に追加していく。後にアニメーションのトリガーに使うために画像に読み込み完了で<code>loaded</code>というクラス名を振る処理も付けておく。</p>
+
+<pre><code class="language-css">#scroller img {
+  height: 0px;
+}
+
+#scroller .loaded {
+  height: 160px;
+  transition: height 0.2s ease;
+}
+</code></pre>
+
+<p><code>img</code>をデフォルトで<code>height: 0px</code>にしておき、画像の読み込み完了時に付くクラス名<code>.loaded</code>で高さを戻す。その時に同時にCSS Transitionsを使うことによってアニメーションさせる。Firefox 12でCSS Transitionsが動いてないのはよくわからない。能動的なアクションしかトリガーにできないとかなんか制限ありそう。</p>
+
+<hr>
+
+<p>有限数の画像をどんどん追加していくというのならCSSだけでもできそう。トリガーは<code>:target</code>擬似クラスしかなさそうで、そこがアレだけど、ディレイは有限個なのでそれを考慮すれば<code>transition-delay</code>プロパティーで大丈夫。</p>

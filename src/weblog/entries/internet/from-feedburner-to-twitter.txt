@@ -1,0 +1,40 @@
+FeedBurnerからTwitterへ
+
+<p>最近になって「エントリ書いた」つぶやきをTwitterに投げるようになった。<a href="http://twitterfeed.com/">Twitterfeed</a>とかを使うのは何かに負けた気がすると思ったので、エントリをPublishするPerlスクリプト内でTwitterに投げていたが、<a href="http://adsenseforfeeds.blogspot.com/2009/12/socializing-your-feed-with-twitter.html">FeedBurnerでできるようになったらしい</a>のでそれに乗り換えてみた。設定してActivateボタンを押したら502エラーとか出たけど設定は正常に行われたらしい。</p>
+
+<p>と、導入出来たかどうか確認のためにエントリを書く。</p>
+
+<p>設定画面はまだ日本語化されていない。TwitterのアカウントはFeedBurnerのアカウントに対しては複数設定可能だが、フィードに対しては1つだけなので、フィードが更新されたらTwitterの複数アカウントでつぶやくとかは無理そう。Hash tagsは<code>category</code>要素をハッシュ・タグとして付加してくれる。RSS 1.0で<code>taxo:topics</code>とかを使ったカテゴリ(タグ)の表現とかでもOKだった。</p>
+
+<p>Twitterの140文字制限のためのURL短縮には<a href="http://googleblog.blogspot.com/2009/12/making-urls-shorter-for-google-toolbar.html">これもまた新しく登場</a>した<a href="http://goo.gl/">goo.gl URL短縮</a>が使われる(<code>fb/</code>が必ず挿入される)。短縮される元のURLはFeedBurnerの生成したURLになので、クリック監視とかを設定していても大丈夫。</p>
+
+<p>設定画面の最後には、</p>
+
+<blockquote>
+<p>This feature utilizes a Google service to create short versions of your feed links, e.g. http://goo.gl/xyzxyz. Please note that Google may choose to publicly display aggregate and non-personally identifiable statistics about shortened links, such as the number of end user clicks.</p>
+</blockquote>
+
+<p>と書いてあって、短縮されたURLのトラフィックの統計を誰でも閲覧できるようにするかもしれないよとのことなので、将来的にgoo.glはbit.lyのような感じになりそう。注意書きを薄い色で書くなとちょっとだけ思った。</p>
+
+<p>それ(どうせすぐに)Googleで出来る(ようになる)よ！</p>
+
+<hr>
+
+<p>この機能は任意のフィードをTwitterで購読できるという意味でもあるので、<a href="http://b.hatena.ne.jp/bookmarklist?url=http%3A%2F%2Fhail2u.net%2F">はてなブックマークのブックマークされたよフィード</a>とかをFeedBurner経由にしてやって、Socialize設定でTwitterのサブアカウントに投げるようにすると、ブックマークされたらTwitterで知ることが出来て便利かも。<a href="http://feeds.feedburner.com/hail2u/bookmarked">Pipesとかを使ってガリゴリいじってやらないと</a>読みづらそうだし、最大8つまでしか投げてくれないので有名サイトとかだとガンガン取りこぼしそうだけど。</p>
+
+<p>先ほど間違えてメインのアカウントに被ブクマを流してしまったことについては大変遺憾に思っております。</p>
+
+<h2>追記@2009-12-15T21:46:14+09:00</h2>
+
+<p>導入はちゃんとできた模様。以下、気づいた点をメモ。</p>
+
+<ul>
+<li>FeedBurnerへpingを送信した後、1分もしないでつぶやかれる</li>
+<li>短縮されたURLは<code>http://goo.gl/fb/</code>で始まり、FeedBurnerでのものとひと目でわかる</li>
+<li>短縮URLは直ぐに機能するがFeedBurnerのクリック追跡用URLが少し遅れて機能するようになるようで、つぶやかれた直後は404 Not Foundになった(かなり問題ある)</li>
+<li>短縮URLはFeedBurnerのクリック追跡用URLに<code>utm_source=feedburner&amp;utm_medium=twitter</code>という隠しパラメータが設定されている(そのうちFeedBurnerのフィード集計に載るのかも)</li>
+<li>Post contentをTitle and Bodyにした場合、<code>content:encoded</code>や<code>atom:content</code> (なければ<code>description</code>や<code>atom:summary</code>)をプレーンテキスト化したものの先頭が切り出されて使われる</li>
+<li>ハッシュタグは小文字化される</li>
+</ul>
+
+<p>反映の速さと導入の簡単さとコストの低さは魅力的だが、短い間だけどつぶやきに含まれるURLが機能しないことがあるのがちょっと致命的。</p>

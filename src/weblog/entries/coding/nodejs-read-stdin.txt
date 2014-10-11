@@ -1,0 +1,29 @@
+Node.jsで標準入力を一気に読む
+
+<p><code>/dev/stdin</code>とかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今は<code>process.stdin.fd</code>の<code>size</code>を調べてそのサイズでBufferオブジェクトを作り、<code>fs.readSync()</code>で読み込むのが良いみたいだ。本当なのかな？</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var fs = require('fs');
+
+var fd = process.stdin.fd;
+var length = fs.fstatSync(fd).size;
+var buffer = new Buffer(length);
+var bytesRead = fs.readSync(fd, buffer, 0, length, 0);
+var input = buffer.toString('utf8', 0, bytesRead);
+console.log(input);
+</code></pre>
+
+<p><code>fs.readSync()</code>はその第二引数がBufferオブジェクトじゃない場合はレガシーなモードになるので、Bufferオブジェクトを経由しなくて良かったりもする。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var fs = require('fs');
+
+var fd = process.stdin.fd;
+var length = fs.fstatSync(fd).size;
+var input = fs.readSync(fd, length)[0];
+console.log(input);
+</code></pre>
+
+<p>レガシーなモードでは返り値は<code>[string, bytesRead]</code>という配列になってるので、最初の要素だけを抜き出せば良い。短い。でもv0.8.4のドキュメントではこのことについて<a href="http://nodejs.org/docs/v0.8.4/api/fs.html#fs_fs_readsync_fd_buffer_offset_length_position">もう書かれていない</a>ので使わない方が良さそう。</p>

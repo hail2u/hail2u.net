@@ -1,0 +1,45 @@
+hr要素を文字で入れ替える
+
+<figure><img src="/images/blog/swap-hr-with-chars.png" alt="画像を使わなくても少し変わった区切り線を引くことができる"></figure>
+
+<p>HTML5になって<a href="http://www.w3.org/TR/html5/grouping-content.html#the-hr-element"><code>hr</code>要素</a>はセクション内での区切りに使うものなどと役割が割りとはっきりと決められました。今までもそんな感じで使ってた人が多いですけど。ただ<code>hr</code>要素のCSSによる装飾はなかなか難しいところがあります。そこを擬似要素を利用してゴニョゴニョすることにより、あまり罫線々々してない区切りを作って頑張ろうとかそういうお話です。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/270.html">Swap HR Element with Character(s)</a></p>
+
+<p>単純に元のスタイルを消して背景を透明にし、そこに擬似要素を重ねてやるという最近良く使われるテクニックです。</p>
+
+<pre><code class="language-css">hr {
+  margin: 2em auto;
+  border: none;
+  position: relative;
+  clear: both;
+  width: 100%;
+  height: 48px;
+  background-color: transparent;
+  box-sizing: content-box;
+}
+</code></pre>
+
+<p><code>hr</code>要素の装飾はブラウザによって様々なので、とりあえず<code>border</code>プロパティや<code>background-color</code>プロパティあたりをつぶし、挙動をなるべく統一させます。それから擬似要素を簡単に重ねられるように<code>position</code>プロパティの値を<code>relative</code>にして、位置調整を楽にするために<code>width</code>プロパティや<code>height</code>プロパティも指定しておきます。</p>
+
+<p>実際に区切り線として描画されるものの実体は擬似要素に指定された文字になります。</p>
+
+<pre><code class="language-css">hr:before {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  content: "\2022\00a0\2022\00a0\2022";
+  color: rgb(51, 51, 51);
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 48px;
+  text-align: center;
+}
+</code></pre>
+
+<p>センタリングするには<code>width</code>プロパティで100%を指定すれば親である見えない<code>hr</code>要素と幅が揃うので、その上で<code>text-align</code>プロパティを使うのが一番簡単です。縦方向のセンタリングには<code>line-height</code>プロパティの値を<code>height</code>プロパティの値と揃えるという古からある手法を使うと良いでしょう。あとは好きなフォントと文字で区切り線を作るだけです。</p>
+
+<p><code>content</code>プロパティの値は普通に日本語や絵文字系を書くと、CSSファイルの文字コードに気を使わなければならないので、なるべくならコードで直接指定したほうが良いでしょう。文字のコードを調べるには、Windowsなら文字コード表というOS標準のアプリケーションを、OS Xなら文字ビューアというアプリケーションが使えます。なお、半角スペースを普通に入力すると消えたりするので、代わりに<code>\00a0</code>の<a href="http://ja.wikipedia.org/wiki/%E3%83%8E%E3%83%BC%E3%83%96%E3%83%AC%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9">non-breaking space</a>を利用するのが良さそうです。</p>
+
+<p>デモのようにDive Into HTML5の花柄区切り線とかもこんな感じで比較的簡単にいけます。このサイトではニョロマルニョロみたいな感じにしてみました。<code>color</code>プロパティで<code>rgba()</code>を使って透過させたり、色々やってみてます。CSSトランスフォームなどを使って変形させてみたりしても面白いでしょう。CSSアニメーションなどを利用するのはさすがにうっとうしいと思いますが。オーナメントのフォントをWebフォントとして利用したりすれば、もっと柔軟でエレガントな区切り線にできるかもしれませんね。</p>

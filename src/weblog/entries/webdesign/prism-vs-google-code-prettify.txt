@@ -1,0 +1,52 @@
+Prism vs. Google Code Prettify
+
+<p><a href="http://prismjs.com/">Prism</a>を使ってるウェブサイトが増えてきたなーと感じる。<a href="http://google-code-prettify.googlecode.com/svn/trunk/README.html">Google Code Prettify</a>で困ってないというか既存のものの中では最もバランスが良いと思っているので、あまり乗り換える気はない。が、「Only 2KB」を謳うPrismのサイズの小ささには惹かれる。</p>
+
+<p>Prismの本体は素の状態で7.5KBほどと小さい(縮小してgzipすると2KB)。素のGoogle Code Prettifyが62KBあることを考えると圧倒的な差だ。けどその差はコメント量とビルトインで構文強調の定義があるかどうかの違いに過ぎないようだ。試しにGoogle Code Prettifyがサポートしている言語にPrismを対応させるような感じにすると25KBほどになった。そういえば<a href="http://highlightjs.org/">highlight.js</a>とかもあったなーと思い出したので、ついでにこれも含めて比較してみる。</p>
+
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>デフォルト</th>
+<th>言語定義を追加</th>
+<th>Uglified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prism</td>
+<td><mark>7.5KB</mark></td>
+<td><mark>25KB</mark></td>
+<td>17KB</td>
+</tr>
+<tr>
+<td>Google Code Prettify</td>
+<td>62KB</td>
+<td>62KB</td>
+<td><mark>16KB</mark></td>
+</tr>
+<tr>
+<td>highlight.js</td>
+<td>18KB</td>
+<td>63KB</td>
+<td>24KB</td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="http://lisperator.net/uglifyjs/">UglifyJS</a>を通すとGoogle Code Prettifyの大量のコメントが消え、なんと逆転した。Only 2KBに騙された感じある。ここからのgzipではほとんど差は出ないし、どちらも言語定義は正規表現のため新たな言語定義の追加でも差は出ることはない。双方の強調機能に少し差があることを考慮しても、Prismが特に小さいということはないようだ。</p>
+
+<hr>
+
+<p>ただPrismの優位性はコアのサイズだけではなく、必要な言語定義を必要なだけ導入できる所などにもある。<a href="http://prismjs.com/extending.html#language-definitions">新しい言語定義</a>も<a href="https://code.google.com/p/google-code-prettify/source/browse/trunk/src/lang-lisp.js">Google Code Prettifyのそれ</a>と比較して格段に書きやすい。サイズのメリットはあまりないことがわかってしまったが、コンパクトに抑える努力が可能なPrismに乗り換えたい気もする。……んだけど、ちょっとこのサイトに合わせて作り込もうとしたらすごく面倒だった。</p>
+
+<p>まず、言語定義の依存があるため、自前で連結しようとすると順番をきっちり考えなくてはならなくて面倒臭い。また、HTMLやXMLの構文強調は<code>markup</code>でまとめられているので、<code>language-html</code>というクラス名を振っても構文強調されない。クラス名を書き直すか、以下の様な簡単な言語定義を書いて読み込む必要がある。</p>
+
+<pre><code class="language-javascript">Prism.languages.html = Prism.languages.markup;
+Prism.languages.xml = Prism.languages.markup;
+Prism.languages.svg = Prism.languages.markup;</code></pre>
+
+<p>更には付加するクラス名が一般的なものすぎる上、Prismが通った証拠みたいなものがはっきりと残らない(Google Code Prettifyが<code>prettyprinted</code>というクラス名を振ってくれるみたいなのがない)ので、セレクターで<code>[class*=&quot;language-&quot;]</code>とか<code>.token.comment</code>みたいな書き方をしなくてはならない。</p>
+
+<p>しばらくはGoogle Code Prettifyから乗り換えることはなさそう。言語定義書きやすいのは本当に良いんだけどな。</p>

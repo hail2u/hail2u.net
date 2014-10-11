@@ -1,0 +1,20 @@
+IOM Filter
+<p>Opera 7.5とMozilla 1.7.5(Firefox 1.0/1.0.1のコア)でCSSを切り分けたいというケースは、両ブラウザとも実装はかなり優秀なので(←偉そう)まず無いです。が、どうもうまくいかないケースに遭遇してしまったので、<a href="/pub/test/020.html" title="IOM Filter">IOM Filter</a>(ダサいネーミング)と名づけたInternet Explorer 6とOpera 7.52、Mozilla 1.7.5で違うCSSルールを適用できるような書き方を考えてみました。</p>
+<p>コアのコードは以下の通り。</p>
+<pre><code class="language-css">#filterTest {
+  color:red;
+  background-color:transparent;
+}
+
+body &gt; #filterTest {
+  color:green;
+  background-color:transparent;
+}
+
+:root #filterTest {
+  color:blue;
+  background-color:transparent;
+}
+</code></pre>
+<p>Mozilla 1.7.5では全てのルールが有効、Opera 7.52では最初と二番目のルールが有効、Internet Explorer 6では最初のルールだけ有効というわけで、CSSの後出し最強ルールによりそれぞれ違う前景色になるというわけ。この順に書かないとならないことにさえ注意すれば、特にややこしい方法でも無い気がします。</p>
+<p><code>:root</code>擬似クラスは<a href="http://www.w3.org/TR/REC-CSS2/" title="Cascading Style Sheets, Level 2">CSS2 Specification</a>では定義されていないので、<a href="http://jigsaw.w3.org/css-validator/" title="W3C CSS 検証サービス">CSS Validator</a>ではエラーでるけど。<a href="/blog/webdesign/use_underscore_in_css_identifier.html" title="hail2u.net - Weblog - CSSの識別名にアンダースコアを使う">underscore hack</a>と同じで、どうしても必要というのでない限り<del>鮭</del><ins>避け</ins>た方が無難ぽい。</p>

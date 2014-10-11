@@ -1,0 +1,20 @@
+blosxomでTrackBack pingを送信
+<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>の<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.txt">writeback</a>プラグインは、TrackBack pingを受け取る(のとコメントを受け取る)だけのものなので、TrackBack pingの送信に関しては手動で行わなければなりません。手動で行うというのは、TrackBack ping送信用のフォームを書いたHTMLファイルを作成して、必要な情報(TrackBack ping送信先URLやTrackBack送信元のエントリの要約など)をコピペしてフォームを埋め、送信するということです。</p>
+<p>言葉にするだけでも面倒だということが良くわかりますよね。エントリを書くことと融合して送信できれば言うことはないのですが、blosxomの場合は<a href="http://www.movabletype.org/" title="movabletype.org">Movable Type</a>のようにエントリの投稿という機能がCGIそのものに実装されているわけではなく、指定ディレクトリにファイルを作成するという、いわばアナログな手法によって行うわけで、エントリの投稿とTrackBack pingの送信を融合させるということはなかなか難しいと思います。</p>
+<p>それの解としては二通りのアプローチがあると思います。</p>
+<ul>
+<li>エントリを投稿する仕組みをblosxomのCGIそのもの(プラグインででもOK)に実装してやり、その中でTrackBack ping送信の仕組みを実装してやる</li>
+<li>エントリのファイルを作成する、またはファイルが公開される時に、ついでにスクリプトを動かしてTrackBack pingを送信してやる</li>
+</ul>
+<p>前者の実装例としては、<a href="http://blog.bulknews.net/mt/" title="blog.bulknews.net">blog.bulknews.net</a>のmiyagawaさんが作り上げた、<a href="http://blog.bulknews.net/mt/archives/000355.html" title="blog.bulknews.net: blosxom: wikieditish + bookmarklet">wikieditish + bookmarklet</a>というものがあげられると思います。これの利点は言うまでもなく、MT的なエントリ投稿とTrackBack ping送信システムが利用できるようになるということで、一般的にはコレがもっとも優れた解だと思います(blosxomとwikieditshさえ設置できればOKなので)。</p>
+<p>後者は若干わかりにくいですが、実装の好例として<a href="http://www.blosxom.com/plugins/output/autotrack.htm" title="blosxom :: the zen of blogging :: plugins/output/autotrack.txt">autotrack</a>プラグインがあげられると思います。これはエントリが追加された時に、その追加されたエントリから外部リンクを探索し、LWPモジュールやwgetなどを利用して、TrackBack ping送信先URLを探し、送信するわけです。MTの自動でTrackBack pingを送信する仕組み(きちんと調べていないのですが)とは、送信するタイミングの違いくらいしか違いはないと思ってます。こちらもなかなか優れた解だと思うのですが、LWPやwgetが使えないサーバーというものもあるわけで、そこらへんに問題がありますね。</p>
+<p>前者の問題点は、オンラインでの編集でしか自動でTrackBack pingを送信できないところじゃないかと思うわけです。後者の問題点は前述のように、LWPやwgetを使えないサーバーに設置した場合。blosxomの大きな特徴のひとつに、FTPで指定したディレクトリにアップロードすればOKというところがあるわけで、オンラインでの編集に限定されがちなアプローチは、ちと面白味に欠けるかなとか。で、僕の場合はこんな感じで実装しました。</p>
+<ul>
+<li>新規エントリをFTPでアップロード</li>
+<li>新規エントリのファイルをスキャンして外部リンクを抜き出す</li>
+<li>外部リンク先のソースを取得して、TrackBack ping送信先を探す</li>
+<li>見つけたらTrackBack ping送信</li>
+</ul>
+<p>2～4番目の処理をを単体ののPerlスクリプトとして実装してやり、バッチ・ファイルで一気に処理してます。その処理を担当するPerlスクリプトは<a href="/pub/autotb.pl.txt" title="autotb.pl">autotb.pl</a>で、引数に新規エントリのフルパスを渡してやり、利用します。僕のエントリを書く環境にかなり依存してるスクリプトなので、要改造ですが、アプローチとしてはこんなもんだと思います。こういったスクリプトをFTPでファイルをアップロードした後に動かして、TrackBack ping送信の自動化を行う利点は、サーバーがどんな仕様であれ、blosxomさえ設置できるのならば利用できる点に尽きます。それに加えて、うまく改造すれば、自動でTrackBack pingを送信する機能の無いいろいろなもの(HTMLファイルを手書きしてblogのようなページを作っているとか)でも、Perlさえあれば自動でTrackBackが送れたりするんじゃないかなーとか。TrackBack pingの送信パラメータの生成や、外部リンクの抽出あたりにかなり手を加えないとならないですが。やってないので知りませんけど。</p>
+<p>利用の仕方によってはかなりアレなスクリプトなので、公開するのやめとこうとか思ったんですが、エントリのネタが無いので公開しました。</p>
+<p>長いな・・・。<a href="http://www.blosxom.com/plugins/display/seemore.htm" title="blosxom :: the zen of blogging :: plugins/display/seemore.txt">seemore</a>プラグイン入れるべきかもしれない。</p>

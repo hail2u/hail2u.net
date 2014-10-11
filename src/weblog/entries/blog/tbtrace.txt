@@ -1,0 +1,13 @@
+TrackBack Tracer
+<p>先週の土曜日にTrackBackをなんかこうどうにか何かしたいとか話してたので、それの最初の一歩としてTrackBackを辿っていくTrackBack TracerというCGIを作ってみました。作ってから同種のものが腐るほど存在することに気づく罠。</p>
+<p>使い方は、エディット・ボックスに任意のblogのエントリ(TrackBackを1つ以上受信済みでないと意味ないです)のPermalinkを入力して、Traceボタンを押すだけ。すると、下にTrackBack一覧が出てきます。その一覧の各エントリの末尾に付いている&#187; Trace further...をクリックすると、そのエントリのTrackBack一覧に切り替わります。辿れる限り辿れることでしょう。</p>
+<p>単に<a href="http://www.movabletype.org/docs/mttrackback.html#retrieving trackback pings" title="mttrackback - TrackBack Technical Specification"><code>?__mode=rss</code></a>で拾っているだけなので、<code>?__mode=rss</code>に対応していないblogツールのPermalinkを入力した場合は<a href="http://search.cpan.org/search?module=XML::RSS" title="search.cpan.org: XML::RSS - creates and updates RSS files">XML::RSS</a>のエラー・メッセージが出てきます。やってることは以下のような感じ。</p>
+<ul>
+<li>Parmalinkから<a href="http://www.movabletype.org/docs/mttrackback.html#autodiscovery%20of%20trackback%20ping%20urls" title="mttrackback - TrackBack Technical Specification">TrackBack Auto-discovery</a>でTrackBack ping URLを取得</li>
+<li>TrackBack ping URLに<code>?__mode=rss</code>を付加</li>
+<li>getしてRSSっぽく整形してからXML::RSSでパース</li>
+<li>適当にHTMLに整形して出力</li>
+</ul>
+<p>単純明快。<a href="/pub/tbtrace.cgi.txt" title="TrackBack Tracerのソース">ソース</a>も晒しておいたり。モジュール頼みで、ほとんど何もやってないす。</p>
+<p>再帰的にやる場合は、適当にループさせるだけなので、特に難しくはないと思いますが、非常に時間がかかるんではないかと思います。あとちゃんとチェックしていかないと無限ループにもなりそうな気もします。ま、再帰的に探すものは誰かが作ってくれそう。作ってくれそう？作ってくれそう！！！</p>
+<p>てか、<code>?__mode=rss</code>で出力されるXMLの<code>response</code>とか<code>error</code>とかすげー邪魔だよ・・・。存在する必要性あるんだろうか。</p>

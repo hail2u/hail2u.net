@@ -1,0 +1,22 @@
+Bookmarklet: List Colors #2
+
+<p>出力する表を色を背景にしたシンプルな表になるようにした。文字色は明度(ブライトネス)をチェックして明るい色なら黒、暗い色なら白を設定するようにしたので、文字が読めないって事はないと思う。まぁ満足のいくものが出来たのでこれで終わり。</p>
+
+<p>Install Bookmarklet: <a href="javascript:(function(){var colors=[];var re=new RegExp(/rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)/g);function countColor(c){if(typeof c!==&quot;string&quot;){return;}else if(colors[c]){colors[c]++;}else{colors[c]=1;}}function listDocColors(node){if(node===null){return;}else if(node.style){Array.forEach(node.style.cssText.match(re),countColor);}Array.forEach(node.childNodes,listDocColors);}function colorBrightness(color){var [c,r,g,b]=color.match(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/);var brightness=((r*299)+(g*587)+(b*114))/1000;return brightness;}Array.forEach(document.styleSheets,function(ss){try{Array.forEach(ss.cssRules,function(rule){Array.forEach(rule.cssText.match(re),countColor);});}catch(e){}});listDocColors(document);var table=document.createElement(&quot;table&quot;);table.style.position=&quot;absolute&quot;;table.style.border=&quot;2px solid #cccccc&quot;;table.style.top=&quot;12px&quot;;table.style.right=&quot;12px&quot;;table.style.backgroundColor=&quot;#eeeeee&quot;;for(var key in colors){var tr=document.createElement(&quot;tr&quot;);var colorTd=document.createElement(&quot;td&quot;);colorTd.style.padding=&quot;6px&quot;;if(colorBrightness(key)&lt;125){colorTd.style.color=&quot;#ffffff&quot;;}else{colorTd.style.color=&quot;#000000&quot;;}colorTd.style.backgroundColor=key;colorTd.style.fontFamily=&quot;monospace&quot;;colorTd.appendChild(document.createTextNode(key));tr.appendChild(colorTd);table.appendChild(tr);}document.body.appendChild(table);})();">List Colors</a></p>
+
+<figure><img src="/images/blog/list-colors-bookmarklet-2.png" alt="このサイトでList Colorsブックマークレットを起動した時のプレビュー"></figure>
+
+<p>ちょっとすっきりする感じ。</p>
+
+<p>明度差のチェックは、<a href="http://www.w3.org/TR/AERT">Techniques For Accessibility Evaluation And Repair Tools</a>の<a href="http://www.w3.org/TR/AERT#color-contrast">Checkpoint 2.2 - Ensure that foreground and background color combinations provide sufficient contrast when viewed by someone having color deficits or when viewed on a black and white screen</a>で提示されているアルゴリズムを利用した。</p>
+
+<p>このブックマークレットでは<code>rgb()</code>で色を保持しているので、</p>
+
+<pre><code class="language-js">function colorBrightness (color) {
+  var [c, r, g, b] = color.match(/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/);
+  var brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return brightness;
+}
+</code></pre>
+
+<p>というコードで明度を取得し、閾値(いきち)である125以下なら黒(<code>rgb(0, 0, 0)</code>)と十分な明度差がないと考えられるので文字色に白を指定し、それ以外は黒を指定するという単純なもの。</p>

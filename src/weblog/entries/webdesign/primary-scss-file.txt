@@ -1,0 +1,58 @@
+プライマリSCSSファイル
+
+<p><a href="http://sass-lang.com/">Sass</a>では<code>@import</code>をうまく使うと、SCSSファイルを目的別に整理して管理することができます。モジュール化できるということですね。プライマリSCSSファイルとは僕が勝手に付けた呼称ですが、つまり各モジュールを読み込む<em>だけ</em>のSCSSファイルのことです。グローバルに使用する変数の設定ファイルなども含めて整理して、プライマリSCSSファイルではそれらを読みこむだけとしておくと管理が少し楽になるんじゃないかと。</p>
+
+<p>このWebサイトのプライマリSCSSファイルは以下のようなものです。</p>
+
+<pre><code class="language-scss">$version: "6.10.21";
+
+/*!
+ * style.css v#{$version}
+ *
+ * LICENSE: http://hail2u.mit-license.org/2011
+ */
+
+// Web Fonts
+@import url("http://fonts.googleapis.com/css?family=Terminal+Dosis");
+
+// Variables
+@import "vars";
+
+// Partials
+@import "normaliz", "clearfix", "vendor-extension";
+
+// Styles
+@import "basics", "layout", "widget", "forprint";
+</code></pre>
+
+<p>短いですね！</p>
+
+<h2><code>/*!...*/</code>を使ったコメントの保護と変数のインターポレーション</h2>
+
+<p><code>/*!...*/</code>を使うと出力形式として<code>compressed</code>を指定していても、出力CSSにコメントを残すことができます。バージョン番号やライセンス情報など出力CSSにも必要なものはこれを使って保護すると良いでしょう。</p>
+
+<p>また<code>/*!...*/</code>の中ではSassの変数を展開(インターポレーション)することが可能です。上記例ではバージョン番号を変数として定義しておき、コメント内で<code>#{$version}</code>とすることによって展開させています。この例はあまり意味がない感じですけど……。</p>
+
+<h2>CSSの<code>@import</code>ルール</h2>
+
+<p>CSSの<code>@import</code>ルールはCSSの最初にあらゆるCSSルールに先駆けて記述しなくてはならないので、プライマリSCSSファイルに書く必要があります。Sassを使う場合CSSの<code>@import</code>ルールが必要となるケースはあまりないですが、上記例のように<a href="http://www.google.com/webfonts">Google Web Fonts</a>の読み込みなどで使ったりもします。</p>
+
+<h2>変数定義ファイル</h2>
+
+<p>他の人が作ったSCSS partialsなどを利用する場合、そのpartial向けに設定を行う必要が出てくることがあります。Sassの仕様上、partialを読み込む前に変数設定を行わなければならないので、変数定義ファイルはそれらpartialの読み込みより前で読み込まないとなりません。</p>
+
+<p>partialでユーザーの定義した変数による設定を可能にする<code>!default</code>については数日後に<a href="http://atnd.org/events/21919">LESS &amp; Sass Advent calendar 2011</a>で書きます。</p>
+
+<h2>SCSS partials</h2>
+
+<p>次に自分や他人が作ったSCSS partialを読み込みます。SCSSの<code>@import</code>ではカンマで区切って複数のパラメーターを取ることができるので、まとめて一気に読み込んでも良いでしょう。</p>
+
+<h2>自分で書くSCSSファイル</h2>
+
+<p>最後に自分で書くSCSSファイルを読み込みます。僕は<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_basics.scss">基本的な装飾</a>と<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_layout.scss">レイアウト</a>、そして<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_widget.scss">局所的に使うウィジェット</a>という3つに分けて管理しています。これらに加えて印刷向けのスタイルも<code>@import</code>で読み込んでいますが、これはあまり真似しないほうが良いでしょう。</p>
+
+<hr>
+
+<p>実際に全てのケースでこう細かくモジュール化する必要があるわけではありません。例えば変数が数個しかないのならプライマリSCSSファイルに直接書いても良いでしょう。自分で書くスタイルも数10行程度ならそれもプライマリSCSSファイルに書いた方が編集効率が上がるかもしれませんね。</p>
+
+<p>partialはもうライブラリと呼ぶことにしようかな……。</p>

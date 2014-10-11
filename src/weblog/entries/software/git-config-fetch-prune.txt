@@ -1,0 +1,13 @@
+Gitのfetch/pullサブコマンドで--pruneオプションをデフォルトにする
+
+<p>Gitでは<code>branch -a</code>でリモート・リポジトリーも一覧できる。この一覧には既にリモートでは消されたリモート・リポジトリーも表示される。この一覧を更新するには<code>fetch --prune</code>を使うわけだが、いちいちそうするのは面倒くさい。どうやら<code>fetch.prune</code>を<code>true</code>にするとデフォルトで<code>--prune</code>を付けて<code>fetch</code> (及び<code>pull</code>)を実行してくれるようだ。</p>
+
+<pre><samp>$ <kbd>git config --global fetch.prune true</kbd>
+$ <kbd>git fetch</kbd>
+From https://github.com/hail2u/example
+ x [deleted]         (none)     -&gt; origin/deleted-branch
+</samp></pre>
+
+<p>グローバルに設定して良い場合はこれで常に<code>--prune</code>付きで<code>fetch</code>と<code>pull</code>が実行されるようになる。この設定はプロジェクト・ローカルで特定のリモートに対してのみにも設定でき、<code>remote.origin.prune</code>を<code>true</code>にすると<code>origin</code>に対してのみ<code>--prune</code>付きで実行されるようになる。こちらはグローバルやローカルの<code>fetch.prune</code>よりも強い。</p>
+
+<p>この設定の有用性はリモート・リポジトリーの運用方法やブランチの切り方などによって変わってくる。プロジェクトごとに違うこともあるので、グローバルで設定するとまずいこともあるかもしれない。しかし、僕のように<code>pull --prune</code>すら知らなくて苦労してた人は、思い切ってグローバルで有効にするのも良いだろう。</p>

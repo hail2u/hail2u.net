@@ -1,0 +1,106 @@
+Monday Moduleふたり
+<p><a href="http://naoya.dyndns.org/%7Enaoya/mt/" title="NDO::Weblog">NDO::Weblog</a>のnaoyaさんが<a href="http://naoya.dyndns.org/%7Enaoya/mt/archives/000718.html" title="NDO::Weblog: Monday Module ひとり - HTML::LinkExtor">Monday Module ひとり - HTML::LinkExtor</a>というエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。</p>
+<p><a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ということで、HTMLからURLを抜き出すものなわけですが、単にURLリストではやはり面白くないですね。かなり考えて(嘘、10分くらい)、個人的にこんなのがあったら面白いかもと思い、<a href="http://www.towerrecords.com/" title="Tower Records - No Music, No Life!">Tower Records</a>から検索してサンプル提供されているWindows Mediaのプレイリストを作成するスクリプトにしました。お題のHTML::LinkExtorを2回使ってます。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+# Monday Module: HTML::LinkExtor
+#
+# 引数に与えた文字列でTowerRecords.comを検索し、その結果からWindows
+# Mediaで提供されているサウンドクリップを更に探して、Windows Media
+# Playlistとして出力する
+#
+# Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# 2003/11/20 作成
+
+use strict;
+
+use HTML::LinkExtor;
+use LWP::Simple;
+
+# 引数を取得してURLエンコード
+my $query = shift;
+$query =~ s!([^a-zA-Z0-9_.-])!uc sprintf &quot;%%%02x&quot;, ord($1)!eg;
+
+# 検索
+my $content = LWP::Simple::get(&quot;http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query&quot;);
+
+# HTMLソースから検索結果の一覧のところまでを削除
+$content =~ s!^.*?Sort items by!!is;
+
+# リンク抽出
+my @urls;
+my $p = HTML::LinkExtor-&gt;new(\&amp;callback, &quot;http://www.towerrecords.com/music/&quot;);
+sub callback {
+  my($tag, %links) = @_;
+  if ($tag eq &quot;a&quot;) {
+    push(@urls, values %links);
+  }
+}
+$p-&gt;parse($content);
+
+# CDのURLだけにする(callbackでやれよ)
+my @cds;
+foreach (@urls) {
+  if (m!^http://www\.towerrecords\.com/product\.aspx\?pfid=!) {
+    push(@cds, $_);
+  }
+}
+
+# 重複URLを削除
+my %count;
+@cds = grep(!$count{$_}++, @cds);
+
+my @wms;
+foreach my $cd (@cds) {
+  # CDのURLを取得
+  $content = LWP::Simple::get($cd);
+  @urls = ();
+  $p-&gt;parse($content);
+
+  # Windows MediaのURLだけにする
+  foreach (@urls) {
+    if (m!^http://mfile\.akamai\.com/.*?\.asx\?obj=!) {
+      push(@wms, $_);
+    }
+  }
+}
+
+# Windows Mediaがなかったら終了
+if (!@wms) {
+  exit;
+}
+
+# Windows Media Playlistを出力(再生できるからこれで良さげ)
+print &lt;&lt;&quot;_WPL_&quot;;
+&lt;?wpl version=&quot;1.0&quot;?&gt;
+&lt;smil&gt;
+  &lt;body&gt;
+    &lt;seq&gt;
+_WPL_
+
+foreach my $wm (@wms) {
+  $wm =~ s!&amp;!&amp;amp;!;
+  print qq!      &lt;media src=&quot;$wm&quot;/&gt;\n!;
+}
+
+print &lt;&lt;&quot;_WPL_&quot;;
+    &lt;/seq&gt;
+  &lt;/body&gt;
+&lt;/smil&gt;
+_WPL_
+
+exit;
+</code></pre>
+<p>標準出力に出てくるファイルはこんな感じ。</p>
+<pre><code class="language-xml">&lt;?wpl version=&quot;1.0&quot;?&gt;
+&lt;smil&gt;
+  &lt;body&gt;
+    &lt;seq&gt;
+      &lt;media src=&quot;http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729&amp;amp;urlid=b67557aff4096b9abd&quot;/&gt;
+    &lt;/seq&gt;
+  &lt;/body&gt;
+&lt;/smil&gt;
+</code></pre>
+<p>これをWindows Media Player 9で開いてやれば、ずらーっと再生できます。サンプルのサウンド・クリップなので短いのが難点。リンクを取得する時にHTMLをパースしてタイトルとかを取ってきて各asxファイルのタイトルにしたり、asxのURLからもう一回、LWP::Simple::getしてWindwos MediaそのもののURLを拾って来たり、もっと綺麗なプレイリストになりますが、メンドイので。再生できさえすればいいですしね。</p>
+<p>こんな感じの軽い感じでやると良いかもしれないっすね。なんでMonday Moduleなのかというのはnaoyaさんが言ってるように、語呂が良いからだけです。</p>
+<p>さて、本当にこの企画は始まるのでしょうか！！！</p>

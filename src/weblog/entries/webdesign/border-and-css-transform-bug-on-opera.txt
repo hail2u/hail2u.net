@@ -1,0 +1,25 @@
+borderとCSS Transformを組み合わせるとOperaでバグる
+
+<figure><img src="/images/blog/border-and-css-transform-bug-on-opera.png" alt="写真を紙で挟んだような効果"></figure>
+
+<p><a href="/pub/test/344.html">写真を紙に挟んだような効果をCSSで作った</a>らOperaでバグった話。細い枠線でも起こるけど気づきづらい。太くするととてもわかりやすい。<code>border</code>絡みは大体いずれかのブラウザで残念な結果に終わるという経験則はやはり正しかった。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/345.html">Border and CSS Transform Bug on Opera</a></p>
+
+<p>あーアレをあーしてアレしてるからこうなるんだなというような想像はなんとなくできるので、仕様か実装上の都合なんだろう。<code>border</code>を使った場合は回避策はなさそうなので、<a href="/pub/test/346.html"><code>border</code>を使わない形で書き換えるとOperaではうまくいく</a>……が、今度はWebKitでの<code>box-shadow</code>と<code>transform</code>を組み合わせると要素の端に線が浮き出ることがあるバグ(結構メジャー)にハマる。ウケる。</p>
+
+<p>回避するには<a href="/pub/test/347.html">バグが発生するコードをかけ合わせてやる</a>。</p>
+
+<pre><code class="language-css">.test::before,
+.test::after {
+  border: 1px solid white;
+  position: absolute;
+  width: 62px;
+  height: 62px;
+  content: "";
+  background-color: white;
+  transform: rotate(45deg);
+}
+</code></pre>
+
+<p>太い枠線を使わなければOperaでバグらず、枠線があればWebKitで線が浮き出ることはないので、<code>1px</code>だけ背景色と同じ色で枠線を引いてやるというわけ。バッドノウハウ臭がすごい。</p>

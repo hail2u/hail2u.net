@@ -1,0 +1,59 @@
+SCSSでのグリッドの基本
+
+<p><a href="http://sass-lang..com/">SCSS</a>なCSSフレームワークを使うのでも良いんですけど、ちょっとしたパーツだけグリッド・レイアウトしたいとかには少し大げさです。まぁつまりこのサイトのトップで使っているエントリー一覧をSCSSでどう効率的に調節しながら書いたかという話です。</p>
+
+<p>エントリー一覧のHTMLは簡単にすると以下のような形になっています。</p>
+
+<pre><code class="language-html">&lt;section class="news"&gt;
+  &lt;h2&gt;Lastest entry&lt;/h2&gt;
+  &lt;p&gt;Summary of latest entry.&lt;/p&gt;
+  &lt;hr&gt;
+  &lt;section class="sub-news"&gt;&lt;/section&gt;
+  ...
+  &lt;section class="sub-news"&gt;&lt;/section&gt;
+&lt;/section&gt;
+</code></pre>
+
+<p>グリッドにするためのCSSは以下のような形になります。</p>
+
+<pre><code class="language-css">.sub-news {
+  float: left;
+  width: 256px;
+}
+</code></pre>
+
+<p>CSSでゴリゴリ書く場合は、これにマージンなどを加えていくわけですが、その度に幅も微調整しないとなりません。枠線やパディング、更にはグリッド分割数の増減も加わってくるとカオスです。</p>
+
+<p>SCSSでは変数とそれを利用した計算が可能なので以下のように書くことが可能になります。</p>
+
+<pre><code class="language-scss">$cwidth: 768px;
+$count: 3;
+$gap: 8px;
+
+.news {
+  margin-right: (- $gap);
+  margin-left: (- $gap);
+}
+
+.news h2,
+.news p,
+.news hr {
+  margin-right: $gap;
+  margin-left: $gap;
+}
+
+.sub-news {
+  margin: $gap;
+  padding: $gap;
+  float: left;
+  width: (($cwidth + $gap * 2) / $count - $gap * 2 - $gap * 2);
+}
+</code></pre>
+
+<p>コンテンツの幅とグリッドの分割数、その間隔(<code>float</code>によりマージンが相殺されなくなるので、実際には間隔の半分)などを変数として定義しています。最後の<code>width</code>だけ調整する必要が出てきますが、ひとつひとつ調整することを考えたら大したことはないでしょう。CSSで書いた方が短く書けますが、いかに効率よく書けかつ書き直せるかのバランスが重要なので、そこはあまり気にする必要はないと思います。</p>
+
+<hr>
+
+<p>SCSSの変数は「一ヶ所書き換えることで複数の場所を更新できる！すごい！便利！！１」みたいな感じで紹介されることが多いですが、そうではなくてCSSのプロパティの値に論理的な意味を与えることが可能になるということだと思います。その結果として同じ意味を持たせたいプロパティの値を一気に変更することができるというわけです。上記例では「グリッドのカラムのマージンとパディングを揃える」などという意味を持たせてありますし、「グリッドをキレイに分割して配置するためにコンテナに間隔分だけ負のマージンを与える」などという意味も持たせています。単に繰り返し使うから変数にするというのではなく、変数に意味を持たせそれに沿うようにプロパティで利用することによりメンテナンス性が高いSCSSファイルを作成することができるんじゃないでしょうか。</p>
+
+<p>まぁあまり意味づけしすぎてもいまいち見通しの悪いSCSSファイルになってしまうことがあるので難しいところですけどね。更にはやり過ぎると「そうだクラス名に意味を持たせて使いまわすようにすればいいんじゃね！」とかふりだしに戻る感じになると思います。しばらくはそういった<a href="http://oocss.org/">OOCSS</a>ユーザーと<a href="http://lesscss.org/">LESS</a>やSassユーザーの<del>貶め合い</del><ins>議論</ins>が続くと思うので楽しみですね！</p>

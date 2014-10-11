@@ -1,0 +1,73 @@
+FirefoxのuserContent.cssネタ
+<p>Firefox 1.5 Beta 1よりURLやドメインなどでCSSルールを切り分けることが可能になりました。これによりuserContent.cssがとてもいじりやすくなった(あるサイト向けにテキトウに書いても他のサイトに誤爆しなくなった)ので、userChrome.cssと同じくガリガリいじると楽しいようなそうでもないような感じです。</p>
+<h2><code>_blank</code>なリンクのカーソルを変更</h2>
+<pre><code class="language-css">a[target=&quot;_blank&quot;] {
+  cursor: alias !important;
+}
+</code></pre>
+<figure><img src="/images/blog/cursor-alias.png" alt="aliasを指定してより直感的に"></figure>
+<p><code>cursor: crosshair !important;</code>とかやってる人が多いことと思われますが、1.5 Beta 1から先取りサポートされた<a href="http://www.w3.org/TR/css3-ui/#cursor" title="CSS3 Basic User Interface Module"><code>alias</code></a>にするとより直感的に把握できるようになると思います。</p>
+<h2>View Page Sourceのフォントを固定する</h2>
+<pre><code class="language-css">body#viewsource * {
+  font-family: &#39;MS Gothic&#39;, monospace !important;
+  font-size: 9pt !important;
+}
+</code></pre>
+<p>View Page SourceのフォントはFirefoxのフォント設定に引きずられるようなので、ISO-8859-1なページはCourier Newとかで表示される(ことが多い)のがちょっとアレ。./res/viewsource.cssをいじるという方法でも可能ですが、userContent.cssでやればバージョンアップする度に修正しないで良いので楽です。</p>
+<h2>Bloglinesのチャンネル画像を隠す</h2>
+<pre><code class="language-css">@-moz-document domain(bloglines.com) {
+  div.channel &gt; img {
+    display: none !important;
+  }
+}
+</code></pre>
+<p>無闇にでかい画像だったりすることがたまにあって、すごい邪魔なので。</p>
+<h2>Bloglinesの<code>pre</code>の横幅を制限</h2>
+<pre><code class="language-css">@-moz-document domain(bloglines.com) {
+  td.article pre {
+    width: 90% !important;
+    overflow-x: auto !important;
+  }
+}
+</code></pre>
+<p><code>pre</code>でページの横幅が広がり、横スクロールをしながらでないと読めない状態とかになることが稀にあるので。<code>pre</code>がちょっと読みづらくなる感じですが、まぁそれはそれ。</p>
+<h2>Gmailのメール本文を等幅フォントに</h2>
+<pre><code class="language-css">@-moz-document domain(mail.google.com) {
+  div.msg &gt; div.mb {
+    font-family: monospace !important;
+  }
+}
+</code></pre>
+<p>同じことを実現する拡張とかもありますが、「userContent.cssでやった方がお手軽じゃね？」とかなんとか。</p>
+<h2>ITmediaを見やすく</h2>
+<pre><code class="language-css">@-moz-document domain(itmedia.co.jp) {
+  table.vbody {
+    width: 100% !important;
+  }
+
+  div#logoline {
+    width: 100% !important;
+  }
+
+  div#banner {
+    display: none !important;
+  }
+
+  div.lc {
+    margin-right: -40px !important;
+  }
+
+  div.rc {
+    display: none !important;
+  }
+
+  div.l600 {
+    margin-right: 40px !important;
+  }
+}
+</code></pre>
+<p>右のサイドバーを取っ払い、横幅1024ピクセル以上に最適化されているのを完全にリキッドに(横スクロールバーが出ない)。一部のページで右のサイドバーが重要なナビゲーションになっていたりするようですが気にしない方向で。</p>
+<hr>
+<p>シリーズ化するかどうかは未定。</p>
+<h2>追記</h2>
+<p>ITmediaのCSSルールが横スクロールバーが出たり出なかったりという感じだったので、もう少しマージンに余裕を持たせてみました。これで大体大丈夫な感じ。</p>

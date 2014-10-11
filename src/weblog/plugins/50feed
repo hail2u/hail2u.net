@@ -1,0 +1,68 @@
+# Blosxom Plugin: feed
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2013-07-15T19:09:54+09:00
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package feed;
+
+use strict;
+use vars qw($name $url $email $rights $last_build_date $excerpt $encoded_body);
+
+# --- Configurable variables -----------
+
+my $scheme = 'http://';
+my $domain = 'hail2u.net';
+$name = 'Kyo Nagashima';
+$url = "$scheme$domain/";
+$email = 'kyo@hail2u.net';
+$rights = 'Copyright &#x00a9; 2002-2014, Kyo Nagashima';
+my $tzd_rfc = '+0900';
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+use File::stat;
+
+sub start {
+  $last_build_date = &format_time_rfc(time);
+
+  return 1;
+}
+
+sub story {
+  my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+
+  my $file = "$blosxom::datadir$path/$fn.$blosxom::file_extension";
+
+  $excerpt = $$body_ref;
+  $excerpt =~ tr!\x0D\x0A!!d;
+  $excerpt =~ s!^.*?<p.*?>(.*?)</p>.*?$!$1!;
+  $excerpt =~ s!<.*?>!!g;
+
+  $encoded_body = $$body_ref;
+  $encoded_body =~ s!\b(href|src)="(/.*?)"!$1="$scheme$domain$2"!g;
+  $encoded_body =~ s! class=".*?"!!g;
+  $encoded_body =~ s! itemprop=".*?"!!g;
+
+  return 1;
+}
+
+sub format_time_rfc {
+  my $time = shift;
+
+  my($ss, $nn, $hh, $dd, $mm, $yy, $ww) = localtime($time);
+  $yy = $yy + 1900;
+  $dd = sprintf "%d", $dd;
+  $hh = sprintf "%02d", $hh;
+  $nn = sprintf "%02d", $nn;
+  $ss = sprintf "%02d", $ss;
+  my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  my @wdays  = qw(Sun Mon Tue Wed Thu Fri Sat);
+  $time = "$wdays[$ww], $dd $months[$mm] $yy $hh:$nn:$ss $tzd_rfc";
+
+  return $time;
+}
+
+1;
+# vim:ft=perl

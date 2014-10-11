@@ -1,0 +1,43 @@
+CSSのSource Map
+
+<p>Source Mapは、JavaScriptやCSSをモニョモニョしてなんかするツールのすべてでサポートされていないと、その恩恵は受け切れない。しかしその一方でSource Mapはエンドユーザーに必要なものではないので、開発上必要になるわけではない単純な空白削除等を行うツール程度では生成する意味は無いとも言える。破壊的な、例えばCSSだとCSSプリプロセッサーだけにあれば良いとも言える。</p>
+
+<p>一方でプロダクション環境でもSource Map付きでデバッグできると、バグの特定までの高速化は図れる。系統立てての修正にはならないけれど、まずは特定し修正することが重要であるとは言えるので、やはりSource Mapがサポートされている方がより良いとは言える。</p>
+
+<p>ふりだしに戻る。</p>
+
+<p>僕は破壊的なものでは必ずサポートされているべきで、そうでないものではわざわざ苦労してサポートする程でもないと考えていた。CSSならSassやLESSなどのプリプロセッサーには必須だが、<a href="https://github.com/ai/autoprefixer">autoprefixer</a>や<a href="http://yui.github.io/yuicompressor/css.html">YUI Compressor</a>などのポストプロセッサーではあれば便利程度だ、と。</p>
+
+<p>でも、この「あれば便利」はワークフローで変化するとも思うようになった。例えばLESSで開発していると、明示的にコンパイルすることなく開発を行えるので、ビルドに集約されていく。その場合、Source Mapを使ったレビュー(テスト)はプロダクションと同じようなビルドを通してから行えば無駄は少なくなる。こういったケースではSource Mapがあらゆるツールでサポートされている方が都合が良いだろう。</p>
+
+<hr>
+
+<p><a href="https://github.com/hail2u/node-csswring">CSSWring</a>では利用している<a href="https://github.com/ai/postcss">PostCSS</a>のSource Map生成機能をそのまま利用できるので、ちゃんと使えば生成はもちろん、既存のSource Mapファイルの更新も可能だ(ということになっている)。このウェブサイトでもSource Mapファイルを吐き、サーバーにも置くようにしたので、その動作は確認できるはずだ。数行ずれることがあるが、特にこれといって複雑なことはしていないのでPostCSS側の問題だろう。</p>
+
+<p>簡単な使い方は以下のようになる。</p>
+
+<pre><code class="language-javascript">#!/usr/bin/env node
+
+&#39;use strict&#39;;
+
+var fs = require(&#39;fs&#39;);
+var csswring = require(&#39;csswring&#39;);
+
+var input = &#39;test.css&#39;;
+var output = &#39;test.min.css&#39;;
+
+var css = fs.readFileSync(input, {
+  encoding: &#39;utf8&#39;
+});
+var min = csswring.wring(css, {
+  map: true,
+  from: input,
+  to: output
+});
+fs.writeFileSync(output, min.css);
+fs.writeFileSync(output + &#39;.map&#39;, min.map);
+</code></pre>
+
+<p><code>csswirng.wring()</code>の第二引数はPostCSSの<code>process()</code>関数と同じ引数を取る。<code>map</code>を<code>true</code>にすることによって、Source Mapの生成を必ず行うようになるだろう(自動的に保存されるかは場合による)。<code>from</code>と<code>to</code>は処理前・処理後のCSSファイルのパスを指定する。これらをちゃんと指定しないと出力されるCSSに追加される<code>sourceMappingURL</code>やSource Mapファイル内の参照先パスがおかしくなる。</p>
+
+<p>既存のSource Mapファイルを更新したい場合は<code>map</code>にそのSource Mapファイルの中身を文字列として渡す。けれど既にSource Mapファイルがあるかどうかを自動的にチェックしてくれる機能があるので、あんまり使うことはない。他にインラインSource Mapなども可能なはずだ。</p>
