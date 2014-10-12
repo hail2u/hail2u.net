@@ -14,8 +14,7 @@ module.exports = function (grunt) {
       message: 'Commit',
       push: false,
       remote: 'origin',
-      root: './',
-      submodule: false
+      root: './'
     });
     var file = '--all';
     var cmd = 'git';
@@ -51,45 +50,6 @@ module.exports = function (grunt) {
             options.message + ' ' + file
           ],
           opts: opts
-        }, function (error, result, code) {
-          next(error);
-        });
-      },
-
-      sm_add: function (next) {
-        if (!options.submodule) {
-          return next();
-        }
-
-        grunt.util.spawn({
-          cmd: cmd,
-          args: [
-            'add',
-            options.root
-          ],
-          opts: {
-            stdio: 'inherit'
-          }
-        }, function (error, result, code) {
-          next(error);
-        });
-      },
-
-      sm_commit: function (next) {
-        if (!options.submodule) {
-          return next();
-        }
-
-        grunt.util.spawn({
-          cmd: cmd,
-          args: [
-            'commit',
-            '-m',
-            'Update submodules'
-          ],
-          opts: {
-            stdio: 'inherit'
-          }
         }, function (error, result, code) {
           next(error);
         });
