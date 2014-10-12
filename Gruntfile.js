@@ -132,14 +132,6 @@ module.exports = function (grunt) {
           dry_run: false,
           sync: true
         }
-      },
-
-      xrea: {
-        options: {
-          remote: 'hail2u@s44.xrea.com:~/public_html/hail2u.net/',
-          dry_run: false,
-          sync: true
-        }
       }
     },
 
