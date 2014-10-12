@@ -17,6 +17,7 @@ module.exports = function (grunt) {
       root: './'
     });
     var file = '--all';
+    var message = options.message + ' ' + file;
     var cmd = 'git';
     var opts = {
       cwd: options.root,
@@ -25,6 +26,10 @@ module.exports = function (grunt) {
 
     if (this.data.file) {
       file = path.relative(options.root, this.data.file).replace(/\\/g, '/');
+    }
+
+    if (file === '--all') {
+      message = options.message;
     }
 
     async.series({
@@ -46,8 +51,7 @@ module.exports = function (grunt) {
           cmd: cmd,
           args: [
             'commit',
-            '-m',
-            options.message + ' ' + file
+            '--message="' + message + '"'
           ],
           opts: opts
         }, function (error, result, code) {
