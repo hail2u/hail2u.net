@@ -51,7 +51,8 @@ module.exports = function (grunt) {
           cmd: cmd,
           args: [
             'commit',
-            '--message="' + message + '"'
+            '-m',
+            message
           ],
           opts: opts
         }, function (error, result, code) {
