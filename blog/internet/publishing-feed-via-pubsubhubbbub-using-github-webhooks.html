@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="PubSubHubbubでフィードの更新通知を行う場合、当然RSSやらが更新された後に行う必要がある。GitHub Pagesにウェブサイトをホスティングさせている場合、ビルドにどれくらい時間がかかるかは不定なので、ローカルで行うことは難しい。しかし、当該リポジトリでwebhookをうまく作成してやると、ビルド完了後に自動で更新通知を行わせることが出来るようだ。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>GitHubのwebhooks経由でのPubSubHubbubによるフィードの更新通知 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/internet/publishing-feed-via-pubsubhubbbub-using-github-webhooks.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/internet/hello-github-pages.html">
+
+    
+
+    
+
+    
+      <meta content="GitHubのwebhooks経由でのPubSubHubbubによるフィードの更新通知" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="PubSubHubbubでフィードの更新通知を行う場合、当然RSSやらが更新された後に行う必要がある。GitHub Pagesにウェブサイトをホスティングさせている場合、ビルドにどれくらい時間がかかるかは不定なので、ローカルで行うことは難しい。しかし、当該リポジトリでwebhookをうまく作成してやると、ビルド完了後に自動で更新通知を行わせることが出来るようだ。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/internet/publishing-feed-via-pubsubhubbbub-using-github-webhooks.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/internet/publishing-feed-via-pubsubhubbbub-using-github-webhooks.html" itemprop="url">
+
+        <h1 itemprop="name">GitHubのwebhooks経由でのPubSubHubbubによるフィードの更新通知</h1>
+
+        <footer>
+          <p>on <time datetime="2014-10-15T00:55:00+09:00" itemprop="datePublished">Oct 15, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/internet/">Internet</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://en.wikipedia.org/wiki/PubSubHubbub">PubSubHubbub</a>でフィードの更新通知を行う場合、当然RSSやらが更新された後に行う必要がある。<a href="https://pages.github.com/">GitHub Pages</a>にウェブサイトをホスティングさせている場合、ビルドにどれくらい時間がかかるかは不定なので、ローカルで行うことは難しい。しかし、当該リポジトリでwebhookをうまく作成してやると、ビルド完了後に自動で更新通知を行わせることが出来るようだ。</p>
+
+<p>GitHubリポジトリへの<code>push</code>とGitHub Pagesのビルドには一定でないラグがどうしてもある。<a href="http://jekyllrb.com/">Jekyll</a>を使っているかどうかが一番大きいが、それだけでもないので、何分経てばビルドが終わり、RSSが更新されているかは確実には言えない。かといってその確認をポーリングで行うのはコストが高い。</p>
+
+<p>そこで確実にビルド後に更新通知を行えるように、リポジトリで設定できるwebhook (Settings→Webhooks &amp; Services)のトリガーのひとつである<em>Page build</em>を利用する。ただし、リファレンス実装のPubSubHubbubハブはGitHubのwebhooksが送るデータは解釈できないし、またwebhook側の設定でも通知するデータをカスタマイズすることはできないので、真っ当に利用しようとする場合はプロクシーを作る必要があることになる。</p>
+
+<p>しかし、運が良いことに<a href="https://pubsubhubbub.appspot.com/">GoogleのPubSubHubbubハブ</a>や<a href="https://superfeedr.com/">Superfeedrで作成したハブ</a>は<code>POST</code>だけでなく<em><code>GET</code>でもpublishできる</em>ので、作成するwebhookのPayload URLで<code>hub.url</code>パラメーターの値としてRSS等のURLを指定してやればちゃんと更新を通知することができる。</p>
+
+<pre>https://pubsubhubbub.appspot.com/publish?<mark>hub.mode=publish</mark>&amp;<mark>hub.url=http://example.com/feed</mark></pre>
+
+<p>GoogleのPubSubHubbubハブへ通知する場合はこのようなURLを指定すれば良い。Content-Typeは<code>application/x-www-form-urlencoded</code>に、Secretは空のまま、トリガーの設定はLet me select individual events.を選択してPage buildのみにチェックを入れれば良いだろう。</p>
+
+<p>正常に動いているかは当該webhookのログでは確認できないが、最低限<code>204</code>が返ってきていることだけは確認しておくと良い。実際に通知がうまく言っているかどうかはPubSubHubbubへ対応している<a href="https://feedly.com/">Feedly</a>などのクライアントで確認するしかないと思う。</p>
+
+<p>このウェブサイトのRSSとFeedlyで確認した限りではきちんと動いてるようだ。少なくとも直近3つの記事を公開した時は1分以内にFeedlyで読めるようになっていた。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/internet/hello-github-pages.html">
+  <p>GitHub Pagesへ移行した</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
