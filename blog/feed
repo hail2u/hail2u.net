@@ -12,12 +12,58 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Mon, 13 Oct 2014 00:59:54 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 14 Oct 2014 10:13:01 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" type="application/rss+xml" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>GitHub Pagesへ移行した</title>
+      <link>http://hail2u.net/blog/internet/hello-github-pages.html</link>
+      <description>好みの問題でJekyllはどうしても使う気になれないのでビルド・システムはそのままに、ホスティング先をGitHub Pagesに移動した。DNS設定もTTL通り5分で反映され、www付きのリダイレクトもうまくいっているようだ。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/hello-github-pages.html</guid>
+      <pubDate>Tue, 14 Oct 2014 10:12:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <img alt="GitHub Pages" src="http://hail2u.net/images/blog/hello-github-pages.png">
+</figure>
+
+<p>好みの問題で<a href="http://jekyllrb.com/">Jekyll</a>はどうしても使う気になれないのでビルド・システムはそのままに、ホスティング先を<a href="https://pages.github.com/">GitHub Pages</a>に移動した。DNS設定もTTL通り5分で反映され、www付きのリダイレクトもうまくいっているようだ。</p>
+
+<p>ビルド・システムは変えないと決めたので、今まではrsyncでリモート・サーバーにミラーしていたのを、そのまま<code>build</code>という名前のサブディレクトリーにミラーするように変える方法にした。その後常に<code>gh-pages</code>ブランチをチェックアウトしている<code>build</code>ディレクトリーで全追加(<code>add --all</code>)してからコミット、そして<code>push</code>するという形で公開する。</p>
+
+<ol>
+<li>記事ファイルの作成</li>
+<li>ウェブサイト管理用リポジトリー(プライベート)にコミット</li>
+<li>HTMLとRSS、およびサイトマップの生成</li>
+<li>rsyncで必要なファイルだけサブディレクトリーにミラー</li>
+<li><a href="https://github.com/hail2u/hail2u.net">ウェブサイト公開用リポジトリー</a>にコミット</li>
+</ol>
+
+<p>このようなフローがGruntで自動実行され、ウェブログの記事はさっくりと公開される。</p>
+
+<h2>ドメインの設定</h2>
+
+<p>wwwの無いいわゆるエイペックス・ドメインはAレコードで設定した。<a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/">Tips for configuring an A record with your DNS provider</a>によると、昔と違って今は複数のIPアドレスを割り当ててやる必要があるようで、それだけには注意した。</p>
+
+<pre><samp>C:&gt; <kbd>nslookup hail2u.net</kbd>
+権限のない回答:
+名前:    hail2u.net
+Addresses:  192.30.252.153
+          192.30.252.154
+</samp></pre>
+
+
+<p>www付きでのアクセスをwww無しへリダイレクトさせたい場合は、更にwwwサブドメインをCNAMEを使って<code>hail2u.github.io.</code>に割り当ててやるだけで良いようだ。そうすると対象リポジトリに置かれた<code>CNAME</code>ファイルの中身に従ってGitHub側が良きに計らってくれるようになっている。</p>
+
+<hr>
+
+<p>色々あーでもないこーでもないと考えたりしてる中で、デプロイに使っているオレオレGruntタスクが総入れ替えみたいな感じになった。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>git grepをVimで使う</title>
@@ -258,37 +304,6 @@ console.log(xml);
 <p>これで落ちない。しかし、xml2jsではこのオプションを有効にできないので、自前でジェネレーター関数を作り直す必要がある。</p>
 
 <p>今はxml2jsの<code>Builder()</code>をパクってお茶を濁しているけど、どうにかしないと今後辛そう。プルリクエストを投げたいけど、CoffeeScriptという難敵が。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Terms of Services; Didn’t Read</title>
-      <link>http://hail2u.net/blog/software/tosdr.html</link>
-      <description>利用規約(ToS)やプライバシー・ポリシーはまじめに読むにはかなり長いことがよくある。日本語でもかなりの辛さだが、英語だと更に厳しい。その利用規約を簡単なレーティングと重要そうなポイントのリストで概要を把握できるようにしてくれるブラウザー拡張がTerms of Service; Didn’t Readだ。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/tosdr.html</guid>
-      <pubDate>Sat, 04 Oct 2014 07:50:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <img src="http://hail2u.net/images/blog/tosdr.png" alt="Terms of Services; Didn’t Read">
-</figure>
-
-<p>利用規約(ToS)やプライバシー・ポリシーはまじめに読むにはかなり長いことがよくある。日本語でもかなりの辛さだが、英語だと更に厳しい。その利用規約を簡単なレーティングと重要そうなポイントのリストで概要を把握できるようにしてくれるブラウザー拡張が<a href="https://tosdr.org/">Terms of Service; Didn’t Read</a>だ。</p>
-
-<p><a href="https://chrome.google.com/webstore/detail/terms-of-service-didn%E2%80%99t-r/hjdoplcnndgiblooccencgcggcoihigg">Chrome拡張をインストールするページ</a>にあるスクリーンショットのように、URLバーに表示されるアイコンでレーティングが表示される。さらにそのアイコンをクリックする事で利用規約のポイントの一覧がポップアップで表示されるようになっている。</p>
-<figure>
-  <img src="http://hail2u.net/images/blog/tosdr-duckduckgo.png" alt="DuckDuckGoではURLバーに表示されたAというアイコンをクリックすると、ポップアップでトラッキングをしないことを利用規約で明言していることが確認できる">
-
-  <figcaption>ToS;DR on DuckDuckGo</figcaption>
-</figure>
-
-<p>例えば<a href="https://duckduckgo.com/">DuckDuckGo</a>はクラスAとレーティングされているので、URLバーにアイコンがこのように表示される。このレーティングはラフに開発者が付けた上で、コミュニティーで議論されることになっているようだ。</p>
-
-<p>ポップアップでは利用規約のポイントが列挙される。例えば<a href="https://github.com/">GitHub</a>では、GitHubへプロジェクトの特別な権利を付与しない事が明言されているが、アカウントの削除やデータの削除はいつでも行われる可能性があるということも書かれていることがすぐわかるようになっている。これらのポイントがポジティブなものかネガティブなものかも👍か👎のアイコンと色で容易に判別がつく。</p>
-
-<hr>
-
-<p>現時点では100に満たない数のウェブサービスにしか対応していないので、これを元に使うウェブサービスを決定するのはまだ無理がある。しかし、自分の使っているメジャーなウェブサービスがどのようなものなのかを改めて確認したりするにはそこそこ使えるし、今後に期待できそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>
