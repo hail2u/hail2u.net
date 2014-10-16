@@ -35,10 +35,10 @@ module.exports = function (grunt) {
           ],
           '.grunt/tmp/main.js': [
             'src/js/bower_components/unutm/unutm.js',
-            'src/js/async-csses/async-csses.js'
+            'src/js/async-csses.js'
           ],
           '.grunt/tmp/search.js': [
-            'src/js/popular-pages/popular-pages.js'
+            'src/js/popular-pages.js'
           ]
         }
       }
