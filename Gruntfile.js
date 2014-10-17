@@ -120,6 +120,16 @@ module.exports = function (grunt) {
       }
     },
 
+    pubsubhubbub_publish: {
+      main: {
+        hubUrl: 'http://hail2u.net/feed'
+      },
+
+      blog: {
+        hubUrl: 'http://hail2u.net/blog/feed'
+      }
+    },
+
     sass: {
       options: {
         sourcemap: 'none',
@@ -355,7 +365,8 @@ module.exports = function (grunt) {
     'rebuild:html',
     'merge_feeds:main',
     'rebuild:sitemap',
-    'gitcommit:deploy'
+    'gitcommit:deploy',
+    'pubsubhubbub_publish:main'
   ]);
 
   grunt.registerTask('deploy:html', [
@@ -370,7 +381,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('publish:blog', [
     'gitcommit:publish_blog',
-    'deploy:blog'
+    'deploy:blog',
+    'pubsubhubbub_publish:main'
   ]);
 
   grunt.registerTask('update:blog', [
