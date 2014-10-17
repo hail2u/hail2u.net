@@ -16,7 +16,7 @@ module.exports = function (grunt) {
       remote: 'origin',
       root: './'
     });
-    var file = '--all';
+    var file = grunt.option('file');
     var message = options.message;
     var cmd = 'git';
     var opts = {
@@ -24,12 +24,20 @@ module.exports = function (grunt) {
       stdio: 'inherit'
     };
 
-    if (this.data.file) {
-      file = path.relative(options.root, this.data.file).replace(/\\/g, '/');
+    if (file) {
+      file = path.relative(options.root, file).replace(/\\/g, '/');
+
+      if (file.indexOf('../src/weblog/entries/') === 0) {
+        file = file.replace(/\.\.\/src\/weblog\/entries\//, 'blog/').replace(/\.txt$/, '.html');
+      }
+
+      message = message + ' ' + file;
+    } else {
+      file = '--all';
     }
 
-    if (file !== '--all') {
-      message = message + ' ' + file;
+    if (options.all) {
+      file = '--all';
     }
 
     async.series({

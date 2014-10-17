@@ -239,6 +239,7 @@ module.exports = function (grunt) {
     gitcommit: {
       deploy: {
         options: {
+          all: true,
           branch: 'gh-pages',
           message: 'Deploy',
           push: true,
@@ -249,17 +250,13 @@ module.exports = function (grunt) {
       publish_blog: {
         options: {
           message: 'Publish'
-        },
-
-        file: grunt.option('file')
+        }
       },
 
       update_blog: {
         options: {
           message: 'Update'
-        },
-
-        file: grunt.option('file')
+        }
       },
 
       upload: {
@@ -268,9 +265,7 @@ module.exports = function (grunt) {
           message: 'Upload',
           push: true,
           root: 'build/'
-        },
-
-        file: grunt.option('file')
+        }
       }
     },
 
