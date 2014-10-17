@@ -260,6 +260,17 @@ module.exports = function (grunt) {
         },
 
         file: grunt.option('file')
+      },
+
+      upload: {
+        options: {
+          branch: 'gh-pages',
+          message: 'Upload',
+          push: true,
+          root: 'build/'
+        },
+
+        file: grunt.option('file')
       }
     },
 
@@ -314,6 +325,10 @@ module.exports = function (grunt) {
 
   grunt.registerTask('rebuild:sitemap', [
     'generate_sitemap'
+  ]);
+
+  grunt.registerTask('upload', [
+    'gitcommit:upload'
   ]);
 
   grunt.registerTask('deploy', [
