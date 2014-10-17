@@ -25,7 +25,7 @@
     link.rel = 'stylesheet';
 
     if (!/^https?:/.test(css.href) && location.protocol === 'file:') {
-      css.href = '../..' + css.href;
+      css.href = '../../build' + css.href;
     }
 
     link.href = css.href;

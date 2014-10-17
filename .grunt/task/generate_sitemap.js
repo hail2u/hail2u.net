@@ -32,7 +32,7 @@ module.exports = function (grunt) {
       '/search/'
     ];
 
-    urls = addDocuments('documents/', urls);
+    urls = addDocuments('build/documents/', urls);
     urls = addArticles(path.join(__dirname, '.cache', 'articles.json'), urls);
     grunt.file.write(file, createSitemap(domain, urls));
     grunt.log.writeln('File "' + file + '" created.');
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
         '*.html',
         '!index.html'
       ]).map(function (file) {
-        return '/' + dir + file;
+        return '/documents/' + file;
       });
 
       return to.concat(documents);

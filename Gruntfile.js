@@ -63,7 +63,7 @@ module.exports = function (grunt) {
           '*.css',
           '*.css.map'
         ],
-        dest: 'styles/'
+        dest: 'build/styles/'
       },
 
       js: {
@@ -73,12 +73,18 @@ module.exports = function (grunt) {
           '**/*.js',
           '**/*.js.map'
         ],
-        dest: 'scripts/'
+        dest: 'build/scripts/'
       },
 
       style_guide: {
+        options: {
+          process: function (content, srcpath) {
+            return content.replace(/\.\.\/\.\.\/build\//g, '/');
+          }
+        },
+
         src: 'src/css/test.html',
-        dest: 'about/style-guide/index.html'
+        dest: 'build/about/style-guide/index.html'
       }
     },
 
@@ -111,26 +117,6 @@ module.exports = function (grunt) {
           '**/*.min.css'
         ],
         dest: '.grunt/tmp/'
-      }
-    },
-
-    pubsubhubbub_publish: {
-      main: {
-        hubUrl: 'http://hail2u.net/feed'
-      },
-
-      blog: {
-        hubUrl: 'http://hail2u.net/blog/feed'
-      }
-    },
-
-    rsync: {
-      main: {
-        options: {
-          remote: './build/',
-          dry_run: false,
-          sync: true
-        }
       }
     },
 
@@ -181,7 +167,7 @@ module.exports = function (grunt) {
       options: {
         datadir: 'src/weblog/entries/',
         root: 'src/weblog/',
-        static_dir: 'blog/'
+        static_dir: 'build/blog/'
       },
 
       article: {
@@ -210,6 +196,7 @@ module.exports = function (grunt) {
           '!shared/*',
           '!blog/theme.mustache'
         ],
+        dest: 'build/',
         ext: '.html'
       },
 
@@ -220,6 +207,7 @@ module.exports = function (grunt) {
           'blog/index.mustache',
           'index.mustache'
         ],
+        dest: 'build/',
         ext: '.html'
       },
 
@@ -237,13 +225,14 @@ module.exports = function (grunt) {
         expand: true,
         cwd: 'src/html/',
         src: ['index.mustache'],
+        dest: 'build/',
         ext: '.html'
       }
     },
 
     generate_sitemap: {
       main: {
-        file: 'sitemap.xml'
+        file: 'build/sitemap.xml'
       }
     },
 
@@ -279,9 +268,9 @@ module.exports = function (grunt) {
         options: {
           into: 'src/feed/index.rss',
           feeds: [
-            './blog/feed'
+            'build/blog/feed'
           ],
-          file: './feed'
+          file: 'build/feed'
         }
       }
     }
@@ -329,7 +318,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', [
     'rebuild',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:blog', [
@@ -339,34 +328,34 @@ module.exports = function (grunt) {
     'generate:blog',
     'merge_feeds',
     'rebuild:sitemap',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:css', [
     'rebuild:css',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:js', [
     'rebuild:js',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:home', [
     'rebuild:html',
     'merge_feeds:main',
     'rebuild:sitemap',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:html', [
     'rebuild:html',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:sitemap', [
     'rebuild:sitemap',
-    'upload'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('publish:blog', [
@@ -377,11 +366,6 @@ module.exports = function (grunt) {
   grunt.registerTask('update:blog', [
     'gitcommit:update_blog',
     'deploy:blog'
-  ]);
-
-  grunt.registerTask('upload', [
-    'rsync',
-    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('default', ['connect']);

@@ -84,7 +84,7 @@ module.exports = function (grunt) {
         case 'src/html/index.mustache': {
           data.updates = _loadRSS('src/feed/index.rss');
           data.updates.item = data.updates.item.slice(0, 5);
-          data.articles = _loadRSS('blog/feed');
+          data.articles = _loadRSS('build/blog/feed');
           data.articles.item = data.articles.item.slice(0, 6);
           data.articles.first = data.articles.item.shift();
           var imgs = data.articles.first['content:encoded'].match(/<img.*?>/g);
