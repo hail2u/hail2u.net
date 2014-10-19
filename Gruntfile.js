@@ -79,7 +79,11 @@ module.exports = function (grunt) {
       style_guide: {
         options: {
           process: function (content, srcpath) {
-            return content.replace(/((href|src)=")(\.\.\/\.\.\/build\/|http:\/\/hail2u\.net\/)/g, '$1/');
+            content = content.replace(/((href|src)=")http:\/\/hail2u\.net\//g, '$1/');
+            content = content.replace(/((href|src)=")\.\.\/\.\.\/build\//g, '$1/');
+            content = content.replace(/((href|src)=")\.\//g, '$1/styles/');
+
+            return content;
           }
         },
 
