@@ -58,7 +58,7 @@ module.exports = function (grunt) {
     });
 
     function _loadSharedPartials() {
-      var dir = path.join(dirTemplate, 'shared');
+      var dir = path.join(dirTemplate, 'partial');
       var partials = {};
 
       var files = fs.readdirSync(dir);
