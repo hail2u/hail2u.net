@@ -163,7 +163,7 @@ module.exports = function (grunt) {
     }
 
     function _loadArticles(data) {
-      var cache = path.join(__dirname, '.cache', 'articles.json');
+      var cache = path.relative(process.cwd(), path.join(__dirname, '.cache', 'articles.json'));
       var articles = JSON.parse(grunt.file.read(cache));
       var fileNew = path.basename(grunt.option('file'));
 
@@ -205,7 +205,7 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          grunt.log.writeln('File "' + cache + '" updated.');
+          grunt.log.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
           grunt.file.write(cache, JSON.stringify(articles));
         });
       }
