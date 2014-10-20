@@ -12,12 +12,54 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Mon, 20 Oct 2014 04:02:48 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 21 Oct 2014 04:10:51 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>Modularized Normalize.scssのテスト</title>
+      <link>http://hail2u.net/blog/coding/testing-normalize-scss.html</link>
+      <description>Normalize.cssがv3.0.2に更新されていたので、Modularized Normalize.scssも更新した。変更点はmenu要素の追加とIE10でのa要素の背景削除がbackground-colorプロパティーのみに変わったことで、大きな変化はない。で、追随したv3.0.2をリリース後、テストを少し書き換えた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/testing-normalize-scss.html</guid>
+      <pubDate>Tue, 21 Oct 2014 04:10:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/necolas/normalize.css">Normalize.css</a>がv3.0.2に更新されていたので、<a href="https://github.com/hail2u/normalize.scss">Modularized Normalize.scss</a>も更新した。変更点は<code>menu</code>要素の追加とIE10での<code>a</code>要素の背景削除が<code>background-color</code>プロパティーのみに変わったことで、大きな変化はない。で、追随したv3.0.2をリリース後、テストを少し書き換えた。</p>
+
+<p>Modularized Normalize.scssのテストは以下のような単純なものになっている。</p>
+
+<ol>
+  <li>最新版のNormalize.cssのリリース・ファイルをダウンロード</li>
+  <li>Sassを使ってリポジトリーからビルド</li>
+  <li>両者を圧縮</li>
+  <li>文字列として比較</li>
+</ol>
+
+<p>これでオリジナルのリリース・ファイルとSassでビルドしたものがCSSとして一致するかを確認している。完全なものではないけど、きちんと動作するものをビルド可能かどうかは確認できる。</p>
+
+<p>しかし、今までは圧縮する時にいわゆるバナー・コメント(ライセンスなどが書かれている消すべきではないコメント)を残していた。そのためバージョン番号をインクリメントしてからじゃないと、バージョン番号が一致せずテストが通らなかった。リリースを自動化しているのにも関わらず、手作業でバージョン番号を上げてからテストし、また戻すとかいう頭の悪い作業が必要だった。</p>
+
+<p>よくよく考えたらテストの時だけコメントを全削除すれば良いだけなので、内部で使っている<code>grunt-contrib-cssmin</code>の<code>options</code>で<code>keepSpecialComments: 0</code>にして解決した。</p>
+
+<pre><code>cssmin: {
+  test: {
+    options: {
+      keepSpecialComments: 0,
+    },
+
+    expand: true,
+    filter: &#39;isFile&#39;,
+    src: [&#39;tmp/*.css&#39;]
+  }
+}
+</code></pre>
+
+<p>これでいつでもちゃんとテストできるようになった。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Feedlyでのフィードの分類</title>
@@ -269,34 +311,6 @@ Addresses:  192.30.252.153
 <p>商品の性格的にも値段的にも試着しづらいので、勘で買うしかないのが精神衛生上良くない。少し前に公開されていた<a href="http://www.houyhnhnm.jp/series/008356.html">Houyhnhnmの無地Tシャツ特集</a>を見たりしてみたけど、まったくピンと来ない。そのうちHanesのJapan Fitとかを騙されて買ってしまいそう。</p>
 
 <p>一生買い続けるつもりだったくらい気に入ってたものが消えると言葉にならないくらい辛い。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Mobile Safari 8でposition: fixedした擬似要素が完全に位置が固定されない</title>
-      <link>http://hail2u.net/blog/webdesign/fixed-pseudo-element-on-mobile-safari-8.html</link>
-      <description>Style GuideをMobile Safari 8で確認していて気づいたのだけど、擬似要素をposition: fixedした場合、スクロールしている最中は位置が変化しないようだ。つまりスクロールを止めた後で位置がアップデートされるので、他のブラウザーのように完全に位置が固定されない。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/fixed-pseudo-element-on-mobile-safari-8.html</guid>
-      <pubDate>Sat, 11 Oct 2014 01:01:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <img alt=".elm::before { position: fixed }" src="http://hail2u.net/images/blog/fixed-pseudo-element-on-mobile-safari-8.png">
-</figure>
-
-<p><a href="http://hail2u.net/about/style-guide/">Style Guide</a>をMobile Safari 8で確認していて気づいたのだけど、擬似要素を<code>position: fixed</code>した場合、スクロールしている最中は位置が変化しないようだ。つまりスクロールを止めた後で位置がアップデートされるので、他のブラウザーのように完全に位置が固定されない。</p>
-
-<p>View Demo: <a href="http://hail2u.net/pub/test/598.html">Fixed Pseudo Element on Mobile Safari 8</a></p>
-
-<p>デモでは見出しと概要に続く「Lorem Ipsum」という文字列が擬似要素として仕込んである。これを同時に<code>position: fixed</code>で位置固定しているが、Mobile Safari 8ではスクロール中は位置が変化しないので、画面外にスクロールアウトしてしまう。スクロールを止めると位置固定で期待される位置に改めて描画される。</p>
-
-<p>擬似要素ではない場合は今まで通り完全に位置が固定される。</p>
-
-<hr>
-
-<p>パフォーマンスの向上を受けてか<a href="http://developer.telerik.com/featured/scroll-event-change-ios-8-big-deal/">Mobile Safari 8でJavaScriptでのスクロール・イベントの扱いが少し変わったこと</a>は注目されているが、CSSでは場合によっては似たようなことがまだ起こるようだ。</p>
-
-<p>回避方法はまったく思いつかない。ただバグだとは思うので、そのうち直りそうではある。それまでは擬似要素と位置固定の組み合わせは鬼門と覚えておいた方が良さそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>

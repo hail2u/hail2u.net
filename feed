@@ -12,6 +12,46 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Modularized Normalize.scssのテスト</title>
+      <link>http://hail2u.net/blog/coding/testing-normalize-scss.html</link>
+      <description>Normalize.cssがv3.0.2に更新されていたので、Modularized Normalize.scssも更新した。変更点はmenu要素の追加とIE10でのa要素の背景削除がbackground-colorプロパティーのみに変わったことで、大きな変化はない。で、追随したv3.0.2をリリース後、テストを少し書き換えた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/testing-normalize-scss.html</guid>
+      <pubDate>Tue, 21 Oct 2014 04:10:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://github.com/necolas/normalize.css"&gt;Normalize.css&lt;/a&gt;がv3.0.2に更新されていたので、&lt;a href="https://github.com/hail2u/normalize.scss"&gt;Modularized Normalize.scss&lt;/a&gt;も更新した。変更点は&lt;code&gt;menu&lt;/code&gt;要素の追加とIE10での&lt;code&gt;a&lt;/code&gt;要素の背景削除が&lt;code&gt;background-color&lt;/code&gt;プロパティーのみに変わったことで、大きな変化はない。で、追随したv3.0.2をリリース後、テストを少し書き換えた。&lt;/p&gt;
+
+&lt;p&gt;Modularized Normalize.scssのテストは以下のような単純なものになっている。&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;最新版のNormalize.cssのリリース・ファイルをダウンロード&lt;/li&gt;
+  &lt;li&gt;Sassを使ってリポジトリーからビルド&lt;/li&gt;
+  &lt;li&gt;両者を圧縮&lt;/li&gt;
+  &lt;li&gt;文字列として比較&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;これでオリジナルのリリース・ファイルとSassでビルドしたものがCSSとして一致するかを確認している。完全なものではないけど、きちんと動作するものをビルド可能かどうかは確認できる。&lt;/p&gt;
+
+&lt;p&gt;しかし、今までは圧縮する時にいわゆるバナー・コメント(ライセンスなどが書かれている消すべきではないコメント)を残していた。そのためバージョン番号をインクリメントしてからじゃないと、バージョン番号が一致せずテストが通らなかった。リリースを自動化しているのにも関わらず、手作業でバージョン番号を上げてからテストし、また戻すとかいう頭の悪い作業が必要だった。&lt;/p&gt;
+
+&lt;p&gt;よくよく考えたらテストの時だけコメントを全削除すれば良いだけなので、内部で使っている&lt;code&gt;grunt-contrib-cssmin&lt;/code&gt;の&lt;code&gt;options&lt;/code&gt;で&lt;code&gt;keepSpecialComments: 0&lt;/code&gt;にして解決した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cssmin: {
+  test: {
+    options: {
+      keepSpecialComments: 0,
+    },
+
+    expand: true,
+    filter: &amp;#39;isFile&amp;#39;,
+    src: [&amp;#39;tmp/*.css&amp;#39;]
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これでいつでもちゃんとテストできるようになった。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>Feedlyでのフィードの分類</title>
       <link>http://hail2u.net/blog/rss/reading-in-feedly.html</link>
       <description>Feedlyでは今は亡きGoogle Readerや不死鳥のごとく蘇った(蘇る予定の)livedoor Readerのように全文表示の状態でサクサク読むのはUI的にもパフォーマンス的にも難しい。読む必要があるフィードとそうでないフィードを分類することは、Feedlyではより重要だと言える。</description>
@@ -246,32 +286,6 @@ Addresses:  192.30.252.153
 &lt;p&gt;一生買い続けるつもりだったくらい気に入ってたものが消えると言葉にならないくらい辛い。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>Mobile Safari 8でposition: fixedした擬似要素が完全に位置が固定されない</title>
-      <link>http://hail2u.net/blog/webdesign/fixed-pseudo-element-on-mobile-safari-8.html</link>
-      <description>Style GuideをMobile Safari 8で確認していて気づいたのだけど、擬似要素をposition: fixedした場合、スクロールしている最中は位置が変化しないようだ。つまりスクロールを止めた後で位置がアップデートされるので、他のブラウザーのように完全に位置が固定されない。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/fixed-pseudo-element-on-mobile-safari-8.html</guid>
-      <pubDate>Sat, 11 Oct 2014 01:01:00 +0900</pubDate>
-      <content:encoded>&lt;figure&gt;
-  &lt;img alt=".elm::before { position: fixed }" src="http://hail2u.net/images/blog/fixed-pseudo-element-on-mobile-safari-8.png"&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;&lt;a href="http://hail2u.net/about/style-guide/"&gt;Style Guide&lt;/a&gt;をMobile Safari 8で確認していて気づいたのだけど、擬似要素を&lt;code&gt;position: fixed&lt;/code&gt;した場合、スクロールしている最中は位置が変化しないようだ。つまりスクロールを止めた後で位置がアップデートされるので、他のブラウザーのように完全に位置が固定されない。&lt;/p&gt;
-
-&lt;p&gt;View Demo: &lt;a href="http://hail2u.net/pub/test/598.html"&gt;Fixed Pseudo Element on Mobile Safari 8&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;デモでは見出しと概要に続く「Lorem Ipsum」という文字列が擬似要素として仕込んである。これを同時に&lt;code&gt;position: fixed&lt;/code&gt;で位置固定しているが、Mobile Safari 8ではスクロール中は位置が変化しないので、画面外にスクロールアウトしてしまう。スクロールを止めると位置固定で期待される位置に改めて描画される。&lt;/p&gt;
-
-&lt;p&gt;擬似要素ではない場合は今まで通り完全に位置が固定される。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;パフォーマンスの向上を受けてか&lt;a href="http://developer.telerik.com/featured/scroll-event-change-ios-8-big-deal/"&gt;Mobile Safari 8でJavaScriptでのスクロール・イベントの扱いが少し変わったこと&lt;/a&gt;は注目されているが、CSSでは場合によっては似たようなことがまだ起こるようだ。&lt;/p&gt;
-
-&lt;p&gt;回避方法はまったく思いつかない。ただバグだとは思うので、そのうち直りそうではある。それまでは擬似要素と位置固定の組み合わせは鬼門と覚えておいた方が良さそうだ。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -341,6 +355,6 @@ Addresses:  192.30.252.153
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Mon, 20 Oct 2014 04:02:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 21 Oct 2014 04:10:00 +0900</lastBuildDate>
   </channel>
 </rss>
