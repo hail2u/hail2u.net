@@ -20,8 +20,7 @@ module.exports = function (grunt) {
     var message = options.message;
     var cmd = 'git';
     var opts = {
-      cwd: options.root,
-      stdio: 'inherit'
+      cwd: options.root
     };
 
     if (file) {
@@ -38,6 +37,10 @@ module.exports = function (grunt) {
 
     if (options.all) {
       file = '--all';
+    }
+
+    if (grunt.option('verbose')) {
+      opts.stdio = 'inherit';
     }
 
     async.series({

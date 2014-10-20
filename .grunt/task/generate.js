@@ -51,7 +51,7 @@ module.exports = function (grunt) {
       });
       rendered = rendered.replace(/^[ \t]+$\n/gm, '');
       grunt.file.write(file.dest, rendered);
-      grunt.log.writeln('File "' + file.dest + '" created.');
+      grunt.verbose.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
       done(error);
@@ -205,8 +205,8 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          grunt.log.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
           grunt.file.write(cache, JSON.stringify(articles));
+          grunt.verbose.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
         });
       }
 

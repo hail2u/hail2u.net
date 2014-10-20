@@ -53,6 +53,6 @@ module.exports = function (grunt) {
         allowSurrogateChars: true
       }
     }).buildObject(into));
-    grunt.log.writeln('File "' + options.file + '" created.');
+    grunt.verbose.writeln('File "' + options.file + '" created.');
   });
 };
