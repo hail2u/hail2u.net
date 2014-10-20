@@ -207,7 +207,7 @@ module.exports = function (grunt) {
         cwd: 'src/html/',
         src: [
           '**/*.mustache',
-          '!shared/*',
+          '!partial/*',
           '!blog/theme.mustache'
         ],
         dest: 'build/',
