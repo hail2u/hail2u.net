@@ -10,6 +10,7 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var options = this.options({
+      all: false,
       branch: 'master',
       message: 'Commit',
       push: false,
