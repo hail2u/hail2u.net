@@ -25,10 +25,13 @@ module.exports = function (grunt) {
     };
 
     if (file) {
-      file = path.relative(options.root, file).replace(/\\/g, '/');
+      file = path.resolve(file);
+      file = path.relative(options.root, file);
+      file = file.replace(/\\/g, '/');
 
       if (file.indexOf('../src/weblog/entries/') === 0) {
-        file = file.replace(/\.\.\/src\/weblog\/entries\//, 'blog/').replace(/\.txt$/, '.html');
+        file = file.replace(/\.\.\/src\/weblog\/entries\//, 'blog/');
+        file = file.replace(/\.txt$/, '.html');
       }
 
       message = message + ' ' + file;
