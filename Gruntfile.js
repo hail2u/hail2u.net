@@ -352,8 +352,7 @@ module.exports = function (grunt) {
     'generate:blog',
     'merge_feeds',
     'rebuild:sitemap',
-    'gitcommit:deploy',
-    'pubsubhubbub_publish'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:css', [
@@ -370,8 +369,7 @@ module.exports = function (grunt) {
     'rebuild:html',
     'merge_feeds:main',
     'rebuild:sitemap',
-    'gitcommit:deploy',
-    'pubsubhubbub_publish:main'
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:html', [
