@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>aspect-ratio特性 - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/webdesign/aspect-ratio-feature.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/misc/shoe-sore-and-band-aid-active-flex.html">
+
+    
+
+    
+
+    
+      <meta content="aspect-ratio特性" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/aspect-ratio-feature.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/aspect-ratio-feature.html" itemprop="url">
+
+        <h1 itemprop="name">aspect-ratio特性</h1>
+
+        <footer>
+          <p>on <time datetime="2014-10-27T05:15:00+09:00" itemprop="datePublished">Oct 27, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">ビューポートが16:9以上かどうかの判定に<code>aspect-ratio</code>を使って行おうとしていた。が、<code>min-aspect-ratio: 16/9</code>でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単に<code>max-aspect-ratio</code>でやるべきなだけだった。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/599.html">Detect viewport ratio is 16:9+ or not</a></p>
+
+<p><code>aspect-ratio</code>特性では<a href="http://www.w3.org/TR/css3-mediaqueries/#values"><code>&lt;ratio&gt;</code>という種類の値</a>で指定する。この<code>&lt;ratio&gt;</code>は<code>正の整数/正の整数</code>でしか書くことができない。しかし、<code>min-</code>か<code>max-</code>プリフィックスをつける場合、比率として少数化した値で扱われる。そのため16:9より縦の比率が大きい16:10や16:12にマッチさせたい場合は、<code>max-</code>プリフィックスを使う必要がある。</p>
+
+<p><code>aspect-ratio</code>特性を使ったメディア・クエリーの式は縦幅を分母とした分数で記述し、プリフィックスはそれを少数に変換して考える。こう覚えておくと良さそう。</p>
+
+<hr>
+
+<p>16:9<em>以上</em>という考え方自体が間違っているのかもしれない。縦横比は横幅が基準という印象を持っていて、それに従うと<em>以上</em>で良いと思っていた。けれども縦幅が分母、つまり基準になるこのようなケースもあるようだ。</p>
+
+<p>またこの調査の過程で<code>min-height: 56.25vw</code>とかでも良いんじゃないかと考え、試したのもデモに載せておいた。<code>56.25vw</code>は<code>100vw / 16 * 9</code>で計算した答えで、ビューポートの横幅が<code>100vw</code>で参照できることを利用してる。けれどもFirefox 33と35では動いたものの、Chrome 38 (と40)やInternet Explorer 11 (と12)では動かなかった。これら動かないブラウザーでは、どうも<code>vw</code>単位そのものがメディア・クエリーの式では扱えないみたいだ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/misc/shoe-sore-and-band-aid-active-flex.html">
+  <p>靴擦れとキズパワーパッド</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
