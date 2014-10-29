@@ -51,7 +51,7 @@ module.exports = function (grunt) {
       });
       rendered = rendered.replace(/^[ \t]+$\n/gm, '');
       grunt.file.write(file.dest, rendered);
-      grunt.verbose.writeln('File "' + file.dest + '" created.');
+      grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
       done(error);

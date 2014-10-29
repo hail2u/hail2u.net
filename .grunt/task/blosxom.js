@@ -45,7 +45,7 @@ module.exports = function (grunt) {
       var contents = result.toString().replace(/^[\s\S]*?\r?\n\r?\n/, '') + '\n';
 
       grunt.file.write(options.static_dir + file, contents);
-      grunt.verbose.writeln('File "' + options.static_dir + file + '" created.');
+      grunt.log.writeln('File "' + options.static_dir + file + '" created.');
       done();
     });
   });
