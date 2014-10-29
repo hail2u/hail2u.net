@@ -12,12 +12,59 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Wed, 29 Oct 2014 08:27:44 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 30 Oct 2014 08:39:28 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSSライブラリーはそのままでどうぞ</title>
+      <link>http://hail2u.net/blog/webdesign/dont-process-css-libraries.html</link>
+      <description>Normalize.cssを始めとして、Twitter BootstrapやPureに至るまでCSSのライブラリーは数多くある。それらはそれなりに気をつけて作られているが、他のライブラリーと混ぜることはもとより、ページ制作者のCSSと混ぜることは想定されていない。単純にlink要素を使って先に読ませるか連結するだけで使わないと、開発者はもちろんそれらが使われているページのユーザーにも意図しない不具合が起きる可能性がある。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/dont-process-css-libraries.html</guid>
+      <pubDate>Thu, 30 Oct 2014 08:33:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="http://necolas.github.io/normalize.css/">Normalize.css</a>を始めとして、<a href="http://getbootstrap.com/">Twitter Bootstrap</a>や<a href="http://purecss.io/">Pure</a>に至るまでCSSのライブラリーは数多くある。それらはそれなりに気をつけて作られているが、他のライブラリーと混ぜることはもとより、ページ制作者のCSSと混ぜることは想定されていない。単純に<code>link</code>要素を使って先に読ませるか連結するだけで使わないと、開発者はもちろんそれらが使われているページのユーザーにも意図しない不具合が起きる可能性がある。</p>
+
+<p>そのためNomralize.cssなどではわざわざ以下のように推奨されている。</p>
+
+<figure>
+<blockquote>
+<p>It is recommended that you include the normalize.css file as <mark>untouched library code</mark>.</p>
+</blockquote>
+
+<figcaption>normalize.css v3 - <cite><a href="https://github.com/necolas/normalize.css#install">Install</a></cite></figcaption>
+</figure>
+
+<p>概ねライブラリーと呼ばれるものには手を付けるべきではないが、フロントエンド界隈では軽視されている傾向があるように思う。特にCSSにおいては何よりもまずルールセットの記述順が重要になるため、不可逆な変更を行う最適化ツールはCSSライブラリーと相性は良くない。公式に配布されている最小化済みのものそのまま何もせず使うのが確実だ。</p>
+
+<p>ただ最近は様々な最適化・最小化ツールやそれらを効率的に扱えるビルド・ツールがあるため、公式には最小化済みのものが配布されていないこともある。その場合の判断は難しいが、安全第一なら最小化されてないものをそのまま、バランスをとるなら別個に最小化のみ行いそれを使うのが良いだろう。</p>
+
+<hr>
+
+<p>Gruntやgulpのようなビルド・ツールを使う場合は以下のような順序で処理するようにするべきだろう。</p>
+
+<ol>
+<li>自身のCSS群を連結</li>
+<li>最適化</li>
+<li>最小化</li>
+<li><em>配布されている最小化済みのライブラリーのCSS</em>と手順3で最小化した自身のCSSを連結</li>
+</ol>
+
+<p>手順1はSassなどで行っても構わないだろう。手順2の最適化にはCSSスプライトの生成ツールや<a href="https://github.com/giakki/uncss">UnCSS</a>のような非可逆なツールでの作業が含まれ、手順3では可逆に近い安全な変換作業を行う。ここで自身で書いたCSSを一旦完成させ、最後にCSSライブラリー群と連結させるという形だ。</p>
+
+<p>このようなやり方だと開発中(手順1の辺り)ではCSSライブラリーが含まれない状態になるが、開発中にはパフォーマンスに目をつぶって<code>link</code>要素などでCSSライブラリーを読みこめば良い。パフォーマンスに類する問題は別に計測と解決を行うべきと考えられるので、大きな問題は起こらないはずだ。</p>
+
+<p>このような形でビルドすることのメリットはCSSライブラリーが配布された状態そのままであることが保証されることが挙げられ、それが全てと言って良い。他にライセンスが書かれたコメントを確実に残すことができるというような副次的なメリットもある。ビルド時間も少し速くなるが、それはプロダクションのファイルが少し大きめになりやすいことと相殺される程度のメリットで、特筆するべきようなことではないだろう。</p>
+
+<hr>
+
+<p>僕の作っている<a href="https://github.com/hail2u/normalize.scss">Modularized Normalize.css</a>はページ制作者のCSSに混ぜ込むことを目的としたものなので、このあたりの主張と対立するものだ。が、これについては少し目的が違う。そのうち書くような気がするかもしれないこともない。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>grunt.verbose.log</title>
@@ -267,42 +314,6 @@
 </code></pre>
 
 <p>これでいつでもちゃんとテストできるようになった。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Feedlyでのフィードの分類</title>
-      <link>http://hail2u.net/blog/rss/reading-in-feedly.html</link>
-      <description>Feedlyでは今は亡きGoogle Readerや不死鳥のごとく蘇った(蘇る予定の)livedoor Readerのように全文表示の状態でサクサク読むのはUI的にもパフォーマンス的にも難しい。読む必要があるフィードとそうでないフィードを分類することは、Feedlyではより重要だと言える。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>RSS</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/rss/reading-in-feedly.html</guid>
-      <pubDate>Mon, 20 Oct 2014 04:02:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="https://feedly.com/">Feedly</a>では今は亡き<a href="http://www.google.com/reader/about/">Google Reader</a>や不死鳥のごとく蘇った(蘇る予定の)<a href="http://reader.livedoor.com/">livedoor Reader</a>のように全文表示の状態でサクサク読むのはUI的にもパフォーマンス的にも難しい。読む必要があるフィードとそうでないフィードを分類することは、Feedlyではより重要だと言える。</p>
-
-<h2>Collectionを使う</h2>
-
-<figure>
-  <img alt="★と☆を使ってCollectionを作成すると、サイドバーにわかりやすい形でフィードが整理される" src="http://hail2u.net/images/blog/feedly-rating-collection.png">
-</figure>
-
-<p>Collectionはフォルダー分けやタグ付けと似ている機能で、登録したフィードを分類する仕組み。複数のCollectionに所属できるので、タグ付けと言った方がわかりやすいかもしれないが、タグはタグで別にそういう機能がある。</p>
-
-<p>ldRのレーティングのような仕組みは、レーティングっぽい名前でCollectionを作成するだけで実現できる。Collectionのソート順はドラッグ・アンド・ドロップで入れ替えられるので、ソート順は特に考慮する必要はない。絵文字や全角記号は通らない……と思いきやその場ではうまく表示されないことがあるものの<kbd>F5</kbd>で再読み込みするとちゃんと表示されるので、わかりやすく★★★☆☆などという名前でCollectionを作ったりすることもできないことはない。</p>
-
-<h2>Must Readを使う</h2>
-
-<figure>
-  <img alt="フィードの登録状態を編集できる画面には、Must Readというフラグの有効・無効を切り替えられるチェックボックスが、タイトルのすぐ下に表示されている" src="http://hail2u.net/images/blog/feedly-edit-subscription.png">
-</figure>
-
-<p>もうひとつのMust Readは各フィードを登録する時などにつけることができるフラグ。これを有効にしたフィードがひとつでもあると、☆のアイコン付きでMust Readsという項目がサイドバーに作成されるので、そこからアクセスすることになる。</p>
-
-<p>僕はこっちでやっている。Must ReadsだけをFull Articlesにして、それを消化した後、残りの未読をCardsでざっと流し読む。暇じゃなさそうな時はMust Readsを消化したら残りは全部既読にするようにしてたりして、未読が残らないように。</p>
-
-<hr>
-
-<p>ldR終了記念の記事として書いていた部分がなくなったらこんなことしか書くことなくなった。</p>]]></content:encoded>
     </item>
 
   </channel>
