@@ -12,12 +12,40 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Wed, 5 Nov 2014 10:18:45 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 6 Nov 2014 19:00:02 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>印刷向けCSSとそのパフォーマンス</title>
+      <link>http://hail2u.net/blog/webdesign/print-css-and-its-performance.html</link>
+      <description>Does a print CSS file slow your site down?という印刷向けCSSの書き方によるパフォーマンスの違いについての記事を読んだ。この辺りの話はクリティカルなんちゃらのあれなので特に目新しくはないのだけど、最近のChromeが賢くなっているのはちょっと驚いた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/print-css-and-its-performance.html</guid>
+      <pubDate>Thu, 06 Nov 2014 18:59:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://www.nccgroup.com/en/blog/2014/10/does-a-print-css-file-slow-your-site-down/">Does a print CSS file slow your site down?</a>という印刷向けCSSの書き方によるパフォーマンスの違いについての記事を読んだ。この辺りの話はクリティカルなんちゃらのあれなので特に目新しくはないのだけど、最近のChromeが賢くなっているのはちょっと驚いた。</p>
+
+<p>きっとメディア・タイプが一致しない<code>link</code>要素で参照されたCSSは読み込んでもレンダリングには使わないという感じなのだろう(調べてない)。不一致のメディア・タイプなのに待つのは良く意味がわからないので、他のブラウザーでもこのような実装になってもおかしくなさそう。というかなって欲しい。</p>
+
+<p>この記事の結論としては、</p>
+
+<ol>
+<li><code>@media print {}</code>を使ってメインのCSSに混ぜる</li>
+<li><code>html</code>要素の閉じタグの直前に置く</li>
+<li>JavaScriptで動的に追加</li>
+</ol>
+
+<p>という感じになってる。JavaScriptでやる場合は、普通に<code>head</code>要素内に<code>rel</code>属性抜き(invalid)で書いて、後で<code>rel=&quot;stylesheet&quot;</code>を追加するような感じで良い。が、やはり<code>script</code>要素の動的追加と同じような形で追加すると、HTMLをいじらないで済むので楽そう。</p>
+
+<hr>
+
+<p>クリティカルなんちゃらのアレでもはや<code>@media print {}</code>で混ぜるのは悪手っぽい雰囲気なので、僕はJavaScriptかなーという感じになっている。このウェブサイトでもそうなってる。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Camperのサイドゴア・ブーツ</title>
@@ -226,30 +254,6 @@
 <hr>
 
 <p>今のところURLを維持したまま直す方法がないのでこのままにしておく。Content-Type以外にもCache-Controlといったパフォーマンスに直結するヘッダーも変更したいと感じることも多く、ホスティング自体は静的ファイルのみだが、<code>.htaccess</code>的なものは使えるレンタル・サーバーが欲しいなという気持ちが強まってきた。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>aspect-ratio特性</title>
-      <link>http://hail2u.net/blog/webdesign/aspect-ratio-feature.html</link>
-      <description>ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/aspect-ratio-feature.html</guid>
-      <pubDate>Mon, 27 Oct 2014 05:15:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>ビューポートが16:9以上かどうかの判定に<code>aspect-ratio</code>を使って行おうとしていた。が、<code>min-aspect-ratio: 16/9</code>でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単に<code>max-aspect-ratio</code>でやるべきなだけだった。</p>
-
-<p>View Demo: <a href="http://hail2u.net/pub/test/599.html">Detect viewport ratio is 16:9+ or not</a></p>
-
-<p><code>aspect-ratio</code>特性では<a href="http://www.w3.org/TR/css3-mediaqueries/#values"><code>&lt;ratio&gt;</code>という種類の値</a>で指定する。この<code>&lt;ratio&gt;</code>は<code>正の整数/正の整数</code>でしか書くことができない。しかし、<code>min-</code>か<code>max-</code>プリフィックスをつける場合、比率として少数化した値で扱われる。そのため16:9より縦の比率が大きい16:10や16:12にマッチさせたい場合は、<code>max-</code>プリフィックスを使う必要がある。</p>
-
-<p><code>aspect-ratio</code>特性を使ったメディア・クエリーの式は縦幅を分母とした分数で記述し、プリフィックスはそれを少数に変換して考える。こう覚えておくと良さそう。</p>
-
-<hr>
-
-<p>16:9<em>以上</em>という考え方自体が間違っているのかもしれない。縦横比は横幅が基準という印象を持っていて、それに従うと<em>以上</em>で良いと思っていた。けれども縦幅が分母、つまり基準になるこのようなケースもあるようだ。</p>
-
-<p>またこの調査の過程で<code>min-height: 56.25vw</code>とかでも良いんじゃないかと考え、試したのもデモに載せておいた。<code>56.25vw</code>は<code>100vw / 16 * 9</code>で計算した答えで、ビューポートの横幅が<code>100vw</code>で参照できることを利用してる。けれどもFirefox 33と35では動いたものの、Chrome 38 (と40)やInternet Explorer 11 (と12)では動かなかった。これら動かないブラウザーでは、どうも<code>vw</code>単位そのものがメディア・クエリーの式では扱えないみたいだ。</p>]]></content:encoded>
     </item>
 
   </channel>

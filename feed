@@ -12,6 +12,32 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>印刷向けCSSとそのパフォーマンス</title>
+      <link>http://hail2u.net/blog/webdesign/print-css-and-its-performance.html</link>
+      <description>Does a print CSS file slow your site down?という印刷向けCSSの書き方によるパフォーマンスの違いについての記事を読んだ。この辺りの話はクリティカルなんちゃらのあれなので特に目新しくはないのだけど、最近のChromeが賢くなっているのはちょっと驚いた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/print-css-and-its-performance.html</guid>
+      <pubDate>Thu, 06 Nov 2014 18:59:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://www.nccgroup.com/en/blog/2014/10/does-a-print-css-file-slow-your-site-down/"&gt;Does a print CSS file slow your site down?&lt;/a&gt;という印刷向けCSSの書き方によるパフォーマンスの違いについての記事を読んだ。この辺りの話はクリティカルなんちゃらのあれなので特に目新しくはないのだけど、最近のChromeが賢くなっているのはちょっと驚いた。&lt;/p&gt;
+
+&lt;p&gt;きっとメディア・タイプが一致しない&lt;code&gt;link&lt;/code&gt;要素で参照されたCSSは読み込んでもレンダリングには使わないという感じなのだろう(調べてない)。不一致のメディア・タイプなのに待つのは良く意味がわからないので、他のブラウザーでもこのような実装になってもおかしくなさそう。というかなって欲しい。&lt;/p&gt;
+
+&lt;p&gt;この記事の結論としては、&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;@media print {}&lt;/code&gt;を使ってメインのCSSに混ぜる&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html&lt;/code&gt;要素の閉じタグの直前に置く&lt;/li&gt;
+&lt;li&gt;JavaScriptで動的に追加&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;という感じになってる。JavaScriptでやる場合は、普通に&lt;code&gt;head&lt;/code&gt;要素内に&lt;code&gt;rel&lt;/code&gt;属性抜き(invalid)で書いて、後で&lt;code&gt;rel=&amp;quot;stylesheet&amp;quot;&lt;/code&gt;を追加するような感じで良い。が、やはり&lt;code&gt;script&lt;/code&gt;要素の動的追加と同じような形で追加すると、HTMLをいじらないで済むので楽そう。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;クリティカルなんちゃらのアレでもはや&lt;code&gt;@media print {}&lt;/code&gt;で混ぜるのは悪手っぽい雰囲気なので、僕はJavaScriptかなーという感じになっている。このウェブサイトでもそうなってる。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>Camperのサイドゴア・ブーツ</title>
       <link>http://hail2u.net/blog/gadget/camper-mil-chelsea-boots.html</link>
       <description>8年くらい履いてたシャーク・ソールのブーツがそろそろ寿命っぽいので、去年辺りからブーツを探していた。サイドゴア・ブーツのぬるっとした見た目が好きなので、ドレスっぽくなくカジュアルすぎないものを色々探した結果、CamperのMilシリーズのサイドゴア・ブーツを買った。32400円。</description>
@@ -203,28 +229,6 @@
 &lt;p&gt;今のところURLを維持したまま直す方法がないのでこのままにしておく。Content-Type以外にもCache-Controlといったパフォーマンスに直結するヘッダーも変更したいと感じることも多く、ホスティング自体は静的ファイルのみだが、&lt;code&gt;.htaccess&lt;/code&gt;的なものは使えるレンタル・サーバーが欲しいなという気持ちが強まってきた。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>aspect-ratio特性</title>
-      <link>http://hail2u.net/blog/webdesign/aspect-ratio-feature.html</link>
-      <description>ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/aspect-ratio-feature.html</guid>
-      <pubDate>Mon, 27 Oct 2014 05:15:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;ビューポートが16:9以上かどうかの判定に&lt;code&gt;aspect-ratio&lt;/code&gt;を使って行おうとしていた。が、&lt;code&gt;min-aspect-ratio: 16/9&lt;/code&gt;でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単に&lt;code&gt;max-aspect-ratio&lt;/code&gt;でやるべきなだけだった。&lt;/p&gt;
-
-&lt;p&gt;View Demo: &lt;a href="http://hail2u.net/pub/test/599.html"&gt;Detect viewport ratio is 16:9+ or not&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;aspect-ratio&lt;/code&gt;特性では&lt;a href="http://www.w3.org/TR/css3-mediaqueries/#values"&gt;&lt;code&gt;&amp;lt;ratio&amp;gt;&lt;/code&gt;という種類の値&lt;/a&gt;で指定する。この&lt;code&gt;&amp;lt;ratio&amp;gt;&lt;/code&gt;は&lt;code&gt;正の整数/正の整数&lt;/code&gt;でしか書くことができない。しかし、&lt;code&gt;min-&lt;/code&gt;か&lt;code&gt;max-&lt;/code&gt;プリフィックスをつける場合、比率として少数化した値で扱われる。そのため16:9より縦の比率が大きい16:10や16:12にマッチさせたい場合は、&lt;code&gt;max-&lt;/code&gt;プリフィックスを使う必要がある。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;aspect-ratio&lt;/code&gt;特性を使ったメディア・クエリーの式は縦幅を分母とした分数で記述し、プリフィックスはそれを少数に変換して考える。こう覚えておくと良さそう。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;16:9&lt;em&gt;以上&lt;/em&gt;という考え方自体が間違っているのかもしれない。縦横比は横幅が基準という印象を持っていて、それに従うと&lt;em&gt;以上&lt;/em&gt;で良いと思っていた。けれども縦幅が分母、つまり基準になるこのようなケースもあるようだ。&lt;/p&gt;
-
-&lt;p&gt;またこの調査の過程で&lt;code&gt;min-height: 56.25vw&lt;/code&gt;とかでも良いんじゃないかと考え、試したのもデモに載せておいた。&lt;code&gt;56.25vw&lt;/code&gt;は&lt;code&gt;100vw / 16 * 9&lt;/code&gt;で計算した答えで、ビューポートの横幅が&lt;code&gt;100vw&lt;/code&gt;で参照できることを利用してる。けれどもFirefox 33と35では動いたものの、Chrome 38 (と40)やInternet Explorer 11 (と12)では動かなかった。これら動かないブラウザーでは、どうも&lt;code&gt;vw&lt;/code&gt;単位そのものがメディア・クエリーの式では扱えないみたいだ。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -294,6 +298,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Wed, 05 Nov 2014 10:18:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 06 Nov 2014 18:59:00 +0900</lastBuildDate>
   </channel>
 </rss>
