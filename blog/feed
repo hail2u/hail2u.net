@@ -12,12 +12,53 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Mon, 17 Nov 2014 02:51:35 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 18 Nov 2014 01:47:57 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSSWringで標準入力を読めるように</title>
+      <link>http://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html</link>
+      <description>先週末の某カンファレンスの方面から無言の圧力を感じたので、CSSWringのCLIプログラムをパイプで繋げられるようにした。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が-だった場合に……で実装した。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html</guid>
+      <pubDate>Tue, 18 Nov 2014 01:47:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>先週末の某カンファレンスの方面から無言の圧力を感じたので、<a href="https://github.com/hail2u/node-csswring">CSSWring</a>のCLIプログラムを<a href="https://github.com/hail2u/node-csswring/commit/95d5346b096bf1063afbe4add18f46b82405032d">パイプで繋げられるように</a>した。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が<code>-</code>だった場合に……で実装した。</p>
+
+<p>利用方法は今まで入力ファイル名を指定した部分を<code>-</code>に差し替えるだけで良い。特に今までの使い方を阻害することもないと思う。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring -</kbd>
+$ <kbd>csswring - &lt;input.css</kbd>
+</samp></pre>
+
+<p>もちろんこのどちらでも大丈夫になっている。この場合は出力ファイルを省略しているので標準出力へ処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring - out.css</kbd>
+</samp></pre>
+
+<p>標準入力を読みつつ、出力ファイルを指定することもできる。この場合は<code>out.css</code>に処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring --sourcemap -</kbd>
+$ <kbd>cat input.css | csswring --sourcemap - out.css</kbd>
+</samp></pre>
+
+<p>Source Mapsも問題なく出力される。前者ではインラインでData URI化されて埋め込まれ、後者では<code>out.css.map</code>に吐かれる。</p>
+
+<hr>
+
+<p>実装では<a href="http://hail2u.net/blog/coding/nodejs-read-stdin.html">標準入力を同期的に読もうか</a>とも考えたが、同期に固執するほどではないのでNode.js界隈のCLIプログラム達でメジャーな<code>process.openStdin()</code>を使って実装した。<code>process.openStdin()</code>はドキュメントに載っていない気がする。ここが非同期になった関係で出力部分に少し手を入れることになったが、概ねそのままで済んだので新たにバグは入っていないと思う。</p>
+
+<p>ここらへんまで面倒を見てくれるNode.jsパッケージなどもいくつかあるようだ。しかしインタラクティブな入力を処理する必要もないプログラムなので、この程度のもので良いだろう。</p>
+
+<hr>
+
+<p><a href="https://github.com/postcss/postcss/issues/134">PostCSS v3のパーサーのバグ</a>の修正を待って、まとめてリリースする予定だ。そのうち気が向いたら出力の方も善処する。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>PostCSS v3の変更点</title>
@@ -243,26 +284,6 @@ exit
 <p>ConEmuは色々と気持ち悪い。特に設定を探すために設定画面とかをずっと見つめてると使う気が失せてくる。後で設定を変える必要があることはほとんどないので、最初の設定という壁を超えられるかが使うための鍵と言えそう。そういう意味で<a href="http://bliker.github.io/cmder/">cmder</a>はちょっとバカにしていたけれど存在意義は大きいんだなと思った。実際僕もこれを見てConEmu使ってみようかという気分になったし。</p>
 
 <p>最近のConEmuは起動時にタブ(のプログラム)とそのカレント・ディレクトリーを復帰できるようにもなった(Settings→Startup→Auto save/restore opened tabs)。カジュアルにターミナルを使えるようになって平和だ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>ゴールドポイント・カードの廃棄</title>
-      <link>http://hail2u.net/blog/misc/disposing-of-gold-point-card.html</link>
-      <description>ヨドバシカメラのゴールドポイント・カードを廃棄した。渡したら「あっはい」みたいな感じで即廃棄してくれるかと思ったら「えっ？」みたいな応対だった。廃棄の際にデータの削除も行う場合は身分証が必要で、残ったポイントの削除への了承も必要だった。無事、廃棄でき、財布からカードが一枚減った。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/disposing-of-gold-point-card.html</guid>
-      <pubDate>Sat, 08 Nov 2014 09:17:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>ヨドバシカメラのゴールドポイント・カードを廃棄した。渡したら「あっはい」みたいな感じで即廃棄してくれるかと思ったら「えっ？」みたいな応対だった。廃棄の際にデータの削除も行う場合は身分証が必要で、残ったポイントの削除への了承も必要だった。無事、廃棄でき、財布からカードが一枚減った。</p>
-
-<p>カード類を極力減らしたい期になってる。邪魔とか探すの面倒とかわかりやすい理由が最も大きなもの。小さな理由としては、財布を新しくしたいことがある。その時にカード収納数といった実用的な部分でなく、デザインや触り心地だけで決めたい。少し前から財布をかばんにしまうようにしたので、このままカードが多いと実用性を重視してバカでかい財布買っちゃいそう。</p>
-
-<p>色々なメンバーズ・カード的なものを持っていないと、会計時に「持ってないです」からの「いらないです」のコンボを決めないとならないのは面倒な気がするけれど、「持ってないです」と「いらないです」を言う人が少しずつ増えればそのうち変化するんじゃないかと思う。しないか。しないな。オプトイン！</p>
-
-<hr>
-
-<p>他のカードはともかく、ヨドバシのゴールドポイント・カードについては必要になったら<a href="https://itunes.apple.com/jp/app/yodobashigorudopointokado/id531033552?l=en&amp;mt=8">iOSアプリ</a>にすれば良さそう。統合すればポイント移せて……みたいなのもあったけど、最近はそんなにヨドバシで買い物しなくなったので、必要になるまでは無くても大丈夫だと考えてそうした。</p>]]></content:encoded>
     </item>
 
   </channel>

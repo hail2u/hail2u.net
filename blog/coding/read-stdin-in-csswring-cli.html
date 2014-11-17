@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    
+    <meta name="description" content="先週末の某カンファレンスの方面から無言の圧力を感じたので、CSSWringのCLIプログラムをパイプで繋げられるようにした。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が-だった場合に……で実装した。">
+    <meta name="generator" content="blosxom v2.1.2+dev">
+
+
+
+
+<meta name="viewport" content="width=device-width">
+
+    <title>CSSWringで標準入力を読めるように - Weblog - Hail2u.net</title>
+
+    <link rel="alternate" type="application/rss+xml" href="/feed">
+<link rel="author" href="/about/">
+<link rel="canonical" href="http://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html">
+<link rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+    <link rel="prev" href="http://hail2u.net/blog/coding/postcss-v3.html">
+
+    
+
+    
+
+    
+      <meta content="CSSWringで標準入力を読めるように" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="先週末の某カンファレンスの方面から無言の圧力を感じたので、CSSWringのCLIプログラムをパイプで繋げられるようにした。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が-だった場合に……で実装した。" property="og:description">
+      <meta content="http://hail2u.net/images/favicon-152.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@hail2unet">
+
+    <link rel="stylesheet" href="/styles/style.min.css">
+    <script async src="/scripts/main.min.js"></script>
+
+
+<!-- Google Analytics -->
+<script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42525667-1', 'auto');
+  ga('send', 'pageview');
+</script>
+  </head>
+
+  <body class="permalink">
+    <header role="banner">
+  <h1><a href="/"><img src="/images/logo.min.svg" alt="Hail2u.net"></a></h1>
+
+  
+
+  <nav>
+    <ul>
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+
+      <li><a href="/documents/">Documents</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+    <main>
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/images/favicon-152.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html" itemprop="url">
+
+        <h1 itemprop="name">CSSWringで標準入力を読めるように</h1>
+
+        <footer>
+          <p>on <time datetime="2014-11-18T01:47:00+09:00" itemprop="datePublished">Nov 18, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">先週末の某カンファレンスの方面から無言の圧力を感じたので、<a href="https://github.com/hail2u/node-csswring">CSSWring</a>のCLIプログラムを<a href="https://github.com/hail2u/node-csswring/commit/95d5346b096bf1063afbe4add18f46b82405032d">パイプで繋げられるように</a>した。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が<code>-</code>だった場合に……で実装した。</p>
+
+<p>利用方法は今まで入力ファイル名を指定した部分を<code>-</code>に差し替えるだけで良い。特に今までの使い方を阻害することもないと思う。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring -</kbd>
+$ <kbd>csswring - &lt;input.css</kbd>
+</samp></pre>
+
+<p>もちろんこのどちらでも大丈夫になっている。この場合は出力ファイルを省略しているので標準出力へ処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring - out.css</kbd>
+</samp></pre>
+
+<p>標準入力を読みつつ、出力ファイルを指定することもできる。この場合は<code>out.css</code>に処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring --sourcemap -</kbd>
+$ <kbd>cat input.css | csswring --sourcemap - out.css</kbd>
+</samp></pre>
+
+<p>Source Mapsも問題なく出力される。前者ではインラインでData URI化されて埋め込まれ、後者では<code>out.css.map</code>に吐かれる。</p>
+
+<hr>
+
+<p>実装では<a href="/blog/coding/nodejs-read-stdin.html">標準入力を同期的に読もうか</a>とも考えたが、同期に固執するほどではないのでNode.js界隈のCLIプログラム達でメジャーな<code>process.openStdin()</code>を使って実装した。<code>process.openStdin()</code>はドキュメントに載っていない気がする。ここが非同期になった関係で出力部分に少し手を入れることになったが、概ねそのままで済んだので新たにバグは入っていないと思う。</p>
+
+<p>ここらへんまで面倒を見てくれるNode.jsパッケージなどもいくつかあるようだ。しかしインタラクティブな入力を処理する必要もないプログラムなので、この程度のもので良いだろう。</p>
+
+<hr>
+
+<p><a href="https://github.com/postcss/postcss/issues/134">PostCSS v3のパーサーのバグ</a>の修正を待って、まとめてリリースする予定だ。そのうち気が向いたら出力の方も善処する。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+  <!-- Hail2u.net (Main) -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8712792805045949"
+       data-ad-slot="1723739447"
+       data-ad-format="rectangle, horizontal"></ins>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</aside>
+      
+
+      
+        <nav class="read-older">
+          <a rel="prev" href="http://hail2u.net/blog/coding/postcss-v3.html">
+  <p>PostCSS v3の変更点</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside role="search">
+  <!-- Google Custom Search Engine -->
+  <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
+    <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
+    <input type="hidden" name="ie" value="UTF-8">
+    <input type="search" name="q" size="32">
+    <input type="submit" name="sa" value="Search">
+  </form>
+</aside>
+    <footer role="contentinfo">
+  <section class="footlinks">
+    <ul>
+      <li><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a></li>
+      <li><a rel="alternate" type="application/rss+xml" href="/feed">RSS</a></li>
+    </ul>
+  </section>
+
+  <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a rel="author" href="/about/" itemprop="url">Kyo Nagashima</a></span>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
