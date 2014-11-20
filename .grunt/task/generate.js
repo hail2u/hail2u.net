@@ -66,7 +66,7 @@ module.exports = function (grunt) {
       for (var i = 0, l = files.length; i < l; i++) {
         var file = files[i];
         var name = path.basename(file, '.mustache');
-        partials[name] = grunt.file.read(path.join(dir, file)).replace(/\n$/, '');
+        partials[name] = grunt.file.read(path.join(dir, file));
       }
 
       return partials;
