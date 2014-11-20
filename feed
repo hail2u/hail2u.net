@@ -12,6 +12,64 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Handlebars.js v2.0.0における出力の変化</title>
+      <link>http://hail2u.net/blog/coding/output-changes-on-handlebarsjs-v2.0.0.html</link>
+      <description>Handlebars.jsのv2.0.0が9月に出ていたようだ。今更気付いたので更新してみたら、出力が少し変わっていた。改行や空白の扱いがMustacheのspec通りになったということらしい。パーシャルで親テンプレートのインデントが継承されたり、改行が二重にならなくなったりと、おおよそ直感的な出力に変わったと言えそう。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/output-changes-on-handlebarsjs-v2.0.0.html</guid>
+      <pubDate>Fri, 21 Nov 2014 01:44:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://github.com/wycats/handlebars.js/releases/tag/v2.0.0"&gt;Handlebars.jsのv2.0.0&lt;/a&gt;が9月に出ていたようだ。今更気付いたので更新してみたら、出力が少し変わっていた。改行や空白の扱いが&lt;a href="https://github.com/mustache/spec"&gt;Mustacheのspec&lt;/a&gt;通りになったということらしい。パーシャルで親テンプレートのインデントが継承されたり、改行が二重にならなくなったりと、おおよそ直感的な出力に変わったと言えそう。&lt;/p&gt;
+
+&lt;p&gt;例えば、以下のようなパーシャルを呼ぶテンプレートがあるとする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
+  {{&amp;gt; navigation}}
+&amp;lt;/header&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;navigationパーシャルは以下のようなもので、インデントなし・最後に改行ありという普通に書いたものとする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;ul&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/&amp;quot;&amp;gt;Home&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/features&amp;quot;&amp;gt;Features&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/pricing&amp;quot;&amp;gt;Pricing&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/support&amp;quot;&amp;gt;Support&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;旧バージョンでは以下のように出力されていた。インデントが無視され、最後の改行が重なる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
+  &amp;lt;ul&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/&amp;quot;&amp;gt;Home&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/features&amp;quot;&amp;gt;Features&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/pricing&amp;quot;&amp;gt;Pricing&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/support&amp;quot;&amp;gt;Support&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+
+&amp;lt;/header&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;{{&amp;gt; navigation}}&lt;/code&gt;が書いてあったところにただそのまま流し込んだだけと言って良い。対してv2.0.0では以下のようにインデントが継承され、最後の改行が重ならないようになる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;header&amp;gt;
+  &amp;lt;ul&amp;gt;
+    &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/&amp;quot;&amp;gt;Home&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+    &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/features&amp;quot;&amp;gt;Features&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+    &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/pricing&amp;quot;&amp;gt;Pricing&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+    &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;/support&amp;quot;&amp;gt;Support&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;
+  &amp;lt;/ul&amp;gt;
+&amp;lt;/header&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;きれい。この辺りのことはMustacheのspecできちんと定義されてるので、Handlebars.jsが正しく処理するようになったと考えて良さそう。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;自前のHTML生成スクリプトでアドホックにパーシャルの最後の改行を消してたとこを削除できたので、すこぶる気分が良い。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>Markdownの参照形式によるリンク</title>
       <link>http://hail2u.net/blog/coding/markdown-reference-style-links.html</link>
       <description>Markdownでリンクを作成する方法には2種類ある。インラインで記述する方法が最もよく使われており、必ずHTMLに変換するということならばこれだけで十分とも言える。もう一つの参照形式で記述する方法はほとんど使われていないが、Markdown文書をテキストとして読む場合に、ともすれば長くなりがちなURLが本文に挟まらないので格段に読みやすさが向上する。</description>
@@ -283,26 +341,6 @@ exit
 &lt;p&gt;2014年にもなってバッチファイルかという感じだけど、最近はNode.js (というよりもnpm)やGoのおかげでCLIツールが充実してきたので、こういった簡単なラッパー的なバッチファイルを書く機会が増えてる。良い時代になったのか悪い時代に戻ったのか微妙なところだ。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>Google Fonts版のSource Sans Pro</title>
-      <link>http://hail2u.net/blog/webdesign/source-sans-pro-google-fonts-version.html</link>
-      <description>Google Fonts版のSource Sans Proはオリジナルと微妙に違うところがある。多くはほとんど気づかないようなものだが、稀に顕著に現れることもあり困る。僕が今まで気づいた中で最も顕著なものはExtra Lightを使った時に38px以上にすると、文字のストロークがExtra Lightに見えない程度に太くなってしまうという問題だ。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/source-sans-pro-google-fonts-version.html</guid>
-      <pubDate>Tue, 11 Nov 2014 17:29:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="https://www.google.com/fonts"&gt;Google Fonts&lt;/a&gt;版のSource Sans Proはオリジナルと微妙に違うところがある。多くはほとんど気づかないようなものだが、稀に顕著に現れることもあり困る。僕が今まで気づいた中で最も顕著なものはExtra Lightを使った時に38px以上にすると、文字のストロークがExtra Lightに見えない程度に太くなってしまうという問題だ。&lt;/p&gt;
-
-&lt;p&gt;View Demo: &lt;a href="http://hail2u.net/pub/test/600.html"&gt;Source Sans Pro&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;手元のWindowsではほとんどすべてのブラウザーで再現した。ClearType有効・無効や古いOSだとまた変わるかもしれない。iPhone 5sのMobile Safari 8では再現しないが、これも世代によって変わるかもしれない。太くなるだけでなく汚くなってしまうので、なかなか厳しい。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;これに気づいたのは結構前で、Google Fontsのフォントがイマイチ信用できないというきっかけになった。再現性やフォントによるとか多分にそういう面はあると思うが、フォント・ファイルの軽量化の過程で色々失われているものがあるということでもある。そしてその失われたものによる問題がいつ顕在化するのか、そしてそれは修正されるのか、という辺りが不透明なウェブサービスだと言えると思う。Google Fontsの利用をやめた隠れた理由のひとつはこの不透明さだ。&lt;/p&gt;
-
-&lt;p&gt;トレードオフなどという便利な言葉で逃げることも可能な話ではあるだろう。しかし少なくともオープンソースの欧文フォントに関しては自前でホスティングしても問題ないレベルまでウェブは進化している。それならばオリジナルを最大限維持する形で提供することを確実に行うことを重視するという選択もアリではないだろうか。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -372,6 +410,6 @@ exit
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Thu, 20 Nov 2014 03:38:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 21 Nov 2014 01:44:00 +0900</lastBuildDate>
   </channel>
 </rss>
