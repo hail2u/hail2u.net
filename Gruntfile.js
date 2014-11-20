@@ -390,6 +390,10 @@ module.exports = function (grunt) {
     'gitcommit:deploy'
   ]);
 
+  grunt.registerTask('ping', [
+    'pubsubhubbub_publish'
+  ]);
+
   grunt.registerTask('publish:blog', [
     'gitcommit:publish_blog',
     'deploy:blog'
