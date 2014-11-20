@@ -79,8 +79,14 @@ module.exports = function (grunt) {
       style_guide: {
         options: {
           process: function (content, srcpath) {
-            content = content.replace(/((href|src)=")http:\/\/hail2u\.net\//g, '$1/');
-            content = content.replace(/((href|src)=")\.\.\/\.\.\/build\//g, '$1/');
+            content = content.replace(
+              /((href|src)=")http:\/\/hail2u\.net\//g,
+              '$1/'
+            );
+            content = content.replace(
+              /((href|src)=")\.\.\/\.\.\/build\//g,
+              '$1/'
+            );
             content = content.replace(/((href|src)=")\.\//g, '$1/styles/');
 
             return content;
@@ -193,7 +199,9 @@ module.exports = function (grunt) {
       },
 
       category: {
-        file: (grunt.option('file') ? grunt.option('file').replace(/[^/]*$/, 'index.html') : grunt.option('file'))
+        file: (grunt.option('file') ?
+          grunt.option('file').replace(/[^/]*$/, 'index.html') :
+          grunt.option('file'))
       },
 
       feed: {
