@@ -1,15 +1,18 @@
-#!/usr/bin/env node
-
 'use strict';
 
-var exec = require('child_process').exec;
-var fs = require('fs');
-var marked = require('marked');
-var path = require('path');
+module.exports = function (grunt) {
+  var taskName = 'preview';
+  var taskDescription = 'Convert Markdown file to HTML, and preview in default browser.';
 
-var root = 'file:///' + path.resolve(__dirname, '../build/').replace(/\\/g, '/') + '/';
-var preview_file = path.normalize(process.env.TEMP + '/__preview.html');
-var preview = (function () {/*
+  grunt.registerMultiTask(taskName, taskDescription, function () {
+    var fs = require('fs');
+    var marked = require('marked');
+    var path = require('path');
+
+    var done = this.async();
+    var root = 'file:///' + path.resolve(__dirname, '../../build/').replace(/\\/g, '/') + '/';
+    var preview_file = path.normalize(process.env.TEMP + '/__preview.html');
+    var preview = (function () {/*
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -76,19 +79,30 @@ var preview = (function () {/*
 </html>
 */}).toString().split('\n').slice(1, -1).join('\n');
 
-var entry_file = process.argv[2];
-var fn = path.basename(entry_file, '.txt').replace(/\$/g, '$$');
-var entry = fs.readFileSync(entry_file, 'UTF-8').split('\n');
-var title = entry.shift().replace(/\$/g, '$$$$');
-var body = entry.join('\n').replace(/\$/g, '$$$$');
+    var entry_file = grunt.option('file');
+    var fn = path.basename(entry_file, '.txt').replace(/\$/g, '$$');
+    var entry = fs.readFileSync(entry_file, 'UTF-8').split('\n');
+    var title = entry.shift().replace(/\$/g, '$$$$');
+    var body = entry.join('\n').replace(/\$/g, '$$$$');
 
-if (!/<\/\w+>\s*$/.test(body)) {
-  body = marked(body, {
-    langPrefix: 'language-'
+    if (!/<\/\w+>\s*$/.test(body)) {
+      body = marked(body, {
+        langPrefix: 'language-'
+      });
+    }
+
+    body = body.replace(/="\//g, '="./');
+    preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
+    fs.writeFileSync(preview_file, preview);
+    grunt.util.spawn({
+      cmd: 'open',
+      args: [preview_file]
+    }, function (error, result, code) {
+      if (error) {
+        return done(error);
+      }
+
+      done();
+    });
   });
-}
-
-body = body.replace(/="\//g, '="./');
-preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
-fs.writeFileSync(preview_file, preview);
-exec(preview_file);
+};

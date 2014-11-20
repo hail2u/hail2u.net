@@ -301,6 +301,14 @@ module.exports = function (grunt) {
           file: 'build/feed'
         }
       }
+    },
+
+    preview: {
+      main: {}
+    },
+
+    rebuild_blog: {
+      main: {}
     }
   });
 
@@ -337,7 +345,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('rebuild:html', [
     'generate:main',
-    'generate:blog_theme'
+    'generate:blog_theme',
+    'rebuild_blog'
   ]);
 
   grunt.registerTask('rebuild:sitemap', [
