@@ -33,7 +33,7 @@ module.exports = function (grunt) {
     ];
 
     urls = addDocuments('build/documents/', urls);
-    urls = addArticles(path.join(__dirname, '.cache', 'articles.json'), urls);
+    urls = addArticles(path.join(__dirname, '../cache', 'articles.json'), urls);
     grunt.file.write(file, createSitemap(domain, urls));
     grunt.log.writeln('File "' + file + '" created.');
 
