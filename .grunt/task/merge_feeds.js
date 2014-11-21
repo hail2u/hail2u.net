@@ -5,13 +5,14 @@ module.exports = function (grunt) {
   var taskDescription = 'Merge feed(s) into a feed.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
+    var fs = require('fs');
     var xml2js = require('xml2js');
 
     var options = this.options();
     var _loadRSS = function (file) {
       var feed = {};
 
-      xml2js.parseString(grunt.file.read(file), {
+      xml2js.parseString(fs.readFileSync(file, 'utf-8'), {
         trim: true,
         explicitArray: false
       }, function (error, data) {
@@ -44,7 +45,7 @@ module.exports = function (grunt) {
       'xmlns:content': 'http://purl.org/rss/1.0/modules/content/'
     };
     into.channel.lastBuildDate = into.channel.item[0].pubDate;
-    grunt.file.write(options.file, new xml2js.Builder({
+    fs.writeFileSync(options.file, new xml2js.Builder({
       rootName: 'rss',
       xmldec: {
         encoding: 'UTF-8'

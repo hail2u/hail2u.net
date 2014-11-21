@@ -11,7 +11,7 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var root = 'file:///' + path.resolve(__dirname, '../../build/').replace(/\\/g, '/') + '/';
-    var preview_file = path.normalize(process.env.TEMP + '/__preview.html');
+    var preview_file = path.resolve(__dirname, '../tmp/__preview.html');
     var preview = (function () {/*
 <!DOCTYPE html>
 <html lang="ja">
@@ -94,6 +94,7 @@ module.exports = function (grunt) {
     body = body.replace(/="\//g, '="./');
     preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
     fs.writeFileSync(preview_file, preview);
+    grunt.log.writeln('File "' + preview_file + '" created.');
     grunt.util.spawn({
       cmd: 'open',
       args: [preview_file]

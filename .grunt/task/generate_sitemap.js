@@ -5,6 +5,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate a sitemap XML file.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
+    var fs = require('fs');
     var path = require('path');
     var xml2js = require('xml2js');
 
@@ -34,16 +35,17 @@ module.exports = function (grunt) {
 
     urls = addDocuments('build/documents/', urls);
     urls = addArticles(path.join(__dirname, '../cache', 'articles.json'), urls);
-    grunt.file.write(file, createSitemap(domain, urls));
+    fs.writeFileSync(file, createSitemap(domain, urls));
     grunt.log.writeln('File "' + file + '" created.');
 
     function addDocuments(dir, to) {
-      var documents = grunt.file.expand({
-        cwd: dir
-      }, [
-        '*.html',
-        '!index.html'
-      ]).map(function (file) {
+      var documents = fs.readdirSync(dir).filter(function (file) {
+        if (file === 'index.html' || file.indexOf('.html') !== file.length - 5) {
+          return false;
+        }
+
+        return true;
+      }).map(function (file) {
         return '/documents/' + file;
       });
 
@@ -52,7 +54,7 @@ module.exports = function (grunt) {
 
     function addArticles(data, to) {
       var articles = [];
-      grunt.file.readJSON(data).forEach(function (article) {
+      JSON.parse(fs.readFileSync(data, 'utf-8')).forEach(function (article) {
         articles.push(article.link);
       });
 

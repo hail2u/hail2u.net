@@ -30,13 +30,13 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var dirTemplate = this.data.cwd;
-    var metadataBase = grunt.file.readJSON(dirTemplate + 'metadata.json');
+    var metadataBase = JSON.parse(fs.readFileSync(dirTemplate + 'metadata.json', 'utf-8'));
     var partials = _loadSharedPartials();
 
     async.each(this.files, function (file, next) {
       var fileTemplate = file.src[0];
 
-      if (!grunt.file.exists(fileTemplate)) {
+      if (!fs.existsSync(fileTemplate)) {
         grunt.log.warn('Source file "' + fileTemplate + '" not found.');
 
         return next();
@@ -44,12 +44,12 @@ module.exports = function (grunt) {
 
       dirTemplate = path.dirname(fileTemplate);
       var metadata = _extendData(fileTemplate);
-      var template = grunt.file.read(fileTemplate);
+      var template = fs.readFileSync(fileTemplate, 'utf-8');
       var render = hbs.compile(template);
       var rendered = render(metadata, {
         partials: partials
       });
-      grunt.file.write(file.dest, rendered);
+      fs.writeFileSync(file.dest, rendered);
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
@@ -65,7 +65,7 @@ module.exports = function (grunt) {
       for (var i = 0, l = files.length; i < l; i++) {
         var file = files[i];
         var name = path.basename(file, '.mustache');
-        partials[name] = grunt.file.read(path.join(dir, file));
+        partials[name] = fs.readFileSync(path.join(dir, file), 'utf-8');
       }
 
       return partials;
@@ -75,8 +75,8 @@ module.exports = function (grunt) {
       var data = _extendObject({}, metadataBase);
       var fileMetadata = file.replace(/\.\w+$/, '.json');
 
-      if (grunt.file.isFile(fileMetadata)) {
-        _extendObject(data, grunt.file.readJSON(fileMetadata));
+      if (fs.existsSync(fileMetadata) && fs.statSync(fileMetadata).isFile()) {
+        _extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, 'utf-8')));
       }
 
       switch (file) {
@@ -122,7 +122,7 @@ module.exports = function (grunt) {
     function _loadRSS(file) {
       var feed = {};
 
-      parseXML(grunt.file.read(file), {
+      parseXML(fs.readFileSync(file, 'utf-8'), {
         trim: true,
         explicitArray: false
       }, function (error, data) {
@@ -163,11 +163,11 @@ module.exports = function (grunt) {
 
     function _loadArticles(data) {
       var cache = path.relative(process.cwd(), path.join(__dirname, '../cache', 'articles.json'));
-      var articles = JSON.parse(grunt.file.read(cache));
+      var articles = JSON.parse(fs.readFileSync(cache, 'utf-8'));
       var fileNew = path.basename(grunt.option('file'));
 
       if (grunt.cli.tasks[0] === 'publish:blog' && fileNew) {
-        grunt.file.read(data).split(/\r?\n/).forEach(function (line) {
+        fs.readFileSync(data, 'utf-8').split(/\r?\n/).forEach(function (line) {
           if (!/\d+$/.test(line) || line.indexOf(fileNew) < 0) {
             return;
           }
@@ -184,7 +184,7 @@ module.exports = function (grunt) {
           var nn = date.getMinutes();
           var ss = date.getSeconds();
           var article = {
-            title: grunt.file.read(file).split(/\n/)[0],
+            title: fs.readFileSync(file, 'utf-8').split(/\n/)[0],
             link: '/blog/' + category + '/' + fn  + '.html',
             unixtime: date.getTime(),
             year: yy,
@@ -204,7 +204,7 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          grunt.file.write(cache, JSON.stringify(articles));
+          fs.writeFileSync(cache, JSON.stringify(articles));
           grunt.verbose.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
         });
       }

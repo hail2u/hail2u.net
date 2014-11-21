@@ -5,6 +5,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate Blosxom files.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
+    var fs = require('fs');
     var path = require('path');
 
     var done = this.async();
@@ -12,7 +13,7 @@ module.exports = function (grunt) {
     var file = this.data.file;
     var args = ['blosxom.cgi'];
 
-    if (grunt.file.isPathAbsolute(file)) {
+    if (path.resolve(file) === file.replace(/[\/\\]+$/, '')) {
       var datadir = path.resolve(options.datadir);
       file = path.relative(datadir, file);
     }
@@ -44,7 +45,7 @@ module.exports = function (grunt) {
 
       var contents = result.toString().replace(/^[\s\S]*?\r?\n\r?\n/, '') + '\n';
 
-      grunt.file.write(options.static_dir + file, contents);
+      fs.writeFileSync(options.static_dir + file, contents);
       grunt.log.writeln('File "' + options.static_dir + file + '" created.');
       done();
     });
