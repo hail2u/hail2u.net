@@ -49,7 +49,6 @@ module.exports = function (grunt) {
       var rendered = render(metadata, {
         partials: partials
       });
-      rendered = rendered.replace(/^[ \t]+$\n/gm, '');
       grunt.file.write(file.dest, rendered);
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
