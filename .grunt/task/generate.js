@@ -205,7 +205,7 @@ module.exports = function (grunt) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
           fs.writeFileSync(cache, JSON.stringify(articles));
-          grunt.verbose.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
+          grunt.log.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
         });
       }
 
