@@ -39,15 +39,15 @@ module.exports = function (grunt) {
         return path.relative(dirData, file.split('=>')[0]).replace(/\\/g, '/');
       }));
 
-      /* if (option !== '--all') {
+      if (all !== true) {
         files = files.filter(function (file) {
-          if (file.indexOf(option + '/') < 0) {
-            return false;
+          if (file.indexOf(all + '/') === 0) {
+            return true;
           }
 
-          return true;
+          return false;
         });
-      } */
+      }
     }
 
     var bar = new ProgressBar('Rebuilding [:bar] :percent :elapsed', {
