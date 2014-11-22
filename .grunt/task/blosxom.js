@@ -13,7 +13,7 @@ module.exports = function (grunt) {
     var file = this.data.file;
     var args = ['blosxom.cgi'];
 
-    if (path.resolve(file) === file.replace(/[\/\\]+$/, '')) {
+    if (path.resolve(file) === path.normalize(file).replace(/[\/\\]+$/, '')) {
       var datadir = path.resolve(options.datadir);
       file = path.relative(datadir, file);
     }
