@@ -30,7 +30,7 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var dirTemplate = this.data.cwd;
-    var metadataBase = JSON.parse(fs.readFileSync(dirTemplate + 'metadata.json', 'utf-8'));
+    var metadataBase = JSON.parse(fs.readFileSync(dirTemplate + 'metadata.json', 'utf8'));
     var partials = _loadSharedPartials();
 
     async.each(this.files, function (file, next) {
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
 
       dirTemplate = path.dirname(fileTemplate);
       var metadata = _extendData(fileTemplate);
-      var template = fs.readFileSync(fileTemplate, 'utf-8');
+      var template = fs.readFileSync(fileTemplate, 'utf8');
       var render = hbs.compile(template);
       var rendered = render(metadata, {
         partials: partials
@@ -65,7 +65,7 @@ module.exports = function (grunt) {
       for (var i = 0, l = files.length; i < l; i++) {
         var file = files[i];
         var name = path.basename(file, '.mustache');
-        partials[name] = fs.readFileSync(path.join(dir, file), 'utf-8');
+        partials[name] = fs.readFileSync(path.join(dir, file), 'utf8');
       }
 
       return partials;
@@ -76,7 +76,7 @@ module.exports = function (grunt) {
       var fileMetadata = file.replace(/\.\w+$/, '.json');
 
       if (fs.existsSync(fileMetadata) && fs.statSync(fileMetadata).isFile()) {
-        _extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, 'utf-8')));
+        _extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, 'utf8')));
       }
 
       switch (file) {
@@ -122,7 +122,7 @@ module.exports = function (grunt) {
     function _loadRSS(file) {
       var feed = {};
 
-      parseXML(fs.readFileSync(file, 'utf-8'), {
+      parseXML(fs.readFileSync(file, 'utf8'), {
         trim: true,
         explicitArray: false
       }, function (error, data) {
@@ -163,11 +163,11 @@ module.exports = function (grunt) {
 
     function _loadArticles(data) {
       var cache = path.relative(process.cwd(), path.join(__dirname, '../cache', 'articles.json'));
-      var articles = JSON.parse(fs.readFileSync(cache, 'utf-8'));
+      var articles = JSON.parse(fs.readFileSync(cache, 'utf8'));
       var fileNew = path.basename(grunt.option('file'));
 
       if (grunt.cli.tasks[0] === 'publish:blog' && fileNew) {
-        fs.readFileSync(data, 'utf-8').split(/\r?\n/).forEach(function (line) {
+        fs.readFileSync(data, 'utf8').split(/\r?\n/).forEach(function (line) {
           if (!/\d+$/.test(line) || line.indexOf(fileNew) < 0) {
             return;
           }
@@ -184,7 +184,7 @@ module.exports = function (grunt) {
           var nn = date.getMinutes();
           var ss = date.getSeconds();
           var article = {
-            title: fs.readFileSync(file, 'utf-8').split(/\n/)[0],
+            title: fs.readFileSync(file, 'utf8').split(/\n/)[0],
             link: '/blog/' + category + '/' + fn  + '.html',
             unixtime: date.getTime(),
             year: yy,

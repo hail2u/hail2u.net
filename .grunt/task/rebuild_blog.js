@@ -29,7 +29,7 @@ module.exports = function (grunt) {
     });
 
     if (all) {
-      files = files.concat(fs.readFileSync(fileCache, 'utf-8').split(/\r?\n/).filter(function (file) {
+      files = files.concat(fs.readFileSync(fileCache, 'utf8').split(/\r?\n/).filter(function (file) {
         if (file === '') {
           return false;
         }

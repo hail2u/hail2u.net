@@ -12,7 +12,7 @@ module.exports = function (grunt) {
     var _loadRSS = function (file) {
       var feed = {};
 
-      xml2js.parseString(fs.readFileSync(file, 'utf-8'), {
+      xml2js.parseString(fs.readFileSync(file, 'utf8'), {
         trim: true,
         explicitArray: false
       }, function (error, data) {

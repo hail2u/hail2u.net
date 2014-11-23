@@ -54,7 +54,7 @@ module.exports = function (grunt) {
 
     function addArticles(data, to) {
       var articles = [];
-      JSON.parse(fs.readFileSync(data, 'utf-8')).forEach(function (article) {
+      JSON.parse(fs.readFileSync(data, 'utf8')).forEach(function (article) {
         articles.push(article.link);
       });
 
