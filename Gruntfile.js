@@ -100,7 +100,10 @@ module.exports = function (grunt) {
 
     css_mqpacker: {
       options: {
-        map: true
+        map: {
+          inline: false,
+          sourcesContent: false
+        }
       },
 
       main: {
@@ -117,7 +120,10 @@ module.exports = function (grunt) {
 
     csswring: {
       options: {
-        map: true
+        map: {
+          inline: false,
+          sourcesContent: false
+        }
       },
 
       main: {
