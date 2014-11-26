@@ -73,6 +73,7 @@ module.exports = function (grunt) {
           BLOSXOM_CONFIG_DIR: path.resolve(dirRoot)
         }
       });
+      blosxom.stdout.setEncoding('utf8');
 
       blosxom.stdout.on('data', function (data) {
         html += data;
