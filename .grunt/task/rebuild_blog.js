@@ -79,7 +79,7 @@ module.exports = function (grunt) {
       });
 
       blosxom.stdout.on('end', function (data) {
-        html = html.replace(/^[\s\S]*?\r?\n\r?\n/, '').trimRight() + '\n';
+        html = html.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() + '\n';
         fs.writeFileSync(path.join(dirStatic, file), html);
       });
 

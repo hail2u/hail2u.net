@@ -43,7 +43,8 @@ module.exports = function (grunt) {
         return done(error);
       }
 
-      var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '') + '\n';
+      var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
+        '\n';
       file = options.static_dir + file;
       fs.writeFileSync(file, contents);
       grunt.log.writeln('File "' + file + '" created.');
