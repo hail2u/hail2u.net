@@ -13,6 +13,10 @@ module.exports = function (grunt) {
     var file = this.data.file;
     var args = ['blosxom.cgi'];
 
+    if (options.reindex) {
+      args.push('reindex=1');
+    }
+
     if (path.resolve(file) === path.normalize(file).replace(/[\/\\]+$/, '')) {
       var datadir = path.resolve(options.datadir);
       file = path.relative(datadir, file);
@@ -23,10 +27,6 @@ module.exports = function (grunt) {
 
     if (file === 'index.rss') {
       file = 'feed';
-    }
-
-    if (options.reindex) {
-      args.push('reindex=1');
     }
 
     grunt.util.spawn({
@@ -43,10 +43,10 @@ module.exports = function (grunt) {
         return done(error);
       }
 
-      var contents = result.toString().replace(/^[\s\S]*?\r?\n\r?\n/, '') + '\n';
-
-      fs.writeFileSync(options.static_dir + file, contents);
-      grunt.log.writeln('File "' + options.static_dir + file + '" created.');
+      var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '') + '\n';
+      file = options.static_dir + file;
+      fs.writeFileSync(file, contents);
+      grunt.log.writeln('File "' + file + '" created.');
       done();
     });
   });
