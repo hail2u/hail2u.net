@@ -215,6 +215,16 @@ module.exports = function (grunt) {
       }
     },
 
+    blosxom_preview: {
+      main: {
+        file: grunt.option('file')
+      }
+    },
+
+    blosxom_rebuild: {
+      main: {}
+    },
+
     generate: {
       main: {
         expand: true,
@@ -307,14 +317,6 @@ module.exports = function (grunt) {
           file: 'build/feed'
         }
       }
-    },
-
-    preview: {
-      main: {}
-    },
-
-    rebuild_blog: {
-      main: {}
     }
   });
 
@@ -352,7 +354,7 @@ module.exports = function (grunt) {
   grunt.registerTask('rebuild:html', [
     'generate:main',
     'generate:blog_theme',
-    'rebuild_blog'
+    'blosxom_rebuild'
   ]);
 
   grunt.registerTask('rebuild:sitemap', [

@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var taskName = 'preview';
-  var taskDescription = 'Convert Markdown file to HTML, and preview in default browser.';
+  var taskName = 'blosxom_preview';
+  var taskDescription = 'Preview Blosxom entry in default browser.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var fs = require('fs');
@@ -10,6 +10,7 @@ module.exports = function (grunt) {
     var path = require('path');
 
     var done = this.async();
+    var file = this.data.file;
     var root = 'file:///' + path.resolve(__dirname, '../../build/').replace(/\\/g, '/') + '/';
     var preview_file = path.resolve(__dirname, '../tmp/__preview.html');
     var preview = (function () {/*
@@ -79,9 +80,8 @@ module.exports = function (grunt) {
 </html>
 */}).toString().split('\n').slice(1, -1).join('\n');
 
-    var entry_file = grunt.option('file');
-    var fn = path.basename(entry_file, '.txt').replace(/\$/g, '$$');
-    var entry = fs.readFileSync(entry_file, 'UTF-8').split('\n');
+    var fn = path.basename(file, '.txt').replace(/\$/g, '$$');
+    var entry = fs.readFileSync(file, 'UTF-8').split('\n');
     var title = entry.shift().replace(/\$/g, '$$$$');
     var body = entry.join('\n').replace(/\$/g, '$$$$');
 

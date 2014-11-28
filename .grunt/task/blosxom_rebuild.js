@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var taskName = 'rebuild_blog';
-  var taskDescription = 'Rebuild weblog entries.';
+  var taskName = 'blosxom_rebuild';
+  var taskDescription = 'Rebuild Blosxom entries.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require('async');
