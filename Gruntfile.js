@@ -219,9 +219,7 @@ module.exports = function (grunt) {
     },
 
     blosxom_preview: {
-      main: {
-        file: grunt.option('file')
-      }
+      main: {}
     },
 
     generate: {

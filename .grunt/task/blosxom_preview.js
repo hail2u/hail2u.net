@@ -10,7 +10,7 @@ module.exports = function (grunt) {
     var path = require('path');
 
     var done = this.async();
-    var file = this.data.file;
+    var file = grunt.option('file');
     var root = 'file:///' + path.resolve(__dirname, '../../build/').replace(/\\/g, '/') + '/';
     var preview_file = path.resolve(__dirname, '../tmp/__preview.html');
     var preview = (function () {/*
