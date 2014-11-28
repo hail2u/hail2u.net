@@ -196,22 +196,25 @@ module.exports = function (grunt) {
         static_dir: 'build/blog/'
       },
 
+      all: {
+        options: {
+          all: true
+        }
+      },
+
       article: {
         options: {
+          feed: true,
+          index: true,
           reindex: true
-        },
-
-        file: grunt.option('file')
+        }
       },
 
-      category: {
-        file: (grunt.option('file') ?
-          grunt.option('file').replace(/[^/]*$/, 'index.html') :
-          grunt.option('file'))
-      },
-
-      feed: {
-        file: 'index.rss'
+      index: {
+        options: {
+          all: true,
+          index: true
+        }
       }
     },
 
@@ -219,10 +222,6 @@ module.exports = function (grunt) {
       main: {
         file: grunt.option('file')
       }
-    },
-
-    blosxom_rebuild: {
-      main: {}
     },
 
     generate: {
@@ -354,7 +353,7 @@ module.exports = function (grunt) {
   grunt.registerTask('rebuild:html', [
     'generate:main',
     'generate:blog_theme',
-    'blosxom_rebuild'
+    'blosxom:index'
   ]);
 
   grunt.registerTask('rebuild:sitemap', [
