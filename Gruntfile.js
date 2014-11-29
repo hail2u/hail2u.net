@@ -214,10 +214,6 @@ module.exports = function (grunt) {
       }
     },
 
-    blosxom_preview: {
-      main: {}
-    },
-
     generate: {
       main: {
         cwd: 'src/html/',
