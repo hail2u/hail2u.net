@@ -257,12 +257,6 @@ module.exports = function (grunt) {
       }
     },
 
-    generate_sitemap: {
-      main: {
-        file: 'build/sitemap.xml'
-      }
-    },
-
     gitcommit: {
       deploy: {
         options: {
@@ -322,7 +316,7 @@ module.exports = function (grunt) {
     'rebuild:css',
     'rebuild:js',
     'rebuild:html',
-    'rebuild:sitemap'
+    'sitemap'
   ]);
 
   grunt.registerTask('rebuild:css', [
@@ -347,10 +341,6 @@ module.exports = function (grunt) {
     'blosxom:index'
   ]);
 
-  grunt.registerTask('rebuild:sitemap', [
-    'generate_sitemap'
-  ]);
-
   grunt.registerTask('upload', [
     'gitcommit:upload'
   ]);
@@ -364,7 +354,7 @@ module.exports = function (grunt) {
     'blosxom:article',
     'generate:blog',
     'merge_feeds',
-    'rebuild:sitemap',
+    'sitemap',
     'gitcommit:deploy'
   ]);
 
@@ -381,7 +371,7 @@ module.exports = function (grunt) {
   grunt.registerTask('deploy:home', [
     'rebuild:html',
     'merge_feeds:main',
-    'rebuild:sitemap',
+    'sitemap',
     'gitcommit:deploy'
   ]);
 
@@ -391,7 +381,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('deploy:sitemap', [
-    'rebuild:sitemap',
+    'sitemap',
     'gitcommit:deploy'
   ]);
 
