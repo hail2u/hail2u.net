@@ -288,16 +288,6 @@ module.exports = function (grunt) {
           root: 'build/'
         }
       }
-    },
-
-    merge_feeds: {
-      main: {
-        dest: 'build/feed',
-        src: [
-          'src/feed/index.rss',
-          'build/blog/feed'
-        ]
-      }
     }
   });
 
