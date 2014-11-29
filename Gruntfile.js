@@ -308,7 +308,10 @@ module.exports = function (grunt) {
   });
 
   for (var devDependency in grunt.config.data.pkg.devDependencies) {
-    if (devDependency.match(/^grunt-/)) {
+    if (
+      devDependency !== 'grunt-cli' &&
+      devDependency.indexOf('grunt-') === 0
+    ) {
       grunt.loadNpmTasks(devDependency);
     }
   }
