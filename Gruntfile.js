@@ -306,13 +306,11 @@ module.exports = function (grunt) {
 
     merge_feeds: {
       main: {
-        options: {
-          into: 'src/feed/index.rss',
-          feeds: [
-            'build/blog/feed'
-          ],
-          file: 'build/feed'
-        }
+        src: [
+          'src/feed/index.rss',
+          'build/blog/feed'
+        ],
+        dest: 'build/feed'
       }
     }
   });

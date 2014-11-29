@@ -13,8 +13,8 @@ module.exports = function (grunt) {
       var feed = {};
 
       xml2js.parseString(fs.readFileSync(file, 'utf8'), {
-        trim: true,
-        explicitArray: false
+        explicitArray: false,
+        trim: true
       }, function (error, data) {
         if (error) {
           grunt.fail.warn(error);
@@ -26,34 +26,36 @@ module.exports = function (grunt) {
       return feed;
     };
 
-    var into = _loadRSS(options.into);
-    options.feeds.forEach(function (feed) {
-      var f = _loadRSS(feed);
-      into.channel.item = into.channel.item.concat(f.channel.item);
-    });
-    into.channel.item.sort(function (itemA, itemB) {
-      var dateA = new Date(itemA.pubDate).getTime();
-      var dateB = new Date(itemB.pubDate).getTime();
+    this.files.forEach(function (file) {
+      var into = _loadRSS(file.src.shift());
+      file.src.forEach(function (src) {
+        var feed = _loadRSS(src);
+        into.channel.item = into.channel.item.concat(feed.channel.item);
+      });
+      into.channel.item.sort(function (itemA, itemB) {
+        var dateA = new Date(itemA.pubDate).getTime();
+        var dateB = new Date(itemB.pubDate).getTime();
 
-      return dateA - dateB;
-    }).reverse();
-    into.$ = {
-      version: '2.0',
-      'xml:lang': 'ja-JP',
-      'xmlns:atom': 'http://www.w3.org/2005/Atom',
-      'xmlns:creativeCommons': 'http://backend.userland.com/creativeCommonsRssModule',
-      'xmlns:content': 'http://purl.org/rss/1.0/modules/content/'
-    };
-    into.channel.lastBuildDate = into.channel.item[0].pubDate;
-    fs.writeFileSync(options.file, new xml2js.Builder({
-      rootName: 'rss',
-      xmldec: {
-        encoding: 'UTF-8'
-      },
-      options: {
-        allowSurrogateChars: true
-      }
-    }).buildObject(into));
-    grunt.log.writeln('File "' + options.file + '" created.');
+        return dateA - dateB;
+      }).reverse();
+      into.$ = {
+        'version': '2.0',
+        'xml:lang': 'ja-JP',
+        'xmlns:atom': 'http://www.w3.org/2005/Atom',
+        'xmlns:content': 'http://purl.org/rss/1.0/modules/content/',
+        'xmlns:creativeCommons': 'http://backend.userland.com/creativeCommonsRssModule'
+      };
+      into.channel.lastBuildDate = into.channel.item[0].pubDate;
+      fs.writeFileSync(file.dest, new xml2js.Builder({
+        options: {
+          allowSurrogateChars: true
+        },
+        rootName: 'rss',
+        xmldec: {
+          encoding: 'UTF-8'
+        }
+      }).buildObject(into) + '\n');
+      grunt.log.writeln('File "' + file.dest + '" created.');
+    });
   });
 };
