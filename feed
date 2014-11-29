@@ -12,6 +12,53 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Gruntで実行しているエイリアス・タスクの名前とターゲットの取得</title>
+      <link>http://hail2u.net/blog/coding/getting-grunt-alias-task-name-and-target.html</link>
+      <description>Gruntのタスク内から今実行されているタスクの名前とターゲットは、それぞれthis.nameとthis.targetで取得できる。しかしエイリアス・タスク経由での実行の場合、その名前やターゲットを簡単に取得する方法は用意されてない。どうやっても拾えないかというとそうでもなく、grunt.cli.tasksにコマンドラインで実際に指定されたタスク群が配列として格納されるので、それから拾えば良い。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/getting-grunt-alias-task-name-and-target.html</guid>
+      <pubDate>Sat, 29 Nov 2014 10:16:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;Gruntのタスク内から今実行されているタスクの名前とターゲットは、それぞれ&lt;a href="http://gruntjs.com/api/inside-tasks#this.name"&gt;&lt;code&gt;this.name&lt;/code&gt;&lt;/a&gt;と&lt;a href="http://gruntjs.com/api/inside-tasks#this.target"&gt;&lt;code&gt;this.target&lt;/code&gt;&lt;/a&gt;で取得できる。しかし&lt;a href="http://gruntjs.com/creating-tasks#alias-tasks"&gt;エイリアス・タスク&lt;/a&gt;経由での実行の場合、その名前やターゲットを簡単に取得する方法は用意されてない。どうやっても拾えないかというとそうでもなく、&lt;code&gt;grunt.cli.tasks&lt;/code&gt;にコマンドラインで実際に指定されたタスク群が配列として格納されるので、それから拾えば良い。&lt;/p&gt;
+
+&lt;p&gt;例えば以下のようなオプションでGruntを実行し、普通のマルチ・タスクとエイリアス・タスクを複数まとめて実行したとする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;$ &lt;kbd&gt;grunt multi:foo alias:bar&lt;/kbd&gt;
+&lt;/samp&gt;&lt;/pre&gt;
+
+&lt;p&gt;この場合&lt;code&gt;grunt.cli.tasks&lt;/code&gt;は以下のような配列になる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[
+  &amp;#39;multi:foo&amp;#39;,
+  &amp;#39;alias:bar&amp;#39;
+];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;この&lt;code&gt;grunt.cli.tasks&lt;/code&gt;にはコマンドライン・オプションで指定したタスクがそのままの順序で格納される。そのためエイリアス・タスクの名前やターゲットへアクセスできるというわけだ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;#39;use strict&amp;#39;;
+
+module.exports = function (grunt) {
+  grunt.registerMultiTask(
+    &amp;#39;example&amp;#39;,
+    &amp;#39;Example task.&amp;#39;,
+    function () {
+      if (grunt.cli.tasks.some(function (task) {
+        return task === &amp;#39;alias:bar&amp;#39;;
+      })) {
+        // Do task.
+      }
+    }
+  );
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;タスク内からはこのようにしてアクセスすることになるだろう。&lt;code&gt;Array.prototype.some()&lt;/code&gt;を使って&lt;code&gt;grunt.cli.tasks&lt;/code&gt;を調べ、&lt;code&gt;alias:bar&lt;/code&gt;経由での実行の時のみ特別扱いしてやる、というわけだ。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;Gruntの本道としては設定を切り分けて&lt;code&gt;options&lt;/code&gt;でフラグを立ててやるべきようなことなので、あまり必要とされることはない。そのためかアクセスする方法が用意されていないのだが、書き捨てるタスクではコード側でガッツリやってやった方が面倒じゃないことも多い。エイリアス・タスクの名前やターゲットと同じような意味を持つ設定を書かなくて済み、コード側で完結できるからだ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>twitter:siteプロパティー</title>
       <link>http://hail2u.net/blog/internet/twitter-site-property.html</link>
       <description>TwitterアナリティクスにはTwitterカードの解析が出来る機能があるのだけど、単にウェブサイトにTwitterカードを設置しただけでは解析してくれなかった。どうやれば良いのか全然わからなかったけど、どうやらtwitter:creatorだけでなくtwitter:siteプロパティーも設定してやる必要があるようだ。</description>
@@ -285,33 +332,6 @@ var result = csswring.wring(css, {
 &lt;p&gt;あまり使われていない参照形式によるリンクだが、こちらを使うことにより、文書を実際の表示に近い形で編集することが可能になる。そうなることによって文書がより良い体裁を持って公開できるようになることに繋がる。かもしれない。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>依存しているもののメジャー・バージョンアップ</title>
-      <link>http://hail2u.net/blog/software/major-update-of-dependencies.html</link>
-      <description>自身のライブラリーなどにおける依存しているものがSemantic Versioningで言うところのメジャー・バージョンアップした場合、APIに互換性のない変更が加えられたということなので、動作を確認して自身のライブラリーもバージョンアップする必要がある。多くの場合、パッチ・バージョンアップで十分だが、互換性のない変更が加わったAPIを透過的に使っていた場合にどうすれば良いのかよくわからなくなった。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/major-update-of-dependencies.html</guid>
-      <pubDate>Wed, 19 Nov 2014 08:57:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;自身のライブラリーなどにおける依存しているものが&lt;a href="http://semver.org/"&gt;Semantic Versioning&lt;/a&gt;で言うところのメジャー・バージョンアップした場合、APIに互換性のない変更が加えられたということなので、動作を確認して自身のライブラリーもバージョンアップする必要がある。多くの場合、パッチ・バージョンアップで十分だが、互換性のない変更が加わったAPIを透過的に使っていた場合にどうすれば良いのかよくわからなくなった。&lt;/p&gt;
-
-&lt;p&gt;透過的に使っていたAPIに互換性のない変更が加わっているということは、ユーザーがライブラリーを使う方法に互換性のない変更が加わるということになる。仮にこれが依存しているものの変更でないとすると、当然メジャー・バージョンアップすべき変更ということになる。&lt;/p&gt;
-
-&lt;p&gt;しかしこういった場合にメジャー・バージョンアップするとすると、最悪の場合依存しているもののメジャー・バージョンアップごとに自身のライブラリーもメジャー・バージョンアップしなくてはならなくなる。自身のライブラリーにおける変更は少ないか全くないにも関わらず、だ。これはフラストレーションが溜まりそうな予感しかない。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;API&lt;em&gt;そのもの&lt;/em&gt;においてどういう変更が加わったのか&lt;/li&gt;
-&lt;li&gt;APIの&lt;em&gt;使われ方&lt;/em&gt;においてどういう変更が加わったのか&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;このどちらの観点でSemantic Versioningのバージョンアップを行うかということになる。後者を重視した方がユーザーに優しいと言えるが、後に首を絞めることになりそうだ。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;PostCSS v3でSource Mapがデフォルトでインラインに埋め込まれるようになった影響で、自分で作っているCSSWringやCSS MQPackerの使い方に互換性のない変更が加わることとなった。この際にこういった疑問を持ったわけだが、まだ自分の中ですら結論は出ていない。&lt;/p&gt;
-
-&lt;p&gt;とりあえずバージョンは上げると戻せないので、上げないと思う。後ろ向きな理由だ。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -381,6 +401,6 @@ var result = csswring.wring(css, {
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Fri, 28 Nov 2014 08:18:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 29 Nov 2014 10:16:00 +0900</lastBuildDate>
   </channel>
 </rss>
