@@ -78,15 +78,22 @@ module.exports = function (grunt) {
       style_guide: {
         options: {
           process: function (content, srcpath) {
-            content = content.replace(
-              /((href|src)=")http:\/\/hail2u\.net\//g,
-              '$1/'
-            );
-            content = content.replace(
-              /((href|src)=")\.\.\/\.\.\/build\//g,
-              '$1/'
-            );
-            content = content.replace(/((href|src)=")\.\//g, '$1/styles/');
+            [
+              {
+                pattern: /((href|src)=")http:\/\/hail2u\.net\//g,
+                replace: '$1/'
+              },
+              {
+                pattern: /((href|src)=")\.\.\/\.\.\/build\//g,
+                replace: '$1/'
+              },
+              {
+                pattern: /((href|src)=")\.\//g,
+                replace: '$1/styles/'
+              },
+            ].forEach(function (sub) {
+              content = content.replace(sub.pattern, sub.replace);
+            });
 
             return content;
           }
