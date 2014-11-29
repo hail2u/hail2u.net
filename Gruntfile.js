@@ -14,7 +14,7 @@ module.exports = function (grunt) {
       },
 
       js: {
-        'src': [
+        src: [
           '.grunt/tmp/**/*.js',
           '.grunt/tmp/**/*.js.map'
         ]
@@ -37,9 +37,7 @@ module.exports = function (grunt) {
             'src/js/bower_components/unutm/unutm.js',
             'src/js/async-csses.js'
           ],
-          '.grunt/tmp/search.js': [
-            'src/js/popular-pages.js'
-          ]
+          '.grunt/tmp/search.js': ['src/js/popular-pages.js']
         }
       }
     },
@@ -47,33 +45,33 @@ module.exports = function (grunt) {
     connect: {
       main: {
         options: {
-          port: 0,
           hostname: '127.0.0.1',
           keepalive: true,
-          open: true
+          open: true,
+          port: 0
         }
       }
     },
 
     copy: {
       css: {
-        expand: true,
         cwd: '.grunt/tmp/',
+        dest: 'build/styles/',
+        expand: true,
         src: [
           '*.css',
           '*.css.map'
-        ],
-        dest: 'build/styles/'
+        ]
       },
 
       js: {
-        expand: true,
         cwd: '.grunt/tmp/',
+        dest: 'build/scripts/',
+        expand: true,
         src: [
           '**/*.js',
           '**/*.js.map'
-        ],
-        dest: 'build/scripts/'
+        ]
       },
 
       style_guide: {
@@ -93,8 +91,8 @@ module.exports = function (grunt) {
           }
         },
 
-        src: 'src/css/test.html',
-        dest: 'build/about/style-guide/index.html'
+        dest: 'build/about/style-guide/index.html',
+        src: 'src/css/test.html'
       }
     },
 
@@ -107,14 +105,14 @@ module.exports = function (grunt) {
       },
 
       main: {
-        expand: true,
         cwd: '.grunt/tmp/',
+        dest: '.grunt/tmp/',
+        expand: true,
+        ext: '.min.css',
         src: [
           '**/*.css',
           '!**/*.min.css'
-        ],
-        dest: '.grunt/tmp/',
-        ext: '.min.css'
+        ]
       }
     },
 
@@ -127,12 +125,10 @@ module.exports = function (grunt) {
       },
 
       main: {
-        expand: true,
         cwd: '.grunt/tmp/',
-        src: [
-          '**/*.min.css'
-        ],
-        dest: '.grunt/tmp/'
+        dest: '.grunt/tmp/',
+        expand: true,
+        src: ['**/*.min.css'],
       }
     },
 
@@ -148,9 +144,9 @@ module.exports = function (grunt) {
 
     sass: {
       options: {
+        precision: 3,
         sourcemap: 'none',
         unixNewlines: true,
-        precision: 3,
         update: true
       },
 
@@ -159,11 +155,11 @@ module.exports = function (grunt) {
           cacheLocation: 'src/css/.sass-cache/'
         },
 
-        expand: true,
         cwd: 'src/css/',
-        src: ['*.scss'],
         dest: '.grunt/tmp/',
-        ext: '.css'
+        expand: true,
+        ext: '.css',
+        src: ['*.scss']
       }
     },
 
@@ -173,19 +169,19 @@ module.exports = function (grunt) {
           ascii_only: true
         },
 
-        sourceMap: true,
-        preserveComments: false
+        preserveComments: false,
+        sourceMap: true
       },
 
       main: {
-        expand: true,
         cwd: '.grunt/tmp/',
+        dest: '.grunt/tmp/',
+        expand: true,
+        ext: '.min.js',
         src: [
           '**/*.js',
           '!**/*.min.js'
-        ],
-        dest: '.grunt/tmp/',
-        ext: '.min.js'
+        ]
       }
     },
 
@@ -224,44 +220,44 @@ module.exports = function (grunt) {
 
     generate: {
       main: {
-        expand: true,
         cwd: 'src/html/',
+        dest: 'build/',
+        expand: true,
+        ext: '.html',
         src: [
           '**/*.mustache',
           '!partial/*',
           '!blog/theme.mustache'
-        ],
-        dest: 'build/',
-        ext: '.html'
+        ]
       },
 
       blog: {
-        expand: true,
         cwd: 'src/html/',
+        dest: 'build/',
+        expand: true,
+        ext: '.html',
         src: [
           'blog/index.mustache',
           'index.mustache'
-        ],
-        dest: 'build/',
-        ext: '.html'
+        ]
       },
 
       blog_theme: {
-        expand: true,
         cwd: 'src/html/',
-        src: ['blog/theme.mustache'],
         dest: 'src/weblog/entries/themes/html/',
+        expand: true,
         rename: function (dest, src) {
           return dest + 'page';
-        }
+        },
+        src: ['blog/theme.mustache']
       },
 
       home: {
-        expand: true,
         cwd: 'src/html/',
-        src: ['index.mustache'],
         dest: 'build/',
-        ext: '.html'
+        expand: true,
+        ext: '.html',
+        src: ['index.mustache']
       }
     },
 
@@ -306,11 +302,11 @@ module.exports = function (grunt) {
 
     merge_feeds: {
       main: {
+        dest: 'build/feed',
         src: [
           'src/feed/index.rss',
           'build/blog/feed'
-        ],
-        dest: 'build/feed'
+        ]
       }
     }
   });
