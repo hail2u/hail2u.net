@@ -369,8 +369,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy:blog', [
     'blosxom:article',
-    'blosxom:category',
-    'blosxom:feed',
     'generate:blog',
     'merge_feeds',
     'rebuild:sitemap',
