@@ -45,6 +45,7 @@ module.exports = function (grunt) {
     connect: {
       main: {
         options: {
+          base: 'build/',
           hostname: '127.0.0.1',
           keepalive: true,
           open: true,
