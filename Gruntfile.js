@@ -294,8 +294,8 @@ module.exports = function (grunt) {
 
   for (var devDependency in grunt.config.data.pkg.devDependencies) {
     if (
-      devDependency !== 'grunt-cli' &&
-      devDependency.indexOf('grunt-') === 0
+      devDependency.indexOf('grunt-') === 0 &&
+      devDependency !== 'grunt-cli'
     ) {
       grunt.loadNpmTasks(devDependency);
     }
