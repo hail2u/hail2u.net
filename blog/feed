@@ -12,12 +12,68 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Sat, 29 Nov 2014 10:25:14 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 30 Nov 2014 11:48:58 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>タスク・ランナーをnpm run-scriptでラップ</title>
+      <link>http://hail2u.net/blog/webdesign/wrapping-task-runner-with-npm-run-script.html</link>
+      <description>npm で依存もタスクも一元化するという記事を興味深く読んだ。僕もしばらく前、具体的にはnpm v2出た時からGruntをnpm run-scriptでラップして使っている。概ね良好に機能すると感じている。懸念であった引数で特定の処理を行わせたいようなケースもnpm v2で引数を解釈できるようになったので解決した。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/wrapping-task-runner-with-npm-run-script.html</guid>
+      <pubDate>Sun, 30 Nov 2014 11:48:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="http://qiita.com/Jxck_/items/efaff21b977ddc782971">npm で依存もタスクも一元化する</a>という記事を興味深く読んだ。僕もしばらく前、具体的にはnpm v2出た時からGruntを<a href="https://www.npmjs.org/doc/cli/npm-run-script.html">npm run-script</a>でラップして使っている。概ね良好に機能すると感じている。懸念であった引数で特定の処理を行わせたいようなケースもnpm v2で引数を解釈できるようになったので解決した。</p>
+
+<p>npm run-script経由にすることによる大きなデメリットとしては、そんなに速くもないnpm経由で常にタスクを実行することによる速度の低下が挙げられる。</p>
+
+<p>この速度の低下は、Gruntやgulpの主要な目的であるビルドにおいてはそれほど問題にならない。ビルドにかかる時間に比べると、相対的にその低下の割合は低いものだと考えられるからだ。しかしタスクはそういったものにとどまらず例えばHTML(やMarkdown)のプレビューであったり、Sassのオンデマンド・コンパイルといった小さなタスクもある。その場合は速度低下が占める割合は高くなってしまい、実行時のストレスに繋がる。</p>
+
+<p>もちろんそういった小さなタスクを各開発者が自前で用意している環境に任せるという選択もあり、実際そうする方が良いことが多い。しかしその一方で小さなタスクまでも用意してやることによって、環境一式を開発者間で揃えられるというメリットも捨てがたい。その場合、小さなタスクのコストをできるだけ小さく抑えるための工夫が必要になる。</p>
+
+<p>そうなるとタスク・ランナー経由で実行させるよりも、設定不要な小さなNode.jsスクリプトを作りそれを実行した方が効率的だ。プロジェクトにGruntとgulpを混ぜてnpm run-scriptでラップというのは馬鹿げているが、Gruntと小さなNode.jsスクリプトの組み合わせは悪くはない。そのNode.jsスクリプトが設定不要なことと<code>package.json</code>の<code>script</code>で複雑なコマンドライン・オプションを指定したコマンドを定義しないこと辺りがキモになる。</p>
+
+<pre><code>{
+  &quot;private&quot;: true,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;grunt build&quot;,
+    &quot;deploy&quot;: &quot;grunt deploy&quot;,
+    &quot;preview&quot;: &quot;.bin/preview&quot;,
+    &quot;sassc&quot;: &quot;.bin/sassc&quot;,
+    &quot;start&quot;: &quot;grunt connect&quot;,
+    &quot;test&quot;: &quot;grunt test&quot;
+  },
+  devDependencies: {}
+}
+</code></pre>
+
+<p>具体的にはこのような形でミックスしている。</p>
+
+<pre><code>$ npm test
+$ npm run deploy
+$ npm run preview -- src/weblog/drafts/example.markdown
+$ npm run sassc -- src/css/style.scss
+</code></pre>
+
+<p>実行のインターフェイスは統一され、引数あるなしはあるものの中身には特に左右されない。例えばこの<code>.bin/preview</code> (20行くらい)では引数のファイルの拡張子でどうやってHTMLを作るかを分け、一時ディレクトリーにHTMLファイルを作成し、最後にそれをブラウザーで開くようになっている。また<code>.bin/sassc</code> (10行くらい)はSassのCLIプログラムをプロジェクトにあった形のオプションで実行するだけのラッパー・スクリプトだ。</p>
+
+<p>両者ともに似たような、またはもっと高機能のGruntプラグインやgulpプラグインはいくつも存在する。それらは小回りを犠牲に汎用性を持たせているため、プロジェクト特化型の小さなNode.jsスクリプトと違い、やることに比して大仰過ぎる嫌いがある。まさに牛刀といったところだ。</p>
+
+<p>無理にGruntやgulpに寄せるよりも、タスクの規模と利用ケースを考慮して書き分け、npm run-scriptで統一してやる方が使いやすいものになるはずだ。どうせ使う方は中身を読んだり修正したりはしないので、Node.jsで完結しているならばどんな風に書かれていても大した問題ではない。プロジェクトを構成するファイルが増えることにはなるが、<code>.bin</code>といった見えにくいディレクトリーに放り込んでおけば邪魔扱いされることもないだろう。</p>
+
+<p>僕はGruntやgulpといったタスク・ランナーをいずれ捨てる(新しいタスク・ランナーに変えるではなく、単に捨てる)ことも視野に入れて使っているので、特にこう感じるのかもしれない。</p>
+
+<hr>
+
+<p>他には<code>npm run</code>は微妙に長いことと引数を付ける時に<code>--</code>を挟むのを忘れがちなことというような、使い方において慣れないと厳しいことくらいか。<code>package.json</code>の肥大化が～というような観点もあるが、多くても20行くらい(<code>pre-</code>や<code>post-</code>を駆使した場合でも)なので<code>Gruntfile.js</code>のあっという間に300行と比べると問題にならないだろう。</p>
+
+<p>npm run-scriptでのラップが優れた解であることは疑いないが、その実際の構成にはもう少し色々考えるべきところがありそうだ。もっと様々なユースケースを知りたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Gruntで実行しているエイリアス・タスクの名前とターゲットの取得</title>
@@ -308,55 +364,6 @@ var result = csswring.wring(css, {
 <hr>
 
 <p>自前のHTML生成スクリプトでアドホックにパーシャルの最後の改行を消してたとこを削除できたので、すこぶる気分が良い。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Markdownの参照形式によるリンク</title>
-      <link>http://hail2u.net/blog/coding/markdown-reference-style-links.html</link>
-      <description>Markdownでリンクを作成する方法には2種類ある。インラインで記述する方法が最もよく使われており、必ずHTMLに変換するということならばこれだけで十分とも言える。もう一つの参照形式で記述する方法はほとんど使われていないが、Markdown文書をテキストとして読む場合に、ともすれば長くなりがちなURLが本文に挟まらないので格段に読みやすさが向上する。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/markdown-reference-style-links.html</guid>
-      <pubDate>Thu, 20 Nov 2014 03:38:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="http://daringfireball.net/projects/markdown/syntax#link">Markdownでリンクを作成する方法</a>には2種類ある。インラインで記述する方法が最もよく使われており、必ずHTMLに変換するということならばこれだけで十分とも言える。もう一つの参照形式で記述する方法はほとんど使われていないが、Markdown文書をテキストとして読む場合に、ともすれば長くなりがちなURLが本文に挟まらないので格段に読みやすさが向上する。</p>
-
-<pre><code>This is <mark>[an example reference-style link][1]</mark>.
-
-<mark>[1]: http://example.com/</mark>
-</code></pre>
-
-<p>参照形式ではこのような形でリンクを作成する。本文では<code>[link text][id]</code>という形で書き、文書の最後に<code>[id]: URL</code>という形で書くわけだ。ちょうど脚注のような形になる。<code>[id]: URL</code>は任意の場所に書くことができるが、読みやすさと書きやすさの両面から最後にまとめて書いた方が良いだろう。</p>
-
-<p>この<code>id</code>は省略できるので以下のようにして作成することもできる。</p>
-
-<pre><code>This is [an example reference-style link]<mark>[]</mark>.
-
-<mark>[an example reference-style link]</mark>: http://example.com/
-</code></pre>
-
-<p>実はこの空の<code>[]</code>も省略できるので以下のようにしてもまた作成することができる。</p>
-
-<pre><code>This is <mark>[an example reference-style link]</mark>.
-
-[an example reference-style link]: http://example.com/
-</code></pre>
-
-<p>この<code>[]</code>の省略についてはドキュメントでは触れられていないが、オリジナルのMarkdown実装及び多くの派生実装でも動作する。本文がよりすっきりすることと、リンクの対応が明確なことがこの書き方の利点だと言える。しかし同じ文字列を繰り返して書くことになるので、決して効率的であるとは言えない。</p>
-
-<p>数字のIDを使う書き方は脚注として見やすく効率的なのに対して、<code>[]</code>を省略した書き方は連番を管理する必要がないためメンテナンス性が高い。どちらでも良いが統一はした方が良いだろう。</p>
-
-<hr>
-
-<p>ウェブログの記事のようにほぼ簡易HTML記法としてMarkdownを使うだけの場合はインラインで書いても問題になることはない。しかし一文や段落の長さといった文章の体裁にも気を使いたい場合、インラインで書かれたURLは大きくその作業を阻害する。参照形式によるリンクを利用するとより自然に文章を添削することが可能になるだろう。</p>
-
-<p>またプロジェクトのREADMEなど、Markdown文書がそのままテキストととして読まれることも多い場合にも威力を発揮する。紙の文書で欄外の注を読むような感覚でリンクを読むことができるだろう。編集する側としても脚注のような形で最後に参考リンクのリストのようなものをまとめておけることは利点が多いはずだ。</p>
-
-<p>他に80文字で改行を入れる記述ルールとの相性の良さも見逃せない。インラインの場合には80文字で改行するのはとても難しくなるが、参照形式ならほぼ問題になることはない。</p>
-
-<hr>
-
-<p>あまり使われていない参照形式によるリンクだが、こちらを使うことにより、文書を実際の表示に近い形で編集することが可能になる。そうなることによって文書がより良い体裁を持って公開できるようになることに繋がる。かもしれない。</p>]]></content:encoded>
     </item>
 
   </channel>

@@ -12,6 +12,60 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>タスク・ランナーをnpm run-scriptでラップ</title>
+      <link>http://hail2u.net/blog/webdesign/wrapping-task-runner-with-npm-run-script.html</link>
+      <description>npm で依存もタスクも一元化するという記事を興味深く読んだ。僕もしばらく前、具体的にはnpm v2出た時からGruntをnpm run-scriptでラップして使っている。概ね良好に機能すると感じている。懸念であった引数で特定の処理を行わせたいようなケースもnpm v2で引数を解釈できるようになったので解決した。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/wrapping-task-runner-with-npm-run-script.html</guid>
+      <pubDate>Sun, 30 Nov 2014 11:48:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="http://qiita.com/Jxck_/items/efaff21b977ddc782971"&gt;npm で依存もタスクも一元化する&lt;/a&gt;という記事を興味深く読んだ。僕もしばらく前、具体的にはnpm v2出た時からGruntを&lt;a href="https://www.npmjs.org/doc/cli/npm-run-script.html"&gt;npm run-script&lt;/a&gt;でラップして使っている。概ね良好に機能すると感じている。懸念であった引数で特定の処理を行わせたいようなケースもnpm v2で引数を解釈できるようになったので解決した。&lt;/p&gt;
+
+&lt;p&gt;npm run-script経由にすることによる大きなデメリットとしては、そんなに速くもないnpm経由で常にタスクを実行することによる速度の低下が挙げられる。&lt;/p&gt;
+
+&lt;p&gt;この速度の低下は、Gruntやgulpの主要な目的であるビルドにおいてはそれほど問題にならない。ビルドにかかる時間に比べると、相対的にその低下の割合は低いものだと考えられるからだ。しかしタスクはそういったものにとどまらず例えばHTML(やMarkdown)のプレビューであったり、Sassのオンデマンド・コンパイルといった小さなタスクもある。その場合は速度低下が占める割合は高くなってしまい、実行時のストレスに繋がる。&lt;/p&gt;
+
+&lt;p&gt;もちろんそういった小さなタスクを各開発者が自前で用意している環境に任せるという選択もあり、実際そうする方が良いことが多い。しかしその一方で小さなタスクまでも用意してやることによって、環境一式を開発者間で揃えられるというメリットも捨てがたい。その場合、小さなタスクのコストをできるだけ小さく抑えるための工夫が必要になる。&lt;/p&gt;
+
+&lt;p&gt;そうなるとタスク・ランナー経由で実行させるよりも、設定不要な小さなNode.jsスクリプトを作りそれを実行した方が効率的だ。プロジェクトにGruntとgulpを混ぜてnpm run-scriptでラップというのは馬鹿げているが、Gruntと小さなNode.jsスクリプトの組み合わせは悪くはない。そのNode.jsスクリプトが設定不要なことと&lt;code&gt;package.json&lt;/code&gt;の&lt;code&gt;script&lt;/code&gt;で複雑なコマンドライン・オプションを指定したコマンドを定義しないこと辺りがキモになる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;private&amp;quot;: true,
+  &amp;quot;scripts&amp;quot;: {
+    &amp;quot;build&amp;quot;: &amp;quot;grunt build&amp;quot;,
+    &amp;quot;deploy&amp;quot;: &amp;quot;grunt deploy&amp;quot;,
+    &amp;quot;preview&amp;quot;: &amp;quot;.bin/preview&amp;quot;,
+    &amp;quot;sassc&amp;quot;: &amp;quot;.bin/sassc&amp;quot;,
+    &amp;quot;start&amp;quot;: &amp;quot;grunt connect&amp;quot;,
+    &amp;quot;test&amp;quot;: &amp;quot;grunt test&amp;quot;
+  },
+  devDependencies: {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;具体的にはこのような形でミックスしている。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ npm test
+$ npm run deploy
+$ npm run preview -- src/weblog/drafts/example.markdown
+$ npm run sassc -- src/css/style.scss
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;実行のインターフェイスは統一され、引数あるなしはあるものの中身には特に左右されない。例えばこの&lt;code&gt;.bin/preview&lt;/code&gt; (20行くらい)では引数のファイルの拡張子でどうやってHTMLを作るかを分け、一時ディレクトリーにHTMLファイルを作成し、最後にそれをブラウザーで開くようになっている。また&lt;code&gt;.bin/sassc&lt;/code&gt; (10行くらい)はSassのCLIプログラムをプロジェクトにあった形のオプションで実行するだけのラッパー・スクリプトだ。&lt;/p&gt;
+
+&lt;p&gt;両者ともに似たような、またはもっと高機能のGruntプラグインやgulpプラグインはいくつも存在する。それらは小回りを犠牲に汎用性を持たせているため、プロジェクト特化型の小さなNode.jsスクリプトと違い、やることに比して大仰過ぎる嫌いがある。まさに牛刀といったところだ。&lt;/p&gt;
+
+&lt;p&gt;無理にGruntやgulpに寄せるよりも、タスクの規模と利用ケースを考慮して書き分け、npm run-scriptで統一してやる方が使いやすいものになるはずだ。どうせ使う方は中身を読んだり修正したりはしないので、Node.jsで完結しているならばどんな風に書かれていても大した問題ではない。プロジェクトを構成するファイルが増えることにはなるが、&lt;code&gt;.bin&lt;/code&gt;といった見えにくいディレクトリーに放り込んでおけば邪魔扱いされることもないだろう。&lt;/p&gt;
+
+&lt;p&gt;僕はGruntやgulpといったタスク・ランナーをいずれ捨てる(新しいタスク・ランナーに変えるではなく、単に捨てる)ことも視野に入れて使っているので、特にこう感じるのかもしれない。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;他には&lt;code&gt;npm run&lt;/code&gt;は微妙に長いことと引数を付ける時に&lt;code&gt;--&lt;/code&gt;を挟むのを忘れがちなことというような、使い方において慣れないと厳しいことくらいか。&lt;code&gt;package.json&lt;/code&gt;の肥大化が～というような観点もあるが、多くても20行くらい(&lt;code&gt;pre-&lt;/code&gt;や&lt;code&gt;post-&lt;/code&gt;を駆使した場合でも)なので&lt;code&gt;Gruntfile.js&lt;/code&gt;のあっという間に300行と比べると問題にならないだろう。&lt;/p&gt;
+
+&lt;p&gt;npm run-scriptでのラップが優れた解であることは疑いないが、その実際の構成にはもう少し色々考えるべきところがありそうだ。もっと様々なユースケースを知りたい。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>Gruntで実行しているエイリアス・タスクの名前とターゲットの取得</title>
       <link>http://hail2u.net/blog/coding/getting-grunt-alias-task-name-and-target.html</link>
       <description>Gruntのタスク内から今実行されているタスクの名前とターゲットは、それぞれthis.nameとthis.targetで取得できる。しかしエイリアス・タスク経由での実行の場合、その名前やターゲットを簡単に取得する方法は用意されてない。どうやっても拾えないかというとそうでもなく、grunt.cli.tasksにコマンドラインで実際に指定されたタスク群が配列として格納されるので、それから拾えば良い。</description>
@@ -285,53 +339,6 @@ var result = csswring.wring(css, {
 &lt;p&gt;自前のHTML生成スクリプトでアドホックにパーシャルの最後の改行を消してたとこを削除できたので、すこぶる気分が良い。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>Markdownの参照形式によるリンク</title>
-      <link>http://hail2u.net/blog/coding/markdown-reference-style-links.html</link>
-      <description>Markdownでリンクを作成する方法には2種類ある。インラインで記述する方法が最もよく使われており、必ずHTMLに変換するということならばこれだけで十分とも言える。もう一つの参照形式で記述する方法はほとんど使われていないが、Markdown文書をテキストとして読む場合に、ともすれば長くなりがちなURLが本文に挟まらないので格段に読みやすさが向上する。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/markdown-reference-style-links.html</guid>
-      <pubDate>Thu, 20 Nov 2014 03:38:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="http://daringfireball.net/projects/markdown/syntax#link"&gt;Markdownでリンクを作成する方法&lt;/a&gt;には2種類ある。インラインで記述する方法が最もよく使われており、必ずHTMLに変換するということならばこれだけで十分とも言える。もう一つの参照形式で記述する方法はほとんど使われていないが、Markdown文書をテキストとして読む場合に、ともすれば長くなりがちなURLが本文に挟まらないので格段に読みやすさが向上する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;This is &lt;mark&gt;[an example reference-style link][1]&lt;/mark&gt;.
-
-&lt;mark&gt;[1]: http://example.com/&lt;/mark&gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;参照形式ではこのような形でリンクを作成する。本文では&lt;code&gt;[link text][id]&lt;/code&gt;という形で書き、文書の最後に&lt;code&gt;[id]: URL&lt;/code&gt;という形で書くわけだ。ちょうど脚注のような形になる。&lt;code&gt;[id]: URL&lt;/code&gt;は任意の場所に書くことができるが、読みやすさと書きやすさの両面から最後にまとめて書いた方が良いだろう。&lt;/p&gt;
-
-&lt;p&gt;この&lt;code&gt;id&lt;/code&gt;は省略できるので以下のようにして作成することもできる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;This is [an example reference-style link]&lt;mark&gt;[]&lt;/mark&gt;.
-
-&lt;mark&gt;[an example reference-style link]&lt;/mark&gt;: http://example.com/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;実はこの空の&lt;code&gt;[]&lt;/code&gt;も省略できるので以下のようにしてもまた作成することができる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;This is &lt;mark&gt;[an example reference-style link]&lt;/mark&gt;.
-
-[an example reference-style link]: http://example.com/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;この&lt;code&gt;[]&lt;/code&gt;の省略についてはドキュメントでは触れられていないが、オリジナルのMarkdown実装及び多くの派生実装でも動作する。本文がよりすっきりすることと、リンクの対応が明確なことがこの書き方の利点だと言える。しかし同じ文字列を繰り返して書くことになるので、決して効率的であるとは言えない。&lt;/p&gt;
-
-&lt;p&gt;数字のIDを使う書き方は脚注として見やすく効率的なのに対して、&lt;code&gt;[]&lt;/code&gt;を省略した書き方は連番を管理する必要がないためメンテナンス性が高い。どちらでも良いが統一はした方が良いだろう。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ウェブログの記事のようにほぼ簡易HTML記法としてMarkdownを使うだけの場合はインラインで書いても問題になることはない。しかし一文や段落の長さといった文章の体裁にも気を使いたい場合、インラインで書かれたURLは大きくその作業を阻害する。参照形式によるリンクを利用するとより自然に文章を添削することが可能になるだろう。&lt;/p&gt;
-
-&lt;p&gt;またプロジェクトのREADMEなど、Markdown文書がそのままテキストととして読まれることも多い場合にも威力を発揮する。紙の文書で欄外の注を読むような感覚でリンクを読むことができるだろう。編集する側としても脚注のような形で最後に参考リンクのリストのようなものをまとめておけることは利点が多いはずだ。&lt;/p&gt;
-
-&lt;p&gt;他に80文字で改行を入れる記述ルールとの相性の良さも見逃せない。インラインの場合には80文字で改行するのはとても難しくなるが、参照形式ならほぼ問題になることはない。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;あまり使われていない参照形式によるリンクだが、こちらを使うことにより、文書を実際の表示に近い形で編集することが可能になる。そうなることによって文書がより良い体裁を持って公開できるようになることに繋がる。かもしれない。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -401,6 +408,6 @@ var result = csswring.wring(css, {
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Sat, 29 Nov 2014 10:16:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 30 Nov 2014 11:48:00 +0900</lastBuildDate>
   </channel>
 </rss>
