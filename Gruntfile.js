@@ -266,6 +266,12 @@ module.exports = function (grunt) {
     },
 
     gitcommit: {
+      add_entry: {
+        option: {
+          message: 'Add'
+        }
+      },
+
       deploy: {
         options: {
           all: true,
@@ -278,12 +284,26 @@ module.exports = function (grunt) {
 
       publish_blog: {
         options: {
-          message: 'Publish'
+          all: true,
+          branch: 'gh-pages',
+          message: 'Publish',
+          push: true,
+          root: 'build/'
         }
       },
 
       update_blog: {
         options: {
+          all: true,
+          branch: 'gh-pages',
+          message: 'Update',
+          push: true,
+          root: 'build/'
+        }
+      },
+
+      update_entry: {
+        option: {
           message: 'Update'
         }
       },
@@ -317,6 +337,13 @@ module.exports = function (grunt) {
     'sitemap'
   ]);
 
+  grunt.registerTask('rebuild:blog', [
+    'blosxom:article',
+    'generate:blog',
+    'merge_feeds',
+    'sitemap'
+  ]);
+
   grunt.registerTask('rebuild:css', [
     'clean:css',
     'sass',
@@ -345,14 +372,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', [
     'rebuild',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:blog', [
-    'blosxom:article',
-    'generate:blog',
-    'merge_feeds',
-    'sitemap',
     'gitcommit:deploy'
   ]);
 
@@ -388,13 +407,15 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('publish:blog', [
-    'gitcommit:publish_blog',
-    'deploy:blog'
+    'gitcommit:add_entry',
+    'rebuild:blog',
+    'gitcommit:publish_blog'
   ]);
 
   grunt.registerTask('update:blog', [
-    'gitcommit:update_blog',
-    'deploy:blog'
+    'gitcommit:update_entry',
+    'rebuild:blog',
+    'gitcommit:update_blog'
   ]);
 
   grunt.registerTask('default', ['connect']);
