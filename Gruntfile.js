@@ -330,46 +330,6 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('.grunt/task/');
 
-  grunt.registerTask('rebuild', [
-    'rebuild:css',
-    'rebuild:js',
-    'rebuild:html',
-    'sitemap'
-  ]);
-
-  grunt.registerTask('rebuild:blog', [
-    'blosxom:article',
-    'generate:blog',
-    'merge_feeds',
-    'sitemap'
-  ]);
-
-  grunt.registerTask('rebuild:css', [
-    'clean:css',
-    'sass',
-    'css_mqpacker',
-    'csswring',
-    'copy:css',
-    'copy:style_guide',
-  ]);
-
-  grunt.registerTask('rebuild:js', [
-    'clean:js',
-    'concat:js',
-    'uglify',
-    'copy:js',
-  ]);
-
-  grunt.registerTask('rebuild:html', [
-    'generate:main',
-    'generate:blog_theme',
-    'blosxom:index'
-  ]);
-
-  grunt.registerTask('upload', [
-    'gitcommit:upload'
-  ]);
-
   grunt.registerTask('deploy', [
     'rebuild',
     'gitcommit:deploy'
@@ -412,11 +372,49 @@ module.exports = function (grunt) {
     'gitcommit:publish_blog'
   ]);
 
+  grunt.registerTask('rebuild', [
+    'rebuild:css',
+    'rebuild:js',
+    'rebuild:html',
+    'sitemap'
+  ]);
+
+  grunt.registerTask('rebuild:blog', [
+    'blosxom:article',
+    'generate:blog',
+    'merge_feeds',
+    'sitemap'
+  ]);
+
+  grunt.registerTask('rebuild:css', [
+    'clean:css',
+    'sass',
+    'css_mqpacker',
+    'csswring',
+    'copy:css',
+    'copy:style_guide',
+  ]);
+
+  grunt.registerTask('rebuild:js', [
+    'clean:js',
+    'concat:js',
+    'uglify',
+    'copy:js',
+  ]);
+
+  grunt.registerTask('rebuild:html', [
+    'generate:main',
+    'generate:blog_theme',
+    'blosxom:index'
+  ]);
+
   grunt.registerTask('update:blog', [
     'gitcommit:update_entry',
     'rebuild:blog',
     'gitcommit:update_blog'
   ]);
 
-  grunt.registerTask('default', ['connect']);
+  grunt.registerTask('upload', [
+    'gitcommit:upload'
+  ]);
 };
