@@ -267,7 +267,7 @@ module.exports = function (grunt) {
 
     gitcommit: {
       add_entry: {
-        option: {
+        options: {
           message: 'Add'
         }
       },
@@ -303,7 +303,7 @@ module.exports = function (grunt) {
       },
 
       update_entry: {
-        option: {
+        options: {
           message: 'Update'
         }
       },
