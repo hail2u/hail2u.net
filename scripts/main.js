@@ -30,10 +30,6 @@
 (function (d) {
   var csses = [
     {
-      href: '/styles/print.min.css',
-      media: 'print'
-    },
-    {
       href: '/fonts/megrim.min.css'
     },
     {
