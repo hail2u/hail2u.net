@@ -12,12 +12,48 @@
     <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>kyo@hail2u.net (Kyo Nagashima)</managingEditor>
     <webMaster>kyo@hail2u.net (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Thu, 4 Dec 2014 16:47:53 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 5 Dec 2014 01:19:24 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>Sassでの関数の再帰呼び出し</title>
+      <link>http://hail2u.net/blog/coding/recursive-function-in-sass.html</link>
+      <description>ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/recursive-function-in-sass.html</guid>
+      <pubDate>Fri, 05 Dec 2014 01:19:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。</p>
+
+<p>以下のようなテスト・コードを書き、<code>$max</code>を書きかえて限界を探った。</p>
+
+<pre><code>$initial: 0;
+$max: 302;
+
+@function loop($i) {
+  $i: $i + 1;
+
+  @if ($i &lt; $max) {
+    @return loop($i);
+  } @else {
+    @return $i;
+  }
+}
+
+.test {
+  z-index: loop($initial);
+}
+</code></pre>
+
+<p>コンパイラーが落ちず、出力されるCSSで<code>z-index</code>プロパティーの値が<code>$initial + $max</code>と等しくなれば良い。手元の環境(Sass v3.4.9)では302までは問題なく通り、303にするとstack level too deep (SystemStackError)で落ちた。</p>
+
+<p>再帰呼び出しの内容にもよるかもしれないが、数十回くらいまでなら再帰呼び出ししても問題なさそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>ゆるやかな出会い</title>
@@ -315,47 +351,6 @@ module.exports = function (grunt) {
 <hr>
 
 <p>そのまま流れでアッシュ・リンクスのお話の方を読んでて、時間がいくらあっても足りない。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSWringとCSS MQPackerのv2.0.0をリリース</title>
-      <link>http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v2.0.0.html</link>
-      <description>CSSWringとCSS MQPackerをPostCSS v3に更新したものをリリースした。どのバージョンを上げるか迷ったが、メジャー・バージョンアップして気持ち悪いのは自分だけなので、ユーザーに混乱を与えないようにメジャー・バージョンを上げることにした。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v2.0.0.html</guid>
-      <pubDate>Tue, 25 Nov 2014 09:12:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="https://github.com/hail2u/node-csswring">CSSWring</a>と<a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>をPostCSS v3に更新したものをリリースした。<a href="http://hail2u.net/blog/software/major-update-of-dependencies.html">どのバージョンを上げるか</a>迷ったが、メジャー・バージョンアップして気持ち悪いのは自分だけなので、ユーザーに混乱を与えないようにメジャー・バージョンを上げることにした。</p>
-
-<p>PostCSSにそのまま渡されるオプションのうち<code>map</code>キーのデフォルト値が変わったことが互換性のない変更ということになる。今まで通りソース・マップ・ファイルを外部に吐き、元ソースを含めない場合は以下のように設定してやる必要がある。</p>
-
-<pre><code>var csswring = require(&#39;csswring&#39;);
-
-var result = csswring.wring(css, {
-  map: {
-    inline: false,
-    sourcesContent: false
-  },
-  from: &#39;from.css&#39;,
-  to: &#39;to.css&#39;
-});
-</code></pre>
-
-<p>つまりインラインにソース・マップを埋め込む<code>inline</code>オプションと、元ソースをソース・マップに含める<code>sourcesContent</code>オプションが<code>false</code>から<code>true</code>に変更になったので、それぞれを無効にしてやる必要があるということだ。単純にインラインで元ソース付きのソース・マップでも構わないのなら、<code>map</code>オプションを<code>true</code>にするだけで良い。</p>
-
-<pre><code>var csswring = require(&#39;csswring&#39;);
-
-var result = csswring.wring(css, {
-  map: true
-});
-</code></pre>
-
-<p>この場合はインラインで全て解決するので、<code>from</code>や<code>to</code>オプションも不要になる。</p>
-
-<hr>
-
-<p>インラインをデフォルトにした理由はちょっと良くわかっていない。インラインの方がパス解決などの点で都合が良いことが多く、開発現場では使いやすいからなのではないかと想像している。今までのように<code>map: true</code>だと出力するCSSが肥大化する(3倍超)ので、開発とリリースそれぞれのビルドにおいてオプションを変えて生成するように気を付ける必要があるだろう。</p>]]></content:encoded>
     </item>
 
   </channel>

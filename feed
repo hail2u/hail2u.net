@@ -12,6 +12,40 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Sassでの関数の再帰呼び出し</title>
+      <link>http://hail2u.net/blog/coding/recursive-function-in-sass.html</link>
+      <description>ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/recursive-function-in-sass.html</guid>
+      <pubDate>Fri, 05 Dec 2014 01:19:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。&lt;/p&gt;
+
+&lt;p&gt;以下のようなテスト・コードを書き、&lt;code&gt;$max&lt;/code&gt;を書きかえて限界を探った。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$initial: 0;
+$max: 302;
+
+@function loop($i) {
+  $i: $i + 1;
+
+  @if ($i &amp;lt; $max) {
+    @return loop($i);
+  } @else {
+    @return $i;
+  }
+}
+
+.test {
+  z-index: loop($initial);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;コンパイラーが落ちず、出力されるCSSで&lt;code&gt;z-index&lt;/code&gt;プロパティーの値が&lt;code&gt;$initial + $max&lt;/code&gt;と等しくなれば良い。手元の環境(Sass v3.4.9)では302までは問題なく通り、303にするとstack level too deep (SystemStackError)で落ちた。&lt;/p&gt;
+
+&lt;p&gt;再帰呼び出しの内容にもよるかもしれないが、数十回くらいまでなら再帰呼び出ししても問題なさそうだ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>ゆるやかな出会い</title>
       <link>http://hail2u.net/blog/blog/encounter.html</link>
       <description>内容に曖昧なところの少ない公式文書や仕様書、あるいはWikipediaの項目などのみをリンクで参照する形でウェブログの記事が書かれることが多くなった。孫引きや孫々引きのような記事は減り、全体的な記事の質は比べ物にならないくらい上がった。その一方でゆるやかな繋がりは死に、それに伴うゆるやかな出会いは消滅した。</description>
@@ -292,45 +326,6 @@ module.exports = function (grunt) {
 &lt;p&gt;そのまま流れでアッシュ・リンクスのお話の方を読んでて、時間がいくらあっても足りない。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>CSSWringとCSS MQPackerのv2.0.0をリリース</title>
-      <link>http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v2.0.0.html</link>
-      <description>CSSWringとCSS MQPackerをPostCSS v3に更新したものをリリースした。どのバージョンを上げるか迷ったが、メジャー・バージョンアップして気持ち悪いのは自分だけなので、ユーザーに混乱を与えないようにメジャー・バージョンを上げることにした。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v2.0.0.html</guid>
-      <pubDate>Tue, 25 Nov 2014 09:12:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="https://github.com/hail2u/node-csswring"&gt;CSSWring&lt;/a&gt;と&lt;a href="https://github.com/hail2u/node-css-mqpacker"&gt;CSS MQPacker&lt;/a&gt;をPostCSS v3に更新したものをリリースした。&lt;a href="http://hail2u.net/blog/software/major-update-of-dependencies.html"&gt;どのバージョンを上げるか&lt;/a&gt;迷ったが、メジャー・バージョンアップして気持ち悪いのは自分だけなので、ユーザーに混乱を与えないようにメジャー・バージョンを上げることにした。&lt;/p&gt;
-
-&lt;p&gt;PostCSSにそのまま渡されるオプションのうち&lt;code&gt;map&lt;/code&gt;キーのデフォルト値が変わったことが互換性のない変更ということになる。今まで通りソース・マップ・ファイルを外部に吐き、元ソースを含めない場合は以下のように設定してやる必要がある。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var csswring = require(&amp;#39;csswring&amp;#39;);
-
-var result = csswring.wring(css, {
-  map: {
-    inline: false,
-    sourcesContent: false
-  },
-  from: &amp;#39;from.css&amp;#39;,
-  to: &amp;#39;to.css&amp;#39;
-});
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;つまりインラインにソース・マップを埋め込む&lt;code&gt;inline&lt;/code&gt;オプションと、元ソースをソース・マップに含める&lt;code&gt;sourcesContent&lt;/code&gt;オプションが&lt;code&gt;false&lt;/code&gt;から&lt;code&gt;true&lt;/code&gt;に変更になったので、それぞれを無効にしてやる必要があるということだ。単純にインラインで元ソース付きのソース・マップでも構わないのなら、&lt;code&gt;map&lt;/code&gt;オプションを&lt;code&gt;true&lt;/code&gt;にするだけで良い。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var csswring = require(&amp;#39;csswring&amp;#39;);
-
-var result = csswring.wring(css, {
-  map: true
-});
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;この場合はインラインで全て解決するので、&lt;code&gt;from&lt;/code&gt;や&lt;code&gt;to&lt;/code&gt;オプションも不要になる。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;インラインをデフォルトにした理由はちょっと良くわかっていない。インラインの方がパス解決などの点で都合が良いことが多く、開発現場では使いやすいからなのではないかと想像している。今までのように&lt;code&gt;map: true&lt;/code&gt;だと出力するCSSが肥大化する(3倍超)ので、開発とリリースそれぞれのビルドにおいてオプションを変えて生成するように気を付ける必要があるだろう。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -400,6 +395,6 @@ var result = csswring.wring(css, {
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Thu, 04 Dec 2014 02:19:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 05 Dec 2014 01:19:00 +0900</lastBuildDate>
   </channel>
 </rss>
