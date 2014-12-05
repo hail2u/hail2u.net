@@ -1,34 +1,66 @@
-document.body.addEventListener('dblclick', function () {
-  if (/\bshow-column\b/.test(this.className)) {
-    this.className = this.className.replace(/ \bdebug\b/, '');
-  } else {
-    this.className += ' show-column';
+(function () {
+  var c = 'show-column';
+
+  if (!('classList' in document.createElement('_'))) {
+    var re = new RegExp(' \\b' + c + '\\b');
+    document.body.addEventListener('dblclick', function () {
+      if (re.test(this.className)) {
+        this.className = this.className.replace(re, '');
+      } else {
+        this.className += ' ' + c;
+      }
+    }, false);
+
+    return;
   }
-}, false);
 
-document.querySelector('#introduction h1').addEventListener('click', function (e) {
-  if (e.which === 1) {
-    var body = document.body;
+  document.body.addEventListener('dblclick', function () {
+    this.classList.toggle(c);
+  }, false);
+})();
 
-    if (/\bpermalink\b/.test(body.className)) {
-      body.className = body.className.replace(/\s?\bpermalink\b/, '');
-    } else {
-      body.className += ' permalink';
+(function () {
+  var intro = '#introduction h1';
+  var c = 'permalink';
+
+  if (!('classList' in document.createElement('_'))) {
+    var re = new RegExp(' \\b' + c + '\\b');
+    document.querySelector(intro).addEventListener('click', function (e) {
+      if (e.which === 1) {
+        var body = document.body;
+
+        if (re.test(body.className)) {
+          body.className = body.className.replace(re, '');
+        } else {
+          body.className += ' ' + c;
+        }
+
+        e.preventDefault();
+      }
+    }, false);
+
+    return;
+  }
+
+  document.querySelector(intro).addEventListener('click', function (e) {
+    if (e.which === 1) {
+      document.body.classList.toggle(c);
     }
+  }, false);
+})();
 
-    e.preventDefault();
-  }
-}, false);
-
-document.querySelector('.tagline').addEventListener('click', function () {
+(function () {
   var debug  = 'Lorem ipsum dolor sit amet, consectetur <em>adipiscing</em> elit. Cras sit amet risus ac odio porta sodales. Etiam consectetur eros et lacus &amp; tristique <em>imperdiet</em>.';
   var store = 'data-original';
-  var current = this.getAttribute(store);
-  this.setAttribute(store, this.innerHTML);
+  var tagline = document.querySelector('.tagline');
+  tagline.setAttribute(store, tagline.innerHTML);
+  tagline.addEventListener('click', function () {
+    var current = this.innerHTML;
 
-  if (current && current !== debug) {
-    this.innerHTML = current;
-  } else {
-    this.innerHTML = debug;
-  }
-}, false);
+    if (current !== debug) {
+      this.innerHTML = debug;
+    } else {
+      this.innerHTML = this.getAttribute(store);
+    }
+  }, false);
+})();
