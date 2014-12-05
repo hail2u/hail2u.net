@@ -55,5 +55,5 @@
 
     links.appendChild(link);
   });
-  document.headocument.appendChild(links);
+  document.head.appendChild(links);
 })();
