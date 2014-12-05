@@ -1,13 +1,29 @@
-document.querySelector('#introduction h1').addEventListener('click', function (e) {
-  if (e.which === 1) {
-    var body = document.body;
+(function () {
+  var intro = '#introduction h1';
+  var c = 'permalink';
 
-    if (/\bpermalink\b/.test(body.className)) {
-      body.className = body.className.replace(/\s?\bpermalink\b/, '');
-    } else {
-      body.className += ' permalink';
-    }
+  if (!('classList' in document.createElement('_'))) {
+    var re = new RegExp(' \\b' + c + '\\b');
+    document.querySelector(intro).addEventListener('click', function (e) {
+      if (e.which === 1) {
+        var body = document.body;
 
-    e.preventDefault();
+        if (re.test(body.className)) {
+          body.className = body.className.replace(re, '');
+        } else {
+          body.className += ' ' + c;
+        }
+
+        e.preventDefault();
+      }
+    }, false);
+
+    return;
   }
-}, false);
+
+  document.querySelector(intro).addEventListener('click', function (e) {
+    if (e.which === 1) {
+      document.body.classList.toggle(c);
+    }
+  }, false);
+})();
