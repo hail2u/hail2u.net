@@ -3,8 +3,8 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2013
  */
-(function (d) {
-  var placeholder = d.getElementById('popular-pages');
+(function () {
+  var placeholder = document.getElementById('popular-pages');
 
   if (!placeholder) {
     return;
@@ -12,8 +12,8 @@
 
   window.displayPopularPages = function (data) {
     function txt(str) {
-      var a = d.createElement('a');
-      a.appendChild(d.createTextNode(str));
+      var a = document.createElement('a');
+      a.appendChild(document.createTextNode(str));
 
       return a.innerHTML;
     }
@@ -51,10 +51,10 @@
     delete window.displayPopularPages;
   };
 
-  var js = d.createElement('script');
-  var s = d.getElementsByTagName('script')[0];
+  var js = document.createElement('script');
+  var s = document.getElementsByTagName('script')[0];
 
   js.async = true;
   js.src = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D"http%3A%2F%2Fb.hatena.ne.jp%2Fentrylist%3Fsort%3Dcount%26url%3Dhttp%253A%252F%252Fhail2u.net%252F%26mode%3Drss"&format=json&callback=displayPopularPages';
   s.parentNode.insertBefore(js, s);
-})(document);
+})();
