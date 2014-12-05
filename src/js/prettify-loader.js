@@ -12,16 +12,18 @@ document.addEventListener('readystatechange', function () {
   var reLanguage = new RegExp('\\blanguage-(' + languages.join('|') + ')\\b');
   var codes = document.querySelectorAll('code[class*=language-]');
 
-  if (codes) {
-    for (var i = 0, l = codes.length; i < l; i++) {
-      var code = codes[i];
-      var parent = code.parentNode;
-
-      if (parent.tagName.toLowerCase() === 'pre' && reLanguage.test(code.className)) {
-        parent.className += ' prettyprint';
-      }
-    }
-
-    prettyPrint();
+  if (!codes) {
+    return;
   }
+
+  for (var i = 0, l = codes.length; i < l; i++) {
+    var code = codes[i];
+    var parent = code.parentNode;
+
+    if (parent.tagName.toLowerCase() === 'pre' && reLanguage.test(code.className)) {
+      parent.className += ' prettyprint';
+    }
+  }
+
+  prettyPrint();
 });
