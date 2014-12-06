@@ -12,7 +12,8 @@ module.exports = function (grunt) {
     var path = require('path');
     var sprintf = require('sprintf').sprintf;
 
-    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+      'Sep', 'Oct', 'Nov', 'Dec'];
     var categoryNames = {
       'Blog': 'blog',
       'Blosxom': 'blosxom',
@@ -30,7 +31,9 @@ module.exports = function (grunt) {
 
     var done = this.async();
     var dirTemplate = this.data.cwd;
-    var metadataBase = JSON.parse(fs.readFileSync(dirTemplate + 'metadata.json', 'utf8'));
+    var metadataBase = JSON.parse(
+      fs.readFileSync(dirTemplate + 'metadata.json', 'utf8')
+    );
     var dirPartial = path.join(dirTemplate, 'partial');
     fs.readdirSync(dirPartial).forEach(function (partial) {
       hbs.registerPartial(
@@ -86,7 +89,9 @@ module.exports = function (grunt) {
         }
 
         case 'src/html/blog/index.mustache': {
-          data.articles = _loadArticles('src/weblog/plugins/state/files_index.dat');
+          data.articles = _loadArticles(
+            'src/weblog/plugins/state/files_index.dat'
+          );
 
           break;
         }
@@ -150,7 +155,10 @@ module.exports = function (grunt) {
     }
 
     function _loadArticles(data) {
-      var cache = path.relative(process.cwd(), path.join(__dirname, '../cache', 'articles.json'));
+      var cache = path.relative(
+        process.cwd(),
+        path.join(__dirname, '../cache', 'articles.json')
+      );
       var articles = JSON.parse(fs.readFileSync(cache, 'utf8'));
       var fileNew = path.basename(grunt.option('file'));
 
@@ -193,7 +201,8 @@ module.exports = function (grunt) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
           fs.writeFileSync(cache, JSON.stringify(articles));
-          grunt.log.writeln('File "' + cache.replace(/\\/g, '/') + '" updated.');
+          grunt.log.writeln('File "' + cache.replace(/\\/g, '/') +
+            '" updated.');
         });
       }
 
