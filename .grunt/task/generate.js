@@ -31,7 +31,13 @@ module.exports = function (grunt) {
     var done = this.async();
     var dirTemplate = this.data.cwd;
     var metadataBase = JSON.parse(fs.readFileSync(dirTemplate + 'metadata.json', 'utf8'));
-    var partials = _loadSharedPartials();
+    var dirPartial = path.join(dirTemplate, 'partial');
+    fs.readdirSync(dirPartial).forEach(function (partial) {
+      hbs.registerPartial(
+        path.basename(partial, '.mustache'),
+        fs.readFileSync(path.join(dirPartial, partial), 'utf8')
+      );
+    });
 
     async.each(this.files, function (file, next) {
       var fileTemplate = file.src[0];
@@ -46,30 +52,12 @@ module.exports = function (grunt) {
       var metadata = _extendData(fileTemplate);
       var template = fs.readFileSync(fileTemplate, 'utf8');
       var render = hbs.compile(template);
-      var rendered = render(metadata, {
-        partials: partials
-      });
-      fs.writeFileSync(file.dest, rendered);
+      fs.writeFileSync(file.dest, render(metadata));
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
       done(error);
     });
-
-    function _loadSharedPartials() {
-      var dir = path.join(dirTemplate, 'partial');
-      var partials = {};
-
-      var files = fs.readdirSync(dir);
-
-      for (var i = 0, l = files.length; i < l; i++) {
-        var file = files[i];
-        var name = path.basename(file, '.mustache');
-        partials[name] = fs.readFileSync(path.join(dir, file), 'utf8');
-      }
-
-      return partials;
-    }
 
     function _extendData(file) {
       var data = _extendObject({}, metadataBase);
