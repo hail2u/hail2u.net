@@ -327,29 +327,29 @@ module.exports = function (grunt) {
   grunt.loadTasks('.grunt/task/');
 
   grunt.registerTask('deploy', [
-    'rebuild',
+    'build',
     'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:css', [
-    'rebuild:css',
+    'build:css',
     'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:js', [
-    'rebuild:js',
+    'build:js',
     'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:home', [
-    'rebuild:html',
+    'build:html',
     'merge_feeds:main',
     'sitemap',
     'gitcommit:deploy'
   ]);
 
   grunt.registerTask('deploy:html', [
-    'rebuild:html',
+    'build:html',
     'gitcommit:deploy'
   ]);
 
@@ -364,25 +364,25 @@ module.exports = function (grunt) {
 
   grunt.registerTask('publish:blog', [
     'gitcommit:add_entry',
-    'rebuild:blog',
+    'build:blog',
     'gitcommit:publish_blog'
   ]);
 
-  grunt.registerTask('rebuild', [
-    'rebuild:css',
-    'rebuild:js',
-    'rebuild:html',
+  grunt.registerTask('build', [
+    'build:css',
+    'build:js',
+    'build:html',
     'sitemap'
   ]);
 
-  grunt.registerTask('rebuild:blog', [
+  grunt.registerTask('build:blog', [
     'blosxom:article',
     'generate:blog',
     'merge_feeds',
     'sitemap'
   ]);
 
-  grunt.registerTask('rebuild:css', [
+  grunt.registerTask('build:css', [
     'clean:css',
     'sass',
     'css_mqpacker',
@@ -391,14 +391,14 @@ module.exports = function (grunt) {
     'copy:style_guide',
   ]);
 
-  grunt.registerTask('rebuild:js', [
+  grunt.registerTask('build:js', [
     'clean:js',
     'concat:js',
     'uglify',
     'copy:js',
   ]);
 
-  grunt.registerTask('rebuild:html', [
+  grunt.registerTask('build:html', [
     'generate:main',
     'generate:blog_theme',
     'blosxom:index'
@@ -406,7 +406,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('update:blog', [
     'gitcommit:update_entry',
-    'rebuild:blog',
+    'build:blog',
     'gitcommit:update_blog'
   ]);
 
