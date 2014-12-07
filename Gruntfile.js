@@ -28,9 +28,7 @@ module.exports = function (grunt) {
 
       js: {
         files: {
-          '.grunt/tmp/debug.js': [
-            'src/js/debug/show-column.js'
-          ],
+          '.grunt/tmp/debug.js': ['src/js/debug/show-column.js'],
           '.grunt/tmp/main.js': [
             'src/js/bower_components/unutm/unutm.js',
             'src/js/async-csses.js'
@@ -412,7 +410,5 @@ module.exports = function (grunt) {
     'gitcommit:update_blog'
   ]);
 
-  grunt.registerTask('upload', [
-    'gitcommit:upload'
-  ]);
+  grunt.registerTask('upload', ['gitcommit:upload']);
 };
