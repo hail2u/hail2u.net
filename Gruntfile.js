@@ -63,6 +63,12 @@ module.exports = function (grunt) {
         ]
       },
 
+      favicon: {
+        files: {
+          'build/images/favicon.svg': 'build/images/logo.min.svg'
+        }
+      },
+
       js: {
         cwd: '.grunt/tmp/',
         dest: 'build/scripts/',
@@ -345,6 +351,80 @@ module.exports = function (grunt) {
           root: 'build/'
         }
       }
+    },
+
+    svg2png: {
+      favicon16: {
+        options: {
+          width: 16
+        },
+
+        dest: 'build/images/favicon-16.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon32: {
+        options: {
+          width: 32
+        },
+
+        dest: 'build/images/favicon-32.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon48: {
+        options: {
+          width: 48
+        },
+
+        dest: 'build/images/favicon-48.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon64: {
+        options: {
+          width: 64
+        },
+
+        dest: 'build/images/favicon-64.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon114: {
+        options: {
+          width: 114
+        },
+
+        dest: 'build/images/favicon-114.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon152: {
+        options: {
+          width: 152
+        },
+
+        dest: 'build/images/favicon-152.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon256: {
+        options: {
+          width: 256
+        },
+
+        dest: 'build/images/favicon-256.png',
+        src: 'build/images/favicon.svg'
+      },
+
+      favicon1024: {
+        options: {
+          width: 1024
+        },
+
+        dest: 'build/images/favicon-1024.png',
+        src: 'build/images/favicon.svg'
+      }
     }
   });
 
@@ -366,6 +446,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy:css', [
     'build:css',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:favicon', [
+    'build:favicon',
     'gitcommit:deploy'
   ]);
 
@@ -404,6 +489,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'build:css',
+    'build:favicon',
     'build:js',
     'build:html',
     'sitemap'
@@ -423,6 +509,18 @@ module.exports = function (grunt) {
     'csswring',
     'copy:css',
     'copy:style_guide',
+  ]);
+
+  grunt.registerTask('build:favicon', [
+    'copy:favicon',
+    'svg2png:favicon16',
+    'svg2png:favicon32',
+    'svg2png:favicon48',
+    'svg2png:favicon64',
+    'svg2png:favicon114',
+    'svg2png:favicon152',
+    'svg2png:favicon256',
+    'svg2png:favicon1024'
   ]);
 
   grunt.registerTask('build:js', [
