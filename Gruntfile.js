@@ -520,7 +520,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build:html', [
     'generate:main',
     'generate:blog_theme',
-    'gitcommit:blog_theme',
+    'gitcommit:update_blog_theme',
     'blosxom:index'
   ]);
 
