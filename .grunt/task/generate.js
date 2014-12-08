@@ -200,7 +200,7 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          fs.writeFileSync(cache, JSON.stringify(articles));
+          fs.writeFileSync(cache, JSON.stringify(articles, null, 2));
           grunt.log.writeln('File "' + cache.replace(/\\/g, '/') +
             '" updated.');
         });
