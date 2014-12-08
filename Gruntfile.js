@@ -317,14 +317,6 @@ module.exports = function (grunt) {
         }
       },
 
-      update_blog_theme: {
-        options: {
-          message: 'Update weblog theme'
-        },
-
-        src: ['src/weblog/entries/themes/html/page']
-      },
-
       update_cache: {
         options: {
           message: 'Update cache files'
@@ -520,7 +512,6 @@ module.exports = function (grunt) {
   grunt.registerTask('build:html', [
     'generate:main',
     'generate:blog_theme',
-    'gitcommit:update_blog_theme',
     'blosxom:index'
   ]);
 
