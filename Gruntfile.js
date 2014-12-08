@@ -354,8 +354,7 @@ module.exports = function (grunt) {
           'build/images/favicon-48.png',
           'build/images/favicon-256.png'
         ]
-      },
-
+      }
     },
 
     svg2png: {
