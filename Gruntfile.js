@@ -352,7 +352,7 @@ module.exports = function (grunt) {
           'build/images/favicon-16.png',
           'build/images/favicon-32.png',
           'build/images/favicon-48.png',
-          'build/images/favicon-128.png',
+          'build/images/favicon-256.png'
         ]
       },
 
@@ -395,12 +395,12 @@ module.exports = function (grunt) {
         src: 'build/images/favicon.svg'
       },
 
-      favicon128: {
+      favicon256: {
         options: {
-          width: 128
+          width: 256
         },
 
-        dest: 'build/images/favicon-128.png',
+        dest: 'build/images/favicon-256.png',
         src: 'build/images/favicon.svg'
       },
 
@@ -504,7 +504,7 @@ module.exports = function (grunt) {
     'svg2png:favicon16',
     'svg2png:favicon32',
     'svg2png:favicon48',
-    'svg2png:favicon128',
+    'svg2png:favicon256',
     'svg2png:favicon1024',
     'png2ico'
   ]);

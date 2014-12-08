@@ -9,21 +9,25 @@ module.exports = function (grunt) {
     var options = this.options({});
 
     var args = [];
-    var cmd = 'png2ico';
+    var cmd = 'convert';
     var opts = {
       stdio: 'inherit'
     };
 
+    if (grunt.option('verbose')) {
+      args.push('-verbose');
+    }
+
     this.files.forEach(function (file) {
-      args.push(file.dest);
       args = args.concat(file.src);
+      args.push(file.dest);
       grunt.util.spawn({
         cmd: cmd,
         args: args,
         opts: opts
       }, function (error, result, code) {
         if (error) {
-          done(error);
+          return done(error);
         }
 
         grunt.log.writeln('File "' + file.dest + '" created.');
