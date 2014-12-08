@@ -22,18 +22,20 @@ module.exports = function (grunt) {
     },
 
     concat: {
-      options: {
-        seperator: ';'
-      },
-
       js: {
+        options: {
+          seperator: ';',
+          sourceMap: true,
+          sourceMapStyle: 'link'
+        },
+
         files: {
-          '.grunt/tmp/debug.js': ['src/js/debug/show-column.js'],
-          '.grunt/tmp/main.js': [
-            'src/js/bower_components/unutm/unutm.js',
-            'src/js/async-csses.js'
+          '.grunt/tmp/debug.min.js': ['.grunt/tmp/show-column.min.js'],
+          '.grunt/tmp/main.min.js': [
+            '.grunt/tmp/unutm.min.js',
+            '.grunt/tmp/async-csses.min.js'
           ],
-          '.grunt/tmp/search.js': ['src/js/popular-pages.js']
+          '.grunt/tmp/search.min.js': ['.grunt/tmp/popular-pages.min.js']
         }
       }
     },
@@ -69,6 +71,17 @@ module.exports = function (grunt) {
           '**/*.js',
           '**/*.js.map'
         ]
+      },
+
+      prejs: {
+        files: {
+          '.grunt/tmp/async-csses.js': 'src/js/async-csses.js',
+          '.grunt/tmp/popular-pages.js': 'src/js/popular-pages.js',
+          '.grunt/tmp/show-column.js': 'src/js/debug/show-column.js',
+          '.grunt/tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
+          '.grunt/tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
+          '.grunt/tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
+        }
       },
 
       style_guide: {
@@ -173,7 +186,7 @@ module.exports = function (grunt) {
           ascii_only: true
         },
 
-        preserveComments: false,
+        preserveComments: 'some',
         sourceMap: true
       },
 
@@ -298,6 +311,14 @@ module.exports = function (grunt) {
         }
       },
 
+      update_blog_theme: {
+        options: {
+          message: 'Update weblog theme'
+        },
+
+        src: ['src/weblog/entries/themes/html/page']
+      },
+
       update_cache: {
         options: {
           message: 'Update cache files'
@@ -406,14 +427,16 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:js', [
     'clean:js',
-    'concat:js',
+    'copy:prejs',
     'uglify',
+    'concat:js',
     'copy:js',
   ]);
 
   grunt.registerTask('build:html', [
     'generate:main',
     'generate:blog_theme',
+    'gitcommit:blog_theme',
     'blosxom:index'
   ]);
 
