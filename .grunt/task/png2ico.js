@@ -14,6 +14,10 @@ module.exports = function (grunt) {
       stdio: 'inherit'
     };
 
+    if (process.platform === 'win32') {
+      cmd += '.bat';
+    }
+
     if (grunt.option('verbose')) {
       args.push('-verbose');
     }
