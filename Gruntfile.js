@@ -353,6 +353,19 @@ module.exports = function (grunt) {
       }
     },
 
+    png2ico: {
+      main: {
+        dest: 'build/favicon.ico',
+        src: [
+          'build/images/favicon-16.png',
+          'build/images/favicon-32.png',
+          'build/images/favicon-48.png',
+          'build/images/favicon-128.png',
+        ]
+      },
+
+    },
+
     svg2png: {
       apple_touch_icon: {
         options: {
@@ -390,21 +403,12 @@ module.exports = function (grunt) {
         src: 'build/images/favicon.svg'
       },
 
-      favicon64: {
+      favicon128: {
         options: {
-          width: 64
+          width: 128
         },
 
-        dest: 'build/images/favicon-64.png',
-        src: 'build/images/favicon.svg'
-      },
-
-      favicon256: {
-        options: {
-          width: 256
-        },
-
-        dest: 'build/images/favicon-256.png',
+        dest: 'build/images/favicon-128.png',
         src: 'build/images/favicon.svg'
       },
 
@@ -508,9 +512,9 @@ module.exports = function (grunt) {
     'svg2png:favicon16',
     'svg2png:favicon32',
     'svg2png:favicon48',
-    'svg2png:favicon64',
-    'svg2png:favicon256',
-    'svg2png:favicon1024'
+    'svg2png:favicon128',
+    'svg2png:favicon1024',
+    'png2ico'
   ]);
 
   grunt.registerTask('build:html', [
