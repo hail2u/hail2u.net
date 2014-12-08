@@ -298,6 +298,18 @@ module.exports = function (grunt) {
         }
       },
 
+      update_cache: {
+        options: {
+          message: 'Update cache files'
+        },
+
+        src: [
+          '.grunt/cache/articles.json',
+          'src/weblog/plugins/state/files_index.dat',
+          'src/weblog/plugins/state/others_index.dat'
+        ]
+      },
+
       update_entry: {
         options: {
           message: 'Update'
@@ -365,6 +377,7 @@ module.exports = function (grunt) {
   grunt.registerTask('publish:blog', [
     'gitcommit:add_entry',
     'build:blog',
+    'gitcommit:update_cache',
     'gitcommit:publish_blog'
   ]);
 

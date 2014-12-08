@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     var path = require('path');
 
     var done = this.async();
+    var files = this.filesSrc;
     var options = this.options({
       all: false,
       branch: 'master',
@@ -17,9 +18,10 @@ module.exports = function (grunt) {
       remote: 'origin',
       root: './'
     });
+
+    var cmd = 'git';
     var file = grunt.option('file');
     var message = options.message;
-    var cmd = 'git';
     var opts = {
       cwd: options.root,
       stdio: 'inherit'
@@ -36,22 +38,21 @@ module.exports = function (grunt) {
       }
 
       message = message + ' ' + file;
-    } else {
-      file = '--all';
     }
 
     if (options.all) {
       file = '--all';
     }
 
+    if (file) {
+      files.push(file);
+    }
+
     async.series({
       add: function (next) {
         grunt.util.spawn({
           cmd: cmd,
-          args: [
-            'add',
-            file
-          ],
+          args: ['add'].concat(files),
           opts: opts
         }, function (error, result, code) {
           next(error);
