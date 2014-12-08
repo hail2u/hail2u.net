@@ -454,11 +454,6 @@ module.exports = function (grunt) {
     'gitcommit:deploy'
   ]);
 
-  grunt.registerTask('deploy:js', [
-    'build:js',
-    'gitcommit:deploy'
-  ]);
-
   grunt.registerTask('deploy:home', [
     'build:html',
     'merge_feeds:main',
@@ -468,6 +463,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy:html', [
     'build:html',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:js', [
+    'build:js',
     'gitcommit:deploy'
   ]);
 
@@ -523,19 +523,19 @@ module.exports = function (grunt) {
     'svg2png:favicon1024'
   ]);
 
+  grunt.registerTask('build:html', [
+    'generate:main',
+    'generate:blog_theme',
+    'gitcommit:blog_theme',
+    'blosxom:index'
+  ]);
+
   grunt.registerTask('build:js', [
     'clean:js',
     'copy:prejs',
     'uglify',
     'concat:js',
     'copy:js',
-  ]);
-
-  grunt.registerTask('build:html', [
-    'generate:main',
-    'generate:blog_theme',
-    'gitcommit:blog_theme',
-    'blosxom:index'
   ]);
 
   grunt.registerTask('update:blog', [
