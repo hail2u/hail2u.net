@@ -99,11 +99,7 @@ module.exports = function (grunt) {
       cmd: 'open',
       args: [preview_file]
     }, function (error, result, code) {
-      if (error) {
-        return done(error);
-      }
-
-      done();
+      done(error);
     });
   });
 };

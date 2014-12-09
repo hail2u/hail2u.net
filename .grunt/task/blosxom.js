@@ -116,11 +116,7 @@ module.exports = function (grunt) {
         next();
       });
     }, function (error) {
-      if (error) {
-        done(error);
-      }
-
-      done();
+      done(error);
     });
   });
 };

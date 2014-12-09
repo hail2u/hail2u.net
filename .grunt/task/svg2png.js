@@ -34,7 +34,11 @@ module.exports = function (grunt) {
         args: args,
         opts: opts
       }, function (error, result, code) {
-        done(error);
+        if (error) {
+          return done(error);
+        }
+
+        done();
       });
     });
   });
