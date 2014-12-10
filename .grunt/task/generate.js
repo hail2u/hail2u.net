@@ -206,20 +206,24 @@ module.exports = function (grunt) {
         });
       }
 
-      var currentYear = false;
-      articles.forEach(function (article, index) {
-        if (currentYear && article.year !== currentYear) {
+      articles.forEach(function (article, i, a) {
+        if (i > 0 && this.y !== article.year) {
           article.isFirstInYear = true;
-          articles[index - 1].isLastInYear = true;
+          a[i - 1].isLastInYear = true;
         }
 
-        currentYear = article.year;
+        if (i === 0) {
+          article.isFirstInYear = true;
+        }
+
+        if (i === a.length - 1) {
+          article.isLastInYear = true;
+        }
+
+        this.y = article.year;
+      }, {
+        y: true
       });
-      articles[0].isFirstInYear = true;
-      articles[articles.length - 1].isLastInYear = true;
-      articles.filter(function (article) {
-        return article.isLastInYear;
-      })[0].isLastInLatestYear = true;
 
       return articles;
     }
