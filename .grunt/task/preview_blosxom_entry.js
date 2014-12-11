@@ -17,7 +17,7 @@ module.exports = function (grunt) {
   <head>
     <meta charset="UTF-8">
 
-    <title><%TITLE%> - Weblog - hail2u.net</title>
+    <title><%TITLE%> - Weblog - Hail2u.net</title>
 
     <base href="<%ROOT%>">
 
@@ -30,7 +30,7 @@ module.exports = function (grunt) {
 
   <body class="permalink">
     <header class="global-header" role="banner">
-      <h1 class="logo"><a href="./"><img src="./images/logo.min.svg" alt="Hail2u.net"></a></h1>
+      <h1 class="logo"><a href="./"><img alt="Hail2u.net" src="./images/logo.min.svg"></a></h1>
 
       <nav class="site-navigation">
         <ul>
@@ -44,10 +44,10 @@ module.exports = function (grunt) {
 
     <main class="main" role="main">
       <article id="<%FN%>">
-        <h1 class="article-heading"><%TITLE%></h1>
+        <h1><%TITLE%></h1>
 
-        <footer class="article-footer">
-          <p>on <time pubdate datetime="1976-07-23">Jul 23, 1976</time> under <span class=tag"><a href="#">Preview</a></span></p>
+        <footer class="section-footer">
+          <p>on <time datetime="1976-07-23" pubdate>Jul 23, 1976</time> under <span class=tag"><a href="#">Preview</a></span></p>
         </footer>
 
         <%BODY%>
@@ -56,11 +56,11 @@ module.exports = function (grunt) {
 
     <aside class="subcontent" role="search">
       <!-- Google Custom Search Engine -->
-      <form class="searchbox searchboxbygoogle" action="http://www.google.com/cse">
-        <input type="hidden" name="cx" value="partner-pub-8712792805045949:3747342316">
-        <input type="hidden" name="ie" value="UTF-8">
-        <input type="search" name="q" size="32">
-        <input type="submit" name="sa" value="Search">
+      <form class="site-search searchbox" action="http://www.google.com/cse">
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
       </form>
     </aside>
 
