@@ -6,9 +6,6 @@
 (function () {
   var csses = [
     {
-      href: '/fonts/megrim.min.css'
-    },
-    {
       href: '/fonts/source-code-pro.min.css'
     },
     {
