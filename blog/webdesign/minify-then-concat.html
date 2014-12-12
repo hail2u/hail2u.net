@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+        
+        <meta content="配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。" name="description">
+        <meta content="blosxom v2.1.2+dev" name="generator">
+    
+      
+    
+    
+    <meta content="width=device-width" name="viewport">
+
+    <title>MinifyしてからConcat - Weblog - Hail2u.net</title>
+
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/about/" rel="author">
+    <link href="http://hail2u.net/blog/webdesign/minify-then-concat.html" rel="canonical">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+
+    <link rel="prev" href="http://hail2u.net/blog/software/convert-svg-to-png-with-inkscape-cli.html">
+
+    
+
+    
+
+    
+      <meta content="MinifyしてからConcat" property="og:title">
+      <meta content="article" property="og:type">
+      <meta content="配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。" property="og:description">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/minify-then-concat.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/projects/">Projects</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="main" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/minify-then-concat.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">MinifyしてからConcat</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2014-12-13T07:13:00+09:00" itemprop="datePublished">Dec 13, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は<a href="https://github.com/gruntjs/grunt-contrib-copy">壊れる可能性を否定できないこと</a>は意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫を<em>ソース・マップを維持すること</em>を前提にこのウェブサイトで実験し始めた。</p>
+
+<p>JavaScriptファイルのビルドをGruntでやるとして、最小化についてはソース・マップのサポートは問題ないので、いつも通り<a href="https://github.com/gruntjs/grunt-contrib-copy">grunt-contrib-copy</a>と<a href="https://github.com/gruntjs/grunt-contrib-uglify">grunt-contrib-uglify</a>を使うことにする。最後に連結する時にソース・マップを維持できるのかというのが最大の問題だったが、7月にソース・マップのサポートが<a href="https://github.com/gruntjs/grunt-contrib-concat">grunt-contrib-copy</a>へ入っていたため、結果的にはこれを使うだけで良かった。</p>
+
+<p>タスクの手順的には以下のようになる。</p>
+
+<ol>
+<li>一時ディレクトリーを掃除</li>
+<li>一時ディレクトリーへソースとなるファイルのコピー<ul>
+<li>非ライブラリーはそのファイルのみをコピー</li>
+<li>ライブラリーはソース・マップ・ファイルを含めてコピー</li>
+</ul>
+</li>
+<li>非ライブラリーのファイルのみをソース・マップ付きで最小化</li>
+<li>プロダクションのファイルを連結して作成</li>
+<li>公開ディレクトリーへソース・マップ・ファイルを含めてコピー</li>
+</ol>
+
+<p>これを踏まえて、Bowerでインストールした<code>lib-a.min.js</code>と<code>lib-b.min.js</code>、そして自分で書いた<code>foo.js</code>と<code>bar.js</code>を最小化してから連結し、最終的に<code>main.min.js</code>を作るとする。タスクの設定は以下のようになることだろう。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.initConfig({
+    clean: {
+      // `tmp/`ディレクトリーを掃除するタスク
+      main: {
+        src: ['tmp/**/*']
+      }
+    },
+
+    concat: {
+      // 最小化済みのファイルをソース・マップ付きで連結するタスク
+      js: {
+        options: {
+          seperator: &#39;;&#39;,
+          sourceMap: true,
+          sourceMapStyle: &#39;link&#39;
+        },
+
+        files: {
+          &#39;tmp/main.min.js&#39;: [
+            &#39;tmp/lib-a.min.js&#39;,
+            &#39;tmp/lib-b.min.js&#39;,
+            &#39;tmp/foo.min.js&#39;,
+            &#39;tmp/bar.min.js&#39;
+          ]
+        }
+      }
+    },
+
+    copy: {
+      // プロダクション向けに公開ディレクトリーへコピーするタスク
+      js: {
+        cwd: &#39;tmp/&#39;,
+        dest: &#39;build/js/&#39;,
+        expand: true,
+        src: [
+          &#39;**/*.js&#39;,
+          &#39;**/*.js.map&#39;
+        ]
+      },
+
+      // 一時ディレクトリーへ必要なファイルをコピーするタスク
+      // 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも
+      prejs: {
+        files: {
+          &#39;tmp/bar.js&#39;: &#39;src/js/bar.js&#39;,
+          &#39;tmp/foo.js&#39;: &#39;src/js/foo.js&#39;,
+          &#39;tmp/lib-a.js&#39;: &#39;bower_component/lib-a/dist/lib-a.js&#39;,
+          &#39;tmp/lib-a.min.js&#39;: &#39;bower_component/lib-a/dist/lib-a.min.js&#39;,
+          &#39;tmp/lib-a.min.js.map&#39;: &#39;bower_component/lib-a/dist/lib-a.min.js.map&#39;,
+          &#39;tmp/lib-b.js&#39;: &#39;bower_component/lib-a/dist/lib-b.js&#39;,
+          &#39;tmp/lib-b.min.js&#39;: &#39;bower_component/lib-b/dist/lib-b.min.js&#39;,
+          &#39;tmp/lib-b.min.js.map&#39;: &#39;bower_component/lib-b/dist/lib-b.min.js.map&#39;
+        }
+      }
+    },
+
+    uglify: {
+      options: {
+        preserveComments: &#39;some&#39;,
+        sourceMap: true
+      },
+
+      // まだ最小化されていないファイルをソース・マップ付きで最小化するタスク
+      main: {
+        cwd: &#39;tmp/&#39;,
+        dest: &#39;tmp/&#39;,
+        expand: true,
+        ext: &#39;.min.js&#39;,
+        src: [
+          &#39;**/*.js&#39;,
+          &#39;!**/*.min.js&#39;
+        ]
+      }
+    }
+  });
+
+  grunt.loadNpmTasks(&#39;grunt-contrib-clean&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-copy&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-concat&#39;);
+  grunt.loadNpmTasks(&#39;grunt-contrib-uglify&#39;);
+
+  grunt.registerTask(&#39;build:js&#39;, [
+    &#39;clean&#39;,
+    &#39;copy:prejs&#39;,
+    &#39;uglify&#39;,
+    &#39;concat:js&#39;,
+    &#39;copy:js&#39;
+  ]);
+};
+</code></pre>
+
+<p><code>concat:js</code>と<code>copy:prejs</code>以外はほぼポータブルなタスク設定になっている。これで<code>grunt build:js</code>と実行すると、最終的に<code>build/js/</code>ディレクトリーへ以下のようにファイルが作成される。</p>
+
+<ul>
+<li><mark>bar.js</mark></li>
+<li>bar.min.js</li>
+<li>bar.min.js.map</li>
+<li><mark>foo.js</mark></li>
+<li>foo.min.js</li>
+<li>foo.min.js.map</li>
+<li><mark>lib-a.js</mark></li>
+<li>lib-a.min.js</li>
+<li>lib-a.min.js.map</li>
+<li><mark>lib-b.js</mark></li>
+<li>lib-b.min.js</li>
+<li>lib-b.min.js.map</li>
+<li><mark>main.min.js</mark></li>
+<li><mark>main.min.js.map</mark></li>
+</ul>
+
+<p>中間のソース・マップ・ファイルはちゃんとまとめられているので、実際にはマークされているファイルだけあれば良い。しかし設定が汎用性のない複雑なものになってしまうので、全部コピーしておく方が面倒がないだろう。そうでなければソース・マップ・ファイルへ<code>sourcesContent</code>で元ソースを含めてしまうのが良い。この辺りはもうちょっと運用しないとどうするのが最良なのかは見えてこなさそうだ。</p>
+
+<hr>
+
+<p>欠点はあまりない。最小化後に連結するという観点の考察がウェブにはまだないので手探りでやることになるのが一番の壁だろう。取るに足りないとは思うが、最終ファイルが数バイトから数十バイト増えることは挙げておく。</p>
+
+<p>利点としては、ライブラリーのライセンスや著作権者情報など消すべきでないものが確実に残ることと、ライブラリーが動作が確認されている状態のままで連結されることが挙げられる。消すべきでないものが残るということは、つまりビルド・タスク側でいわゆるバナーなどと呼ばれている先頭のコメントのことを考えなくて良いということでもある。</p>
+
+<p>欠点と比較する限り、得られるものは大きいと言える。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/software/convert-svg-to-png-with-inkscape-cli.html" rel="prev">
+  <p>InkscapeのCLIを利用してSVGからPNGへ変換</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="/about/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

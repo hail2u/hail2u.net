@@ -12,6 +12,155 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>MinifyしてからConcat</title>
+      <link>http://hail2u.net/blog/webdesign/minify-then-concat.html</link>
+      <description>配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。</description>
+      <author>kyo@hail2u.net (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/minify-then-concat.html</guid>
+      <pubDate>Sat, 13 Dec 2014 07:13:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は&lt;a href="https://github.com/gruntjs/grunt-contrib-copy"&gt;壊れる可能性を否定できないこと&lt;/a&gt;は意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫を&lt;em&gt;ソース・マップを維持すること&lt;/em&gt;を前提にこのウェブサイトで実験し始めた。&lt;/p&gt;
+
+&lt;p&gt;JavaScriptファイルのビルドをGruntでやるとして、最小化についてはソース・マップのサポートは問題ないので、いつも通り&lt;a href="https://github.com/gruntjs/grunt-contrib-copy"&gt;grunt-contrib-copy&lt;/a&gt;と&lt;a href="https://github.com/gruntjs/grunt-contrib-uglify"&gt;grunt-contrib-uglify&lt;/a&gt;を使うことにする。最後に連結する時にソース・マップを維持できるのかというのが最大の問題だったが、7月にソース・マップのサポートが&lt;a href="https://github.com/gruntjs/grunt-contrib-concat"&gt;grunt-contrib-copy&lt;/a&gt;へ入っていたため、結果的にはこれを使うだけで良かった。&lt;/p&gt;
+
+&lt;p&gt;タスクの手順的には以下のようになる。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;一時ディレクトリーを掃除&lt;/li&gt;
+&lt;li&gt;一時ディレクトリーへソースとなるファイルのコピー&lt;ul&gt;
+&lt;li&gt;非ライブラリーはそのファイルのみをコピー&lt;/li&gt;
+&lt;li&gt;ライブラリーはソース・マップ・ファイルを含めてコピー&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;非ライブラリーのファイルのみをソース・マップ付きで最小化&lt;/li&gt;
+&lt;li&gt;プロダクションのファイルを連結して作成&lt;/li&gt;
+&lt;li&gt;公開ディレクトリーへソース・マップ・ファイルを含めてコピー&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;これを踏まえて、Bowerでインストールした&lt;code&gt;lib-a.min.js&lt;/code&gt;と&lt;code&gt;lib-b.min.js&lt;/code&gt;、そして自分で書いた&lt;code&gt;foo.js&lt;/code&gt;と&lt;code&gt;bar.js&lt;/code&gt;を最小化してから連結し、最終的に&lt;code&gt;main.min.js&lt;/code&gt;を作るとする。タスクの設定は以下のようになることだろう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module.exports = function (grunt) {
+  grunt.initConfig({
+    clean: {
+      // `tmp/`ディレクトリーを掃除するタスク
+      main: {
+        src: ['tmp/**/*']
+      }
+    },
+
+    concat: {
+      // 最小化済みのファイルをソース・マップ付きで連結するタスク
+      js: {
+        options: {
+          seperator: &amp;#39;;&amp;#39;,
+          sourceMap: true,
+          sourceMapStyle: &amp;#39;link&amp;#39;
+        },
+
+        files: {
+          &amp;#39;tmp/main.min.js&amp;#39;: [
+            &amp;#39;tmp/lib-a.min.js&amp;#39;,
+            &amp;#39;tmp/lib-b.min.js&amp;#39;,
+            &amp;#39;tmp/foo.min.js&amp;#39;,
+            &amp;#39;tmp/bar.min.js&amp;#39;
+          ]
+        }
+      }
+    },
+
+    copy: {
+      // プロダクション向けに公開ディレクトリーへコピーするタスク
+      js: {
+        cwd: &amp;#39;tmp/&amp;#39;,
+        dest: &amp;#39;build/js/&amp;#39;,
+        expand: true,
+        src: [
+          &amp;#39;**/*.js&amp;#39;,
+          &amp;#39;**/*.js.map&amp;#39;
+        ]
+      },
+
+      // 一時ディレクトリーへ必要なファイルをコピーするタスク
+      // 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも
+      prejs: {
+        files: {
+          &amp;#39;tmp/bar.js&amp;#39;: &amp;#39;src/js/bar.js&amp;#39;,
+          &amp;#39;tmp/foo.js&amp;#39;: &amp;#39;src/js/foo.js&amp;#39;,
+          &amp;#39;tmp/lib-a.js&amp;#39;: &amp;#39;bower_component/lib-a/dist/lib-a.js&amp;#39;,
+          &amp;#39;tmp/lib-a.min.js&amp;#39;: &amp;#39;bower_component/lib-a/dist/lib-a.min.js&amp;#39;,
+          &amp;#39;tmp/lib-a.min.js.map&amp;#39;: &amp;#39;bower_component/lib-a/dist/lib-a.min.js.map&amp;#39;,
+          &amp;#39;tmp/lib-b.js&amp;#39;: &amp;#39;bower_component/lib-a/dist/lib-b.js&amp;#39;,
+          &amp;#39;tmp/lib-b.min.js&amp;#39;: &amp;#39;bower_component/lib-b/dist/lib-b.min.js&amp;#39;,
+          &amp;#39;tmp/lib-b.min.js.map&amp;#39;: &amp;#39;bower_component/lib-b/dist/lib-b.min.js.map&amp;#39;
+        }
+      }
+    },
+
+    uglify: {
+      options: {
+        preserveComments: &amp;#39;some&amp;#39;,
+        sourceMap: true
+      },
+
+      // まだ最小化されていないファイルをソース・マップ付きで最小化するタスク
+      main: {
+        cwd: &amp;#39;tmp/&amp;#39;,
+        dest: &amp;#39;tmp/&amp;#39;,
+        expand: true,
+        ext: &amp;#39;.min.js&amp;#39;,
+        src: [
+          &amp;#39;**/*.js&amp;#39;,
+          &amp;#39;!**/*.min.js&amp;#39;
+        ]
+      }
+    }
+  });
+
+  grunt.loadNpmTasks(&amp;#39;grunt-contrib-clean&amp;#39;);
+  grunt.loadNpmTasks(&amp;#39;grunt-contrib-copy&amp;#39;);
+  grunt.loadNpmTasks(&amp;#39;grunt-contrib-concat&amp;#39;);
+  grunt.loadNpmTasks(&amp;#39;grunt-contrib-uglify&amp;#39;);
+
+  grunt.registerTask(&amp;#39;build:js&amp;#39;, [
+    &amp;#39;clean&amp;#39;,
+    &amp;#39;copy:prejs&amp;#39;,
+    &amp;#39;uglify&amp;#39;,
+    &amp;#39;concat:js&amp;#39;,
+    &amp;#39;copy:js&amp;#39;
+  ]);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;concat:js&lt;/code&gt;と&lt;code&gt;copy:prejs&lt;/code&gt;以外はほぼポータブルなタスク設定になっている。これで&lt;code&gt;grunt build:js&lt;/code&gt;と実行すると、最終的に&lt;code&gt;build/js/&lt;/code&gt;ディレクトリーへ以下のようにファイルが作成される。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;mark&gt;bar.js&lt;/mark&gt;&lt;/li&gt;
+&lt;li&gt;bar.min.js&lt;/li&gt;
+&lt;li&gt;bar.min.js.map&lt;/li&gt;
+&lt;li&gt;&lt;mark&gt;foo.js&lt;/mark&gt;&lt;/li&gt;
+&lt;li&gt;foo.min.js&lt;/li&gt;
+&lt;li&gt;foo.min.js.map&lt;/li&gt;
+&lt;li&gt;&lt;mark&gt;lib-a.js&lt;/mark&gt;&lt;/li&gt;
+&lt;li&gt;lib-a.min.js&lt;/li&gt;
+&lt;li&gt;lib-a.min.js.map&lt;/li&gt;
+&lt;li&gt;&lt;mark&gt;lib-b.js&lt;/mark&gt;&lt;/li&gt;
+&lt;li&gt;lib-b.min.js&lt;/li&gt;
+&lt;li&gt;lib-b.min.js.map&lt;/li&gt;
+&lt;li&gt;&lt;mark&gt;main.min.js&lt;/mark&gt;&lt;/li&gt;
+&lt;li&gt;&lt;mark&gt;main.min.js.map&lt;/mark&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;中間のソース・マップ・ファイルはちゃんとまとめられているので、実際にはマークされているファイルだけあれば良い。しかし設定が汎用性のない複雑なものになってしまうので、全部コピーしておく方が面倒がないだろう。そうでなければソース・マップ・ファイルへ&lt;code&gt;sourcesContent&lt;/code&gt;で元ソースを含めてしまうのが良い。この辺りはもうちょっと運用しないとどうするのが最良なのかは見えてこなさそうだ。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;欠点はあまりない。最小化後に連結するという観点の考察がウェブにはまだないので手探りでやることになるのが一番の壁だろう。取るに足りないとは思うが、最終ファイルが数バイトから数十バイト増えることは挙げておく。&lt;/p&gt;
+
+&lt;p&gt;利点としては、ライブラリーのライセンスや著作権者情報など消すべきでないものが確実に残ることと、ライブラリーが動作が確認されている状態のままで連結されることが挙げられる。消すべきでないものが残るということは、つまりビルド・タスク側でいわゆるバナーなどと呼ばれている先頭のコメントのことを考えなくて良いということでもある。&lt;/p&gt;
+
+&lt;p&gt;欠点と比較する限り、得られるものは大きいと言える。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>InkscapeのCLIを利用してSVGからPNGへ変換</title>
       <link>http://hail2u.net/blog/software/convert-svg-to-png-with-inkscape-cli.html</link>
       <description>InkscapeにはCLIがあったらしい。これを利用するとSVGから様々なファイル形式、特にPNGへの変換を自動化しやすくなる。最初PhantomJSとcanvas使ってやろうかとか錯乱してた。後出しだけどSVG Advent Calendar 2014の12日目の記事ということにしておこう。</description>
@@ -235,36 +384,6 @@ $max: 302;
 &lt;p&gt;今はどのようなAdvent Calendarがあるかの発見は、QiitaやAdventarの一覧を見る以外にまったくないだろう。具体的な何か、例えばCSSやらBEMやらをもってAdvent Calendarを探すというのなら集約されている現状は効率が良い。でも無作為で意外な出会いもあって欲しいと考えるのは強欲なのだろうか。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>2014年の宗旨替え</title>
-      <link>http://hail2u.net/blog/webdesign/i-changed-my-mind-in-2014.html</link>
-      <description>移り変わりが激しい世界なので、去年まで当たり前のようにやっていたことを、今年はまったくやらなくなったりすることはよくある。僕は遂に諦めてCSSの定義(プロパティーと値のセット)を書く順序をアルファベット順に統一した。去年はシンプルなクラス名からBEMへの変更だった。</description>
-      <author>kyo@hail2u.net (Kyo Nagashima)</author>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/i-changed-my-mind-in-2014.html</guid>
-      <pubDate>Wed, 03 Dec 2014 12:49:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;移り変わりが激しい世界なので、去年まで当たり前のようにやっていたことを、今年はまったくやらなくなったりすることはよくある。僕は遂に諦めてCSSの定義(プロパティーと値のセット)を書く順序をアルファベット順に統一した。去年はシンプルなクラス名からBEMへの変更だった。&lt;/p&gt;
-
-&lt;p&gt;CSSで定義を書く順序は論理的な理由を持つ順序が良いとは今でも思っている。関連するプロパティーが並んでいれば、そのルールセットがどういう振る舞いをするのかわかりやすいはずだ。そういう意味で&lt;a href="http://hail2u.net/blog/webdesign/css2-property-order.html"&gt;CSS 2.1仕様書に出てくる順&lt;/a&gt;で書くというのは、仕様書が論理的な構造を持って書かれていることを考えると理にかなっている。&lt;/p&gt;
-
-&lt;p&gt;しかし時代は変わった。&lt;/p&gt;
-
-&lt;p&gt;CSS 3の時代になり、仕様書はモジュール単位で散在するようになり、実装が出てから安定版に進むようになり、スナップショットは作られなくなった。こうなるとどのような順で書くか仕様書を基準に明確に規定することは難しくなる。CSS 2.1をベースに考えてモジュール化された仕様の位置を決めることはできなくはないが、AnimationなどといったCSS 2.1には欠片も存在しないようなものの位置は決めることができない。&lt;/p&gt;
-
-&lt;p&gt;かといって無作為な順番で書くというのは読みづらさを加速する。落とし所としてはアルファベット順がデメリットが少ないという点と賛同を得やすいという点で優れている。そうでなければルールセットごとにひとつの定義しか書かない&lt;a href="https://developers.google.com/speed/articles/optimizing-css"&gt;Declaration Just Once&lt;/a&gt;アプローチだろうか。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;Declaration Just Onceアプローチは一度(まだ一度だけ)使ってみた。これはCSSプリプロセッサーと、そしてオブジェクト志向と食合せが非常に悪い。しかしひたすら素のCSSで書くというケースではそこそこうまく行き、保守性が高いことがすこしわかってきた。&lt;/p&gt;
-
-&lt;p&gt;CSSファイルでセレクターが散在することが懸念だったが、2006年当時と違ってあるセレクターでの問題はCSSファイルと格闘するわけではない。余程のことがなければ開発者ツールで格闘するので、セレクターがあっちこっちに散らばっていてもほとんど問題になることはなかった。&lt;/p&gt;
-
-&lt;p&gt;来年にはうまくいけばCSSプリプロセッサーを捨てることも不可能ではないと感じている。その際にはCSSの定義を書く順序……というかCSSの書き方という単位でまた宗旨変えしそうだ。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;こういった宗旨替えは誰しも毎年(どころか四半期に一度くらい)何かしらやっていることと思う。みなネタが豊富そうなので、来年は是非アドベント・カレンダーとして作りたい。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -334,6 +453,6 @@ $max: 302;
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description>&lt;p&gt;アイコン・フォントの安全な実装についての&lt;a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/"&gt;Bulletproof Accessible Icon Fonts&lt;/a&gt;という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Fri, 12 Dec 2014 02:52:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 13 Dec 2014 07:13:00 +0900</lastBuildDate>
   </channel>
 </rss>
