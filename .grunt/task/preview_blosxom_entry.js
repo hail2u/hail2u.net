@@ -77,8 +77,8 @@ module.exports = function (grunt) {
   </body>
 </html>
 */}).toString().split('\n').slice(1, -1).join('\n');
-    var preview_file = path.resolve(__dirname, '../tmp/__preview.html');
-    var root = 'file:///' + path.resolve(__dirname, '../../build/').replace(/\\/g, '/') + '/';
+    var preview_file = path.resolve(process.cwd(), 'tmp/__preview.html');
+    var root = 'file:///' + path.resolve(process.cwd(), 'build/').replace(/\\/g, '/') + '/';
 
     var fn = path.basename(file, '.txt').replace(/\$/g, '$$');
     var entry = fs.readFileSync(file, 'UTF-8').split('\n');

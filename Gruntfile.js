@@ -27,7 +27,7 @@ module.exports = function (grunt) {
 
     clean: {
       main: {
-        src: ['.grunt/tmp/**/*']
+        src: ['tmp/**/*']
       }
     },
 
@@ -40,12 +40,12 @@ module.exports = function (grunt) {
         },
 
         files: {
-          '.grunt/tmp/debug.min.js': ['.grunt/tmp/show-column.min.js'],
-          '.grunt/tmp/main.min.js': [
-            '.grunt/tmp/unutm.min.js',
-            '.grunt/tmp/async-csses.min.js'
+          'tmp/debug.min.js': ['tmp/show-column.min.js'],
+          'tmp/main.min.js': [
+            'tmp/unutm.min.js',
+            'tmp/async-csses.min.js'
           ],
-          '.grunt/tmp/search.min.js': ['.grunt/tmp/popular-pages.min.js']
+          'tmp/search.min.js': ['tmp/popular-pages.min.js']
         }
       }
     },
@@ -63,7 +63,7 @@ module.exports = function (grunt) {
 
     copy: {
       css: {
-        cwd: '.grunt/tmp/',
+        cwd: 'tmp/',
         dest: 'build/styles/',
         expand: true,
         src: [
@@ -73,7 +73,7 @@ module.exports = function (grunt) {
       },
 
       js: {
-        cwd: '.grunt/tmp/',
+        cwd: 'tmp/',
         dest: 'build/scripts/',
         expand: true,
         src: [
@@ -84,12 +84,12 @@ module.exports = function (grunt) {
 
       prejs: {
         files: {
-          '.grunt/tmp/async-csses.js': 'src/js/async-csses.js',
-          '.grunt/tmp/popular-pages.js': 'src/js/popular-pages.js',
-          '.grunt/tmp/show-column.js': 'src/js/debug/show-column.js',
-          '.grunt/tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
-          '.grunt/tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
-          '.grunt/tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
+          'tmp/async-csses.js': 'src/js/async-csses.js',
+          'tmp/popular-pages.js': 'src/js/popular-pages.js',
+          'tmp/show-column.js': 'src/js/debug/show-column.js',
+          'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
+          'tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
+          'tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
         }
       },
 
@@ -112,8 +112,8 @@ module.exports = function (grunt) {
       },
 
       main: {
-        cwd: '.grunt/tmp/',
-        dest: '.grunt/tmp/',
+        cwd: 'tmp/',
+        dest: 'tmp/',
         expand: true,
         src: ['**/*.css']
       }
@@ -128,8 +128,8 @@ module.exports = function (grunt) {
       },
 
       main: {
-        cwd: '.grunt/tmp/',
-        dest: '.grunt/tmp/',
+        cwd: 'tmp/',
+        dest: 'tmp/',
         expand: true,
         ext: '.min.css',
         src: ['**/*.min.css'],
@@ -160,7 +160,7 @@ module.exports = function (grunt) {
         },
 
         cwd: 'src/css/',
-        dest: '.grunt/tmp/',
+        dest: 'tmp/',
         expand: true,
         ext: '.css',
         src: ['*.scss']
@@ -178,8 +178,8 @@ module.exports = function (grunt) {
       },
 
       main: {
-        cwd: '.grunt/tmp/',
-        dest: '.grunt/tmp/',
+        cwd: 'tmp/',
+        dest: 'tmp/',
         expand: true,
         ext: '.min.js',
         src: [
