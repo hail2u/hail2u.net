@@ -20,7 +20,7 @@ module.exports = function (grunt) {
     var args = ['blosxom.cgi'];
     var file = grunt.option('file');
     var files = [];
-    var fileCache = path.resolve(options.root, 'plugins/state/files_index.dat');
+    var fileCache = path.resolve(options.rootdir, 'plugins/state/files_index.dat');
     var bar;
     var num = 1;
 
@@ -84,9 +84,9 @@ module.exports = function (grunt) {
         cmd: 'C:/perl/bin/perl',
         args: args.concat('path=/' + file),
         opts: {
-          cwd: options.root,
+          cwd: options.rootdir,
           env: {
-            BLOSXOM_CONFIG_DIR: path.resolve(options.root)
+            BLOSXOM_CONFIG_DIR: path.resolve(options.rootdir)
           }
         }
       }, function (error, result, code) {
@@ -100,7 +100,7 @@ module.exports = function (grunt) {
 
         var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
           '\n';
-        file = options.static_dir + file;
+        file = options.staticdir + file;
         fs.writeFileSync(file, contents);
 
         if (bar) {

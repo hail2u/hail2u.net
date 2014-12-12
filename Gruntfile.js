@@ -1,23 +1,33 @@
 'use strict';
 
 module.exports = function (grunt) {
+  var fixPath = function (content, srcpath) {
+    [
+      {
+        pattern: /((href|src)=")http:\/\/hail2u\.net\//g,
+        replace: '$1/'
+      },
+      {
+        pattern: /((href|src)=")\.\.\/\.\.\/build\//g,
+        replace: '$1/'
+      },
+      {
+        pattern: /((href|src)=")\.\//g,
+        replace: '$1/styles/'
+      },
+    ].forEach(function (sub) {
+      content = content.replace(sub.pattern, sub.replace);
+    });
+
+    return content;
+  };
   grunt.util.linefeed = '\n';
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
     clean: {
-      css: {
-        src: [
-          '.grunt/tmp/**/*.css',
-          '.grunt/tmp/**/*.css.map'
-        ]
-      },
-
-      js: {
-        src: [
-          '.grunt/tmp/**/*.js',
-          '.grunt/tmp/**/*.js.map'
-        ]
+      main: {
+        src: ['.grunt/tmp/**/*']
       }
     },
 
@@ -44,10 +54,9 @@ module.exports = function (grunt) {
       main: {
         options: {
           base: 'build/',
-          hostname: '127.0.0.1',
+          hostname: 'localhost',
           keepalive: true,
-          open: true,
-          port: 0
+          open: true
         }
       }
     },
@@ -86,26 +95,7 @@ module.exports = function (grunt) {
 
       style_guide: {
         options: {
-          process: function (content, srcpath) {
-            [
-              {
-                pattern: /((href|src)=")http:\/\/hail2u\.net\//g,
-                replace: '$1/'
-              },
-              {
-                pattern: /((href|src)=")\.\.\/\.\.\/build\//g,
-                replace: '$1/'
-              },
-              {
-                pattern: /((href|src)=")\.\//g,
-                replace: '$1/styles/'
-              },
-            ].forEach(function (sub) {
-              content = content.replace(sub.pattern, sub.replace);
-            });
-
-            return content;
-          }
+          process: fixPath,
         },
 
         dest: 'build/about/style-guide/index.html',
@@ -125,11 +115,7 @@ module.exports = function (grunt) {
         cwd: '.grunt/tmp/',
         dest: '.grunt/tmp/',
         expand: true,
-        ext: '.min.css',
-        src: [
-          '**/*.css',
-          '!**/*.min.css'
-        ]
+        src: ['**/*.css']
       }
     },
 
@@ -145,6 +131,7 @@ module.exports = function (grunt) {
         cwd: '.grunt/tmp/',
         dest: '.grunt/tmp/',
         expand: true,
+        ext: '.min.css',
         src: ['**/*.min.css'],
       }
     },
@@ -205,8 +192,8 @@ module.exports = function (grunt) {
     blosxom: {
       options: {
         datadir: 'src/weblog/entries/',
-        root: 'src/weblog/',
-        static_dir: 'build/blog/'
+        rootdir: 'src/weblog/',
+        staticdir: 'build/blog/'
       },
 
       all: {
@@ -237,10 +224,16 @@ module.exports = function (grunt) {
         dest: 'build/',
         expand: true,
         ext: '.html',
+        rename: function (dest, src) {
+          if (src.lastIndexOf('theme.html') === src.length - 10) {
+            return 'src/weblog/entries/themes/html/page';
+          }
+
+          return dest + src;
+        },
         src: [
           '**/*.mustache',
-          '!partial/*',
-          '!blog/theme.mustache'
+          '!partial/*'
         ]
       },
 
@@ -253,24 +246,6 @@ module.exports = function (grunt) {
           'blog/index.mustache',
           'index.mustache'
         ]
-      },
-
-      blog_theme: {
-        cwd: 'src/html/',
-        dest: 'src/weblog/entries/themes/html/',
-        expand: true,
-        rename: function (dest, src) {
-          return dest + 'page';
-        },
-        src: ['blog/theme.mustache']
-      },
-
-      home: {
-        cwd: 'src/html/',
-        dest: 'build/',
-        expand: true,
-        ext: '.html',
-        src: ['index.mustache']
       }
     },
 
@@ -483,7 +458,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build:css', [
-    'clean:css',
+    'clean',
     'sass',
     'css_mqpacker',
     'csswring',
@@ -504,12 +479,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:html', [
     'generate:main',
-    'generate:blog_theme',
     'blosxom:index'
   ]);
 
   grunt.registerTask('build:js', [
-    'clean:js',
+    'clean',
     'copy:prejs',
     'uglify',
     'concat:js',
