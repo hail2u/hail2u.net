@@ -525,6 +525,7 @@ module.exports = function (grunt) {
   grunt.registerTask('update:blog', [
     'gitcommit:update_entry',
     'build:blog',
+    'gitcommit:update_cache',
     'gitcommit:update_blog'
   ]);
 
