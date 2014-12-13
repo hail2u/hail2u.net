@@ -32,13 +32,22 @@ module.exports = function (grunt) {
     },
 
     concat: {
-      js: {
-        options: {
-          seperator: ';',
-          sourceMap: true,
-          sourceMapStyle: 'link'
-        },
+      options: {
+        seperator: ';',
+        sourceMap: true,
+        sourceMapStyle: 'link'
+      },
 
+      css: {
+        files: {
+          'tmp/style.min.css': [
+            'tmp/normalize.min.css',
+            'tmp/style.min.css'
+          ]
+        }
+      },
+
+      js: {
         files: {
           'tmp/debug.min.js': ['tmp/show-column.min.js'],
           'tmp/main.min.js': [
@@ -82,6 +91,12 @@ module.exports = function (grunt) {
         ]
       },
 
+      precss: {
+        files: {
+          'tmp/normalize.css': 'node_modules/normalize.css/normalize.css'
+        }
+      },
+
       prejs: {
         files: {
           'tmp/async-csses.js': 'src/js/async-csses.js',
@@ -115,6 +130,7 @@ module.exports = function (grunt) {
         cwd: 'tmp/',
         dest: 'tmp/',
         expand: true,
+        ext: '.min.css',
         src: ['**/*.css']
       }
     },
@@ -131,8 +147,9 @@ module.exports = function (grunt) {
         cwd: 'tmp/',
         dest: 'tmp/',
         expand: true,
-        ext: '.min.css',
-        src: ['**/*.css']
+        src: [
+          '**/*.min.css'
+        ]
       }
     },
 
@@ -459,9 +476,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:css', [
     'clean',
+    'copy:precss',
     'sass',
     'css_mqpacker',
     'csswring',
+    'concat:css',
     'copy:css',
     'copy:style_guide',
   ]);
