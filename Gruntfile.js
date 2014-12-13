@@ -33,7 +33,6 @@ module.exports = function (grunt) {
 
     concat: {
       options: {
-        seperator: ';',
         sourceMap: true,
         sourceMapStyle: 'link'
       },
@@ -48,6 +47,10 @@ module.exports = function (grunt) {
       },
 
       js: {
+        options: {
+          seperator: ';',
+        },
+
         files: {
           'tmp/debug.min.js': ['tmp/show-column.min.js'],
           'tmp/main.min.js': [
