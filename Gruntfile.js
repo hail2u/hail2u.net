@@ -132,7 +132,7 @@ module.exports = function (grunt) {
         dest: 'tmp/',
         expand: true,
         ext: '.min.css',
-        src: ['**/*.min.css'],
+        src: ['**/*.css']
       }
     },
 
