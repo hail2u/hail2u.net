@@ -189,12 +189,7 @@ module.exports = function (grunt) {
             hour: hh,
             minute: nn,
             second: ss,
-            tz: '+09:00',
-            strPubDate: monthNames[mm] + ' ' + dd + ', ' + yy,
-            html5PubDate: sprintf(
-              '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
-              yy, mm + 1, dd, hh, nn, ss
-            )
+            tz: '+09:00'
           };
           articles.unshift(article);
           articles.sort(function (a, b) {
@@ -207,6 +202,13 @@ module.exports = function (grunt) {
       }
 
       articles.forEach(function (article, i, a) {
+        article.strPubDate = monthNames[article.month - 1] + ' ' + article.day;
+        article.html5PubDate = sprintf(
+          '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
+          article.year, article.month, article.day, article.hour,
+          article.minute, article.second
+        );
+
         if (i > 0 && this.y !== article.year) {
           article.isFirstInYear = true;
           a[i - 1].isLastInYear = true;
