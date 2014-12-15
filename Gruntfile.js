@@ -66,9 +66,8 @@ module.exports = function (grunt) {
       main: {
         options: {
           base: 'build/',
-          hostname: 'localhost',
           keepalive: true,
-          open: true
+          open: 'http://localhost:8000/'
         }
       }
     },
