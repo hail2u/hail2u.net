@@ -1,0 +1,31 @@
+絵文字のショートカット・ファミリー
+
+<p>Chromeでも着々とユニコード絵文字への対応が始まっているようだが、Windows版のChromeにはまだ来る気配がない。そのため絵文字をそのままで表示しようとすると工夫が必要になる。が、JavaScriptでカラー画像に差し替えて……というのは、コストがそこそこ高く個人のウェブサイト向けではない。かといって様々な要素に絵文字を表示できるフォントをプラットフォームごとに指定していくのも手がかかる。そこで絵文字用のショートカット・ファミリーの出番になる。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: &#39;Emoji&#39;;
+  src: <mark>local(&#39;Apple Color Emoji&#39;)</mark>,
+    local(&#39;Gecko Emoji&#39;),
+    local(&#39;Noto Sans Emoji&#39;),
+    <mark>local(&#39;Segoe UI Emoji&#39;)</mark>,
+    <mark>local(&#39;Segoe UI Symbol&#39;)</mark>,
+    local(&#39;Noto Sans Symbols&#39;);
+}
+</code></pre>
+
+<p>上から順にOS X、Firefox OS (予)、Android (予)、Windows 8、Windows 7、Linux向けに絵文字を表示できるフォントをフォールバックさせている。通常はハイライトした3つだけで良い。こうして定義したショートカット・ファミリーは自由にCSSで利用できる。</p>
+
+<pre><code class="language-css">body {
+  font-family: Hoefler Text, Constantia, Emoji, serif;
+}
+
+h1 {
+  font-family: Helvetica Neue, Calibri, Emoji, sans-serif;
+}
+
+pre {
+  font-family: Menlo, Consolas, Emoji, monospace;
+}
+</code></pre>
+
+<p>方法そのものとしては<code>unicode-range</code>プロパティーを使って絵文字を含めた形にフォント・ファミリーを再定義してやる方が真っ当で優れている。しかしFirefox 36以降に限定される問題があることと、OSネイティブの絵文字を表示する仕組みとバッティングしかねない。各ブラウザーで絵文字が自動的に表示されるようになるまでは、このようにショートカット・ファミリーを作ってやるのが良い。</p>
