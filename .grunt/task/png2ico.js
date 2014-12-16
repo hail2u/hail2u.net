@@ -9,14 +9,10 @@ module.exports = function (grunt) {
     var options = this.options({});
 
     var args = [];
-    var cmd = 'convert';
+    var cmd = 'png2ico';
     var opts = {
       stdio: 'inherit'
     };
-
-    if (process.platform === 'win32') {
-      cmd += '.bat';
-    }
 
     if (grunt.option('verbose')) {
       args.push('-verbose');
