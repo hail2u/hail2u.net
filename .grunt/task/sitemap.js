@@ -36,7 +36,6 @@ module.exports = function (grunt) {
       '/blog/sports/',
       '/blog/webdesign/',
       '/documents/',
-      '/projects/',
       '/search/'
     ];
 
