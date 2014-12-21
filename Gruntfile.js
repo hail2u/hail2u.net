@@ -488,7 +488,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build:favicon', [
-    'copy:favicon',
     'svg2png:apple_touch_icon',
     'svg2png:favicon16',
     'svg2png:favicon32',
