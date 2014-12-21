@@ -135,6 +135,7 @@ function buildToc(a) {
   a.shift();
 
   return a.map(function (v) {
+    var i = new Array(Math.max(0, v.l - a[0].l + 1)).join(indent);
     var id = encodeURIComponent(
       v.r.toLowerCase().replace(
         /[<>&+$,/:;=?@\"#{}|^~[\]`\\*()%.!']/g,
@@ -144,7 +145,6 @@ function buildToc(a) {
         '-'
       )
     );
-    var i = new Array(v.l - a[0].l + 1).join(indent);
 
     return i + '* [' + v.r + '](#' + id + ')';
   }).join(eol);
