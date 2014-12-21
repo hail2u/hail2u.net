@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製でmarkedパッケージに依存している。実行すると引数に指定したMarkdownファイルの中に書かれた&lt;!-- #toc --&gt;と&lt;!-- /toc --&gt;の間がToCになる。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>mdtoc - The markdown ToC generator - Weblog - Hail2u.net</title>
+
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="http://hail2u.net/blog/coding/mdtoc.html" rel="canonical">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="http://hail2u.net/blog/webdesign/html-best-practices.html">
+
+    
+
+    
+      <meta content="mdtoc - The markdown ToC generator" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製でmarkedパッケージに依存している。実行すると引数に指定したMarkdownファイルの中に書かれた&lt;!-- #toc --&gt;と&lt;!-- /toc --&gt;の間がToCになる。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/mdtoc.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="main" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/mdtoc.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">mdtoc - The markdown ToC generator</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2014-12-22T00:40:00+09:00" itemprop="datePublished">Dec 22, 2014</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製で<a href="https://www.npmjs.com/package/marked">markedパッケージ</a>に依存している。実行すると引数に指定したMarkdownファイルの中に書かれた<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>の間がToCになる。</p>
+
+<p class="seealso">Download: <a href="/pub/mdtoc.js">mdtoc.js</a></p>
+
+<p>例えば以下のようにMarkdownファイル、<code>foo.md</code>に<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>を書いておき、</p>
+
+<pre><code class="language-markdown">Test
+====
+
+&lt;!-- #toc --&gt;
+&lt;!-- /toc --&gt;
+
+Foo
+---
+
+### Foo Foo
+
+### Foo Bar
+
+Bar
+---
+
+### Bar Foo
+</code></pre>
+
+<p>ターミナルからmdtocを実行すると、</p>
+
+<pre><samp>$ <kbd>mdtoc foo.md</kbd>
+</samp></pre>
+
+<p>以下のようにToCが挿入される。</p>
+
+<pre><code class="language-markdown">Test
+====
+
+&lt;!-- #toc --&gt;
+
+* [Foo](#foo)
+  * [Foo Foo](#foo-foo)
+  * [Foo Bar](#foo-bar)
+* [Bar](#bar)
+  * [Bar Foo](#bar-foo)
+
+&lt;!-- /toc --&gt;
+
+Foo
+---
+
+### Foo Foo
+
+### Foo Bar
+
+Bar
+---
+
+### Bar Foo
+</code></pre>
+
+<p>ToCの生成対象は最初の見出し以外のすべて。インデントは二番目の見出しを基準に調節されるようにした。大抵は<code>README.md</code>に対して使われると思うので、引数を省略した場合は<code>README.md</code>に対して実行するようにもなっている。改行コードは元の文書に従うようにしておいた。</p>
+
+<p>互換性はそこそこありそうだが、Redcarpetを使ったCLIツールの方が確実と思われるので、それを探すか暇な時に書き直したい。そのためnpmで公開するつもりは今のところない。</p>
+
+<hr>
+
+<p><a href="https://github.com/hail2u/html-best-practices">HTML Best Practices</a>のToCを簡単に更新できるようにするために色々探したけど良い物が見つからなかった。</p>
+
+<p><a href="https://www.npmjs.com/package/marked-toc">marked-toc</a>は記号の扱いにGitHubと互換性がなく、大体はうまくいくのだけど、たまにうまくいかない。別の名前で一から作り直してるみたいだが、今度はまったく英数字以外がまったく考慮されないものになっていて期待できない。</p>
+
+<p><a href="https://www.npmjs.com/package/doctoc">doctoc</a>はコード・ブロックに書いた<code>&lt;h1&gt;</code>タグなどを拾ってしまってめちゃくちゃなToCが生成された。他、どうでも良さそうなPRリンクや派手すぎる埋め込みコメントなど色々うっとうしかった。</p>
+
+<p>他にもたくさんあった(npmだけで15くらい見つかる)が、<code>#</code>での見出し限定のものであったり、特殊な記法で見出しを書かなくてはならなかったりと、試すまでもなく使いたくならないものばかりだった。</p>
+
+<p>mdtocでは、markedの<a href="https://github.com/chjj/marked#overriding-renderer-methods">レンダラーの差し替え</a>を利用して見出しをすべて拾い、Redcarpetのコードにあった<a href="https://github.com/vmg/redcarpet/blob/816e0933a120b66759a71284a24eacac8880f765/ext/redcarpet/html.h#L76">削除する文字</a>を削除し、空白をマイナスに置換し、最後にURLエンコードするというだけにした。余計なことをなるべくしないようにしたので、そこそこ互換性があるんじゃないかと思う。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/webdesign/html-best-practices.html" rel="prev">
+  <p>HTML Best Practices</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
