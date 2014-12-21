@@ -144,7 +144,7 @@ function buildToc(a) {
         '-'
       )
     );
-    var i = new Array(v.l - 1).join(indent);
+    var i = new Array(v.l - a[0].l + 1).join(indent);
 
     return i + '* [' + v.r + '](#' + id + ')';
   }).join(eol);
