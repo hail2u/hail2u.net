@@ -33,11 +33,13 @@
  *     ====
  *     
  *     <!-- #toc -->
+ *     
  *     * [Foo](#foo)
  *       * [Foo Foo](#foo-foo)
  *       * [Foo Bar](#foo-bar)
  *     * [Bar](#bar)
  *       * [Bar Foo](#bar-foo)
+ *     
  *     <!-- /toc -->
  *     
  *     Foo
@@ -86,10 +88,11 @@ fs.writeFileSync(file, markdown.split(eol).map(function (l) {
   if (l === '<!-- #toc -->') {
     this.skip = true;
 
-    return l + eol + buildToc(headings).trim();
+    return l + eol + eol + buildToc(headings).trim();
   }
 
   if (l === '<!-- /toc -->') {
+    l = eol + l;
     this.skip = false;
   }
 
