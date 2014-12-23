@@ -1,26 +1,6 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var fixPath = function (content, srcpath) {
-    [
-      {
-        pattern: /((href|src)=")http:\/\/hail2u\.net\//g,
-        replace: '$1/'
-      },
-      {
-        pattern: /((href|src)=")\.\.\/\.\.\/build\//g,
-        replace: '$1/'
-      },
-      {
-        pattern: /((href|src)=")\.\//g,
-        replace: '$1/styles/'
-      },
-    ].forEach(function (sub) {
-      content = content.replace(sub.pattern, sub.replace);
-    });
-
-    return content;
-  };
   grunt.util.linefeed = '\n';
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -112,7 +92,22 @@ module.exports = function (grunt) {
 
       style_guide: {
         options: {
-          process: fixPath,
+          process: function (content, srcpath) {
+            [
+              {
+                pattern: /((href|src)=")(http:\/\/hail2u\.net\/|\.\/assets\/)/g,
+                replace: '$1/'
+              },
+              {
+                pattern: /((href|src)=")\.\//g,
+                replace: '$1/styles/'
+              },
+            ].forEach(function (sub) {
+              content = content.replace(sub.pattern, sub.replace);
+            });
+
+            return content;
+          }
         },
 
         dest: 'build/about/style-guide/index.html',
