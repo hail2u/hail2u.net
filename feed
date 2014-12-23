@@ -3,7 +3,7 @@
   <channel>
     <title>Hail2u.net</title>
     <link>http://hail2u.net/</link>
-    <description>Hail2u.net is simply a notebook of Kyo Nagashima about web design, programming &amp; their related technologies.</description>
+    <description>Hail2u.net is simply a notebook of Kyo Nagashima mainly about web design, programming &amp; their related technologies.</description>
     <language>ja-JP</language>
     <copyright>Copyright © 2002-2014, Kyo Nagashima</copyright>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
@@ -11,6 +11,50 @@
     <atom:link rel="self" href="http://hail2u.net/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
+    <item>
+      <title>URLUtils.hash (location.hash)とその返す値</title>
+      <link>http://hail2u.net/blog/webdesign/urlutils-hash-and-its-returning-value.html</link>
+      <description>URLUtilsインターフェイスのブラウザーにおける実装であるLocationオブジェクトのhashプロパティーによりURLのフラグメント識別子(と#)を取得・代入できる。最近のブラウザーは非ASCII文字列もURLエンコードせずに扱えるようになっているが、この辺りの挙動がFirefoxだけ少し違うようだ。それはhashプロパティーの返す値で、常にデコードされた形で返ってくるようになっている。</description>
+      <author>hail2u@gmail.com (Kyo Nagashima)</author>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/urlutils-hash-and-its-returning-value.html</guid>
+      <pubDate>Wed, 24 Dec 2014 01:05:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;code&gt;URLUtils&lt;/code&gt;インターフェイスのブラウザーにおける実装である&lt;code&gt;Location&lt;/code&gt;オブジェクトの&lt;code&gt;hash&lt;/code&gt;プロパティーによりURLのフラグメント識別子(と&lt;code&gt;#&lt;/code&gt;)を取得・代入できる。最近のブラウザーは非ASCII文字列もURLエンコードせずに扱えるようになっているが、この辺りの挙動がFirefoxだけ少し違うようだ。それは&lt;code&gt;hash&lt;/code&gt;プロパティーの返す値で、常にデコードされた形で返ってくるようになっている。&lt;/p&gt;
+
+&lt;p&gt;例えば適当なウェブページで開発者ツール(的なもの)を開き、コンソール(などと呼ばれてるもの)で以下を実行してみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;&amp;gt; &lt;kbd&gt;location.hash = &amp;#39;#&amp;#39; + &amp;#39;あいうえお&amp;#39;&lt;/kbd&gt;
+&amp;lt; &amp;quot;#あいうえお&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash&lt;/kbd&gt;
+&amp;lt; &amp;quot;#あいうえお&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash = &amp;#39;#&amp;#39; + encodeURIComponent(&amp;#39;あいうえお&amp;#39;)&lt;/kbd&gt;
+&amp;lt; &amp;quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash&lt;/kbd&gt;
+&amp;lt; &amp;quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&amp;quot;
+&lt;/samp&gt;&lt;/pre&gt;
+
+&lt;p&gt;Chrome 39やInternet Explorer 11ではこのようになる。&lt;code&gt;location.hash&lt;/code&gt;に代入した文字列はそのまま返ってくるだけだ。対してFirefox 34ではURLエンコードした文字列を代入した場合、デコードされて返ってくる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;&amp;gt; &lt;kbd&gt;location.hash = &amp;#39;#&amp;#39; + &amp;#39;あいうえお&amp;#39;&lt;/kbd&gt;
+&amp;lt; &amp;quot;#あいうえお&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash&lt;/kbd&gt;
+&amp;lt; &amp;quot;#あいうえお&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash = &amp;#39;#&amp;#39; + encodeURIComponent(&amp;#39;あいうえお&amp;#39;)&lt;/kbd&gt;
+&amp;lt; &amp;quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&amp;quot;
+&amp;gt; &lt;kbd&gt;location.hash&lt;/kbd&gt;
+&amp;lt; &amp;quot;#あいうえお&amp;quot;
+&lt;/samp&gt;&lt;/pre&gt;
+
+&lt;p&gt;もちろん開発者ツール上だけでなく通常のスクリプト上でも同じなので、この辺りを扱う場合はそれなりの注意が必要になる。常にURLエンコードされているのかどうかを意識するべきということだ。&lt;/p&gt;
+
+&lt;p&gt;例えば今のGitHubではこの辺りを使って&lt;code&gt;id&lt;/code&gt;属性の重複避けと&lt;code&gt;hashchange&lt;/code&gt;イベントの監視によるページ内ジャンプを実装している。しかし、URLエンコード済み(&lt;code&gt;href&lt;/code&gt;属性の値)とそうでないもの(&lt;code&gt;id&lt;/code&gt;属性の値)が混ざっているため、日本語の見出しではChrome 39やInternet Explorer 11だと比較に失敗してページ内ジャンプがうまく動かない。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;どちらかというとFirefoxの挙動の方が開発者に優しいとは言えるかもしれない。常にデコードされていると想定できるので、二重にエンコードしてしまうことやデコードし忘れということがない。しかしその一方でURLエンコードされた文字列とそうでない文字列が含まれたフラグメント識別子を元に戻すことができないという欠陥もある。&lt;a href="https://bugzilla.mozilla.org/show_bug.cgi?id=483304"&gt;Bug 483304&lt;/a&gt;でかなり昔から議論されているようだ。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://url.spec.whatwg.org/"&gt;URL仕様&lt;/a&gt;では、とにかくフラグメント識別子は&lt;a href="https://url.spec.whatwg.org/#fragment-state"&gt;必要ならURLエンコードされているべき&lt;/a&gt;となっている。そして&lt;a href="https://url.spec.whatwg.org/#dom-urlutils-hash"&gt;&lt;code&gt;URLUtils&lt;/code&gt;インターフェイスの&lt;code&gt;hash&lt;/code&gt;プロパティー&lt;/a&gt;でもゲッターは&lt;code&gt;#&lt;/code&gt;と連結して返せというだけになっているので、勝手にデコードして返すのはバグと言って良さそう。&lt;/p&gt;</content:encoded>
+    </item>
     <item>
       <title>:target擬似クラスとHistory API</title>
       <link>http://hail2u.net/blog/webdesign/target-pseudo-class-and-history-api.html</link>
@@ -311,23 +355,6 @@ pre {
 &lt;p&gt;4コマは好きでよく読む。わりと何でも読む。けど二極化して長いので、山東ユカの書くやつみたいなのが増えて三極化して欲しい。いわゆる青年誌とかで連載されてる4コマやショートものみたいなのがこれにあたる。専門誌に連載されてるものと違う、絶妙な暗さみたいなのがあるやつ。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>Gitで最新のタグをチェックアウト</title>
-      <link>http://hail2u.net/blog/software/git-checkout-latest-tag.html</link>
-      <description>最新のタグを知りたいことがたまにある。その時はgit describe --tagsで調べ、結果をコピーしていた。シェルの展開をうまく利用すれば良いようなところだが、describe --tagsがハッシュ付きで返ってくる時があり、そのまま流しこむと変なことになる。未だにハッシュ付きになる条件はわからないものの、--abbrev=0を加えると消えることがわかった。</description>
-      <author>hail2u@gmail.com (Kyo Nagashima)</author>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/git-checkout-latest-tag.html</guid>
-      <pubDate>Sun, 14 Dec 2014 09:21:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;最新のタグを知りたいことがたまにある。その時は&lt;code&gt;git describe --tags&lt;/code&gt;で調べ、結果をコピーしていた。シェルの展開をうまく利用すれば良いようなところだが、&lt;code&gt;describe --tags&lt;/code&gt;がハッシュ付きで返ってくる時があり、そのまま流しこむと変なことになる。未だにハッシュ付きになる条件はわからないものの、&lt;code&gt;--abbrev=0&lt;/code&gt;を加えると消えることがわかった。&lt;/p&gt;
-
-&lt;p&gt;具体的には以下のようなコマンドをターミナルで実行すれば良い。&lt;/p&gt;
-
-&lt;pre&gt;&lt;samp&gt;$ &lt;kbd&gt;git checkout $(git describe --tags &lt;mark&gt;--abbrev=0&lt;/mark&gt;)&lt;/kbd&gt;
-&lt;/samp&gt;&lt;/pre&gt;
-
-&lt;p&gt;主に、何かしらをビルドする時のタスクで使っている。事前に最新のタグをチェックアウトさせることによって、常に安定版がデプロイされるように制御することができる。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -362,6 +389,6 @@ pre {
       <guid isPermaLink="true">http://hail2u.net/documents/css-postprocessor-era.html</guid>
       <description>&lt;p&gt;市民権を得たCSSプリプロセッサーでは開発という段階しかカバーすることは出来ません。レビューとリリースという必要な段階を効率よく確実に行うためには、CSSポストプロセッサーという名前で総称されることになるであろうツールたちをうまく使う必要が出てくるでしょう。CSSポストプロセッサーとはどういうものなのか、そしてどういう働きをするものなのか、更にはどういう効果を持つのか、この文書で説明するこれらの点を理解して適切に使う必要があるでしょう。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Tue, 23 Dec 2014 15:20:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 24 Dec 2014 01:05:00 +0900</lastBuildDate>
   </channel>
 </rss>
