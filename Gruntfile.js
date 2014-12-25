@@ -101,7 +101,7 @@ module.exports = function (grunt) {
               {
                 pattern: /((href|src)=")\.\//g,
                 replace: '$1/styles/'
-              },
+              }
             ].forEach(function (sub) {
               content = content.replace(sub.pattern, sub.replace);
             });
