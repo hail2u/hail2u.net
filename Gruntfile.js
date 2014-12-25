@@ -92,7 +92,7 @@ module.exports = function (grunt) {
 
       style_guide: {
         options: {
-          process: function (content, srcpath) {
+          process: function (content) {
             [
               {
                 pattern: /((href|src)=")(http:\/\/hail2u\.net\/|\.\/assets\/)/g,
