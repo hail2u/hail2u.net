@@ -9,15 +9,94 @@
     <link>http://hail2u.net/blog/</link>
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
-    <copyright>Copyright &#x00a9; 2002-2014, Kyo Nagashima</copyright>
+    <copyright>Copyright © 2002-2015, Kyo Nagashima</copyright>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <webMaster>hail2u@gmail.com (Kyo Nagashima)</webMaster>
-    <lastBuildDate>Wed, 31 Dec 2014 04:53:23 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 1 Jan 2015 06:07:54 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>GitHub互換の見出しID</title>
+      <link>http://hail2u.net/blog/coding/github-compatible-header-id.html</link>
+      <description>gfmtoc (mdtocから名前を変えた)を作っている時にGitHub flavored Markdown (本当はHTML Pipeline)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。</description>
+      <author>hail2u@gmail.com (Kyo Nagashima)</author>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/github-compatible-header-id.html</guid>
+      <pubDate>Thu, 01 Jan 2015 06:07:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/hail2u/node-gfmtoc">gfmtoc (mdtocから名前を変えた)</a>を作っている時にGitHub flavored Markdown (本当は<a href="https://github.com/jch/html-pipeline/">HTML Pipeline</a>)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた<code>\p{Word}</code>を使っているので、それを作ればあとは簡単なようだ。</p>
+
+<p><a href=https://github.com/ruby/ruby/blob/1026907467ea3d5441e1bfa95f5f37b431a684f3/doc/regexp.rdoc#character-properties">Rubyのソースコードにある正規表現のドキュメント</a>によると、以下のユニコード文字プロパティーのカテゴリーを組み合わせたものが<code>\p{Word}</code>ということのようだ。</p>
+
+<ul>
+<li><code>\p{L}</code>: Letter</li>
+<li><code>\p{M}</code>: Mark</li>
+<li><code>\p{N}</code>: Number</li>
+<li><code>\p{Pc}</code>: Connector_Punctuation</li>
+</ul>
+
+<p>つまりこれらを連結した正規表現パターンを作れば良い。まともにやったら日が暮れるので、Node.jsでは<a href="https://www.npmjs.com/package/unicode-7.0.0">unicode-7.0.0</a>と<a href="https://www.npmjs.com/package/regenerate">regenerate</a>の両パッケージを使って生成してやる。</p>
+
+<pre><code>var regenerate = require(&#39;regenerate&#39;);
+
+var word = regenerate().add(
+  require(&#39;unicode-7.0.0/<mark>properties/Any</mark>/code-points&#39;)
+).remove(
+  require(&#39;unicode-7.0.0/<mark>categories/L</mark>/code-points&#39;)
+).remove(
+  require(&#39;unicode-7.0.0/<mark>categories/M</mark>/code-points&#39;)
+).remove(
+  require(&#39;unicode-7.0.0/<mark>categories/N</mark>/code-points&#39;)
+).remove(
+  require(&#39;unicode-7.0.0/<mark>categories/Pc</mark>/code-points&#39;)
+).remove(
+  &#39;-&#39;,
+  &#39; &#39;
+);
+
+console.log(word.toString());
+</code></pre>
+
+<p>ここでは否定形が欲しいので、Anyプロパティーを<code>add()</code>してから上記カテゴリーを<code>remove()</code>していく。最終的には特別視される<code>-</code>と<code> </code>もここでついでに削除しておく。gfmtocでは<a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js">生成結果をファイルに保存したもの</a>をライブラリとして使っている。普通はそのまま書けば良い(毎回動的に生成させるととても遅いことには注意が必要)。あとはHTML Pipelineがやっていることをなぞるのみだ。</p>
+
+<ol>
+<li>小文字に変換</li>
+<li><code>\p{Word}</code>と<code>-</code>、<code> </code> (半角空白)以外を削除</li>
+<li>半角空白を<code>-</code>に置換</li>
+<li>IDが被らないように数字を追加</li>
+</ol>
+
+<p>HTML Pipelineではこのような<a href="https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb">生成手順</a>になっているようだ。</p>
+
+<pre><code>var h = {};
+
+function genID(s, h) {
+  var u = &#39;&#39;;
+  var word = /.../g;
+  s = s.toLowerCase();
+  s = s.replace(word, &#39;&#39;);
+  s = s.replace(/ /g, &#39;-&#39;);
+
+  if (h[s] &gt; 0) {
+    u = &#39;-&#39; + h[s];
+  }
+
+  if (!h[s]) {
+    h[s] = 0;
+  }
+
+  h[s] += 1;
+
+  return s + u;
+}
+</code></pre>
+
+<p>確認した限りではうまくいっているようだ。<code>id</code>属性の値として使う場合はこのままで問題ないが、<code>href</code>属性の値として使う場合は<code>encodeURIComponent()</code>でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>はんぺんだて巻き</title>
@@ -288,96 +367,6 @@
 <p><code>:target</code>擬似クラスを使ったオーバーレイのフルスクリーン・ナビゲーションを作ろうかなという過程で、CSSだけだと消せないためどうしてやろうかと考えていて、History APIを使ってみたらダメだった、という過程で発見した。「珍」というほどではないが、直感的な動作とは思えないので<a href="http://www.adventar.org/calendars/341">CSS珍百景 Advent Calendar 2014</a>の19日目として提供しておく。</p>
 
 <p>対策はそれほど難しくはない。<code>location.hash = &#39;&#39;</code>でフラグメント識別子を空にし、<code>:target</code>擬似クラスを無効にした後、改めて<code>history.replaceState(&#39;&#39;, &#39;&#39;, location.pathname)</code>とすれば良い。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>mdtoc - The markdown ToC generator</title>
-      <link>http://hail2u.net/blog/coding/mdtoc.html</link>
-      <description>Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製でmarkedパッケージに依存している。実行すると引数に指定したMarkdownファイルの中に書かれた&lt;!-- #toc --&gt;と&lt;!-- /toc --&gt;の間がToCになる。</description>
-      <author>hail2u@gmail.com (Kyo Nagashima)</author>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/mdtoc.html</guid>
-      <pubDate>Mon, 22 Dec 2014 00:40:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製で<a href="https://www.npmjs.com/package/marked">markedパッケージ</a>に依存している。実行すると引数に指定したMarkdownファイルの中に書かれた<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>の間がToCになる。</p>
-
-<p>Download: <a href="http://hail2u.net/pub/mdtoc.js">mdtoc.js</a></p>
-
-<p>例えば以下のようにMarkdownファイル、<code>foo.md</code>に<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>を書いておき、</p>
-
-<pre><code>Test
-====
-
-&lt;!-- #toc --&gt;
-&lt;!-- /toc --&gt;
-
-Foo
----
-
-### Foo Foo
-
-### Foo Bar
-
-Bar
----
-
-### Bar Foo
-</code></pre>
-
-<p>ターミナルからmdtocを実行すると、</p>
-
-<pre><samp>$ <kbd>mdtoc foo.md</kbd>
-</samp></pre>
-
-<p>以下のようにToCが挿入される。</p>
-
-<pre><code>Test
-====
-
-&lt;!-- #toc --&gt;
-
-* [Foo](#foo)
-  * [Foo Foo](#foo-foo)
-  * [Foo Bar](#foo-bar)
-* [Bar](#bar)
-  * [Bar Foo](#bar-foo)
-
-&lt;!-- /toc --&gt;
-
-Foo
----
-
-### Foo Foo
-
-### Foo Bar
-
-Bar
----
-
-### Bar Foo
-</code></pre>
-
-<p>ToCの生成対象は最初の見出し以外のすべて。インデントは二番目の見出しを基準に調節されるようにした。大抵は<code>README.md</code>に対して使われると思うので、引数を省略した場合は<code>README.md</code>に対して実行するようにもなっている。改行コードは元の文書に従うようにしておいた。</p>
-
-<p>互換性はそこそこありそうだが、Redcarpetを使ったCLIツールの方が確実と思われるので、それを探すか暇な時に書き直したい。そのためnpmで公開するつもりは今のところない。</p>
-
-<hr>
-
-<p><a href="https://github.com/hail2u/html-best-practices">HTML Best Practices</a>のToCを簡単に更新できるようにするために色々探したけど良い物が見つからなかった。</p>
-
-<p><a href="https://www.npmjs.com/package/marked-toc">marked-toc</a>は記号の扱いにGitHubと互換性がなく、大体はうまくいくのだけど、たまにうまくいかない。別の名前で一から作り直してるみたいだが、今度はまったく英数字以外がまったく考慮されないものになっていて期待できない。</p>
-
-<p><a href="https://www.npmjs.com/package/doctoc">doctoc</a>はコード・ブロックに書いた<code>&lt;h1&gt;</code>タグなどを拾ってしまってめちゃくちゃなToCが生成された。他、どうでも良さそうなPRリンクや派手すぎる埋め込みコメントなど色々うっとうしかった。</p>
-
-<p>他にもたくさんあった(npmだけで15くらい見つかる)が、<code>#</code>での見出し限定のものであったり、特殊な記法で見出しを書かなくてはならなかったりと、試すまでもなく使いたくならないものばかりだった。</p>
-
-<p>mdtocでは、markedの<a href="https://github.com/chjj/marked#overriding-renderer-methods">レンダラーの差し替え</a>を利用して見出しをすべて拾い、Redcarpetのコードにあった<a href="https://github.com/vmg/redcarpet/blob/816e0933a120b66759a71284a24eacac8880f765/ext/redcarpet/html.h#L76">削除する文字</a>を削除し、空白をマイナスに置換し、最後にURLエンコードするというだけにした。余計なことをなるべくしないようにしたので、そこそこ互換性があるんじゃないかと思う。</p>
-
-<h2>追記</h2>
-
-<p>Git Repository: <a href="https://github.com/hail2u/node-gfmtoc">node-gfmtoc</a></p>
-
-<p>リポジトリーを作成し、<code>git clone</code>からの<code>npm install &amp;&amp; npm link</code>でサクッと利用可能になるようにしておいた。MarkdownというかGitHub flavored Markdown (正確にはHTML pipeline？)に依存するものなのでgfmtocに名前は変えた。npmレジストリーへ公開はしない。</p>]]></content:encoded>
     </item>
 
   </channel>
