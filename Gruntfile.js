@@ -35,7 +35,7 @@ module.exports = function (grunt) {
           'tmp/debug.min.js': ['tmp/show-column.min.js'],
           'tmp/main.min.js': [
             'tmp/unutm.min.js',
-            'tmp/async-csses.min.js'
+            'tmp/asyncss.min.js'
           ],
           'tmp/search.min.js': ['tmp/popular-pages.min.js']
         }
@@ -81,7 +81,7 @@ module.exports = function (grunt) {
 
       prejs: {
         files: {
-          'tmp/async-csses.js': 'src/js/async-csses.js',
+          'tmp/asyncss.js': 'src/js/asyncss.js',
           'tmp/popular-pages.js': 'src/js/popular-pages.js',
           'tmp/show-column.js': 'src/js/debug/show-column.js',
           'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
