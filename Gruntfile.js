@@ -329,6 +329,10 @@ module.exports = function (grunt) {
     },
 
     png2ico: {
+      options: {
+        cmd: 'png2ico'
+      },
+
       main: {
         dest: 'build/favicon.ico',
         src: [

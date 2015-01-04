@@ -6,23 +6,20 @@ module.exports = function (grunt) {
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var done = this.async();
-    var options = this.options({});
+    var options = this.options({
+      cmd: 'convert',
+    });
 
     var args = [];
-    var cmd = 'png2ico';
     var opts = {
       stdio: 'inherit'
     };
-
-    if (grunt.option('verbose')) {
-      args.push('-verbose');
-    }
 
     this.files.forEach(function (file) {
       args = args.concat(file.src);
       args.push(file.dest);
       grunt.util.spawn({
-        cmd: cmd,
+        cmd: options.cmd,
         args: args,
         opts: opts
       }, function (error, result, code) {
