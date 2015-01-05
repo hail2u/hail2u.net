@@ -10,12 +10,55 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 5 Jan 2015 06:14:16 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 6 Jan 2015 08:48:17 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>RUBYOPTを使った外部エンコーディングの指定</title>
+      <link>http://hail2u.net/blog/webdesign/setting-rubyopt-for-sass.html</link>
+      <description>今年からSassでcontentプロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数LANGを変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としてはRUBYOPTの方を使うべきなようだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/setting-rubyopt-for-sass.html</guid>
+      <pubDate>Tue, 06 Jan 2015 08:48:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>今年からSassで<code>content</code>プロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数<code>LANG</code>を変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としては<code>RUBYOPT</code>の方を使うべきなようだ。</p>
+
+<p>特に設定していないとマルチバイト文字列を含むSassファイルをコンパイルしようとすると以下のようなエラーメッセージを吐いて落ちる。</p>
+
+<pre><samp>C:\&gt;<kbd>scss test.scss</kbd>
+Error: Invalid Windows-31J character &quot;\xE2&quot;
+        on line 2 of test.scss
+  Use --trace for backtrace.
+</samp></pre>
+
+<p><code>test.scss</code>の2行目には<code>➔</code>が含まれている。このファイルに<code>@charset "UTF-8";</code>を追加することでも正常にコンパイルされるようになるが、Sass(やRuby)はUTF-8で書くので、ユーザーワイドに設定してやった方が省力化を図れる。</p>
+
+<pre><samp>C:\&gt;<kbd>set RUBYOPT=--encoding=UTF-8</kbd>
+
+C:\&gt;<kbd>scss test.scss</kbd>
+@charset &quot;UTF-8&quot;;
+.test {
+  content: &#39;➔&#39;; }
+</samp></pre>
+
+<p><code>RUBYOPT</code>環境変数で<code>--encoding</code>オプションを指定してやることで、外部エンコーディングをUTF-8に強制すると動くようになる。動作が確認できたら、あとはシステムのプロパティーからユーザー環境変数に仕込んでやれば良い。</p>
+
+<figure>
+  <img alt="システムのプロパティーのダイアログよりユーザー環境変数へRUBYOPTを追加している様子" src="http://hail2u.net/images/blog/setting-rubyopt-environment-variable.png">
+
+  <figcaption>ユーザー環境変数の設定ダイアログ</figcaption>
+</figure>
+
+<p>なお、今のSassは非ASCII文字列があると、適切な値の<code>@charset</code>ディレクティブを必ず追加するようになっている。先頭の<code>@charset &quot;UTF-8&quot;;</code>を削除したい場合は何かしら別のツールに頼る必要がある。</p>
+
+<hr>
+
+<p>マルチバイト文字列をそのまま書くことにしたのにはいくつか理由があるが、一番大きいのはエスケープされた文字列は人間が書くべきものではないということだ。<code>\0020</code>とか書いているとバカバカしくなる。それ以外にももちろんわかりやすくなることとか、わざわざコメントでどういう文字のエスケープなのかとか書かなくて済むこととか。ただし見てもなにかわからない非改行スペースのようなものだけはエスケープする、というルールにした。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>名前を付けることの難しさ</title>
@@ -284,29 +327,6 @@ function genID(s, h) {
 <p>ここで予防線をいっぱい張っておきたいところだけれども、それはやめておく。もちろん僕は仕様側の人間ではないので、とか、あくまでも、とか、一般的には、とかいっぱい書きたい。</p>
 
 <p>あ、<a href="http://www.w3.org/2014/10/html5-rec.html.ja">HTML5勧告</a>おめでとうございます。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>ブラウザー・キャッシュの今</title>
-      <link>http://hail2u.net/blog/webdesign/the-browser-cache-today.html</link>
-      <description>元々「静的なファイルは限界までキャッシュしろ！」というような金言はそれほど重要視していなかった。The changing role of the browser cacheという記事では、開きっぱなしにされるタブと継続的デプロイをキーワードに、ブラウザー・キャッシュの役割が変化していることを解説している。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/the-browser-cache-today.html</guid>
-      <pubDate>Sat, 27 Dec 2014 00:47:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>元々「静的なファイルは限界までキャッシュしろ！」というような金言はそれほど重要視していなかった。<a href="http://calendar.perfplanet.com/2014/the-changing-role-of-the-browser-cache/">The changing role of the browser cache</a>という記事では、開きっぱなしにされるタブと継続的デプロイをキーワードに、ブラウザー・キャッシュの役割が変化していることを解説している。</p>
-
-<p>ブラウザー・キャッシュが再訪問に対して威力を発揮するのに対し、開きっぱなしにされるタブでは再訪問されることはなく、継続的デプロイされるアプリケーションではその効果は限定的なものにしかなりえない、という意見だ。納得の出来る意見ではある。</p>
-
-<p>僕が元々こういった長期間のキャッシュに疑問を持っていたのも少し似ている。特に継続的デプロイの元では限定的な効果になることは自明だと考えていた。またいわゆる普通のウェブページにおいては再訪問という行為そのものが随分前から死滅したとも考えている。具体的にはソーシャル・ブックマークの普及後、一時的な消費に偏るようになってからそうなったと思っている。</p>
-
-<p>一方で長期化のデメリットは迅速にキャッシュの更新が行き渡らないという点で明白だ。もちろんキャッシュをリフレッシュする、というか別に配信するテクニックがあり、それを採用するわけだけど、なんというか美しくない。デプロイされる間隔に対して適切なキャッシュ期限を試行錯誤する方が真っ当なんじゃないかという思いが強い。</p>
-
-<p>ウェブのコンポーネント化が進むであろう今後は更に迅速なキャッシュの更新が求められるわけで、ブラウザー・キャッシュの長期化は忌避されていくようになるのかもしれない。</p>
-
-<hr>
-
-<p>今年から読み始めた<a href="http://calendar.perfplanet.com/">Performance Calendar</a>は過去ログもそれなりに面白そうなので、年末年始に読んでみようと思う。</p>]]></content:encoded>
     </item>
 
   </channel>

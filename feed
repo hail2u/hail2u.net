@@ -10,6 +10,47 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>RUBYOPTを使った外部エンコーディングの指定</title>
+      <link>http://hail2u.net/blog/webdesign/setting-rubyopt-for-sass.html</link>
+      <description>今年からSassでcontentプロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数LANGを変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としてはRUBYOPTの方を使うべきなようだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/setting-rubyopt-for-sass.html</guid>
+      <pubDate>Tue, 06 Jan 2015 08:48:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;今年からSassで&lt;code&gt;content&lt;/code&gt;プロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数&lt;code&gt;LANG&lt;/code&gt;を変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としては&lt;code&gt;RUBYOPT&lt;/code&gt;の方を使うべきなようだ。&lt;/p&gt;
+
+&lt;p&gt;特に設定していないとマルチバイト文字列を含むSassファイルをコンパイルしようとすると以下のようなエラーメッセージを吐いて落ちる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;C:\&amp;gt;&lt;kbd&gt;scss test.scss&lt;/kbd&gt;
+Error: Invalid Windows-31J character &amp;quot;\xE2&amp;quot;
+        on line 2 of test.scss
+  Use --trace for backtrace.
+&lt;/samp&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;test.scss&lt;/code&gt;の2行目には&lt;code&gt;➔&lt;/code&gt;が含まれている。このファイルに&lt;code&gt;@charset "UTF-8";&lt;/code&gt;を追加することでも正常にコンパイルされるようになるが、Sass(やRuby)はUTF-8で書くので、ユーザーワイドに設定してやった方が省力化を図れる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;C:\&amp;gt;&lt;kbd&gt;set RUBYOPT=--encoding=UTF-8&lt;/kbd&gt;
+
+C:\&amp;gt;&lt;kbd&gt;scss test.scss&lt;/kbd&gt;
+@charset &amp;quot;UTF-8&amp;quot;;
+.test {
+  content: &amp;#39;➔&amp;#39;; }
+&lt;/samp&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;RUBYOPT&lt;/code&gt;環境変数で&lt;code&gt;--encoding&lt;/code&gt;オプションを指定してやることで、外部エンコーディングをUTF-8に強制すると動くようになる。動作が確認できたら、あとはシステムのプロパティーからユーザー環境変数に仕込んでやれば良い。&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img alt="システムのプロパティーのダイアログよりユーザー環境変数へRUBYOPTを追加している様子" src="http://hail2u.net/images/blog/setting-rubyopt-environment-variable.png"&gt;
+
+  &lt;figcaption&gt;ユーザー環境変数の設定ダイアログ&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;なお、今のSassは非ASCII文字列があると、適切な値の&lt;code&gt;@charset&lt;/code&gt;ディレクティブを必ず追加するようになっている。先頭の&lt;code&gt;@charset &amp;quot;UTF-8&amp;quot;;&lt;/code&gt;を削除したい場合は何かしら別のツールに頼る必要がある。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;マルチバイト文字列をそのまま書くことにしたのにはいくつか理由があるが、一番大きいのはエスケープされた文字列は人間が書くべきものではないということだ。&lt;code&gt;\0020&lt;/code&gt;とか書いているとバカバカしくなる。それ以外にももちろんわかりやすくなることとか、わざわざコメントでどういう文字のエスケープなのかとか書かなくて済むこととか。ただし見てもなにかわからない非改行スペースのようなものだけはエスケープする、というルールにした。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>名前を付けることの難しさ</title>
       <link>http://hail2u.net/blog/webdesign/naming-things-is-really-hard.html</link>
       <description>名前をつけることの難しさについて、実際にどうして格闘してやればよいのかについて書かれたNaming Thingsという記事を読み返した。中心となるのはCSSにおけるクラス名で、SUIT CSSの命名規則を取り上げて、わかりやすさ・明白さ・機能性・一貫性・適切さ・拡張性・短さと若干のジョークが許されるゆるさのようなものが重要であるとしている。</description>
@@ -268,27 +309,6 @@ function genID(s, h) {
       <description>&lt;p&gt;HTMLを適切な要素を使って書いていくことは実はそれほど難しくはない。しかし過剰に要素を使わずに、かつスタイリングすることも意識して、と適切に“マークアップ”するのはなかなかの修練を必要とする。いったい“マークアップ”するということはどういうことなのだろうか、そしてどのような思考の元に行えば良いのだろうか。&lt;/p&gt;</description>
     </item>
     <item>
-      <title>ブラウザー・キャッシュの今</title>
-      <link>http://hail2u.net/blog/webdesign/the-browser-cache-today.html</link>
-      <description>元々「静的なファイルは限界までキャッシュしろ！」というような金言はそれほど重要視していなかった。The changing role of the browser cacheという記事では、開きっぱなしにされるタブと継続的デプロイをキーワードに、ブラウザー・キャッシュの役割が変化していることを解説している。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/the-browser-cache-today.html</guid>
-      <pubDate>Sat, 27 Dec 2014 00:47:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;元々「静的なファイルは限界までキャッシュしろ！」というような金言はそれほど重要視していなかった。&lt;a href="http://calendar.perfplanet.com/2014/the-changing-role-of-the-browser-cache/"&gt;The changing role of the browser cache&lt;/a&gt;という記事では、開きっぱなしにされるタブと継続的デプロイをキーワードに、ブラウザー・キャッシュの役割が変化していることを解説している。&lt;/p&gt;
-
-&lt;p&gt;ブラウザー・キャッシュが再訪問に対して威力を発揮するのに対し、開きっぱなしにされるタブでは再訪問されることはなく、継続的デプロイされるアプリケーションではその効果は限定的なものにしかなりえない、という意見だ。納得の出来る意見ではある。&lt;/p&gt;
-
-&lt;p&gt;僕が元々こういった長期間のキャッシュに疑問を持っていたのも少し似ている。特に継続的デプロイの元では限定的な効果になることは自明だと考えていた。またいわゆる普通のウェブページにおいては再訪問という行為そのものが随分前から死滅したとも考えている。具体的にはソーシャル・ブックマークの普及後、一時的な消費に偏るようになってからそうなったと思っている。&lt;/p&gt;
-
-&lt;p&gt;一方で長期化のデメリットは迅速にキャッシュの更新が行き渡らないという点で明白だ。もちろんキャッシュをリフレッシュする、というか別に配信するテクニックがあり、それを採用するわけだけど、なんというか美しくない。デプロイされる間隔に対して適切なキャッシュ期限を試行錯誤する方が真っ当なんじゃないかという思いが強い。&lt;/p&gt;
-
-&lt;p&gt;ウェブのコンポーネント化が進むであろう今後は更に迅速なキャッシュの更新が求められるわけで、ブラウザー・キャッシュの長期化は忌避されていくようになるのかもしれない。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今年から読み始めた&lt;a href="http://calendar.perfplanet.com/"&gt;Performance Calendar&lt;/a&gt;は過去ログもそれなりに面白そうなので、年末年始に読んでみようと思う。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「ウェブ・タイポグラフィーのベスト・プラクティス」を追加</title>
       <link>http://hail2u.net/documents/web-typography-best-practices.html</link>
       <pubDate>Sun, 28 Sep 2014 00:51:35 +0900</pubDate>
@@ -316,6 +336,6 @@ function genID(s, h) {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Mon, 05 Jan 2015 06:14:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 06 Jan 2015 08:48:00 +0900</lastBuildDate>
   </channel>
 </rss>
