@@ -42,7 +42,7 @@ module.exports = function (grunt) {
       </nav>
     </header>
 
-    <main class="main" role="main">
+    <main class="content" role="main">
       <article id="<%FN%>">
         <h1><%TITLE%></h1>
 
