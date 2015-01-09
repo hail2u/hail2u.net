@@ -136,10 +136,7 @@ module.exports = function (grunt) {
 
     csswring: {
       options: {
-        map: {
-          inline: false,
-          sourcesContent: false
-        }
+        map: true
       },
 
       main: {
@@ -418,6 +415,7 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.loadNpmTasks('csswring');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
@@ -425,7 +423,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-css-mqpacker');
-  grunt.loadNpmTasks('grunt-csswring');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
   grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
