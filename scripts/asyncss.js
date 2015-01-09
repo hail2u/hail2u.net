@@ -5,15 +5,6 @@
  */
 (function () {
   var files = [
-    {
-      href: '/fonts/megrim.min.css'
-    },
-    {
-      href: '/fonts/source-code-pro.min.css'
-    },
-    {
-      href: '/fonts/source-sans-pro.min.css'
-    }
   ];
   var links = document.createDocumentFragment();
   files.forEach(function (file) {
