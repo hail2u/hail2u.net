@@ -234,6 +234,14 @@ module.exports = function (grunt) {
       }
     },
 
+    fix_css_charset: {
+      main: {
+        files: {
+          'tmp/style.min.css': ['tmp/style.min.css']
+        }
+      }
+    },
+
     generate: {
       main: {
         cwd: 'src/html/',
@@ -484,6 +492,7 @@ module.exports = function (grunt) {
     'css_mqpacker',
     'csswring',
     'concat:css',
+    'fix_css_charset',
     'copy:css',
     'copy:style_guide',
   ]);
