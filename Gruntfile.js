@@ -183,6 +183,21 @@ module.exports = function (grunt) {
       }
     },
 
+    single_charset: {
+      options: {
+        map: {
+          inline: false,
+          sourcesContent: false
+        }
+      },
+
+      main: {
+        files: {
+          'tmp/style.min.css': ['tmp/style.min.css']
+        }
+      }
+    },
+
     uglify: {
       options: {
         beautify: {
@@ -230,21 +245,6 @@ module.exports = function (grunt) {
         options: {
           all: true,
           index: true
-        }
-      }
-    },
-
-    fix_css_charset: {
-      options: {
-        map: {
-          inline: false,
-          sourcesContent: false
-        }
-      },
-
-      main: {
-        files: {
-          'tmp/style.min.css': ['tmp/style.min.css']
         }
       }
     },
@@ -427,6 +427,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-css-mqpacker');
   grunt.loadNpmTasks('grunt-csswring');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
+  grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
 
   grunt.registerTask('deploy', [
@@ -499,7 +500,7 @@ module.exports = function (grunt) {
     'css_mqpacker',
     'csswring',
     'concat:css',
-    'fix_css_charset',
+    'single_charset',
     'copy:css',
     'copy:style_guide',
   ]);
