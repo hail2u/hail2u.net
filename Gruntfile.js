@@ -21,6 +21,9 @@ module.exports = function (grunt) {
         files: {
           'tmp/style.min.css': [
             'tmp/normalize.min.css',
+            'tmp/source-sans-pro.min.css',
+            'tmp/source-code-pro.min.css',
+            'tmp/megrim.min.css',
             'tmp/style.min.css'
           ]
         }
@@ -33,11 +36,7 @@ module.exports = function (grunt) {
 
         files: {
           'tmp/debug.min.js': ['tmp/show-column.min.js'],
-          'tmp/main.min.js': [
-            'tmp/unutm.min.js',
-            'tmp/asyncss.min.js'
-          ],
-          'tmp/search.min.js': ['tmp/popular-pages.min.js']
+          'tmp/main.min.js': ['tmp/unutm.min.js']
         }
       }
     },
@@ -75,7 +74,10 @@ module.exports = function (grunt) {
 
       precss: {
         files: {
-          'tmp/normalize.css': 'node_modules/normalize.css/normalize.css'
+          'tmp/normalize.css': 'node_modules/normalize.css/normalize.css',
+          'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
+          'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
+          'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
         }
       },
 
