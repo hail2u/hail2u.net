@@ -23,9 +23,9 @@ module.exports = function (grunt) {
 
     <link href="./favicon.ico" rel="icon">
     <link href="./styles/style.min.css" rel="stylesheet">
-    <link href="./fonts/megrim.min.css" rel="stylesheet">
-    <link href="./fonts/source-code-pro.min.css" rel="stylesheet">
-    <link href="./fonts/source-sans-pro.min.css" rel="stylesheet">
+    <link href="./styles/megrim.min.css" rel="stylesheet">
+    <link href="./styles/source-code-pro.min.css" rel="stylesheet">
+    <link href="./styles/source-sans-pro.min.css" rel="stylesheet">
   </head>
 
   <body class="permalink">
