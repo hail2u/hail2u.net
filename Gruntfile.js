@@ -182,10 +182,7 @@ module.exports = function (grunt) {
 
     single_charset: {
       options: {
-        map: {
-          inline: false,
-          sourcesContent: false
-        }
+        map: true
       },
 
       main: {
