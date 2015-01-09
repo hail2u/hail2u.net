@@ -10,6 +10,35 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>postcss-single-charset</title>
+      <link>http://hail2u.net/blog/webdesign/postcss-single-charset.html</link>
+      <description>minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/postcss-single-charset.html</guid>
+      <pubDate>Sat, 10 Jan 2015 01:52:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="http://hail2u.net/blog/webdesign/minify-then-concat.html"&gt;minifyしてからconcat&lt;/a&gt;という手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある&lt;code&gt;@charset&lt;/code&gt;ルールが無意味になる。そこで最初の&lt;code&gt;@charset&lt;/code&gt;を先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。&lt;/p&gt;
+
+&lt;p&gt;PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの&lt;code&gt;use()&lt;/code&gt;でプロセッサーとして読み込んでやる必要がある。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var fs = require(&amp;#39;fs&amp;#39;);
+var postcss = require(&amp;#39;postcss&amp;#39;);
+
+var input = fs.readFileSync(&amp;#39;input.css&amp;#39;, &amp;#39;utf8&amp;#39;);
+var output = postcss().use(
+  require(&amp;#39;postcss-single-charset&amp;#39;)()
+).process(input).css;
+fs.writeFileSync(&amp;#39;output.css&amp;#39;, output);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には&lt;a href="https://github.com/nDmitry/grunt-postcss"&gt;grunt-postcss&lt;/a&gt;や&lt;a href="https://github.com/w0rm/gulp-postcss"&gt;gulp-postcss&lt;/a&gt;経由で使うことになるだろう。&lt;/p&gt;
+
+&lt;p&gt;利用サンプルを兼ねてGruntプラグインも同梱しておいた。&lt;code&gt;grunt-&lt;/code&gt;プリフィックスが付いていないため、&lt;a href="https://github.com/sindresorhus/load-grunt-tasks"&gt;load-grunt-tasks&lt;/a&gt;では読み込んでくれない(と思う)ので、READMEにあるように書いてちゃんと読み込む必要がある。他は特に変なことはないが、あまり行儀良くはなさそうなので利用は非推奨ということにしておく。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;あんまりパッケージ化するつもりはなかったけど、PostCSSプラグインというような形で書いたことがなかったので試しに書いてみた。特に何ということもなかった。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>ウェブ・フォントの読み込み</title>
       <link>http://hail2u.net/blog/webdesign/loading-web-fonts.html</link>
       <description>ウェブ・フォントも完全に行き渡り、今はどう効率的に配信するかについて多くの時間を割くようになった。Google Fontsの低め安定路線を見限り、TypeKitやFonts.comへ鞍替えする人々も増えた。それと同時に自前でホスティングする人々も徐々にその数を増やしており、どれが最適解なのか一応の結論が出るにはもう少しかかるだろう。まず、ウェブ・フォントの読み込みにおいてどのようなアプローチがあり、どのようなメリット、そしてデメリットがあるのだろうか。</description>
@@ -292,48 +321,6 @@ function genID(s, h) {
 &lt;p&gt;確認した限りではうまくいっているようだ。&lt;code&gt;id&lt;/code&gt;属性の値として使う場合はこのままで問題ないが、&lt;code&gt;href&lt;/code&gt;属性の値として使う場合は&lt;code&gt;encodeURIComponent()&lt;/code&gt;でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>はんぺんだて巻き</title>
-      <link>http://hail2u.net/blog/misc/hanpen-datemaki.html</link>
-      <description>だて巻き苦手とか言うと大人っぽいけど、そんなことは特になくおせちの中で好きなもののひとつ。だけどペッタペタに甘いのもさすがに辛くなってきたので、今年は作ってみるかと調べたり聞いたりしたところ、はんぺんで作ると楽でおいしいという話だった。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/hanpen-datemaki.html</guid>
-      <pubDate>Wed, 31 Dec 2014 04:53:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;だて巻き苦手とか言うと大人っぽいけど、そんなことは特になくおせちの中で好きなもののひとつ。だけどペッタペタに甘いのもさすがに辛くなってきたので、今年は作ってみるかと調べたり聞いたりしたところ、はんぺんで作ると楽でおいしいという話だった。&lt;/p&gt;
-
-&lt;p&gt;試しに&lt;a href="http://www.kyounoryouri.jp/recipe/3275_%E3%82%B9%E3%83%94%E3%83%BC%E3%83%89%E3%81%A0%E3%81%A6%E5%B7%BB%E3%81%8D.html"&gt;きょうの料理のスピードだて巻き&lt;/a&gt;をそのままで作ったら5mmくらいのペラッペラのしか焼けなかったので、本番では倍の量にしてやったらうまく3cm近くまでなった。&lt;/p&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;材料&lt;/th&gt;
-&lt;th style="text-align:right"&gt;分量&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;はんぺん&lt;/td&gt;
-&lt;td style="text-align:right"&gt;110g&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;卵&lt;/td&gt;
-&lt;td style="text-align:right"&gt;4個&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;砂糖&lt;/td&gt;
-&lt;td style="text-align:right"&gt;大さじ2&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;みりん&lt;/td&gt;
-&lt;td style="text-align:right"&gt;大さじ1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;はんぺんは紀文の大判のものが一枚。これが塩分が多いような感じだったので塩は入れなかった。みりんも試しに作った時にきつかったような気がしたので、半分に。あとはひたすら&lt;a href="http://www.amazon.co.jp/gp/product/B00ITGDH16/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=B00ITGDH16&amp;amp;linkCode=as2&amp;amp;tag=hail2unet-22"&gt;混ぜて&lt;/a&gt;、型に入れ、180度に予熱したオーブンの下段で15分焼くだけ。焼き色がうまくつかなかったので、上段で仕上げれば良かったのかもしれない。&lt;/p&gt;
-
-&lt;p&gt;所要時間15分(+焼くのに15分)とは思えない手軽さとおいしさ。恵方巻きみたいに一本食いできそう。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -368,6 +355,6 @@ function genID(s, h) {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Fri, 09 Jan 2015 13:10:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 10 Jan 2015 01:52:00 +0900</lastBuildDate>
   </channel>
 </rss>

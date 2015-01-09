@@ -10,12 +10,43 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Fri, 9 Jan 2015 15:08:44 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 10 Jan 2015 01:52:42 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>postcss-single-charset</title>
+      <link>http://hail2u.net/blog/webdesign/postcss-single-charset.html</link>
+      <description>minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/postcss-single-charset.html</guid>
+      <pubDate>Sat, 10 Jan 2015 01:52:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="http://hail2u.net/blog/webdesign/minify-then-concat.html">minifyしてからconcat</a>という手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある<code>@charset</code>ルールが無意味になる。そこで最初の<code>@charset</code>を先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</p>
+
+<p>PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの<code>use()</code>でプロセッサーとして読み込んでやる必要がある。</p>
+
+<pre><code>var fs = require(&#39;fs&#39;);
+var postcss = require(&#39;postcss&#39;);
+
+var input = fs.readFileSync(&#39;input.css&#39;, &#39;utf8&#39;);
+var output = postcss().use(
+  require(&#39;postcss-single-charset&#39;)()
+).process(input).css;
+fs.writeFileSync(&#39;output.css&#39;, output);
+</code></pre>
+
+<p>PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には<a href="https://github.com/nDmitry/grunt-postcss">grunt-postcss</a>や<a href="https://github.com/w0rm/gulp-postcss">gulp-postcss</a>経由で使うことになるだろう。</p>
+
+<p>利用サンプルを兼ねてGruntプラグインも同梱しておいた。<code>grunt-</code>プリフィックスが付いていないため、<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>では読み込んでくれない(と思う)ので、READMEにあるように書いてちゃんと読み込む必要がある。他は特に変なことはないが、あまり行儀良くはなさそうなので利用は非推奨ということにしておく。</p>
+
+<hr>
+
+<p>あんまりパッケージ化するつもりはなかったけど、PostCSSプラグインというような形で書いたことがなかったので試しに書いてみた。特に何ということもなかった。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>ウェブ・フォントの読み込み</title>
@@ -315,50 +346,6 @@ function genID(s, h) {
 </code></pre>
 
 <p>確認した限りではうまくいっているようだ。<code>id</code>属性の値として使う場合はこのままで問題ないが、<code>href</code>属性の値として使う場合は<code>encodeURIComponent()</code>でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>はんぺんだて巻き</title>
-      <link>http://hail2u.net/blog/misc/hanpen-datemaki.html</link>
-      <description>だて巻き苦手とか言うと大人っぽいけど、そんなことは特になくおせちの中で好きなもののひとつ。だけどペッタペタに甘いのもさすがに辛くなってきたので、今年は作ってみるかと調べたり聞いたりしたところ、はんぺんで作ると楽でおいしいという話だった。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/hanpen-datemaki.html</guid>
-      <pubDate>Wed, 31 Dec 2014 04:53:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>だて巻き苦手とか言うと大人っぽいけど、そんなことは特になくおせちの中で好きなもののひとつ。だけどペッタペタに甘いのもさすがに辛くなってきたので、今年は作ってみるかと調べたり聞いたりしたところ、はんぺんで作ると楽でおいしいという話だった。</p>
-
-<p>試しに<a href="http://www.kyounoryouri.jp/recipe/3275_%E3%82%B9%E3%83%94%E3%83%BC%E3%83%89%E3%81%A0%E3%81%A6%E5%B7%BB%E3%81%8D.html">きょうの料理のスピードだて巻き</a>をそのままで作ったら5mmくらいのペラッペラのしか焼けなかったので、本番では倍の量にしてやったらうまく3cm近くまでなった。</p>
-
-<table>
-<thead>
-<tr>
-<th>材料</th>
-<th style="text-align:right">分量</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>はんぺん</td>
-<td style="text-align:right">110g</td>
-</tr>
-<tr>
-<td>卵</td>
-<td style="text-align:right">4個</td>
-</tr>
-<tr>
-<td>砂糖</td>
-<td style="text-align:right">大さじ2</td>
-</tr>
-<tr>
-<td>みりん</td>
-<td style="text-align:right">大さじ1</td>
-</tr>
-</tbody>
-</table>
-
-<p>はんぺんは紀文の大判のものが一枚。これが塩分が多いような感じだったので塩は入れなかった。みりんも試しに作った時にきつかったような気がしたので、半分に。あとはひたすら<a href="http://www.amazon.co.jp/gp/product/B00ITGDH16/ref=as_li_ss_tl?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=B00ITGDH16&amp;linkCode=as2&amp;tag=hail2unet-22">混ぜて</a>、型に入れ、180度に予熱したオーブンの下段で15分焼くだけ。焼き色がうまくつかなかったので、上段で仕上げれば良かったのかもしれない。</p>
-
-<p>所要時間15分(+焼くのに15分)とは思えない手軽さとおいしさ。恵方巻きみたいに一本食いできそう。</p>]]></content:encoded>
     </item>
 
   </channel>
