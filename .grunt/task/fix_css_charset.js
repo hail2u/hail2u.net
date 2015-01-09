@@ -11,24 +11,11 @@ module.exports = function (grunt) {
     var options = this.options({});
 
     this.files.forEach(function (file) {
-      var fixed = postcss(function (css) {
-        var metCharset = false;
-
-        css.eachAtRule(function (atRule) {
-          if (atRule.name !== 'charset') {
-            return;
-          }
-
-          if (!metCharset) {
-            metCharset = true;
-            atRule.parent.prepend(atRule.clone());
-          }
-
-          atRule.removeSelf();
-        });
-
-        return css;
-      }).process(fs.readFileSync(file.src[0], 'utf8'), options);
+      var fixed = postcss().use(
+        require('postcss-single-charset')()
+      ).process(
+        fs.readFileSync(file.src[0], 'utf8'), options
+      );
 
       fs.writeFileSync(file.dest, fixed.css);
       grunt.log.writeln('File "' + file.dest + '" created.');
