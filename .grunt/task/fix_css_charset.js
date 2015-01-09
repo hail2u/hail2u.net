@@ -8,6 +8,8 @@ module.exports = function (grunt) {
     var fs = require('fs');
     var postcss = require('postcss');
 
+    var options = this.options({});
+
     this.files.forEach(function (file) {
       var fixed = postcss(function (css) {
         var metCharset = false;
@@ -26,14 +28,15 @@ module.exports = function (grunt) {
         });
 
         return css;
-      }).process(fs.readFileSync(file.src[0], 'utf8'), {
-        map: true
-      });
+      }).process(fs.readFileSync(file.src[0], 'utf8'), options);
 
       fs.writeFileSync(file.dest, fixed.css);
       grunt.log.writeln('File "' + file.dest + '" created.');
-      fs.writeFileSync(file.dest + '.map', fixed.map);
-      grunt.log.writeln('File "' + file.dest + '.map" created.');
+
+      if (fixed.map) {
+        fs.writeFileSync(file.dest + '.map', fixed.map);
+        grunt.log.writeln('File "' + file.dest + '.map" created.');
+      }
     });
   });
 };

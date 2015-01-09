@@ -235,6 +235,13 @@ module.exports = function (grunt) {
     },
 
     fix_css_charset: {
+      options: {
+        map: {
+          inline: false,
+          sourcesContent: false
+        }
+      },
+
       main: {
         files: {
           'tmp/style.min.css': ['tmp/style.min.css']
