@@ -93,7 +93,7 @@ module.exports = function (grunt) {
 
     body = body.replace(/="\//g, '="./');
     preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
-    fs.writeFileSync(preview_file, preview);
+    grunt.file.write(preview_file, preview);
     grunt.log.writeln('File "' + preview_file + '" created.');
     grunt.util.spawn({
       cmd: 'open',

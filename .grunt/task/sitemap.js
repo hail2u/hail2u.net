@@ -57,7 +57,7 @@ module.exports = function (grunt) {
         loc: 'http://hail2u.net' + url
       });
     });
-    fs.writeFileSync(dest, new xml2js.Builder().buildObject(sitemap));
+    grunt.file.write(dest, new xml2js.Builder().buildObject(sitemap));
     grunt.log.writeln('File "' + dest + '" created.');
   });
 };

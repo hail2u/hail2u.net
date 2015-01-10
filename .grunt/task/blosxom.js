@@ -101,7 +101,7 @@ module.exports = function (grunt) {
         var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
           '\n';
         file = options.staticdir + file;
-        fs.writeFileSync(file, contents);
+        grunt.file.write(file, contents);
 
         if (bar) {
           bar.tick();

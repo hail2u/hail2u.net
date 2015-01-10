@@ -55,7 +55,7 @@ module.exports = function (grunt) {
       var metadata = _extendData(fileTemplate);
       var template = fs.readFileSync(fileTemplate, 'utf8');
       var render = hbs.compile(template);
-      fs.writeFileSync(file.dest, render(metadata));
+      grunt.file.write(file.dest, render(metadata));
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
@@ -195,7 +195,7 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          fs.writeFileSync(cache, JSON.stringify(articles, null, 2));
+          grunt.file.write(cache, JSON.stringify(articles, null, 2));
           grunt.log.writeln('File "' + cache.replace(/\\/g, '/') +
             '" updated.');
         });

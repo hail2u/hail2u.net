@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       return new Date(a.pubDate).getTime() - new Date(b.pubDate).getTime();
     }).reverse();
     feed.rss.channel.lastBuildDate = feed.rss.channel.item[0].pubDate;
-    fs.writeFileSync(dest, new xml2js.Builder({
+    grunt.file.write(dest, new xml2js.Builder({
       xmldec: {
         encoding: 'UTF-8',
         version: '1.0'
