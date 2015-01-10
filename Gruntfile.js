@@ -412,6 +412,7 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.loadNpmTasks('css-mqpacker');
   grunt.loadNpmTasks('csswring');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
