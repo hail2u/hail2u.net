@@ -74,7 +74,7 @@ module.exports = function (grunt) {
 
       precss: {
         files: {
-          'tmp/normalize.css': 'node_modules/normalize.css/normalize.css',
+          'tmp/normalize.css': 'src/css/assets/styles/normalize.css',
           'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
           'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
           'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
