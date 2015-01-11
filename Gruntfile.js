@@ -418,7 +418,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-css-mqpacker');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
   grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
