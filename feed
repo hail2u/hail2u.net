@@ -10,6 +10,19 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>PostCSS v4と空白</title>
+      <link>http://hail2u.net/blog/coding/postcss-v4-and-white-spaces.html</link>
+      <description>PostCSSのv4.0.0が年明け早々に出た。互換性のない変更の中では、v3.0.0でchildsと妙なスペルで名付けられたものがnodesに修正されたことが一番大きそうだ。他、便利メソッドの追加に加え、空白の最適化機能が大幅に変更になった。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/postcss-v4-and-white-spaces.html</guid>
+      <pubDate>Sun, 11 Jan 2015 14:00:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://github.com/postcss/postcss/releases/tag/4.0.0"&gt;PostCSSのv4.0.0&lt;/a&gt;が年明け早々に出た。互換性のない変更の中では、v3.0.0で&lt;code&gt;childs&lt;/code&gt;と妙なスペルで名付けられたものが&lt;code&gt;nodes&lt;/code&gt;に修正されたことが一番大きそうだ。他、便利メソッドの追加に加え、空白の最適化機能が大幅に変更になった。&lt;/p&gt;
+
+&lt;p&gt;ソースを読んでもよくわからなかったので&lt;a href="https://github.com/postcss/postcss/issues/165"&gt;イシューを立てて聞いたところ&lt;/a&gt;、思ったよりもかなり複雑そうだった。しかしよく練られてはいる印象は持ったので、これに任せてしまうのが賢そうだ。つまりノードを動かす時には&lt;code&gt;clone()&lt;/code&gt;を通すか、新メソッドの&lt;code&gt;moveTo()&lt;/code&gt;などを使ってやることで、まずノードの空白関連のプロパティーをリセットする。後はPostCSSに前後のノードを参照するかデフォルトのフォーマットを採用するかを選択させるという形だ。&lt;/p&gt;
+
+&lt;p&gt;PostCSS側の変更でテストの期待される結果は書き直さなければならなそうだが、ライブラリー側で余計なことをするよりかはコストが低いと思われる。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>postcss-single-charset</title>
       <link>http://hail2u.net/blog/webdesign/postcss-single-charset.html</link>
       <description>minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</description>
@@ -245,82 +258,6 @@ C:\&amp;gt;&lt;kbd&gt;scss test.scss&lt;/kbd&gt;
 &lt;p&gt;買って気に入ったものがめちゃくちゃになる夢をよく見るようになった気がする。気がするというのはちゃんと覚えてないから。ブーツを買った後にもものすごい悪天候かなんかでブーツが濡れて溶けてなくなるみたいなのを見た気がする。夢の中でも大事にしたい。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>GitHub互換の見出しID</title>
-      <link>http://hail2u.net/blog/coding/github-compatible-header-id.html</link>
-      <description>gfmtoc (mdtocから名前を変えた)を作っている時にGitHub flavored Markdown (本当はHTML Pipeline)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/github-compatible-header-id.html</guid>
-      <pubDate>Thu, 01 Jan 2015 06:07:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="https://github.com/hail2u/node-gfmtoc"&gt;gfmtoc (mdtocから名前を変えた)&lt;/a&gt;を作っている時にGitHub flavored Markdown (本当は&lt;a href="https://github.com/jch/html-pipeline/"&gt;HTML Pipeline&lt;/a&gt;)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた&lt;code&gt;\p{Word}&lt;/code&gt;を使っているので、それを作ればあとは簡単なようだ。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=https://github.com/ruby/ruby/blob/1026907467ea3d5441e1bfa95f5f37b431a684f3/doc/regexp.rdoc#character-properties"&gt;Rubyのソースコードにある正規表現のドキュメント&lt;/a&gt;によると、以下のユニコード文字プロパティーのカテゴリーを組み合わせたものが&lt;code&gt;\p{Word}&lt;/code&gt;ということのようだ。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;\p{L}&lt;/code&gt;: Letter&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;\p{M}&lt;/code&gt;: Mark&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;\p{N}&lt;/code&gt;: Number&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;\p{Pc}&lt;/code&gt;: Connector_Punctuation&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;つまりこれらを連結した正規表現パターンを作れば良い。まともにやったら日が暮れるので、Node.jsでは&lt;a href="https://www.npmjs.com/package/unicode-7.0.0"&gt;unicode-7.0.0&lt;/a&gt;と&lt;a href="https://www.npmjs.com/package/regenerate"&gt;regenerate&lt;/a&gt;の両パッケージを使って生成してやる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var regenerate = require(&amp;#39;regenerate&amp;#39;);
-
-var word = regenerate().add(
-  require(&amp;#39;unicode-7.0.0/&lt;mark&gt;properties/Any&lt;/mark&gt;/code-points&amp;#39;)
-).remove(
-  require(&amp;#39;unicode-7.0.0/&lt;mark&gt;categories/L&lt;/mark&gt;/code-points&amp;#39;)
-).remove(
-  require(&amp;#39;unicode-7.0.0/&lt;mark&gt;categories/M&lt;/mark&gt;/code-points&amp;#39;)
-).remove(
-  require(&amp;#39;unicode-7.0.0/&lt;mark&gt;categories/N&lt;/mark&gt;/code-points&amp;#39;)
-).remove(
-  require(&amp;#39;unicode-7.0.0/&lt;mark&gt;categories/Pc&lt;/mark&gt;/code-points&amp;#39;)
-).remove(
-  &amp;#39;-&amp;#39;,
-  &amp;#39; &amp;#39;
-);
-
-console.log(word.toString());
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでは否定形が欲しいので、Anyプロパティーを&lt;code&gt;add()&lt;/code&gt;してから上記カテゴリーを&lt;code&gt;remove()&lt;/code&gt;していく。最終的には特別視される&lt;code&gt;-&lt;/code&gt;と&lt;code&gt; &lt;/code&gt;もここでついでに削除しておく。gfmtocでは&lt;a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js"&gt;生成結果をファイルに保存したもの&lt;/a&gt;をライブラリとして使っている。普通はそのまま書けば良い(毎回動的に生成させるととても遅いことには注意が必要)。あとはHTML Pipelineがやっていることをなぞるのみだ。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;小文字に変換&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;\p{Word}&lt;/code&gt;と&lt;code&gt;-&lt;/code&gt;、&lt;code&gt; &lt;/code&gt; (半角空白)以外を削除&lt;/li&gt;
-&lt;li&gt;半角空白を&lt;code&gt;-&lt;/code&gt;に置換&lt;/li&gt;
-&lt;li&gt;IDが被らないように数字を追加&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;HTML Pipelineではこのような&lt;a href="https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb"&gt;生成手順&lt;/a&gt;になっているようだ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var h = {};
-
-function genID(s, h) {
-  var u = &amp;#39;&amp;#39;;
-  var word = /.../g;
-  s = s.toLowerCase();
-  s = s.replace(word, &amp;#39;&amp;#39;);
-  s = s.replace(/ /g, &amp;#39;-&amp;#39;);
-
-  if (h[s] &amp;gt; 0) {
-    u = &amp;#39;-&amp;#39; + h[s];
-  }
-
-  if (!h[s]) {
-    h[s] = 0;
-  }
-
-  h[s] += 1;
-
-  return s + u;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;確認した限りではうまくいっているようだ。&lt;code&gt;id&lt;/code&gt;属性の値として使う場合はこのままで問題ないが、&lt;code&gt;href&lt;/code&gt;属性の値として使う場合は&lt;code&gt;encodeURIComponent()&lt;/code&gt;でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -355,6 +292,6 @@ function genID(s, h) {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Sat, 10 Jan 2015 01:52:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 11 Jan 2015 14:00:00 +0900</lastBuildDate>
   </channel>
 </rss>
