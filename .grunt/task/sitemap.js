@@ -5,7 +5,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate a sitemap XML file.';
 
   grunt.registerTask(taskName, taskDescription, function () {
-    var fs = require('fs');
+    var fs = require('fs-extra');
     var path = require('path');
     var xml2js = require('xml2js');
 
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
         loc: 'http://hail2u.net' + url
       });
     });
-    grunt.file.write(dest, new xml2js.Builder().buildObject(sitemap));
+    fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));
     grunt.log.writeln('File "' + dest + '" created.');
   });
 };

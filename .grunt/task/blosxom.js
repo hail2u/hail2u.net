@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require('async');
-    var fs = require('fs');
+    var fs = require('fs-extra');
     var path = require('path');
     var ProgressBar = require('progress');
 
@@ -101,7 +101,7 @@ module.exports = function (grunt) {
         var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
           '\n';
         file = options.staticdir + file;
-        grunt.file.write(file, contents);
+        fs.outputFileSync(file, contents);
 
         if (bar) {
           bar.tick();

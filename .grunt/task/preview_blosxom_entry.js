@@ -5,7 +5,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Preview Blosxom entry in default browser.';
 
   grunt.registerTask(taskName, taskDescription, function () {
-    var fs = require('fs');
+    var fs = require('fs-extra');
     var marked = require('marked');
     var path = require('path');
 
@@ -93,7 +93,7 @@ module.exports = function (grunt) {
 
     body = body.replace(/="\//g, '="./');
     preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
-    grunt.file.write(preview_file, preview);
+    fs.outputFileSync(preview_file, preview);
     grunt.log.writeln('File "' + preview_file + '" created.');
     grunt.util.spawn({
       cmd: 'open',

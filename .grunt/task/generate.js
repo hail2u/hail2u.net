@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require('async');
-    var fs = require('fs');
+    var fs = require('fs-extra');
     var hbs = require('handlebars');
     var parseXML = require('xml2js').parseString;
     var path = require('path');
@@ -55,7 +55,7 @@ module.exports = function (grunt) {
       var metadata = _extendData(fileTemplate);
       var template = fs.readFileSync(fileTemplate, 'utf8');
       var render = hbs.compile(template);
-      grunt.file.write(file.dest, render(metadata));
+      fs.outputFileSync(file.dest, render(metadata));
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
@@ -195,7 +195,7 @@ module.exports = function (grunt) {
           articles.sort(function (a, b) {
             return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
           }).reverse();
-          grunt.file.write(cache, JSON.stringify(articles, null, 2));
+          fs.outputFileSync(cache, JSON.stringify(articles, null, 2));
           grunt.log.writeln('File "' + cache.replace(/\\/g, '/') +
             '" updated.');
         });

@@ -5,7 +5,7 @@ module.exports = function (grunt) {
   var taskDescription = 'Merge feed(s) into a feed.';
 
   grunt.registerTask(taskName, taskDescription, function () {
-    var fs = require('fs');
+    var fs = require('fs-extra');
     var xml2js = require('xml2js');
 
     var dest = 'build/feed';
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       return new Date(a.pubDate).getTime() - new Date(b.pubDate).getTime();
     }).reverse();
     feed.rss.channel.lastBuildDate = feed.rss.channel.item[0].pubDate;
-    grunt.file.write(dest, new xml2js.Builder({
+    fs.outputFileSync(dest, new xml2js.Builder({
       xmldec: {
         encoding: 'UTF-8',
         version: '1.0'
