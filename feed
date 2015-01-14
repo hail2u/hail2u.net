@@ -10,6 +10,125 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Every Declaration Just Onceの例</title>
+      <link>http://hail2u.net/blog/webdesign/every-declaration-just-once-example.html</link>
+      <description>同じ定義は書かないCSSの簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/every-declaration-just-once-example.html</guid>
+      <pubDate>Wed, 14 Jan 2015 10:02:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://developers.google.com/speed/articles/optimizing-css"&gt;同じ定義は書かないCSS&lt;/a&gt;の簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.foo {
+  border: 1px solid red;
+  margin: 0 auto;
+  width: 40rem;
+}
+
+.bar {
+  border: 1px solid green;
+  margin: 0 auto;
+  width: 40rem;
+}
+
+.baz {
+  border: 1px solid blue;
+  margin: 0 auto;
+  width: 40rem;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このような共通する定義を持つセレクターは以下のように書かれる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.foo,
+.bar,
+.baz {
+  margin: 0 auto;
+}
+
+.foo,
+.bar,
+.baz {
+  width: 40rem;
+}
+
+.foo {
+  border: 1px solid red;
+}
+
+.bar {
+  border: 1px solid green;
+}
+
+.baz {
+  border: 1px solid blue;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まずは定義ごとというのがポイントだ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.foo,
+.bar,
+.baz {
+  margin: 0 auto;
+}
+
+.foo,
+.bar,
+.baz {
+  width: 40rem;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このようにまとめられそうなブロックでもあえて分割する。そうしておくことによって、後に&lt;code&gt;margin: 0 auto&lt;/code&gt;だけ使うクラスを追加したい時に分割し直す手間が省ける。こういった後のメンテナンス性を考えた場合、先頭に定義をわかりやすくしたクラスを追加するのも悪くなかった。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.centering,
+.foo,
+.bar,
+.baz {
+  margin: 0 auto;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こうしておくと&lt;code&gt;,\n\.foo&lt;/code&gt;で置換を行えるようになる。しかし使いもしないセレクターが書かれているのは無駄が多い気がしたのでやめてしまった。ただし、そのブロックがどういう定義のためのブロックなのかをわかりやすくできるので、すこし規模が大きくなると助かるかもしれない。その場合は後にツールで削除してやると良さそうだ。&lt;/p&gt;
+
+&lt;p&gt;またどこまで定義を分けるかというのもちょっと悩む。例えば&lt;code&gt;border&lt;/code&gt;ショートカット・プロパティーなどだ。上記例だと以下のようにも書くことができ、定義をなるべく重複しないようにとするとこのように書くべきようにも思える。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.foo,
+.bar,
+.baz {
+  border-style: solid;
+}
+
+.foo,
+.bar,
+.baz {
+  border-width: 1px;
+}
+
+.foo {
+  border-color: red;
+}
+
+.bar {
+  border-color: green;
+}
+
+.baz {
+  border-color: blue;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;さすがに冗長すぎる印象だ。どこまで分割するかの線引きはもうちょっと考える必要があるだろう。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;この書き方は、今まで良い解とされていたOOCSSのようなアプローチとは真逆で、悪いアプローチとされていた物理的な装飾を基準としたアプローチに近い。そのためOOCSSどっぷりだった人達には違和感しかない。&lt;/p&gt;
+
+&lt;p&gt;作業としては、どのような装飾を加えるか決まったら、そのプロパティー等で検索し、既にあったらそこにセレクターを追加、なかったらブロックを追加と、非常に単純化されたものだけで済む。ルールそのものが単純なこと、書き方の説明としても簡単で済むこと、&lt;em&gt;間違えて重複する定義を追加しても致命的ではないこと&lt;/em&gt;、差分がわかりやすいことなど開発中の利点は多い。&lt;/p&gt;
+
+&lt;p&gt;一方でコンポーネント単位での確認というような地道な作業、つまりテストとは相性が悪い。逆に言うと定義ごとに分けることによってコード上で確認できるようにしたとも言えるかもしれない。ブラウザーの実装の不行き届きやバグへの対処に確認が必要な現状だと絵空事に近いので、ワークフローが大幅に省力化するわけではなさそうだ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>白Tシャツ</title>
       <link>http://hail2u.net/blog/misc/white-t-shirt.html</link>
       <description>良さそうな白いTシャツがなかなか見つからず、結局HanesのJapan FitなるもののBEAMSのロゴ入りのバージョンを買った。着丈がもうちょっと短めのを探すとなると大変なようなので、もうインナーでしか着ないと決め、これにした。</description>
@@ -255,31 +374,6 @@ C:\&amp;gt;&lt;kbd&gt;scss test.scss&lt;/kbd&gt;
 &lt;p&gt;僕にはこの記事が今年の&lt;a href="http://24ways.org/"&gt;24 ways&lt;/a&gt;で最も良かった記事だった。他にも&lt;a href="http://24ways.org/2014/seo-in-2015-and-why-you-should-care/"&gt;SEOのようなそうでないような話&lt;/a&gt;や&lt;a href="http://24ways.org/2014/taglines-and-truisms/"&gt;タグラインの話&lt;/a&gt;(これを読んだ後にホームのタグラインを復活させた)も良かったが、実践性と哲学性のバランスでNaming Thingsが一番だったと思う。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>HTMLHintをSyntasticで使う</title>
-      <link>http://hail2u.net/blog/software/htmlhint-in-syntastic.html</link>
-      <description>重い腰を上げてVimでSyntasticを使うようにした。となるとHTMLHintを使いたいのだけど、対応してなかったので自分でチェッカー定義を書くところから始めた。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/htmlhint-in-syntastic.html</guid>
-      <pubDate>Sun, 04 Jan 2015 08:58:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;重い腰を上げてVimで&lt;a href="https://github.com/scrooloose/syntastic"&gt;Syntastic&lt;/a&gt;を使うようにした。となると&lt;a href="https://github.com/yaniswang/HTMLHint"&gt;HTMLHint&lt;/a&gt;を使いたいのだけど、対応してなかったので自分でチェッカー定義を書くところから始めた。&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img src="http://hail2u.net/images/blog/htmlhint-in-syntastic.png" alt="HTMLHintでのチェックの結果がガッターとバルーンヘルプで表示されている"&gt;
-
-  &lt;figcaption&gt;Runnnig HTMLHint with Syntastic&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;今のところ&lt;a href="https://github.com/scrooloose/syntastic/pull/1280"&gt;チェッカー定義を追加したプルリクエスト&lt;/a&gt;が取り込まれる気配はない。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;Syntasticはそのままだと辛いことが多い気がする。汎用にした弊害か。CSSLintはルールをカスタマイズしづらいし、perlcriticはWindowsで死ぬ。そういったものをひとつひとつ潰すのは難しいし、好みの設定をできるようにすると保守できなくなる。適当なディレクトリーに置いたチェッカー定義を自動で読み込んでくれる(ビルトインのそれとバッティングしたら上書きしてくれる)機能などがあれば良いような気がした。ありそう。&lt;/p&gt;
-
-&lt;h2&gt;追記&lt;/h2&gt;
-
-&lt;p&gt;他のところにあるチェッカー定義は&lt;a href="https://github.com/scrooloose/syntastic/wiki/Syntax-Checker-Guide#6-external-checkers"&gt;external checkers&lt;/a&gt;という仕組みで実現できるようだ。こっちでやってみよう。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -314,6 +408,6 @@ C:\&amp;gt;&lt;kbd&gt;scss test.scss&lt;/kbd&gt;
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Tue, 13 Jan 2015 13:22:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 14 Jan 2015 10:02:00 +0900</lastBuildDate>
   </channel>
 </rss>
