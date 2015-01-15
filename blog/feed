@@ -10,12 +10,137 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Wed, 14 Jan 2015 10:02:18 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 15 Jan 2015 11:29:44 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの</title>
+      <link>http://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html</link>
+      <description>昨日も少し書いたEvery Declaration Just Onceアプローチ(以下EDJOと略す)について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html</guid>
+      <pubDate>Thu, 15 Jan 2015 11:29:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>昨日も少し書いた<a href="https://developers.google.com/speed/articles/optimizing-css">Every Declaration Just Onceアプローチ</a>(以下EDJOと略す)について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。</p>
+
+<h2>OOCSSとは</h2>
+
+<p>まずはOOCSSについてざっと触れておく。OOCSSではいくつかの<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">定義</a>(プロパティーとその値のセット)を組み合わせることにより再現できる見た目をオブジェクトとみなし、それを継承・拡張していく。オブジェクトは一定の意味を持つ単位で作成され、それを組み合わせることで振る舞いベースで、ウェブサイトのビジュアル・デザインを完成させていくことができるというわけだ。</p>
+
+<p>実際に継承と拡張を行う手段は、オブジェクトとして定義されたクラスを複数組み合わせていく手法、いわゆる<em>マルチ・クラス</em>による。今ではCSSプリプロセッサーなどもあるが、例えばSassの<code>@extend</code>を使ったロジカルな継承は開発者間での濃いコミュニケーションによる意識の摺り合わせが必須とも言えるので、まだまだマルチ・クラスで行われている、行われるだろうと言って良い。</p>
+
+<p>もし仮に後で書かれたセレクターの方が必ず強いというようなシンプルな仕組みであったら、マルチ・クラスはその想定通りうまく機能しただろう。しかしそうはいかない。</p>
+
+<h2>セレクターの詳細度</h2>
+
+<p>CSSでは<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity">セレクターの詳細度</a>というものがある。例えば<code>.foo</code>より<code>.bar .foo</code>が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。</p>
+
+<pre><code>body h1 {
+  font-family: serif;
+}
+
+h1 {
+  font-family: sans-serif;
+}
+</code></pre>
+
+<p>このCSSの場合<a href="http://hail2u.net/pub/test/606.html"><code>h1</code>は<code>serif</code>で表示されること</a>だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">ルールセット</a>の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。</p>
+
+<p>詳細度の仕組みは仕様を読むと簡単に書かれているが、実際にはそこそこ複雑だ。自然、その理解度が人によりまちまちであることも頭に入れておく必要がある(僕も正直8割強くらいしか理解している自信はない)。そうなるといかにしてこのような仕組みが発動しないようにCSSを書くか、ということになる。</p>
+
+<h2>クラスの命名規則</h2>
+
+<p>つまりセレクターでクラス名を二つ以上使わないようにし、すべてのセレクターの詳細度を等しくするわけだ。もちろん要素名やIDなどはこの世に存在しないものとみなして忘れ去ってしまえば良い。そうすることですべてのオブジェクト(=ルールセットに書かれた定義たち)はひとつのクラス名で表現されたセレクターにより割り当てられていくため、その書かれた順番に従ってその定義が上書きされていくようになる。</p>
+
+<p>問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。</p>
+
+<pre><code>.global-header .nav .item .icon {
+  ...
+}
+</code></pre>
+
+<p>従ってこのようなクラス名を付けることになる。</p>
+
+<pre><code>.global-header-nav-item-icon {
+  ...
+}
+</code></pre>
+
+<p>HTMLは当然のようにこうなる。</p>
+
+<pre><code>&lt;header class=&quot;global-header&quot;&gt;
+  ...
+  &lt;nav class=&quot;global-header-nav&quot;&gt;
+    &lt;li class=&quot;global-header-nav-item&quot;&gt;
+      &lt;span class=&quot;global-header-nav-item-icon&quot;&gt;&lt;/span&gt;
+      &lt;span class=&quot;global-header-nav-item-title&quot;&gt;Blog&lt;/span&gt;
+    &lt;/li&gt;
+    ...
+  &lt;/nav&gt;
+&lt;/header&gt;
+</code></pre>
+
+<p>おおっと。</p>
+
+<p>マルチ・クラスによる割り当てになるので、実際にはもう少しシンプルな値にはなる。が、それと同時に短いとはいえ別のクラス名が追加されていくので、<code>class</code>属性の値は概ねこのような複雑なものになっていく。更にこういった単純に連結したり組み合わせたりするだけの命名規則では表現できない概念を補足するように鍛えていくと、<a href="https://smacss.com/">SMACSS</a>や<a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/">MindBEMding</a>、そして今最も注目度が高い<a href="https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md">SUIT CSSの命名規則</a>へと進化することになる。</p>
+
+<p>かくしてHTMLでは各要素に<code>class</code>属性として20–50文字くらいの値がちょくちょく割り当てられていくようになった。CMSやビルド・ツールを前提にしないと保守できない状態だといえるだろう。</p>
+
+<h2>Every Declaration Just Once</h2>
+
+<p>すべての定義を一度だけしか書かないこのアプローチ、EDJOではOOCSSとはCSSを書く手順が逆になる。</p>
+
+<p>OOCSSではオブジェクトといういくつかの定義の組み合わせであるルールセットをまず書き、それにクラス名を使って名付ける。そしてHTMLに戻り、そのオブジェクトを割り当てたい要素に対し、クラス名を振っていく。</p>
+
+<p>EDJOではまずHTMLで適切なクラス名(IDでも良いだろう)を振っておく。誤解を恐れずに言うのならば、セマンティックなクラス名とかそのようなもので、ウェブページにおいてその要素がどのようなものかを表現するクラス名だ。IDでも良いだろうし、HTML5の強い意味付けを持つ要素をきちんと使い分けているならクラス名やIDを付けなくても良いこともあるかもしれない。またクラス名は再利用しないので、抽象化した名称(例えば<code>.clearfix</code>であったり<code>.column-wrapper</code>など)である必要もない。</p>
+
+<p>そしてCSSではビジュアル・デザインを決定する定義をまず書き、それを適用するセレクターを割り当て、ひとつの定義ごとにルールセットを作っていく。例えばこのような形だ。わかりやすいように様々なパターンでセレクターを書いてみたが、実際には開発者やプロジェクトごとにパターン化されてくるだろう。とりあえず一意に確定する形で書いておけば、後で置換をかけることでそのフォーマットを統一することも容易いはずだ。</p>
+
+<pre><code>body &gt; header,
+main,
+.searchbox,
+[role=&quot;contentinfo&quot;] {
+  margin: 0 auto;
+}
+
+body &gt; header,
+[role=&quot;contentinfo&quot;] {
+  background-color: #333;
+}
+
+main {
+  background-color: #fff;
+}
+
+.searchbox {
+  background-color: #999;
+}
+</code></pre>
+
+<p>EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。</p>
+
+<p>このようにEDJOでは、セレクターの詳細度という<em>あまり理解されていない仕組み</em>とクラスの命名規則という<em>守らせることはおろかまず作ることからして難しい仕組み</em>を共に意識せずにCSSとHTMLを書いていくことができるということだ。それはつまりHTMLはHTMLで書くことができ、CSSはCSSで書くことができ、更にその両者の結びつけを同じ定義を二度書かないという単純明快なルールのみで行うことができるということでもある。</p>
+
+<hr>
+
+<p>OOCSSの欠点はその思想や哲学、ベースとなった技術の問題ではない。ツリー構造を持つHTMLやカスケーディングという独自の継承の仕組みを持つCSSとは根本的に相性が悪く、命名規則というような運用におけるルール付けでカバーしなくてはならないところだ。もしHTMLやCSSがもう少し違うものだったら、OOCSSは間違いなく論理的で明確な方向性をウェブデザインに与える唯一無二の手法であった、そしてありつづけるものだったろう。しかし現実は違うし、未来もそうなりそうもない(セレクターのネストが可能になるとわからないけれども)。</p>
+
+<p>そこでCSSにおいてその力不足を補い、OOCSSのような論理的なアプローチを可能にしようとするために生まれたのがCSSプリプロセッサーだった。しかしこれもOOCSSの欠点を完全にはカバーすることは出来てはいない。そのため既に名前だけは何回か出したSUIT CSSの命名規則のようなものが、ここに至っても生まれた(生まれてしまった)というわけだ。</p>
+
+<p>EDJOがCSSを本来あるような形に戻したものだと捉えると、もはやCSSプリプロセッサーはCSSを無闇に複雑にしてしまっただけにも感じられてしまう。EDJOならCSS Variableのみのプリプロセッサーで十分機能しそうだ。</p>
+
+<hr>
+
+<p>ひとつ、声を大きくして謝りたいのは、フロントエンド側じゃない人たちのCSSの書き方にダメ出しをしていたことだ。過去の僕はOOCSSをいかにして再現するかを重要視しており、OOCSSへの理解に欠ける人たちによるEDJO的な書き方(定義があるところに雑にセレクターを追加していく書き方)に対してかなり厳しく反論していたように思う。OOCSSを採用している以上、そういったEDJO的な書き方を否定することは間違っていたわけではないのだけど、その時の論理は「OOCSSだから～」というような、今思うと曖昧な、当時も理由としては弱いと薄々気付いていた言葉で押し通していた。</p>
+
+<p>その頃にもう少しOOCSSの欠点について掘り下げていればそういった書き方にも一理以上の何かがあったことに気づけたはずだ。広く受け入れられているアプローチだからというような理由で盲信するのは良くないが、それを実践するのはなかなか難しい。もちろんこのEDJOというアプローチにも言えることだ。気をつけながらEDJOの世界をもうちょっと掘り起こしていこうと思う。</p>
+
+<p>もしMindBEMdingのようなBEMライクな命名規則から、よりわかりやすく強力なSUIT CSSの命名規則に移行しようかなと考えている人がいたら、ちょっとだけEvery Declaration Just Onceというアプローチを試してみて欲しい。僕はこのアプローチを試した結果、OOCSSにより嫌いになりかけ、Sassでかろうじて理性を保っていたCSSを本気でもう一度好きになれそうな気がしてきている。HTMLとCSSが疎結合する未来を夢見ていた人達なら、OOCSSが唯一無二の解ではないという前提だと、このアプローチに未来を見出すことができるのではないだろうか。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Every Declaration Just Onceの例</title>
@@ -382,23 +507,6 @@ C:\&gt;<kbd>scss test.scss</kbd>
 <hr>
 
 <p>マルチバイト文字列をそのまま書くことにしたのにはいくつか理由があるが、一番大きいのはエスケープされた文字列は人間が書くべきものではないということだ。<code>\0020</code>とか書いているとバカバカしくなる。それ以外にももちろんわかりやすくなることとか、わざわざコメントでどういう文字のエスケープなのかとか書かなくて済むこととか。ただし見てもなにかわからない非改行スペースのようなものだけはエスケープする、というルールにした。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>名前を付けることの難しさ</title>
-      <link>http://hail2u.net/blog/webdesign/naming-things-is-really-hard.html</link>
-      <description>名前をつけることの難しさについて、実際にどうして格闘してやればよいのかについて書かれたNaming Thingsという記事を読み返した。中心となるのはCSSにおけるクラス名で、SUIT CSSの命名規則を取り上げて、わかりやすさ・明白さ・機能性・一貫性・適切さ・拡張性・短さと若干のジョークが許されるゆるさのようなものが重要であるとしている。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/naming-things-is-really-hard.html</guid>
-      <pubDate>Mon, 05 Jan 2015 06:14:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>名前をつけることの難しさについて、実際にどうして格闘してやればよいのかについて書かれた<a href="http://24ways.org/2014/naming-things/">Naming Things</a>という記事を読み返した。中心となるのはCSSにおけるクラス名で、<a href="https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md">SUIT CSSの命名規則</a>を取り上げて、わかりやすさ・明白さ・機能性・一貫性・適切さ・拡張性・短さと若干のジョークが許されるゆるさのようなものが重要であるとしている。</p>
-
-<p>BEMから一歩進める(か下がる)時期ではあると思うが、なかなかとっかかりがなかった。この記事をもう一度くらい読んで、今年中にどう変えていくのかをちゃんと考えていきたい。SUIT CSSの命名規則はPascalCaseとcamelCaseが混じるところがあんまり好きじゃないので、別の何かが産み出せれば良いかなと思う。大文字使いたくないというのもちょっとある。</p>
-
-<hr>
-
-<p>僕にはこの記事が今年の<a href="http://24ways.org/">24 ways</a>で最も良かった記事だった。他にも<a href="http://24ways.org/2014/seo-in-2015-and-why-you-should-care/">SEOのようなそうでないような話</a>や<a href="http://24ways.org/2014/taglines-and-truisms/">タグラインの話</a>(これを読んだ後にホームのタグラインを復活させた)も良かったが、実践性と哲学性のバランスでNaming Thingsが一番だったと思う。</p>]]></content:encoded>
     </item>
 
   </channel>
