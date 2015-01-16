@@ -10,6 +10,42 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>CSSWring v3.0.0とCSS MQPacker v3.0.0のリリース</title>
+      <link>http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v3.0.0.html</link>
+      <description>CSSWringとCSS MQPackerのメジャー・バージョンをそれぞれ更新した。中身としてはPostCSSをv4.0.0に更新しただけと言って良い。PostCSS v3でしか動作しないツールやプラグインと組み合わせたい場合は引き続き古いバージョンを利用する必要がある。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v3.0.0.html</guid>
+      <pubDate>Sat, 17 Jan 2015 01:13:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://www.npmjs.org/package/csswring"&gt;CSSWring&lt;/a&gt;と&lt;a href="https://www.npmjs.com/package/css-mqpacker"&gt;CSS MQPacker&lt;/a&gt;のメジャー・バージョンをそれぞれ更新した。中身としてはPostCSSをv4.0.0に更新しただけと言って良い。PostCSS v3でしか動作しないツールやプラグインと組み合わせたい場合は引き続き古いバージョンを利用する必要がある。&lt;/p&gt;
+
+&lt;p&gt;実際には結構簡単に対応はできたのだけど、CSS MQPackerでの空白の取り扱いでどうしようかなという感じだった。具体的に言うと&lt;code&gt;@charset&lt;/code&gt;ルールだけのような&lt;code&gt;between&lt;/code&gt;プロパティー(&lt;code&gt;@charset&lt;/code&gt;ルールの場合はその値と&lt;code&gt;;&lt;/code&gt;の間の空白)のないCSSに普通のルールセットを突っ込むとその&lt;code&gt;between&lt;/code&gt;プロパティー(ルールセットの場合はセレクターと定義群を括る&lt;code&gt;{&lt;/code&gt;の間の空白)が消えてしまう問題についてだ。&lt;/p&gt;
+
+&lt;p&gt;例えばこのようなCSSをCSS MQPackerで処理すると、想定外の結果になる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@charset &amp;#39;UTF-8&amp;#39;;
+
+@media (min-width: 1px) {
+  .foo {
+    display: block;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;@media&lt;/code&gt;ルールをまとめながら退避させていくと、このCSSは&lt;code&gt;@charset&lt;/code&gt;ルールのみになる。そのため改めてまとめた&lt;code&gt;@media&lt;/code&gt;ルールを追加しなおすと、以下のように改行とインデント、セミコロンがPostCSSのデフォルトへと修正された上で、クエリーや&lt;code&gt;.foo&lt;/code&gt;と&lt;code&gt;{&lt;/code&gt;の間の空白が消えてしまう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@charset &amp;#39;UTF-8&amp;#39;;
+@media &lt;mark&gt;(min-width: 1px){&lt;/mark&gt;
+    &lt;mark&gt;.foo{&lt;/mark&gt;
+        display: block
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;内部の細かい挙動を理解すれば納得できる結果ではあるが、直感的ではない。&lt;code&gt;between&lt;/code&gt;プロパティーだけ&lt;a href="https://github.com/postcss/postcss/blob/5b86e6a94de9309cb354fcadd23f23249c174854/lib/node.js#L404-L417"&gt;デフォルトのスタイル&lt;/a&gt;が定められておらず、ところどころで&lt;a href="https://github.com/postcss/postcss/blob/5b86e6a94de9309cb354fcadd23f23249c174854/lib/node.js#L379-L390"&gt;特別視&lt;/a&gt;されていることから、うまくコピーできてしまってこうなるようだ。同じ&lt;code&gt;between&lt;/code&gt;という名前で違うものを扱おうとしていることが原因なのではないかと想像している。&lt;/p&gt;
+
+&lt;p&gt;ちょっと実装として気になるので、このあたりは今後変わりそうではある。もしこの&lt;code&gt;between&lt;/code&gt;プロパティーをいじるようなツールやプラグインを作っている場合は注意した方が良さそうだ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>node-edjo</title>
       <link>http://hail2u.net/blog/webdesign/node-edjo.html</link>
       <description>Every Declaration Just Onceのスタイルに既存のCSSを変換し、どのような感じになるのかを確認するためのツールを書いてた。node-edjoとしてGitHubに公開しておいたので、Node.js互換の何かがあればnpmでインストールして誰でも使える。ただしnpmリポジトリーには公開されることはないので、READMEに書いてあるようにユーザー名とリポジトリー名を使ってインストールする。</description>
@@ -443,27 +479,6 @@ fs.writeFileSync(&amp;#39;output.css&amp;#39;, output);
 &lt;p&gt;生活習慣のようなものはすっぱり変えるという具合にはいかない。このような感じで一年くらいかけてゆっくり変えていくのは今後も続けていこう。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>HTTPからHTTPSへ</title>
-      <link>http://hail2u.net/blog/internet/http-to-https.html</link>
-      <description>HTTPSへの移行が今年は加速するだろうというのは言うまでもないが、それに伴い起こりうる事象については真っ二つな印象がある。僕は特にもうCool URIとか言いたくないので、301すれば良いだろう派だ。HTTPSという記事ではそれはおいておいてブラウザーのデフォルトは変えるべきなのかなど、移行の加速がもたらす環境の変化について指摘している。</description>
-      <category>Internet</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/internet/http-to-https.html</guid>
-      <pubDate>Wed, 07 Jan 2015 08:08:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;HTTPSへの移行が今年は加速するだろうというのは言うまでもないが、それに伴い起こりうる事象については真っ二つな印象がある。僕は特にもうCool URIとか言いたくないので、301すれば良いだろう派だ。&lt;a href="https://adactio.com/journal/8100"&gt;HTTPSという記事&lt;/a&gt;ではそれはおいておいてブラウザーのデフォルトは変えるべきなのかなど、移行の加速がもたらす環境の変化について指摘している。&lt;/p&gt;
-
-&lt;p&gt;ブラウザーのデフォルトは早々にHTTPSに変わるものとそうでないものに分かれるのだろうか。プロトコル・スキームを表示しなくなって久しいし、セキュアではないウェブページで警告を出す方が理に適ってはいる。しかしコストゼロで移行が行えない以上、HTTPのウェブサイトがあたかもフィッシングやスパムのウェブサイトと同列に見られかねない状況が強制されるのはかなり厳しい。&lt;/p&gt;
-
-&lt;p&gt;そうなると「この警告は問題ありません！」といったお知らせをすべてのウェブページに突っ込む、というような展開もありえそう。ぞっとしない未来だ。&lt;/p&gt;
-
-&lt;p&gt;また、HTTPからHTTPSへリダイレクトを設定し、単純にURLとおぼしきものからすべてプロトコル・スキームを削除するだけでは解決できない部分もある。例えばFacebookなどが利用しているOGPやはてなブックマークのようなHTTPSを厳密に区別するウェブサービスだ。&lt;/p&gt;
-
-&lt;p&gt;OGPでは&lt;code&gt;meta&lt;/code&gt;要素を使ってURLも表現するので、スキームを省略することはできない。移行の際にはすべてのページの&lt;code&gt;og:url&lt;/code&gt;を書き換える必要がある。また移行と同時に既存のいいね！を失う(かもしれない)。はてなブックマークでも似たようなことが起こりうる。それぞれウェブサービス側の慎重な対応(HTTPとHTTPSの同一視ではなく301の解釈？)が必要になる。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;僕はそれでも今年中にこのウェブサイトはHTTPSに移行させたいな、と考えている。CloudFlareを使って頑張るとどこまでいけるのかみたいな実験でもあるが、小さなウェブサイトをHTTPSで運営するという今までにほとんどなかったケースをもうちょっと詳しく学びたいのが大きい。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -498,6 +513,6 @@ fs.writeFileSync(&amp;#39;output.css&amp;#39;, output);
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Fri, 16 Jan 2015 00:03:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jan 2015 01:13:00 +0900</lastBuildDate>
   </channel>
 </rss>
