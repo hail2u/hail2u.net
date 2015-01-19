@@ -9,6 +9,8 @@ module.exports = function (grunt) {
     var fs = require('fs-extra');
     var path = require('path');
     var ProgressBar = require('progress');
+    var spawn = require('child_process').spawnSync;
+    var which = require('which').sync;
 
     var done = this.async();
     var options = this.options({
@@ -80,41 +82,42 @@ module.exports = function (grunt) {
     }
 
     async.eachLimit(files, num, function (file, next) {
-      grunt.util.spawn({
-        cmd: 'C:/perl/bin/perl',
-        args: args.concat('path=/' + file),
-        opts: {
+      var child = spawn(
+        which('C:/perl/bin/perl'),
+        args.concat('path=/' + file),
+        {
           cwd: options.rootdir,
+          encoding: 'utf8',
           env: {
             BLOSXOM_CONFIG_DIR: path.resolve(options.rootdir)
           }
         }
-      }, function (error, result, code) {
-        if (error) {
-          return next(error);
-        }
+      );
 
-        if (file === 'index.rss') {
-          file = 'feed';
-        }
+      if (child.error) {
+        return next(child.error);
+      }
 
-        var contents = result.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
-          '\n';
-        file = options.staticdir + file;
-        fs.outputFileSync(file, contents);
+      if (file === 'index.rss') {
+        file = 'feed';
+      }
 
-        if (bar) {
-          bar.tick();
-        } else {
-          grunt.log.writeln('File "' + file + '" created.');
-        }
+      var contents = child.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
+        '\n';
+      file = options.staticdir + file;
+      fs.outputFileSync(file, contents);
 
-        if (num === 1 && args.length === 2) {
-          args.pop();
-        }
+      if (bar) {
+        bar.tick();
+      } else {
+        grunt.log.writeln('File "' + file + '" created.');
+      }
 
-        next();
-      });
+      if (num === 1 && args.length === 2) {
+        args.pop();
+      }
+
+      next();
     }, function (error) {
       done(error);
     });

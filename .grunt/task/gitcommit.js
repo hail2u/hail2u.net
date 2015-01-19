@@ -7,8 +7,9 @@ module.exports = function (grunt) {
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require('async');
     var path = require('path');
+    var spawn = require('child_process').spawnSync;
+    var which = require('which').sync;
 
-    var done = this.async();
     var files = this.filesSrc;
     var options = this.options({
       all: false,
@@ -18,8 +19,7 @@ module.exports = function (grunt) {
       remote: 'origin',
       root: './'
     });
-
-    var cmd = 'git';
+    var cmd = which('git');
     var file = grunt.option('file');
     var message = options.message;
     var opts = {
@@ -48,50 +48,34 @@ module.exports = function (grunt) {
       files.push(file);
     }
 
-    async.series({
-      add: function (next) {
-        grunt.util.spawn({
-          cmd: cmd,
-          args: ['add'].concat(files),
-          opts: opts
-        }, function (error, result, code) {
-          next(error);
-        });
-      },
+    var git = spawn(cmd, ['add'].concat(files), opts);
 
-      commit: function (next) {
-        grunt.util.spawn({
-          cmd: cmd,
-          args: [
-            'commit',
-            '-m',
-            message
-          ],
-          opts: opts
-        }, function (error, result, code) {
-          next(error);
-        });
-      },
+    if (git.error) {
+      grunt.fail.warn(git.error);
+    }
 
-      push: function (next) {
-        if (!options.push) {
-          return next();
-        }
+    git = spawn(cmd, [
+      'commit',
+      '-m',
+      message
+    ], opts);
 
-        grunt.util.spawn({
-          cmd: cmd,
-          args:  [
-            'push',
-            options.remote,
-            options.branch
-          ],
-          opts: opts
-        }, function (error, result, code) {
-          next(error);
-        });
-      }
-    }, function (error, results) {
-      done(error);
-    });
+    if (git.error) {
+      grunt.fail.warn(git.error);
+    }
+
+    if (options.push) {
+      return;
+    }
+
+    git = spawn(cmd, [
+      'push',
+      options.remote,
+      options.branch
+    ], opts);
+
+    if (git.error) {
+      grunt.fail.warn(git.error);
+    }
   });
 };

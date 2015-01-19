@@ -5,31 +5,26 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate ICO file from multiple PNG files.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
-    var done = this.async();
+    var spawn = require('child_process').spawnSync;
+    var which = require('which').sync;
+
     var options = this.options({
       cmd: 'convert',
     });
-
     var args = [];
     var opts = {
       stdio: 'inherit'
     };
-
     this.files.forEach(function (file) {
       args = args.concat(file.src);
       args.push(file.dest);
-      grunt.util.spawn({
-        cmd: options.cmd,
-        args: args,
-        opts: opts
-      }, function (error, result, code) {
-        if (error) {
-          return done(error);
-        }
+      var child = spawn(which(options.cmd), args, opts);
 
-        grunt.log.writeln('File "' + file.dest + '" created.');
-        done();
-      });
+      if (child.error) {
+        grunt.fail.warn(child.error);
+      }
+
+      grunt.log.writeln('File "' + file.dest + '" created.');
     });
   });
 };

@@ -8,8 +8,9 @@ module.exports = function (grunt) {
     var fs = require('fs-extra');
     var marked = require('marked');
     var path = require('path');
+    var spawn = require('child_process').spawnSync;
+    var which = require('which').sync;
 
-    var done = this.async();
     var file = grunt.option('file');
     var preview = (function () {/*
 <!DOCTYPE html>
@@ -79,7 +80,6 @@ module.exports = function (grunt) {
 */}).toString().split('\n').slice(1, -1).join('\n');
     var preview_file = path.resolve(process.cwd(), 'tmp/__preview.html');
     var root = 'file:///' + path.resolve(process.cwd(), 'build/').replace(/\\/g, '/') + '/';
-
     var fn = path.basename(file, '.txt').replace(/\$/g, '$$');
     var entry = fs.readFileSync(file, 'UTF-8').split('\n');
     var title = entry.shift().replace(/\$/g, '$$$$');
@@ -95,11 +95,10 @@ module.exports = function (grunt) {
     preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
     fs.outputFileSync(preview_file, preview);
     grunt.log.writeln('File "' + preview_file + '" created.');
-    grunt.util.spawn({
-      cmd: 'open',
-      args: [preview_file]
-    }, function (error, result, code) {
-      done(error);
-    });
+    var child = spawn(which('open'), [preview_file]);
+
+    if (child.error) {
+      grunt.fail.warn(child.error);
+    }
   });
 };

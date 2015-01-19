@@ -5,9 +5,10 @@ module.exports = function (grunt) {
   var taskDescription = 'Generate PNG file from SVG file with Inkscape.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
-    var done = this.async();
-    var options = this.options({});
+    var spawn = require('child_process').spawnSync;
+    var which = require('which').sync;
 
+    var options = this.options({});
     var args = [];
     var cmd = 'inkscape';
     var opts = {
@@ -29,17 +30,11 @@ module.exports = function (grunt) {
       args.push(file.src[0]);
       args.push('-e');
       args.push(file.dest);
-      grunt.util.spawn({
-        cmd: cmd,
-        args: args,
-        opts: opts
-      }, function (error, result, code) {
-        if (error) {
-          return done(error);
-        }
+      var child = spawn(which(cmd), args, opts);
 
-        done();
-      });
+      if (child.error) {
+        grunt.fail.warn(child.error);
+      }
     });
   });
 };
