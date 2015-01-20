@@ -22,10 +22,6 @@ module.exports = function (grunt) {
     var cmd = which('git');
     var file = grunt.option('file');
     var message = options.message;
-    var opts = {
-      cwd: options.root,
-      stdio: 'inherit'
-    };
 
     if (file) {
       file = path.resolve(file);
@@ -48,7 +44,10 @@ module.exports = function (grunt) {
       files.push(file);
     }
 
-    var git = spawn(cmd, ['add'].concat(files), opts);
+    var git = spawn(cmd, ['add'].concat(files), {
+      cwd: options.root,
+      stdio: 'inherit'
+    });
 
     if (git.error) {
       grunt.fail.warn(git.error);
@@ -58,7 +57,10 @@ module.exports = function (grunt) {
       'commit',
       '-m',
       message
-    ], opts);
+    ], {
+      cwd: options.root,
+      stdio: 'inherit'
+    });
 
     if (git.error) {
       grunt.fail.warn(git.error);
@@ -72,7 +74,10 @@ module.exports = function (grunt) {
       'push',
       options.remote,
       options.branch
-    ], opts);
+    ], {
+      cwd: options.root,
+      stdio: 'inherit'
+    });
 
     if (git.error) {
       grunt.fail.warn(git.error);
