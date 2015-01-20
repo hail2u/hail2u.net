@@ -10,6 +10,66 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>grunt.util.spawn()のリプレース</title>
+      <link>http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</link>
+      <description>Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</guid>
+      <pubDate>Tue, 20 Jan 2015 15:30:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされた&lt;a href="http://gruntjs.com/api/grunt.util#grunt.util.spawn"&gt;&lt;code&gt;grunt.util.spawn()&lt;/code&gt;&lt;/a&gt;を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えば&lt;code&gt;grunt.file.write()&lt;/code&gt;は&lt;a href="https://www.npmjs.com/package/fs-extra"&gt;fs-extra&lt;/a&gt;パッケージが良い。&lt;code&gt;grunt.util.spawn()&lt;/code&gt;はというとio.jsかNode.jsのUnstableが入っている環境ならば&lt;code&gt;spawnSync()&lt;/code&gt;と&lt;code&gt;which.sync()&lt;/code&gt;を組み合わせてリプレースすると良さそうだ。&lt;/p&gt;
+
+&lt;p&gt;別プロセスを立ち上げる辺りはだいたい以下のような形になっていることと思う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var done = this.async();
+
+grunt.util.spawn({
+  cmd: &amp;#39;foo&amp;#39;,
+  args: [&amp;#39;--bar&amp;#39;],
+  opts: {
+    stdio: &amp;#39;inherit&amp;#39;
+  }
+}, function (error, result, code) {
+  if (error) {
+    return done(error);
+  }
+
+  done();
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ストレートに書き換えると、以下のようになるだろう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var spawn = require(&amp;#39;child_process&amp;#39;).&lt;mark&gt;spawnSync&lt;/mark&gt;;
+var which = require(&amp;#39;which&amp;#39;).sync;
+var child = spawn(&lt;mark&gt;which(&amp;#39;foo&amp;#39;)&lt;/mark&gt;, [&amp;#39;--bar&amp;#39;], {
+  stdio: &amp;#39;inherit&amp;#39;
+});
+
+if (child.error) {
+  grunt.fail.warn(child.error);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まず必要なパッケージを読み込む。コールバックがなくなるので&lt;code&gt;this.async()&lt;/code&gt;を呼ぶ必要はない。&lt;code&gt;child_process.spawnSync()&lt;/code&gt;はエラーが起きたら返り値のオブジェクトの&lt;code&gt;error&lt;/code&gt;プロパティーにErrorオブジェクトを格納するので、それをチェックしてエラーを返してやるのみ。&lt;/p&gt;
+
+&lt;p&gt;コマンドを&lt;code&gt;which.sync()&lt;/code&gt;でラップしてやっているのは、&lt;code&gt;child_process.spawnSync()&lt;/code&gt; (&lt;code&gt;child_process.spawn()&lt;/code&gt;も)がWindowsで&lt;code&gt;PATHEXT&lt;/code&gt;環境変数を考慮してくれないことへ対策するためだ。ラップしてやらないと.batや.cmdで定義されているコマンドの場合、見つけることが出来ずENOENTで落ちてしまう。&lt;/p&gt;
+
+&lt;p&gt;別プロセスに何かをしてもらうだけのタスクの場合はこれで良いが、標準出力を受け取って……という場合は&lt;code&gt;stdout&lt;/code&gt;プロパティーを拾ってやれば良い。ただしデフォルトではBufferオブジェクトなので、&lt;code&gt;child_process.spawnSync()&lt;/code&gt;の第三引数であるオプションで&lt;code&gt;encoding&lt;/code&gt;を指定してやりStringオブジェクトになるようにして、後に受け取るのが簡単だろう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var child = spawn(which(&amp;#39;foo&amp;#39;), [&amp;#39;--bar&amp;#39;], {
+  encoding: &amp;#39;utf8&amp;#39;
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;エラーチェックはもうちょっと厳密な必要がありそうだ。そうしないとゾンビプロセスが残ったり、タスクがうまく終了しなくなる可能性がある。でもまだ&lt;code&gt;child_process.spawnSync()&lt;/code&gt;の知見がなくてよくわからない。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;なぜリプレースするかというと、後にNode.js製の別の何か向けに書きなおす時にまずは書きなおしやすくするためだ。最終的にはフルスクラッチで書きなおした方が良いことが多いだろうが、まず簡単に書きなおせるようにしておくと移行コストが大きく下がる。依存を大きくする(Gruntべったり)か依存を増やす(Node.jsパッケージいっぱい)かという選択で、後者を取るというわけだ。&lt;/p&gt;
+
+&lt;p&gt;もちろん今はまだ公開するGruntタスクは書きかえるべきではない。io.jsのインストールを要求するのは馬鹿げている。そのうちNode.js v0.12系などが出て安心版でサポートされるようになったら書きかえてやっても良いかもしれない。まずは手元のオレオレタスクを書きかえてみるくらいが良い。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>チーズ・スコーン</title>
       <link>http://hail2u.net/blog/misc/cheese-scones.html</link>
       <description>TLにちょくちょくスコーン焼いた写真が飛んでくるので、我慢できなくなって夕飯後に焼いてた。慣れると30分くらいで作れてちょっとした遊びっぽくて楽しい。ドライフルーツみたいなのが何もなかったので、チーズを入れた。</description>
@@ -449,35 +509,6 @@ main {
 &lt;p&gt;PostCSS側の変更でテストの期待される結果は書き直さなければならなそうだが、ライブラリー側で余計なことをするよりかはコストが低いと思われる。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>postcss-single-charset</title>
-      <link>http://hail2u.net/blog/webdesign/postcss-single-charset.html</link>
-      <description>minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/postcss-single-charset.html</guid>
-      <pubDate>Sat, 10 Jan 2015 01:52:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="http://hail2u.net/blog/webdesign/minify-then-concat.html"&gt;minifyしてからconcat&lt;/a&gt;という手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある&lt;code&gt;@charset&lt;/code&gt;ルールが無意味になる。そこで最初の&lt;code&gt;@charset&lt;/code&gt;を先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。&lt;/p&gt;
-
-&lt;p&gt;PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの&lt;code&gt;use()&lt;/code&gt;でプロセッサーとして読み込んでやる必要がある。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var fs = require(&amp;#39;fs&amp;#39;);
-var postcss = require(&amp;#39;postcss&amp;#39;);
-
-var input = fs.readFileSync(&amp;#39;input.css&amp;#39;, &amp;#39;utf8&amp;#39;);
-var output = postcss().use(
-  require(&amp;#39;postcss-single-charset&amp;#39;)()
-).process(input).css;
-fs.writeFileSync(&amp;#39;output.css&amp;#39;, output);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には&lt;a href="https://github.com/nDmitry/grunt-postcss"&gt;grunt-postcss&lt;/a&gt;や&lt;a href="https://github.com/w0rm/gulp-postcss"&gt;gulp-postcss&lt;/a&gt;経由で使うことになるだろう。&lt;/p&gt;
-
-&lt;p&gt;利用サンプルを兼ねてGruntプラグインも同梱しておいた。&lt;code&gt;grunt-&lt;/code&gt;プリフィックスが付いていないため、&lt;a href="https://github.com/sindresorhus/load-grunt-tasks"&gt;load-grunt-tasks&lt;/a&gt;では読み込んでくれない(と思う)ので、READMEにあるように書いてちゃんと読み込む必要がある。他は特に変なことはないが、あまり行儀良くはなさそうなので利用は非推奨ということにしておく。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;あんまりパッケージ化するつもりはなかったけど、PostCSSプラグインというような形で書いたことがなかったので試しに書いてみた。特に何ということもなかった。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -512,6 +543,6 @@ fs.writeFileSync(&amp;#39;output.css&amp;#39;, output);
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Mon, 19 Jan 2015 03:10:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 20 Jan 2015 15:30:00 +0900</lastBuildDate>
   </channel>
 </rss>

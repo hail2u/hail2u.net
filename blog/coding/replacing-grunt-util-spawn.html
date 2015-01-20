@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>grunt.util.spawn()のリプレース - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html" rel="canonical">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="http://hail2u.net/blog/misc/cheese-scones.html">
+
+    
+
+    
+      <meta content="grunt.util.spawn()のリプレース" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">grunt.util.spawn()のリプレース</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2015-01-20T15:30:00+09:00" itemprop="datePublished">Jan 20, 2015</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされた<a href="http://gruntjs.com/api/grunt.util#grunt.util.spawn"><code>grunt.util.spawn()</code></a>を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えば<code>grunt.file.write()</code>は<a href="https://www.npmjs.com/package/fs-extra">fs-extra</a>パッケージが良い。<code>grunt.util.spawn()</code>はというとio.jsかNode.jsのUnstableが入っている環境ならば<code>spawnSync()</code>と<code>which.sync()</code>を組み合わせてリプレースすると良さそうだ。</p>
+
+<p>別プロセスを立ち上げる辺りはだいたい以下のような形になっていることと思う。</p>
+
+<pre><code class="language-javascript">var done = this.async();
+
+grunt.util.spawn({
+  cmd: &#39;foo&#39;,
+  args: [&#39;--bar&#39;],
+  opts: {
+    stdio: &#39;inherit&#39;
+  }
+}, function (error, result, code) {
+  if (error) {
+    return done(error);
+  }
+
+  done();
+});
+</code></pre>
+
+<p>ストレートに書き換えると、以下のようになるだろう。</p>
+
+<pre><code class="language-javascript">var spawn = require(&#39;child_process&#39;).<mark>spawnSync</mark>;
+var which = require(&#39;which&#39;).sync;
+var child = spawn(<mark>which(&#39;foo&#39;)</mark>, [&#39;--bar&#39;], {
+  stdio: &#39;inherit&#39;
+});
+
+if (child.error) {
+  grunt.fail.warn(child.error);
+}
+</code></pre>
+
+<p>まず必要なパッケージを読み込む。コールバックがなくなるので<code>this.async()</code>を呼ぶ必要はない。<code>child_process.spawnSync()</code>はエラーが起きたら返り値のオブジェクトの<code>error</code>プロパティーにErrorオブジェクトを格納するので、それをチェックしてエラーを返してやるのみ。</p>
+
+<p>コマンドを<code>which.sync()</code>でラップしてやっているのは、<code>child_process.spawnSync()</code> (<code>child_process.spawn()</code>も)がWindowsで<code>PATHEXT</code>環境変数を考慮してくれないことへ対策するためだ。ラップしてやらないと.batや.cmdで定義されているコマンドの場合、見つけることが出来ずENOENTで落ちてしまう。</p>
+
+<p>別プロセスに何かをしてもらうだけのタスクの場合はこれで良いが、標準出力を受け取って……という場合は<code>stdout</code>プロパティーを拾ってやれば良い。ただしデフォルトではBufferオブジェクトなので、<code>child_process.spawnSync()</code>の第三引数であるオプションで<code>encoding</code>を指定してやりStringオブジェクトになるようにして、後に受け取るのが簡単だろう。</p>
+
+<pre><code class="language-javascript">var child = spawn(which(&#39;foo&#39;), [&#39;--bar&#39;], {
+  encoding: &#39;utf8&#39;
+});
+</code></pre>
+
+<p>エラーチェックはもうちょっと厳密な必要がありそうだ。そうしないとゾンビプロセスが残ったり、タスクがうまく終了しなくなる可能性がある。でもまだ<code>child_process.spawnSync()</code>の知見がなくてよくわからない。</p>
+
+<hr>
+
+<p>なぜリプレースするかというと、後にNode.js製の別の何か向けに書きなおす時にまずは書きなおしやすくするためだ。最終的にはフルスクラッチで書きなおした方が良いことが多いだろうが、まず簡単に書きなおせるようにしておくと移行コストが大きく下がる。依存を大きくする(Gruntべったり)か依存を増やす(Node.jsパッケージいっぱい)かという選択で、後者を取るというわけだ。</p>
+
+<p>もちろん今はまだ公開するGruntタスクは書きかえるべきではない。io.jsのインストールを要求するのは馬鹿げている。そのうちNode.js v0.12系などが出て安心版でサポートされるようになったら書きかえてやっても良いかもしれない。まずは手元のオレオレタスクを書きかえてみるくらいが良い。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/misc/cheese-scones.html" rel="prev">
+  <p>チーズ・スコーン</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

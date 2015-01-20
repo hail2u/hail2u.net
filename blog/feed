@@ -10,12 +10,74 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 19 Jan 2015 03:10:58 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 20 Jan 2015 15:30:21 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>grunt.util.spawn()のリプレース</title>
+      <link>http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</link>
+      <description>Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</guid>
+      <pubDate>Tue, 20 Jan 2015 15:30:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされた<a href="http://gruntjs.com/api/grunt.util#grunt.util.spawn"><code>grunt.util.spawn()</code></a>を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えば<code>grunt.file.write()</code>は<a href="https://www.npmjs.com/package/fs-extra">fs-extra</a>パッケージが良い。<code>grunt.util.spawn()</code>はというとio.jsかNode.jsのUnstableが入っている環境ならば<code>spawnSync()</code>と<code>which.sync()</code>を組み合わせてリプレースすると良さそうだ。</p>
+
+<p>別プロセスを立ち上げる辺りはだいたい以下のような形になっていることと思う。</p>
+
+<pre><code>var done = this.async();
+
+grunt.util.spawn({
+  cmd: &#39;foo&#39;,
+  args: [&#39;--bar&#39;],
+  opts: {
+    stdio: &#39;inherit&#39;
+  }
+}, function (error, result, code) {
+  if (error) {
+    return done(error);
+  }
+
+  done();
+});
+</code></pre>
+
+<p>ストレートに書き換えると、以下のようになるだろう。</p>
+
+<pre><code>var spawn = require(&#39;child_process&#39;).<mark>spawnSync</mark>;
+var which = require(&#39;which&#39;).sync;
+var child = spawn(<mark>which(&#39;foo&#39;)</mark>, [&#39;--bar&#39;], {
+  stdio: &#39;inherit&#39;
+});
+
+if (child.error) {
+  grunt.fail.warn(child.error);
+}
+</code></pre>
+
+<p>まず必要なパッケージを読み込む。コールバックがなくなるので<code>this.async()</code>を呼ぶ必要はない。<code>child_process.spawnSync()</code>はエラーが起きたら返り値のオブジェクトの<code>error</code>プロパティーにErrorオブジェクトを格納するので、それをチェックしてエラーを返してやるのみ。</p>
+
+<p>コマンドを<code>which.sync()</code>でラップしてやっているのは、<code>child_process.spawnSync()</code> (<code>child_process.spawn()</code>も)がWindowsで<code>PATHEXT</code>環境変数を考慮してくれないことへ対策するためだ。ラップしてやらないと.batや.cmdで定義されているコマンドの場合、見つけることが出来ずENOENTで落ちてしまう。</p>
+
+<p>別プロセスに何かをしてもらうだけのタスクの場合はこれで良いが、標準出力を受け取って……という場合は<code>stdout</code>プロパティーを拾ってやれば良い。ただしデフォルトではBufferオブジェクトなので、<code>child_process.spawnSync()</code>の第三引数であるオプションで<code>encoding</code>を指定してやりStringオブジェクトになるようにして、後に受け取るのが簡単だろう。</p>
+
+<pre><code>var child = spawn(which(&#39;foo&#39;), [&#39;--bar&#39;], {
+  encoding: &#39;utf8&#39;
+});
+</code></pre>
+
+<p>エラーチェックはもうちょっと厳密な必要がありそうだ。そうしないとゾンビプロセスが残ったり、タスクがうまく終了しなくなる可能性がある。でもまだ<code>child_process.spawnSync()</code>の知見がなくてよくわからない。</p>
+
+<hr>
+
+<p>なぜリプレースするかというと、後にNode.js製の別の何か向けに書きなおす時にまずは書きなおしやすくするためだ。最終的にはフルスクラッチで書きなおした方が良いことが多いだろうが、まず簡単に書きなおせるようにしておくと移行コストが大きく下がる。依存を大きくする(Gruntべったり)か依存を増やす(Node.jsパッケージいっぱい)かという選択で、後者を取るというわけだ。</p>
+
+<p>もちろん今はまだ公開するGruntタスクは書きかえるべきではない。io.jsのインストールを要求するのは馬鹿げている。そのうちNode.js v0.12系などが出て安心版でサポートされるようになったら書きかえてやっても良いかもしれない。まずは手元のオレオレタスクを書きかえてみるくらいが良い。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>チーズ・スコーン</title>
@@ -472,37 +534,6 @@ main {
 <p>ソースを読んでもよくわからなかったので<a href="https://github.com/postcss/postcss/issues/165">イシューを立てて聞いたところ</a>、思ったよりもかなり複雑そうだった。しかしよく練られてはいる印象は持ったので、これに任せてしまうのが賢そうだ。つまりノードを動かす時には<code>clone()</code>を通すか、新メソッドの<code>moveTo()</code>などを使ってやることで、まずノードの空白関連のプロパティーをリセットする。後はPostCSSに前後のノードを参照するかデフォルトのフォーマットを採用するかを選択させるという形だ。</p>
 
 <p>PostCSS側の変更でテストの期待される結果は書き直さなければならなそうだが、ライブラリー側で余計なことをするよりかはコストが低いと思われる。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>postcss-single-charset</title>
-      <link>http://hail2u.net/blog/webdesign/postcss-single-charset.html</link>
-      <description>minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/postcss-single-charset.html</guid>
-      <pubDate>Sat, 10 Jan 2015 01:52:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="http://hail2u.net/blog/webdesign/minify-then-concat.html">minifyしてからconcat</a>という手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある<code>@charset</code>ルールが無意味になる。そこで最初の<code>@charset</code>を先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</p>
-
-<p>PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの<code>use()</code>でプロセッサーとして読み込んでやる必要がある。</p>
-
-<pre><code>var fs = require(&#39;fs&#39;);
-var postcss = require(&#39;postcss&#39;);
-
-var input = fs.readFileSync(&#39;input.css&#39;, &#39;utf8&#39;);
-var output = postcss().use(
-  require(&#39;postcss-single-charset&#39;)()
-).process(input).css;
-fs.writeFileSync(&#39;output.css&#39;, output);
-</code></pre>
-
-<p>PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には<a href="https://github.com/nDmitry/grunt-postcss">grunt-postcss</a>や<a href="https://github.com/w0rm/gulp-postcss">gulp-postcss</a>経由で使うことになるだろう。</p>
-
-<p>利用サンプルを兼ねてGruntプラグインも同梱しておいた。<code>grunt-</code>プリフィックスが付いていないため、<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>では読み込んでくれない(と思う)ので、READMEにあるように書いてちゃんと読み込む必要がある。他は特に変なことはないが、あまり行儀良くはなさそうなので利用は非推奨ということにしておく。</p>
-
-<hr>
-
-<p>あんまりパッケージ化するつもりはなかったけど、PostCSSプラグインというような形で書いたことがなかったので試しに書いてみた。特に何ということもなかった。</p>]]></content:encoded>
     </item>
 
   </channel>
