@@ -64,7 +64,7 @@ module.exports = function (grunt) {
       grunt.fail.warn(git.error);
     }
 
-    if (options.push) {
+    if (!options.push) {
       return;
     }
 
