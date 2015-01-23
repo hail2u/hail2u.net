@@ -431,54 +431,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
 
-  grunt.registerTask('deploy', [
-    'build',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:css', [
-    'build:css',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:favicon', [
-    'build:favicon',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:home', [
-    'build:html',
-    'merge_feeds:main',
-    'sitemap',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:html', [
-    'build:html',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:js', [
-    'build:js',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('deploy:sitemap', [
-    'sitemap',
-    'gitcommit:deploy'
-  ]);
-
-  grunt.registerTask('ping', [
-    'pubsubhubbub_publish'
-  ]);
-
-  grunt.registerTask('publish:blog', [
-    'gitcommit:add_entry',
-    'build:blog',
-    'gitcommit:update_cache',
-    'gitcommit:publish_blog'
-  ]);
-
   grunt.registerTask('build', [
     'build:css',
     'build:favicon',
@@ -528,6 +480,54 @@ module.exports = function (grunt) {
     'copy:postjs',
     'concat:js',
     'copy:js',
+  ]);
+
+  grunt.registerTask('deploy', [
+    'build',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:css', [
+    'build:css',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:favicon', [
+    'build:favicon',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:home', [
+    'build:html',
+    'merge_feeds:main',
+    'sitemap',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:html', [
+    'build:html',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:js', [
+    'build:js',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:sitemap', [
+    'sitemap',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('ping', [
+    'pubsubhubbub_publish'
+  ]);
+
+  grunt.registerTask('publish:blog', [
+    'gitcommit:add_entry',
+    'build:blog',
+    'gitcommit:update_cache',
+    'gitcommit:publish_blog'
   ]);
 
   grunt.registerTask('update:blog', [
