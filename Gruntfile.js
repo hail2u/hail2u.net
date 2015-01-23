@@ -35,7 +35,10 @@ module.exports = function (grunt) {
         },
 
         files: {
-          'tmp/debug.min.js': ['tmp/show-column.min.js'],
+          'tmp/debug.min.js': [
+            'tmp/show-column.min.js',
+            'tmp/toggle-tagline.min.js'
+          ],
           'tmp/main.min.js': ['tmp/unutm.min.js']
         }
       }
@@ -84,6 +87,7 @@ module.exports = function (grunt) {
       prejs: {
         files: {
           'tmp/show-column.js': 'src/js/debug/show-column.js',
+          'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js',
           'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
           'tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
           'tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
