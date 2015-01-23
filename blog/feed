@@ -10,12 +10,75 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Fri, 23 Jan 2015 03:38:52 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 24 Jan 2015 01:24:36 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CloudFlareにおけるメール・ソリューションとしてのMailgun</title>
+      <link>http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html</link>
+      <description>Value Domainで取得したドメインをCloudFlareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。</description>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html</guid>
+      <pubDate>Sat, 24 Jan 2015 01:24:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://www.value-domain.com/">Value Domain</a>で取得したドメインを<a href="https://www.cloudflare.com/">CloudFlare</a>の提供するネームサーバーで<a href="https://pages.github.com/">GitHub Pages</a>に向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができる<a href="https://mailgun.com/">Mailgun</a>を使うのが良さそうだ。</p>
+
+<p>Mailgunではアカウントを取得後、まずドメインを追加する。すると計5つのDNSレコードが提供される。</p>
+
+<ul>
+<li>認証用のTXTレコードが2つ</li>
+<li>送信メールでのトラッキングに使われるリソースのためのCNAMEレコードが1つ</li>
+<li>受信用のMXレコードが2つ</li>
+</ul>
+
+<p>これらDNSレコードをCloudFlareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff CloudFlareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。</p>
+
+<figure>
+  <a href="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"></a>
+
+  <figcaption>DNS Settings on CloudFlare</figcaption>
+</figure>
+
+<p>次にMailgun側でドメインの照合を行うわけだが、その前にMailgunで設定しようとしているドメインのDomain SettingsでInbound Spam FilterをBlock Detected Spamに変更しておくと良い。こうしないとスパムメールをちょくちょく受信するようなメールアドレスをMailgunで処理しようとする場合、即座にDisabledにされてしまう。もしDisabledにされた場合は、まだメールの送信はしていないことなどを添えてサポートから連絡すれば簡単に復活させてはくれる。</p>
+
+<p>続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる(待っていても自動で照合してはくれない)。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。</p>
+
+<figure>
+  <a href="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"></a>
+
+  <figcaption>Domain Verification on Mailgun</figcaption>
+</figure>
+
+<p>次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。</p>
+
+<figure>
+  <a href="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"></a>
+
+  <figcaption>Mail Forwarding Setting on Mailgun</figcaption>
+</figure>
+
+<p>Filter Expressionで<code>match_recipient()</code>を使って利用したいメールアドレスを指定し、Actionsで<code>forward()</code>を使って自分のGmailのメールアドレスを指定する。Priorityは他に何もしないのなら0のままで良い。Descriptionはわかりやすい名前を付けておくべきだろう。Filter Expressionで<code>catch_all()</code>を使うといわゆるキャッチオール的な転送も可能だ。</p>
+
+<p>ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。</p>
+
+<figure>
+  <a href="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"></a>
+
+  <figcaption>Viewing Logs on Mailgun</figcaption>
+</figure>
+
+<p>Mailgunはクレジットカード情報を登録しない場合、常にFreeアカウントでの運営になる。その場合、<a href="http://documentation.mailgun.com/faqs.html#what-are-the-differences-between-free-and-paid-accounts">いくつかの制限</a>があるが、送信せず転送のみならば問題ない制限だろう。</p>
+
+<hr>
+
+<p>今のところは動いているようだが、何回かDisabledになったので継続運営にはまだかなり不安がある。サポートといろいろ話したところ、既存のメールアドレスをそのまま運用するのはなかなか難しいという話なので、僕は別の手段を探した方が良さそうだ。</p>
+
+<p>日頃からスパムが来ないように注意を払っている人達には十分に機能する手段ではあるだろう。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Muspy</title>
@@ -437,127 +500,6 @@ main {
 <h2>追記</h2>
 
 <p>参照したGoogleのEDJOに関する文書とこの記事の内容が乖離していたことに気づいていなかったので、本来的に参照するべきJens Oliver Meiertのブログ記事へのリンクを追加した。両文書は同じ筆者による記事ではあるが、違う観点によって書かれているので、両方参照するべきだった。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Every Declaration Just Onceの例</title>
-      <link>http://hail2u.net/blog/webdesign/every-declaration-just-once-example.html</link>
-      <description>同じ定義は書かないCSSの簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/every-declaration-just-once-example.html</guid>
-      <pubDate>Wed, 14 Jan 2015 10:02:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="https://developers.google.com/speed/articles/optimizing-css">同じ定義は書かないCSS</a>の簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。</p>
-
-<pre><code>.foo {
-  border: 1px solid red;
-  margin: 0 auto;
-  width: 40rem;
-}
-
-.bar {
-  border: 1px solid green;
-  margin: 0 auto;
-  width: 40rem;
-}
-
-.baz {
-  border: 1px solid blue;
-  margin: 0 auto;
-  width: 40rem;
-}
-</code></pre>
-
-<p>このような共通する定義を持つセレクターは以下のように書かれる。</p>
-
-<pre><code>.foo,
-.bar,
-.baz {
-  margin: 0 auto;
-}
-
-.foo,
-.bar,
-.baz {
-  width: 40rem;
-}
-
-.foo {
-  border: 1px solid red;
-}
-
-.bar {
-  border: 1px solid green;
-}
-
-.baz {
-  border: 1px solid blue;
-}
-</code></pre>
-
-<p>まずは定義ごとというのがポイントだ。</p>
-
-<pre><code>.foo,
-.bar,
-.baz {
-  margin: 0 auto;
-}
-
-.foo,
-.bar,
-.baz {
-  width: 40rem;
-}
-</code></pre>
-
-<p>このようにまとめられそうなブロックでもあえて分割する。そうしておくことによって、後に<code>margin: 0 auto</code>だけ使うクラスを追加したい時に分割し直す手間が省ける。こういった後のメンテナンス性を考えた場合、先頭に定義をわかりやすくしたクラスを追加するのも悪くなかった。</p>
-
-<pre><code>.centering,
-.foo,
-.bar,
-.baz {
-  margin: 0 auto;
-}
-</code></pre>
-
-<p>こうしておくと<code>,\n\.foo</code>で置換を行えるようになる。しかし使いもしないセレクターが書かれているのは無駄が多い気がしたのでやめてしまった。ただし、そのブロックがどういう定義のためのブロックなのかをわかりやすくできるので、すこし規模が大きくなると助かるかもしれない。その場合は後にツールで削除してやると良さそうだ。</p>
-
-<p>またどこまで定義を分けるかというのもちょっと悩む。例えば<code>border</code>ショートカット・プロパティーなどだ。上記例だと以下のようにも書くことができ、定義をなるべく重複しないようにとするとこのように書くべきようにも思える。</p>
-
-<pre><code>.foo,
-.bar,
-.baz {
-  border-style: solid;
-}
-
-.foo,
-.bar,
-.baz {
-  border-width: 1px;
-}
-
-.foo {
-  border-color: red;
-}
-
-.bar {
-  border-color: green;
-}
-
-.baz {
-  border-color: blue;
-}
-</code></pre>
-
-<p>さすがに冗長すぎる印象だ。どこまで分割するかの線引きはもうちょっと考える必要があるだろう。</p>
-
-<hr>
-
-<p>この書き方は、今まで良い解とされていたOOCSSのようなアプローチとは真逆で、悪いアプローチとされていた物理的な装飾を基準としたアプローチに近い。そのためOOCSSどっぷりだった人達には違和感しかない。</p>
-
-<p>作業としては、どのような装飾を加えるか決まったら、そのプロパティー等で検索し、既にあったらそこにセレクターを追加、なかったらブロックを追加と、非常に単純化されたものだけで済む。ルールそのものが単純なこと、書き方の説明としても簡単で済むこと、<em>間違えて重複する定義を追加しても致命的ではないこと</em>、差分がわかりやすいことなど開発中の利点は多い。</p>
-
-<p>一方でコンポーネント単位での確認というような地道な作業、つまりテストとは相性が悪い。逆に言うと定義ごとに分けることによってコード上で確認できるようにしたとも言えるかもしれない。ブラウザーの実装の不行き届きやバグへの対処に確認が必要な現状だと絵空事に近いので、ワークフローが大幅に省力化するわけではなさそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>

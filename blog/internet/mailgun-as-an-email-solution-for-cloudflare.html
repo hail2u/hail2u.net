@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Value Domainで取得したドメインをCloudFlareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>CloudFlareにおけるメール・ソリューションとしてのMailgun - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html" rel="canonical">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="http://hail2u.net/blog/internet/muspy.html">
+
+    
+
+    
+      <meta content="CloudFlareにおけるメール・ソリューションとしてのMailgun" property="og:title">
+      <meta content="http://hail2u.net/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" property="og:image">
+      <meta content="Value Domainで取得したドメインをCloudFlareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        
+        <link href="http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">CloudFlareにおけるメール・ソリューションとしてのMailgun</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2015-01-24T01:24:00+09:00" itemprop="datePublished">Jan 24, 2015</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/internet/">Internet</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://www.value-domain.com/">Value Domain</a>で取得したドメインを<a href="https://www.cloudflare.com/">CloudFlare</a>の提供するネームサーバーで<a href="https://pages.github.com/">GitHub Pages</a>に向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができる<a href="https://mailgun.com/">Mailgun</a>を使うのが良さそうだ。</p>
+
+<p>Mailgunではアカウントを取得後、まずドメインを追加する。すると計5つのDNSレコードが提供される。</p>
+
+<ul>
+<li>認証用のTXTレコードが2つ</li>
+<li>送信メールでのトラッキングに使われるリソースのためのCNAMEレコードが1つ</li>
+<li>受信用のMXレコードが2つ</li>
+</ul>
+
+<p>これらDNSレコードをCloudFlareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff CloudFlareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。</p>
+
+<figure>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" itemprop="image"></a>
+
+  <figcaption>DNS Settings on CloudFlare</figcaption>
+</figure>
+
+<p>次にMailgun側でドメインの照合を行うわけだが、その前にMailgunで設定しようとしているドメインのDomain SettingsでInbound Spam FilterをBlock Detected Spamに変更しておくと良い。こうしないとスパムメールをちょくちょく受信するようなメールアドレスをMailgunで処理しようとする場合、即座にDisabledにされてしまう。もしDisabledにされた場合は、まだメールの送信はしていないことなどを添えてサポートから連絡すれば簡単に復活させてはくれる。</p>
+
+<p>続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる(待っていても自動で照合してはくれない)。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。</p>
+
+<figure>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"></a>
+
+  <figcaption>Domain Verification on Mailgun</figcaption>
+</figure>
+
+<p>次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。</p>
+
+<figure>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"></a>
+
+  <figcaption>Mail Forwarding Setting on Mailgun</figcaption>
+</figure>
+
+<p>Filter Expressionで<code>match_recipient()</code>を使って利用したいメールアドレスを指定し、Actionsで<code>forward()</code>を使って自分のGmailのメールアドレスを指定する。Priorityは他に何もしないのなら0のままで良い。Descriptionはわかりやすい名前を付けておくべきだろう。Filter Expressionで<code>catch_all()</code>を使うといわゆるキャッチオール的な転送も可能だ。</p>
+
+<p>ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。</p>
+
+<figure>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"></a>
+
+  <figcaption>Viewing Logs on Mailgun</figcaption>
+</figure>
+
+<p>Mailgunはクレジットカード情報を登録しない場合、常にFreeアカウントでの運営になる。その場合、<a href="http://documentation.mailgun.com/faqs.html#what-are-the-differences-between-free-and-paid-accounts">いくつかの制限</a>があるが、送信せず転送のみならば問題ない制限だろう。</p>
+
+<hr>
+
+<p>今のところは動いているようだが、何回かDisabledになったので継続運営にはまだかなり不安がある。サポートといろいろ話したところ、既存のメールアドレスをそのまま運用するのはなかなか難しいという話なので、僕は別の手段を探した方が良さそうだ。</p>
+
+<p>日頃からスパムが来ないように注意を払っている人達には十分に機能する手段ではあるだろう。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/internet/muspy.html" rel="prev">
+  <p>Muspy</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
