@@ -75,6 +75,14 @@ module.exports = function (grunt) {
         ]
       },
 
+      postjs: {
+        files: {
+          'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
+          'tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
+          'tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
+        }
+      },
+
       precss: {
         files: {
           'tmp/normalize.css': 'src/css/assets/styles/normalize.css',
@@ -87,10 +95,7 @@ module.exports = function (grunt) {
       prejs: {
         files: {
           'tmp/show-column.js': 'src/js/debug/show-column.js',
-          'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js',
-          'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
-          'tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
-          'tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
+          'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js'
         }
       },
 
@@ -520,6 +525,7 @@ module.exports = function (grunt) {
     'clean',
     'copy:prejs',
     'uglify',
+    'copy:postjs',
     'concat:js',
     'copy:js',
   ]);
