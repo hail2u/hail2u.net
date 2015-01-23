@@ -1,15 +1,14 @@
 (function () {
-  var debug  = 'Lorem ipsum dolor sit amet, consectetur <em>adipiscing</em> elit. Cras sit amet risus ac odio porta sodales. Etiam consectetur eros et lacus &amp; tristique <em>imperdiet</em>.';
-  var store = 'data-original';
+  var logo = document.querySelector('.logo');
   var tagline = document.querySelector('.tagline');
-  tagline.setAttribute(store, tagline.innerHTML);
-  tagline.addEventListener('click', function () {
-    var current = this.innerHTML;
-
-    if (current !== debug) {
-      this.innerHTML = debug;
+  logo.addEventListener('click', function (evt) {
+    if (tagline.hidden) {
+      tagline.hidden = false;
     } else {
-      this.innerHTML = this.getAttribute(store);
+      tagline.hidden = true;
     }
+
+    evt.preventDefault();
+    evt.stopPropagation();
   }, false);
 })();
