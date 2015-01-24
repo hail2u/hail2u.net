@@ -292,7 +292,7 @@ module.exports = function (grunt) {
         options: {
           all: true,
           branch: 'gh-pages',
-          message: 'Deploy',
+          message: 'Build',
           push: true,
           root: 'build/'
         }
@@ -302,7 +302,7 @@ module.exports = function (grunt) {
         options: {
           all: true,
           branch: 'gh-pages',
-          message: 'Publish',
+          message: 'Add',
           push: true,
           root: 'build/'
         }
@@ -339,7 +339,7 @@ module.exports = function (grunt) {
       upload: {
         options: {
           branch: 'gh-pages',
-          message: 'Upload',
+          message: 'Add',
           push: true,
           root: 'build/'
         }
