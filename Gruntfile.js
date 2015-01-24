@@ -77,9 +77,9 @@ module.exports = function (grunt) {
 
       postjs: {
         files: {
-          'tmp/unutm.js': 'src/js/bower_components/unutm/build/unutm.js',
-          'tmp/unutm.min.js': 'src/js/bower_components/unutm/build/unutm.min.js',
-          'tmp/unutm.min.js.map': 'src/js/bower_components/unutm/build/unutm.min.js.map'
+          'tmp/unutm.js': 'node_modules//unutm/build/unutm.js',
+          'tmp/unutm.min.js': 'node_modules//unutm/build/unutm.min.js',
+          'tmp/unutm.min.js.map': 'node_modules//unutm/build/unutm.min.js.map'
         }
       },
 
