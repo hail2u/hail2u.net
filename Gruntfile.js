@@ -102,20 +102,21 @@ module.exports = function (grunt) {
       style_guide: {
         options: {
           process: function (content) {
-            [
-              {
-                pattern: /((href|src)=")(http:\/\/hail2u\.net\/|\.\/assets\/)/g,
-                replace: '$1/'
-              },
-              {
-                pattern: /((href|src)=")\.\//g,
-                replace: '$1/styles/'
-              }
-            ].forEach(function (sub) {
-              content = content.replace(sub.pattern, sub.replace);
-            });
+            var re = /(href|src)(=)(")(.*?)(")/g;
+            var site = 'http://hail2u.net/';
+            var asset = 'assets/';
 
-            return content;
+            return content.replace(re, function (m, at, eq, oq, url, cq) {
+              if (url.indexOf(site) === 0) {
+                url = url.substr(site.length - 1);
+              } else if (url.indexOf(asset) === 0) {
+                url = url.substr(asset.length - 1);
+              } else if (/^\w+\.\w+$/.test(url)) {
+                url = '/styles/' + url;
+              }
+
+              return at + eq + oq + url + cq;
+            });
           }
         },
 
