@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>child_process.spawnSync()のoptions引数 - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="http://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html" rel="canonical">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html">
+
+    
+
+    
+      <meta content="child_process.spawnSync()のoptions引数" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="http://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">child_process.spawnSync()のoptions引数</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2015-01-25T18:54:00+09:00" itemprop="datePublished">Jan 25, 2015</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://iojs.org/api/child_process.html#child_process_child_process_spawnsync_command_args_options"><code>child_process.spawnSync()</code></a>で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。<a href="https://github.com/iojs/io.js/issues/576">イシュー</a>立てたらすぐ<a href="https://github.com/iojs/io.js/pull/579">修正</a>された。どうやら内部で<code>options</code>を上書きしてしまっていただけらしい。</p>
+
+<p>io.js v1.0.3上では以下のようなコードで再現できる。</p>
+
+<pre><code class="language-javascript">var spawnSync = require(&#39;child_process&#39;).spawnSync;
+
+var ls;
+var opts = {
+  stdio: &#39;inherit&#39;
+};
+
+ls = spawnSync(&#39;ls&#39;, [], opts);
+ls = spawnSync(&#39;ls&#39;, [], opts);
+ls = spawnSync(&#39;ls&#39;, [], opts);
+</code></pre>
+
+<p>実行すると3回目の`spawnSync()`で例外を吐いて落ちる。</p>
+
+<pre>~/Desktop $ iojs test.js
+desktop.ini test.js
+desktop.ini test.js
+child_process.js:905
+      throw new TypeError(&#39;Incorrect value for stdio stream: &#39; +
+            ^
+TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &#39;fd&#39;, fd: 0 } }
+    at child_process.js:905:13
+    at Array.reduce (native)
+    at _validateStdio (child_process.js:829:17)
+    at spawnSync (child_process.js:1251:19)
+    at Object.&lt;anonymous&gt; (c:\Users\Kyo\Desktop\test.js:13:10)
+    at Module._compile (module.js:446:26)
+    at Object.Module._extensions..js (module.js:464:10)
+    at Module.load (module.js:341:32)
+    at Function.Module._load (module.js:296:12)
+    at Function.Module.runMain (module.js:487:10)
+</pre>
+
+<p>io.jsではすぐ直りそう(Node.jsではstableに来る頃には直っていることだろう)だが、それまでは<code>options</code>はいちいち書いた方が無難だろう。具体的には<code>JSON.parse(JSON.stringify(opts))</code>とオブジェクトをクローンするテクニックを利用して指定するのが安定して良さそうだ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html" rel="prev">
+  <p>CloudFlareにおけるメール・ソリューションとしてのMailgun</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

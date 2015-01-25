@@ -10,6 +10,52 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>child_process.spawnSync()のoptions引数</title>
+      <link>http://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html</link>
+      <description>child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html</guid>
+      <pubDate>Sun, 25 Jan 2015 18:54:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://iojs.org/api/child_process.html#child_process_child_process_spawnsync_command_args_options"&gt;&lt;code&gt;child_process.spawnSync()&lt;/code&gt;&lt;/a&gt;で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。&lt;a href="https://github.com/iojs/io.js/issues/576"&gt;イシュー&lt;/a&gt;立てたらすぐ&lt;a href="https://github.com/iojs/io.js/pull/579"&gt;修正&lt;/a&gt;された。どうやら内部で&lt;code&gt;options&lt;/code&gt;を上書きしてしまっていただけらしい。&lt;/p&gt;
+
+&lt;p&gt;io.js v1.0.3上では以下のようなコードで再現できる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var spawnSync = require(&amp;#39;child_process&amp;#39;).spawnSync;
+
+var ls;
+var opts = {
+  stdio: &amp;#39;inherit&amp;#39;
+};
+
+ls = spawnSync(&amp;#39;ls&amp;#39;, [], opts);
+ls = spawnSync(&amp;#39;ls&amp;#39;, [], opts);
+ls = spawnSync(&amp;#39;ls&amp;#39;, [], opts);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;実行すると3回目の`spawnSync()`で例外を吐いて落ちる。&lt;/p&gt;
+
+&lt;pre&gt;~/Desktop $ iojs test.js
+desktop.ini test.js
+desktop.ini test.js
+child_process.js:905
+      throw new TypeError(&amp;#39;Incorrect value for stdio stream: &amp;#39; +
+            ^
+TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: { type: &amp;#39;fd&amp;#39;, fd: 0 } }
+    at child_process.js:905:13
+    at Array.reduce (native)
+    at _validateStdio (child_process.js:829:17)
+    at spawnSync (child_process.js:1251:19)
+    at Object.&amp;lt;anonymous&amp;gt; (c:\Users\Kyo\Desktop\test.js:13:10)
+    at Module._compile (module.js:446:26)
+    at Object.Module._extensions..js (module.js:464:10)
+    at Module.load (module.js:341:32)
+    at Function.Module._load (module.js:296:12)
+    at Function.Module.runMain (module.js:487:10)
+&lt;/pre&gt;
+
+&lt;p&gt;io.jsではすぐ直りそう(Node.jsではstableに来る頃には直っていることだろう)だが、それまでは&lt;code&gt;options&lt;/code&gt;はいちいち書いた方が無難だろう。具体的には&lt;code&gt;JSON.parse(JSON.stringify(opts))&lt;/code&gt;とオブジェクトをクローンするテクニックを利用して指定するのが安定して良さそうだ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>CloudFlareにおけるメール・ソリューションとしてのMailgun</title>
       <link>http://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html</link>
       <description>Value Domainで取得したドメインをCloudFlareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。CloudFlareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。</description>
@@ -223,7 +269,7 @@ if (child.error) {
       <guid isPermaLink="true">http://hail2u.net/blog/misc/cheese-scones.html</guid>
       <pubDate>Mon, 19 Jan 2015 03:10:00 +0900</pubDate>
       <content:encoded>&lt;figure&gt;
-  &lt;img alt="焼きたてのスコーン、ところどころ濃く焦げているところはチーズ" src="http://hail2u.net/images/blog/cheese-scones.jpg"&gt;
+  &lt;a href="http://hail2u.net/images/blog/cheese-scones.jpg"&gt;&lt;img alt="焼きたてのスコーン、ところどころ濃く焦げているところはチーズ" src="http://hail2u.net/images/blog/cheese-scones.jpg"&gt;&lt;/a&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;TLにちょくちょくスコーン焼いた写真が飛んでくるので、我慢できなくなって夕飯後に焼いてた。慣れると30分くらいで作れてちょっとした遊びっぽくて楽しい。ドライフルーツみたいなのが何もなかったので、チーズを入れた。&lt;/p&gt;
@@ -344,137 +390,6 @@ if (child.error) {
 &lt;p&gt;EDJOのダメそうなところは改めてちゃんと書きたい。このツールを使いつつ色々考える。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの</title>
-      <link>http://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html</link>
-      <description>昨日も少し書いたEvery Declaration Just Onceアプローチ(以下EDJOと略す)について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html</guid>
-      <pubDate>Thu, 15 Jan 2015 11:29:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;昨日も少し書いた&lt;a href="https://developers.google.com/speed/articles/optimizing-css"&gt;Every Declaration Just Onceアプローチ&lt;/a&gt;(以下EDJOと略す)について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。&lt;/p&gt;
-
-&lt;p&gt;上記Googleの文書は、主にパフォーマンスの観点で書かれている。どうしても長くなりがちな定義を分散して書くよりも、能動的に短くすることができるセレクターを分散して書いた方が、プロダクションにおいてリリースされるCSSファイルのサイズを小さくすることが可能だろうというものだ。同時にこの文書の筆者は自身のブログで、&lt;a href="http://meiert.com/en/blog/20141009/css-dry-and-optimization/"&gt;より自然にCSSを書くための手法(原文: &lt;q&gt;The Natural Way of Writing CSS&lt;/q&gt;)&lt;/a&gt;としてこのEDJOという手法について述べている。&lt;/p&gt;
-
-&lt;p&gt;僕は主にそういったCSSの書き方という観点からEDJOに注目した。この記事もそれに従って書かれている上、パフォーマンスについてはGoogleの文書で十分に書かれているので、以下では特に触れない。&lt;/p&gt;
-
-&lt;h2&gt;OOCSSとは&lt;/h2&gt;
-
-&lt;p&gt;まずはOOCSSについてざっと触れておく。OOCSSではいくつかの&lt;a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets"&gt;定義&lt;/a&gt;(プロパティーとその値のセット)を組み合わせることにより再現できる見た目をオブジェクトとみなし、それを継承・拡張していく。オブジェクトは一定の意味を持つ単位で作成され、それを組み合わせることで振る舞いベースで、ウェブサイトのビジュアル・デザインを完成させていくことができるというわけだ。&lt;/p&gt;
-
-&lt;p&gt;実際に継承と拡張を行う手段は、オブジェクトとして定義されたクラスを複数組み合わせていく手法、いわゆる&lt;em&gt;マルチ・クラス&lt;/em&gt;による。今ではCSSプリプロセッサーなどもあるが、例えばSassの&lt;code&gt;@extend&lt;/code&gt;を使ったロジカルな継承は開発者間での濃いコミュニケーションによる意識の摺り合わせが必須とも言えるので、まだまだマルチ・クラスで行われている、行われるだろうと言って良い。&lt;/p&gt;
-
-&lt;p&gt;もし仮に後で書かれたセレクターの方が必ず強いというようなシンプルな仕組みであったら、マルチ・クラスはその想定通りうまく機能しただろう。しかしそうはいかない。&lt;/p&gt;
-
-&lt;h2&gt;セレクターの詳細度&lt;/h2&gt;
-
-&lt;p&gt;CSSでは&lt;a href="http://www.w3.org/TR/CSS2/cascade.html#specificity"&gt;セレクターの詳細度&lt;/a&gt;というものがある。例えば&lt;code&gt;.foo&lt;/code&gt;より&lt;code&gt;.bar .foo&lt;/code&gt;が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;body h1 {
-  font-family: serif;
-}
-
-h1 {
-  font-family: sans-serif;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;このCSSの場合&lt;a href="http://hail2u.net/pub/test/606.html"&gt;&lt;code&gt;h1&lt;/code&gt;は&lt;code&gt;serif&lt;/code&gt;で表示されること&lt;/a&gt;だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された&lt;a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets"&gt;ルールセット&lt;/a&gt;の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。&lt;/p&gt;
-
-&lt;p&gt;詳細度の仕組みは仕様を読むと簡単に書かれているが、実際にはそこそこ複雑だ。自然、その理解度が人によりまちまちであることも頭に入れておく必要がある(僕も正直8割強くらいしか理解している自信はない)。そうなるといかにしてこのような仕組みが発動しないようにCSSを書くか、ということになる。&lt;/p&gt;
-
-&lt;h2&gt;クラスの命名規則&lt;/h2&gt;
-
-&lt;p&gt;つまりセレクターでクラス名を二つ以上使わないようにし、すべてのセレクターの詳細度を等しくするわけだ。もちろん要素名やIDなどはこの世に存在しないものとみなして忘れ去ってしまえば良い。そうすることですべてのオブジェクト(=ルールセットに書かれた定義たち)はひとつのクラス名で表現されたセレクターにより割り当てられていくため、その書かれた順番に従ってその定義が上書きされていくようになる。&lt;/p&gt;
-
-&lt;p&gt;問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.global-header .nav .item .icon {
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;従ってこのようなクラス名を付けることになる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.global-header-nav-item-icon {
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;HTMLは当然のようにこうなる。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;header class=&amp;quot;global-header&amp;quot;&amp;gt;
-  ...
-  &amp;lt;nav class=&amp;quot;global-header-nav&amp;quot;&amp;gt;
-    &amp;lt;li class=&amp;quot;global-header-nav-item&amp;quot;&amp;gt;
-      &amp;lt;span class=&amp;quot;global-header-nav-item-icon&amp;quot;&amp;gt;&amp;lt;/span&amp;gt;
-      &amp;lt;span class=&amp;quot;global-header-nav-item-title&amp;quot;&amp;gt;Blog&amp;lt;/span&amp;gt;
-    &amp;lt;/li&amp;gt;
-    ...
-  &amp;lt;/nav&amp;gt;
-&amp;lt;/header&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;おおっと。&lt;/p&gt;
-
-&lt;p&gt;マルチ・クラスによる割り当てになるので、実際にはもう少しシンプルな値にはなる。が、それと同時に短いとはいえ別のクラス名が追加されていくので、&lt;code&gt;class&lt;/code&gt;属性の値は概ねこのような複雑なものになっていく。更にこういった単純に連結したり組み合わせたりするだけの命名規則では表現できない概念を補足するように鍛えていくと、&lt;a href="https://smacss.com/"&gt;SMACSS&lt;/a&gt;や&lt;a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/"&gt;MindBEMding&lt;/a&gt;、そして今最も注目度が高い&lt;a href="https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md"&gt;SUIT CSSの命名規則&lt;/a&gt;へと進化することになる。&lt;/p&gt;
-
-&lt;p&gt;かくしてHTMLでは各要素に&lt;code&gt;class&lt;/code&gt;属性として20–50文字くらいの値がちょくちょく割り当てられていくようになった。CMSやビルド・ツールを前提にしないと保守できない状態だといえるだろう。&lt;/p&gt;
-
-&lt;h2&gt;Every Declaration Just Once&lt;/h2&gt;
-
-&lt;p&gt;すべての定義を一度だけしか書かないこのアプローチ、EDJOではOOCSSとはCSSを書く手順が逆になる。&lt;/p&gt;
-
-&lt;p&gt;OOCSSではオブジェクトといういくつかの定義の組み合わせであるルールセットをまず書き、それにクラス名を使って名付ける。そしてHTMLに戻り、そのオブジェクトを割り当てたい要素に対し、クラス名を振っていく。&lt;/p&gt;
-
-&lt;p&gt;EDJOではまずHTMLで適切なクラス名(IDでも良いだろう)を振っておく。誤解を恐れずに言うのならば、セマンティックなクラス名とかそのようなもので、ウェブページにおいてその要素がどのようなものかを表現するクラス名だ。IDでも良いだろうし、HTML5の強い意味付けを持つ要素をきちんと使い分けているならクラス名やIDを付けなくても良いこともあるかもしれない。またクラス名は再利用しないので、抽象化した名称(例えば&lt;code&gt;.clearfix&lt;/code&gt;であったり&lt;code&gt;.column-wrapper&lt;/code&gt;など)である必要もない。&lt;/p&gt;
-
-&lt;p&gt;そしてCSSではビジュアル・デザインを決定する定義をまず書き、それを適用するセレクターを割り当て、ひとつの定義ごとにルールセットを作っていく。例えばこのような形だ。わかりやすいように様々なパターンでセレクターを書いてみたが、実際には開発者やプロジェクトごとにパターン化されてくるだろう。とりあえず一意に確定する形で書いておけば、後で置換をかけることでそのフォーマットを統一することも容易いはずだ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;body &amp;gt; header,
-main,
-.searchbox,
-[role=&amp;quot;contentinfo&amp;quot;] {
-  margin: 0 auto;
-}
-
-body &amp;gt; header,
-[role=&amp;quot;contentinfo&amp;quot;] {
-  background-color: #333;
-}
-
-main {
-  background-color: #fff;
-}
-
-.searchbox {
-  background-color: #999;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。&lt;/p&gt;
-
-&lt;p&gt;このようにEDJOでは、セレクターの詳細度という&lt;em&gt;あまり理解されていない仕組み&lt;/em&gt;とクラスの命名規則という&lt;em&gt;守らせることはおろかまず作ることからして難しい仕組み&lt;/em&gt;を共に意識せずにCSSとHTMLを書いていくことができるということだ。それはつまりHTMLはHTMLで書くことができ、CSSはCSSで書くことができ、更にその両者の結びつけを同じ定義を二度書かないという単純明快なルールのみで行うことができるということでもある。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;OOCSSの欠点はその思想や哲学、ベースとなった技術の問題ではない。ツリー構造を持つHTMLやカスケーディングという独自の継承の仕組みを持つCSSとは根本的に相性が悪く、命名規則というような運用におけるルール付けでカバーしなくてはならないところだ。もしHTMLやCSSがもう少し違うものだったら、OOCSSは間違いなく論理的で明確な方向性をウェブデザインに与える唯一無二の手法であった、そしてありつづけるものだったろう。しかし現実は違うし、未来もそうなりそうもない(セレクターのネストが可能になるとわからないけれども)。&lt;/p&gt;
-
-&lt;p&gt;そこでCSSにおいてその力不足を補い、OOCSSのような論理的なアプローチを可能にしようとするために生まれたのがCSSプリプロセッサーだった。しかしこれもOOCSSの欠点を完全にはカバーすることは出来てはいない。そのため既に名前だけは何回か出したSUIT CSSの命名規則のようなものが、ここに至っても生まれた(生まれてしまった)というわけだ。&lt;/p&gt;
-
-&lt;p&gt;EDJOがCSSを本来あるような形に戻したものだと捉えると、もはやCSSプリプロセッサーはCSSを無闇に複雑にしてしまっただけにも感じられてしまう。EDJOならCSS Variableのみのプリプロセッサーで十分機能しそうだ。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ひとつ、声を大きくして謝りたいのは、フロントエンド側じゃない人たちのCSSの書き方にダメ出しをしていたことだ。過去の僕はOOCSSをいかにして再現するかを重要視しており、OOCSSへの理解に欠ける人たちによるEDJO的な書き方(定義があるところに雑にセレクターを追加していく書き方)に対してかなり厳しく反論していたように思う。OOCSSを採用している以上、そういったEDJO的な書き方を否定することは間違っていたわけではないのだけど、その時の論理は「OOCSSだから～」というような、今思うと曖昧な、当時も理由としては弱いと薄々気付いていた言葉で押し通していた。&lt;/p&gt;
-
-&lt;p&gt;その頃にもう少しOOCSSの欠点について掘り下げていればそういった書き方にも一理以上の何かがあったことに気づけたはずだ。広く受け入れられているアプローチだからというような理由で盲信するのは良くないが、それを実践するのはなかなか難しい。もちろんこのEDJOというアプローチにも言えることだ。気をつけながらEDJOの世界をもうちょっと掘り起こしていこうと思う。&lt;/p&gt;
-
-&lt;p&gt;もしMindBEMdingのようなBEMライクな命名規則から、よりわかりやすく強力なSUIT CSSの命名規則に移行しようかなと考えている人がいたら、ちょっとだけEvery Declaration Just Onceというアプローチを試してみて欲しい。僕はこのアプローチを試した結果、OOCSSの実装の難しさにより嫌いになりかけたCSS(Sassでかろうじて理性を保ってやり過ごしてきていたが)を本気でもう一度好きになれそうな気がしてきている。HTMLとCSSが疎結合する未来を夢見ていた人達なら、OOCSSが唯一無二の解ではないという前提だと、このアプローチに未来を見出すことができるのではないだろうか。&lt;/p&gt;
-
-&lt;h2&gt;追記&lt;/h2&gt;
-
-&lt;p&gt;参照したGoogleのEDJOに関する文書とこの記事の内容が乖離していたことに気づいていなかったので、本来的に参照するべきJens Oliver Meiertのブログ記事へのリンクを追加した。両文書は同じ筆者による記事ではあるが、違う観点によって書かれているので、両方参照するべきだった。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -509,6 +424,6 @@ main {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Sat, 24 Jan 2015 01:24:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 25 Jan 2015 18:54:00 +0900</lastBuildDate>
   </channel>
 </rss>
