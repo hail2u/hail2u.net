@@ -65,6 +65,15 @@ module.exports = function (grunt) {
         ]
       },
 
+      css_pre: {
+        files: {
+          'tmp/normalize.css': 'src/css/assets/styles/normalize.css',
+          'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
+          'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
+          'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
+        }
+      },
+
       js: {
         cwd: 'tmp/',
         dest: 'build/scripts/',
@@ -75,7 +84,7 @@ module.exports = function (grunt) {
         ]
       },
 
-      postjs: {
+      js_minified: {
         files: {
           'tmp/unutm.js': 'node_modules//unutm/build/unutm.js',
           'tmp/unutm.min.js': 'node_modules//unutm/build/unutm.min.js',
@@ -83,16 +92,7 @@ module.exports = function (grunt) {
         }
       },
 
-      precss: {
-        files: {
-          'tmp/normalize.css': 'src/css/assets/styles/normalize.css',
-          'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
-          'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
-          'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
-        }
-      },
-
-      prejs: {
+      js_pre: {
         files: {
           'tmp/show-column.js': 'src/js/debug/show-column.js',
           'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js'
@@ -448,7 +448,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:css', [
     'clean',
-    'copy:precss',
+    'copy:css_pre',
     'sass',
     'css_mqpacker',
     'csswring',
@@ -475,9 +475,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:js', [
     'clean',
-    'copy:prejs',
+    'copy:js_pre',
     'uglify',
-    'copy:postjs',
+    'copy:js_minified',
     'concat:js',
     'copy:js',
   ]);
