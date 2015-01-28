@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     var file = grunt.option('file');
     var message = options.message;
 
-    if (file) {
+    if (file && files.length === 0) {
       file = path.resolve(file);
       file = path.relative(options.root, file);
       file = file.replace(/\\/g, '/');
@@ -40,7 +40,7 @@ module.exports = function (grunt) {
       file = '--all';
     }
 
-    if (file) {
+    if (file && files.length === 0) {
       files.push(file);
     }
 
