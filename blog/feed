@@ -10,12 +10,53 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 27 Jan 2015 17:42:42 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 28 Jan 2015 20:26:37 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>rel=subresourceを併用したCSSの遅延読み込み</title>
+      <link>http://hail2u.net/blog/webdesign/async-css-and-rel-subresource-together.html</link>
+      <description>クリティカルなんとかの関係やウェブ・フォントにおいて、CSSの遅延読み込みを行う気運は高まっている。様々なアイディアがあって、普通にCSSの中身を読み込んでhead要素に追加するものや、link要素を動的に追加するもの、予めlink要素をrel=stylesheetなしで書いておいて後で追加するものなどがその主なものだ。最後の手法ではrel=subresourceを追加して書いておくと、一部ブラウザーでダウンロードが速く始まるんじゃないかというアイディアを持った。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/async-css-and-rel-subresource-together.html</guid>
+      <pubDate>Wed, 28 Jan 2015 20:26:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>クリティカルなんとかの関係やウェブ・フォントにおいて、CSSの遅延読み込みを行う気運は高まっている。様々なアイディアがあって、普通にCSSの中身を読み込んで<code>head</code>要素に追加するものや、<code>link</code>要素を動的に追加するもの、予め<code>link</code>要素を<code>rel=stylesheet</code>なしで書いておいて後で追加するものなどがその主なものだ。最後の手法では<code>rel=subresource</code>を追加して書いておくと、一部ブラウザーでダウンロードが速く始まるんじゃないかというアイディアを持った。</p>
+
+<p>サポートが広いので<code>prefetch</code>かなと思ったけど、書いたそのページ内で使うリソースの先読みに使うものではないような印象で、すぐさま使う場合は<code>subresource</code>の方が適切なようだ。Chromeがそういうイメージで実装してるという話で、ウェブ標準では特に細かく規定はないようではある。</p>
+
+<pre><code>&lt;html&gt;
+  &lt;head&gt;
+    &lt;style&gt;
+      /* Critical Styles */
+    &lt;/style&gt;
+    &lt;link class=&quot;async-css&quot; href=&quot;main.css&quot; <mark>rel=&quot;subresource&quot;</mark>&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+    &lt;script&gt;
+      var css = document.querySelectorAll(&#39;.async-css&#39;);
+
+      for (var i = 0, l = css.length; i &lt; l; i++) {
+        css[i].rel = &#39;stylesheet&#39;;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>特に難しいことはない。<code>rel=subresource</code>で即キャッシュに持ってきてくれるはずなので、ドキュメントの<em>パース</em>(レンダリングではない)と平行してダウンロードされることが期待できる。つまり<code>body</code>要素の最後や<code>DOMContentLoaded</code>イベントでCSSを追加する場合よりも速くにダウンロードが開始されるのではないだろうか。</p>
+
+<p><code>rel=stylesheet</code>に入れ替える時点でダウンロードが終わってない時にどうなるかは謎(下手をするとリクエストがやり直されたりしそう)なので、実際に使う時はちゃんと検証する必要がある。</p>
+
+<hr>
+
+<p>遅延読み込みそのものは、その後襲うリペイントやリフローに比べればさほどコストの高いものでもないのでどうやっても良さそうだが、保守性が高そうなのは<code>link</code>要素を予め書いておく方法だと思う。その上で更に早期に読み込みを開始させるために<code>rel=subresource</code>を併用するのは悪くなさそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>ImprovMX</title>
@@ -373,31 +414,6 @@ if (child.error) {
 <p>この分量で直径5cmくらいに膨らむ。バーミックスのスライシーがあると、粉ふるうのから、牛乳を入れて生地をまとめるとこまで一つの容器で完結する。このレシピの場合、型抜きせずに手で丸めて焼くのも片付けが楽で良い。</p>
 
 <p>味見だけはしたけど、夜に食べない誓いがあるのでまだ食べてない……。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>厚いレイヤー</title>
-      <link>http://hail2u.net/blog/webdesign/thick-layer.html</link>
-      <description>Sitepointに書かれたBEMやSMACSSを使っている開発者たちからのアドバイスを読んでいた。僕は今いかにして命名規則をなくすかといったことを考えている最中のため否定的に読んだが、それでもここに書かれたアドバイスは正しいとは感じた。BEMやSMACSSが概ね想定以上に機能することは確かだし、スケールするし、指揮もとりやすい。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/thick-layer.html</guid>
-      <pubDate>Sun, 18 Jan 2015 01:44:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Sitepointに書かれた<a href="http://www.sitepoint.com/bem-smacss-advice-from-developers/">BEMやSMACSSを使っている開発者たちからのアドバイス</a>を読んでいた。僕は今いかにして命名規則をなくすかといったことを考えている最中のため否定的に読んだが、それでもここに書かれたアドバイスは正しいとは感じた。BEMやSMACSSが概ね想定以上に機能することは確かだし、スケールするし、指揮もとりやすい。</p>
-
-<p>僕が避けたいのは<em>何かしらへの強い依存</em>だ。薄いレイヤーならともかく、厚いレイヤーの場合は重度の依存をもたらす。その依存はこれからもそのまま通用するのかというと、不安が大きい。厚いレイヤーとは心中する覚悟が必要というのは正しいが、多くの場合心中する羽目になるのは導入した人ではなかったりもする。もっと薄いレイヤーでウェブ標準(など)に寄せた形の解があれば安心できるはずだ。</p>
-
-<p>HTML 4.01に対するHTML5を始めとして、CSS 2.1に対するCSS 3、いわゆるJavaScriptに対するECMAScript 6は比較的薄い(技術的な点ではなく、アプローチとして)レイヤーと言える。こういったものなら移行もスムーズだし、受け入れられやすいし、学びやすいし、将来への不安も少ない。ウェブ標準外でそのようなものを実現できた・実現しているものを挙げるとすると、HTMLに対するMarkdownやMustache、CSSに対するSassのSCSS記法、JavaScriptに対するTypeScriptや6to5だろうか。</p>
-
-<p>厚いレイヤーとして作られているものは多い。例えばHTMLに対するTextileやHAML、Jade、Slimであったり、CSSに対するSassのインデント記法やStylusの省略記法であったり、JavaScriptに対するCoffeeScriptであったり、だ。筋が悪いわけでもなく、現在の選択肢としては適当で、むしろ現時点では厚いレイヤーのこれらの方が評価されることも多い。これらはウェブ標準のしがらみから飛び出してその枝を延ばし、開発者に生産性を始めとした多くの果実を与えるからだ。</p>
-
-<p>BEMやSMACSSがどちらに属すかというと、それは微妙なところだ。ウェブ標準とは特に干渉するわけではないのでそういう点では薄いが、命名規則なるものがウェブ標準にはないことを考えると、分厚く新たなレイヤーを追加してしまうものとも言える。その習得難易度や複雑化しつづける規則に鑑みると、厚いレイヤーになりつつあるのかなと感じる。</p>
-
-<hr>
-
-<p>と言いつつ<a href="https://github.com/hail2u/hail2u.net-styles">このウェブサイトのCSS</a>は<a href="http://hail2u.net/blog/webdesign/sass-and-bem.html">BEMをベースにしたアプローチ</a>でプレースホルダー・セレクターとネストに意味を持たせて制作していたりする。この方法はかなり複雑なので汎用的ではないが、BEMのブロック・エレメント・モディファイアーという概念を継承したCSSの構造化というのは悪い解ではない。しかしそこに本来構造化されている(はず)のHTMLがあるのにも関わらず、その更に上に命名規則による構造化を行うレイヤーを設けることに疑問を持ち始めた。</p>
-
-<p>そんなわけでOOCSSを絶対として生まれたBEMやSMACSSといった命名規則に基づくCSSアーキテクチャーという代物を廃棄するため、<a href="http://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html">同じ定義を二度書かないアプローチ</a>を試行錯誤しているわけだ。BEMが嫌いになったとかそういうわけではなく、CSSアーキテクチャーなる代物が本当に必要なのかという疑問に対する答えを探すためだ。しっかりと構造化されたHTMLへ完全に従属させる形でCSSを書いても、昨今の高機能ないわゆる開発者ツールの助けがあればうまく機能するのではないか、というような思いつきを証明できるかというような話でもある。</p>]]></content:encoded>
     </item>
 
   </channel>

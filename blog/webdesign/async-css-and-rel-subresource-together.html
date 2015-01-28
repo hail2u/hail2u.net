@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="クリティカルなんとかの関係やウェブ・フォントにおいて、CSSの遅延読み込みを行う気運は高まっている。様々なアイディアがあって、普通にCSSの中身を読み込んでhead要素に追加するものや、link要素を動的に追加するもの、予めlink要素をrel=stylesheetなしで書いておいて後で追加するものなどがその主なものだ。最後の手法ではrel=subresourceを追加して書いておくと、一部ブラウザーでダウンロードが速く始まるんじゃないかというアイディアを持った。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>rel=subresourceを併用したCSSの遅延読み込み - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="http://hail2u.net/blog/webdesign/async-css-and-rel-subresource-together.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">
+    <link href="https://kyonagashima.com/" rel="author">
+
+    <link rel="prev" href="http://hail2u.net/blog/internet/improvmx.html">
+
+    
+
+    
+      <meta content="rel=subresourceを併用したCSSの遅延読み込み" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="クリティカルなんとかの関係やウェブ・フォントにおいて、CSSの遅延読み込みを行う気運は高まっている。様々なアイディアがあって、普通にCSSの中身を読み込んでhead要素に追加するものや、link要素を動的に追加するもの、予めlink要素をrel=stylesheetなしで書いておいて後で追加するものなどがその主なものだ。最後の手法ではrel=subresourceを追加して書いておくと、一部ブラウザーでダウンロードが速く始まるんじゃないかというアイディアを持った。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/async-css-and-rel-subresource-together.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a></h1>
+    
+      
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="http://hail2u.net/blog/webdesign/async-css-and-rel-subresource-together.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">rel=subresourceを併用したCSSの遅延読み込み</h1>
+
+        <footer class="section-footer">
+          <p>on <time datetime="2015-01-28T20:26:00+09:00" itemprop="datePublished">Jan 28, 2015</time>
+            under <span class="tag" itemprop="keywords"><a href="http://hail2u.net/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">クリティカルなんとかの関係やウェブ・フォントにおいて、CSSの遅延読み込みを行う気運は高まっている。様々なアイディアがあって、普通にCSSの中身を読み込んで<code>head</code>要素に追加するものや、<code>link</code>要素を動的に追加するもの、予め<code>link</code>要素を<code>rel=stylesheet</code>なしで書いておいて後で追加するものなどがその主なものだ。最後の手法では<code>rel=subresource</code>を追加して書いておくと、一部ブラウザーでダウンロードが速く始まるんじゃないかというアイディアを持った。</p>
+
+<p>サポートが広いので<code>prefetch</code>かなと思ったけど、書いたそのページ内で使うリソースの先読みに使うものではないような印象で、すぐさま使う場合は<code>subresource</code>の方が適切なようだ。Chromeがそういうイメージで実装してるという話で、ウェブ標準では特に細かく規定はないようではある。</p>
+
+<pre><code class="language-html">&lt;html&gt;
+  &lt;head&gt;
+    &lt;style&gt;
+      /* Critical Styles */
+    &lt;/style&gt;
+    &lt;link class=&quot;async-css&quot; href=&quot;main.css&quot; <mark>rel=&quot;subresource&quot;</mark>&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+    &lt;script&gt;
+      var css = document.querySelectorAll(&#39;.async-css&#39;);
+
+      for (var i = 0, l = css.length; i &lt; l; i++) {
+        css[i].rel = &#39;stylesheet&#39;;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>特に難しいことはない。<code>rel=subresource</code>で即キャッシュに持ってきてくれるはずなので、ドキュメントの<em>パース</em>(レンダリングではない)と平行してダウンロードされることが期待できる。つまり<code>body</code>要素の最後や<code>DOMContentLoaded</code>イベントでCSSを追加する場合よりも速くにダウンロードが開始されるのではないだろうか。</p>
+
+<p><code>rel=stylesheet</code>に入れ替える時点でダウンロードが終わってない時にどうなるかは謎(下手をするとリクエストがやり直されたりしそう)なので、実際に使う時はちゃんと検証する必要がある。</p>
+
+<hr>
+
+<p>遅延読み込みそのものは、その後襲うリペイントやリフローに比べればさほどコストの高いものでもないのでどうやっても良さそうだが、保守性が高そうなのは<code>link</code>要素を予め書いておく方法だと思う。その上で更に早期に読み込みを開始させるために<code>rel=subresource</code>を併用するのは悪くなさそうだ。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="http://hail2u.net/blog/internet/improvmx.html" rel="prev">
+  <p>ImprovMX</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
