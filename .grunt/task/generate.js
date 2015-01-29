@@ -139,10 +139,7 @@ module.exports = function (grunt) {
           var hh = date.getHours();
           var nn = date.getMinutes();
           var ss = date.getSeconds();
-          val.strPubDate = sprintf(
-            'on ' + monthNames[mm] + ' ' + dd + ', ' + yy + ' at %02d:%02d',
-            hh, nn
-          );
+          val.strPubDate = monthNames[mm] + ' ' + dd;
           val.html5PubDate = sprintf(
             '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
             yy, mm + 1, dd, hh, nn, ss
@@ -205,10 +202,7 @@ module.exports = function (grunt) {
       }
 
       articles.forEach(function (article, i, a) {
-        article.strPubDate = sprintf(
-          'on ' + monthNames[article.month - 1] + ' ' + article.day + ' at %02d:%02d',
-          article.hour, article.minute
-        );
+        article.strPubDate = monthNames[article.month - 1] + ' ' + article.day;
         article.html5PubDate = sprintf(
           '%04d-%02d-%02dT%02d:%02d:%02d+09:00',
           article.year, article.month, article.day, article.hour,
