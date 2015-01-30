@@ -10,12 +10,25 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Thu, 29 Jan 2015 02:35:23 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 30 Jan 2015 19:17:37 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>rel=dns-prefetchの導入</title>
+      <link>http://hail2u.net/blog/webdesign/implementing-dns-prefetch.html</link>
+      <description>前にちょっと書いてからもう一年以上経ってしまったが、rel=dns-prefetchを仕込むようにした。小規模なウェブサイトではあまり意味はないが、あってもほとんど損はないとも思われる。他のウェブサイトへ移動した時にも効果があるらしい、というような話を小耳に挟んだこともあり、追加してみることにした。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/implementing-dns-prefetch.html</guid>
+      <pubDate>Fri, 30 Jan 2015 19:17:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>前にちょっと書いてからもう一年以上経ってしまったが、<code>rel=dns-prefetch</code>を仕込むようにした。小規模なウェブサイトではあまり意味はないが、あってもほとんど損はないとも思われる。他のウェブサイトへ移動した時にも効果があるらしい、というような話を小耳に挟んだこともあり、追加してみることにした。</p>
+
+<p>僕は開発者ツールを見ながら手作業でリストを作っていったが、<a href="http://dnsprefetch.com/">dns-prefetch Online Code Generator</a>で生成すると手軽だ。URLを入力してボタンを押すだけで、外部リソースをスキャンしてそのドメイン+αをリストアップしてくれる。Google AdSenseやGoogle Analyticsではリダイレクト先で新たなリソースの追加もあるが、それらのドメインまでは調べてくれない。とはいえこのツールで調べられるドメインまでで十分だろう。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>クリティカル・パスのCSSなるシロモノ</title>
@@ -327,68 +340,6 @@ a {
 <p>気に入るものはちょくちょくあるんだけれどもそのうち手に入らなくなるのが怖くて、ここ数年は無印良品のものはなるべく避けようと意識してる。でも他に良いものが見つからなくて結局買ってしまう。そしてなくなり、悲しい思いをする。</p>
 
 <p>文庫本カバー探そう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>grunt.util.spawn()のリプレース</title>
-      <link>http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</link>
-      <description>Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/replacing-grunt-util-spawn.html</guid>
-      <pubDate>Tue, 20 Jan 2015 15:30:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされた<a href="http://gruntjs.com/api/grunt.util#grunt.util.spawn"><code>grunt.util.spawn()</code></a>を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えば<code>grunt.file.write()</code>は<a href="https://www.npmjs.com/package/fs-extra">fs-extra</a>パッケージが良い。<code>grunt.util.spawn()</code>はというとio.jsかNode.jsのUnstableが入っている環境ならば<code>spawnSync()</code>と<code>which.sync()</code>を組み合わせてリプレースすると良さそうだ。</p>
-
-<p>別プロセスを立ち上げる辺りはだいたい以下のような形になっていることと思う。</p>
-
-<pre><code>var done = this.async();
-
-grunt.util.spawn({
-  cmd: &#39;foo&#39;,
-  args: [&#39;--bar&#39;],
-  opts: {
-    stdio: &#39;inherit&#39;
-  }
-}, function (error, result, code) {
-  if (error) {
-    return done(error);
-  }
-
-  done();
-});
-</code></pre>
-
-<p>ストレートに書き換えると、以下のようになるだろう。</p>
-
-<pre><code>var spawn = require(&#39;child_process&#39;).<mark>spawnSync</mark>;
-var which = require(&#39;which&#39;).sync;
-var child = spawn(<mark>which(&#39;foo&#39;)</mark>, [&#39;--bar&#39;], {
-  stdio: &#39;inherit&#39;
-});
-
-if (child.error) {
-  grunt.fail.warn(child.error);
-}
-</code></pre>
-
-<p>まず必要なパッケージを読み込む。コールバックがなくなるので<code>this.async()</code>を呼ぶ必要はない。<code>child_process.spawnSync()</code>はエラーが起きたら返り値のオブジェクトの<code>error</code>プロパティーにErrorオブジェクトを格納するので、それをチェックしてエラーを返してやるのみ。</p>
-
-<p>コマンドを<code>which.sync()</code>でラップしてやっているのは、<code>child_process.spawnSync()</code> (<code>child_process.spawn()</code>も)がWindowsで<code>PATHEXT</code>環境変数を考慮してくれないことへ対策するためだ。ラップしてやらないと.batや.cmdで定義されているコマンドの場合、見つけることが出来ずENOENTで落ちてしまう。</p>
-
-<p>別プロセスに何かをしてもらうだけのタスクの場合はこれで良いが、標準出力を受け取って……という場合は<code>stdout</code>プロパティーを拾ってやれば良い。ただしデフォルトではBufferオブジェクトなので、<code>child_process.spawnSync()</code>の第三引数であるオプションで<code>encoding</code>を指定してやりStringオブジェクトになるようにして、後に受け取るのが簡単だろう。</p>
-
-<pre><code>var child = spawn(which(&#39;foo&#39;), [&#39;--bar&#39;], {
-  encoding: &#39;utf8&#39;
-});
-</code></pre>
-
-<p>エラーチェックはもうちょっと厳密な必要がありそうだ。そうしないとゾンビプロセスが残ったり、タスクがうまく終了しなくなる可能性がある。でもまだ<code>child_process.spawnSync()</code>の知見がなくてよくわからない。</p>
-
-<hr>
-
-<p>なぜリプレースするかというと、後にNode.js製の別の何か向けに書きなおす時にまずは書きなおしやすくするためだ。最終的にはフルスクラッチで書きなおした方が良いことが多いだろうが、まず簡単に書きなおせるようにしておくと移行コストが大きく下がる。依存を大きくする(Gruntべったり)か依存を増やす(Node.jsパッケージいっぱい)かという選択で、後者を取るというわけだ。</p>
-
-<p>もちろん今はまだ公開するGruntタスクは書きかえるべきではない。io.jsのインストールを要求するのは馬鹿げている。そのうちNode.js v0.12系などが出て安心版でサポートされるようになったら書きかえてやっても良いかもしれない。まずは手元のオレオレタスクを書きかえてみるくらいが良い。</p>]]></content:encoded>
     </item>
 
   </channel>
