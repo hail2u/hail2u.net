@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="毎回dns-prefetch Online Code Generatorからコピペはさすがに面倒そうなので、URLを指定するとそのページに含まれる外部リソースのドメインから&lt;link rel=&quot;dns-prefetch&quot;&gt;を生成するCLIツール、dns-prefetchを作成した。Node.jsからPhantomJSを使って書いたので、ドメイン抽出とかも簡単でよかった。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>node-dns-prefetch - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/node-dns-prefetch.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/webdesign/implementing-dns-prefetch.html">
+
+    
+
+    
+      <meta content="node-dns-prefetch" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="毎回dns-prefetch Online Code Generatorからコピペはさすがに面倒そうなので、URLを指定するとそのページに含まれる外部リソースのドメインから&lt;link rel=&quot;dns-prefetch&quot;&gt;を生成するCLIツール、dns-prefetchを作成した。Node.jsからPhantomJSを使って書いたので、ドメイン抽出とかも簡単でよかった。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/node-dns-prefetch.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      <nav>
+        
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/node-dns-prefetch.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">node-dns-prefetch</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-01-31T01:28:00+09:00" itemprop="datePublished">Jan 31, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">毎回<a href="http://dnsprefetch.com/">dns-prefetch Online Code Generator</a>からコピペはさすがに面倒そうなので、URLを指定するとそのページに含まれる外部リソースのドメインから<code>&lt;link rel=&quot;dns-prefetch&quot;&gt;</code>を生成するCLIツール、<a href="https://github.com/hail2u/node-dns-prefetch">dns-prefetch</a>を作成した。Node.jsからPhantomJSを使って書いたので、ドメイン抽出とかも簡単でよかった。</p>
+
+<pre><samp>$ <kbd>dns-prefetch &lt;URL&gt; [--xhtml]</kbd>
+</samp></pre>
+
+<p>npmを使ってインストールした後、ターミナルでURLを指定して実行するのみ。デフォルトではHTML文法で出力するので、XHTML文法で出力したい場合は<code>--xhtml</code>オプションを追加する。</p>
+
+<pre><samp>$ <kbd>dns-prefetch http://hail2u.net/</kbd>
+&lt;link href=&quot;//googleads.g.doubleclick.net&quot; rel=&quot;dns-prefetch&quot;&gt;
+&lt;link href=&quot;//pagead2.googlesyndication.com&quot; rel=&quot;dns-prefetch&quot;&gt;
+&lt;link href=&quot;//www.google-analytics.com&quot; rel=&quot;dns-prefetch&quot;&gt;
+&lt;link href=&quot;//www.gstatic.com&quot; rel=&quot;dns-prefetch&quot;&gt;
+</samp></pre>
+
+<p>このウェブサイトに対して実行するとこのような結果になる(ユニーク化され、ソートされる)。さらなるリダイレクト先をたどるのはもうちょっと工夫が必要そうだ。</p>
+
+<hr>
+
+<p>本当はGruntやgulpから扱えると良いが、URLを指定して行う都合上、タスク・ランナーやビルド・ツールには向いていない気がするので、単独のCLIツールにした。タスク・ランナーやビルド・ツールへのプラグインとして作るのは不可能ではないが、ローカルサーバーを立てるなりする必要がある上に、プロジェクト側にちゃんとしたHTMLファイルが存在しないとならず、ちょっと面倒くさい。PhantomJS製のためインストール負荷が高いことやそんなに頻繁に更新する必要はないことも少しある。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/webdesign/implementing-dns-prefetch.html" rel="prev">
+  <p>rel=dns-prefetchの導入</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
