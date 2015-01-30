@@ -102,8 +102,13 @@ module.exports = function (grunt) {
         file = 'feed';
       }
 
-      var contents = child.stdout.replace(/^[\s\S]*?\r?\n\r?\n/, '').trim() +
-        '\n';
+      var contents = child.stdout.replace(
+        /^[\s\S]*?\r?\n\r?\n/,
+        ''
+      ).replace(
+        /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
+        '$1$2/'
+      ).trim() + '\n';
       file = options.staticdir + file;
       fs.outputFileSync(file, contents);
 
