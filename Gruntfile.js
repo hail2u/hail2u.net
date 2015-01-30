@@ -20,7 +20,6 @@ module.exports = function (grunt) {
       css: {
         files: {
           'tmp/style.min.css': [
-            'tmp/normalize.min.css',
             'tmp/source-sans-pro.min.css',
             'tmp/source-code-pro.min.css',
             'tmp/megrim.min.css',
@@ -67,7 +66,6 @@ module.exports = function (grunt) {
 
       css_pre: {
         files: {
-          'tmp/normalize.css': 'src/css/assets/styles/normalize.css',
           'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
           'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
           'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
