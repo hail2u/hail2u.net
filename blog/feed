@@ -10,12 +10,45 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sat, 31 Jan 2015 01:29:01 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 1 Feb 2015 03:29:54 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>画像の縦横サイズの追加</title>
+      <link>http://hail2u.net/blog/webdesign/adding-image-width-and-height.html</link>
+      <description>自前の画像を参照する時にwidthとheight属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでにimg要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/adding-image-width-and-height.html</guid>
+      <pubDate>Sun, 01 Feb 2015 03:29:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>自前の画像を参照する時に<code>width</code>と<code>height</code>属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでに<code>img</code>要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。</p>
+
+<p>サイズを明示した画像がはみ出すことへの対策にはCSSで<code>max-width</code>プロパティーを使う。それだけだと縦横比が狂ってリサイズされるので、以下のように<code>height</code>プロパティーも併用するのが良い。</p>
+
+<pre><code>img {
+  height: auto;
+  max-width: 100%;
+}
+
+@supports (object-fit: scale-down) {
+  img {
+    height: auto;
+    max-width: none;
+    object-fit: scale-down;
+  }
+}
+</code></pre>
+
+<p>こういう時は<a href="http://www.w3.org/TR/css3-images/#the-object-fit"><code>object-fit</code>プロパティー</a>の出番のはずなので、このように更に<a href="http://www.w3.org/TR/css3-conditional/#at-supports"><code>@supports</code>ルール</a>を使ってやるとChrome 31以降とFirefox 36 (まだ安定版ではない)以降で<code>scale-down</code>を使うようにできる。しかし<code>object-fit</code>プロパティーをサポートしているSafari 7以降で<code>@supports</code>ルールがサポートされていないという問題があるので、もうちょっと工夫した方が良さそう。</p>
+
+<hr>
+
+<p>バッチ処理には<a href="https://www.npmjs.com/package/imagesize">imagesize</a>パッケージを使って、オレオレGruntタスクとして書いてやった。Grunt使うとファイルのリストアップと非同期処理がラップされるので、こういう一括処理のツールを書き捨てる時にもすでに導入されているプロジェクトならちょっと使ってやると楽できる。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>node-dns-prefetch</title>
@@ -238,7 +271,7 @@ TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &
 <p>これらDNSレコードをCloudFlareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff CloudFlareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。</p>
 
 <figure>
-  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"></a>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" height="544" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" width="960"></a>
 
   <figcaption>DNS Settings on CloudFlare</figcaption>
 </figure>
@@ -248,7 +281,7 @@ TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &
 <p>続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる(待っていても自動で照合してはくれない)。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。</p>
 
 <figure>
-  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"></a>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" height="375" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png" width="943"></a>
 
   <figcaption>Domain Verification on Mailgun</figcaption>
 </figure>
@@ -256,7 +289,7 @@ TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &
 <p>次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。</p>
 
 <figure>
-  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"></a>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" height="387" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png" width="1163"></a>
 
   <figcaption>Mail Forwarding Setting on Mailgun</figcaption>
 </figure>
@@ -266,7 +299,7 @@ TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &
 <p>ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。</p>
 
 <figure>
-  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"></a>
+  <a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" height="156" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png" width="933"></a>
 
   <figcaption>Viewing Logs on Mailgun</figcaption>
 </figure>
@@ -293,65 +326,6 @@ TypeError: Incorrect value for stdio stream: { type: &#39;fd&#39;, fd: { type: &
 <p>バックエンドは<a href="http://musicbrainz.org/">MusicBrainz</a>のようなので、日本人アーティストにも対応しているんじゃないかと思う。残念な点は未来のリリース予定が見えないところ。カレンダーには1ヶ月先のリリース予定くらいまで含めて欲しい気がする。</p>
 
 <p>ということで<a href="http://en.wikipedia.org/wiki/The_Beautiful_People_(song)">The Beautiful People</a>からもうすぐ20年(！)かと思うと感慨深い人の新譜が出ていることを知ったりした。買わないけど。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Sassの変数の仕組みとOOCSS</title>
-      <link>http://hail2u.net/blog/webdesign/sass-s-variable-system-and-oocss.html</link>
-      <description>A List Apartに掲載されたA Vision for Our Sassという記事を読んでいた。ここに書かれていることが正しいとすると、やはりOOCSSあってのSassなのかなという思いを強くした。でも、今のSassの変数の仕組みとCSSのフラットな構造を考えると、Sassを使ったOOCSSの実現は既に詰みかけている局面だと考えることが多い。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/sass-s-variable-system-and-oocss.html</guid>
-      <pubDate>Thu, 22 Jan 2015 02:00:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="http://alistapart.com/article/a-vision-for-our-sass">A List Apartに掲載されたA Vision for Our Sass</a>という記事を読んでいた。ここに書かれていることが正しいとすると、やはりOOCSSあってのSassなのかなという思いを強くした。でも、今のSassの変数の仕組みとCSSのフラットな構造を考えると、Sassを使ったOOCSSの実現は既に詰みかけている局面だと考えることが多い。</p>
-
-<p>例えば<a href="http://alistapart.com/article/a-vision-for-our-sass#section9">Function over Presentation</a>の例を見てみよう。</p>
-
-<pre><code>$primary-color: #b32293; //magenta
-$secondary-color: #2f6b49; //green
-</code></pre>
-
-<p>これは確かに機能すると思う。しかし大体においてカラーパレットは最低でもあと5色くらいは必要になることが多いだろう。もちろん<code>$primary-color</code>のバリエーションであったりするわけだが、それらの名前付けはどうするのだろうか。例えば名前付けをせずに実際に使われる場所でSassの様々な色関数を利用するという手段がある。</p>
-
-<pre><code>a {
-  color: $primary-color;
-
-  &amp;:hover {
-    color: darken($primary-color, 20%);
-  }
-}
-</code></pre>
-
-<p>これもうまく機能することだろう。だが今度はこの微調整した色の再利用性は失われる。とするとやはり名前付けを行う必要があるということになるだろう。</p>
-
-<pre><code>$primary-color-dark: darken($primary-color, 20%);
-</code></pre>
-
-<p>こうして変数を定義していくとどんどん変数の名前付けが苦しくなっていく。BEMを利用して変数でも頑張って命名規則を細かく規定しても良いだろうが、今度は複数のBEMを取り扱う必要が出てくるかもしれない。カラーパレット用のBEM、ウェブサイト用のBEM、下手をするとプレースホルダー・セレクター用のBEMなどだ。</p>
-
-<p>別のアプローチとしては変数をさらに挟むという手法もある。</p>
-
-<pre><code>$primary-color: #b32293;
-
-$color-a: $primary-color;
-$color-a-hover: darken($primary-color, 20%);
-
-a {
-  color: $color-a;
-
-  &amp;:hover {
-    color: $color-a-hover;
-  }
-}
-</code></pre>
-
-<p>カラーパレットの定義をまず行い、それを参照する形で要素やコンポーネントに応じた変数を作成していく。変数名は元々存在する要素名やクラス名にプリフィックスを加えたものなので、HTML側でクラス名さえちゃんと付ければあんまり困らない。実際にスタイルを当てるパーシャルでもどのような変数を参照するかまったく迷う必要がなくなる。グローバル変数が前提な今のSassだとこのようにして変数を挟むか、再利用性を一部で捨てるかのどちらかに決断しないとならない印象だ。</p>
-
-<p>つまりOOCSSのキモとも言える小さい単位でのスタイルの管理が、今のSassのグローバル変数を強いる仕組みと極端に食い合せが悪いということだ。もう少しするとこの辺りは変化していくわけだが、大幅な概念の変化をもたらす変数の局所化へとスムーズに移行ができるわけもなく、破綻して一から作りなおされるという未来はかなり現実味がある。</p>
-
-<hr>
-
-<p>ではその時にSassを選択する意味・価値はあるのか、というのが今の僕が最も興味を持っている部分だ。結局は厳しい命名規則に縛られた管理を行わざるをえないSassを使ったOOCSSの実現の代わりに、ウェブ標準に寄せたHTML/CSSの書き方で対抗できる可能性があったら面白いなというわけだ。そのためにはHTMLに完全に従属する形でCSSを取り扱う必要があると思うので、構造化されたHTMLを設計するところをスタート地点として、Every Declaration Just OnceのようなCSSでは何も抽象化したりする必要のない書き方を採用すると実現しやすそうかなと考え、色々試し始めたということになる。</p>]]></content:encoded>
     </item>
 
   </channel>

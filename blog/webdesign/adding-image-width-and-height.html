@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="自前の画像を参照する時にwidthとheight属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでにimg要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>画像の縦横サイズの追加 - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/adding-image-width-and-height.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/webdesign/node-dns-prefetch.html">
+
+    
+
+    
+      <meta content="画像の縦横サイズの追加" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="自前の画像を参照する時にwidthとheight属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでにimg要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/adding-image-width-and-height.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      <nav>
+        
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/adding-image-width-and-height.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">画像の縦横サイズの追加</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-01T03:29:00+09:00" itemprop="datePublished">Feb 1, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">自前の画像を参照する時に<code>width</code>と<code>height</code>属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでに<code>img</code>要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。</p>
+
+<p>サイズを明示した画像がはみ出すことへの対策にはCSSで<code>max-width</code>プロパティーを使う。それだけだと縦横比が狂ってリサイズされるので、以下のように<code>height</code>プロパティーも併用するのが良い。</p>
+
+<pre><code class="language-css">img {
+  height: auto;
+  max-width: 100%;
+}
+
+@supports (object-fit: scale-down) {
+  img {
+    height: auto;
+    max-width: none;
+    object-fit: scale-down;
+  }
+}
+</code></pre>
+
+<p>こういう時は<a href="http://www.w3.org/TR/css3-images/#the-object-fit"><code>object-fit</code>プロパティー</a>の出番のはずなので、このように更に<a href="http://www.w3.org/TR/css3-conditional/#at-supports"><code>@supports</code>ルール</a>を使ってやるとChrome 31以降とFirefox 36 (まだ安定版ではない)以降で<code>scale-down</code>を使うようにできる。しかし<code>object-fit</code>プロパティーをサポートしているSafari 7以降で<code>@supports</code>ルールがサポートされていないという問題があるので、もうちょっと工夫した方が良さそう。</p>
+
+<hr>
+
+<p>バッチ処理には<a href="https://www.npmjs.com/package/imagesize">imagesize</a>パッケージを使って、オレオレGruntタスクとして書いてやった。Grunt使うとファイルのリストアップと非同期処理がラップされるので、こういう一括処理のツールを書き捨てる時にもすでに導入されているプロジェクトならちょっと使ってやると楽できる。</p></div>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/webdesign/node-dns-prefetch.html" rel="prev">
+  <p>node-dns-prefetch</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

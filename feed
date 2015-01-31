@@ -10,6 +10,37 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>画像の縦横サイズの追加</title>
+      <link>http://hail2u.net/blog/webdesign/adding-image-width-and-height.html</link>
+      <description>自前の画像を参照する時にwidthとheight属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでにimg要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/adding-image-width-and-height.html</guid>
+      <pubDate>Sun, 01 Feb 2015 03:29:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;自前の画像を参照する時に&lt;code&gt;width&lt;/code&gt;と&lt;code&gt;height&lt;/code&gt;属性を追加すると激しい腹痛におそわれる病を長く患っていたけど、どうやら完治したようなのでバッチ処理で追加してた。ついでに&lt;code&gt;img&lt;/code&gt;要素の各属性の記述順序なども書きかえたりして、楽しく時間を浪費した。大いなる無駄だが、他人には迷惑をかけないし、途中から段々トランスしてきた。&lt;/p&gt;
+
+&lt;p&gt;サイズを明示した画像がはみ出すことへの対策にはCSSで&lt;code&gt;max-width&lt;/code&gt;プロパティーを使う。それだけだと縦横比が狂ってリサイズされるので、以下のように&lt;code&gt;height&lt;/code&gt;プロパティーも併用するのが良い。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;img {
+  height: auto;
+  max-width: 100%;
+}
+
+@supports (object-fit: scale-down) {
+  img {
+    height: auto;
+    max-width: none;
+    object-fit: scale-down;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こういう時は&lt;a href="http://www.w3.org/TR/css3-images/#the-object-fit"&gt;&lt;code&gt;object-fit&lt;/code&gt;プロパティー&lt;/a&gt;の出番のはずなので、このように更に&lt;a href="http://www.w3.org/TR/css3-conditional/#at-supports"&gt;&lt;code&gt;@supports&lt;/code&gt;ルール&lt;/a&gt;を使ってやるとChrome 31以降とFirefox 36 (まだ安定版ではない)以降で&lt;code&gt;scale-down&lt;/code&gt;を使うようにできる。しかし&lt;code&gt;object-fit&lt;/code&gt;プロパティーをサポートしているSafari 7以降で&lt;code&gt;@supports&lt;/code&gt;ルールがサポートされていないという問題があるので、もうちょっと工夫した方が良さそう。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;バッチ処理には&lt;a href="https://www.npmjs.com/package/imagesize"&gt;imagesize&lt;/a&gt;パッケージを使って、オレオレGruntタスクとして書いてやった。Grunt使うとファイルのリストアップと非同期処理がラップされるので、こういう一括処理のツールを書き捨てる時にもすでに導入されているプロジェクトならちょっと使ってやると楽できる。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>node-dns-prefetch</title>
       <link>http://hail2u.net/blog/webdesign/node-dns-prefetch.html</link>
       <description>毎回dns-prefetch Online Code Generatorからコピペはさすがに面倒そうなので、URLを指定するとそのページに含まれる外部リソースのドメインから&lt;link rel="dns-prefetch"&gt;を生成するCLIツール、dns-prefetchを作成した。Node.jsからPhantomJSを使って書いたので、ドメイン抽出とかも簡単でよかった。</description>
@@ -215,7 +246,7 @@ TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: {
 &lt;p&gt;これらDNSレコードをCloudFlareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff CloudFlareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"&gt;&lt;img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"&gt;&lt;/a&gt;
+  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"&gt;&lt;img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" height="544" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" width="960"&gt;&lt;/a&gt;
 
   &lt;figcaption&gt;DNS Settings on CloudFlare&lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -225,7 +256,7 @@ TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: {
 &lt;p&gt;続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる(待っていても自動で照合してはくれない)。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"&gt;&lt;img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"&gt;&lt;/a&gt;
+  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"&gt;&lt;img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" height="375" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-2.png" width="943"&gt;&lt;/a&gt;
 
   &lt;figcaption&gt;Domain Verification on Mailgun&lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -233,7 +264,7 @@ TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: {
 &lt;p&gt;次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"&gt;&lt;img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"&gt;&lt;/a&gt;
+  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"&gt;&lt;img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" height="387" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-3.png" width="1163"&gt;&lt;/a&gt;
 
   &lt;figcaption&gt;Mail Forwarding Setting on Mailgun&lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -243,7 +274,7 @@ TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: {
 &lt;p&gt;ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"&gt;&lt;img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"&gt;&lt;/a&gt;
+  &lt;a href="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"&gt;&lt;img alt="Mailgunで正常にメールが転送されていることを確認している様子" height="156" src="/images/blog/mailgun-as-an-email-solution-for-cloudflare-4.png" width="933"&gt;&lt;/a&gt;
 
   &lt;figcaption&gt;Viewing Logs on Mailgun&lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -268,63 +299,6 @@ TypeError: Incorrect value for stdio stream: { type: &amp;#39;fd&amp;#39;, fd: {
 &lt;p&gt;バックエンドは&lt;a href="http://musicbrainz.org/"&gt;MusicBrainz&lt;/a&gt;のようなので、日本人アーティストにも対応しているんじゃないかと思う。残念な点は未来のリリース予定が見えないところ。カレンダーには1ヶ月先のリリース予定くらいまで含めて欲しい気がする。&lt;/p&gt;
 
 &lt;p&gt;ということで&lt;a href="http://en.wikipedia.org/wiki/The_Beautiful_People_(song)"&gt;The Beautiful People&lt;/a&gt;からもうすぐ20年(！)かと思うと感慨深い人の新譜が出ていることを知ったりした。買わないけど。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
-      <title>Sassの変数の仕組みとOOCSS</title>
-      <link>http://hail2u.net/blog/webdesign/sass-s-variable-system-and-oocss.html</link>
-      <description>A List Apartに掲載されたA Vision for Our Sassという記事を読んでいた。ここに書かれていることが正しいとすると、やはりOOCSSあってのSassなのかなという思いを強くした。でも、今のSassの変数の仕組みとCSSのフラットな構造を考えると、Sassを使ったOOCSSの実現は既に詰みかけている局面だと考えることが多い。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/sass-s-variable-system-and-oocss.html</guid>
-      <pubDate>Thu, 22 Jan 2015 02:00:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;&lt;a href="http://alistapart.com/article/a-vision-for-our-sass"&gt;A List Apartに掲載されたA Vision for Our Sass&lt;/a&gt;という記事を読んでいた。ここに書かれていることが正しいとすると、やはりOOCSSあってのSassなのかなという思いを強くした。でも、今のSassの変数の仕組みとCSSのフラットな構造を考えると、Sassを使ったOOCSSの実現は既に詰みかけている局面だと考えることが多い。&lt;/p&gt;
-
-&lt;p&gt;例えば&lt;a href="http://alistapart.com/article/a-vision-for-our-sass#section9"&gt;Function over Presentation&lt;/a&gt;の例を見てみよう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$primary-color: #b32293; //magenta
-$secondary-color: #2f6b49; //green
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これは確かに機能すると思う。しかし大体においてカラーパレットは最低でもあと5色くらいは必要になることが多いだろう。もちろん&lt;code&gt;$primary-color&lt;/code&gt;のバリエーションであったりするわけだが、それらの名前付けはどうするのだろうか。例えば名前付けをせずに実際に使われる場所でSassの様々な色関数を利用するという手段がある。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;a {
-  color: $primary-color;
-
-  &amp;amp;:hover {
-    color: darken($primary-color, 20%);
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これもうまく機能することだろう。だが今度はこの微調整した色の再利用性は失われる。とするとやはり名前付けを行う必要があるということになるだろう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$primary-color-dark: darken($primary-color, 20%);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こうして変数を定義していくとどんどん変数の名前付けが苦しくなっていく。BEMを利用して変数でも頑張って命名規則を細かく規定しても良いだろうが、今度は複数のBEMを取り扱う必要が出てくるかもしれない。カラーパレット用のBEM、ウェブサイト用のBEM、下手をするとプレースホルダー・セレクター用のBEMなどだ。&lt;/p&gt;
-
-&lt;p&gt;別のアプローチとしては変数をさらに挟むという手法もある。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$primary-color: #b32293;
-
-$color-a: $primary-color;
-$color-a-hover: darken($primary-color, 20%);
-
-a {
-  color: $color-a;
-
-  &amp;amp;:hover {
-    color: $color-a-hover;
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;カラーパレットの定義をまず行い、それを参照する形で要素やコンポーネントに応じた変数を作成していく。変数名は元々存在する要素名やクラス名にプリフィックスを加えたものなので、HTML側でクラス名さえちゃんと付ければあんまり困らない。実際にスタイルを当てるパーシャルでもどのような変数を参照するかまったく迷う必要がなくなる。グローバル変数が前提な今のSassだとこのようにして変数を挟むか、再利用性を一部で捨てるかのどちらかに決断しないとならない印象だ。&lt;/p&gt;
-
-&lt;p&gt;つまりOOCSSのキモとも言える小さい単位でのスタイルの管理が、今のSassのグローバル変数を強いる仕組みと極端に食い合せが悪いということだ。もう少しするとこの辺りは変化していくわけだが、大幅な概念の変化をもたらす変数の局所化へとスムーズに移行ができるわけもなく、破綻して一から作りなおされるという未来はかなり現実味がある。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ではその時にSassを選択する意味・価値はあるのか、というのが今の僕が最も興味を持っている部分だ。結局は厳しい命名規則に縛られた管理を行わざるをえないSassを使ったOOCSSの実現の代わりに、ウェブ標準に寄せたHTML/CSSの書き方で対抗できる可能性があったら面白いなというわけだ。そのためにはHTMLに完全に従属する形でCSSを取り扱う必要があると思うので、構造化されたHTMLを設計するところをスタート地点として、Every Declaration Just OnceのようなCSSでは何も抽象化したりする必要のない書き方を採用すると実現しやすそうかなと考え、色々試し始めたということになる。&lt;/p&gt;</content:encoded>
     </item>
     <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
@@ -361,6 +335,6 @@ a {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Sat, 31 Jan 2015 01:28:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 01 Feb 2015 03:29:00 +0900</lastBuildDate>
   </channel>
 </rss>
