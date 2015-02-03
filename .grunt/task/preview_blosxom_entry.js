@@ -31,10 +31,10 @@ module.exports = function (grunt) {
 
   <body class="permalink">
     <header class="global-header" role="banner">
-      <h1 class="logo"><a href="./"><img alt="Hail2u.net" src="./images/logo.min.svg"></a></h1>
+      <a class="logo" href="./"><img alt="Hail2u.net" src="./images/logo.min.svg"></a>
 
-      <nav class="site-navigation">
-        <ul>
+      <nav>
+        <ul class="site-navigation">
           <li><a href="./blog/"><mark>Weblog</mark></a></li>
           <li><a href="./documents/">Documents</a></li>
           <li><a href="./projects/">Projects</a></li>
@@ -55,9 +55,9 @@ module.exports = function (grunt) {
       </article>
     </main>
 
-    <aside class="subcontent" role="search">
+    <aside class="subcontent">
       <!-- Google Custom Search Engine -->
-      <form class="site-search searchbox" action="http://www.google.com/cse">
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
         <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
         <input name="ie" type="hidden" value="UTF-8">
         <input class="query" name="q" size="32" type="search">
@@ -68,12 +68,15 @@ module.exports = function (grunt) {
     <footer class="global-footer" role="contentinfo">
       <section class="footlinks">
         <ul>
-          <li><a href="http://creativecommons.org/licenses/by-nc/3.0/" rel="license">CC BY-NC</a></li>
-          <li><a href="./feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="http://hail2u.net/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
         </ul>
       </section>
 
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="./about/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
     </footer>
   </body>
 </html>
