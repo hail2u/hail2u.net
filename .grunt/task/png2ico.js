@@ -12,13 +12,12 @@ module.exports = function (grunt) {
       cmd: 'convert',
     });
     var args = [];
-    var opts = {
-      stdio: 'inherit'
-    };
     this.files.forEach(function (file) {
       args = args.concat(file.src);
       args.push(file.dest);
-      var child = spawn(which(options.cmd), args, opts);
+      var child = spawn(which(options.cmd), args, {
+        stdio: 'inherit'
+      });
 
       if (child.error) {
         grunt.fail.warn(child.error);

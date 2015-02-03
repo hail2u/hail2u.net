@@ -11,9 +11,6 @@ module.exports = function (grunt) {
     var options = this.options({});
     var args = [];
     var cmd = 'inkscape';
-    var opts = {
-      stdio: 'inherit'
-    };
 
     if (options.height) {
       args.push('-h');
@@ -30,7 +27,9 @@ module.exports = function (grunt) {
       args.push(file.src[0]);
       args.push('-e');
       args.push(file.dest);
-      var child = spawn(which(cmd), args, opts);
+      var child = spawn(which(cmd), args, {
+        stdio: 'inherit'
+      });
 
       if (child.error) {
         grunt.fail.warn(child.error);
