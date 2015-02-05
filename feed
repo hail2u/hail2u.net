@@ -10,6 +10,63 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>EDJOの(デ)メリット</title>
+      <link>http://hail2u.net/blog/webdesign/on-every-declaration-just-once.html</link>
+      <description>Every Declaration Just Once (以下EDJO)アプローチの最大のメリットはなんだろうかということについて考えていた。情報設計と重なるところがまるでないため、設計思想としては完全に成立しない。つまりCSSを設計することを放棄し、設計されたHTMLに対してスタイルを割り当てていく手法としてのみ存在しうる。このことがすなわちメリットなのではないだろうか。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/on-every-declaration-just-once.html</guid>
+      <pubDate>Thu, 05 Feb 2015 11:54:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;Every Declaration Just Once (以下EDJO)アプローチの最大のメリットはなんだろうかということについて考えていた。情報設計と重なるところがまるでないため、設計思想としては完全に成立しない。つまりCSSを設計することを放棄し、設計されたHTMLに対してスタイルを割り当てていく手法としてのみ存在しうる。このことがすなわちメリットなのではないだろうか。&lt;/p&gt;
+
+&lt;p&gt;CSSの限られた文法が情報設計に基づく複雑な構造の表現に適さないことは明白だ。OOCSSではHTMLとCSSを設計のもとに平等に扱っていたが、どうしてもCSSにおいては限界があり、複雑な命名規則やCSSプリプロセッサーの登場となったのではないかと思う。CSSプリプロセッサーの高機能化により実現可能になりつつあるが、それと同時に高度に抽象化された複雑さも氾濫しつつある。&lt;/p&gt;
+
+&lt;p&gt;EDJOにおいては&lt;a href="https://github.com/hail2u/node-edjo/blob/master/test.edjo.css"&gt;その書かれ方&lt;/a&gt;を見ればわかる通り、設計というものを放棄することになる。設計されたHTMLに対してスタイルを割り当てていくという作業にすべては集約されることになるだろう。CSSは単にHTMLへスタルを割り当てていくのみでそれ以上の意味は持たない。OOCSSにおいてはともすれば「貧弱さ」と表現されるCSS文法の単純さに似合った割り切りであると言えよう。&lt;/p&gt;
+
+&lt;p&gt;CSSでの設計の放棄とEDJOの採用には、いくつかの派生的なデメリットとメリットが含まれる。&lt;/p&gt;
+
+&lt;h2&gt;CSSのわかりやすさ&lt;/h2&gt;
+
+&lt;p&gt;論理的な単位で定義がまとまっていないため、定義そのものはわかっても、他と組み合わせた結果どうなるかまでは不透明で、わかりやすさに欠けるCSSになる。定義が上書きされることがまずないという点ではOOCSSのような論理的な単位で管理するよりも&lt;em&gt;誤解&lt;/em&gt;をする可能性は減るが、全般的にはデメリットと言えるだろう。&lt;/p&gt;
+
+&lt;p&gt;このわかりやすさの欠如はデバッガビリティーというようなものにはあまり影響をあたえることはない。なぜならこのわかりにくさの欠如はCSSファイルを相手にして格闘することが不可能なことを意味するので、ブラウザーに内蔵されている開発者ツールという武器を必ず使うことになるからだ。そういう意味では開発者ツールとは相性が良いとも言えるだろう。&lt;/p&gt;
+
+&lt;h2&gt;セレクター数&lt;/h2&gt;
+
+&lt;p&gt;IE9以下にはよく忘れてよくハマるCSSファイルごとのセレクター数に限界があるという仕様がある。定義ごとにセレクターを割り当てていくという手法の都合上、その限界はかなり簡単に突破してしまう。普通にCSSを書く場合と比べると、おおまかに3–5倍程度にセレクター数が増えると見積もる必要がある。&lt;/p&gt;
+
+&lt;p&gt;OOCSS+CSSプリプロセッサーで書く場合と比べるならば遭遇しやすいというだけに過ぎないとも言えるが、現実的な問題ではある。運用でカバーすることは難しいので、必ず&lt;a href="https://www.npmjs.com/package/grunt-selector4096"&gt;チェックすること&lt;/a&gt;と、&lt;a href="http://blesscss.com/"&gt;機械的に処理すること&lt;/a&gt;を徹底する必要はあるだろう。&lt;/p&gt;
+
+&lt;h2&gt;オブジェクトの再構築&lt;/h2&gt;
+
+&lt;p&gt;OOCSSで書いている時に避けて通れないのがオブジェクトの再構築だ。&lt;a href="https://www.npmjs.com/package/grunt-selector4096"&gt;EDJOなオブジェクトの妄想という記事&lt;/a&gt;でも触れられているが、僕もこれは非常に大きいと考える。OOCSSのオブジェクトを再構築するのは非常にコストが高い。単にオブジェクトのスタイルの編集だけに留まらず、そのリネーム、新たなオブジェクトの設計、参照の書きかえ、と必要になる作業が非常に多い。&lt;/p&gt;
+
+&lt;p&gt;EDJOにおいてはセレクターの書き足し、必要ならルールセットの追加という2つのパターンで常に完了する。OOCSSにおけるオブジェクトのような参照の対象を、CSSの仕様(または実装)にまで遡るため、書きかえたくてもできないという方が適切かもしれない。&lt;/p&gt;
+
+&lt;p&gt;このことはオブジェクトの再構築を避けるためによく行うプロパティーの上書きをなくせるということでもある。それに伴ってほぼ上書きが不要になることからセレクターの詳細度への配慮が不要になることでもあり、CSSにおける制約からHTMLのクラス名に強い命名規則を強制しなくても良いということでもある。&lt;/p&gt;
+
+&lt;h2&gt;差分&lt;/h2&gt;
+
+&lt;p&gt;近年の開発において差分への意識は不可欠であるとも言える。確実なマージのためにはレビューが不可欠であり、適切なレビューのためには差分が明確であることがある程度要求される。&lt;/p&gt;
+
+&lt;p&gt;通常のCSSの書き方では、CSSへのルールセットのブロック単位での追加とHTMLへのクラスの追加が差分として表示されることになる。対してEDJOではCSSへの編集のみに集約されることだろう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@@ -1,4 +1,5 @@
+ .foo,
++.bar,
+ .black-text {
+   color: black;
+ }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CSSにおける差分もこのような単純な行の追加の組み合わせだけになる。他の差分ブロックと混ざることもない。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;設計の放棄と言っても、実際には情報設計が最初にあり、それを反映させたHTMLがある。EDJOでは情報設計を元にするのではなく、それを元にしたHTMLに対してアピアランスとしてスタイルを割り当てていくというわけだ。情報設計の元でHTMLとCSSを並列させる場合、両者をきれいに連携させるためには強力な命名規則か高機能なCSSプリプロセッサー、またはその両者が必要になってしまう。それをHTMLに完全にCSSを従属させることでシンプルでストレートで逆転することのない序列を強いることができるのがEDJOの良いところだろう。&lt;/p&gt;
+
+&lt;p&gt;反面、論理的な構造を持たないため、CSSファイル単体で完結しないという問題がある。機械的な生成ではない形でスタイル・ガイド(のようなもの)を作成し、それを基準にブラウザーの開発者ツールでデバッグするという形での開発でないと苦しいだろう。書き方の違いに慣れることも含め、ドラスティックに開発フローを変更する手法であると言える。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>Patrick Marathon-LE</title>
       <link>http://hail2u.net/blog/gadget/patrick-marathon-le-black.html</link>
       <description>スタンスミスの黒(白ソール・白ヒールパッチ)が出そうな気配がないのであきらめて、いつか買おうと思っていたPatrickのMarathonのレザー版を買った。暇だったので銀座にある直営店まで足をのばしたものの、まさかのサイズ切れで、在庫確認をしない詰めの甘さをちょっと後悔した。それでも色違いでサイズを合わせ、サイズ違いで色を合わせてすごく気に入ったので、在庫のあった神戸の直営店から自宅に配送してもらい、無事届いた。</description>
@@ -227,27 +284,6 @@
 &lt;p&gt;これくらいシンプルな仕組みのメール転送サービスはもっとあっても良いような気がするが、なかなかないものだ。収益化が見込めないからか。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>Bower→npm</title>
-      <link>http://hail2u.net/blog/software/forget-about-bower-use-npm.html</link>
-      <description>npmとBowerが混ざってたりするとやる気ゲージが一気に減る。Bowerはやめられるけど、npmはやめられない。npmレジストリーにはNormalize.cssがあったりとわりとなんでもありな空気がある。ということでSassパーシャルをnpmパッケージ化してた。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/forget-about-bower-use-npm.html</guid>
-      <pubDate>Mon, 26 Jan 2015 00:47:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;npmとBowerが混ざってたりするとやる気ゲージが一気に減る。Bowerはやめられるけど、npmはやめられない。npmレジストリーにはNormalize.cssがあったりとわりとなんでもありな空気がある。ということでSassパーシャルをnpmパッケージ化してた。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://www.npmjs.com/package/hail2u-scss-column-equation"&gt;hail2u-scss-column-equation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://www.npmjs.com/package/hail2u-scss-functions"&gt;hail2u-scss-functions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://www.npmjs.com/package/hail2u-scss-partials"&gt;hail2u-scss-partials&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;最近はウェブ開発に使うものなら何でもありみたいな雰囲気でnpmは使われているような気がする。io.jsのおかげでNode Package Managerじゃないとか後出しされたのも大きそう。パフォーマンスの面からもnpmを主軸に置くのは悪くない選択だと思う。でもモノによって依存解決の仕組みを切り替えてやるのも一理あるので悩ましい。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;こういうものの場合は&lt;code&gt;private: true&lt;/code&gt;にしておいて、publishせずに単に&lt;code&gt;npm install hail2u/scss-partials&lt;/code&gt;してもらう方が良かったかもしれない。もう少し考えてこちらの方が良さそうだったらunpublishしよう……。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -282,6 +318,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Wed, 04 Feb 2015 06:56:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 05 Feb 2015 11:54:00 +0900</lastBuildDate>
   </channel>
 </rss>
