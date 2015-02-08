@@ -4,69 +4,66 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
 
-    <title>position: absolute in Chrome 40</title>
+    <title>position: absolute on Replaced Element</title>
 
     <link href="http://hail2u.net/styles/natural.min.css" rel="stylesheet">
     <style>
-.searchbox {
-  position: relative; }
+      .test {
+        position: relative;
+        width: 80%;
+      }
 
-.searchbox .query {
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  background-color: #fdfcf7;
-  border: 0.063rem solid #e1ddd5;
-  border-radius: 0;
-  color: #3c3330;
-  height: 1.868rem;
-  padding: 0 0.25rem 0 1.618rem;
-  width: 100%; }
-.searchbox .button {
-  direction: ltr;
-  text-indent: -9999px;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22896%22%20height%3D%22896%22%20viewBox%3D%220%200%20896%20896%22%3E%3Cpath%20d%3D%22M384%20192a192%20192%200%200%200-192%20192%20192%20192%200%200%200%20192%20192%20192%20192%200%200%200%2099.766-28.234l156.234%20156.234%2064-64-156.186-156.186a192%20192%200%200%200%2028.186-99.814%20192%20192%200%200%200-192-192zm0%2064a128%20128%200%200%201%20128%20128%20128%20128%200%200%201-128%20128%20128%20128%200%200%201-128-128%20128%20128%200%200%201%20128-128z%22%20fill%3D%22%23817a75%22%2F%3E%3C%2Fsvg%3E");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  border: 0;
-  height: 1.618rem;
-  padding: 0;
-  position: absolute;
-  top: 0.125rem;
-  width: 1.618rem; }
-.with-left .searchbox .button {
-left: 0; }
+      .query {
+        width: 100%;
+      }
+
+      .button {
+        left: auto;
+        position: absolute;
+      }
+
+      .with-border-box .query {
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      .with-left .button {
+        left: 0;
+      }
     </style>
   </head>
   <body>
     <header>
-      <h1>position: absolute in Chrome 40</h1>
+      <h1>position: absolute on Replaced Element</h1>
 
-      <p>Chrome 40で<code>left</code>の初期値である<code>auto</code>の解釈が置換要素と非置換要素で同じになっている。</p>
+      <p>置換要素を絶対配置した時の<code>left: auto</code>の扱いがブラウザーと併用するプロパティーによってまちまちな問題について。手前の要素の幅によっても変わるので、折り返しが起こる時の挙動が微妙に違うことも重なる。Chrome 40の挙動が正しいような気がするがわからない。</p>
     </header>
 
     <section class="test">
-      <h1><code>left</code>無指定</h1>
+      <h1><code>left</code>無指定(手前の要素が親に収まらない場合)</h1>
 
-      <form class="searchbox" action="https://www.google.com/cse">
-        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
-        <input name="ie" type="hidden" value="UTF-8">
-        <input class="query" name="q" size="32" type="search" itemprop="query-input">
-        <input class="button" name="sa" type="submit" value="Search">
-      </form>
+      <input class="query" name="q" size="32" type="search" itemprop="query-input">
+      <input class="button" name="sa" type="submit" value="Search">
+
+      <p>Chrome 40とMobile Safri 8、Firefox 35では左下に、Internet Explorer 11でボタンが右上に配置される。</p>
+    </section>
+
+    <section class="test with-border-box">
+      <h1><code>left</code>無指定(手前の要素が親に収まる場合)</h1>
+
+      <input class="query" name="q" size="32" type="search" itemprop="query-input">
+      <input class="button" name="sa" type="submit" value="Search">
+
+      <p>Chrome 40では左下に、Firefox 35とMobile Safari 8、Internet Explorer 11でボタンが右上に配置される。</p>
     </section>
 
     <section class="test with-left">
       <h1><code>left: 0</code></h1>
 
-      <form class="searchbox" action="https://www.google.com/cse">
-        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
-        <input name="ie" type="hidden" value="UTF-8">
-        <input class="query" name="q" size="32" type="search" itemprop="query-input">
-        <input class="button" name="sa" type="submit" value="Search">
-      </form>
+      <input class="query" name="q" size="32" type="search" itemprop="query-input">
+      <input class="button" name="sa" type="submit" value="Search">
+
+      <p>Chrome 40とMobile Safri 8、Firefox 35では左下に、Internet Explorer 11でボタンが左上に配置される。</p>
     </section>
   </body>
 </html>
