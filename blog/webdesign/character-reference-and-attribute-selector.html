@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。style要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>文字参照と属性セレクター - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/character-reference-and-attribute-selector.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/software/node-git-release-v1.1.2.html">
+
+    
+
+    
+      <meta content="文字参照と属性セレクター" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。style要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/character-reference-and-attribute-selector.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      <nav>
+        
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" >
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/character-reference-and-attribute-selector.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">文字参照と属性セレクター</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-08T10:12:00+09:00" itemprop="datePublished">Feb 8, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。<code>style</code>要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/607.html">Character Reference and Attribute Selector</a></p>
+
+<p>デモの<code>p</code>要素には<code>title</code>属性の値に二重引用符が文字参照で入っている。普通に文字参照を使って属性セレクターを書いた場合、要素が選択できない。また属性セレクターでの二重引用符は特別な意味を持つので、引用符なしのつもりで書いても同じように選択できない。文字参照を戻した上で以下のどれかで指定する必要がある。</p>
+
+<ul>
+<li>一重引用符で括る</li>
+<li>二重引用符で括り、エスケープする</li>
+<li>二重引用符をエスケープする</li>
+</ul>
+
+<p>属性セレクターでは引用符で括ることが必須ではないので、エスケープするだけでも大丈夫だった。</p>
+
+<hr>
+
+<p>やりたかった仕組みではユーザーの入力によって仕込まれた<code>title</code>属性の値に従ってセレクターを生成して、スタイルを追加するというようなものなので、ユーザーの入力をそのまま<code>style</code>要素の子に追加する必要があり、かなり危険そうだ。別の方法を考えなければならなくなった……。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E6%96%87%E5%AD%97%E5%8F%82%E7%85%A7%E3%81%A8%E5%B1%9E%E6%80%A7%E3%82%BB%E3%83%AC%E3%82%AF%E3%82%BF%E3%83%BC%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcharacter-reference-and-attribute-selector.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcharacter-reference-and-attribute-selector.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E6%96%87%E5%AD%97%E5%8F%82%E7%85%A7%E3%81%A8%E5%B1%9E%E6%80%A7%E3%82%BB%E3%83%AC%E3%82%AF%E3%82%BF%E3%83%BC%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcharacter-reference-and-attribute-selector.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/software/node-git-release-v1.1.2.html" rel="prev">
+  <p>node-git-release v1.1.2</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search searchbox" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
