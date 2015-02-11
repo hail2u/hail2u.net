@@ -10,6 +10,122 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>フルスクリーンでオーバーレイの検索ボックス</title>
+      <link>http://hail2u.net/blog/webdesign/fullscreen-overlay-searchbox.html</link>
+      <description>増えてきたフルスクリーンでオーバーレイの検索ボックスだが、まだこれといった無難な実装方法はないように見える。今だとvw/vh/vmin/vmax単位を使ってレイアウト、:target擬似クラスを使ってトグルという形にすれば、ほぼCSSで実現できそうだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/fullscreen-overlay-searchbox.html</guid>
+      <pubDate>Thu, 12 Feb 2015 00:55:00 +0900</pubDate>
+      <content:encoded>&lt;figure&gt;
+  &lt;a href="/images/blog/fullscreen-overlay-searchbox.png"&gt;&lt;img alt="虫眼鏡アイコンをクリックすると、フルスクリーンかつオーバーレイで表示されるタイプの検索ボックス" height="627" src="/images/blog/fullscreen-overlay-searchbox.png" width="1200"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;増えてきたフルスクリーンでオーバーレイの検索ボックスだが、まだこれといった無難な実装方法はないように見える。今だと&lt;a href="http://www.w3.org/TR/css3-values/#viewport-relative-lengths"&gt;&lt;code&gt;vw&lt;/code&gt;/&lt;code&gt;vh&lt;/code&gt;/&lt;code&gt;vmin&lt;/code&gt;/&lt;code&gt;vmax&lt;/code&gt;単位&lt;/a&gt;を使ってレイアウト、&lt;a href="http://www.w3.org/TR/css3-selectors/#target-pseudo"&gt;&lt;code&gt;:target&lt;/code&gt;擬似クラス&lt;/a&gt;を使ってトグルという形にすれば、ほぼCSSで実現できそうだ。&lt;/p&gt;
+
+&lt;p&gt;View Demo: &lt;a href="/pub/test/609.html"&gt;Fullscreen Overlay Searchbox&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;デモではShow Searchboxというリンクをクリックすると検索ボックスが表示され、検索ボックスの左上にある✖をクリックすると閉じることができる。実際のウェブサイトではリンクの代わりに虫眼鏡のアイコンでも使ってやれば良いだろう。&lt;/p&gt;
+
+&lt;h2&gt;マークアップ&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;aside id=&amp;quot;search&amp;quot; class=&amp;quot;searchbox&amp;quot;&amp;gt;
+  &amp;lt;h1&amp;gt;Search this site&amp;lt;/h1&amp;gt;
+
+  &amp;lt;form&amp;gt;
+    &amp;lt;input class=&amp;quot;query&amp;quot; placeholder=&amp;quot;Enter search keyword(s)&amp;quot; type=&amp;quot;search&amp;quot;&amp;gt;
+  &amp;lt;/form&amp;gt;
+
+  &amp;lt;footer&amp;gt;
+    &amp;lt;a class=&amp;quot;close&amp;quot; href=&amp;quot;#top&amp;quot;&amp;gt;Back to Top&amp;lt;/a&amp;gt;
+  &amp;lt;/footer&amp;gt;
+&amp;lt;/aside&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索ボックスのマークアップは&lt;code&gt;aside&lt;/code&gt;要素を使って、このような形にした。&lt;code&gt;id&lt;/code&gt;属性は後に&lt;code&gt;:target&lt;/code&gt;擬似クラスで利用するため、必須になる。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;h1&lt;/code&gt;要素は冗長な気もするが、通常は隠れたセクションであることを考慮すると、見出しはあった方が良いだろう。&lt;code&gt;label&lt;/code&gt;要素や&lt;code&gt;input type=submit&amp;quot;&lt;/code&gt;を使う必要がないフォームであることも考えると、このような一般的な文言で見出しを付けておくのが無難か。&lt;/p&gt;
+
+&lt;p&gt;閉じるボタンは&lt;code&gt;a&lt;/code&gt;要素で&lt;code&gt;#top&lt;/code&gt;に移動させるようにして実現するが、リンク文字列は「閉じる」や「Close」ではない方が良い。CSS側で✖に変えたりすることになるが、リンクそのものの機能としてはページの最上部に移動するという機能でしかないからだ。CSSが無効の時に「閉じる」というリンクで「ページの最上部に移動する」ことになるのがおかしいからというように考えても良いだろう。&lt;/p&gt;
+
+&lt;h2&gt;フルスクリーン化&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;.searchbox {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索ボックスのレイアウトでは&lt;code&gt;vw&lt;/code&gt;と&lt;code&gt;vh&lt;/code&gt;単位を使って描画領域全体と同じサイズになるようにして、フルスクリーンになるようにする。サイズさえ正しければ&lt;code&gt;position: fixed&lt;/code&gt;で配置するだけで、きれいに全体にかぶさるはずだ。&lt;/p&gt;
+
+&lt;h2&gt;閉じるボタン&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;.searchbox .close {
+  display: block;
+  font-size: 8vmin;
+  height: 8vmin;
+  left: 1vmin;
+  position: absolute;
+  top: 1vmin;
+  width: 8vmin;
+}
+
+.searchbox .close::before {
+  content: &amp;#39;✖&amp;#39;;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;閉じるボタンでは&lt;code&gt;vmin&lt;/code&gt;単位を使うことで占有する面積を一定以下に維持し、大きすぎる・小さすぎるがあまりないようにしておいた。&lt;code&gt;font-size&lt;/code&gt;でも使えるので、うまく使ってやるときれいに文字(記号)を配置することができる。また、&lt;code&gt;vw&lt;/code&gt;や&lt;code&gt;vh&lt;/code&gt;ではなく&lt;code&gt;vmin&lt;/code&gt;単位を使うことで、縦横のどちらが余っているのかわからない検索フォームの領域とかぶさらないようにもできる。そうすると閉じるボタンがクリックできないというような事故や検索フォームをクリアーするアイコンとかぶったというような事故を避けることができるはずだ。&lt;/p&gt;
+
+&lt;p&gt;もうひとつスクロールバーの有無という問題があるので、左上に配置すると簡単になる。スクロールバーの有無をCSSで判定するのは難しく、かといってそのためだけにJavaScriptを使うのももったいない。&lt;code&gt;calc()&lt;/code&gt;を使うと何とかなるが、直感的ではない。近年のOSのGUIを考えると、閉じるボタンが右上というのももはや暗黙の了解とは言えなくなってきたので、左上でもわかりやすければ大丈夫だろう。&lt;/p&gt;
+
+&lt;p&gt;アイコン化は簡単にユニコードの&lt;a href="http://en.wikipedia.org/wiki/Dingbat#Unicode"&gt;Dingbatsブロック&lt;/a&gt;のHeavy Multiplication Xを利用した。うかつに絵文字で良さそうなものを探すと予期せぬカラー化などが起こるので、こういったUIでおとなしめに使う場合はこの辺りの記号から選択すると良い。&lt;/p&gt;
+
+&lt;h2&gt;検索ボックス&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;.searchbox .query {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 7vmin;
+  left: 10vw;
+  margin-top: -0.675em;
+  position: absolute;
+  top: 50%;
+  width: 80vw;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索フォームは縦横中央寄せをすることになる。&lt;code&gt;transform: translate()&lt;/code&gt;を使って配置しても良いが、運が悪いと枠線や背景画像がぼやけてしまう。この場合はサイズが明確なので、絶対配置と負のマージンで配置する方が安定する。Flexboxも悪くないが、単純な縦方向のセンタリングには少し牛刀感がある。&lt;/p&gt;
+
+&lt;p&gt;左位置の指定や幅においても&lt;code&gt;vw&lt;/code&gt;単位を使うことで、前述の閉じるボタンとうまくマッチさせることができる。画面サイズに従ってある程度可変して欲しいフォント・サイズは&lt;code&gt;vmin&lt;/code&gt;を使って調節するのが簡単だ。メディア・クエリーを使ってビューポートのサイズで切り替えるのも悪くないがそこそこ手間がかかる。&lt;/p&gt;
+
+&lt;h2&gt;トグルの実装&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;#searchbox {
+  display: none;
+}
+
+#searchbox:target {
+  display: block;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;トグルの機能はフラグメント識別子と&lt;code&gt;:target&lt;/code&gt;擬似クラスの組み合わせで簡単に実装できる。閉じるボタンのリンク先を&lt;code&gt;#top&lt;/code&gt;にしてやると、それをクリック(タッチ)することで&lt;code&gt;#search:target&lt;/code&gt;を無効にできるため、うまいこと検索ボックスを閉じることができるというわけだ。ここでIDセレクターをちゃんと使うことで、フルスクリーンでオーバーレイにするビジュアル・デザインのためのルール群とトグルのためのルールを切り分けることができる。&lt;/p&gt;
+
+&lt;p&gt;デモでは検索ボックスを消した後に残るフラグメント識別子を&lt;code&gt;histroy.replaceState()&lt;/code&gt;を使って消しているが、これをやめればCSSのみでできるだろう。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;フルスクリーンでオーバーレイの検索ボックスは、独立したコンポーネントとしてデザインしやすいのが大きな利点だ。そうデザインできることで、異なるデバイス間でも似た検索体験を提供でき、また違うプロジェクトでも再利用することも比較的容易になる。ここで作ったデモもほぼどこでも使えるように出来たと思う。&lt;/p&gt;
+
+&lt;p&gt;しかし独立したコンポーネントとしてデザインするためには、構造(HTML)として安定した形(独立したセクション)である必要があり、その上で前後の文脈や周辺の要素に依存しないようにCSSを書いていく必要がある。&lt;code&gt;vw&lt;/code&gt;や&lt;code&gt;vh&lt;/code&gt;、&lt;code&gt;vmin&lt;/code&gt;、&lt;code&gt;vmax&lt;/code&gt;といった描画領域を基準にした単位は、親要素はもちろん&lt;code&gt;body&lt;/code&gt;や&lt;code&gt;html&lt;/code&gt;要素のレンダリング状況を迂回してサイズを決定できるので、そういったCSSの書き方に大いに役に立つ。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>バターなし！牛乳なし！のヨーグルトを使ったスコーン</title>
       <link>http://hail2u.net/blog/misc/yogurt-scone.html</link>
       <description>ヨーグルトを水切りしてクリームとホエーに分け、それをバターと牛乳の代わりにして作るスコーンを作った。水切りに時間はかかったものの、バターの時とほぼ同じ感覚で作ることができ、特に難しくなかった。美味しかったけれど、やっぱりスコーンではないかなーというできあがりだ。</description>
@@ -303,27 +419,6 @@
 &lt;p&gt;はてなブックマークでブックマークするリンクがおかしかったのを直した。報告をくれた&lt;a href="https://twitter.com/shimabukuro"&gt;@shimabukuro&lt;/a&gt;とおかしいところを指摘してくれた&lt;a href="https://twitter.com/motemen"&gt;@motemen&lt;/a&gt;の二人のおかげ。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>動的なサブセット化と動的なコンテンツ</title>
-      <link>http://hail2u.net/blog/webdesign/dynamic-subsetting-and-dynamic-contents.html</link>
-      <description>日本語を含むウェブ・フォントを使う場合、その転送量の多さとライセンスの問題により、動的にサブセット化されることがある。手段として間違ってはいないが、利用する側はそれなりに気をつける必要がある。それは動的に追加されるコンテンツに対しては指定しない、ということだ。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/dynamic-subsetting-and-dynamic-contents.html</guid>
-      <pubDate>Mon, 02 Feb 2015 06:40:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;日本語を含むウェブ・フォントを使う場合、その転送量の多さとライセンスの問題により、動的にサブセット化されることがある。手段として間違ってはいないが、利用する側はそれなりに気をつける必要がある。それは動的に追加されるコンテンツに対しては指定しない、ということだ。&lt;/p&gt;
-
-&lt;p&gt;動的なサブセット化はHTMLに書かれた文字列を利用して行われる。多くの場合、その仕組みとパフォーマンスの観点から静的なHTMLのソースそのものを利用することになる。つまりJavaScriptを利用してクライアント側で動的に追加されるコンテンツの文字列がサブセットに反映されることはまずない。&lt;/p&gt;
-
-&lt;p&gt;例えば&lt;a href="http://www.iwatafont.co.jp/ud/"&gt;イワタUDゴシック&lt;/a&gt;を&lt;a href="http://webfont.fontplus.jp/"&gt;Fontplus&lt;/a&gt;経由で採用している&lt;a href="http://vps.sakura.ad.jp/"&gt;さくらのVPSのトップページ&lt;/a&gt;では、以下のようにクライアント側で動的に生成されるお知らせの一覧はイワタUDゴシックと他のフォント(ここでは游ゴシック)が混ざって表示される。&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;a href="/images/blog/dynamic-subsetting-and-dynamic-contens.png"&gt;&lt;img alt="同じページで使われていない文字だけ他のフォントで表示されている" height="360" src="/images/blog/dynamic-subsetting-and-dynamic-contens.png" width="640"&gt;&lt;/a&gt;
-
-  &lt;figcaption&gt;さくらのVPSのWindowsでのスクリーンショット&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;ウェブ・フォントを使うべきところだけ指定するのが確実だが、それはあまりにも煩雑だろう。ブラックリスト方式で、動的にコンテンツを挿入する要素に&lt;code&gt;.disable-webfonts&lt;/code&gt;などといったウェブ・フォントを無効化するような&lt;code&gt;font-family&lt;/code&gt;プロパティーを指定したクラス名も振っておくのが良いだろう。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -358,6 +453,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Wed, 11 Feb 2015 00:01:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 12 Feb 2015 00:55:00 +0900</lastBuildDate>
   </channel>
 </rss>
