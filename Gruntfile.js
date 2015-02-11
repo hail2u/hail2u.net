@@ -54,6 +54,47 @@ module.exports = function (grunt) {
     },
 
     copy: {
+      assets: {
+        files: [
+          {
+            cwd: 'node_modules/',
+            dest: 'src/css/assets/partials/',
+            expand: true,
+            src: [
+              'hail2u-scss-functions/**/*',
+              'hail2u-scss-partials/**/*',
+              'modularized-normalize-scss/**/*'
+            ]
+          },
+          {
+            cwd: 'build/',
+            dest: 'src/css/assets/',
+            expand: true,
+            src: [
+              'apple-touch-icon.png',
+              'fonts/**/*',
+              'images/about/layout-*.png',
+              'images/favicon-16.png',
+              'images/favicon-256.png',
+              'images/favicon-32.png',
+              'images/favicon-48.png',
+              'images/icon/facebook.svg',
+              'images/icon/feed.svg',
+              'images/icon/tumblr.svg',
+              'images/icon/twitter.svg',
+              'images/logo.svg',
+              'scripts/show-column.js',
+              'scripts/toggle-tagline.js',
+              'scripts/unutm.js',
+              'styles/colorscheme.aco',
+              'styles/megrim.css',
+              'styles/source-code-pro.css',
+              'styles/source-sans-pro.css'
+            ]
+          }
+        ]
+      },
+
       css: {
         cwd: 'tmp/',
         dest: 'build/styles/',
