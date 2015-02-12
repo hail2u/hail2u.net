@@ -409,7 +409,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/apple-touch-icon.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       },
 
       favicon16: {
@@ -418,7 +418,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-16.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       },
 
       favicon32: {
@@ -427,7 +427,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-32.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       },
 
       favicon48: {
@@ -436,7 +436,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-48.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       },
 
       favicon256: {
@@ -445,7 +445,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-256.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       },
 
       favicon1024: {
@@ -454,7 +454,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-1024.png',
-        src: 'build/images/logo.svg'
+        src: 'build/images/favicon.svg'
       }
     }
   });
