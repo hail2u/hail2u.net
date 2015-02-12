@@ -10,12 +10,42 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Thu, 12 Feb 2015 01:06:49 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 13 Feb 2015 01:08:16 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>IE11でのfile:プロトコルに対するHistory APIによる操作</title>
+      <link>http://hail2u.net/blog/coding/history-api-for-file-protocol-on-ie11.html</link>
+      <description>Internet Explorer 11でfile:///で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に/C:が先頭に追加されていく。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/history-api-for-file-protocol-on-ie11.html</guid>
+      <pubDate>Fri, 13 Feb 2015 01:08:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>Internet Explorer 11で<code>file:///</code>で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に<code>/C:</code>が先頭に追加されていく。</p>
+
+<pre><code>history.replaceState(null, &#39;&#39;, location.pathname);
+</code></pre>
+
+<p>相対URLで書きかえが起こるはずなので、こうするとクエリー文字列やフラグメント識別子を削除してクリーンなURLに書き換わるはずだ。実際、普通のウェブサイトで試すと問題なくうまくいく。しかし<code>file:///</code>プロトコルでローカルのファイルを開いている場合、想定通りに動かない。</p>
+
+<pre>&gt; location.pathname
+&lt; &quot;/C:/Users/Kyo/Desktop/test.html&quot;
+&gt; history.replaceState(null, &#39;&#39;, location.pathname)
+&lt; undefined
+&gt; location.pathname
+&lt; &quot;/C:/C:/Users/Kyo/Desktop/test.html&quot;
+</pre>
+
+<p>このようにドライブレターが増殖する。URLの書き換え自体はこのおかしなURLにちゃんと(？)書き換わっているので、この状態で再読込すると「このページは表示できません」になる。</p>
+
+<hr>
+
+<p>明らかにバグと言えそうだが、実際に何か致命的なことが起こるとも思えないバグだ。報告はしておいたけど、悪いこともできなそうな気がするので放置されそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>フルスクリーンでオーバーレイの検索ボックス</title>
@@ -421,29 +451,6 @@
 <hr>
 
 <p>8000円でソールの張替えができるようなので、長く愛用してやりたい。2ヶ月後くらいきれいにする時には<a href="http://jasonmarkk.com/collections/products/products/3691-4-oz-premium-kit-1">Jason Markkの汚れ落とし</a>でも買おう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>ソーシャル・ボタンの再設置</title>
-      <link>http://hail2u.net/blog/internet/social-buttons-20150203.html</link>
-      <description>SNSをやめる人がいる一方で、僕はソーシャル・ボタンを再設置した。各記事の最後にTwitterとFacebook、はてなブックマークに流すリンクが、狭い画面ではコンテンツに続いて、広い画面では左にぶら下がる形で配置される。カウントは蛇足っぽい気がしたので、単なるリンクにしておいた。</description>
-      <category>Internet</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/internet/social-buttons-20150203.html</guid>
-      <pubDate>Tue, 03 Feb 2015 09:39:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="/images/blog/social-buttons-20150203.png"><img alt="Tweet, Share &amp; Bookmark!" height="627" src="/images/blog/social-buttons-20150203.png" width="1200"></a>
-</figure>
-
-<p><a href="http://blog.kyanny.me/entry/2015/02/01/003412">SNSをやめる人</a>がいる一方で、僕はソーシャル・ボタンを再設置した。各記事の最後にTwitterとFacebook、はてなブックマークに流すリンクが、狭い画面ではコンテンツに続いて、広い画面では左にぶら下がる形で配置される。カウントは蛇足っぽい気がしたので、単なるリンクにしておいた。</p>
-
-<p>僕はSNSは雑多でうっとうしいことが多くて正常だと考えている。でも雑多なことはともかく、うっとうしさを許容する必要はあまり感じていなくて、すぐにミュートしたりアンフォローしたり再フォローするように軽くやってれば良いのかなというスタンスをとっている。なのでFacebookのようなやたらとアンフォローするとダメージが大きそうなSNSは近寄りたくはないなと思っていて、運用が難しそうではあるがサークルの再構成という形でアンフォローを代替できるGoogle+はもっと流行っても良さそうだと思ってる。</p>
-
-<p>情報のノイズ率のような方向から見ると、SNSというシステムでコミュニケーションをすることそのものが根本的に壊れていることに気づいてしまうので、考えないことにしている。ノイズの多さは自分の世界がまともである証、とかそんな感じでポジティブにとらえられると良さそうだ。</p>
-
-<h2>追記</h2>
-
-<p>はてなブックマークでブックマークするリンクがおかしかったのを直した。報告をくれた<a href="https://twitter.com/shimabukuro">@shimabukuro</a>とおかしいところを指摘してくれた<a href="https://twitter.com/motemen">@motemen</a>の二人のおかげ。</p>]]></content:encoded>
     </item>
 
   </channel>
