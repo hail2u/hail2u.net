@@ -36,6 +36,7 @@ module.exports = function (grunt) {
         files: {
           'tmp/debug.min.js': [
             'tmp/show-column.min.js',
+            'tmp/show-outline.min.js',
             'tmp/toggle-tagline.min.js'
           ],
           'tmp/main.min.js': ['tmp/unutm.min.js']
@@ -84,6 +85,7 @@ module.exports = function (grunt) {
               'images/icon/twitter.svg',
               'images/logo.svg',
               'scripts/show-column.js',
+              'scripts/show-outline.js',
               'scripts/toggle-tagline.js',
               'scripts/unutm.js',
               'styles/colorscheme.aco',
@@ -147,6 +149,7 @@ module.exports = function (grunt) {
       js_pre: {
         files: {
           'tmp/show-column.js': 'src/js/debug/show-column.js',
+          'tmp/show-outline.js': 'src/js/debug/show-outline.js',
           'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js'
         }
       },
