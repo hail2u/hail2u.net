@@ -239,6 +239,22 @@ module.exports = function (grunt) {
       }
     },
 
+    svgmin: {
+      main: {
+        cwd: 'src/img/',
+        dest: 'build/images/',
+        expand: true,
+        ext: '.min.svg',
+        src: [
+          '**/*.svg',
+          '!icon/asterisk.svg',
+          '!icon/chain.svg',
+          '!icon/magnifying-glass.svg',
+          '!**/*.min.svg'
+        ]
+      }
+    },
+
     uglify: {
       options: {
         beautify: {
@@ -468,6 +484,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
+  grunt.loadNpmTasks('grunt-svgmin');
   grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
 
