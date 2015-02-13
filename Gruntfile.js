@@ -113,6 +113,19 @@ module.exports = function (grunt) {
         }
       },
 
+      img: {
+        cwd: 'src/img/',
+        dest: 'build/images/',
+        expand: true,
+        src: [
+          '**/*.gif',
+          '**/*.ico',
+          '**/*.jpg',
+          '**/*.png',
+          '**/*.svg'
+        ]
+      },
+
       js: {
         cwd: 'tmp/',
         dest: 'build/scripts/',
@@ -425,7 +438,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/apple-touch-icon.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       },
 
       favicon16: {
@@ -434,7 +447,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-16.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       },
 
       favicon32: {
@@ -443,7 +456,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-32.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       },
 
       favicon48: {
@@ -452,7 +465,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-48.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       },
 
       favicon256: {
@@ -461,7 +474,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-256.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       },
 
       favicon1024: {
@@ -470,7 +483,7 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-1024.png',
-        src: 'build/images/favicon.svg'
+        src: 'src/img/favicon.svg'
       }
     }
   });
@@ -490,7 +503,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'build:css',
-    'build:favicon',
+    'build:img',
     'build:js',
     'build:html',
     'sitemap'
@@ -515,19 +528,21 @@ module.exports = function (grunt) {
     'copy:style_guide',
   ]);
 
-  grunt.registerTask('build:favicon', [
+  grunt.registerTask('build:html', [
+    'generate:main',
+    'blosxom:index'
+  ]);
+
+  grunt.registerTask('build:img', [
+    'svgmin',
     'svg2png:apple_touch_icon',
     'svg2png:favicon16',
     'svg2png:favicon32',
     'svg2png:favicon48',
     'svg2png:favicon256',
     'svg2png:favicon1024',
-    'png2ico'
-  ]);
-
-  grunt.registerTask('build:html', [
-    'generate:main',
-    'blosxom:index'
+    'png2ico',
+    'copy:img'
   ]);
 
   grunt.registerTask('build:js', [
@@ -549,11 +564,6 @@ module.exports = function (grunt) {
     'gitcommit:deploy'
   ]);
 
-  grunt.registerTask('deploy:favicon', [
-    'build:favicon',
-    'gitcommit:deploy'
-  ]);
-
   grunt.registerTask('deploy:home', [
     'build:html',
     'merge_feeds:main',
@@ -563,6 +573,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy:html', [
     'build:html',
+    'gitcommit:deploy'
+  ]);
+
+  grunt.registerTask('deploy:img', [
+    'build:img',
     'gitcommit:deploy'
   ]);
 
