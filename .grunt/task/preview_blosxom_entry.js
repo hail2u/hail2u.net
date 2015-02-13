@@ -20,27 +20,16 @@ module.exports = function (grunt) {
 
     <title><%TITLE%> - Weblog - Hail2u.net</title>
 
-    <base href="<%ROOT%>">
-
-    <link href="./favicon.ico" rel="icon">
-    <link href="./styles/style.min.css" rel="stylesheet">
-    <link href="./styles/megrim.min.css" rel="stylesheet">
-    <link href="./styles/source-code-pro.min.css" rel="stylesheet">
-    <link href="./styles/source-sans-pro.min.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="icon">
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link href="/styles/megrim.min.css" rel="stylesheet">
+    <link href="/styles/source-code-pro.min.css" rel="stylesheet">
+    <link href="/styles/source-sans-pro.min.css" rel="stylesheet">
   </head>
 
   <body class="permalink">
     <header class="global-header" role="banner">
-      <a class="logo" href="./"><img alt="Hail2u.net" src="./images/logo.min.svg"></a>
-
-      <nav>
-        <ul class="site-navigation">
-          <li><a href="./blog/"><mark>Weblog</mark></a></li>
-          <li><a href="./documents/">Documents</a></li>
-          <li><a href="./projects/">Projects</a></li>
-          <li><a href="./about/">About</a></li>
-        </ul>
-      </nav>
+      <mark class="logo"><img alt="Hail2u.net" src="/images/logo.min.svg"></mark>
     </header>
 
     <main class="content" role="main">
@@ -82,7 +71,6 @@ module.exports = function (grunt) {
 </html>
 */}).toString().split('\n').slice(1, -1).join('\n');
     var preview_file = path.resolve(process.cwd(), 'tmp/__preview.html');
-    var root = 'file:///' + path.resolve(process.cwd(), 'build/').replace(/\\/g, '/') + '/';
     var fn = path.basename(file, '.txt').replace(/\$/g, '$$');
     var entry = fs.readFileSync(file, 'UTF-8').split('\n');
     var title = entry.shift().replace(/\$/g, '$$$$');
@@ -94,8 +82,8 @@ module.exports = function (grunt) {
       });
     }
 
-    body = body.replace(/="\//g, '="./');
-    preview = preview.replace(/<%ROOT%>/g, root).replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body);
+    body = body.replace(/(href|src)="\/images\//g, '$1="../src/img/');
+    preview = preview.replace(/<%FN%>/g, fn).replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body).replace(/="\//g, '="../build/');
     fs.outputFileSync(preview_file, preview);
     grunt.log.writeln('File "' + preview_file + '" created.');
     var child = spawn(which('open'), [preview_file]);
