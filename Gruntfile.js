@@ -513,6 +513,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build:blog', [
+    'copy_blog_images',
     'blosxom:article',
     'generate:blog',
     'merge_feeds',
