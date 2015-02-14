@@ -10,24 +10,30 @@ module.exports = function (grunt) {
 
     var i = 0;
     var f = 'file';
-    fs.readFileSync(grunt.option('file'), 'utf-8').match(/\bsrc=".*?"/g).forEach(function (image) {
-      var src = 'src/img';
-      var dest = 'build';
-      image = image.replace(/^src="(.*?)"$/, '$1');
-      src += image.replace(/^\/images/, '');
-      dest += image;
+    var images = fs.readFileSync(grunt.option('file'), 'utf-8').match(/\bsrc=".*?"/g);
 
-      if (fs.statSync(src).isFile()) {
-        fs.copySync(src, dest);
-        i++;
-        grunt.verbose.writeln('Image "' + src + '" copied to "' + dest + '".')
+    if (images) {
+      images.forEach(function (image) {
+        var src = 'src/img';
+        var dest = 'build';
+        image = image.replace(/^src="(.*?)"$/, '$1');
+        src += image.replace(/^\/images/, '');
+        dest += image;
+
+        if (fs.statSync(src).isFile()) {
+          fs.copySync(src, dest);
+          i++;
+          grunt.verbose.writeln('Image "' + src + '" copied to "' + dest + '".')
+        }
+      });
+
+      if (i > 1) {
+        f = 'files';
       }
-    });
 
-    if (i > 1) {
-      f = 'files';
+      grunt.log.writeln(i + ' ' + f + ' copied.');
+    } else {
+      grunt.log.writeln('Images not found.');
     }
-
-    grunt.log.writeln(i + ' ' + f + ' copied.');
   });
 };
