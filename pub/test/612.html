@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+
+    <title>Lightbox with Clean Markup</title>
+
+    <link href="http://hail2u.net/styles/natural.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <h1>Lightbox with Clean Markup</h1>
+
+      <p>リンクを張ってあるリンクのみなんとなくlightbox的なUIで表示するデモ。<code>z-index</code>プロパティーの値が要調整になるため、ライブラリーとして作ることは難しそう。</p>
+    </header>
+
+    <section>
+      <h1>Landscape Image</h1>
+
+      <figure>
+        <a href="http://placeimg.com/480/270/any"><img src="http://placeimg.com/480/270/any"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Portrait Image</h1>
+
+      <figure>
+        <a href="http://placeimg.com/360/640/any"><img src="http://placeimg.com/360/640/any"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Large Landscape Image</h1>
+
+      <figure>
+        <a href="http://placeimg.com/2560/1440/any"><img src="http://placeimg.com/2560/1440/any"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Large Portrait Image</h1>
+
+      <figure>
+        <a href="http://placeimg.com/1080/1920/any"><img src="http://placeimg.com/1080/1920/any"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Link Different Image</h1>
+
+      <figure>
+        <a href="http://placeimg.com/960/540/any"><img src="http://placeimg.com/160/90/any"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>動作環境</h1>
+
+      <ul>
+        <li><code>document.querySelectorAll()</code>のサポート</li>
+        <li>属性セレクター及び<code>^=</code>のサポート</li>
+        <li><code>Function.prototype.bind()</code>のサポート</li>
+        <li><code>HTMLElement.dataset</code>のサポート</li>
+        <li><code>vw</code>と<code>vh</code>単位のサポート</li>
+        <li>2D Transformのサポート</li>
+      </ul>
+    </section>
+
+    <script>
+      (function () {
+        var images = document.querySelectorAll('section img[src^="http://placeimg.com/"]');
+        var image;
+        var parent;
+
+        for (var i = 0, l = images.length; i < l; i++) {
+          image = images[i];
+          parent = image.parentNode;
+
+          if (parent.tagName === 'A' && /^http:\/\/placeimg\.com\//.test(parent.getAttribute('href'))) {
+            parent.addEventListener('click', function (image, evt) {
+              if (evt.which !== 1) {
+                return;
+              }
+
+              evt.preventDefault();
+
+              if (this.style.cssText && image.style.cssText) {
+                if (image.dataset.src) {
+                  image.src = image.dataset.src;
+                }
+
+                this.style.cssText = '';
+                image.style.cssText = '';
+
+                return;
+              }
+
+              if (this.href !== image.src) {
+                image.dataset.src = image.src;
+                image.src = this.href;
+              }
+
+              this.style.backgroundColor = '#333';
+              this.style.cursor = 'zoom-out';
+              this.style.height = '96vh';
+              this.style.left = '0';
+              this.style.padding = '2vh 2vw';
+              this.style.position = 'fixed';
+              this.style.top = '0';
+              this.style.width = '96vw';
+              this.style.zIndex = '1';
+              image.style.height = 'auto';
+              image.style.left = '50%';
+              image.style.maxHeight = '96%';
+              image.style.maxWidth = '96%';
+              image.style.position = 'absolute';
+              image.style.top = '50%';
+              image.style.transform = 'translate(-50%, -50%)';
+              image.style.width = 'auto';
+            }.bind(parent, image), false);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
