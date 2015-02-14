@@ -70,7 +70,7 @@ module.exports = function (grunt) {
           {
             dest: 'src/css/assets/scripts/unutm.js',
             src: ['node_modules/unutm/build/unutm.js']
-          }
+          },
           {
             cwd: 'build/',
             dest: 'src/css/assets/',
@@ -109,9 +109,10 @@ module.exports = function (grunt) {
             src: [
               'debug/show-column.js',
               'debug/show-outline.js',
-              'debug/toggle-tagline.js'
+              'debug/toggle-tagline.js',
+              'lightbox.js'
             ]
-          },
+          }
         ]
       },
 
