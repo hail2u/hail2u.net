@@ -68,32 +68,50 @@ module.exports = function (grunt) {
             ]
           },
           {
+            dest: 'src/css/assets/scripts/unutm.js',
+            src: ['node_modules/unutm/build/unutm.js']
+          }
+          {
             cwd: 'build/',
             dest: 'src/css/assets/',
             expand: true,
             src: [
               'apple-touch-icon.png',
               'fonts/**/*',
-              'images/about/layout-*.png',
               'images/favicon-16.png',
               'images/favicon-256.png',
               'images/favicon-32.png',
               'images/favicon-48.png',
-              'images/icon/facebook.svg',
-              'images/icon/feed.svg',
-              'images/icon/tumblr.svg',
-              'images/icon/twitter.svg',
-              'images/logo.svg',
-              'scripts/show-column.js',
-              'scripts/show-outline.js',
-              'scripts/toggle-tagline.js',
-              'scripts/unutm.js',
               'styles/colorscheme.aco',
               'styles/megrim.css',
               'styles/source-code-pro.css',
               'styles/source-sans-pro.css'
             ]
-          }
+          },
+          {
+            cwd: 'src/img/',
+            dest: 'src/css/assets/images/',
+            expand: true,
+            src: [
+              'about/layout-*.png',
+              'icon/facebook.svg',
+              'icon/feed.svg',
+              'icon/tumblr.svg',
+              'icon/twitter.svg',
+              'logo.svg',
+            ]
+          },
+          {
+            cwd: 'src/js/',
+            dest: 'src/css/assets/scripts/',
+            expand: true,
+            flatten: true,
+            src: [
+              'debug/show-column.js',
+              'debug/show-outline.js',
+              'debug/toggle-tagline.js'
+            ]
+          },
         ]
       },
 
