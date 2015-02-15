@@ -25,6 +25,8 @@ module.exports = function (grunt) {
     <link href="/styles/megrim.min.css" rel="stylesheet">
     <link href="/styles/source-code-pro.min.css" rel="stylesheet">
     <link href="/styles/source-sans-pro.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.css"></script>
   </head>
 
   <body class="permalink">
