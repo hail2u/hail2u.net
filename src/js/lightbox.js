@@ -40,7 +40,7 @@
             image.src = this.href;
           }
 
-          this.style.backgroundColor = '#333';
+          this.style.backgroundColor = '#fff';
           this.style.cursor = 'zoom-out';
           this.style.height = '100vh';
           this.style.left = '0';
