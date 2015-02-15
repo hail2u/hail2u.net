@@ -48,15 +48,15 @@
           this.style.top = '0';
           this.style.width = '100vw';
           this.style.zIndex = '2';
+          image.style.bottom = '0';
           image.style.height = 'auto';
-          image.style.left = '50%';
+          image.style.left = '0';
+          image.style.margin = 'auto';
           image.style.maxHeight = '96%';
           image.style.maxWidth = '96%';
           image.style.position = 'absolute';
-          image.style.top = '50%';
-          image.style.msTransform = 'translate(-50%, -50%)';
-          image.style.WebkitTransform = 'translate(-50%, -50%)';
-          image.style.transform = 'translate(-50%, -50%)';
+          image.style.right = '0';
+          image.style.top = '0';
           image.style.width = 'auto';
         }.bind(parent, image), false);
       }
