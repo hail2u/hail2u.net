@@ -379,6 +379,14 @@ module.exports = function (grunt) {
         }
       },
 
+      assets: {
+        options: {
+          all: true,
+          message: 'Update assets',
+          root: 'src/css/'
+        }
+      },
+
       deploy: {
         options: {
           all: true,
@@ -623,6 +631,11 @@ module.exports = function (grunt) {
     'build:blog',
     'gitcommit:update_cache',
     'gitcommit:publish_blog'
+  ]);
+
+  grunt.registerTask('update:assets', [
+    'copy:assets',
+    'gitcommit:assets'
   ]);
 
   grunt.registerTask('update:blog', [
