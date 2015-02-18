@@ -30,7 +30,7 @@ module.exports = function (grunt) {
 
       js: {
         options: {
-          seperator: ';',
+          seperator: ';'
         },
 
         files: {
@@ -94,7 +94,7 @@ module.exports = function (grunt) {
               'icon/feed.svg',
               'icon/tumblr.svg',
               'icon/twitter.svg',
-              'logo.svg',
+              'logo.svg'
             ]
           },
           {
@@ -142,7 +142,7 @@ module.exports = function (grunt) {
         src: [
           'megrim.scss',
           'source-code-pro.scss',
-          'source-sans-pro.scss',
+          'source-sans-pro.scss'
         ]
       },
 
@@ -602,7 +602,7 @@ module.exports = function (grunt) {
     'uglify',
     'copy:js_minified',
     'concat:js',
-    'copy:js',
+    'copy:js'
   ]);
 
   grunt.registerTask('deploy', [
