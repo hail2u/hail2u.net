@@ -34,11 +34,6 @@ module.exports = function (grunt) {
         },
 
         files: {
-          'tmp/debug.min.js': [
-            'tmp/show-column.min.js',
-            'tmp/show-outline.min.js',
-            'tmp/toggle-tagline.min.js'
-          ],
           'tmp/main.min.js': ['tmp/unutm.min.js']
         }
       }
