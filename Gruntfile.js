@@ -132,7 +132,7 @@ module.exports = function (grunt) {
       css_pre: {
         options: {
           process: function (content) {
-            return content.replace(/'assets\/(.*?)'/g, '\'/$1\'');
+            return content.replace(/'assets\/(.*?)'/g, '\'../$1\'');
           }
         },
 
