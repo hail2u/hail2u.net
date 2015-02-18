@@ -93,7 +93,6 @@ module.exports = function (grunt) {
             dest: 'src/css/assets/images/',
             expand: true,
             src: [
-              'about/layout-*.png',
               'icon/facebook.svg',
               'icon/feed.svg',
               'icon/tumblr.svg',
