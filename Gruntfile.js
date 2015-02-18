@@ -34,7 +34,10 @@ module.exports = function (grunt) {
         },
 
         files: {
-          'tmp/main.min.js': ['tmp/unutm.min.js']
+          'tmp/main.min.js': [
+            'tmp/lightbox.min.js',
+            'tmp/unutm.min.js'
+          ]
         }
       }
     },
@@ -177,6 +180,7 @@ module.exports = function (grunt) {
 
       js_pre: {
         files: {
+          'tmp/lightbox.js': 'src/js/lightbox.js',
           'tmp/show-column.js': 'src/js/debug/show-column.js',
           'tmp/show-outline.js': 'src/js/debug/show-outline.js',
           'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js'
