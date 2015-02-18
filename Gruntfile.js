@@ -77,15 +77,11 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               'apple-touch-icon.png',
-              'fonts/**/*',
               'images/favicon-16.png',
               'images/favicon-256.png',
               'images/favicon-32.png',
               'images/favicon-48.png',
-              'styles/colorscheme.aco',
-              'styles/megrim.css',
-              'styles/source-code-pro.css',
-              'styles/source-sans-pro.css'
+              'styles/colorscheme.aco'
             ]
           },
           {
@@ -112,6 +108,12 @@ module.exports = function (grunt) {
               'debug/toggle-tagline.js',
               'lightbox.js'
             ]
+          },
+          {
+            cwd: 'src/woff/',
+            dest: 'src/css/assets/fonts/',
+            expand: true,
+            src: ['*.woff']
           }
         ]
       },
@@ -127,11 +129,21 @@ module.exports = function (grunt) {
       },
 
       css_pre: {
-        files: {
-          'tmp/source-sans-pro.css': 'src/css/assets/styles/source-sans-pro.css',
-          'tmp/source-code-pro.css': 'src/css/assets/styles/source-code-pro.css',
-          'tmp/megrim.css': 'src/css/assets/styles/megrim.css'
-        }
+        options: {
+          process: function (content) {
+            return content.replace(/'assets\/(.*?)'/g, '\'/$1\'');
+          }
+        },
+
+        cwd: 'src/css/',
+        dest: 'tmp/',
+        expand: true,
+        ext: '.css',
+        src: [
+          'megrim.scss',
+          'source-code-pro.scss',
+          'source-sans-pro.scss',
+        ]
       },
 
       img: {
@@ -185,7 +197,7 @@ module.exports = function (grunt) {
                 url = url.substr(site.length - 1);
               } else if (url.indexOf(asset) === 0) {
                 url = url.substr(asset.length - 1);
-              } else if (/^\w+\.\w+$/.test(url)) {
+              } else if (/^[\w-]+\.[\w^]+$/.test(url)) {
                 url = '/styles/' + url;
               }
 
@@ -196,6 +208,13 @@ module.exports = function (grunt) {
 
         dest: 'build/about/style-guide/index.html',
         src: 'src/css/test.html'
+      },
+
+      woff: {
+        cwd: 'src/woff/',
+        dest: 'build/fonts/',
+        expand: true,
+        src: ['**/*.woff']
       }
     },
 
@@ -557,6 +576,7 @@ module.exports = function (grunt) {
     'single_charset',
     'copy:css',
     'copy:style_guide',
+    'copy:woff'
   ]);
 
   grunt.registerTask('build:html', [
