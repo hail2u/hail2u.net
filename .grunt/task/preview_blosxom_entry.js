@@ -22,11 +22,8 @@ module.exports = function (grunt) {
 
     <link href="/favicon.ico" rel="icon">
     <link href="/styles/style.min.css" rel="stylesheet">
-    <link href="/styles/megrim.min.css" rel="stylesheet">
-    <link href="/styles/source-code-pro.min.css" rel="stylesheet">
-    <link href="/styles/source-sans-pro.min.css" rel="stylesheet">
 
-    <script async src="/scripts/main.min.css"></script>
+    <script async src="/scripts/main.min.js"></script>
   </head>
 
   <body class="permalink">
