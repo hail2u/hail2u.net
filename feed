@@ -10,6 +10,53 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>全称セレクターは擬似要素にマッチしない</title>
+      <link>http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</link>
+      <description>Mediumの印刷スタイルシートの記事を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</guid>
+      <pubDate>Wed, 18 Feb 2015 13:52:00 +0900</pubDate>
+      <content:encoded>&lt;p&gt;&lt;a href="https://medium.com/designing-medium/printing-medium-stories-89f381b903c9"&gt;Mediumの印刷スタイルシートの記事&lt;/a&gt;を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;* {
+  color: black !important;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このウェブサイトの印刷スタイルシートではこのようにして、強制的に文字を&lt;code&gt;#000000&lt;/code&gt;で印刷させるようにしていた。よくよく確認してみると、実際に印刷するまでもなく、印刷プレビューの状態でも一部色がおかしいことに気付いた。おかしい部分は全て擬似要素で挿入した文字列だった。&lt;/p&gt;
+
+&lt;p&gt;最初は全称セレクターが詳細度においてもっとも弱いことに由来する問題かと思ったが、この例では&lt;code&gt;!important&lt;/code&gt;フラグでも逆転できていないため、詳細度の問題ではないようだ。つまり全称セレクターは擬似要素にはマッチしないということになる。&lt;/p&gt;
+
+&lt;p&gt;View Demo: &lt;a href="/pub/test/611.html"&gt;Universal Selector and Pseudo Element&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;デモでは擬似要素で挿入した文字列を赤にし、それを全称セレクターと&lt;code&gt;!important&lt;/code&gt;フラグを使って上書きしようとしている。しかしうまくいかない。マッチしないでまず間違いないだろう。確認はChrome 40とInternet Explorer 11、Firefox 35で行った。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;実際にどう対処するべきかというと二通りに分かれると思う。一つは普通に擬似要素の文字色も直してしまう方法だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*,
+*::before,
+*::after {
+  color: black !important;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;もう一つは擬似要素は印刷しないことにする方法だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;* {
+  color: black !important;
+}
+
+*::before,
+*::after {
+  display: none !important;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;擬似要素で挿入する文字列等がクリティカルな要素であるべきではないことを考慮すると、後者の方がより良い印刷結果をもたらしそうではある。その反面、印刷結果でも擬似要素を使って補助的な情報や飾りを挿入したいようなケースに対する柔軟性に欠ける。前者が無難か。&lt;/p&gt;</content:encoded>
+    </item>
+    <item>
       <title>良い・悪くない・良くない・悪い</title>
       <link>http://hail2u.net/blog/misc/good-not-bad-not-good-bad.html</link>
       <description>モノの評価軸はモノと人によって違うけれど、それぞれの軸では良い・悪くない・良くない・悪いの4段階で大抵は評価してる。強く意識していなくてもきっとそう。けれどもそういった評価を判断する時、される時は、悪いとそれ以外というような2段階で判断してしまうし、されてしまう。</description>
@@ -378,31 +425,6 @@ image.style.width = &amp;#39;auto&amp;#39;;
 &lt;p&gt;まだブックマークされていない時のページが気になるけど、ブックマークレットの画面を流用するよりは多分マシ。&lt;/p&gt;</content:encoded>
     </item>
     <item>
-      <title>文字参照と属性セレクター</title>
-      <link>http://hail2u.net/blog/webdesign/character-reference-and-attribute-selector.html</link>
-      <description>文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。style要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/character-reference-and-attribute-selector.html</guid>
-      <pubDate>Sun, 08 Feb 2015 10:12:00 +0900</pubDate>
-      <content:encoded>&lt;p&gt;文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。&lt;code&gt;style&lt;/code&gt;要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。&lt;/p&gt;
-
-&lt;p&gt;View Demo: &lt;a href="/pub/test/607.html"&gt;Character Reference and Attribute Selector&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;デモの&lt;code&gt;p&lt;/code&gt;要素には&lt;code&gt;title&lt;/code&gt;属性の値に二重引用符が文字参照で入っている。普通に文字参照を使って属性セレクターを書いた場合、要素が選択できない。また属性セレクターでの二重引用符は特別な意味を持つので、引用符なしのつもりで書いても同じように選択できない。文字参照を戻した上で以下のどれかで指定する必要がある。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;一重引用符で括る&lt;/li&gt;
-&lt;li&gt;二重引用符で括り、エスケープする&lt;/li&gt;
-&lt;li&gt;二重引用符をエスケープする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;属性セレクターでは引用符で括ることが必須ではないので、エスケープするだけでも大丈夫だった。&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;やりたかった仕組みではユーザーの入力によって仕込まれた&lt;code&gt;title&lt;/code&gt;属性の値に従ってセレクターを生成して、スタイルを追加するというようなものなので、ユーザーの入力をそのまま&lt;code&gt;style&lt;/code&gt;要素の子に追加する必要があり、かなり危険そうだ。別の方法を考えなければならなくなった……。&lt;/p&gt;</content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -437,6 +459,6 @@ image.style.width = &amp;#39;auto&amp;#39;;
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description>&lt;p&gt;&lt;a href="http://sass-lang.com/"&gt;Sass&lt;/a&gt;がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに&lt;a href="http://sass-lang.com/guide"&gt;Sass Basics&lt;/a&gt;になりました。内容的にはあまり変わらないか多少薄くなっていますが、&lt;code&gt;@extend&lt;/code&gt;への言及も追加されたので、日本語訳を作成しました。&lt;/p&gt;</description>
     </item>
-    <lastBuildDate>Tue, 17 Feb 2015 03:46:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 18 Feb 2015 13:52:00 +0900</lastBuildDate>
   </channel>
 </rss>

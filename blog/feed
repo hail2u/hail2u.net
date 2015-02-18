@@ -10,12 +10,61 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja-JP</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 17 Feb 2015 03:46:39 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 18 Feb 2015 13:52:45 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>全称セレクターは擬似要素にマッチしない</title>
+      <link>http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</link>
+      <description>Mediumの印刷スタイルシートの記事を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</guid>
+      <pubDate>Wed, 18 Feb 2015 13:52:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://medium.com/designing-medium/printing-medium-stories-89f381b903c9">Mediumの印刷スタイルシートの記事</a>を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。</p>
+
+<pre><code>* {
+  color: black !important;
+}
+</code></pre>
+
+<p>このウェブサイトの印刷スタイルシートではこのようにして、強制的に文字を<code>#000000</code>で印刷させるようにしていた。よくよく確認してみると、実際に印刷するまでもなく、印刷プレビューの状態でも一部色がおかしいことに気付いた。おかしい部分は全て擬似要素で挿入した文字列だった。</p>
+
+<p>最初は全称セレクターが詳細度においてもっとも弱いことに由来する問題かと思ったが、この例では<code>!important</code>フラグでも逆転できていないため、詳細度の問題ではないようだ。つまり全称セレクターは擬似要素にはマッチしないということになる。</p>
+
+<p>View Demo: <a href="/pub/test/611.html">Universal Selector and Pseudo Element</a></p>
+
+<p>デモでは擬似要素で挿入した文字列を赤にし、それを全称セレクターと<code>!important</code>フラグを使って上書きしようとしている。しかしうまくいかない。マッチしないでまず間違いないだろう。確認はChrome 40とInternet Explorer 11、Firefox 35で行った。</p>
+
+<hr>
+
+<p>実際にどう対処するべきかというと二通りに分かれると思う。一つは普通に擬似要素の文字色も直してしまう方法だ。</p>
+
+<pre><code>*,
+*::before,
+*::after {
+  color: black !important;
+}
+</code></pre>
+
+<p>もう一つは擬似要素は印刷しないことにする方法だ。</p>
+
+<pre><code>* {
+  color: black !important;
+}
+
+*::before,
+*::after {
+  display: none !important;
+}
+</code></pre>
+
+<p>擬似要素で挿入する文字列等がクリティカルな要素であるべきではないことを考慮すると、後者の方がより良い印刷結果をもたらしそうではある。その反面、印刷結果でも擬似要素を使って補助的な情報や飾りを挿入したいようなケースに対する柔軟性に欠ける。前者が無難か。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>良い・悪くない・良くない・悪い</title>
@@ -401,33 +450,6 @@ image.style.width = &#39;auto&#39;;
 <p>ブックマークするリンクを追加する時、はてなブックマークでブックマークするページがユーザーごとにユニークなことをすっかり忘れてた。TwitterやFacebookみたいなURLか、あの大きいブックマーク画面へリダイレクトしてくれるURLみたいなの欲しい気がする……と<code>/my/add.confirm</code>をエンドポイントにするとリダイレクトしてくれることを思い出したので、これを使うことにした。</p>
 
 <p>まだブックマークされていない時のページが気になるけど、ブックマークレットの画面を流用するよりは多分マシ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>文字参照と属性セレクター</title>
-      <link>http://hail2u.net/blog/webdesign/character-reference-and-attribute-selector.html</link>
-      <description>文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。style要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/character-reference-and-attribute-selector.html</guid>
-      <pubDate>Sun, 08 Feb 2015 10:12:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>文字参照を含む可能性がある属性の値を使ってセレクターを自動生成するような仕組みで少しハマった。文字参照をそのまま属性セレクターの値として指定してしまったので、うまく動かなかった。<code>style</code>要素に記述するようなケースでも、属性セレクターの値には文字参照は使えない。戻して書き、必要ならバックスラッシュでエスケープする。</p>
-
-<p>View Demo: <a href="/pub/test/607.html">Character Reference and Attribute Selector</a></p>
-
-<p>デモの<code>p</code>要素には<code>title</code>属性の値に二重引用符が文字参照で入っている。普通に文字参照を使って属性セレクターを書いた場合、要素が選択できない。また属性セレクターでの二重引用符は特別な意味を持つので、引用符なしのつもりで書いても同じように選択できない。文字参照を戻した上で以下のどれかで指定する必要がある。</p>
-
-<ul>
-<li>一重引用符で括る</li>
-<li>二重引用符で括り、エスケープする</li>
-<li>二重引用符をエスケープする</li>
-</ul>
-
-<p>属性セレクターでは引用符で括ることが必須ではないので、エスケープするだけでも大丈夫だった。</p>
-
-<hr>
-
-<p>やりたかった仕組みではユーザーの入力によって仕込まれた<code>title</code>属性の値に従ってセレクターを生成して、スタイルを追加するというようなものなので、ユーザーの入力をそのまま<code>style</code>要素の子に追加する必要があり、かなり危険そうだ。別の方法を考えなければならなくなった……。</p>]]></content:encoded>
     </item>
 
   </channel>
