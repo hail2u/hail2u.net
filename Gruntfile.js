@@ -55,6 +55,11 @@ module.exports = function (grunt) {
     },
 
     copy: {
+      aco: {
+        dest: 'build/styles/colorscheme.aco',
+        src: ['src/css/colorscheme.aco']
+      },
+
       assets: {
         files: [
           {
@@ -80,8 +85,7 @@ module.exports = function (grunt) {
               'images/favicon-16.png',
               'images/favicon-256.png',
               'images/favicon-32.png',
-              'images/favicon-48.png',
-              'styles/colorscheme.aco'
+              'images/favicon-48.png'
             ]
           },
           {
@@ -574,6 +578,7 @@ module.exports = function (grunt) {
     'csswring',
     'concat:css',
     'single_charset',
+    'copy:aco',
     'copy:css',
     'copy:style_guide',
     'copy:woff'
