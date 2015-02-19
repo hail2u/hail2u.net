@@ -102,12 +102,11 @@ module.exports = function (grunt) {
             cwd: 'src/js/',
             dest: 'src/css/assets/scripts/',
             expand: true,
-            flatten: true,
             src: [
-              'debug/show-column.js',
-              'debug/show-outline.js',
-              'debug/toggle-tagline.js',
-              'lightbox.js'
+              'lightbox.js',
+              'show-column.js',
+              'show-outline.js',
+              'toggle-tagline.js'
             ]
           },
           {
@@ -181,9 +180,9 @@ module.exports = function (grunt) {
       jsPre: {
         files: {
           'tmp/lightbox.js': 'src/js/lightbox.js',
-          'tmp/show-column.js': 'src/js/debug/show-column.js',
-          'tmp/show-outline.js': 'src/js/debug/show-outline.js',
-          'tmp/toggle-tagline.js': 'src/js/debug/toggle-tagline.js'
+          'tmp/show-column.js': 'src/js/show-column.js',
+          'tmp/show-outline.js': 'src/js/show-outline.js',
+          'tmp/toggle-tagline.js': 'src/js/toggle-tagline.js'
         }
       },
 
