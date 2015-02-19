@@ -129,7 +129,7 @@ module.exports = function (grunt) {
         ]
       },
 
-      css_pre: {
+      cssPre: {
         options: {
           process: function (content) {
             return content.replace(/'assets\/(.*?)'/g, '\'../$1\'');
@@ -170,7 +170,7 @@ module.exports = function (grunt) {
         ]
       },
 
-      js_minified: {
+      jsMinified: {
         files: {
           'tmp/unutm.js': 'node_modules//unutm/build/unutm.js',
           'tmp/unutm.min.js': 'node_modules//unutm/build/unutm.min.js',
@@ -178,7 +178,7 @@ module.exports = function (grunt) {
         }
       },
 
-      js_pre: {
+      jsPre: {
         files: {
           'tmp/lightbox.js': 'src/js/lightbox.js',
           'tmp/show-column.js': 'src/js/debug/show-column.js',
@@ -187,7 +187,7 @@ module.exports = function (grunt) {
         }
       },
 
-      style_guide: {
+      styleGuide: {
         options: {
           process: function (content) {
             var re = /(href|src)(=)(")(.*?)(")/g;
@@ -220,7 +220,7 @@ module.exports = function (grunt) {
       }
     },
 
-    css_mqpacker: {
+    'css_mqpacker': {
       options: {
         map: {
           inline: false,
@@ -252,7 +252,7 @@ module.exports = function (grunt) {
       }
     },
 
-    pubsubhubbub_publish: {
+    'pubsubhubbub_publish': {
       main: {
         hubUrl: 'http://hail2u.net/feed'
       },
@@ -283,7 +283,7 @@ module.exports = function (grunt) {
       }
     },
 
-    single_charset: {
+    'single_charset': {
       options: {
         map: true
       },
@@ -314,7 +314,7 @@ module.exports = function (grunt) {
     uglify: {
       options: {
         beautify: {
-          ascii_only: true
+          'ascii_only': true
         },
 
         preserveComments: 'some',
@@ -394,18 +394,44 @@ module.exports = function (grunt) {
     },
 
     gitcommit: {
-      add_entry: {
-        options: {
-          message: 'Add'
-        }
-      },
-
       assets: {
         options: {
           all: true,
           message: 'Update assets',
           root: 'src/css/'
         }
+      },
+
+      blogPublish: {
+        options: {
+          all: true,
+          branch: 'gh-pages',
+          message: 'Add',
+          push: true,
+          root: 'build/'
+        }
+      },
+
+      blogUpdate: {
+        options: {
+          all: true,
+          branch: 'gh-pages',
+          message: 'Update',
+          push: true,
+          root: 'build/'
+        }
+      },
+
+      cacheUpdate: {
+        options: {
+          message: 'Update cache files'
+        },
+
+        src: [
+          '.grunt/cache/articles.json',
+          'src/weblog/plugins/state/files_index.dat',
+          'src/weblog/plugins/state/others_index.dat'
+        ]
       },
 
       deploy: {
@@ -418,39 +444,13 @@ module.exports = function (grunt) {
         }
       },
 
-      publish_blog: {
+      entryAdd: {
         options: {
-          all: true,
-          branch: 'gh-pages',
-          message: 'Add',
-          push: true,
-          root: 'build/'
+          message: 'Add'
         }
       },
 
-      update_blog: {
-        options: {
-          all: true,
-          branch: 'gh-pages',
-          message: 'Update',
-          push: true,
-          root: 'build/'
-        }
-      },
-
-      update_cache: {
-        options: {
-          message: 'Update cache files'
-        },
-
-        src: [
-          '.grunt/cache/articles.json',
-          'src/weblog/plugins/state/files_index.dat',
-          'src/weblog/plugins/state/others_index.dat'
-        ]
-      },
-
-      update_entry: {
+      entryUpdate: {
         options: {
           message: 'Update'
         }
@@ -483,12 +483,21 @@ module.exports = function (grunt) {
     },
 
     svg2png: {
-      apple_touch_icon: {
+      appleTouchIcon: {
         options: {
           width: 180
         },
 
         dest: 'build/apple-touch-icon.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon1024: {
+        options: {
+          width: 1024
+        },
+
+        dest: 'build/images/favicon-1024.png',
         src: 'src/img/favicon.svg'
       },
 
@@ -498,6 +507,15 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-16.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon256: {
+        options: {
+          width: 256
+        },
+
+        dest: 'build/images/favicon-256.png',
         src: 'src/img/favicon.svg'
       },
 
@@ -516,24 +534,6 @@ module.exports = function (grunt) {
         },
 
         dest: 'build/images/favicon-48.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon256: {
-        options: {
-          width: 256
-        },
-
-        dest: 'build/images/favicon-256.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon1024: {
-        options: {
-          width: 1024
-        },
-
-        dest: 'build/images/favicon-1024.png',
         src: 'src/img/favicon.svg'
       }
     }
@@ -570,7 +570,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:css', [
     'clean',
-    'copy:css_pre',
+    'copy:cssPre',
     'sass',
     'css_mqpacker',
     'csswring',
@@ -578,7 +578,7 @@ module.exports = function (grunt) {
     'single_charset',
     'copy:aco',
     'copy:css',
-    'copy:style_guide',
+    'copy:styleGuide',
     'copy:woff'
   ]);
 
@@ -589,21 +589,21 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:img', [
     'svgmin',
-    'svg2png:apple_touch_icon',
+    'svg2png:appleTouchIcon',
+    'svg2png:favicon1024',
     'svg2png:favicon16',
+    'svg2png:favicon256',
     'svg2png:favicon32',
     'svg2png:favicon48',
-    'svg2png:favicon256',
-    'svg2png:favicon1024',
     'png2ico',
     'copy:img'
   ]);
 
   grunt.registerTask('build:js', [
     'clean',
-    'copy:js_pre',
+    'copy:jsPre',
     'uglify',
-    'copy:js_minified',
+    'copy:jsMinified',
     'concat:js',
     'copy:js'
   ]);
@@ -650,10 +650,10 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('publish:blog', [
-    'gitcommit:add_entry',
+    'gitcommit:entryAdd',
     'build:blog',
-    'gitcommit:update_cache',
-    'gitcommit:publish_blog'
+    'gitcommit:cacheUpdate',
+    'gitcommit:blogPublish'
   ]);
 
   grunt.registerTask('update:assets', [
@@ -662,10 +662,10 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('update:blog', [
-    'gitcommit:update_entry',
+    'gitcommit:entryUpdate',
     'build:blog',
-    'gitcommit:update_cache',
-    'gitcommit:update_blog'
+    'gitcommit:cacheUpdate',
+    'gitcommit:blogUpdate'
   ]);
 
   grunt.registerTask('upload', ['gitcommit:upload']);
