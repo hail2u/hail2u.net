@@ -6,7 +6,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask(taskName, taskDescription, function () {
     var fs = require('fs-extra');
-    var path = require('path');
 
     var i = 0;
     var f = 'file';
@@ -23,7 +22,7 @@ module.exports = function (grunt) {
         if (fs.statSync(src).isFile()) {
           fs.copySync(src, dest);
           i++;
-          grunt.verbose.writeln('Image "' + src + '" copied to "' + dest + '".')
+          grunt.verbose.writeln('Image "' + src + '" copied to "' + dest + '".');
         }
       });
 

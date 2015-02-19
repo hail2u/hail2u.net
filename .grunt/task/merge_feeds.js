@@ -9,8 +9,13 @@ module.exports = function (grunt) {
     var xml2js = require('xml2js');
 
     var dest = 'build/feed';
+    var src = [
+      'src/feed/index.rss',
+      'build/blog/feed'
+    ];
+
     var loadFeed = function (file) {
-      var feed = {};
+      var obj = {};
       xml2js.parseString(fs.readFileSync(file, 'utf8'), {
         explicitArray: false,
         trim: true
@@ -19,15 +24,11 @@ module.exports = function (grunt) {
           throw error;
         }
 
-        feed = data;
+        obj = data;
       });
 
-      return feed;
+      return obj;
     };
-    var src = [
-      'src/feed/index.rss',
-      'build/blog/feed'
-    ];
 
     var feed = loadFeed(src.shift());
     var items = feed.rss.channel.item;

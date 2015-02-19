@@ -26,7 +26,7 @@ module.exports = function (grunt) {
       'RSS': 'rss',
       'Software': 'software',
       'Sports': 'sports',
-      'Web Design': 'webdesign',
+      'Web Design': 'webdesign'
     };
 
     var done = this.async();
@@ -42,65 +42,7 @@ module.exports = function (grunt) {
       );
     });
 
-    async.each(this.files, function (file, next) {
-      var fileTemplate = file.src[0];
-
-      if (!fs.existsSync(fileTemplate)) {
-        grunt.log.warn('Source file "' + fileTemplate + '" not found.');
-
-        return next();
-      }
-
-      dirTemplate = path.dirname(fileTemplate);
-      var metadata = _extendData(fileTemplate);
-      var template = fs.readFileSync(fileTemplate, 'utf8');
-      var render = hbs.compile(template);
-      fs.outputFileSync(file.dest, render(metadata));
-      grunt.log.writeln('File "' + file.dest + '" created.');
-      next();
-    }, function (error) {
-      done(error);
-    });
-
-    function _extendData(file) {
-      var data = _extendObject({}, metadataBase);
-      var fileMetadata = file.replace(/\.\w+$/, '.json');
-
-      if (fs.existsSync(fileMetadata) && fs.statSync(fileMetadata).isFile()) {
-        _extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, 'utf8')));
-      }
-
-      switch (file) {
-        case 'src/html/index.mustache': {
-          data.updates = _loadRSS('src/feed/index.rss');
-          data.updates.item = data.updates.item.slice(0, 5);
-          data.articles = _loadRSS('build/blog/feed');
-          data.articles.item = data.articles.item.slice(0, 6);
-          data.articles.first = data.articles.item.shift();
-          var imgs = data.articles.first['content:encoded'].match(/<img.*?>/g);
-
-          if (imgs) {
-            var img = imgs[0].replace(/src="http:\/\/hail2u\.net/, 'src="');
-            data.articles.first.image = img;
-            data.articles.first.hasImage = true;
-          }
-
-          break;
-        }
-
-        case 'src/html/blog/index.mustache': {
-          data.articles = _loadArticles(
-            'src/weblog/plugins/state/files_index.dat'
-          );
-
-          break;
-        }
-      }
-
-      return data;
-    }
-
-    function _extendObject(dest, src) {
+    var extendObject = function (dest, src) {
       if (dest !== Object(dest)) {
         return dest;
       }
@@ -110,9 +52,9 @@ module.exports = function (grunt) {
       }
 
       return dest;
-    }
+    };
 
-    function _loadRSS(file) {
+    var loadRSS = function (file) {
       var feed = {};
 
       parseXML(fs.readFileSync(file, 'utf8'), {
@@ -152,9 +94,9 @@ module.exports = function (grunt) {
       });
 
       return feed;
-    }
+    };
 
-    function _loadArticles(data) {
+    var loadArticles = function (data) {
       var cache = path.relative(
         process.cwd(),
         path.join(__dirname, '../cache', 'articles.json')
@@ -181,7 +123,7 @@ module.exports = function (grunt) {
           var ss = date.getSeconds();
           var article = {
             title: fs.readFileSync(file, 'utf8').split(/\n/)[0],
-            link: '/blog/' + category + '/' + fn  + '.html',
+            link: '/blog/' + category + '/' + fn + '.html',
             unixtime: date.getTime(),
             year: yy,
             month: mm + 1,
@@ -228,6 +170,64 @@ module.exports = function (grunt) {
       });
 
       return articles;
-    }
+    };
+
+    var extendData = function (file) {
+      var data = extendObject({}, metadataBase);
+      var fileMetadata = file.replace(/\.\w+$/, '.json');
+
+      if (fs.existsSync(fileMetadata) && fs.statSync(fileMetadata).isFile()) {
+        extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, 'utf8')));
+      }
+
+      switch (file) {
+        case 'src/html/index.mustache': {
+          data.updates = loadRSS('src/feed/index.rss');
+          data.updates.item = data.updates.item.slice(0, 5);
+          data.articles = loadRSS('build/blog/feed');
+          data.articles.item = data.articles.item.slice(0, 6);
+          data.articles.first = data.articles.item.shift();
+          var imgs = data.articles.first['content:encoded'].match(/<img.*?>/g);
+
+          if (imgs) {
+            var img = imgs[0].replace(/src="http:\/\/hail2u\.net/, 'src="');
+            data.articles.first.image = img;
+            data.articles.first.hasImage = true;
+          }
+
+          break;
+        }
+
+        case 'src/html/blog/index.mustache': {
+          data.articles = loadArticles(
+            'src/weblog/plugins/state/files_index.dat'
+          );
+
+          break;
+        }
+      }
+
+      return data;
+    };
+
+    async.each(this.files, function (file, next) {
+      var fileTemplate = file.src[0];
+
+      if (!fs.existsSync(fileTemplate)) {
+        grunt.log.warn('Source file "' + fileTemplate + '" not found.');
+
+        return next();
+      }
+
+      dirTemplate = path.dirname(fileTemplate);
+      var metadata = extendData(fileTemplate);
+      var template = fs.readFileSync(fileTemplate, 'utf8');
+      var render = hbs.compile(template);
+      fs.outputFileSync(file.dest, render(metadata));
+      grunt.log.writeln('File "' + file.dest + '" created.');
+      next();
+    }, function (error) {
+      done(error);
+    });
   });
 };

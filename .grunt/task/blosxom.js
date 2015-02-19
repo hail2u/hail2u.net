@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       reindex: false
     });
     var args = ['blosxom.cgi'];
-    var file = grunt.option('file');
+    var entry = grunt.option('file');
     var files = [];
     var fileCache = path.resolve(options.rootdir, 'plugins/state/files_index.dat');
     var bar;
@@ -61,15 +61,15 @@ module.exports = function (grunt) {
         total: files.length,
         width: 32
       });
-    } else if (file) {
-      if (path.resolve(file) === path.normalize(file)) {
-        file = path.relative(options.datadir, file);
-        files.unshift(file);
+    } else if (entry) {
+      if (path.resolve(entry) === path.normalize(entry)) {
+        entry = path.relative(options.datadir, entry);
+        files.unshift(entry);
       }
 
       if (options.index) {
-        file = path.join(path.dirname(file), 'index.html');
-        files.push(file);
+        entry = path.join(path.dirname(entry), 'index.html');
+        files.push(entry);
       }
     }
 

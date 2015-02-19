@@ -9,7 +9,7 @@ module.exports = function (grunt) {
     var which = require('which').sync;
 
     var options = this.options({
-      cmd: 'convert',
+      cmd: 'convert'
     });
     var args = [];
     this.files.forEach(function (file) {

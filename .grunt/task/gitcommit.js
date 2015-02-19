@@ -5,7 +5,6 @@ module.exports = function (grunt) {
   var taskDescription = 'Add and commit (and push) with Git.';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
-    var async = require('async');
     var path = require('path');
     var spawn = require('child_process').spawnSync;
     var which = require('which').sync;
