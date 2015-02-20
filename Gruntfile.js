@@ -336,8 +336,10 @@ module.exports = function (grunt) {
     blosxom: {
       options: {
         datadir: 'src/weblog/entries/',
+        imgdir: 'src/img/blog/',
         rootdir: 'src/weblog/',
-        staticdir: 'build/blog/'
+        staticdir: 'build/blog/',
+        staticimgdir: 'build/images/blog/'
       },
 
       all: {
@@ -561,7 +563,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build:blog', [
-    'copy_blog_images',
     'blosxom:article',
     'generate:blog',
     'merge_feeds',

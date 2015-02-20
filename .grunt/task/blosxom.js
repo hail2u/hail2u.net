@@ -62,6 +62,9 @@ module.exports = function (grunt) {
         width: 32
       });
     } else if (entry) {
+      var i = 0;
+      var images = fs.readFileSync(entry, 'utf-8').match(/\bsrc=".*?"/g);
+
       if (path.resolve(entry) === path.normalize(entry)) {
         entry = path.relative(options.datadir, entry);
         files.unshift(entry);
@@ -70,6 +73,29 @@ module.exports = function (grunt) {
       if (options.index) {
         entry = path.join(path.dirname(entry), 'index.html');
         files.push(entry);
+      }
+
+      if (images) {
+        images.forEach(function (image) {
+          image = image.replace(/^src="\/images\/blog\/(.*?)"$/, '$1');
+          var src = options.imgdir + image;
+          var dest = options.staticimgdir + image;
+
+          if (fs.statSync(src).isFile()) {
+            fs.copySync(src, dest);
+            i++;
+            grunt.verbose.writeln('Image "' + src + '" copied to "' + dest + '".');
+          }
+        });
+        grunt.log.write(i + ' image');
+
+        if (i > 1) {
+          grunt.log.write('s');
+        }
+
+        grunt.log.writeln(' copied.');
+      } else {
+        grunt.log.writeln('Image not found.');
       }
     }
 
