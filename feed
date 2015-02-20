@@ -10,6 +10,56 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>xml2js v0.4.5でCDATAセクションがサポート</title>
+      <link>http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html</link>
+      <description>Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html</guid>
+      <pubDate>Sat, 21 Feb 2015 01:28:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>Node.jsでXMLをまともに読み書きできる唯一と言えそうな<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>パッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</p>
+
+<p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
+
+<pre><code>var xml2js = require(&#39;xml2js&#39;);
+
+var builder = new xml2js.Builder({
+  cdata: true
+});
+var obj = {
+  foo: &#39;Foo&#39;,
+  bar: &#39;Bar&#39;
+};
+var xml = builder.buildObject(obj);
+</code></pre>
+
+<p>このようにグローバルでの設定しかないため、CDATAで書くか書かないかの二択になる。この要素ではCDATAを、この要素では文字参照で、などとはできないのが少し残念だ。</p>
+
+<hr>
+
+<p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
+
+<pre><code>var xml2js = require(&#39;xml2js&#39;);
+
+console.log(new xml2js.Builder({
+  cdata: true
+}).buildObject({
+  &#39;foo&#39;: {
+    &#39;bar&#39;: &#39;baz &amp; qux&#39;
+  }
+}));
+</code></pre>
+
+<p>これで<code>bar</code>要素の中身がCDATAセクションになってくれれば良いが、なってくれない。</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;foo&gt;
+  &lt;bar&gt;baz &amp;amp; qux&lt;/bar&gt;
+&lt;/foo&gt;
+</code></pre>
+
+<p>イシューは立てておいたので早めに直って欲しい。手元では<a href="/pub/xml2js.js.diff">パッチ</a>を(しかもJavaScriptファイルの方に)当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>夢</title>
       <link>http://hail2u.net/blog/misc/dreaming-20150218.html</link>
       <description>ケンタウロス(セントール)のことを考えていた。あのサイズで人間の上半身だと、食料の摂取が大変で、食事だけで数時間浪費してしまいそうだ、とか。胃も同じサイズだと……というところまで考えて、はて胃はどこにあるのだろうか、いや待って腸はどうだろうか、いやいやそもそも心臓や肺が人間の部分にあってそのサイズのままだったら、馬として走れないんじゃないのか、などと疑問がわいた。そこで一頭捕まえて解剖しようとしたら、蹴られて痛いってなったところで目が覚めた。</description>
@@ -406,76 +456,6 @@ image.style.width = &#39;auto&#39;;
 <p>しかし独立したコンポーネントとしてデザインするためには、構造(HTML)として安定した形(独立したセクション)である必要があり、その上で前後の文脈や周辺の要素に依存しないようにCSSを書いていく必要がある。<code>vw</code>や<code>vh</code>、<code>vmin</code>、<code>vmax</code>といった描画領域を基準にした単位は、親要素はもちろん<code>body</code>や<code>html</code>要素のレンダリング状況を迂回してサイズを決定できるので、そういったCSSの書き方に大いに役に立つ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>バターなし！牛乳なし！のヨーグルトを使ったスコーン</title>
-      <link>http://hail2u.net/blog/misc/yogurt-scone.html</link>
-      <description>ヨーグルトを水切りしてクリームとホエーに分け、それをバターと牛乳の代わりにして作るスコーンを作った。水切りに時間はかかったものの、バターの時とほぼ同じ感覚で作ることができ、特に難しくなかった。美味しかったけれど、やっぱりスコーンではないかなーというできあがりだ。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/yogurt-scone.html</guid>
-      <pubDate>Wed, 11 Feb 2015 00:01:00 +0900</pubDate>
-      <content:encoded><![CDATA[<figure>
-  <a href="/images/blog/yogurt-scone.jpg"><img alt="水切りしたヨーグルトを使い、バターなし！牛乳なし！で作ったスコーン" src="/images/blog/yogurt-scone.jpg"></a>
-</figure>
-
-<p>ヨーグルトを水切りしてクリームとホエーに分け、それをバターと牛乳の代わりにして作るスコーンを作った。水切りに時間はかかったものの、バターの時とほぼ同じ感覚で作ることができ、特に難しくなかった。美味しかったけれど、やっぱりスコーンではないかなーというできあがりだ。</p>
-
-<p>ヨーグルトの水切りはガーゼを二重にして筒状の容器にかぶせてから輪ゴムで止めたものでやった。キッチンペーパーでも可能なようだけれど、ヨーグルトの水分量の多さにも依存するので、ガーゼやふきんの方が無難そうだ。きっちりクリーム状にするには一晩かかる。ヨーグルトは<a href="http://product.koiwaimilk.com/product/yogurt/nama_400.html">小岩井 生乳100％ヨーグルト</a>を丸々400g使った。これで大体200g弱のクリームと150ccくらいのホエーに分離するようだ。</p>
-
-<table>
-<thead>
-<tr>
-<th>材料</th>
-<th style="text-align:right">分量</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>小麦粉</td>
-<td style="text-align:right">150g</td>
-</tr>
-<tr>
-<td>ベーキングパウダー</td>
-<td style="text-align:right">10g</td>
-</tr>
-<tr>
-<td>砂糖</td>
-<td style="text-align:right">大さじ2</td>
-</tr>
-<tr>
-<td>塩</td>
-<td style="text-align:right">小さじ1/3</td>
-</tr>
-<tr>
-<td>ヨーグルトクリーム</td>
-<td style="text-align:right">50g</td>
-</tr>
-<tr>
-<td>ホエー</td>
-<td style="text-align:right">大さじ1</td>
-</tr>
-<tr>
-<td>サラダ油</td>
-<td style="text-align:right">大さじ1</td>
-</tr>
-<tr>
-<td>溶き卵</td>
-<td style="text-align:right">1/2個</td>
-</tr>
-</tbody>
-</table>
-
-<p>この分量で7個分として焼いたところ、こぶし大より一回りくらい小さいサイズに焼きあがった。バターなし！牛乳なし！</p>
-
-<p>小麦粉から塩までを一旦混ぜあわせ、そこにヨーグルトクリームを加えて更に混ぜ、最後にホエーから溶き卵までを混ぜると生地がまとまる。ゴルフボールくらいに丸めただけで焼いたところ、ポワンとパンみたいにふっくらしてしまったので、ちゃんとのばして型抜きした方が良いのかもしれない。</p>
-
-<p>サクフワで普通のスコーンとは違った美味しさだった。まわりはカリッと焼きあがることもあって、甘食とかの食感に近い。甘みが強めだったので、砂糖はもうちょっと減らしても良いかもしれないけれど、それだと今度はヨーグルトクリームの酸味やベーキングパウダーの苦味が出てしまいそうだ。</p>
-
-<hr>
-
-<p>スコーンのサクサクではないサックリ感みたいなのはやはりバターなようだ。ちょくちょくバターをなたね油などで代用したお菓子レシピとか見かけるが、あんまり期待はできない感じがしてきた。でも今度やってみよう。</p>
-
-<p>余ったホエーは野菜入れてスープにして飲んだが、これは微妙だった(まずくはない)。このホエーと牛乳でリコッタチーズのようなものができあがるらしいので、今度やる時は挑戦してみようと思う。ヨーグルトクリームの方はレーズンパンに塗ったり、コーヒーに浮かべたり、どうやっても美味しかった。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -510,6 +490,6 @@ image.style.width = &#39;auto&#39;;
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 20 Feb 2015 05:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 21 Feb 2015 01:28:00 +0900</lastBuildDate>
   </channel>
 </rss>

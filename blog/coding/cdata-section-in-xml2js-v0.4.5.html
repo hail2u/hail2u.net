@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja-JP" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>xml2js v0.4.5でCDATAセクションがサポート - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/coding/cdata-section-in-xml2js-v0.4.5.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/misc/dreaming-20150218.html">
+
+    
+
+    
+      <meta content="xml2js v0.4.5でCDATAセクションがサポート" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content">
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/coding/cdata-section-in-xml2js-v0.4.5.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">xml2js v0.4.5でCDATAセクションがサポート</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-21T01:28:00+09:00" itemprop="datePublished">Feb 21, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Node.jsでXMLをまともに読み書きできる唯一と言えそうな<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>パッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</p>
+
+<p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
+
+<pre><code class="language-javascript">var xml2js = require(&#39;xml2js&#39;);
+
+var builder = new xml2js.Builder({
+  cdata: true
+});
+var obj = {
+  foo: &#39;Foo&#39;,
+  bar: &#39;Bar&#39;
+};
+var xml = builder.buildObject(obj);
+</code></pre>
+
+<p>このようにグローバルでの設定しかないため、CDATAで書くか書かないかの二択になる。この要素ではCDATAを、この要素では文字参照で、などとはできないのが少し残念だ。</p>
+
+<hr>
+
+<p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
+
+<pre><code class="language-javascript">var xml2js = require(&#39;xml2js&#39;);
+
+console.log(new xml2js.Builder({
+  cdata: true
+}).buildObject({
+  &#39;foo&#39;: {
+    &#39;bar&#39;: &#39;baz &amp; qux&#39;
+  }
+}));
+</code></pre>
+
+<p>これで<code>bar</code>要素の中身がCDATAセクションになってくれれば良いが、なってくれない。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;foo&gt;
+  &lt;bar&gt;baz &amp;amp; qux&lt;/bar&gt;
+&lt;/foo&gt;
+</code></pre>
+
+<p>イシューは立てておいたので早めに直って欲しい。手元では<a href="/pub/xml2js.js.diff">パッチ</a>を(しかもJavaScriptファイルの方に)当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=xml2js%20v0.4.5%E3%81%A7CDATA%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%8C%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcdata-section-in-xml2js-v0.4.5.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcdata-section-in-xml2js-v0.4.5.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=xml2js%20v0.4.5%E3%81%A7CDATA%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%8C%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcdata-section-in-xml2js-v0.4.5.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/misc/dreaming-20150218.html" rel="prev">
+  <p>夢</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
