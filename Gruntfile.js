@@ -252,6 +252,22 @@ module.exports = function (grunt) {
       }
     },
 
+    png2ico: {
+      options: {
+        cmd: 'png2ico'
+      },
+
+      main: {
+        dest: 'build/favicon.ico',
+        src: [
+          'build/images/favicon-16.png',
+          'build/images/favicon-32.png',
+          'build/images/favicon-48.png',
+          'build/images/favicon-256.png'
+        ]
+      }
+    },
+
     'pubsubhubbub_publish': {
       main: {
         hubUrl: 'http://hail2u.net/feed'
@@ -308,6 +324,62 @@ module.exports = function (grunt) {
           '!icon/magnifying-glass.svg',
           '!**/*.min.svg'
         ]
+      }
+    },
+
+    svgRasterizer: {
+      appleTouchIcon: {
+        options: {
+          width: 180
+        },
+
+        dest: 'build/apple-touch-icon.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon1024: {
+        options: {
+          width: 1024
+        },
+
+        dest: 'build/images/favicon-1024.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon16: {
+        options: {
+          width: 16
+        },
+
+        dest: 'build/images/favicon-16.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon256: {
+        options: {
+          width: 256
+        },
+
+        dest: 'build/images/favicon-256.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon32: {
+        options: {
+          width: 32
+        },
+
+        dest: 'build/images/favicon-32.png',
+        src: 'src/img/favicon.svg'
+      },
+
+      favicon48: {
+        options: {
+          width: 48
+        },
+
+        dest: 'build/images/favicon-48.png',
+        src: 'src/img/favicon.svg'
       }
     },
 
@@ -482,78 +554,6 @@ module.exports = function (grunt) {
           root: 'build/'
         }
       }
-    },
-
-    png2ico: {
-      options: {
-        cmd: 'png2ico'
-      },
-
-      main: {
-        dest: 'build/favicon.ico',
-        src: [
-          'build/images/favicon-16.png',
-          'build/images/favicon-32.png',
-          'build/images/favicon-48.png',
-          'build/images/favicon-256.png'
-        ]
-      }
-    },
-
-    svgRasterizer: {
-      appleTouchIcon: {
-        options: {
-          width: 180
-        },
-
-        dest: 'build/apple-touch-icon.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon1024: {
-        options: {
-          width: 1024
-        },
-
-        dest: 'build/images/favicon-1024.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon16: {
-        options: {
-          width: 16
-        },
-
-        dest: 'build/images/favicon-16.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon256: {
-        options: {
-          width: 256
-        },
-
-        dest: 'build/images/favicon-256.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon32: {
-        options: {
-          width: 32
-        },
-
-        dest: 'build/images/favicon-32.png',
-        src: 'src/img/favicon.svg'
-      },
-
-      favicon48: {
-        options: {
-          width: 48
-        },
-
-        dest: 'build/images/favicon-48.png',
-        src: 'src/img/favicon.svg'
-      }
     }
   });
 
@@ -686,6 +686,4 @@ module.exports = function (grunt) {
     'gitcommit:cacheUpdate',
     'gitcommit:blogUpdate'
   ]);
-
-  grunt.registerTask('upload', ['gitcommit:upload']);
 };
