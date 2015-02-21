@@ -443,6 +443,19 @@ module.exports = function (grunt) {
     },
 
     feedmix: {
+      options: {
+        builder: {
+          cdata: true,
+          xmldec: {
+            encoding: 'UTF-8',
+            version: '1.0'
+          }
+        },
+        parser: {
+          trim: true
+        }
+      },
+
       main: {
         dest: 'build/feed',
         src: [
