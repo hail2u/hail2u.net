@@ -559,6 +559,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('css-mqpacker');
   grunt.loadNpmTasks('csswring');
+  grunt.loadNpmTasks('feedmix');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
