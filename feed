@@ -10,6 +10,84 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>CSSできれいな斜め線</title>
+      <link>http://hail2u.net/blog/webdesign/antialiased-diagonal-line-with-css.html</link>
+      <description>CSSで斜めに線を引くようなことをするには多少なりとも工夫が必要だった。つまりCSSで作る吹き出し(もう5年前の記事だ)のようにborderプロパティーを使って頑張るしかなかったわけだ。今はlinear-gradient()があるので直感的に作ることができるようになった。しかしきれいに引くとなるとまだ工夫が必要そうだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/antialiased-diagonal-line-with-css.html</guid>
+      <pubDate>Sun, 22 Feb 2015 01:39:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="/images/blog/antialiased-diagonal-line-with-css.png"><img alt="斜め" height="627" src="/images/blog/antialiased-diagonal-line-with-css.png" width="1200"></a>
+</figure>
+
+<p>CSSで斜めに線を引くようなことをするには多少なりとも工夫が必要だった。つまり<a href="/blog/webdesign/pure-css-speech-bubble.html">CSSで作る吹き出し</a>(もう5年前の記事だ)のように<code>border</code>プロパティーを使って頑張るしかなかったわけだ。今は<code>linear-gradient()</code>があるので直感的に作ることができるようになった。しかしきれいに引くとなるとまだ工夫が必要そうだ。</p>
+
+<p>View Demo: <a href="/pub/test/614.html">CSS Diagonal Line</a></p>
+
+<p><code>border</code>プロパティーを使ったもの、<code>linear-gradient()</code>を背景で使ったもの、Data URI化したSVGを背景に使ったもの、以上の計3つのデモを作った。</p>
+
+<pre><code>.lg {
+  background-image: linear-gradient(
+    <mark>to right bottom</mark>,
+    transparent 50%,
+    #f0f 50%
+  );
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 3rem;
+  width: 16rem;
+}
+</code></pre>
+
+<p>2番目の<code>linear-gradient()</code>を背景に使ったものが最も直感的に書けるが、Chrome 40ではぎざぎざになってしまう。Chromeはトップシェアで安定しだしたと考えられるので、今この方法で実装するのはかなり勇気がいる。</p>
+
+<pre><code>.border {
+  border-bottom: 3rem solid #f0f;
+  border-left: 16rem solid <mark>transparent</mark>;
+  box-sizing: border-box;
+  height: 0;
+  width: 16rem;
+}
+</code></pre>
+
+<p>1番目の<code>border</code>プロパティーによる実装は安定の結果だ。以前はハードウェア・アクセラレーションを有効化するハックが必要だったが、今はいらない。とはいえ相変わらず意味のわからないCSSコードになる。加えて<code>border</code>プロパティーで<code>%</code>を使えないため、不明な幅の要素に対してはうまく作ることができない。</p>
+
+<pre><code>.svg {
+  background-image: url(&#39;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221%22%20height%3D%221%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%201l1-1v1z%22%20fill%3D%22%23f0f%22%2F%3E%3C%2Fsvg%3E&#39;);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  height: 3rem;
+  width: 16rem;
+}
+</code></pre>
+
+<p>しょうがないのでSVGをData URI化して埋め込むという奥の手を使った。斜めの画像があるという前提だと、概ね直感的なCSSだとは言える。Data URIも長いが、それでも226バイト程度なので、多少複雑なCSSグラデーションだと思えば許容範囲だろう。見逃しがちなのは<code>background-size</code>プロパティーで明示的にいっぱいいっぱいにリサイズしてやることくらいだ。</p>
+
+<pre><code>&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  width=&quot;1&quot;
+  height=&quot;1&quot;
+  preserveAspectRatio=&quot;none&quot;&gt;
+  &lt;path
+    d=&quot;M0 1l1-1v1z&quot;
+    fill=&quot;#f0f&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>SVGもこの程度の簡単なものだ。Chromeにかなり古くからある<a href="/pub/test/613.html">リサイズ・バグ</a>へ対応するために<code>preserveAspectRatio</code>属性を指定することに注意が必要なくらいだ(これで30分くらいハマった)。</p>
+
+<hr>
+
+<p>こういった斜めの線やブロックを作る場合にはCSS Transformを使って回転させる(<code>rotate()</code>する)というアプローチも可能だ。少し足りなかったりはみ出たりする部分は、<code>width</code>プロパティーで大きく作り、<code>overflow</code>プロパティーで隠せば良い。中身も回ってしまうのは、回転軸に注意して子の要素で逆方向に回転させれば戻せるだろう。CSSは煩雑だが傾けたいから傾けるわけで、概ね直感的とも言えそうだ。</p>
+
+<p>ただ<a href="http://kyonagashima.com/">必要としたページ</a>では、斜めにしたいブロックの高さが一定ではないこと、斜めの角度ではなく高さを一定にしたかったことなどの条件があった。CSS Transformでも頑張って計算すれば可能そうだったが、面倒すぎるかと思い、背景画像によるアプローチに絞って考えていた。</p>
+
+<hr>
+
+<p>安定なのは<code>border</code>プロパティーで行う実装だが、不明な幅の要素で使いたい場合はSVGによる実装というのが現時点での妥当な選択だろう。Firefox 35で若干アンチエイリアスが甘いことも考慮すると、SVGで統一という選択も悪くはない。とにかくChromeでも早いところ<code>linear-gradient()</code>へきれいにアンチエイリアスかかるようになって欲しい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>xml2js v0.4.5でCDATAセクションがサポート</title>
       <link>http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html</link>
       <description>Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</description>
@@ -349,123 +427,6 @@ image.style.width = &#39;auto&#39;;
 <p>明らかにバグと言えそうだが、実際に何か致命的なことが起こるとも思えないバグだ。報告はしておいたけど、悪いこともできなそうな気がするので放置されそうだ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>フルスクリーンでオーバーレイの検索ボックス</title>
-      <link>http://hail2u.net/blog/webdesign/fullscreen-overlay-searchbox.html</link>
-      <description>増えてきたフルスクリーンでオーバーレイの検索ボックスだが、まだこれといった無難な実装方法はないように見える。今だとvw/vh/vmin/vmax単位を使ってレイアウト、:target擬似クラスを使ってトグルという形にすれば、ほぼCSSで実現できそうだ。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/fullscreen-overlay-searchbox.html</guid>
-      <pubDate>Thu, 12 Feb 2015 00:55:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="/images/blog/fullscreen-overlay-searchbox.png"><img alt="虫眼鏡アイコンをクリックすると、フルスクリーンかつオーバーレイで表示されるタイプの検索ボックス" height="627" src="/images/blog/fullscreen-overlay-searchbox.png" width="1200"></a>
-</figure>
-
-<p>増えてきたフルスクリーンでオーバーレイの検索ボックスだが、まだこれといった無難な実装方法はないように見える。今だと<a href="http://www.w3.org/TR/css3-values/#viewport-relative-lengths"><code>vw</code>/<code>vh</code>/<code>vmin</code>/<code>vmax</code>単位</a>を使ってレイアウト、<a href="http://www.w3.org/TR/css3-selectors/#target-pseudo"><code>:target</code>擬似クラス</a>を使ってトグルという形にすれば、ほぼCSSで実現できそうだ。</p>
-
-<p>View Demo: <a href="/pub/test/609.html">Fullscreen Overlay Searchbox</a></p>
-
-<p>デモではShow Searchboxというリンクをクリックすると検索ボックスが表示され、検索ボックスの左上にある✖をクリックすると閉じることができる。実際のウェブサイトではリンクの代わりに虫眼鏡のアイコンでも使ってやれば良いだろう。</p>
-
-<h2>マークアップ</h2>
-
-<pre><code>&lt;aside id=&quot;search&quot; class=&quot;searchbox&quot;&gt;
-  &lt;h1&gt;Search this site&lt;/h1&gt;
-
-  &lt;form&gt;
-    &lt;input class=&quot;query&quot; placeholder=&quot;Enter search keyword(s)&quot; type=&quot;search&quot;&gt;
-  &lt;/form&gt;
-
-  &lt;footer&gt;
-    &lt;a class=&quot;close&quot; href=&quot;#top&quot;&gt;Back to Top&lt;/a&gt;
-  &lt;/footer&gt;
-&lt;/aside&gt;
-</code></pre>
-
-<p>検索ボックスのマークアップは<code>aside</code>要素を使って、このような形にした。<code>id</code>属性は後に<code>:target</code>擬似クラスで利用するため、必須になる。</p>
-
-<p><code>h1</code>要素は冗長な気もするが、通常は隠れたセクションであることを考慮すると、見出しはあった方が良いだろう。<code>label</code>要素や<code>input type=submit&quot;</code>を使う必要がないフォームであることも考えると、このような一般的な文言で見出しを付けておくのが無難か。</p>
-
-<p>閉じるボタンは<code>a</code>要素で<code>#top</code>に移動させるようにして実現するが、リンク文字列は「閉じる」や「Close」ではない方が良い。CSS側で✖に変えたりすることになるが、リンクそのものの機能としてはページの最上部に移動するという機能でしかないからだ。CSSが無効の時に「閉じる」というリンクで「ページの最上部に移動する」ことになるのがおかしいからというように考えても良いだろう。</p>
-
-<h2>フルスクリーン化</h2>
-
-<pre><code>.searchbox {
-  height: 100vh;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-}
-</code></pre>
-
-<p>検索ボックスのレイアウトでは<code>vw</code>と<code>vh</code>単位を使って描画領域全体と同じサイズになるようにして、フルスクリーンになるようにする。サイズさえ正しければ<code>position: fixed</code>で配置するだけで、きれいに全体にかぶさるはずだ。</p>
-
-<h2>閉じるボタン</h2>
-
-<pre><code>.searchbox .close {
-  display: block;
-  font-size: 8vmin;
-  height: 8vmin;
-  left: 1vmin;
-  position: absolute;
-  top: 1vmin;
-  width: 8vmin;
-}
-
-.searchbox .close::before {
-  content: &#39;✖&#39;;
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-</code></pre>
-
-<p>閉じるボタンでは<code>vmin</code>単位を使うことで占有する面積を一定以下に維持し、大きすぎる・小さすぎるがあまりないようにしておいた。<code>font-size</code>でも使えるので、うまく使ってやるときれいに文字(記号)を配置することができる。また、<code>vw</code>や<code>vh</code>ではなく<code>vmin</code>単位を使うことで、縦横のどちらが余っているのかわからない検索フォームの領域とかぶさらないようにもできる。そうすると閉じるボタンがクリックできないというような事故や検索フォームをクリアーするアイコンとかぶったというような事故を避けることができるはずだ。</p>
-
-<p>もうひとつスクロールバーの有無という問題があるので、左上に配置すると簡単になる。スクロールバーの有無をCSSで判定するのは難しく、かといってそのためだけにJavaScriptを使うのももったいない。<code>calc()</code>を使うと何とかなるが、直感的ではない。近年のOSのGUIを考えると、閉じるボタンが右上というのももはや暗黙の了解とは言えなくなってきたので、左上でもわかりやすければ大丈夫だろう。</p>
-
-<p>アイコン化は簡単にユニコードの<a href="http://en.wikipedia.org/wiki/Dingbat#Unicode">Dingbatsブロック</a>のHeavy Multiplication Xを利用した。うかつに絵文字で良さそうなものを探すと予期せぬカラー化などが起こるので、こういったUIでおとなしめに使う場合はこの辺りの記号から選択すると良い。</p>
-
-<h2>検索ボックス</h2>
-
-<pre><code>.searchbox .query {
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  font-size: 7vmin;
-  left: 10vw;
-  margin-top: -0.675em;
-  position: absolute;
-  top: 50%;
-  width: 80vw;
-}
-</code></pre>
-
-<p>検索フォームは縦横中央寄せをすることになる。<code>transform: translate()</code>を使って配置しても良いが、運が悪いと枠線や背景画像がぼやけてしまう。この場合はサイズが明確なので、絶対配置と負のマージンで配置する方が安定する。Flexboxも悪くないが、単純な縦方向のセンタリングには少し牛刀感がある。</p>
-
-<p>左位置の指定や幅においても<code>vw</code>単位を使うことで、前述の閉じるボタンとうまくマッチさせることができる。画面サイズに従ってある程度可変して欲しいフォント・サイズは<code>vmin</code>を使って調節するのが簡単だ。メディア・クエリーを使ってビューポートのサイズで切り替えるのも悪くないがそこそこ手間がかかる。</p>
-
-<h2>トグルの実装</h2>
-
-<pre><code>#searchbox {
-  display: none;
-}
-
-#searchbox:target {
-  display: block;
-}
-</code></pre>
-
-<p>トグルの機能はフラグメント識別子と<code>:target</code>擬似クラスの組み合わせで簡単に実装できる。閉じるボタンのリンク先を<code>#top</code>にしてやると、それをクリック(タッチ)することで<code>#search:target</code>を無効にできるため、うまいこと検索ボックスを閉じることができるというわけだ。ここでIDセレクターをちゃんと使うことで、フルスクリーンでオーバーレイにするビジュアル・デザインのためのルール群とトグルのためのルールを切り分けることができる。</p>
-
-<p>デモでは検索ボックスを消した後に残るフラグメント識別子を<code>histroy.replaceState()</code>を使って消しているが、これをやめればCSSのみでできるだろう。</p>
-
-<hr>
-
-<p>フルスクリーンでオーバーレイの検索ボックスは、独立したコンポーネントとしてデザインしやすいのが大きな利点だ。そうデザインできることで、異なるデバイス間でも似た検索体験を提供でき、また違うプロジェクトでも再利用することも比較的容易になる。ここで作ったデモもほぼどこでも使えるように出来たと思う。</p>
-
-<p>しかし独立したコンポーネントとしてデザインするためには、構造(HTML)として安定した形(独立したセクション)である必要があり、その上で前後の文脈や周辺の要素に依存しないようにCSSを書いていく必要がある。<code>vw</code>や<code>vh</code>、<code>vmin</code>、<code>vmax</code>といった描画領域を基準にした単位は、親要素はもちろん<code>body</code>や<code>html</code>要素のレンダリング状況を迂回してサイズを決定できるので、そういったCSSの書き方に大いに役に立つ。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -510,6 +471,6 @@ image.style.width = &#39;auto&#39;;
         <p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>
       ]]></description>
     </item>
-    <lastBuildDate>Sat, 21 Feb 2015 01:28:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 22 Feb 2015 01:39:00 +0900</lastBuildDate>
   </channel>
 </rss>
