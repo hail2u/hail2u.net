@@ -114,7 +114,11 @@ module.exports = function (grunt) {
             cwd: 'src/woff/',
             dest: 'src/css/assets/fonts/',
             expand: true,
-            src: ['*.woff']
+            src: [
+              'megrim/*.woff',
+              'source-code-pro/*.woff',
+              'source-sans-pro/*.woff'
+            ]
           }
         ]
       },
@@ -216,7 +220,11 @@ module.exports = function (grunt) {
         cwd: 'src/woff/',
         dest: 'build/fonts/',
         expand: true,
-        src: ['**/*.woff']
+        src: [
+          'megrim/*.woff',
+          'source-code-pro/*.woff',
+          'source-sans-pro/*.woff'
+        ]
       }
     },
 
