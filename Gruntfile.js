@@ -370,6 +370,16 @@ module.exports = function (grunt) {
       }
     },
 
+    feedmix: {
+      main: {
+        dest: 'build/feed',
+        src: [
+          'src/feed/index.rss',
+          'build/blog/feed'
+        ]
+      }
+    },
+
     generate: {
       main: {
         cwd: 'src/html/',
@@ -573,7 +583,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build:blog', [
     'blosxom:article',
     'generate:blog',
-    'merge_feeds',
+    'feedmix',
     'sitemap'
   ]);
 
@@ -629,7 +639,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy:home', [
     'build:html',
-    'merge_feeds:main',
+    'feedmix',
     'sitemap',
     'gitcommit:deploy'
   ]);
