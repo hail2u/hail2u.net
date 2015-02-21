@@ -555,6 +555,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-png2ico');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
   grunt.loadNpmTasks('grunt-svg-rasterizer');
   grunt.loadNpmTasks('grunt-svgmin');
