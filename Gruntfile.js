@@ -490,7 +490,7 @@ module.exports = function (grunt) {
       }
     },
 
-    svg2png: {
+    svgRasterizer: {
       appleTouchIcon: {
         options: {
           width: 180
@@ -556,6 +556,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-pubsubhubbub_publish');
+  grunt.loadNpmTasks('grunt-svg-rasterizer');
   grunt.loadNpmTasks('grunt-svgmin');
   grunt.loadNpmTasks('postcss-single-charset');
   grunt.loadTasks('.grunt/task/');
@@ -596,12 +597,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:img', [
     'svgmin',
-    'svg2png:appleTouchIcon',
-    'svg2png:favicon1024',
-    'svg2png:favicon16',
-    'svg2png:favicon256',
-    'svg2png:favicon32',
-    'svg2png:favicon48',
+    'svgRasterizer:appleTouchIcon',
+    'svgRasterizer:favicon1024',
+    'svgRasterizer:favicon16',
+    'svgRasterizer:favicon256',
+    'svgRasterizer:favicon32',
+    'svgRasterizer:favicon48',
     'png2ico',
     'copy:img'
   ]);
