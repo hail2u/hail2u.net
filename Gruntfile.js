@@ -20,9 +20,8 @@ module.exports = function (grunt) {
       css: {
         files: {
           'tmp/style.min.css': [
-            'tmp/source-sans-pro.min.css',
             'tmp/source-code-pro.min.css',
-            'tmp/megrim.min.css',
+            'tmp/source-sans-pro.min.css',
             'tmp/style.min.css'
           ]
         }
@@ -115,9 +114,10 @@ module.exports = function (grunt) {
             dest: 'src/css/assets/fonts/',
             expand: true,
             src: [
-              'megrim/*.woff',
-              'source-code-pro/*.woff',
-              'source-sans-pro/*.woff'
+              'source-code-pro/b.woff',
+              'source-code-pro/r.woff',
+              'source-sans-pro/b.woff',
+              'source-sans-pro/r.woff'
             ]
           }
         ]
@@ -145,7 +145,6 @@ module.exports = function (grunt) {
         expand: true,
         ext: '.css',
         src: [
-          'megrim.scss',
           'source-code-pro.scss',
           'source-sans-pro.scss'
         ]
@@ -221,9 +220,10 @@ module.exports = function (grunt) {
         dest: 'build/fonts/',
         expand: true,
         src: [
-          'megrim/*.woff',
-          'source-code-pro/*.woff',
-          'source-sans-pro/*.woff'
+          'source-code-pro/b.woff',
+          'source-code-pro/r.woff',
+          'source-sans-pro/b.woff',
+          'source-sans-pro/r.woff'
         ]
       }
     },
