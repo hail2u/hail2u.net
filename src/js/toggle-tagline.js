@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+
   var t = function () {
     var logo = document.querySelector('.logo');
     var tagline = document.querySelector('.tagline');
