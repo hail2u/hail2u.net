@@ -133,20 +133,20 @@ module.exports = function (grunt) {
         ]
       },
 
-      cssPre: {
+      cssPathRewrite: {
         options: {
           process: function (content) {
-            return content.replace(/'assets\/(.*?)'/g, '\'../$1\'');
+            return content.replace(/"assets\/(.*?)"/g, '"../$1"');
           }
         },
 
-        cwd: 'src/css/',
+        cwd: 'tmp/',
         dest: 'tmp/',
         expand: true,
         ext: '.css',
         src: [
-          'source-code-pro.scss',
-          'source-sans-pro.scss'
+          'source-code-pro.css',
+          'source-sans-pro.css'
         ]
       },
 
@@ -303,7 +303,14 @@ module.exports = function (grunt) {
         dest: 'tmp/',
         expand: true,
         ext: '.css',
-        src: ['*.scss']
+        src: [
+          'debug.scss',
+          'documents.scss',
+          'natural.scss',
+          'source-code-pro.scss',
+          'source-sans-pro.scss',
+          'style.scss'
+        ]
       }
     },
 
@@ -611,8 +618,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build:css', [
     'clean',
-    'copy:cssPre',
     'sass',
+    'copy:cssPathRewrite',
     'css_mqpacker',
     'csswring',
     'concat:css',
