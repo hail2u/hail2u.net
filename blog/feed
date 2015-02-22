@@ -10,12 +10,27 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 22 Feb 2015 01:39:10 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 23 Feb 2015 06:54:14 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>Failswatch</title>
+      <link>http://hail2u.net/blog/internet/failswatch.html</link>
+      <description>ウェブサイトの死活監視をしつつ、もし落ちたら事前に保存しておいたキャッシュを自動的に返してくれる、Failswatchはそういう機能を提供する。CloudFlareや他のCDNにも同じ機能があるが、こちらはCDN的な機能はなく特化型で有料プランのみ。構成がシンプルな分、トラブルは少なそうだ。</description>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/failswatch.html</guid>
+      <pubDate>Mon, 23 Feb 2015 06:54:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>ウェブサイトの死活監視をしつつ、もし落ちたら事前に保存しておいたキャッシュを自動的に返してくれる、<a href="https://failswitch.com/">Failswatch</a>はそういう機能を提供する。<a href="https://www.cloudflare.com/">CloudFlare</a>や他のCDNにも同じ機能があるが、こちらはCDN的な機能はなく特化型で有料プランのみ。構成がシンプルな分、トラブルは少なそうだ。</p>
+
+<p>ウェブサイトの死活監視は必要なのだけど、中小規模のウェブサイトにおいてその対策までは練られない印象がある。実際に問題が起こるのはもっと上流であったりして、手が出せないからだ。せいぜい落ちた時にすばやくアナウンスをTwitterなどで出すくらいだろう。</p>
+
+<p>このFailswatchのような、対策までをセットにしたソリューションというのは需要はかなりある。導入に成功すればほぼ全自動で対策が完了という点もスケールにマッチしている。しかし小規模なウェブサイトで継続的に使うには月15ドルはちょっと高いか。立ちあげ直後のトラフィックが読めない時期だけ保険として使うなどという一時的な利用に留めるのが良さそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>CSSできれいな斜め線</title>
@@ -412,36 +427,6 @@ image.style.width = &#39;auto&#39;;
 <p>歩いてたらいきなり臭い。しばらくすると防護服を着た人に囲まれる。そのままずっとにらみ合いを続けているとどんどん臭くなっていき、慌てて脇の下とか手とかを嗅いだが臭くない。なんでだろうとお尻に手を伸ばしてからその手を嗅いだら臭くてびっくりしたところで目が覚めた。</p>
 
 <p>自分が寝ながらすごく臭いおならをしただけだった。そのうち大きい方を漏らしそうで怖い。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>IE11でのfile:プロトコルに対するHistory APIによる操作</title>
-      <link>http://hail2u.net/blog/coding/history-api-for-file-protocol-on-ie11.html</link>
-      <description>Internet Explorer 11でfile:///で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に/C:が先頭に追加されていく。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/history-api-for-file-protocol-on-ie11.html</guid>
-      <pubDate>Fri, 13 Feb 2015 01:08:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Internet Explorer 11で<code>file:///</code>で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に<code>/C:</code>が先頭に追加されていく。</p>
-
-<pre><code>history.replaceState(null, &#39;&#39;, location.pathname);
-</code></pre>
-
-<p>相対URLで書きかえが起こるはずなので、こうするとクエリー文字列やフラグメント識別子を削除してクリーンなURLに書き換わるはずだ。実際、普通のウェブサイトで試すと問題なくうまくいく。しかし<code>file:///</code>プロトコルでローカルのファイルを開いている場合、想定通りに動かない。</p>
-
-<pre><samp>&gt; <kbd>location.pathname</kbd>
-&lt; &quot;/C:/Users/Kyo/Desktop/test.html&quot;
-&gt; <kbd>history.replaceState(null, &#39;&#39;, location.pathname)</kbd>
-&lt; undefined
-&gt; <kbd>location.pathname</kbd>
-&lt; &quot;/C:/C:/Users/Kyo/Desktop/test.html&quot;
-</samp></pre>
-
-<p>このようにドライブレターが増殖する。URLの書き換え自体はこのおかしなURLにちゃんと(？)書き換わっているので、この状態で再読込すると「このページは表示できません」になる。</p>
-
-<hr>
-
-<p>明らかにバグと言えそうだが、実際に何か致命的なことが起こるとも思えないバグだ。報告はしておいたけど、悪いこともできなそうな気がするので放置されそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>
