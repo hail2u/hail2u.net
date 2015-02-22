@@ -175,9 +175,9 @@ module.exports = function (grunt) {
 
       jsMinified: {
         files: {
-          'tmp/unutm.js': 'node_modules//unutm/build/unutm.js',
-          'tmp/unutm.min.js': 'node_modules//unutm/build/unutm.min.js',
-          'tmp/unutm.min.js.map': 'node_modules//unutm/build/unutm.min.js.map'
+          'tmp/unutm.js': 'node_modules/unutm/build/unutm.js',
+          'tmp/unutm.min.js': 'node_modules/unutm/build/unutm.min.js',
+          'tmp/unutm.min.js.map': 'node_modules/unutm/build/unutm.min.js.map'
         }
       },
 
