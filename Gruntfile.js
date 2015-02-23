@@ -20,7 +20,6 @@ module.exports = function (grunt) {
       css: {
         files: {
           'tmp/style.min.css': [
-            'tmp/source-code-pro.min.css',
             'tmp/source-sans-pro.min.css',
             'tmp/style.min.css'
           ]
@@ -114,8 +113,6 @@ module.exports = function (grunt) {
             dest: 'src/css/assets/fonts/',
             expand: true,
             src: [
-              'source-code-pro/b.woff',
-              'source-code-pro/r.woff',
               'source-sans-pro/b.woff',
               'source-sans-pro/r.woff'
             ]
@@ -144,10 +141,7 @@ module.exports = function (grunt) {
         dest: 'tmp/',
         expand: true,
         ext: '.css',
-        src: [
-          'source-code-pro.css',
-          'source-sans-pro.css'
-        ]
+        src: ['source-sans-pro.css']
       },
 
       img: {
@@ -220,8 +214,6 @@ module.exports = function (grunt) {
         dest: 'build/fonts/',
         expand: true,
         src: [
-          'source-code-pro/b.woff',
-          'source-code-pro/r.woff',
           'source-sans-pro/b.woff',
           'source-sans-pro/r.woff'
         ]
@@ -307,7 +299,6 @@ module.exports = function (grunt) {
           'debug.scss',
           'documents.scss',
           'natural.scss',
-          'source-code-pro.scss',
           'source-sans-pro.scss',
           'style.scss'
         ]
