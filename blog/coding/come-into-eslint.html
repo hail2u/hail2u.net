@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>よろしくESLint - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/coding/come-into-eslint.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/internet/failswatch.html">
+
+    
+
+    
+      <meta content="よろしくESLint" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/come-into-eslint.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content">
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/coding/come-into-eslint.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">よろしくESLint</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-24T05:14:00+09:00" itemprop="datePublished">Feb 24, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">重い腰を上げて<a href="http://eslint.org/">ESLint</a>を使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。</p>
+
+<h2>package.jsonに設定が書ける</h2>
+
+<p>外部設定ファイルとしては<code>.eslinrc</code>の他にも<code>package.json</code>に混ぜ込むこともできる。フィールド名は<code>eslintConfig</code>で、それ以下は同じ。</p>
+
+<pre><code class="language-json">{
+  &quot;eslintConfig&quot;: {
+    &quot;env&quot;: {
+      &quot;node&quot;: true
+    }
+  }
+}
+</code></pre>
+
+<p>通常のnpmパッケージでは別にした方が良さそうだが、依存解決にnpmを使うだけとかコマンド作るためだけのようなプライベートなケースでは特に気にせず混ぜてしまって良さそう。</p>
+
+<h2>no-multi-spaces</h2>
+
+<p>複数の連続した空白が検出できる。</p>
+
+<pre><code class="language-javascript">var a =  1;
+</code></pre>
+
+<p>これで警告出るのはかなり助かる。ソロエルノスキーさんには厳しそう。</p>
+
+<h2>no-comma-dangle</h2>
+
+<p><a href="http://jshint.com/">JSHint</a>では<code>es3</code>オプションを有効にしないと検出できない不必要なカンマを検出できる。とにかくあのカンマを消したい人なのですごくうれしい。</p>
+
+<h2>curly</h2>
+
+<p>中括弧なしの制御構文を検出できる。一行<code>if</code>とか書くなやみたいな感じで、僕はそっち派なのですごい助かる。</p>
+
+<h2>出現順の検出</h2>
+
+<p>先に<code>var</code>などで定義されているかや定義される前に関数が使われていないかなどを検出できる。他、定義済みで使われていないというケースも検出できる。メンテナンスのお供に。</p>
+
+<hr>
+
+<p>あまり気にしたことがなくて対処に困ったものも挙げておく。</p>
+
+<h2>quotes</h2>
+
+<p>JSHintで一重引用符を強制されて以降、そっちを使っていたが、ESlintではデフォルトは二重引用符になっていた。書き直すのがとても面倒な気がするので、<code>~/.eslintrc</code>で以下のようにして一重引用符をデフォルトにしてしまった。</p>
+
+<pre><code class="language-json">{
+  &quot;rules&quot;: {
+    &quot;quotes&quot;: [
+      1,
+      &quot;single&quot;
+    ]
+  }
+}
+</code></pre>
+
+<h2>camelcase</h2>
+
+<p>変数名などにアンダースコアを使えなくなり、キャメルケースで書くことを要求される。厳しいのはGruntの設定ファイルなどでアンダースコアがばんばん出てくるあたり。グローバルやファイルごとに無効にしたいところだけど、素直に引用符で括ってパスさせるのが良さそう。</p>
+
+<h2>no-underscore-dangle</h2>
+
+<p>アンダースコアで始まるまたは終わる変数やプロパティーへアクセスするだけで怒られる。ライブラリー側で使っていることもあるので、そういったファイルでのみ無効にするのが良さそう。</p>
+
+<pre><code class="language-javascript">var _ = require(&#39;underscore&#39;);
+</code></pre>
+
+<p>だけは特別視されてて、現実的。</p>
+
+<h2>no-process-exit</h2>
+
+<p>Node.js (つまり<code>&quot;node&quot;: true</code>)で<code>process.exit()</code>を使ってプログラムを終了しようとしていると怒られる。とりあえずは以下のようにして逃げるのも可能だが、完全に悪手っぽい。</p>
+
+<pre><code class="language-javascript">var exit = process.exit;
+
+if (process.argv[3] === &#39;--version&#39;) {
+  console.log(&#39;Foo v0.1.0&#39;);
+  exit();
+}
+</code></pre>
+
+<p>CLIプログラムのような完全に最上流であることを保証できるファイルのみで無効にするなら悪くはなさそう。だけど埋め込みコメントでの設定はなるべく避けた方が良いという経験則があるので、<code>switch</code>構文などをうまく使って書き直すのが良さそう。</p>
+
+<p>他に<code>ecmaFeatures</code>フィールドで<code>globalReturn</code>を許可してやり、<code>process.exit()</code>の代わりに<code>return</code>を使うという手もなくはないみたいだけど、どうなんだろう。</p>
+
+<hr>
+
+<p>凶悪なルール(one-varとか)がデフォルトで無効なことが多いので、JSLintほどイラッとすることはない。しかしコード・スタイル的な面で様々なチェックが入るので、JSHintほどこれ拾えやみたいな辛さもない。肌にあっているのか快適に気持ちよく修正していけた。</p>
+
+<p>無効になっているルールも機会があったら有効にしてみたいと感じるものが多い。例えば以下のルールは気になる。</p>
+
+<ul>
+<li>valid-jsdoc - JSDocのバリデーション</li>
+<li>block-scoped-var - <code>var</code>をなんとなく<code>let</code>扱いするぞ</li>
+<li>no-process-env - <code>process.env</code>いじっちゃダメ</li>
+<li>no-warning-comments - コメントにTODOとか書くなや</li>
+<li>vars-on-top - <code>var</code>はスコープの先頭にまとめてね</li>
+<li>no-undefined - その<code>undefined</code>は<code>undefined</code>なの</li>
+<li>no-sync - 同期とかウケる</li>
+<li>brace-style - 中括弧の前後の改行スタイルは統一してくれ</li>
+<li>sort-vars - 変数はソートするとわかりやすいぞ</li>
+</ul>
+
+<p>歴史的な事情により今すぐJSHintを投げ捨てるということは難しい。まずは手元でESLintを使ってJSHintよりのルール(一重引用符だとか半角空白二つによるインデントだとか)でチェックし、JSHintはタスク・ランナーなどからのみ実行するようにしておくようにするのが良さそう。そうしておけばうまく機会を捉えて切り替えを断行することができるはず。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E3%82%88%E3%82%8D%E3%81%97%E3%81%8FESLint%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcome-into-eslint.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcome-into-eslint.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E3%82%88%E3%82%8D%E3%81%97%E3%81%8FESLint%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fcome-into-eslint.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/internet/failswatch.html" rel="prev">
+  <p>Failswatch</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
