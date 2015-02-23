@@ -29,7 +29,8 @@ module.exports = function (grunt) {
     var num = 1;
 
     if (options.preview) {
-      var preview = `<!DOCTYPE html>
+      var preview = function () {/*
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -95,7 +96,8 @@ module.exports = function (grunt) {
       </form>
     </aside>
   </body>
-</html>`;
+</html>
+      */}.toString().split('\n').slice(1, -1).join('\n');
       var filePreview = path.resolve(process.cwd(), 'tmp/__preview.html');
       var body = fs.readFileSync(entry, 'UTF-8').split('\n');
       var title = body.shift().replace(/\$/g, '$$$$');
