@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に&lt;&lt;&lt;&lt;&lt;&lt;&lt;にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>VimでGitで衝突したところにジャンプ - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/software/jump-git-conflict-in-vim.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/coding/come-into-eslint.html">
+
+    
+
+    
+      <meta content="VimでGitで衝突したところにジャンプ" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に&lt;&lt;&lt;&lt;&lt;&lt;&lt;にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/software/jump-git-conflict-in-vim.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content">
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/software/jump-git-conflict-in-vim.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">VimでGitで衝突したところにジャンプ</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-25T21:37:00+09:00" itemprop="datePublished">Feb 25, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>にジャンプするだけみたいなのがちょっと欲しくなった。Vimだと<code>BufReadPost</code>で<code>search()</code>を呼べば良さそうだ。</p>
+
+<pre><code class="language-vim">augroup LtLtLtLtLtLtLt
+  autocmd!
+
+  &quot; Jump to first conflict position if find
+  autocmd BufReadPost * call search(&#39;^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&#39;, &#39;sw&#39;, 0, 1000)
+augroup END
+</code></pre>
+
+<p>検索を一周させるようにフラグを立てておくついでに戻れるようにもフラグを立てたつもりだけど、発火するタイミング的に常に先頭で意味が無いような気がしないでもない。あと大きなファイルで死にそうなので1000ミリ秒に制限しておいたけど、もっと短くても良さそう。カーソル位置の復帰など、同じようにファイルを開いた時にカーソル位置を動かすプラグインと相性は悪いけど、なんとかなる。</p>
+
+<p><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>は大体は文法エラーなので、Syntasticを使っている人は、</p>
+
+<ul>
+<li>開いた時にチェック(<code>let g:syntastic_check_on_open = 1</code>)</li>
+<li>最初のエラーにジャンプ(<code>let g:syntastic_auto_jump = 1</code>)</li>
+<li>位置リストを自動的に開く(<code>let g:syntastic_auto_loc_list = 1</code>)</li>
+</ul>
+
+<p>の設定を有効にするとだいたい実現できそうな気がする。最初のエラーじゃなかった時の保険として、位置リストを自動的に開くようにしておくといける。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=Vim%E3%81%A7Git%E3%81%A7%E8%A1%9D%E7%AA%81%E3%81%97%E3%81%9F%E3%81%A8%E3%81%93%E3%82%8D%E3%81%AB%E3%82%B8%E3%83%A3%E3%83%B3%E3%83%97%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fjump-git-conflict-in-vim.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fjump-git-conflict-in-vim.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=Vim%E3%81%A7Git%E3%81%A7%E8%A1%9D%E7%AA%81%E3%81%97%E3%81%9F%E3%81%A8%E3%81%93%E3%82%8D%E3%81%AB%E3%82%B8%E3%83%A3%E3%83%B3%E3%83%97%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fjump-git-conflict-in-vim.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/coding/come-into-eslint.html" rel="prev">
+  <p>よろしくESLint</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

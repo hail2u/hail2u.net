@@ -10,6 +10,35 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>VimでGitで衝突したところにジャンプ</title>
+      <link>http://hail2u.net/blog/software/jump-git-conflict-in-vim.html</link>
+      <description><![CDATA[Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<<<<<<<にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。]]></description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/jump-git-conflict-in-vim.html</guid>
+      <pubDate>Wed, 25 Feb 2015 21:37:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>にジャンプするだけみたいなのがちょっと欲しくなった。Vimだと<code>BufReadPost</code>で<code>search()</code>を呼べば良さそうだ。</p>
+
+<pre><code>augroup LtLtLtLtLtLtLt
+  autocmd!
+
+  &quot; Jump to first conflict position if find
+  autocmd BufReadPost * call search(&#39;^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&#39;, &#39;sw&#39;, 0, 1000)
+augroup END
+</code></pre>
+
+<p>検索を一周させるようにフラグを立てておくついでに戻れるようにもフラグを立てたつもりだけど、発火するタイミング的に常に先頭で意味が無いような気がしないでもない。あと大きなファイルで死にそうなので1000ミリ秒に制限しておいたけど、もっと短くても良さそう。カーソル位置の復帰など、同じようにファイルを開いた時にカーソル位置を動かすプラグインと相性は悪いけど、なんとかなる。</p>
+
+<p><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>は大体は文法エラーなので、Syntasticを使っている人は、</p>
+
+<ul>
+<li>開いた時にチェック(<code>let g:syntastic_check_on_open = 1</code>)</li>
+<li>最初のエラーにジャンプ(<code>let g:syntastic_auto_jump = 1</code>)</li>
+<li>位置リストを自動的に開く(<code>let g:syntastic_auto_loc_list = 1</code>)</li>
+</ul>
+
+<p>の設定を有効にするとだいたい実現できそうな気がする。最初のエラーじゃなかった時の保険として、位置リストを自動的に開くようにしておくといける。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>よろしくESLint</title>
       <link>http://hail2u.net/blog/coding/come-into-eslint.html</link>
       <description>重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。</description>
@@ -482,27 +511,6 @@ image.style.width = &#39;auto&#39;;
 <p>デモのページにも書いておいたが、実装依存はともかく<code>z-index</code>プロパティーがコンテキストに依存するという問題がある。ライブラリー化するのは難しそうだ。とは言うもののストレートな実装なので汎用化しなくても良さそうではある。</p>]]></content:encoded>
     </item>
     <item>
-      <title>グローバル・ヘッダーのマークアップ</title>
-      <link>http://hail2u.net/blog/webdesign/marking-global-header-up.html</link>
-      <description>ホーム以外ではロゴとサイト・ナビゲーションをまとめてnav要素で括るような形にグローバル・ヘッダーのマークアップを変えた。ホームでは今まで通りnav要素の外でmark要素を使ってロゴは表示される。あわせてタグラインをh1要素にしてしまったが、何か違う気がする。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/marking-global-header-up.html</guid>
-      <pubDate>Sun, 15 Feb 2015 03:30:00 +0900</pubDate>
-      <content:encoded><![CDATA[<figure>
-  <a href="/images/blog/marking-global-header-up.png"><img height="627" alt="ロゴとサイト・ナビゲーションをnav要素の子に" src="/images/blog/marking-global-header-up.png" width="1200"></a>
-</figure>
-
-<p>ホーム以外ではロゴとサイト・ナビゲーションをまとめて<code>nav</code>要素で括るような形にグローバル・ヘッダーのマークアップを変えた。ホームでは今まで通り<code>nav</code>要素の外で<code>mark</code>要素を使ってロゴは表示される。あわせてタグラインを<code>h1</code>要素にしてしまったが、何か違う気がする。</p>
-
-<p>他にはロゴを真四角から縦長で下が斜めにカットされているような形に変更した。SVGを直すのがなんとなく面倒だったので<a href="https://github.com/hail2u/hail2u.net-styles/blob/92a47719e30a143657c033bd29314dfc958b407e/global-header/_logo.scss"><code>border</code>プロパティーを利用したCSS</a>で雑にやったけど、明らかにSVGを直す方が簡単だったのでちゃんと<a href="https://github.com/hail2u/hail2u.net-styles/blob/eeed78cc4161ffc8d2784f1d52df382ad8b6fbd0/assets/images/logo.svg">SVG画像</a>を作り直した。縦横比は<code>1:1.618</code>になっていて、ロゴの幅に<code>1.618</code>の4乗をかけるとサブカラムの幅に、それにガッターを加えてまた<code>1.618</code>の2乗をかけるとコンテンツ(メインカラム)の幅になったりする。</p>
-
-<hr>
-
-<p>このマークアップの変更は、ロゴは<code>h1</code>要素か否かみたいなちょくちょく論争になる問題というよりも、ロゴもナビゲーションの一部とみなすべきかなという考えに基づいたもの。そうするとロゴも<code>nav</code>要素の子になるべきかな、と。この場合、ロゴで<code>h1</code>要素を使ってしまうとその<code>nav</code>要素の見出しになってしまう。それはさすがにおかしいので、自然とロゴは<code>h1</code>要素ではなくなった。</p>
-
-<p>このままだと<code>body</code>要素がUntitled BODYになってしまうのが難点で、タグラインを半ば強引に<code>h1</code>要素にしたりしてみた。<code>title</code>要素がちゃんとあるならUntitled BODYでもいいかみたいな雑な感覚でお茶を濁しても良さそうだけど……。もうちょっとちゃんと考えよう。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -537,6 +545,6 @@ image.style.width = &#39;auto&#39;;
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Tue, 24 Feb 2015 05:14:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 25 Feb 2015 21:37:00 +0900</lastBuildDate>
   </channel>
 </rss>
