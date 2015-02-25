@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="io.jsがv1.3.0になり、ビルトインのURLモジュールでresolve(&#39;/foo/bar&#39;, &#39;.&#39;)が/foo/とスラッシュ付きで返されるようになった。今までは/fooとスラッシュなしで返っていたので、これは破壊的な変更であり、Semantic Versioningに従うならばメジャー・バージョンを上げるべきではないのかという議論がなされていたようだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>Semantic Versioningにおける破壊的な変更 - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/software/breaking-changes-on-semver.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/software/jump-git-conflict-in-vim.html">
+
+    
+
+    
+      <meta content="Semantic Versioningにおける破壊的な変更" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="io.jsがv1.3.0になり、ビルトインのURLモジュールでresolve(&#39;/foo/bar&#39;, &#39;.&#39;)が/foo/とスラッシュ付きで返されるようになった。今までは/fooとスラッシュなしで返っていたので、これは破壊的な変更であり、Semantic Versioningに従うならばメジャー・バージョンを上げるべきではないのかという議論がなされていたようだ。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/software/breaking-changes-on-semver.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content">
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/software/breaking-changes-on-semver.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">Semantic Versioningにおける破壊的な変更</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-26T06:49:00+09:00" itemprop="datePublished">Feb 26, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://iojs.org/">io.js</a>がv1.3.0になり、ビルトインのURLモジュールで<code>resolve(&#39;/foo/bar&#39;, &#39;.&#39;)</code>が<code>/foo/</code>とスラッシュ付きで返されるようになった。今までは<code>/foo</code>とスラッシュなしで返っていたので、これは破壊的な変更であり、Semantic Versioningに従うならばメジャー・バージョンを上げるべきではないのかという議論がなされていたようだ。</p>
+
+<p>仮にこういった実装ミスの修正が破壊的な変更だとすると、ほとんどすべてのバグ・フィックスは破壊的な変更になってしまう。バグ・フィックスは必ずどこかで何か(モンキーパッチとか)を破壊するし、破壊しないことを保証することは不可能だ。Semverにおいては変更の仕分けはユーザーの利用ではなく、仕様という観点での話になる。つまり仕様に変更があったかどうかが焦点になる。</p>
+
+<p>このURLモジュールのケースでは、仕様が外部(ドキュメントのブラウザーの実装のように～という一文)にあり、それに従った結果になっていなかったということになる。この間違った実装に依存したコードにおいては破壊的な変更となるが、それはそのコードが悪いだけで、メジャー・バージョンを上げる理由にはならない。</p>
+
+<p>概ねこう解釈したが、ユーザーに優しくはない。特にこのモジュールのこの挙動は長らく放置されていたバグで、こういうものだと思って利用していた人も多かったはずだ。stableと明記されていたこともその判断を後押ししたことだろう。そこを考慮するとメジャー・バージョンを上げてやり、ユーザーに周知する必要があったんじゃないだろうか。</p>
+
+<p>Semverのこのあたりの微妙な判断を求められる点が、v1.0.0をリリースする気配がないパッケージでnpmリポジトリーが溢れかえっている原因なのかなと感じる。メジャー・バージョンを上げることの抵抗感をなくすか、Semverを諦めるかの二択になりそうだ。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=Semantic%20Versioning%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E3%81%AA%E5%A4%89%E6%9B%B4%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fbreaking-changes-on-semver.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fbreaking-changes-on-semver.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=Semantic%20Versioning%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E3%81%AA%E5%A4%89%E6%9B%B4%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fbreaking-changes-on-semver.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/software/jump-git-conflict-in-vim.html" rel="prev">
+  <p>VimでGitで衝突したところにジャンプ</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

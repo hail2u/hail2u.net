@@ -10,12 +10,31 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Wed, 25 Feb 2015 21:37:58 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 26 Feb 2015 06:50:12 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>Semantic Versioningにおける破壊的な変更</title>
+      <link>http://hail2u.net/blog/software/breaking-changes-on-semver.html</link>
+      <description>io.jsがv1.3.0になり、ビルトインのURLモジュールでresolve(&#39;/foo/bar&#39;, &#39;.&#39;)が/foo/とスラッシュ付きで返されるようになった。今までは/fooとスラッシュなしで返っていたので、これは破壊的な変更であり、Semantic Versioningに従うならばメジャー・バージョンを上げるべきではないのかという議論がなされていたようだ。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/breaking-changes-on-semver.html</guid>
+      <pubDate>Thu, 26 Feb 2015 06:49:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://iojs.org/">io.js</a>がv1.3.0になり、ビルトインのURLモジュールで<code>resolve(&#39;/foo/bar&#39;, &#39;.&#39;)</code>が<code>/foo/</code>とスラッシュ付きで返されるようになった。今までは<code>/foo</code>とスラッシュなしで返っていたので、これは破壊的な変更であり、Semantic Versioningに従うならばメジャー・バージョンを上げるべきではないのかという議論がなされていたようだ。</p>
+
+<p>仮にこういった実装ミスの修正が破壊的な変更だとすると、ほとんどすべてのバグ・フィックスは破壊的な変更になってしまう。バグ・フィックスは必ずどこかで何か(モンキーパッチとか)を破壊するし、破壊しないことを保証することは不可能だ。Semverにおいては変更の仕分けはユーザーの利用ではなく、仕様という観点での話になる。つまり仕様に変更があったかどうかが焦点になる。</p>
+
+<p>このURLモジュールのケースでは、仕様が外部(ドキュメントのブラウザーの実装のように～という一文)にあり、それに従った結果になっていなかったということになる。この間違った実装に依存したコードにおいては破壊的な変更となるが、それはそのコードが悪いだけで、メジャー・バージョンを上げる理由にはならない。</p>
+
+<p>概ねこう解釈したが、ユーザーに優しくはない。特にこのモジュールのこの挙動は長らく放置されていたバグで、こういうものだと思って利用していた人も多かったはずだ。stableと明記されていたこともその判断を後押ししたことだろう。そこを考慮するとメジャー・バージョンを上げてやり、ユーザーに周知する必要があったんじゃないだろうか。</p>
+
+<p>Semverのこのあたりの微妙な判断を求められる点が、v1.0.0をリリースする気配がないパッケージでnpmリポジトリーが溢れかえっている原因なのかなと感じる。メジャー・バージョンを上げることの抵抗感をなくすか、Semverを諦めるかの二択になりそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>VimでGitで衝突したところにジャンプ</title>
@@ -467,75 +486,6 @@ console.log(new xml2js.Builder({
 <p>判断する時、される時は、相手や自分からの提案があった時で、ある程度予防線を張った状態で提案されるし、する。その予防線が評価をベールに隠してぼやかしてしまい、判断する側には「悪かったようだ」か「悪くはなかったようだ」くらいまでしか見えてこない。そのため悪いでなければOKというような単純な確認作業だけで判断が終わる。もうちょっと厳密にチェックして欲しいという時でも。</p>
 
 <p>一歩踏み込んで、良い・悪くない・良くない・悪いまでを汲んで判断していきたいし、判断されるようにしていきたい。せめて自分の側からは予防線を張らずに生きていきたい。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>ドロップインで動くLightbox</title>
-      <link>http://hail2u.net/blog/webdesign/drop-in-lightbox.html</link>
-      <description>リンクが張られた画像をLightbox形式で表示するようなJavaScriptを書いていた。vwとvh単位でa要素を引き伸ばして適当に前面に表示し、img要素をなんとなく拡大してから天地左右中央配置する。予めクラス指定が必要だったり、スタイルの追加が必要だったりしない、ドロップインで動作するものだ。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/drop-in-lightbox.html</guid>
-      <pubDate>Mon, 16 Feb 2015 14:03:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="/images/blog/drop-in-lightbox.png"><img alt="描画領域を超える画像はアスペクト比を維持して縮小される(拡大はされない)" height="627" src="/images/blog/drop-in-lightbox.png" width="1200"></a>
-</figure>
-
-<p>リンクが張られた画像をLightbox形式で表示するようなJavaScriptを書いていた。<code>vw</code>と<code>vh</code>単位で<code>a</code>要素を引き伸ばして適当に前面に表示し、<code>img</code>要素をなんとなく拡大してから天地左右中央配置する。予めクラス指定が必要だったり、スタイルの追加が必要だったりしない、ドロップインで動作するものだ。</p>
-
-<p>View Demo: <a href="/pub/test/612.html">Lightbox with Clean Markup</a></p>
-
-<p>デモでそれぞれの画像をクリック(タッチ)すると、描画領域全体に画像が表示される。<code>a</code>要素をオーバーレイの背景に変え、<code>img</code>要素をうまく収まるように調整することになる。</p>
-
-<pre><code>if (this.href !== image.src) {
-  image._src = image.src;
-  image.src = this.href;
-}
-</code></pre>
-
-<p>リンク先と画像のURLが違う場合は、画像がサムネイルでリンク先がフルサイズの画像とみなし、一時的に画像のリンク先を書き換えてフルサイズ画像が表示されるようにもなっている。サムネイルのURLは一時的に<code>_src</code>プロパティーに保存しておき、閉じると元に戻るようにもした。</p>
-
-<pre><code>if (image._src) {
-  image.src = image._src;
-  delete image._src;
-}
-</code></pre>
-
-<p><code>data-*</code>属性を使ってやりたいところだが、スクリプトの規模に比べて大仰なポリフィルが必要になるので、オレオレプロパティーに保存している。<code>setAttribute()</code>や<code>getAttribute()</code>を<code>data-*</code>属性に使ったら負けだ。</p>
-
-<pre><code>this.style.backgroundColor = &#39;#333&#39;;
-this.style.cursor = &#39;zoom-out&#39;;
-this.style.height = &#39;100vh&#39;;
-this.style.left = &#39;0&#39;;
-this.style.position = &#39;fixed&#39;;
-this.style.top = &#39;0&#39;;
-this.style.width = &#39;100vw&#39;;
-this.style.zIndex = &#39;1&#39;;
-</code></pre>
-
-<p>コンテキストに依存するので、<code>left</code>と<code>top</code>プロパティーは<code>0</code>にする必要があるだろう。<code>a</code>要素はデフォルトで<code>display: inline</code>のため、<code>position: fixed</code>を指定すると<code>block</code>に変わる、と<a href="http://www.w3.org/TR/css3-positioning/#dis-pos-flo">仕様に規定</a>がある。そのためわざわざ<code>this.style.display = &#39;block&#39;</code>を指定しなくても<code>width</code>プロパティー等はきちんと反映されるようになる。描画領域に合わせるのは<code>100vw</code>と<code>100vh</code>で簡単な時代だ。</p>
-
-<pre><code>image.style.bottom = &#39;0&#39;;
-image.style.height = &#39;auto&#39;;
-image.style.left = &#39;0&#39;;
-image.style.margin = &#39;auto&#39;;
-image.style.maxHeight = &#39;96%&#39;;
-image.style.maxWidth = &#39;96%&#39;;
-image.style.position = &#39;absolute&#39;;
-image.style.right = &#39;0&#39;;
-image.style.top = &#39;0&#39;;
-image.style.width = &#39;auto&#39;;
-</code></pre>
-
-<p>画像の天地左右中央配置は<a href="http://unformedbuilding.com/articles/firefox-style-center-middle-aligned-css/">Firefoxの画像表示スタイルシート</a>に幅制限を加えたものにした。FirefoxでCSSではなくJavaScriptで<code>height</code>と<code>width</code>属性を書き換えてリサイズしているのは何か意味があるんだろうか。最大幅を<code>100%</code>にしていないのは単に好みだ。</p>
-
-<p>デモではPlaceIMGの画像でリンク先もそれの場合のみに有効になるようにしている。実際にはURLの判定を<code>[src^=&quot;/img/&quot;]</code>やウェブサイトのドメイン、またはその両方で判定するようにすると良いだろう。</p>
-
-<hr>
-
-<p>様々な事情があってHTMLファイルはいじることが難しいけれど、それらから固定で参照されているJavaScriptファイルだけは追記することが可能、というようなケースで必要になって考えていた。このように画像のURLなどから類推し、既存のHTML構造を利用してスタイルを当てていくのがコストが低い。</p>
-
-<p>デモのページにも書いておいたが、実装依存はともかく<code>z-index</code>プロパティーがコンテキストに依存するという問題がある。ライブラリー化するのは難しそうだ。とは言うもののストレートな実装なので汎用化しなくても良さそうではある。</p>]]></content:encoded>
     </item>
 
   </channel>
