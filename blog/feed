@@ -10,12 +10,57 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Thu, 26 Feb 2015 06:50:12 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 27 Feb 2015 05:40:56 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>min-widthを含むクエリーをソート</title>
+      <link>http://hail2u.net/blog/coding/pack-and-sort-min-width.html</link>
+      <description>CSS MQPackerにmin-widthを使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/pack-and-sort-min-width.html</guid>
+      <pubDate>Fri, 27 Feb 2015 05:40:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>に<code>min-width</code>を使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</p>
+
+<p>色々面倒なのがあるので、多くの人が必要なのは<code>min-width</code>だけだろうと決めつけて実装している。その上で以下の条件にマッチするクエリーを<em>後ろ</em>に回して、その中でソートするようにした。</p>
+
+<ul>
+<li><code>min-width</code>をどこかに含む</li>
+<li>対応している単位である</li>
+<li><code>calc()</code>は使っていない</li>
+</ul>
+
+<p>クエリーはまずカンマで分割されて、その中で更に空白文字で分割し、クエリーをなんとなく多次元配列へ変換する。ここで<code>min-width</code>が見つかったら後ろに回すようになっている。対応した単位は<code>px</code>を基準に<code>ch</code>、<code>em</code>、<code>ex</code>、<code>pc</code>、<code>pt</code>、そして<code>rem</code>までだ。どうやっても描画領域を基準にした<code>v*</code>単位には対応できない。<code>cm</code>や<code>in</code>は対応しても良いけれどさほど意味はなさそうだ。ソートは<code>px</code>単位に変換されて行われる。</p>
+
+<pre><code>@media (min-width: 48px) {}
+@media (min-width: 2em) {}
+@media (min-width: 1rem) {}
+</code></pre>
+
+<p>このように単位系が混在している場合は以下のように良い感じ(私見)にソートされる。それぞれの単位系ごとにソートとしても良いのだけど、それはそれで面倒そうなので一気にソートしてしまうことにした。</p>
+
+<pre><code>@media (min-width: 1rem) {}
+@media (min-width: 2em) {}
+@media (min-width: 48px) {}
+</code></pre>
+
+<p><code>1rem</code>は<code>16px</code>、<code>2em</code>は<code>32px</code>とみなされ<code>48px</code>より前に来るようになるわけだ。</p>
+
+<p>式自体の書き換えはもちろん行わない。<code>calc()</code>にも対応したい気はすごくあるのだけど、フルスクラッチで書くのはなかなか厳しそうだ。<a href="https://www.npmjs.com/package/reduce-css-calc">reduce-css-calc</a>を使おうかなと考えている。</p>
+
+<p>CSSの書き方自体は普通にメディア・クエリーを書いてくれればなんとかなるはずだ。気をつけるのはなるべく単位を揃えることくらいだろう。気取って<code>screen</code>とか書いていても、Retina対応の<code>resolution</code>が混ざっていたりとかも大丈夫だと思うのだけど、もっと色々テスト書かないと不安だ。</p>
+
+<hr>
+
+<p>メディア・クエリーは<em>後方互換性を維持して</em>今度更に強化されていく。実装の方も進みつつある上、<code>calc()</code>の存在や憎むべきCSS Variablesも控えているので、やはり一時的なソリューションにしかならないと思う。<code>min-width</code>だけにしたのもその辺りが理由だ。でもソリューションとして機能しなくなった頃にはHTTP/2やらWeb Componentsやらで大量の細かいCSSファイルを気軽に投げつけられる時代になっているはずなので、きっとメディア・クエリーをまとめなくても良くなっているのではないかとも思う。</p>
+
+<p><code>not</code>キーワードの扱いをどうしようか悩んでいて、それが解決したらリリースするつもりだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Semantic Versioningにおける破壊的な変更</title>
@@ -471,21 +516,6 @@ console.log(new xml2js.Builder({
 </code></pre>
 
 <p>擬似要素で挿入する文字列等がクリティカルな要素であるべきではないことを考慮すると、後者の方がより良い印刷結果をもたらしそうではある。その反面、印刷結果でも擬似要素を使って補助的な情報や飾りを挿入したいようなケースに対する柔軟性に欠ける。前者が無難か。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>良い・悪くない・良くない・悪い</title>
-      <link>http://hail2u.net/blog/misc/good-not-bad-not-good-bad.html</link>
-      <description>モノの評価軸はモノと人によって違うけれど、それぞれの軸では良い・悪くない・良くない・悪いの4段階で大抵は評価してる。強く意識していなくてもきっとそう。けれどもそういった評価を判断する時、される時は、悪いとそれ以外というような2段階で判断してしまうし、されてしまう。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/good-not-bad-not-good-bad.html</guid>
-      <pubDate>Tue, 17 Feb 2015 03:46:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>モノの評価軸はモノと人によって違うけれど、それぞれの軸では良い・悪くない・良くない・悪いの4段階で大抵は評価してる。強く意識していなくてもきっとそう。けれどもそういった評価を判断する時、される時は、悪いとそれ以外というような2段階で判断してしまうし、されてしまう。</p>
-
-<p>判断する時、される時は、相手や自分からの提案があった時で、ある程度予防線を張った状態で提案されるし、する。その予防線が評価をベールに隠してぼやかしてしまい、判断する側には「悪かったようだ」か「悪くはなかったようだ」くらいまでしか見えてこない。そのため悪いでなければOKというような単純な確認作業だけで判断が終わる。もうちょっと厳密にチェックして欲しいという時でも。</p>
-
-<p>一歩踏み込んで、良い・悪くない・良くない・悪いまでを汲んで判断していきたいし、判断されるようにしていきたい。せめて自分の側からは予防線を張らずに生きていきたい。</p>]]></content:encoded>
     </item>
 
   </channel>
