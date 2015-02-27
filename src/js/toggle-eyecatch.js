@@ -2,8 +2,8 @@
   'use strict';
 
   var t = function () {
-    var sectionFooter = document.querySelector('.section-footer');
     var eyecatch = document.querySelector('.full-width');
+    var sectionFooter = document.querySelector('.section-footer');
     sectionFooter.addEventListener('click', function (evt) {
       if (eyecatch.hidden) {
         eyecatch.hidden = false;

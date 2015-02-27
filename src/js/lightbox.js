@@ -6,13 +6,6 @@
 (function () {
   'use strict';
 
-  if (
-    !('querySelectorAll' in document) ||
-    !('bind' in Function)
-  ) {
-    return;
-  }
-
   var toggle = function (image, evt) {
     if (evt.which !== 1) {
       return;
@@ -58,14 +51,16 @@
   };
 
   var lightbox = function () {
+    var i;
+    var image;
     var images = document.querySelectorAll([
       'main img[src^="assets/images/"]',
       'main img[src^="/images/"]'
     ].join(','));
-    var image;
+    var l;
     var parent;
 
-    for (var i = 0, l = images.length; i < l; i++) {
+    for (i = 0, l = images.length; i < l; i++) {
       image = images[i];
       parent = image.parentNode;
 
@@ -74,6 +69,13 @@
       }
     }
   };
+
+  if (
+    !('querySelectorAll' in document) ||
+    !('bind' in Function)
+  ) {
+    return;
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', lightbox, false);
