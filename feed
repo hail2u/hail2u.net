@@ -10,6 +10,129 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>JavaScriptをビルドするJavaScript</title>
+      <link>http://hail2u.net/blog/coding/javascript-for-building-javascript.html</link>
+      <description>たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/javascript-for-building-javascript.html</guid>
+      <pubDate>Sat, 28 Feb 2015 12:52:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、<code>npm run-script</code><em>だけ</em>でいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕は<a href="http://qiita.com/Jxck_/items/efaff21b977ddc782971">ビルド・ツールを<code>npm run-script</code>で薄くラップする手法</a>というのが現実的だと考えてて、それを確認したいというのもあった。</p>
+
+<p>依存はnpmやBowerで解決している前提で、自前で書いたものを最小化し、依存と連結するようなものを想定しておく。つまり、</p>
+
+<ul>
+<li>node_modules/foo/dist/foo.min.js</li>
+<li>src/js/bar.js</li>
+<li>src/js/baz.js</li>
+</ul>
+
+<p>を<code>build/js/main.min.js</code>へとビルドするくらいにしておく。</p>
+
+<pre><code>#!/usr/bin/env node
+
+&#39;use strict&#39;;
+
+var async = require(&#39;async&#39;);
+var fs = require(&#39;fs-extra&#39;);
+var path = require(&#39;path&#39;);
+var uglifyjs = require(&#39;uglify-js&#39;);
+
+async.waterfall([
+  function (next) {
+    fs.remove(&#39;tmp/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.remove(&#39;build/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&#39;tmp/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&#39;tmp/js/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.readFile(&#39;src/js/bar.js&#39;, &#39;utf8&#39;, function (err, data) {
+      next(err, data);
+    });
+  },
+
+  function (js, next) {
+    fs.readFile(&#39;src/js/baz.js&#39;, &#39;utf8&#39;, function (err, data) {
+      next(err, js + &#39;;&#39; + data);
+    });
+  },
+
+  function (js, next) {
+    try {
+      next(null, uglifyjs.minify(js, {
+        fromString: true
+      }).code);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  function (js, next) {
+    fs.readFile(
+      path.join(
+        __dirname,
+        &#39;node_modules&#39;,
+        &#39;foo&#39;,
+        &#39;dist&#39;,
+        &#39;foo.min.js&#39;
+      ),
+      &#39;utf8&#39;,
+      function (err, data) {
+        next(err, data + &#39;;&#39; + js);
+      }
+    );
+  },
+
+  function (js, next) {
+    fs.writeFile(&#39;tmp/js/main.min.js&#39;, js, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.move(&#39;tmp/&#39;, &#39;build/&#39;, function (err) {
+      next(err);
+    });
+  }
+],
+
+function (err) {
+  if (err) {
+    throw err;
+  }
+});
+</code></pre>
+
+<p>コード自体は簡単でわかりやすい。手軽なので<code>asyn.waterfall()</code>でフローを制御。Streamじゃないけど、中間ファイルを吐かないのでGruntよりは速い。テキトーに書かれたモジュールも<code>try...catch</code>しつつ流せるとか気軽に書ける。ファイルの保証やディレクトリの削除などは<code>fs-extra</code>パッケージに頼ればこんなもので済んだ。</p>
+
+<p>……でも長い。これでも<code>fs-extra</code>パッケージのおかげで短くなってる。読み込みと連結をまとめたりとかでもっと短くできるけど、そこを抽象化するとストレートに書けるという長所が無くなっちゃう。<code>async</code>の代わりに<a href="https://github.com/petkaantonov/bluebird">Promisify</a>するともうちょっと楽だけど、それほど劇的でもない。</p>
+
+<p>ビルド・ツールのキモはやはりグロブを使った抽象化を提供してくれるあたりにあり、そこを毎回自前でどうにかするのは面倒すぎる。Gruntやgulpのような巨大な依存を減らせることは確かだけど、その代わりに小さな依存が増えるので、あんまり変わらない。こういうのを書くためのパッケージをセットにしたメタ・パッケージみたいなのがあればまた少し話が変わる……かなー？</p>
+
+<p>こういうのを抽象化して引数で入力と出力を指定して終わりというパッケージがあっても面白そうだけど、それだとGruntとあんまり変わらないっぽい。<code>Gruntfile.js</code>を書く代わりに<code>package.json</code>で複雑な引数を書くわけだし。</p>
+
+<hr>
+
+<p>つまり<code>make</code>はありだけど、<code>npm run-script</code>はなしかなーという感じになった。引数取れるようになったので<code>npm run-script</code>でいけるいけるとか言ってる人の話はじっくりと聞いて、本気でそれだけで済むと言っていたら聞き流した方が良さそう。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>min-widthを含むクエリーをソート</title>
       <link>http://hail2u.net/blog/coding/pack-and-sort-min-width.html</link>
       <description>CSS MQPackerにmin-widthを使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</description>
@@ -444,53 +567,6 @@ console.log(new xml2js.Builder({
 <p>プリフィックス付きの式を含む<code>@supports</code>ルールをもう一回書いたりしていると頭がおかしくなってくる。現実は厳しい。</p>]]></content:encoded>
     </item>
     <item>
-      <title>全称セレクターは擬似要素にマッチしない</title>
-      <link>http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</link>
-      <description>Mediumの印刷スタイルシートの記事を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/universal-selector-does-not-match-against-pseudo-elements.html</guid>
-      <pubDate>Wed, 18 Feb 2015 13:52:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p><a href="https://medium.com/designing-medium/printing-medium-stories-89f381b903c9">Mediumの印刷スタイルシートの記事</a>を読んでいた。印刷スタイルシートについては常に盛り上がりに欠けるような印象だが、Mediumのデザイナーが書くと盛り上がってくれるんじゃないかとちょっと期待している。ついでに少しこのウェブサイトの印刷スタイルシートに手を入れていたところ、どうやら全称セレクターは擬似要素にマッチしないという、あまり関係のないことを今さら学んだ。</p>
-
-<pre><code>* {
-  color: black !important;
-}
-</code></pre>
-
-<p>このウェブサイトの印刷スタイルシートではこのようにして、強制的に文字を<code>#000000</code>で印刷させるようにしていた。よくよく確認してみると、実際に印刷するまでもなく、印刷プレビューの状態でも一部色がおかしいことに気付いた。おかしい部分は全て擬似要素で挿入した文字列だった。</p>
-
-<p>最初は全称セレクターが詳細度においてもっとも弱いことに由来する問題かと思ったが、この例では<code>!important</code>フラグでも逆転できていないため、詳細度の問題ではないようだ。つまり全称セレクターは擬似要素にはマッチしないということになる。</p>
-
-<p>View Demo: <a href="/pub/test/611.html">Universal Selector and Pseudo Element</a></p>
-
-<p>デモでは擬似要素で挿入した文字列を赤にし、それを全称セレクターと<code>!important</code>フラグを使って上書きしようとしている。しかしうまくいかない。マッチしないでまず間違いないだろう。確認はChrome 40とInternet Explorer 11、Firefox 35で行った。</p>
-
-<hr>
-
-<p>実際にどう対処するべきかというと二通りに分かれると思う。一つは普通に擬似要素の文字色も直してしまう方法だ。</p>
-
-<pre><code>*,
-*::before,
-*::after {
-  color: black !important;
-}
-</code></pre>
-
-<p>もう一つは擬似要素は印刷しないことにする方法だ。</p>
-
-<pre><code>* {
-  color: black !important;
-}
-
-*::before,
-*::after {
-  display: none !important;
-}
-</code></pre>
-
-<p>擬似要素で挿入する文字列等がクリティカルな要素であるべきではないことを考慮すると、後者の方がより良い印刷結果をもたらしそうではある。その反面、印刷結果でも擬似要素を使って補助的な情報や飾りを挿入したいようなケースに対する柔軟性に欠ける。前者が無難か。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -525,6 +601,6 @@ console.log(new xml2js.Builder({
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 27 Feb 2015 05:40:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 28 Feb 2015 12:52:00 +0900</lastBuildDate>
   </channel>
 </rss>

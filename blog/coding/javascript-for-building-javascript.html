@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>JavaScriptをビルドするJavaScript - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/coding/javascript-for-building-javascript.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/coding/pack-and-sort-min-width.html">
+
+    
+
+    
+      <meta content="JavaScriptをビルドするJavaScript" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/javascript-for-building-javascript.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content">
+      
+
+
+      <article role="main">
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/coding/javascript-for-building-javascript.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">JavaScriptをビルドするJavaScript</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-02-28T12:52:00+09:00" itemprop="datePublished">Feb 28, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、<code>npm run-script</code><em>だけ</em>でいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕は<a href="http://qiita.com/Jxck_/items/efaff21b977ddc782971">ビルド・ツールを<code>npm run-script</code>で薄くラップする手法</a>というのが現実的だと考えてて、それを確認したいというのもあった。</p>
+
+<p>依存はnpmやBowerで解決している前提で、自前で書いたものを最小化し、依存と連結するようなものを想定しておく。つまり、</p>
+
+<ul>
+<li>node_modules/foo/dist/foo.min.js</li>
+<li>src/js/bar.js</li>
+<li>src/js/baz.js</li>
+</ul>
+
+<p>を<code>build/js/main.min.js</code>へとビルドするくらいにしておく。</p>
+
+<pre><code class="language-javascript">#!/usr/bin/env node
+
+&#39;use strict&#39;;
+
+var async = require(&#39;async&#39;);
+var fs = require(&#39;fs-extra&#39;);
+var path = require(&#39;path&#39;);
+var uglifyjs = require(&#39;uglify-js&#39;);
+
+async.waterfall([
+  function (next) {
+    fs.remove(&#39;tmp/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.remove(&#39;build/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&#39;tmp/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&#39;tmp/js/&#39;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.readFile(&#39;src/js/bar.js&#39;, &#39;utf8&#39;, function (err, data) {
+      next(err, data);
+    });
+  },
+
+  function (js, next) {
+    fs.readFile(&#39;src/js/baz.js&#39;, &#39;utf8&#39;, function (err, data) {
+      next(err, js + &#39;;&#39; + data);
+    });
+  },
+
+  function (js, next) {
+    try {
+      next(null, uglifyjs.minify(js, {
+        fromString: true
+      }).code);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  function (js, next) {
+    fs.readFile(
+      path.join(
+        __dirname,
+        &#39;node_modules&#39;,
+        &#39;foo&#39;,
+        &#39;dist&#39;,
+        &#39;foo.min.js&#39;
+      ),
+      &#39;utf8&#39;,
+      function (err, data) {
+        next(err, data + &#39;;&#39; + js);
+      }
+    );
+  },
+
+  function (js, next) {
+    fs.writeFile(&#39;tmp/js/main.min.js&#39;, js, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.move(&#39;tmp/&#39;, &#39;build/&#39;, function (err) {
+      next(err);
+    });
+  }
+],
+
+function (err) {
+  if (err) {
+    throw err;
+  }
+});
+</code></pre>
+
+<p>コード自体は簡単でわかりやすい。手軽なので<code>asyn.waterfall()</code>でフローを制御。Streamじゃないけど、中間ファイルを吐かないのでGruntよりは速い。テキトーに書かれたモジュールも<code>try...catch</code>しつつ流せるとか気軽に書ける。ファイルの保証やディレクトリの削除などは<code>fs-extra</code>パッケージに頼ればこんなもので済んだ。</p>
+
+<p>……でも長い。これでも<code>fs-extra</code>パッケージのおかげで短くなってる。読み込みと連結をまとめたりとかでもっと短くできるけど、そこを抽象化するとストレートに書けるという長所が無くなっちゃう。<code>async</code>の代わりに<a href="https://github.com/petkaantonov/bluebird">Promisify</a>するともうちょっと楽だけど、それほど劇的でもない。</p>
+
+<p>ビルド・ツールのキモはやはりグロブを使った抽象化を提供してくれるあたりにあり、そこを毎回自前でどうにかするのは面倒すぎる。Gruntやgulpのような巨大な依存を減らせることは確かだけど、その代わりに小さな依存が増えるので、あんまり変わらない。こういうのを書くためのパッケージをセットにしたメタ・パッケージみたいなのがあればまた少し話が変わる……かなー？</p>
+
+<p>こういうのを抽象化して引数で入力と出力を指定して終わりというパッケージがあっても面白そうだけど、それだとGruntとあんまり変わらないっぽい。<code>Gruntfile.js</code>を書く代わりに<code>package.json</code>で複雑な引数を書くわけだし。</p>
+
+<hr>
+
+<p>つまり<code>make</code>はありだけど、<code>npm run-script</code>はなしかなーという感じになった。引数取れるようになったので<code>npm run-script</code>でいけるいけるとか言ってる人の話はじっくりと聞いて、本気でそれだけで済むと言っていたら聞き流した方が良さそう。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=JavaScript%E3%82%92%E3%83%93%E3%83%AB%E3%83%89%E3%81%99%E3%82%8BJavaScript%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fjavascript-for-building-javascript.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fjavascript-for-building-javascript.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=JavaScript%E3%82%92%E3%83%93%E3%83%AB%E3%83%89%E3%81%99%E3%82%8BJavaScript%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fjavascript-for-building-javascript.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/coding/pack-and-sort-min-width.html" rel="prev">
+  <p>min-widthを含むクエリーをソート</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    </main>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
