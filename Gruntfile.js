@@ -179,8 +179,9 @@ module.exports = function (grunt) {
       jsPre: {
         files: {
           'tmp/lightbox.js': 'src/js/lightbox.js',
-          'tmp/show-column.js': 'src/js/show-column.js',
-          'tmp/show-outline.js': 'src/js/show-outline.js',
+          'tmp/toggle-column.js': 'src/js/toggle-column.js',
+          'tmp/toggle-eyecatch.js': 'src/js/toggle-eyecatch.js',
+          'tmp/toggle-outline.js': 'src/js/toggle-outline.js',
           'tmp/toggle-tagline.js': 'src/js/toggle-tagline.js'
         }
       },
