@@ -103,8 +103,9 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               'lightbox.js',
-              'show-column.js',
-              'show-outline.js',
+              'toggle-column.js',
+              'toggle-eyecatch.js',
+              'toggle-outline.js',
               'toggle-tagline.js'
             ]
           },

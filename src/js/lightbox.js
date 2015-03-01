@@ -3,7 +3,7 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2015
  */
-(function () {
+(function (d) {
   'use strict';
 
   var toggle = function (image, evt) {
@@ -50,10 +50,10 @@
     image.style.width = 'auto';
   };
 
-  var lightbox = function () {
+  var init = function () {
     var i;
     var image;
-    var images = document.querySelectorAll([
+    var images = d.querySelectorAll([
       'main img[src^="assets/images/"]',
       'main img[src^="/images/"]'
     ].join(','));
@@ -64,22 +64,22 @@
       image = images[i];
       parent = image.parentNode;
 
-      if (parent.tagName === 'A' && /^(assets)?\/images\//.test(parent.getAttribute('href'))) {
+      if (
+        parent.tagName === 'A' &&
+        /^(assets)?\/images\//.test(parent.getAttribute('href'))
+      ) {
         parent.addEventListener('click', toggle.bind(parent, image), false);
       }
     }
   };
 
-  if (
-    !('querySelectorAll' in document) ||
-    !('bind' in Function)
-  ) {
+  if (!('querySelectorAll' in d) || !('bind' in Function)) {
     return;
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', lightbox, false);
+  if (d.readyState === 'loading') {
+    d.addEventListener('DOMContentLoaded', init, false);
   } else {
-    lightbox();
+    init();
   }
-})();
+})(document);

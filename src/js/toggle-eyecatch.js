@@ -1,24 +1,29 @@
-(function () {
+(function (d) {
   'use strict';
 
-  var t = function () {
-    var eyecatch = document.querySelector('.full-width');
-    var sectionFooter = document.querySelector('.section-footer');
-    sectionFooter.addEventListener('click', function (evt) {
-      if (eyecatch.hidden) {
-        eyecatch.hidden = false;
-      } else {
-        eyecatch.hidden = true;
-      }
+  var toggle = function (eyecatch, evt) {
+    if (eyecatch.hidden) {
+      eyecatch.hidden = false;
+    } else {
+      eyecatch.hidden = true;
+    }
 
-      evt.preventDefault();
-      evt.stopPropagation();
-    }, false);
+    evt.preventDefault();
+    evt.stopPropagation();
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', t, false);
+  var init = function () {
+    var eyecatch = d.querySelector('.full-width');
+    d.querySelector('.section-footer').addEventListener(
+      'click',
+      toggle.bind(null, eyecatch),
+      false
+    );
+  };
+
+  if (d.readyState === 'loading') {
+    d.addEventListener('DOMContentLoaded', init, false);
   } else {
-    t();
+    init();
   }
-})();
+})(document);
