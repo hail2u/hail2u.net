@@ -10,6 +10,78 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>node-feedmix</title>
+      <link>http://hail2u.net/blog/coding/node-feedmix.html</link>
+      <description>xml2jsを使って複数のRSS 2.0をマージするパッケージ、FeedMixを作った。手元で結構前から使っていたGruntタスクをNode.jsパッケージにして、それを叩くだけのGruntタスクを同梱するという形にした。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/node-feedmix.html</guid>
+      <pubDate>Mon, 02 Mar 2015 06:26:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>を使って複数のRSS 2.0をマージするパッケージ、<a href="https://github.com/hail2u/node-feedmix">FeedMix</a>を作った。手元で結構前から使っていたGruntタスクをNode.jsパッケージにして、それを叩くだけのGruntタスクを同梱するという形にした。</p>
+
+<p>混ぜたいRSSファイルを配列として<code>merge()</code>の引数に指定する。XMLファイルではない場合はxml2jsが、RSSファイルではなさそうな場合はFeedMixがそれぞれ例外を吐いて落ちる。落ちる。</p>
+
+<pre><code>var feedmix = require(&#39;feedmix&#39;);
+var fs = require(&#39;fs&#39;);
+
+var a = f.readFileSync(&#39;a.rss&#39;, &#39;utf8&#39;);
+var b = f.readFileSync(&#39;b.rss&#39;, &#39;utf8&#39;);
+var c = f.readFileSync(&#39;c.rss&#39;, &#39;utf8&#39;);
+var m = feedmix.merge([a, b, c], {
+  trim: true
+});
+</code></pre>
+
+<p>これで<code>m</code>の中身が<code>b.rss</code>と<code>c.rss</code>のすべての<code>item</code>要素を<code>a.rss</code>へ混ぜ込んだJavaScriptオブジェクトになる。<code>item</code>は<code>pubDate</code>要素の値を使ってソートされるが、切り詰められたりはしない。<code>channel</code>要素は<code>a.rss</code>のものが採用されるが、<code>lastBuildDate</code>要素の値のみ最初の<code>item</code>要素の<code>pubDate</code>要素の値がコピーされ書き換えられる。</p>
+
+<pre><code>console.log(feedmix.stringify(m, {
+  cdata: true,
+  xmldec: {
+    encoding: &#39;UTF-8&#39;,
+    version: &#39;1.0&#39;
+  }
+}));
+</code></pre>
+
+<p>XMLへの変換は<code>stringify()</code>へパース結果のオブジェクトを渡して行う。xml2jsのビルダーの単なるラッパーで、特に何もしない。</p>
+
+<p>また<code>merge()</code>では第二引数にxmljsのパーサーのオプションが、<code>strigify()</code>ではxml2jsのビルダーのオプションがそれぞれ指定できる。ただしパーサーの<code>explicitArray</code>オプションはパース後のオブジェクトの構造を変えてしまうので、強制的に<code>true</code>にしているため指定しても効果はない。他にも指定するとおかしくなるオプションがあるかもしれない。</p>
+
+<hr>
+
+<p>同梱されているGruntタスクも凝ってはいない。</p>
+
+<pre><code>feedmix: {
+  main: {
+    options: {
+      builder: {
+        cdata: true,
+        xmldec: {
+          encoding: &#39;UTF-8&#39;,
+          version: &#39;1.0&#39;
+        }
+      },
+
+      parser: {
+        trim: true
+      }
+    },
+
+    dest: &#39;build/feed&#39;,
+    src: [
+      &#39;src/feed/index.rss&#39;,
+      &#39;build/blog/feed&#39;
+    ]
+  }
+}
+</code></pre>
+
+<p>こちらは<code>src</code>でファイルを指定してやると<code>dest</code>にマージした結果を吐いてくれる。動的マッピングだと配列の順序が思ったようにいかない可能性があるので、普通に指定したほうが良いだろう。<code>options.builder</code>と<code>options.parser</code>経由で<code>stringify()</code>と<code>merge()</code>に渡すオプションを指定することはできるので、入出力もモジュールと同等に制御することができる。</p>
+
+<hr>
+
+<p>RSS 1.0とかAtomとかもうよく知らないので無視した。RSS 0.9xなどは通ってしまいそうな気がする。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>indexのマークアップとpermalinkのマークアップ</title>
       <link>http://hail2u.net/blog/webdesign/index-markup-and-permalink-markup.html</link>
       <description>何らかのツールでテンプレートを元にページを生成する昨今、あまりページごとに大きくアウトラインの構造(変な表現だ)が変わることはない。枠を作って流し込む、枠を作って流し込む、というわけだ。ウェブではコンテンツは主に文章であるので、流動性はそれなりに高く、流しこむこと自体は多くの場合は問題にならないが、もうちょっと考えても良い所ではある。</description>
@@ -526,17 +598,6 @@ console.log(new xml2js.Builder({
 <p>イシューは立てておいたので早めに直って欲しい。手元では<a href="/pub/xml2js.js.diff">パッチ</a>を(しかもJavaScriptファイルの方に)当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>夢</title>
-      <link>http://hail2u.net/blog/misc/dreaming-20150218.html</link>
-      <description>ケンタウロス(セントール)のことを考えていた。あのサイズで人間の上半身だと、食料の摂取が大変で、食事だけで数時間浪費してしまいそうだ、とか。胃も同じサイズだと……というところまで考えて、はて胃はどこにあるのだろうか、いや待って腸はどうだろうか、いやいやそもそも心臓や肺が人間の部分にあってそのサイズのままだったら、馬として走れないんじゃないのか、などと疑問がわいた。そこで一頭捕まえて解剖しようとしたら、蹴られて痛いってなったところで目が覚めた。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/dreaming-20150218.html</guid>
-      <pubDate>Fri, 20 Feb 2015 05:00:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>ケンタウロス(セントール)のことを考えていた。あのサイズで人間の上半身だと、食料の摂取が大変で、食事だけで数時間浪費してしまいそうだ、とか。胃も同じサイズだと……というところまで考えて、はて胃はどこにあるのだろうか、いや待って腸はどうだろうか、いやいやそもそも心臓や肺が人間の部分にあってそのサイズのままだったら、馬として走れないんじゃないのか、などと疑問がわいた。そこで一頭捕まえて解剖しようとしたら、蹴られて痛いってなったところで目が覚めた。</p>
-
-<p>合成生物学みたいなのあるけど、別にこういうケンタウロスのようなキメラ(複合生物)を扱う学問じゃなかった。キメラ系だとグリフォン(鷲の頭と翼にライオンの胴体と足)が飛び抜けてかっこいいとずっと思ってたけど、ヒッポグリフ(鷲の頭と翼に馬の胴体と足)の方がシュッとしててもっとかっこいい。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -571,6 +632,6 @@ console.log(new xml2js.Builder({
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sun, 01 Mar 2015 03:49:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 02 Mar 2015 06:26:00 +0900</lastBuildDate>
   </channel>
 </rss>
