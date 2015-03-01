@@ -5,7 +5,7 @@
 package utils;
 
 use strict;
-use vars qw($debug $path_info $canonical $has_image $card_type $ogp_image);
+use vars qw($debug $path_info $canonical $has_eyecatch $has_image $card_type $ogp_image);
 
 # --- Configurable variables -----------
 
@@ -57,10 +57,15 @@ sub start {
 sub story {
   my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
 
+  $has_eyecatch = 0;
   $has_image = 0;
   $card_type_name = 'summary';
 
   $$body_ref =~ s/<p>/<p itemprop="description">/;
+
+  if ($$body_ref =~ m!^\s*<figure class="full-width">!) {
+    $has_eyecatch = 1;
+  }
 
   if ($$body_ref =~ m!<img!) {
     $has_image = 1;
