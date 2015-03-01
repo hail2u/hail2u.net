@@ -681,11 +681,6 @@ module.exports = function (grunt) {
     'gitcommit:deploy'
   ]);
 
-  grunt.registerTask('deploy:sitemap', [
-    'sitemap',
-    'gitcommit:deploy'
-  ]);
-
   grunt.registerTask('ping', [
     'pubsubhubbub_publish'
   ]);
