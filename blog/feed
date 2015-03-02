@@ -10,12 +10,57 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 2 Mar 2015 06:27:05 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 3 Mar 2015 07:34:24 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>media_query_listのパース</title>
+      <link>http://hail2u.net/blog/coding/parsing-media-query-list.html</link>
+      <description>Media Queriesの各クエリーは、featureとexpのセットもしくはmedia_typeでexpressionが、expressionをandで繋いでmedia_queryが、media_queryをカンマで繋いでmedia_query_listになり、それで完成する。そこそこ正確にパースしてJavaScriptから扱えるようにするためには、まずカンマで区切り、更にandキーワードまたはスペースで区切り、更に同じfeatureがあることを考慮した多次元配列に変換してやる必要がありそうだ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/parsing-media-query-list.html</guid>
+      <pubDate>Tue, 03 Mar 2015 07:34:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>Media Queriesの各クエリーは、<code>feature</code>と<code>exp</code>のセットもしくは<code>media_type</code>で<code>expression</code>が、<code>expression</code>を<code>and</code>で繋いで<code>media_query</code>が、<code>media_query</code>をカンマで繋いで<code>media_query_list</code>になり、それで完成する。そこそこ正確にパースしてJavaScriptから扱えるようにするためには、まずカンマで区切り、更に<code>and</code>キーワードまたはスペースで区切り、更に同じ<code>feature</code>があることを考慮した多次元配列に変換してやる必要がありそうだ。</p>
+
+<p>まず存在しなさそうだが、以下のようなクエリーも理論上はありうる。</p>
+
+<pre>only
+  screen and
+  (min-width: 1em) and
+  (min-width: 2em),
+not
+  (min-width: 3em) and
+  (min-height: 4em) and
+  (min-height: 5em)
+</pre>
+
+<p>例えばこのようなクエリーを以下のようにできれば良さそうだ。</p>
+
+<pre><code>var mediaQueryList = [
+  {
+    &#39;min-width&#39;: [&#39;1em&#39;, &#39;2em&#39;],
+    &#39;only&#39;: true,
+    &#39;screen&#39;: true
+  },
+  {
+    &#39;min-height&#39;: [&#39;4em&#39;, 5em&#39;],
+    &#39;min-width&#39;: [&#39;3em&#39;],
+    &#39;not&#39;: true
+  }
+];
+</code></pre>
+
+<p>こうするための実装を書いているけどすごい面倒くさくて嫌になってきている。<code>min-width</code>が複数回出てきても良いとか想定していなかった。</p>
+
+<hr>
+
+<p>パースは出来たとしてもどう扱ってソートするかでまた面倒くさい。<code>min-width</code>に絞っていても<code>media_query</code>の中で<em>最大</em>かつその中で<em>最小</em>を基準にソートする必要がありそうだ。他に<code>print, (min-width: 1em)</code>みたいなものの判断も難しい。もうちょっと時間かかりそうだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>node-feedmix</title>
@@ -571,58 +616,6 @@ if (process.argv[3] === &#39;--version&#39;) {
 <hr>
 
 <p>安定なのは<code>border</code>プロパティーで行う実装だが、不明な幅の要素で使いたい場合はSVGによる実装というのが現時点での妥当な選択だろう。Firefox 35で若干アンチエイリアスが甘いことも考慮すると、SVGで統一という選択も悪くはない。とにかくChromeでも早いところ<code>linear-gradient()</code>へきれいにアンチエイリアスかかるようになって欲しい。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>xml2js v0.4.5でCDATAセクションがサポート</title>
-      <link>http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html</link>
-      <description>Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html</guid>
-      <pubDate>Sat, 21 Feb 2015 01:28:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Node.jsでXMLをまともに読み書きできる唯一と言えそうな<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>パッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</p>
-
-<p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
-
-<pre><code>var xml2js = require(&#39;xml2js&#39;);
-
-var builder = new xml2js.Builder({
-  cdata: true
-});
-var obj = {
-  foo: &#39;Foo&#39;,
-  bar: &#39;Bar&#39;
-};
-var xml = builder.buildObject(obj);
-</code></pre>
-
-<p>このようにグローバルでの設定しかないため、CDATAで書くか書かないかの二択になる。この要素ではCDATAを、この要素では文字参照で、などとはできないのが少し残念だ。</p>
-
-<hr>
-
-<p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
-
-<pre><code>var xml2js = require(&#39;xml2js&#39;);
-
-console.log(new xml2js.Builder({
-  cdata: true
-}).buildObject({
-  &#39;foo&#39;: {
-    &#39;bar&#39;: &#39;baz &amp; qux&#39;
-  }
-}));
-</code></pre>
-
-<p>これで<code>bar</code>要素の中身がCDATAセクションになってくれれば良いが、なってくれない。</p>
-
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
-&lt;foo&gt;
-  &lt;bar&gt;baz &amp;amp; qux&lt;/bar&gt;
-&lt;/foo&gt;
-</code></pre>
-
-<p>イシューは立てておいたので早めに直って欲しい。手元では<a href="/pub/xml2js.js.diff">パッチ</a>を(しかもJavaScriptファイルの方に)当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>
