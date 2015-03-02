@@ -596,17 +596,22 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'build:css',
+    'build:html',
     'build:img',
     'build:js',
-    'build:html',
     'sitemap'
   ]);
 
-  grunt.registerTask('build:blog', [
+  grunt.registerTask('build:article', [
     'blosxom:article',
     'generate:blog',
     'feedmix',
     'sitemap'
+  ]);
+
+  grunt.registerTask('build:blog', [
+    'blosxom:index',
+    'blosxom:all'
   ]);
 
   grunt.registerTask('build:css', [
@@ -624,8 +629,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build:html', [
-    'generate:main',
-    'blosxom:index'
+    'generate:main'
   ]);
 
   grunt.registerTask('build:img', [
@@ -687,7 +691,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('publish:blog', [
     'gitcommit:entryAdd',
-    'build:blog',
+    'build:article',
     'gitcommit:cacheUpdate',
     'gitcommit:blogPublish'
   ]);
@@ -699,7 +703,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('update:blog', [
     'gitcommit:entryUpdate',
-    'build:blog',
+    'build:article',
     'gitcommit:cacheUpdate',
     'gitcommit:blogUpdate'
   ]);
