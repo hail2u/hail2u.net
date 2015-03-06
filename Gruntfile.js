@@ -327,9 +327,6 @@ module.exports = function (grunt) {
         ext: '.min.svg',
         src: [
           '**/*.svg',
-          '!icon/asterisk.svg',
-          '!icon/chain.svg',
-          '!icon/magnifying-glass.svg',
           '!**/*.min.svg'
         ]
       }
