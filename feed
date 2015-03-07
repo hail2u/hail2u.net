@@ -10,6 +10,75 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>chやexとpxの対応関係</title>
+      <link>http://hail2u.net/blog/webdesign/converting-ch-and-ex-to-px.html</link>
+      <description>1chと1pxがどちらが大きいかはすぐにわかることだが、1chと10pxとするとちゃんと答えられる人は少数派だろう。正解はフォントによって違う、だ。その要素で使われているフォントの特定のグリフの特定のパーツの正確なサイズを知らなければ、chやex単位をpx単位に変換することはできない。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/converting-ch-and-ex-to-px.html</guid>
+      <pubDate>Sat, 07 Mar 2015 11:16:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><code>1ch</code>と<code>1px</code>がどちらが大きいかはすぐにわかることだが、<code>1ch</code>と<code>10px</code>とするとちゃんと答えられる人は少数派だろう。正解はフォントによって違う、だ。その要素で使われているフォントの特定のグリフの特定のパーツの正確なサイズを知らなければ、<code>ch</code>や<code>ex</code>単位を<code>px</code>単位に変換することはできない。</p>
+
+<p>例えば標準的なArial (のRegular)と特徴的なImpactでどのように変わってくるのかを表にまとめてみよう。基本のフォント・サイズは<code>16px</code>になっているとする。Chrome 41での結果であることも明記しておく。</p>
+
+<table>
+<thead>
+<tr>
+<th>フォント</th>
+<th style="text-align:right"><code>100em</code></th>
+<th style="text-align:right"><code>100ch</code></th>
+<th style="text-align:right"><code>100ex</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arial</td>
+<td style="text-align:right"><code>1600.000px</code></td>
+<td style="text-align:right"><code>889.844px</code></td>
+<td style="text-align:right"><code>829.688px</code></td>
+</tr>
+<tr>
+<td>Impact</td>
+<td style="text-align:right"><code>1600.000px</code></td>
+<td style="text-align:right"><code>857.813px</code></td>
+<td style="text-align:right"><code>1036.719px</code></td>
+</tr>
+</tbody>
+</table>
+
+<p><code>1em</code>が必ず<code>16px</code>になることに対して、<code>ch</code>と<code>ex</code>単位ではフォントによって変化している。それぞれのフォントのグリフの特定のパーツ、<code>ch</code>単位では<code>0</code>の幅、<code>ex</code>単位では<code>x</code>の高さ(とされるx-height)、が考慮された上で<code>px</code>単位に変換され、計算済みスタイルの値となっていることがわかる。Impactのようなx-heightがかなり高く設定されているフォントでは<code>ex</code>単位で大きく差が出てくるというわけだ。</p>
+
+<p>このことは普通にCSSのプロパティーの値として使う場合はあまり問題になることはない。しかしながらブラウザー以外の何らかのツールで扱おうとすると一定の決めつけが必要となる。そうでないとフォントを調べて係数をひねり出さなければならなくなるからだ。</p>
+
+<p>少なくともメディア・クエリーにおいては初期設定の値を基準として変換されることになるので、Arial (やHelvetica Neue)を基準にした係数を使って変換するのが妥当だろう。Chrome 41でArialを使って調べた<code>px</code>単位に変換するための係数は以下の通りだ。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:right">単位</th>
+<th style="text-align:right">to <code>px</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>1ch</code></td>
+<td style="text-align:right"><code>8.8984375</code></td>
+</tr>
+<tr>
+<td style="text-align:right"><code>1ex</code></td>
+<td style="text-align:right"><code>8.296875</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>これらの係数を使って<code>px</code>単位に変換することで、<code>(min-width: 2ch)</code>というクエリーは<code>(min-width: 1em)</code>というクエリーよりも後に書いた方が良さそうだということがわかる。</p>
+
+<hr>
+
+<p>実際にはメディア・クエリーで使う長さの単位は余程の事情がない限り統一すべきだろう。そして、その統一した単位とは別の単位が使われている可能性があるサードパーティ製のライブラリーは何らかのツールで機械的に処理すべきではない。そのためこういった変換のことを考える必要はまずない。</p>
+
+<p>それでもどうにかして処理してやりたいという場合には、このようにArialやHelvetica Neueを想定して変換してやるしかなさそうだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Rhodia dotPad</title>
       <link>http://hail2u.net/blog/gadget/rhodia-dotpad.html</link>
       <description>ドット方眼に目覚めてから愛用しはじめたRHODIAのdotPadの二代目をおろした。僕が使っているのは最小サイズのNo.12で270円。もちろんオレンジ。</description>
@@ -420,35 +489,6 @@ function (err) {
 <p>Semverのこのあたりの微妙な判断を求められる点が、v1.0.0をリリースする気配がないパッケージでnpmリポジトリーが溢れかえっている原因なのかなと感じる。メジャー・バージョンを上げることの抵抗感をなくすか、Semverを諦めるかの二択になりそうだ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>VimでGitで衝突したところにジャンプ</title>
-      <link>http://hail2u.net/blog/software/jump-git-conflict-in-vim.html</link>
-      <description><![CDATA[Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<<<<<<<にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。]]></description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/jump-git-conflict-in-vim.html</guid>
-      <pubDate>Wed, 25 Feb 2015 21:37:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>にジャンプするだけみたいなのがちょっと欲しくなった。Vimだと<code>BufReadPost</code>で<code>search()</code>を呼べば良さそうだ。</p>
-
-<pre><code>augroup LtLtLtLtLtLtLt
-  autocmd!
-
-  &quot; Jump to first conflict position if find
-  autocmd BufReadPost * call search(&#39;^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&#39;, &#39;sw&#39;, 0, 1000)
-augroup END
-</code></pre>
-
-<p>検索を一周させるようにフラグを立てておくついでに戻れるようにもフラグを立てたつもりだけど、発火するタイミング的に常に先頭で意味が無いような気がしないでもない。あと大きなファイルで死にそうなので1000ミリ秒に制限しておいたけど、もっと短くても良さそう。カーソル位置の復帰など、同じようにファイルを開いた時にカーソル位置を動かすプラグインと相性は悪いけど、なんとかなる。</p>
-
-<p><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>は大体は文法エラーなので、Syntasticを使っている人は、</p>
-
-<ul>
-<li>開いた時にチェック(<code>let g:syntastic_check_on_open = 1</code>)</li>
-<li>最初のエラーにジャンプ(<code>let g:syntastic_auto_jump = 1</code>)</li>
-<li>位置リストを自動的に開く(<code>let g:syntastic_auto_loc_list = 1</code>)</li>
-</ul>
-
-<p>の設定を有効にするとだいたい実現できそうな気がする。最初のエラーじゃなかった時の保険として、位置リストを自動的に開くようにしておくといける。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -483,6 +523,6 @@ augroup END
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 06 Mar 2015 09:23:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Mar 2015 11:16:00 +0900</lastBuildDate>
   </channel>
 </rss>
