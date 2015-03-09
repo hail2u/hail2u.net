@@ -219,7 +219,9 @@ module.exports = function (grunt) {
         expand: true,
         src: [
           'eau-douce/b.woff',
-          'eau-douce/r.woff'
+          'eau-douce/b.woff2',
+          'eau-douce/r.woff',
+          'eau-douce/r.woff2'
         ]
       }
     },
