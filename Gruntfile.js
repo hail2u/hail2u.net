@@ -227,7 +227,8 @@ module.exports = function (grunt) {
         map: {
           inline: false,
           sourcesContent: false
-        }
+        },
+        sort: true
       },
 
       main: {
