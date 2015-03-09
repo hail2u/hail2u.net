@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       css: {
         files: {
           'tmp/style.min.css': [
-            'tmp/source-sans-pro.min.css',
+            'tmp/eau-douce.min.css',
             'tmp/style.min.css'
           ]
         }
@@ -114,8 +114,10 @@ module.exports = function (grunt) {
             dest: 'src/css/assets/fonts/',
             expand: true,
             src: [
-              'source-sans-pro/b.woff',
-              'source-sans-pro/r.woff'
+              'eau-douce/b.woff',
+              'eau-douce/b.woff2',
+              'eau-douce/r.woff',
+              'eau-douce/r.woff2'
             ]
           }
         ]
@@ -142,7 +144,7 @@ module.exports = function (grunt) {
         dest: 'tmp/',
         expand: true,
         ext: '.css',
-        src: ['source-sans-pro.css']
+        src: ['eau-douce.css']
       },
 
       img: {
@@ -216,8 +218,8 @@ module.exports = function (grunt) {
         dest: 'build/fonts/',
         expand: true,
         src: [
-          'source-sans-pro/b.woff',
-          'source-sans-pro/r.woff'
+          'eau-douce/b.woff',
+          'eau-douce/r.woff'
         ]
       }
     },
@@ -302,7 +304,7 @@ module.exports = function (grunt) {
           'debug.scss',
           'documents.scss',
           'natural.scss',
-          'source-sans-pro.scss',
+          'eau-douce.scss',
           'style.scss'
         ]
       }
