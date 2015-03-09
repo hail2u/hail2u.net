@@ -10,6 +10,37 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Istanbulとnodeunit</title>
+      <link>http://hail2u.net/blog/software/istanbul-and-nodeunit.html</link>
+      <description>Istanbulはよく使っていたのだけど、直接叩くことはなかった。初めてこれ単体でnodeunitと組み合わせて使おうかと、node_modules/.bin/nodeunitを引数に指定して実行してもうまく動かなかった。どうやらnodeunitパッケージ内のbin/nodeunitを指定しないとダメらしい。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/istanbul-and-nodeunit.html</guid>
+      <pubDate>Mon, 09 Mar 2015 12:21:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><a href="https://github.com/gotwarlost/istanbul">Istanbul</a>はよく使っていたのだけど、直接叩くことはなかった。初めてこれ単体で<a href="https://github.com/caolan/nodeunit">nodeunit</a>と組み合わせて使おうかと、<code>node_modules/.bin/nodeunit</code>を引数に指定して実行してもうまく動かなかった。どうやらnodeunitパッケージ内の<code>bin/nodeunit</code>を指定しないとダメらしい。</p>
+
+<p>プロジェクト・ローカルにインストールしたnodeunitを使う場合、<code>node_modules/.bin/nodeunit</code>を叩いて実行する。</p>
+
+<pre><samp>$ <kbd>./node_modules/.bin/nodeunit test</kbd>
+</samp></pre>
+
+<p>これをIstanbulでラップしてコード・カバレッジを調べたい場合、</p>
+
+<pre><samp>$ <kbd>istanbul cover node_modules/nodeunit/bin/nodeunit -- test</kbd>
+</pre>
+
+<p>というようにnpmが作成するラッパーではなく、nodeunitパッケージに含まれるスクリプトを直接叩くようにしてやらないと上手く動かないようだ。</p>
+
+<hr>
+
+<figure>
+  <a href="/images/blog/istanbul-and-nodeunit.png"><img alt="Istanbulでnodeunitを使ってCSS MQPackerのコード・カバレッジを調査した結果" height="156" src="/images/blog/istanbul-and-nodeunit.png" width="672"></a>
+
+  <figcaption>100% Code Coverage</figcaption>
+</figure>
+
+<p>ということでCSSWringとCSS MQPackerはめでたくカバレッジ100%に到達した。CSSWringでは再現できないバグのところを一つ無視させてるけど。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>TL;DR (Too Light; Didn’t Read)</title>
       <link>http://hail2u.net/blog/webdesign/too-light-didnt-read.html</link>
       <description>コントラストの低さが読みやすさに及ぼす影響についてはそれなりに認知されてきたが、ウェブで使われ始めて間もない軽いウェイトのフォントが読みやすさに与える影響は軽視されている。このことには早いうちから警鐘は鳴らされているが、浸透しそうな気配はない。新しい10のサービスのうち、必ず1つか2つは読めたものじゃない軽いウェイトのフォントが本文でも使われていたりするような印象だ。</description>
@@ -444,49 +475,6 @@ function (err) {
 <p>つまり<code>make</code>はありだけど、<code>npm run-script</code>はなしかなーという感じになった。引数取れるようになったので<code>npm run-script</code>でいけるいけるとか言ってる人の話はじっくりと聞いて、本気でそれだけで済むと言っていたら聞き流した方が良さそう。</p>]]></content:encoded>
     </item>
     <item>
-      <title>min-widthを含むクエリーをソート</title>
-      <link>http://hail2u.net/blog/coding/pack-and-sort-min-width.html</link>
-      <description>CSS MQPackerにmin-widthを使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/pack-and-sort-min-width.html</guid>
-      <pubDate>Fri, 27 Feb 2015 05:40:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p><a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>に<code>min-width</code>を使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</p>
-
-<p>色々面倒なのがあるので、多くの人が必要なのは<code>min-width</code>だけだろうと決めつけて実装している。その上で以下の条件にマッチするクエリーを<em>後ろ</em>に回して、その中でソートするようにした。</p>
-
-<ul>
-<li><code>min-width</code>をどこかに含む</li>
-<li>対応している単位である</li>
-<li><code>calc()</code>は使っていない</li>
-</ul>
-
-<p>クエリーはまずカンマで分割されて、その中で更に空白文字で分割し、クエリーをなんとなく多次元配列へ変換する。ここで<code>min-width</code>が見つかったら後ろに回すようになっている。対応した単位は<code>px</code>を基準に<code>ch</code>、<code>em</code>、<code>ex</code>、<code>pc</code>、<code>pt</code>、そして<code>rem</code>までだ。どうやっても描画領域を基準にした<code>v*</code>単位には対応できない。<code>cm</code>や<code>in</code>は対応しても良いけれどさほど意味はなさそうだ。ソートは<code>px</code>単位に変換されて行われる。</p>
-
-<pre><code>@media (min-width: 48px) {}
-@media (min-width: 2em) {}
-@media (min-width: 1rem) {}
-</code></pre>
-
-<p>このように単位系が混在している場合は以下のように良い感じ(私見)にソートされる。それぞれの単位系ごとにソートとしても良いのだけど、それはそれで面倒そうなので一気にソートしてしまうことにした。</p>
-
-<pre><code>@media (min-width: 1rem) {}
-@media (min-width: 2em) {}
-@media (min-width: 48px) {}
-</code></pre>
-
-<p><code>1rem</code>は<code>16px</code>、<code>2em</code>は<code>32px</code>とみなされ<code>48px</code>より前に来るようになるわけだ。</p>
-
-<p>式自体の書き換えはもちろん行わない。<code>calc()</code>にも対応したい気はすごくあるのだけど、フルスクラッチで書くのはなかなか厳しそうだ。<a href="https://www.npmjs.com/package/reduce-css-calc">reduce-css-calc</a>を使おうかなと考えている。</p>
-
-<p>CSSの書き方自体は普通にメディア・クエリーを書いてくれればなんとかなるはずだ。気をつけるのはなるべく単位を揃えることくらいだろう。気取って<code>screen</code>とか書いていても、Retina対応の<code>resolution</code>が混ざっていたりとかも大丈夫だと思うのだけど、もっと色々テスト書かないと不安だ。</p>
-
-<hr>
-
-<p>メディア・クエリーは<em>後方互換性を維持して</em>今度更に強化されていく。実装の方も進みつつある上、<code>calc()</code>の存在や憎むべきCSS Variablesも控えているので、やはり一時的なソリューションにしかならないと思う。<code>min-width</code>だけにしたのもその辺りが理由だ。でもソリューションとして機能しなくなった頃にはHTTP/2やらWeb Componentsやらで大量の細かいCSSファイルを気軽に投げつけられる時代になっているはずなので、きっとメディア・クエリーをまとめなくても良くなっているのではないかとも思う。</p>
-
-<p><code>not</code>キーワードの扱いをどうしようか悩んでいて、それが解決したらリリースするつもりだ。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -521,6 +509,6 @@ function (err) {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sun, 08 Mar 2015 12:08:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 09 Mar 2015 12:21:00 +0900</lastBuildDate>
   </channel>
 </rss>
