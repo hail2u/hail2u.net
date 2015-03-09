@@ -60,7 +60,7 @@ module.exports = function (grunt) {
     </header>
 
     <main class="content">
-      <article id="<%FN%>" role="main">
+      <article role="main">
         <h1 class="first-heading"><%TITLE%></h1>
 
         <footer class="section-footer">
