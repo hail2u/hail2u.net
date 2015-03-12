@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>伝言ゲーム化するバグ報告 - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/coding/bug-reporting-telephone-game.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/webdesign/eau-douce.html">
+
+    
+
+    
+      <meta content="伝言ゲーム化するバグ報告" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/coding/bug-reporting-telephone-game.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/coding/bug-reporting-telephone-game.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">伝言ゲーム化するバグ報告</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-03-12T14:27:00+09:00" itemprop="datePublished">Mar 12, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。</p>
+
+<p>小さく作っていく関係上、多くの場合はそういったライブラリー達をうまくラップしたものがエンド・ユーザーには使われる。具体的には以下のような構成になっていることだろう。</p>
+
+<ol>
+<li>標準仕様のみを正確に実装したライブラリー</li>
+<li>1を限定的に扱うライブラリー</li>
+<li>2を利用した単機能ライブラリー</li>
+<li>3を複数扱うラッパー・ライブラリー</li>
+</ol>
+
+<p>4を使っている人がバグを見つけた場合、当然4に報告する。4の開発者がどうも3に原因があるらしいと判断した場合、3へ報告される。以下、3の開発者が2へ、2の開発者が1へ、と必要ならばバグは伝言ゲームのように伝わっていくことだろう。途中でバグの内容がうまく伝わらなくなり、戻ってきたりすることもある(それで良いことももちろんあるが)。または途中の開発者が忙しかったり、もう開発を投げていたりすると、1などの上流へバグが伝わらないこともある。</p>
+
+<p>つまり、バグ報告に正確さが欠けやすいという問題と、上流のモジュールにバグ報告が到達しづらいという問題がある。これらの問題を避けるためには、なるべく上流にバグ報告をする必要があるが、それをしてしまうとせっかく小さい単位で作っている意味が少なくなってしまう。小さく作ることの目的の一つに、自分で書いたコード以外におけるバグの調査を他に投げられることがあるはずだからだ。</p>
+
+<p>上流に直接報告することが難しいとなると、いかにこのバグ報告という伝言ゲームを途切らせないかが重要になる。すなわち、小さなライブラリーで構成される世界では、ライブラリーを選択する際、その歴史的な評価よりも開発の活発さの方が重要な要素になりうるということだ。上流へ速やかにバグが伝わり、下流へきちんとその修正が流れてくれば、開発者がアドホックな対策に追われる必要はなくなる。この流れが途切れないようにするためには開発の活発さが重要になるというわけだ。</p>
+
+<hr>
+
+<p>単純にコミットのペースだけではなく、週に閉じられたイシューの数やプルリクエストが立ってからの反応の早さなどでも開発の活発さを計ることができるだろう。むしろ後者の方が重要かもしれない。パッケージ・リポジトリーでの人気だけではなく、こういった点もライブラリーを選択する参考にすると良さそうだ。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E4%BC%9D%E8%A8%80%E3%82%B2%E3%83%BC%E3%83%A0%E5%8C%96%E3%81%99%E3%82%8B%E3%83%90%E3%82%B0%E5%A0%B1%E5%91%8A%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fbug-reporting-telephone-game.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fbug-reporting-telephone-game.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fbug-reporting-telephone-game.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E4%BC%9D%E8%A8%80%E3%82%B2%E3%83%BC%E3%83%A0%E5%8C%96%E3%81%99%E3%82%8B%E3%83%90%E3%82%B0%E5%A0%B1%E5%91%8A%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fbug-reporting-telephone-game.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/webdesign/eau-douce.html" rel="prev">
+  <p>Eau Douce</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
