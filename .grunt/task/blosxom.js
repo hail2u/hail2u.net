@@ -154,7 +154,7 @@ module.exports = function (grunt) {
     } else if (entry) {
       var i = 0;
       var n = 'image';
-      var images = fs.readFileSync(entry, 'utf-8').match(/\bsrc=".*?"/g);
+      var images = fs.readFileSync(entry, 'utf-8').match(/\bsrc="\/images\/blog\/.*?"/g);
 
       if (path.resolve(entry) === path.normalize(entry)) {
         entry = path.relative(options.datadir, entry);
