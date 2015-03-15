@@ -10,12 +10,90 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 15 Mar 2015 17:31:12 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 16 Mar 2015 04:04:09 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSS MQPackerの行うソート</title>
+      <link>http://hail2u.net/blog/webdesign/sorting-on-csmqpacker.html</link>
+      <description>CSS MQPackerに加わったソート機能は完全なものではない。完全なものを実現するのが難しいこともあるが、必要とされていないからでもある。メインはmin-widthクエリーに絞り、それ以上は自前で用意してもらうというのは妥協であると同時に、僕の能力の限界でもある。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/sorting-on-csmqpacker.html</guid>
+      <pubDate>Mon, 16 Mar 2015 04:04:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>に加わったソート機能は完全なものではない。完全なものを実現するのが難しいこともあるが、必要とされていないからでもある。メインは<code>min-width</code>クエリーに絞り、それ以上は自前で用意してもらうというのは妥協であると同時に、僕の能力の限界でもある。</p>
+
+<p>メディア・クエリーにおいて<code>min-width</code>クエリーは以下のいずれかの書かれ方をする。</p>
+
+<ol>
+<li><code>(min-width: 100px)</code></li>
+<li><code>(min-width: 100em)</code></li>
+<li><code>(min-width: 100px) and (min-width: 200px)</code></li>
+<li><code>not (min-width: 100px)</code></li>
+<li><code>print and (min-width: 100px)</code></li>
+<li><code>print, (min-width: 100px)</code></li>
+</ol>
+
+<p>CSS MQPackerのソート機能はこれらすべてを対象にするわけではない。</p>
+
+<h2>シンプルなもの</h2>
+
+<p>もちろん<code>min-width</code>クエリーのみのものは対象になる。この種類のクエリーには<code>screen</code>など主要なメディア・タイプを含むこともある。後述するが特別に無視されるのは<code>print</code>と同時に指定された場合だけだ。</p>
+
+<p>単一の<code>min-width</code>クエリーが<code>px</code>単位を使って書かれている場合には話は単純で、それらの値を取り出して昇順にソートする。世の7割近くのメディア・クエリーはこれでカバーできるのではないかと思われる。</p>
+
+<h2>単位の違い</h2>
+
+<p><code>px</code>単位以外で書かれることももちろんあるし、混ざることもある……かもしれない(このウェブサイトでは混ざっている)。単位の違いは完全に吸収することは出来ない。CSS 2.1の時代からそうだが、CSSのみでは異なる単位間の完全な変換は行えないからだ。<code>v*</code>単位はもちろん、<code>pt</code>や<code>pc</code>も無理がある。それら対応していない単位を使っている場合には、例え<code>min-width</code>クエリーであってもソートの対象には含まれない。</p>
+
+<ol>
+<li><code>ch</code></li>
+<li><code>em</code></li>
+<li><code>ex</code></li>
+<li><code>px</code></li>
+<li><code>rem</code></li>
+</ol>
+
+<p>ソート対象に含まれる単位は以上の5つになる。これらの単位を<code>px</code>単位に変化した上で昇順にソートするというわけだ。<code>em</code>と<code>rem</code>は<code>16px</code>を基準に、<code>ch</code>と<code>ex</code>に関しては初期フォントをArialのNormalと仮定して変換している。</p>
+
+<h2>複数のmin-width</h2>
+
+<p>本当は意味が無いのだが、クエリーには<code>and</code>キーワードを使って複数の<code>min-width</code>クエリーが含まれることもあるかもしれない。<code>min-width</code>クエリーの場合、複数指定されるとその最も<em>大きい</em>値で発動することになる(<code>and</code>は論理積だからだ)。</p>
+
+<p>そのため、複数の<code>min-width</code>クエリーが見つかった場合は、その中で最大の値を取り出し、それのみを使ってソートを行うことになる。</p>
+
+<h2>否定のクエリー</h2>
+
+<p>メディア・クエリーでは<code>not</code>キーワードを使ってそのクエリーを否定することができる。<code>min-width</code>クエリーの場合は<code>max-width</code>クエリーとほぼ同じような扱いになると考えて良いだろう。</p>
+
+<p>これらはソートに含める必要はないので、無視する。</p>
+
+<h2>printメディア・タイプ</h2>
+
+<p>印刷向けスタイルシートはそれなりに需要が増えてきた。今はPDFで印刷するなども手軽に行えるようになったので、そこそこ提供しているウェブサイトも増えてきた印象だ。もちろん<code>min-width</code>クエリーと組み合わさって、用紙の大きさによって調整を行うこともあるだろう。</p>
+
+<p>多くの場合はスクリーン向けと印刷向けのCSSを混ぜて書くことはないと思われるため、これも無視する。本当は<code>print</code>メディア・タイプを含むクエリーを特別扱いしてやると良いのだろうが、まだそこまでの需要はないだろう。</p>
+
+<h2>クエリー・リスト</h2>
+
+<p>メディア・クエリーでは複数のクエリーをリストにして指定することもできる。その場合、カンマ区切りで指定してやることになる。このカンマは論理和になるORと同じ意味を持つので、カンマで区切られたクエリーのいずれかにこれまでのルールに従い対象とするクエリーがあった場合、ソートされる。</p>
+
+<p>例え他に<code>print</code>メディア・タイプを含むクエリーがあったとしても、だ。</p>
+
+<hr>
+
+<p>CSS MQPackerではこのようにしてソートの対象を選び出し、それらのみをソートする。対象ではない他のクエリーは、元のCSSファイルでの出現順を維持してまとめられる。また、ソートされたクエリーは他のクエリーの<em>前に</em>配置されるので、印刷向けCSSが意図せず前に来てしまうなどということは起こらない。</p>
+
+<p>概ねうまく動作していることと思われる。バグはもちろん、対象を広げて欲しいなどといった要望は是非イシューを立てて欲しい。</p>
+
+<hr>
+
+<p>そのうち英語でリポジトリーのWikiにちゃんと書きたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>夢</title>
@@ -414,27 +492,6 @@ console.log(result.css);
 <p>実際にはメディア・クエリーで使う長さの単位は余程の事情がない限り統一すべきだろう。そして、その統一した単位とは別の単位が使われている可能性があるサードパーティ製のライブラリーは何らかのツールで機械的に処理すべきではない。そのためこういった変換のことを考える必要はまずない。</p>
 
 <p>それでもどうにかして処理してやりたいという場合には、このようにArialやHelvetica Neueを想定して変換してやるしかなさそうだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Rhodia dotPad</title>
-      <link>http://hail2u.net/blog/gadget/rhodia-dotpad.html</link>
-      <description>ドット方眼に目覚めてから愛用しはじめたRHODIAのdotPadの二代目をおろした。僕が使っているのは最小サイズのNo.12で270円。もちろんオレンジ。</description>
-      <category>Gadget</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/gadget/rhodia-dotpad.html</guid>
-      <pubDate>Fri, 06 Mar 2015 09:23:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="http://www.amazon.co.jp/gp/product/B00JO1JCKK/ref=as_li_ss_tl?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=B00JO1JCKK&amp;linkCode=as2&amp;tag=hail2unet-22"><img alt="ロディア ドットパッド No.12 オレンジ 2冊セット" height="228" src="/images/blog/rhodia-dotpad.jpg" width="2216"></a>
-</figure>
-
-<p><a href="/blog/software/dot-grid-and-line-grid.html">ドット方眼</a>に目覚めてから愛用しはじめた<a href="http://www.amazon.co.jp/gp/product/B00JO1JCKK/ref=as_li_ss_tl?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=B00JO1JCKK&amp;linkCode=as2&amp;tag=hail2unet-22">RHODIAのdotPad</a>の二代目をおろした。僕が使っているのは最小サイズのNo.12で270円。もちろんオレンジ。</p>
-
-<p>書き味はRhodiaらしいやつで、ボールペンや鉛筆に向いてる。万年筆(Lamy)とはちょっと相性悪いような気がする。切りはなしやすさもRhodiaと同じ。ただゆがみはないものの、線方眼のものよりも方眼の位置に個体差があるような気がする。気になる場合は文具店で実物確認して買うのが良さそう。</p>
-
-<p>表紙は耐水性がちょっとある。そのための加工のお陰で手触りもスベスベで、長期間使ってもあまり劣化してこない。。裏表紙も同じ。裏表紙の内側には厚めのボール紙が台紙として更にあって、手で持ってる時も安定して書けるという謳い文句通り、しっかりしてる。</p>
-
-<p>ホッチキス留めだけど裏にホッチキス針の先が出てこないとかそういうあたりもちゃんとRhodiaクオリティー。かなり丈夫な方だとは思うけど、やはり端はヘナヘナになってしまう。カバーが欲しい気もするけど、うーん。</p>]]></content:encoded>
     </item>
 
   </channel>
