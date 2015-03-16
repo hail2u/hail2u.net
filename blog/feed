@@ -10,12 +10,61 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 16 Mar 2015 04:04:09 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 17 Mar 2015 07:29:23 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CtrlPとGitのls-filesサブコマンド</title>
+      <link>http://hail2u.net/blog/software/ctrlp-and-git-ls-files.html</link>
+      <description>CtrlPのヘルプのカスタム・コマンドの項に記載があるように、Gitのls-filesサブコマンドを使ったカスタム・コマンドを定義すると、.gitignoreを考慮してファイルをリストアップすることができる。ただ常にこちらである必要はないので、Git管理下だけでそうなるようにしたい。その場合、ラッパー関数を作成して、その中でb:ctrlp_user_commandを設定してやると良さそうだ。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/ctrlp-and-git-ls-files.html</guid>
+      <pubDate>Tue, 17 Mar 2015 07:29:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/ctrlpvim/ctrlp.vim/blob/51888616a29eeddc933d8ec0596bd13e83231b90/doc/ctrlp.txt#L295-L361">CtrlPのヘルプのカスタム・コマンドの項</a>に記載があるように、Gitの<code>ls-files</code>サブコマンドを使ったカスタム・コマンドを定義すると、<code>.gitignore</code>を考慮してファイルをリストアップすることができる。ただ常にこちらである必要はないので、Git管理下だけでそうなるようにしたい。その場合、ラッパー関数を作成して、その中で<code>b:ctrlp_user_command</code>を設定してやると良さそうだ。</p>
+
+<p><a href="/blog/software/call-ctrlp-vim-based-on-git-status.html">Git配下のファイルかどうかでCtrlPを切り替える</a>で作成した関数を元にして、<code>v:shell_error</code>が<code>0</code>の時も特別視してやるようにすることで実装した。カスタム・コマンドはヘルプのまま、Gitリポジトリーのルートへ移動して<code>ls-files</code>サブコマンドを呼んでいる。</p>
+
+<pre><code>nnoremap &lt;Leader&gt;f :call &lt;SID&gt;CallCtrlPBasedOnGitStatus()&lt;Return&gt;
+
+function! s:CallCtrlPBasedOnGitStatus()
+  if exists(&#39;b:ctrlp_user_command&#39;)
+    unlet b:ctrlp_user_command
+  endif
+
+  let s:git_status = system(&#39;git rev-parse --is-inside-git-dir&#39;)
+
+  if v:shell_error == 0
+    let b:ctrlp_user_command = [&#39;.git&#39;, &#39;cd %s &amp;&amp; git ls-files&#39;]
+    execute &#39;CtrlP&#39;
+  elseif v:shell_error == 128
+    execute &#39;CtrlPCurFile&#39;
+  else
+    execute &#39;CtrlP&#39;
+  endif
+endfunction
+</code></pre>
+
+<p>まずバッファー・ローカルの変数にカスタム・コマンドの設定があったら削除しておく。そうしないと変数の型の問題で、定義を上書き出来なかったりすることがあるからだ。</p>
+
+<p>その後、Gitの<code>rev-parse</code>サブコマンドを<code>--is-inside-git-dir</code>オプションを指定して呼ぶことで、カレント・ディレクトリーがGit管理下かどうかをチェックする。一応標準出力は拾っておくが、判断は終了コードのみで行う。</p>
+
+<p>終了コードが<code>0</code>の場合は<code>ls-files</code>サブコマンドを呼ぶようにバッファー・ローカルの変数を設定してやり、普通にCtrlPを呼ぶ。<code>128</code>は管理下でなかった場合なので、その時は編集中のファイルのディレクトリーを使ってCtrlPを呼ぶように<code>CtrlPCurFile</code>を呼ぶ。変な終了コードが返ってきた場合のフォールバックとして、カスタム・コマンドを設定せずにCtrlPを呼ぶようにもしておいた。</p>
+
+<p>うまく動いている気がする。autocommandを使ってバッファーを読み込んだ時に<code>b:ctrlp_user_command</code>を設定しても良さそうだったが、バッファー開く度にGitが呼ばれるのはちょっとコストが高い。なのでCtrlPを呼ぼうとした時にフックするように作った。CtrlPをつかう頻度によってはautocommandの方が効率的かもしれない。</p>
+
+<hr>
+
+<p>ただし、WindowsのVimで<code>set shell=sh</code>かつ<code>set shellslash</code>している場合、CtrlPが<a href="https://github.com/ctrlpvim/ctrlp.vim/blob/51888616a29eeddc933d8ec0596bd13e83231b90/autoload/ctrlp.vim#L405">カスタム・コマンドを呼ぶ時</a>にカレント・ディレクトリーのパス情報をバックスラッシュに変換してしまうためうまく動かない。CtrlPの修正が必要になるようだ。僕はとりあえず<code>autoload/ctrlp.vim</code>の405行目をコメントアウトして凌いでみている。</p>
+
+<hr>
+
+<p>コマンドの短縮形ばかりで書かれているVimスクリプト読みづらいな。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>CSS MQPackerの行うソート</title>
@@ -421,77 +470,6 @@ console.log(result.css);
 <p>コントラストの低さが読みやすさに及ぼす影響についてはそれなりに認知されてきたが、ウェブで使われ始めて間もない軽いウェイトのフォントが読みやすさに与える影響は軽視されている。このことには早いうちから警鐘は鳴らされているが、浸透しそうな気配はない。新しい10のサービスのうち、必ず1つか2つは読めたものじゃない軽いウェイトのフォントが本文でも使われていたりするような印象だ。</p>
 
 <p>とは言うものの慣れてないので自分でもよくやらかしてしまう。作ってから「あー読めない」とか。WCAGにコントラストのバリエーションとしてウェイトとサイズについてもあるともうちょっと意識できそうだ。追加して欲しいみたいなのどこに言えばいいんだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>chやexとpxの対応関係</title>
-      <link>http://hail2u.net/blog/webdesign/converting-ch-and-ex-to-px.html</link>
-      <description>1chと1pxがどちらが大きいかはすぐにわかることだが、1chと10pxとするとちゃんと答えられる人は少数派だろう。正解はフォントによって違う、だ。その要素で使われているフォントの特定のグリフの特定のパーツの正確なサイズを知らなければ、chやex単位をpx単位に変換することはできない。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/converting-ch-and-ex-to-px.html</guid>
-      <pubDate>Sat, 07 Mar 2015 11:16:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><code>1ch</code>と<code>1px</code>がどちらが大きいかはすぐにわかることだが、<code>1ch</code>と<code>10px</code>とするとちゃんと答えられる人は少数派だろう。正解はフォントによって違う、だ。その要素で使われているフォントの特定のグリフの特定のパーツの正確なサイズを知らなければ、<code>ch</code>や<code>ex</code>単位を<code>px</code>単位に変換することはできない。</p>
-
-<p>例えば標準的なArial (のRegular)と特徴的なImpactでどのように変わってくるのかを表にまとめてみよう。基本のフォント・サイズは<code>16px</code>になっているとする。Chrome 41での結果であることも明記しておく。</p>
-
-<table>
-<thead>
-<tr>
-<th>フォント</th>
-<th style="text-align:right"><code>100em</code></th>
-<th style="text-align:right"><code>100ch</code></th>
-<th style="text-align:right"><code>100ex</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Arial</td>
-<td style="text-align:right"><code>1600.000px</code></td>
-<td style="text-align:right"><code>889.844px</code></td>
-<td style="text-align:right"><code>829.688px</code></td>
-</tr>
-<tr>
-<td>Impact</td>
-<td style="text-align:right"><code>1600.000px</code></td>
-<td style="text-align:right"><code>857.813px</code></td>
-<td style="text-align:right"><code>1036.719px</code></td>
-</tr>
-</tbody>
-</table>
-
-<p><code>1em</code>が必ず<code>16px</code>になることに対して、<code>ch</code>と<code>ex</code>単位ではフォントによって変化している。それぞれのフォントのグリフの特定のパーツ、<code>ch</code>単位では<code>0</code>の幅、<code>ex</code>単位では<code>x</code>の高さ(とされるx-height)、が考慮された上で<code>px</code>単位に変換され、計算済みスタイルの値となっていることがわかる。Impactのようなx-heightがかなり高く設定されているフォントでは<code>ex</code>単位で大きく差が出てくるというわけだ。</p>
-
-<p>このことは普通にCSSのプロパティーの値として使う場合はあまり問題になることはない。しかしながらブラウザー以外の何らかのツールで扱おうとすると一定の決めつけが必要となる。そうでないとフォントを調べて係数をひねり出さなければならなくなるからだ。</p>
-
-<p>少なくともメディア・クエリーにおいては初期設定の値を基準として変換されることになるので、Arial (やHelvetica Neue)を基準にした係数を使って変換するのが妥当だろう。Chrome 41でArialを使って調べた<code>px</code>単位に変換するための係数は以下の通りだ。</p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:right">単位</th>
-<th style="text-align:right">to <code>px</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right"><code>1ch</code></td>
-<td style="text-align:right"><code>8.8984375</code></td>
-</tr>
-<tr>
-<td style="text-align:right"><code>1ex</code></td>
-<td style="text-align:right"><code>8.296875</code></td>
-</tr>
-</tbody>
-</table>
-
-<p>これらの係数を使って<code>px</code>単位に変換することで、<code>(min-width: 2ch)</code>というクエリーは<code>(min-width: 1em)</code>というクエリーよりも後に書いた方が良さそうだということがわかる。</p>
-
-<hr>
-
-<p>実際にはメディア・クエリーで使う長さの単位は余程の事情がない限り統一すべきだろう。そして、その統一した単位とは別の単位が使われている可能性があるサードパーティ製のライブラリーは何らかのツールで機械的に処理すべきではない。そのためこういった変換のことを考える必要はまずない。</p>
-
-<p>それでもどうにかして処理してやりたいという場合には、このようにArialやHelvetica Neueを想定して変換してやるしかなさそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>
