@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="Inlining critical CSS for first-time visitsという、クリティカルCSSを初回訪問時のみインラインに展開して、その後はインライン化せず予めキャッシュさせておいたフルセットのCSSを使うというアイディアについての記事を読んだ。実装はともかく、アイディアとして成立していないんじゃないかと思う。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>クリティカルCSSの動的なインライン化 - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/inlining-critical-css-dynamically.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/software/ctrlp-and-git-ls-files.html">
+
+    
+
+    
+      <meta content="クリティカルCSSの動的なインライン化" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="Inlining critical CSS for first-time visitsという、クリティカルCSSを初回訪問時のみインラインに展開して、その後はインライン化せず予めキャッシュさせておいたフルセットのCSSを使うというアイディアについての記事を読んだ。実装はともかく、アイディアとして成立していないんじゃないかと思う。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/inlining-critical-css-dynamically.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/inlining-critical-css-dynamically.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">クリティカルCSSの動的なインライン化</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-03-18T06:34:00+09:00" itemprop="datePublished">Mar 18, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="https://adactio.com/journal/8504">Inlining critical CSS for first-time visits</a>という、クリティカルCSSを初回訪問時のみインラインに展開して、その後はインライン化せず予めキャッシュさせておいたフルセットのCSSを使うというアイディアについての記事を読んだ。実装はともかく、アイディアとして成立していないんじゃないかと思う。</p>
+
+<p>クリティカルCSSをインライン化することのメリットは既に多くのウェブサイトでも取り上げられており、もちろんネタ元のGoogle PageSpeedでも<a href="https://developers.google.com/speed/docs/insights/PrioritizeVisibleContent#structure">項</a>が割かれている。ここでは特に触れないが、描画領域の大きさにかかわらず初期描画の高速化には大きなメリットがあるとは言えるだろう。上記リンク先の記事ではそれを動的に行うことで、2度目以降の訪問の時にはキャッシュ済みであるフルセットのCSSを使わせるようにし、効率的なキャッシュ運用と保守性を実現する実装について解説されている。</p>
+
+<p>常にクリティカルCSSをインライン化している場合、1度目の訪問では以下のリソースがリクエストされる。</p>
+
+<ol>
+<li>インライン化されたクリティカルCSSを含むHTML (非キャッシュ)</li>
+<li>クリティカルCSSを含まないCSS (非キャッシュ)</li>
+</ol>
+
+<p>そして2度目の訪問では以下のリソースがリクエストされる。</p>
+
+<ol>
+<li>インライン化されたクリティカルCSSを含むHTML (キャッシュ)</li>
+<li>クリティカルCSSを含まないCSS (キャッシュ)</li>
+</ol>
+
+<p>対して記事の実装においては1度目の訪問の時は以下のリソースがリクエストされる。</p>
+
+<ol>
+<li>インライン化されたクリティカルCSSを含むHTML (非キャッシュ)</li>
+<li>完全なCSS (非キャッシュ)</li>
+</ol>
+
+<p>そして2度目の訪問では以下のリソースがリクエストされる。</p>
+
+<ol>
+<li>HTML (<em>非キャッシュ</em>)</li>
+<li>完全なCSS (キャッシュ)</li>
+</ol>
+
+<p>つまり記事の実装だと、2度目の訪問時にHTMLのキャッシュが効かない。その上、フルセットのCSSを読み込むのでそのパース時間も改善しない。インライン化しない場合と比べると、HTMLのキャッシュが効かないので<em>ページ読み込み時間は遅くなる</em>(3度目以降には追いつく)だろう。静的にインライン化する場合と比べても、CSSのパースに時間がかかるため<em>初期描画までの時間が遅くなる</em>(3度目以降も悪化したまま)。</p>
+
+<p>保守性という点では多少見るべき点はあるが、同じようなアプローチを使ってタスク・ランナー経由で静的にHTMLをビルドした方が効率的だろう。CDNのようなシステムとの相性も考えると静的なHTML生成の方に軍配が上がる。</p>
+
+<hr>
+
+<p>クリティカルCSSのインライン化についてはまだ歴史が浅く、その目的と効果がはっきりと伝わっていないような印象を受ける。この技術の目的はページの読み込み時間の改善ではなく、むしろそれを悪化させてでもとにかく初期描画までの時間を短くすること、これくらいにとらえておくと良いのではないだろうか。そしてその最適化はその目的を崩さずに行われるべきなので、自然とクリティカルCSSを小さくするようなデザインへと帰結することになる。</p>
+
+<p>僕があまりクリティカルCSSのインライン化に興味を持てないのは、ウェブサイトのデザインに大きな影響を与えすぎる点だ。インライン化を効果的に行うためには初期描画領域のビジュアル・デザインをとにかく必要最低限までに絞る必要がある。そのことは他のビジュアル・デザインとの兼ね合いという点でも情報設計という点でもウェブサイトのデザインに大きな影響を与えることだろう。ひとつの指標ではあって良いとは思うが、その性質上プライオリティーが高くなりやすく、他の指標を否定してしまいやすいと感じている。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E3%82%AF%E3%83%AA%E3%83%86%E3%82%A3%E3%82%AB%E3%83%ABCSS%E3%81%AE%E5%8B%95%E7%9A%84%E3%81%AA%E3%82%A4%E3%83%B3%E3%83%A9%E3%82%A4%E3%83%B3%E5%8C%96%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Finlining-critical-css-dynamically.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Finlining-critical-css-dynamically.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Finlining-critical-css-dynamically.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E3%82%AF%E3%83%AA%E3%83%86%E3%82%A3%E3%82%AB%E3%83%ABCSS%E3%81%AE%E5%8B%95%E7%9A%84%E3%81%AA%E3%82%A4%E3%83%B3%E3%83%A9%E3%82%A4%E3%83%B3%E5%8C%96%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Finlining-critical-css-dynamically.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/software/ctrlp-and-git-ls-files.html" rel="prev">
+  <p>CtrlPとGitのls-filesサブコマンド</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
