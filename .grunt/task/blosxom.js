@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var taskName = 'blosxom';
   var taskDescription = 'Generate Blosxom files.';
+  var taskName = 'blosxom';
 
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var ProgressBar = require('progress');
@@ -13,7 +13,13 @@ module.exports = function (grunt) {
     var spawn = require('child_process').spawnSync;
     var which = require('which').sync;
 
+    var args = ['blosxom.cgi'];
+    var bar;
     var done = this.async();
+    var entry = grunt.option('file');
+    var fileCache;
+    var files = [];
+    var num = 1;
     var options = this.options({
       all: false,
       feed: false,
@@ -21,14 +27,11 @@ module.exports = function (grunt) {
       preview: false,
       reindex: false
     });
-    var args = ['blosxom.cgi'];
-    var bar;
-    var entry = grunt.option('file');
-    var files = [];
-    var fileCache = path.resolve(options.rootdir, 'plugins/state/files_index.dat');
-    var num = 1;
+    fileCache = path.resolve(options.rootdir, 'plugins/state/files_index.dat');
 
     if (options.preview) {
+      var body = fs.readFileSync(entry, 'UTF-8').split('\n');
+      var filePreview = path.resolve(process.cwd(), 'tmp/__preview.html');
       var preview = function () {/*
 <!DOCTYPE html>
 <html lang="ja">
@@ -98,8 +101,6 @@ module.exports = function (grunt) {
   </body>
 </html>
       */}.toString().split('\n').slice(1, -1).join('\n');
-      var filePreview = path.resolve(process.cwd(), 'tmp/__preview.html');
-      var body = fs.readFileSync(entry, 'UTF-8').split('\n');
       var title = body.shift().replace(/\$/g, '$$$$');
       body = body.join('\n').replace(/\$/g, '$$$$');
 
@@ -113,6 +114,7 @@ module.exports = function (grunt) {
       preview = preview.replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body).replace(/="\//g, '="../build/');
       fs.outputFileSync(filePreview, preview);
       grunt.log.writeln('File "' + filePreview + '" created.');
+
       return done(spawn(which('open'), [filePreview]).error);
     }
 
@@ -153,8 +155,8 @@ module.exports = function (grunt) {
       });
     } else if (entry) {
       var i = 0;
-      var n = 'image';
       var images = fs.readFileSync(entry, 'utf-8').match(/\bsrc="\/images\/blog\/.*?"/g);
+      var n = 'image';
 
       if (path.resolve(entry) === path.normalize(entry)) {
         entry = path.relative(options.datadir, entry);
@@ -168,9 +170,11 @@ module.exports = function (grunt) {
 
       if (images) {
         images.forEach(function (image) {
+          var dest;
+          var src;
           image = image.replace(/^src="\/images\/blog\/(.*?)"$/, '$1');
-          var src = options.imgdir + image;
-          var dest = options.staticimgdir + image;
+          src = options.imgdir + image;
+          dest = options.staticimgdir + image;
 
           if (fs.statSync(src).isFile()) {
             fs.copySync(src, dest);
@@ -208,6 +212,7 @@ module.exports = function (grunt) {
           }
         }
       );
+      var contents;
 
       if (child.error) {
         return next(child.error);
@@ -217,7 +222,7 @@ module.exports = function (grunt) {
         file = 'feed';
       }
 
-      var contents = child.stdout.replace(
+      contents = child.stdout.replace(
         /^[\s\S]*?\r?\n\r?\n/,
         ''
       ).replace(
