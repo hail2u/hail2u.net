@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="ウェブ標準であるCSS Font Loadingが気軽に使えるようになるにはまだまだ時間がかかりそうだ。そのポリフィルであるFont Loaderは動作が不安定かつ開発が止まっており信用できない。代替技術としてはポリフィルと同じ開発者が積極的にコミットしているFont Face Observerと、広く使われているWeb Font Loaderがある。同じフォントの読み込みを検知する場合、この三者ではどのようにコードが変わってくるのだろうか。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>CSS Font LoadingとFont Face Observer、Web Font Loader - Weblog - Hail2u.net</title>
+
+    <link href="//googleads.g.doubleclick.net" rel="dns-prefetch">
+    <link href="//pagead2.googlesyndication.com" rel="dns-prefetch">
+    <link href="//www.google-analytics.com" rel="dns-prefetch">
+    <link href="//www.google.com" rel="dns-prefetch">
+    <link href="//www.gstatic.com" rel="dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/css-font-loading-font-face-observer-and-web-font-loader.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/misc/gyouza.html">
+
+    
+
+    
+      <meta content="CSS Font LoadingとFont Face Observer、Web Font Loader" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="ウェブ標準であるCSS Font Loadingが気軽に使えるようになるにはまだまだ時間がかかりそうだ。そのポリフィルであるFont Loaderは動作が不安定かつ開発が止まっており信用できない。代替技術としてはポリフィルと同じ開発者が積極的にコミットしているFont Face Observerと、広く使われているWeb Font Loaderがある。同じフォントの読み込みを検知する場合、この三者ではどのようにコードが変わってくるのだろうか。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/css-font-loading-font-face-observer-and-web-font-loader.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/css-font-loading-font-face-observer-and-web-font-loader.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">CSS Font LoadingとFont Face Observer、Web Font Loader</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-04-05T14:47:00+09:00" itemprop="datePublished">Apr 5, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">ウェブ標準である<a href="http://www.w3.org/TR/css-font-loading/">CSS Font Loading</a>が気軽に使えるようになるにはまだまだ時間がかかりそうだ。そのポリフィルである<a href="https://github.com/bramstein/fontloader">Font Loader</a>は動作が不安定かつ開発が止まっており信用できない。代替技術としてはポリフィルと同じ開発者が積極的にコミットしている<a href="https://github.com/bramstein/fontfaceobserver">Font Face Observer</a>と、広く使われている<a href="https://github.com/typekit/webfontloader">Web Font Loader</a>がある。同じフォントの読み込みを検知する場合、この三者ではどのようにコードが変わってくるのだろうか。</p>
+
+<p>以下のコード例では、自前でホスティングしている<a href="http://en.wikipedia.org/wiki/Open_Sans">Open Sans</a>の読み込みが完了・失敗したら<code>body</code>要素にクラスを振るという単純なケースを書き分ける。</p>
+
+<h2>CSS Font Loading</h2>
+
+<p>CSS Font Loading仕様はPromiseによる実装で、読み込み待ちはPromiseで解決することになる。</p>
+
+<pre><code class="language-javascript">new FontFace(
+  &#39;Open Sans&#39;,
+  &#39;<mark>url(/assets/font/open-sans/r.woff)</mark>&#39;
+).load().then(function (fontface) {
+  <mark>document.fonts.add(fontface);</mark>
+  document.body.className += &#39; loaded&#39;;
+}, function (reason) {
+  document.body.className += &#39; failed&#39;;
+  throw new Error(reason);
+});
+</code></pre>
+
+<p>気をつけるのはウェブ・フォントのURLを<code>url()</code>でくくる必要があること、そして読み込み成功時に<code>add()</code>することくらいだろう。Promiseなので、読み込み失敗は<code>then()</code>の第二引数に指定した関数で処理すれば良い。</p>
+
+<h2>Font Face Observer</h2>
+
+<p>Font Face Observerはウェブ標準と同じくPromiseによる実装のためウェブ標準と置換えがしやすい……と思いきや、ウェブ・フォントを読み込む機能自体は持っていない。そのためウェブ・フォントCSSを自前で読み込み、そのウェブ・フォントが利用可能になったかどうかをもって読み込み完了が決定される。</p>
+
+<pre><code class="language-javascript"><mark>var cssFont = document.createElement(&#39;link&#39;);
+cssFont.href = &#39;/assets/css/open-sans.css&#39;;
+cssFont.rel = &#39;stylesheet&#39;;
+document.head.appendChild(cssFont);</mark>
+new FontFaceObserver(
+  &#39;<mark>Open Sans</mark>&#39;,
+  {}
+).check().then(function () {
+  document.body.className += &#39; loaded&#39;;
+}, function (reason) {
+  document.body.className += &#39; failed&#39;;
+  throw new Error(reason);
+});
+</code></pre>
+
+<p>気をつけるのは<code>FontFaceObserver</code>コンストラクターへ渡す第一引数の値と読み込むウェブ・フォントCSSでの<code>font-family</code>の値が一致していることだ。こちらもPromiseのため第二引数に指定した関数で読み込み失敗を処理できる。ただし読み込みする機能自体を持っておらずイベント監視(スクロールイベントで監視しているので軽量)のため、デフォルトの3秒、または<code>check()</code>の第二引数で指定したミリ秒数のタイムアウトでも読み込み失敗になる。</p>
+
+<h2>Web Font Loader</h2>
+
+<p>使っている人はおなじみだろうがWeb Font LoaderはPromiseによる実装ではない。ウェブ標準とはコードが大きく異る。</p>
+
+<pre><code class="language-javascript">WebFont.load({
+  custom: {
+    families: [&#39;Open Sans&#39;],
+    <mark>urls: [&#39;/assets/css/open-sans.css&#39;]</mark>
+  },
+  <mark>fontactive</mark>: function () {
+    document.body.className += &#39; loaded&#39;;
+  },
+  <mark>fontinactive</mark>: function (family) {
+    document.body.className += &#39; failed&#39;;
+    throw new Error(&#39;Web font &quot;&#39; + family + &#39;&quot; not loaded.&#39;);
+  }
+});
+</code></pre>
+
+<p>このようにライブラリーが用意する<code>WebFont</code>オブジェクトの<code>load()</code>メソッドですべて指定することになる。自前で用意したウェブ・フォントを使いたい場合は<code>custom</code>フィールドで<code>families</code>と<code>urls</code>を指定することで読み込みを行う。Font Face Observerとは違うウェブ・フォントの読み込み機能自体は半分(ウェブ・フォントCSSの読み込みだけ)内蔵されているということだ。読み込みエラーは<code>fontinactive</code>フィールドで指定した関数で処理できる。こちらもタイムアウト(デフォルトでは5秒)でもエラーになる。</p>
+
+<hr>
+
+<p>コード量の面でもPromiseで書くことができるという面でもウェブ標準での実装が優秀だが、ほぼChrome以外で使えないないものは使えない上、ポリフィルは本当に信用ができない。Font Face ObserverはPromiseによる実装で良さそうに見えるが、少し前のリリース(v1.4.1)では何度も呼ぶとかなりの確率で読み込みに成功しても(フォント・ファイル自体は正常に読み込まれている)失敗の方の関数が呼ばれることが高確率で起こっていた。</p>
+
+<p>結局のところ、まだまだWeb Font Loaderで安定ということになると思う。Font Face Observerは悪くはないけれども、ポリフィルでないのなら安定のWeb Font Loaderの方がマシだろう。軽量という点はすこし魅力的だが、多くの場合はウェブページごとに一回呼ぶだけだろうと思われるので、それほど魅力的なファクターではない。</p>
+
+<p>僕は今のところはWeb Font Loaderを使いつつ、常にウェブ標準での置換えを意識しておくという書き方をしている。Font Face Observerは使う利点を見出すことができなかった。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=CSS%20Font%20Loading%E3%81%A8Font%20Face%20Observer%E3%80%81Web%20Font%20Loader%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcss-font-loading-font-face-observer-and-web-font-loader.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcss-font-loading-font-face-observer-and-web-font-loader.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcss-font-loading-font-face-observer-and-web-font-loader.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=CSS%20Font%20Loading%E3%81%A8Font%20Face%20Observer%E3%80%81Web%20Font%20Loader%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fcss-font-loading-font-face-observer-and-web-font-loader.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/misc/gyouza.html" rel="prev">
+  <p>餃子</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
