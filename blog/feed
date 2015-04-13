@@ -10,12 +10,85 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 13 Apr 2015 01:18:14 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 14 Apr 2015 00:20:12 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSSで月の満ち欠け</title>
+      <link>http://hail2u.net/blog/webdesign/css-lunar-phase.html</link>
+      <description>月の満ち欠けは球体に光を当てた結果のもので、円を円でカットするようなものではない。CSSでは立体を立体としては扱うのは難しいので、それを平面として捉え、半円を円で膨らませたり押し出したりすることで近いものにすることが可能になりそうだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/css-lunar-phase.html</guid>
+      <pubDate>Tue, 14 Apr 2015 00:20:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="/images/blog/css-lunar-phase.png"><img alt="新月から新月へ" src="/images/blog/css-lunar-phase.png"></a>
+</figure>
+
+<p>月の満ち欠けは球体に光を当てた結果のもので、円を円でカットするようなものではない。CSSでは立体を立体としては扱うのは難しいので、それを平面として捉え、半円を円で膨らませたり押し出したりすることで近いものにすることが可能になりそうだ。</p>
+
+<p>View Demo: <a href="/pub/test/620.html">Lunar Phase</a></p>
+
+<p>CSSグラデーションで作った半円に、<code>border-radius</code>で作った半楕円を組み合わせることで実現している。月齢15以上の場合は半円を逆転させる。地球と太陽と月の位置関係から平面で捉えると、半円を基本にするということであっている(と思う)。</p>
+
+<p>例えば月齢5の場合は以下の様なCSSで構成されている。</p>
+
+<pre><code>.moon {
+  border-radius: 51%;
+  height: 3rem;
+  overflow: hidden;
+  position: relative;
+  width: 3rem;
+}
+
+.phase5 {
+  background-image: linear-gradient(to right, #ff0 0, #ff0 50%, #000 50%, #000 100%);
+}
+</code></pre>
+
+<p><code>.moon</code>が基本の月で、それに前述のとおりCSSグラデーションで半円になるように色を塗っておく。左から明るくなっていく。</p>
+
+<pre><code>.moon::before,
+.moon::after {
+  content: &#39;&#39;;
+  display: block;
+  height: 100%;
+  position: absolute;
+}
+
+.moon::before {
+  border-top-left-radius: 3rem 200%;
+  border-bottom-left-radius: 3rem 200%;
+  right: 50%;
+}
+
+.moon::after {
+  border-top-right-radius: 3rem 200%;
+  border-bottom-right-radius: 3rem 200%;
+  left: 50%;
+}
+</code></pre>
+
+<p><code>.moon</code>の擬似要素が影と光になる。影も光も半楕円にする必要があるので、<code>border-*-radius</code>プロパティーでちゃんと半円かつ幅を変えた場合もきれいな半楕円にスケールするように、全体単位と%を組み合わせて調節してやる。</p>
+
+<pre><code>.phase5::before {
+  background-color: #000;
+  width: 33.333%;
+}
+</code></pre>
+
+<p>月齢5だと擬似要素は影として扱われるので、<code>#000</code>で塗る。そして月齢15で満月なので、その1/3ほど影が後退することになることから幅を<code>33.333%</code>に減らしてやっている。</p>
+
+<p>こういう風に、形を実現するだけでなく、現実世界の状態をある程度反映させた形でCSSによってエミュレートするのは頭の体操になる。</p>
+
+<hr>
+
+<p>Sassをつかうとミックスイン化できるが二度と使わないので書くのはやめた。そして記事を書いてから気づいたけれど、北半球だと月は右から明るくなるんだった……。頭の体操になっていない。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>夢</title>
@@ -292,21 +365,6 @@ new FontFaceObserver(
 <p>結局のところ、まだまだWeb Font Loaderで安定ということになると思う。Font Face Observerは悪くはないけれども、ポリフィルでないのなら安定のWeb Font Loaderの方がマシだろう。軽量という点はすこし魅力的だが、多くの場合はウェブページごとに一回呼ぶだけだろうと思われるので、それほど魅力的なファクターではない。</p>
 
 <p>僕は今のところはWeb Font Loaderを使いつつ、常にウェブ標準での置換えを意識しておくという書き方をしている。Font Face Observerは使う利点を見出すことができなかった。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>餃子</title>
-      <link>http://hail2u.net/blog/misc/gyouza.html</link>
-      <description>無心になって野菜を刻み、無心になって豚ひき肉と混ぜ、無心になって餃子の皮で包むと、あとは焼くか茹でると餃子になる。あんまり考えずに無心に作れるので好き。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/gyouza.html</guid>
-      <pubDate>Sat, 04 Apr 2015 18:54:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>無心になって野菜を刻み、無心になって豚ひき肉と混ぜ、無心になって餃子の皮で包むと、あとは焼くか茹でると餃子になる。あんまり考えずに無心に作れるので好き。</p>
-
-<p>ずっと焼き色を付けてから水を入れて蒸し焼きにしてたんだけど、蒸し焼きにしてからあとで油を回し入れて焼き色を付けるみたいなやり方もあるのか。そちらの方が羽根みたいなのを付ける場合は簡単らしい。羽根好きじゃないのでつけようとも考えたことないけど。一旦普通に茹でて、最後に焼き色付けるというやり方は今度やってみよう。</p>
-
-<p>餃子の最大の問題は、無心で作って包むところまで終わると満足してしまって、それほど食べる気起きなくなるところ。</p>]]></content:encoded>
     </item>
 
   </channel>
