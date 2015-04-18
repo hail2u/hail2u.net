@@ -10,6 +10,66 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>色覚異常を再現するSVGフィルター</title>
+      <link>http://hail2u.net/blog/webdesign/color-blindness-emulation-svg-filter.html</link>
+      <description>多くのウェブ制作者達が色覚異常について考えることはまずない。せいぜいコントラストを確保したり、リンクの下線を消さないようにしたりすることで、グレースケールでもそれなりに識別できるように注意するくらいだろう。それで十分とも言えそうではあるが、それ以上考えようにも取っ掛かりがないためそれで止まっているとも言える。その取っ掛かりとして色覚異常を再現するSVGのフィルターを作った。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/color-blindness-emulation-svg-filter.html</guid>
+      <pubDate>Sun, 19 Apr 2015 00:41:00 +0900</pubDate>
+      <content:encoded><![CDATA[<figure>
+  <a href="/images/blog/color-blindness-emulation-svg-filter.png"><img alt="同じ画像をいくつかの色覚異常をエミュレートするSVGフィルターを通して加工したサンプル" src="/images/blog/color-blindness-emulation-svg-filter.png"></a>
+</figure>
+
+<p>多くのウェブ制作者達が色覚異常について考えることはまずない。せいぜいコントラストを確保したり、リンクの下線を消さないようにしたりすることで、グレースケールでもそれなりに識別できるように注意するくらいだろう。それで十分とも言えそうではあるが、それ以上考えようにも取っ掛かりがないためそれで止まっているとも言える。その取っ掛かりとして色覚異常を再現するSVGのフィルターを作った。</p>
+
+<p>Download: <a href="https://github.com/hail2u/color-blindness-emulation">Color Blindness Emulation</a></p>
+
+<p><code>filters.svg</code>に含まれる8つのフィルターは、そのアルゴリズムはともかく、<code>feColorMatrix</code>要素を使ったごく簡単なものだ。</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;&gt;
+  &lt;defs&gt;
+    &lt;filter id=&quot;protanopia&quot;&gt;
+      &lt;feColorMatrix
+        in=&quot;SourceGraphic&quot;
+        type=&quot;matrix&quot;
+        values=&quot;<mark>0.567, 0.433, 0,     0, 0
+                0.558, 0.442, 0,     0, 0
+                0,     0.242, 0.758, 0, 0
+                0,     0,     0,     1, 0</mark>&quot;/&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>このような行列によってProtanopia (1型2色覚/赤色盲)はエミュレートすることができる。</p>
+
+<p>利用はFirefox 35以降やChrome 18以降、Safari 6以降ならばCSS経由で行える。<a href="http://www.w3.org/TR/filter-effects/#FilterProperty"><code>filter</code>プロパティー</a>(Internet Explorerで実装されている独自の<code>filter</code>プロパティーとは違うもの)で<code>url()</code>を使ってSVGファイルを参照すれば良い。</p>
+
+<p>View Demo: <a href="/pub/test/622.html">Color Blindness Emulator with Filter Effects via CSS</a></p>
+
+<p>デモではPlaceIMGの画像をそれぞれフィルターをかけて色覚異常の状態をエミュレーションしている。画像によっては違いがわかりづらいが、色覚異常のタイプと画像によって大きく結果が異なるということがわかるということでもあるだろう。再読み込みすれば様々な画像で確認できるので試してみると良い。Chromeではフィルターを適用する処理がかなり重いようで、CPUを占領してしまうことには留意して欲しい。</p>
+
+<pre><code>.protanopia {
+  filter: url(&#39;622.svg#protanopia&#39;);
+}
+</code></pre>
+
+<p><code>filter</code>プロパティーでは<code>blur()</code>などの組み込み関数を使う以外にも、このようにSVGの<code>filter</code>要素として定義したフィルターを<code>url()</code>を使って参照することができる。具体的には予めSVGの<code>filter</code>要素にIDを振っておき、URL識別子で参照することになる。他にも参照する方法はあるが、少しややこしく挙動も微妙なためここでは触れない。</p>
+
+<hr>
+
+<p>最終的にはこれを使って任意のウェブページを色覚異常をエミュレートした形で確認するツールを作りたい。そういったツールを使って常に確認するべきだとは思わないが、そういったツールを一度体験するだけでも色覚異常者が見ている世界について少しだけ知識を得ることができるはずだ。</p>
+
+<p>視覚障害者と違い、メディア・タイプで判別できない世界であることもまた難しい点だ。視覚障害者へはそれなりにまともにマークアップして、CSSをうまく切り分けてやるだけでベースラインは確保できそうだが、色覚異常者へはそういうアプローチでは届くことはない。カラー・スキームの制作にもう一つ考慮すべきことが加わることは間違いない。</p>
+
+<p>例えばこのウェブサイトではブルーがメイン・カラーとなっているが、仮にこれに加えて所々でイエローを使っていたりすると、Tritanopia (3型2色覚/青色盲)の人にはブルーはグレーに、イエローはピンク(に近い色)に見えるため、ピンクに見える部分がメイン・カラー、すなわちリンク等に誤解されてしまうかもしれない。</p>
+
+<p>これはもちろん極端な例だが、そういったことがわかるかもしれないツールがあることは、取っ掛かりとしては悪くはないはずだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Gillette Proglide Flexball</title>
       <link>http://hail2u.net/blog/gadget/gillette-proglide-flexball.html</link>
       <description>ジレットから新しく出たフレックスボールが良さそうだという話なので、ちょうど替刃が切れるタイミングということもあって、ホルダーごと買った。口角の辺りや顎の付け根あたりがずいぶんと剃りやすくなったような気がする。傑作っぽい。ボールの部分のアシンメトリーなデザインも好き。</description>
@@ -248,31 +308,6 @@
 <p>この辺りの話は「我慢」というキーワードでもうちょっと書きたい。</p>]]></content:encoded>
     </item>
     <item>
-      <title>左寄せvs.中央寄せ</title>
-      <link>http://hail2u.net/blog/webdesign/left-aligned-vs-centering.html</link>
-      <description>一時期は全てのウェブサイトが中央寄せになるのではないかというくらいの勢いだったような気がするが、最近は左寄せが盛り返しているようだ。AwwwardsやHTTPSTERなどのジャンルレスのウェブデザイン・ギャラリーを見るとなんとなくそう思う。正確に言うとレイアウトは中央寄せしつつ、テキストは左寄せしているウェブサイトが増えている。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/left-aligned-vs-centering.html</guid>
-      <pubDate>Thu, 09 Apr 2015 15:09:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>一時期は全てのウェブサイトが中央寄せになるのではないかというくらいの勢いだったような気がするが、最近は左寄せが盛り返しているようだ。<a href="http://www.awwwards.com/">Awwwards</a>や<a href="http://httpster.net/">HTTPSTER</a>などのジャンルレスのウェブデザイン・ギャラリーを見るとなんとなくそう思う。正確に言うとレイアウトは中央寄せしつつ、テキストは左寄せしているウェブサイトが増えている。</p>
-
-<p>レイアウトの中央寄せは、<a href="http://baymard.com/blog/line-length-readability">最適な一行の文字数</a>に限界があることを考えると採用せざるをえない。<a href="http://www.w3.org/TR/css3-multicol/">CSSでマルチカラム・レイアウト</a>が簡単に提供できる様になれば少し変わる可能性はあるが、縦スクロールとマルチカラム・レイアウトの相性は良くない。実装方法は色々変化していくことだろうが、レイアウトの中央寄せ自体はこのまま継続して行われていきそうだ。</p>
-
-<p>テキストの左寄せが盛り返しつつあるのは、ウェブ・フォントの流行と共にタイポグラフィーへの傾倒が進んだことによる結果だろうか。CSSの実装が追いついていない現状では、俗に<a href="http://en.wikipedia.org/wiki/Typographic_alignment#Flush_left">flush left (またはragged right)</a>と呼ばれるような右がガタガタになっている状態になるという特徴がある。しかしそれも以下のような理由でプラスに働く。</p>
-
-<ul>
-<li>自然な形で余白を確保しやすい</li>
-<li>矩形である画像や表などとの明確な差異をつけやすい</li>
-<li>見出し等で良いアクセントになりうる(欧文タイポグラフィーのみ)</li>
-</ul>
-
-<p>余白とコントラストをどう作るかをタイポグラフィーという比較的低いレイヤーで解決しようとしていると言えるだろう。</p>
-
-<p>日本語のウェブサイトでこまめに改行を入れて文章を書くスタイルがいまだマジョリティーを保っている理由はいくつかありそうだが、そのひとつに文字の密度が下がることはある。欧文と比べて文字の密度そのものが高いため、文章単位で密度を下げようとすると、文字間や行間を空けるか、こまめに改行するかくらいしか対処する方法がない。これもまたタイポグラフィーというレイヤーでの工夫であるのかもしれない。</p>
-
-<p>今ひとつ受け入れがたいスタイルだが、それなりに意味と効果があると感じるようになった。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -307,6 +342,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sat, 18 Apr 2015 15:37:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 19 Apr 2015 00:41:00 +0900</lastBuildDate>
   </channel>
 </rss>
