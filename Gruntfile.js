@@ -611,11 +611,6 @@ module.exports = function (grunt) {
     'sitemap'
   ]);
 
-  grunt.registerTask('build:blog', [
-    'blosxom:index',
-    'blosxom:all'
-  ]);
-
   grunt.registerTask('build:css', [
     'clean',
     'sass',
@@ -660,15 +655,13 @@ module.exports = function (grunt) {
     'gitcommit:deploy'
   ]);
 
-  grunt.registerTask('deploy:css', [
-    'build:css',
+  grunt.registerTask('deploy:blog', [
+    'build:blog',
     'gitcommit:deploy'
   ]);
 
-  grunt.registerTask('deploy:home', [
-    'build:html',
-    'feedmix',
-    'sitemap',
+  grunt.registerTask('deploy:css', [
+    'build:css',
     'gitcommit:deploy'
   ]);
 
@@ -696,6 +689,13 @@ module.exports = function (grunt) {
     'build:article',
     'gitcommit:cacheUpdate',
     'gitcommit:blogPublish'
+  ]);
+
+  grunt.registerTask('publish:home', [
+    'build:html',
+    'feedmix',
+    'sitemap',
+    'gitcommit:deploy'
   ]);
 
   grunt.registerTask('update:assets', [
