@@ -34,6 +34,7 @@ module.exports = function (grunt) {
         files: {
           'tmp/main.min.js': [
             'tmp/lightbox.min.js',
+            'tmp/nohashtop.min.js',
             'tmp/unutm.min.js'
           ]
         }
@@ -103,6 +104,7 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               'lightbox.js',
+              'nohashtop.js',
               'toggle-column.js',
               'toggle-eyecatch.js',
               'toggle-outline.js',
@@ -181,6 +183,7 @@ module.exports = function (grunt) {
       jsPre: {
         files: {
           'tmp/lightbox.js': 'src/js/lightbox.js',
+          'tmp/nohashtop.js': 'src/js/nohashtop.js',
           'tmp/toggle-column.js': 'src/js/toggle-column.js',
           'tmp/toggle-eyecatch.js': 'src/js/toggle-eyecatch.js',
           'tmp/toggle-outline.js': 'src/js/toggle-outline.js',
