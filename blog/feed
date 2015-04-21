@@ -10,12 +10,84 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 21 Apr 2015 00:03:04 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 22 Apr 2015 01:09:56 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>Vimで小数を四捨五入して置換</title>
+      <link>http://hail2u.net/blog/software/vim-round-and-replace-decimal.html</link>
+      <description>渡されたSVGファイルを見たらpath要素のアンカーポイントの数字が小数点以下6桁くらいから30桁まで混在していて、無駄な感じがあった。SVGOでできるのでそれでやっても良かったが、まずは単純に小数を指定桁(3–5桁)で四捨五入したいだけなので他に何かされてしまう可能性があるツールはちょっと避けたい。ということでVimの置換でどうにかした。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/vim-round-and-replace-decimal.html</guid>
+      <pubDate>Wed, 22 Apr 2015 01:09:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>渡されたSVGファイルを見たら<code>path</code>要素のアンカーポイントの数字が小数点以下6桁くらいから30桁まで混在していて、無駄な感じがあった。<a href="https://github.com/svg/svgo/blob/master/plugins/cleanupNumericValues.js">SVGOでできる</a>のでそれでやっても良かったが、まずは単純に小数を指定桁(3–5桁)で四捨五入したいだけなので他に何かされてしまう可能性があるツールはちょっと避けたい。ということでVimの置換でどうにかした。</p>
+
+<p>コマンドとしては長いがやっていることは普通なので、後述の説明が理解できればソラで打てるんじゃないかと思う。</p>
+
+<pre><code>:%s@\d\+\.\d\+@\=round(str2float(submatch(0))*1000)/1000@g
+</code></pre>
+
+<p>例えば、</p>
+
+<pre><code> 0.12345
+12.34567
+ 0.99999
+56.78999
+</code></pre>
+
+<p>は、</p>
+
+<pre><code> 0.123
+12.346
+ 1.0
+56.79
+</code></pre>
+
+<p>と置換される。それぞれ切り捨て、切り上げ、切り上げて余分な0を削除、切り上げて余分な0を削除と置換されている。できれば<code>1.0</code>が<code>1</code>になって欲しいが、<code>round()</code>の仕様上少し面倒くさそう。</p>
+
+<hr>
+
+<p>使うのは</p>
+
+<ul>
+<li><a href="http://vim-jp.org/vimdoc-ja/change.html#%3Asubstitute">:substitute</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/change.html#sub-replace-special">sub-replace-special (:s\=)</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#submatch()">submatch()</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#str2float()">str2float()</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#round()">round()</a></li>
+</ul>
+
+<p>になる。</p>
+
+<h2>:substitute</h2>
+
+<p>全置換なので<code>:s[ubstitute]</code>に<code>%</code>を付けて<code>g</code>フラグ付きで行う。通常は<code>/</code>で検索パターンと置換パターンを区切るが、置換側で<code>/</code>を使いたいので<code>@</code>を使って区切るとエスケープで頭が混乱することはない。</p>
+
+<h2>sub-replace-special (:s\=)</h2>
+
+<p>単純な置換ではなく、検索した文字列を加工したいので、置換パターンの方を<code>\=</code>で始めて、Vimの内蔵関数を使えるようにする。</p>
+
+<h2>submatch()</h2>
+
+<p>通常の置換では置換パターンで<code>\0</code>を使うことで、検索パターン全体のマッチ拾うことが出来る。しかし<code>\=</code>ではそれは使えない(と思う)ので、代わりに<code>submatch()</code>で直前の検索パターンの全体のマッチ(及びサブマッチ)を拾うことができるのでこれを使う。ここではマッチ全体を拾えば良いので<code>submatch(0)</code>で良い。</p>
+
+<h2>str2float()</h2>
+
+<p>検索文字列は<code>String</code>なので<code>Float</code>へキャストする必要がある。暗黙の型変換でもうまくいくような気がするが念のためキャストした方が良い。</p>
+
+<h2>round()</h2>
+
+<p>小数の丸めには3種類あるが、四捨五入したい場合は<code>round()</code>を使う。しかしこれは強制的に整数へ(<code>.0</code>付きで)丸められるため、事前に維持したい桁数だけ少数点をずらしておく必要がある。ここでは3桁維持するとして、まず1000を掛けておき、<code>round()</code>した後に1000で割って戻す。</p>
+
+<hr>
+
+<p>ちゃんと関数を書かないと面倒かと思ったが、それほどでもなかった。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Drawic v2.10.1</title>
@@ -313,37 +385,6 @@
 <p>HTML10を書いている。HTML10ではすべての要素がモジュール化されていて、HTML Section Module version 10などと仕様書がある。それとは別にHTML Article Section Module version 10とかHTML Strong Text Module version 10などもあり、コアの仕様書には<code>div</code>要素と<code>span</code>要素のみ定義されている。そのため世のウェブサイトはすべて<code>div</code>と<code>span</code>要素で出来ており、モジュール化された要素を利用するマークアッパーは原理主義者として公安にマークされ、外出もままならない。食料を買いに行こうと外に出ようとし、玄関前で警備している人に「今日はまだHTML書いていません」と宣誓したところで目が覚めた。</p>
 
 <p>うっかり<code>div</code>要素を書いてしまい、原理主義者の仲間から裏切り者として追われ始めるみたいな続きの夢ならちょっと見たい。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>ソーシャル・ボタンの色</title>
-      <link>http://hail2u.net/blog/webdesign/social-button-color.html</link>
-      <description>ウェブサイトにソーシャル・ボタンを設置する際にその色はどうすると良いのかは悩みどころだ。効果的であることとビジュアル・デザインとの兼ね合いという二つの点から考えないとならないからだ。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/social-button-color.html</guid>
-      <pubDate>Sun, 12 Apr 2015 12:25:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="/images/blog/social-button-color.png"><img alt="Facebook/Tumblr/Twitter/Pinterest" src="/images/blog/social-button-color.png"></a>
-</figure>
-
-<p>ウェブサイトにソーシャル・ボタンを設置する際にその色はどうすると良いのかは悩みどころだ。効果的であることとビジュアル・デザインとの兼ね合いという二つの点から考えないとならないからだ。</p>
-
-<h2>対応するソーシャル・ネットワークのテーマカラー</h2>
-
-<p>もっとも認識されやすいのは対応するソーシャル・ネットワークを象徴する色でボタンを作成することだ。認識されやすさはその利用につながるので、マーケティングの面から重視するのならばこうすべきだろう。もちろん元々その色で作成されているであろう公式のウィジェットを使うのが望ましい。</p>
-
-<h2>ウェブサイトのテーマカラー</h2>
-
-<p>ソーシャル・ネットワークを象徴する色で作成する場合と比べて認識度では劣るが、コンテンツとの差異を確保した上で、何らかのアクションを起こすことのできるものだとは理解されやすい。リンクやナビゲーションとは差異をつけづらいので、それらとは大きさや形(他では使っていないシェイプにするなど)でより識別しやすくする必要がある。</p>
-
-<h2>無彩色</h2>
-
-<p>無彩色で作成されたボタンはどんなビジュアル・デザインにも馴染みやすい。<code>:hover</code>で色を変える工夫なども通用しなくなりつつあるので、何らかの形でアピールすることはまず無理だと意識しておく必要がある。つまりそれを越えて認識出来る人であるところの常連向けに置いておくという程度にしか役には立たないだろう。</p>
-
-<hr>
-
-<p>ソーシャル・ボタンの効果とビジュアル・デザインとの馴染みやすさは、ほぼ両立できない。インターネットというものがウェブサイト同士がつながって成り立っていることを考えると、それぞれの対応するソーシャル・ネットワークを象徴するカラーで作成した方が望ましいのではないかと思う。もしかすると無彩色で作り、それをアニメーションさせれば両立できるかもしれないが、かなりの挑戦になることだろう。</p>]]></content:encoded>
     </item>
 
   </channel>
