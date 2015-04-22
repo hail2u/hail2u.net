@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="最近はnpmで全部ラップしてやるようにしていたりするのだけど、間違っているような気がしてきた。機能とかそういう面では十分で、運用においても癖はあるもののなんとかなりそうなため、そういう点でじゃなくて。利用時に混乱しやすいとかそういうところ。npmコマンドを汎用的に使うことになるので、ふと気づくとgit run buildとかnpm rebase -iとかやってしまう。一番ひどいなって思ったのはgit run rebase -iとやった時。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>全部npmで - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/software/use-npm-for-everything.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/software/vim-round-and-replace-decimal.html">
+
+    
+
+    
+      <meta content="全部npmで" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="最近はnpmで全部ラップしてやるようにしていたりするのだけど、間違っているような気がしてきた。機能とかそういう面では十分で、運用においても癖はあるもののなんとかなりそうなため、そういう点でじゃなくて。利用時に混乱しやすいとかそういうところ。npmコマンドを汎用的に使うことになるので、ふと気づくとgit run buildとかnpm rebase -iとかやってしまう。一番ひどいなって思ったのはgit run rebase -iとやった時。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/software/use-npm-for-everything.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/software/use-npm-for-everything.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">全部npmで</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-04-23T06:09:00+09:00" itemprop="datePublished">Apr 23, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description">最近はnpmで全部ラップしてやるようにしていたりするのだけど、間違っているような気がしてきた。機能とかそういう面では十分で、運用においても癖はあるもののなんとかなりそうなため、そういう点でじゃなくて。利用時に混乱しやすいとかそういうところ。npmコマンドを汎用的に使うことになるので、ふと気づくと<code>git run build</code>とか<code>npm rebase -i</code>とかやってしまう。一番ひどいなって思ったのは<code>git run rebase -i</code>とやった時。</p>
+
+<p>これはもう自分の脳の限界なのかとも少し思うけど、問題はそこじゃなくて、CLIアプリケーションのような対話的なアプリケーションを汎用的に使うと、コマンド名の意味が薄くなってしまうということなんじゃないかなと(自信ない)。ビルド・ツールのコマンド、バージョン・コントロールのコマンド、パッケージ・マネージャーのコマンド、それぞれがコマンド名という名前空間的に機能するもので切り分けられている状態の方が自然。だからそうなっていると今自分がやりたいこととコマンド名のマッピングが脳内でうまく行われる気がする。</p>
+
+<p>全部npmでやると確かにすっきりするんだけれど、どちらかというと管理のしやすさとかそういう面ですっきりするだけで、ユーザー・インターフェイスという点ではすっきりしているように見えるだけっぽい。ちゃんとツールの使い分けを考えた方が良いような気がしないでもないけど、そうするとnpmの世界ではグローバルにCLIツールをインストールする必要がある感じになって、それは別の点(<code>npm install</code>で入ってくれるわけじゃないとか依存バージョンを束縛できないとか)でやはり厳しいよなというジレンマ。</p>
+
+<p>エンドユーザーである自分における問題であるとも思うので、シェルのエイリアスやラッパー・コマンドで解決するというのも悪くはなさそう。だけどこういった混乱しやすい(と思われる)環境を撒き散らすようなことをしてもいいものだろうかというような点で悩ましい。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E5%85%A8%E9%83%A8npm%E3%81%A7%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fuse-npm-for-everything.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fuse-npm-for-everything.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fuse-npm-for-everything.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E5%85%A8%E9%83%A8npm%E3%81%A7%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fuse-npm-for-everything.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/software/vim-round-and-replace-decimal.html" rel="prev">
+  <p>Vimで小数を四捨五入して置換</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
