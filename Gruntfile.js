@@ -119,7 +119,9 @@ module.exports = function (grunt) {
               'eau-douce/b.woff',
               'eau-douce/b.woff2',
               'eau-douce/r.woff',
-              'eau-douce/r.woff2'
+              'eau-douce/r.woff2',
+              'eau-douce/xl.woff',
+              'eau-douce/xl.woff2'
             ]
           }
         ]
@@ -224,7 +226,9 @@ module.exports = function (grunt) {
           'eau-douce/b.woff',
           'eau-douce/b.woff2',
           'eau-douce/r.woff',
-          'eau-douce/r.woff2'
+          'eau-douce/r.woff2',
+          'eau-douce/xl.woff',
+          'eau-douce/xl.woff2'
         ]
       }
     },
