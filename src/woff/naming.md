@@ -3,9 +3,9 @@ Naming
 
 | Weight | Friendly Name | Name |
 |-------:|---------------|------|
-|    100 | eXtra Light   | xl   |
-|    200 | Light         | l    |
-|    300 | Book          | bo   |
+|    100 | Thin          | t    |
+|    200 | eXtra Light   | xl   |
+|    300 | Light         | l    |
 |    400 | Regular       | r    |
 |    500 | Medium        | m    |
 |    600 | Semi Bold     | sb   |
