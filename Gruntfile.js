@@ -119,20 +119,10 @@ module.exports = function (grunt) {
             src: [
               "eau-douce/b.woff",
               "eau-douce/b.woff2",
-              "eau-douce/bk.woff",
-              "eau-douce/bk.woff2",
-              "eau-douce/l.woff",
-              "eau-douce/l.woff2",
-              "eau-douce/m.woff",
-              "eau-douce/m.woff2",
               "eau-douce/r.woff",
               "eau-douce/r.woff2",
-              "eau-douce/t.woff",
-              "eau-douce/t.woff2",
               "fira-mono/b.woff",
               "fira-mono/b.woff2",
-              "fira-mono/m.woff",
-              "fira-mono/m.woff2",
               "fira-mono/r.woff",
               "fira-mono/r.woff2"
             ]
@@ -241,20 +231,10 @@ module.exports = function (grunt) {
         src: [
           "eau-douce/b.woff",
           "eau-douce/b.woff2",
-          "eau-douce/bk.woff",
-          "eau-douce/bk.woff2",
-          "eau-douce/l.woff",
-          "eau-douce/l.woff2",
-          "eau-douce/m.woff",
-          "eau-douce/m.woff2",
           "eau-douce/r.woff",
           "eau-douce/r.woff2",
-          "eau-douce/t.woff",
-          "eau-douce/t.woff2",
           "fira-mono/b.woff",
           "fira-mono/b.woff2",
-          "fira-mono/m.woff",
-          "fira-mono/m.woff2",
           "fira-mono/r.woff",
           "fira-mono/r.woff2"
         ]
