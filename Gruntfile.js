@@ -21,6 +21,7 @@ module.exports = function (grunt) {
         files: {
           'tmp/style.min.css': [
             'tmp/eau-douce.min.css',
+            'tmp/fira-mono.min.css',
             'tmp/style.min.css'
           ]
         }
@@ -127,7 +128,13 @@ module.exports = function (grunt) {
               'eau-douce/r.woff',
               'eau-douce/r.woff2',
               'eau-douce/t.woff',
-              'eau-douce/t.woff2'
+              'eau-douce/t.woff2',
+              'fira-mono/b.woff',
+              'fira-mono/b.woff2',
+              'fira-mono/m.woff',
+              'fira-mono/m.woff2',
+              'fira-mono/r.woff',
+              'fira-mono/r.woff2'
             ]
           }
         ]
@@ -154,7 +161,10 @@ module.exports = function (grunt) {
         dest: 'tmp/',
         expand: true,
         ext: '.css',
-        src: ['eau-douce.css']
+        src: [
+          'eau-douce.css',
+          'fira-mono.css'
+        ]
       },
 
       img: {
@@ -240,7 +250,13 @@ module.exports = function (grunt) {
           'eau-douce/r.woff',
           'eau-douce/r.woff2',
           'eau-douce/t.woff',
-          'eau-douce/t.woff2'
+          'eau-douce/t.woff2',
+          'fira-mono/b.woff',
+          'fira-mono/b.woff2',
+          'fira-mono/m.woff',
+          'fira-mono/m.woff2',
+          'fira-mono/r.woff',
+          'fira-mono/r.woff2'
         ]
       }
     },
@@ -326,6 +342,7 @@ module.exports = function (grunt) {
           'documents.scss',
           'natural.scss',
           'eau-douce.scss',
+          'fira-mono.scss',
           'style.scss'
         ]
       }
