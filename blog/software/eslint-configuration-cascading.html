@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="ESLintのv0.20.0からプロジェクト・ローカルに.eslintrcがある場合は~/.eslintrcから設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>ESLintの設定継承システム - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/software/eslint-configuration-cascading.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/internet/login-with-signup-button.html">
+
+    
+
+    
+      <meta content="ESLintの設定継承システム" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="ESLintのv0.20.0からプロジェクト・ローカルに.eslintrcがある場合は~/.eslintrcから設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/software/eslint-configuration-cascading.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/software/eslint-configuration-cascading.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">ESLintの設定継承システム</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-04-30T09:49:00+09:00" itemprop="datePublished">Apr 30, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+        </footer>
+
+        <div itemprop="articleBody">
+<p itemprop="description"><a href="http://eslint.org/">ESLint</a>のv0.20.0からプロジェクト・ローカルに<code>.eslintrc</code>がある場合は<code>~/.eslintrc</code>から設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。</p>
+
+<p>確かにプロジェクト・ローカルの<code>.eslintrc</code>だけしか見ないようにすると、プロジェクト・メンバー間でのコーディング・スタイルが統一しやすくなる。しかしそれはいわゆるフォーマッターの役目で、リンターの役目ではないように思う。リンターの段階でコーディング・スタイルへの準拠を強いられると、普段それと違う書き方をしている人達にものすごいフラストレーションを与えることだろう。</p>
+
+<p>強いられたスタイルのうちいくつかは<a href="http://editorconfig.org/">EditorConfig</a>などの併用により自動的に対応することはできる。その状態で書かれたコードは確かにコーディング・スタイルに沿っているだろうが、普段インデント幅を半角空白2つに設定している人が半角空白4つのインデントを強いられた場合、普段通りの感覚で書くことができるわけがない。つまり成果物の体裁の保証ができる代わりに、その質の保証が失われるという結果になる。</p>
+
+<hr>
+
+<p>とにかくどれくらい辛いのかと、僕は<code>rules</code>フィールドを書かなくて済むように自分を調教する道をあえて選んで色々書いているところだ。率直な感想としてはこれを他の開発者に強いるのはちょっと僕にはできそうもない。</p>
+
+<p>他の開発者との兼ね合いだけではなく、自分だけのプロジェクトの時もいちいち設定してあげなくてはならないことが辛い。そういう場合はプロジェクト・ローカルの<code>.eslintrc</code>を作らなければ良いようにも思えるが、実際にはまだ多くのプロジェクトで<code>env</code>フィールドを使ってNode.js向けかブラウザー向けかを<code>.eslintrc</code>で設定してやる必要があり、そういう運用は難しいだろう。</p>
+
+<hr>
+
+<p>ESLintでは将来的には<a href="https://github.com/eslint/eslint/issues/2302">ウィザードでルールを設定して<code>.eslintrc</code>を吐くこと</a>ができるように考えられているようだ。<code>~/.eslintrc</code>の継承を元に戻して、強いルール付けを課したいプロジェクトではこのウィザードを使って全ルールを出力するというような形がバランスが良いのかなと思う。とにかくリンターとしては良いツールだとは思っているので、プロジェクトごとにルールを柔軟かつ手軽に設定できるようになってほしいものだ。</p></div>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=ESLint%E3%81%AE%E8%A8%AD%E5%AE%9A%E7%B6%99%E6%89%BF%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Feslint-configuration-cascading.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Feslint-configuration-cascading.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Feslint-configuration-cascading.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=ESLint%E3%81%AE%E8%A8%AD%E5%AE%9A%E7%B6%99%E6%89%BF%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Feslint-configuration-cascading.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/internet/login-with-signup-button.html" rel="prev">
+  <p>サインアップ・ボタンでログイン</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="https://www.google.com/cse" role="search">
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
