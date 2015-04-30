@@ -20,8 +20,8 @@ module.exports = function (grunt) {
       css: {
         files: {
           "tmp/style.min.css": [
-            "tmp/eau-douce.min.css",
-            "tmp/fira-mono.min.css",
+            "tmp/noto-sans-cjk-jp.min.css",
+            "tmp/source-code-pro.min.css",
             "tmp/style.min.css"
           ]
         }
@@ -117,14 +117,16 @@ module.exports = function (grunt) {
             dest: "src/css/assets/fonts/",
             expand: true,
             src: [
-              "eau-douce/b.woff",
-              "eau-douce/b.woff2",
-              "eau-douce/r.woff",
-              "eau-douce/r.woff2",
-              "fira-mono/b.woff",
-              "fira-mono/b.woff2",
-              "fira-mono/r.woff",
-              "fira-mono/r.woff2"
+              "noto-sans-cjk-jp/b.woff",
+              "noto-sans-cjk-jp/b.woff2",
+              "noto-sans-cjk-jp/r.woff",
+              "noto-sans-cjk-jp/r.woff2",
+              "noto-sans-cjk-jp/t.woff",
+              "noto-sans-cjk-jp/t.woff2",
+              "source-code-pro/b.woff",
+              "source-code-pro/b.woff2",
+              "source-code-pro/r.woff",
+              "source-code-pro/r.woff2"
             ]
           }
         ]
@@ -152,8 +154,8 @@ module.exports = function (grunt) {
         expand: true,
         ext: ".css",
         src: [
-          "eau-douce.css",
-          "fira-mono.css"
+          "noto-sans-cjk-jp.css",
+          "source-code-pro.css"
         ]
       },
 
@@ -229,14 +231,16 @@ module.exports = function (grunt) {
         dest: "build/fonts/",
         expand: true,
         src: [
-          "eau-douce/b.woff",
-          "eau-douce/b.woff2",
-          "eau-douce/r.woff",
-          "eau-douce/r.woff2",
-          "fira-mono/b.woff",
-          "fira-mono/b.woff2",
-          "fira-mono/r.woff",
-          "fira-mono/r.woff2"
+          "noto-sans-cjk-jp/b.woff",
+          "noto-sans-cjk-jp/b.woff2",
+          "noto-sans-cjk-jp/r.woff",
+          "noto-sans-cjk-jp/r.woff2",
+          "noto-sans-cjk-jp/t.woff",
+          "noto-sans-cjk-jp/t.woff2",
+          "source-code-pro/b.woff",
+          "source-code-pro/b.woff2",
+          "source-code-pro/r.woff",
+          "source-code-pro/r.woff2"
         ]
       }
     },
@@ -321,8 +325,8 @@ module.exports = function (grunt) {
           "debug.scss",
           "documents.scss",
           "natural.scss",
-          "eau-douce.scss",
-          "fira-mono.scss",
+          "noto-sans-cjk-jp.scss",
+          "source-code-pro.scss",
           "style.scss"
         ]
       }
