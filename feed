@@ -10,6 +10,25 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>HSTS: HTTP Strict Transport Security</title>
+      <link>http://hail2u.net/blog/internet/hsts.html</link>
+      <description>強まるHTTPS化の圧力の中で、その移行を円滑に進めるための仕組みであるHTTP Strict Transport Securityについてちょっと調べていた。HTTPでアクセスした際にStrict-Transport-Securityヘッダーがあった場合、その後その指定期間はHTTPでアクセスしようとしてもブラウザー側でHTTPSでアクセスするように処理されるという仕組みだ。HTTPからHTTPSへのリダイレクトが不要になるというわけでもないが、ブラウザー側で処理されることによりよりセキュアにHTTPSへの移行を勧めることができるということだろう。</description>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/hsts.html</guid>
+      <pubDate>Mon, 04 May 2015 14:04:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>強まるHTTPS化の圧力の中で、その移行を円滑に進めるための仕組みである<a href="http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security">HTTP Strict Transport Security</a>についてちょっと調べていた。HTTPでアクセスした際に<code>Strict-Transport-Security</code>ヘッダーがあった場合、その後その指定期間はHTTPでアクセスしようとしても<em>ブラウザー側で</em>HTTPSでアクセスするように処理されるという仕組みだ。HTTPからHTTPSへのリダイレクトが不要になるというわけでもないが、ブラウザー側で処理されることによりよりセキュアにHTTPSへの移行を勧めることができるということだろう。</p>
+
+<p>Chrome 42では307 Internal Redirectで処理されるようだ。開発者ツールで確認できる。</p>
+
+<figure>
+  <a href="/images/blog/hsts-example.png"><img alt="Chrome 42ではHTTPへアクセスした場合、仕様通りネットワーク・アクセスなしでちゃんとHTTPSへリダイレクトされる" src="/images/blog/hsts-example.png"></a>
+
+  <figcaption>307 Internal Redirect</figcaption>
+</figure>
+
+<p>HSTSを利用する際に気をつけることはあまりないが、HTTPSの利用を停止する際には十分な準備期間が必要になる。少なくとも<code>max-age</code>に指定した期間はHTTPSのページを提供していないと、HTTPのページに到達できなくなる。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>カラーEmojiのテキスト化</title>
       <link>http://hail2u.net/blog/software/un-color-emoji.html</link>
       <description>Emoji (ユニコード絵文字)はOSやフォントによって色々挙動が変わる。その代表的なものがOS XやiOSでのApple Color Emojiによるフルカラーの画像形式だ。概ねこのカラーで画像形式のEmojiはうまく機能するが、稀にテキスト形式である方が都合が良いこともある。そういった場合は異体字セレクターであるU+FE0Eを使うとテキスト形式に変換できる。</description>
@@ -157,27 +176,6 @@
 <p>アクセシビリティーについての仕様や記事がいま一つ注目されない理由は、それら記事の書かれ方の問題というよりも、読者が限界のある想像力で読んでしまうからなのかもしれない。自分の想像力がまったく及びもつかない世界があるということを強く意識した上で読むことが重要だ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>Mobile Safari 8におけるlang=jaとpre要素のフォント</title>
-      <link>http://hail2u.net/blog/webdesign/lang-ja-pre-element-font-and-mobile-safari-8.html</link>
-      <description>このウェブサイトではしばらく前にpreやcode要素のフォント・ファミリー指定を消した。あまり確認していなかったが、無指定なので良い感じになってくれるだろうと軽く考えていた。が、どうもMobile Safari 8で等幅フォントになっていなかったようだ。なかなかうまく再現できなかったが、どうやらlang属性で変わるようだ。また君か。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/lang-ja-pre-element-font-and-mobile-safari-8.html</guid>
-      <pubDate>Fri, 24 Apr 2015 01:43:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>このウェブサイトでは<a href="https://github.com/hail2u/hail2u.net-styles/commit/c3d13567056c2de77ab7f8d5601decab51d543b6">しばらく前に</a><code>pre</code>や<code>code</code>要素のフォント・ファミリー指定を消した。あまり確認していなかったが、無指定なので良い感じになってくれるだろうと軽く考えていた。が、どうもMobile Safari 8で等幅フォントになっていなかったようだ。なかなかうまく再現できなかったが、どうやら<code>lang</code>属性で変わるようだ。また君か。</p>
-
-<p>View Demo: <a href="/pub/test/623.html">pre font on Mobile Safari 8</a></p>
-
-<p>デモのページをMobile Safari 8で見ると<code>lang</code>属性で<code>ja</code>を指定したセクションの<code>pre</code>要素が等幅フォントになっていないことがわかる。このページにはスタイルは当てておらず、まったく同じ中身を持つが<code>lang</code>属性のないセクションでは<code>pre</code>要素のフォントはちゃんと等幅フォントになっている。</p>
-
-<p><a href="https://bugs.webkit.org/show_bug.cgi?id=96348">lang=zhで報告されているBug 96348</a>と同じで、内部のフォント設定によるフォールバックが<code>sans-serif</code>と同じになっていることによる現象のようだ。根本的な原因は今のOS XやiOSに明確な日本語の等幅フォントというものが存在しないことにあり、もしかしたらデスクトップのSafariやFirefox、Chromeでも同じ現象が起こるのかもしれない。</p>
-
-<p>WONTFIXにはなっていないが、原因を考えると直りそうもないので、対処としては何らかのフォントを必ず指定してやるしかなさそう。このウェブサイトのように主にコードの表示に使っている場合はMenloなりの確実にインストール済みの欧文等幅フォントを指定するのが妥当だろう。汎用ファミリーの解釈において問題が出てくるため、Normalize.cssのような<code>monospace, monospace</code>では対処することはできない。</p>
-
-<hr>
-
-<p><a href="/blog/webdesign/font-preference-and-lang-attribute-on-chrome-42.html">Chrome 42の問題</a>とこれと立て続けに遭遇したので、<code>lang</code>属性は指定しない方が良いみたいな妄想が現実味を増してきたような気がして恐ろしい。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Documentsに「“マークアップ”するということ ～ HTML5勧告に寄せて ～」を追加</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -212,6 +210,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sun, 03 May 2015 12:21:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2015 14:04:00 +0900</lastBuildDate>
   </channel>
 </rss>
