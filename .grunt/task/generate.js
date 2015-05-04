@@ -153,7 +153,7 @@ module.exports = function (grunt) {
       }
 
       articles.forEach(function (article, i, a) {
-        article.cat = article.link(/^\/blog\/(.*?)\/.*$/, '$1');
+        article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, '$1');
         article.category = invCategoryNames[article.cat];
         article.strPubDate = monthNames[article.month - 1] + " " + article.day;
         article.html5PubDate = sprintf(
