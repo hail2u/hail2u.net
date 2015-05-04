@@ -28,6 +28,15 @@ module.exports = function (grunt) {
       "Sports": "sports",
       "Web Design": "webdesign"
     };
+    var invCategoryNames = (function (obj) {
+      var newObj = {};
+
+      for (var prop in obj) {
+        newObj[obj[prop]] = prop;
+      }
+
+      return newObj;
+    })(categoryNames);
 
     var done = this.async();
     var dirTemplate = this.data.cwd;
@@ -144,6 +153,8 @@ module.exports = function (grunt) {
       }
 
       articles.forEach(function (article, i, a) {
+        article.cat = article.link(/^\/blog\/(.*?)\/.*$/, '$1');
+        article.category = invCategoryNames[article.cat];
         article.strPubDate = monthNames[article.month - 1] + " " + article.day;
         article.html5PubDate = sprintf(
           "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
