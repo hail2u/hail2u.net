@@ -203,7 +203,7 @@ module.exports = function (grunt) {
 
     async.eachLimit(files, num, function (file, next) {
       var child = spawn(
-        which("C:/perl/bin/perl"),
+        which("perl"),
         args.concat("path=/" + file), {
           cwd: options.rootdir,
           encoding: "utf8",
