@@ -21,6 +21,7 @@ module.exports = function (grunt) {
         files: {
           "tmp/style.min.css": [
             "tmp/eau-douce.min.css",
+            "tmp/niconne.min.css",
             "tmp/source-code-pro.min.css",
             "tmp/style.min.css"
           ]
@@ -123,6 +124,8 @@ module.exports = function (grunt) {
               "eau-douce/r.woff2",
               "eau-douce/t.woff",
               "eau-douce/t.woff2",
+              "niconne/r-26.woff",
+              "niconne/r-26.woff2",
               "source-code-pro/b.woff",
               "source-code-pro/b.woff2",
               "source-code-pro/r.woff",
@@ -155,6 +158,7 @@ module.exports = function (grunt) {
         ext: ".css",
         src: [
           "eau-douce.css",
+          "niconne.css",
           "source-code-pro.css"
         ]
       },
@@ -237,6 +241,8 @@ module.exports = function (grunt) {
           "eau-douce/r.woff2",
           "eau-douce/t.woff",
           "eau-douce/t.woff2",
+          "niconne/r-26.woff",
+          "niconne/r-26.woff2",
           "source-code-pro/b.woff",
           "source-code-pro/b.woff2",
           "source-code-pro/r.woff",
@@ -326,6 +332,7 @@ module.exports = function (grunt) {
           "documents.scss",
           "natural.scss",
           "eau-douce.scss",
+          "niconne.scss",
           "source-code-pro.scss",
           "style.scss"
         ]
