@@ -47,7 +47,7 @@ module.exports = function (grunt) {
         options: {
           base: "build/",
           keepalive: true,
-          open: "http://localhost:8000/"
+          open: true
         }
       }
     },
