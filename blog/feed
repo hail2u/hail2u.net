@@ -10,12 +10,42 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Thu, 7 May 2015 03:45:26 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 8 May 2015 00:55:24 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>woff2_compress.exeとwoff2_decompress.exe</title>
+      <link>http://hail2u.net/blog/software/woff2_compress.exe-and-woff2_decompress.exe.html</link>
+      <description>あるフォント・ファイルをWOFF2フォーマットへ変換するには、現状google/woff2をビルドするしかない。FontSquirrelはかなり優秀ではあるが若干不安定で苦労する。他にもいくつかあるが、大きなファイルを食わせることのできるオンライン・コンバーターは皆無に等しい。ということで2855ee7をクローンして、ビルドし、ローカルで頑張ることにした。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/woff2_compress.exe-and-woff2_decompress.exe.html</guid>
+      <pubDate>Fri, 08 May 2015 00:55:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>あるフォント・ファイルをWOFF2フォーマットへ変換するには、現状<a href="https://github.com/google/woff2"><code>google/woff2</code></a>をビルドするしかない。<a href="http://www.fontsquirrel.com/">FontSquirrel</a>はかなり優秀ではあるが若干不安定で苦労する。他にもいくつかあるが、大きなファイルを食わせることのできるオンライン・コンバーターは皆無に等しい。ということで<a href="https://github.com/google/woff2/commit/2855ee7b8bf6a46ec3a10f773f358c8c0f808b74"><code>2855ee7</code></a>をクローンして、ビルドし、ローカルで頑張ることにした。</p>
+
+<p>Download: <a href="/pub/woff2_windows_x64.zip">woff2_windows_x64.zip</a></p>
+
+<p>ビルドはそんなに苦労することはないが、Brotliが<code>cc</code>でコンパイルしようとするので工夫が少し必要だった。僕は別のやり方でやったが、<code>gcc.exe</code>をコピーして<code>cc.exe</code>にリネームするという力技でも大丈夫だろう。</p>
+
+<pre><samp>$ <kbd>git clone https://github.com/google/woff2.git</kbd>
+$ <kbd>cd woff2</kbd>
+$ <kbd>git submodule init</kbd>
+$ <kbd>git submodule update</kbd>
+$ <kbd><mark>LFLAGS=&quot;--static -s&quot;</mark> make clean all</kbd>
+</samp></pre>
+
+<p>ほとんどREADMEと同じだが、静的リンクするための環境変数を設定しつつ<code>make</code>してやる。</p>
+
+<hr>
+
+<p>ここで使っているフォント・ファイルも全て圧縮しなおしたため、少し変わってしまった……。サイズ自体は小さくなったので良しとしよう。</p>
+
+<p>最近はこういったものをビルドするには<a href="http://mingw-w64.yaxm.org/doku.php">MinGW-w64</a>を使っている。パッケージ・マネージャーとかなしの全部入りで配布されており、ガッと入ってピュッと設定してエイヤッと使えるようになる。たまに何かをビルドするだけの人には面倒くさくなくて良い。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>相対命名ルール</title>
@@ -75,7 +105,7 @@
 
 <h2>OpenSSLのアップデート</h2>
 
-<p>様々なコマンドから使われる<code>libeay32.dll</code>が、その読み込み優先順の問題で、システムにインストールされている<code>libeay32.dll</code>を呼びに行ってしまいようだ。もしバージョンが古いOpenSSLが何らかの理由でシステムにインストールされていたりすると、エラーで落ちたりする。僕の場合は<code>git-remote-https.exe</code>が<q>プロシージャ エントリ ポイント EVP_aes_128_ctr がダイナミック リンク ライブラリ LIBEAY32.dll から見つかりませんでした。</q>というエラーで落ち、<code>push</code>や<code>fetch</code>などがまったくできなかった。</p>
+<p>様々なコマンドから使われる<code>libeay32.dll</code>が、その読み込み優先順の問題で、システムにインストールされている<code>libeay32.dll</code>を呼びに行ってしまうようだ。もしバージョンが古いOpenSSLが何らかの理由でシステムにインストールされていたりすると、エラーで落ちたりする。僕の場合は<code>git-remote-https.exe</code>が<q>プロシージャ エントリ ポイント EVP_aes_128_ctr がダイナミック リンク ライブラリ LIBEAY32.dll から見つかりませんでした。</q>というエラーで落ち、<code>push</code>や<code>fetch</code>などがまったくできなかった。</p>
 
 <p><code>libeay32.dll</code>がらみでエラーが出る人は、Git for Windows v2.4.0では最新版の1.0.2aを使っているようなので、それと同じものをシステムにインストールするのが良いだろう。インストーラーで配布しているところもあるが、<a href="http://indy.fulgan.com/SSL/">OpenSSLの公式サイトからリンクされているページで配布されているZIPアーカイブ</a>を展開してコピーする方が良い。</p>
 
@@ -258,25 +288,6 @@ endif
 <p>実際にはGoogleのような大きな括りのアカウントとそれを使ってログインするアプリケーションという組み合わせでしか提供できなそうではある。しかし自動的にログインさせることは無理でも、過去にログインした形跡があればログイン・フォームの方を出すなどは可能だろう。</p>
 
 <p>ユーザーは間違えるものという前提は浸透したと思うが、それへの対応の多くはその間違いの指摘に留まる。間違いをさりげなくフォローする仕組みが提供されるようになるともっと良いインターネットになるはずだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSWring v3.0.4</title>
-      <link>http://hail2u.net/blog/webdesign/node-csswring-v3.0.4.html</link>
-      <description>完全に重複したルールを削除する際に間違ったルールが削除されることがあるバグを修正してCSSWringのv3.0.4をリリースした。他に特に大きな変更はない。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/node-csswring-v3.0.4.html</guid>
-      <pubDate>Tue, 28 Apr 2015 06:51:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>完全に重複したルールを削除する際に間違ったルールが削除されることがあるバグを修正して<a href="https://github.com/hail2u/node-csswring/">CSSWring</a>のv3.0.4をリリースした。他に特に大きな変更はない。</p>
-
-<p>PostCSSの<code>container.each*()</code>はイテレート中に<code>container</code>が保証されるが、イテレート関数へ引数として与えられるインデックスを使ってノードの追加や削除を行うと保証されるとは限らないようだ。<code>node.removeSelf()</code>を使うとうまくいったので、バグの修正ではそうすることでシンプルに対応した。</p>
-
-<p>PostCSSではノードを削除する時に、その親からインデックスを使って削除した方が速い。そのため意図的に<code>node.removeSelf()</code>を避けていたが、それが仇となった。</p>
-
-<hr>
-
-<p>PostCSSの注目度がグッと上がってきたのでうれしい。もうちょっと頑張ろうっていう気になってきた。</p>]]></content:encoded>
     </item>
 
   </channel>
