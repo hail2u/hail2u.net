@@ -683,11 +683,6 @@ module.exports = function (grunt) {
     "gitcommit:deploy"
   ]);
 
-  grunt.registerTask("deploy:blog", [
-    "build:blog",
-    "gitcommit:deploy"
-  ]);
-
   grunt.registerTask("deploy:css", [
     "build:css",
     "gitcommit:deploy"
