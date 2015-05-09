@@ -6,6 +6,23 @@
 (function (w, d) {
   "use strict";
 
+  // Polyfill for String#endsWith()
+  if (!String.prototype.endsWith) {
+    String.prototype.endsWith = function (search, position) {
+      var index = 0;
+      var subject = this.toString();
+
+      if (position === undefined || position > subject.length) {
+        position = subject.length;
+      }
+
+      position -= search.length;
+      index = subject.lastIndexOf(search, position);
+
+      return index !== -1 && index === position;
+    };
+  }
+
   var debounce = function (fn, delay) {
     var timeout = null;
 
@@ -33,20 +50,28 @@
   var init = function () {
     var logo = document.querySelector(".logo");
     var heightLogo = logo.scrollHeight;
+    var hrefToTop = "#top";
+    var classToTop = " to-top";
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset > heightLogo) {
-        logo.addEventListener("click", scrollToTop, false);
+        if (logo.href && logo.href.endsWith(hrefToTop)) {
+          return;
+        }
 
-        if (logo.tagName === "A") {
-          logo.href = "#top";
+        logo.addEventListener("click", scrollToTop, false);
+        logo.className += classToTop;
+
+        if (logo.href) {
+          logo.href = hrefToTop;
         }
 
         return;
       }
 
       logo.removeEventListener("click", scrollToTop, false);
+      logo.className = logo.className.replace(new RegExp(classToTop), "");
 
-      if (logo.tagName === "A") {
+      if (logo.href) {
         logo.href = "/";
       }
     }, 500);
