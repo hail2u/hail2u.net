@@ -77,23 +77,12 @@ module.exports = function (grunt) {
             src: ["node_modules/unutm/build/unutm.js"]
           },
           {
-            cwd: "build/",
-            dest: "src/css/assets/",
-            expand: true,
-            src: [
-              "apple-touch-icon.png",
-              "images/favicon-16.png",
-              "images/favicon-256.png",
-              "images/favicon-32.png",
-              "images/favicon-48.png"
-            ]
-          },
-          {
             cwd: "src/img/",
             dest: "src/css/assets/images/",
             expand: true,
             src: [
               "about/how-i-markup-and-style-this-website.png",
+              "favicon.svg",
               "icon/facebook.svg",
               "icon/feed.svg",
               "icon/tumblr.svg",
