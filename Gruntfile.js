@@ -37,6 +37,7 @@ module.exports = function (grunt) {
           "tmp/main.min.js": [
             "tmp/lightbox.min.js",
             "tmp/nohashtop.min.js",
+            "tmp/toggle-logo-action.min.js",
             "tmp/unutm.min.js"
           ]
         }
@@ -109,6 +110,7 @@ module.exports = function (grunt) {
               "nohashtop.js",
               "toggle-column.js",
               "toggle-eyecatch.js",
+              "toggle-logo-action.js",
               "toggle-outline.js",
               "toggle-tagline.js"
             ]
@@ -200,6 +202,7 @@ module.exports = function (grunt) {
           "tmp/nohashtop.js": "src/js/nohashtop.js",
           "tmp/toggle-column.js": "src/js/toggle-column.js",
           "tmp/toggle-eyecatch.js": "src/js/toggle-eyecatch.js",
+          "tmp/toggle-logo-action.js": "src/js/toggle-logo-action.js",
           "tmp/toggle-outline.js": "src/js/toggle-outline.js",
           "tmp/toggle-tagline.js": "src/js/toggle-tagline.js"
         }
