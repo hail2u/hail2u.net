@@ -43,15 +43,23 @@
   };
 
   var scrollToTop = function (evt) {
+    var offset = (w.pageYOffset - 1) + "px";
+    var styleBody = d.body.style;
+    var styleLogo = evt.srcElement.parentNode.style;
+    styleBody.transition = styleLogo.transition = "initial";
+    styleBody.marginTop = "-" + offset;
+    styleLogo.marginTop = offset;
     w.scrollTo(0, 0);
+    styleBody.transition = styleLogo.transition = "margin-top .5s ease-in-out";
+    styleBody.marginTop = styleLogo.marginTop = "0";
     evt.preventDefault();
   };
 
   var init = function () {
-    var logo = document.querySelector(".logo");
+    var classToTop = " to-top";
+    var logo = d.querySelector(".logo");
     var heightLogo = logo.scrollHeight;
     var hrefToTop = "#top";
-    var classToTop = " to-top";
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset > heightLogo) {
         if (logo.href && logo.href.endsWith(hrefToTop)) {
