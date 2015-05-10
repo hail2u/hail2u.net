@@ -10,12 +10,71 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 10 May 2015 02:01:09 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2015 04:05:30 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能</title>
+      <link>http://hail2u.net/blog/webdesign/scroll-smoothly-to-top-with-css-transition.html</link>
+      <description>前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/scroll-smoothly-to-top-with-css-transition.html</guid>
+      <pubDate>Mon, 11 May 2015 04:05:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<figure>
+  <a href="/images/blog/scroll-smoothly-to-top-with-css-transition.png"><img alt="スムーズニトップヘモドル" src="/images/blog/scroll-smoothly-to-top-with-css-transition.png"></a>
+</figure>
+
+<p>前に作った<a href="/blog/webdesign/fixed-logo-with-to-top-function.html">スクロールした時に位置固定のロゴをトップに戻る機能にすり替えるもの</a>を少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptで<code>scrollTo()</code>を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやら<code>body</code>要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。</p>
+
+<p>View Demo: <a href="/pub/test/628.html">Scroll Smoothly with CSS Transition</a></p>
+
+<p>デモのページにはダミーテキストの各セクションの最後にそれぞれ⇑ Back to Topというリンクがある。それをクリックすると1秒かけてスムーズにスクロールしながらトップに戻る。トリガーとスクロール自体はJavaScriptで行っているが、スクロールのアニメーション自体はCSS Transitionで行っている。具体的には以下のような処理と仕組みになる。</p>
+
+<ol>
+<li>トップに戻るリンクをクリック</li>
+<li>現在のスクロール距離(<code>window.pageYOffset</code>)分だけ<em>マイナスに</em><code>body</code>要素の<code>margin-top</code>プロパティーを設定する</li>
+<li>スクロールしてトップへ戻す</li>
+<li><code>transition</code>プロパティーを<code>body</code>要素の<code>margin-top</code>プロパティーへ仕込む</li>
+<li><code>body</code>要素の<code>margin-top</code>プロパティーの値を<code>0</code>にする</li>
+<li>CSS Transitionで<code>margin-top</code>プロパティーの値を戻すアニメーションが起こる</li>
+</ol>
+
+<p>スクロールバー(があるなら)を注意深く見るとわかるが、実際にはスムーズにスクロールしているわけではなく、<em>そのように見える</em>というだけである。CSS Transitionによるアニメーションはユーザーが途中で止める手段もないので、実用上はほとんど問題ないだろう。</p>
+
+<p>実装のコードも9行ほどと短く、色々なものに組み込みやすいと思われる。コードも順序良くCSSを割り当てていくだけだ。</p>
+
+<pre><code>document.getElementById(&quot;to-top&quot;).addEventListener(&quot;click&quot;, function (evt) {
+  var styleBody = document.body.style;
+  styleBody.transition = &quot;<mark>initial</mark>&quot;;
+  styleBody.marginTop = &quot;-&quot; + (<mark>window.pageYOffset - 1</mark>) + &quot;px&quot;;
+  window.scrollTo(0, 0);
+  styleBody.transition = &quot;<mark>margin-top 1s ease-in-out</mark>&quot;;
+  styleBody.marginTop = &quot;0&quot;;
+  evt.preventDefault();
+});
+</code></pre>
+
+<p>最初に<code>body</code>要素の<code>transition</code>プロパティーを<a href="http://www.w3.org/TR/css3-values/#common-keywords"><code>initial</code></a>に戻すことで、負のマージンを与えた時にアニメーションしないようにすることができる。最初にこうしておかないと、複数回このトップに戻る機能を利用した場合におかしなことになってしまう。<code>initial</code>というキーワードの値はInternet Explorer 11を始めいくつかのブラウザーでまだサポートされていないが、不正な値を仕込んでも目的である<em>アニメーションを潰すこと</em>は可能だ。そのため行儀が良いとは言えないが、このままでも良いだろう。気になる人は<a href="http://www.w3.org/TR/css3-transitions/#transition-shorthand-property">その仕様</a>で決まっている初期値である<code>all 0s ease 0s</code>にすると良い。</p>
+
+<p>この辺りのアニメーションに使ったスタイルの後始末は、<a href="http://www.w3.org/TR/css3-transitions/#transitionend"><code>transitionEnd</code>イベント</a>できれいに行える。明示的にスタイルをきちんと元に戻すことができるので、バグが潜みづらい実装になるはずだ。複雑なCSSを持つウェブサイトではそうすることも考えるべきだ。</p>
+
+<p>スクロール位置を取得する<code>window.pageYOffset</code>から<code>1</code>を引いているのは、スクロールバーが一瞬消えてしまわないようにするためのおまじないだ。これは僕は気づいておらず、<a href="https://twitter.com/ginpei_jp/status/597253862798438400">@ginpei_jpが考えてくれた</a>。これがないとスクロールしきった状態でこのトップに戻る機能を利用すると、スクロールバーが一瞬消え、場合によってはレイアウトが一瞬ずれる可能性がある。</p>
+
+<p><code>transition</code>プロパティーの長さとアニメーション関数は自分の好みでもっと色々試してみると良い。僕の感触では、長さが<code>.5s</code>でアニメーション関数は<code>ease-in-out</code>とするのが一番スカッとスクロールしてくれると感じた。長さは移動距離に応じて調節しても良さそうだが、同じ時間で動かした方が好ましく感じる人が多いだろう。</p>
+
+<hr>
+
+<p>このウェブサイトでは位置固定のロゴも同じようにスムーズにスクロールさせる必要があるので、<a href="https://github.com/hail2u/hail2u.net/blob/da911847f7a5a18b1bbd47f11b6c4e33780136bd/scripts/toggle-logo-action.js#L45-L56">ほんの少し実装がややこしく</a>なっている。といってもロゴの<code>margin-top</code>プロパティーで<code>body</code>要素とは逆に正のマージンでずらしてやり、同じようにアニメーションさせているだけだ。うまく機能しているように思う。</p>
+
+<p>ここまでくればPure CSSでもいけそうに思えるが、それはちょっと難しそうだ。アニメーションまではHTMLの助けを借りれば容易に実装することができるが、<code>transition</code>プロパティーのリセットまたは<code>:target</code>の解除がCSSだけではできない。</p>
+
+<p>昨今は、とにかくCSSをうまく利用してアニメーションをさせた方が軽いものになることが多い。機能の発動のためのイベントなどでJavaScriptを使う事にはなるだろうが、それ以外では頭をひねってCSS Transition (またはAnimation)でやることを念頭に置くと、挙動と実装が共にスカッとしたアニメーションを提供できることだろう。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>git grepをVimで使う #2</title>
@@ -260,25 +319,6 @@ endif
 <p>パーソナライズされたフィードはやはり普通のフィード・リーダーで読むのはあまり良くない。流し読みすべきではない記事が多いこともそうだが、情報の収集元としては他のフィードと決定的に佇まいが違うことがもっと大きい。となると専用アプリなのかなと思うけれど、それはそれでまた面倒だったりもする。</p>
 
 <p>今はフィード・リーダーを使い分ける方向で色々模索している。なかなかこれといった解が思いつかない。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>PostCSSとPromise</title>
-      <link>http://hail2u.net/blog/coding/postcss-and-promise.html</link>
-      <description>PostCSSのv4.1.0からprocess()などがPromiseを返すようにもなったようだ。Promiseで処理するようにすると、何かのエラーで強制的に例外が吐かれて止まることがなくなり、エラーや警告をまとめて拾えるようになる。つまりPostCSSプロセッサーを連結して処理するツールでは非常に重要な変更だと言えそう。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/postcss-and-promise.html</guid>
-      <pubDate>Fri, 01 May 2015 00:44:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><a href="https://github.com/postcss/postcss">PostCSS</a>のv4.1.0から<code>process()</code>などが<a href="https://github.com/postcss/postcss/blob/482281b80031ef15b398b6ce7e6060fd299a1837/API.md#lazyresult-class">Promiseを返すように</a>もなったようだ。Promiseで処理するようにすると、何かのエラーで強制的に例外が吐かれて止まることがなくなり、エラーや警告をまとめて拾えるようになる。つまりPostCSSプロセッサーを連結して処理するツールでは非常に重要な変更だと言えそう。</p>
-
-<p>合わせてプラグインやツール側から警告を渡せるようにもなっている。今まで例外を返していたようなケース(または例外を吐くべきだが止めたくないので握りつぶしていたケース)では、この警告機能を使った方が良いようなことが多そうだ。僕のPostCSSプロセッサー達ではほとんどないが、極稀に<a href="https://github.com/One-com/one-color">one.color</a>に変な色を投げてしまって落ちるバグのアドホックな対応にちゃんと警告を仕込んでやると、そのうちにどんなバグで落ちてるのか正確にわかることにはなりそうだ。</p>
-
-<p>また単機能のツールであっても、Node.jsのスタックトレースの代わりに処理しやすい形(GNU error formatなど)でエラーを出力することが可能になる。活躍の機会はなかなかないと思うが、うまくハマればエディターで自動的にエラー箇所へジャンプとかも可能になることだろう。</p>
-
-<hr>
-
-<p>CSSWringとCSS MQPackerのCLIではCSSのパースエラーをうまいこと表示されるようにしているところだ。だけどイマイチ複数のエラーをきれいに拾って処理する方法がわからず、四苦八苦している。このケースでは最初のパースエラーで止まるのでこれでもまぁ良いと思うのだけど。</p>]]></content:encoded>
     </item>
 
   </channel>
