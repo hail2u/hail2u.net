@@ -65,7 +65,7 @@ if (!String.prototype.endsWith) {
     var reClassToTop = new RegExp(classToTop);
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset < heightLogo) {
-        logo.removeEventListener("click", scrollToTop, false);
+        logo.removeEventListener("click", this, false);
         logo.className = logo.className.replace(reClassToTop, "");
 
         if (logo.href) {
@@ -79,17 +79,13 @@ if (!String.prototype.endsWith) {
         return;
       }
 
-      logo.addEventListener(
-        "click",
-        scrollToTop.bind(null, styleBody, styleLogo),
-        false
-      );
+      logo.addEventListener("click", this, false);
       logo.className += classToTop;
 
       if (logo.href) {
         logo.href = hrefToTop;
       }
-    }, 500);
+    }, 500).bind(scrollToTop.bind(null, styleBody, styleLogo));
 
     w.addEventListener("scroll", toggleLogoAction, false);
   };
