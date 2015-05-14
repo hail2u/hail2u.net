@@ -3,25 +3,27 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2014
  */
+// Polyfill for String#endsWith()
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function (search, position) {
+    "use strict";
+
+    var index = 0;
+    var subject = this.toString();
+
+    if (position === undefined || position > subject.length) {
+      position = subject.length;
+    }
+
+    position -= search.length;
+    index = subject.lastIndexOf(search, position);
+
+    return index !== -1 && index === position;
+  };
+}
+
 (function (w, d) {
   "use strict";
-
-  // Polyfill for String#endsWith()
-  if (!String.prototype.endsWith) {
-    String.prototype.endsWith = function (search, position) {
-      var index = 0;
-      var subject = this.toString();
-
-      if (position === undefined || position > subject.length) {
-        position = subject.length;
-      }
-
-      position -= search.length;
-      index = subject.lastIndexOf(search, position);
-
-      return index !== -1 && index === position;
-    };
-  }
 
   var debounce = function (fn, delay) {
     var timeout = null;
@@ -42,10 +44,8 @@
     };
   };
 
-  var scrollToTop = function (evt) {
+  var scrollToTop = function (styleBody, styleLogo, evt) {
     var offset = (w.pageYOffset - 1) + "px";
-    var styleBody = d.body.style;
-    var styleLogo = evt.srcElement.parentNode.style;
     styleBody.transition = styleLogo.transition = "initial";
     styleBody.marginTop = "-" + offset;
     styleLogo.marginTop = offset;
@@ -53,20 +53,27 @@
     styleBody.transition = styleLogo.transition = "margin-top .5s ease-in-out";
     styleBody.marginTop = styleLogo.marginTop = "0";
     evt.preventDefault();
+    evt.stopPropagation();
   };
 
   var init = function () {
-    var classToTop = " to-top";
     var logo = d.querySelector(".logo");
     var heightLogo = logo.scrollHeight;
     var hrefToTop = "#top";
+    var styleBody = d.body.style;
+    var styleLogo = logo.style;
+    var classToTop = " to-top";
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset > heightLogo) {
         if (logo.href && logo.href.endsWith(hrefToTop)) {
           return;
         }
 
-        logo.addEventListener("click", scrollToTop, false);
+        logo.addEventListener(
+          "click",
+          scrollToTop.bind(null, styleBody, styleLogo),
+          false
+        );
         logo.className += classToTop;
 
         if (logo.href) {
@@ -84,7 +91,6 @@
       }
     }, 500);
 
-    toggleLogoAction();
     w.addEventListener("scroll", toggleLogoAction, false);
   };
 
