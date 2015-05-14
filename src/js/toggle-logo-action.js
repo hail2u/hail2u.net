@@ -62,6 +62,7 @@ if (!String.prototype.endsWith) {
     var styleBody = d.body.style;
     var styleLogo = logo.style;
     var classToTop = " to-top";
+    var reClassToTop = new RegExp(classToTop);
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset > heightLogo) {
         if (logo.href && logo.href.endsWith(hrefToTop)) {
@@ -83,7 +84,7 @@ if (!String.prototype.endsWith) {
       }
 
       logo.removeEventListener("click", scrollToTop, false);
-      logo.className = logo.className.replace(new RegExp(classToTop), "");
+      logo.className = logo.className.replace(reClassToTop, "");
 
       if (logo.href) {
         logo.href = "/";
