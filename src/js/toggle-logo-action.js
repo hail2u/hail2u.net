@@ -53,7 +53,6 @@ if (!String.prototype.endsWith) {
     styleBody.transition = styleLogo.transition = "margin-top .5s ease-in-out";
     styleBody.marginTop = styleLogo.marginTop = "0";
     evt.preventDefault();
-    evt.stopPropagation();
   };
 
   var init = function () {
