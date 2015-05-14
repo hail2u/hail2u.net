@@ -64,30 +64,30 @@ if (!String.prototype.endsWith) {
     var classToTop = " to-top";
     var reClassToTop = new RegExp(classToTop);
     var toggleLogoAction = debounce(function () {
-      if (w.pageYOffset > heightLogo) {
-        if (logo.href && logo.href.endsWith(hrefToTop)) {
-          return;
-        }
-
-        logo.addEventListener(
-          "click",
-          scrollToTop.bind(null, styleBody, styleLogo),
-          false
-        );
-        logo.className += classToTop;
+      if (w.pageYOffset < heightLogo) {
+        logo.removeEventListener("click", scrollToTop, false);
+        logo.className = logo.className.replace(reClassToTop, "");
 
         if (logo.href) {
-          logo.href = hrefToTop;
+          logo.href = "/";
         }
 
         return;
       }
 
-      logo.removeEventListener("click", scrollToTop, false);
-      logo.className = logo.className.replace(reClassToTop, "");
+      if (logo.href && logo.href.endsWith(hrefToTop)) {
+        return;
+      }
+
+      logo.addEventListener(
+        "click",
+        scrollToTop.bind(null, styleBody, styleLogo),
+        false
+      );
+      logo.className += classToTop;
 
       if (logo.href) {
-        logo.href = "/";
+        logo.href = hrefToTop;
       }
     }, 500);
 
