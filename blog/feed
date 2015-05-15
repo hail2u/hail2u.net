@@ -10,12 +10,45 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Fri, 15 May 2015 04:38:46 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 16 May 2015 06:57:58 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>window.scrollTo(Infinity, Infinity)</title>
+      <link>http://hail2u.net/blog/coding/window-scrollto-infinity-infinity.html</link>
+      <description>絶対的なスクロールはwindow.scrollTo()で、相対的なスクロールはwindow.scrollBy()で可能だ。このあたりのことを決めているCSSOM View Moduleではwindow.scroll()のショートカットとしてscrollTo()が決められていたりするが、大抵はこのどちらかで行うことになる。しかしページ最下部への移動をちゃんと行うとなると、色々面倒くさい(スクロール・バーとか)。そのためありえないくらいの大きな値を渡して誤魔化すことが多かったが、それならとInifityを渡したらChrome 42やInternet Explorer 11ではうまく動いた。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/window-scrollto-infinity-infinity.html</guid>
+      <pubDate>Sat, 16 May 2015 06:57:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>絶対的なスクロールは<code>window.scrollTo()</code>で、相対的なスクロールは<code>window.scrollBy()</code>で可能だ。<a href="http://www.w3.org/TR/cssom-view/">このあたりのことを決めているCSSOM View Module</a>では<code>window.scroll()</code>のショートカットとして<code>scrollTo()</code>が決められていたりするが、大抵はこのどちらかで行うことになる。しかしページ最下部への移動をちゃんと行うとなると、色々面倒くさい(スクロール・バーとか)。そのためありえないくらいの大きな値を渡して誤魔化すことが多かったが、それならと<code>Inifity</code>を渡したらChrome 42やInternet Explorer 11ではうまく動いた。</p>
+
+<p>View Demo: <a href="/pub/test/629.html">window.scrollTo(Infinity, Infinity)</a></p>
+
+<p>デモでは右と下の端までスクロールさせるボタンが三種類ある。もちろんX座標とY座標のどちらかだけ<code>Infinity</code>を指定してもそのどちらかの端までスクロールさせることができるということだ。どれもChrome 42とInternet Explorer 11ではスクロールされるが、Firefox 37と(Mobile )Safari 8ではそのようにはスクロールされず、ページの先頭に戻される。</p>
+
+<p>どうやらFirefox 37とSafari 8の挙動が正しいようだ。<a href="http://dev.w3.org/csswg/cssom-view/">2015/04/20版の開発中の仕様</a>では以下のように定義されている。</p>
+
+<figure>
+  <blockquote>
+    <p>void scroll(<mark>unrestricted double</mark> x, <mark>unrestricted double</mark> y);</p>
+  </blockquote>
+
+  <figcaption>— <a href="http://dev.w3.org/csswg/cssom-view/#dom-window-scrollx-y-y"><cite>4. Extensions to the Window Interface</cite></a></figcaption>
+</figure>
+
+<p>Web IDLによると<a href="http://www.w3.org/TR/WebIDL/#float-token-value">unrestricted double</a>は正負のInfinity (やNaN)を許容するので、<code>window.scrollTo(Infinity, Infinity)</code>としても間違いではないということになる。しかし同時に<a href="http://dev.w3.org/csswg/cssom-view/#webidl-values">non-finite valueを0とすると</a>も決められているので、<code>window.scrollTo(0, 0)</code>と解釈されるべきということになる。</p>
+
+<p>一方、<a href="http://www.w3.org/TR/2013/WD-cssom-view-20131217/">最新のWD</a>では<code>double</code>となっており、<code>Infinity</code>は許容されない(<q><code>Infinity</code>, <code>-Infinity</code> and <code>NaN</code> <em>must not</em> be used as the value of a float or double</q>)。そのためChrome 42やInternet Explorer 11の挙動はどちらの仕様をとったとしてもバグだと言える。Chromeでは<a href="https://code.google.com/p/chromium/issues/detail?id=456670">バグ</a>が立っており、既に修正されたようだ。Internet Explorerにはバグ報告はしておいた。</p>
+
+<hr>
+
+<p><code>Infinity</code>で書けるとわかりやすそうかなと思ったが、そうはうまくいかなかった。結局<code>window.scrollTo(99999999, 99999999)</code>とか書き続けることになるようだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>ConEmuのタブごとにカレント・ディレクトリーを復元</title>
@@ -270,63 +303,6 @@ $ <kbd><mark>LFLAGS=&quot;--static -s&quot;</mark> make clean all</kbd>
 <p>CSS (とHTML)のみではコンポーネントのクラス名という、俗にセマンティックなクラス名という単位で帰結し、そういった相対的なニュアンスという文脈は埋もれることになるが、CSSプリプロセッサーではそういった曖昧な相対的なニュアンスを変数として定義することが可能であり、かつ必須だろう。</p>
 
 <p>そういった相対的なスケーリングを表現するための一貫した命名規則は重要であるわけだが、多くは場当たり的に`large`だとか`grande`だとか`mini`だとか付けるくらいで終わる。実際には色定義の命名くらい気を使っても良い部分なのではないだろうか。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Git for Windows v2.x.xのインストール</title>
-      <link>http://hail2u.net/blog/software/install-git-for-windows-v2.html</link>
-      <description>Git v2系のWindows版がGit for Windowsの方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/install-git-for-windows-v2.html</guid>
-      <pubDate>Wed, 06 May 2015 00:39:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Git v2系のWindows版が<a href="http://git-for-windows.github.io/">Git for Windows</a>の方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。</p>
-
-<h2>~/.bashrcの読み込み</h2>
-
-<p>このGit for Windowsでは、デフォルトで<em>無理やり</em><code>~/.bashrc</code>を読みに行くことがなくなった。<code>~/.bash_profile</code>は読みに行くので、<code>~/.bash_profile</code>から<code>~/.bashrc</code>を読みに行くように、つまり普通にBashを設定してやれば良い。</p>
-
-<pre><code>if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
-</code></pre>
-
-<p>これだけ書いた<code>~/.bash_profile</code>を作成するのが良い。<a href="https://github.com/git-for-windows/git/issues/86">あまり関係ないイシュー</a>ではそのうち<code>~/.bash_profile</code>がなかったら作成するようにするというような事を言っているので、これについてはそのうち直りそうだ。</p>
-
-<h2>OpenSSLのアップデート</h2>
-
-<p>様々なコマンドから使われる<code>libeay32.dll</code>が、その読み込み優先順の問題で、システムにインストールされている<code>libeay32.dll</code>を呼びに行ってしまうようだ。もしバージョンが古いOpenSSLが何らかの理由でシステムにインストールされていたりすると、エラーで落ちたりする。僕の場合は<code>git-remote-https.exe</code>が<q>プロシージャ エントリ ポイント EVP_aes_128_ctr がダイナミック リンク ライブラリ LIBEAY32.dll から見つかりませんでした。</q>というエラーで落ち、<code>push</code>や<code>fetch</code>などがまったくできなかった。</p>
-
-<p><code>libeay32.dll</code>がらみでエラーが出る人は、Git for Windows v2.4.0では最新版の1.0.2aを使っているようなので、それと同じものをシステムにインストールするのが良いだろう。インストーラーで配布しているところもあるが、<a href="http://indy.fulgan.com/SSL/">OpenSSLの公式サイトからリンクされているページで配布されているZIPアーカイブ</a>を展開してコピーする方が良い。</p>
-
-<p>64bit版Windowsを使っている人は<code>openssl-1.0.2-x64_86-win64.zip</code>をダウンロードして、展開し、中に入っている<code>libeay32.dll</code>と<code>ssleay32.dll</code>を<code>C:\Windows\System32</code>へコピーする。</p>
-
-<h2>環境変数MSYSTEM</h2>
-
-<p>デフォルトでインストールされるGit Bash (実体はMinTTY)を使う場合は問題ないが、他のターミナルを使うとうまく判定されない事があり、パスが上手く通らないことがあるようだ(ConEmuで上手く通らなかった)。パスの最適化は環境変数<code>MSYSTEM</code>を見て行われるようなので、新規ユーザー環境変数として<code>MSYSTEM</code>を作り、その値を<code>MINGW64</code> (32bit版をインストールした人は<code>MINGW32</code>)に設定してやれば良い。</p>
-
-<p>上記OpenSSLがらみのエラーもこのあたりが怪しいが、Git CMDでも同じエラーでダメだったので、アップデートは必須だと思われる。</p>
-
-<h2>git.exe他、実行ファイル群のパス</h2>
-
-<p>全て一箇所に集約されていたv1系とは違い、多くの実行ファイルがインストール先フォルダーの<code>mingw64/bin/</code>以下に移動した。<code>curl.exe</code>などもここにある。またその他の実行ファイルも<code>usr/bin/</code>に移動されている。<code>bash.exe</code>や<code>vim.exe</code>など、MSYS関係の実行ファイルはこちらにある。</p>
-
-<p>Vimなど他のプログラムから気軽に呼び出したい場合、両者にパスが通っていることが必要になることもあるので、うまいことパスを通す方法を模索する必要がある。僕は<code>~/.vim/vimrc</code>の先頭で無理やり<code>$PATH</code>を最適化してお茶を濁した。</p>
-
-<pre><code>if has(&#39;win32&#39;)
-  let $PATH = substitute($PATH, &#39;\\&#39;, &#39;/&#39;, &#39;g&#39;);
-
-  if $PATH !~? &#39;\(^\|;\)C:/git/usr/bin\(;\|$\)&#39;
-    let $PATH = &#39;C:/git/usr/bin;&#39; . $PATH
-  endif
-
-  if $PATH !~? &#39;\(^\|;\)C:/git/mingw64/bin\(;\|$\)&#39;
-    let $PATH = &#39;C:/git/mingw64/bin;&#39; . $PATH
-  endif
-endif
-</code></pre>
-
-<hr>
-
-<p>ちゃんとインストールできた状態だと、HTTPSでの認証もそのまま継承され、ちゃんと<code>push</code>することができた。問題なく動いている。とはいっても特に何もすごく良くなったところもない気がしないでもないので、興味ある人だけいれるのが良いだろう。</p>]]></content:encoded>
     </item>
 
   </channel>
