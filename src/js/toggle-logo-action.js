@@ -44,33 +44,29 @@ if (!String.prototype.endsWith) {
     };
   };
 
-  var scrollToTop = function (styleBody, styleLogo, evt) {
-    var body = d.body;
-    var scrollDistance = body.scrollTop;
+  var scrollToTop = function (evt) {
+    var root = d.documentElement;
+    var styleRoot = root.style;
     var doScroll = function () {
-      styleBody.transition = styleLogo.transition = "initial";
-      styleBody.marginTop = styleLogo.marginTop = "0px";
+      styleRoot.transition = styleRoot.transform = "initial";
       w.scrollTo(0, 0);
-      body.removeEventListener("transitionend", doScroll, false);
+      root.removeEventListener("transitionend", doScroll, false);
     };
-    body.addEventListener("transitionend", doScroll, false);
-    styleBody.transition = styleLogo.transition = "margin-top .5s ease-in-out";
-    styleBody.marginTop = scrollDistance + "px";
-    styleLogo.marginTop = "-" + scrollDistance + "px";
+    var scrollDistance = w.pageYOffset;
+    root.addEventListener("transitionend", doScroll, false);
+    styleRoot.transition = "transform 1s ease-in-out";
+    styleRoot.transform = "translate3d(0, " + scrollDistance + "px, 0)";
     evt.preventDefault();
   };
 
   var init = function () {
     var logo = d.querySelector(".logo");
-    var heightLogo = logo.scrollHeight;
-    var hrefToTop = "#top";
-    var styleBody = d.body.style;
-    var styleLogo = logo.style;
     var classToTop = " to-top";
     var reClassToTop = new RegExp(classToTop);
-    var toggleLogoAction = debounce(function (fn) {
-      if (w.pageYOffset < heightLogo) {
-        logo.removeEventListener("click", fn, false);
+    var hrefToTop = "#top";
+    var toggleLogoAction = debounce(function () {
+      if (w.pageYOffset < logo.scrollHeight) {
+        logo.removeEventListener("click", scrollToTop, false);
         logo.className = logo.className.replace(reClassToTop, "");
 
         if (logo.href) {
@@ -84,14 +80,13 @@ if (!String.prototype.endsWith) {
         return;
       }
 
-      logo.addEventListener("click", fn, false);
+      logo.addEventListener("click", scrollToTop, false);
       logo.className += classToTop;
 
       if (logo.href) {
         logo.href = hrefToTop;
       }
-    }, 500).bind(null, scrollToTop.bind(null, styleBody, styleLogo));
-
+    }, 500);
     w.addEventListener("scroll", toggleLogoAction, false);
   };
 
