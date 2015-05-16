@@ -63,28 +63,29 @@ if (!String.prototype.endsWith) {
     var logo = d.querySelector(".logo");
     var classToTop = " to-top";
     var reClassToTop = new RegExp(classToTop);
-    var hrefToTop = "#top";
+    var hrefLogo = logo.href;
+    var fragToTop = "#top";
     var toggleLogoAction = debounce(function () {
       if (w.pageYOffset < logo.scrollHeight) {
         logo.removeEventListener("click", scrollToTop, false);
         logo.className = logo.className.replace(reClassToTop, "");
 
-        if (logo.href) {
-          logo.href = "/";
+        if (hrefLogo) {
+          hrefLogo = "/";
         }
 
         return;
       }
 
-      if (logo.href && logo.href.endsWith(hrefToTop)) {
+      if (hrefLogo && hrefLogo.endsWith(fragToTop)) {
         return;
       }
 
       logo.addEventListener("click", scrollToTop, false);
       logo.className += classToTop;
 
-      if (logo.href) {
-        logo.href = hrefToTop;
+      if (hrefLogo) {
+        hrefLogo = fragToTop;
       }
     }, 500);
     w.addEventListener("scroll", toggleLogoAction, false);
