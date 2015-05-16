@@ -35,6 +35,7 @@ module.exports = function (grunt) {
 
         files: {
           "tmp/main.min.js": [
+            "tmp/_string_endswith.min.js",
             "tmp/lightbox.min.js",
             "tmp/nohashtop.min.js",
             "tmp/toggle-logo-action.min.js",
@@ -95,6 +96,7 @@ module.exports = function (grunt) {
             dest: "src/css/assets/scripts/",
             expand: true,
             src: [
+              "_string_endswith.js",
               "lightbox.js",
               "nohashtop.js",
               "toggle-column.js",
@@ -185,6 +187,7 @@ module.exports = function (grunt) {
 
       jsPre: {
         files: {
+          "tmp/_string_endswith.js": "src/js/_string_endswith.js",
           "tmp/lightbox.js": "src/js/lightbox.js",
           "tmp/nohashtop.js": "src/js/nohashtop.js",
           "tmp/toggle-column.js": "src/js/toggle-column.js",

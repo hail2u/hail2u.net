@@ -1,7 +1,7 @@
-"use strict";
-
 if (!String.prototype.endsWith) {
   String.prototype.endsWith = function (search, position) {
+    "use strict";
+
     var index = 0;
     var subject = this.toString();
 
@@ -15,3 +15,4 @@ if (!String.prototype.endsWith) {
     return index !== -1 && index === position;
   };
 }
+/* eslint no-extend-native:0 */
