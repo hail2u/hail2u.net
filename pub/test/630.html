@@ -73,6 +73,8 @@
       <h1>Hi!</h1>
 
       <p>It’s bottom of this page!</p>
+
+      <p><button id="to-top">Back to Top</button></p>
     </section>
 
     <script>
@@ -84,18 +86,25 @@
         scrollToElm(document.getElementById('middle'));
       }, false);
 
+      document.getElementById('to-top').addEventListener('click', function () {
+        scrollToElm(document.body);
+      }, false);
+
       function scrollToElm(to) {
         var body = document.body;
         var styleBody = body.style;
         var doScroll = function () {
           styleBody.transition = styleBody.transform = 'initial';
-          to.scrollIntoView();
+          window.scrollTo(0, to.offsetTop);
           body.removeEventListener('transitionend', doScroll, false);
         };
-        var scrollDistance = Math.min(to.offsetTop, body.scrollHeight - window.innerHeight);
+        var scrollDistance = Math.max(
+          body.scrollTop - to.offsetTop,
+          body.scrollTop - (body.scrollHeight - window.innerHeight)
+        );
         body.addEventListener('transitionend', doScroll, false);
         styleBody.transition = 'transform 5s ease-in-out';
-        styleBody.transform = 'translateY(-' + scrollDistance + 'px)';
+        styleBody.transform = 'translateY(' + scrollDistance + 'px)';
       }
     </script>
   </body>
