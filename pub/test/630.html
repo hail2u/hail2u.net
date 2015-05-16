@@ -78,34 +78,34 @@
     </section>
 
     <script>
+      function scrollToElment(to) {
+        var root = document.documentElement;
+        var styleRoot = root.style;
+        var doScroll = function () {
+          styleRoot.transition = styleRoot.marginTop = 'initial';
+          window.scrollTo(0, to.offsetTop);
+          root.removeEventListener('transitionend', doScroll, false);
+        };
+        var scrollDistance = window.pageYOffset - Math.min(
+          to.offsetTop,
+          root.scrollHeight - window.innerHeight
+        );
+        root.addEventListener('transitionend', doScroll, false);
+        styleRoot.transition = 'margin-top 1s ease-in-out';
+        styleRoot.marginTop = scrollDistance + 'px';
+      }
+
       document.getElementById('to-bottom').addEventListener('click', function () {
-        scrollToElm(document.getElementById('bottom'));
+        scrollToElment(document.getElementById('bottom'));
       }, false);
 
       document.getElementById('to-middle').addEventListener('click', function () {
-        scrollToElm(document.getElementById('middle'));
+        scrollToElment(document.getElementById('middle'));
       }, false);
 
       document.getElementById('to-top').addEventListener('click', function () {
-        scrollToElm(document.body);
+        scrollToElment(document.body);
       }, false);
-
-      function scrollToElm(to) {
-        var body = document.body;
-        var styleBody = body.style;
-        var doScroll = function () {
-          styleBody.transition = styleBody.transform = 'initial';
-          window.scrollTo(0, to.offsetTop);
-          body.removeEventListener('transitionend', doScroll, false);
-        };
-        var scrollDistance = Math.max(
-          body.scrollTop - to.offsetTop,
-          body.scrollTop - (body.scrollHeight - window.innerHeight)
-        );
-        body.addEventListener('transitionend', doScroll, false);
-        styleBody.transition = 'transform 5s ease-in-out';
-        styleBody.transform = 'translateY(' + scrollDistance + 'px)';
-      }
     </script>
   </body>
 </html>
