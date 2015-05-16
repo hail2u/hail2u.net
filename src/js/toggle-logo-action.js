@@ -45,13 +45,18 @@ if (!String.prototype.endsWith) {
   };
 
   var scrollToTop = function (styleBody, styleLogo, evt) {
-    var offset = (w.pageYOffset - 1) + "px";
-    styleBody.transition = styleLogo.transition = "initial";
-    styleBody.marginTop = "-" + offset;
-    styleLogo.marginTop = offset;
-    w.scrollTo(0, 0);
+    var body = d.body;
+    var scrollDistance = body.scrollTop;
+    var doScroll = function () {
+      styleBody.transition = styleLogo.transition = "initial";
+      styleBody.marginTop = styleLogo.marginTop = "0px";
+      w.scrollTo(0, 0);
+      body.removeEventListener("transitionend", doScroll, false);
+    };
+    body.addEventListener("transitionend", doScroll, false);
     styleBody.transition = styleLogo.transition = "margin-top .5s ease-in-out";
-    styleBody.marginTop = styleLogo.marginTop = "0";
+    styleBody.marginTop = scrollDistance + "px";
+    styleLogo.marginTop = "-" + scrollDistance + "px";
     evt.preventDefault();
   };
 
@@ -63,9 +68,9 @@ if (!String.prototype.endsWith) {
     var styleLogo = logo.style;
     var classToTop = " to-top";
     var reClassToTop = new RegExp(classToTop);
-    var toggleLogoAction = debounce(function () {
+    var toggleLogoAction = debounce(function (fn) {
       if (w.pageYOffset < heightLogo) {
-        logo.removeEventListener("click", this, false);
+        logo.removeEventListener("click", fn, false);
         logo.className = logo.className.replace(reClassToTop, "");
 
         if (logo.href) {
@@ -79,13 +84,13 @@ if (!String.prototype.endsWith) {
         return;
       }
 
-      logo.addEventListener("click", this, false);
+      logo.addEventListener("click", fn, false);
       logo.className += classToTop;
 
       if (logo.href) {
         logo.href = hrefToTop;
       }
-    }, 500).bind(scrollToTop.bind(null, styleBody, styleLogo));
+    }, 500).bind(null, scrollToTop.bind(null, styleBody, styleLogo));
 
     w.addEventListener("scroll", toggleLogoAction, false);
   };
