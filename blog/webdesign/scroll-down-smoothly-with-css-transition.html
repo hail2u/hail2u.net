@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="少し前のCSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事では、CSS Transitionを使ってスムーズにスクロールさせるためにbody要素のmargin-topプロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>下方向にもCSS Transitionでスムーズにスクロール - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/scroll-down-smoothly-with-css-transition.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/misc/the-end-svg.html">
+
+    
+
+    
+      <meta content="下方向にもCSS Transitionでスムーズにスクロール" property="og:title">
+      <meta content="http://hail2u.net/images/blog/scroll-down-smoothly-with-css-transition.png" property="og:image">
+      <meta content="少し前のCSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事では、CSS Transitionを使ってスムーズにスクロールさせるためにbody要素のmargin-topプロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/webdesign/scroll-down-smoothly-with-css-transition.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div class="has-image" role="main">
+      
+        
+        <link href="/blog/webdesign/scroll-down-smoothly-with-css-transition.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">下方向にもCSS Transitionでスムーズにスクロール</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-05-18T06:55:00+09:00" itemprop="datePublished">May 18, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <main itemprop="articleBody">
+<figure class="full-width">
+  <a href="/images/blog/scroll-down-smoothly-with-css-transition.png"><img alt="下方向へスムーズにスクロール" src="/images/blog/scroll-down-smoothly-with-css-transition.png" itemprop="image"></a>
+</figure>
+
+<p itemprop="description">少し前の<a href="/blog/webdesign/scroll-smoothly-to-top-with-css-transition.html">CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事</a>では、CSS Transitionを使ってスムーズにスクロールさせるために<code>body</code>要素の<code>margin-top</code>プロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。</p>
+
+<p>何かしらのCSSプロパティーを使い、<code>body</code>要素を上方向にずらすということになる。つまり<code>transform</code>プロパティーで<code>translate()</code>や<code>translate3d()</code>を使いY方向のマイナスへ動かすのが向いているようだ。あとは<code>transition</code>プロパティーを組み合わせるだけでスムーズにスクロール(しているように見せる)ことができる。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/630.html">Scroll Down Smoothly with CSS Transition</a></p>
+
+<p>デモではJump to Bottomというボタンを押すとページの最下部までスクロールするようになっている。スムーズなことがわかりやすいように長めのアニメーションにしておいた。今回のものは任意の要素の位置へにもスクロールすることが可能だ。Jump to Middleというボタンでは中程までスクロールしてピタッと止まる。また上方向にも対応させた。Back to Topというボタンではページの先頭にスムーズにスクロールしながら戻ることができる。</p>
+
+<pre><code class="language-javascript">function scrollToElm(to) {
+  var root = document.documentElement;
+  var styleRoot = root.style;
+  var doScroll = function () {
+    styleRoot.transition = styleRoot.transform = &#39;initial&#39;;
+    <mark>window.scrollTo(0, to.offsetTop)</mark>;
+    root.removeEventListener(&#39;transitionend&#39;, doScroll, false);
+  };
+  var scrollDistance = <mark>window.pageYOffset - Math.min(
+    to.offsetTop,
+    root.scrollHeight - window.innerHeight
+  )</mark>;
+  root.addEventListener(&#39;<mark>transitionend</mark>&#39;, doScroll, false);
+  styleRoot.transition = &#39;transform 1s ease-in-out&#39;;
+  styleRoot.transform = <mark>&#39;translate3d(0, &#39; + scrollDistance + &#39;px, 0)&#39;</mark>;
+}
+</code></pre>
+
+<p>少しややこしくなったが、それでも16行程度で実装することができる。上下へスクロールさせる場合、後処理が重要になるので<code>transitionend</code>イベントを使うことが必須になる(使わなくても不可能ではない)。</p>
+
+<p>まずは必要なスクロール量を考える。通常は現在のスクロール位置からスクロールして表示したい要素の<code>offsetTop</code>を引いた量で良いが、ページの最後付近にある場合はページの最大スクロール量(ここでは<code>root.scrollHeight - window.innerHeight</code>で求めた)を引いた量に制限する必要がある。つまりこの2つのどちらか小さい方<code>Math#min()</code>を使って求め、現在のスクロール位置から引けば良い。</p>
+
+<p><code>transform</code>プロパティーでは<code>translate3d()</code> (<code>translateY()</code>でも悪くはない)を使い、ドキュメント全体を動かす。そうするとスクロールしたように見える。もしスクロールバーがあるなら、それを注視すれば実際にはスクロールしていないことがわかるだろう。既にスクロール量の引き算で調節されているため、文字列連結でマイナスへ変換したりする必要はない。これに<code>transition</code>プロパティーで適当にアニメーションを追加すればスムーズになる。</p>
+
+<p>実際のスクロールはアニメーションの終了後に行うことになる。CSS Transitionの終了時には<code>transitionend</code>というイベントが発火するので、これを使ってスクロール系のメソッドを使いスクロールさせる……前に<code>transform</code>プロパティーをリセットしてやる。もちろん<code>transition</code>プロパティーも同時にリセットする必要がある。スクロールは<code>Element.scrollIntoView()</code>が一番直感的だが、要素のマージンなどにより微妙にずれることがあるため、<code>window.scrollTo()</code>を使う方が良いだろう。最後にこのもう必要のないイベント・ハンドラーは削除しておく。</p>
+
+<hr>
+
+<p>これでCSS Transitionを利用したスムーズなスクロールを上下に行うことができるようになった。<code>margin-top</code>プロパティーを使ったものがハックに近い印象を受けるのと違って、この<code>transform</code>プロパティーを使ったものは自然な実装に近いのもポイントが高い。</p>
+
+<p>実際にはそれほど<code>scrollTo()</code>を使ったスムーズなスクロールは重くない。だがそれは普通の状態であるなら、だ。最近は非常に巨大な動画や埋め込み<code>iframe</code>要素、スクロールを阻害するもの(<code>scroll</code>イベントを使うもの)は多い。それらを考慮するとCSS Transitionのようなコストが低いかコストを他に(ここではCSS Transformに)丸投げできる技術を流用すると、安定した結果を得られるはずだ。</p>
+
+<p>またスクロールのスムーズさを<code>transition-timing-function</code>プロパティーで容易にカスタマイズできる点も魅力的だ。<code>ease-in-out</code>でのなめらかな加速と減速はもちろん、<code>linear</code>をかわりに使えば平坦にもできる。ちょっと戻って勢いを付けてガッとスクロールさせる……といった更なるカスタマイズも<code>cubic-bezier()</code>を使えば不可能ではない(<code>cubic-bezier(0.4, -0.4, 0.8, 1)</code>とか)。<code>steps()</code>を使えばスキップしながらスクロールさせることすらできるだろう。現行の一部ブラウザーの開発者ツールには、そのアニメーションをGUIでプレビューしながら編集する機能もあり、その時には大いに助けになるはずだ。</p>
+
+<p>このCSS TransitionとCSS Transformによるスムーズなスクロールの実装が万能なわけではない。ブラウザー側で全て制御させることになるので、場合によってはスムーズさとは無縁の結果になりうる。どう動くかはブラウザーの気分次第ということだ。その一方で<em>アニメーションの制御コストと挙動カスタマイズ</em>という難題をブラウザーに丸投げできるという大きなメリットがある。ウェブページのコンテンツ次第では、スムーズにスクロールさせるための選択肢として最右翼になり得るはずだ。</p></main>
+
+        <aside class="share-buttons">
+          <ul>
+            <li class="twitter-tweet"><a href="https://twitter.com/intent/tweet?text=%E4%B8%8B%E6%96%B9%E5%90%91%E3%81%AB%E3%82%82CSS%20Transition%E3%81%A7%E3%82%B9%E3%83%A0%E3%83%BC%E3%82%BA%E3%81%AB%E3%82%B9%E3%82%AF%E3%83%AD%E3%83%BC%E3%83%AB%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fscroll-down-smoothly-with-css-transition.html&amp;via=hail2unet&amp;related=hail2u_">Tweet</a></li>
+            <li class="facebook-share"><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fscroll-down-smoothly-with-css-transition.html">Share</a></li>
+            <li class="googleplus-share"><a href="https://plus.google.com/share?url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fscroll-down-smoothly-with-css-transition.html">Share</a></li>
+            <li class="hatena-bookmark"><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E4%B8%8B%E6%96%B9%E5%90%91%E3%81%AB%E3%82%82CSS%20Transition%E3%81%A7%E3%82%B9%E3%83%A0%E3%83%BC%E3%82%BA%E3%81%AB%E3%82%B9%E3%82%AF%E3%83%AD%E3%83%BC%E3%83%AB%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fscroll-down-smoothly-with-css-transition.html">Bookmark</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/misc/the-end-svg.html" rel="prev">
+  <p>The End (SVG)</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <aside class="subcontent">
+      <!-- Google Custom Search Engine -->
+      <form class="site-search" action="//www.google.com/cse" role="search">
+        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
+        <input name="ie" type="hidden" value="UTF-8">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" name="sa" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <section class="footlinks">
+        <ul>
+          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        </ul>
+      </section>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
