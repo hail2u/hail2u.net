@@ -4,6 +4,7 @@ jQueryプラグイン: Query YQL
 
 <p>ソースを見ればわかる通り、<code>jQuery.getJSON()</code>とほぼ同じで、<code>jQuery.get()</code>のラッパー。将来を見据えてエンドポイントは設定で指定できるようにしようかと少し考えたけど、それは別にQuery YQL v2(またはQuery YQL v1)プラグインとか作ってやれば良さそうだと思ったので実装しなかった。色々オプション設定できるようにして複雑化させたらこのプラグインを書いた意味ないし。</p>
 
+<section>
 <h2>使い方</h2>
 
 <pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;jquery-1.3.2.js&quot;&gt;&lt;/script&gt;
@@ -11,8 +12,8 @@ jQueryプラグイン: Query YQL
 &lt;script type=&quot;text/javascript&quot;&gt;
 var statement = &quot;select * from feed where url=&#39;http://example.com/rss&#39;&quot;;
 $.queryYQL(statement, function (data) {
-  // do something with &quot;data&quot;.
-});
+    // do something with &quot;data&quot;.
+    });
 &lt;/script&gt;
 </code></pre>
 
@@ -22,10 +23,10 @@ $.queryYQL(statement, function (data) {
 &lt;script type=&quot;text/javascript&quot;&gt;
 var statement = &quot;select * from feed where url=&#39;http://example.com/rss&#39;&quot;;
 $.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
-  format: &quot;json&quot;,
-  q: statement
+format: &quot;json&quot;,
+q: statement
 }, function (data) {
-  // do something with &quot;data&quot;.
+// do something with &quot;data&quot;.
 });
 &lt;/script&gt;
 </code></pre>
@@ -36,12 +37,14 @@ $.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
 
 <pre><code class="language-js">var statement = &quot;select * from html where url=&#39;http://example.com/&#39; and xpath=&#39;//a&#39;&quot;;
 $.queryYQL(statement, &quot;xml&quot;, function (data) {
-  // do something with &quot;data&quot;.
-});
+    // do something with &quot;data&quot;.
+    });
 </code></pre>
 
 <p>最初の例のように第二引数がコールバック関数の場合や第二引数で<code>json</code>を指定した場合はJSONPを利用する。</p>
+</section>
 
+<section>
 <h2>YQLのJSONP-Xの返すJSONデータ</h2>
 
 <p>Query YQLプラグイン自体とはあまり関係ない話だが、テスト・コードを書いている途中で若干はまったので触れておく。YQLのJSONPとJSONP-Xでは返ってくるJSONデータの構造が微妙に違う。JSONPでは、</p>
@@ -57,11 +60,12 @@ $.queryYQL(statement, &quot;xml&quot;, function (data) {
 
 <pre><code class="language-js">{
   &quot;query&quot;: {},
-  &quot;results&quot;: []
+    &quot;results&quot;: []
 }
 </code></pre>
 
 <p>と双方がルートにある。単なるYQL側の実装ミスかもしれないので、今後ともこの形かどうかはわからないけど今は注意が必要。10分はまった僕が言うのだから間違いない。</p>
+</section>
 
 <hr>
 

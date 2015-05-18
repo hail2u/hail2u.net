@@ -6,6 +6,7 @@ WebKitでのSVGを背景画像にすると起こるバグ
 
 <p>WebKit以外では自動リサイズが期待される<code>viewBox</code>のみ指定したSVGを背景画像にすると問題なくキレイにリサイズされます。対してWebKitではリサイズされたりされなかったりです。しかもChromeとSafariでは挙動が少し違ったりもし、追求する気が失せるほど挙動不審です。どうも良きに計らってはくれそうにないので、明示的にリサイズを促す方法を探ってみました。</p>
 
+<section>
 <h2><code>background-resize</code>プロパティー</h2>
 
 <pre><code class="language-css">.arrow {
@@ -16,7 +17,9 @@ WebKitでのSVGを背景画像にすると起こるバグ
 <p>まずは背景画像のサイズを指定する<code>background-size</code>プロパティーを使用してみました。するとどうやらSVGをラスタライズしてからリサイズするようで、デモを見ればわかるようにぼやけます。ここでは<code>%</code>を使っていますが、<code>px</code>指定でのリサイズでも同じくぼやけます。</p>
 
 <p>最初のデモと違い、このデモではSVG画像で<code>width</code>と<code>height</code>属性を指定しています。これらの指定がないとそもそもうまくリサイズ出来なかったため、<code>viewBox</code>属性と合わせた数を指定しましたが、その結果ぼやけるという……。</p>
+</section>
 
+<section>
 <h2>SVGの<code>width</code>と<code>height</code>属性で<code>100%</code></h2>
 
 <pre><code class="language-xml">&lt;svg
@@ -26,7 +29,9 @@ WebKitでのSVGを背景画像にすると起こるバグ
 </code></pre>
 
 <p>CSSでのリサイズはラスタライズされてからになってしまうということだと思うので、今度はSVGのルート要素の<code>width</code>と<code>height</code>属性で<code>100%</code>を指定してリサイズさせてみました。今度はうまくいった……と思ったんですが、同じSVG画像を更に使用した場合に片一方のリサイズ結果に引きずられてしまうという現象が起こりました。デモのように左の<code>64px</code>へのリサイズ結果が<code>128px</code>へのリサイズへ影響してしまうということです。場合によっては<code>128px</code>の方が成功して、<code>64px</code>の方が失敗するなどひどく挙動不審です。</p>
+</section>
 
+<section>
 <h2><code>::before</code>擬似要素で！</h2>
 
 <pre><code class="language-css">.arrow {
@@ -43,6 +48,7 @@ WebKitでのSVGを背景画像にすると起こるバグ
 </code></pre>
 
 <p>結局のところ背景画像で使う以上どうにもならなそうな気がしたので、目先を変えて<code>::before</code>擬似要素の<code>content</code>プロパティーでSVGを指定するという方法を試したところすんなりうまく行きました。WebKit以外でも問題ありません。</p>
+</section>
 
 <hr>
 
@@ -66,6 +72,8 @@ WebKitでのSVGを背景画像にすると起こるバグ
 
 <p>パスで書く必要もなさそうだったので、適当に線を組み合わせてカギ型にし、それを<code>transform</code>属性で移動(<code>translate</code>)と回転(<code>rotate</code>)を使ってシンプルなページング向けの矢印を作りました。</p>
 
+<section>
 <h2>追記</h2>
 
 <p>WebKit……というかブラウザのバージョンについて書いていなかったので追記しておきます。バグが起こるのはChrome 15.0.874.121 mとSafari 5.1.2です。Chrome 17.0.963.3 canaryでは完全に直っているので、デスクトップ界では結構すぐに統一されそうですね。</p>
+</section>
