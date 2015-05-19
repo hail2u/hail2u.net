@@ -79,7 +79,7 @@ module.exports = function (grunt) {
 
       feed.item.forEach(function (val) {
         if (val.link) {
-          val.link = val.link.replace("http://hail2u.net/", "/");
+          val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
         }
 
         if (val.pubDate) {
@@ -201,7 +201,7 @@ module.exports = function (grunt) {
           var imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
 
           if (imgs) {
-            var img = imgs[0].replace(/src="http:\/\/hail2u\.net/, "src=\"");
+            var img = imgs[0].replace(/src="https?:\/\/hail2u\.net/, "src=\"");
             data.articles.first.image = img;
             data.articles.first.hasImage = true;
           }
