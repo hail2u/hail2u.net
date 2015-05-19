@@ -99,7 +99,7 @@
             · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
         </footer>
 
-        <div itemprop="articleBody">
+        <main itemprop="articleBody">
 <p itemprop="description">というか<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>のREST APIを叩くスクリプト。<a href="http://validator.nu/">Validator.nu</a>と違って<code>application/x-www-form-urlencoded</code>に対応してるのでQuery Stringモジュールで良く、コア・モジュールだけでいける。けどローカル・ファイルへの対応を加える時にコールバック地獄に堕ちそうなので、<a href="https://github.com/caolan/async/">asyncモジュール</a>でガッとまとめてやるようにした。</p>
 
 <p>まず元になるJavaScriptファイルへのコメントに書かれた<code>@compilation_level</code>などを解釈してオブジェクトにキーを追加していく。<code>@code_url</code>と独自に追加したローカルのJavaScriptファイルのパスを指定する<code>@code_path</code>だけを特別視し、JavaScriptファイルをURLやローカルのパスから読み込む。URLもこちらで読み込んでるのはClosure Compiler Service側のキャッシュが結構強く、問題が起きることがあるため。最後にQuery Stringモジュールでパラメーターに組み立ててPOSTするだけ。</p>
@@ -230,6 +230,7 @@ function loadFromURL(jsurl) {
 
 <p>ファイルの読み込みは順序良く実行される必要はないので、<code>async.parallel()</code>で実行するようにした。ローカルからの読み込みはパスの解決を忘れずに行わないと死ぬ。URLからの読み込みの時はHTTPかHTTPSかをちゃんとチェックするだけ。</p>
 
+<section>
 <h2><code>js_code</code>パラメーター</h2>
 
 <p>Closure Comiler Serviceでは<code>js_code</code>というパラメーターでJavaScriptのコードを渡す。これは複数渡すことができるので、Query Stringモジュールの仕様に従い配列にしてやると良い。ここで適当に<code>;</code>で連結したりしてしまうと残すコメントの位置がおかしくなったりと、コンパイル結果がアレになるので注意が必要。</p>
@@ -237,12 +238,12 @@ function loadFromURL(jsurl) {
 <pre><code class="language-js">var querystring = require('querystring');
 
 querystring.stringify({
-  'js_code': [
+    'js_code': [
     'var foo;',
     'var bar;',
     'var buz;'
-  ]
-})
+    ]
+    })
 </code></pre>
 
 <p>で、</p>
@@ -251,10 +252,11 @@ querystring.stringify({
 </pre>
 
 <p>になる。実際のコードでは<code>async.pararell()</code>のコールバックでファイルやURLのJavaScriptコードの配列が返ってくるようにしたので、それに元JavaScriptファイルに書かれているコードを<code>push()</code>してやるだけで良い。</p>
+</section>
 
 <hr>
 
-<p>はー。</p></div>
+<p>はー。</p></main>
 
         <aside class="share-buttons">
           <ul>
@@ -297,7 +299,7 @@ querystring.stringify({
 
     <aside class="subcontent">
       <!-- Google Custom Search Engine -->
-      <form class="site-search" action="https://www.google.com/cse" role="search">
+      <form class="site-search" action="//www.google.com/cse" role="search">
         <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
         <input name="ie" type="hidden" value="UTF-8">
         <input class="query" name="q" size="32" type="search">
@@ -308,11 +310,11 @@ querystring.stringify({
     <footer class="global-footer" role="contentinfo">
       <section class="footlinks">
         <ul>
-          <li><a href="http://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
-            <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
-            <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
-            <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
-            <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+          <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
         </ul>
       </section>
     
