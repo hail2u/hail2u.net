@@ -218,17 +218,22 @@ module.exports = function (grunt) {
         return next(child.error);
       }
 
+      contents = child.stdout.replace(
+        /^[\s\S]*?\r?\n\r?\n/,
+        ""
+      ).trim() + "\n";
+
       if (file === "index.rss") {
         file = "feed";
       }
 
-      contents = child.stdout.replace(
-        /^[\s\S]*?\r?\n\r?\n/,
-        ""
-      ).replace(
-        /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
-        "$1$2/"
-      ).trim() + "\n";
+      if (file.endsWith(".html")) {
+        contents = contents.replace(
+          /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
+          "$1$2/"
+        );
+      }
+
       file = options.staticdir + file;
       fs.outputFileSync(file, contents);
 
