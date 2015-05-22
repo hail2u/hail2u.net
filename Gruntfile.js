@@ -79,10 +79,6 @@ module.exports = function (grunt) {
             src: [
               "about/how-i-markup-and-style-this-website.png",
               "favicon.svg",
-              "icon/facebook.svg",
-              "icon/feed.svg",
-              "icon/tumblr.svg",
-              "icon/twitter.svg",
               "logo.svg"
             ]
           },
