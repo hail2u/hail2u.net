@@ -56,11 +56,6 @@ module.exports = function (grunt) {
     },
 
     copy: {
-      aco: {
-        dest: "build/styles/colorscheme.aco",
-        src: ["src/css/colorscheme.aco"]
-      },
-
       assets: {
         files: [
           {
@@ -637,7 +632,6 @@ module.exports = function (grunt) {
     "csswring",
     "concat:css",
     "single_charset",
-    "copy:aco",
     "copy:css",
     "copy:styleGuide",
     "copy:woff"
