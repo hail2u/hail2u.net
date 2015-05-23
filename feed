@@ -10,6 +10,31 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>CSS Transformによるセンタリングのベスト・プラクティス</title>
+      <link>http://hail2u.net/blog/webdesign/best-practice-for-css-transform-centering.html</link>
+      <description>上下左右のセンタリングには様々な手法が編み出されてきた。最近はCSS Transformを使う方法がメジャーになりつつある。コンテナーとセンタリングしたい要素のサイズが共に不明でもうまくいくところなど、そこそこ万能感があるのがポイントだろうか。このCSS Transformによるセンタリングは左下に動かしてから右上に戻すパターンと、その逆の右上に動かしてから左下に動かすパターンがある。どちらでも理論的には上手くいくが、ベスト・プラクティスとなりうるのは後者だけだろう。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/best-practice-for-css-transform-centering.html</guid>
+      <pubDate>Sun, 24 May 2015 02:59:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>上下左右のセンタリングには様々な手法が編み出されてきた。最近はCSS Transformを使う方法がメジャーになりつつある。コンテナーとセンタリングしたい要素のサイズが共に不明でもうまくいくところなど、そこそこ万能感があるのがポイントだろうか。このCSS Transformによるセンタリングは左下に動かしてから右上に戻すパターンと、その逆の右上に動かしてから左下に動かすパターンがある。どちらでも理論的には上手くいくが、ベスト・プラクティスとなりうるのは後者だけだろう。</p>
+
+<p>View Demo: <a href="http://hail2u.net/pub/test/631-1.html">Centering Unknown with CSS Transform (top/left)</a></p>
+
+<p>このデモは実際に不具合が起こりうるパターンになっている。センタリングする要素を<code>top</code>と<code>left</code>プロパティーで動かした後、<code>transform: translate(-50%, -50%)</code>で元に戻しているわけだが、Internet Explorer 11では横スクロールバーが出る原因となる。どうやら<code>left</code>と<code>top</code>プロパティーで動かした時点で横スクロールバーの有無が確定してしまうようだ。コンテナー側で<code>overflow</code>プロパティーを使えばアドホックに対処することは可能ではあるが、副作用を伴うのでやらない方が良いだろう。</p>
+
+<p>View Demo: <a href="http://hail2u.net/pub/test/631-2.html">Centering Unknown with CSS Transform (right/bottom)</a></p>
+
+<p>対して<code>right</code>と<code>bottom</code>プロパティーで動かした後、<code>transform: translate(50%, 50%)</code>するパターンでは横スクロールバーが出ることはない。描画領域が拡大しない方向へ動かしているからだ。こちらのパターンには特にデメリットもなく、<code>top</code>と<code>left</code>プロパティーのパターンと比べても極端にコード量が増えるわけでもない(2文字増えるだけだ)。</p>
+
+<p>CSS Transformによるセンタリングの説明では多くの場合、前者の<code>top</code>と<code>left</code>プロパティーを使ったパターンが使われている。その解説は間違っているわけではないが、Internet Explorer 11の挙動を考慮すると<code>right</code>と<code>bottom</code>プロパティーを使ったパターンが安定していると言え、ベスト・プラクティス足りえる。</p>
+
+<hr>
+
+<p>僕はこのCSS Transformによるセンタリングには欠点があると感じていて、あまり多用はしないようにしている。その欠点とは動かした要素がブラーがかかったようにぼやけることがあることだ。以前からWindowsのChromeでは多発する。文字はぼやけないのでわかりづらい(気づきづらい)が、幾何学的なシャープな画像を動かしてみたりすると気づきやすい。再現条件がよくわからないのでサンプルもうまく作れない。</p>
+
+<p>ともあれ上下左右の中央寄せには選択肢は多くないので、結局は使わざるを得ない。<code>position</code>プロパティーでも<code>background-position</code>プロパティーのような配置ができれば良いのになとたまに思う。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Instapaper</title>
       <link>http://hail2u.net/blog/internet/hello-instapaper.html</link>
       <description>Readabilityを愛して止まなかっただけど、結構な頻度で読めない、または画像がうまく出ないみたいな感じになってきたので、遂に諦めてInstapaperに乗り換えた。特に良いなと思ったところもないけれど、悪いと思ったところもまるでない。日付やお気に入りを維持してインポートすることができ、スムーズに乗り換えることができた。</description>
@@ -248,32 +273,6 @@
 <p>これでSettings→Startupで<q>Auto save/restore opened tabs</q>を有効にしていると、再起動時に<code>bash.exe</code>をシェルにしたタブがうまく復元されるようになる。</p>]]></content:encoded>
     </item>
     <item>
-      <title>Safariにおける日本語の文章に対する下線</title>
-      <link>http://hail2u.net/blog/webdesign/underline-of-japanese-text-on-safari.html</link>
-      <description>(Mobile )Safari 7.1より下線がディセンダーに重ならずに引かれるようになった。主にリンクの下線で確認することができる。概ね問題なく期待通りにうまく機能しているものと考えていたが、日本語の文章ではそれなりの確率(再現条件はよくわからない)でおかしくなることを知った。例えば上記スクリーンショットでは、大きめのグリフを持つ「作」や「安」などで下線が途切れているように見える。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/underline-of-japanese-text-on-safari.html</guid>
-      <pubDate>Thu, 14 May 2015 03:41:00 +0900</pubDate>
-      <content:encoded><![CDATA[<figure>
-  <a href="http://hail2u.net/images/blog/safari-text-underline-and-japanese-text.png"><img alt="(Mobile )Safari 7.1以降では、アルファベットのディセンダーのみでなく、日本語の一部グリフでも下線が途切れることがある" height="627" src="http://hail2u.net/images/blog/safari-text-underline-and-japanese-text.png" width="1200"></a>
-</figure>
-
-<p>(Mobile )Safari 7.1より下線がディセンダーに重ならずに引かれるようになった。主にリンクの下線で確認することができる。概ね問題なく期待通りにうまく機能しているものと考えていたが、日本語の文章ではそれなりの確率(再現条件はよくわからない)でおかしくなることを知った。例えば上記スクリーンショットでは、大きめのグリフを持つ「作」や「安」などで下線が途切れているように見える。</p>
-
-<p>Safariでこの機能は、現状では一部実装に留まるものの、CSSの<a href="http://www.w3.org/TR/css-text-decor-3/#text-decoration-skip-property"><code>text-decoration-skip</code>プロパティー</a>を使って実装されている。仕様で定義されている<code>ink</code>という値の実装というわけだ。つまり同じくこのプロパティーを利用することで、挙動を他のブラウザーと合わせることが可能になる。</p>
-
-<pre><code>a {
-  -webkit-text-decoration-skip: none;
-}
-</code></pre>
-
-<hr>
-
-<p>下線がきれいに見えるかどうかは、ディセンダーとの重なりよりもその色と太さにあると考えられる。またこのディセンダーとの重なりをスキップする機能は、日本語のウェブサイトで大きな力を発揮するわけでもない。対して日本語の文章で一部完全に途切れたような形になることは大きな欠点と言えそうだ。安定した表示を求めるのなら、この機能は無効にしておいたほうが無難だろう。</p>
-
-<p><code>text-decoration-color</code>プロパティーを始めとした<a href="http://www.w3.org/TR/css-text-decor-3/">CSS Text Decoration Module Level 3</a>で定義されているプロパティー群の実装は進みつつある。下線、ことリンクの下線の改良については、それらが安心して使えるようになってから改めて考えることにしたい。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -308,6 +307,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sat, 23 May 2015 10:57:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 24 May 2015 02:59:00 +0900</lastBuildDate>
   </channel>
 </rss>
