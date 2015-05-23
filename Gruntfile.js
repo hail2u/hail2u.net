@@ -321,7 +321,7 @@ module.exports = function (grunt) {
       }
     },
 
-    "single_charset": {
+    singleCharset: {
       options: {
         map: true
       },
@@ -627,7 +627,7 @@ module.exports = function (grunt) {
     "css_mqpacker",
     "csswring",
     "concat:css",
-    "single_charset",
+    "singleCharset",
     "copy:css",
     "copy:styleGuide",
     "copy:woff"
