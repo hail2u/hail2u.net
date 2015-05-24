@@ -19,12 +19,7 @@ module.exports = function (grunt) {
 
       css: {
         files: {
-          "tmp/style.min.css": [
-            "tmp/eau-douce.min.css",
-            "tmp/mplus-1m-latin.min.css",
-            "tmp/niconne.min.css",
-            "tmp/style.min.css"
-          ]
+          "tmp/style.min.css": ["tmp/style.min.css"]
         }
       },
 
@@ -96,23 +91,6 @@ module.exports = function (grunt) {
               "toggle-outline.js",
               "toggle-tagline.js"
             ]
-          },
-          {
-            cwd: "src/woff/",
-            dest: "src/css/assets/fonts/",
-            expand: true,
-            src: [
-              "eau-douce/b.woff",
-              "eau-douce/b.woff2",
-              "eau-douce/r.woff",
-              "eau-douce/r.woff2",
-              "mplus-1m-latin/b.woff",
-              "mplus-1m-latin/b.woff2",
-              "mplus-1m-latin/r.woff",
-              "mplus-1m-latin/r.woff2",
-              "niconne/r-26.woff",
-              "niconne/r-26.woff2"
-            ]
           }
         ]
       },
@@ -124,24 +102,6 @@ module.exports = function (grunt) {
         src: [
           "*.css",
           "*.css.map"
-        ]
-      },
-
-      cssPathRewrite: {
-        options: {
-          process: function (content) {
-            return content.replace(/"assets\/(.*?)"/g, "\"../$1\"");
-          }
-        },
-
-        cwd: "tmp/",
-        dest: "tmp/",
-        expand: true,
-        ext: ".css",
-        src: [
-          "eau-douce.css",
-          "mplus-1m-latin.css",
-          "niconne.css"
         ]
       },
 
@@ -212,24 +172,6 @@ module.exports = function (grunt) {
 
         dest: "build/about/style-guide/index.html",
         src: "src/css/test.html"
-      },
-
-      woff: {
-        cwd: "src/woff/",
-        dest: "build/fonts/",
-        expand: true,
-        src: [
-          "eau-douce/b.woff",
-          "eau-douce/b.woff2",
-          "eau-douce/r.woff",
-          "eau-douce/r.woff2",
-          "mplus-1m-latin/b.woff",
-          "mplus-1m-latin/b.woff2",
-          "mplus-1m-latin/r.woff",
-          "mplus-1m-latin/r.woff2",
-          "niconne/r-26.woff",
-          "niconne/r-26.woff2"
-        ]
       }
     },
 
@@ -313,9 +255,6 @@ module.exports = function (grunt) {
           "debug.scss",
           "documents.scss",
           "natural.scss",
-          "eau-douce.scss",
-          "mplus-1m-latin.scss",
-          "niconne.scss",
           "style.scss"
         ]
       }
@@ -623,14 +562,12 @@ module.exports = function (grunt) {
   grunt.registerTask("build:css", [
     "clean",
     "sass",
-    "copy:cssPathRewrite",
     "css_mqpacker",
     "csswring",
     "concat:css",
     "singleCharset",
     "copy:css",
-    "copy:styleGuide",
-    "copy:woff"
+    "copy:styleGuide"
   ]);
 
   grunt.registerTask("build:html", [
