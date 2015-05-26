@@ -10,12 +10,40 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 26 May 2015 12:49:22 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 27 May 2015 06:07:09 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>scss-lint.sh</title>
+      <link>http://hail2u.net/blog/software/scss-lint-sh.html</link>
+      <description>SCSS Lintがv0.34.0から設定ファイルを上流から探さなくなった。カレント・ディレクトリーから探して見つからなかったらユーザーのホーム・ディレクトリーから探すようにはったようだが、プロジェクトのルート・ディレクトリーから探すようにはならないようだ。イシューを立てようかと思ったのだけど上流から探す機能をわざわざ削除したことの意味を調べるのが面倒くさかったので、シェル・スクリプトからプロジェクトのルート・ディレクトリーに.scss-lint.ymlがある場合はそれを使うようなラッパー・スクリプトを書くことにした。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/scss-lint-sh.html</guid>
+      <pubDate>Wed, 27 May 2015 06:07:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/brigade/scss-lint">SCSS Lint</a>がv0.34.0から設定ファイルを上流から探さなくなった。カレント・ディレクトリーから探して見つからなかったら<a href="https://github.com/brigade/scss-lint/pull/452">ユーザーのホーム・ディレクトリーから探すようにはった</a>ようだが、プロジェクトのルート・ディレクトリーから探すようにはならないようだ。イシューを立てようかと思ったのだけど上流から探す機能をわざわざ削除したことの意味を調べるのが面倒くさかったので、シェル・スクリプトからプロジェクトのルート・ディレクトリーに<code>.scss-lint.yml</code>がある場合はそれを使うようなラッパー・スクリプトを書くことにした。</p>
+
+<pre><code>#!/bin/sh
+
+b=${GEM_HOME}/bin/scss-lint
+r=`git rev-parse --show-cdup 2&gt;/dev/null`
+c=${r}.scss-lint.yml
+
+if [ $? -eq 0 ] &amp;&amp; [ -e $c ]; then
+  ${b} -c ${c} $*
+else
+  ${b} $*
+fi
+</code></pre>
+
+<p>Gitの<code>rev-parse</code>サブコマンドで<code>--show-cdup</code>を使うと、<code>.git</code>ディレクトリーのあるディレクトリー、つまりプロジェクトのルート・ディレクトリーまでの相対パスが取得できる。これと<code>.scss-lint.yml</code>を連結してファイル・テスト演算子で存在チェックし、あった場合は<code>-c</code> (--config)オプションで設定を渡してやるようにする。オリジナルの<code>scss-lint</code>の実行ファイルは<code>$GEM_HOME</code>から探す。</p>
+
+<p><a href="http://hail2u.net/pub/test/scss-lint.sh">このシェル・スクリプト</a>に<code>scss-lint</code>という名前をつけて、パスの通ったディレクトリーかつ<code>$GEM_HOME/bin/scss-lint</code>より先に見つかるディレクトリーに置けばそっくり入れ替えることができる。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>夢</title>
@@ -280,23 +308,6 @@
 
 <p>デモにいくつかあったバグを潰しておいた。うまく動かなかったと思った人は再度見てみてほしい。潰したバグは、Internet Explorer 11で<code>CSSStyleDeclaration.transform = &#39;initial&#39;</code>が無視されるバグと、ベンダー拡張プリフィックスのつけ忘れにより(Mobile )Safari 8でアニメーションできないバグの2つ。</p>
 </section>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>The End (SVG)</title>
-      <link>http://hail2u.net/blog/misc/the-end-svg.html</link>
-      <description>重い腰を上げ、そこかしこで使っているプロフィール画像のSVG化を始めた。再現度は7割くらいまでは到達したように思う。この画像はその未完のものをPNGにエクスポートした。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/the-end-svg.html</guid>
-      <pubDate>Sun, 17 May 2015 06:24:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="http://hail2u.net/images/blog/the-end.png"><img alt="The End" height="627" src="http://hail2u.net/images/blog/the-end.png" width="1200"></a>
-</figure>
-
-<p>重い腰を上げ、そこかしこで使っているプロフィール画像のSVG化を始めた。再現度は7割くらいまでは到達したように思う。この画像はその未完のものをPNGにエクスポートした。</p>
-
-<p>ビットマップをトレースするのではなく、長方形でちゃんと作り、それを変形することで再現している。変形のパラメーターの調節よりも元の長方形の再現が大変で苦労している。</p>]]></content:encoded>
     </item>
 
   </channel>
