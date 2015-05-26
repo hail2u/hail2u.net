@@ -4,28 +4,32 @@
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
 
-    <title>Pseudo table-cell</title>
+    <title>Pseudo Display on Resize</title>
 
+    <link href="http://hail2u.net/styles/natural.min.css" rel="stylesheet">
     <style>
-      .test ul {
-        padding-left: 0;
-      }
-
       .test ul::before {
         content: 'lorem';
-        display: table-cell;
       }
 
+      .test ul::before,
       .test li {
-        display: table-cell;
+        display: block;
+      }
+
+      @media (max-width: 640px) {
+        .test ul::before,
+        .test li {
+          display: table-cell;
+        }
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Pseudo table-cell</h1>
+      <h1>Pseudo Display on Resize</h1>
 
-      <p>擬似要素を<code>table-cell</code>にし、それと隣接することになる普通の要素を<code>table-cell</code>にした場合にどう表示されるか。</p>
+      <p>擬似要素とその隣接する要素が<code>block</code>の状態から、ブラウザーをリサイズするとそれらが<code>table-cell</code>になるようにメディア・クエリーを使って調節した場合、Chrome 43では擬似要素だけ<code>table-cell</code>に変化しない。</p>
     </header>
 
     <section class="test in-block">
@@ -37,6 +41,10 @@
         <li>sit</li>
         <li>amet</li>
       </ul>
+
+      <p>このリストでは擬似要素(lorem)とそれ以外のリスト項目(ipsum…amet)が<code>display: block</code>になるように指定してあり、幅640px以上のウィンドウでは縦並びになる。幅640pxを切ると<code>display: table-cell</code>に切り替わるため、横並びになるはずだが、Chrome 43では擬似要素のみ<code>display: block</code>のままのようにレンダリングされる。</p>
+
+      <p>なおリサイズして切り替えた場合にのみ起こるため、幅640px以下の状態で再読み込みした場合はちゃんと横並びになる。</p>
     </section>
   </body>
 </html>
