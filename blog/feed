@@ -10,12 +10,63 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 1 Jun 2015 12:05:52 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 2 Jun 2015 03:10:44 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>プレースホルダーのスタイルにおけるノーマリゼーション</title>
+      <link>http://hail2u.net/blog/webdesign/placeholder-normalization.html</link>
+      <description>テキスト入力コントロールにplaceholder属性を使って入力例を表示することができるようになってから、もうかなりの年月がたった。悪用されてもいるが、わかりやすいフォームには不可欠になりつつある程度には浸透したと言ってよいだろう。ただMozilla Developer Networkのグローバル・ナビゲーションに設置されている検索フォームのようにそのスタイリングに失敗しているケースはままある(Chrome 43だと入力済みかどうかまったく判断できない)。そういった失敗を極力減らすためには、Firefoxのようにopacityプロパティーを使ってノーマライズしてやるのが良いだろう。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/placeholder-normalization.html</guid>
+      <pubDate>Tue, 02 Jun 2015 03:10:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p >テキスト入力コントロールに<code>placeholder</code>属性を使って入力例を表示することができるようになってから、もうかなりの年月がたった。悪用されてもいるが、わかりやすいフォームには不可欠になりつつある程度には浸透したと言ってよいだろう。ただ<a href="https://developer.mozilla.org/">Mozilla Developer Networkのグローバル・ナビゲーションに設置されている検索フォーム</a>のようにそのスタイリングに失敗しているケースはままある(Chrome 43だと入力済みかどうかまったく判断できない)。そういった失敗を極力減らすためには、Firefoxのように<code>opacity</code>プロパティーを使ってノーマライズしてやるのが良いだろう。</p>
+
+<p>ではFirefoxの挙動に合わせるようにノーマリゼーションする場合はどのようにCSSを書くことになるのだろうか。</p>
+
+<p>Firefoxではユーザー・エージェントCSSで<code>opacity</code>の値に<code>0.54</code>を指定している(以前は<code>0.4</code>だったようだが、Firefox 38では<code>0.54</code>のようだ)。これと他のブラウザー及びウェブ標準での挙動を合わせるためには以下のように書く必要がある。</p>
+
+<pre><code >/*
+<mark>::-moz-placeholder</mark> {
+  color: inherit;
+  opacity: .54;
+}
+*/
+
+<mark>::-ms-input-placeholder</mark> {
+  color: inherit;
+  opacity: .54;
+}
+
+<mark>::-webkit-input-placeholder</mark> {
+  color: inherit;
+  opacity: .54;
+}
+
+<mark>:placeholder-shown</mark> {
+  opacity: .54;
+}
+</code></pre>
+
+<p>プレースホルダー文字列のスタイルは、Internet Explorer 10以降では<code>::-ms-input-placeholder</code>擬似要素で、ChromeやSafariでは<code>::-webkit-input-placeholder</code>擬似要素、そしてSelectors Level 4となることになるウェブ標準仕様では<a href="http://www.w3.org/TR/2013/WD-selectors4-20130502/#placeholder"><code>:placeholder-shown</code><em>擬似クラス</em></a>になる予定で、それぞれ行うことができる。ウェブ標準では擬似クラスになっていることは頭の隅に入れておいた方がよいが、まだこれに従った実装はない。</p>
+
+<p>現行ブラウザー群の実装では擬似要素になっていることと、Internet ExplorerやChromeで決め打ちで色が指定されていることから、<code>color</code>プロパティーを<code>inherit</code>にしておく(<code>initial</code>でも悪くない)。ウェブ標準では擬似クラスのため<code>color</code>プロパティーを<code>inherit</code>にする必要はなくなる。<a href="http://hail2u.net/blog/webdesign/unknown-css-selector.html">不明なセレクターによるルールセットの無視</a>が起こらないように、それぞれのルールセットは別々に記述していく必要がある。</p>
+
+<p>Firefoxの挙動に合わせるので<code>::-moz-placeholder</code>の記述は不要だが、コメントで残しておいた。</p>
+
+<hr>
+
+<p>Firefoxが単に<code>grayText</code>キーワードや特定の色を指定しないようになった理由には、ユーザーの設定やテーマの設定によりフォーム要素の背景が何色になるか変化するからなどいくつかの理由は思い当たる。最適解ではない(制作者が色を指定したい時に<code>opacity</code>プロパティーを戻さなければならない)が、悪くはないデフォルト値ではあるだろう。</p>
+
+<p>ウェブサイト制作者サイドから見てドキュメントのCSSでも<code>opacity</code>プロパティーを使う理由はあまりない。しかしユーザー側から見ると<em>常に入力テキストよりもコントラストが下がった色</em>でプレースホルダー文字列が表示されるということはそれなりにメリットがあると考えられる。ユーザーは入力例はグレーの文字列で表示されているというよりも、薄い色の文字で表示されていると捉えているからだ。</p>
+
+<p>フォーム要素の前景色と背景色のコントラストが十分に確保されているという前提だと、プレースホルダー文字列の色は色相は変えずコントラストを落とすだけにするのがもっともわかりすい。色相を変えてしまうと特別な意味や機能が存在するように捉えられる可能がある上、デフォルトの<em>薄い文字</em>という感覚からかけ離れてしまう。もちろんそれぞれのウェブサイトのカラースキームを元にして完璧な色を追求するのも良いが、多くの場合は<code>opacity</code>プロパティーをうまく使ってノーマリゼーションというレベルで行うだけで十二分に機能させることが可能だろう。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>MN</title>
@@ -288,25 +339,6 @@ fi
 <p>僕はこのCSS Transformによるセンタリングには欠点があると感じていて、あまり多用はしないようにしている。その欠点とは動かした要素がブラーがかかったようにぼやけることがあることだ。以前からWindowsのChromeでは多発する。文字はぼやけないのでわかりづらい(気づきづらい)が、幾何学的なシャープな画像を動かしてみたりすると気づきやすい。再現条件がよくわからないのでサンプルもうまく作れない。</p>
 
 <p>ともあれ上下左右の中央寄せには選択肢は多くないので、結局は使わざるを得ない。<code>position</code>プロパティーでも<code>background-position</code>プロパティーのような配置ができれば良いのになとたまに思う。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Instapaper</title>
-      <link>http://hail2u.net/blog/internet/hello-instapaper.html</link>
-      <description>Readabilityを愛して止まないのだけど、結構な頻度で読めない、または画像がうまく出ないみたいな感じになってきたので、遂に諦めてInstapaperに乗り換えた。特に良いなと思ったところもないけれど、悪いと思ったところもまるでない。日付やお気に入りを維持してインポートすることができ、スムーズに乗り換えることができた。</description>
-      <category>Internet</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/internet/hello-instapaper.html</guid>
-      <pubDate>Sat, 23 May 2015 10:57:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p ><a href="https://www.readability.com/">Readability</a>を愛して止まないのだけど、結構な頻度で読めない、または画像がうまく出ないみたいな感じになってきたので、遂に諦めて<a href="https://www.instapaper.com/">Instapaper</a>に乗り換えた。特に良いなと思ったところもないけれど、悪いと思ったところもまるでない。日付やお気に入りを維持してインポートすることができ、スムーズに乗り換えることができた。</p>
-
-<p>ウェブ側では不満はまったくないけれど、Chrome拡張はReadabilityのものの方が即読み始めることができて良いかなと思った。このあたりの読むフローを変える必要がありそう。送って後で読むというスタイルだと読むの忘れるので、送りつつ読む方が性に合っていそうなことを考えると、公式の拡張ではないやつを使った方が良いのかもしれない。</p>
-
-<p>もうひとつ想定外だったのはReederが読む方に対応していなかったこと。てっきりサポートされているかと思ったけどそんなことは全然なかった。これは公式アプリに慣れるしかなさそうだ。</p>
-
-<hr>
-
-<p><a href="https://github.com/hail2u/drawic/blob/master/instapaper.svg">アイコン</a>は作った。</p>]]></content:encoded>
     </item>
 
   </channel>
