@@ -73,8 +73,10 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               "about/how-i-markup-and-style-this-website.png",
+              "asterisk.svg",
               "favicon.svg",
-              "logo.svg"
+              "logo.svg",
+              "magnifying-glass.svg"
             ]
           },
           {
