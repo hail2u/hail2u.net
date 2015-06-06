@@ -393,12 +393,6 @@ module.exports = function (grunt) {
           all: true,
           index: true
         }
-      },
-
-      preview: {
-        options: {
-          preview: true
-        }
       }
     },
 

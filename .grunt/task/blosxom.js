@@ -8,7 +8,6 @@ module.exports = function (grunt) {
     var ProgressBar = require("progress");
     var async = require("async");
     var fs = require("fs-extra");
-    var marked = require("marked");
     var path = require("path");
     var spawn = require("child_process").spawnSync;
     var which = require("which").sync;
@@ -24,99 +23,9 @@ module.exports = function (grunt) {
       all: false,
       feed: false,
       index: false,
-      preview: false,
       reindex: false
     });
     fileCache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
-
-    if (options.preview) {
-      var body = fs.readFileSync(entry, "UTF-8").split("\n");
-      var filePreview = path.resolve(process.cwd(), "tmp/__preview.html");
-      var preview = function () {/*
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width" name="viewport">
-
-    <title><%TITLE%> - Weblog - Hail2u.net</title>
-
-    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
-    <link href="/feed" rel="alternate" type="application/rss+xml">
-
-    <link href="/styles/style.min.css" rel="stylesheet">
-
-    <script async src="/scripts/main.min.js"></script>
-  </head>
-
-  <body>
-    <header class="global-header" role="banner">
-      <nav>
-        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
-
-        <ul class="site-navigation">
-          <li><a href="/blog/"><mark>Weblog</mark></a></li>
-          <li><a href="/documents/">Documents</a></li>
-          <li><a href="/about/">About</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <main class="content">
-      <article role="main">
-        <h1 class="first-heading"><%TITLE%></h1>
-
-        <footer class="section-footer">
-          <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under <span class="tag"><a href="#">Preview</a></span></p>
-        </footer>
-
-        <%BODY%>
-      </article>
-    </main>
-
-    <aside class="subcontent">
-      <!-- Google Custom Search Engine -->
-      <form class="site-search" action="https://www.google.com/cse" role="search">
-
-        <input name="cx" type="hidden" value="partner-pub-8712792805045949:3747342316">
-        <input name="ie" type="hidden" value="UTF-8">
-        <input class="query" name="q" size="32" type="search">
-        <input class="button" name="sa" type="submit" value="Search">
-      </form>
-    </aside>
-
-    <footer class="global-footer" role="contentinfo">
-      <section class="footlinks">
-        <ul>
-          <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
-          <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
-          <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
-          <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
-          <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
-        </ul>
-      </section>
-
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
-    </footer>
-  </body>
-</html>
-      */}.toString().split("\n").slice(1, -1).join("\n");
-      var title = body.shift().replace(/\$/g, "$$$$");
-      body = body.join("\n").replace(/\$/g, "$$$$");
-
-      if (!/<\/\w+>\s*$/.test(body)) {
-        body = marked(body, {
-          langPrefix: "language-"
-        });
-      }
-
-      body = body.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
-      preview = preview.replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body).replace(/="\//g, "=\"../build/");
-      fs.outputFileSync(filePreview, preview);
-      grunt.log.writeln("File \"" + filePreview + "\" created.");
-
-      return done(spawn(which("open"), [filePreview]).error);
-    }
 
     if (options.feed) {
       files.push("index.rss");
