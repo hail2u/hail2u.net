@@ -40,16 +40,6 @@ module.exports = function (grunt) {
       }
     },
 
-    connect: {
-      main: {
-        options: {
-          base: "build/",
-          keepalive: true,
-          open: true
-        }
-      }
-    },
-
     copy: {
       assets: {
         files: [
