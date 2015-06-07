@@ -32,6 +32,7 @@ module.exports = function (grunt) {
           "tmp/main.min.js": [
             "tmp/_string_endswith.min.js",
             "tmp/lightbox.min.js",
+            "tmp/load-css.min.js",
             "tmp/nohashtop.min.js",
             "tmp/toggle-logo-action.min.js",
             "tmp/unutm.min.js"
@@ -76,12 +77,30 @@ module.exports = function (grunt) {
             src: [
               "_string_endswith.js",
               "lightbox.js",
+              "load-css.js",
               "nohashtop.js",
               "toggle-column.js",
               "toggle-eyecatch.js",
               "toggle-logo-action.js",
               "toggle-outline.js",
               "toggle-tagline.js"
+            ]
+          },
+          {
+            cwd: "src/woff/",
+            dest: "src/css/assets/fonts/",
+            expand: true,
+            src: [
+              "eau-douce/b.woff",
+              "eau-douce/b.woff2",
+              "eau-douce/r.woff",
+              "eau-douce/r.woff2",
+              "niconne/r-26.woff",
+              "niconne/r-26.woff2",
+              "mplus-1m-latin/b.woff",
+              "mplus-1m-latin/b.woff2",
+              "mplus-1m-latin/r.woff",
+              "mplus-1m-latin/r.woff2"
             ]
           }
         ]
@@ -132,6 +151,7 @@ module.exports = function (grunt) {
         files: {
           "tmp/_string_endswith.js": "src/js/_string_endswith.js",
           "tmp/lightbox.js": "src/js/lightbox.js",
+          "tmp/load-css.js": "src/js/load-css.js",
           "tmp/nohashtop.js": "src/js/nohashtop.js",
           "tmp/toggle-column.js": "src/js/toggle-column.js",
           "tmp/toggle-eyecatch.js": "src/js/toggle-eyecatch.js",
@@ -164,6 +184,24 @@ module.exports = function (grunt) {
 
         dest: "build/about/style-guide/index.html",
         src: "src/css/test.html"
+      },
+
+      woff: {
+        cwd: "src/woff/",
+        dest: "build/fonts/",
+        expand: true,
+        src: [
+          "eau-douce/b.woff",
+          "eau-douce/b.woff2",
+          "eau-douce/r.woff",
+          "eau-douce/r.woff2",
+          "niconne/r-26.woff",
+          "niconne/r-26.woff2",
+          "mplus-1m-latin/b.woff",
+          "mplus-1m-latin/b.woff2",
+          "mplus-1m-latin/r.woff",
+          "mplus-1m-latin/r.woff2"
+        ]
       }
     },
 
@@ -234,10 +272,8 @@ module.exports = function (grunt) {
         expand: true,
         ext: ".css",
         src: [
-          "debug.scss",
-          "documents.scss",
-          "natural.scss",
-          "style.scss"
+          "*.scss",
+          "!_*.scss"
         ]
       }
     },
@@ -541,7 +577,8 @@ module.exports = function (grunt) {
     "concat:css",
     "singleCharset",
     "copy:css",
-    "copy:styleGuide"
+    "copy:styleGuide",
+    "copy:woff"
   ]);
 
   grunt.registerTask("build:html", [
