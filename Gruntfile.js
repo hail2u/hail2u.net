@@ -216,16 +216,6 @@ module.exports = function (grunt) {
       }
     },
 
-    "pubsubhubbub_publish": {
-      main: {
-        hubUrl: "http://hail2u.net/feed"
-      },
-
-      blog: {
-        hubUrl: "http://hail2u.net/blog/feed"
-      }
-    },
-
     sass: {
       options: {
         precision: 3,
@@ -523,7 +513,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-png2ico");
-  grunt.loadNpmTasks("grunt-pubsubhubbub_publish");
   grunt.loadNpmTasks("grunt-svg-rasterizer");
   grunt.loadNpmTasks("grunt-svgmin");
   grunt.loadNpmTasks("postcss-single-charset");
@@ -604,10 +593,6 @@ module.exports = function (grunt) {
   grunt.registerTask("deploy:js", [
     "build:js",
     "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("ping", [
-    "pubsubhubbub_publish"
   ]);
 
   grunt.registerTask("publish:blog", [
