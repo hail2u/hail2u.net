@@ -10,6 +10,53 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>無限スクロール向け雑なローディング画像</title>
+      <link>http://hail2u.net/blog/webdesign/easy-loading-marker-for-infinite-scroll.html</link>
+      <description>無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/easy-loading-marker-for-infinite-scroll.html</guid>
+      <pubDate>Wed, 10 Jun 2015 03:15:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p >無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。</p>
+
+<p >View Demo: <a href="http://hail2u.net/pub/test/634.html">Easy Loading Marker for Infinite Scroll</a></p>
+
+<p>デモでは90%ほどスクロールすると無限スクロールっぽくコンテンツが少し時間をおいてから追加される。コンテナーである<code>#content</code>の最下部には常にローディング画像を背景画像として表示してあるので、特に操作することなく無限スクロールのためにコンテンツを読込中であることを示すことができる。SVGアニメーションでローディング画像を作ったためInternet Explorer 11では回らないが、おおまかにどういう挙動をするのかはわかることだろう。</p>
+
+<p>こういった雑なローディング画像の実装には利点が3つ挙げられる。</p>
+
+<ul>
+<li>コンテンツの読み込み以外のコードを書く必要がなくなる</li>
+<li>ローディング画像が必要(とされそう)な時に即表示される</li>
+<li>レンダリングのコストを下げられる</li>
+</ul>
+
+<section>
+<h2>コード</h2>
+
+<p>単純にローディング画像の挿入と削除を担当するコードがなくなり、ローディング画像の状態を保存する必要もなくなる。アニメーションGIFではなくスケーラブルにしたい場合も、デモのようにSVGアニメーションで完結させれば、HTMLへ空要素の挿入が必要ない(CSSでやる場合は擬似要素のアニメーションという点でいろいろあるので空要素などが必要になる)。もちろんCSSのコードが単純明快になるという点も見逃せない。</p>
+</section>
+
+<section>
+<h2>ローディング画像の表示</h2>
+
+<p>常に表示されているので、パフォーマンスを考慮したスクロール・イベントの間引きによる若干の遅延に影響を受けない。もちろんコンテンツの挿入そのもの自体は影響を受けるが、ローディング画像の表示においては影響を受けず、長めにアニメーションするだけになる。</p>
+</section>
+
+<section>
+<h2>レンダリング・コスト</h2>
+
+<p>画面外で常にアニメーションをさせることにはそれなりにコストはあるが、突然DOMに要素を追加(リフローやリレイアウト)し、アニメーションを開始(アニメーションの初期化コスト)するよりは低い。デモの場合はSVG内で完結させており、GPUのサポートも期待できる。</p>
+</section>
+
+<hr>
+
+<p>欠点としては無限スクロール中のエラーに対して弱いことだ。追加コンテンツの読み込みとローディング画像の表示が完全に分離しているので、エラーが起きた時だけ両者を連動させる必要が出てくる。追加コンテンツの読み込み側ではエラー時にクラスを振るだけに留め、ローディング画像の表示と同じく簡単なCSSで見えなくしてやるのが妥当か。</p>
+
+<hr>
+
+<p>無限スクロールにおいては、ローディング画像などを表示することなく必要そうになる前に読み込み挿入しておく方が実装としては理想に近い。しかしその理想を実現するまでには、コンテンツを送る側のパフォーマンスやいつ読み込み始めるかのタイミング、ユーザーの回線への負担など解決が必要な問題がいくつもある。まずは実装ということを考えると、この雑なローディング画像は面倒がなく、便利に使っている。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>夢</title>
       <link>http://hail2u.net/blog/misc/dreaming-20150603.html</link>
       <description>近くに昨日できた山が噴火する。そこから直径5mくらいの岩が降ってくるので、必死で避ける。避ける。3時間くらい避けたら岩の代わりにコインが降ってくるようになった。「コインだ！金だ！」と思って触ったら死んだ。ところで目が覚めた。</description>
@@ -287,59 +334,6 @@ jsdom.env(
 <p>等幅フォントを使ったプレビュー以外のフォントは、同じGoogle Fontsから<a href="https://www.google.com/fonts/specimen/Libre+Baskerville">Libre Baskerville</a>を使った。Boldの斜体がないのが残念なこと以外は使いやすく、よく使う。同じデザインでセリフのフォントをプレビューするものも作りたくなった。</p>]]></content:encoded>
     </item>
     <item>
-      <title>横浜散歩</title>
-      <link>http://hail2u.net/blog/misc/strolling-in-yokohama.html</link>
-      <description>5/27は天気が良かったので横浜まで行ったものの、海を見に行くところまでは辿りつけなかった。暑すぎた。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/strolling-in-yokohama.html</guid>
-      <pubDate>Sun, 31 May 2015 00:12:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p >5/27は天気が良かったので横浜まで行ったものの、海を見に行くところまでは辿りつけなかった。暑すぎた。</p>
-
-<figure >
-<a href="http://hail2u.net/images/blog/strolling-in-yokohama-joinus-the-diamond.jpg"><img alt="希少になったザ・ダイヤモンドだけしか書かれていないロゴ" height="2448" src="http://hail2u.net/images/blog/strolling-in-yokohama-joinus-the-diamond.jpg" width="2448" ></a>
-<figcaption>ザ・ダイアモンド西口側入り口アーケード</figcaption>
-</figure>
-
-<p>相鉄ジョイナスとザ・ダイヤモンドの合体が完了してた。新しいターゲット層と合わないというよりも、自分が老いて勝手にターゲット層から外れただけだった。ザ・ダイヤモンドとくっついた結果、ところどころ変な段差があったり、5段くらいのエスカレーターがあったりした。苦労の跡は感じる。</p>
-
-<p>有隣堂がまとまって広く綺麗になったのはすごく良い。突然マンガの生原稿が並んでるだけの一角があったりするのは微妙な感じだと思われてそうでなんか辛い。全体的に照明が暗めで、静かな雰囲気はあるのだけど、雑誌とか美術書のあたりで致命的な感じがする。とにかくスーパーの魚の匂いが届かなくなっただけで気分が良い。</p>
-
-<figure >
-<a href="http://hail2u.net/images/blog/strolling-in-yokohama-nishiguchi-lumine.jpg"><img alt="西口ルミネの看板" height="2448" src="http://hail2u.net/images/blog/strolling-in-yokohama-nishiguchi-lumine.jpg" width="2448"></a>
-<figcaption>西口ルミネ入り口</figcaption>
-</figure>
-
-<p>何がなんだかよくわからないままずっとそこにあって見てた西口ルミネは5/31で終わるみたいだ。</p>
-
-<p>ロゴはちょっと好きだった。西口って横にちょこっと付けただけみたいなのは、肩肘張った感じがせずバランス良い。西なのに右にあって、ちょっと東っぽいとはずっと思ってる。</p>
-
-<figure >
-<a href="http://hail2u.net/images/blog/strolling-in-yokohama-sogo.jpg"><img alt="からくり時計横のそごうのロゴ" height="2448" src="http://hail2u.net/images/blog/strolling-in-yokohama-sogo.jpg" width="2448"></a>
-<figcaption>横浜そごう正面入り口</figcaption>
-</figure>
-
-<p>そごうの地下食料品売り場にちょいちょいセブンプレミアムの商品が置いてあったり、専用のコーナーがあったりしたけど、誰も立ち止まってなかった。僕は立ち止まった。</p>
-
-<p>富澤商店で頼まれてた紅茶を買って、昼飯用にメゾンカイザーでパンを買った。アンデルセンとメゾンカイザーが並んでるとさすがに迷う。</p>
-
-<figure >
-<a href="http://hail2u.net/images/blog/strolling-in-yokohama-sea-bass.jpg"><img alt="Sea Bass, not Sea Bus" height="2448" src="http://hail2u.net/images/blog/strolling-in-yokohama-sea-bass.jpg" width="2448"></a>
-<figcaption>ベイクォーター横シーバス乗り場</figcaption>
-</figure>
-
-<p>海へ行って食べようかと考えていたけど、シーバスに人が並びまくってて萎えたので、ベイクォーターのCafé&amp;Meal MUJIでサラダを頼んでこっそりパンも食べてた。</p>
-
-<p>あの辺りの海をすごく感じるものの海まではちょっとあるみたいな感じがすごい好き。海まで行くと行き止まりっぽい感じがあってちょっと沈んだ気持ちになる。</p>
-
-<hr>
-
-<p>サンダルかスリッポンを買うというのが主な目的だった。ベイクォーターのビルケンシュトックにいくつか良さそうなのがあったし、そこかしこに置いてあったナイキのつま先が足袋っぽくなってる奴とか、同じくナイキのオーロラっぽいグラデーションの奴(<a href="https://plus.google.com/+KotaroKokubo/posts/CfBbx8Eyzcx">@kotarokが買ったやつ</a>っぽい)とか、ちょっと欲しくなったのはあったけど結局買わなかった。</p>
-
-<p>サンダルはもう完全にダメっぽい。去年くらいからダメそうだなと思ってて、去年も結局買わなかった。今年は試着まではいったけれど、足が痩せててひょろいのとか白いのとかはともかく、足の甲に浮く血管と足の爪の老化を完全に把握してしまった。血管が浮いていると病人が病院で履いてるようにしか見えない。足の爪は、真っ白とか形が汚いとか臭いとか(臭いけど)ではなく、ただただ健康な足の爪にはどうやっても見えない。色艶というものがまったくない。ネイル・エステ行きたい。</p>
-
-<p>スリッポンは似合わなかった。VANSくらいの値段なら買っても良さそうだったけど、この歳でVANSってのもなみたいな感想だった。6月一杯くらいかけてじっくり探そう……と思ったけど、とりあえずのところは壊れかけのキャンバス・スニーカーを履きつぶすことにした。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -374,6 +368,6 @@ jsdom.env(
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Tue, 09 Jun 2015 04:29:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2015 03:15:00 +0900</lastBuildDate>
   </channel>
 </rss>
