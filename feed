@@ -10,6 +10,63 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>PostCSSプラグイン</title>
+      <link>http://hail2u.net/blog/coding/postcss-plugin.html</link>
+      <description>PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/postcss-plugin.html</guid>
+      <pubDate>Thu, 11 Jun 2015 08:05:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p ><a href="https://github.com/postcss/postcss/releases/tag/4.1.0">PostCSS v4.1.0</a>からプラグインAPIが実装され、<code>postcss.plugin()</code>でプラグインを作ることが推奨されるようになった。この<a href="https://github.com/postcss/postcss/blob/master/docs/guidelines/plugin.md">ガイドライン</a>に従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</p>
+
+<p>仮に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
+
+<pre><code >var fs = require(&quot;fs&quot;);
+var postcss = require(&quot;postcss&quot;);
+var csswring = require(&quot;csswring&quot;);
+
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
+
+postcss([
+  csswring()
+]).process(fs.readFileSync(input, &quot;utf8&quot;), {
+  from: input,
+  to: output
+}).then(function (result) {
+  fs.writeFileSync(output, result.css);
+});
+</code></pre>
+
+<p>PostCSSプラグインなので、このようにPostCSSの使い方をちゃんと知って使わざるをえない。もちろん他のPostCSSプラグインと組み合わせることもあるので、最終的にはこういう利用に落ち着くことはありうる。しかしCSSWringの機能のみを必要とする場合にもこう書かざるをえないのは無駄が多い。Autoprefixerのようにこういった形でコアを書き、別にラッパーを提供するという手もあるが、メンテナンスの手間が倍増することは確実だ。</p>
+
+<p>また必要なPostCSSのバージョンを調べて、手作業で依存を解決しなくてはならないことも欠点になる。CSSWring側の<code>package.json</code>ですでに依存バージョンを明示していることを効果的に利用することができない。</p>
+
+<pre><code >var fs = require(&quot;fs&quot;);
+var csswring = require(&quot;csswring&quot;);
+
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
+
+var result = csswring.wring(fs.readFileSync(input, &quot;utf8&quot;), {
+  from: input,
+  to: output
+});
+fs.writeFileSync(output, result.css);
+</code></pre>
+
+<p>CSSWringではこのように標準的なNode.jsモジュールのように利用することができる。Promiseではないことを考慮しても、コードは短くなっている。そもそもとしてPostCSSプラグインとしての使い方を知らなくても、はっきり言うのならPostCSSの存在を知らなくても書けるようになっている。</p>
+
+<p>またこのスクリプトの<code>dependencies</code>からPostCSSが不要にもなる。つまり依存管理をモジュール側に任せることができるわけだ。</p>
+
+<hr>
+
+<p>プラグイン・システムというような方向から見ると、そういうデザインだとも言えるだろう。だがあるNode.jsモジュールを使う時にその依存モジュールの使い方をも知らなくてはならないという見方をするとどうだろうか。そんなことは知らなくてもそれ単体で使えるようになっているべきではないだろうか。</p>
+
+<p>プラグイン・システムのような独自の生態系がいくつかのルール付けによって守られるようになると、同時にそれを内包する生態系(ここではNode.jsとnpm)との間に囲いを築くことにもなる。その囲いが低く感じられるか高く感じられるかはなんとも言えない。深くその独自の生態系について知れば、必要な高さの囲いだと納得できるかもしれないが、万人にそれを求めるのは酷だろう。</p>
+
+<p>もちろんPostCSSプラグインはまったく悪いものではないし、PostCSSのプロセッサーとしてのみ機能するモジュールを書く場合に最も良い選択であることは確かだろう。ただそれだけではなく、Node.jsモジュールとしても単体で使えるようなインターフェイスも用意しておくことで、もっと使いやすくなるはずだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>無限スクロール向け雑なローディング画像</title>
       <link>http://hail2u.net/blog/webdesign/easy-loading-marker-for-infinite-scroll.html</link>
       <description>無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。</description>
@@ -315,25 +372,6 @@ jsdom.env(
 <p>Internet Explorer 10以降では<code>:-ms-input-placeholder</code><em>擬似クラス</em>だった。修正し、サンプル・コードも修正しておいた。</p>]]></content:encoded>
     </item>
     <item>
-      <title>MN</title>
-      <link>http://hail2u.net/blog/software/mn.html</link>
-      <description>等幅フォントは本文に使ってもうまく機能する。しかし余白が多くなりがちなその形状を、Google Fontsのような複雑なインターフェイスではレビューすることが難しい。MNではミニマルなスタイルでGoogle Fontsにある等幅フォントをサンプルの文章(そのフォントの説明文)を使ってレビューすることができるようにしたものだ。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/mn.html</guid>
-      <pubDate>Mon, 01 Jun 2015 12:05:00 +0900</pubDate>
-      <content:encoded><![CDATA[<figure >
-  <a href="https://hail2u.github.io/mn/"><img alt="MN — the monospace fonts from the Google Fonts directory." height="627" src="http://hail2u.net/images/blog/mn.png" width="1200" ></a>
-</figure>
-
-<p >等幅フォントは本文に使ってもうまく機能する。しかし余白が多くなりがちなその形状を、<a href="https://www.google.com/fonts">Google Fonts</a>のような複雑なインターフェイスではレビューすることが難しい。<a href="https://hail2u.github.io/mn/">MN</a>ではミニマルなスタイルでGoogle Fontsにある等幅フォントをサンプルの文章(そのフォントの説明文)を使ってレビューすることができるようにしたものだ。</p>
-
-<p>現在はSource Code ProやInconsolataを始めとしたGoogle Fontsにある等幅フォント、全11種類になる。新たにGoogle Fontsに追加されたら、その都度追加するつもりだ。余裕があったらGoogle Fontsにないオープンソースの等幅フォントも追加したい。</p>
-
-<hr>
-
-<p>等幅フォントを使ったプレビュー以外のフォントは、同じGoogle Fontsから<a href="https://www.google.com/fonts/specimen/Libre+Baskerville">Libre Baskerville</a>を使った。Boldの斜体がないのが残念なこと以外は使いやすく、よく使う。同じデザインでセリフのフォントをプレビューするものも作りたくなった。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -368,6 +406,6 @@ jsdom.env(
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Wed, 10 Jun 2015 03:15:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jun 2015 08:05:00 +0900</lastBuildDate>
   </channel>
 </rss>
