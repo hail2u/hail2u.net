@@ -310,8 +310,7 @@ module.exports = function (grunt) {
         expand: true,
         ext: ".min.svg",
         src: [
-          "**/*.svg",
-          "!**/*.min.svg"
+          "logo.svg"
         ]
       }
     },
@@ -324,6 +323,25 @@ module.exports = function (grunt) {
 
         dest: "build/apple-touch-icon.png",
         src: "src/img/favicon-large.svg"
+      },
+
+      cover: {
+        options: {
+          width: 2560
+        },
+
+        cwd: "src/img/",
+        dest: "build/images/",
+        expand: true,
+        ext: ".png",
+        src: [
+          "about/cc-by-nc.svg",
+          "about/how-i-markup-and-style-this-website.svg",
+          "about/i-know-what-you-want-to-know.svg",
+          "blog/everything-that-i-want-to-forget.svg",
+          "documents/publish-what-i-learned.svg",
+          "make-things-simple.svg"
+        ]
       },
 
       favicon1024: {
@@ -602,12 +620,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:img", [
     "svgmin",
-    "svgRasterizer:appleTouchIcon",
-    "svgRasterizer:favicon1024",
-    "svgRasterizer:favicon16",
-    "svgRasterizer:favicon256",
-    "svgRasterizer:favicon32",
-    "svgRasterizer:favicon48",
+    "svgRasterizer",
     "png2ico",
     "copy:img"
   ]);
