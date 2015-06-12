@@ -55,8 +55,13 @@ module.exports = function (grunt) {
             ]
           },
           {
-            dest: "src/css/assets/scripts/unutm.js",
-            src: ["node_modules/unutm/build/unutm.js"]
+            cwd: "node_modules/",
+            dest: "src/css/assets/scripts/",
+            expand: true,
+            flatten: true,
+            src: [
+              "unutm/build/unutm.js"
+            ]
           },
           {
             cwd: "src/img/",
