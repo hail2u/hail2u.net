@@ -323,7 +323,7 @@ module.exports = function (grunt) {
         },
 
         dest: "build/apple-touch-icon.png",
-        src: "src/img/favicon.svg"
+        src: "src/img/favicon-large.svg"
       },
 
       favicon1024: {
@@ -341,7 +341,7 @@ module.exports = function (grunt) {
         },
 
         dest: "build/images/favicon-16.png",
-        src: "src/img/favicon.svg"
+        src: "src/img/favicon-small.svg"
       },
 
       favicon256: {
@@ -359,7 +359,7 @@ module.exports = function (grunt) {
         },
 
         dest: "build/images/favicon-32.png",
-        src: "src/img/favicon.svg"
+        src: "src/img/favicon-small.svg"
       },
 
       favicon48: {
