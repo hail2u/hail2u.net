@@ -23,6 +23,7 @@ module.exports = function (grunt) {
       all: false,
       feed: false,
       index: false,
+      perl: "perl",
       reindex: false
     });
     fileCache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
@@ -112,7 +113,7 @@ module.exports = function (grunt) {
 
     async.eachLimit(files, num, function (file, next) {
       var child = spawn(
-        which("C:/perl/perl/bin/perl.exe"),
+        which(options.perl),
         args.concat("path=/" + file), {
           cwd: options.rootdir,
           encoding: "utf8",

@@ -421,6 +421,7 @@ module.exports = function (grunt) {
       options: {
         datadir: "src/weblog/entries/",
         imgdir: "src/img/blog/",
+        perl: "C:/strawberry/perl/bin/perl",
         rootdir: "src/weblog/",
         staticdir: "build/blog/",
         staticimgdir: "build/images/blog/"
