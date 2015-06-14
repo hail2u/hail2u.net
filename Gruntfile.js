@@ -30,11 +30,8 @@ module.exports = function (grunt) {
 
         files: {
           "tmp/main.min.js": [
-            "tmp/_string_endswith.min.js",
             "tmp/lightbox.min.js",
             "tmp/load-css.min.js",
-            "tmp/nohashtop.min.js",
-            "tmp/toggle-logo-action.min.js",
             "tmp/unutm.min.js"
           ]
         }
@@ -80,13 +77,10 @@ module.exports = function (grunt) {
             dest: "src/css/assets/scripts/",
             expand: true,
             src: [
-              "_string_endswith.js",
               "lightbox.js",
               "load-css.js",
-              "nohashtop.js",
               "toggle-column.js",
               "toggle-eyecatch.js",
-              "toggle-logo-action.js",
               "toggle-outline.js",
               "toggle-tagline.js"
             ]
@@ -167,13 +161,10 @@ module.exports = function (grunt) {
 
       jsPre: {
         files: {
-          "tmp/_string_endswith.js": "src/js/_string_endswith.js",
           "tmp/lightbox.js": "src/js/lightbox.js",
           "tmp/load-css.js": "src/js/load-css.js",
-          "tmp/nohashtop.js": "src/js/nohashtop.js",
           "tmp/toggle-column.js": "src/js/toggle-column.js",
           "tmp/toggle-eyecatch.js": "src/js/toggle-eyecatch.js",
-          "tmp/toggle-logo-action.js": "src/js/toggle-logo-action.js",
           "tmp/toggle-outline.js": "src/js/toggle-outline.js",
           "tmp/toggle-tagline.js": "src/js/toggle-tagline.js"
         }
