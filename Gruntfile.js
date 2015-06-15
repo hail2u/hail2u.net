@@ -548,6 +548,8 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.loadNpmTasks("@hail2u/grunt-png2ico");
+  grunt.loadNpmTasks("@hail2u/grunt-svg-rasterizer");
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
   grunt.loadNpmTasks("feedmix");
@@ -556,8 +558,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
-  grunt.loadNpmTasks("grunt-png2ico");
-  grunt.loadNpmTasks("grunt-svg-rasterizer");
   grunt.loadNpmTasks("grunt-svgmin");
   grunt.loadNpmTasks("postcss-single-charset");
   grunt.loadTasks(".grunt/task/");
