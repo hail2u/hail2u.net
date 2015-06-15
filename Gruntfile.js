@@ -56,9 +56,7 @@ module.exports = function (grunt) {
             dest: "src/css/assets/scripts/",
             expand: true,
             flatten: true,
-            src: [
-              "unutm/build/unutm.js"
-            ]
+            src: ["unutm/build/unutm.js"]
           },
           {
             cwd: "src/img/",
@@ -241,9 +239,7 @@ module.exports = function (grunt) {
         cwd: "tmp/",
         dest: "tmp/",
         expand: true,
-        src: [
-          "**/*.min.css"
-        ]
+        src: ["**/*.min.css"]
       }
     },
 
@@ -300,9 +296,7 @@ module.exports = function (grunt) {
         dest: "build/images/",
         expand: true,
         ext: ".min.svg",
-        src: [
-          "logo.svg"
-        ]
+        src: ["logo.svg"]
       }
     },
 
