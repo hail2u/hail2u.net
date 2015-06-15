@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>パッケージのスコープ化 - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/software/scoped-npm-packages.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link rel="prev" href="/blog/webdesign/ogp-and-link-element.html">
+
+    
+
+    
+      <meta content="パッケージのスコープ化" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。" property="og:description">
+    
+
+    <meta content="article" property="og:type">
+    <meta content="http://hail2u.net/blog/software/scoped-npm-packages.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/niconne.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/software/scoped-npm-packages.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">パッケージのスコープ化</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-06-15T11:46:00+09:00" itemprop="datePublished">Jun 15, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+        </footer>
+
+        <main itemprop="articleBody">
+<p itemprop="description">2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。</p>
+
+<p><code>&quot;private&quot;: true</code>からスコープ化したパッケージへの変換は2ステップで行う。</p>
+
+<section>
+<h2>package.jsonの更新</h2>
+
+<ul>
+<li><code>&quot;private&quot;: true</code>の削除</li>
+<li><code>name</code>フィールドの値へプリフィックスを追加</li>
+</ul>
+
+<p>プリフィックスはなんでも良いようだが、通常はnpmのユーザー名を使うと良いだろう。僕は<code>@hail2u/</code>にしておいた。GitHubオーガニゼーション単位でスコープ化したい場合はその名前の方が良い。</p>
+</section>
+
+<section>
+<h2>公開</h2>
+
+<p>npmレジストリーへの公開にはオプションを追加する必要がある。特にインストールへ制限は設けないのなら<code>public</code>で良い。</p>
+
+<pre><samp>$ <kbd>npm publish <mark>--access public</mark></kbd>
+</samp></pre>
+
+<p>このオプションの指定は最初に<code>npm publish</code>する時だけ必要になるようだ。</p>
+</section>
+
+<hr>
+
+<p>特にnpmパッケージ自体を非公開にしたいわけではないけれど、プライベートにすることはたまにある。それほど本気でずっと使う予定もないとか、npmレジストリーの名前を占拠したくないとか、その場合にも変な名前を付けるのも嫌だとか、環境に強く依存していて自分専用に近いものとか。</p>
+
+<p>こういった半プライベートなnpmパッケージをGitHub経由でインストールする(してもらう)というアプローチは、短期的にはあまり問題ない。しかしインストールはやはり遅く、特にCI環境下では致命的といえる。また、バージョン指定が特殊で面倒な感じになりやすい。そのため常に最新版を使うような運用にしてしまいがちで、あっと思ったら環境が壊れたということになりうる(やった)。</p>
+
+<p>スコープ化しておくと通常のnpmパッケージとほとんど変わらず扱える。運用も同じように行うことになるので、GitHub経由特有の問題からは解放され、npmレジストリーとnpmパッケージそのものの問題に集約されることになる。問題が減るわけではないが、少なくとも問題の原因は減るので、その究明は楽になるだろう。</p></main>
+
+        <aside class="share-buttons">
+          <ul>
+            <li><a href="https://twitter.com/intent/tweet?text=%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%97%E5%8C%96%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fscoped-npm-packages.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
+            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fscoped-npm-packages.html">Facebook</a></li>
+            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%97%E5%8C%96%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fscoped-npm-packages.html">Hatena</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+        <nav class="read-older">
+          <a href="/blog/webdesign/ogp-and-link-element.html" rel="prev">
+  <p>OGPとlink要素</p>
+</a>
+
+
+        </nav>
+      
+
+      
+    
+    </div>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search with DuckDuckGo">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+        <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+        <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+      </ul>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
