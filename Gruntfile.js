@@ -254,12 +254,7 @@ module.exports = function (grunt) {
 
       main: {
         dest: "build/favicon.ico",
-        src: [
-          "build/images/favicon-16.png",
-          "build/images/favicon-32.png",
-          "build/images/favicon-48.png",
-          "build/images/favicon-256.png"
-        ]
+        src: ["tmp/favicon-*.png"]
       }
     },
 
@@ -340,21 +335,12 @@ module.exports = function (grunt) {
         ]
       },
 
-      favicon1024: {
-        options: {
-          width: 1024
-        },
-
-        dest: "build/images/favicon-1024.png",
-        src: "src/img/favicon.svg"
-      },
-
       favicon16: {
         options: {
           width: 16
         },
 
-        dest: "build/images/favicon-16.png",
+        dest: "tmp/favicon-16.png",
         src: "src/img/favicon-small.svg"
       },
 
@@ -363,7 +349,7 @@ module.exports = function (grunt) {
           width: 256
         },
 
-        dest: "build/images/favicon-256.png",
+        dest: "tmp/favicon-256.png",
         src: "src/img/favicon.svg"
       },
 
@@ -372,7 +358,7 @@ module.exports = function (grunt) {
           width: 32
         },
 
-        dest: "build/images/favicon-32.png",
+        dest: "tmp/favicon-32.png",
         src: "src/img/favicon-small.svg"
       },
 
@@ -381,7 +367,7 @@ module.exports = function (grunt) {
           width: 48
         },
 
-        dest: "build/images/favicon-48.png",
+        dest: "tmp/favicon-48.png",
         src: "src/img/favicon.svg"
       }
     },
@@ -591,6 +577,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:article", [
+    "clean",
     "blosxom:article",
     "generate:blog",
     "feedmix",
@@ -611,11 +598,13 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:html", [
+    "clean",
     "generate:main",
     "blosxom:index"
   ]);
 
   grunt.registerTask("build:img", [
+    "clean",
     "svgmin",
     "svgRasterizer",
     "png2ico",
