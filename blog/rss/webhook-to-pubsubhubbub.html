@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="少し前に公開されたIFTTTのMakerチャンネルを使って、GitHubリポジトリーのWebhookをPubSubHubbubの公開POSTリクエストに翻訳するようにした。GETを使った公開リクエストがあまり行儀が良くなさそうなことが前から気になっていたので、Makerチャンネルを使えば良いかなと試したところうまくいった。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>WebhookからPubSubHubbubへの翻訳 - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/rss/webhook-to-pubsubhubbub.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    
+
+    
+
+    
+      <meta content="article" property="og:type">
+      <meta content="WebhookからPubSubHubbubへの翻訳" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="少し前に公開されたIFTTTのMakerチャンネルを使って、GitHubリポジトリーのWebhookをPubSubHubbubの公開POSTリクエストに翻訳するようにした。GETを使った公開リクエストがあまり行儀が良くなさそうなことが前から気になっていたので、Makerチャンネルを使えば良いかなと試したところうまくいった。" property="og:description">
+    
+
+    <meta content="http://hail2u.net/blog/rss/webhook-to-pubsubhubbub.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/niconne.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/rss/webhook-to-pubsubhubbub.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">WebhookからPubSubHubbubへの翻訳</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-06-21T07:13:00+09:00" itemprop="datePublished">Jun 21, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/rss/">RSS</a></span></p>
+        </footer>
+
+        <main itemprop="articleBody">
+<p itemprop="description">少し前に公開された<a href="https://ifttt.com/">IFTTT</a>の<a href="https://ifttt.com/maker">Makerチャンネル</a>を使って、GitHubリポジトリーのWebhookをPubSubHubbubの公開POSTリクエストに翻訳するようにした。<a href="/blog/internet/publishing-feed-via-pubsubhubbbub-using-github-webhooks.html">GETを使った公開リクエスト</a>があまり行儀が良くなさそうなことが前から気になっていたので、Makerチャンネルを使えば良いかなと試したところうまくいった。</p>
+
+<section>
+<h2>Makerチャンネルの有効化</h2>
+
+<p>まずはMakerチャンネルのページへ行き、Connectボタンを押す。するとユーザーごとに専用のエンドポイントURLが作成されるので、How to Trigger Eventsというリンクをクリックして、それを確認しておく。</p>
+
+<pre>https://maker.ifttt.com/trigger/{event}/with/key/{secret_key}
+</pre>
+
+<p>エンドポイントURLはこのような形になっている。<code>{event}</code>は後ほど好きに指定することになる。<code>{secret key}</code>はユーザーごとに発行されるユニークな文字列に置き換えられて表示される。第三者にバレるとまずそうなので、気を付けた方が良い(再生成することは可能)。</p>
+</section>
+
+<section>
+<h2>GitHub Pages側の準備</h2>
+
+<p>各リポジトリーの設定からWebhooks &amp; Servicesのページにアクセスし、Add Webhookボタンを押す。Payload URLにIFTTTのMakerチャンネルで作成された専用のエンドポイントURLを指定する。ここではGitHub PagesがビルドされたらPubSubHubbubで公開したいので、<code>{event}</code>は<code>page_build</code>にしておいた。GitHubリポジトリー側のイベントに対応させた名前にすると良いだろう。データを受け取ってゴニョゴニョするわけではないのでContent typeはどちらでも良いが、Secretは指定する必要がある(と思う)。</p>
+
+<p>イベントはPage builtのみに絞っておくと良いだろう。</p>
+</section>
+
+<section>
+<h2>レシピの作成</h2>
+
+<p>Trigger側では先ほどGitHubリポジトリー側で指定したエンドポイントURLで使ったイベント名を指定する(ここでは<code>page_build</code>)。Action側では、以下のように指定すれば良い。</p>
+
+<table>
+<thead>
+<tr>
+<th>フィールド</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>URL</td>
+<td>https://pubsubhubbub.appspot.com/</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>POST</td>
+</tr>
+<tr>
+<td>Content Type</td>
+<td>application/x-www-form-urlencoded</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>hub.mode=publish&amp;hub.url=http:%2F%2Fexample.com%2Ffeed</td>
+</tr>
+</tbody>
+</table>
+
+<p>Bodyフィールドで指定するRSSフィードのURL以外は同じで良いはずだ。Bodyフィールドでは自前でURLエンコードして指定しているが<code>&lt;&lt;&lt;</code>と<code>&gt;&gt;&gt;</code>で生URLを括るときっとURLエンコードされるだろう。</p>
+</section>
+
+<hr>
+
+<p>これでGitHubリポジトリーの<code>gh-pages</code>ブランチへpushしGitHub Pagesのビルドを走らせると、一連の動作が確認できる。</p>
+
+<p>GitHubリポジトリー側では、該当Webhookの管理画面にRecent Deliveriesというログが残っているので、そこでIFTTT側から<code>200</code>が帰っていることを確認することでリクエストが成功していることを確認できる。IFTTTのレシピ側では、Personal Recipe triggeredというログで、レシピが走りPubSubHubbubハブへのリクエストが成功していることを確認できる。更にGoogleのPubSubHubbubハブに用意されている<a href="https://pubsubhubbub.appspot.com/publish">Publisher Diagnostics</a>を使ってRSSフィードのURLを調べると、最後に記事を受け取った時刻と内容がわかるので、それを照らし合わせることで公開がうまくいっているか確認できる。</p>
+
+<p>気になる人はFeedlyなどPubSubHubbubによる購読に対応しているフィード・リーダーを使うと公開即反映されているかも確認することができる。</p>
+
+<hr>
+
+<p>某アプリのおかげでRSSフィードが本来想定されていたような機械的に処理することのできるフォーマットのコンテンツとして復権する可能性がある。それと同時にポーリングではないPubSubHubbubによる公開と購読の重要性も上がるのではないかと考えられる。折に触れPubSubHubbubに言及することにより、少しでもPubSubHubbubによる公開を行ってくれるウェブログ(とウェブログ・ホスティング・サービス)が増えることに期待したい。</p></main>
+
+        <aside class="share-buttons">
+          <ul>
+            <li><a href="https://twitter.com/intent/tweet?text=Webhook%E3%81%8B%E3%82%89PubSubHubbub%E3%81%B8%E3%81%AE%E7%BF%BB%E8%A8%B3%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Frss%2Fwebhook-to-pubsubhubbub.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
+            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Frss%2Fwebhook-to-pubsubhubbub.html">Facebook</a></li>
+            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=Webhook%E3%81%8B%E3%82%89PubSubHubbub%E3%81%B8%E3%81%AE%E7%BF%BB%E8%A8%B3%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Frss%2Fwebhook-to-pubsubhubbub.html">Hatena</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    
+    </div>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search with DuckDuckGo">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+        <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+        <li><a href="http://u2liah.tumblr.com/">Tumblr</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+      </ul>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

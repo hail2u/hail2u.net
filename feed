@@ -10,6 +10,81 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>WebhookからPubSubHubbubへの翻訳</title>
+      <link>http://hail2u.net/blog/rss/webhook-to-pubsubhubbub.html</link>
+      <description>少し前に公開されたIFTTTのMakerチャンネルを使って、GitHubリポジトリーのWebhookをPubSubHubbubの公開POSTリクエストに翻訳するようにした。GETを使った公開リクエストがあまり行儀が良くなさそうなことが前から気になっていたので、Makerチャンネルを使えば良いかなと試したところうまくいった。</description>
+      <category>RSS</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/rss/webhook-to-pubsubhubbub.html</guid>
+      <pubDate>Sun, 21 Jun 2015 07:13:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p >少し前に公開された<a href="https://ifttt.com/">IFTTT</a>の<a href="https://ifttt.com/maker">Makerチャンネル</a>を使って、GitHubリポジトリーのWebhookをPubSubHubbubの公開POSTリクエストに翻訳するようにした。<a href="http://hail2u.net/blog/internet/publishing-feed-via-pubsubhubbbub-using-github-webhooks.html">GETを使った公開リクエスト</a>があまり行儀が良くなさそうなことが前から気になっていたので、Makerチャンネルを使えば良いかなと試したところうまくいった。</p>
+
+<section>
+<h2>Makerチャンネルの有効化</h2>
+
+<p>まずはMakerチャンネルのページへ行き、Connectボタンを押す。するとユーザーごとに専用のエンドポイントURLが作成されるので、How to Trigger Eventsというリンクをクリックして、それを確認しておく。</p>
+
+<pre>https://maker.ifttt.com/trigger/{event}/with/key/{secret_key}
+</pre>
+
+<p>エンドポイントURLはこのような形になっている。<code>{event}</code>は後ほど好きに指定することになる。<code>{secret key}</code>はユーザーごとに発行されるユニークな文字列に置き換えられて表示される。第三者にバレるとまずそうなので、気を付けた方が良い(再生成することは可能)。</p>
+</section>
+
+<section>
+<h2>GitHub Pages側の準備</h2>
+
+<p>各リポジトリーの設定からWebhooks &amp; Servicesのページにアクセスし、Add Webhookボタンを押す。Payload URLにIFTTTのMakerチャンネルで作成された専用のエンドポイントURLを指定する。ここではGitHub PagesがビルドされたらPubSubHubbubで公開したいので、<code>{event}</code>は<code>page_build</code>にしておいた。GitHubリポジトリー側のイベントに対応させた名前にすると良いだろう。データを受け取ってゴニョゴニョするわけではないのでContent typeはどちらでも良いが、Secretは指定する必要がある(と思う)。</p>
+
+<p>イベントはPage builtのみに絞っておくと良いだろう。</p>
+</section>
+
+<section>
+<h2>レシピの作成</h2>
+
+<p>Trigger側では先ほどGitHubリポジトリー側で指定したエンドポイントURLで使ったイベント名を指定する(ここでは<code>page_build</code>)。Action側では、以下のように指定すれば良い。</p>
+
+<table>
+<thead>
+<tr>
+<th>フィールド</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>URL</td>
+<td>https://pubsubhubbub.appspot.com/</td>
+</tr>
+<tr>
+<td>Method</td>
+<td>POST</td>
+</tr>
+<tr>
+<td>Content Type</td>
+<td>application/x-www-form-urlencoded</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>hub.mode=publish&amp;hub.url=http:%2F%2Fexample.com%2Ffeed</td>
+</tr>
+</tbody>
+</table>
+
+<p>Bodyフィールドで指定するRSSフィードのURL以外は同じで良いはずだ。Bodyフィールドでは自前でURLエンコードして指定しているが<code>&lt;&lt;&lt;</code>と<code>&gt;&gt;&gt;</code>で生URLを括るときっとURLエンコードされるだろう。</p>
+</section>
+
+<hr>
+
+<p>これでGitHubリポジトリーの<code>gh-pages</code>ブランチへpushしGitHub Pagesのビルドを走らせると、一連の動作が確認できる。</p>
+
+<p>GitHubリポジトリー側では、該当Webhookの管理画面にRecent Deliveriesというログが残っているので、そこでIFTTT側から<code>200</code>が帰っていることを確認することでリクエストが成功していることを確認できる。IFTTTのレシピ側では、Personal Recipe triggeredというログで、レシピが走りPubSubHubbubハブへのリクエストが成功していることを確認できる。更にGoogleのPubSubHubbubハブに用意されている<a href="https://pubsubhubbub.appspot.com/publish">Publisher Diagnostics</a>を使ってRSSフィードのURLを調べると、最後に記事を受け取った時刻と内容がわかるので、それを照らし合わせることで公開がうまくいっているか確認できる。</p>
+
+<p>気になる人はFeedlyなどPubSubHubbubによる購読に対応しているフィード・リーダーを使うと公開即反映されているかも確認することができる。</p>
+
+<hr>
+
+<p>某アプリのおかげでRSSフィードが本来想定されていたような機械的に処理することのできるフォーマットのコンテンツとして復権する可能性がある。それと同時にポーリングではないPubSubHubbubによる公開と購読の重要性も上がるのではないかと考えられる。折に触れPubSubHubbubに言及することにより、少しでもPubSubHubbubによる公開を行ってくれるウェブログ(とウェブログ・ホスティング・サービス)が増えることに期待したい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>夢</title>
       <link>http://hail2u.net/blog/misc/dreaming-20150620.html</link>
       <description>湯船で丸々一本漏らす。あわてて手桶ですくい、トイレに流そうと風呂から出たらおばあちゃん(故人)に見つかる。そのまま正座させられ説教をされる。おばあちゃんには怒られたことがなかったので、すごいショックを受けつつ、とにかく服を着たかった。途中で「体拭いて服着ていい？」って聞いたら、「良いよ」ってニッコリ笑って返事してくれて、そのまますうっと蒸発するみたいに消えた。</description>
@@ -192,63 +267,6 @@
 <p>やっぱり災厄の町の新訳版が欲しくなってきた。完全な電子書籍時代になると、もしかしたらこういった新訳も無料か安価に手に入れられたりするようになるのかな。</p>]]></content:encoded>
     </item>
     <item>
-      <title>PostCSSプラグイン</title>
-      <link>http://hail2u.net/blog/coding/postcss-plugin.html</link>
-      <description>PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/coding/postcss-plugin.html</guid>
-      <pubDate>Thu, 11 Jun 2015 08:05:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p ><a href="https://github.com/postcss/postcss/releases/tag/4.1.0">PostCSS v4.1.0</a>からプラグインAPIが実装され、<code>postcss.plugin()</code>でプラグインを作ることが推奨されるようになった。この<a href="https://github.com/postcss/postcss/blob/master/docs/guidelines/plugin.md">ガイドライン</a>に従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</p>
-
-<p>仮に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
-
-<pre><code >var fs = require(&quot;fs&quot;);
-var postcss = require(&quot;postcss&quot;);
-var csswring = require(&quot;csswring&quot;);
-
-var input = &quot;main.css&quot;;
-var output = &quot;main.min.css&quot;;
-
-postcss([
-  csswring()
-]).process(fs.readFileSync(input, &quot;utf8&quot;), {
-  from: input,
-  to: output
-}).then(function (result) {
-  fs.writeFileSync(output, result.css);
-});
-</code></pre>
-
-<p>PostCSSプラグインなので、このようにPostCSSの使い方をちゃんと知って使わざるをえない。もちろん他のPostCSSプラグインと組み合わせることもあるので、最終的にはこういう利用に落ち着くことはありうる。しかしCSSWringの機能のみを必要とする場合にもこう書かざるをえないのは無駄が多い。Autoprefixerのようにこういった形でコアを書き、別にラッパーを提供するという手もあるが、メンテナンスの手間が倍増することは確実だ。</p>
-
-<p>また必要なPostCSSのバージョンを調べて、手作業で依存を解決しなくてはならないことも欠点になる。CSSWring側の<code>package.json</code>ですでに依存バージョンを明示していることを効果的に利用することができない。</p>
-
-<pre><code >var fs = require(&quot;fs&quot;);
-var csswring = require(&quot;csswring&quot;);
-
-var input = &quot;main.css&quot;;
-var output = &quot;main.min.css&quot;;
-
-var result = csswring.wring(fs.readFileSync(input, &quot;utf8&quot;), {
-  from: input,
-  to: output
-});
-fs.writeFileSync(output, result.css);
-</code></pre>
-
-<p>CSSWringではこのように標準的なNode.jsモジュールのように利用することができる。Promiseではないことを考慮しても、コードは短くなっている。そもそもとしてPostCSSプラグインとしての使い方を知らなくても、はっきり言うのならPostCSSの存在を知らなくても書けるようになっている。</p>
-
-<p>またこのスクリプトの<code>dependencies</code>からPostCSSが不要にもなる。つまり依存管理をモジュール側に任せることができるわけだ。</p>
-
-<hr>
-
-<p>プラグイン・システムというような方向から見ると、そういうデザインだとも言えるだろう。だがあるNode.jsモジュールを使う時にその依存モジュールの使い方をも知らなくてはならないという見方をするとどうだろうか。そんなことは知らなくてもそれ単体で使えるようになっているべきではないだろうか。</p>
-
-<p>プラグイン・システムのような独自の生態系がいくつかのルール付けによって守られるようになると、同時にそれを内包する生態系(ここではNode.jsとnpm)との間に囲いを築くことにもなる。その囲いが低く感じられるか高く感じられるかはなんとも言えない。深くその独自の生態系について知れば、必要な高さの囲いだと納得できるかもしれないが、万人にそれを求めるのは酷だろう。</p>
-
-<p>もちろんPostCSSプラグインはまったく悪いものではないし、PostCSSのプロセッサーとしてのみ機能するモジュールを書く場合に最も良い選択であることは確かだろう。ただそれだけではなく、Node.jsモジュールとしても単体で使えるようなインターフェイスも用意しておくことで、もっと使いやすくなるはずだ。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -283,6 +301,6 @@ fs.writeFileSync(output, result.css);
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sat, 20 Jun 2015 06:24:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 21 Jun 2015 07:13:00 +0900</lastBuildDate>
   </channel>
 </rss>
