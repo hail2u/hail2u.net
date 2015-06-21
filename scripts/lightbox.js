@@ -3,7 +3,7 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2015
  */
-(function (d) {
+var lightbox = (function (d) {
   "use strict";
 
   var toggle = function (evt) {
@@ -53,34 +53,32 @@
     image.style.width = "auto";
   };
 
-  var init = function () {
-    var i;
-    var images = d.querySelectorAll([
-      ".content img[src^=\"assets/images/\"]",
-      ".content img[src^=\"/images/\"]"
-    ].join(","));
-    var l = images.length;
-    var parent;
+  return {
+    init: function () {
+      var i;
+      var images = d.querySelectorAll([
+        ".content img[src^=\"assets/images/\"]",
+        ".content img[src^=\"/images/\"]"
+      ].join(","));
+      var l = images.length;
+      var parent;
 
-    for (i = 0; i < l; i++) {
-      parent = images[i].parentNode;
+      for (i = 0; i < l; i++) {
+        parent = images[i].parentNode;
 
-      if (
-        parent.tagName === "A" &&
-        /^(assets)?\/images\//.test(parent.getAttribute("href"))
-      ) {
-        parent.addEventListener("click", toggle, false);
+        if (
+          parent.tagName === "A" &&
+          /^(assets)?\/images\//.test(parent.getAttribute("href"))
+        ) {
+          parent.addEventListener("click", toggle, false);
+        }
       }
     }
   };
-
-  if (!("querySelectorAll" in d) || !("bind" in Function)) {
-    return;
-  }
-
-  if (d.readyState === "loading") {
-    d.addEventListener("DOMContentLoaded", init, false);
-  } else {
-    init();
-  }
 })(document);
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", lightbox.init, false);
+} else {
+  lightbox.init();
+}
