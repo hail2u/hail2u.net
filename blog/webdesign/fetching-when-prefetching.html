@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="特定のリソースをrel=prefetchを使ってプリフェッチしている最中に、何らかの形で新たにリクエストされるような状況になった場合、各ブラウザーはどういう挙動になるのかということを試していた。Firefox 38ではプリフェッチがそのまま続行され、新たなリクエストは発生しないという賢い挙動のようだ。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>プリフェッチ中のリクエスト - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/fetching-when-prefetching.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    
+
+    
+
+    
+      <meta content="article" property="og:type">
+      <meta content="プリフェッチ中のリクエスト" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="特定のリソースをrel=prefetchを使ってプリフェッチしている最中に、何らかの形で新たにリクエストされるような状況になった場合、各ブラウザーはどういう挙動になるのかということを試していた。Firefox 38ではプリフェッチがそのまま続行され、新たなリクエストは発生しないという賢い挙動のようだ。" property="og:description">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/fetching-when-prefetching.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/niconne.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/fetching-when-prefetching.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">プリフェッチ中のリクエスト</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-06-22T09:42:00+09:00" itemprop="datePublished">Jun 22, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <main itemprop="articleBody">
+<p itemprop="description">特定のリソースを<code>rel=prefetch</code>を使ってプリフェッチしている最中に、何らかの形で新たにリクエストされるような状況になった場合、各ブラウザーはどういう挙動になるのかということを試していた。Firefox 38ではプリフェッチがそのまま続行され、新たなリクエストは発生しないという賢い挙動のようだ。</p>
+
+<p class="seealso">View Demo: <a href="/pub/test/637.html">Fetching when Prefetching</a></p>
+
+<p>デモでは<code>rel=prefetch</code>を使って<code>head</code>要素内で画像を先読みさせ、ドキュメントの読み込み完了の1秒後に動的に突っ込んだ<code>img</code>要素によりリクエストしてやろうとしている。開発者ツールなどでネットワーク状況を確認することで、どういう挙動になるか確認できる。</p>
+
+<p>Firefox 38ではプリフェッチがそのまま続行され、新たにリクエストを発生せずに画像が挿入される。対してChrome 43とInternet Explorer 11ではプリフェッチがそのまま続行された上で、<code>img</code>要素を追加した時にもリクエストが走るようになり、プリフェッチは完全に無駄になる。</p>
+
+<hr>
+
+<p>主に同じページで使われるリソースを想定した<a href="https://www.chromium.org/spdy/link-headers-and-server-hint/link-rel-subresource"><code>rel=subresource</code>という別のヒント</a>が考えられていることや、より正確に制御することが可能になる<a href="http://www.w3.org/TR/resource-hints/">Resource Hints仕様(これでは<code>rel=preload</code>になる)</a>が作られていることを踏まえると、<code>rel=prefetch</code>他は現状の実装のままで、仕様に従った実装が新たに追加されそうだ。少なくとも<code>rel=prefetch</code>がFirefox 38の挙動に揃うことはなさそうだ。</p></main>
+
+        <aside class="share-buttons">
+          <ul>
+            <li><a href="https://twitter.com/intent/tweet?text=%E3%83%97%E3%83%AA%E3%83%95%E3%82%A7%E3%83%83%E3%83%81%E4%B8%AD%E3%81%AE%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Ffetching-when-prefetching.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
+            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Ffetching-when-prefetching.html">Facebook</a></li>
+            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E3%83%97%E3%83%AA%E3%83%95%E3%82%A7%E3%83%83%E3%83%81%E4%B8%AD%E3%81%AE%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Ffetching-when-prefetching.html">Hatena</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    
+    </div>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search with DuckDuckGo">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+        <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+      </ul>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
