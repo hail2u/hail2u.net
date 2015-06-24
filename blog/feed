@@ -10,12 +10,64 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 23 Jun 2015 21:32:46 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jun 2015 09:15:00 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>dns-prefetchとpreconnect、そしてprefetchやprerenderとpreloadの併記</title>
+      <link>http://hail2u.net/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html</link>
+      <description>2014年10月より標準化作業が公開されたResource Hints仕様により、既存のrel=dns-prefetchとrel=prefetch、そしてrel=prerenderは置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、link要素のrel属性は複数の値を取ることができるので、同時指定しても良い。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html</guid>
+      <pubDate>Wed, 24 Jun 2015 09:14:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p >2014年10月より標準化作業が公開された<a href="http://www.w3.org/TR/resource-hints/">Resource Hints仕様</a>により、既存の<code>rel=dns-prefetch</code>と<code>rel=prefetch</code>、そして<code>rel=prerender</code>は置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、<code>link</code>要素の<code>rel</code>属性は複数の値を取ることができるので、同時指定しても良い。</p>
+
+<p><code>rel=dns-prefetch</code>は<code>rel=preconnect</code>と完全に対応しているので、そのまま追加してやるだけになる。</p>
+
+<pre><code >&lt;link
+  href=&quot;//example.com&quot;
+  rel=&quot;preconnect dns-prefetch&quot;&gt;
+</code></pre>
+
+<p><code>rel=prefetch</code>と<code>rel=prerender</code>はResource Hints仕様では<code>rel=preload</code>に統合される。事前にレンダリングまでするかどうかは<code>loadpolicy</code>属性を併用することで制御する。</p>
+
+<pre><code >&lt;link
+  href=&quot;http://example.com/fetch&quot;
+  loadpolicy=&quot;next <mark>inert</mark>&quot;
+  rel=&quot;preload prefetch&quot;&gt;
+&lt;link
+  href=&quot;http://example.com/render&quot;
+  loadpolicy=&quot;next&quot;
+  rel=&quot;preload prerender&quot;&gt;
+</code></pre>
+
+<p><code>rel=preload</code>はデフォルトで事前レンダリングを行うように支持するということになっており、それを無効にするためには<code>loadpolicy</code>属性で不活性やサボるなどという意味を持つ<code>inert</code>を指定する。つまり<code>rel=prefetch</code>と同じ挙動にしたい場合は<code>inert</code>を追加するということになる。</p>
+
+<p><code>rel=preload</code>では他に<code>pr</code>属性を使って読み込みのプライオリティーを、<code>as</code>属性を使って読み込むリソースの形式を指定することもできるようになっている。特にウェブアプリではその動線の予測しやすさから、事前読み込みを駆使することになると思うので、<code>pr</code>属性を使ってうまくプライオリティーを制御することでより効果的なプリロードを行えることだろう。対して<code>as</code>属性での形式の指定は、画像やフォントの場合は択一式で提供することも多いはずなので、<code>html</code>以外を使う機会はあまりなさそうだ。</p>
+
+<hr>
+
+<p>あとは実際にうまく機能してくれるかどうかということになる。</p>
+
+<aside >
+<p>Chrome 43では開発者ツールのネットワークで<code>rel=dns-prefetch</code>や<code>rel=prefetch</code>の動作を確認でき、タスク マネージャ(Chromeのそれ)でレンダリング・プロセスが走っていることにより<code>rel=prerender</code>の動作を確認できる。</p>
+</aside>
+
+<p><code>rel=dns-prefetch</code>と<code>rel=preconnect</code>の併記は、Firefox 38及びChrome 43、Internet Explorer 11でちゃんと名前解決を行っているらしいことが確認できた。</p>
+
+<p><code>rel=prefetch</code>と<code>rel=prerender</code>の両方に対応しているChrome 43とInternet Explorer 11ではどちらの併記方法もうまく動いているらしきことは確認できた。Firefox 38でも<code>rel=prefetch</code>の方の併記は問題ないようだった。</p>
+
+<hr>
+
+<p>速やかに<code>rel=preconnect</code>と<code>rel=preload</code>へと移行されるかというと大きく疑問が残る。Resource Hints仕様が現状の実装に比べて大きく強化されていることもそうだが、実装の足並みがバラバラで各自が制限や拡張を行っていることや、プリフェッチ系の機能への根強い抵抗があることもある。少なくともマルチ・プロセス化したFirefoxが<code>rel=prerender</code>相当の機能を実装するくらいになるまではどうなるかの予想は難しいだろう。</p>
+
+<p>ともあれ現時点では併記しておくというのは悪くない。運良くResource Hints仕様へ揃う可能性もなくはないからだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Postcards from Penguin</title>
@@ -285,27 +337,6 @@
 <p>こういった半プライベートなnpmパッケージをGitHub経由でインストールする(してもらう)というアプローチは、短期的にはあまり問題ない。しかしインストールはやはり遅く、特にCI環境下では致命的といえる。また、バージョン指定が特殊で面倒な感じになりやすい。そのため常に最新版を使うような運用にしてしまいがちで、あっと思ったら環境が壊れたということになりうる(やった)。</p>
 
 <p>スコープ化しておくと通常のnpmパッケージとほとんど変わらず扱える。運用も同じように行うことになるので、GitHub経由特有の問題からは解放され、npmレジストリーとnpmパッケージそのものの問題に集約されることになる。問題が減るわけではないが、少なくとも問題の原因は減るので、その究明は楽になるだろう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>OGPとlink要素</title>
-      <link>http://hail2u.net/blog/webdesign/ogp-and-link-element.html</link>
-      <description>HTTPS化の準備を始めるにあたって、HTMLで内部的に利用しているURLを対応するのは簡単だ。すべて相対URLに書き換えるだけで対応することができる。その相対URLの書き換えもパスの位置を考慮して最短にする必要もなく、//で始まる相対URLで行えば良い。aやimg要素はもちろん、scriptやlink要素も相対URLで問題ない。しかし外部から利用されるURLもどきではこの限りではない。例えばOGPなど利用することになるmeta要素では相対URLは使えず、OGPの仕様そのものでmeta要素に限定されており、そのパーサー実装のひとつであるFacebookでも解釈できない(できなかった)。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/ogp-and-link-element.html</guid>
-      <pubDate>Sun, 14 Jun 2015 07:18:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p >HTTPS化の準備を始めるにあたって、HTMLで内部的に利用しているURLを対応するのは簡単だ。すべて相対URLに書き換えるだけで対応することができる。その相対URLの書き換えもパスの位置を考慮して最短にする必要もなく、<code>//</code>で始まる相対URLで行えば良い。<code>a</code>や<code>img</code>要素はもちろん、<code>script</code>や<code>link</code>要素も相対URLで問題ない。しかし外部から利用されるURLもどきではこの限りではない。例えばOGPなど利用することになる<code>meta</code>要素では相対URLは使えず、OGPの仕様そのもので<code>meta</code>要素に限定されており、そのパーサー実装のひとつであるFacebookでも解釈できない(できなかった)。</p>
-
-<p>OGPはRDFa Liteだが、なぜか<code>meta</code>要素で記述すると決められている。<code>meta</code>要素ではURLの解決が行われないので、URLスキームは省略できない(仮にFacebookが解釈できるようになっていたとしてもそう書くべきではないだろう)。もちろんCMSやそれに類するものを使っていれば書き換えは機械的に行うことは可能だが、そういう問題ではないだろうし、書き換えた時点でユーザーのキャッシュが破棄されることにもなる。</p>
-
-<p>OGPと似ているもののRDFa LiteのモドキですらないTwitter Cardsでは<code>link</code>要素を使えたりもするが、相対URLへの対応は挙動が不審だった。少なくとも画像(<code>twitter:image</code>)についてはパーサー自体は通すものの表示には対応してくれないようだ。</p>
-
-<p>URLの変更は気軽に行われるべきではないので、それだけを考えていれば良かった時代ではこういう仕様でもあまり問題はなかった。しかしHTTPS化の有形・無形の圧力と欲求にさらされることで、こういったウェブサービスの仕様がフレキシブルに対応できないものとなっている点が表面化してきてしまった。</p>
-
-<hr>
-
-<p>結局はこちら側からはどうにもできないので、やるしかない。手元ではCMSの設定でURLスキームの切り替えを簡単に行えるように対応させつつあり、ようやく準備は完了してきた。しかしよくわからない人達が勝手に作った標準っぽいオレオレ仕様を考慮して苦労するのは割に合わないし、すっきりしない。</p>]]></content:encoded>
     </item>
 
   </channel>

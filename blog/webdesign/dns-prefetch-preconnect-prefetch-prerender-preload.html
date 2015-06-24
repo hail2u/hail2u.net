@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="2014年10月より標準化作業が公開されたResource Hints仕様により、既存のrel=dns-prefetchとrel=prefetch、そしてrel=prerenderは置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、link要素のrel属性は複数の値を取ることができるので、同時指定しても良い。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>dns-prefetchとpreconnect、そしてprefetchやprerenderとpreloadの併記 - Weblog - Hail2u.net</title>
+
+    <link href="//pagead2.googlesyndication.com" rel="preconnect dns-prefetch">
+    <link href="//www.google-analytics.com" rel="preconnect dns-prefetch">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    
+
+    
+
+    
+      <meta content="article" property="og:type">
+      <meta content="dns-prefetchとpreconnect、そしてprefetchやprerenderとpreloadの併記" property="og:title">
+      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
+      <meta content="2014年10月より標準化作業が公開されたResource Hints仕様により、既存のrel=dns-prefetchとrel=prefetch、そしてrel=prerenderは置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、link要素のrel属性は複数の値を取ることができるので、同時指定しても良い。" property="og:description">
+    
+
+    <meta content="http://hail2u.net/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html" property="og:url">
+    <meta content="ja_JP" property="og:locale">
+    <meta content="Hail2u.net" property="og:site_name">
+    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
+    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2unet" name="twitter:site">
+    <meta content="@hail2u_" name="twitter:creator">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/niconne.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+      
+      <div class="global-header" role="banner">
+    
+      
+    
+      <nav>
+        <a class="logo" href="/"><img alt="Hail2u.net" src="/images/logo.min.svg"></a>
+    
+        <ul class="site-navigation">
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+      
+      </div>
+    
+
+    <div class="content">
+    
+      
+
+
+      <div role="main">
+      
+        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
+        <link href="/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html" itemprop="url">
+
+        <h1 class="first-heading" itemprop="name">dns-prefetchとpreconnect、そしてprefetchやprerenderとpreloadの併記</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-06-24T09:14:00+09:00" itemprop="datePublished">Jun 24, 2015</time>
+            · <span class="tag" itemprop="keywords"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        <main itemprop="articleBody">
+<p itemprop="description">2014年10月より標準化作業が公開された<a href="http://www.w3.org/TR/resource-hints/">Resource Hints仕様</a>により、既存の<code>rel=dns-prefetch</code>と<code>rel=prefetch</code>、そして<code>rel=prerender</code>は置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、<code>link</code>要素の<code>rel</code>属性は複数の値を取ることができるので、同時指定しても良い。</p>
+
+<p><code>rel=dns-prefetch</code>は<code>rel=preconnect</code>と完全に対応しているので、そのまま追加してやるだけになる。</p>
+
+<pre><code class="language-html">&lt;link
+  href=&quot;//example.com&quot;
+  rel=&quot;preconnect dns-prefetch&quot;&gt;
+</code></pre>
+
+<p><code>rel=prefetch</code>と<code>rel=prerender</code>はResource Hints仕様では<code>rel=preload</code>に統合される。事前にレンダリングまでするかどうかは<code>loadpolicy</code>属性を併用することで制御する。</p>
+
+<pre><code class="language-html">&lt;link
+  href=&quot;http://example.com/fetch&quot;
+  loadpolicy=&quot;next <mark>inert</mark>&quot;
+  rel=&quot;preload prefetch&quot;&gt;
+&lt;link
+  href=&quot;http://example.com/render&quot;
+  loadpolicy=&quot;next&quot;
+  rel=&quot;preload prerender&quot;&gt;
+</code></pre>
+
+<p><code>rel=preload</code>はデフォルトで事前レンダリングを行うように支持するということになっており、それを無効にするためには<code>loadpolicy</code>属性で不活性やサボるなどという意味を持つ<code>inert</code>を指定する。つまり<code>rel=prefetch</code>と同じ挙動にしたい場合は<code>inert</code>を追加するということになる。</p>
+
+<p><code>rel=preload</code>では他に<code>pr</code>属性を使って読み込みのプライオリティーを、<code>as</code>属性を使って読み込むリソースの形式を指定することもできるようになっている。特にウェブアプリではその動線の予測しやすさから、事前読み込みを駆使することになると思うので、<code>pr</code>属性を使ってうまくプライオリティーを制御することでより効果的なプリロードを行えることだろう。対して<code>as</code>属性での形式の指定は、画像やフォントの場合は択一式で提供することも多いはずなので、<code>html</code>以外を使う機会はあまりなさそうだ。</p>
+
+<hr>
+
+<p>あとは実際にうまく機能してくれるかどうかということになる。</p>
+
+<aside class="sidenote">
+<p>Chrome 43では開発者ツールのネットワークで<code>rel=dns-prefetch</code>や<code>rel=prefetch</code>の動作を確認でき、タスク マネージャ(Chromeのそれ)でレンダリング・プロセスが走っていることにより<code>rel=prerender</code>の動作を確認できる。</p>
+</aside>
+
+<p><code>rel=dns-prefetch</code>と<code>rel=preconnect</code>の併記は、Firefox 38及びChrome 43、Internet Explorer 11でちゃんと名前解決を行っているらしいことが確認できた。</p>
+
+<p><code>rel=prefetch</code>と<code>rel=prerender</code>の両方に対応しているChrome 43とInternet Explorer 11ではどちらの併記方法もうまく動いているらしきことは確認できた。Firefox 38でも<code>rel=prefetch</code>の方の併記は問題ないようだった。</p>
+
+<hr>
+
+<p>速やかに<code>rel=preconnect</code>と<code>rel=preload</code>へと移行されるかというと大きく疑問が残る。Resource Hints仕様が現状の実装に比べて大きく強化されていることもそうだが、実装の足並みがバラバラで各自が制限や拡張を行っていることや、プリフェッチ系の機能への根強い抵抗があることもある。少なくともマルチ・プロセス化したFirefoxが<code>rel=prerender</code>相当の機能を実装するくらいになるまではどうなるかの予想は難しいだろう。</p>
+
+<p>ともあれ現時点では併記しておくというのは悪くない。運良くResource Hints仕様へ揃う可能性もなくはないからだ。</p></main>
+
+        <aside class="share-buttons">
+          <ul>
+            <li><a href="https://twitter.com/intent/tweet?text=dns-prefetch%E3%81%A8preconnect%E3%80%81%E3%81%9D%E3%81%97%E3%81%A6prefetch%E3%82%84prerender%E3%81%A8preload%E3%81%AE%E4%BD%B5%E8%A8%98%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fdns-prefetch-preconnect-prefetch-prerender-preload.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
+            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fdns-prefetch-preconnect-prefetch-prerender-preload.html">Facebook</a></li>
+            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=dns-prefetch%E3%81%A8preconnect%E3%80%81%E3%81%9D%E3%81%97%E3%81%A6prefetch%E3%82%84prerender%E3%81%A8preload%E3%81%AE%E4%BD%B5%E8%A8%98%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fwebdesign%2Fdns-prefetch-preconnect-prefetch-prerender-preload.html">Hatena</a></li>
+          </ul>
+        </aside>
+      </div>
+      
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    
+    </div>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search with DuckDuckGo">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+        <li><a href="https://www.facebook.com/hail2u.net">Facebook</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+      </ul>
+    
+      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
