@@ -303,7 +303,7 @@ module.exports = function (grunt) {
         },
 
         dest: "build/apple-touch-icon.png",
-        src: "src/img/icon.svg"
+        src: "src/img/faicon-large.svg"
       },
 
       cover: {
