@@ -1,0 +1,45 @@
+# Blosxom Plugin: canonical
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package canonical;
+
+use strict;
+use vars qw($url);
+
+# --- Configurable variables -----------
+
+# --- Plug-in package variables --------
+
+$url = "$blosxom::url";
+
+# --------------------------------------
+
+sub start {
+  my $path_info = $blosxom::path_info_full;
+  $path_info =~ s!/index\.html$!/!;
+
+  if ($path_info !~ /\.$blosxom::default_flavour$/ && $blosxom::path_info_yr) {
+    $url .= "/$blosxom::path_info_yr";
+
+    if ($blosxom::path_info_mo) {
+      $url .= "/$blosxom::path_info_mo_num";
+
+      if ($blosxom::path_info_da) {
+        $url .= "/$blosxom::path_info_da";
+      }
+    }
+  }
+
+  $url .= "/$blosxom::path_info";
+
+  if ($url !~ /\.$blosxom::default_flavour$/) {
+    $url .= '/';
+    $url =~ s!/+$!/!g;
+  }
+
+  return 1;
+}
+
+1;
+# vim:ft=perl:

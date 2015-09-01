@@ -5,7 +5,7 @@
 package utils;
 
 use strict;
-use vars qw($debug $path_info $canonical $has_eyecatch $has_image $card_type $ogp_image);
+use vars qw($debug $has_eyecatch $has_image $card_type $ogp_image);
 
 # --- Configurable variables -----------
 
@@ -15,7 +15,6 @@ my $ogp_image_url = "$blosxom::scheme//$blosxom::domain/apple-touch-icon.png";
 # --- Plug-in package variables --------
 
 $debug = "Hello from Blosxom $blosxom::version.";
-$canonical = "$blosxom::url";
 my $card_type_placeholder = '{{{utils::card_type_placeholder}}}';
 my $ogp_image_placeholder = '{{{utils::ogp_image_placeholder}}}';
 
@@ -24,28 +23,6 @@ my $ogp_image_placeholder = '{{{utils::ogp_image_placeholder}}}';
 use URI::Escape qw(uri_escape);
 
 sub start {
-  $path_info = $blosxom::path_info_full;
-  $path_info =~ s!/index\.html$!/!;
-
-  if ($path_info !~ /\.$blosxom::default_flavour$/ && $blosxom::path_info_yr) {
-    $canonical .= "/$blosxom::path_info_yr";
-
-    if ($blosxom::path_info_mo) {
-      $canonical .= "/$blosxom::path_info_mo_num";
-
-      if ($blosxom::path_info_da) {
-        $canonical .= "/$blosxom::path_info_da";
-      }
-    }
-  }
-
-  $canonical .= "/$blosxom::path_info";
-
-  if ($canonical !~ /\.$blosxom::default_flavour$/) {
-    $canonical .= '/';
-    $canonical =~ s!/+$!/!g;
-  }
-
   $card_type = $card_type_placeholder;
   $ogp_image = $ogp_image_placeholder;
 
