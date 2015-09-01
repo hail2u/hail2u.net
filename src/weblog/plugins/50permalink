@@ -6,7 +6,7 @@
 package permalink;
 
 use strict;
-use vars qw($is_permalink $title $title_sep $description);
+use vars qw($is_permalink $title $title_sep $description $has_eyecatch $has_image);
 
 # --- Configurable variables -----------
 
@@ -29,8 +29,8 @@ sub start {
   }
 
   $is_permalink = 1;
-  $title_sep = $str_title_sep;
   $title = $title_placeholder;
+  $title_sep = $str_title_sep;
   $description = $description_placeholder;
 
   return 1;
@@ -38,6 +38,17 @@ sub start {
 
 sub story {
   my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  $has_eyecatch = 0;
+  $has_image = 0;
+
+  if ($$body_ref =~ m!^\s*<figure class="full-width">!) {
+    $has_eyecatch = 1;
+  }
+
+  if ($$body_ref =~ m!<img!) {
+    $has_image = 1;
+  }
 
   $t = $$title_ref;
   $t =~ s!"!&quot;!g;
