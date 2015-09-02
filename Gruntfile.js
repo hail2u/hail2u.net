@@ -5,6 +5,37 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
 
+    blosxom: {
+      options: {
+        datadir: "src/weblog/entries/",
+        imgdir: "src/img/blog/",
+        rootdir: "src/weblog/",
+        staticdir: "build/blog/",
+        staticimgdir: "build/images/blog/"
+      },
+
+      all: {
+        options: {
+          all: true
+        }
+      },
+
+      article: {
+        options: {
+          feed: true,
+          index: true,
+          reindex: true
+        }
+      },
+
+      index: {
+        options: {
+          all: true,
+          index: true
+        }
+      }
+    },
+
     clean: {
       main: {
         src: ["tmp/**/*"]
@@ -208,7 +239,7 @@ module.exports = function (grunt) {
       }
     },
 
-    "css_mqpacker": {
+    css_mqpacker: {
       options: {
         map: {
           inline: false,
@@ -236,6 +267,133 @@ module.exports = function (grunt) {
         dest: "tmp/",
         expand: true,
         src: ["**/*.min.css"]
+      }
+    },
+
+    feedmix: {
+      options: {
+        builder: {
+          cdata: true,
+          xmldec: {
+            encoding: "UTF-8",
+            version: "1.0"
+          }
+        },
+        parser: {
+          trim: true
+        }
+      },
+
+      main: {
+        dest: "build/feed",
+        src: [
+          "src/feed/index.rss",
+          "build/blog/feed"
+        ]
+      }
+    },
+
+    generate: {
+      main: {
+        cwd: "src/html/",
+        dest: "build/",
+        expand: true,
+        ext: ".html",
+        rename: function (dest, src) {
+          if (src.lastIndexOf("theme.html") === src.length - 10) {
+            return "src/weblog/entries/themes/html/page";
+          }
+
+          return dest + src;
+        },
+        src: [
+          "**/*.mustache",
+          "!partial/*"
+        ]
+      },
+
+      blog: {
+        cwd: "src/html/",
+        dest: "build/",
+        expand: true,
+        ext: ".html",
+        src: [
+          "blog/index.mustache",
+          "index.mustache"
+        ]
+      }
+    },
+
+    gitcommit: {
+      assets: {
+        options: {
+          all: true,
+          message: "Update assets",
+          root: "src/css/"
+        }
+      },
+
+      blogPublish: {
+        options: {
+          all: true,
+          branch: "gh-pages",
+          message: "Add",
+          push: true,
+          root: "build/"
+        }
+      },
+
+      blogUpdate: {
+        options: {
+          all: true,
+          branch: "gh-pages",
+          message: "Update",
+          push: true,
+          root: "build/"
+        }
+      },
+
+      cacheUpdate: {
+        options: {
+          message: "Update cache files"
+        },
+
+        src: [
+          ".grunt/cache/articles.json",
+          "src/weblog/plugins/state/files_index.dat",
+          "src/weblog/plugins/state/others_index.dat"
+        ]
+      },
+
+      deploy: {
+        options: {
+          all: true,
+          branch: "gh-pages",
+          message: "Build",
+          push: true,
+          root: "build/"
+        }
+      },
+
+      entryAdd: {
+        options: {
+          message: "Add"
+        }
+      },
+
+      entryUpdate: {
+        options: {
+          message: "Update"
+        }
+      },
+
+      upload: {
+        options: {
+          branch: "gh-pages",
+          message: "Add",
+          push: true,
+          root: "build/"
+        }
       }
     },
 
@@ -381,164 +539,6 @@ module.exports = function (grunt) {
           "**/*.js",
           "!**/*.min.js"
         ]
-      }
-    },
-
-    blosxom: {
-      options: {
-        datadir: "src/weblog/entries/",
-        imgdir: "src/img/blog/",
-        rootdir: "src/weblog/",
-        staticdir: "build/blog/",
-        staticimgdir: "build/images/blog/"
-      },
-
-      all: {
-        options: {
-          all: true
-        }
-      },
-
-      article: {
-        options: {
-          feed: true,
-          index: true,
-          reindex: true
-        }
-      },
-
-      index: {
-        options: {
-          all: true,
-          index: true
-        }
-      }
-    },
-
-    feedmix: {
-      options: {
-        builder: {
-          cdata: true,
-          xmldec: {
-            encoding: "UTF-8",
-            version: "1.0"
-          }
-        },
-        parser: {
-          trim: true
-        }
-      },
-
-      main: {
-        dest: "build/feed",
-        src: [
-          "src/feed/index.rss",
-          "build/blog/feed"
-        ]
-      }
-    },
-
-    generate: {
-      main: {
-        cwd: "src/html/",
-        dest: "build/",
-        expand: true,
-        ext: ".html",
-        rename: function (dest, src) {
-          if (src.lastIndexOf("theme.html") === src.length - 10) {
-            return "src/weblog/entries/themes/html/page";
-          }
-
-          return dest + src;
-        },
-        src: [
-          "**/*.mustache",
-          "!partial/*"
-        ]
-      },
-
-      blog: {
-        cwd: "src/html/",
-        dest: "build/",
-        expand: true,
-        ext: ".html",
-        src: [
-          "blog/index.mustache",
-          "index.mustache"
-        ]
-      }
-    },
-
-    gitcommit: {
-      assets: {
-        options: {
-          all: true,
-          message: "Update assets",
-          root: "src/css/"
-        }
-      },
-
-      blogPublish: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Add",
-          push: true,
-          root: "build/"
-        }
-      },
-
-      blogUpdate: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Update",
-          push: true,
-          root: "build/"
-        }
-      },
-
-      cacheUpdate: {
-        options: {
-          message: "Update cache files"
-        },
-
-        src: [
-          ".grunt/cache/articles.json",
-          "src/weblog/plugins/state/files_index.dat",
-          "src/weblog/plugins/state/others_index.dat"
-        ]
-      },
-
-      deploy: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Build",
-          push: true,
-          root: "build/"
-        }
-      },
-
-      entryAdd: {
-        options: {
-          message: "Add"
-        }
-      },
-
-      entryUpdate: {
-        options: {
-          message: "Update"
-        }
-      },
-
-      upload: {
-        options: {
-          branch: "gh-pages",
-          message: "Add",
-          push: true,
-          root: "build/"
-        }
       }
     }
   });
