@@ -5,51 +5,20 @@
 package utils;
 
 use strict;
-use vars qw($debug $card_type $ogp_image);
+use vars qw($debug);
 
 # --- Configurable variables -----------
-
-my $card_type_name = 'summary';
-my $ogp_image_url = "$blosxom::scheme//$blosxom::domain/apple-touch-icon.png";
 
 # --- Plug-in package variables --------
 
 $debug = "Hello from Blosxom $blosxom::version.";
-my $card_type_placeholder = '{{{utils::card_type_placeholder}}}';
-my $ogp_image_placeholder = '{{{utils::ogp_image_placeholder}}}';
 
 # --------------------------------------
 
 use URI::Escape qw(uri_escape);
 
 sub start {
-  $card_type = $card_type_placeholder;
-  $ogp_image = $ogp_image_placeholder;
-
   return 1;
-}
-
-sub story {
-  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
-
-  $card_type_name = 'summary';
-
-  $$body_ref =~ s/<p>/<p itemprop="description">/;
-
-  if ($$body_ref =~ m!<img!) {
-    $card_type_name .= '_large_image';
-    $ogp_image_url = $$body_ref;
-    $ogp_image_url =~ s/^.*? src="(.*?)".*?$/$1/s;
-    $ogp_image_url =~ s!^/!$blosxom::scheme//$blosxom::domain/!;
-    $$body_ref =~ s/<img (.*?)>/<img $1 itemprop="image">/;
-  }
-
-  return 1;
-}
-
-sub last {
-  $blosxom::output =~ s/$card_type_placeholder/$card_type_name/gm;
-  $blosxom::output =~ s/$ogp_image_placeholder/$ogp_image_url/gm;
 }
 
 sub encode_uri_component {
