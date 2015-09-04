@@ -55,6 +55,11 @@ module.exports = function (grunt) {
           }
 
           file = path.relative(options.datadir, file.split("=>")[0]);
+
+          // if (file.indexOf("webdeign/") < 0) {
+          //   return;
+          // }
+
           files.push(file);
         });
       }
