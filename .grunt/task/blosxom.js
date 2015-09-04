@@ -63,6 +63,7 @@ module.exports = function (grunt) {
         total: files.length,
         width: 32
       });
+      num = 8;
     } else if (entry) {
       var i = 0;
       var images = fs.readFileSync(entry, "utf-8").match(/\bsrc="\/images\/blog\/.*?"/g);
@@ -106,10 +107,6 @@ module.exports = function (grunt) {
     files = files.map(function (file) {
       return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
     });
-
-    if (files.length > 8) {
-      num = 8;
-    }
 
     async.eachLimit(files, num, function (file, next) {
       var child = spawn(
