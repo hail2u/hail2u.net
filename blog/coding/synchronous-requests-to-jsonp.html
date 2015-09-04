@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
@@ -16,30 +16,9 @@
     <link href="/blog/coding/synchronous-requests-to-jsonp.html" rel="canonical">
     <link href="/feed" rel="alternate" type="application/rss+xml">
 
-    
-
-    
-
-    
-      <meta content="article" property="og:type">
-      <meta content="JSONPに同期リクエスト" property="og:title">
-      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
-      <meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない(Opera除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" property="og:description">
-    
-
-    <meta content="http://hail2u.net/blog/coding/synchronous-requests-to-jsonp.html" property="og:url">
-    <meta content="ja_JP" property="og:locale">
-    <meta content="Hail2u.net" property="og:site_name">
-    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
-    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
-
-    <meta content="summary" name="twitter:card">
-    <meta content="@hail2unet" name="twitter:site">
-    <meta content="@hail2u_" name="twitter:creator">
-
     <link href="/styles/style.min.css" rel="stylesheet">
-    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
-    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
 
     <script async src="/scripts/main.min.js"></script>
     
@@ -59,9 +38,7 @@
   </head>
 
   <body>
-      
-      <div class="global-header" role="banner">
-    
+    <header class="global-header" role="banner">
       
     
       <nav>
@@ -80,29 +57,22 @@
       </nav>
     
       
-      
-      </div>
-    
+    </header>
 
-    <div class="content">
-    
+    <main class="content" role="main">
       
 
 
-      <div role="main">
-      
-        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
-        <link href="/blog/coding/synchronous-requests-to-jsonp.html" itemprop="url">
-
-        <h1 class="first-heading" itemprop="name">JSONPに同期リクエスト</h1>
+      <article>
+        <h1 class="first-heading">JSONPに同期リクエスト</h1>
 
         <footer class="section-footer">
-          <p><time class="date" datetime="2006-09-25T13:46:00+09:00" itemprop="datePublished">Sep 25, 2006</time>
-            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+          <p><time class="date" datetime="2006-09-25T13:46:00+09:00">Sep 25, 2006</time>
+            · <span class="tag"><a href="/blog/coding/">Coding</a></span></p>
         </footer>
 
-        <main itemprop="articleBody">
-<p itemprop="description">コールバック関数を指定する形のJSONPへ<code>for</code>ループなどで複数回リクエストする場合、コールバック関数の実行される順は<code>for</code>ループで回した順と一致するとは限らない(<a href="http://www.opera.com/products/desktop/">Opera</a>除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。</p>
+        
+<p>コールバック関数を指定する形のJSONPへ<code>for</code>ループなどで複数回リクエストする場合、コールバック関数の実行される順は<code>for</code>ループで回した順と一致するとは限らない(<a href="http://www.opera.com/products/desktop/">Opera</a>除く)。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする(不可能というわけではない、多分)。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。</p>
 
 <p>同期リクエストするためには、<code>for</code>ループなどでJSONPへのリクエストを一気に処理するのではなく、リクエストをひとつに留めてコールバック関数内で次に進むといった形で実装するが良さそう・・・とアイディアを<a href="http://la.ma.la/blog/">バソキヤ求めて三千里の人</a>に貰った。</p>
 
@@ -149,17 +119,8 @@ function loadNext() {
 
 <p>あえて同期リクエストすることにより、非同期であることからスムースに処理できる(ことが多い)というJSONPの長所を失う上に、処理に時間がかかってしまうという欠点もある。それでもあえて非同期でリクエストしないことによって、得られるものがいくつかあるわけで、場合によってはあえて並行リクエストをしないという選択はアリなのかもしれない。</p>
 
-<p>少し前に作った指定したdel.icio.usのユーザーのnetworkに登録しているユーザーのブックマークを並べるモノは誰のブックマークやらわからない状態でずらっとブックマークが並べられていたが、同期リクエストに変更することによってユーザー名付きでブックマークを並べられるようになった。</p></main>
-
-        <aside class="share-buttons">
-          <ul>
-            <li><a href="https://twitter.com/intent/tweet?text=JSONP%E3%81%AB%E5%90%8C%E6%9C%9F%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fsynchronous-requests-to-jsonp.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
-            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fsynchronous-requests-to-jsonp.html">Facebook</a></li>
-            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=JSONP%E3%81%AB%E5%90%8C%E6%9C%9F%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Fsynchronous-requests-to-jsonp.html">Hatena</a></li>
-          </ul>
-        </aside>
-      </div>
-      
+<p>少し前に作った指定したdel.icio.usのユーザーのnetworkに登録しているユーザーのブックマークを並べるモノは誰のブックマークやらわからない状態でずらっとブックマークが並べられていたが、同期リクエストに変更することによってユーザー名付きでブックマークを並べられるようになった。</p>
+      </article>
 
       
         <aside class="ads">
@@ -176,8 +137,7 @@ function loadNext() {
       
 
       
-    
-    </div>
+    </main>
 
     <aside class="subcontent">
       <form class="site-search" action="https://duckduckgo.com/" role="search">
@@ -195,7 +155,7 @@ function loadNext() {
         <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
       </ul>
     
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+      <p id="author" class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
     </footer>
   </body>
 </html>

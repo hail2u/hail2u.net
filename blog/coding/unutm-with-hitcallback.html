@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
@@ -16,30 +16,9 @@
     <link href="/blog/coding/unutm-with-hitcallback.html" rel="canonical">
     <link href="/feed" rel="alternate" type="application/rss+xml">
 
-    
-
-    
-
-    
-      <meta content="article" property="og:type">
-      <meta content="hitCallbackを使ったUnUTMの実行" property="og:title">
-      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
-      <meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。" property="og:description">
-    
-
-    <meta content="http://hail2u.net/blog/coding/unutm-with-hitcallback.html" property="og:url">
-    <meta content="ja_JP" property="og:locale">
-    <meta content="Hail2u.net" property="og:site_name">
-    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
-    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
-
-    <meta content="summary" name="twitter:card">
-    <meta content="@hail2unet" name="twitter:site">
-    <meta content="@hail2u_" name="twitter:creator">
-
     <link href="/styles/style.min.css" rel="stylesheet">
-    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
-    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
 
     <script async src="/scripts/main.min.js"></script>
     
@@ -59,9 +38,7 @@
   </head>
 
   <body>
-      
-      <div class="global-header" role="banner">
-    
+    <header class="global-header" role="banner">
       
     
       <nav>
@@ -80,29 +57,22 @@
       </nav>
     
       
-      
-      </div>
-    
+    </header>
 
-    <div class="content">
-    
+    <main class="content" role="main">
       
 
 
-      <div role="main">
-      
-        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
-        <link href="/blog/coding/unutm-with-hitcallback.html" itemprop="url">
-
-        <h1 class="first-heading" itemprop="name">hitCallbackを使ったUnUTMの実行</h1>
+      <article>
+        <h1 class="first-heading">hitCallbackを使ったUnUTMの実行</h1>
 
         <footer class="section-footer">
-          <p><time class="date" datetime="2014-07-19T12:31:00+09:00" itemprop="datePublished">Jul 19, 2014</time>
-            · <span class="tag" itemprop="keywords"><a href="/blog/coding/">Coding</a></span></p>
+          <p><time class="date" datetime="2014-07-19T12:31:00+09:00">Jul 19, 2014</time>
+            · <span class="tag"><a href="/blog/coding/">Coding</a></span></p>
         </footer>
 
-        <main itemprop="articleBody">
-<p itemprop="description"><a href="https://github.com/hail2u/unutm">UnUTM</a>はGoogle Analyticsなどで使われる<code>utm_*</code>パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスの<code>ga()</code>を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。<code>ga()</code>を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できる<a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#hitCallback"><code>hitCallback</code>フィールド</a>を使うのが良さそう。</p>
+        
+<p><a href="https://github.com/hail2u/unutm">UnUTM</a>はGoogle Analyticsなどで使われる<code>utm_*</code>パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスの<code>ga()</code>を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。<code>ga()</code>を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できる<a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#hitCallback"><code>hitCallback</code>フィールド</a>を使うのが良さそう。</p>
 
 <p>普通に書くと以下の様なコードになる。</p>
 
@@ -144,17 +114,8 @@ ga(&#39;send&#39;, &#39;pageview&#39;, {
 &lt;/script&gt;
 </code></pre>
 
-<p>後で他から特定のトラッカーにちゃんとフィールドを追加する方法がわからなかったので、独立したライブラリにはできなかった。正確に言うと、追加自体は問題なくできるけれど、<code>ga('send')</code>が既にある場合はフィールドが追加される前に<code>send</code>されてしまうので、フィールドに設定した値が反映されることはないという感じ。例えば<code>hitCallback</code>の場合は値に設定した関数が発動しない。そのため利用はこのようにAnalyticsのコードを書き換えるという形しかなさそう。</p></main>
-
-        <aside class="share-buttons">
-          <ul>
-            <li><a href="https://twitter.com/intent/tweet?text=hitCallback%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9FUnUTM%E3%81%AE%E5%AE%9F%E8%A1%8C%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Funutm-with-hitcallback.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
-            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Funutm-with-hitcallback.html">Facebook</a></li>
-            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=hitCallback%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9FUnUTM%E3%81%AE%E5%AE%9F%E8%A1%8C%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fcoding%2Funutm-with-hitcallback.html">Hatena</a></li>
-          </ul>
-        </aside>
-      </div>
-      
+<p>後で他から特定のトラッカーにちゃんとフィールドを追加する方法がわからなかったので、独立したライブラリにはできなかった。正確に言うと、追加自体は問題なくできるけれど、<code>ga('send')</code>が既にある場合はフィールドが追加される前に<code>send</code>されてしまうので、フィールドに設定した値が反映されることはないという感じ。例えば<code>hitCallback</code>の場合は値に設定した関数が発動しない。そのため利用はこのようにAnalyticsのコードを書き換えるという形しかなさそう。</p>
+      </article>
 
       
         <aside class="ads">
@@ -171,8 +132,7 @@ ga(&#39;send&#39;, &#39;pageview&#39;, {
       
 
       
-    
-    </div>
+    </main>
 
     <aside class="subcontent">
       <form class="site-search" action="https://duckduckgo.com/" role="search">
@@ -190,7 +150,7 @@ ga(&#39;send&#39;, &#39;pageview&#39;, {
         <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
       </ul>
     
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+      <p id="author" class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
     </footer>
   </body>
 </html>

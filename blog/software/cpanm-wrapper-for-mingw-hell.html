@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
@@ -16,30 +16,9 @@
     <link href="/blog/software/cpanm-wrapper-for-mingw-hell.html" rel="canonical">
     <link href="/feed" rel="alternate" type="application/rss+xml">
 
-    
-
-    
-
-    
-      <meta content="article" property="og:type">
-      <meta content="いっぱいMinGWがある環境におけるStrawberry Perl向けcpanmのラッパー" property="og:title">
-      <meta content="http://hail2u.net/apple-touch-icon.png" property="og:image">
-      <meta content="MinGWに加えてGit for Windows、Strawberry Perl、DevKit付きのRubyInstallerと、MinGWがいっぱい入ってる。こういう環境だとStrawberry PerlのセットアップでPATH環境変数にld.exeとかがあるフォルダーへのパスを追加される(または追加する必要がある)のがコンフリクトの原因になってとても厄介。どうせもうcpanmしか使わないので、そのラッパー書いてRubyInstallerのDevKitとRubyGemの挙動に似たような感じにごまかすことにしたメモ。" property="og:description">
-    
-
-    <meta content="http://hail2u.net/blog/software/cpanm-wrapper-for-mingw-hell.html" property="og:url">
-    <meta content="ja_JP" property="og:locale">
-    <meta content="Hail2u.net" property="og:site_name">
-    <meta content="https://www.facebook.com/hail2u" prefix="article: http://ogp.me/ns/article#" property="article:author">
-    <meta content="100000022521341" prefix="fb: http://ogp.me/ns/fb#" property="fb:admins">
-
-    <meta content="summary" name="twitter:card">
-    <meta content="@hail2unet" name="twitter:site">
-    <meta content="@hail2u_" name="twitter:creator">
-
     <link href="/styles/style.min.css" rel="stylesheet">
-    <link class="js-load-css" href="/styles/eau-douce.css" rel="subresource">
-    <link class="js-load-css" href="/styles/mplus-1m-latin.css" rel="subresource">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
 
     <script async src="/scripts/main.min.js"></script>
     
@@ -59,9 +38,7 @@
   </head>
 
   <body>
-      
-      <div class="global-header" role="banner">
-    
+    <header class="global-header" role="banner">
       
     
       <nav>
@@ -80,29 +57,22 @@
       </nav>
     
       
-      
-      </div>
-    
+    </header>
 
-    <div class="content">
-    
+    <main class="content" role="main">
       
 
 
-      <div role="main">
-      
-        <meta content="http://hail2u.net/apple-touch-icon.png" itemprop="image">
-        <link href="/blog/software/cpanm-wrapper-for-mingw-hell.html" itemprop="url">
-
-        <h1 class="first-heading" itemprop="name">いっぱいMinGWがある環境におけるStrawberry Perl向けcpanmのラッパー</h1>
+      <article>
+        <h1 class="first-heading">いっぱいMinGWがある環境におけるStrawberry Perl向けcpanmのラッパー</h1>
 
         <footer class="section-footer">
-          <p><time class="date" datetime="2013-08-11T13:27:00+09:00" itemprop="datePublished">Aug 11, 2013</time>
-            · <span class="tag" itemprop="keywords"><a href="/blog/software/">Software</a></span></p>
+          <p><time class="date" datetime="2013-08-11T13:27:00+09:00">Aug 11, 2013</time>
+            · <span class="tag"><a href="/blog/software/">Software</a></span></p>
         </footer>
 
-        <main itemprop="articleBody">
-<p itemprop="description"><a href="http://www.mingw.org/">MinGW</a>に加えて<a href="http://msysgit.github.io/">Git for Windows</a>、<a href="http://strawberryperl.com/">Strawberry Perl</a>、DevKit付きの<a href="http://rubyinstaller.org/">RubyInstaller</a>と、MinGWがいっぱい入ってる。こういう環境だとStrawberry Perlのセットアップで<code>PATH</code>環境変数に<code>ld.exe</code>とかがあるフォルダーへのパスを追加される(または追加する必要がある)のがコンフリクトの原因になってとても厄介。どうせもう<code>cpanm</code>しか使わないので、そのラッパー書いてRubyInstallerのDevKitとRubyGemの挙動に似たような感じにごまかすことにしたメモ。</p>
+        
+<p><a href="http://www.mingw.org/">MinGW</a>に加えて<a href="http://msysgit.github.io/">Git for Windows</a>、<a href="http://strawberryperl.com/">Strawberry Perl</a>、DevKit付きの<a href="http://rubyinstaller.org/">RubyInstaller</a>と、MinGWがいっぱい入ってる。こういう環境だとStrawberry Perlのセットアップで<code>PATH</code>環境変数に<code>ld.exe</code>とかがあるフォルダーへのパスを追加される(または追加する必要がある)のがコンフリクトの原因になってとても厄介。どうせもう<code>cpanm</code>しか使わないので、そのラッパー書いてRubyInstallerのDevKitとRubyGemの挙動に似たような感じにごまかすことにしたメモ。</p>
 
 <p>RubyInstallerのDevKitとRubyGemはうまく出来ていて、DevKitをインストールするとRubyGemでインストール系のコマンドを使う時にだけ<a href="https://github.com/oneclick/rubyinstaller/blob/master/resources/devkit/dk.rb.erb#L61-L75"><code>PATH</code>にDevKitのフォルダーを追加してくれるようになっている</a>(んだと思う)。優先して<code>PATH</code>に追加されるので、かなりコンフリクトに強い。というかMinGWは使うときにだけ<code>PATH</code>に追加するのが王道だと思うので、こっちの方が素直な利用法な気がする。</p>
 
@@ -118,17 +88,8 @@ cmd /c set PATH=C:\strawberry\c\bin;%PATH% &amp;&amp; C:\strawberry\perl\bin\cpa
 
 <p>全ての引数をそのまま渡すので<code>cpanm</code>コマンドと使い方は同じ。</p>
 
-<p>このままだと例えばLWP::UserAgentでhttpsにアクセスする場合とかにDLLがなくて怒られるので、<code>dmake.exe</code>や<code>ld.exe</code>とかがあるフォルダーにあるDLLファイルを<code>perl.exe</code>があるフォルダーにコピーするという荒業でごまかしている。他にも不具合ありそうだけど、特定のモジュールがうまく動かないか<code>cpanm</code>でのユーザー領域へのモジュールのインストールが失敗するくらいだと思うので、あまり環境がぶっ壊れる感じにはならないんじゃないかと思う。</p></main>
-
-        <aside class="share-buttons">
-          <ul>
-            <li><a href="https://twitter.com/intent/tweet?text=%E3%81%84%E3%81%A3%E3%81%B1%E3%81%84MinGW%E3%81%8C%E3%81%82%E3%82%8B%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8BStrawberry%20Perl%E5%90%91%E3%81%91cpanm%E3%81%AE%E3%83%A9%E3%83%83%E3%83%91%E3%83%BC%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fcpanm-wrapper-for-mingw-hell.html&amp;via=hail2unet&amp;related=hail2u_">Twitter</a></li>
-            <li><a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fcpanm-wrapper-for-mingw-hell.html">Facebook</a></li>
-            <li><a href="http://b.hatena.ne.jp/my/add.confirm?title=%E3%81%84%E3%81%A3%E3%81%B1%E3%81%84MinGW%E3%81%8C%E3%81%82%E3%82%8B%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8BStrawberry%20Perl%E5%90%91%E3%81%91cpanm%E3%81%AE%E3%83%A9%E3%83%83%E3%83%91%E3%83%BC%20-%20Weblog%20-%20Hail2u.net&amp;url=http%3A%2F%2Fhail2u.net%2Fblog%2Fsoftware%2Fcpanm-wrapper-for-mingw-hell.html">Hatena</a></li>
-          </ul>
-        </aside>
-      </div>
-      
+<p>このままだと例えばLWP::UserAgentでhttpsにアクセスする場合とかにDLLがなくて怒られるので、<code>dmake.exe</code>や<code>ld.exe</code>とかがあるフォルダーにあるDLLファイルを<code>perl.exe</code>があるフォルダーにコピーするという荒業でごまかしている。他にも不具合ありそうだけど、特定のモジュールがうまく動かないか<code>cpanm</code>でのユーザー領域へのモジュールのインストールが失敗するくらいだと思うので、あまり環境がぶっ壊れる感じにはならないんじゃないかと思う。</p>
+      </article>
 
       
         <aside class="ads">
@@ -145,8 +106,7 @@ cmd /c set PATH=C:\strawberry\c\bin;%PATH% &amp;&amp; C:\strawberry\perl\bin\cpa
       
 
       
-    
-    </div>
+    </main>
 
     <aside class="subcontent">
       <form class="site-search" action="https://duckduckgo.com/" role="search">
@@ -164,7 +124,7 @@ cmd /c set PATH=C:\strawberry\c\bin;%PATH% &amp;&amp; C:\strawberry\perl\bin\cpa
         <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
       </ul>
     
-      <p id="author" class="byline" itemprop="author" itemscope itemtype="http://schema.org/Person">Made by <span itemprop="name"><a href="https://kyonagashima.com/" rel="author" itemprop="url">Kyo Nagashima</a></span>.</p>
+      <p id="author" class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
     </footer>
   </body>
 </html>
