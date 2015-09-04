@@ -42,7 +42,7 @@ module.exports = function (grunt) {
           return;
         }
 
-        files.push(dir + "\\index.html");
+        files.push(dir + path.sep + "index.html");
       });
 
       if (!options.index) {
@@ -56,7 +56,7 @@ module.exports = function (grunt) {
 
           file = path.relative(options.datadir, file.split("=>")[0]);
 
-          // if (file.indexOf("webdeign/") < 0) {
+          // if (file.indexOf("webdesign" + path.sep) < 0) {
           //   return;
           // }
 
