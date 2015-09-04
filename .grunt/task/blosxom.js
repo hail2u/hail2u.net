@@ -153,7 +153,7 @@ module.exports = function (grunt) {
         grunt.log.writeln("File \"" + file + "\" created.");
       }
 
-      if (num === 1 && args.length === 2) {
+      if (options.reindex) {
         args.pop();
       }
 
