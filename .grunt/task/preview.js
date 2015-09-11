@@ -8,8 +8,7 @@ module.exports = function (grunt) {
     var which = require("which").sync;
 
     var filePreview = "tmp/__preview.html";
-    var preview = function () {/*
-<!DOCTYPE html>
+    var preview = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -28,8 +27,7 @@ module.exports = function (grunt) {
       </article>
     </main>
   </body>
-</html>
-    */}.toString().split("\n").slice(1, -1).join("\n");
+</html>`;
     var fileEntry = grunt.option("file");
     var entry = fs.readFileSync(fileEntry, "UTF-8").split("\n");
     var title = entry.shift().replace(/\$/g, "$$$$");
