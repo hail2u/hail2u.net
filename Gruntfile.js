@@ -110,7 +110,8 @@ module.exports = function (grunt) {
               "toggle-column.js",
               "toggle-eyecatch.js",
               "toggle-outline.js",
-              "toggle-tagline.js"
+              "toggle-tagline.js",
+              "toggle-webfont.js"
             ]
           },
           {
@@ -192,7 +193,8 @@ module.exports = function (grunt) {
           "tmp/toggle-column.js": "src/js/toggle-column.js",
           "tmp/toggle-eyecatch.js": "src/js/toggle-eyecatch.js",
           "tmp/toggle-outline.js": "src/js/toggle-outline.js",
-          "tmp/toggle-tagline.js": "src/js/toggle-tagline.js"
+          "tmp/toggle-tagline.js": "src/js/toggle-tagline.js",
+          "tmp/toggle-webfont.js": "src/js/toggle-webfont.js"
         }
       },
 
