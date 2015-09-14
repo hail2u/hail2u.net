@@ -70,6 +70,18 @@ module.exports = function (grunt) {
     },
 
     copy: {
+      asitis: {
+        cwd: "src/",
+        dest: "build/",
+        expand: true,
+        src: [
+          "html/documents/*.html",
+          ".nojekyll",
+          "CNAME",
+          "*.txt"
+        ]
+      },
+
       assets: {
         files: [
           {
@@ -502,6 +514,7 @@ module.exports = function (grunt) {
     "build:html",
     "build:img",
     "build:js",
+    "copy:asitis",
     "sitemap"
   ]);
 
