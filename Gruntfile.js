@@ -124,19 +124,6 @@ module.exports = function (grunt) {
         ]
       },
 
-      cssPre: {
-        options: {
-          process: function (content) {
-            return content.replace(/"assets\/(.*?)"/g, "\"../$1\"");
-          }
-        },
-
-        cwd: "tmp/",
-        dest: "tmp/",
-        expand: true,
-        src: ["*.css"]
-      },
-
       img: {
         cwd: "src/img/",
         dest: "build/images/",
@@ -161,14 +148,26 @@ module.exports = function (grunt) {
       },
 
       jsMinified: {
-        files: {
-          "tmp/unutm.js": "node_modules/unutm/build/unutm.js",
-          "tmp/unutm.min.js": "node_modules/unutm/build/unutm.min.js",
-          "tmp/unutm.min.js.map": "node_modules/unutm/build/unutm.min.js.map"
-        }
+        cwd: "node_modules/unutm/build/",
+        dest: "tmp/",
+        expand: true,
+        src: ["unutm.*"]
       },
 
-      jsPre: {
+      precss: {
+        options: {
+          process: function (content) {
+            return content.replace(/"assets\/(.*?)"/g, "\"../$1\"");
+          }
+        },
+
+        cwd: "tmp/",
+        dest: "tmp/",
+        expand: true,
+        src: ["*.css"]
+      },
+
+      prejs: {
         cwd: "src/js/",
         dest: "tmp/",
         expand: true,
@@ -517,7 +516,7 @@ module.exports = function (grunt) {
   grunt.registerTask("build:css", [
     "clean",
     "sass",
-    "copy:cssPre",
+    "copy:precss",
     "css_mqpacker",
     "csswring",
     "concat:css",
@@ -542,7 +541,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:js", [
     "clean",
-    "copy:jsPre",
+    "copy:prejs",
     "uglify",
     "copy:jsMinified",
     "concat:js",
