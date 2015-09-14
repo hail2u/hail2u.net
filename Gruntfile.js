@@ -95,39 +95,21 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               "about/how-i-markup-and-style-this-website.png",
-              "asterisk.svg",
-              "favicon-large.svg",
-              "magnifying-glass.svg"
+              "favicon-large.svg"
             ]
           },
           {
             cwd: "src/js/",
             dest: "src/css/assets/scripts/",
             expand: true,
-            src: [
-              "lightbox.js",
-              "load-css.js",
-              "toggle-column.js",
-              "toggle-eyecatch.js",
-              "toggle-outline.js",
-              "toggle-tagline.js",
-              "toggle-webfont.js"
-            ]
+            flatten: true,
+            src: ["**/*.js"]
           },
           {
             cwd: "src/woff/",
             dest: "src/css/assets/fonts/",
             expand: true,
-            src: [
-              "eau-douce/b.woff",
-              "eau-douce/b.woff2",
-              "eau-douce/r.woff",
-              "eau-douce/r.woff2",
-              "mplus-1m-latin/b.woff",
-              "mplus-1m-latin/b.woff2",
-              "mplus-1m-latin/r.woff",
-              "mplus-1m-latin/r.woff2"
-            ]
+            src: ["**/*.woff*"]
           }
         ]
       },
@@ -160,11 +142,11 @@ module.exports = function (grunt) {
         dest: "build/images/",
         expand: true,
         src: [
-          "**/*.gif",
-          "**/*.ico",
-          "**/*.jpg",
-          "**/*.png",
-          "**/*.svg"
+          "**/*",
+          "!*.psd",
+          "!*.svg",
+          "!*.xcf",
+          "blog/*.svg"
         ]
       },
 
@@ -187,15 +169,11 @@ module.exports = function (grunt) {
       },
 
       jsPre: {
-        files: {
-          "tmp/lightbox.js": "src/js/lightbox.js",
-          "tmp/load-css.js": "src/js/load-css.js",
-          "tmp/toggle-column.js": "src/js/toggle-column.js",
-          "tmp/toggle-eyecatch.js": "src/js/toggle-eyecatch.js",
-          "tmp/toggle-outline.js": "src/js/toggle-outline.js",
-          "tmp/toggle-tagline.js": "src/js/toggle-tagline.js",
-          "tmp/toggle-webfont.js": "src/js/toggle-webfont.js"
-        }
+        cwd: "src/js/",
+        dest: "tmp/",
+        expand: true,
+        flatten: true,
+        src: ["**/*.js"]
       },
 
       styleGuide: {
@@ -227,16 +205,7 @@ module.exports = function (grunt) {
         cwd: "src/woff/",
         dest: "build/fonts/",
         expand: true,
-        src: [
-          "eau-douce/b.woff",
-          "eau-douce/b.woff2",
-          "eau-douce/r.woff",
-          "eau-douce/r.woff2",
-          "mplus-1m-latin/b.woff",
-          "mplus-1m-latin/b.woff2",
-          "mplus-1m-latin/r.woff",
-          "mplus-1m-latin/r.woff2"
-        ]
+        src: ["**/*.woff*"]
       }
     },
 
@@ -453,25 +422,6 @@ module.exports = function (grunt) {
 
         dest: "build/apple-touch-icon.png",
         src: "src/img/favicon-large.svg"
-      },
-
-      cover: {
-        options: {
-          width: 2560
-        },
-
-        cwd: "src/img/",
-        dest: "build/images/",
-        expand: true,
-        ext: ".png",
-        src: [
-          "about/cc-by-nc.svg",
-          "about/how-i-markup-and-style-this-website.svg",
-          "about/i-know-what-you-want-to-know.svg",
-          "blog/everything-that-i-want-to-forget.svg",
-          "documents/publish-what-i-learned.svg",
-          "make-things-simple.svg"
-        ]
       },
 
       favicon16: {
