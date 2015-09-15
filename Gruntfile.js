@@ -75,7 +75,7 @@ module.exports = function (grunt) {
         dest: "build/",
         expand: true,
         src: [
-          "html/documents/*.html",
+          "html/**/*.html",
           ".nojekyll",
           "CNAME",
           "*.txt"
