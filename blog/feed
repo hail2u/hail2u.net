@@ -10,12 +10,51 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 15 Sep 2015 08:01:20 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2015 08:46:47 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>レスポンシブ・タイポグラフィーなど</title>
+      <link>http://hail2u.net/blog/webdesign/on-responsive-typography.html</link>
+      <description>ウィンドウや画面のサイズに合わせて文字の大きさを自動的に変更するテクニックは、俗にレスポンシブ・タイポグラフィーまたはフルイド・タイプと呼ばれている。当初は僕も良いアイディアだと思い多用していたが、重要なのはビューポートの大きさではなくデバイスとの距離だろうと思い直したためもうほとんど使うことはない。当初から嫌いといっていた人はこの辺にしっかりとした意識があったのだろう。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/on-responsive-typography.html</guid>
+      <pubDate>Thu, 17 Sep 2015 08:46:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>ウィンドウや画面のサイズに合わせて文字の大きさを自動的に変更するテクニックは、俗に<a href="http://www.smashingmagazine.com/2015/06/responsive-typography-with-sass-maps/">レスポンシブ・タイポグラフィー</a>または<a href="http://trentwalton.com/2012/06/19/fluid-type/">フルイド・タイプ</a>と呼ばれている。当初は僕も良いアイディアだと思い多用していたが、重要なのはビューポートの大きさではなく<em>デバイスとの距離</em>だろうと思い直したためもうほとんど使うことはない。当初から嫌いといっていた人はこの辺にしっかりとした意識があったのだろう。</p>
+
+<p>使うことをやめた理由は、単純に技術的制約によってユーザーとデバイスの距離を知るすべがないからに過ぎない。レスポンシブ・タイポグラフィーが目指す、適切な文字の大きさを環境ごとに提示することそのものについては正しい考え方であると思う。ただ今利用されている「ビューポートが768px以下なら文字を小さめにする」というようなアバウトな実装だと問題がある。もちろん<code>vw</code>単位を使ったフォント・サイズ指定でも同じだ。</p>
+
+<p>なぜならばデスクトップPCでもそれくらいのビューポートになるようなウィンドウ・サイズでブラウザーを開いているかもしれないからだ。TwitterやFacebookを小さいウィンドウでデスクトップの端に表示しておくことはよくあるだろう。その場合ユーザーとデバイスの距離がある程度あるにもかかわらず文字が小さくなってしまうため、制作者が意図した読みやすさにはならない。iOS 9のアプリ分割表示なども（致命的ではなさそうではあるが）それに類する状況となるかもしれない。</p>
+
+<p>つまり<em>ビューポートの大きさとデバイスとの距離は一貫した関係にない</em>ということだ。これくらいのビューポートならデバイスとの距離はこれくらいだろう、とはならない。つまりそういったギャップを想定していない実装には大きな問題があるということになる。</p>
+
+<hr>
+
+<p>ユーザーとデバイスとの距離を決定付ける要因は以下の4つになるように思う。</p>
+
+<ol>
+<li>画面サイズ</li>
+<li>タッチ操作可能かどうか</li>
+<li>可搬性</li>
+<li>重量</li>
+<li>設置（利用）場所</li>
+</ol>
+
+<p>1と2は今でも知ることができるが、3から5はなかなか難しそうだ。例えば<a href="https://www.microsoft.com/microsoft-surface-hub/ja-jp">Surface Hub</a>のようなものは設置場所（壁か机か）によってユーザーとの距離が大きく変わるデバイスで、デバイスの特定が距離の判定にはつながらない。もちろん普通のSurfaceのようないわゆる2in1も机に置いて使う場合と手で持って使う場合で距離は変化するので、これもまた距離を判定することはできない。</p>
+
+<p>ジャイロ・センサーのようなものがあるなら手に持たれているかどうかは判定可能だと思うので、レスポンシブ・タイポグラフィーは完全な絵空事とまでは言えない。しかし「レスポンシブ」と付くその魅惑的な名前とは裏腹に、今は実装が非常に難しい、またはほとんど不可能なテクニックであると言って良いだろう。</p>
+
+<hr>
+
+<p>どうしても実装したいのならCSSで行うよりもJavaScriptでデバイス（ビューポートではなく）を特定し、ページ読み込み時に一度だけフォント・サイズを設定するというようなやり方が良さそうだ。デフォルトのフォントサイズをベースラインとして提供した上で、なんとかデバイスとの距離を判定することができそうなスマホやデスクトップPCなどのみに限って調整してやるに留めるという形にできるだろう。</p>
+
+<p>パフォーマンスや振る舞いを考えるとCSSで<code>*-device-width</code>を使ってやりたいところだが、画面に直接触れるタブレット機器と触れることのないモバイル・ノートブックPCを同じにみなすことになりかねず、うまくいかないだろう。<a href="http://www.w3.org/TR/mediaqueries-4/#issue-e310bdfa">Media Queries 4で削除される方向</a>で話が進んでいることも避ける理由になる（このあたりの話を聞いた時にデバイスとの距離を参照できる機能が追加されるというような話をどこかで聞いたような気がするが定かではない）。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>FOUTはプログレッシブ・エンハンスメントだ</title>
@@ -299,36 +338,6 @@
 <p>速やかに<code>rel=preconnect</code>と<code>rel=preload</code>へと移行されるかというと大きく疑問が残る。Resource Hints仕様が現状の実装に比べて大きく強化されていることもそうだが、実装の足並みがバラバラで各自が制限や拡張を行っていることや、プリフェッチ系の機能への根強い抵抗があることもある。少なくともマルチ・プロセス化したFirefoxが<code>rel=prerender</code>相当の機能を実装するくらいになるまではどうなるかの予想は難しいだろう。</p>
 
 <p>ともあれ現時点では併記しておくというのは悪くない。運良くResource Hints仕様へ揃う可能性もなくはないからだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>Postcards from Penguin</title>
-      <link>http://hail2u.net/blog/gadget/postcards-from-penguin.html</link>
-      <description>ペンギン・ブックスの本のカバーをポストカードにしたものの100枚入りのセット、Postcards from Pengin: One Hundred Book Covers in One Boxを衝動買いした。Amazon.co.jpでタイポグラフィーの本を漁ってたら見つけた。100枚入っていてもだいたいは同じデザイン……なんだけれどもそこが異様に良い。2500円くらいだった。</description>
-      <category>Gadget</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/gadget/postcards-from-penguin.html</guid>
-      <pubDate>Tue, 23 Jun 2015 00:37:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure >
-  <a href="http://www.amazon.co.jp/gp/product/0141044667/ref=as_li_ss_il?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=0141044667&amp;linkCode=as2&amp;tag=hail2unet-22"><img alt="Postcards from Penguin: One Hundred Book Covers in One Box" src="http://ecx.images-amazon.com/images/I/410OK-ej6sL.jpg"></a>
-</figure>
-
-<p>ペンギン・ブックスの本のカバーをポストカードにしたものの100枚入りのセット、<a href="http://www.amazon.co.jp/gp/product/0141044667/ref=as_li_ss_il?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=0141044667&amp;linkCode=as2&amp;tag=hail2unet-22">Postcards from Pengin: One Hundred Book Covers in One Box</a>を衝動買いした。Amazon.co.jpでタイポグラフィーの本を漁ってたら見つけた。100枚入っていてもだいたいは同じデザイン……なんだけれどもそこが異様に良い。2500円くらいだった。</p>
-
-<p><a href="https://instagram.com/p/4LPx-iqG1C/">ハードカバーの本のようなボックス</a>に入っている。背表紙のペンギンは安定の可愛さ。それほど高級感はないが、ボックスの表面はきちんとコーティングされていて、そう簡単にはヘタレなさそう。手触りも良い。</p>
-
-<p>レビューをあさってたら50種類の2枚づつみたいな話もみつけたけれど、ちゃんと100種類ある(と思う)。ペンギンはいつも直立不動っていう訳じゃないとか、ちょっとの違いが楽しい。ペリカン・ブックスのものも結構な割合で混ざっていて、こちらは科学的な教養書が中心なので、ちょっとレトロ・フューチャーっぽい雰囲気がありこれもまた楽しい。</p>
-
-<figure >
-  <a href="http://hail2u.net/images/blog/postcards-from-penguin.jpg"><img alt="華麗なるギャツビーや嵐が丘、オデュッセイア、ペリカン・ブックスの教本などのレトロなカバーをポストカードにしたもの" height="1530" src="http://hail2u.net/images/blog/postcards-from-penguin.jpg" width="2720"></a>
-  <figcaption>Postcards from Penguin</figcaption>
-</figure>
-
-<p>ばら撒いてるだけでも楽しくなってくる。額にうまく並べて飾れたら、下手なポスターよりもかっこよくなりそうだ。けど1枚25円もしないくらいなので、額の方が高くつく。切手を傷つけずに貼る時に使うヒンジとかをうまく使って工夫した方が良さそう。</p>
-
-<hr>
-
-<p>ポストカード集めの趣味をすごいバカにしていたけど、ハマりそうな感じがする。あまり手間と暇と金をかけずに収集感が得られて楽しい。</p>]]></content:encoded>
     </item>
 
   </channel>
