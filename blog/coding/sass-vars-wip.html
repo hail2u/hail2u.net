@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="時代はとっくにSass 3.4なのでローカル変数メインにしたいということが前提にある。そうすることで変数名にBEM等のしっかりとした命名規則を使わずに済み、自己言及的な変数名と数文字の変数名でおおむね完結することになる。パーシャル間で共有したい場合はしょうがないので!globalを使ってローカル変数をグローバルへエクスポートするようなあきらめを許容して誤魔化す。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>Sass変数の（ダメそうな）案 - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/coding/sass-vars-wip.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/">Hail2u.net</a></h1>
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" role="main">
+      
+
+
+      <article>
+        <h1 class="first-heading">Sass変数の（ダメそうな）案</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-09-19T00:05:00+09:00">Sep 19, 2015</time>
+            · <span class="tag"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        
+<p>時代はとっくにSass 3.4なのでローカル変数メインにしたいということが前提にある。そうすることで変数名にBEM等のしっかりとした命名規則を使わずに済み、自己言及的な変数名と数文字の変数名でおおむね完結することになる。パーシャル間で共有したい場合はしょうがないので<code>!global</code>を使ってローカル変数をグローバルへエクスポートするようなあきらめを許容して誤魔化す。</p>
+
+<p>まずある程度はグローバル変数として定義しておく必要がある。それらグローバル変数は自己言及的なもの（それこそ<code>$color-black: #000;</code>といったようなもの）で、実際にウェブサイトで使われる要素やクラスとは無関係に定義していく。</p>
+
+<pre><code class="language-scss">// _variables.scss
+$ratio: 1.7;
+
+$ratio-text: 1;
+$ratio-text-large: 1.5;
+
+$line-height-default: $ratio;
+</code></pre>
+
+<p>BEMで言うところのブロックのような意味のある単位で切り分けたパーシャルでは、グローバル変数を使いつつ、繰り返し使うならローカル変数を作る。ローカル変数はちゃんとスコープを抜けたら破棄されるので、短い名前で良い。が、ロゴとサイト・ナビゲーションで高さを揃えたいという要件があった場合、ルールセットの最後（他のスコープが始まる<em>前</em>）で<code>!global</code>フラグを使ってグローバル変数へとエクスポートする。</p>
+
+<pre><code class="language-scss">// _logo.scss
+.logo {
+  $fs: ($ratio-text-large * 1rem);
+  $lh: $line-height-default;
+
+  font-size: $fs;
+  line-height: $lh;
+
+  <mark>$height-logo: ($lh * $fs) !global;</mark>
+}
+</code></pre>
+
+<p>サイト・ナビゲーションでは定義済みのグローバル変数を参照するだけだ。</p>
+
+<pre><code class="language-scss">// _site-navigation.scss
+.site-navigation {
+  height: $height-logo;
+}
+</code></pre>
+
+<p>こうすると長い変数名を極力減らすことが可能になる。グローバル変数へとエクスポートする時だけ他との衝突が起こりうるので、その時だけ工夫した長い名前を付ける。</p>
+
+<hr>
+
+<p>どうやってもきれいに書けない。変数の命名パターンが3つになるのも死の香りが漂っている。変数を一箇所にまとめることのできるグローバル変数のみ使う手法は書きやすさで優る。ただローカル変数メインで書くと、特定のウィジェットを削除する時にそのファイルを削除するだけで終わりになり、一箇所に変数をまとめた場合にグローバルに定義しておくことになるそのウィジェット向けの変数がゴミとして残らないという保守性での見逃せないメリットがある。</p>
+
+<p>まずは自分のウェブサイトでローカル変数メインに書き換えて運用しはじめた。結論はもうちょっと先になりそうだ。</p>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+      </ul>
+    
+      <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->

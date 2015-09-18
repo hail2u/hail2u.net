@@ -10,6 +10,56 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
     <item>
+      <title>Sass変数の（ダメそうな）案</title>
+      <link>http://hail2u.net/blog/coding/sass-vars-wip.html</link>
+      <description>時代はとっくにSass 3.4なのでローカル変数メインにしたいということが前提にある。そうすることで変数名にBEM等のしっかりとした命名規則を使わずに済み、自己言及的な変数名と数文字の変数名でおおむね完結することになる。パーシャル間で共有したい場合はしょうがないので!globalを使ってローカル変数をグローバルへエクスポートするようなあきらめを許容して誤魔化す。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/sass-vars-wip.html</guid>
+      <pubDate>Sat, 19 Sep 2015 00:05:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>時代はとっくにSass 3.4なのでローカル変数メインにしたいということが前提にある。そうすることで変数名にBEM等のしっかりとした命名規則を使わずに済み、自己言及的な変数名と数文字の変数名でおおむね完結することになる。パーシャル間で共有したい場合はしょうがないので<code>!global</code>を使ってローカル変数をグローバルへエクスポートするようなあきらめを許容して誤魔化す。</p>
+
+<p>まずある程度はグローバル変数として定義しておく必要がある。それらグローバル変数は自己言及的なもの（それこそ<code>$color-black: #000;</code>といったようなもの）で、実際にウェブサイトで使われる要素やクラスとは無関係に定義していく。</p>
+
+<pre><code >// _variables.scss
+$ratio: 1.7;
+
+$ratio-text: 1;
+$ratio-text-large: 1.5;
+
+$line-height-default: $ratio;
+</code></pre>
+
+<p>BEMで言うところのブロックのような意味のある単位で切り分けたパーシャルでは、グローバル変数を使いつつ、繰り返し使うならローカル変数を作る。ローカル変数はちゃんとスコープを抜けたら破棄されるので、短い名前で良い。が、ロゴとサイト・ナビゲーションで高さを揃えたいという要件があった場合、ルールセットの最後（他のスコープが始まる<em>前</em>）で<code>!global</code>フラグを使ってグローバル変数へとエクスポートする。</p>
+
+<pre><code >// _logo.scss
+.logo {
+  $fs: ($ratio-text-large * 1rem);
+  $lh: $line-height-default;
+
+  font-size: $fs;
+  line-height: $lh;
+
+  <mark>$height-logo: ($lh * $fs) !global;</mark>
+}
+</code></pre>
+
+<p>サイト・ナビゲーションでは定義済みのグローバル変数を参照するだけだ。</p>
+
+<pre><code >// _site-navigation.scss
+.site-navigation {
+  height: $height-logo;
+}
+</code></pre>
+
+<p>こうすると長い変数名を極力減らすことが可能になる。グローバル変数へとエクスポートする時だけ他との衝突が起こりうるので、その時だけ工夫した長い名前を付ける。</p>
+
+<hr>
+
+<p>どうやってもきれいに書けない。変数の命名パターンが3つになるのも死の香りが漂っている。変数を一箇所にまとめることのできるグローバル変数のみ使う手法は書きやすさで優る。ただローカル変数メインで書くと、特定のウィジェットを削除する時にそのファイルを削除するだけで終わりになり、一箇所に変数をまとめた場合にグローバルに定義しておくことになるそのウィジェット向けの変数がゴミとして残らないという保守性での見逃せないメリットがある。</p>
+
+<p>まずは自分のウェブサイトでローカル変数メインに書き換えて運用しはじめた。結論はもうちょっと先になりそうだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>レスポンシブ・タイポグラフィーなど</title>
       <link>http://hail2u.net/blog/webdesign/on-responsive-typography.html</link>
       <description>ウィンドウや画面のサイズに合わせて文字の大きさを自動的に変更するテクニックは、俗にレスポンシブ・タイポグラフィーまたはフルイド・タイプと呼ばれている。当初は僕も良いアイディアだと思い多用していたが、重要なのはビューポートの大きさではなくデバイスとの距離だろうと思い直したためもうほとんど使うことはない。当初から嫌いといっていた人はこの辺にしっかりとした意識があったのだろう。</description>
@@ -263,56 +313,6 @@
 <p>このすっきりしない感じもそのうち変わってくるのだろうか。たまに来る父親宛ての郵便物にまだ軽いショックを受けたりもする。</p>]]></content:encoded>
     </item>
     <item>
-      <title>dns-prefetchとpreconnect、そしてprefetchやprerenderとpreloadの併記</title>
-      <link>http://hail2u.net/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html</link>
-      <description>2014年10月より標準化作業が公開されたResource Hints仕様により、既存のrel=dns-prefetchとrel=prefetch、そしてrel=prerenderは置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、link要素のrel属性は複数の値を取ることができるので、同時指定しても良い。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/dns-prefetch-preconnect-prefetch-prerender-preload.html</guid>
-      <pubDate>Wed, 24 Jun 2015 09:14:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>2014年10月より標準化作業が公開された<a href="http://www.w3.org/TR/resource-hints/">Resource Hints仕様</a>により、既存の<code>rel=dns-prefetch</code>と<code>rel=prefetch</code>、そして<code>rel=prerender</code>は置き換えられる可能性がある。この置き換えが起こる可能性は決して高くはなさそうなので、実装されているもののままでも構わないと思うが、<code>link</code>要素の<code>rel</code>属性は複数の値を取ることができるので、同時指定しても良い。</p>
-
-<p><code>rel=dns-prefetch</code>は<code>rel=preconnect</code>と完全に対応しているので、そのまま追加してやるだけになる。</p>
-
-<pre><code >&lt;link
-  href=&quot;//example.com&quot;
-  rel=&quot;preconnect dns-prefetch&quot;&gt;
-</code></pre>
-
-<p><code>rel=prefetch</code>と<code>rel=prerender</code>はResource Hints仕様では<code>rel=preload</code>に統合される。事前にレンダリングまでするかどうかは<code>loadpolicy</code>属性を併用することで制御する。</p>
-
-<pre><code >&lt;link
-  href=&quot;http://example.com/fetch&quot;
-  loadpolicy=&quot;next <mark>inert</mark>&quot;
-  rel=&quot;preload prefetch&quot;&gt;
-&lt;link
-  href=&quot;http://example.com/render&quot;
-  loadpolicy=&quot;next&quot;
-  rel=&quot;preload prerender&quot;&gt;
-</code></pre>
-
-<p><code>rel=preload</code>はデフォルトで事前レンダリングを行うように支持するということになっており、それを無効にするためには<code>loadpolicy</code>属性で不活性やサボるなどという意味を持つ<code>inert</code>を指定する。つまり<code>rel=prefetch</code>と同じ挙動にしたい場合は<code>inert</code>を追加するということになる。</p>
-
-<p><code>rel=preload</code>では他に<code>pr</code>属性を使って<del>読み込みのプライオリティー</del>を、<code>as</code>属性を使って読み込むリソースの形式を指定することもできるようになっている。<del>特にウェブアプリではその動線の予測しやすさから、事前読み込みを駆使することになると思うので、<code>pr</code>属性を使ってうまくプライオリティーを制御することでより効果的なプリロードを行えることだろう。</del>対して<code>as</code>属性での形式の指定は、画像やフォントの場合は択一式で提供することも多いはずなので、<code>html</code>以外を使う機会はあまりなさそうだ。</p>
-
-<hr>
-
-<p>あとは実際にうまく機能してくれるかどうかということになる。</p>
-
-<aside >
-<p>Chrome 43では開発者ツールのネットワークで<code>rel=dns-prefetch</code>や<code>rel=prefetch</code>の動作を確認でき、タスク マネージャ(Chromeのそれ)でレンダリング・プロセスが走っていることにより<code>rel=prerender</code>の動作を確認できる。</p>
-</aside>
-
-<p><code>rel=dns-prefetch</code>と<code>rel=preconnect</code>の併記は、Firefox 38及びChrome 43、Internet Explorer 11でちゃんと名前解決を行っているらしいことが確認できた。</p>
-
-<p><code>rel=prefetch</code>と<code>rel=prerender</code>の両方に対応しているChrome 43とInternet Explorer 11ではどちらの併記方法もうまく動いているらしきことは確認できた。Firefox 38でも<code>rel=prefetch</code>の方の併記は問題ないようだった。</p>
-
-<hr>
-
-<p>速やかに<code>rel=preconnect</code>と<code>rel=preload</code>へと移行されるかというと大きく疑問が残る。Resource Hints仕様が現状の実装に比べて大きく強化されていることもそうだが、実装の足並みがバラバラで各自が制限や拡張を行っていることや、プリフェッチ系の機能への根強い抵抗があることもある。少なくともマルチ・プロセス化したFirefoxが<code>rel=prerender</code>相当の機能を実装するくらいになるまではどうなるかの予想は難しいだろう。</p>
-
-<p>ともあれ現時点では併記しておくというのは悪くない。運良くResource Hints仕様へ揃う可能性もなくはないからだ。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -347,6 +347,6 @@
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Thu, 17 Sep 2015 08:46:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2015 00:05:00 +0900</lastBuildDate>
   </channel>
 </rss>
