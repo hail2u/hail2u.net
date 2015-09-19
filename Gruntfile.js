@@ -444,15 +444,6 @@ module.exports = function (grunt) {
         src: "src/img/favicon.svg"
       },
 
-      favicon256: {
-        options: {
-          width: 256
-        },
-
-        dest: "tmp/favicon-256.png",
-        src: "src/img/favicon.svg"
-      },
-
       favicon32: {
         options: {
           width: 32
