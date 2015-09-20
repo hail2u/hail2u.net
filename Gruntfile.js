@@ -69,14 +69,23 @@ module.exports = function (grunt) {
 
     copy: {
       asitis: {
-        cwd: "src/",
-        dest: "dist/",
-        expand: true,
-        src: [
-          "html/**/*.html",
-          ".nojekyll",
-          "CNAME",
-          "*.txt"
+        files: [
+          {
+            cwd: "src/",
+            dest: "dist/",
+            expand: true,
+            src: [
+              "*.txt",
+              ".nojekyll",
+              "CNAME"
+            ]
+          },
+          {
+            cwd: "src/html/",
+            dest: "dist/",
+            expand: true,
+            src: ["**/*.html"]
+          }
         ]
       },
 
