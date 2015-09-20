@@ -33,7 +33,7 @@ module.exports = function (grunt) {
     var title = entry.shift().replace(/\$/g, "$$$$");
     var body = entry.join("\n").replace(/\$/g, "$$$$");
     body = marked(body).replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
-    preview = preview.replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body).replace(/="\//g, "=\"../build/");
+    preview = preview.replace(/<%TITLE%>/g, title).replace(/<%BODY%>/g, body).replace(/="\//g, "=\"../dist/");
     fs.outputFileSync(filePreview, preview);
     grunt.log.writeln('File "' + filePreview + '" created.');
     spawn(which("open"), [filePreview]);

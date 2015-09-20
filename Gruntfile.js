@@ -10,8 +10,8 @@ module.exports = function (grunt) {
         datadir: "src/weblog/entries/",
         imgdir: "src/img/blog/",
         rootdir: "src/weblog/",
-        staticdir: "build/blog/",
-        staticimgdir: "build/images/blog/"
+        staticdir: "dist/blog/",
+        staticimgdir: "dist/images/blog/"
       },
 
       all: {
@@ -70,7 +70,7 @@ module.exports = function (grunt) {
     copy: {
       asitis: {
         cwd: "src/",
-        dest: "build/",
+        dest: "dist/",
         expand: true,
         src: [
           "html/**/*.html",
@@ -126,7 +126,7 @@ module.exports = function (grunt) {
 
       css: {
         cwd: "tmp/",
-        dest: "build/styles/",
+        dest: "dist/styles/",
         expand: true,
         src: [
           "*.css",
@@ -136,7 +136,7 @@ module.exports = function (grunt) {
 
       img: {
         cwd: "src/img/",
-        dest: "build/images/",
+        dest: "dist/images/",
         expand: true,
         src: [
           "**/*",
@@ -149,7 +149,7 @@ module.exports = function (grunt) {
 
       js: {
         cwd: "tmp/",
-        dest: "build/scripts/",
+        dest: "dist/scripts/",
         expand: true,
         src: [
           "**/*.js",
@@ -206,13 +206,13 @@ module.exports = function (grunt) {
           }
         },
 
-        dest: "build/about/style-guide/index.html",
+        dest: "dist/about/style-guide/index.html",
         src: "src/css/test.html"
       },
 
       woff: {
         cwd: "src/woff/",
-        dest: "build/fonts/",
+        dest: "dist/fonts/",
         expand: true,
         src: ["**/*.woff*"]
       }
@@ -264,10 +264,10 @@ module.exports = function (grunt) {
       },
 
       main: {
-        dest: "build/feed",
+        dest: "dist/feed",
         src: [
-          "src/feed/index.rss",
-          "build/blog/feed"
+          "src/index.rss",
+          "dist/blog/feed"
         ]
       }
     },
@@ -275,7 +275,7 @@ module.exports = function (grunt) {
     generate: {
       main: {
         cwd: "src/html/",
-        dest: "build/",
+        dest: "dist/",
         expand: true,
         ext: ".html",
         rename: function (dest, src) {
@@ -293,7 +293,7 @@ module.exports = function (grunt) {
 
       blog: {
         cwd: "src/html/",
-        dest: "build/",
+        dest: "dist/",
         expand: true,
         ext: ".html",
         src: [
@@ -318,7 +318,7 @@ module.exports = function (grunt) {
           branch: "gh-pages",
           message: "Add",
           push: true,
-          root: "build/"
+          root: "dist/"
         }
       },
 
@@ -328,7 +328,7 @@ module.exports = function (grunt) {
           branch: "gh-pages",
           message: "Update",
           push: true,
-          root: "build/"
+          root: "dist/"
         }
       },
 
@@ -350,7 +350,7 @@ module.exports = function (grunt) {
           branch: "gh-pages",
           message: "Build",
           push: true,
-          root: "build/"
+          root: "dist/"
         }
       },
 
@@ -371,7 +371,7 @@ module.exports = function (grunt) {
           branch: "gh-pages",
           message: "Add",
           push: true,
-          root: "build/"
+          root: "dist/"
         }
       }
     },
@@ -382,7 +382,7 @@ module.exports = function (grunt) {
       },
 
       main: {
-        dest: "build/favicon.ico",
+        dest: "dist/favicon.ico",
         src: ["tmp/favicon-*.png"]
       }
     },
@@ -429,7 +429,7 @@ module.exports = function (grunt) {
           width: 180
         },
 
-        dest: "build/apple-touch-icon.png",
+        dest: "dist/apple-touch-icon.png",
         src: "src/img/favicon-large.svg"
       },
 

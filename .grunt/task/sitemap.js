@@ -9,7 +9,7 @@ module.exports = function (grunt) {
     var path = require("path");
     var xml2js = require("xml2js");
 
-    var dest = "build/sitemap.xml";
+    var dest = "dist/sitemap.xml";
     var sitemap = {
       urlset: {
         $: {
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       "/documents/"
     ];
 
-    fs.readdirSync("build/documents/").forEach(function (file) {
+    fs.readdirSync("src/html/documents/").forEach(function (file) {
       if (file === "index.html" || file.indexOf(".html") !== file.length - 5) {
         return false;
       }
