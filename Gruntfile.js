@@ -23,14 +23,12 @@ module.exports = function (grunt) {
       article: {
         options: {
           feed: true,
-          index: true,
           reindex: true
         }
       },
 
       index: {
         options: {
-          all: true,
           index: true
         }
       }
