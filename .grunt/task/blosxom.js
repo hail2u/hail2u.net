@@ -150,7 +150,6 @@ module.exports = function (grunt) {
         args.pop();
       }
 
-      next();
       async.setImmediate(function () {
         next();
       });
