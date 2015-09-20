@@ -18,6 +18,7 @@ module.exports = function (grunt) {
     var entry = grunt.option("file");
     var fileCache;
     var files = [];
+    var images = [];
     var num = 1;
     var options = this.options({
       all: false,
@@ -70,9 +71,10 @@ module.exports = function (grunt) {
       });
       num = 8;
     } else if (entry) {
-      var i = 0;
-      var images = fs.readFileSync(entry, "utf-8").match(/\bsrc="\/images\/blog\/.*?"/g);
-      var n = "image";
+      images = fs.readFileSync(
+        entry,
+        "utf-8"
+      ).match(/\bsrc="\/images\/blog\/.*?"/g);
 
       if (path.resolve(entry) === path.normalize(entry)) {
         entry = path.relative(options.datadir, entry);
@@ -94,16 +96,16 @@ module.exports = function (grunt) {
 
           if (fs.statSync(src).isFile()) {
             fs.copySync(src, dest);
-            i++;
             grunt.verbose.writeln("Image \"" + src + "\" copied to \"" + dest + "\".");
           }
         });
+        grunt.log.write(images.length + " image");
 
-        if (i > 1) {
-          n += "s";
+        if (images.length > 1) {
+          grunt.log.write("s");
         }
 
-        grunt.log.writeln(i + " " + n + " copied.");
+        grunt.log.writeln(" copied.");
       } else {
         grunt.log.writeln("Image not found.");
       }
