@@ -87,9 +87,11 @@ module.exports = function (grunt) {
           src = options.imgdir + image;
           dest = options.staticimgdir + image;
 
-          if (fs.statSync(src).isFile()) {
+          try {
             fs.copySync(src, dest);
             grunt.verbose.writeln("Image \"" + src + "\" copied to \"" + dest + "\".");
+          } catch (e) {
+            throw e;
           }
         });
         grunt.log.write(images.length + " image");
