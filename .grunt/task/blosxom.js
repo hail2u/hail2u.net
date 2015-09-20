@@ -68,16 +68,9 @@ module.exports = function (grunt) {
         entry,
         "utf-8"
       ).match(/\bsrc="\/images\/blog\/.*?"/g);
-
-      if (path.resolve(entry) === path.normalize(entry)) {
-        entry = path.relative(options.datadir, entry);
-        files.unshift(entry);
-      }
-
-      if (options.index) {
-        entry = path.join(path.dirname(entry), "index.html");
-        files.push(entry);
-      }
+      entry = path.relative(options.datadir, entry);
+      files.unshift(entry);
+      files.push(path.join(path.dirname(entry), "index.html"));
 
       if (images) {
         images.forEach(function (image) {
