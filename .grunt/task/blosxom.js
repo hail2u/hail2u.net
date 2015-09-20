@@ -55,13 +55,7 @@ module.exports = function (grunt) {
             return;
           }
 
-          file = path.relative(options.datadir, file.split("=>")[0]);
-
-          // if (file.indexOf("webdesign" + path.sep) < 0) {
-          //   return;
-          // }
-
-          files.push(file);
+          files.push(path.relative(options.datadir, file.split("=>")[0]));
         });
       }
 
@@ -162,6 +156,9 @@ module.exports = function (grunt) {
       }
 
       next();
+      async.setImmediate(function () {
+        next();
+      });
     }, function (error) {
       done(error);
     });
