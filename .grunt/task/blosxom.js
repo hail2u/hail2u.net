@@ -29,15 +29,15 @@ module.exports = function (grunt) {
     });
     fileCache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
 
-    if (options.feed) {
-      files.push("index.rss");
-    }
-
     if (options.reindex) {
       args.push("reindex=1");
     }
 
-    if (options.all) {
+    if (options.feed) {
+      files.push("index.rss");
+    }
+
+    if (options.index) {
       fs.readdirSync(options.datadir).forEach(function (dir) {
         if (dir === "themes") {
           return;
@@ -45,25 +45,24 @@ module.exports = function (grunt) {
 
         files.push(dir + path.sep + "index.html");
       });
+    }
 
-      if (!options.index) {
-        fs.readFileSync(
-          fileCache,
-          "utf8"
-        ).split(/\r?\n/).forEach(function (file) {
-          if (file === "") {
-            return;
-          }
+    if (options.all) {
+      num = 8;
+      fs.readFileSync(
+        fileCache,
+        "utf8"
+      ).split(/\r?\n/).forEach(function (file) {
+        if (file === "") {
+          return;
+        }
 
-          files.push(path.relative(options.datadir, file.split("=>")[0]));
-        });
-      }
-
+        files.push(path.relative(options.datadir, file.split("=>")[0]));
+      });
       bar = new ProgressBar("Rebuilding [:bar] :percent :elapsed", {
         total: files.length,
         width: 32
       });
-      num = 8;
     } else if (entry) {
       images = fs.readFileSync(
         entry,
