@@ -82,7 +82,8 @@ module.exports = function (grunt) {
 
           try {
             fs.copySync(src, dest);
-            grunt.verbose.writeln("Image \"" + src + "\" copied to \"" + dest + "\".");
+            grunt.verbose.writeln("Image \"" + src + "\" copied to \"" + dest +
+              "\".");
           } catch (e) {
             throw e;
           }
