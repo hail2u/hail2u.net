@@ -10,12 +10,58 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 21 Sep 2015 11:57:10 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 22 Sep 2015 11:38:56 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>表のセルにおける少数の行揃え</title>
+      <link>http://hail2u.net/blog/webdesign/decimal-alignment-in-table-cell.html</link>
+      <description>表のセルでは数字は右揃えにすることが多い。しかし少数を右揃えにすると、小数点以下の桁数が違う時に読みづらくなる。等幅フォントにしてもそれは解決しない。少数点がうまく縦に並ぶように揃えたいわけだ。CSSではtext-alignプロパティーで文字列が指定できるようにしたいようで、いずれ可能になるかもしれない。とされているが、実はHTML4.01の頃からほぼ同じ機能は仕様で定義されているものの実装はないので、期待は薄い……と思ったものの、うっかり実装されていないかどうか確認した。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/decimal-alignment-in-table-cell.html</guid>
+      <pubDate>Tue, 22 Sep 2015 11:38:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>表のセルでは数字は右揃えにすることが多い。しかし少数を右揃えにすると、小数点以下の桁数が違う時に読みづらくなる。等幅フォントにしてもそれは解決しない。少数<em>点</em>がうまく縦に並ぶように揃えたいわけだ。CSSでは<a href="https://drafts.csswg.org/css-text-4/#character-alignment"><code>text-align</code>プロパティーで文字列が指定できるようにしたい</a>ようで、いずれ可能になるかもしれない。とされているが、実は<a href="http://www.w3.org/TR/html401/struct/tables.html#h-11.3.2">HTML4.01の頃からほぼ同じ機能は仕様で定義されている</a>ものの実装はないので、期待は薄い……と思ったものの、うっかり実装されていないかどうか確認した。</p>
+
+<p >See also: <a href="http://hail2u.net/pub/test/639.html">Test Page for Decimal Alignment in Table Cell</a></p>
+
+<p>やはりというか<code>&lt;td align=&quot;char&quot; char=&quot;.&quot;&gt;</code>の実装はなかった。ついでに<code>text-align: &quot;.&quot;</code>もテストしてみたが、こちらもまだ実装はない模様だ。テスト・ページでは省いたが、ベンダー拡張プリフィックスでの実装ということもなかった。</p>
+
+<hr>
+
+<p>この小数点での行揃えは前に@ub_pnrと「欲しいね」とか言ってたような記憶がある。それ以外にもどうにかしてそうして欲しいというようなことはよく言われる。じゃあどうするかというと、大体は表で欲しがられ、その表は何かしらのデータから生成されるので、データ側をいじって誤魔化している。</p>
+
+<ol>
+<li>データをいじり、小数点以下の最大桁に足りない分半角スペースを追加する</li>
+<li>セルのスタイルで以下の3つを指定する<ol>
+<li><code>font-family: monospace</code></li>
+<li><code>text-align: right</code></li>
+<li><code>white-space: pre</code></li>
+</ol>
+</li>
+</ol>
+
+<p>これでなんとか揃う。</p>
+
+<p>今時だと等幅フォントに変える代わりに<code>font-feature-settings</code>プロパティーで<code>tnum &quot;1&quot;</code>するのも良い。このウェブサイトでは<a href="http://hail2u.net/pub/test/639.html">ずいぶん前から試しに設定してみて</a>おり、稀に効果を発揮していた（今は発揮していない）。もちろん対応フォントを上流で使っている必要はあるが、違うフォントを使わずに専用の等幅数字を使えるので、より読みやすい結果となりうる。</p>
+
+<hr>
+
+<p>CSS Text Module Level 4はLevel 3に入れることはできなかったものが寄せ集められている。</p>
+
+<ul>
+<li><code>display: inline-block</code>でできる隙間を潰す、<code>text-space-collapse: discard</code></li>
+<li>最後の一文字や句読点だけ次の行になったりしなくなる、<code>text-wrap: balance</code></li>
+<li>完全なる自動ハイフネーション</li>
+<li>日本語の文章内の英単語の前後に空白をはさむ、<code>text-spacing: ideograph-alpha</code></li>
+</ul>
+
+<p>などなど、<del>人類</del><ins>ウェブ・デザイナー</ins>の夢が詰まっているので、可及的速やかに実装が出てくるとうれしい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Mobile Safari 8と表のセルのフォント・サイズ</title>
@@ -297,35 +343,6 @@ $line-height-default: $ratio;
 <p>天の声に「CSSの基本は発声から」と言われる。朝起きたらまず裏の神社にお参りし、今日も一日CSSをうまく書けるように大きな声でお祈りすることが義務付けられる。恥ずかしいのでサボったらテキスト・エディターでCSSファイルが開けなくなった。基本大事だなーと思ったところで目が覚める。</p>
 
 <p>少し前にCSSかるたみたいな夢も見た。読む人が「display」って読むと、並べてある<code>block</code>や<code>inline</code>などを取れる。取れる札が複数あるかるた、ゲームとして成立しないことがわかった。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>物の価値</title>
-      <link>http://hail2u.net/blog/misc/the-value-of-things.html</link>
-      <description>遺品の整理をやっているわけだが、親(や多分配偶者)のものにはまったく価値が見いだせなくて、捨てるしかどうしようもない感じだ。思い出が多少あるものがあっても、明らかに着ることのできない洋服だったりする。袖が足らなかったり、ウエストが10cmくらい余ったり。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/the-value-of-things.html</guid>
-      <pubDate>Thu, 27 Aug 2015 09:57:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure >
-  <a href="http://hail2u.net/images/blog/23-year-old-t-shirts.jpg"><img alt="23年モノのTシャツ" height="2360" src="http://hail2u.net/images/blog/23-year-old-t-shirts.jpg" width="2360"></a>
-</figure>
-
-<p>遺品の整理をやっているわけだが、親(や多分配偶者)のものにはまったく価値が見いだせなくて、捨てるしかどうしようもない感じだ。思い出が多少あるものがあっても、明らかに着ることのできない洋服だったりする。袖が足らなかったり、ウエストが10cmくらい余ったり。</p>
-
-<p>サイズが問題にならない鞄類は取っておいても良さそうだったが、あまりきれい好きではなかったため、酒のシミや匂いで厳しかった。唯一、一澤帆布のトートバッグは大丈夫そうだったので洗濯して使うことにした。あとはスーツケースか。服もカシミアのニットだけは貰って着ようと思う。</p>
-
-<hr>
-
-<p>多くの場合物の金銭的な価値は買った時点で失われ、利用価値と利用に伴う思い入れだけになる。最初の画像は僕が高校生の頃に買ったTシャツでなんだかんだで23年着ている。購入当時既に古着だったので、最低でも30年物くらいだと思う。だからといっても特に価値があるわけではなく、着やすいわけでもない。色は悪くないけれど、悪くはない程度だ。穴でもできない限りは捨てることなく毎夏着ることだろう。でも僕が死んだら間違いなく捨てられる。</p>
-
-<p>いつ死んでも良いように身の回りのものを極限まで減らすのは馬鹿げていると思うけれど、明らかに遺族に負担がかかりそうなものは出来うる限り整理しておくくらいの気は使っても良いのかもしれない。服とかは捨てるのがまぁまぁ大変(そもそもまとめるのが大変であるとか、うちの自治体では雨降ってると出せないとかある)なので、着ないものはなるべく整理しておいた方が良さそうだ。</p>
-
-<p>趣味のものについてはどうしようもないので、その整理に余力を残してやるためにも……という意味もある。生前にどうにかしろとか言うとケンカどころか警察沙汰になりかねないのでやめた方が良い。ようやく5万枚のデジタル写真の処理が終わって、あとは50PくらいあるB5サイズのアルバム30冊とスライド化されている3万枚くらいのネガの処理に移る。</p>
-
-<hr>
-
-<p>葬式直後くらいから何回か「不要な服や靴を無料で回収いたします」という主旨の電話が頻繁にかかってくるようになった。葬儀屋か火葬場、市役所あたりから伝わる謎のネットワークがあるのだろうか。</p>]]></content:encoded>
     </item>
 
   </channel>

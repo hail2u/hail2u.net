@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="表のセルでは数字は右揃えにすることが多い。しかし少数を右揃えにすると、小数点以下の桁数が違う時に読みづらくなる。等幅フォントにしてもそれは解決しない。少数点がうまく縦に並ぶように揃えたいわけだ。CSSではtext-alignプロパティーで文字列が指定できるようにしたいようで、いずれ可能になるかもしれない。とされているが、実はHTML4.01の頃からほぼ同じ機能は仕様で定義されているものの実装はないので、期待は薄い……と思ったものの、うっかり実装されていないかどうか確認した。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>表のセルにおける少数の行揃え - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/decimal-alignment-in-table-cell.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/">Hail2u.net</a></h1>
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" role="main">
+      
+
+
+      <article>
+        <h1 class="first-heading">表のセルにおける少数の行揃え</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-09-22T11:38:00+09:00">Sep 22, 2015</time>
+            · <span class="tag"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        
+<p>表のセルでは数字は右揃えにすることが多い。しかし少数を右揃えにすると、小数点以下の桁数が違う時に読みづらくなる。等幅フォントにしてもそれは解決しない。少数<em>点</em>がうまく縦に並ぶように揃えたいわけだ。CSSでは<a href="https://drafts.csswg.org/css-text-4/#character-alignment"><code>text-align</code>プロパティーで文字列が指定できるようにしたい</a>ようで、いずれ可能になるかもしれない。とされているが、実は<a href="http://www.w3.org/TR/html401/struct/tables.html#h-11.3.2">HTML4.01の頃からほぼ同じ機能は仕様で定義されている</a>ものの実装はないので、期待は薄い……と思ったものの、うっかり実装されていないかどうか確認した。</p>
+
+<p class="seealso">See also: <a href="/pub/test/639.html">Test Page for Decimal Alignment in Table Cell</a></p>
+
+<p>やはりというか<code>&lt;td align=&quot;char&quot; char=&quot;.&quot;&gt;</code>の実装はなかった。ついでに<code>text-align: &quot;.&quot;</code>もテストしてみたが、こちらもまだ実装はない模様だ。テスト・ページでは省いたが、ベンダー拡張プリフィックスでの実装ということもなかった。</p>
+
+<hr>
+
+<p>この小数点での行揃えは前に@ub_pnrと「欲しいね」とか言ってたような記憶がある。それ以外にもどうにかしてそうして欲しいというようなことはよく言われる。じゃあどうするかというと、大体は表で欲しがられ、その表は何かしらのデータから生成されるので、データ側をいじって誤魔化している。</p>
+
+<ol>
+<li>データをいじり、小数点以下の最大桁に足りない分半角スペースを追加する</li>
+<li>セルのスタイルで以下の3つを指定する<ol>
+<li><code>font-family: monospace</code></li>
+<li><code>text-align: right</code></li>
+<li><code>white-space: pre</code></li>
+</ol>
+</li>
+</ol>
+
+<p>これでなんとか揃う。</p>
+
+<p>今時だと等幅フォントに変える代わりに<code>font-feature-settings</code>プロパティーで<code>tnum &quot;1&quot;</code>するのも良い。このウェブサイトでは<a href="/pub/test/639.html">ずいぶん前から試しに設定してみて</a>おり、稀に効果を発揮していた（今は発揮していない）。もちろん対応フォントを上流で使っている必要はあるが、違うフォントを使わずに専用の等幅数字を使えるので、より読みやすい結果となりうる。</p>
+
+<hr>
+
+<p>CSS Text Module Level 4はLevel 3に入れることはできなかったものが寄せ集められている。</p>
+
+<ul>
+<li><code>display: inline-block</code>でできる隙間を潰す、<code>text-space-collapse: discard</code></li>
+<li>最後の一文字や句読点だけ次の行になったりしなくなる、<code>text-wrap: balance</code></li>
+<li>完全なる自動ハイフネーション</li>
+<li>日本語の文章内の英単語の前後に空白をはさむ、<code>text-spacing: ideograph-alpha</code></li>
+</ul>
+
+<p>などなど、<del>人類</del><ins>ウェブ・デザイナー</ins>の夢が詰まっているので、可及的速やかに実装が出てくるとうれしい。</p>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+      </ul>
+    
+      <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
