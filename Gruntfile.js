@@ -97,8 +97,7 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               "hail2u-scss-functions/**/*",
-              "hail2u-scss-partials/**/*",
-              "modularized-normalize-scss/**/*"
+              "hail2u-scss-partials/**/*"
             ]
           },
           {
