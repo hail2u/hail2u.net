@@ -2,7 +2,7 @@ Gruntのロード時間
 
 <p><a href="http://qiita.com/makotot/items/bf7e8a4d704b2e977fed">必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニック</a>はすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。<a href="https://github.com/gruntjs/grunt/issues/975">Qiitaの記事が参照しているIssue</a>でも似たようなことが推奨されている。</p>
 
-<p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する(昔どこかで読んだ気がするけど見つからなかった)ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
+<p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する（昔どこかで読んだ気がするけど見つからなかった）ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
 
 <pre><code class="language-javascript">module.exports = function (grunt) {
   grunt.registerMultiTask(&#39;example&#39;, &#39;Grunt multi task example.&#39;, function () {
