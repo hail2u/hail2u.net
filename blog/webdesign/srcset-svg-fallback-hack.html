@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    
+      
+      <meta content="SVGをサポートする環境がほとんどになってきた。それでもなんとか8であったり、かんとか2.3であったりのことを考慮せざるをえないという状況はありうる。それにはonerror属性を使った対応が有力だが、srcset属性でSVGファイルを指定するだけというハックのことを知った。将来的に使えなくなるわけではないが、やりたいことと実装に食い違いが少なからずあるのでハックと言って良いだろう。" name="description">
+      <meta content="blosxom v2.1.2+dev" name="generator">
+    
+    
+
+    <title>srcset属性を使ったSVGフォールバック・ハック - Weblog - Hail2u.net</title>
+
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" type="image/png">
+    <link href="/blog/webdesign/srcset-svg-fallback-hack.html" rel="canonical">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+
+    <link href="/styles/style.min.css" rel="stylesheet">
+    <link class="js-load-css" href="/styles/eau-douce.min.css" rel="subresource">
+    <link class="js-load-css" href="/styles/mplus-1m-latin.min.css" rel="subresource">
+
+    <script async src="/scripts/main.min.js"></script>
+    
+    <!-- Google AdSense -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-42525667-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </head>
+
+  <body>
+    <header class="global-header" role="banner">
+      
+      <h1 class="logo"><a href="/">Hail2u.net</a></h1>
+    
+      <nav class="site-navigation">
+        <ul>
+            <li><a href="/blog/"><mark>Weblog</mark></a></li>
+            
+    
+          
+          
+          <li><a href="/documents/">Documents</a></li>
+          
+          <li><a href="/about/">About</a></li>
+        </ul>
+      </nav>
+    
+      
+    </header>
+
+    <main class="content" role="main">
+      
+
+
+      <article>
+        <h1 class="first-heading">srcset属性を使ったSVGフォールバック・ハック</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2015-10-04T03:31:00+09:00">Oct 4, 2015</time>
+            · <span class="tag"><a href="/blog/webdesign/">Web Design</a></span></p>
+        </footer>
+
+        
+<p>SVGをサポートする環境がほとんどになってきた。それでもなんとか8であったり、かんとか2.3であったりのことを考慮せざるをえないという状況はありうる。それには<code>onerror</code>属性を使った対応が有力だが、<code>srcset</code>属性でSVGファイルを指定するだけというハックのことを知った。将来的に使えなくなるわけではないが、やりたいことと実装に食い違いが少なからずあるのでハックと言って良いだろう。</p>
+
+<pre><code class="language-html">&lt;img src=&quot;foo.png&quot; srcset=&quot;foo.svg&quot;&gt;
+</code></pre>
+
+<p>表示したいSVGを<code>srcset</code>属性で、フォールバックに使いたいPNGを<code>src</code>属性で指定するだけだ。これで<code>srcset</code>属性をサポートしているブラウザーではSVGが、そうでないブラウザーではPNGが表示される。<a href="http://caniuse.com/#search=srcset"><code>srcset</code>属性のサポート</a>に対して、<a href="http://caniuse.com/#search=svg">より多くのブラウザーがSVGをサポート</a>していることから成立する。もちろん食い違いがあるのでSVGをサポートしているブラウザーではSVGを、とはいかない。</p>
+
+<p>ただし<code>onerror</code>属性を使ったテクニックと比較すると、画像へのリクエストが必ず1回で収まるという利点がある。<code>onerror</code>属性では古い環境へ負担を強いることに対し、公平な負担（十数文字の追加）だけで済むというのはかなり魅力的だ。</p>
+
+<p>SVGと<code>srcset</code>属性のサポートの食い違いが問題だが、ハック臭なしできれいに書ける<code>picture</code>要素よりはカバー範囲が広いようだ（Safari 8やEdge 12がカバーできる）。<code>srcset</code>属性をサポートしない環境が後ろ向きな環境であること（OSレベルでレガシーであったり、Chromeへと切り替わっていなかったり）することを考えると、妥協点としても見るべきところはある。</p>
+
+<p><a href="http://lynn.ru/examples/svg/en.html">インラインSVGでのフォールバック・テクニック</a>とこれでかなりの範囲をカバーできることだろう。</p>
+
+<hr>
+
+<p>初期からこのハックの利用を想定して実装を進めるのは薦められないが、SVGで良いと言われていたのにも関わらず急にPNGでフォールバックして欲しいと言われた時の緊急手段などとしては抗いがたい魅力がある。つまり計画的に利用しないことは意識したい。</p>
+      </article>
+
+      
+        <aside class="ads">
+          <!-- Hail2u.net (Main) -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8712792805045949"
+            data-ad-format="rectangle, horizontal"
+            data-ad-slot="1723739447"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </aside>
+      
+
+      
+    </main>
+
+    <aside class="subcontent">
+      <form class="site-search" action="https://duckduckgo.com/" role="search">
+        <input name="sites" type="hidden" value="hail2u.net">
+        <input class="query" name="q" size="32" type="search">
+        <input class="button" type="submit" value="Search">
+      </form>
+    </aside>
+
+    <footer class="global-footer" role="contentinfo">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+        <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+        <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+      </ul>
+    
+      <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
+    </footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
