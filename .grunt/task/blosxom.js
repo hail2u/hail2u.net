@@ -8,6 +8,7 @@ module.exports = function (grunt) {
     var ProgressBar = require("progress");
     var async = require("async");
     var fs = require("fs-extra");
+    var os = require("os");
     var path = require("path");
     var spawn = require("child_process").spawnSync;
     var which = require("which").sync;
@@ -48,7 +49,7 @@ module.exports = function (grunt) {
     }
 
     if (options.all) {
-      num = 8;
+      num = os.cpus().length;
       fs.readFileSync(
         fileCache,
         "utf8"
