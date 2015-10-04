@@ -92,9 +92,9 @@ IsRelative=1
 Path=Profiles/xxxxxxxx.development
 </pre>
 
-<p>という感じになっていて、GeneralセクションのStartWithLastProfileキーの値が0で、各プロファイルのセクションにDefaultキーがない場合プロファイル・マネージャが立ち上がる。なので、ベタベタにファイルの内容を全部読み込んで正規表現で置換という方法で書き換えて再起動させるものを作ったのだけど、<a href="https://developer.mozilla.org/En/NsIAppStartup"><code>nsIAppStartup</code></a>インターフェイスの<code>quit()</code>メソッドを<code>eRestart</code>フラグを立てて呼び出した場合、<em>同じプロファイルで再起動する</em>という仕様(明記されてたが読んでなかった)のため実現不可能だった。</p>
+<p>という感じになっていて、GeneralセクションのStartWithLastProfileキーの値が0で、各プロファイルのセクションにDefaultキーがない場合プロファイル・マネージャが立ち上がる。なので、ベタベタにファイルの内容を全部読み込んで正規表現で置換という方法で書き換えて再起動させるものを作ったのだけど、<a href="https://developer.mozilla.org/En/NsIAppStartup"><code>nsIAppStartup</code></a>インターフェイスの<code>quit()</code>メソッドを<code>eRestart</code>フラグを立てて呼び出した場合、<em>同じプロファイルで再起動する</em>という仕様（明記されてたが読んでなかった）のため実現不可能だった。</p>
 
-<p>最終的に<em>-P -no-remote</em>をコマンド・ライン・オプションに付けてもうひとつFirefoxを立ち上げて、元のFirefoxをこっそり終了させるという方法に辿りついた。0.1はこれで実装されている。OSによって実行ファイル名を少し変えてあげる手間以外はほとんど考えずに実装できた(実行ファイルのある場所自体は共通のインターフェイスで取得できる<a href="https://developer.mozilla.org/ja/Code_snippets/File_I%2f%2fO#.e7.89.b9.e6.ae.8a.e3.83.95.e3.82.a1.e3.82.a4.e3.83.ab.e3.82.92.e5.8f.96.e5.be.97.e3.81.99.e3.82.8b">実行ファイルのある場所自体は共通のインターフェイスで取得できる</a>)。最初にこれに気づいていれば……。</p>
+<p>最終的に<em>-P -no-remote</em>をコマンド・ライン・オプションに付けてもうひとつFirefoxを立ち上げて、元のFirefoxをこっそり終了させるという方法に辿りついた。0.1はこれで実装されている。OSによって実行ファイル名を少し変えてあげる手間以外はほとんど考えずに実装できた（実行ファイルのある場所自体は共通のインターフェイスで取得できる<a href="https://developer.mozilla.org/ja/Code_snippets/File_I%2f%2fO#.e7.89.b9.e6.ae.8a.e3.83.95.e3.82.a1.e3.82.a4.e3.83.ab.e3.82.92.e5.8f.96.e5.be.97.e3.81.99.e3.82.8b">実行ファイルのある場所自体は共通のインターフェイスで取得できる</a>）。最初にこれに気づいていれば……。</p>
 <p>が、この拡張でプロファイルを切り替えた後に外部アプリケーションからURLを開こうとすると、「Firefoxが動いてるけど応答しない！ちゃんと閉じて再起動しろ！」とかいうダイアログで怒られてしまう。</p>
 
 <figure><a href="/images/blog/close-firefox-dialog.png"><img alt="Firefoxの終了を促されるダイアログ" height="128" src="/images/blog/close-firefox-dialog.png" width="607"></a></figure>
