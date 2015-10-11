@@ -111,7 +111,7 @@ module.exports = function (grunt) {
             dest: "src/css/assets/images/",
             expand: true,
             src: [
-              "about/how-i-markup-and-style-this-website.png",
+              "about/how-i-markup-and-style-this-website.svg",
               "favicon-large.svg"
             ]
           },
@@ -150,7 +150,7 @@ module.exports = function (grunt) {
           "!*.psd",
           "!*.svg",
           "!*.xcf",
-          "blog/*.svg"
+          "*/*.svg"
         ]
       },
 
@@ -438,6 +438,15 @@ module.exports = function (grunt) {
 
         dest: "dist/apple-touch-icon.png",
         src: "src/img/favicon-large.svg"
+      },
+
+      cover: {
+        options: {
+          width: 180
+        },
+
+        dest: "dist/images/cover.png",
+        src: "src/img/cover.svg"
       },
 
       favicon16: {
