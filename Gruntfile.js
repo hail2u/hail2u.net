@@ -530,7 +530,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-svgmin");
   grunt.loadNpmTasks("postcss-single-charset");
-  grunt.loadTasks(".grunt/task/");
+  grunt.loadTasks(".grunt/");
 
   grunt.registerTask("build", [
     "build:css",

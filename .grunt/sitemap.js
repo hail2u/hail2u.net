@@ -47,7 +47,6 @@ module.exports = function (grunt) {
     });
     JSON.parse(fs.readFileSync(path.join(
       __dirname,
-      "../cache",
       "articles.json"
     ), "utf8")).forEach(function (article) {
       urls.push(article.link);
