@@ -108,7 +108,7 @@ module.exports = function (grunt) {
     var loadArticles = function (data) {
       var cache = path.relative(
         process.cwd(),
-        path.join(__dirname, "articles.json")
+        path.join(__dirname, "cache", "articles.json")
       );
       var articles = JSON.parse(fs.readFileSync(cache, "utf8"));
       var fileNew = path.basename(grunt.option("file"));
