@@ -2,7 +2,7 @@ GruntのMultiタスクの実行順
 
 <p><a href="http://gruntjs.com/creating-tasks#multi-tasks">GruntのMultiタスク</a>はまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。</p>
 
-<p><a href="https://github.com/gruntjs/grunt/blob/71e631c054cb073dc9d81b911694b4e62eb9dc98/lib/grunt/task.js#L281-L295">GruntのMultiタスクの一括実行</a>は<code>Object.keys</code>で返ってくる配列を<code>forEach()</code>してその中で各ターゲットを実行している。なので実行環境である<a href="http://nodejs.org/">Node.js</a>というか、それで使われているV8がそれらをどう解釈するかに依存していることになる。そして<a href="https://code.google.com/p/v8/issues/detail?id=164">V8では<code>Object.keys</code>で返ってくる配列(や<code>for...in</code>の順番)が勝手にソートされるケース</a>があることもわかった。</p>
+<p><a href="https://github.com/gruntjs/grunt/blob/71e631c054cb073dc9d81b911694b4e62eb9dc98/lib/grunt/task.js#L281-L295">GruntのMultiタスクの一括実行</a>は<code>Object.keys</code>で返ってくる配列を<code>forEach()</code>してその中で各ターゲットを実行している。なので実行環境である<a href="http://nodejs.org/">Node.js</a>というか、それで使われているV8がそれらをどう解釈するかに依存していることになる。そして<a href="https://code.google.com/p/v8/issues/detail?id=164">V8では<code>Object.keys</code>で返ってくる配列（や<code>for...in</code>の順番）が勝手にソートされるケース</a>があることもわかった。</p>
 
 <p>タスクを実行すると設定されたデータを吐くだけのMultiタスクを例にする。</p>
 
