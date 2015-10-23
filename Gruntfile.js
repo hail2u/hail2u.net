@@ -59,7 +59,6 @@ module.exports = function (grunt) {
 
         files: {
           "tmp/main.min.js": [
-            "tmp/lightbox.min.js",
             "tmp/unutm.min.js"
           ]
         }
