@@ -17,60 +17,30 @@ module.exports = function (grunt) {
     var bar;
     var done = this.async();
     var entry = grunt.option("file");
-    var fileCache;
     var files = [];
     var images = [];
-    var num = 1;
+    var num = os.cpus().length;
     var options = this.options({
       all: false,
+      datadir: "./src/data/",
       feed: false,
+      imgdir: "./src/img/",
       index: false,
       perl: "perl",
-      reindex: false
+      reindex: false,
+      rootdir: "./",
+      staticdir: "./dist/",
+      staticimgdir: "./dist/img/"
     });
-    fileCache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
+    var cache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
 
-    if (options.reindex) {
-      args.push("reindex=1");
-    }
-
-    if (options.feed) {
-      files.push("index.rss");
-    }
-
-    if (options.index) {
-      fs.readdirSync(options.datadir).forEach(function (dir) {
-        if (dir === "themes") {
-          return;
-        }
-
-        files.push(dir + path.sep + "index.html");
-      });
-    }
-
-    if (options.all) {
-      num = os.cpus().length;
-      fs.readFileSync(
-        fileCache,
-        "utf8"
-      ).split(/\r?\n/).forEach(function (file) {
-        if (file === "") {
-          return;
-        }
-
-        files.push(path.relative(options.datadir, file.split("=>")[0]));
-      });
-      bar = new ProgressBar("Rebuilding [:bar] :percent :elapsed", {
-        total: files.length,
-        width: 32
-      });
-    } else if (entry) {
+    if (entry) {
       images = fs.readFileSync(
         entry,
         "utf-8"
       ).match(/\bsrc="\/images\/blog\/.*?"/g);
       entry = path.relative(options.datadir, entry);
-      files.unshift(entry);
+      files.push(entry);
       files.push(path.join(path.dirname(entry), "index.html"));
 
       if (images) {
@@ -99,6 +69,42 @@ module.exports = function (grunt) {
       } else {
         grunt.log.writeln("Image not found.");
       }
+    }
+
+    if (options.all && files.length === 0) {
+      fs.readFileSync(
+        cache,
+        "utf8"
+      ).split(/\r?\n/).forEach(function (file) {
+        if (file === "") {
+          return;
+        }
+
+        files.push(path.relative(options.datadir, file.split("=>")[0]));
+      });
+      bar = new ProgressBar("Rebuilding [:bar] :percent :elapsed", {
+        total: files.length,
+        width: 32
+      });
+    }
+
+    if (options.feed) {
+      files.push("index.rss");
+    }
+
+    if (options.index) {
+      fs.readdirSync(options.datadir).forEach(function (dir) {
+        if (dir === "themes") {
+          return;
+        }
+
+        files.push(dir + path.sep + "index.html");
+      });
+    }
+
+    if (options.reindex) {
+      args.push("reindex=1");
+      num = 1;
     }
 
     files = files.map(function (file) {
