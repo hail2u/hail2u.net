@@ -17,6 +17,9 @@ use vars qw($enabled $prev $next $link_prev $link_next);
 # Do you want to output as XHTML?
 my $as_xhtml = 0;
 
+# Do you want to reverse order?
+my $reversed = 1;
+
 # --- Plug-in package variables --------
 
 $enabled = 0;
@@ -41,7 +44,11 @@ sub start {
 sub filter {
   my($pkg, $files_ref) = @_;
 
-  @file_info = sort {$files_ref->{$b} <=> $files_ref->{$a}} keys %$files_ref;
+  if ($reversed) {
+    @file_info = sort {$files_ref->{$b} <=> $files_ref->{$a}} keys %$files_ref;
+  } else {
+    @file_info = sort {$files_ref->{$a} <=> $files_ref->{$b}} keys %$files_ref;
+  }
 
   return 1;
 }
@@ -53,17 +60,17 @@ sub head {
   my %path2idx = map { $file_info[$_] => $_ } 0..$#file_info;
   my $index = $path2idx{"$blosxom::datadir/$path"};
 
-  if ($index < $#file_info) {
-    my($prev_url, $prev_title) = &get_url_and_title($file_info[$index + 1]);
-    $link_prev = qq!<link rel="prev" href="$prev_url"$xhtml>!;
+  if ($index > 0) {
+    my($prev_url, $prev_title) = &get_info($file_info[$index - 1]);
+    $link_prev = qq!<link href="$prev_url" rel="prev"$xhtml>!;
     $prev = &$blosxom::template($path, 'back_and_forth_prev', $blosxom::flavour) || '<p><a href="$back_and_forth::prev_url">$back_and_forth::prev_title</a></p>';
     $prev =~ s/\$back_and_forth::prev_url/$prev_url/ge;
     $prev =~ s/\$back_and_forth::prev_title/$prev_title/ge;
   }
 
-  if ($index > 0) {
-    my($next_url, $next_title) = &get_url_and_title($file_info[$index - 1]);
-    $link_next = qq!<link rel="next" href="$next_url"$xhtml>!;
+  if ($index < $#file_info) {
+    my($next_url, $next_title) = &get_info($file_info[$index + 1]);
+    $link_next = qq!<link href="$next_url" rel="next"$xhtml>!;
     $next = &$blosxom::template($path, 'back_and_forth_next', $blosxom::flavour) || '<p><a href="$back_and_forth::next_url">$back_and_forth::next_title</a></p>';
     $next =~ s/\$back_and_forth::next_url/$next_url/ge;
     $next =~ s/\$back_and_forth::next_title/$next_title/ge;
@@ -72,7 +79,7 @@ sub head {
   return 1;
 }
 
-sub get_url_and_title {
+sub get_info {
   my $file = shift;
 
   my($path, $fn) = $file =~ m!^$blosxom::datadir(?:(/.*)/)?(.*)\.$blosxom::file_extension!;
