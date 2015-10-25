@@ -22,15 +22,15 @@ module.exports = function (grunt) {
     var num = os.cpus().length;
     var options = this.options({
       all: false,
-      datadir: "./src/data/",
+      datadir: __dirname,
       feed: false,
-      imgdir: "./src/img/",
+      imgdir: __dirname,
       index: false,
       perl: "perl",
       reindex: false,
-      rootdir: "./",
-      staticdir: "./dist/",
-      staticimgdir: "./dist/img/"
+      rootdir: __dirname,
+      staticdir: __dirname,
+      staticimgdir: __dirname
     });
     var cache = path.resolve(options.rootdir, "plugins/state/files_index.dat");
 
