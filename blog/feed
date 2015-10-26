@@ -10,12 +10,53 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 25 Oct 2015 20:13:12 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 26 Oct 2015 14:02:58 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>サブディレクトリ－をgh-pagesへ向ける運用</title>
+      <link>http://hail2u.net/blog/software/pointing-sub-directory-to-gh-pages.html</link>
+      <description>gh-pagesブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとするとsubtreeを使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーをmasterからは無視しつつ、gh-pagesブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/software/pointing-sub-directory-to-gh-pages.html</guid>
+      <pubDate>Mon, 26 Oct 2015 14:01:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><code>gh-pages</code>ブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとすると<a href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt">subtree</a>を使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーを<code>master</code>からは無視しつつ、<code>gh-pages</code>ブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。</p>
+
+<pre>example.com/
+├ dist/
+│ └ index.html
+├ src/
+│ └ index.mustache
+├ .gitignore
+├ index.js
+└ package.json
+</pre>
+
+<p>Node.jsで<code>index.js</code>を使って<code>src/index.mustache</code>を処理し、<code>dist/index.html</code>を吐くという形だ。ルートでは<code>.gitignore</code>で<code>dist/</code>を無視し、普通に<code>origin</code>を追加しておく。<code>dist/</code>で改めて<code>git init</code>し、ルートと同じ<code>origin</code>を追加しつつブランチは<code>gh-pages</code>に向くようにしておく。</p>
+
+<p>サブディレクトリーではファイルの更新と追加、削除しか起こらないので、機械的に以下のようなコマンドを発行するのみでGitHub Pagesが更新できる。</p>
+
+<pre><samp>$ <kbd>cd dist/ &amp;&amp; git add --all &amp;&amp; git commit -m &quot;Build&quot; &amp;&amp; git push origin gh-pages</kbd>
+</samp></pre>
+
+<ul>
+<li>subtreeのような特殊な知識を必要としない</li>
+<li><code>gh-pages</code>ブランチへ切り替える作業が必要ない</li>
+<li><code>dist/</code>サブディレクトリーでルートのnpmスクリプトを使える</li>
+<li><code>gh-pages</code>ブランチに不必要なファイルとログが含まれない</li>
+</ul>
+
+<p>このあたりがメリットと考えて使っている。</p>
+
+<p>デメリットとしては<code>gh-pages</code>ブランチをまとめて<code>push</code>することがGitからはできないので、npmスクリプトなどでまとめて<code>push</code>する手法を編み出す必要があることが挙げられる。他にも2回<code>clone</code>しないと他のPCに作業環境を作れないことあたりもなかなか厳しそうだ。</p>
+
+<p>ここに至って通常はsubtreeに落ち着く理由がようやくわかった。つまり複数の人間が触る環境だと、何よりも<code>clone</code>のしやすさが重要になるということだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>夢</title>
@@ -275,25 +316,6 @@ vel velit ultricies ullamcorper.
 <hr>
 
 <p>実証実験をそのうちちゃんとやろう。HTTP/2はともかくHTTPSのテスト環境の作り方が皆目見当もつかないので先は長そう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>図書館とか</title>
-      <link>http://hail2u.net/blog/misc/on-my-local-library.html</link>
-      <description>噂の図書館は地元のため、ちょくちょく行っている。行くようになった。色々に色々と書かれていて、それに対して思うところはあるもののうまく書けそうもない。原子力発電所の地元に住んでいる人たちは東日本大震災以降ずっとこんな気持ちだったのかなと少し感じる。もちろんスケールはまったく違うと思うが。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/misc/on-my-local-library.html</guid>
-      <pubDate>Fri, 16 Oct 2015 11:20:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>噂の図書館は地元のため、ちょくちょく行っている。行くようになった。色々に色々と書かれていて、それに対して思うところはあるもののうまく書けそうもない。原子力発電所の地元に住んでいる人たちは東日本大震災以降ずっとこんな気持ちだったのかなと少し感じる。もちろんスケールはまったく違うと思うが。</p>
-
-<p>だから書くな！とかいう話ではもちろんない。気をつかって書け！でもない。しかしTwitterででもやれというレベルの伝聞推定の記事が紙媒体で散見されるのはなかなか受け入れがたい。</p>
-
-<p>とにかく来月の11/15が市長選挙である。これ（やもうすぐ開業するららぽーと海老名を中心とした北側の開発計画）を進めた市長について市民の評価が問われることは知っておいてほしいかなと感じる。</p>
-
-<hr>
-
-<p>公式ウェブサイトの<a href="https://ebina.city-library.jp/library/en">英語バージョン</a>が90%英語じゃないのはさっさと直した方が良い。これじゃせいぜい地図を探せる（Accessが伝わるのか知らないけど）くらいで、それ以外はGoogle翻訳を使わせた方がずっと良い。</p>]]></content:encoded>
     </item>
 
   </channel>
