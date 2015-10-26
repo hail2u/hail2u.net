@@ -10,6 +10,34 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>ファイル記述子がfs.readFile()等でサポートへ</title>
+      <link>http://hail2u.net/blog/coding/file-descriptor-support-in-fs-file-functions.html</link>
+      <description>Node.js v5のリリース案を見ていたところ、fs.readFile()等の第一引数でファイル記述子（file descriptor）がサポートされるようになるようだ。便利極まりない/dev/stdinなどがない環境（Windowsとか）で標準入出力の読み込みが簡単になるのかなと想像している。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/file-descriptor-support-in-fs-file-functions.html</guid>
+      <pubDate>Tue, 27 Oct 2015 02:28:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><a href="https://github.com/nodejs/node/pull/3466">Node.js v5のリリース案</a>を見ていたところ、<code>fs.readFile()</code>等の第一引数でファイル記述子（file descriptor）がサポートされるようになるようだ。便利極まりない<code>/dev/stdin</code>などがない環境（Windowsとか）で標準入出力の読み込みが簡単になるのかなと想像している。</p>
+
+<p>今までは標準入力を一気読みしようとするとこのようなコードを書く必要があった。</p>
+
+<pre><code>var fs = require(&quot;fs&quot;);
+
+var fd = process.stdin.fd;
+var len = fs.fstatSync(fd).size;
+var buf = new Buffer(len);
+var input = buf.toString(&quot;utf8&quot;, 0, fs.readSync(fd, buf, 0, len, 0));
+</code></pre>
+
+<p>もちろんこれと同じことをやってくれる便利パッケージがいっぱいあるので、それらのうちのどれかを使えば良いという話ではある。しかし<code>/dev/stdin</code>を読むくらい手軽に読む手段が標準モジュールでできるときっとうれしいはずだ。</p>
+
+<pre><code>var fs = require(&quot;fs&quot;);
+
+var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
+</code></pre>
+
+<p>ソースを読んだ限りでは、ファイル記述子サポートの実装は上記コードと同じように見えた。そのため、このような簡単なコードで標準入力を一気に読めるという風に理解しているが、実際にはどうなるのだろう。こうなったらとてもうれしい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>サブディレクトリ－をgh-pagesへ向ける運用</title>
       <link>http://hail2u.net/blog/software/pointing-sub-directory-to-gh-pages.html</link>
       <description>gh-pagesブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとするとsubtreeを使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーをmasterからは無視しつつ、gh-pagesブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。</description>
@@ -279,25 +307,6 @@ vel velit ultricies ullamcorper.
 <p>何かには使えるだろうということで記事にしておく。</p>]]></content:encoded>
     </item>
     <item>
-      <title>CSSやJSの分割</title>
-      <link>http://hail2u.net/blog/webdesign/split-css-and-js.html</link>
-      <description>HTTPS化したらやろうと思っていた、CSSファイルとJavaScriptファイルの分割を別ドメインの方で試していた。果たして聞いていたように効果があるのか……と思ったが、利用しているファイルが少なくてよくわからない。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/split-css-and-js.html</guid>
-      <pubDate>Sat, 17 Oct 2015 02:17:00 +0900</pubDate>
-      <content:encoded><![CDATA[<figure>
-  <a href="http://hail2u.net/images/blog/split-css-and-js.png"><img alt="HTTPリクエストがスパパパッと並行に走っている様子" height="1200" src="http://hail2u.net/images/blog/split-css-and-js.png" height="600"></a>
-</figure>
-
-<p>HTTPS化したらやろうと思っていた、CSSファイルとJavaScriptファイルの分割を別ドメインの方で試していた。果たして聞いていたように効果があるのか……と思ったが、利用しているファイルが少なくてよくわからない。</p>
-
-<p>CSSファイルのダウンロードが終わってからその中で使われている画像を読み始めるとなると遅いので、画像のプリロードを大量に仕込むようなことも同時に行うと良いのかもしれない。全部やろうとするとHTMLが肥大化し、保守性が落ちるのでクリティカル・レンダリング・パスで使われている画像のみなどと制限を付けるべきだろう。</p>
-
-<hr>
-
-<p>実証実験をそのうちちゃんとやろう。HTTP/2はともかくHTTPSのテスト環境の作り方が皆目見当もつかないので先は長そう。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>“マークアップ”するということ ～ HTML5勧告に寄せて ～</title>
       <link>http://hail2u.net/documents/markup.html</link>
       <pubDate>Sat, 27 Dec 2014 21:02:53 +0900</pubDate>
@@ -325,6 +334,6 @@ vel velit ultricies ullamcorper.
       <guid isPermaLink="true">http://hail2u.net/documents/bulletproof-icon-fonts.html</guid>
       <description><![CDATA[<p>アイコン・フォントの安全な実装についての<a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/">Bulletproof Accessible Icon Fonts</a>という記事の日本語訳です。アクセシビリティ上の問題を含め、巷間のアイコン・フォントの現状の課題とその対処についても触れられているので、アイコン・フォントの実装に大いに役に立ってくれるでしょう。</p>]]></description>
     </item>
-    <lastBuildDate>Mon, 26 Oct 2015 14:01:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 27 Oct 2015 02:28:00 +0900</lastBuildDate>
   </channel>
 </rss>

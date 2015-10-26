@@ -10,12 +10,42 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 26 Oct 2015 14:02:58 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 27 Oct 2015 02:29:58 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>ファイル記述子がfs.readFile()等でサポートへ</title>
+      <link>http://hail2u.net/blog/coding/file-descriptor-support-in-fs-file-functions.html</link>
+      <description>Node.js v5のリリース案を見ていたところ、fs.readFile()等の第一引数でファイル記述子（file descriptor）がサポートされるようになるようだ。便利極まりない/dev/stdinなどがない環境（Windowsとか）で標準入出力の読み込みが簡単になるのかなと想像している。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/coding/file-descriptor-support-in-fs-file-functions.html</guid>
+      <pubDate>Tue, 27 Oct 2015 02:28:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/nodejs/node/pull/3466">Node.js v5のリリース案</a>を見ていたところ、<code>fs.readFile()</code>等の第一引数でファイル記述子（file descriptor）がサポートされるようになるようだ。便利極まりない<code>/dev/stdin</code>などがない環境（Windowsとか）で標準入出力の読み込みが簡単になるのかなと想像している。</p>
+
+<p>今までは標準入力を一気読みしようとするとこのようなコードを書く必要があった。</p>
+
+<pre><code>var fs = require(&quot;fs&quot;);
+
+var fd = process.stdin.fd;
+var len = fs.fstatSync(fd).size;
+var buf = new Buffer(len);
+var input = buf.toString(&quot;utf8&quot;, 0, fs.readSync(fd, buf, 0, len, 0));
+</code></pre>
+
+<p>もちろんこれと同じことをやってくれる便利パッケージがいっぱいあるので、それらのうちのどれかを使えば良いという話ではある。しかし<code>/dev/stdin</code>を読むくらい手軽に読む手段が標準モジュールでできるときっとうれしいはずだ。</p>
+
+<pre><code>var fs = require(&quot;fs&quot;);
+
+var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
+</code></pre>
+
+<p>ソースを読んだ限りでは、ファイル記述子サポートの実装は上記コードと同じように見えた。そのため、このような簡単なコードで標準入力を一気に読めるという風に理解しているが、実際にはどうなるのだろう。こうなったらとてもうれしい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>サブディレクトリ－をgh-pagesへ向ける運用</title>
@@ -295,27 +325,6 @@ vel velit ultricies ullamcorper.
 <p>実際の目標は与えられた任意の姓名へそのフリガナを推測させるというものだった。ジェネレーターを作ったところで、メジャーな姓名なので容易に推測できそうみたいなことに気付いたのだが、難読姓名のジェネレーターはそれはそれで難しそうだ。ということで準備時点で詰まってしまった。</p>
 
 <p>何かには使えるだろうということで記事にしておく。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSやJSの分割</title>
-      <link>http://hail2u.net/blog/webdesign/split-css-and-js.html</link>
-      <description>HTTPS化したらやろうと思っていた、CSSファイルとJavaScriptファイルの分割を別ドメインの方で試していた。果たして聞いていたように効果があるのか……と思ったが、利用しているファイルが少なくてよくわからない。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/webdesign/split-css-and-js.html</guid>
-      <pubDate>Sat, 17 Oct 2015 02:17:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="http://hail2u.net/images/blog/split-css-and-js.png"><img alt="HTTPリクエストがスパパパッと並行に走っている様子" height="1200" src="http://hail2u.net/images/blog/split-css-and-js.png" height="600"></a>
-</figure>
-
-<p>HTTPS化したらやろうと思っていた、CSSファイルとJavaScriptファイルの分割を別ドメインの方で試していた。果たして聞いていたように効果があるのか……と思ったが、利用しているファイルが少なくてよくわからない。</p>
-
-<p>CSSファイルのダウンロードが終わってからその中で使われている画像を読み始めるとなると遅いので、画像のプリロードを大量に仕込むようなことも同時に行うと良いのかもしれない。全部やろうとするとHTMLが肥大化し、保守性が落ちるのでクリティカル・レンダリング・パスで使われている画像のみなどと制限を付けるべきだろう。</p>
-
-<hr>
-
-<p>実証実験をそのうちちゃんとやろう。HTTP/2はともかくHTTPSのテスト環境の作り方が皆目見当もつかないので先は長そう。</p>]]></content:encoded>
     </item>
 
   </channel>
