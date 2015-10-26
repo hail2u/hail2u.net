@@ -310,14 +310,6 @@ module.exports = function (grunt) {
     },
 
     gitcommit: {
-      assets: {
-        options: {
-          all: true,
-          message: "Update assets",
-          root: "src/css/"
-        }
-      },
-
       blogPublish: {
         options: {
           all: true,
@@ -620,11 +612,6 @@ module.exports = function (grunt) {
     "feedmix",
     "sitemap",
     "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("update:assets", [
-    "copy:assets",
-    "gitcommit:assets"
   ]);
 
   grunt.registerTask("update:blog", [
