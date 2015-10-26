@@ -9,7 +9,7 @@ module.exports = function (grunt) {
 
     var filePreview = "tmp/__preview.html";
     var preview = `<!DOCTYPE html>
-<html lang="ja">
+<html class="permalink" lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
