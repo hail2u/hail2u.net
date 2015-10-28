@@ -10,12 +10,29 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Wed, 28 Oct 2015 20:24:55 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 29 Oct 2015 00:47:40 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="http://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</title>
+      <link>http://hail2u.net/blog/internet/history-sniffing-with-hsts-and-csp.html</link>
+      <description>Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLをimg要素で読み込ませることで、訪問済みかどうか調べるというSnifflyという手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。</description>
+      <category>Internet</category>
+      <guid isPermaLink="true">http://hail2u.net/blog/internet/history-sniffing-with-hsts-and-csp.html</guid>
+      <pubDate>Thu, 29 Oct 2015 00:46:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLを<code>img</code>要素で読み込ませることで、訪問済みかどうか調べるという<a href="https://github.com/diracdeltas/sniffly">Sniffly</a>という手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。</p>
+
+<p>HSTSを提供している場合、そのウェブサイトへのアクセスはすべてHTTPSにブラウザー側で書き換えられる。つまりHSTSを提供しているウェブサイトへ訪問済みの場合、そのウェブサイトへHTTPで画像をリクエストしてもHTTPSに書き換わることになる。そうするとCSPでHTTPな画像に制限している場合、必ず読み込みエラーになることになる。</p>
+
+<p>それだけでは普通の読み込みエラーと判別できない。しかしHTTPSへの書き換えとCSPによる読み込みエラーはブラウザー側で高速に行われるため、<code>error</code>イベントでエラーになるまでの時間を調査することで通常の読み込みエラーと識別できる。</p>
+
+<p>だいたいこのような仕組みのようだ。HSTSの仕組みでどうにかするのは難しそうなので、CSP側で……ということになりそう。いずれにせよHTTPS化が一気に進みそうになる前になんとか解決されると良いなと思う。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>MediumのPublication Page</title>
@@ -331,30 +348,6 @@ vel velit ultricies ullamcorper.
 <hr>
 
 <p>ウェブでもダメ元で<code>font-family: Georgia Pro, Georgia, serif</code>とするのは良さそうだ。一方でArialの代わりにArial Novaとしたり、Helvetica対抗としてNeue Haas Groteskを追加するのは勧められない。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>VimへのEditorConfigの導入</title>
-      <link>http://hail2u.net/blog/software/installing-editorconfig-to-vim.html</link>
-      <description>他人のリポジトリーをいじるときだけEditorConfigを使うような仕組みにしていたが、3回ミスして迷惑をかけたので、諦めて常時使用することにした。バイナリーをパスを通ったところに入れて、ediorconfig-vimをインストール……ではすんなり環境を構築できなかった。どうやらWindowsでset shell=shかつset shellslashしてる場合でだけで起こるようだ。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">http://hail2u.net/blog/software/installing-editorconfig-to-vim.html</guid>
-      <pubDate>Mon, 19 Oct 2015 13:32:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>他人のリポジトリーをいじるときだけ<a href="http://editorconfig.org/">EditorConfig</a>を使うような仕組みにしていたが、3回ミスして迷惑をかけたので、諦めて常時使用することにした。<a href="http://sourceforge.net/projects/editorconfig/">バイナリー</a>をパスを通ったところに入れて、<a href="https://github.com/editorconfig/editorconfig-vim">ediorconfig-vim</a>をインストール……ではすんなり環境を構築できなかった。どうやらWindowsで<code>set shell=sh</code>かつ<code>set shellslash</code>してる場合でだけで起こるようだ。</p>
-
-<p>うまく動かない理由はeditorconfig-vimが内部で<code>setlocal noshellslash</code>しており、それにより<code>sh.exe</code>が解釈できない形（バックスラッシュによるパス区切り）でファイルのパスが渡されることによるものだった。該当箇所をコメントアウトするだけで動くことが確認できたので、イシューを投げておいた。その後テスト環境ないのでPR欲しいと言われたため、Vundleのコードを参考にして直したものも投げておいた。取り込まれれば直ると思う。</p>
-
-<p>また<code>:vimgrep</code>を使うと隠しバッファーとして開いたファイルのすべてでEditorConfigの設定読み込みが行われてしまうので死ぬほど遅くなる。普段は<code>:vimgrep</code>を使わない（<a href="http://hail2u.net/blog/software/using-git-grep-with-vim.html"><code>git grep</code></a>を使っている）ので問題ないが、たまに使おうとするとものすごい遅い。</p>
-
-<pre><code>:noautocmd vimgrep /foo/ **/*
-</code></pre>
-
-<p>プラグインを変えるのは影響が大きそうなので、能動的に<code>:noautocmd</code>を付けることで回避するのがよさそうだ。</p>
-
-<hr>
-
-<p>ちゃんと動くまでに大変だったが、ちゃんと動くようになったので、これでもうミスはしないはずだ。ごめんなさい。</p>]]></content:encoded>
     </item>
 
   </channel>
