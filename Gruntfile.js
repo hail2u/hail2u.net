@@ -111,6 +111,7 @@ module.exports = function (grunt) {
             expand: true,
             src: [
               "about/how-i-markup-and-style-this-website.svg",
+              "logo.svg",
               "favicon-large.svg"
             ]
           },
@@ -149,6 +150,7 @@ module.exports = function (grunt) {
           "!*.psd",
           "!*.svg",
           "!*.xcf",
+          "logo.svg",
           "*/*.svg"
         ]
       },
