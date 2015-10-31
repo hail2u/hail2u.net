@@ -10,6 +10,8 @@ module.exports = function (grunt) {
     var xml2js = require("xml2js");
 
     var dest = "dist/sitemap.xml";
+    var domain = "hail2u.net";
+    var scheme = "https:";
     var sitemap = {
       urlset: {
         $: {
@@ -54,10 +56,10 @@ module.exports = function (grunt) {
     });
     urls.forEach(function (url) {
       sitemap.urlset.url.push({
-        loc: "http://hail2u.net" + url
+        loc: scheme + "//" + domain + url
       });
     });
     fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));
-    grunt.log.writeln("File \"" + dest + "\" created.");
+    grunt.log.writeln('File "' + dest + '" created.');
   });
 };

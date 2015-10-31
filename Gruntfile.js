@@ -197,7 +197,7 @@ module.exports = function (grunt) {
         options: {
           process: function (content) {
             var re = /(href|src)(=)(")(.*?)(")/g;
-            var site = "http://hail2u.net/";
+            var site = "https://hail2u.net/";
             var asset = "assets/";
 
             return content.replace(re, function (m, at, eq, oq, url, cq) {
