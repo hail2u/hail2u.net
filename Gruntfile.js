@@ -211,11 +211,14 @@ module.exports = function (grunt) {
 
               return at + eq + oq + url + cq;
             });
-          }
+          },
+          noProcess: ["*.svg"]
         },
 
-        dest: "dist/about/style-guide/index.html",
-        src: "src/css/test.html"
+        files: {
+          "dist/about/style-guide/index.html": ["src/css/test.html"],
+          "dist/images/favicon-large.svg": ["src/img/favicon-large.svg"]
+        }
       },
 
       woff: {
