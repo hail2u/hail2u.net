@@ -10,12 +10,99 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 1 Nov 2015 13:07:28 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 2 Nov 2015 11:59:33 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>HTTPSにした時に気を付けたこと</title>
+      <link>https://hail2u.net/blog/webdesign/https-checklist.html</link>
+      <description>何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/https-checklist.html</guid>
+      <pubDate>Mon, 02 Nov 2015 11:58:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。</p>
+
+<section>
+<h2>内部リンク</h2>
+
+<p>事前に徹底的に書き換えておくのが良い。内部リンクにはドメインも不要なので<code>/</code>で始まる絶対パスで全部書くように統一するのが楽だろう。</p>
+
+<p>ただし<code>rel=canonical</code>は色々なウェブサービスから（時々考えなしにプロトコル・スキームから始まっていると仮定されて）使われるため、<code>http:</code>から始める方が安全かもしれない。そもそもFacebook向けのOGPで<code>og:url</code>を書いている場合もあり、この類もプロトコル・スキームから始める必要があり、どうせ書き換える必要は出てくる。諦めて機械的に書き換えができる仕組みを作っておくのも良い。</p>
+
+<p>このウェブサイトの場合は、OGP他を消した上で全て絶対パスにしておくという手法を取ったが、おすすめしない。</p>
+</section>
+
+<section>
+<h2>Amazonアソシエイトの画像URL</h2>
+
+<p>通常、Amazonアソシエイトを使って画像を得ようとするとHTTPの画像になる。一応リダイレクトで振り分けられるのだが、元々のURLはHTTPなためどうしてもMixed Contentにはなる。リダイレクトされて<code>images-fe.ssl-images-amazon.com</code>配下を参照する画像に書き換えるか、リダイレクト元の方をHTTPSに書き換えておくとうまくいく。</p>
+
+<p>HTTPからHTTPSの画像を参照する分には問題は少ないので、これも事前に作業しておくことができる。</p>
+</section>
+
+<section>
+<h2>RSSフィードの再構築</h2>
+
+<p>RSSフィードでは絶対URLでリンクは書く。そのためすべてのリンクを書き換える必要がある。あまり忘れない上、概ねブログ・ツール等から自動的に更新されることになるので、大丈夫だろう。RSSリーダーからは全部新着になったり、IFTTTのようなウェブサービスが暴発することがあることには気を付けた方が良い。</p>
+
+<p>僕のように魂を込めてRSS（一部だが）をテキスト・エディターで書いている人は忘れないようにする。</p>
+</section>
+
+<section>
+<h2>サイトマップの再構築</h2>
+
+<p>RSSフィードは忘れないだろうが、サイトマップは忘れる可能性が高い。それなりに自動生成していない人もいると思うので、再構築した方が良い。</p>
+
+<p>301でのURLの移動とサイトマップのURLが食い違ってると何らかの悪影響がある可能性を否定できないので、特に気を付ける必要がある。</p>
+</section>
+
+<section>
+<h2>連携ウェブサービスの再設定</h2>
+
+<p>HTTPで始まるURLを登録しているウェブサービスを利用している場合は忘れずに書き換える。FacebookページやTwitterアカウントなどは忘れがちだろう。</p>
+
+<p>IFTTTやDlvr.itのようなRSSフィードをトリガーとしているものは注意を要する。これらは新着記事かそうでないかをURLで判断し、多くの場合HTTPのURLとHTTPSのURLを区別する。そのため今までの設定を書き換えて使おうとすると、全部新着とみなされ暴発する（僕はまんまと暴発させた）。面倒だが新しく作り直す必要があるだろう。</p>
+</section>
+
+<section>
+<h2>Search Consoleの再設定</h2>
+
+<p>Googleの検索結果での表示などを制御するSearch ConsoleではHTTPとHTTPSが別のプロファイルになる。そのため改めて追加する必要がある。それだけでなくすべて設定のやり直しなので、ウェブサイトの認証やサイトマップの送信も行う。</p>
+
+<p>特に何かこうというわけではないが、ウェブサイトについてGoogleへの連絡する際の要になるので、作っておいた方が無難だろう。</p>
+</section>
+
+<section>
+<h2>Analyticsの設定変更</h2>
+
+<p>AnalyticsはHTTPとHTTPSの両対応であるが、設定内に優先するプロトコルの設定が複数ある。プロパティのプロパティ設定にあるデフォルトのURLとビューのビュー設定にあるウェブサイトのURLの2つだ。どちらも書き換えておく必要が出てくるだろう。</p>
+
+<p>思い切ってAnalysticsを捨てるという選択もなくはない。どちらにせよ設定は書き換えておいても損はないだろう。</p>
+</section>
+
+<section>
+<h2>他</h2>
+
+<p>HTML生成に使うツールなどでプロトコル・スキームを切り替えられるようにしておくと書き換える場所が少なくて済むので、作業がスムーズに進む。といってもそういうことができることはあまりないので、どこを書き換えればうまく切り替わるかを事前に色々実験しておくと良い。</p>
+
+<p>もう誰が使っているか知らないが<a href="http://blosxom.sourceforge.net/">Blosxom</a>では<code>$blog_url</code>という設定変数で集中管理されるので、それをうまく利用する。</p>
+
+<pre><code>$scheme = &quot;https:&quot;;
+$domain = &quot;hail2u.net&quot;;
+$blog_url = &quot;$scheme//$domain/blog&quot;;
+</code></pre>
+
+<p>このように<code>blosxom.conf</code>で設定を分離させ、切り替えられるようにしたうえで、プラグインやフレーバーから必ず<code>$blog_url</code>を使うようにしておいた。たまにどうしようもないプラグインもあったりするので、その場合に<code>$blosxom::scheme</code>で拾えるようにするためこうなっている。</p>
+
+<hr>
+
+<p>grepして置換など必要のない形に事前に整えるのが<em>最低限のライン</em>で、HTTPで公開済みのHTMLがそのままHTTPSで機能するようになっているのが理想だ。HTTPSへの移行を発動させる直前の作業は、HTTPな参照が残っていないかgrepして確認するくらいで終えたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>HTTPSへ</title>
@@ -333,33 +420,6 @@ var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
 </ul>
 
 <p>これら以外の擬似要素でコロンを1つにすることは<a href="http://www.w3.org/TR/css3-selectors/#pseudo-elements">セレクターの仕様</a>では許されていない。同時にこれらの擬似要素では後方互換性のために必ずコロン1つでも良いように実装することとなっているので、安全に縮めることが可能だろう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>WEB+DB PRESS Vol.89</title>
-      <link>https://hail2u.net/blog/media/wdpress-89.html</link>
-      <description>以前記事を書いてより毎号WEB+DB PRESSをいただいているが、感想を書いてなくて申し訳ない。謝罪から始めたが、11/24発売の第89号に載っていた@kazuhoによる速習HTTP/2という記事が非常に良かった。これはフロントエンド側の人からもっとデザイナーよりの人にまでも薦めることのできるHTTP/2の入門記事だと感じた。</description>
-      <category>Media</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/media/wdpress-89.html</guid>
-      <pubDate>Fri, 23 Oct 2015 02:37:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-  <a href="http://www.amazon.co.jp/gp/product/4774176389/ref=as_li_ss_il?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=4774176389&amp;linkCode=as2&amp;tag=hail2unet-22"><img alt="WEB+DB PRESS Vol.89" height="500" src="https://images-fe.ssl-images-amazon.com/images/I/61aoxzmo9OL.jpg" width="354"></a>
-</figure>
-
-<p>以前記事を書いてより毎号WEB+DB PRESSをいただいているが、感想を書いてなくて申し訳ない。謝罪から始めたが、<a href="http://www.amazon.co.jp/gp/product/4774176389/ref=as_li_ss_il?ie=UTF8&camp=247&creative=7399&creativeASIN=4774176389&linkCode=as2&tag=hail2unet-22">11/24発売の第89号</a>に載っていた<a href="https://twitter.com/kazuho">@kazuho</a>による速習HTTP/2という記事が非常に良かった。これはフロントエンド側の人からもっとデザイナーよりの人にまでも薦めることのできるHTTP/2の入門記事だと感じた。</p>
-
-<p>もう結構な量が観測されるHTTP/2についての記事やページは、やはりサーバーを管理する人やネットワーク知識が豊富な人向けのものが多く、出てくるキーワードからなかなかの敷居の高さを演出してくる。それでも必要ではありそうなので頑張って読むが、もちろん僕をはじめとしたフロントエンド側の人に向けて書かれているわけではないので、ちゃんとは理解できない。それぞれの記事で20%くらいわかるというのを繰り返すことで少しづつ分かってきた……つもりという程度のものだった。この辺りはあまり変わらないのではないかと思う。</p>
-
-<p>記事の内容についてはそれほど長くもない（10ページ）こともあり、特に触れないこととするが、冒頭だけ引用する。</p>
-
-<blockquote>
-  <p>本稿では、その背景とHTTP/2の機能、利点、使い方、および今後について解説します。</p>
-</blockquote>
-
-<p>まさにこれで、これらが専門的なキーワードのわかりやすい説明とともに書き進められている。この記事を読んだ後、フロントエンド側の人でも自らHTTPS化と同時にHTTP/2化を働きかけるようになるのではないか、というくらいHTTP/2のパワーと可能性を十二分に伝えきっている。</p>
-
-<p>第89号では第一特集でChromeのデベロッパー・ツールを、そして第三特集では様々なフォームの改善方法をそれぞれ取り上げている。そういう意味でもフロントエンド側の人間に多くの学びがある号だと言えるだろう。是非手に取ってみてほしい。</p>]]></content:encoded>
     </item>
 
   </channel>
