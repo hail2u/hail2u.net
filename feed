@@ -10,6 +10,19 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>Encoding</title>
+      <link>https://hail2u.net/blog/internet/encoding-specification.html</link>
+      <description>2年弱くらい作業が続いているEncoding仕様を、新たなCRが出た機会に改めて読んでいた。このような仕様に人を浪費することがないように、どのような手間とヒマをかけてもUTF-8に変更していくべきなのかな、と感じる。</description>
+      <category>Internet</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/internet/encoding-specification.html</guid>
+      <pubDate>Tue, 03 Nov 2015 13:05:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>2年弱くらい作業が続いている<a href="http://www.w3.org/TR/encoding/">Encoding</a>仕様を、新たなCRが出た機会に改めて読んでいた。このような仕様に人を浪費することがないように、どのような手間とヒマをかけてもUTF-8に変更していくべきなのかな、と感じる。</p>
+
+<p>UTF-8を使わない理由はあまりないが、同時にレガシーなEUC-JPやShift_JISを捨てる理由もあまりないことは確かだ。強い反論が思いつかないためそのまま残る。それはしょうがないが、問題はそれに釣られてしまうことがあることだ。新しいプロジェクトでも建設的な議論の末にUTF-8に落ち着きそうだったにも関わらず、ウェブサイトの変えられない他のページがShift_JISだからという消極的な理由でそれになりそうになることもある。</p>
+
+<p>使い続けられるレガシーな文字コードという鎖の環を断ち切る地道な活動を続けたい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>HTTPSにした時に気を付けたこと</title>
       <link>https://hail2u.net/blog/webdesign/https-checklist.html</link>
       <description>何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。</description>
@@ -373,36 +386,6 @@ var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
 <p>涼しくなってぐっすり眠れるようになったからか、またあまり夢を見なくなってきた。</p>]]></content:encoded>
     </item>
     <item>
-      <title>calc()内の0</title>
-      <link>https://hail2u.net/blog/webdesign/unitless-zero-inside-css-calc-notation.html</link>
-      <description>感覚としてcalc(1rem + 1)は明らかにダメそうだとわかるが、なんとなく通りそうに見えるcalc(1rem + 0)もダメになるということをCSSWringへのPRで知った。0ならユニットを省略できることが多いが、calc()内では別のようだ。最初良くわからなかったが、この辺りを定義しているCSS Values and Units Module Level 3仕様でもちゃんとそうなっていた。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/unitless-zero-inside-css-calc-notation.html</guid>
-      <pubDate>Sat, 24 Oct 2015 13:23:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>感覚として<code>calc(1rem + 1)</code>は明らかにダメそうだとわかるが、なんとなく通りそうに見える<code>calc(1rem + 0)</code>もダメになるということを<a href="https://github.com/hail2u/node-csswring/pull/62">CSSWringへのPR</a>で知った。<code>0</code>ならユニットを省略できることが多いが、<code>calc()</code>内では別のようだ。最初良くわからなかったが、この辺りを定義している<a href="http://www.w3.org/TR/css3-values/">CSS Values and Units Module Level 3仕様</a>でもちゃんとそうなっていた。</p>
-
-<p>仕様では<code>calc()</code>の中身を処理する時に、<a href="http://www.w3.org/TR/css3-values/#calc-type-checking">右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>（乗算）の場合は両辺のどちらかが数字であることが、<code>/</code>（除算）では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>（加算）と<code>-</code>（減算）では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
-
-<p>問題の<code>calc(1em + 0)</code>は左辺が<code>&lt;length&gt;</code>で右辺が<code>&lt;integer&gt;</code>となる。そのため両辺の型が一致せず文法違反になる。実際に各ブラウザーでもことごとく無視されるようになる。</p>
-
-<hr>
-
-<p>CSSWringではプロパティーの値の中で単位を外せそうな<code>0</code>の長さかパーセンテージを見つけたら問答無用に削除していたため、このバグを作ってしまっていた。PRでは<code>calc()</code>かどうか簡単に探してスキップされるようになっており、これで問題なさそうだったため、ちょっとだけマッチ方法を変えてマージした。そういうわけで<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.1.0">CSSWring v4.1.0</a>では既に修正済みだ。</p>
-
-<hr>
-
-<p>v4.1.0では<code>::before</code>を<code>:before</code>に縮める機能も追加している。すべての擬似要素というわけではなく、以下の4つの擬似要素でのみ1つに縮められる。</p>
-
-<ul>
-<li><code>::before</code></li>
-<li><code>::after</code></li>
-<li><code>::first-line</code></li>
-<li><code>::first-letter</code></li>
-</ul>
-
-<p>これら以外の擬似要素でコロンを1つにすることは<a href="http://www.w3.org/TR/css3-selectors/#pseudo-elements">セレクターの仕様</a>では許されていない。同時にこれらの擬似要素では後方互換性のために必ずコロン1つでも良いように実装することとなっているので、安全に縮めることが可能だろう。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>Mediumへの配信</title>
       <link>https://medium.com/muidem-no-ten-u2liah</link>
       <pubDate>Fri, 23 Oct 2015 05:07:39 +0900</pubDate>
@@ -430,6 +413,6 @@ var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
       <guid isPermaLink="true">https://twitter.com/hail2unet</guid>
       <description><![CDATA[<p>更新情報やブログに公開された記事の他、重要なお知らせを通知するためのTwitterアカウントを作成しました。今まで個人のアカウントでツイートされていたそれらは、今後こちらで行われます。</p>]]></description>
     </item>
-    <lastBuildDate>Mon, 02 Nov 2015 11:58:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 03 Nov 2015 13:05:00 +0900</lastBuildDate>
   </channel>
 </rss>
