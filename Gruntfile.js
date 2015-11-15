@@ -150,12 +150,7 @@ module.exports = function (grunt) {
         dest: "dist/images/",
         expand: true,
         src: [
-          "**/*",
-          "!*.psd",
-          "!*.svg",
-          "!*.xcf",
-          "logo.svg",
-          "*/*.svg"
+          "**/*"
         ]
       },
 
