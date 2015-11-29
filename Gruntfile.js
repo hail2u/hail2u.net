@@ -462,22 +462,22 @@ module.exports = function (grunt) {
         src: "src/img/favicon.svg"
       },
 
-      favicon48: {
-        options: {
-          width: 48
-        },
-
-        dest: "tmp/favicon-48.png",
-        src: "src/img/favicon.svg"
-      },
-
       favicon64: {
         options: {
           width: 64
         },
 
-        dest: "dist/images/favicon-64.png",
-        src: "src/img/favicon.svg"
+        dest: "tmp/favicon-64.png",
+        src: "src/img/favicon-large.svg"
+      },
+
+      favicon256: {
+        options: {
+          width: 256
+        },
+
+        dest: "tmp/favicon-256.png",
+        src: "src/img/favicon-large.svg"
       },
 
       favicon1024: {
