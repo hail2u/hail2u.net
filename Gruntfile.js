@@ -314,27 +314,7 @@ module.exports = function (grunt) {
     },
 
     gitcommit: {
-      blogPublish: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Add",
-          push: true,
-          root: "dist/"
-        }
-      },
-
-      blogUpdate: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Update",
-          push: true,
-          root: "dist/"
-        }
-      },
-
-      cacheUpdate: {
+      cache: {
         options: {
           message: "Update cache files"
         },
@@ -356,15 +336,9 @@ module.exports = function (grunt) {
         }
       },
 
-      entryAdd: {
+      entry: {
         options: {
           message: "Add"
-        }
-      },
-
-      entryUpdate: {
-        options: {
-          message: "Update"
         }
       },
 
@@ -536,11 +510,13 @@ module.exports = function (grunt) {
     "sitemap"
   ]);
 
-  grunt.registerTask("build:article", [
+  grunt.registerTask("build:blog", [
     "clean",
+    "gitcommit:entry",
     "blosxom:article",
     "generate:blog",
     "feedmix",
+    "gitcommit:cache",
     "sitemap"
   ]);
 
@@ -555,6 +531,13 @@ module.exports = function (grunt) {
     "copy:css",
     "copy:styleGuide",
     "copy:woff"
+  ]);
+
+  grunt.registerTask("build:home", [
+    "clean",
+    "build:html",
+    "feedmix",
+    "sitemap"
   ]);
 
   grunt.registerTask("build:html", [
@@ -584,8 +567,18 @@ module.exports = function (grunt) {
     "gitcommit:deploy"
   ]);
 
+  grunt.registerTask("deploy:blog", [
+    "build:blog",
+    "gitcommit:deploy"
+  ]);
+
   grunt.registerTask("deploy:css", [
     "build:css",
+    "gitcommit:deploy"
+  ]);
+
+  grunt.registerTask("deploy:home", [
+    "build:home",
     "gitcommit:deploy"
   ]);
 
@@ -602,26 +595,5 @@ module.exports = function (grunt) {
   grunt.registerTask("deploy:js", [
     "build:js",
     "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("publish:blog", [
-    "gitcommit:entryAdd",
-    "build:article",
-    "gitcommit:cacheUpdate",
-    "gitcommit:blogPublish"
-  ]);
-
-  grunt.registerTask("publish:home", [
-    "build:html",
-    "feedmix",
-    "sitemap",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("update:blog", [
-    "gitcommit:entryUpdate",
-    "build:article",
-    "gitcommit:cacheUpdate",
-    "gitcommit:blogUpdate"
   ]);
 };
