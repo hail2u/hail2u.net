@@ -6,7 +6,7 @@
 package categories;
 
 use strict;
-use vars qw($enabled $title $title_sep $name);
+use vars qw($enabled $title $title_sep $description $name);
 
 # --- Configuration Variables ----------
 
@@ -36,6 +36,7 @@ my $name_sep = "/";
 
 $enabled = 0;
 $title = "";
+$description = "";
 my $flavour = $blosxom::default_flavour;
 my $flavour_prefix = "categories_";
 my $cache = {};
@@ -45,15 +46,18 @@ my $cache = {};
 sub start {
   if (!$blosxom::path_info_yr and $blosxom::path_info and ($blosxom::path_info !~ m!.*?/?\w+\.\w+$!)) {
     $enabled = 1;
+    $description = "このページでは";
 
     foreach (split(/\//, $blosxom::path_info)) {
       next if !$_;
       $_ = $friendly_name->{$_} if $friendly_name->{$_};
       $title .= "$name_sep$_";
+      $description .= $_;
     }
 
     $title =~ s!^$name_sep!!;
     $title_sep = $str_title_sep;
+    $description .= "についての記事が一覧できます。";
     $blosxom::num_entries = 9999;
   }
 
