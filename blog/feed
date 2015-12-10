@@ -10,12 +10,53 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Wed, 9 Dec 2015 12:28:39 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 10 Dec 2015 11:32:14 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>ウェブフォントが無効化されているケースのテスト</title>
+      <link>https://hail2u.net/blog/webdesign/test-no-webfont.html</link>
+      <description>CSSでのフォント指定を無効にする手段はブラウザーに用意されていることもあるが、ウェブフォントだけを無効にする手段は用意されていないように思う。もちろんMobile Safariのコンテンツブロッカーに対応したアプリのいくつかでは対応しているようだが、それをデスクトップからテストするのはなかなか難しい。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/test-no-webfont.html</guid>
+      <pubDate>Thu, 10 Dec 2015 11:31:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>CSSでのフォント指定を無効にする手段はブラウザーに用意されていることもあるが、ウェブフォントだけを無効にする手段は用意されていないように思う。もちろんMobile Safariのコンテンツブロッカーに対応したアプリのいくつかでは対応しているようだが、それをデスクトップからテストするのはなかなか難しい。</p>
+
+<p>僕はまずはSCSSのレベルで工夫してデバッグしやすいように整えておき、JavaScriptの助けを借りる形にした。</p>
+
+<pre><code>$font-family-sans-serif-local: -apple-system, &quot;Helvetica Neue&quot;, &quot;Calibri&quot;, sans-serif;
+$font-family-sans-serif: &quot;Eau Douce&quot;, $font-family-sans-serif-local;
+</code></pre>
+
+<p>フォント定義ではまずローカルのフォントを参照する変数を作成する。実際に使う変数ではそれを参照したうえでウェブフォントを先頭に追加する。</p>
+
+<pre><code>.no-webfont {
+  font-family: $font-family-sans-serif-local;
+}
+</code></pre>
+
+<p>デバッグ用のCSSファイルの元になるSCSSファイルでは、このように<code>no-webfont</code>クラスを作っておく。</p>
+
+<pre><code>document.getElementById(&quot;toggle-webfont&quot;).addEventListener(&quot;click&quot;, function () {
+  document.body.classList.toggle(&quot;no-webfont&quot;);
+});
+</code></pre>
+
+<p>テストに使うウェブページではこのようなJavaScriptを仕込み、<code>toggle-webfont</code>というIDを持つ要素（<code>button</code>要素など）で<code>body</code>要素の<code>no-webfont</code>クラスをトグルできるようにする。これでその要素をクリックするとウェブフォントの有効と無効をエミュレートすることができる。</p>
+
+<hr>
+
+<p>このようなテストが必要な理由は簡単で、Mobile Safariのコンテンツブロッカーはフォント指定を無効にするわけではないからだ。<a href="https://twitter.com/hinatami/status/674537426170155009">@hinatamiのツイート</a>でも教えてもらったが、手元で確認した感じでも<code>@font-face</code>ルールを無効化するような形（HTTPリクエストのレベルで無効化しているような雰囲気だが、ちゃんとした挙動を知るにはもうちょっとちゃんと調べる必要がある）で機能しているようだ。そのためフォールバックのフォントでどうなるかを確認する必要があるということになる。</p>
+
+<p>僕のようなやり方はちょっと遠回りで環境に強く依存している。しかし、何かしらの手段でテストするか、テストせずともうまく機能するようにCSSを工夫する必要があるだろう。そうでないとウェブフォントが、もっとはっきりと言えばアイコン・フォントが、もっと細かく言うのならばハンバーガー・ボタンが適切に表示されない場合にどうなるかを確認することができない。</p>
+
+<p>CSSの工夫となると一番単純なものはウェブフォントを使わないになる。そうでない場合は使いたいウェブフォントとボディのサイズが近いローカルのフォントをフォールバックに指定することになる。どちらも選択肢としてはなかなか厳しいところがあるので、しっかりとテストする環境を整えることを薦めたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>スタンディングデスクのセッティング（2015/12/07）</title>
@@ -253,43 +294,6 @@
 <p>部屋の床いっぱいに人をダメにするソファが敷き詰められている。これでいつでもどこでも横になれる最高の環境だとなって、ごろんごろん堪能していた。ふと気づくと机も人をダメにするソファにかわっていて、それに置いてあったディスプレイもなんだか柔らかい。というところで目が覚めた。</p>
 
 <p>特に欲しいというわけではないはずなのだけど、夢へ人をダメにするソファが出演することは多い。後で思い返してみると背景に脈絡なく置いてあったということがよくある。庭とか道端とか、電車の中とか。潜在的に欲しがっているのか、それとももうこれだけは買ってはならないという強い意識の現れなのか。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>スタンディングデスク雑感</title>
-      <link>https://hail2u.net/blog/gadget/standing-desk.html</link>
-      <description>レンタルしていた骨盤をサポートする座布団を返却してからスタンディングデスクを試している。以下はその雑感だが、まだ既存の机の上にカラーボックスを重ねただけの状態での体験でのものだ。</description>
-      <category>Gadget</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/gadget/standing-desk.html</guid>
-      <pubDate>Sat, 28 Nov 2015 10:46:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>レンタルしていた<a href="https://hail2u.net/blog/gadget/one-week-with-backjoy.html">骨盤をサポートする座布団</a>を返却してからスタンディングデスクを試している。以下はその雑感だが、まだ既存の机の上にカラーボックスを重ねただけの状態での体験でのものだ。</p>
-
-<ul>
-<li>腰や背中が楽になる</li>
-<li>肩こりが減る</li>
-<li>ふくらはぎが張る</li>
-<li>足の裏が痛くなる</li>
-<li>姿勢が良くなる</li>
-<li>ディスプレイから離れて作業するようになる</li>
-<li>強制的にポモドーロ・テクニック的な作業単位になる</li>
-<li>ブラインドタッチしやすい</li>
-<li>マウスが使いづらい</li>
-<li>コーディング量が減る</li>
-<li>没入型UIと相性が悪い</li>
-</ul>
-
-<p>ハードウェアにおいてある程度問題が出ることは想定していたが、ソフトウェアにおいても問題が出ることがあることがわかったのは収穫だった。没入型UIとはつまりディストラクション・フリー・テキスト・エディターや電子書籍リーダーのようなものだ。ゲームはまだやっていないが、これもまた集中力を消費するので相性が悪そうだ。</p>
-
-<p>ふくらはぎや足裏への負担はラグやスリッパといったハードウェアの追加でどうにかなりそうな雰囲気だ。すぐ横に倒れこめるソファなどを用意しておくと更に良さそう。真冬は足元暖房も追加したい。</p>
-
-<p>マウスの使いづらさはひじのあたりに支えがないこと由来なのかもしれない。そう仮定するとカラーボックスの奥行の足らなさが問題で、立っていることが原因ではないと言えそうだ。この辺りはもっと検証が必要だろう。</p>
-
-<p>問題は文章を書くのがちょっと辛いかもしれないというところだ。僕はエディターをいじりながら文章をああでもないこうでもないと修正しながら書き進めていくタイプなので、疲れで集中力が強制的に遮断されやすいスタンディングデスクとは相いれないスタイルのようだ。うまくスマホとかを駆使して色んな体勢や場所で文章を書けるように慣らしていく必要があると感じた。</p>
-
-<hr>
-
-<p>全般的に感触は良好なので、気に入っている既存の机を生かした形でスタンディングデスク化を進めたいと考えている。どういうもので30–40cmのかさ上げをするかはこれからゆっくりと考えたい。とりあえずニトリとシマホへ行こう。</p>]]></content:encoded>
     </item>
 
   </channel>
