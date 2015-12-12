@@ -121,35 +121,26 @@ module.exports = function (grunt) {
 
           line = line.split("=>");
           var file = path.relative(process.cwd(), line[0]);
-          var category = path.dirname(file).split(path.sep).pop();
-          var fn = path.basename(file, ".txt");
           var date = new Date(parseInt(line[1], 10) * 1000);
-          var yy = date.getFullYear();
-          var mm = date.getMonth();
-          var dd = date.getDate();
-          var hh = date.getHours();
-          var nn = date.getMinutes();
-          var ss = date.getSeconds();
-          var article = {
+          articles.unshift({
             title: fs.readFileSync(file, "utf8").split(/\n/)[0],
-            link: "/blog/" + category + "/" + fn + ".html",
+            link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
+              path.basename(file, ".txt") + ".html",
             unixtime: date.getTime(),
-            year: yy,
-            month: mm + 1,
-            day: dd,
-            hour: hh,
-            minute: nn,
-            second: ss,
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            day: date.getDate(),
+            hour: date.getHours(),
+            minute: date.getMinutes(),
+            second: date.getSeconds(),
             tz: "+09:00"
-          };
-          articles.unshift(article);
-          articles.sort(function (a, b) {
-            return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-          }).reverse();
-          fs.outputFileSync(cache, JSON.stringify(articles, null, 2));
-          grunt.log.writeln("File \"" + cache.replace(/\\/g, "/") +
-            "\" updated.");
+          });
         });
+        articles.sort(function (a, b) {
+          return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
+        }).reverse();
+        fs.outputFileSync(cache, JSON.stringify(articles, null, 2));
+        grunt.log.writeln('File "' + cache.replace(/\\/g, "/") + '" updated.');
       }
 
       articles.forEach(function (article, i, a) {
@@ -191,7 +182,7 @@ module.exports = function (grunt) {
       try {
         extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, "utf8")));
       } catch (e) {
-        grunt.log.warn("File \"" + fileMetadata + "\" not found.");
+        grunt.log.warn('File "' + fileMetadata + '" not found.');
       }
 
       switch (file) {
@@ -204,7 +195,7 @@ module.exports = function (grunt) {
         var imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
 
         if (imgs) {
-          var img = imgs[0].replace(/src="https?:\/\/hail2u\.net/, "src=\"");
+          var img = imgs[0].replace(/src="https?:\/\/hail2u\.net/, 'src="');
           data.articles.first.image = img;
           data.articles.first.hasImage = true;
         }
@@ -229,7 +220,7 @@ module.exports = function (grunt) {
       try {
         template = fs.readFileSync(fileTemplate, "utf8");
       } catch (e) {
-        grunt.log.warn("Source file \"" + fileTemplate + "\" not found.");
+        grunt.log.warn('Source file "' + fileTemplate + '" not found.');
 
         return next();
       }
@@ -237,7 +228,7 @@ module.exports = function (grunt) {
       var render = hbs.compile(template);
       var metadata = extendData(fileTemplate);
       fs.outputFileSync(file.dest, render(metadata));
-      grunt.log.writeln("File \"" + file.dest + "\" created.");
+      grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
       done(error);
