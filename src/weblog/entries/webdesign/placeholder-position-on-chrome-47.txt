@@ -1,0 +1,33 @@
+Chrome 47でのプレースホルダー文字列の位置
+
+<p><code>input</code>要素の<code>placeholder</code>属性で指定することができるプレースホルダ―文字列が場合によって位置がずれることがあることを知った。どうも<code>input</code>要素へフォント指定があり、かつプレースホルダ―文字列にマルチバイト文字列が含まれていると再現するようだ。</p>
+
+<p class="seealso">See Also: <a href="/pub/test/647.html">Placeholder Position on Chrome 47</a></p>
+
+<p>再現環境はChrome 47とEdge 12ということで、OSには依存しない（が、ブラウザーのフォント設定によっては再現しない）。デモ・ページでは下に少しずれているため、プレースホルダ―文字列が入力ボックスの天地中央にきていない。加えて文字“p”のディセンダ―が欠けている。</p>
+
+<p>Chrome 49でも再現したので、すぐに直ることはなさそうだ。<a href="https://code.google.com/p/chromium/issues/detail?id=569869">このバグを報告したイシュー</a>は立てておいたが、<a href="https://code.google.com/p/chromium/issues/detail?id=178032">既にある178032</a>なのかもしれない（とすると3年ほど前からあるのでどうも直りそうもないことになる）。</p>
+
+<hr>
+
+<p>直るのを待つのは厳しそうなので、小手先で対応する必要がありそうだ。原因はShadow DOMとして追加されるプレースホルダ―文字列のための要素が<code>display: block</code>になっていることが問題なのではないかと想像している。そのためブラウザーが想定する行ボックスの高さがずれ、うまく揃わないのではないだろうか。これをうまく変えられれば話は速いのだが、インライン・スタイルである上に当然のように<code>!important</code>が鎮座しているためこれを上書きするのは難しい。</p>
+
+<p>そこでマジック・ナンバーを使わずに行ボックスを調整する方向で考えてみる。</p>
+
+<pre><code class="language-css">::-webkit-input-placeholder {
+  line-height: 1;
+}
+</code></pre>
+
+<p>こうすると欠けることはなくなるが、今度は微妙に上にずれる。これでも悪くはないが、それならいっそ行ボックスがブラウザーの想定通りになるようにしてやるという方が確実か。</p>
+
+<pre><code class="language-css">input {
+  font-family: initial;
+}
+</code></pre>
+
+<p>このようにしてフォント指定をリセットすることになる。Internet Explorer 11では再現しないので、<code>initial</code>キーワードを使っても良いはずだ。ただし影響はかなり大きいので採用するにはもうちょっとテストを重ねる必要がありそうだ。</p>
+
+<hr>
+
+<p>本バグとは関係ないが、どうやらChrome 47では既に（ようやく？）<code>:placeholder-shown</code>擬似クラスに対応しているようだ。いつからだろう。<a href="http://caniuse.com/#feat=css-placeholder-shown">Can I Use...</a>ではまったく対応されていないことになっていて気付かなかった。どうやってPRするんだっけ……。</p>
