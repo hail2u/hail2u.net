@@ -405,7 +405,7 @@ module.exports = function (grunt) {
           width: 180
         },
 
-        dest: "dist/apple-touch-icon.png",
+        dest: "dist/apple-touch-icon-precomposed.png",
         src: "src/img/favicon-large.svg"
       },
 
