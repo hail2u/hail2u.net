@@ -113,7 +113,11 @@ module.exports = function (grunt) {
       var articles = JSON.parse(fs.readFileSync(cache, "utf8"));
       var fileNew = path.basename(grunt.option("file"));
 
-      if (grunt.cli.tasks[0] === "deploy:blog" && fileNew) {
+      if (
+        !grunt.option("update") &&
+        grunt.cli.tasks[0] === "deploy:blog" &&
+        fileNew
+      ) {
         fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
           if (!/\d+$/.test(line) || line.indexOf(fileNew) < 0) {
             return;
