@@ -10,12 +10,27 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sun, 3 Jan 2016 12:51:55 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 4 Jan 2016 15:05:57 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>filesフィールドとtestディレクトリー</title>
+      <link>https://hail2u.net/blog/software/files-field-and-test-directory.html</link>
+      <description>npmはパッケージにtestディレクトリーを含めている。それもあって自分のパッケージでも特に疑問を持たずにtestディレクトリーを含めるようにしていた。.gitignoreや.npmignoreではなく、package.jsonのfilesフィールドをメインで使うようになってからも明示的に加えていた。イシューで指摘されて初めてちゃんと考えたが、どうもいらないようだ。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/software/files-field-and-test-directory.html</guid>
+      <pubDate>Mon, 04 Jan 2016 15:05:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/npm/npm">npm</a>はパッケージに<code>test</code>ディレクトリーを含めている。それもあって自分のパッケージでも特に疑問を持たずに<code>test</code>ディレクトリーを含めるようにしていた。<code>.gitignore</code>や<code>.npmignore</code>ではなく、<code>package.json</code>の<code>files</code>フィールドをメインで使うようになってからも明示的に加えていた。イシューで指摘されて初めてちゃんと考えたが、どうもいらないようだ。</p>
+
+<p>実際に考えると<code>test</code>ディレクトリーが必要なのは開発時だけだろう。その場合はGitを使うか、TARボールをダウンロードするかのどちらかであるはずなので、<code>test</code>ディレクトリーはそれらのみに含まれていればよい。<code>npm install</code>を使って依存パッケージとしてインストールする場合にはまったく必要ないはずだ。</p>
+
+<p><code>files</code>フィールドを使っているリポジトリーが少なく、なかなか判断が難しいが、必要ないだろうと判断した。ただし<code>node_modules</code>ディレクトリーへ移動して、個々の依存パッケージのテストができないのは少し気になる。問題があった時に切り分けがしづらいかもしれない。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>発泡純米酒ねね</title>
@@ -204,43 +219,6 @@
 <p>逆にこれまであまり使っていなかったが使うようになったのは<code>min-height</code>プロパティーあたりのように思う。初期レンダリングできる範囲の意識と共に、無限にある縦方向のパフォーマンス的な限界への意識が高まった結果だろう。</p>
 
 <p>みなさんは何か見限っただろうか？CSSそのものは見限らないで欲しいところだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>BAKEとその行列</title>
-      <link>https://hail2u.net/blog/misc/bake-and-its-line.html</link>
-      <description>チーズタルトのBAKEが近所にできたが行列がものすごくて並ぶ気にならなかった。たまたま行列が少ないタイミングで近くを通る機会があったので、どうにか25分並んで買った。並んだことで初めてわかったが、根本的に行列ができる仕組みと運用になっているようだ。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/misc/bake-and-its-line.html</guid>
-      <pubDate>Thu, 24 Dec 2015 09:18:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>チーズタルトの<a href="http://bakecheesetart.com/">BAKE</a>が近所にできたが行列がものすごくて並ぶ気にならなかった。たまたま行列が少ないタイミングで近くを通る機会があったので、どうにか25分並んで買った。並んだことで初めてわかったが、根本的に行列ができる仕組みと運用になっているようだ。</p>
-
-<p>実際に並ぶ前と並んでいる間は単にレジが少ないだけだと考えていた。シングル・タスクで一人当たり30秒近くかかっているのがひどいなという印象だった。しかしBAKEのチーズタルトの販売にはいくつか無視できない条件があるようだ。</p>
-
-<ol>
-<li>売り場付近で焼くこと</li>
-<li>時間当たりに焼ける量に限界があること</li>
-<li>あら熱をとること</li>
-<li>事前に箱詰めをしないこと</li>
-</ol>
-
-<p>どうもレジを増やして回転を上げると、3のあら熱をとる時間が確保できないようだ。焼くのが間に合わないということは見た感じだとなさそうな印象ではあるが、あら熱をとるために結局は焼ける量を増やす必要が出てくる。つまりオペレーションの並列化では解決できず、店舗の大幅な拡大が必須ということになる。しかしそれはテナントとして入っている以上ほぼ不可能だろう。</p>
-
-<p>改善できそうなところはレジの簡略化と箱詰めの並列化によって効率を上げることくらいだろうか。商品が一種類しかないのでどちらも難しくはないはずだ。そのためにレジと箱詰めを別オペレーションにした方が良いように感じた。レジの簡略化は価格の調整も同時に行うと効果が高いだろう。箱自体の簡略化も効果が高そうだが、それによって払うコストは無視できない大きさになりそうだ。</p>
-
-<ul>
-<li>25分並ぶ→レジと受け取り</li>
-<li>10分並ぶ→レジ→10分並ぶ→受け取り</li>
-</ul>
-
-<p>こう変化すると想像している。ただひたすら待つ時間の分断と、箱詰めの並列化による若干の短縮という2つの効果を想定しているというわけだ。</p>
-
-<p>もう一回買いたいけど並びたくないのでなんとか改善してほしい。半年後くらいには並ばずに買えるようになっていそうではあるが、それまで待てない。おいしかった。</p>
-
-<hr>
-
-<p>箱にbake.co.jpと書いてあるにもかかわらず、実際のウェブサイトがbakecheesetart.comで運用されているのはあまり良くない。またモノによって書かれているドメインがバラバラなのも良くない。世界展開をしていくようなのでbakecheesetart.comへ徐々に統一するべきだろう。統一されている最中なのかな？</p>]]></content:encoded>
     </item>
 
   </channel>
