@@ -77,9 +77,10 @@ module.exports = function (grunt) {
             dest: "dist/",
             expand: true,
             src: [
-              "*.txt",
               ".nojekyll",
-              "CNAME"
+              "CNAME",
+              "humans.txt",
+              "robots.txt"
             ]
           },
           {
@@ -125,12 +126,6 @@ module.exports = function (grunt) {
             expand: true,
             flatten: true,
             src: ["**/*.js"]
-          },
-          {
-            cwd: "src/woff/",
-            dest: "src/css/assets/fonts/",
-            expand: true,
-            src: ["**/*.woff*"]
           }
         ]
       },
@@ -218,13 +213,6 @@ module.exports = function (grunt) {
           "dist/about/style-guide/index.html": ["src/css/test.html"],
           "dist/images/favicon-large.svg": ["src/img/favicon-large.svg"]
         }
-      },
-
-      woff: {
-        cwd: "src/woff/",
-        dest: "dist/fonts/",
-        expand: true,
-        src: ["**/*.woff*"]
       }
     },
 
@@ -529,8 +517,7 @@ module.exports = function (grunt) {
     "concat:css",
     "singleCharset",
     "copy:css",
-    "copy:styleGuide",
-    "copy:woff"
+    "copy:styleGuide"
   ]);
 
   grunt.registerTask("build:home", [
