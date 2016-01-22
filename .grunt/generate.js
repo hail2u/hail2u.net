@@ -90,7 +90,7 @@ module.exports = function (grunt) {
           var hh = date.getHours();
           var nn = date.getMinutes();
           var ss = date.getSeconds();
-          val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
+          val.strPubDate = monthNames[mm] + " " + dd;
           val.html5PubDate = sprintf(
             "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
             yy, mm + 1, dd, hh, nn, ss
