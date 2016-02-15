@@ -90,7 +90,7 @@ module.exports = function (grunt) {
           var hh = date.getHours();
           var nn = date.getMinutes();
           var ss = date.getSeconds();
-          val.strPubDate = monthNames[mm] + " " + dd;
+          val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
           val.html5PubDate = sprintf(
             "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
             yy, mm + 1, dd, hh, nn, ss
@@ -150,8 +150,7 @@ module.exports = function (grunt) {
       articles.forEach(function (article, i, a) {
         article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
         article.category = invCategoryNames[article.cat];
-        article.strPubDate = monthNames[article.month - 1] + " " + article.day +
-          ", " + article.year;
+        article.strPubDate = monthNames[article.month - 1] + " " + article.day;
         article.html5PubDate = sprintf(
           "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
           article.year, article.month, article.day, article.hour,
