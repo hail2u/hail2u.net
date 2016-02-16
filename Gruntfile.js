@@ -330,6 +330,16 @@ module.exports = function (grunt) {
         }
       },
 
+      links: {
+        options: {
+          message: "Update src/links/index.json"
+        },
+
+        src: [
+          "src/links/index.json",
+        ]
+      },
+
       upload: {
         options: {
           branch: "gh-pages",
@@ -530,7 +540,9 @@ module.exports = function (grunt) {
   grunt.registerTask("build:html", [
     "clean",
     "generate:main",
-    "blosxom:index"
+    "blosxom:index",
+    "links",
+    "gitcommit:links"
   ]);
 
   grunt.registerTask("build:img", [
