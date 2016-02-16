@@ -74,8 +74,27 @@ module.exports = function (grunt) {
       });
       fs.writeJsonSync(data, d);
       d.item.forEach(function (item, i, a) {
+        var category = item.tags;
         var date = new Date(item.time);
         var year = date.getFullYear();
+
+        if (category.indexOf("github")) {
+          category = "GitHub";
+        } else if (category.indexOf("instagram")) {
+          category = "Instagram";
+        } else if (category.indexOf("instapaper")) {
+          category = "Instapaper";
+        } else if (category.indexOf("pinterest")) {
+          category = "Pinterest";
+        } else if (category.indexOf("soundcloud")) {
+          category = "Soundcloud";
+        } else if (category.indexOf("vimeo")) {
+          category = "Vimeo";
+        } else {
+          category = "Pinboard";
+        }
+
+        item.category = category;
         item.date = monthNames[date.getMonth()] + " " + date.getDate();
         item.year = year;
 
