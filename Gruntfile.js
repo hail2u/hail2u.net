@@ -541,8 +541,7 @@ module.exports = function (grunt) {
     "clean",
     "generate:main",
     "blosxom:index",
-    "links",
-    "gitcommit:links"
+    "build:links"
   ]);
 
   grunt.registerTask("build:img", [
@@ -559,6 +558,11 @@ module.exports = function (grunt) {
     "copy:jsMinified",
     "concat:js",
     "copy:js"
+  ]);
+
+  grunt.registerTask("build:links", [
+    "links",
+    "gitcommit:links"
   ]);
 
   grunt.registerTask("deploy", [
@@ -593,6 +597,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask("deploy:js", [
     "build:js",
+    "gitcommit:deploy"
+  ]);
+
+  grunt.registerTask("deploy:links", [
+    "build:links",
     "gitcommit:deploy"
   ]);
 };
