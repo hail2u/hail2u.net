@@ -285,6 +285,7 @@ module.exports = function (grunt) {
         },
         src: [
           "**/*.mustache",
+          "!links/index.mustache",
           "!partial/*"
         ]
       },

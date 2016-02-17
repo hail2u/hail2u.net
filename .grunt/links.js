@@ -27,7 +27,7 @@ module.exports = function (grunt) {
     var qs = {
       format: "json"
     };
-    var tmpl = "src/links/index.mustache";
+    var tmpl = "src/html/links/index.mustache";
     var url = "https://api.pinboard.in/v1/posts/all";
 
     if (!force) {
