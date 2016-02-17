@@ -285,7 +285,6 @@ module.exports = function (grunt) {
         },
         src: [
           "**/*.mustache",
-          "!links/index.mustache",
           "!partial/*"
         ]
       },
@@ -333,11 +332,11 @@ module.exports = function (grunt) {
 
       links: {
         options: {
-          message: "Update src/links/index.json"
+          message: "Update .grunt/cache/links.json"
         },
 
         src: [
-          "src/links/index.json",
+          ".grunt/cache/links.json",
         ]
       },
 
@@ -541,8 +540,8 @@ module.exports = function (grunt) {
   grunt.registerTask("build:html", [
     "clean",
     "generate:main",
-    "blosxom:index",
-    "build:links"
+    "gitcommit:links",
+    "blosxom:index"
   ]);
 
   grunt.registerTask("build:img", [
@@ -559,11 +558,6 @@ module.exports = function (grunt) {
     "copy:jsMinified",
     "concat:js",
     "copy:js"
-  ]);
-
-  grunt.registerTask("build:links", [
-    "links",
-    "gitcommit:links"
   ]);
 
   grunt.registerTask("deploy", [
@@ -598,11 +592,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask("deploy:js", [
     "build:js",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:links", [
-    "build:links",
     "gitcommit:deploy"
   ]);
 };

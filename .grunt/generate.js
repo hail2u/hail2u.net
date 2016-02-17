@@ -10,6 +10,8 @@ module.exports = function (grunt) {
     var hbs = require("handlebars");
     var parseXML = require("xml2js").parseString;
     var path = require("path");
+    var pit = require("pit-ro");
+    var request = require("sync-request");
     var sprintf = require("sprintf").sprintf;
 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
@@ -178,6 +180,103 @@ module.exports = function (grunt) {
       return articles;
     };
 
+    var loadLinks = function () {
+      var cache = path.relative(
+        process.cwd(),
+        path.join(__dirname, "cache", "links.json")
+      );
+      var config = pit.get("pinboard.in");
+      var links = [];
+      var newLinks;
+      var qs = {
+        format: "json"
+      };
+      var res;
+      var url = "https://api.pinboard.in/v1/posts/all";
+
+      try {
+        links = fs.readJsonSync(cache);
+        qs.fromdt = links[0].time;
+      } catch (e) {
+        grunt.log.warn('File "' + cache + '" not found.');
+      }
+
+      qs.auth_token = config.username + ":" + config.token;
+      res = request("GET", url, {
+        qs: qs
+      });
+
+      try {
+        newLinks = JSON.parse(res.getBody());
+      } catch (e) {
+        grunt.log.warn("Pinboard API server returned " + res.statusCode + ".");
+
+        return links;
+      }
+
+      newLinks = newLinks.filter(function (link) {
+        if (link.toread === "yes") {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (newLinks.length === 0) {
+        grunt.log.writeln("No new bookmarks found.");
+
+        return links;
+      }
+
+      newLinks.reverse().forEach(function (link) {
+        grunt.log.writeln('New bookmark "' + link.href + '" is added.');
+        links.unshift(link);
+      });
+
+      fs.writeJsonSync(cache, links);
+      links.forEach(function (item, i, a) {
+        var category = item.tags;
+        var date = new Date(item.time);
+        var year = date.getFullYear();
+
+        if (category.indexOf("github") > 0) {
+          category = "GitHub";
+        } else if (category.indexOf("instagram") > 0) {
+          category = "Instagram";
+        } else if (category.indexOf("instapaper") > 0) {
+          category = "Instapaper";
+        } else if (category.indexOf("pinterest") > 0) {
+          category = "Pinterest";
+        } else if (category.indexOf("soundcloud") > 0) {
+          category = "Soundcloud";
+        } else if (category.indexOf("vimeo") > 0) {
+          category = "Vimeo";
+        } else {
+          category = "Pinboard";
+        }
+
+        item.category = category;
+        item.date = monthNames[date.getMonth()] + " " + date.getDate();
+        item.year = year;
+
+        if (i > 0 && this.y !== year) {
+          item.isFirstInYear = true;
+          a[i - 1].isLastInYear = true;
+        }
+
+        if (i === 0) {
+          item.isFirstInYear = true;
+        }
+
+        this.y = year;
+      }, {
+        y: 0
+      });
+      links[links.length - 1].isLastInYear = true;
+
+      return links;
+    };
+
     var extendData = function (file) {
       var data = extendObject({}, metadataBase);
       var fileMetadata = file.replace(/\.\w+$/, ".json");
@@ -209,6 +308,11 @@ module.exports = function (grunt) {
         data.articles = loadArticles(
           "src/weblog/plugins/state/files_index.dat"
         );
+
+        break;
+
+      case "src/html/links/index.mustache":
+        data.links = loadLinks();
 
         break;
       }
