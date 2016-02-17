@@ -11,19 +11,19 @@ module.exports = function (grunt) {
     var pit = require("pit-ro");
     var request = require("request");
 
-    var config = pit.get("pinboard.in");
     var cache = path.relative(
       process.cwd(),
       path.join(__dirname, "cache", "links.json")
     );
+    var config = pit.get("pinboard.in");
     var data = {
       item: []
     };
     var dest = "dist/links/index.html";
     var done = this.async();
+    var force = grunt.option("force");
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
       "Sep", "Oct", "Nov", "Dec"];
-    var force = grunt.option("force");
     var qs = {
       format: "json"
     };
