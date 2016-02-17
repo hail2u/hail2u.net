@@ -539,8 +539,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:html", [
     "clean",
-    "generate:main",
+    "links",
     "gitcommit:links",
+    "generate:main",
     "blosxom:index"
   ]);
 

@@ -10,8 +10,6 @@ module.exports = function (grunt) {
     var hbs = require("handlebars");
     var parseXML = require("xml2js").parseString;
     var path = require("path");
-    var pit = require("pit-ro");
-    var request = require("sync-request");
     var sprintf = require("sprintf").sprintf;
 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
@@ -185,55 +183,14 @@ module.exports = function (grunt) {
         process.cwd(),
         path.join(__dirname, "cache", "links.json")
       );
-      var config = pit.get("pinboard.in");
       var links = [];
-      var newLinks;
-      var qs = {
-        format: "json"
-      };
-      var res;
-      var url = "https://api.pinboard.in/v1/posts/all";
 
       try {
         links = fs.readJsonSync(cache);
-        qs.fromdt = links[0].time;
       } catch (e) {
-        grunt.log.warn('File "' + cache + '" not found.');
+        grunt.log.fail('File "' + cache + '" not found.');
       }
 
-      qs.auth_token = config.username + ":" + config.token;
-      res = request("GET", url, {
-        qs: qs
-      });
-
-      try {
-        newLinks = JSON.parse(res.getBody());
-      } catch (e) {
-        grunt.log.warn("Pinboard API server returned " + res.statusCode + ".");
-
-        return links;
-      }
-
-      newLinks = newLinks.filter(function (link) {
-        if (link.toread === "yes") {
-          return false;
-        }
-
-        return true;
-      });
-
-      if (newLinks.length === 0) {
-        grunt.log.writeln("No new bookmarks found.");
-
-        return links;
-      }
-
-      newLinks.reverse().forEach(function (link) {
-        grunt.log.writeln('New bookmark "' + link.href + '" is added.');
-        links.unshift(link);
-      });
-
-      fs.writeJsonSync(cache, links);
       links.forEach(function (item, i, a) {
         var category = item.tags;
         var date = new Date(item.time);
