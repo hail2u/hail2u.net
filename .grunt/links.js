@@ -78,17 +78,17 @@ module.exports = function (grunt) {
         var date = new Date(item.time);
         var year = date.getFullYear();
 
-        if (category.indexOf("github")) {
+        if (category.indexOf("github") > 0) {
           category = "GitHub";
-        } else if (category.indexOf("instagram")) {
+        } else if (category.indexOf("instagram") > 0) {
           category = "Instagram";
-        } else if (category.indexOf("instapaper")) {
+        } else if (category.indexOf("instapaper") > 0) {
           category = "Instapaper";
-        } else if (category.indexOf("pinterest")) {
+        } else if (category.indexOf("pinterest") > 0) {
           category = "Pinterest";
-        } else if (category.indexOf("soundcloud")) {
+        } else if (category.indexOf("soundcloud") > 0) {
           category = "Soundcloud";
-        } else if (category.indexOf("vimeo")) {
+        } else if (category.indexOf("vimeo") > 0) {
           category = "Vimeo";
         } else {
           category = "Pinboard";
