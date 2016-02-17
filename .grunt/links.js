@@ -7,18 +7,22 @@ module.exports = function (grunt) {
   grunt.registerTask(taskName, taskDescription, function () {
     var fs = require("fs-extra");
     var hbs = require("handlebars");
+    var path = require("path");
     var pit = require("pit-ro");
     var request = require("request");
 
     var config = pit.get("pinboard.in");
-    var d = {
+    var cache = path.relative(
+      process.cwd(),
+      path.join(__dirname, "cache", "links.json")
+    );
+    var data = {
       item: []
     };
     var dest = "dist/links/index.html";
     var done = this.async();
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
       "Sep", "Oct", "Nov", "Dec"];
-    var data = "src/links/index.json";
     var force = grunt.option("force");
     var qs = {
       format: "json"
@@ -27,8 +31,8 @@ module.exports = function (grunt) {
     var url = "https://api.pinboard.in/v1/posts/all";
 
     if (!force) {
-      d = fs.readJsonSync(data);
-      qs.fromdt = d.item[0].time;
+      data = fs.readJsonSync(cache);
+      qs.fromdt = data.item[0].time;
     }
 
     qs.auth_token = config.username + ":" + config.token;
@@ -58,9 +62,9 @@ module.exports = function (grunt) {
       });
 
       if (force) {
-        d.item = newData.slice(0);
+        data.item = newData.slice(0);
         newData = [];
-        grunt.log.writeln('Cache file "' + data + '" is rebuilt.');
+        grunt.log.writeln('Cache file "' + cache + '" is rebuilt.');
       }
 
       if (!force && newData.length === 0) {
@@ -70,10 +74,10 @@ module.exports = function (grunt) {
 
       newData.reverse().forEach(function (item) {
         grunt.log.writeln('New bookmark "' + item.href + '" is added.');
-        d.item.unshift(item);
+        data.item.unshift(item);
       });
-      fs.writeJsonSync(data, d);
-      d.item.forEach(function (item, i, a) {
+      fs.writeJsonSync(cache, data);
+      data.item.forEach(function (item, i, a) {
         var category = item.tags;
         var date = new Date(item.time);
         var year = date.getFullYear();
@@ -111,9 +115,9 @@ module.exports = function (grunt) {
       }, {
         y: 0
       });
-      d.item[d.item.length - 1].isLastInYear = true;
+      data.item[data.item.length - 1].isLastInYear = true;
       template = hbs.compile(fs.readFileSync(tmpl, "utf-8"));
-      fs.outputFileSync(dest, template(d));
+      fs.outputFileSync(dest, template(data));
       grunt.log.writeln('File "' + dest + '" created.');
       return done()
     });
