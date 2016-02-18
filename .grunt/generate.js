@@ -163,32 +163,33 @@ module.exports = function (grunt) {
       }
 
       bookmarks.forEach(function (bookmark, i, a) {
-        var category = bookmark.tags;
+        var category = "📑";
+        var tags = bookmark.tags;
         var date = new Date(bookmark.time);
         var year = date.getFullYear();
 
         if (bookmark.shared === "yes") {
-          category = "Pinboard";
-        } else if (category.indexOf("github") > 0) {
-          category = "GitHub";
+          category = "🔗";
+        } else if (tags.indexOf("github") > 0) {
+          category = "⭐";
           bookmark.description = bookmark.extended.replace(
             /^hail2u starred /,
             ""
           );
-        } else if (category.indexOf("instagram") > 0) {
-          category = "Instagram";
+        } else if (tags.indexOf("instagram") > 0) {
+          category = "📷";
           bookmark.description = bookmark.href.replace(
             /^https:\/\/www\.instagram\.com\/p\/(.*?)\/$/,
             "$1"
           );
-        } else if (category.indexOf("pinterest") > 0) {
-          category = "Pinterest";
+        } else if (tags.indexOf("pinterest") > 0) {
+          category = "📍";
           bookmark.description = bookmark.extended;
-        } else if (category.indexOf("soundcloud") > 0) {
-          category = "Soundcloud";
+        } else if (tags.indexOf("soundcloud") > 0) {
+          category = "🔊";
           bookmark.description = bookmark.extended;
-        } else if (category.indexOf("vimeo") > 0) {
-          category = "Vimeo";
+        } else if (tags.indexOf("vimeo") > 0) {
+          category = "📹";
           bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
         }
 
