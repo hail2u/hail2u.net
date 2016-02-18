@@ -21,7 +21,6 @@ module.exports = function (grunt) {
     var qs = {
       format: "json"
     };
-    var url = "https://api.pinboard.in/v1/posts/all";
 
     if (!force) {
       links = fs.readJsonSync(cache);
@@ -31,7 +30,7 @@ module.exports = function (grunt) {
     qs.auth_token = config.username + ":" + config.token;
     request.get({
       qs: qs,
-      uri: url
+      uri: "https://api.pinboard.in/v1/posts/all"
     }, function (error, response, body) {
       var code = response.statusCode;
       var newLinks;
