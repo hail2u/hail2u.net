@@ -144,7 +144,7 @@ module.exports = function (grunt) {
           return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
         }).reverse();
         fs.outputFileSync(cache, JSON.stringify(articles, null, 2));
-        grunt.log.writeln('File "' + cache.replace(/\\/g, "/") + '" updated.');
+        grunt.log.writeln('Cache "' + cache.replace(/\\/g, "/") + '" updated.');
       }
 
       articles.forEach(function (article, i, a) {
@@ -188,7 +188,7 @@ module.exports = function (grunt) {
       try {
         links = fs.readJsonSync(cache);
       } catch (e) {
-        grunt.log.fail('File "' + cache + '" not found.');
+        grunt.log.fail('Cache "' + cache + '" not found.');
       }
 
       links.forEach(function (item, i, a) {
@@ -241,7 +241,7 @@ module.exports = function (grunt) {
       try {
         extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, "utf8")));
       } catch (e) {
-        grunt.log.warn('File "' + fileMetadata + '" not found.');
+        grunt.log.warn('Metadata file "' + fileMetadata + '" not found.');
       }
 
       switch (file) {
@@ -284,7 +284,7 @@ module.exports = function (grunt) {
       try {
         template = fs.readFileSync(fileTemplate, "utf8");
       } catch (e) {
-        grunt.log.warn('Source file "' + fileTemplate + '" not found.');
+        grunt.log.warn('Template file "' + fileTemplate + '" not found.');
 
         return next();
       }

@@ -40,7 +40,7 @@ module.exports = function (grunt) {
       }
 
       if (code !== 200) {
-        grunt.log.warn("Pinboard API server returned " + code + ".");
+        grunt.log.writeln("Pinboard API server returned " + code + ".");
 
         return done(new Error(response.statusMessage));
       }
@@ -53,25 +53,26 @@ module.exports = function (grunt) {
         return true;
       });
 
-      if (force) {
-        links = newLinks.slice(0);
-        newLinks = [];
-      }
-
-      if (!force && newLinks.length === 0) {
+      if (newLinks.length === 0) {
         grunt.log.writeln("No new bookmarks found.");
 
         return done();
       }
 
+      if (force) {
+        links = newLinks.slice(0);
+        newLinks = [];
+        grunt.log.writeln('Cache "' + cache + '" rebuilt.');
+      }
+
       newLinks.reverse().forEach(function (link) {
         links.unshift(link);
-        grunt.log.writeln('New bookmark "' + link.href + '" is added.');
+        grunt.log.writeln('Bookmark "' + link.href + '" added.');
       });
 
       fs.writeJsonSync(cache, links);
-      grunt.log.writeln('Cache "' + cache + '" is rebuilt.');
-      return done();
+      grunt.log.writeln('Cache "' + cache + '" created.');
+      done();
     });
   });
 };

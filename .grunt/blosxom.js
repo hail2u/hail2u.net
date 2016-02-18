@@ -53,8 +53,8 @@ module.exports = function (grunt) {
 
           try {
             fs.copySync(src, dest);
-            grunt.verbose.writeln("Image \"" + src + "\" copied to \"" + dest +
-              "\".");
+            grunt.verbose.writeln('Image "' + src + '" copied to "' + dest +
+              '".');
           } catch (e) {
             throw e;
           }
@@ -150,7 +150,7 @@ module.exports = function (grunt) {
       if (bar) {
         bar.tick();
       } else {
-        grunt.log.writeln("File \"" + file + "\" created.");
+        grunt.log.writeln('File "' + file + '" created.');
       }
 
       if (options.reindex && args.length > 1) {

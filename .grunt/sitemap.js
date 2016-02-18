@@ -60,6 +60,6 @@ module.exports = function (grunt) {
       });
     });
     fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));
-    grunt.log.writeln('File "' + dest + '" created.');
+    grunt.log.writeln('Sitemap "' + dest + '" created.');
   });
 };
