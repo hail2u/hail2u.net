@@ -37,7 +37,8 @@ module.exports = function (grunt) {
       "/blog/software/",
       "/blog/sports/",
       "/blog/webdesign/",
-      "/documents/"
+      "/documents/",
+      "/links/"
     ];
 
     fs.readdirSync("src/html/documents/").forEach(function (file) {
