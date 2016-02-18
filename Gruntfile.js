@@ -309,6 +309,7 @@ module.exports = function (grunt) {
 
         src: [
           ".grunt/cache/articles.json",
+          ".grunt/cache/bookmarks.json",
           "src/weblog/plugins/state/files_index.dat",
           "src/weblog/plugins/state/others_index.dat"
         ]
@@ -328,16 +329,6 @@ module.exports = function (grunt) {
         options: {
           message: "Add"
         }
-      },
-
-      links: {
-        options: {
-          message: "Update .grunt/cache/links.json"
-        },
-
-        src: [
-          ".grunt/cache/links.json",
-        ]
       },
 
       upload: {
@@ -539,8 +530,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:html", [
     "clean",
-    "links",
-    "gitcommit:links",
+    "bookmarks",
+    "gitcommit:cache",
     "generate:main",
     "blosxom:index"
   ]);

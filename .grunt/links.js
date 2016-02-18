@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = function (grunt) {
-  var taskName = "links";
-  var taskDescription = "Build links cache.";
+  var taskName = "bookmarks";
+  var taskDescription = "Build bookmarks cache.";
 
   grunt.registerTask(taskName, taskDescription, function () {
     var fs = require("fs-extra");
@@ -12,19 +12,19 @@ module.exports = function (grunt) {
 
     var cache = path.relative(
       process.cwd(),
-      path.join(__dirname, "cache", "links.json")
+      path.join(__dirname, "cache", "bookmarks.json")
     );
     var config = pit.get("pinboard.in");
     var done = this.async();
     var force = grunt.option("force");
-    var links = [];
+    var bookmarks = [];
     var qs = {
       format: "json"
     };
 
     if (!force) {
-      links = fs.readJsonSync(cache);
-      qs.fromdt = links[0].time;
+      bookmarks = fs.readJsonSync(cache);
+      qs.fromdt = bookmarks[0].time;
     }
 
     qs.auth_token = config.username + ":" + config.token;
@@ -33,7 +33,7 @@ module.exports = function (grunt) {
       uri: "https://api.pinboard.in/v1/posts/all"
     }, function (error, response, body) {
       var code = response.statusCode;
-      var newLinks;
+      var newBookmarks;
 
       if (error) {
         return done(error);
@@ -45,7 +45,7 @@ module.exports = function (grunt) {
         return done(new Error(response.statusMessage));
       }
 
-      newLinks = JSON.parse(body).filter(function (link) {
+      newBookmarks = JSON.parse(body).filter(function (link) {
         if (link.toread === "yes") {
           return false;
         }
@@ -53,24 +53,24 @@ module.exports = function (grunt) {
         return true;
       });
 
-      if (newLinks.length === 0) {
+      if (newBookmarks.length === 0) {
         grunt.log.writeln("No new bookmarks found.");
 
         return done();
       }
 
       if (force) {
-        links = newLinks.slice(0);
-        newLinks = [];
+        bookmarks = newBookmarks.slice(0);
+        newBookmarks = [];
         grunt.log.writeln('Cache "' + cache + '" rebuilt.');
       }
 
-      newLinks.reverse().forEach(function (link) {
-        links.unshift(link);
+      newBookmarks.reverse().forEach(function (link) {
+        bookmarks.unshift(link);
         grunt.log.writeln('Bookmark "' + link.href + '" added.');
       });
 
-      fs.writeJsonSync(cache, links);
+      fs.writeJsonSync(cache, bookmarks);
       grunt.log.writeln('Cache "' + cache + '" created.');
       done();
     });

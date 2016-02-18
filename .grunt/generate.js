@@ -178,20 +178,20 @@ module.exports = function (grunt) {
       return articles;
     };
 
-    var loadLinks = function () {
+    var loadBookmarks = function () {
       var cache = path.relative(
         process.cwd(),
-        path.join(__dirname, "cache", "links.json")
+        path.join(__dirname, "cache", "bookmarks.json")
       );
-      var links = [];
+      var bookmarks = [];
 
       try {
-        links = fs.readJsonSync(cache);
+        bookmarks = fs.readJsonSync(cache);
       } catch (e) {
         grunt.log.fail('Cache "' + cache + '" not found.');
       }
 
-      links.forEach(function (item, i, a) {
+      bookmarks.forEach(function (item, i, a) {
         var category = item.tags;
         var date = new Date(item.time);
         var year = date.getFullYear();
@@ -229,9 +229,9 @@ module.exports = function (grunt) {
       }, {
         y: 0
       });
-      links[links.length - 1].isLastInYear = true;
+      bookmarks[bookmarks.length - 1].isLastInYear = true;
 
-      return links;
+      return bookmarks;
     };
 
     var extendData = function (file) {
@@ -269,7 +269,7 @@ module.exports = function (grunt) {
         break;
 
       case "src/html/links/index.mustache":
-        data.links = loadLinks();
+        data.bookmarks = loadBookmarks();
 
         break;
       }
