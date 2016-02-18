@@ -167,20 +167,29 @@ module.exports = function (grunt) {
         var date = new Date(bookmark.time);
         var year = date.getFullYear();
 
-        if (category.indexOf("github") > 0) {
+        if (bookmark.shared === "yes") {
+          category = "Pinboard";
+        } else if (category.indexOf("github") > 0) {
           category = "GitHub";
+          bookmark.description = bookmark.extended.replace(
+            /^hail2u starred /,
+            ""
+          );
         } else if (category.indexOf("instagram") > 0) {
           category = "Instagram";
-        } else if (category.indexOf("instapaper") > 0) {
-          category = "Instapaper";
+          bookmark.description = bookmark.href.replace(
+            /^https:\/\/www\.instagram\.com\/p\/(.*?)\/$/,
+            "$1"
+          );
         } else if (category.indexOf("pinterest") > 0) {
           category = "Pinterest";
+          bookmark.description = bookmark.extended;
         } else if (category.indexOf("soundcloud") > 0) {
           category = "Soundcloud";
+          bookmark.description = bookmark.extended;
         } else if (category.indexOf("vimeo") > 0) {
           category = "Vimeo";
-        } else {
-          category = "Pinboard";
+          bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
         }
 
         bookmark.category = category;
