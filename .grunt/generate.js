@@ -188,7 +188,7 @@ module.exports = function (grunt) {
       try {
         bookmarks = fs.readJsonSync(cache);
       } catch (e) {
-        grunt.log.fail('Cache "' + cache + '" not found.');
+        grunt.log.writeln('Cache "' + cache + '" not found.');
       }
 
       bookmarks.forEach(function (item, i, a) {
