@@ -503,6 +503,7 @@ module.exports = function (grunt) {
     "clean",
     "gitcommit:entry",
     "blosxom:article",
+    "articles",
     "generate:blog",
     "feedmix",
     "gitcommit:cache",
@@ -531,9 +532,9 @@ module.exports = function (grunt) {
   grunt.registerTask("build:html", [
     "clean",
     "bookmarks",
-    "gitcommit:cache",
     "generate:main",
-    "blosxom:index"
+    "blosxom:index",
+    "gitcommit:cache"
   ]);
 
   grunt.registerTask("build:img", [
