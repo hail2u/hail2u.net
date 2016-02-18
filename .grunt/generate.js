@@ -105,46 +105,17 @@ module.exports = function (grunt) {
       return feed;
     };
 
-    var loadArticles = function (data) {
+    var loadArticles = function () {
       var cache = path.relative(
         process.cwd(),
         path.join(__dirname, "cache", "articles.json")
       );
-      var articles = JSON.parse(fs.readFileSync(cache, "utf8"));
-      var fileNew = path.basename(grunt.option("file"));
+      var articles = [];
 
-      if (
-        !grunt.option("update") &&
-        grunt.cli.tasks[0] === "deploy:blog" &&
-        fileNew
-      ) {
-        fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
-          if (!/\d+$/.test(line) || line.indexOf(fileNew) < 0) {
-            return;
-          }
-
-          line = line.split("=>");
-          var file = path.relative(process.cwd(), line[0]);
-          var date = new Date(parseInt(line[1], 10) * 1000);
-          articles.unshift({
-            title: fs.readFileSync(file, "utf8").split(/\n/)[0],
-            link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
-              path.basename(file, ".txt") + ".html",
-            unixtime: date.getTime(),
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            day: date.getDate(),
-            hour: date.getHours(),
-            minute: date.getMinutes(),
-            second: date.getSeconds(),
-            tz: "+09:00"
-          });
-        });
-        articles.sort(function (a, b) {
-          return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-        }).reverse();
-        fs.outputFileSync(cache, JSON.stringify(articles, null, 2));
-        grunt.log.writeln('Cache "' + cache.replace(/\\/g, "/") + '" updated.');
+      try {
+        articles = JSON.parse(fs.readFileSync(cache, "utf8"));
+      } catch (e) {
+        grunt.log.writeln('Cache "' + cache + '" not found.');
       }
 
       articles.forEach(function (article, i, a) {
@@ -191,9 +162,9 @@ module.exports = function (grunt) {
         grunt.log.writeln('Cache "' + cache + '" not found.');
       }
 
-      bookmarks.forEach(function (item, i, a) {
-        var category = item.tags;
-        var date = new Date(item.time);
+      bookmarks.forEach(function (bookmark, i, a) {
+        var category = bookmark.tags;
+        var date = new Date(bookmark.time);
         var year = date.getFullYear();
 
         if (category.indexOf("github") > 0) {
@@ -212,17 +183,17 @@ module.exports = function (grunt) {
           category = "Pinboard";
         }
 
-        item.category = category;
-        item.date = monthNames[date.getMonth()] + " " + date.getDate();
-        item.year = year;
+        bookmark.category = category;
+        bookmark.date = monthNames[date.getMonth()] + " " + date.getDate();
+        bookmark.year = year;
 
         if (i > 0 && this.y !== year) {
-          item.isFirstInYear = true;
+          bookmark.isFirstInYear = true;
           a[i - 1].isLastInYear = true;
         }
 
         if (i === 0) {
-          item.isFirstInYear = true;
+          bookmark.isFirstInYear = true;
         }
 
         this.y = year;
@@ -262,9 +233,7 @@ module.exports = function (grunt) {
         break;
 
       case "src/html/blog/index.mustache":
-        data.articles = loadArticles(
-          "src/weblog/plugins/state/files_index.dat"
-        );
+        data.articles = loadArticles();
 
         break;
 
