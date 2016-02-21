@@ -14,6 +14,8 @@ module.exports = function (grunt) {
 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
       "Sep", "Oct", "Nov", "Dec"];
+    var monthNamesFull = ["January", "February", "March", "April", "May",
+      "June", "July", "August", "September", "October", "November", "December"];
     var categoryNames = {
       "Blog": "blog",
       "Blosxom": "blosxom",
@@ -121,7 +123,8 @@ module.exports = function (grunt) {
       articles.forEach(function (article, i, a) {
         article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
         article.category = invCategoryNames[article.cat];
-        article.strPubDate = monthNames[article.month - 1] + " " + article.day;
+        article.strPubDate = monthNamesFull[article.month - 1] + " " +
+          article.day;
         article.html5PubDate = sprintf(
           "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
           article.year, article.month, article.day, article.hour,
@@ -194,7 +197,7 @@ module.exports = function (grunt) {
         }
 
         bookmark.category = category;
-        bookmark.date = monthNames[date.getMonth()] + " " + date.getDate();
+        bookmark.date = monthNamesFull[date.getMonth()] + " " + date.getDate();
         bookmark.year = year;
 
         if (i > 0 && this.y !== year) {
