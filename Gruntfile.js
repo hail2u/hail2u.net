@@ -49,8 +49,6 @@ module.exports = function (grunt) {
       css: {
         files: {
           "tmp/style.min.css": [
-            "tmp/eau-douce.min.css",
-            "tmp/mplus-1m-latin.min.css",
             "tmp/style.min.css"
           ]
         }
