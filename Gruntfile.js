@@ -91,44 +91,6 @@ module.exports = function (grunt) {
         ]
       },
 
-      assets: {
-        files: [
-          {
-            cwd: "node_modules/",
-            dest: "src/css/assets/partials/",
-            expand: true,
-            src: [
-              "hail2u-scss-functions/**/*",
-              "hail2u-scss-partials/**/*"
-            ]
-          },
-          {
-            cwd: "node_modules/",
-            dest: "src/css/assets/scripts/",
-            expand: true,
-            flatten: true,
-            src: ["unutm/build/unutm.js"]
-          },
-          {
-            cwd: "src/img/",
-            dest: "src/css/assets/images/",
-            expand: true,
-            src: [
-              "about/how-i-markup-and-style-this-website.svg",
-              "logo.svg",
-              "favicon-large.svg"
-            ]
-          },
-          {
-            cwd: "src/js/",
-            dest: "src/css/assets/scripts/",
-            expand: true,
-            flatten: true,
-            src: ["**/*.js"]
-          }
-        ]
-      },
-
       css: {
         cwd: "tmp/",
         dest: "dist/styles/",
@@ -184,6 +146,44 @@ module.exports = function (grunt) {
         expand: true,
         flatten: true,
         src: ["**/*.js"]
+      },
+
+      src_css: {
+        files: [
+          {
+            cwd: "node_modules/",
+            dest: "src/css/assets/partials/",
+            expand: true,
+            src: [
+              "hail2u-scss-functions/**/*",
+              "hail2u-scss-partials/**/*"
+            ]
+          },
+          {
+            cwd: "node_modules/",
+            dest: "src/css/assets/scripts/",
+            expand: true,
+            flatten: true,
+            src: ["unutm/build/unutm.js"]
+          },
+          {
+            cwd: "src/img/",
+            dest: "src/css/assets/images/",
+            expand: true,
+            src: [
+              "about/how-i-markup-and-style-this-website.svg",
+              "logo.svg",
+              "favicon-large.svg"
+            ]
+          },
+          {
+            cwd: "src/js/",
+            dest: "src/css/assets/scripts/",
+            expand: true,
+            flatten: true,
+            src: ["**/*.js"]
+          }
+        ]
       },
 
       styleGuide: {
