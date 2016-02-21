@@ -225,7 +225,7 @@ module.exports = function (grunt) {
       try {
         extendObject(data, JSON.parse(fs.readFileSync(fileMetadata, "utf8")));
       } catch (e) {
-        grunt.log.warn('Metadata file "' + fileMetadata + '" not found.');
+        grunt.log.writeln('Metadata file "' + fileMetadata + '" not found.');
       }
 
       switch (file) {
@@ -266,7 +266,7 @@ module.exports = function (grunt) {
       try {
         template = fs.readFileSync(fileTemplate, "utf8");
       } catch (e) {
-        grunt.log.warn('Template file "' + fileTemplate + '" not found.');
+        grunt.log.writeln('Template file "' + fileTemplate + '" not found.');
 
         return next();
       }
