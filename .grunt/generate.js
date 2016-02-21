@@ -12,10 +12,6 @@ module.exports = function (grunt) {
     var path = require("path");
     var sprintf = require("sprintf").sprintf;
 
-    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-      "Sep", "Oct", "Nov", "Dec"];
-    var monthNamesFull = ["January", "February", "March", "April", "May",
-      "June", "July", "August", "September", "October", "November", "December"];
     var categoryNames = {
       "Blog": "blog",
       "Blosxom": "blosxom",
@@ -30,7 +26,7 @@ module.exports = function (grunt) {
       "Sports": "sports",
       "Web Design": "webdesign"
     };
-    var invCategoryNames = (function (obj) {
+    var categoryNamesInv = (function (obj) {
       var newObj = {};
 
       for (var prop in obj) {
@@ -39,6 +35,10 @@ module.exports = function (grunt) {
 
       return newObj;
     })(categoryNames);
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+      "Sep", "Oct", "Nov", "Dec"];
+    var monthNamesFull = ["January", "February", "March", "April", "May",
+      "June", "July", "August", "September", "October", "November", "December"];
 
     var done = this.async();
     var dirTemplate = this.data.cwd;
@@ -122,7 +122,7 @@ module.exports = function (grunt) {
 
       articles.forEach(function (article, i, a) {
         article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
-        article.category = invCategoryNames[article.cat];
+        article.category = categoryNamesInv[article.cat];
         article.strPubDate = monthNamesFull[article.month - 1] + " " +
           article.day;
         article.html5PubDate = sprintf(
