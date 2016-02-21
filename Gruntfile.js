@@ -48,9 +48,7 @@ module.exports = function (grunt) {
 
       css: {
         files: {
-          "tmp/style.min.css": [
-            "tmp/style.min.css"
-          ]
+          "tmp/style.min.css": ["tmp/style.min.css"]
         }
       },
 
@@ -105,9 +103,7 @@ module.exports = function (grunt) {
         cwd: "src/img/",
         dest: "dist/images/",
         expand: true,
-        src: [
-          "**/*"
-        ]
+        src: ["**/*"]
       },
 
       js: {
