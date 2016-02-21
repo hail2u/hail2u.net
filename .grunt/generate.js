@@ -7,7 +7,7 @@ module.exports = function (grunt) {
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require("async");
     var fs = require("fs-extra");
-    var hbs = require("handlebars");
+    var mustache = require("mustache");
     var parseXML = require("xml2js").parseString;
     var path = require("path");
     var sprintf = require("sprintf").sprintf;
@@ -35,6 +35,13 @@ module.exports = function (grunt) {
 
       return newObj;
     })(categoryNames);
+    var entityMap = {
+      '"': "&quot;",
+      "&": "&amp;",
+      "'": "&#39;",
+      "<": "&lt;",
+      ">": "&gt;"
+    };
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
       "Sep", "Oct", "Nov", "Dec"];
     var monthNamesFull = ["January", "February", "March", "April", "May",
@@ -46,12 +53,7 @@ module.exports = function (grunt) {
       fs.readFileSync(dirTemplate + "metadata.json", "utf8")
     );
     var dirPartial = path.join(dirTemplate, "partial");
-    fs.readdirSync(dirPartial).forEach(function (partial) {
-      hbs.registerPartial(
-        path.basename(partial, ".mustache"),
-        fs.readFileSync(path.join(dirPartial, partial), "utf8")
-      );
-    });
+    var partials = {};
 
     var extendObject = function (dest, src) {
       if (dest !== Object(dest)) {
@@ -259,6 +261,17 @@ module.exports = function (grunt) {
       return data;
     };
 
+    mustache.escape = function (str) {
+      return String(str).replace(/[&<>"']/g, function (s) {
+        return entityMap[s];
+      });
+    };
+    fs.readdirSync(dirPartial).forEach(function (partial) {
+      partials[path.basename(partial, ".mustache")] = fs.readFileSync(
+        path.join(dirPartial, partial),
+        "utf8"
+      );
+    });
     async.each(this.files, function (file, next) {
       var template;
       var fileTemplate = file.src[0];
@@ -271,9 +284,10 @@ module.exports = function (grunt) {
         return next();
       }
 
-      var render = hbs.compile(template);
-      var metadata = extendData(fileTemplate);
-      fs.outputFileSync(file.dest, render(metadata));
+      fs.outputFileSync(
+        file.dest,
+        mustache.render(template, extendData(fileTemplate), partials)
+      );
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
