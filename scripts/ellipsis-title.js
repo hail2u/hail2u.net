@@ -26,12 +26,3 @@
     load();
   }
 })(document);
-
-/**
- * @preserve unutm.js
- *
- * LICENSE: http://hail2u.mit-license.org/2013
- */
-!function(a,b){if(a.search&&b.replaceState){var c=function(){var c=a.pathname+a.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?")+a.hash;b.replaceState(null,"",c)};"function"==typeof ga?ga(c()):c()}}(location,history);
-//
-//# sourceMappingURL=main.min.js.map
