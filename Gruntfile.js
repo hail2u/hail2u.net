@@ -59,7 +59,7 @@ module.exports = function (grunt) {
 
         files: {
           "tmp/main.min.js": [
-            "tmp/set-title-for-post-list.js",
+            "tmp/ellipsis-title.js",
             "tmp/unutm.min.js"
           ]
         }

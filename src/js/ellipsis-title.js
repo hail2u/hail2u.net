@@ -1,5 +1,5 @@
 /**
- * @preserve set-title-for-post-list.js
+ * @preserve ellipsis-title.js
  *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
@@ -7,12 +7,16 @@
   "use strict";
 
   var load = function () {
-    var a = d.querySelectorAll(".post-list a");
+    var n = d.querySelectorAll("*");
     var i;
-    var l = a.length;
+    var l = n.length;
 
     for (i = 0; i < l; i++) {
-      a[i].title = a[i].textContent;
+      var e = n[i];
+
+      if (window.getComputedStyle(e)["text-overflow"] === "ellipsis") {
+        e.title = e.textContent;
+      }
     }
   };
 
