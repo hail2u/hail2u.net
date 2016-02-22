@@ -184,9 +184,12 @@ module.exports = function (grunt) {
         } else if (tags.indexOf("instagram") > 0) {
           category = "📷";
           bookmark.description = bookmark.href.replace(
-            /^https:\/\/www\.instagram\.com\/p\/(.*?)\/$/,
-            "$1"
-          );
+            /^https:\/\/www\.instagram\.com\/p\//,
+            ""
+          ).replace(
+            /\/$/,
+            ""
+          ).substr(0, 12);
         } else if (tags.indexOf("pinterest") > 0) {
           category = "📍";
           bookmark.description = bookmark.extended;
