@@ -15,6 +15,7 @@ module.exports = function (grunt) {
     );
     var data = "src/weblog/plugins/state/files_index.dat";
     var fileNew = grunt.option("file");
+    var force = grunt.option("force");
     var loadArticle = function (file, date) {
       return {
         title: fs.readFileSync(file, "utf8").split(/\n/)[0],
@@ -31,35 +32,40 @@ module.exports = function (grunt) {
       };
     };
 
-    articles = fs.readJsonSync(cache);
-
-    if (!fileNew) {
+    if (!force && !fileNew) {
       grunt.fail.warn("`--file` option not found.");
 
       return;
     }
 
-    if (
-      !grunt.option("update") &&
-      grunt.cli.tasks[0] === "deploy:blog" &&
-      fileNew
-    ) {
-      fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
-        if (!/\d+$/.test(line) || line.indexOf(fileNew) < 0) {
-          return;
-        }
-
-        line = line.split("=>");
-        articles.unshift(loadArticle(
-          path.relative(process.cwd(), line[0]),
-          new Date(parseInt(line[1], 10) * 1000)
-        ));
-      });
-      articles.sort(function (a, b) {
-        return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-      }).reverse();
-      fs.writeJsonSync(cache, articles);
-      grunt.log.writeln('Cache "' + cache + '" created.');
+    if (!force) {
+      articles = fs.readJsonSync(cache);
     }
+
+    fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
+      if (!/\d+$/.test(line)) {
+        return;
+      }
+
+      if (
+        !force &&
+        fileNew &&
+        !grunt.option("update") &&
+        line.indexOf(fileNew) < 0
+      ) {
+        return;
+      }
+
+      line = line.split("=>");
+      articles.unshift(loadArticle(
+        path.relative(process.cwd(), line[0]),
+        new Date(parseInt(line[1], 10) * 1000)
+      ));
+    });
+    articles.sort(function (a, b) {
+      return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
+    }).reverse();
+    fs.writeJsonSync(cache, articles);
+    grunt.log.writeln('Cache "' + cache + '" created.');
   });
 };
