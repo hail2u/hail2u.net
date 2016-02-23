@@ -10,6 +10,40 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>CSSの定義からHTMLの要素を取得するために</title>
+      <link>https://hail2u.net/blog/coding/get-elemets-by-declaration.html</link>
+      <description>text-overflow: ellipsisのためにtitle属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。@ykztsにも書いてもらったのでそちらもどうぞ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/coding/get-elemets-by-declaration.html</guid>
+      <pubDate>Tue, 23 Feb 2016 13:21:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><code>text-overflow: ellipsis</code>のために<code>title</code>属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。<a href="https://gist.github.com/ykzts/564afcc4e8c9a700cc54">@ykztsにも書いてもらった</a>のでそちらもどうぞ。</p>
+
+<pre><code>// var elms = getElementsByDeclaration("text-overflow", "ellipsis");
+function getElementsByDeclaration(property, value) {
+  var elements;
+  var i;
+  var l;
+  var nodes = document.querySelectorAll(&quot;*&quot;);
+
+  for (i = 0, l = nodes.length; i &lt; l; i++) {
+    var node = nodes[i];
+
+    if (window.getComputedStyle(node)[property] === value) {
+      elements.push(node);
+    }
+  }
+
+  return elements;
+}
+</code></pre>
+
+<p>実際に使うことはなさそうだ。理由は簡単で、ループして列挙した要素群をもう一度ループしなくてはならないからだ。普通に書いた方がかなり速くなることだろう。また計算済みスタイルの値に依存するので、特定の文字列を値としてとるプロパティーしか探せない。</p>
+
+<hr>
+
+<p>こういったCSSで機能を追加する（変更する、削除する）ことによって失われるもののフォローを簡単に行える手法は必要なのではないだろうか。標準化する必要があるかというとかなり疑問だが、<code>NodeList</code>への便利関数の解放で簡単になるであろうと考えられる。上のような簡単な関数にイテレーターを渡せるようにするなどでも悪くはないが、やはり便利関数くださいというところに落ち着くだろう。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>網戸の張り替え</title>
       <link>https://hail2u.net/blog/misc/repairing-amido.html</link>
       <description>去年の今頃に夏に自前で張り替えようかと考えていたが、色々あったため延び延びになっていた。ようやく余裕も出てきたのでやってみようかと思ったが、他にもいくつか張り替えることになったため頼むことにした。普通に何でも屋に頼んだりすると高くつくようで、シルバー人材センターの1400円/枚が一番安価だった。</description>
@@ -180,23 +214,6 @@
 <p>今のところは1年後くらいに再導入するつもりだ。それくらいまでにはGoogle AdSenseへ何かしらの高速化が図られるか、高速に展開される新しいパターンの広告が提供されるのではないかと予測している。</p>]]></content:encoded>
     </item>
     <item>
-      <title>ネットショップにおける色</title>
-      <link>https://hail2u.net/blog/webdesign/color-in-ecommerce.html</link>
-      <description>ネットショップのデザインを色覚異常者ために改善する5つの方法という記事を読んだ。色覚異常者のために（for Colourblind Users）となっているが、ウェブサイトが思ってもみない環境（色再現性が大きく違うといったハードウェア環境だけでなく、陽ざしを遮るところのないビーチといった自然環境も含む）から閲覧されることが想定される昨今は、すでにこのあたりのこと、つまりラベリングとコントラストがベースラインとされていても良い。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/color-in-ecommerce.html</guid>
-      <pubDate>Thu, 28 Jan 2016 14:06:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p><a href="https://www.shopify.com/partners/blog/86314118-5-ways-to-improve-your-ecommerce-design-for-colourblind-users">ネットショップのデザインを色覚異常者ために改善する5つの方法</a>という記事を読んだ。色覚異常者のために（for Colourblind Users）となっているが、ウェブサイトが思ってもみない環境（色再現性が大きく違うといったハードウェア環境だけでなく、陽ざしを遮るところのないビーチといった自然環境も含む）から閲覧されることが想定される昨今は、すでにこのあたりのこと、つまりラベリングとコントラストがベースラインとされていても良い。</p>
-
-<p>ラベリングはボタンだけでなく、補助的な文章やアイコンによるラベル付けも含む。モノクロで見ても判断がつくようにするというのが最低のラインである、とするとわかりやすく、実践しやすいだろう。</p>
-
-<p>コントラストは機械的なチェック（WCAG 2.0のAAA compilantかどうか）に任せるとわかりやすい。しかし頑張って使用している色のあらゆる組み合わせをチェックするのもなかなか難しいので、使う基本の色を絞り、それらのバリエーションでコントラストを上げ下げするのが妥当なところだろう。基本の色のコントラストがAAA Compilantならば、ボールドの文字列や太い枠線ではコントラストを落としても大丈夫だと判断することができるはずだ。</p>
-
-<hr>
-
-<p>ラベリングとコントラストは、ネットショップに限らず、すべてのウェブサイトでも必要な意識であることは間違いない。特に低コントラストのウェブサイトは非常に増えており、加えて細字の台頭（ブームは終わりつつあるような印象ではあるが）もあるため、ちょっと間違えると読めたものではないウェブサイトができあがってしまう。気を付けたい。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -231,6 +248,6 @@
       <guid isPermaLink="true">https://hail2u.net/documents/web-typography-best-practices.html</guid>
       <description><![CDATA[<p><a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineによるウェブサイトのタイポグラフィーについての調査</a>をわかりやすくまとめた<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-Inclusive Guide to Web Typography Best Practices</a>の日本語訳です。ベスト・プラクティスになりうる部分のみコンパクトに抽出された参考になる文書だと思います。</p>]]></description>
     </item>
-    <lastBuildDate>Sat, 20 Feb 2016 13:35:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 23 Feb 2016 13:21:00 +0900</lastBuildDate>
   </channel>
 </rss>

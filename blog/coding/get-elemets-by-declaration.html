@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja" class="permalink">
+  <head>
+<meta charset="UTF-8">
+<meta content="width=device-width" name="viewport">
+
+  
+  <meta content="text-overflow: ellipsisのためにtitle属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。@ykztsにも書いてもらったのでそちらもどうぞ。" name="description">
+  <meta content="blosxom v2.1.2+dev" name="generator">
+
+
+
+    <title>CSSの定義からHTMLの要素を取得するために - Weblog - Hail2u.net</title>
+
+<link href="/feed" rel="alternate" type="application/rss+xml">
+<link href="/blog/coding/get-elemets-by-declaration.html" rel="canonical">
+<link color="#534b47" href="/images/pinicon.svg" rel="mask-icon" type="image/svg">
+
+
+<link href="/blog/misc/repairing-amido.html" rel="next prerender">
+
+<link href="/styles/style.min.css" rel="stylesheet">
+<script async src="/scripts/main.min.js"></script>
+  </head>
+
+  <body>
+<header class="global-header" role="banner">
+  
+  <h1 class="logo"><a href="/">Hail2u.net</a></h1>
+
+  <nav class="site-navigation">
+    <ul>
+      
+      <li><a href="/documents/">Documents</a></li>
+
+        <li><a href="/blog/"><mark>Weblog</mark></a></li>
+        
+
+      
+      
+      <li><a href="/links/">Links</a></li>
+      
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </nav>
+
+  
+</header>
+
+    <main class="content" role="main">
+      
+
+
+      <article>
+        <h1 class="first-heading">CSSの定義からHTMLの要素を取得するために</h1>
+
+        <footer class="section-footer">
+          <p><time class="date" datetime="2016-02-23T13:21:00+09:00">Feb 23, 2016</time>
+            · <span class="tag"><a href="/blog/coding/">Coding</a></span></p>
+        </footer>
+
+        
+<p><code>text-overflow: ellipsis</code>のために<code>title</code>属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。<a href="https://gist.github.com/ykzts/564afcc4e8c9a700cc54">@ykztsにも書いてもらった</a>のでそちらもどうぞ。</p>
+
+<pre><code class="language-javascript">// var elms = getElementsByDeclaration("text-overflow", "ellipsis");
+function getElementsByDeclaration(property, value) {
+  var elements;
+  var i;
+  var l;
+  var nodes = document.querySelectorAll(&quot;*&quot;);
+
+  for (i = 0, l = nodes.length; i &lt; l; i++) {
+    var node = nodes[i];
+
+    if (window.getComputedStyle(node)[property] === value) {
+      elements.push(node);
+    }
+  }
+
+  return elements;
+}
+</code></pre>
+
+<p>実際に使うことはなさそうだ。理由は簡単で、ループして列挙した要素群をもう一度ループしなくてはならないからだ。普通に書いた方がかなり速くなることだろう。また計算済みスタイルの値に依存するので、特定の文字列を値としてとるプロパティーしか探せない。</p>
+
+<hr>
+
+<p>こういったCSSで機能を追加する（変更する、削除する）ことによって失われるもののフォローを簡単に行える手法は必要なのではないだろうか。標準化する必要があるかというとかなり疑問だが、<code>NodeList</code>への便利関数の解放で簡単になるであろうと考えられる。上のような簡単な関数にイテレーターを渡せるようにするなどでも悪くはないが、やはり便利関数くださいというところに落ち着くだろう。</p>
+      </article>
+
+      
+        <nav class="read-older">
+  <a href="/blog/misc/repairing-amido.html" rel="next prerender">
+    <p>網戸の張り替え</p>
+  </a>
+</nav>
+
+
+      
+
+      
+    </main>
+
+<aside class="subcontent">
+  <form class="site-search" action="https://duckduckgo.com/" role="search">
+    <input name="sites" type="hidden" value="hail2u.net">
+    <input class="query" name="q" placeholder="例: Blosxom" size="32" type="search">
+    <input class="button" type="submit" value="Search">
+  </form>
+</aside>
+<footer class="global-footer" role="contentinfo">
+  <ul class="footlinks">
+    <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
+    <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+    <li><a href="https://twitter.com/hail2unet">Twitter</a></li>
+  </ul>
+
+  <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
+</footer>
+  </body>
+</html>
+<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
