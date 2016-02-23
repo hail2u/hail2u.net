@@ -32,6 +32,12 @@ module.exports = function (grunt) {
       };
     };
 
+    if (grunt.option("update")) {
+      grunt.log.writeln("Cache generation skipped.");
+
+      return;
+    }
+
     if (!force && !fileNew) {
       grunt.fail.warn("`--file` option not found.");
 
@@ -50,7 +56,6 @@ module.exports = function (grunt) {
       if (
         !force &&
         fileNew &&
-        !grunt.option("update") &&
         line.indexOf(fileNew) < 0
       ) {
         return;
