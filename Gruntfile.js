@@ -303,8 +303,6 @@ module.exports = function (grunt) {
         },
 
         src: [
-          ".grunt/cache/articles.json",
-          ".grunt/cache/bookmarks.json",
           "src/weblog/plugins/state/files_index.dat",
           "src/weblog/plugins/state/others_index.dat"
         ]
@@ -528,8 +526,7 @@ module.exports = function (grunt) {
     "clean",
     "bookmarks",
     "generate:main",
-    "blosxom:index",
-    "gitcommit:cache"
+    "blosxom:index"
   ]);
 
   grunt.registerTask("build:img", [
