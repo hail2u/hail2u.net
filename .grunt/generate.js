@@ -175,6 +175,12 @@ module.exports = function (grunt) {
 
         if (bookmark.shared === "yes") {
           category = "pinboard";
+        } else if (tags.indexOf("dribbble") > 0) {
+          category = "dribbble";
+          bookmark.description = bookmark.extended.replace(
+            /^Dribbble - /,
+            ""
+          );
         } else if (tags.indexOf("github") > 0) {
           category = "github";
           bookmark.description = bookmark.extended.replace(
