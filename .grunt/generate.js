@@ -138,18 +138,12 @@ module.exports = function (grunt) {
           a[i - 1].isLastInYear = true;
         }
 
-        if (i === 0) {
-          article.isFirstInYear = true;
-        }
-
-        if (i === a.length - 1) {
-          article.isLastInYear = true;
-        }
-
         this.y = article.year;
       }, {
         y: true
       });
+      articles[0].isFirstInYear = true;
+      articles[a.length - 1].isLastInYear = true;
 
       return articles;
     };
@@ -173,9 +167,7 @@ module.exports = function (grunt) {
         var tags = bookmark.tags;
         var year = date.getFullYear();
 
-        if (bookmark.shared === "yes") {
-          category = "pinboard";
-        } else if (tags.indexOf("dribbble") > 0) {
+        if (tags.indexOf("dribbble") > 0) {
           category = "dribbble";
           bookmark.description = bookmark.extended.replace(
             /^Dribbble - /,
@@ -205,6 +197,8 @@ module.exports = function (grunt) {
         } else if (tags.indexOf("vimeo") > 0) {
           category = "vimeo";
           bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
+        } else if (bookmark.shared === "yes") {
+          category = "pinboard";
         }
 
         bookmark.category = category;
@@ -216,14 +210,11 @@ module.exports = function (grunt) {
           a[i - 1].isLastInYear = true;
         }
 
-        if (i === 0) {
-          bookmark.isFirstInYear = true;
-        }
-
         this.y = year;
       }, {
         y: 0
       });
+      bookmarks[0].isFirstInYear = true;
       bookmarks[bookmarks.length - 1].isLastInYear = true;
 
       return bookmarks;
