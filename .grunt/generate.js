@@ -143,7 +143,7 @@ module.exports = function (grunt) {
         y: true
       });
       articles[0].isFirstInYear = true;
-      articles[a.length - 1].isLastInYear = true;
+      articles[articles.length - 1].isLastInYear = true;
 
       return articles;
     };
