@@ -172,6 +172,9 @@ module.exports = function (grunt) {
           bookmark.description = bookmark.description.replace(
             /^Dribbble - /,
             ""
+          ).replace(
+            / - Dribbble$/,
+            ""
           );
         } else if (tags.indexOf("github") > 0) {
           category = "github";
