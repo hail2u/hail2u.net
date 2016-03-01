@@ -167,7 +167,7 @@ module.exports = function (grunt) {
         var tags = bookmark.tags;
         var year = date.getFullYear();
 
-        if (tags.indexOf("dribbble") > 0) {
+        if (tags.indexOf("dribbble") !== -1) {
           category = "dribbble";
           bookmark.description = bookmark.description.replace(
             /^Dribbble - /,
@@ -176,13 +176,13 @@ module.exports = function (grunt) {
             / - Dribbble$/,
             ""
           );
-        } else if (tags.indexOf("github") > 0) {
+        } else if (tags.indexOf("github") !== -1) {
           category = "github";
           bookmark.description = bookmark.extended.replace(
             /^hail2u starred /,
             ""
           );
-        } else if (tags.indexOf("instagram") > 0) {
+        } else if (tags.indexOf("instagram") !== -1) {
           category = "instagram";
           bookmark.description = bookmark.href.replace(
             /^https:\/\/www\.instagram\.com\/p\//,
@@ -191,13 +191,13 @@ module.exports = function (grunt) {
             /\/$/,
             ""
           ).substr(0, 12);
-        } else if (tags.indexOf("pinterest") > 0) {
+        } else if (tags.indexOf("pinterest") !== -1) {
           category ="pinterest";
           bookmark.description = bookmark.extended;
-        } else if (tags.indexOf("soundcloud") > 0) {
+        } else if (tags.indexOf("soundcloud") !== -1) {
           category = "soundcloud";
           bookmark.description = bookmark.extended;
-        } else if (tags.indexOf("vimeo") > 0) {
+        } else if (tags.indexOf("vimeo") !== -1) {
           category = "vimeo";
           bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
         } else if (bookmark.shared === "yes") {
