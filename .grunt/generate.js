@@ -191,6 +191,8 @@ module.exports = function (grunt) {
             /\/$/,
             ""
           ).substr(0, 12);
+        } else if (tags.indexOf("instapaper") !== -1) {
+          category ="instapaper";
         } else if (tags.indexOf("pinterest") !== -1) {
           category ="pinterest";
           bookmark.description = bookmark.extended;
