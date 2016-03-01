@@ -185,7 +185,7 @@ module.exports = function (grunt) {
         } else if (tags.indexOf("instagram") !== -1) {
           category = "instagram";
           bookmark.description = bookmark.href.replace(
-            /^https:\/\/www\.instagram\.com\/p\//,
+            /^https?:\/\/(www\.)?instagram\.com\/p\//,
             ""
           ).replace(
             /\/$/,
