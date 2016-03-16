@@ -10,12 +10,56 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Thu, 10 Mar 2016 19:46:13 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 17 Mar 2016 07:58:32 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>CSSWring v4.2.2</title>
+      <link>https://hail2u.net/blog/webdesign/csswring-v4.2.2.html</link>
+      <description>CSSWringではfont-familyプロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値にvar()を使われることを想定していなかったため、var()が引用符で括られてしまうというバグがあったようだ。修正してv4.2.2をリリースした。</description>
+      <category>Web Design</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/csswring-v4.2.2.html</guid>
+      <pubDate>Thu, 17 Mar 2016 07:57:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>CSSWringでは<code>font-family</code>プロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値に<code>var()</code>を使われることを想定していなかったため、<code>var()</code>が引用符で括られてしまうというバグがあったようだ。修正して<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.2.2">v4.2.2</a>をリリースした。</p>
+
+<p><code>font-family</code>プロパティーの値で引用符が必要かどうかは簡単だが、誤解も多い。大まかにいえば<a href="https://www.w3.org/TR/CSS2/syndata.html#value-def-identifier">識別子</a>の連続のセットならば引用符はいらない。</p>
+
+<pre><code>.test {
+  font-family: Helvetica, Arial, sans-serif;
+}
+</code></pre>
+
+<p>識別子の連続とは、ASCIIの記号を除いたものと考えると近い。つまりカタカナや漢字が含まれていても引用符で括る必要はない。ただし数字やハイフン2つ、そしてハイフンに続いて数字では始めることはできないというような規則もある。</p>
+
+<pre><code>.test {
+  font-family: ヒラギノ角ゴ ProN, ＭＳ Ｐゴシック, sans-serif;
+}
+</code></pre>
+
+<p>識別子の連続のセットとは識別子の連続を空白文字で連結したものだ。つまりフォント名に空白があっても引用符で括る必要はない。また空白文字（改行やタブ文字も含まれる）は1つの半角空白文字にまとめられるので、フォント名と正確に同じでなくても良い。</p>
+
+<pre><code>.test {
+  font-family:
+    Lucida         Grande,
+    Lucida
+    Sans
+    Unicode, sans-serif;
+}
+</code></pre>
+
+<p>こう書いてもいいという話ではなく、こういったものをうまいこと処理するようになっているツールはいくつかある（CSSWringを含め）ので、安全のために<em>常に引用符付きでフォント名を書いても最適化してくれる</em>という話だ。仕様でも触れられているように引用符で括るようにするのが良く、こういったミスをしやすいところはツールに任せるのが無難だろう。</p>
+
+<hr>
+
+<p><code>var()</code>の大文字・小文字のパターンを考えている過程で開発者ツールのバグが見つかったりした。<code>var()</code>自体はCSS一般と同じで大文字・小文字を区別しないが、<a href="https://www.w3.org/TR/css-variables-1/#defining-variables">定義したカスタム・プロパティーでは区別する</a>ということを学んだ。つまり<code>vAr(--foo)</code>とは書け、<code>--foo</code>を参照できるが、<code>var(-Foo)</code>とは書くことができず、<code>--foo</code>を参照することはできない。</p>
+
+<p>ついついCSS VariablesとかCSS変数とか書いてしまい、言ってしまうので、ちょくちょくCustom Propertiesとかカスタム・プロパティーと書いたり、言ったりするようにしたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>夢</title>
@@ -227,23 +271,6 @@ function getElementsByDeclaration(property, value) {
 <p>普通のちょうちょ結びと違い、結び目に指をくぐらせる必要がないため、結び目が小さく決まる。その結果としてきつく結べ、ほどけづらいということのようだ。複雑な船乗り系の結び方のように結び方自体がほどけづらいというわけではない。</p>
 
 <p>素早く結べるようになるまでにはかなりの修練が必要そうだ。今のところ普通のちょうちょ結びと同じくらい時間がかかっている。両手を同時に動かすのが難しく、これ以上素早く結べそうにない……。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSWring v4.2.1</title>
-      <link>https://hail2u.net/blog/webdesign/csswring-v4.2.1.html</link>
-      <description>CSSハックのあたりを突き詰めていたところ、残してもしょうがない定義が残ることに気付いた。例えば00propertyなどといった不正なプロパティーを含む定義だ。これらを仕様通り、つまりブラウザーと同じように削除するようにし、CSS Wring v4.2.0をリリースした。今はちょっとしたバグを修正して、v4.2.1を既にリリースしている。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/csswring-v4.2.1.html</guid>
-      <pubDate>Fri, 05 Feb 2016 15:29:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>CSSハックのあたりを突き詰めていたところ、残してもしょうがない定義が残ることに気付いた。例えば<code>00property</code>などといった不正なプロパティーを含む定義だ。これらを仕様通り、つまりブラウザーと同じように削除するようにし、CSS Wring v4.2.0をリリースした。今はちょっとしたバグを修正して、<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.2.1">v4.2.1</a>を既にリリースしている。</p>
-
-<p>こういった仕様や実装で無視される定義やルールセットの最小化ツールでの扱いは難しい。そもそもエラーだと考えると、リンター等で直されるべき点だとも考えられる。あえて書かれているとすると残して欲しいからこそ書いていると考えられるため、最小化ツールでも残すべきだろう。</p>
-
-<p>CSSWringではどちらも採用しなかった。入力されるCSSにエラーがないと想定することが難しいからだ。CSSハックのことはそろそろ忘れても良いだろうが、実装によって未実装でエラーになるということは十分にありうる。そういった未実装によるエラーはリンターで拾うことは難しい。</p>
-
-<p>そんなわけで単純に文法上のエラーをなるべく排していくという中庸な実装に落ち着いた。</p>]]></content:encoded>
     </item>
 
   </channel>
