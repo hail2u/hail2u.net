@@ -41,17 +41,6 @@ module.exports = function (grunt) {
     },
 
     concat: {
-      options: {
-        sourceMap: true,
-        sourceMapStyle: "link"
-      },
-
-      css: {
-        files: {
-          "tmp/style.min.css": ["tmp/style.min.css"]
-        }
-      },
-
       js: {
         options: {
           seperator: ";"
@@ -510,7 +499,6 @@ module.exports = function (grunt) {
     "copy:precss",
     "css_mqpacker",
     "csswring",
-    "concat:css",
     "singleCharset",
     "copy:css",
     "copy:styleGuide"
