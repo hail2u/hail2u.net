@@ -40,21 +40,6 @@ module.exports = function (grunt) {
       }
     },
 
-    concat: {
-      js: {
-        options: {
-          seperator: ";"
-        },
-
-        files: {
-          "tmp/main.min.js": [
-            "tmp/ellipsis-title.js",
-            "tmp/unutm.min.js"
-          ]
-        }
-      }
-    },
-
     copy: {
       asitis: {
         files: [
@@ -465,7 +450,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("csswring");
   grunt.loadNpmTasks("feedmix");
   grunt.loadNpmTasks("grunt-contrib-clean");
-  grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
@@ -530,7 +514,6 @@ module.exports = function (grunt) {
     "copy:prejs",
     "uglify",
     "copy:jsMinified",
-    "concat:js",
     "copy:js"
   ]);
 
