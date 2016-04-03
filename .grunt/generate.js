@@ -167,7 +167,9 @@ module.exports = function (grunt) {
         var tags = bookmark.tags;
         var year = date.getFullYear();
 
-        if (tags.indexOf("dribbble") !== -1) {
+        if (tags.indexOf("instapaper") !== -1) {
+          category ="instapaper";
+        } else if (tags.indexOf("dribbble") !== -1) {
           category = "dribbble";
           bookmark.description = bookmark.description.replace(
             /^Dribbble - /,
@@ -191,8 +193,6 @@ module.exports = function (grunt) {
             /\/$/,
             ""
           ).substr(0, 12);
-        } else if (tags.indexOf("instapaper") !== -1) {
-          category ="instapaper";
         } else if (tags.indexOf("pinterest") !== -1) {
           category ="pinterest";
           bookmark.description = bookmark.extended;
