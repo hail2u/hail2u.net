@@ -97,19 +97,6 @@ module.exports = function (grunt) {
         src: ["unutm.*"]
       },
 
-      precss: {
-        options: {
-          process: function (content) {
-            return content.replace(/"assets\/(.*?)"/g, "\"../$1\"");
-          }
-        },
-
-        cwd: "tmp/",
-        dest: "tmp/",
-        expand: true,
-        src: ["*.css"]
-      },
-
       prejs: {
         cwd: "src/js/",
         dest: "tmp/",
@@ -118,56 +105,23 @@ module.exports = function (grunt) {
         src: ["**/*.js"]
       },
 
-      src_css: {
-        files: [
-          {
-            cwd: "node_modules/",
-            dest: "src/css/assets/partials/",
-            expand: true,
-            src: [
-              "hail2u-scss-functions/**/*",
-              "hail2u-scss-partials/**/*"
-            ]
-          },
-          {
-            cwd: "node_modules/",
-            dest: "src/css/assets/scripts/",
-            expand: true,
-            flatten: true,
-            src: ["unutm/build/unutm.js"]
-          },
-          {
-            cwd: "src/img/",
-            dest: "src/css/assets/images/",
-            expand: true,
-            src: [
-              "about/how-i-markup-and-style-this-website.svg",
-              "logo.svg",
-              "favicon-large.svg"
-            ]
-          },
-          {
-            cwd: "src/js/",
-            dest: "src/css/assets/scripts/",
-            expand: true,
-            flatten: true,
-            src: ["**/*.js"]
-          }
-        ]
-      },
-
       styleGuide: {
         options: {
           process: function (content) {
+            var path = {
+              img: "../img/",
+              js: "../js/"
+            };
             var re = /(href|src)(=)(")(.*?)(")/g;
             var site = "https://hail2u.net/";
-            var asset = "assets/";
 
             return content.replace(re, function (m, at, eq, oq, url, cq) {
               if (url.indexOf(site) === 0) {
                 url = url.substr(site.length - 1);
-              } else if (url.indexOf(asset) === 0) {
-                url = url.substr(asset.length - 1);
+              } else if (url.indexOf(path.img) === 0) {
+                url = "/images" + url.substr(path.img.length - 1);
+              } else if (url.indexOf(path.js) === 0) {
+                url = "/scripts" + url.substr(path.js.length - 1);
               } else if (/^[\w-]+\.[\w^]+$/.test(url)) {
                 url = "/styles/" + url;
               }
@@ -328,10 +282,6 @@ module.exports = function (grunt) {
       },
 
       main: {
-        options: {
-          cacheLocation: "src/css/.sass-cache/"
-        },
-
         cwd: "src/css/",
         dest: "tmp/",
         expand: true,
@@ -480,7 +430,6 @@ module.exports = function (grunt) {
   grunt.registerTask("build:css", [
     "clean",
     "sass",
-    "copy:precss",
     "css_mqpacker",
     "csswring",
     "singleCharset",
