@@ -16,7 +16,8 @@ module.exports = function (grunt) {
 
       all: {
         options: {
-          all: true
+          all: true,
+          index: true
         }
       },
 
@@ -24,12 +25,6 @@ module.exports = function (grunt) {
         options: {
           feed: true,
           reindex: true
-        }
-      },
-
-      index: {
-        options: {
-          index: true
         }
       }
     },
@@ -447,8 +442,7 @@ module.exports = function (grunt) {
   grunt.registerTask("build:html", [
     "clean",
     "bookmarks",
-    "generate:main",
-    "blosxom:index"
+    "generate:main"
   ]);
 
   grunt.registerTask("build:img", [
