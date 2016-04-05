@@ -411,7 +411,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:html", [
     "clean",
-    "bookmarks",
     "generate:main"
   ]);
 
