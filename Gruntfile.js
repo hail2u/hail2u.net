@@ -455,39 +455,4 @@ module.exports = function (grunt) {
     "copy:jsMinified",
     "copy:js"
   ]);
-
-  grunt.registerTask("deploy", [
-    "build",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:blog", [
-    "build:blog",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:css", [
-    "build:css",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:home", [
-    "build:home",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:html", [
-    "build:html",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:img", [
-    "build:img",
-    "gitcommit:deploy"
-  ]);
-
-  grunt.registerTask("deploy:js", [
-    "build:js",
-    "gitcommit:deploy"
-  ]);
 };
