@@ -8,6 +8,7 @@ module.exports = function (grunt) {
     var ProgressBar = require("progress");
     var async = require("async");
     var fs = require("fs-extra");
+    var minifyHTML = require("html-minifier").minify;
     var os = require("os");
     var path = require("path");
     var spawn = require("child_process").spawnSync;
@@ -140,6 +141,23 @@ module.exports = function (grunt) {
           /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
           "$1$2/"
         );
+        contents = minifyHTML(contents, {
+          collapseBooleanAttributes: true,
+          collapseInlineTagWhitespace: true,
+          collapseWhitespace: true,
+          minifyCSS: true,
+          minifyJS: true,
+          removeAttributeQuotes: true,
+          removeComments: true,
+          removeEmptyElements: true,
+          removeOptionalTags: true,
+          removeRedundantAttributes: true,
+          removeScriptTypeAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          sortAttributes: true,
+          sortClassName: true,
+          useShortDoctype: true
+        });
       }
 
       file = options.staticdir + file;

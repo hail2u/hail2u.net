@@ -7,6 +7,7 @@ module.exports = function (grunt) {
   grunt.registerMultiTask(taskName, taskDescription, function () {
     var async = require("async");
     var fs = require("fs-extra");
+    var minifyHTML = require("html-minifier").minify;
     var mustache = require("mustache");
     var parseXML = require("xml2js").parseString;
     var path = require("path");
@@ -280,6 +281,7 @@ module.exports = function (grunt) {
     async.each(this.files, function (file, next) {
       var template;
       var fileTemplate = file.src[0];
+      var html;
 
       try {
         template = fs.readFileSync(fileTemplate, "utf8");
@@ -289,10 +291,29 @@ module.exports = function (grunt) {
         return next();
       }
 
-      fs.outputFileSync(
-        file.dest,
-        mustache.render(template, extendData(fileTemplate), partials)
-      );
+      html = mustache.render(template, extendData(fileTemplate), partials);
+
+      if (file.dest.lastIndexOf("/page") === -1) {
+        html = minifyHTML(html, {
+          collapseBooleanAttributes: true,
+          collapseInlineTagWhitespace: true,
+          collapseWhitespace: true,
+          minifyCSS: true,
+          minifyJS: true,
+          removeAttributeQuotes: true,
+          removeComments: true,
+          removeEmptyElements: true,
+          removeOptionalTags: true,
+          removeRedundantAttributes: true,
+          removeScriptTypeAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          sortAttributes: true,
+          sortClassName: true,
+          useShortDoctype: true
+        });
+      }
+
+      fs.outputFileSync(file.dest, html);
       grunt.log.writeln('File "' + file.dest + '" created.');
       next();
     }, function (error) {
