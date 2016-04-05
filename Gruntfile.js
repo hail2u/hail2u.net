@@ -165,29 +165,6 @@ module.exports = function (grunt) {
       }
     },
 
-    feedmix: {
-      options: {
-        builder: {
-          cdata: true,
-          xmldec: {
-            encoding: "UTF-8",
-            version: "1.0"
-          }
-        },
-        parser: {
-          trim: true
-        }
-      },
-
-      main: {
-        dest: "dist/feed",
-        src: [
-          "src/index.rss",
-          "dist/blog/feed"
-        ]
-      }
-    },
-
     generate: {
       main: {
         cwd: "src/html/",
@@ -393,7 +370,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("@hail2u/grunt-svg-rasterizer");
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
-  grunt.loadNpmTasks("feedmix");
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-sass");
@@ -415,8 +391,7 @@ module.exports = function (grunt) {
     "blosxom:article",
     "articles",
     "generate:blog",
-    "gitcommit:cache",
-    "feedmix"
+    "gitcommit:cache"
   ]);
 
   grunt.registerTask("build:css", [
@@ -431,8 +406,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:home", [
     "clean",
-    "build:html",
-    "feedmix"
+    "build:html"
   ]);
 
   grunt.registerTask("build:html", [
