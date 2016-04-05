@@ -15,7 +15,7 @@ var preview = `<!DOCTYPE html>
     <meta content="width=device-width" name="viewport">
     <title><%TITLE%> - Weblog - Hail2u.net</title>
     <link href="/styles/common.min.css" rel="stylesheet">
-    <link href="/styles/permalinks.min.css" rel="stylesheet">
+    <link href="/styles/permalink.min.css" rel="stylesheet">
   </head>
   <body style="margin-bottom: 6rem">
     <main class="content">
