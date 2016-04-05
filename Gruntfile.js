@@ -406,8 +406,7 @@ module.exports = function (grunt) {
     "build:html",
     "build:img",
     "build:js",
-    "copy:asitis",
-    "sitemap"
+    "copy:asitis"
   ]);
 
   grunt.registerTask("build:blog", [
@@ -416,9 +415,8 @@ module.exports = function (grunt) {
     "blosxom:article",
     "articles",
     "generate:blog",
-    "feedmix",
     "gitcommit:cache",
-    "sitemap"
+    "feedmix"
   ]);
 
   grunt.registerTask("build:css", [
@@ -434,8 +432,7 @@ module.exports = function (grunt) {
   grunt.registerTask("build:home", [
     "clean",
     "build:html",
-    "feedmix",
-    "sitemap"
+    "feedmix"
   ]);
 
   grunt.registerTask("build:html", [
