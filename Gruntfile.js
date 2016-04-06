@@ -184,16 +184,6 @@ module.exports = function (grunt) {
         ]
       },
 
-      deploy: {
-        options: {
-          all: true,
-          branch: "gh-pages",
-          message: "Build",
-          push: true,
-          root: "dist/"
-        }
-      },
-
       upload: {
         options: {
           branch: "gh-pages",
