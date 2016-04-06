@@ -388,9 +388,9 @@ module.exports = function (grunt) {
   grunt.registerTask("build:blog", [
     "gitcommit:entry",
     "blosxom:article",
+    "gitcommit:cache",
     "articles",
-    "generate:blog",
-    "gitcommit:cache"
+    "generate:blog"
   ]);
 
   grunt.registerTask("build:css", [
