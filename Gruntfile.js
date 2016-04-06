@@ -337,11 +337,6 @@ module.exports = function (grunt) {
     "copy:styleGuide"
   ]);
 
-  grunt.registerTask("build:home", [
-    "clean",
-    "build:html"
-  ]);
-
   grunt.registerTask("build:html", [
     "clean",
     "generate:main"
