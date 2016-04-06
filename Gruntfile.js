@@ -386,7 +386,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:blog", [
-    "clean",
     "gitcommit:entry",
     "blosxom:article",
     "articles",
