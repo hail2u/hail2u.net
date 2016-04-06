@@ -172,19 +172,6 @@ module.exports = function (grunt) {
       }
     },
 
-    gitcommit: {
-      cache: {
-        options: {
-          message: "Update cache files"
-        },
-
-        src: [
-          "src/weblog/plugins/state/files_index.dat",
-          "src/weblog/plugins/state/others_index.dat"
-        ]
-      },
-    },
-
     png2ico: {
       options: {
         cmd: "png2ico"
