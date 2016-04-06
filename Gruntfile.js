@@ -5,30 +5,6 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
 
-    blosxom: {
-      options: {
-        datadir: "src/weblog/entries/",
-        imgdir: "src/img/blog/",
-        rootdir: "src/weblog/",
-        staticdir: "dist/blog/",
-        staticimgdir: "dist/images/blog/"
-      },
-
-      all: {
-        options: {
-          all: true,
-          index: true
-        }
-      },
-
-      article: {
-        options: {
-          feed: true,
-          reindex: true
-        }
-      }
-    },
-
     clean: {
       main: {
         src: ["tmp/**/*"]
@@ -218,12 +194,6 @@ module.exports = function (grunt) {
         }
       },
 
-      entry: {
-        options: {
-          message: "Add"
-        }
-      },
-
       upload: {
         options: {
           branch: "gh-pages",
@@ -387,8 +357,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build:blog", [
     "gitcommit:entry",
-    "blosxom:article",
-    "gitcommit:cache"
   ]);
 
   grunt.registerTask("build:css", [
