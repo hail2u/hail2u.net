@@ -1,20 +1,20 @@
 "use strict";
 
 var fs = require("fs-extra");
+var minimist = require("minimist");
 var pit = require("pit-ro");
 var request = require("request");
 
+var argv = minimist(process.argv.slice(2), {
+  boolean: ["force"]
+});
 var cache = ".grunt/cache/bookmarks.json";
 var config = pit.get("pinboard.in");
-var force = false;
+var force = argv.force;
 var bookmarks = [];
 var qs = {
   format: "json"
 };
-
-if (process.argv.length > 2 && process.argv[2] === "--force") {
-  force = true;
-}
 
 if (!force) {
   bookmarks = fs.readJsonSync(cache);
