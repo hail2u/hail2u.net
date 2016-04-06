@@ -183,15 +183,6 @@ module.exports = function (grunt) {
           "src/weblog/plugins/state/others_index.dat"
         ]
       },
-
-      upload: {
-        options: {
-          branch: "gh-pages",
-          message: "Add",
-          push: true,
-          root: "dist/"
-        }
-      }
     },
 
     png2ico: {
