@@ -4,6 +4,7 @@
 
 var fs = require("fs-extra");
 var marked = require("marked");
+var minimist = require("minimist");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
@@ -29,8 +30,11 @@ var preview = `<!DOCTYPE html>
     </main>
   </body>
 </html>`;
+var argv = minimist(process.argv.slice(2), {
+  string: ["file"]
+});
 var entry = fs.readFileSync(
-  process.argv[2].replace(/^--file=/, ""),
+  argv.file,
   "utf8"
 ).split("\n");
 preview = preview.replace(
