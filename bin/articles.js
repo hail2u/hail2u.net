@@ -9,7 +9,7 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var articles = [];
-var cache = ".grunt/cache/articles.json";
+var cache = "cache/articles.json";
 var data = "src/weblog/plugins/state/files_index.dat";
 var fileNew = argv.file;
 var force = argv.force;

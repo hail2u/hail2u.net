@@ -113,7 +113,7 @@ module.exports = function (grunt) {
     var loadArticles = function () {
       var cache = path.relative(
         process.cwd(),
-        path.join(__dirname, "cache", "articles.json")
+        path.join("cache", "articles.json")
       );
       var articles = [];
 
@@ -152,7 +152,7 @@ module.exports = function (grunt) {
     var loadBookmarks = function () {
       var cache = path.relative(
         process.cwd(),
-        path.join(__dirname, "cache", "bookmarks.json")
+        path.join("cache", "bookmarks.json")
       );
       var bookmarks = [];
 

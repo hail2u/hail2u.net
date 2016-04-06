@@ -40,7 +40,7 @@ fs.readdirSync("src/html/documents/").forEach(function (file) {
   urls.push("/documents/" + file);
 });
 fs.readJsonSync(
-  ".grunt/cache/articles.json",
+  "cache/articles.json",
   "utf8"
 ).forEach(function (article) {
   urls.push(article.link);
