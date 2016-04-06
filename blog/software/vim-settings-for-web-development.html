@@ -1,122 +1,16 @@
-<!DOCTYPE html>
-<html lang="ja" class="permalink">
-  <head>
-<meta charset="UTF-8">
-<meta content="width=device-width" name="viewport">
-
-  
-  <meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" name="description">
-  <meta content="blosxom v2.1.2+dev" name="generator">
-
-
-
-    <title>Web開発周りのVimの設定 - Weblog - Hail2u.net</title>
-
-<link href="/feed" rel="alternate" type="application/rss+xml">
-<link href="/blog/software/vim-settings-for-web-development.html" rel="canonical">
-<link color="#534b47" href="/images/pinicon.svg" rel="mask-icon" type="image/svg">
-
-
-<link href="/blog/webdesign/redesign-and-border-radius-and-text-shadow.html" rel="next prerender">
-
-<link href="/styles/common.min.css" media="screen" rel="stylesheet">
-<link href="/styles/permalink.min.css" media="screen" rel="stylesheet">
-<link href="/styles/print.min.css" media="print" rel="stylesheet">
-<script async src="/scripts/ellipsis-title.min.js"></script>
-<script async src="/scripts/unutm.min.js"></script>
-  </head>
-
-  <body>
-<header class="global-header" role="banner">
-  
-  <h1 class="logo"><a href="/">Hail2u.net</a></h1>
-
-  <nav class="site-navigation">
-    <ul>
-      
-      <li><a href="/documents/">Documents</a></li>
-
-        <li><a href="/blog/"><mark>Weblog</mark></a></li>
-        
-
-      
-      
-      <li><a href="/links/">Links</a></li>
-      
-      <li><a href="/about/">About</a></li>
-    </ul>
-  </nav>
-
-  
-</header>
-
-    <main class="content" role="main">
-      
-
-
-      <article>
-        <h1 class="first-heading">Web開発周りのVimの設定</h1>
-
-        <footer class="section-footer">
-          <p><time class="date" datetime="2009-10-31T10:58:00+09:00">Oct 31, 2009</time>
-            · <span class="tag"><a href="/blog/software/">Software</a></span></p>
-        </footer>
-
-        
-<p>HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。</p>
-
-<section>
-<h1>HTMLファイルを<code>:make</code>で文法チェック</h1>
-
-<p>tidy.vimが用意されているので、<a href="http://tidy.sourceforge.net/">HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。</p>
-
-<pre><code class="language-vim">autocmd FileType html :compiler tidy
+<!DOCTYPE html><html lang=ja class=permalink><meta charset=UTF-8><meta content="width=device-width" name=viewport><meta content=HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。 name=description><meta content="blosxom v2.1.2+dev" name=generator><title>Web開発周りのVimの設定 - Weblog - Hail2u.net</title><link href=/feed rel=alternate type=application/rss+xml><link href=/blog/software/vim-settings-for-web-development.html rel=canonical><link color=#534b47 href=/images/pinicon.svg rel=mask-icon type=image/svg><link href=/blog/webdesign/redesign-and-border-radius-and-text-shadow.html rel="next prerender"><link href=/styles/common.min.css media=screen rel=stylesheet><link href=/styles/permalink.min.css media=screen rel=stylesheet><link href=/styles/print.min.css media=print rel=stylesheet><script async src=/scripts/ellipsis-title.min.js></script><script async src=/scripts/unutm.min.js></script><header class=global-header role=banner><h1 class=logo><a href=/ >Hail2u.net</a></h1><nav class=site-navigation><ul><li><a href=/documents/ >Documents</a><li><a href=/blog/ ><mark>Weblog</mark></a><li><a href=/links/ >Links</a><li><a href=/about/ >About</a></ul></nav></header><main class=content role=main><article><h1 class=first-heading>Web開発周りのVimの設定</h1><footer class=section-footer><p><time class=date datetime=2009-10-31T10:58:00+09:00>Oct 31, 2009</time>·<span class=tag><a href=/blog/software/ >Software</a></span></footer><p>HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。<section><h1>HTMLファイルを<code>:make</code>で文法チェック</h1><p>tidy.vimが用意されているので、<a href=http://tidy.sourceforge.net/ >HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。<pre><code class=language-vim>autocmd FileType html :compiler tidy
 autocmd FileType html :setlocal makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \&quot;%\&quot;
-</code></pre>
-
-<p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</p>
-</section>
-
-<section>
-<h1>HTMLファイルのインデントをやり直す</h1>
-
-<pre>gg=G
-</pre>
-
-<p>ノーマルモードでは<kbd>gg</kbd>でファイルの先頭に移動して<kbd>=G</kbd>でファイル全体をインデントし直すことができる。選択範囲のみをインデントし直す場合は、適当にビジュアルモードで選択した状態で<kbd>=</kbd>を押すだけ。1000行とかあるHTMLファイルだと結構時間がかかる。デフォルトではJavaScriptファイルでやると残念な結果に……。</p>
-</section>
-
-<section>
-<h1>HTMLファイルをブラウザで開く(Windows)</h1>
-
-<p>FirefoxやSafari、Chromeは普通にインストールするとApp Pathsに登録されるので、</p>
-
-<pre>:! start chrome.exe %
+</code></pre><p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</section><section><h1>HTMLファイルのインデントをやり直す</h1><pre>gg=G
+</pre><p>ノーマルモードでは<kbd>gg</kbd>でファイルの先頭に移動して<kbd>=G</kbd>でファイル全体をインデントし直すことができる。選択範囲のみをインデントし直す場合は、適当にビジュアルモードで選択した状態で<kbd>=</kbd>を押すだけ。1000行とかあるHTMLファイルだと結構時間がかかる。デフォルトではJavaScriptファイルでやると残念な結果に……。</section><section><h1>HTMLファイルをブラウザで開く(Windows)</h1><p>FirefoxやSafari、Chromeは普通にインストールするとApp Pathsに登録されるので、<pre>:! start chrome.exe %
 :! start firefox.exe %
 :! start IEXPLORE.EXE %
 :! start Safari.exe %
-</pre>
-
-<p>でブラウザで開くことができる。<code>! start</code>と間に半角スペースがあることに注意。</p>
-
-<p>OperaのインストーラはApp Pathsに登録しないので、</p>
-
-<pre>REGEDIT4
+</pre><p>でブラウザで開くことができる。<code>! start</code>と間に半角スペースがあることに注意。<p>OperaのインストーラはApp Pathsに登録しないので、<pre>REGEDIT4
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\opera.exe]
 @=&quot;C:\\Program Files\\Opera\\opera.exe&quot;
 &quot;Path&quot;=&quot;C:\\Program Files\\Opera&quot;
-</pre>
-
-<p>といったレジストリファイルをインポートして登録してやると<code>:! start opera.exe %</code>で開くことができるようになる。</p>
-</section>
-
-<section>
-<h1>選択範囲を文字参照に変換</h1>
-
-<p>以下のPerlスクリプトをパスの通った場所に置いておく。</p>
-
-<pre><code class="language-perl">#!/usr/bin/perl
+</pre><p>といったレジストリファイルをインポートして登録してやると<code>:! start opera.exe %</code>で開くことができるようになる。</section><section><h1>選択範囲を文字参照に変換</h1><p>以下のPerlスクリプトをパスの通った場所に置いておく。<pre><code class=language-perl>#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -124,40 +18,10 @@ use warnings;
 use HTML::Entities;
 
 print encode_entities(join(&#39;&#39;, &lt;STDIN&gt;), &#39;&amp;&lt;&gt;&quot;\&#39;&#39;);
-</code></pre>
-
-<p>その上でコマンドを作成。</p>
-
-<pre><code class="language-vim">command! -range EncodeEntities :&#39;&lt;,&#39;&gt;!perl -S encode-entities.pl
-</code></pre>
-</section>
-
-<section>
-<h1>W3CDTFで日付と時刻の挿入</h1>
-
-<pre><code class="language-vim">command! InsertDateTime :execute &quot;normal! i&quot;.strftime(&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;)
-</code></pre>
-
-<p>必要な人は少ないだろうけど。</p>
-</section>
-
-<section>
-<h1>CSSファイルを<code>:make</code>で文法チェック</h1>
-
-<p><a href="http://www.vim.org/scripts/script.php?script_id=1577">css.vim</a>をダウンロードしてインストールする。</p>
-
-<pre><code class="language-vim">autocmd FileType css :compiler css
-</code></pre>
-
-<p>同梱のPerlスクリプト(validate_css)はパスの通ったディレクトリにコピーする必要がある。</p>
-</section>
-
-<section>
-<h1>JavaScriptファイルを<code>:make</code>で文法チェック</h1>
-
-<p><a href="http://www.javascriptlint.com/">JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code>（Windowsでは<code>$HOME/vimfiles/compiler</code>）以下に作成する。</p>
-
-<pre><code class="language-vim">
+</code></pre><p>その上でコマンドを作成。<pre><code class=language-vim>command! -range EncodeEntities :&#39;&lt;,&#39;&gt;!perl -S encode-entities.pl
+</code></pre></section><section><h1>W3CDTFで日付と時刻の挿入</h1><pre><code class=language-vim>command! InsertDateTime :execute &quot;normal! i&quot;.strftime(&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;)
+</code></pre><p>必要な人は少ないだろうけど。</section><section><h1>CSSファイルを<code>:make</code>で文法チェック</h1><p><a href="http://www.vim.org/scripts/script.php?script_id=1577">css.vim</a>をダウンロードしてインストールする。<pre><code class=language-vim>autocmd FileType css :compiler css
+</code></pre><p>同梱のPerlスクリプト(validate_css)はパスの通ったディレクトリにコピーする必要がある。</section><section><h1>JavaScriptファイルを<code>:make</code>で文法チェック</h1><p><a href=http://www.javascriptlint.com/ >JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code>（Windowsでは<code>$HOME/vimfiles/compiler</code>）以下に作成する。<pre><code class=language-vim>
 if exists(&quot;current_compiler&quot;)
   finish
 endif
@@ -177,32 +41,8 @@ CompilerSet errorformat=%f(%l):\ %m
 
 let &amp;cpo = s:cpo_save
 unlet s:cpo_save
-</code></pre>
-
-<p>そして.vimrcに以下のように書く。</p>
-
-<pre><code class="language-vim">autocmd FileType javascript :compiler javascriptlint
-</code></pre>
-</section>
-
-<section>
-<h1>JavaScriptファイルのインデントの改善</h1>
-
-<p>デフォルトのインデント・スクリプトは<a href="http://jquery.com/">jQuery</a>を利用してJavaScriptを書いているとかなり酷いことになる。</p>
-
-<ul>
-<li><code>foo(function () {</code>の次の行のインデント</li>
-<li><code>foo({</code>の次の行のインデント</li>
-<li><code>})</code>でのアンインデント</li>
-</ul>
-
-<p>あたりがメジャーなインデントがおかしくなる箇所で、「コード書くよりインデントの修正の方が大変！」というくらい（おおげさ）。</p>
-
-<p><a href="http://www.vim.org/scripts/script.php?script_id=1936">あれ</a>や<a href="http://www.vim.org/scripts/script.php?script_id=1840">これ</a>やJavaScriptのインデント・スクリプトは見つかるが、<a href="http://www.vim.org/scripts/script.php?script_id=2765">Better Javascript Indentation</a>が一番良かった。普通にインストールするだけで特に設定等は必要ない。</p>
-
-<p>インストールすると以下のような典型的なPowered by jQueryのJavaScriptファイルがすんなりインデントされるようになる。気持ち良い！</p>
-
-<pre><code class="language-js">$(function () {
+</code></pre><p>そして.vimrcに以下のように書く。<pre><code class=language-vim>autocmd FileType javascript :compiler javascriptlint
+</code></pre></section><section><h1>JavaScriptファイルのインデントの改善</h1><p>デフォルトのインデント・スクリプトは<a href=http://jquery.com/ >jQuery</a>を利用してJavaScriptを書いているとかなり酷いことになる。<ul><li><code>foo(function () {</code>の次の行のインデント<li><code>foo({</code>の次の行のインデント<li><code>})</code>でのアンインデント</ul><p>あたりがメジャーなインデントがおかしくなる箇所で、「コード書くよりインデントの修正の方が大変！」というくらい（おおげさ）。<p><a href="http://www.vim.org/scripts/script.php?script_id=1936">あれ</a>や<a href="http://www.vim.org/scripts/script.php?script_id=1840">これ</a>やJavaScriptのインデント・スクリプトは見つかるが、<a href="http://www.vim.org/scripts/script.php?script_id=2765">Better Javascript Indentation</a>が一番良かった。普通にインストールするだけで特に設定等は必要ない。<p>インストールすると以下のような典型的なPowered by jQueryのJavaScriptファイルがすんなりインデントされるようになる。気持ち良い！<pre><code class=language-js>$(function () {
   var num = 32;
 
   $(&quot;#monthly_archives &gt; li&quot;).each(function (i, li) {
@@ -218,76 +58,15 @@ unlet s:cpo_save
     }
   });
 });
-</code></pre>
-
-<p>気付いた範囲では、</p>
-
-<pre><code class="language-js">var foo = {
+</code></pre><p>気付いた範囲では、<pre><code class=language-js>var foo = {
   bar:
     function () {
-</code></pre>
-
-<p>と書いた時に、</p>
-
-<ul>
-<li>次の行がインデントされない</li>
-<li>その後<code>}</code>で2段階アンインデントされてしまう</li>
-</ul>
-
-<p>といったラベル絡みでの不具合があった。<code>function</code>の前で改行しない場合は問題ないと思う（そう書けという意味ではない）。</p>
-
-<p>また、これをインストールすると<code>gg=G</code>によるインデントのやり直しも改善される（当たり前だけど）。ただし複数行コメント内の行頭の空白が消えてしまうので、</p>
-
-<pre><code class="language-js">/*!
+</code></pre><p>と書いた時に、<ul><li>次の行がインデントされない<li>その後<code>}</code>で2段階アンインデントされてしまう</ul><p>といったラベル絡みでの不具合があった。<code>function</code>の前で改行しない場合は問題ないと思う（そう書けという意味ではない）。<p>また、これをインストールすると<code>gg=G</code>によるインデントのやり直しも改善される（当たり前だけど）。ただし複数行コメント内の行頭の空白が消えてしまうので、<pre><code class=language-js>/*!
  * foobar
  * hogehoge
  */
-</code></pre>
-
-<p>といった<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>向けなコメントなどは、</p>
-
-<pre><code class="language-js">/*!
+</code></pre><p>といった<a href=http://developer.yahoo.com/yui/compressor/ >YUI Compressor</a>向けなコメントなどは、<pre><code class=language-js>/*!
 * foobar
 * hogehoge
 */
-</code></pre>
-
-<p>となってしまうので注意が必要。</p>
-</section>
-
-<hr>
-
-<p>他にはMarkdownやTextileなどでHTMLに変換するコマンドを作っておいていたりするくらい。あとはひたすら<a href="http://www.vim.org/scripts/script.php?script_id=1879">AutoComplPop</a>でOmni補完！</p>
-      </article>
-
-      
-        <nav class="read-older">
-  <a href="/blog/webdesign/redesign-and-border-radius-and-text-shadow.html" rel="next prerender">
-    <p>リデザインとborder-radiusとtext-shadow</p>
-  </a>
-</nav>
-
-
-      
-
-      
-    </main>
-
-<aside class="subcontent">
-  <form class="site-search" action="https://duckduckgo.com/" role="search">
-    <input name="sites" type="hidden" value="hail2u.net">
-    <input class="query" name="q" placeholder="例: Blosxom" size="32" type="search">
-    <input class="button" type="submit" value="Search">
-  </form>
-</aside>
-<footer class="global-footer" role="contentinfo">
-  <ul class="footlinks">
-    <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
-    <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
-  </ul>
-
-  <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
-</footer>
-  </body>
-</html>
-<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
+</code></pre><p>となってしまうので注意が必要。</section><hr><p>他にはMarkdownやTextileなどでHTMLに変換するコマンドを作っておいていたりするくらい。あとはひたすら<a href="http://www.vim.org/scripts/script.php?script_id=1879">AutoComplPop</a>でOmni補完！</article><nav class=read-older><a href=/blog/webdesign/redesign-and-border-radius-and-text-shadow.html rel="next prerender"><p>リデザインとborder-radiusとtext-shadow</p></a></nav></main><aside class=subcontent><form class=site-search action=https://duckduckgo.com/ role=search><input name=sites type=hidden value=hail2u.net> <input class=query name=q placeholder="例: Blosxom" size=32 type=search> <input class=button type=submit value=Search></form></aside><footer class=global-footer role=contentinfo><ul class=footlinks><li><a href=https://creativecommons.org/licenses/by-nc/4.0/ rel=license>CC BY-NC</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><p class=byline>Made by<a href=https://kyonagashima.com/ rel=author>Kyo Nagashima</a>.</footer>

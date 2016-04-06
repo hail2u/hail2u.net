@@ -1,95 +1,14 @@
-<!DOCTYPE html>
-<html lang="ja" class="permalink">
-  <head>
-<meta charset="UTF-8">
-<meta content="width=device-width" name="viewport">
-
-  
-  <meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" name="description">
-  <meta content="blosxom v2.1.2+dev" name="generator">
-
-
-
-    <title>パーマリンクに特別なCSSを追加 - Weblog - Hail2u.net</title>
-
-<link href="/feed" rel="alternate" type="application/rss+xml">
-<link href="/blog/blosxom/permalink-css.html" rel="canonical">
-<link color="#534b47" href="/images/pinicon.svg" rel="mask-icon" type="image/svg">
-
-
-<link href="/blog/internet/chugoku-np-subscription.html" rel="next prerender">
-
-<link href="/styles/common.min.css" media="screen" rel="stylesheet">
-<link href="/styles/permalink.min.css" media="screen" rel="stylesheet">
-<link href="/styles/print.min.css" media="print" rel="stylesheet">
-<script async src="/scripts/ellipsis-title.min.js"></script>
-<script async src="/scripts/unutm.min.js"></script>
-  </head>
-
-  <body>
-<header class="global-header" role="banner">
-  
-  <h1 class="logo"><a href="/">Hail2u.net</a></h1>
-
-  <nav class="site-navigation">
-    <ul>
-      
-      <li><a href="/documents/">Documents</a></li>
-
-        <li><a href="/blog/"><mark>Weblog</mark></a></li>
-        
-
-      
-      
-      <li><a href="/links/">Links</a></li>
-      
-      <li><a href="/about/">About</a></li>
-    </ul>
-  </nav>
-
-  
-</header>
-
-    <main class="content" role="main">
-      
-
-
-      <article>
-        <h1 class="first-heading">パーマリンクに特別なCSSを追加</h1>
-
-        <footer class="section-footer">
-          <p><time class="date" datetime="2014-04-01T02:39:00+09:00">Apr 1, 2014</time>
-            · <span class="tag"><a href="/blog/blosxom/">Blosxom</a></span></p>
-        </footer>
-
-        
-<p><a href="http://blosxom.sourceforge.net/">Blosxom</a>で記事ごとに専用のCSSを当てる方法を考えていた。<code>last()</code>で<code>rel=&quot;stylesheet&quot;</code>を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。</p>
-
-<p>記事ファイルでは特別なCSSを使うかどうかのフラグのみ書く。</p>
-
-<pre><code class="language-markdown">パーマリンクに特別なCSSを追加
+<!DOCTYPE html><html lang=ja class=permalink><meta charset=UTF-8><meta content="width=device-width" name=viewport><meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" name=description><meta content="blosxom v2.1.2+dev" name=generator><title>パーマリンクに特別なCSSを追加 - Weblog - Hail2u.net</title><link href=/feed rel=alternate type=application/rss+xml><link href=/blog/blosxom/permalink-css.html rel=canonical><link color=#534b47 href=/images/pinicon.svg rel=mask-icon type=image/svg><link href=/blog/internet/chugoku-np-subscription.html rel="next prerender"><link href=/styles/common.min.css media=screen rel=stylesheet><link href=/styles/permalink.min.css media=screen rel=stylesheet><link href=/styles/print.min.css media=print rel=stylesheet><script async src=/scripts/ellipsis-title.min.js></script><script async src=/scripts/unutm.min.js></script><header class=global-header role=banner><h1 class=logo><a href=/ >Hail2u.net</a></h1><nav class=site-navigation><ul><li><a href=/documents/ >Documents</a><li><a href=/blog/ ><mark>Weblog</mark></a><li><a href=/links/ >Links</a><li><a href=/about/ >About</a></ul></nav></header><main class=content role=main><article><h1 class=first-heading>パーマリンクに特別なCSSを追加</h1><footer class=section-footer><p><time class=date datetime=2014-04-01T02:39:00+09:00>Apr 1, 2014</time>·<span class=tag><a href=/blog/blosxom/ >Blosxom</a></span></footer><p><a href=http://blosxom.sourceforge.net/ >Blosxom</a>で記事ごとに専用のCSSを当てる方法を考えていた。<code>last()</code>で<code>rel=&quot;stylesheet&quot;</code>を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。<p>記事ファイルでは特別なCSSを使うかどうかのフラグのみ書く。<pre><code class=language-markdown>パーマリンクに特別なCSSを追加
 <mark>meta-special_css: 1</mark>
 
 &lt;p&gt;...&lt;/p&gt;
-</code></pre>
-
-<p>フレーバーでは以下のようにして、<code>$meta::special_css</code>を使った分岐を利用する。CSSファイルのパスは記事ファイル名を利用することでユニークさを保証できる。</p>
-
-<pre><code class="language-html">&lt;?<mark>$meta::special_css</mark> eq=&quot;1&quot;&gt;
+</code></pre><p>フレーバーでは以下のようにして、<code>$meta::special_css</code>を使った分岐を利用する。CSSファイルのパスは記事ファイル名を利用することでユニークさを保証できる。<pre><code class=language-html>&lt;?<mark>$meta::special_css</mark> eq=&quot;1&quot;&gt;
   &lt;link rel=&quot;stylesheet&quot; href=&quot;<mark>/styles$path/$fn.css</mark>&quot;&gt;
 &lt;/?&gt;
 &lt;?$meta::special_css ne=&quot;1&quot;&gt;
   &lt;link rel=&quot;stylesheet&quot; href=&quot;/styles/style.css&quot;&gt;
 &lt;/?&gt;
-</code></pre>
-
-<p>まだ採用はしてない。</p>
-
-<hr>
-
-<p>常に記事ファイル名を利用したCSSファイルのパスを参照するようにしておいて、mod_rewriteでそのパスが見つからなかった場合にデフォルトのCSSにフォールバックさせる方がもっと手っ取り早い感じする。普通にURL書き換えしちゃうとキャッシュが効かなくなるけど、302での外部リダイレクトにすれば良さそう。</p>
-
-<pre><code class="language-config">&lt;IfModule mod_rewrite.c&gt;
+</code></pre><p>まだ採用はしてない。<hr><p>常に記事ファイル名を利用したCSSファイルのパスを参照するようにしておいて、mod_rewriteでそのパスが見つからなかった場合にデフォルトのCSSにフォールバックさせる方がもっと手っ取り早い感じする。普通にURL書き換えしちゃうとキャッシュが効かなくなるけど、302での外部リダイレクトにすれば良さそう。<pre><code class=language-config>&lt;IfModule mod_rewrite.c&gt;
   RewriteEngine On
 
   RewriteBase /styles/
@@ -97,39 +16,4 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^(.*)$ style.css [L,R=302]
 &lt;/IfModule&gt;
-</code></pre>
-
-<p>こういう実装だとBlosxomに依存しないので、CSSファイルのパスをユニークにする仕組みさえ用意できれば、様々なCMSで実現できる。</p>
-      </article>
-
-      
-        <nav class="read-older">
-  <a href="/blog/internet/chugoku-np-subscription.html" rel="next prerender">
-    <p>中国新聞のデジタルコース</p>
-  </a>
-</nav>
-
-
-      
-
-      
-    </main>
-
-<aside class="subcontent">
-  <form class="site-search" action="https://duckduckgo.com/" role="search">
-    <input name="sites" type="hidden" value="hail2u.net">
-    <input class="query" name="q" placeholder="例: Blosxom" size="32" type="search">
-    <input class="button" type="submit" value="Search">
-  </form>
-</aside>
-<footer class="global-footer" role="contentinfo">
-  <ul class="footlinks">
-    <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
-    <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
-  </ul>
-
-  <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
-</footer>
-  </body>
-</html>
-<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
+</code></pre><p>こういう実装だとBlosxomに依存しないので、CSSファイルのパスをユニークにする仕組みさえ用意できれば、様々なCMSで実現できる。</article><nav class=read-older><a href=/blog/internet/chugoku-np-subscription.html rel="next prerender"><p>中国新聞のデジタルコース</p></a></nav></main><aside class=subcontent><form class=site-search action=https://duckduckgo.com/ role=search><input name=sites type=hidden value=hail2u.net> <input class=query name=q placeholder="例: Blosxom" size=32 type=search> <input class=button type=submit value=Search></form></aside><footer class=global-footer role=contentinfo><ul class=footlinks><li><a href=https://creativecommons.org/licenses/by-nc/4.0/ rel=license>CC BY-NC</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><p class=byline>Made by<a href=https://kyonagashima.com/ rel=author>Kyo Nagashima</a>.</footer>

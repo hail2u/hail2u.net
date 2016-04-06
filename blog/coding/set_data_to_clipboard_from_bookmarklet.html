@@ -1,70 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja" class="permalink">
-  <head>
-<meta charset="UTF-8">
-<meta content="width=device-width" name="viewport">
-
-  
-  <meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" name="description">
-  <meta content="blosxom v2.1.2+dev" name="generator">
-
-
-
-    <title>Bookmarkletからクリップボードに文字列をコピー - Weblog - Hail2u.net</title>
-
-<link href="/feed" rel="alternate" type="application/rss+xml">
-<link href="/blog/coding/set_data_to_clipboard_from_bookmarklet.html" rel="canonical">
-<link color="#534b47" href="/images/pinicon.svg" rel="mask-icon" type="image/svg">
-
-
-<link href="/blog/coding/view_sorce_in_firefox.html" rel="next prerender">
-
-<link href="/styles/common.min.css" media="screen" rel="stylesheet">
-<link href="/styles/permalink.min.css" media="screen" rel="stylesheet">
-<link href="/styles/print.min.css" media="print" rel="stylesheet">
-<script async src="/scripts/ellipsis-title.min.js"></script>
-<script async src="/scripts/unutm.min.js"></script>
-  </head>
-
-  <body>
-<header class="global-header" role="banner">
-  
-  <h1 class="logo"><a href="/">Hail2u.net</a></h1>
-
-  <nav class="site-navigation">
-    <ul>
-      
-      <li><a href="/documents/">Documents</a></li>
-
-        <li><a href="/blog/"><mark>Weblog</mark></a></li>
-        
-
-      
-      
-      <li><a href="/links/">Links</a></li>
-      
-      <li><a href="/about/">About</a></li>
-    </ul>
-  </nav>
-
-  
-</header>
-
-    <main class="content" role="main">
-      
-
-
-      <article>
-        <h1 class="first-heading">Bookmarkletからクリップボードに文字列をコピー</h1>
-
-        <footer class="section-footer">
-          <p><time class="date" datetime="2004-07-04T00:08:00+09:00">Jul 4, 2004</time>
-            · <span class="tag"><a href="/blog/coding/">Coding</a></span></p>
-        </footer>
-
-        <p>前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。</p>
-<p>今回でっちあげたURIスキーマはset-data-to-clipboard:にしてみた。前回のレジストリと同じような感覚でまず登録。今度はスクリプトをSetDataToClipBoard.jsとします。</p>
-<pre>REGEDIT4
+<!DOCTYPE html><html lang=ja class=permalink><meta charset=UTF-8><meta content="width=device-width" name=viewport><meta content=前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。 name=description><meta content="blosxom v2.1.2+dev" name=generator><title>Bookmarkletからクリップボードに文字列をコピー - Weblog - Hail2u.net</title><link href=/feed rel=alternate type=application/rss+xml><link href=/blog/coding/set_data_to_clipboard_from_bookmarklet.html rel=canonical><link color=#534b47 href=/images/pinicon.svg rel=mask-icon type=image/svg><link href=/blog/coding/view_sorce_in_firefox.html rel="next prerender"><link href=/styles/common.min.css media=screen rel=stylesheet><link href=/styles/permalink.min.css media=screen rel=stylesheet><link href=/styles/print.min.css media=print rel=stylesheet><script async src=/scripts/ellipsis-title.min.js></script><script async src=/scripts/unutm.min.js></script><header class=global-header role=banner><h1 class=logo><a href=/ >Hail2u.net</a></h1><nav class=site-navigation><ul><li><a href=/documents/ >Documents</a><li><a href=/blog/ ><mark>Weblog</mark></a><li><a href=/links/ >Links</a><li><a href=/about/ >About</a></ul></nav></header><main class=content role=main><article><h1 class=first-heading>Bookmarkletからクリップボードに文字列をコピー</h1><footer class=section-footer><p><time class=date datetime=2004-07-04T00:08:00+09:00>Jul 4, 2004</time>·<span class=tag><a href=/blog/coding/ >Coding</a></span></footer><p>前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。<p>今回でっちあげたURIスキーマはset-data-to-clipboard:にしてみた。前回のレジストリと同じような感覚でまず登録。今度はスクリプトをSetDataToClipBoard.jsとします。<pre>REGEDIT4
 
 [HKEY_CLASSES_ROOT\set-data-to-clipboard]
 @=&quot;URL:Set Data To Clipboard Protocol&quot;
@@ -76,9 +10,7 @@
 
 [HKEY_CLASSES_ROOT\set-data-to-clipboard\shell\open\command]
 @=&quot;wscript.exe C:\\Scripts\\SetDataToClipBoard.js \&quot;%1\&quot;&quot;
-</pre>
-<p>SetDataToClipBoard.jsはこんな感じ。</p>
-<pre><code class="language-js">var oArgs = WScript.Arguments
+</pre><p>SetDataToClipBoard.jsはこんな感じ。<pre><code class=language-js>var oArgs = WScript.Arguments
 var s = oArgs(0);
 s = s.replace(/^set-data-to-clipboard:\/\//, &quot;&quot;);
 s = s.replace(/\/$/, &quot;&quot;);
@@ -90,52 +22,5 @@ while (oIe.Busy) WScript.Sleep(100);
 
 oIe.Document.parentWindow.clipboardData.setData(&quot;text&quot;, unescape(s));
 oIe.Quit();
-</code></pre>
-<p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。</p>
-<p>あとはテキトウにBookmarkletを作成してみましょう。例えば閲覧中のページのタイトルとリンクをコピーするBookmarkletだと、Locationには、</p>
-<pre>javascript:document.location.href=&#39;set-data-to-clipboard://&#39;+escape(document.title+&#39;\n&#39;+document.location.href+&#39;\n&#39;)+&#39;/&#39;;
-</pre>
-<p>と、なります。エスケープしてやることと、最後にスラッシュを付けてやるのがポイント。</p>
-<p>これでリンクタグ作成とかAmazonの個別商品リンク作成とかもコピーするのがメンドウな<code>prompt()</code>経由ではなく一気にクリップボードにセットできる様になります。</p>
-<p>すげー便利だよ。俺、天才。</p>
-<p>寝ぼけてるのか。</p>
-<p>前回と今回のエントリを実践するのはかなりメンドウだと思いますが（説明わかりにくいし）、やれば必ずそれだけの利点はあるような気がします。</p>
-<p>WSHマンセー。</p>
-<p>ちなみに、前回と今回のエントリを実践するとJavaScript Consoleにガンガンエラーが溜まっていきます。まー実害はないし、個人の裁量で使うものなのでまぁ良いかなとか、投げやりな。</p>
-<section>
-<h1>追記@2004/07/04</h1>
-<p>書き忘れていたのですが、インターネット オプションのセキュリティ設定のレベルのカスタマイズから、「スクリプトによる貼り付け処理の許可」を「有効にする」にしないとうまく動かないと思います。</p>
-</section>
-      </article>
-
-      
-        <nav class="read-older">
-  <a href="/blog/coding/view_sorce_in_firefox.html" rel="next prerender">
-    <p>Firefoxのソースの表示を任意のエディタで</p>
-  </a>
-</nav>
-
-
-      
-
-      
-    </main>
-
-<aside class="subcontent">
-  <form class="site-search" action="https://duckduckgo.com/" role="search">
-    <input name="sites" type="hidden" value="hail2u.net">
-    <input class="query" name="q" placeholder="例: Blosxom" size="32" type="search">
-    <input class="button" type="submit" value="Search">
-  </form>
-</aside>
-<footer class="global-footer" role="contentinfo">
-  <ul class="footlinks">
-    <li><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license">CC BY-NC</a></li>
-    <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
-  </ul>
-
-  <p class="byline">Made by <a href="https://kyonagashima.com/" rel="author">Kyo Nagashima</a>.</p>
-</footer>
-  </body>
-</html>
-<!-- DEBUG: Hello from Blosxom 2.1.2+dev. -->
+</code></pre><p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。<p>あとはテキトウにBookmarkletを作成してみましょう。例えば閲覧中のページのタイトルとリンクをコピーするBookmarkletだと、Locationには、<pre>javascript:document.location.href=&#39;set-data-to-clipboard://&#39;+escape(document.title+&#39;\n&#39;+document.location.href+&#39;\n&#39;)+&#39;/&#39;;
+</pre><p>と、なります。エスケープしてやることと、最後にスラッシュを付けてやるのがポイント。<p>これでリンクタグ作成とかAmazonの個別商品リンク作成とかもコピーするのがメンドウな<code>prompt()</code>経由ではなく一気にクリップボードにセットできる様になります。<p>すげー便利だよ。俺、天才。<p>寝ぼけてるのか。<p>前回と今回のエントリを実践するのはかなりメンドウだと思いますが（説明わかりにくいし）、やれば必ずそれだけの利点はあるような気がします。<p>WSHマンセー。<p>ちなみに、前回と今回のエントリを実践するとJavaScript Consoleにガンガンエラーが溜まっていきます。まー実害はないし、個人の裁量で使うものなのでまぁ良いかなとか、投げやりな。<section><h1>追記@2004/07/04</h1><p>書き忘れていたのですが、インターネット オプションのセキュリティ設定のレベルのカスタマイズから、「スクリプトによる貼り付け処理の許可」を「有効にする」にしないとうまく動かないと思います。</section></article><nav class=read-older><a href=/blog/coding/view_sorce_in_firefox.html rel="next prerender"><p>Firefoxのソースの表示を任意のエディタで</p></a></nav></main><aside class=subcontent><form class=site-search action=https://duckduckgo.com/ role=search><input name=sites type=hidden value=hail2u.net> <input class=query name=q placeholder="例: Blosxom" size=32 type=search> <input class=button type=submit value=Search></form></aside><footer class=global-footer role=contentinfo><ul class=footlinks><li><a href=https://creativecommons.org/licenses/by-nc/4.0/ rel=license>CC BY-NC</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><p class=byline>Made by<a href=https://kyonagashima.com/ rel=author>Kyo Nagashima</a>.</footer>
