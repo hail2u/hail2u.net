@@ -323,10 +323,6 @@ module.exports = function (grunt) {
     "copy:asitis"
   ]);
 
-  grunt.registerTask("build:blog", [
-    "gitcommit:entry",
-  ]);
-
   grunt.registerTask("build:css", [
     "clean",
     "sass",
