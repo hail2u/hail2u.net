@@ -26,49 +26,6 @@ module.exports = function (grunt) {
             src: ["**/*.html"]
           }
         ]
-      },
-
-      css: {
-        cwd: "tmp/",
-        dest: "dist/styles/",
-        expand: true,
-        src: [
-          "*.css",
-          "*.css.map"
-        ]
-      },
-
-      styleGuide: {
-        options: {
-          process: function (content) {
-            var path = {
-              img: "../img/",
-              js: "../js/"
-            };
-            var re = /(href|src)(=)(")(.*?)(")/g;
-            var site = "https://hail2u.net/";
-
-            return content.replace(re, function (m, at, eq, oq, url, cq) {
-              if (url.indexOf(site) === 0) {
-                url = url.substr(site.length - 1);
-              } else if (url.indexOf(path.img) === 0) {
-                url = "/images" + url.substr(path.img.length - 1);
-              } else if (url.indexOf(path.js) === 0) {
-                url = "/scripts" + url.substr(path.js.length - 1);
-              } else if (/^[\w-]+\.[\w^]+$/.test(url)) {
-                url = "/styles/" + url;
-              }
-
-              return at + eq + oq + url + cq;
-            });
-          },
-          noProcess: ["*.svg"]
-        },
-
-        files: {
-          "dist/about/style-guide/index.html": ["src/css/test.html"],
-          "dist/images/favicon-large.svg": ["src/img/favicon-large.svg"]
-        }
       }
     },
 
@@ -177,8 +134,6 @@ module.exports = function (grunt) {
     "css_mqpacker",
     "csswring",
     "singleCharset",
-    "copy:css",
-    "copy:styleGuide"
   ]);
 
   grunt.registerTask("build:js", [
