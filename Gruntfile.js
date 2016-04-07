@@ -5,30 +5,6 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
 
-    copy: {
-      asitis: {
-        files: [
-          {
-            cwd: "src/",
-            dest: "dist/",
-            expand: true,
-            src: [
-              ".nojekyll",
-              "CNAME",
-              "humans.txt",
-              "robots.txt"
-            ]
-          },
-          {
-            cwd: "src/html/",
-            dest: "dist/",
-            expand: true,
-            src: ["**/*.html"]
-          }
-        ]
-      }
-    },
-
     css_mqpacker: {
       options: {
         map: {
@@ -118,15 +94,13 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
-  grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("postcss-single-charset");
 
   grunt.registerTask("build", [
     "build:css",
-    "build:js",
-    "copy:asitis"
+    "build:js"
   ]);
 
   grunt.registerTask("build:css", [
