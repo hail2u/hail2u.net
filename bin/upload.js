@@ -5,9 +5,10 @@
 var minimist = require("minimist");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
+var which = require("which").sync;
 
 var argv = minimist(process.argv.slice(2));
-var cmd = "git";
+var cmd = which("git");
 var file = path.relative("dist", argv._[0]);
 var git;
 var opts = {
