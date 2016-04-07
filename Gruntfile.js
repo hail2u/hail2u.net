@@ -5,12 +5,6 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
 
-    clean: {
-      main: {
-        src: ["tmp/**/*"]
-      }
-    },
-
     copy: {
       asitis: {
         files: [
@@ -192,7 +186,6 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
-  grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
@@ -205,7 +198,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:css", [
-    "clean",
     "sass",
     "css_mqpacker",
     "csswring",
@@ -215,7 +207,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:js", [
-    "clean",
     "copy:prejs",
     "uglify",
     "copy:jsMinified",
