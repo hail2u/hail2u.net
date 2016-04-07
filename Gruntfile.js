@@ -44,13 +44,6 @@ module.exports = function (grunt) {
         ]
       },
 
-      img: {
-        cwd: "src/img/",
-        dest: "dist/images/",
-        expand: true,
-        src: ["**/*"]
-      },
-
       js: {
         cwd: "tmp/",
         dest: "dist/scripts/",
@@ -141,17 +134,6 @@ module.exports = function (grunt) {
       }
     },
 
-    png2ico: {
-      options: {
-        cmd: "png2ico"
-      },
-
-      main: {
-        dest: "dist/favicon.ico",
-        src: ["tmp/favicon-*.png"]
-      }
-    },
-
     sass: {
       options: {
         precision: 3,
@@ -185,71 +167,6 @@ module.exports = function (grunt) {
       }
     },
 
-    svgRasterizer: {
-      appleTouchIcon: {
-        options: {
-          width: 180
-        },
-
-        dest: "dist/apple-touch-icon-precomposed.png",
-        src: "src/img/favicon-large.svg"
-      },
-
-      cover: {
-        options: {
-          width: 180
-        },
-
-        dest: "dist/images/cover.png",
-        src: "src/img/cover.svg"
-      },
-
-      favicon16: {
-        options: {
-          width: 16
-        },
-
-        dest: "tmp/favicon-16.png",
-        src: "src/img/favicon.svg"
-      },
-
-      favicon32: {
-        options: {
-          width: 32
-        },
-
-        dest: "tmp/favicon-32.png",
-        src: "src/img/favicon.svg"
-      },
-
-      favicon64: {
-        options: {
-          width: 64
-        },
-
-        dest: "tmp/favicon-64.png",
-        src: "src/img/favicon-large.svg"
-      },
-
-      favicon256: {
-        options: {
-          width: 256
-        },
-
-        dest: "tmp/favicon-256.png",
-        src: "src/img/favicon-large.svg"
-      },
-
-      favicon1024: {
-        options: {
-          width: 1024
-        },
-
-        dest: "dist/images/favicon-1024.png",
-        src: "src/img/favicon-large.svg"
-      }
-    },
-
     uglify: {
       options: {
         beautify: {
@@ -273,8 +190,6 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.loadNpmTasks("@hail2u/grunt-png2ico");
-  grunt.loadNpmTasks("@hail2u/grunt-svg-rasterizer");
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
   grunt.loadNpmTasks("grunt-contrib-clean");
@@ -285,7 +200,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build", [
     "build:css",
-    "build:img",
     "build:js",
     "copy:asitis"
   ]);
@@ -298,13 +212,6 @@ module.exports = function (grunt) {
     "singleCharset",
     "copy:css",
     "copy:styleGuide"
-  ]);
-
-  grunt.registerTask("build:img", [
-    "clean",
-    "svgRasterizer",
-    "png2ico",
-    "copy:img"
   ]);
 
   grunt.registerTask("build:js", [
