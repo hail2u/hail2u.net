@@ -22,7 +22,7 @@ fs.readdirSync(t).forEach(function (i) {
   m = o + ".map";
   r = minifyJS(t + i, {
     output: {
-      comments: /@preserve|@license|@cc_on/i,
+      comments: /@preserve|@license|@cc_on/i
     },
     outSourceMap: m
   });
