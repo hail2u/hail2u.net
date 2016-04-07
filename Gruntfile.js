@@ -67,35 +67,12 @@ module.exports = function (grunt) {
         expand: true,
         src: ["**/*.min.css"]
       }
-    },
-
-    uglify: {
-      options: {
-        beautify: {
-          "ascii_only": true
-        },
-
-        preserveComments: "some",
-        sourceMap: true
-      },
-
-      main: {
-        cwd: "tmp/",
-        dest: "tmp/",
-        expand: true,
-        ext: ".min.js",
-        src: [
-          "**/*.js",
-          "!**/*.min.js"
-        ]
-      }
     }
   });
 
   grunt.loadNpmTasks("css-mqpacker");
   grunt.loadNpmTasks("csswring");
   grunt.loadNpmTasks("grunt-contrib-sass");
-  grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("postcss-single-charset");
 
   grunt.registerTask("build:css", [
@@ -103,9 +80,5 @@ module.exports = function (grunt) {
     "css_mqpacker",
     "csswring",
     "singleCharset",
-  ]);
-
-  grunt.registerTask("build:js", [
-    "uglify"
   ]);
 };
