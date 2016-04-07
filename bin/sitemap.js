@@ -39,10 +39,7 @@ fs.readdirSync("src/html/documents/").forEach(function (file) {
 
   urls.push("/documents/" + file);
 });
-fs.readJsonSync(
-  "cache/articles.json",
-  "utf8"
-).forEach(function (article) {
+fs.readJsonSync("cache/articles.json").forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
