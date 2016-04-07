@@ -1,4 +1,6 @@
-"use strcit";
+#!/usr/bin/env node
+
+"use strict";
 
 var minimist = require("minimist");
 var path = require("path");
