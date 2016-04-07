@@ -38,31 +38,6 @@ module.exports = function (grunt) {
         ]
       },
 
-      js: {
-        cwd: "tmp/",
-        dest: "dist/scripts/",
-        expand: true,
-        src: [
-          "**/*.js",
-          "**/*.js.map"
-        ]
-      },
-
-      jsMinified: {
-        cwd: "node_modules/unutm/build/",
-        dest: "tmp/",
-        expand: true,
-        src: ["unutm.*"]
-      },
-
-      prejs: {
-        cwd: "src/js/",
-        dest: "tmp/",
-        expand: true,
-        flatten: true,
-        src: ["**/*.js"]
-      },
-
       styleGuide: {
         options: {
           process: function (content) {
@@ -207,9 +182,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask("build:js", [
-    "copy:prejs",
-    "uglify",
-    "copy:jsMinified",
-    "copy:js"
+    "uglify"
   ]);
 };
