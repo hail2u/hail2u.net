@@ -98,11 +98,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("postcss-single-charset");
 
-  grunt.registerTask("build", [
-    "build:css",
-    "build:js"
-  ]);
-
   grunt.registerTask("build:css", [
     "sass",
     "css_mqpacker",
