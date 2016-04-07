@@ -141,37 +141,6 @@ module.exports = function (grunt) {
       }
     },
 
-    generate: {
-      main: {
-        cwd: "src/html/",
-        dest: "dist/",
-        expand: true,
-        ext: ".html",
-        rename: function (dest, src) {
-          if (src.lastIndexOf("theme.html") === src.length - 10) {
-            return "src/weblog/entries/themes/html/page";
-          }
-
-          return dest + src;
-        },
-        src: [
-          "**/*.mustache",
-          "!partial/*"
-        ]
-      },
-
-      blog: {
-        cwd: "src/html/",
-        dest: "dist/",
-        expand: true,
-        ext: ".html",
-        src: [
-          "blog/index.mustache",
-          "index.mustache"
-        ]
-      }
-    },
-
     png2ico: {
       options: {
         cmd: "png2ico"
@@ -313,11 +282,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-sass");
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("postcss-single-charset");
-  grunt.loadTasks(".grunt/");
 
   grunt.registerTask("build", [
     "build:css",
-    "build:html",
     "build:img",
     "build:js",
     "copy:asitis"
@@ -331,11 +298,6 @@ module.exports = function (grunt) {
     "singleCharset",
     "copy:css",
     "copy:styleGuide"
-  ]);
-
-  grunt.registerTask("build:html", [
-    "clean",
-    "generate:main"
   ]);
 
   grunt.registerTask("build:img", [
