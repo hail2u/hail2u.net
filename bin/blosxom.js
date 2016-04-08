@@ -94,7 +94,7 @@ files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
 
-async.eachLimit(files, num, function (file, next) {
+async.eachLimit(files, num, async.ensureAsync(function (file, next) {
   var child = spawn(
     which("perl"),
     args.concat("path=/" + file), {
@@ -152,10 +152,8 @@ async.eachLimit(files, num, function (file, next) {
     args.pop();
   }
 
-  async.setImmediate(function () {
-    next();
-  });
-}, function (error) {
+  next();
+}), function (error) {
   if (error) {
     throw error;
   }
