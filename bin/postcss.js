@@ -8,8 +8,7 @@ var postcss = require("postcss")([
   require("css-mqpacker")({
     sort: true
   }),
-  require("csswring")(),
-  require("postcss-single-charset")()
+  require("csswring")()
 ]);
 
 var t = "tmp/";
