@@ -19,6 +19,7 @@ var opts = {
   stdio: "inherit"
 };
 
+fs.accessSync(argv.file);
 git = spawn(cmd, [
   "add",
   "--",
