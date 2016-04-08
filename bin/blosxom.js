@@ -53,12 +53,7 @@ if (entry) {
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
       src = options.imgdir + image;
       dest = options.staticimgdir + image;
-
-      try {
-        fs.copySync(src, dest);
-      } catch (e) {
-        throw e;
-      }
+      fs.copySync(src, dest);
     });
   }
 }

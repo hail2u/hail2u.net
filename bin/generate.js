@@ -129,14 +129,8 @@ var loadRSS = function (file) {
 };
 
 var loadArticles = function () {
-  var articles = [];
   var cache = "cache/articles.json";
-
-  try {
-    articles = fs.readJsonSync(cache);
-  } catch (e) {
-    throw e;
-  }
+  var articles = fs.readJsonSync("cache/articles.json");
 
   articles.forEach(function (article, i, a) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
@@ -165,14 +159,8 @@ var loadArticles = function () {
 };
 
 var loadBookmarks = function () {
-  var bookmarks = [];
   var cache = "cache/bookmarks.json";
-
-  try {
-    bookmarks = fs.readJsonSync(cache);
-  } catch (e) {
-    throw e;
-  }
+  var bookmarks = fs.readJsonSync("cache/bookmarks.json");
 
   bookmarks.forEach(function (bookmark, i, a) {
     var category = "other";
@@ -242,11 +230,7 @@ var extendData = function (file) {
   var data = extendObject({}, metadataBase);
   var fileMetadata = file.replace(/\.\w+$/, ".json");
 
-  try {
-    extendObject(data, fs.readJsonSync(fileMetadata));
-  } catch (e) {
-    // throw e;
-  }
+  extendObject(data, fs.readJsonSync(fileMetadata));
 
   switch (file) {
   case "src/html/index.mustache":
@@ -305,12 +289,7 @@ files.forEach(function (file) {
     ) + ".html";
   }
 
-  try {
-    template = fs.readFileSync(fileTemplate, "utf8");
-  } catch (e) {
-    throw e;
-  }
-
+  template = fs.readFileSync(fileTemplate, "utf8");
   html = mustache.render(template, extendData(fileTemplate), partials);
 
   if (file.dest.lastIndexOf("/page") === -1) {
