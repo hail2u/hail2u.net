@@ -86,12 +86,12 @@ if (argv.index) {
   });
 }
 
+files = files.map(function (file) {
+  return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
+});
 bar = new ProgressBar("Building [:bar] :percent :elapsed", {
   total: files.length,
   width: 32
-});
-files = files.map(function (file) {
-  return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
 
 async.eachLimit(files, num, async.ensureAsync(function (file, next) {
