@@ -7,12 +7,15 @@ var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-var argv = minimist(process.argv.slice(2));
+var argv = minimist(process.argv.slice(2), {
+  string: ["file"]
+});
 var cmd = which("git");
-var file = path.relative("dist", argv._[0]);
+var cwd = "dist/";
+var file = path.relative(cwd, argv.file);
 var git;
 var opts = {
-  cwd: "dist/",
+  cwd: cwd,
   stdio: "inherit"
 };
 
