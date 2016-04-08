@@ -5,7 +5,7 @@
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-var files = [
+[
   {
     dest: "dist/apple-touch-icon-precomposed.png",
     src: "src/img/favicon-large.svg",
@@ -17,9 +17,19 @@ var files = [
     width: 180
   },
   {
+    dest: "dist/images/favicon-1024.png",
+    src: "src/img/favicon-large.svg",
+    width: 1024
+  },
+  {
     dest: "tmp/favicon-16.png",
     src: "src/img/favicon.svg",
     width: 16
+  },
+  {
+    dest: "tmp/favicon-256.png",
+    src: "src/img/favicon-large.svg",
+    width: 256
   },
   {
     dest: "tmp/favicon-32.png",
@@ -30,20 +40,8 @@ var files = [
     dest: "tmp/favicon-64.png",
     src: "src/img/favicon-large.svg",
     width: 64
-  },
-  {
-    dest: "tmp/favicon-256.png",
-    src: "src/img/favicon-large.svg",
-    width: 256
-  },
-  {
-    dest: "dist/images/favicon-1024.png",
-    src: "src/img/favicon-large.svg",
-    width: 1024
   }
-];
-
-files.forEach(function (file) {
+].forEach(function (file) {
   var args = [
     "-f", file.src, "-e", file.dest
   ];
