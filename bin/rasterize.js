@@ -43,18 +43,29 @@ var which = require("which").sync;
   }
 ].forEach(function (file) {
   var args = [
-    "-f", file.src, "-e", file.dest
+    "-f",
+    file.src,
+    "-e",
+    file.dest
   ];
   var child;
 
+  if (!file.src || !file.dest) {
+    return;
+  }
+
   if (file.height) {
-    args.push("-h");
-    args.push(file.height);
+    args = args.concat([
+      "-h",
+      file.height
+    ]);
   }
 
   if (file.width) {
-    args.push("-w");
-    args.push(file.width);
+    args = args.concat([
+      "-w",
+      file.width
+    ]);
   }
 
   child = spawn(which("inkscape"), args, {
