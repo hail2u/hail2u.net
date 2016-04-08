@@ -18,7 +18,7 @@ fs.readdirSync(t).forEach(function (i) {
   var o;
   var x = ".css";
 
-  if (path.extname(i) !== x) {
+  if (path.extname(i) !== x || path.extname(path.basename(i, x)) === ".min") {
     return;
   }
 
