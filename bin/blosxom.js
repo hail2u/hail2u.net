@@ -144,14 +144,13 @@ async.eachLimit(files, num, async.ensureAsync(function (file, next) {
     });
   }
 
-  file = options.staticdir + file;
-  fs.outputFileSync(file, contents);
-  bar.tick();
-
   if (entry && args.length > 1) {
     args.pop();
   }
 
+  file = options.staticdir + file;
+  fs.outputFileSync(file, contents);
+  bar.tick();
   next();
 }), function (error) {
   if (error) {
