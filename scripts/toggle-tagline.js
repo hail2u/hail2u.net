@@ -12,17 +12,9 @@
     evt.preventDefault();
   };
 
-  var init = function () {
-    d.querySelector(".first-heading").addEventListener(
-      "click",
-      toggle.bind(null, d.querySelector(".tagline"), d.documentElement),
-      false
-    );
-  };
-
-  if (d.readyState === "loading") {
-    d.addEventListener("DOMContentLoaded", init, false);
-  } else {
-    init();
-  }
+  d.querySelector(".first-heading").addEventListener(
+    "click",
+    toggle.bind(null, d.querySelector(".tagline"), d.documentElement),
+    false
+  );
 })(document);
