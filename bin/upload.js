@@ -2,6 +2,7 @@
 
 "use strict";
 
+var fs = require("fs");
 var minimist = require("minimist");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
