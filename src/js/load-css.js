@@ -3,22 +3,14 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2015
  */
-(function (d) {
+(function () {
   "use strict";
 
-  var load = function () {
-    var links = d.querySelectorAll('link[class="js-load-css"]');
-    var i;
-    var l = links.length;
+  var i;
+  var l;
+  var s = document.querySelectorAll('link[class="js-load-css"]');
 
-    for (i = 0; i < l; i++) {
-      links[i].rel += " stylesheet";
-    }
-  };
-
-  if (d.readyState === "loading") {
-    d.addEventListener("DOMContentLoaded", load, false);
-  } else {
-    load();
+  for (i = 0, l = s.length; i < l; i++) {
+    s[i].rel += " stylesheet";
   }
-})(document);
+})();

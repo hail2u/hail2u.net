@@ -13,19 +13,13 @@
     evt.stopPropagation();
   };
 
-  var init = function () {
-    var article = d.getElementById("introduction");
-    var eyecatch = d.querySelector(".fill");
-    d.querySelector(".section-footer").addEventListener(
-      "click",
-      toggle.bind(null, eyecatch, article),
-      false
-    );
-  };
-
-  if (d.readyState === "loading") {
-    d.addEventListener("DOMContentLoaded", init, false);
-  } else {
-    init();
-  }
+  d.querySelector(".section-footer").addEventListener(
+    "click",
+    toggle.bind(
+      null,
+      d.querySelector(".fill"),
+      d.getElementById("introduction")
+    ),
+    false
+  );
 })(document);
