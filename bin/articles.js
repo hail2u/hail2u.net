@@ -11,7 +11,7 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var articles = [];
-var cache = "cache/articles.json";
+var cache = process.env.npm_package_config_cachedir + "articles.json";
 var data = "src/weblog/plugins/state/files_index.dat";
 var fileNew = argv.file;
 var force = argv.force;

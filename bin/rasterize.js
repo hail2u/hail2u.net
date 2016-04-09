@@ -5,6 +5,7 @@
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
+var tmpdir = process.env.npm_package_config_tmpdir;
 [
   {
     dest: "dist/apple-touch-icon-precomposed.png",
@@ -22,22 +23,22 @@ var which = require("which").sync;
     width: 1024
   },
   {
-    dest: "tmp/favicon-16.png",
+    dest: tmpdir + "favicon-16.png",
     src: "src/img/favicon.svg",
     width: 16
   },
   {
-    dest: "tmp/favicon-256.png",
+    dest: tmpdir + "favicon-256.png",
     src: "src/img/favicon-large.svg",
     width: 256
   },
   {
-    dest: "tmp/favicon-32.png",
+    dest: tmpdir + "favicon-32.png",
     src: "src/img/favicon.svg",
     width: 32
   },
   {
-    dest: "tmp/favicon-64.png",
+    dest: tmpdir + "favicon-64.png",
     src: "src/img/favicon-large.svg",
     width: 64
   }

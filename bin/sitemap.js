@@ -41,7 +41,9 @@ fs.readdirSync("src/html/documents/").forEach(function (file) {
 
   urls.push("/documents/" + file);
 });
-fs.readJsonSync("cache/articles.json").forEach(function (article) {
+fs.readJsonSync(
+  process.env.npm_package_config_cachedir + "articles.json"
+).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {

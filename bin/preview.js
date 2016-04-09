@@ -8,7 +8,7 @@ var minimist = require("minimist");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-var fPreview = "tmp/__preview.html";
+var fPreview = process.env.npm_package_config_tmpdir + "__preview.html";
 var preview = `<!DOCTYPE html>
 <html class="permalink" lang="ja">
   <head>

@@ -10,7 +10,7 @@ var request = require("request");
 var argv = minimist(process.argv.slice(2), {
   boolean: ["force"]
 });
-var cache = "cache/bookmarks.json";
+var cache = process.env.npm_package_config_cachedir + "bookmarks.json";
 var config = pit.get("pinboard.in");
 var force = argv.force;
 var bookmarks = [];
