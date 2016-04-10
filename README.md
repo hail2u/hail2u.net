@@ -1,7 +1,7 @@
-Hail2u.net
-==========
+[Hail2u.net][1]
+===============
 
-Files for [Hail2u.net][1] website.
+The source files of Hail2u.net website.
 
 
-[1]: http://hail2u.net/
+[1]: https://hail2u.net/
