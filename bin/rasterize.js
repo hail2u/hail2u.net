@@ -6,6 +6,7 @@ var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
 var tmpdir = process.env.npm_package_config_tmpdir;
+
 [
   {
     dest: "dist/apple-touch-icon-precomposed.png",

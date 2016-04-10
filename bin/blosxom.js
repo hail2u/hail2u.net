@@ -50,6 +50,7 @@ if (entry) {
     images.forEach(function (image) {
       var dest;
       var src;
+
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
       src = options.imgdir + image;
       dest = options.staticimgdir + image;

@@ -30,8 +30,9 @@ var categoryNames = {
 };
 var categoryNamesInv = (function (obj) {
   var newObj = {};
+  var prop;
 
-  for (var prop in obj) {
+  for (prop in obj) {
     newObj[obj[prop]] = prop;
   }
 
@@ -76,11 +77,13 @@ var escape = function (str) {
 };
 
 var extendObject = function (dest, src) {
+  var prop;
+
   if (dest !== Object(dest)) {
     return dest;
   }
 
-  for (var prop in src) {
+  for (prop in src) {
     dest[prop] = src[prop];
   }
 
@@ -102,18 +105,27 @@ var loadRSS = function (file) {
   });
 
   feed.item.forEach(function (val) {
+    var date;
+    var yy;
+    var mm;
+    var dd;
+    var hh;
+    var nn;
+    var ss;
+
     if (val.link) {
       val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
     }
 
     if (val.pubDate) {
-      var date = new Date(val.pubDate);
-      var yy = date.getFullYear();
-      var mm = date.getMonth();
-      var dd = date.getDate();
-      var hh = date.getHours();
-      var nn = date.getMinutes();
-      var ss = date.getSeconds();
+      date = new Date(val.pubDate);
+      yy = date.getFullYear();
+      mm = date.getMonth();
+      dd = date.getDate();
+      hh = date.getHours();
+      nn = date.getMinutes();
+      ss = date.getSeconds();
+
       val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
       val.html5PubDate = sprintf(
         "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
@@ -168,7 +180,7 @@ var loadBookmarks = function () {
     var year = date.getFullYear();
 
     if (tags.indexOf("instapaper") !== -1) {
-      category ="instapaper";
+      category = "instapaper";
     } else if (tags.indexOf("dribbble") !== -1) {
       category = "dribbble";
       bookmark.description = bookmark.description.replace(
@@ -194,7 +206,7 @@ var loadBookmarks = function () {
         ""
       ).substr(0, 12);
     } else if (tags.indexOf("pinterest") !== -1) {
-      category ="pinterest";
+      category = "pinterest";
       bookmark.description = bookmark.extended;
     } else if (tags.indexOf("soundcloud") !== -1) {
       category = "soundcloud";
@@ -231,6 +243,7 @@ var extendData = function (file) {
     path.dirname(file),
     path.basename(file, ".mustache") + ".json"
   );
+  var imgs;
 
   extendObject(data, fs.readJsonSync(fileMetadata));
 
@@ -241,11 +254,13 @@ var extendData = function (file) {
     data.articles = loadRSS("dist/blog/feed");
     data.articles.item = data.articles.item.slice(0, 6);
     data.articles.first = data.articles.item.shift();
-    var imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
+    imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
 
     if (imgs) {
-      var img = imgs[0].replace(/src="https?:\/\/hail2u\.net/, 'src="');
-      data.articles.first.image = img;
+      data.articles.first.image = imgs[0].replace(
+        /src="https?:\/\/hail2u\.net/,
+        'src="'
+      );
       data.articles.first.hasImage = true;
     }
 

@@ -8,9 +8,9 @@
 
   var i;
   var l;
-  var s = document.querySelectorAll('link[class="js-load-css"]');
+  var s = document.querySelectorAll("link[class='js-load-css']");
 
-  for (i = 0, l = s.length; i < l; i++) {
+  for (i = 0, l = s.length; i < l; i += 1) {
     s[i].rel += " stylesheet";
   }
 })();

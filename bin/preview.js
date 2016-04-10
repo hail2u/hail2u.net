@@ -37,6 +37,7 @@ var entry = fs.readFileSync(
   argv.file,
   "utf8"
 ).split("\n");
+
 preview = preview.replace(
   /<%TITLE%>/g,
   entry.shift().replace(/\$/g, "$$$$")
