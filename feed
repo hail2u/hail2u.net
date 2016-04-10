@@ -10,6 +10,49 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>fixpackにおけるscriptsフィールドのソート</title>
+      <link>https://hail2u.net/blog/software/fixpack-scripts-sorting.html</link>
+      <description>package.jsonをフォーマットしなおしてくれるfixpackを愛用している。ひとつだけ気になるところがあり、それがscriptsフィールドがアルファベット順に並ぶことだ。つまりpre*やpost*コマンドがその元コマンドと関係ない場所へとまとめられてしまう。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/software/fixpack-scripts-sorting.html</guid>
+      <pubDate>Sun, 10 Apr 2016 14:44:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p><code>package.json</code>をフォーマットしなおしてくれる<a href="https://github.com/HenrikJoreteg/fixpack">fixpack</a>を愛用している。ひとつだけ気になるところがあり、それが<code>scripts</code>フィールドがアルファベット順に並ぶことだ。つまり<code>pre*</code>や<code>post*</code>コマンドがその元コマンドと関係ない場所へとまとめられてしまう。</p>
+
+<p>例えば<code>pre*</code>や<code>post*</code>コマンドを駆使した場合、fixpackを通すと以下のようになってしまう。</p>
+
+<pre><code>{
+  &quot;scripts&quot;: {
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;,
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;
+  }
+}
+</code></pre>
+
+<p>元コマンドのソート順はアルファベット順で構わないが、<code>pre*</code>や<code>post*</code>コマンドは元コマンドの前後にあるとわかりやすいはずだ。つまり以下のようになっていると望ましい。</p>
+
+<pre><code>{
+  &quot;scripts&quot;: {
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;
+  }
+}
+</code></pre>
+
+<p>ここのところ<code>npm run-script</code>を使い倒してやろうという機運が高まっているため、このように管理しやすい形でソートしてくれると助かる。ということで<a href="https://github.com/HenrikJoreteg/fixpack/pull/16">こういった機能を実装したプルリクエスト</a>は投げておいた。</p>
+
+<hr>
+
+<p>プリフィックス付きの文字列をうまい具合に一発でソートするアルゴリズムをちゃんと探して、2パスではない実装にしたい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>コマンド・プロンプトのAutoRun</title>
       <link>https://hail2u.net/blog/software/cmd-autorun.html</link>
       <description>Windowsの環境変数のPATHはシステム由来のものとユーザー由来のものがある。この両者はシステム由来のものの後にユーザー由来のものがくるので、ユーザー領域に放り込んだプログラムを優先的に探してもらうというようなことをする場合、パスを決め打ちでシステム由来のものに書く必要があった。.bashrc的なもので環境変数をいじることができればよいのに……と、ずっと思っていたのだが、どうやらAutoRunという機能があり、それを使うと任意のバッチファイルをコマンド・プロンプトの起動時に実行してくれるようだ。</description>
@@ -344,40 +387,6 @@ set PATH=%USERPROFILE%\Programs;%PATH%
 <p>石や道のちょっとした段差もそうだが、降りるところの平坦が長いエスカレーター、階段の角に付けられたゴム、絨毯とリノリウムの境い目、などといったところでつまづくことが増えた。ユニバーサル・デザインは大事だなと痛切に感じるので、ウェブでも頑張りたい。</p>]]></content:encoded>
     </item>
     <item>
-      <title>CSSの定義からHTMLの要素を取得するために</title>
-      <link>https://hail2u.net/blog/coding/get-elemets-by-declaration.html</link>
-      <description>text-overflow: ellipsisのためにtitle属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。@ykztsにも書いてもらったのでそちらもどうぞ。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/coding/get-elemets-by-declaration.html</guid>
-      <pubDate>Tue, 23 Feb 2016 13:21:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p><code>text-overflow: ellipsis</code>のために<code>title</code>属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。<a href="https://gist.github.com/ykzts/564afcc4e8c9a700cc54">@ykztsにも書いてもらった</a>のでそちらもどうぞ。</p>
-
-<pre><code>// var elms = getElementsByDeclaration("text-overflow", "ellipsis");
-function getElementsByDeclaration(property, value) {
-  var elements;
-  var i;
-  var l;
-  var nodes = document.querySelectorAll(&quot;*&quot;);
-
-  for (i = 0, l = nodes.length; i &lt; l; i++) {
-    var node = nodes[i];
-
-    if (window.getComputedStyle(node)[property] === value) {
-      elements.push(node);
-    }
-  }
-
-  return elements;
-}
-</code></pre>
-
-<p>実際に使うことはなさそうだ。理由は簡単で、ループして列挙した要素群をもう一度ループしなくてはならないからだ。普通に書いた方がかなり速くなることだろう。また計算済みスタイルの値に依存するので、特定の文字列を値としてとるプロパティーしか探せない。</p>
-
-<hr>
-
-<p>こういったCSSで機能を追加する（変更する、削除する）ことによって失われるもののフォローを簡単に行える手法は必要なのではないだろうか。標準化する必要があるかというとかなり疑問だが、<code>NodeList</code>への便利関数の解放で簡単になるであろうと考えられる。上のような簡単な関数にイテレーターを渡せるようにするなどでも悪くはないが、やはり便利関数くださいというところに落ち着くだろう。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -412,6 +421,6 @@ function getElementsByDeclaration(property, value) {
       <guid isPermaLink="true">https://hail2u.net/documents/web-typography-best-practices.html</guid>
       <description><![CDATA[<p><a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineによるウェブサイトのタイポグラフィーについての調査</a>をわかりやすくまとめた<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-Inclusive Guide to Web Typography Best Practices</a>の日本語訳です。ベスト・プラクティスになりうる部分のみコンパクトに抽出された参考になる文書だと思います。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 08 Apr 2016 02:36:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 10 Apr 2016 14:44:00 +0900</lastBuildDate>
   </channel>
 </rss>

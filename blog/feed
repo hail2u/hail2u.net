@@ -10,12 +10,57 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Fri, 8 Apr 2016 02:37:50 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 10 Apr 2016 14:45:21 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>fixpackにおけるscriptsフィールドのソート</title>
+      <link>https://hail2u.net/blog/software/fixpack-scripts-sorting.html</link>
+      <description>package.jsonをフォーマットしなおしてくれるfixpackを愛用している。ひとつだけ気になるところがあり、それがscriptsフィールドがアルファベット順に並ぶことだ。つまりpre*やpost*コマンドがその元コマンドと関係ない場所へとまとめられてしまう。</description>
+      <category>Software</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/software/fixpack-scripts-sorting.html</guid>
+      <pubDate>Sun, 10 Apr 2016 14:44:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><code>package.json</code>をフォーマットしなおしてくれる<a href="https://github.com/HenrikJoreteg/fixpack">fixpack</a>を愛用している。ひとつだけ気になるところがあり、それが<code>scripts</code>フィールドがアルファベット順に並ぶことだ。つまり<code>pre*</code>や<code>post*</code>コマンドがその元コマンドと関係ない場所へとまとめられてしまう。</p>
+
+<p>例えば<code>pre*</code>や<code>post*</code>コマンドを駆使した場合、fixpackを通すと以下のようになってしまう。</p>
+
+<pre><code>{
+  &quot;scripts&quot;: {
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;,
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;
+  }
+}
+</code></pre>
+
+<p>元コマンドのソート順はアルファベット順で構わないが、<code>pre*</code>や<code>post*</code>コマンドは元コマンドの前後にあるとわかりやすいはずだ。つまり以下のようになっていると望ましい。</p>
+
+<pre><code>{
+  &quot;scripts&quot;: {
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;
+  }
+}
+</code></pre>
+
+<p>ここのところ<code>npm run-script</code>を使い倒してやろうという機運が高まっているため、このように管理しやすい形でソートしてくれると助かる。ということで<a href="https://github.com/HenrikJoreteg/fixpack/pull/16">こういった機能を実装したプルリクエスト</a>は投げておいた。</p>
+
+<hr>
+
+<p>プリフィックス付きの文字列をうまい具合に一発でソートするアルゴリズムをちゃんと探して、2パスではない実装にしたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>コマンド・プロンプトのAutoRun</title>
@@ -367,42 +412,6 @@ set PATH=%USERPROFILE%\Programs;%PATH%
 <p>駅まで歩いていたら道に落ちている3cmくらいの石に気づかず踏み、足首をぐりっとやってしまって捻挫した。幸いそれほどひどくもなく、1時間ほど休んだら歩いても痛くないくらいに回復したので良かった。</p>
 
 <p>石や道のちょっとした段差もそうだが、降りるところの平坦が長いエスカレーター、階段の角に付けられたゴム、絨毯とリノリウムの境い目、などといったところでつまづくことが増えた。ユニバーサル・デザインは大事だなと痛切に感じるので、ウェブでも頑張りたい。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSの定義からHTMLの要素を取得するために</title>
-      <link>https://hail2u.net/blog/coding/get-elemets-by-declaration.html</link>
-      <description>text-overflow: ellipsisのためにtitle属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。@ykztsにも書いてもらったのでそちらもどうぞ。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/coding/get-elemets-by-declaration.html</guid>
-      <pubDate>Tue, 23 Feb 2016 13:21:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p><code>text-overflow: ellipsis</code>のために<code>title</code>属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。<a href="https://gist.github.com/ykzts/564afcc4e8c9a700cc54">@ykztsにも書いてもらった</a>のでそちらもどうぞ。</p>
-
-<pre><code>// var elms = getElementsByDeclaration("text-overflow", "ellipsis");
-function getElementsByDeclaration(property, value) {
-  var elements;
-  var i;
-  var l;
-  var nodes = document.querySelectorAll(&quot;*&quot;);
-
-  for (i = 0, l = nodes.length; i &lt; l; i++) {
-    var node = nodes[i];
-
-    if (window.getComputedStyle(node)[property] === value) {
-      elements.push(node);
-    }
-  }
-
-  return elements;
-}
-</code></pre>
-
-<p>実際に使うことはなさそうだ。理由は簡単で、ループして列挙した要素群をもう一度ループしなくてはならないからだ。普通に書いた方がかなり速くなることだろう。また計算済みスタイルの値に依存するので、特定の文字列を値としてとるプロパティーしか探せない。</p>
-
-<hr>
-
-<p>こういったCSSで機能を追加する（変更する、削除する）ことによって失われるもののフォローを簡単に行える手法は必要なのではないだろうか。標準化する必要があるかというとかなり疑問だが、<code>NodeList</code>への便利関数の解放で簡単になるであろうと考えられる。上のような簡単な関数にイテレーターを渡せるようにするなどでも悪くはないが、やはり便利関数くださいというところに落ち着くだろう。</p>]]></content:encoded>
     </item>
 
   </channel>
