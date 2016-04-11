@@ -11,7 +11,7 @@ var postcss = require("postcss")([
   require("csswring")()
 ]);
 
-var t = process.env.npm_package_config_tmpdir;
+var t = "tmp/";
 
 fs.readdirSync(t).forEach(function (i) {
   var o;

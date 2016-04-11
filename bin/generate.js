@@ -13,7 +13,6 @@ var sprintf = require("sprintf").sprintf;
 var argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
 });
-var cachedir = process.env.npm_package_config_cachedir;
 var categoryNames = {
   "Blog": "blog",
   "Blosxom": "blosxom",
@@ -151,7 +150,7 @@ var loadRSS = function (file) {
 };
 
 var loadArticles = function () {
-  var articles = fs.readJsonSync(cachedir + "articles.json");
+  var articles = fs.readJsonSync("cache/articles.json");
 
   articles.forEach(function (article, i, a) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
@@ -180,7 +179,7 @@ var loadArticles = function () {
 };
 
 var loadBookmarks = function () {
-  var bookmarks = fs.readJsonSync(cachedir + "bookmarks.json");
+  var bookmarks = fs.readJsonSync("cache/bookmarks.json");
 
   bookmarks.forEach(function (bookmark, i, a) {
     var category = "other";

@@ -21,7 +21,6 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var bar;
-var cache = "src/weblog/plugins/state/files_index.dat";
 var entry = argv.file;
 var files = [];
 var images = [];
@@ -61,7 +60,7 @@ if (entry) {
 
 if (argv.all && files.length === 0) {
   fs.readFileSync(
-    cache,
+    "src/weblog/plugins/state/files_index.dat",
     "utf8"
   ).split(/\r?\n/).forEach(function (file) {
     if (file === "") {

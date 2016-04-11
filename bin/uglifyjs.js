@@ -6,7 +6,7 @@ var fs = require("fs-extra");
 var minifyJS = require("uglify-js").minify;
 var path = require("path");
 
-var t = process.env.npm_package_config_tmpdir;
+var t = "tmp/";
 
 fs.readdirSync(t).forEach(function (i) {
   var m;
