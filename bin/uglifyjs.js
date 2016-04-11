@@ -6,26 +6,23 @@ var fs = require("fs-extra");
 var minifyJS = require("uglify-js").minify;
 var path = require("path");
 
-var t = "tmp/";
+var ext = ".js";
+var min = ".min";
+var tmpdir = "tmp/";
 
-fs.readdirSync(t).forEach(function (i) {
-  var m;
-  var o;
-  var r;
-  var x = ".js";
+fs.readdirSync(tmpdir).forEach(function (input) {
+  var basename = path.basename(input, ext);
+  var output;
 
-  if (path.extname(i) !== x || path.extname(path.basename(i, x)) === ".min") {
+  if (path.extname(input) !== ext || path.extname(basename) === min) {
     return;
   }
 
-  o = path.join(path.dirname(i), path.basename(i, x) + ".min" + x);
-  m = o + ".map";
-  r = minifyJS(t + i, {
+  input = path.join(tmpdir, input);
+  output = path.join(tmpdir, basename + min + ext);
+  fs.outputFileSync(output, minifyJS(input, {
     output: {
       comments: /@preserve|@license|@cc_on/i
-    },
-    outSourceMap: m
-  });
-  fs.outputFileSync(t + o, r.code);
-  fs.outputFileSync(t + m, r.map);
+    }
+  }).code);
 });

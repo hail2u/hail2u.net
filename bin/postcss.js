@@ -11,27 +11,21 @@ var postcss = require("postcss")([
   require("csswring")()
 ]);
 
-var t = "tmp/";
+var ext = ".css";
+var min = ".min";
+var tmpdir = "tmp/";
 
-fs.readdirSync(t).forEach(function (i) {
-  var o;
-  var x = ".css";
+fs.readdirSync(tmpdir).forEach(function (input) {
+  var basename = path.basename(input, ext);
+  var output;
 
-  if (path.extname(i) !== x || path.extname(path.basename(i, x)) === ".min") {
+  if (path.extname(input) !== ext || path.extname(basename) === min) {
     return;
   }
 
-  i = t + i;
-  o = path.join(path.dirname(i), path.basename(i, x) + ".min" + x);
-  postcss.process(fs.readFileSync(i, "utf8"), {
-    from: i,
-    map: {
-      inline: false,
-      sourcesContent: false
-    },
-    to: o
-  }).then(function (result) {
-    fs.outputFileSync(o, result.css);
-    fs.outputFileSync(o + ".map", result.map);
+  input = path.join(tmpdir, input);
+  output = path.join(tmpdir, basename + min + ext);
+  postcss.process(fs.readFileSync(input, "utf8")).then(function (result) {
+    fs.outputFileSync(output, result.css);
   });
 });
