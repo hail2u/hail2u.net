@@ -48,17 +48,27 @@ var entityMap = {
   ">": "&gt;"
 };
 var files = [
-  {src: "src/html/about/index.mustache"},
+  {
+    src: "src/html/about/index.mustache"
+  },
   {
     dest: "src/weblog/entries/themes/html/page",
     src: "src/html/blog/theme.mustache"
   },
-  {src: "src/html/documents/index.mustache"},
-  {src: "src/html/links/index.mustache"}
+  {
+    src: "src/html/documents/index.mustache"
+  },
+  {
+    src: "src/html/links/index.mustache"
+  }
 ];
 var filesBlog = [
-  {src: "src/html/blog/index.mustache"},
-  {src: "src/html/index.mustache"}
+  {
+    src: "src/html/blog/index.mustache"
+  },
+  {
+    src: "src/html/index.mustache"
+  }
 ];
 var metadataBase = JSON.parse(
   fs.readFileSync(dirTemplate + "metadata.json", "utf8")
