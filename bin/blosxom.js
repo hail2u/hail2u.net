@@ -122,7 +122,6 @@ async.eachLimit(files, num, async.ensureAsync(function (file, next) {
     );
     contents = minifyHTML(contents, {
       collapseBooleanAttributes: true,
-      collapseInlineTagWhitespace: true,
       collapseWhitespace: true,
       minifyCSS: true,
       minifyJS: true,

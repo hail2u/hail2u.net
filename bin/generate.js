@@ -322,7 +322,6 @@ files.forEach(function (file) {
   if (file.dest.lastIndexOf("/page") === -1) {
     html = minifyHTML(html, {
       collapseBooleanAttributes: true,
-      collapseInlineTagWhitespace: true,
       collapseWhitespace: true,
       minifyCSS: true,
       minifyJS: true,
