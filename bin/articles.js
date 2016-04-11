@@ -17,17 +17,17 @@ var fileNew = argv.file;
 var force = argv.force;
 var loadArticle = function (file, date) {
   return {
-    title: fs.readFileSync(file, "utf8").split(/\n/)[0],
-    link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
-      path.basename(file, ".txt") + ".html",
-    unixtime: date.getTime(),
-    year: date.getFullYear(),
-    month: date.getMonth() + 1,
     day: date.getDate(),
     hour: date.getHours(),
+    link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
+      path.basename(file, ".txt") + ".html",
     minute: date.getMinutes(),
+    month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12][date.getMonth()],
     second: date.getSeconds(),
-    tz: "+09:00"
+    title: fs.readFileSync(file, "utf8").split(/\n/).shift(),
+    tz: "+09:00",
+    unixtime: date.getTime(),
+    year: date.getFullYear()
   };
 };
 
@@ -40,6 +40,9 @@ if (!force) {
 }
 
 fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
+  var date;
+  var file;
+
   if (!/\d+$/.test(line)) {
     return;
   }
@@ -53,12 +56,15 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   }
 
   line = line.split("=>");
-  articles.unshift(loadArticle(
-    path.relative(process.cwd(), line[0]),
-    new Date(parseInt(line[1], 10) * 1000)
-  ));
+  file = line.shift();
+  date = line.shift();
+  articles.unshift(
+    loadArticle(
+      path.relative(process.cwd(), file),
+      new Date(parseInt(date, 10) * 1000)
+    )
+  );
 });
-articles.sort(function (a, b) {
+fs.writeJsonSync(cache, articles.sort(function (a, b) {
   return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-}).reverse();
-fs.writeJsonSync(cache, articles);
+}).reverse());

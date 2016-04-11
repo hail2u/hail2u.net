@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require("fs-extra");
+var path = require("path");
 var xml2js = require("xml2js");
 
 var sitemap = {
@@ -35,15 +36,13 @@ var urls = [
 ];
 
 fs.readdirSync("src/html/documents/").forEach(function (file) {
-  if (file === "index.html" || !file.endsWith(".html")) {
+  if (file === "index.html" || path.extname(file) !== ".html") {
     return false;
   }
 
   urls.push("/documents/" + file);
 });
-fs.readJsonSync(
-  "cache/articles.json"
-).forEach(function (article) {
+fs.readJsonSync("cache/articles.json").forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {

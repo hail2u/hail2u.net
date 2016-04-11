@@ -8,7 +8,14 @@ var minimist = require("minimist");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-var fPreview = "tmp/__preview.html";
+var argv = minimist(process.argv.slice(2), {
+  string: ["file"]
+});
+var entry = fs.readFileSync(
+  argv.file,
+  "utf8"
+).split("\n");
+var output = "tmp/__preview.html";
 var preview = `<!DOCTYPE html>
 <html class="permalink" lang="ja">
   <head>
@@ -30,25 +37,20 @@ var preview = `<!DOCTYPE html>
     </main>
   </body>
 </html>`;
-var argv = minimist(process.argv.slice(2), {
-  string: ["file"]
-});
-var entry = fs.readFileSync(
-  argv.file,
-  "utf8"
-).split("\n");
 
-preview = preview.replace(
-  /<%TITLE%>/g,
-  entry.shift().replace(/\$/g, "$$$$")
-).replace(
-  /<%BODY%>/g,
-  marked(
-    entry.join("\n").replace(/\$/g, "$$$$")
-  ).replace(/(href|src)="\/images\//g, "$1=\"../src/img/")
-).replace(
-  /="\//g,
-  "=\"../dist/"
+fs.outputFileSync(
+  output,
+  preview.replace(
+    /<%TITLE%>/g,
+    entry.shift().replace(/\$/g, "$$$$")
+  ).replace(
+    /<%BODY%>/g,
+    marked(
+      entry.join("\n").replace(/\$/g, "$$$$")
+    ).replace(/(href|src)="\/images\//g, "$1=\"../src/img/")
+  ).replace(
+    /="\//g,
+    "=\"../dist/"
+  )
 );
-fs.outputFileSync(fPreview, preview);
-spawn(which("open"), [fPreview]);
+spawn(which("open"), [output]);

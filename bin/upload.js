@@ -2,7 +2,6 @@
 
 "use strict";
 
-var fs = require("fs");
 var minimist = require("minimist");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
@@ -13,18 +12,16 @@ var argv = minimist(process.argv.slice(2), {
 });
 var cmd = which("git");
 var cwd = "dist/";
-var file = path.relative(cwd, argv.file);
 var git;
 var opts = {
   cwd: cwd,
   stdio: "inherit"
 };
 
-fs.accessSync(argv.file);
 git = spawn(cmd, [
   "add",
   "--",
-  file
+  path.relative(cwd, argv.file)
 ], opts);
 
 if (git.error) {

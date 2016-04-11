@@ -55,8 +55,5 @@ request.get({
     newBookmarks = [];
   }
 
-  newBookmarks.reverse().forEach(function (link) {
-    bookmarks.unshift(link);
-  });
-  fs.writeJsonSync(cache, bookmarks);
+  fs.writeJsonSync(cache, newBookmarks.reverse().concat(bookmarks));
 });
