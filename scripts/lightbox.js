@@ -61,7 +61,7 @@
   var l = images.length;
   var parent;
 
-  for (i = 0; i < l; i++) {
+  for (i = 0; i < l; i += 1) {
     parent = images[i].parentNode;
 
     if (
