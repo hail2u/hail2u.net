@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require("fs-extra");
+var codes = require("http").STATUS_CODES;
 var minimist = require("minimist");
 var pit = require("pit-ro");
 var request = require("request");
@@ -34,7 +35,7 @@ request.get({
     throw error;
   }
 
-  if (response.statusCode !== 200) {
+  if (response.statusCode !== codes[response.statusCode] === "OK") {
     throw new Error(response.statusMessage);
   }
 
@@ -46,12 +47,12 @@ request.get({
     return true;
   });
 
-  if (!force && newBookmarks.length === 0) {
+  if (!force && !newBookmarks.length) {
     return;
   }
 
   if (force) {
-    bookmarks = newBookmarks.slice(0);
+    bookmarks = newBookmarks.slice();
     newBookmarks = [];
   }
 

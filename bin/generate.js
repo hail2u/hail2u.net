@@ -163,7 +163,7 @@ var loadArticles = function () {
       article.minute, article.second
     );
 
-    if (i > 0 && this.y !== article.year) {
+    if (i && this.y !== article.year) {
       article.isFirstInYear = true;
       a[i - 1].isLastInYear = true;
     }
@@ -184,12 +184,12 @@ var loadBookmarks = function () {
   bookmarks.forEach(function (bookmark, i, a) {
     var category = "other";
     var date = new Date(bookmark.time);
-    var tags = bookmark.tags;
+    var tags = " " + bookmark.tags + " ";
     var year = date.getFullYear();
 
-    if (tags.indexOf("instapaper") !== -1) {
+    if (tags.includes(" instapaper ")) {
       category = "instapaper";
-    } else if (tags.indexOf("dribbble") !== -1) {
+    } else if (tags.includes(" dribbble ")) {
       category = "dribbble";
       bookmark.description = bookmark.description.replace(
         /^Dribbble - /,
@@ -198,13 +198,13 @@ var loadBookmarks = function () {
         / - Dribbble$/,
         ""
       );
-    } else if (tags.indexOf("github") !== -1) {
+    } else if (tags.includes(" github ")) {
       category = "github";
       bookmark.description = bookmark.extended.replace(
         /^hail2u starred /,
         ""
       );
-    } else if (tags.indexOf("instagram") !== -1) {
+    } else if (tags.includes(" instagram ")) {
       category = "instagram";
       bookmark.description = bookmark.href.replace(
         /^https?:\/\/(www\.)?instagram\.com\/p\//,
@@ -212,14 +212,14 @@ var loadBookmarks = function () {
       ).replace(
         /\/$/,
         ""
-      ).substr(0, 12);
-    } else if (tags.indexOf("pinterest") !== -1) {
+      );
+    } else if (tags.includes(" pinterest ")) {
       category = "pinterest";
       bookmark.description = bookmark.extended;
-    } else if (tags.indexOf("soundcloud") !== -1) {
+    } else if (tags.includes(" soundcloud ")) {
       category = "soundcloud";
       bookmark.description = bookmark.extended;
-    } else if (tags.indexOf("vimeo") !== -1) {
+    } else if (tags.includes(" vimeo ")) {
       category = "vimeo";
       bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
     } else if (bookmark.shared === "yes") {
@@ -230,7 +230,7 @@ var loadBookmarks = function () {
     bookmark.date = monthNamesFull[date.getMonth()] + " " + date.getDate();
     bookmark.year = year;
 
-    if (i > 0 && this.y !== year) {
+    if (i && this.y !== year) {
       bookmark.isFirstInYear = true;
       a[i - 1].isLastInYear = true;
     }
@@ -252,20 +252,22 @@ var extendData = function (file) {
     path.basename(file, ".mustache") + ".json"
   );
   var imgs;
+  var numUpdates = 5;
+  var numArticles = 6;
 
   extendObject(data, fs.readJsonSync(fileMetadata));
 
   switch (file) {
   case "src/html/index.mustache":
     data.updates = loadRSS("src/index.rss");
-    data.updates.item = data.updates.item.slice(0, 5);
+    data.updates.item = data.updates.item.slice(0, numUpdates);
     data.articles = loadRSS("dist/blog/feed");
-    data.articles.item = data.articles.item.slice(0, 6);
+    data.articles.item = data.articles.item.slice(0, numArticles);
     data.articles.first = data.articles.item.shift();
     imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
 
     if (imgs) {
-      data.articles.first.image = imgs[0].replace(
+      data.articles.first.image = imgs.shift().replace(
         /src="https?:\/\/hail2u\.net/,
         'src="'
       );
@@ -319,7 +321,7 @@ files.forEach(function (file) {
     partials
   );
 
-  if (file.dest.lastIndexOf("/page") === -1) {
+  if (!file.dest.endsWith("/page")) {
     html = minifyHTML(html, {
       collapseBooleanAttributes: true,
       collapseWhitespace: true,

@@ -22,7 +22,7 @@ var loadArticle = function (file, date) {
     link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
       path.basename(file, ".txt") + ".html",
     minute: date.getMinutes(),
-    month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12][date.getMonth()],
+    month: date.getMonth() + 1,
     second: date.getSeconds(),
     title: fs.readFileSync(file, "utf8").split(/\n/).shift(),
     tz: "+09:00",
@@ -50,7 +50,7 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   if (
     !force &&
     fileNew &&
-    line.indexOf(fileNew) < 0
+    !line.startsWith(fileNew)
   ) {
     return;
   }

@@ -12,11 +12,11 @@ var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-var args = ["blosxom.cgi"];
 var argv = minimist(process.argv.slice(2), {
   boolean: [
     "all",
-    "index"
+    "index",
+    "update"
   ],
   string: ["file"]
 });
@@ -32,6 +32,7 @@ var options = {
   staticdir: "dist/blog/",
   staticimgdir: "dist/images/blog/"
 };
+var reindexed = false;
 
 if (entry) {
   images = fs.readFileSync(
@@ -42,7 +43,6 @@ if (entry) {
   files.push(entry);
   files.push(path.join(path.dirname(entry), "index.html"));
   files.push("index.rss");
-  args.push("reindex=1");
   num = 1;
 
   if (images) {
@@ -58,7 +58,7 @@ if (entry) {
   }
 }
 
-if (argv.all && files.length === 0) {
+if (argv.all && files.join() === "") {
   fs.readFileSync(
     "src/weblog/plugins/state/files_index.dat",
     "utf8"
@@ -67,7 +67,7 @@ if (argv.all && files.length === 0) {
       return;
     }
 
-    files.push(path.relative(options.datadir, file.split("=>")[0]));
+    files.push(path.relative(options.datadir, file.split("=>").shift()));
   });
 }
 
@@ -90,9 +90,19 @@ bar = new ProgressBar("Building [:bar] :percent :elapsed", {
 });
 
 async.eachLimit(files, num, async.ensureAsync(function (file, next) {
-  var child = spawn(
+  var args = ["blosxom.cgi", "path=/" + file];
+  var child;
+  var contents;
+
+  if (!argv.update && !reindexed) {
+    args = args.concat("reindex=1");
+    reindexed = true;
+  }
+
+  child = spawn(
     which("perl"),
-    args.concat("path=/" + file), {
+    args,
+    {
       cwd: options.rootdir,
       encoding: "utf8",
       env: {
@@ -100,7 +110,6 @@ async.eachLimit(files, num, async.ensureAsync(function (file, next) {
       }
     }
   );
-  var contents;
 
   if (child.error) {
     return next(child.error);
@@ -136,10 +145,6 @@ async.eachLimit(files, num, async.ensureAsync(function (file, next) {
       sortClassName: true,
       useShortDoctype: true
     });
-  }
-
-  if (entry && args.length > 1) {
-    args.pop();
   }
 
   file = options.staticdir + file;
