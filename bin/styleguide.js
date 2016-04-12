@@ -17,7 +17,7 @@ fs.outputFileSync("dist/about/style-guide/index.html", fs.readFileSync(
   if (url.startsWith(site)) {
     url = url.substr(site.length - 1);
   } else if (url.startsWith(path.img)) {
-    url = "/images" + url.split(path.img.length - 1);
+    url = "/images" + url.substr(path.img.length - 1);
   } else if (url.startsWith(path.js)) {
     url = "/scripts" + url.substr(path.js.length - 1);
   } else if (/^[\w-]+\.[\w^]+$/.test(url)) {
