@@ -6,69 +6,71 @@
 (function () {
   "use strict";
 
-  var toggle = function (evt) {
-    var image = evt.srcElement;
-    var parent = image.parentNode;
-
-    if (evt.which !== 1) {
-      return;
-    }
-
-    evt.preventDefault();
-
-    if (parent.style.cssText && image.style.cssText) {
-      if (image.originalsrc) {
-        image.src = image.originalsrc;
-        delete image.originalsrc;
-      }
-
-      parent.style.cssText = "";
-      image.style.cssText = "";
-
-      return;
-    }
-
-    if (parent.href !== image.src) {
-      image.originalsrc = image.src;
-      image.src = parent.href;
-    }
-
-    parent.style.backgroundColor = "#fff";
-    parent.style.cursor = "zoom-out";
-    parent.style.height = "100vh";
-    parent.style.left = "0";
-    parent.style.position = "fixed";
-    parent.style.top = "0";
-    parent.style.width = "100vw";
-    parent.style.zIndex = "100";
-    image.style.bottom = "0";
-    image.style.height = "auto";
-    image.style.left = "0";
-    image.style.margin = "auto";
-    image.style.maxHeight = "96%";
-    image.style.maxWidth = "96%";
-    image.style.position = "absolute";
-    image.style.right = "0";
-    image.style.top = "0";
-    image.style.width = "auto";
-  };
-
   var i;
   var images = document.querySelectorAll([
     ".content img[src^=\"assets/images/\"]",
     ".content img[src^=\"/images/\"]"
   ].join(","));
   var l = images.length;
-  var parent;
+  var left = 1;
+  var node;
+
+  var toggle = function (evt) {
+    var a;
+    var img = evt.srcElement;
+
+    if (evt.which !== left) {
+      return;
+    }
+
+    evt.preventDefault();
+    a = img.parentNode;
+
+    if (a.style.cssText && img.style.cssText) {
+      if (img.originalsrc) {
+        img.src = img.originalsrc;
+        delete img.originalsrc;
+      }
+
+      a.style.cssText = "";
+      img.style.cssText = "";
+
+      return;
+    }
+
+    if (a.href !== img.src) {
+      img.originalsrc = img.src;
+      img.src = a.href;
+    }
+
+    a.style.backgroundColor = "#fff";
+    a.style.cursor = "zoom-out";
+    a.style.height = "100vh";
+    a.style.left = "0";
+    a.style.position = "fixed";
+    a.style.top = "0";
+    a.style.width = "100vw";
+    a.style.zIndex = "100";
+    img.style.bottom = "0";
+    img.style.height = "auto";
+    img.style.left = "0";
+    img.style.margin = "auto";
+    img.style.maxHeight = "96%";
+    img.style.maxWidth = "96%";
+    img.style.position = "absolute";
+    img.style.right = "0";
+    img.style.top = "0";
+    img.style.width = "auto";
+  };
 
   for (i = 0; i < l; i += 1) {
-    parent = images[i].parentNode;
+    node = images[i].parentNode;
 
     if (
-      parent.tagName === "A" &&
-      /^(assets)?\/images\//.test(parent.getAttribute("href"))
+      node.tagName === "A" &&
+      /^(assets)?\/images\//.test(node.getAttribute("href"))
     ) {
-      parent.addEventListener("click", toggle, false);
+      node.addEventListener("click", toggle, false);
     }
   }
 })();
