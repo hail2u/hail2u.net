@@ -98,7 +98,7 @@ var extendObject = function (dest, src) {
   return dest;
 };
 
-var loadRSS = function (file) {
+var readRSS = function (file) {
   var feed = {};
 
   parseXML(fs.readFileSync(file, "utf8"), {
@@ -149,7 +149,7 @@ var loadRSS = function (file) {
   return feed;
 };
 
-var loadArticles = function () {
+var readArticles = function () {
   var articles = fs.readJsonSync("cache/articles.json");
 
   articles.forEach(function (article, i, a) {
@@ -178,7 +178,7 @@ var loadArticles = function () {
   return articles;
 };
 
-var loadBookmarks = function () {
+var readBookmarks = function () {
   var bookmarks = fs.readJsonSync("cache/bookmarks.json");
 
   bookmarks.forEach(function (bookmark, i, a) {
@@ -257,9 +257,9 @@ var readMetadata = function (file, callback) {
 
     switch (file.replace(/\\/g, "/")) {
     case "src/html/index.json":
-      metadata.updates = loadRSS("src/index.rss");
+      metadata.updates = readRSS("src/index.rss");
       metadata.updates.item = metadata.updates.item.slice(0, numUpdates);
-      metadata.articles = loadRSS("dist/blog/feed");
+      metadata.articles = readRSS("dist/blog/feed");
       metadata.articles.item = metadata.articles.item.slice(0, numArticles);
       metadata.articles.first = metadata.articles.item.shift();
       imgs = metadata.articles.first["content:encoded"].match(/<img.*?>/g);
@@ -275,12 +275,12 @@ var readMetadata = function (file, callback) {
       break;
 
     case "src/html/blog/index.json":
-      metadata.articles = loadArticles();
+      metadata.articles = readArticles();
 
       break;
 
     case "src/html/links/index.json":
-      metadata.bookmarks = loadBookmarks();
+      metadata.bookmarks = readBookmarks();
 
       break;
     }
