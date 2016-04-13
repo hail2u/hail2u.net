@@ -11,11 +11,9 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var articles = [];
-var cache = "cache/articles.json";
-var data = "src/weblog/plugins/state/files_index.dat";
-var fileNew = argv.file;
-var force = argv.force;
-var loadArticle = function (file, date) {
+var cache = "../cache/articles.json";
+
+function readArticle(file, date) {
   return {
     day: date.getDate(),
     hour: date.getHours(),
@@ -29,17 +27,22 @@ var loadArticle = function (file, date) {
     unixtime: date.getTime(),
     year: date.getFullYear()
   };
-};
+}
 
-if (!force && !fileNew) {
+cache = path.resolve(__dirname, cache);
+
+if (!argv.force && !argv.file) {
   return;
 }
 
-if (!force) {
+if (!argv.force) {
   articles = fs.readJsonSync(cache);
 }
 
-fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
+fs.readFileSync(
+  path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat"),
+  "utf8"
+).split(/\r?\n/).forEach(function (line) {
   var date;
   var file;
 
@@ -48,9 +51,9 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   }
 
   if (
-    !force &&
-    fileNew &&
-    !line.startsWith(fileNew)
+    !argv.force &&
+    argv.file &&
+    !line.startsWith(argv.file)
   ) {
     return;
   }
@@ -59,12 +62,12 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   file = line.shift();
   date = line.shift();
   articles.unshift(
-    loadArticle(
-      path.relative(process.cwd(), file),
+    readArticle(
+      file,
       new Date(parseInt(date, 10) * 1000)
     )
   );
 });
 fs.writeJsonSync(cache, articles.sort(function (a, b) {
-  return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-}).reverse());
+  return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
+}));

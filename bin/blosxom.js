@@ -21,29 +21,33 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var bar;
-var entry = argv.file;
+var cpuNum = os.cpus().length;
+var d;
+var dir = {
+  data: "../src/weblog/entries/",
+  img: "../src/img/blog/",
+  root: "../src/weblog/",
+  static: "../dist/blog/",
+  staticimg: "../dist/images/blog/"
+};
 var files = [];
 var images = [];
-var num = os.cpus().length;
-var options = {
-  datadir: "src/weblog/entries/",
-  imgdir: "src/img/blog/",
-  rootdir: "src/weblog/",
-  staticdir: "dist/blog/",
-  staticimgdir: "dist/images/blog/"
-};
 var reindexed = false;
 
-if (entry) {
+for (d in dir) {
+  dir[d] = path.resolve(__dirname, dir[d]);
+}
+
+if (argv.file) {
   images = fs.readFileSync(
-    entry,
+    argv.file,
     "utf-8"
   ).match(/\bsrc="\/images\/blog\/.*?"/g);
-  entry = path.relative(options.datadir, entry);
-  files.push(entry);
-  files.push(path.join(path.dirname(entry), "index.html"));
+  argv.file = path.relative(dir.data, argv.file);
+  files.push(argv.file);
+  files.push(path.join(path.dirname(argv.file), "index.html"));
   files.push("index.rss");
-  num = 1;
+  cpuNum = 1;
 
   if (images) {
     images.forEach(function (image) {
@@ -51,8 +55,8 @@ if (entry) {
       var src;
 
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      src = options.imgdir + image;
-      dest = options.staticimgdir + image;
+      src = dir.img + image;
+      dest = dir.staticimg + image;
       fs.copySync(src, dest);
     });
   }
@@ -60,24 +64,28 @@ if (entry) {
 
 if (argv.all && files.join() === "") {
   fs.readFileSync(
-    "src/weblog/plugins/state/files_index.dat",
+    path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat"),
     "utf8"
   ).split(/\r?\n/).forEach(function (file) {
     if (file === "") {
       return;
     }
 
-    files.push(path.relative(options.datadir, file.split("=>").shift()));
+    files.push(path.relative(dir.data, file.split("=>").shift()));
   });
 }
 
 if (argv.index) {
-  fs.readdirSync(options.datadir).forEach(function (dir) {
-    if (dir === "themes") {
+  fs.readdirSync(dir.data).forEach(function (file) {
+    if (!fs.statSync(file).isDirectory()) {
       return;
     }
 
-    files.push(dir + path.sep + "index.html");
+    if (file === "themes") {
+      return;
+    }
+
+    files.push(path.join(file, "index.html"));
   });
 }
 
@@ -89,33 +97,33 @@ bar = new ProgressBar("Building [:bar] :percent :elapsed", {
   width: 32
 });
 
-async.eachLimit(files, num, async.ensureAsync(function (file, next) {
+async.eachLimit(files, cpuNum, async.ensureAsync(function (file, next) {
   var args = ["blosxom.cgi", "path=/" + file];
-  var child;
   var contents;
+  var perl;
 
   if (!argv.update && !reindexed) {
     args = args.concat("reindex=1");
     reindexed = true;
   }
 
-  child = spawn(
+  perl = spawn(
     which("perl"),
     args,
     {
-      cwd: options.rootdir,
+      cwd: dir.root,
       encoding: "utf8",
       env: {
-        BLOSXOM_CONFIG_DIR: path.resolve(options.rootdir)
+        BLOSXOM_CONFIG_DIR: dir.root
       }
     }
   );
 
-  if (child.error) {
-    return next(child.error);
+  if (perl.error) {
+    return next(perl.error);
   }
 
-  contents = child.stdout.replace(
+  contents = perl.stdout.replace(
     /^[\s\S]*?\r?\n\r?\n/,
     ""
   ).trim() + "\n";
@@ -147,7 +155,7 @@ async.eachLimit(files, num, async.ensureAsync(function (file, next) {
     });
   }
 
-  file = options.staticdir + file;
+  file = path.join(dir.static, file);
   fs.outputFileSync(file, contents);
   bar.tick();
   next();

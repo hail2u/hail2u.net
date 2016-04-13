@@ -5,18 +5,19 @@
 var fs = require("fs-extra");
 var marked = require("marked");
 var minimist = require("minimist");
+var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
 var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-var entry = fs.readFileSync(
+var article = fs.readFileSync(
   argv.file,
   "utf8"
 ).split("\n");
-var output = "tmp/__preview.html";
-var preview = `<!DOCTYPE html>
+var previewFile = "../tmp/__preview.html";
+var previewTemplate = `<!DOCTYPE html>
 <html class="permalink" lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -38,19 +39,20 @@ var preview = `<!DOCTYPE html>
   </body>
 </html>`;
 
+previewFile = path.resolve(__dirname, previewFile);
 fs.outputFileSync(
-  output,
-  preview.replace(
+  previewFile,
+  previewTemplate.replace(
     /<%TITLE%>/g,
-    entry.shift().replace(/\$/g, "$$$$")
+    article.shift().replace(/\$/g, "$$$$")
   ).replace(
     /<%BODY%>/g,
     marked(
-      entry.join("\n").replace(/\$/g, "$$$$")
+      article.join("\n").replace(/\$/g, "$$$$")
     ).replace(/(href|src)="\/images\//g, "$1=\"../src/img/")
   ).replace(
     /="\//g,
     "=\"../dist/"
   )
 );
-spawn(which("open"), [output]);
+spawn(which("open"), [previewFile]);

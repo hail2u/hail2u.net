@@ -11,13 +11,14 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var cmd = which("git");
-var cwd = "dist/";
+var cwd = "../dist/";
 var git;
 var opts = {
-  cwd: cwd,
   stdio: "inherit"
 };
 
+cwd = path.resolve(__dirname, cwd);
+opts.cwd = cwd;
 git = spawn(cmd, [
   "add",
   "--",

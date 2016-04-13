@@ -5,6 +5,7 @@
 var fs = require("fs-extra");
 var codes = require("http").STATUS_CODES;
 var minimist = require("minimist");
+var path = require("path");
 var pit = require("pit-ro");
 var request = require("request");
 
@@ -12,14 +13,15 @@ var argv = minimist(process.argv.slice(2), {
   boolean: ["force"]
 });
 var bookmarks = [];
-var cache = "cache/bookmarks.json";
+var cache = "../cache/bookmarks.json";
 var config = pit.get("pinboard.in");
-var force = argv.force;
 var qs = {
   format: "json"
 };
 
-if (!force) {
+cache = path.resolve(__dirname, cache);
+
+if (!argv.force) {
   bookmarks = fs.readJsonSync(cache);
   qs.fromdt = bookmarks[0].time;
 }
@@ -47,11 +49,11 @@ request.get({
     return true;
   });
 
-  if (!force && !newBookmarks.length) {
+  if (!argv.force && !newBookmarks.length) {
     return;
   }
 
-  if (force) {
+  if (argv.force) {
     bookmarks = newBookmarks.slice();
     newBookmarks = [];
   }

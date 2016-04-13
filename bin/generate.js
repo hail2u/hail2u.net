@@ -13,6 +13,15 @@ var sprintf = require("sprintf").sprintf;
 var argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
 });
+var basicMetadata;
+var blogFiles = [
+  {
+    src: "../src/html/blog/index.mustache"
+  },
+  {
+    src: "../src/html/index.mustache"
+  }
+];
 var categoryNames = {
   "Blog": "blog",
   "Blosxom": "blosxom",
@@ -37,8 +46,6 @@ var categoryNamesInv = (function (obj) {
 
   return newObj;
 })(categoryNames);
-var dirTemplate = "src/html/";
-var dirPartial = path.join(dirTemplate, "partial");
 var entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -48,43 +55,34 @@ var entityMap = {
 };
 var files = [
   {
-    src: "src/html/about/index.mustache"
+    src: "../src/html/about/index.mustache"
   },
   {
-    dest: "src/weblog/entries/themes/html/page",
-    src: "src/html/blog/theme.mustache"
+    dest: "../src/weblog/entries/themes/html/page",
+    src: "../src/html/blog/theme.mustache"
   },
   {
-    src: "src/html/documents/index.mustache"
+    src: "../src/html/documents/index.mustache"
   },
   {
-    src: "src/html/links/index.mustache"
+    src: "../src/html/links/index.mustache"
   }
 ];
-var filesBlog = [
-  {
-    src: "src/html/blog/index.mustache"
-  },
-  {
-    src: "src/html/index.mustache"
-  }
-];
-var metadataBase = JSON.parse(
-  fs.readFileSync(dirTemplate + "metadata.json", "utf8")
-);
+var metadataFile = "../src/html/metadata.json";
 var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
   "Sep", "Oct", "Nov", "Dec"];
 var monthNamesFull = ["January", "February", "March", "April", "May",
   "June", "July", "August", "September", "October", "November", "December"];
+var partialDir = "../src/html/partial";
 var partials = {};
 
-var escape = function (str) {
+function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
     return entityMap[s];
   });
-};
+}
 
-var extendObject = function (dest, src) {
+function extendObject(dest, src) {
   var prop;
 
   if (dest !== Object(dest)) {
@@ -96,9 +94,9 @@ var extendObject = function (dest, src) {
   }
 
   return dest;
-};
+}
 
-var readRSS = function (file) {
+function readRSS(file) {
   var feed = {};
 
   parseXML(fs.readFileSync(file, "utf8"), {
@@ -117,9 +115,6 @@ var readRSS = function (file) {
     var yy;
     var mm;
     var dd;
-    var hh;
-    var nn;
-    var ss;
 
     if (val.link) {
       val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
@@ -130,14 +125,11 @@ var readRSS = function (file) {
       yy = date.getFullYear();
       mm = date.getMonth();
       dd = date.getDate();
-      hh = date.getHours();
-      nn = date.getMinutes();
-      ss = date.getSeconds();
 
       val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
       val.html5PubDate = sprintf(
         "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
-        yy, mm + 1, dd, hh, nn, ss
+        yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds()
       );
     }
 
@@ -147,12 +139,14 @@ var readRSS = function (file) {
   });
 
   return feed;
-};
+}
 
-var readArticles = function () {
-  var articles = fs.readJsonSync("cache/articles.json");
+function readArticles() {
+  var articles = fs.readJsonSync(
+    path.resolve(__dirname, "../cache/articles.json")
+  );
 
-  articles.forEach(function (article, i, a) {
+  articles.forEach(function (article, idx) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
     article.category = categoryNamesInv[article.cat];
     article.strPubDate = monthNamesFull[article.month - 1] + " " +
@@ -163,9 +157,9 @@ var readArticles = function () {
       article.minute, article.second
     );
 
-    if (i && this.y !== article.year) {
+    if (idx && this.y !== article.year) {
       article.isFirstInYear = true;
-      a[i - 1].isLastInYear = true;
+      articles[idx - 1].isLastInYear = true;
     }
 
     this.y = article.year;
@@ -176,12 +170,14 @@ var readArticles = function () {
   articles[articles.length - 1].isLastInYear = true;
 
   return articles;
-};
+}
 
-var readBookmarks = function () {
-  var bookmarks = fs.readJsonSync("cache/bookmarks.json");
+function readBookmarks() {
+  var bookmarks = fs.readJsonSync(
+    path.resolve(__dirname, "../cache/bookmarks.json")
+  );
 
-  bookmarks.forEach(function (bookmark, i, a) {
+  bookmarks.forEach(function (bookmark, idx) {
     var category = "other";
     var date = new Date(bookmark.time);
     var tags = " " + bookmark.tags + " ";
@@ -230,9 +226,9 @@ var readBookmarks = function () {
     bookmark.date = monthNamesFull[date.getMonth()] + " " + date.getDate();
     bookmark.year = year;
 
-    if (i && this.y !== year) {
+    if (idx && this.y !== year) {
       bookmark.isFirstInYear = true;
-      a[i - 1].isLastInYear = true;
+      bookmarks[idx - 1].isLastInYear = true;
     }
 
     this.y = year;
@@ -243,24 +239,24 @@ var readBookmarks = function () {
   bookmarks[bookmarks.length - 1].isLastInYear = true;
 
   return bookmarks;
-};
+}
 
-var readMetadata = function (file, callback) {
-  var metadata = extendObject({}, metadataBase);
+function readMetadata(file, callback) {
+  var metadata = extendObject({}, basicMetadata);
 
   fs.readJson(file, function (err, data) {
     var imgs;
-    var numArticles = 6;
-    var numUpdates = 5;
+    var maxArticles = 6;
+    var maxUpdates = 5;
 
     metadata = extendObject(metadata, data);
 
-    switch (file.replace(/\\/g, "/")) {
-    case "src/html/index.json":
-      metadata.updates = readRSS("src/index.rss");
-      metadata.updates.item = metadata.updates.item.slice(0, numUpdates);
-      metadata.articles = readRSS("dist/blog/feed");
-      metadata.articles.item = metadata.articles.item.slice(0, numArticles);
+    switch (path.relative(__dirname, file).replace(/\\/g, "/")) {
+    case "../src/html/index.json":
+      metadata.updates = readRSS(path.resolve(__dirname, "../src/index.rss"));
+      metadata.updates.item = metadata.updates.item.slice(0, maxUpdates);
+      metadata.articles = readRSS(path.resolve(__dirname, "../dist/blog/feed"));
+      metadata.articles.item = metadata.articles.item.slice(0, maxArticles);
       metadata.articles.first = metadata.articles.item.shift();
       imgs = metadata.articles.first["content:encoded"].match(/<img.*?>/g);
 
@@ -274,12 +270,12 @@ var readMetadata = function (file, callback) {
 
       break;
 
-    case "src/html/blog/index.json":
+    case "../src/html/blog/index.json":
       metadata.articles = readArticles();
 
       break;
 
-    case "src/html/links/index.json":
+    case "../src/html/links/index.json":
       metadata.bookmarks = readBookmarks();
 
       break;
@@ -287,33 +283,34 @@ var readMetadata = function (file, callback) {
 
     callback(metadata);
   });
-};
-
-if (argv.blog) {
-  files = filesBlog;
-} else {
-  files = files.concat(filesBlog);
 }
 
+if (argv.blog) {
+  files = blogFiles;
+} else {
+  files = files.concat(blogFiles);
+}
+
+basicMetadata = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, metadataFile), "utf8")
+);
+partialDir = path.resolve(__dirname, partialDir);
 mustache.escape = escape;
-fs.readdirSync(dirPartial).forEach(function (partial) {
+fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
-    path.join(dirPartial, partial),
+    path.join(partialDir, partial),
     "utf8"
   );
 });
 files.forEach(function (file) {
-  var fileTemplate = file.src;
-  var html;
-
-  var processTemplate = function (data) {
-    html = mustache.render(
-      fs.readFileSync(fileTemplate, "utf8"),
+  function processTemplate(data) {
+    var html = mustache.render(
+      fs.readFileSync(file.src, "utf8"),
       data,
       partials
     );
 
-    if (!file.dest.endsWith("/page")) {
+    if (!file.dest.endsWith(path.sep + "page")) {
       html = minifyHTML(html, {
         collapseBooleanAttributes: true,
         collapseWhitespace: true,
@@ -333,20 +330,22 @@ files.forEach(function (file) {
     }
 
     fs.outputFileSync(file.dest, html);
-  };
+  }
 
   if (!file.dest) {
     file.dest = path.join(
-      "dist",
-      path.dirname(path.relative("src/html", file.src)),
+      "dist/",
+      path.dirname(path.relative("src/html/", file.src)),
       path.basename(file.src, ".mustache") + ".html"
     );
   }
 
+  file.dest = path.resolve(__dirname, file.dest);
+  file.src = path.resolve(__dirname, file.src);
   readMetadata(
     path.join(
-      path.dirname(fileTemplate),
-      path.basename(fileTemplate, ".mustache") + ".json"
+      path.dirname(file.src),
+      path.basename(file.src, ".mustache") + ".json"
     ),
     processTemplate
   );

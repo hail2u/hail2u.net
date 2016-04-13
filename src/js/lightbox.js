@@ -15,7 +15,7 @@
   var left = 1;
   var node;
 
-  var toggle = function (evt) {
+  function toggle(evt) {
     var a;
     var img = evt.srcElement;
 
@@ -61,7 +61,7 @@
     img.style.right = "0";
     img.style.top = "0";
     img.style.width = "auto";
-  };
+  }
 
   for (i = 0; i < l; i += 1) {
     node = images[i].parentNode;

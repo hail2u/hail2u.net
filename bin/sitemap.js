@@ -35,14 +35,18 @@ var urls = [
   "/links/"
 ];
 
-fs.readdirSync("src/html/documents/").forEach(function (file) {
+fs.readdirSync(
+  path.resolve(__dirname, "../src/html/documents/")
+).forEach(function (file) {
   if (file === "index.html" || path.extname(file) !== ".html") {
     return false;
   }
 
   urls.push("/documents/" + file);
 });
-fs.readJsonSync("cache/articles.json").forEach(function (article) {
+fs.readJsonSync(
+  path.resolve(__dirname, "../cache/articles.json")
+).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
@@ -51,6 +55,6 @@ urls.forEach(function (url) {
   });
 });
 fs.outputFileSync(
-  "dist/sitemap.xml",
+  path.resolve(__dirname, "../dist/sitemap.xml"),
   new xml2js.Builder().buildObject(sitemap)
 );
