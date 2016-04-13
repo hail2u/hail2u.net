@@ -245,49 +245,48 @@ var loadBookmarks = function () {
   return bookmarks;
 };
 
-var extendData = function (file) {
-  var data = extendObject({}, metadataBase);
-  var fileMetadata = path.join(
-    path.dirname(file),
-    path.basename(file, ".mustache") + ".json"
-  );
-  var imgs;
-  var numUpdates = 5;
-  var numArticles = 6;
+var readMetadata = function (file, callback) {
+  var metadata = extendObject({}, metadataBase);
 
-  extendObject(data, fs.readJsonSync(fileMetadata));
+  fs.readJson(file, function (err, data) {
+    var imgs;
+    var numArticles = 6;
+    var numUpdates = 5;
 
-  switch (file) {
-  case "src/html/index.mustache":
-    data.updates = loadRSS("src/index.rss");
-    data.updates.item = data.updates.item.slice(0, numUpdates);
-    data.articles = loadRSS("dist/blog/feed");
-    data.articles.item = data.articles.item.slice(0, numArticles);
-    data.articles.first = data.articles.item.shift();
-    imgs = data.articles.first["content:encoded"].match(/<img.*?>/g);
+    metadata = extendObject(metadata, data);
 
-    if (imgs) {
-      data.articles.first.image = imgs.shift().replace(
-        /src="https?:\/\/hail2u\.net/,
-        'src="'
-      );
-      data.articles.first.hasImage = true;
+    switch (file.replace(/\\/g, "/")) {
+    case "src/html/index.json":
+      metadata.updates = loadRSS("src/index.rss");
+      metadata.updates.item = metadata.updates.item.slice(0, numUpdates);
+      metadata.articles = loadRSS("dist/blog/feed");
+      metadata.articles.item = metadata.articles.item.slice(0, numArticles);
+      metadata.articles.first = metadata.articles.item.shift();
+      imgs = metadata.articles.first["content:encoded"].match(/<img.*?>/g);
+
+      if (imgs) {
+        metadata.articles.first.image = imgs.shift().replace(
+          /src="https?:\/\/hail2u\.net/,
+          'src="'
+        );
+        metadata.articles.first.hasImage = true;
+      }
+
+      break;
+
+    case "src/html/blog/index.json":
+      metadata.articles = loadArticles();
+
+      break;
+
+    case "src/html/links/index.json":
+      metadata.bookmarks = loadBookmarks();
+
+      break;
     }
 
-    break;
-
-  case "src/html/blog/index.mustache":
-    data.articles = loadArticles();
-
-    break;
-
-  case "src/html/links/index.mustache":
-    data.bookmarks = loadBookmarks();
-
-    break;
-  }
-
-  return data;
+    callback(metadata);
+  });
 };
 
 if (argv.blog) {
@@ -307,6 +306,35 @@ files.forEach(function (file) {
   var fileTemplate = file.src;
   var html;
 
+  var processTemplate = function (data) {
+    html = mustache.render(
+      fs.readFileSync(fileTemplate, "utf8"),
+      data,
+      partials
+    );
+
+    if (!file.dest.endsWith("/page")) {
+      html = minifyHTML(html, {
+        collapseBooleanAttributes: true,
+        collapseWhitespace: true,
+        minifyCSS: true,
+        minifyJS: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+        removeEmptyElements: true,
+        removeOptionalTags: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        sortAttributes: true,
+        sortClassName: true,
+        useShortDoctype: true
+      });
+    }
+
+    fs.outputFileSync(file.dest, html);
+  };
+
   if (!file.dest) {
     file.dest = path.join(
       "dist",
@@ -315,30 +343,11 @@ files.forEach(function (file) {
     );
   }
 
-  html = mustache.render(
-    fs.readFileSync(fileTemplate, "utf8"),
-    extendData(fileTemplate),
-    partials
+  readMetadata(
+    path.join(
+      path.dirname(fileTemplate),
+      path.basename(fileTemplate, ".mustache") + ".json"
+    ),
+    processTemplate
   );
-
-  if (!file.dest.endsWith("/page")) {
-    html = minifyHTML(html, {
-      collapseBooleanAttributes: true,
-      collapseWhitespace: true,
-      minifyCSS: true,
-      minifyJS: true,
-      removeAttributeQuotes: true,
-      removeComments: true,
-      removeEmptyElements: true,
-      removeOptionalTags: true,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      sortAttributes: true,
-      sortClassName: true,
-      useShortDoctype: true
-    });
-  }
-
-  fs.outputFileSync(file.dest, html);
 });
