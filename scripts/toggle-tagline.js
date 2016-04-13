@@ -8,7 +8,8 @@
       tagline.hidden = true;
     }
 
-    html.classList.toggle("permalink");
+    d.querySelector(".first-heading").classList.toggle("is-in-permalink");
+    d.querySelector(".section-footer").classList.toggle("is-in-permalink");
     evt.preventDefault();
   };
 
