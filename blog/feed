@@ -10,12 +10,86 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Tue, 12 Apr 2016 14:42:29 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 14 Apr 2016 01:31:48 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>ESLintのno-magic-numbersルール</title>
+      <link>https://hail2u.net/blog/coding/no-magic-numbers-rule-of-eslint.html</link>
+      <description>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/coding/no-magic-numbers-rule-of-eslint.html</guid>
+      <pubDate>Thu, 14 Apr 2016 01:27:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でも<a href="http://eslint.org/docs/rules/no-magic-numbers">no-magic-numbers</a>にとりわけ怒られた。怒られたコードをメモしておく。</p>
+
+<pre><code>var d = new Date();
+var m = d.getMonth() + <mark>1</mark>;
+</code></pre>
+
+<p>月を数字で取得しようとすると怒られる。</p>
+
+<pre><code>var a = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;, &quot;qux&quot;];
+var firstElement = a[<mark>0</mark>];
+var lastElement = a[a.length - <mark>1</mark>];
+</code></pre>
+
+<p>最初と最後の要素を参照しようとすると怒られる。<code>Array#shift()</code>や<code>Array#pop()</code>で済むものは置き換えても良いが、若干コストがかかりそうだ。</p>
+
+<pre><code>var s = &quot;foobarbazqux&quot;;
+
+if (s.indexOf(&quot;foo&quot;) === <mark>0</mark>) {
+  ...
+}
+</code></pre>
+
+<p>特定の文字列で始まるかどうか調べようとすると怒られる。これはちゃんと<code>Sring#startsWith()</code>で書き換えた。</p>
+
+<pre><code>var s = &quot;foobarbazqux&quot;;
+
+if (s.startsWith(foo)) {
+  s = s.substr(foo - <mark>1</mark>);
+}
+</code></pre>
+
+<p>特定の文字列で始まっていたら削除しようとすると怒られる。素直に正規表現を使うのが良いだろう。</p>
+
+<pre><code>var minimist = require(&quot;minimist&quot;);
+var argv = minimist(process.argv.slice(<mark>2</mark>));
+</code></pre>
+
+<p><a href="https://github.com/substack/minimist">minimist</a>で処理するためにNode.jsの実行ファイルとスクリプトのパスを捨てようとすると怒られる。えっ、これどうしよう……。</p>
+
+<hr>
+
+<p>つまり配列へのテキトウなアクセスで怒られるということだ。配列の長さと添え字のずれを矯正する<code>1</code>と<code>0</code>が問題と言いかえることもできるだろう。代替手段はあるものはあるが、ないものはかなり苦しい対応になる。</p>
+
+<pre><code>{
+  &quot;rules&quot;: {
+    &quot;no-magic-numbers&quot;: [
+      &quot;error&quot;,
+      {
+        &quot;ignores&quot;: [0, 1]
+      }
+    ]
+  }
+}
+</code></pre>
+
+<p>有効にするなら<code>0</code>と<code>1</code>を無視する、このような設定が良いかもしれない。</p>
+
+<hr>
+
+<pre><code>var d = new Date();
+var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;][d.getMonth()];
+</code></pre>
+
+<p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>npmパッケージとtestファイル群</title>
@@ -361,50 +435,6 @@ set PATH=%USERPROFILE%\Programs;%PATH%
 <hr>
 
 <p>次にNormalize.cssがメジャー更新された時には更新しないつもりなので、このバージョンが僕が更新する最後のメジャー版になるだろう。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>CSSWring v4.2.2</title>
-      <link>https://hail2u.net/blog/webdesign/csswring-v4.2.2.html</link>
-      <description>CSSWringではfont-familyプロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値にvar()を使われることを想定していなかったため、var()が引用符で括られてしまうというバグがあったようだ。修正してv4.2.2をリリースした。</description>
-      <category>Web Design</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/csswring-v4.2.2.html</guid>
-      <pubDate>Thu, 17 Mar 2016 07:57:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>CSSWringでは<code>font-family</code>プロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値に<code>var()</code>を使われることを想定していなかったため、<code>var()</code>が引用符で括られてしまうというバグがあったようだ。修正して<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.2.2">v4.2.2</a>をリリースした。</p>
-
-<p><code>font-family</code>プロパティーの値で引用符が必要かどうかは簡単だが、誤解も多い。大まかにいえば<a href="https://www.w3.org/TR/CSS2/syndata.html#value-def-identifier">識別子</a>の連続のセットならば引用符はいらない。</p>
-
-<pre><code>.test {
-  font-family: Helvetica, Arial, sans-serif;
-}
-</code></pre>
-
-<p>識別子の連続とは、ASCIIの記号を除いたものと考えると近い。つまりカタカナや漢字が含まれていても引用符で括る必要はない。ただし数字やハイフン2つ、そしてハイフンに続いて数字では始めることはできないというような規則もある。</p>
-
-<pre><code>.test {
-  font-family: ヒラギノ角ゴ ProN, ＭＳ Ｐゴシック, sans-serif;
-}
-</code></pre>
-
-<p>識別子の連続のセットとは識別子の連続を空白文字で連結したものだ。つまりフォント名に空白があっても引用符で括る必要はない。また空白文字（改行やタブ文字も含まれる）は1つの半角空白文字にまとめられるので、フォント名と正確に同じでなくても良い。</p>
-
-<pre><code>.test {
-  font-family:
-    Lucida         Grande,
-    Lucida
-    Sans
-    Unicode, sans-serif;
-}
-</code></pre>
-
-<p>こう書いてもいいという話ではなく、こういったものをうまいこと処理するようになっているツールはいくつかある（CSSWringを含め）ので、安全のために<em>常に引用符付きでフォント名を書いても最適化してくれる</em>という話だ。仕様でも触れられているように引用符で括るようにするのが良く、こういったミスをしやすいところはツールに任せるのが無難だろう。</p>
-
-<hr>
-
-<p><code>var()</code>の大文字・小文字のパターンを考えている過程で開発者ツールのバグが見つかったりした。<code>var()</code>自体はCSS一般と同じで大文字・小文字を区別しないが、<a href="https://www.w3.org/TR/css-variables-1/#defining-variables">定義したカスタム・プロパティーでは区別する</a>ということを学んだ。つまり<code>vAr(--foo)</code>とは書け、<code>--foo</code>を参照できるが、<code>var(-Foo)</code>とは書くことができず、<code>--foo</code>を参照することはできない。</p>
-
-<p>ついついCSS VariablesとかCSS変数とか書いてしまい、言ってしまうので、ちょくちょくCustom Propertiesとかカスタム・プロパティーと書いたり、言ったりするようにしたい。</p>]]></content:encoded>
     </item>
 
   </channel>
