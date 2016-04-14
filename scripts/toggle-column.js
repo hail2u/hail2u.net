@@ -1,9 +1,7 @@
 (function () {
   "use strict";
 
-  var toggle = function () {
+  document.body.addEventListener("dblclick", function () {
     this.classList.toggle("show-column");
-  };
-
-  document.body.addEventListener("dblclick", toggle, false);
+  }, false);
 })();

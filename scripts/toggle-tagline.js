@@ -8,9 +8,9 @@
       tagline.hidden = true;
     }
 
+    evt.preventDefault();
     d.querySelector(".first-heading").classList.toggle("is-in-permalink");
     d.querySelector(".section-footer").classList.toggle("is-in-permalink");
-    evt.preventDefault();
   };
 
   d.querySelector(".first-heading").addEventListener(

@@ -1,17 +1,17 @@
 (function (d) {
   "use strict";
 
-  var toggle = function (eyecatch, article, evt) {
+  function toggle(eyecatch, article, evt) {
     if (eyecatch.hidden) {
       eyecatch.hidden = false;
     } else {
       eyecatch.hidden = true;
     }
 
-    article.classList.toggle("has-image");
     evt.preventDefault();
     evt.stopPropagation();
-  };
+    article.classList.toggle("has-image");
+  }
 
   d.querySelector(".section-footer").addEventListener(
     "click",
