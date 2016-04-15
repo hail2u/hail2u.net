@@ -15,7 +15,7 @@ fs.outputFileSync(
   path.resolve(__dirname, "../dist/about/style-guide/index.html"),
   fs.readFileSync(
     path.resolve(__dirname, "../src/css/test.html"),
-    "utf-8"
+    "utf8"
   ).replace(
     /\b(href|src)(=)(")(.*?)(")/g,
     function (m, attribute, equal, openQuote, url, closeQuote) {

@@ -41,7 +41,7 @@ for (d in dir) {
 if (argv.file) {
   images = fs.readFileSync(
     argv.file,
-    "utf-8"
+    "utf8"
   ).match(/\bsrc="\/images\/blog\/.*?"/g);
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
