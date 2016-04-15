@@ -337,13 +337,14 @@ files.forEach(function (file) {
   file.src = path.resolve(__dirname, file.src);
 
   if (!file.dest) {
-    file.dest = path.resolve(path.join(
+    file.dest = path.join(
       "../dist/",
       path.dirname(path.relative(templateDir, file.src)),
       path.basename(file.src, ".mustache") + ".html"
-    ));
+    );
   }
 
+  file.dest = path.resolve(__dirname, file.dest);
   readMetadata(
     path.join(
       path.dirname(file.src),
