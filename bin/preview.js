@@ -38,7 +38,28 @@ var previewTemplate = `<!DOCTYPE html>
     </main>
   </body>
 </html>`;
+var renderer = new marked.Renderer();
 
+renderer.html = function (html) {
+  var attributes;
+  var contents;
+  var tag;
+  var tags = ["aside", "figure", "section"];
+  var tokens = html.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
+
+  tag = tokens[1];
+
+  if (tags.indexOf(tag) === -1) {
+    return html;
+  }
+
+  attributes = tokens[2];
+  contents = marked(tokens[3].replace(/&gt;/g, ">"), {
+    renderer: renderer
+  }).trim();
+
+  return "<" + tag + attributes + ">\n" + contents + "\n</" + tag + ">\n";
+};
 previewFile = path.resolve(__dirname, previewFile);
 fs.outputFileSync(
   previewFile,
@@ -48,7 +69,10 @@ fs.outputFileSync(
   ).replace(
     /<%BODY%>/g,
     marked(
-      article.join("\n").replace(/\$/g, "$$$$")
+      article.join("\n").replace(/\$/g, "$$$$"),
+      {
+        renderer: renderer
+      }
     ).replace(/(href|src)="\/images\//g, "$1=\"../src/img/")
   ).replace(
     /="\//g,
