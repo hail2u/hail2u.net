@@ -75,6 +75,7 @@ var monthNamesFull = ["January", "February", "March", "April", "May",
   "June", "July", "August", "September", "October", "November", "December"];
 var partialDir = "../src/html/partial";
 var partials = {};
+var templateDir = "../src/html/";
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
@@ -251,8 +252,8 @@ function readMetadata(file, callback) {
 
     metadata = extendObject(metadata, data);
 
-    switch (path.relative(__dirname, file).replace(/\\/g, "/")) {
-    case "../src/html/index.json":
+    switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
+    case "index.json":
       metadata.updates = readRSS(path.resolve(__dirname, "../src/index.rss"));
       metadata.updates.item = metadata.updates.item.slice(0, maxUpdates);
       metadata.articles = readRSS(path.resolve(__dirname, "../dist/blog/feed"));
@@ -270,12 +271,12 @@ function readMetadata(file, callback) {
 
       break;
 
-    case "../src/html/blog/index.json":
+    case "blog/index.json":
       metadata.articles = readArticles();
 
       break;
 
-    case "../src/html/links/index.json":
+    case "links/index.json":
       metadata.bookmarks = readBookmarks();
 
       break;
@@ -294,7 +295,8 @@ if (argv.blog) {
 basicMetadata = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, metadataFile), "utf8")
 );
-partialDir = path.resolve(__dirname, partialDir);
+partialDir = path.join(__dirname, partialDir);
+templateDir = path.resolve(__dirname, templateDir);
 mustache.escape = escape;
 fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
@@ -332,16 +334,17 @@ files.forEach(function (file) {
     fs.outputFileSync(file.dest, html);
   }
 
+  file.src = path.resolve(__dirname, file.src);
+
   if (!file.dest) {
     file.dest = path.join(
-      "dist/",
-      path.dirname(path.relative("src/html/", file.src)),
+      "../dist/",
+      path.dirname(path.relative(templateDir, file.src)),
       path.basename(file.src, ".mustache") + ".html"
     );
   }
 
   file.dest = path.resolve(__dirname, file.dest);
-  file.src = path.resolve(__dirname, file.src);
   readMetadata(
     path.join(
       path.dirname(file.src),
