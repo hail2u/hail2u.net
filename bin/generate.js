@@ -13,7 +13,9 @@ var sprintf = require("sprintf").sprintf;
 var argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
 });
+var articlesCache = "../cache/articles.json";
 var basicMetadata;
+var blogFeed = "../dist/blog/feed";
 var blogFiles = [
   {
     src: "../src/html/blog/index.mustache"
@@ -22,6 +24,7 @@ var blogFiles = [
     src: "../src/html/index.mustache"
   }
 ];
+var bookmarksCache = "../cache/bookmarks.json";
 var categoryNames = {
   "Blog": "blog",
   "Blosxom": "blosxom",
@@ -68,6 +71,7 @@ var files = [
     src: "../src/html/links/index.mustache"
   }
 ];
+var homeFeed = "../src/index.rss";
 var metadataFile = "../src/html/metadata.json";
 var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
   "Sep", "Oct", "Nov", "Dec"];
@@ -143,9 +147,7 @@ function readRSS(file) {
 }
 
 function readArticles() {
-  var articles = fs.readJsonSync(
-    path.resolve(__dirname, "../cache/articles.json")
-  );
+  var articles = fs.readJsonSync(path.resolve(__dirname, articlesCache));
 
   articles.forEach(function (article, idx) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
@@ -174,9 +176,7 @@ function readArticles() {
 }
 
 function readBookmarks() {
-  var bookmarks = fs.readJsonSync(
-    path.resolve(__dirname, "../cache/bookmarks.json")
-  );
+  var bookmarks = fs.readJsonSync(path.resolve(__dirname, bookmarksCache));
 
   bookmarks.forEach(function (bookmark, idx) {
     var category = "other";
@@ -254,9 +254,9 @@ function readMetadata(file, callback) {
 
     switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
     case "index.json":
-      metadata.updates = readRSS(path.resolve(__dirname, "../src/index.rss"));
+      metadata.updates = readRSS(path.resolve(__dirname, homeFeed));
       metadata.updates.item = metadata.updates.item.slice(0, maxUpdates);
-      metadata.articles = readRSS(path.resolve(__dirname, "../dist/blog/feed"));
+      metadata.articles = readRSS(path.resolve(__dirname, blogFeed));
       metadata.articles.item = metadata.articles.item.slice(0, maxArticles);
       metadata.articles.first = metadata.articles.item.shift();
       imgs = metadata.articles.first["content:encoded"].match(/<img.*?>/g);
@@ -295,9 +295,9 @@ if (argv.blog) {
 basicMetadata = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, metadataFile), "utf8")
 );
+mustache.escape = escape;
 partialDir = path.join(__dirname, partialDir);
 templateDir = path.resolve(__dirname, templateDir);
-mustache.escape = escape;
 fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
     path.join(partialDir, partial),
@@ -337,14 +337,13 @@ files.forEach(function (file) {
   file.src = path.resolve(__dirname, file.src);
 
   if (!file.dest) {
-    file.dest = path.join(
+    file.dest = path.resolve(path.join(
       "../dist/",
       path.dirname(path.relative(templateDir, file.src)),
       path.basename(file.src, ".mustache") + ".html"
-    );
+    ));
   }
 
-  file.dest = path.resolve(__dirname, file.dest);
   readMetadata(
     path.join(
       path.dirname(file.src),

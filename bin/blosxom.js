@@ -23,6 +23,7 @@ var argv = minimist(process.argv.slice(2), {
 var bar;
 var cpuNum = os.cpus().length;
 var d;
+var data = "../src/weblog/plugins/state/files_index.dat";
 var dir = {
   data: "../src/weblog/entries/",
   img: "../src/img/blog/",
@@ -64,7 +65,7 @@ if (argv.file) {
 
 if (argv.all && files.join() === "") {
   fs.readFileSync(
-    path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat"),
+    path.resolve(__dirname, data),
     "utf8"
   ).split(/\r?\n/).forEach(function (file) {
     if (file === "") {

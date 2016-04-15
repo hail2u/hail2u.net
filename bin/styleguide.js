@@ -5,16 +5,18 @@
 var fs = require("fs-extra");
 var path = require("path");
 
+var dest = "../dist/about/style-guide/index.html";
 var dir = {
   img: "../img/",
   js: "../js/"
 };
 var site = "https://hail2u.net/";
+var src = "../src/css/test.html";
 
 fs.outputFileSync(
-  path.resolve(__dirname, "../dist/about/style-guide/index.html"),
+  path.resolve(__dirname, dest),
   fs.readFileSync(
-    path.resolve(__dirname, "../src/css/test.html"),
+    path.resolve(__dirname, src),
     "utf8"
   ).replace(
     /\b(href|src)(=)(")(.*?)(")/g,

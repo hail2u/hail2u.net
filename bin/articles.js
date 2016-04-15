@@ -12,6 +12,7 @@ var argv = minimist(process.argv.slice(2), {
 });
 var articles = [];
 var cache = "../cache/articles.json";
+var data = "../src/weblog/plugins/state/files_index.dat";
 
 function readArticle(file, date) {
   return {
@@ -40,7 +41,7 @@ if (!argv.force) {
 }
 
 fs.readFileSync(
-  path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat"),
+  path.resolve(__dirname, data),
   "utf8"
 ).split(/\r?\n/).forEach(function (line) {
   var date;

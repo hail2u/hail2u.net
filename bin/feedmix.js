@@ -6,12 +6,18 @@ var feedmix = require("feedmix");
 var fs = require("fs-extra");
 var path = require("path");
 
+var dest = "../dist/feed";
+var feeds = [
+  "../src/index.rss",
+  "../dist/blog/feed"
+];
+
+feeds = feeds.map(function (feed) {
+  return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
+});
 fs.outputFileSync(
-  path.resolve(__dirname, "../dist/feed"),
-  feedmix.stringify(feedmix.merge([
-    fs.readFileSync(path.resolve(__dirname, "../src/index.rss")),
-    fs.readFileSync(path.resolve(__dirname, "../dist/blog/feed"))
-  ], {
+  path.resolve(__dirname, dest),
+  feedmix.stringify(feedmix.merge(feeds, {
     trim: true
   }), {
     cdata: true,

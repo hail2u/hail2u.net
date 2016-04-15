@@ -6,6 +6,9 @@ var fs = require("fs-extra");
 var path = require("path");
 var xml2js = require("xml2js");
 
+var cache = "../cache/articles.json";
+var dest = "../dist/sitemap.xml";
+var documentsDir = "../src/html/documents/";
 var sitemap = {
   urlset: {
     $: {
@@ -35,18 +38,14 @@ var urls = [
   "/links/"
 ];
 
-fs.readdirSync(
-  path.resolve(__dirname, "../src/html/documents/")
-).forEach(function (file) {
+fs.readdirSync(path.resolve(__dirname, documentsDir)).forEach(function (file) {
   if (file === "index.html" || path.extname(file) !== ".html") {
     return false;
   }
 
-  urls.push("/documents/" + file);
+  urls.push("/" + path.basename(documentsDir) + "/" + file);
 });
-fs.readJsonSync(
-  path.resolve(__dirname, "../cache/articles.json")
-).forEach(function (article) {
+fs.readJsonSync(path.resolve(__dirname, cache)).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
@@ -55,6 +54,6 @@ urls.forEach(function (url) {
   });
 });
 fs.outputFileSync(
-  path.resolve(__dirname, "../dist/sitemap.xml"),
+  path.resolve(__dirname, dest),
   new xml2js.Builder().buildObject(sitemap)
 );
