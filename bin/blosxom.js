@@ -55,8 +55,8 @@ if (argv.file) {
       var src;
 
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      src = dir.img + image;
-      dest = dir.staticimg + image;
+      src = path.join(dir.img, image);
+      dest = path.join(dir.staticimg, image);
       fs.copySync(src, dest);
     });
   }
