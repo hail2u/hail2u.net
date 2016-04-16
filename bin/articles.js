@@ -18,7 +18,7 @@ function readArticle(file, date) {
   return {
     day: date.getDate(),
     hour: date.getHours(),
-    link: "/blog/" + path.dirname(file).split(path.sep).pop() + "/" +
+    link: "/blog/" + path.basename(path.dirname(file)) + "/" +
       path.basename(file, ".txt") + ".html",
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
