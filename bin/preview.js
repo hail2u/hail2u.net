@@ -47,6 +47,10 @@ renderer.html = function (html) {
   var tags = ["aside", "figure", "section"];
   var tokens = html.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
+  if (!tokens) {
+    return html;
+  }
+
   tag = tokens[1];
 
   if (tags.indexOf(tag) === -1) {
