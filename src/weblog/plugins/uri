@@ -1,11 +1,11 @@
-# Blosxom Plugin: canonical
+# Blosxom Plugin: uri
 # Author(s): Kyo Nagashima <kyo@hail2u.net>
 # Blosxom Home/Docs/Licensing: http://www.blosxom.com/
 
-package canonical;
+package uri;
 
 use strict;
-use vars qw($url);
+use vars qw($canonical);
 
 # --- Configurable variables -----------
 
@@ -14,6 +14,8 @@ use vars qw($url);
 $url = "$blosxom::url";
 
 # --------------------------------------
+
+use URI::Escape;
 
 sub start {
   my $path_info = $blosxom::path_info_full;
@@ -39,6 +41,18 @@ sub start {
   }
 
   return 1;
+}
+
+sub decode {
+  my($self, $attributes, $content) = @_;
+
+  return uri_unescape($content);
+}
+
+sub encode {
+  my($self, $attributes, $content) = @_;
+
+  return uri_escape($content);
 }
 
 1;
