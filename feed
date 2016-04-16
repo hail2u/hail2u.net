@@ -10,6 +10,100 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>再帰的にMarkdownを処理</title>
+      <link>https://hail2u.net/blog/coding/recurisive-markdown.html</link>
+      <description>このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/coding/recurisive-markdown.html</guid>
+      <pubDate>Sat, 16 Apr 2016 13:56:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年は<a href="https://github.com/chjj/marked">marked</a>を使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、<code>section</code>や<code>figure</code>要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。</p>
+
+<p>例えば<code>figure</code>要素を使って<code>table</code>要素を図としてマークアップしたい場合、以下のように書くことになる。</p>
+
+<pre><code>&lt;figure&gt;
+|Name|Num|
+|-|-|
+|foo|128|
+|bar|256|
+
+&lt;figcaption&gt;表1&lt;/figcaption&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>このMarkdown文字列をmarkedで処理しても何も起きず、そのまま出てくる。つまり何らかのHTMLタグで括られた間はインライン系の記法しか処理されない。</p>
+
+<hr>
+
+<p>markedには処理をフックする機構が用意されているので、それを使うとうまく処理することできる。こういったHTML文字列の場合、<code>Renderer.html</code>でそういった文字列を処理する関数を指定してやれば良い。</p>
+
+<pre><code>// node this.js &lt; test.md
+var marked = require(&quot;marked&quot;);
+var renderer = new marked.Renderer();
+
+function processHTML(html) {
+  var attributes;
+  var contents;
+  var tag;
+  var tags = [&quot;aside&quot;, &quot;figure&quot;, &quot;section&quot;];
+  var tokens = html.trim().match(/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/);
+
+  if (!tokens) {
+    return html;
+  }
+
+  tag = tokens[1];
+
+  if (tags.indexOf(tag) === -1) {
+    return html;
+  }
+
+  attributes = tokens[2];
+  contents = marked(tokens[3].replace(/&amp;gt;/g, &quot;&gt;&quot;), {
+    renderer: renderer
+  }).trim();
+
+  return &quot;&lt;&quot; + tag + attributes + &quot;&gt;\n&quot; + contents + &quot;\n&lt;/&quot; + tag + &quot;&gt;\n&quot;;
+}
+
+renderer.html = processHTML;
+console.log(marked(fs.readFileSync(process.stdin.fd, &quot;utf8&quot;), {
+  renderer: renderer
+}));
+</code></pre>
+
+<p>空白文字を削った一番外側のHTMLタグを拾い、その中身を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
+
+<p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される（インデントは読みやすいように追加した）。</p>
+
+<pre><code>&lt;figure&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Name&lt;/th&gt;
+        &lt;th&gt;Num&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;foo&lt;/td&gt;
+        &lt;td&gt;128&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;bar&lt;/td&gt;
+        &lt;td&gt;256&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;figcaption&gt;表1&lt;/figcaption&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<hr>
+
+<p>本当はこういったアドホックなプラグイン志向でMarkdownを拡張するのは好きではない。Markdownは拡張性なしの安定志向のもの（それこそオリジナルで良い）を使い、プリプロセッサーで<code>table</code>や<code>dl</code>要素の独自記法を処理して渡す方が良いと考えている。そうしてプリプロセッサーで処理済みのものをデータとして保存しておけば、ほぼあらゆるMarkdown処理系で正常に処理できることが期待できるからだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>gzip下における、CSScombの昇順ソートに対する優位性</title>
       <link>https://hail2u.net/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html</link>
       <description>CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。</description>
@@ -415,35 +509,6 @@ set PATH=%USERPROFILE%\Programs;%PATH%
 <p>手元のアカウントではうまく動いたので、これでしばらくはしのげそうだ。その間にIFTTTに依存せず集約する仕組みを考えようかと思う。まさかのPlaggerデビューみたいなことになりそう……。</p>]]></content:encoded>
     </item>
     <item>
-      <title>対にならないかぎかっこ</title>
-      <link>https://hail2u.net/blog/media/unpaired-japanese-quotation-marks.html</link>
-      <description>最近、少し古い小説を読むことが多い。古いといっても1970年くらいのものだが。そういう中でよく対にならないかぎかっこがあることを今さら気づいた。なんとなくは見かけた記憶はあり、単なる落丁かと思っていたが、ちゃんとした理由のようなものがあるようだ。</description>
-      <category>Media</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/media/unpaired-japanese-quotation-marks.html</guid>
-      <pubDate>Sat, 26 Mar 2016 23:21:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>最近、少し古い小説を読むことが多い。古いといっても1970年くらいのものだが。そういう中でよく対にならないかぎかっこがあることを今さら気づいた。なんとなくは見かけた記憶はあり、単なる落丁かと思っていたが、ちゃんとした理由のようなものがあるようだ。</p>
-
-<p>具体的には以下のような文章だ。</p>
-
-<blockquote>
-<p>「こんにちは」彼はそう話しかけてきた。<br>
-そういえば、近所の公衆電話が移動したことはご存知ですか？」</p>
-</blockquote>
-
-<p>ある人物の会話文があり、その説明をする文が続き、更に<em>同じ人物の会話文が続く</em>ような場合ということになる。このような場合は2つ目の会話文の開きかぎかっこを省略されていることがある。</p>
-
-<blockquote>
-<p>「こんにちは」彼はそう話しかけてきた。<br>
-「こんにちは。まだ桜は咲きませんね」僕はこう答えた。</p>
-</blockquote>
-
-<p>このように人物が変わる場合にのみ開きかぎかっこを使うようだ。開きかぎかっこの有無で会話文の主体を示しているということなのだろう。</p>
-
-<hr>
-
-<p>僕がそう推測しているという話で、実際にそういう規則なのかどうかはよくわからない。単なる慣例なのか、著者（や翻訳者、または編集者）の癖なのか。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -478,6 +543,6 @@ set PATH=%USERPROFILE%\Programs;%PATH%
       <guid isPermaLink="true">https://hail2u.net/documents/web-typography-best-practices.html</guid>
       <description><![CDATA[<p><a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineによるウェブサイトのタイポグラフィーについての調査</a>をわかりやすくまとめた<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-Inclusive Guide to Web Typography Best Practices</a>の日本語訳です。ベスト・プラクティスになりうる部分のみコンパクトに抽出された参考になる文書だと思います。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 15 Apr 2016 09:33:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 16 Apr 2016 13:56:00 +0900</lastBuildDate>
   </channel>
 </rss>
