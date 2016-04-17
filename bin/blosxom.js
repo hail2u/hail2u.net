@@ -15,7 +15,6 @@ var which = require("which").sync;
 var argv = minimist(process.argv.slice(2), {
   boolean: [
     "all",
-    "index",
     "update"
   ],
   string: ["file"]
@@ -64,19 +63,6 @@ if (argv.file) {
 }
 
 if (argv.all && files.join() === "") {
-  fs.readFileSync(
-    path.resolve(__dirname, data),
-    "utf8"
-  ).split(/\r?\n/).forEach(function (file) {
-    if (file === "") {
-      return;
-    }
-
-    files.push(path.relative(dir.data, file.split("=>").shift()));
-  });
-}
-
-if (argv.index) {
   fs.readdirSync(dir.data).forEach(function (file) {
     if (!fs.statSync(file).isDirectory()) {
       return;
@@ -87,6 +73,16 @@ if (argv.index) {
     }
 
     files.push(path.join(file, "index.html"));
+  });
+  fs.readFileSync(
+    path.resolve(__dirname, data),
+    "utf8"
+  ).split(/\r?\n/).forEach(function (file) {
+    if (file === "") {
+      return;
+    }
+
+    files.push(path.relative(dir.data, file.split("=>").shift()));
   });
 }
 
