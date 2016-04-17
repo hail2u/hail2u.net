@@ -34,6 +34,66 @@ var files = [];
 var images = [];
 var reindexed = false;
 
+function build(file, next) {
+  var args = ["blosxom.cgi", "path=/" + file];
+  var contents;
+  var perl;
+
+  if (!argv.update && !reindexed) {
+    args = args.concat("reindex=1");
+    reindexed = true;
+  }
+
+  perl = spawn(which("perl"), args, {
+    cwd: dir.root,
+    encoding: "utf8",
+    env: {
+      BLOSXOM_CONFIG_DIR: dir.root
+    }
+  });
+
+  if (perl.error) {
+    return next(perl.error);
+  }
+
+  contents = perl.stdout.replace(
+    /^[\s\S]*?\r?\n\r?\n/,
+    ""
+  ).trim() + "\n";
+
+  if (file === "index.rss") {
+    file = "feed";
+  }
+
+  if (file.endsWith(".html")) {
+    contents = contents.replace(
+      /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
+      "$1$2/"
+    );
+    contents = minifyHTML(contents, {
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true,
+      minifyCSS: true,
+      minifyJS: true,
+      removeAttributeQuotes: true,
+      removeComments: true,
+      removeEmptyElements: true,
+      removeOptionalTags: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      sortAttributes: true,
+      sortClassName: true,
+      useShortDoctype: true
+    });
+  }
+
+  file = path.join(dir.static, file);
+  fs.outputFileSync(file, contents);
+  bar.tick();
+  next();
+}
+
 for (d in dir) {
   dir[d] = path.resolve(__dirname, dir[d]);
 }
@@ -42,7 +102,9 @@ if (argv.file) {
   images = fs.readFileSync(
     argv.file,
     "utf8"
-  ).match(/\bsrc="\/images\/blog\/.*?"/g);
+  ).match(
+    /\bsrc="\/images\/blog\/.*?"/g
+  );
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push(path.join(path.dirname(argv.file), "index.html"));
@@ -91,73 +153,10 @@ files = files.map(function (file) {
 });
 bar = new ProgressBar("Building [:bar] :percent :elapsed", {
   total: files.length,
-  width: 32
+  width: 25
 });
-
-async.eachLimit(files, cpuNum, async.ensureAsync(function (file, next) {
-  var args = ["blosxom.cgi", "path=/" + file];
-  var contents;
-  var perl;
-
-  if (!argv.update && !reindexed) {
-    args = args.concat("reindex=1");
-    reindexed = true;
-  }
-
-  perl = spawn(
-    which("perl"),
-    args,
-    {
-      cwd: dir.root,
-      encoding: "utf8",
-      env: {
-        BLOSXOM_CONFIG_DIR: dir.root
-      }
-    }
-  );
-
-  if (perl.error) {
-    return next(perl.error);
-  }
-
-  contents = perl.stdout.replace(
-    /^[\s\S]*?\r?\n\r?\n/,
-    ""
-  ).trim() + "\n";
-
-  if (file === "index.rss") {
-    file = "feed";
-  }
-
-  if (file.endsWith(".html")) {
-    contents = contents.replace(
-      /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
-      "$1$2/"
-    );
-    contents = minifyHTML(contents, {
-      collapseBooleanAttributes: true,
-      collapseWhitespace: true,
-      minifyCSS: true,
-      minifyJS: true,
-      removeAttributeQuotes: true,
-      removeComments: true,
-      removeEmptyElements: true,
-      removeOptionalTags: true,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      sortAttributes: true,
-      sortClassName: true,
-      useShortDoctype: true
-    });
-  }
-
-  file = path.join(dir.static, file);
-  fs.outputFileSync(file, contents);
-  bar.tick();
-  next();
-}), function (error) {
-  if (error) {
-    throw error;
+async.eachLimit(files, cpuNum, async.ensureAsync(build), function (err) {
+  if (err) {
+    throw err;
   }
 });
