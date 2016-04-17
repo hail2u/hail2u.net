@@ -126,7 +126,7 @@ if (argv.file) {
 
 if (argv.all && files.join() === "") {
   fs.readdirSync(dir.data).forEach(function (file) {
-    if (!fs.statSync(file).isDirectory()) {
+    if (!fs.statSync(path.join(dir.data, file)).isDirectory()) {
       return;
     }
 
