@@ -58,5 +58,9 @@ request.get({
     newBookmarks = [];
   }
 
-  fs.writeJsonSync(cache, newBookmarks.reverse().concat(bookmarks));
+  fs.writeJsonSync(cache, newBookmarks.reverse().concat(
+    bookmarks
+  ).filter(function (val, idx, arr) {
+    return arr.indexOf(val) === idx;
+  }));
 });

@@ -71,4 +71,6 @@ fs.readFileSync(
 });
 fs.writeJsonSync(cache, articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
+}).filter(function (val, idx, arr) {
+  return arr.indexOf(val) === idx;
 }));
