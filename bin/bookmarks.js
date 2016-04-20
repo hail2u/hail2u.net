@@ -30,15 +30,15 @@ qs.auth_token = config.username + ":" + config.token;
 request.get({
   qs: qs,
   uri: "https://api.pinboard.in/v1/posts/all"
-}, function (error, response, body) {
+}, function (err, res, body) {
   var newBookmarks;
 
-  if (error) {
-    throw error;
+  if (err) {
+    throw err;
   }
 
-  if (response.statusCode !== codes[response.statusCode] === "OK") {
-    throw new Error(response.statusMessage);
+  if (res.statusCode !== codes[res.statusCode] === "OK") {
+    throw new Error(res.statusMessage);
   }
 
   newBookmarks = JSON.parse(body).filter(function (link) {
