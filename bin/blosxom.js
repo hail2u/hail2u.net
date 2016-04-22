@@ -4,12 +4,12 @@
 
 var ProgressBar = require("progress");
 var async = require("async");
+var execFile = require("child_process").execFile;
 var fs = require("fs-extra");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
 var os = require("os");
 var path = require("path");
-var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
 var argv = minimist(process.argv.slice(2), {
@@ -36,62 +36,60 @@ var reindexed = false;
 
 function build(file, next) {
   var args = ["blosxom.cgi", "path=/" + file];
-  var contents;
-  var perl;
 
   if (!argv.update && !reindexed) {
     args = args.concat("reindex=1");
     reindexed = true;
   }
 
-  perl = spawn(which("perl"), args, {
+  execFile(which("perl"), args, {
     cwd: dir.root,
-    encoding: "utf8",
     env: {
       BLOSXOM_CONFIG_DIR: dir.root
     }
+  }, function (err, stdout) {
+    var contents;
+
+    if (err) {
+      return next(err);
+    }
+
+    contents = stdout.replace(
+      /^[\s\S]*?\r?\n\r?\n/,
+      ""
+    ).trim() + "\n";
+
+    if (file === "index.rss") {
+      file = "feed";
+    }
+
+    if (file.endsWith(".html")) {
+      contents = contents.replace(
+        /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
+        "$1$2/"
+      );
+      contents = minifyHTML(contents, {
+        collapseBooleanAttributes: true,
+        collapseWhitespace: true,
+        minifyCSS: true,
+        minifyJS: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+        removeEmptyElements: true,
+        removeOptionalTags: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        sortAttributes: true,
+        sortClassName: true,
+        useShortDoctype: true
+      });
+    }
+
+    fs.outputFileSync(path.join(dir.static, file), contents);
+    bar.tick();
+    next();
   });
-
-  if (perl.error) {
-    return next(perl.error);
-  }
-
-  contents = perl.stdout.replace(
-    /^[\s\S]*?\r?\n\r?\n/,
-    ""
-  ).trim() + "\n";
-
-  if (file === "index.rss") {
-    file = "feed";
-  }
-
-  if (file.endsWith(".html")) {
-    contents = contents.replace(
-      /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
-      "$1$2/"
-    );
-    contents = minifyHTML(contents, {
-      collapseBooleanAttributes: true,
-      collapseWhitespace: true,
-      minifyCSS: true,
-      minifyJS: true,
-      removeAttributeQuotes: true,
-      removeComments: true,
-      removeEmptyElements: true,
-      removeOptionalTags: true,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      sortAttributes: true,
-      sortClassName: true,
-      useShortDoctype: true
-    });
-  }
-
-  file = path.join(dir.static, file);
-  fs.outputFileSync(file, contents);
-  bar.tick();
-  next();
 }
 
 for (d in dir) {
