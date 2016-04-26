@@ -32,14 +32,12 @@ var dir = {
 };
 var files = [];
 var images = [];
-var reindexed = false;
 
 function build(file, next) {
   var args = ["blosxom.cgi", "path=/" + file];
 
-  if (!argv.update && !reindexed) {
+  if (!argv.update) {
     args = args.concat("reindex=1");
-    reindexed = true;
   }
 
   execFile(which("perl"), args, {
