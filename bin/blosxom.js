@@ -151,7 +151,8 @@ files = files.map(function (file) {
 bar = new ProgressBar("Building [:bar] :percent :elapsed", {
   total: files.length,
   width: 25
-});
+})
+bar.render();
 async.eachLimit(files, cpuNum, async.ensureAsync(build), function (err) {
   if (err) {
     throw err;
