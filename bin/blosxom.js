@@ -15,6 +15,7 @@ var which = require("which").sync;
 var argv = minimist(process.argv.slice(2), {
   boolean: [
     "all",
+    "indexes",
     "reindex"
   ],
   string: ["file"]
@@ -121,7 +122,7 @@ if (argv.file) {
   }
 }
 
-if (argv.all && files.join() === "") {
+if (argv.indexes) {
   fs.readdirSync(dir.data).forEach(function (file) {
     if (!fs.statSync(path.join(dir.data, file)).isDirectory()) {
       return;
@@ -133,6 +134,9 @@ if (argv.all && files.join() === "") {
 
     files.push(path.join(file, "index.html"));
   });
+}
+
+if (argv.all) {
   fs.readFileSync(
     path.resolve(__dirname, data),
     "utf8"
