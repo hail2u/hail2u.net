@@ -15,7 +15,7 @@ var which = require("which").sync;
 var argv = minimist(process.argv.slice(2), {
   boolean: [
     "all",
-    "update"
+    "reindex"
   ],
   string: ["file"]
 });
@@ -36,8 +36,9 @@ var images = [];
 function build(file, next) {
   var args = ["blosxom.cgi", "path=/" + file];
 
-  if (!argv.update) {
+  if (argv.reindex) {
     args = args.concat("reindex=1");
+    argv.reindex = false;
   }
 
   execFile(which("perl"), args, {
