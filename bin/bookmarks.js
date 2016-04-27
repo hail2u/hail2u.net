@@ -53,7 +53,7 @@ request.get({
     return;
   }
 
-  fs.writeJsonSync(cache, newBookmarks.reverse().concat(
+  fs.writeJsonSync(cache, newBookmarks.concat(
     bookmarks
   ).filter(function (val, idx, arr) {
     return arr.indexOf(val) === idx;
