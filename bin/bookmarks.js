@@ -49,13 +49,8 @@ request.get({
     return true;
   });
 
-  if (!argv.force && !newBookmarks.length) {
+  if (newBookmarks.length > 0) {
     return;
-  }
-
-  if (argv.force) {
-    bookmarks = newBookmarks.slice();
-    newBookmarks = [];
   }
 
   fs.writeJsonSync(cache, newBookmarks.reverse().concat(
