@@ -49,7 +49,7 @@ request.get({
     return true;
   });
 
-  if (newBookmarks.length > 0) {
+  if (newBookmarks.length < 1) {
     return;
   }
 
