@@ -29,8 +29,8 @@ var previewTemplate = `<!DOCTYPE html>
   <body style="margin-bottom: 6rem">
     <main class="content">
       <article role="main">
-        <h1 class="first-heading is-in-permalink"><%TITLE%></h1>
-        <footer class="section-footer is-in-permalink">
+        <h1 class="first-heading"><%TITLE%></h1>
+        <footer class="section-footer">
           <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under <span class="tag"><a href="#">Preview</a></span></p>
         </footer>
         <%BODY%>
