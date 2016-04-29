@@ -10,6 +10,114 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>Date.parse() vs new Date().getTime()</title>
+      <link>https://hail2u.net/blog/coding/date-parse-vs-new-date-gettime.html</link>
+      <description>オブジェクトの配列を、各オブジェクトが文字列で持っている日付けでソートしようとし、Date.parse()を使って実装した。しかしもしかするとnew Date().getTime()の方が速いのではないかと調べていたら色々あった。結論としては今はDate.parse()がだいたい速いようだ。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/coding/date-parse-vs-new-date-gettime.html</guid>
+      <pubDate>Fri, 29 Apr 2016 10:40:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>オブジェクトの配列を、各オブジェクトが文字列で持っている日付けでソートしようとし、<code>Date.parse()</code>を使って実装した。しかしもしかすると<code>new Date().getTime()</code>の方が速いのではないかと調べていたら色々あった。結論としては今は<code>Date.parse()</code>がだいたい速いようだ。</p>
+
+<p>以下は確認に使ったコードと実行結果だ。ランダムな日付けじゃないと正確な答えは出ないかと思ったがそうでもなかったので、この最初に書いたもので計った。</p>
+
+<pre><code>&quot;use strict&quot;;
+
+var i;
+var dt = &quot;2016-04-28T19:15:27+09:00&quot;;
+var parse = &quot;Date.parse(d)&quot;;
+var gettime = &quot;new Date(d).getTime()&quot;;
+
+console.time(parse);
+
+for (i = 0; i &lt; 100000; i++) {
+  Date.parse(dt);
+}
+
+console.timeEnd(parse);
+console.time(gettime);
+
+for (i = 0; i &lt; 100000; i++) {
+  new Date(dt).getTime();
+}
+
+console.timeEnd(gettime);
+</code></pre>
+
+<section>
+<h1>Node.js v6.0.0</h1>
+
+<pre><samp>Date.parse(d): <mark>83.232ms</mark>
+new Date(d).getTime(): 102.328ms
+</samp></pre>
+
+<p>Node.js v6系では安定して<code>parse()</code>の方が速い。</p>
+</section>
+
+<section>
+<h1>Node.js v4.4.3</h1>
+
+<pre><samp>Date.parse(d): 130ms
+new Date(d).getTime(): <mark>31ms</mark>
+</samp></pre>
+
+<p>Node.js v4系、つまり少し古いv8では異様に<code>getTime()</code>の方が速い。今のLTS版であるv4.4.3で動かすスクリプトなら<code>getTime()</code>を使った方が良い……ということになりそうだが、何かのバグに基づいたまずい挙動であることも否めないため、意識しない方が無難だろう。</p>
+</section>
+
+<section>
+<h1>Chrome 50</h1>
+
+<pre><samp>Date.parse(d): <mark>105.764ms</mark>
+new Date(d).getTime(): 108.520ms
+</samp></pre>
+</section>
+
+<section>
+<h1>Firefox 46</h1>
+
+<pre><samp>Date.parse(d): <mark>51.39ms</mark>
+new Date(d).getTime(): 75.22ms
+</samp></pre>
+</section>
+
+<section>
+<h1>Edge 13</h1>
+
+<pre><samp>Date.parse(d): <mark>79.165ms</mark>
+new Date(d).getTime(): 149.825ms
+</samp></pre>
+</section>
+
+<section>
+<h1>Chrome 52</h1>
+
+<pre><samp>Date.parse(d): <mark>95.232ms</mark>
+new Date(d).getTime(): 128.391ms
+</samp></pre>
+</section>
+
+<section>
+<h1>Firefox 47</h1>
+
+<pre><samp>Date.parse(d): <mark>55.51ms</mark>
+new Date(d).getTime(): 89.19ms
+</samp></pre>
+</section>
+
+<section>
+<h1>Internet Explorer 11</h1>
+
+<pre><samp>Date.parse(d): <mark>81.201ms</mark>
+new Date(d).getTime(): 129.689ms
+</samp></pre>
+</section>
+
+<p>他の環境でも安定して<code>parse()</code>の方が速いようだ。Chrome 50だけ良い勝負だが、すぐに消えると考えられるので気にする必要はない。</p>
+
+<hr>
+
+<p><a href="https://jsperf.com/">jsPerf</a>が死んでいて色々面倒だ。<a href="https://jsfiddle.net/5eby6bk9/">JSFiddleに置いたコード</a>でブラウザーでは確認できる。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Gandi.netへ移住</title>
       <link>https://hail2u.net/blog/internet/hello-gandi-net.html</link>
       <description>バリュードメインを使う理由がほとんどなくなってきた上、存在したCSRF脆弱性への対応についてその修正アナウンスが出ないということがあったので、レジストラーをGandi.netへ変更した。ドメインごとにメールボックスが5つ提供されること以外には特筆してメリットはなさそうだが、デメリットもないように感じたためここに決めた。ネーム・サーバーはCloudFlareのそれを使っているため、ダウンタイムなしで移住できたように思う。</description>
@@ -368,27 +476,6 @@ var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quo
 <p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p>]]></content:encoded>
     </item>
     <item>
-      <title>npmパッケージとtestファイル群</title>
-      <link>https://hail2u.net/blog/software/npm-package-and-test-files.html</link>
-      <description>某パッケージのイシューを眺めていたら、ファイルが多すぎてnpm installが遅いのでfilesフィールドを使おうやというようなプルリクエストが投げられていた。そこではあっさりと却下され、他にあった同様のプルリクエストで少し議論（ケンカ）がなされていた。どちらにも一理あり、興味深かった。</description>
-      <category>Software</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/software/npm-package-and-test-files.html</guid>
-      <pubDate>Tue, 12 Apr 2016 14:41:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>某パッケージのイシューを眺めていたら、ファイルが多すぎて<code>npm install</code>が遅いので<code>files</code>フィールドを使おうやというようなプルリクエストが投げられていた。そこではあっさりと却下され、<a href="https://github.com/substack/tape/pull/260">他にあった同様のプルリクエスト</a>で少し議論（ケンカ）がなされていた。どちらにも一理あり、興味深かった。</p>
-
-<p>プルリクエストを投げた<a href="https://github.com/deepsweet">deepsweet</a>（様々なプロジェクトに同様のプルリクエストを送っているようだ）は、<code>files</code>フィールドを使わない問題点として、インストールするファイルが多くなることがあるとしている。例えば100MBくらいテスト関係のファイルがあったらひどいことになるじゃないか、とも言い、そのことは<code>npm install</code>が遅いという問題の理由のひとつと主張してもいる。また<code>.gitignore</code>をメインに据えたブラックリスト方式だと、どうしてもプライベートなファイルがうっかり流出してしまうことが避けられないともしている。</p>
-
-<p>対して<code>.gitignore</code>だけで良いとしてこのプルリクエストを取り込まなかった開発者側は、<code>npm explore</code>を使ってテストを走らせたいとしており、そのためテスト関係のファイルは必要だと言う。<code>npm install</code>が遅い問題はファイルの量やサイズではなく、もっと別のところにあり、それはパッケージ開発者ではなくnpmの開発者が責任を持って改良すべきところだとしている。ホワイトリスト方式については、必要なファイルの追加を忘れるという問題を避けることが難しく、そのことは壊れたパッケージを公開することに直結するのでよくないのではないかとしていた。</p>
-
-<p>双方がそれぞれ気にしているデメリットへのとらえ方の溝がとても深そうだ。</p>
-
-<hr>
-
-<p>僕は<code>files</code>フィールドで安全に倒すという考え方は、面倒だなと感じることもしばしばあるが、悪くはないと考えている。しかし、そういった<code>files</code>フィールドを使った運用で起こりうる壊れたパッケージを公開してしまうということは、<em>他人のプロジェクトを破壊してしまう</em>と言いかえることができるとも考えるようになった。そうなると<code>npm install</code>が遅くなる問題よりも避けるべき大きな問題と言えそうだ。</p>
-
-<p>少しづつ<code>files</code>フィールドを削除する方向で調整していきたい。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -423,6 +510,6 @@ var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quo
       <guid isPermaLink="true">https://hail2u.net/documents/web-typography-best-practices.html</guid>
       <description><![CDATA[<p><a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineによるウェブサイトのタイポグラフィーについての調査</a>をわかりやすくまとめた<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-Inclusive Guide to Web Typography Best Practices</a>の日本語訳です。ベスト・プラクティスになりうる部分のみコンパクトに抽出された参考になる文書だと思います。</p>]]></description>
     </item>
-    <lastBuildDate>Thu, 28 Apr 2016 13:46:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 29 Apr 2016 10:40:00 +0900</lastBuildDate>
   </channel>
 </rss>
