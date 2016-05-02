@@ -10,6 +10,17 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>夢</title>
+      <link>https://hail2u.net/blog/misc/dreaming-20160501.html</link>
+      <description>Twitterで「ウェブサイトが見づらい」と言われる。「詳しく」と返すも要領を得ない返事が返ってくる。徐々に口論になる。数十回のやりとりのあと、「でも記事は好き」みたいなことを言われウワッとなって起きる。</description>
+      <category>Misc.</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/misc/dreaming-20160501.html</guid>
+      <pubDate>Mon, 02 May 2016 10:35:00 +0900</pubDate>
+      <content:encoded><![CDATA[<p>Twitterで「ウェブサイトが見づらい」と言われる。「詳しく」と返すも要領を得ない返事が返ってくる。徐々に口論になる。数十回のやりとりのあと、「でも記事は好き」みたいなことを言われウワッとなって起きる。</p>
+
+<p>ウワッてなって起きるのやめたい。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>Date.parse() vs new Date().getTime()</title>
       <link>https://hail2u.net/blog/coding/date-parse-vs-new-date-gettime.html</link>
       <description>オブジェクトの配列を、各オブジェクトが文字列で持っている日付けでソートしようとし、Date.parse()を使って実装した。しかしもしかするとnew Date().getTime()の方が速いのではないかと調べていたら色々あった。結論としては今はDate.parse()がだいたい速いようだ。</description>
@@ -404,78 +415,6 @@ console.log(marked(fs.readFileSync(process.stdin.fd, &quot;utf8&quot;), {
 <p>CSScombのソート順にコーディング規約としての意味は一定以上にある。しかしそれはLinterかフォーマッターで使われて初めて効果を発揮するということで間違っていなかったようだ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>ESLintのno-magic-numbersルール</title>
-      <link>https://hail2u.net/blog/coding/no-magic-numbers-rule-of-eslint.html</link>
-      <description>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。</description>
-      <category>Coding</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/coding/no-magic-numbers-rule-of-eslint.html</guid>
-      <pubDate>Thu, 14 Apr 2016 01:27:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でも<a href="http://eslint.org/docs/rules/no-magic-numbers">no-magic-numbers</a>にとりわけ怒られた。怒られたコードをメモしておく。</p>
-
-<pre><code>var d = new Date();
-var m = d.getMonth() + <mark>1</mark>;
-</code></pre>
-
-<p>月を数字で取得しようとすると怒られる。</p>
-
-<pre><code>var a = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;, &quot;qux&quot;];
-var firstElement = a[<mark>0</mark>];
-var lastElement = a[a.length - <mark>1</mark>];
-</code></pre>
-
-<p>最初と最後の要素を参照しようとすると怒られる。<code>Array#shift()</code>や<code>Array#pop()</code>で済むものは置き換えても良いが、若干コストがかかりそうだ。</p>
-
-<pre><code>var s = &quot;foobarbazqux&quot;;
-
-if (s.indexOf(&quot;foo&quot;) === <mark>0</mark>) {
-  ...
-}
-</code></pre>
-
-<p>特定の文字列で始まるかどうか調べようとすると怒られる。これはちゃんと<code>Sring#startsWith()</code>で書き換えた。</p>
-
-<pre><code>var s = &quot;foobarbazqux&quot;;
-
-if (s.startsWith(foo)) {
-  s = s.substr(foo - <mark>1</mark>);
-}
-</code></pre>
-
-<p>特定の文字列で始まっていたら削除しようとすると怒られる。素直に正規表現を使うのが良いだろう。</p>
-
-<pre><code>var minimist = require(&quot;minimist&quot;);
-var argv = minimist(process.argv.slice(<mark>2</mark>));
-</code></pre>
-
-<p><a href="https://github.com/substack/minimist">minimist</a>で処理するためにNode.jsの実行ファイルとスクリプトのパスを捨てようとすると怒られる。えっ、これどうしよう……。</p>
-
-<hr>
-
-<p>つまり配列へのテキトウなアクセスで怒られるということだ。配列の長さと添え字のずれを矯正する<code>1</code>と<code>0</code>が問題と言いかえることもできるだろう。代替手段はあるものはあるが、ないものはかなり苦しい対応になる。</p>
-
-<pre><code>{
-  &quot;rules&quot;: {
-    &quot;no-magic-numbers&quot;: [
-      &quot;error&quot;,
-      {
-        &quot;ignores&quot;: [0, 1]
-      }
-    ]
-  }
-}
-</code></pre>
-
-<p>有効にするなら<code>0</code>と<code>1</code>を無視する、このような設定が良いかもしれない。</p>
-
-<hr>
-
-<pre><code>var d = new Date();
-var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;][d.getMonth()];
-</code></pre>
-
-<p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -510,6 +449,6 @@ var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quo
       <guid isPermaLink="true">https://hail2u.net/documents/web-typography-best-practices.html</guid>
       <description><![CDATA[<p><a href="http://www.smashingmagazine.com/2013/05/17/typographic-design-patterns-practices-case-study-2013/">Smashing Magazineによるウェブサイトのタイポグラフィーについての調査</a>をわかりやすくまとめた<a href="http://bootstrapbay.com/blog/web-typography-best-practices/">The All-Inclusive Guide to Web Typography Best Practices</a>の日本語訳です。ベスト・プラクティスになりうる部分のみコンパクトに抽出された参考になる文書だと思います。</p>]]></description>
     </item>
-    <lastBuildDate>Fri, 29 Apr 2016 10:40:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 02 May 2016 10:35:00 +0900</lastBuildDate>
   </channel>
 </rss>
