@@ -3,9 +3,9 @@
  *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
-(function () {
-  "use strict";
+"use strict";
 
+(function () {
   var e;
   var i;
   var l;
