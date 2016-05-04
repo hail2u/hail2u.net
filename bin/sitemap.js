@@ -34,8 +34,7 @@ var urls = [
   "/blog/software/",
   "/blog/sports/",
   "/blog/webdesign/",
-  "/documents/",
-  "/links/"
+  "/documents/"
 ];
 
 fs.readdirSync(path.resolve(__dirname, documentsDir)).forEach(function (file) {

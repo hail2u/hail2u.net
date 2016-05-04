@@ -24,7 +24,6 @@ var blogFiles = [
     src: "../src/html/index.mustache"
   }
 ];
-var bookmarksCache = "../cache/bookmarks.json";
 var categoryNames = {
   "Blog": "blog",
   "Blosxom": "blosxom",
@@ -66,9 +65,6 @@ var files = [
   },
   {
     src: "../src/html/documents/index.mustache"
-  },
-  {
-    src: "../src/html/links/index.mustache"
   }
 ];
 var homeFeed = "../src/index.rss";
@@ -130,7 +126,6 @@ function readRSS(file) {
       yy = date.getFullYear();
       mm = date.getMonth();
       dd = date.getDate();
-
       val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
       val.html5PubDate = sprintf(
         "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
@@ -156,8 +151,8 @@ function readArticles() {
       article.day;
     article.html5PubDate = sprintf(
       "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
-      article.year, article.month, article.day, article.hour,
-      article.minute, article.second
+      article.year, article.month, article.day, article.hour, article.minute,
+      article.second
     );
 
     if (idx && this.y !== article.year) {
@@ -173,73 +168,6 @@ function readArticles() {
   articles[articles.length - 1].isLastInYear = true;
 
   return articles;
-}
-
-function readBookmarks() {
-  var bookmarks = fs.readJsonSync(path.resolve(__dirname, bookmarksCache));
-
-  bookmarks.forEach(function (bookmark, idx) {
-    var category = "other";
-    var date = new Date(bookmark.time);
-    var tags = " " + bookmark.tags + " ";
-    var year = date.getFullYear();
-
-    if (tags.includes(" instapaper ")) {
-      category = "instapaper";
-    } else if (tags.includes(" dribbble ")) {
-      category = "dribbble";
-      bookmark.description = bookmark.description.replace(
-        /^Dribbble - /,
-        ""
-      ).replace(
-        / - Dribbble$/,
-        ""
-      );
-    } else if (tags.includes(" github ")) {
-      category = "github";
-      bookmark.description = bookmark.extended.replace(
-        /^hail2u starred /,
-        ""
-      );
-    } else if (tags.includes(" instagram ")) {
-      category = "instagram";
-      bookmark.description = bookmark.href.replace(
-        /^https?:\/\/(www\.)?instagram\.com\/p\//,
-        ""
-      ).replace(
-        /\/$/,
-        ""
-      );
-    } else if (tags.includes(" pinterest ")) {
-      category = "pinterest";
-      bookmark.description = bookmark.extended;
-    } else if (tags.includes(" soundcloud ")) {
-      category = "soundcloud";
-      bookmark.description = bookmark.extended;
-    } else if (tags.includes(" vimeo ")) {
-      category = "vimeo";
-      bookmark.description = bookmark.description.replace(/ on Vimeo$/, "");
-    } else if (bookmark.shared === "yes") {
-      category = "pinboard";
-    }
-
-    bookmark.category = category;
-    bookmark.date = monthNamesFull[date.getMonth()] + " " + date.getDate();
-    bookmark.year = year;
-
-    if (idx && this.y !== year) {
-      bookmark.isFirstInYear = true;
-      bookmarks[idx - 1].isLastInYear = true;
-    }
-
-    this.y = year;
-  }, {
-    y: 0
-  });
-  bookmarks[0].isFirstInYear = true;
-  bookmarks[bookmarks.length - 1].isLastInYear = true;
-
-  return bookmarks;
 }
 
 function readMetadata(file, callback) {
@@ -273,11 +201,6 @@ function readMetadata(file, callback) {
 
     case "blog/index.json":
       metadata.articles = readArticles();
-
-      break;
-
-    case "links/index.json":
-      metadata.bookmarks = readBookmarks();
 
       break;
     }
