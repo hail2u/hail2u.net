@@ -32,7 +32,7 @@ var categoryNames = {
   "Game": "game",
   "Internet": "internet",
   "Media": "media",
-  "Miscellaneous": "misc",
+  "Misc.": "misc",
   "RSS": "rss",
   "Software": "software",
   "Sports": "sports",
