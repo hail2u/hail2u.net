@@ -174,28 +174,24 @@ function readMetadata(file, callback) {
   var metadata = extendObject({}, basicMetadata);
 
   fs.readJson(file, function (err, data) {
-    var imgs;
-    var maxArticles = 6;
-    var maxUpdates = 5;
-
     metadata = extendObject(metadata, data);
 
     switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
     case "index.json":
-      metadata.updates = readRSS(path.resolve(__dirname, homeFeed));
-      metadata.updates.item = metadata.updates.item.slice(0, maxUpdates);
       metadata.articles = readRSS(path.resolve(__dirname, blogFeed));
-      metadata.articles.item = metadata.articles.item.slice(0, maxArticles);
-      metadata.articles.first = metadata.articles.item.shift();
-      imgs = metadata.articles.first["content:encoded"].match(/<img.*?>/g);
+      metadata.articles.item.forEach(function (item) {
+        var imgs = item["content:encoded"].match(/<img.*?>/g);
 
-      if (imgs) {
-        metadata.articles.first.image = imgs.shift().replace(
-          /src="https?:\/\/hail2u\.net/,
-          'src="'
-        );
-        metadata.articles.first.hasImage = true;
-      }
+        if (imgs) {
+          item.image = imgs.shift().replace(
+            /src="https?:\/\/hail2u\.net/,
+            'src="'
+          );
+          item.hasImage = true;
+        }
+      });
+      metadata.articles.first = metadata.articles.item.shift();
+      metadata.updates = readRSS(path.resolve(__dirname, homeFeed));
 
       break;
 
