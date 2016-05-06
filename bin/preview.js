@@ -18,7 +18,7 @@ var article = fs.readFileSync(
 ).split("\n");
 var previewFile = "../tmp/__preview.html";
 var previewTemplate = `<!DOCTYPE html>
-<html class="permalink" lang="ja">
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
@@ -29,10 +29,10 @@ var previewTemplate = `<!DOCTYPE html>
   <body style="margin-bottom: 6rem">
     <main class="content">
       <article role="main">
-        <h1 class="first-heading"><%TITLE%></h1>
         <footer class="section-footer">
           <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under <span class="tag"><a href="#">Preview</a></span></p>
         </footer>
+        <h1 class="first-heading"><%TITLE%></h1>
         <%BODY%>
       </article>
     </main>
