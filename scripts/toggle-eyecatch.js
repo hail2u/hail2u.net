@@ -1,6 +1,6 @@
-(function (d) {
-  "use strict";
+"use strict";
 
+(function (d) {
   function toggle(eyecatch, article, evt) {
     if (eyecatch.hidden) {
       eyecatch.hidden = false;
