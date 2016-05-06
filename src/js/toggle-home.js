@@ -3,10 +3,10 @@
 (function (d) {
   var className = "is-used-at-home";
 
-  function toggle(logo, sectionFooter, evt) {
+  function toggle(globalHeader, sectionFooter, evt) {
     evt.preventDefault();
     evt.stopPropagation();
-    logo.classList.toggle(className);
+    globalHeader.classList.toggle(className);
     sectionFooter.classList.toggle(className);
     evt.target.classList.toggle(className);
   }
@@ -15,7 +15,7 @@
     "click",
     toggle.bind(
       null,
-      d.querySelector(".logo"),
+      d.querySelector(".global-header"),
       d.querySelector(".section-footer")
     ),
     false
