@@ -15,7 +15,7 @@ var which = require("which").sync;
   {
     dest: "../dist/images/cover.png",
     src: "../src/img/cover.svg",
-    width: 180
+    width: 2560
   },
   {
     dest: "../dist/images/favicon-1024.png",
