@@ -6,7 +6,7 @@
 package permalink;
 
 use strict;
-use vars qw($is_permalink $title $title_sep $description $has_eyecatch $has_image);
+use vars qw($is_permalink $title $title_sep);
 
 # --- Configurable variables -----------
 
@@ -16,10 +16,12 @@ my $str_title_sep = " - ";
 # --- Plug-in package variables --------
 
 $is_permalink = 0;
-my $title_placeholder = '{{{permalink::title}}}';
 my $description_placeholder = '{{{permalink::description}}}';
-my $t;
+my $image_placeholder = '{{{permalink::image}}}';
+my $title_placeholder = '{{{permalink::title}}}';
 my $d;
+my $i = $blosxom::blog_image;
+my $t;
 
 # --------------------------------------
 
@@ -31,7 +33,8 @@ sub start {
   $is_permalink = 1;
   $title = $title_placeholder;
   $title_sep = $str_title_sep;
-  $description = $description_placeholder;
+  $blosxom::blog_description = $description_placeholder;
+  $blosxom::blog_image = $image_placeholder;
 
   return 1;
 }
@@ -39,32 +42,26 @@ sub start {
 sub story {
   my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
 
-  $has_eyecatch = 0;
-  $has_image = 0;
-
-  if ($$body_ref =~ m!^\s*<figure class="fill">!) {
-    $has_eyecatch = 1;
-  }
-
-  if ($$body_ref =~ m!<img!) {
-    $has_image = 1;
-  }
-
-  $t = $$title_ref;
-  $t =~ s!"!&quot;!g;
-
   $d = $$body_ref;
   $d =~ tr!\x0D\x0A!!d;
   $d =~ s!^.*?<p.*?>(.*?)</p>.*?$!$1!;
   $d =~ s!<.*?>!!g;
   $d =~ s!"!&quot;!g;
 
+  if ($$body_ref =~ m!<img\s[^>]*src="(.*?)"!) {
+    $i = $1;
+  }
+
+  $t = $$title_ref;
+  $t =~ s!"!&quot;!g;
+
   return 1;
 }
 
 sub last {
-  $blosxom::output =~ s/$title_placeholder/$t/gm;
   $blosxom::output =~ s/$description_placeholder/$d/gm;
+  $blosxom::output =~ s/$image_placeholder/$i/gm;
+  $blosxom::output =~ s/$title_placeholder/$t/gm;
 }
 
 1;
