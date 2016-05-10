@@ -40,7 +40,7 @@ var previewTemplate = `<!DOCTYPE html>
 </html>`;
 var renderer = new marked.Renderer();
 
-renderer.html = function (html) {
+function html(html) {
   var attributes;
   var contents;
   var tag;
@@ -63,7 +63,37 @@ renderer.html = function (html) {
   }).trim();
 
   return "<" + tag + attributes + ">\n" + contents + "\n</" + tag + ">\n";
-};
+}
+
+function p(text) {
+  var close = "</p>\n";
+  var open = "<p>";
+  var tokens = text.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
+  var type = "class";
+
+  if (/^<img\s.*>$/.exec(text)) {
+    return text + "\n";
+  }
+
+  if (!tokens) {
+    return open + text + close;
+  }
+
+  text = tokens[1];
+
+  if (tokens[2] === "#") {
+    type = "id";
+  }
+
+  if (tokens[3]) {
+    open = "<p " + type + '="' + tokens[3] + '">';
+  }
+
+  return open + text + close;
+}
+
+renderer.html = html;
+renderer.paragraph = p;
 previewFile = path.resolve(__dirname, previewFile);
 fs.outputFileSync(
   previewFile,
