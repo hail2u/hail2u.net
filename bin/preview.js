@@ -40,7 +40,7 @@ var previewTemplate = `<!DOCTYPE html>
 </html>`;
 var renderer = new marked.Renderer();
 
-function html(html) {
+function h(html) {
   var attributes;
   var contents;
   var tag;
@@ -92,7 +92,7 @@ function p(text) {
   return open + text + close;
 }
 
-renderer.html = html;
+renderer.html = h;
 renderer.paragraph = p;
 previewFile = path.resolve(__dirname, previewFile);
 fs.outputFileSync(
