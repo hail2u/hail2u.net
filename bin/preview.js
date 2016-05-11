@@ -71,7 +71,7 @@ function p(text) {
   var tokens = text.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
   var type = "class";
 
-  if (/^<img\s.*>$/.exec(text)) {
+  if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(text)) {
     return text + "\n";
   }
 
