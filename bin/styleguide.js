@@ -19,6 +19,9 @@ fs.outputFileSync(
     path.resolve(__dirname, src),
     "utf8"
   ).replace(
+    /\.\.\/\.\.\/node_modules\/unutm\/build\//,
+    dir.js
+  ).replace(
     /\b(href|src)(=)(")(.*?)(")/g,
     function (m, attribute, equal, openQuote, url, closeQuote) {
       if (url.startsWith(site)) {
