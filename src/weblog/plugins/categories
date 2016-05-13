@@ -1,12 +1,12 @@
 # Blosxom Plugin: categories
 # Author(s): Kyo Nagashima <kyo@hail2u.net>
-# Version: 2016-05-11
+# Version: 2016-05-13
 # Blosxom Home/Docs/Licensing: http://www.blosxom.com/
 
 package categories;
 
 use strict;
-use vars qw($enabled $title $title_sep $description $name);
+use vars qw($is_category_page $title $title_sep $description $name);
 
 # --- Configuration Variables ----------
 
@@ -34,7 +34,7 @@ my $name_sep = "/";
 
 # --- Plug-in package variables --------
 
-$enabled = 0;
+$is_category_page = 0;
 $title = "";
 $description = "";
 my $flavour = $blosxom::default_flavour;
@@ -45,7 +45,7 @@ my $cache = {};
 
 sub start {
   if (!$blosxom::path_info_yr and $blosxom::path_info and ($blosxom::path_info !~ m!.*?/?\w+\.\w+$!)) {
-    $enabled = 1;
+    $is_category_page = 1;
     $description = "このページでは";
 
     foreach (split(/\//, $blosxom::path_info)) {
@@ -99,7 +99,7 @@ sub date {
 sub story {
   my ($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
 
-  if (!$enabled) {
+  if (!$is_category_page) {
     $name = '';
 
     foreach (split(/\//, $path)) {
@@ -141,7 +141,7 @@ sub foot {
 }
 
 sub last {
-  if ($enabled) {
+  if ($is_category_page) {
     $blosxom::output =~ s!</ol>!!;
   }
 }
