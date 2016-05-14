@@ -7,6 +7,7 @@ var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
+var argv = process.argv.slice(2);
 var cssExt = ".css";
 var destDir = "../tmp/";
 var scssExt = ".scss";
@@ -26,11 +27,10 @@ fs.readdirSync(srcDir).forEach(function (input) {
     return;
   }
 
-  sassc = spawn(which("sassc"), [
-    "--precision=3",
+  sassc = spawn(which("sassc"), argv.concat([
     sl(path.join(srcDir, input)),
     sl(path.join(destDir, basename + cssExt))
-  ], {
+  ]), {
     stdio: "inherit"
   });
 
