@@ -2,9 +2,9 @@
 
 "use strict";
 
-var fs = require("fs");
+var fs = require("fs-extra");
 var path = require("path");
-var spawn = require("child_process").spawnSync;
+var execFile = require("child_process").execFile;
 var which = require("which").sync;
 
 var argv = process.argv.slice(2);
@@ -21,20 +21,18 @@ destDir = path.resolve(__dirname, destDir);
 srcDir = path.resolve(__dirname, srcDir);
 fs.readdirSync(srcDir).forEach(function (input) {
   var basename = path.basename(input, scssExt);
-  var sassc;
 
   if (path.extname(input) !== scssExt || basename.startsWith("_")) {
     return;
   }
 
-  sassc = spawn(which("sassc"), argv.concat([
+  execFile(which("sassc"), argv.concat([
     sl(path.join(srcDir, input)),
-    sl(path.join(destDir, basename + cssExt))
-  ]), {
-    stdio: "inherit"
-  });
+  ]), function (err, stdout) {
+    if (err) {
+      throw err;
+    }
 
-  if (sassc.error) {
-    throw sassc.error;
-  }
+    fs.outputFileSync(path.join(destDir, basename + cssExt), stdout);
+  });
 });
