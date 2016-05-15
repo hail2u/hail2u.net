@@ -12,10 +12,7 @@ var which = require("which").sync;
 var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-var article = fs.readFileSync(
-  argv.file,
-  "utf8"
-).split("\n");
+var article = fs.readFileSync(argv.file, "utf8").split("\n");
 var previewFile = "../tmp/__preview.html";
 var previewTemplate = `<!DOCTYPE html>
 <html lang="ja">
