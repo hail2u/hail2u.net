@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var minimist = require("minimist");
 var path = require("path");
 
@@ -37,7 +37,7 @@ if (!argv.force && !argv.file) {
 }
 
 if (!argv.force) {
-  articles = fs.readJsonSync(cache);
+  articles = JSON.parse(fs.readFileSync(cache, "utf8"));
 }
 
 fs.readFileSync(
@@ -69,8 +69,8 @@ fs.readFileSync(
     )
   );
 });
-fs.writeJsonSync(cache, articles.sort(function (a, b) {
+fs.writeFileSync(cache, JSON.stringify(articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter(function (val, idx, arr) {
   return arr.indexOf(val) === idx;
-}));
+}), 2));

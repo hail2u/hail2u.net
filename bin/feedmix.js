@@ -3,7 +3,7 @@
 "use strict";
 
 var feedmix = require("feedmix");
-var fs = require("fs-extra");
+var fs = require("fs");
 var path = require("path");
 
 var dest = "../dist/feed";
@@ -15,7 +15,7 @@ var feeds = [
 feeds = feeds.map(function (feed) {
   return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
 });
-fs.outputFileSync(
+fs.writeFileSync(
   path.resolve(__dirname, dest),
   feedmix.stringify(feedmix.merge(feeds, {
     trim: true

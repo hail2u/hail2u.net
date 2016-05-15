@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var path = require("path");
 
 var dest = "../dist/about/style-guide/index.html";
@@ -13,7 +13,7 @@ var dir = {
 var site = "https://hail2u.net/";
 var src = "../src/css/test.html";
 
-fs.outputFileSync(
+fs.writeFileSync(
   path.resolve(__dirname, dest),
   fs.readFileSync(
     path.resolve(__dirname, src),

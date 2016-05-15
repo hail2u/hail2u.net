@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var path = require("path");
 var execFile = require("child_process").execFile;
 var which = require("which").sync;
@@ -33,6 +33,6 @@ fs.readdirSync(srcDir).forEach(function (input) {
       throw err;
     }
 
-    fs.outputFileSync(path.join(destDir, basename + cssExt), stdout);
+    fs.writeFileSync(path.join(destDir, basename + cssExt), stdout);
   });
 });

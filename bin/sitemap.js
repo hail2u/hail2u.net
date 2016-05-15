@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var path = require("path");
 var xml2js = require("xml2js");
 
@@ -44,7 +44,9 @@ fs.readdirSync(path.resolve(__dirname, documentsDir)).forEach(function (file) {
 
   urls.push("/" + path.basename(documentsDir) + "/" + file);
 });
-fs.readJsonSync(path.resolve(__dirname, cache)).forEach(function (article) {
+JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, cache), "utf8")
+).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
@@ -52,7 +54,7 @@ urls.forEach(function (url) {
     loc: "https://hail2u.net" + url
   });
 });
-fs.outputFileSync(
+fs.writeFileSync(
   path.resolve(__dirname, dest),
   new xml2js.Builder().buildObject(sitemap)
 );

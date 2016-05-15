@@ -5,7 +5,7 @@
 var ProgressBar = require("progress");
 var async = require("async");
 var execFile = require("child_process").execFile;
-var fs = require("fs-extra");
+var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
 var os = require("os");
@@ -86,7 +86,7 @@ function build(file, next) {
       });
     }
 
-    fs.outputFileSync(path.join(dir.static, file), contents);
+    fs.writeFileSync(path.join(dir.static, file), contents);
     bar.tick();
     next();
   });
@@ -117,7 +117,7 @@ if (argv.file) {
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
       src = path.join(dir.img, image);
       dest = path.join(dir.staticimg, image);
-      fs.copySync(src, dest);
+      fs.createReadStream(src).pipe(fs.createWriteStream(dest));
     });
   }
 }

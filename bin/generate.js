@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
 var mustache = require("mustache");
@@ -142,7 +142,9 @@ function readRSS(file) {
 }
 
 function readArticles() {
-  var articles = fs.readJsonSync(path.resolve(__dirname, articlesCache));
+  var articles = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, articlesCache), "utf8")
+  );
 
   articles.forEach(function (article, idx) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
@@ -173,8 +175,8 @@ function readArticles() {
 function readMetadata(file, callback) {
   var metadata = extendObject({}, basicMetadata);
 
-  fs.readJson(file, function (err, data) {
-    metadata = extendObject(metadata, data);
+  fs.readFile(file, function (err, data) {
+    metadata = extendObject(metadata, JSON.parse(data));
 
     switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
     case "index.json":
@@ -250,7 +252,7 @@ files.forEach(function (file) {
       });
     }
 
-    fs.outputFileSync(file.dest, html);
+    fs.writeFileSync(file.dest, html);
   }
 
   file.src = path.resolve(__dirname, file.src);

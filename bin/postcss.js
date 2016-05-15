@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var path = require("path");
 var postcss = require("postcss")([
   require("css-mqpacker")({
@@ -27,6 +27,6 @@ fs.readdirSync(tmpdir).forEach(function (input) {
   input = path.join(tmpdir, input);
   output = path.join(tmpdir, basename + minExt + cssExt);
   postcss.process(fs.readFileSync(input, "utf8")).then(function (result) {
-    fs.outputFileSync(output, result.css);
+    fs.writeFileSync(output, result.css);
   });
 });

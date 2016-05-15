@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var marked = require("marked");
 var minimist = require("minimist");
 var path = require("path");
@@ -92,7 +92,7 @@ function p(text) {
 renderer.html = h;
 renderer.paragraph = p;
 previewFile = path.resolve(__dirname, previewFile);
-fs.outputFileSync(
+fs.writeFileSync(
   previewFile,
   previewTemplate.replace(
     /<%TITLE%>/g,

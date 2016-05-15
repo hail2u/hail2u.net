@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var minifyJS = require("uglify-js").minify;
 var path = require("path");
 
@@ -21,7 +21,7 @@ fs.readdirSync(tmpdir).forEach(function (input) {
 
   input = path.join(tmpdir, input);
   output = path.join(tmpdir, basename + minExt + jsExt);
-  fs.outputFileSync(output, minifyJS(input, {
+  fs.writeFileSync(output, minifyJS(input, {
     output: {
       comments: /@preserve|@license|@cc_on/i
     }
