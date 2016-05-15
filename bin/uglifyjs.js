@@ -12,18 +12,18 @@ var minExt = ".min";
 var tmpdir = "../tmp/";
 
 tmpdir = path.resolve(__dirname, tmpdir);
-fs.readdirSync(tmpdir).forEach(function (input) {
-  var basename = path.basename(input, jsExt);
-  var output;
+fs.readdirSync(tmpdir).forEach(function (src) {
+  var basename = path.basename(src, jsExt);
+  var dest;
 
-  if (path.extname(input) !== jsExt || path.extname(basename) === minExt) {
+  if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
     return;
   }
 
-  input = path.join(tmpdir, input);
-  output = path.join(tmpdir, basename + minExt + jsExt);
-  mkdirp.sync(path.dirname(output));
-  fs.writeFileSync(output, minifyJS(input, {
+  src = path.join(tmpdir, src);
+  dest = path.join(tmpdir, basename + minExt + jsExt);
+  mkdirp.sync(path.dirname(dest));
+  fs.writeFileSync(dest, minifyJS(src, {
     output: {
       comments: /@preserve|@license|@cc_on/i
     }

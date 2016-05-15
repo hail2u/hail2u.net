@@ -20,24 +20,24 @@ function sl(p) {
 
 destDir = path.resolve(__dirname, destDir);
 srcDir = path.resolve(__dirname, srcDir);
-fs.readdirSync(srcDir).forEach(function (input) {
-  var basename = path.basename(input, scssExt);
+fs.readdirSync(srcDir).forEach(function (src) {
+  var basename = path.basename(src, scssExt);
 
-  if (path.extname(input) !== scssExt || basename.startsWith("_")) {
+  if (path.extname(src) !== scssExt || basename.startsWith("_")) {
     return;
   }
 
   execFile(which("sassc"), argv.concat([
-    sl(path.join(srcDir, input))
+    sl(path.join(srcDir, src))
   ]), function (err, stdout) {
-    var output;
+    var dest;
 
     if (err) {
       throw err;
     }
 
-    output = path.join(destDir, basename + cssExt);
-    mkdirp.sync(path.dirname(output));
-    fs.writeFileSync(output, stdout);
+    dest = path.join(destDir, basename + cssExt);
+    mkdirp.sync(path.dirname(dest));
+    fs.writeFileSync(dest, stdout);
   });
 });
