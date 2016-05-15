@@ -25,7 +25,7 @@ fs.readdirSync(tmpdir).forEach(function (src) {
   mkdirp.sync(path.dirname(dest));
   fs.writeFileSync(dest, minifyJS(src, {
     output: {
-      comments: /@preserve|@license|@cc_on/i
+      comments: /^!/
     }
   }).code);
 });

@@ -1,5 +1,5 @@
-/**
- * @preserve ellipsis-title.js
+/*!
+ * ellipsis-title.js
  *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
