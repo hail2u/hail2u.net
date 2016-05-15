@@ -19,7 +19,7 @@ var which = require("which").sync;
   },
   {
     dest: "../dist/images/cover.png",
-    src: "../src/img/cover.svg",
+    src: "../src/img/favicon-large.svg",
     width: 2560
   },
   {
