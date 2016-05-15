@@ -1,12 +1,12 @@
 # Blosxom Plugin: permalink
 # Author(s): Kyo Nagashima <kyo@hail2u.net>
-# Version: 2016-05-13
+# Version: 2016-05-16
 # Blosxom Home/Docs/Licensing: http://www.blosxom.com/
 
 package permalink;
 
 use strict;
-use vars qw($is_permalink $title $title_sep);
+use vars qw($is_permalink $card_type $title $title_sep);
 
 # --- Configurable variables -----------
 
@@ -16,9 +16,11 @@ my $str_title_sep = " - ";
 # --- Plug-in package variables --------
 
 $is_permalink = 0;
+my $card_type_placeholder = '{{{permalink::card_type}}}';
 my $description_placeholder = '{{{permalink::description}}}';
 my $image_placeholder = '{{{permalink::image}}}';
 my $title_placeholder = '{{{permalink::title}}}';
+my $c;
 my $d;
 my $i = $blosxom::blog_image;
 my $t;
@@ -31,6 +33,7 @@ sub start {
   }
 
   $is_permalink = 1;
+  $card_type = $card_type_placeholder;
   $title = $title_placeholder;
   $title_sep = $str_title_sep;
   $blosxom::blog_description = $description_placeholder;
@@ -49,6 +52,7 @@ sub story {
   $d =~ s!"!&quot;!g;
 
   if ($$body_ref =~ m!<img\s[^>]*src="(.*?)"!) {
+    $c = "_large_image";
     $i = $1;
   }
 
@@ -59,6 +63,7 @@ sub story {
 }
 
 sub last {
+  $blosxom::output =~ s/$card_type_placeholder/$c/gm;
   $blosxom::output =~ s/$description_placeholder/$d/gm;
   $blosxom::output =~ s/$image_placeholder/$i/gm;
   $blosxom::output =~ s/$title_placeholder/$t/gm;
