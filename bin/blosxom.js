@@ -8,6 +8,7 @@ var execFile = require("child_process").execFile;
 var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
+var mkdirp = require("mkdirp");
 var os = require("os");
 var path = require("path");
 var which = require("which").sync;
@@ -48,6 +49,7 @@ function build(file, next) {
       BLOSXOM_CONFIG_DIR: dir.root
     }
   }, function (err, stdout) {
+    var entry;
     var contents;
 
     if (err) {
@@ -86,7 +88,9 @@ function build(file, next) {
       });
     }
 
-    fs.writeFileSync(path.join(dir.static, file), contents);
+    entry = path.join(dir.static, file);
+    mkdirp.sync(path.dirname(entry));
+    fs.writeFileSync(entry, contents);
     bar.tick();
     next();
   });

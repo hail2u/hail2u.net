@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require("fs");
+var mkdirp = require("mkdirp");
 var path = require("path");
 var execFile = require("child_process").execFile;
 var which = require("which").sync;
@@ -27,12 +28,16 @@ fs.readdirSync(srcDir).forEach(function (input) {
   }
 
   execFile(which("sassc"), argv.concat([
-    sl(path.join(srcDir, input)),
+    sl(path.join(srcDir, input))
   ]), function (err, stdout) {
+    var output;
+
     if (err) {
       throw err;
     }
 
-    fs.writeFileSync(path.join(destDir, basename + cssExt), stdout);
+    output = path.join(destDir, basename + cssExt);
+    mkdirp.sync(path.dirname(output));
+    fs.writeFileSync(output, stdout);
   });
 });

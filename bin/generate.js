@@ -5,6 +5,7 @@
 var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
+var mkdirp = require("mkdirp");
 var mustache = require("mustache");
 var parseXML = require("xml2js").parseString;
 var path = require("path");
@@ -252,6 +253,7 @@ files.forEach(function (file) {
       });
     }
 
+    mkdirp.sync(path.dirname(file.dest));
     fs.writeFileSync(file.dest, html);
   }
 

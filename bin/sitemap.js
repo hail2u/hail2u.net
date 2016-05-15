@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require("fs");
+var mkdirp = require("mkdirp");
 var path = require("path");
 var xml2js = require("xml2js");
 
@@ -37,6 +38,7 @@ var urls = [
   "/documents/"
 ];
 
+dest = path.resolve(__dirname, dest);
 fs.readdirSync(path.resolve(__dirname, documentsDir)).forEach(function (file) {
   if (file === "index.html" || path.extname(file) !== ".html") {
     return false;
@@ -54,7 +56,8 @@ urls.forEach(function (url) {
     loc: "https://hail2u.net" + url
   });
 });
+mkdirp.sync(path.dirname(dest));
 fs.writeFileSync(
-  path.resolve(__dirname, dest),
+  dest,
   new xml2js.Builder().buildObject(sitemap)
 );

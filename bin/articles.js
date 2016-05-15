@@ -4,6 +4,7 @@
 
 var fs = require("fs");
 var minimist = require("minimist");
+var mkdirp = require("mkdirp");
 var path = require("path");
 
 var argv = minimist(process.argv.slice(2), {
@@ -69,6 +70,7 @@ fs.readFileSync(
     )
   );
 });
+mkdirp.sync(path.dirname(cache));
 fs.writeFileSync(cache, JSON.stringify(articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter(function (val, idx, arr) {

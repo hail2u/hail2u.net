@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require("fs");
+var mkdirp = require("mkdirp");
 var path = require("path");
 
 var dest = "../dist/about/style-guide/index.html";
@@ -13,8 +14,10 @@ var dir = {
 var site = "https://hail2u.net/";
 var src = "../src/css/test.html";
 
+dest = path.resolve(__dirname, dest);
+mkdirp.sync(path.dirname(dest));
 fs.writeFileSync(
-  path.resolve(__dirname, dest),
+  dest,
   fs.readFileSync(
     path.resolve(__dirname, src),
     "utf8"

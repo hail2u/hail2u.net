@@ -5,6 +5,7 @@
 var fs = require("fs");
 var marked = require("marked");
 var minimist = require("minimist");
+var mkdirp = require("mkdirp");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
@@ -92,6 +93,7 @@ function p(text) {
 renderer.html = h;
 renderer.paragraph = p;
 previewFile = path.resolve(__dirname, previewFile);
+mkdirp.sync(path.dirname(previewFile));
 fs.writeFileSync(
   previewFile,
   previewTemplate.replace(
