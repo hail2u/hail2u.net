@@ -10,12 +10,52 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 16 May 2016 11:21:39 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 17 May 2016 12:20:12 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>fs-extraパッケージの置き換え</title>
+      <link>https://hail2u.net/blog/coding/replacing-fs-extra-package.html</link>
+      <description>fs-extraパッケージを便利に使っていたのだが、よくよく確認してみるとreadJson()とoutputFile()だけしか使っていなかった。それらを使うだけにはfs-extraパッケージはちょっと大きすぎる。両者はコア・モジュールと小さなパッケージでどうにかなりそうなので、ついにという感じで書き換えていくことにした。</description>
+      <category>Coding</category>
+      <guid isPermaLink="true">https://hail2u.net/blog/coding/replacing-fs-extra-package.html</guid>
+      <pubDate>Tue, 17 May 2016 12:19:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://github.com/jprichardson/node-fs-extra">fs-extra</a>パッケージを便利に使っていたのだが、よくよく確認してみると<code>readJson()</code>と<code>outputFile()</code>だけしか使っていなかった。それらを使うだけにはfs-extraパッケージはちょっと大きすぎる。両者はコア・モジュールと小さなパッケージでどうにかなりそうなので、ついにという感じで書き換えていくことにした。</p>
+
+<p>指定したパスを読み、JSONとしてパースし、オブジェクトに格納してくれる<code>readJson()</code>は、fsモジュールと<code>JSON#parse()</code>を組み合わせるだけで置き換えられる。BOMがありそうならそれに気を付けるくらいで良いだろう。</p>
+
+<p><code>outputFile()</code>は親のディレクトリーがなかったら自動的に作ってくれるものだ。これはコア・モジュールだけで実装するとかなり辛いので、安定の<a href="https://github.com/substack/node-mkdirp">mkdirp</a>を使うのが良さそうだ。</p>
+
+<pre><code>var fs = require(&quot;fs&quot;);
+var mkdirp = require(&quot;mkdirp&quot;);
+var path = require(&quot;path&quot;);
+
+var data = &quot;Hi!&quot;;
+var dest = &quot;/some/non/existent/path/to/dest.ext&quot;;
+
+// fs-extra.outputFile(dest, data, function (err) {});
+mkdirp(path.dirname(dest), function (err) {
+  if (err) {
+    throw err;
+  }
+
+  fs.writeFile(dest, data, function (err2) {
+    if (err2) {
+      throw err2;
+    }
+  });
+});
+</code></pre>
+
+<hr>
+
+<p>書き換えの主な理由は最初に書いたように大きすぎることだ。もうひとつ隠れた理由として、fs-extraパッケージがいつまでたってもメジャーリリースされず、依存アップデートが面倒になってきたことがある。メジャー・バージョン出るまでは更新しないつもりでいたが、fs-extraパッケージが依存している某パッケージの出す警告のせいで更新を強いられ、嫌になった。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>欧米小説の引用癖</title>
@@ -242,19 +282,6 @@ pre {
 <p>いわゆる外典と呼ばれているこれらには興味はあったのだが、なにしろ日本語では出版されていなかった。去年発売されたことを知ったのだが、単行本で2500円という価格はちょっと出せなかった。元がペーパーバックということも考えるとなおさらだ。既に他にもいくつか出ているが、大枚はたいて集めてしまいそうな予感がある。</p>
 
 <p>またこの名義貸し作品を担当した<a href="https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%83%83%E3%82%AF%E3%83%BB%E3%83%B4%E3%82%A1%E3%83%B3%E3%82%B9">ジャック・ヴァンス</a>の本も読んでみたい。盲目の作家だそうで、興味深い。D&amp;Dの魔法体系のネタ元の小説も彼が書いたものだそうだ。SFは最近読んでいないのでちょうど良さそうだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>夢</title>
-      <link>https://hail2u.net/blog/misc/dreaming-20160501.html</link>
-      <description>Twitterで「ウェブサイトが見づらい」と言われる。「詳しく」と返すも要領を得ない返事が返ってくる。徐々に口論になる。数十回のやりとりのあと、「でも記事は好き」みたいなことを言われウワッとなって起きる。</description>
-      <category>Misc.</category>
-      <guid isPermaLink="true">https://hail2u.net/blog/misc/dreaming-20160501.html</guid>
-      <pubDate>Mon, 02 May 2016 10:35:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>Twitterで「ウェブサイトが見づらい」と言われる。「詳しく」と返すも要領を得ない返事が返ってくる。徐々に口論になる。数十回のやりとりのあと、「でも記事は好き」みたいなことを言われウワッとなって起きる。</p>
-
-<p>ウワッてなって起きるのやめたい。</p>]]></content:encoded>
     </item>
 
   </channel>
