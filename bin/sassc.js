@@ -2,13 +2,16 @@
 
 "use strict";
 
+var async = require("async");
 var fs = require("fs");
 var mkdirp = require("mkdirp");
+var os = require("os");
 var path = require("path");
 var execFile = require("child_process").execFile;
 var which = require("which").sync;
 
 var argv = process.argv.slice(2);
+var cpuNum = Math.max(1, os.cpus().length - 1);
 var cssExt = ".css";
 var destDir = "../tmp/";
 var scssExt = ".scss";
@@ -20,11 +23,11 @@ function sl(p) {
 
 destDir = path.resolve(__dirname, destDir);
 srcDir = path.resolve(__dirname, srcDir);
-fs.readdirSync(srcDir).forEach(function (src) {
+async.eachLimit(fs.readdirSync(srcDir), cpuNum, function (src, next) {
   var basename = path.basename(src, scssExt);
 
   if (path.extname(src) !== scssExt || basename.startsWith("_")) {
-    return;
+    return next();
   }
 
   execFile(which("sassc"), argv.concat([
@@ -33,11 +36,16 @@ fs.readdirSync(srcDir).forEach(function (src) {
     var dest;
 
     if (err) {
-      throw err;
+      return next(err);
     }
 
     dest = path.join(destDir, basename + cssExt);
     mkdirp.sync(path.dirname(dest));
     fs.writeFileSync(dest, stdout);
+    next();
   });
+}, function (err) {
+  if (err) {
+    throw err;
+  }
 });
