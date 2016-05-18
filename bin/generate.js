@@ -2,11 +2,13 @@
 
 "use strict";
 
+var async = require("async");
 var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
 var mkdirp = require("mkdirp");
 var mustache = require("mustache");
+var os = require("os");
 var parseXML = require("xml2js").parseString;
 var path = require("path");
 var sprintf = require("sprintf").sprintf;
@@ -49,6 +51,7 @@ var categoryNamesInv = (function (obj) {
 
   return newObj;
 })(categoryNames);
+var cpuNum = Math.max(1, os.cpus().length - 1);
 var entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -226,7 +229,7 @@ fs.readdirSync(partialDir).forEach(function (partial) {
     "utf8"
   );
 });
-files.forEach(function (file) {
+async.eachLimit(files, cpuNum, function (file, next) {
   function processTemplate(data) {
     var html = mustache.render(
       fs.readFileSync(file.src, "utf8"),
@@ -255,6 +258,7 @@ files.forEach(function (file) {
 
     mkdirp.sync(path.dirname(file.dest));
     fs.writeFileSync(file.dest, html);
+    next();
   }
 
   file.src = path.resolve(__dirname, file.src);
@@ -275,4 +279,8 @@ files.forEach(function (file) {
     ),
     processTemplate
   );
+}, function (err) {
+  if (err) {
+    throw err;
+  }
 });
