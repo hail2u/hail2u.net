@@ -70,9 +70,7 @@ var which = require("which").sync;
     ]);
   }
 
-  inkscape = spawn(which("inkscape"), args, {
-    stdio: "inherit"
-  });
+  inkscape = spawn(which("inkscape"), args);
 
   if (inkscape.error) {
     throw inkscape.error;
