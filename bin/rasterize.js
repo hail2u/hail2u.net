@@ -2,7 +2,7 @@
 
 "use strict";
 
-var async = require("async");
+var eachLimit = require("async").eachLimit;
 var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
@@ -52,7 +52,7 @@ var files = [
   }
 ];
 
-async.eachLimit(files, cpuNum, function (file, next) {
+eachLimit(files, cpuNum, function (file, next) {
   var args = [
     "-f",
     path.resolve(__dirname, file.src),

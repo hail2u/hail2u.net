@@ -2,7 +2,7 @@
 
 "use strict";
 
-var async = require("async");
+var eachLimit = require("async").eachLimit;
 var fs = require("fs");
 var mkdirp = require("mkdirp");
 var os = require("os");
@@ -23,7 +23,7 @@ function sl(p) {
 
 destDir = path.resolve(__dirname, destDir);
 srcDir = path.resolve(__dirname, srcDir);
-async.eachLimit(fs.readdirSync(srcDir), cpuNum, function (src, next) {
+eachLimit(fs.readdirSync(srcDir), cpuNum, function (src, next) {
   var basename = path.basename(src, scssExt);
 
   if (path.extname(src) !== scssExt || basename.startsWith("_")) {

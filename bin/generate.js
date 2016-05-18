@@ -2,7 +2,7 @@
 
 "use strict";
 
-var async = require("async");
+var eachLimit = require("async").eachLimit;
 var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
 var minimist = require("minimist");
@@ -229,7 +229,7 @@ fs.readdirSync(partialDir).forEach(function (partial) {
     "utf8"
   );
 });
-async.eachLimit(files, cpuNum, function (file, next) {
+eachLimit(files, cpuNum, function (file, next) {
   function processTemplate(data) {
     var html = mustache.render(
       fs.readFileSync(file.src, "utf8"),

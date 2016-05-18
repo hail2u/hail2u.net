@@ -3,7 +3,8 @@
 "use strict";
 
 var ProgressBar = require("progress");
-var async = require("async");
+var eachLimit = require("async").eachLimit;
+var ensureAsync = require("async").ensureAsync;
 var execFile = require("child_process").execFile;
 var fs = require("fs");
 var minifyHTML = require("html-minifier").minify;
@@ -161,7 +162,7 @@ bar = new ProgressBar("Building [:bar] :percent :elapsed", {
   width: 25
 });
 bar.render();
-async.eachLimit(files, cpuNum, async.ensureAsync(build), function (err) {
+eachLimit(files, cpuNum, ensureAsync(build), function (err) {
   if (err) {
     throw err;
   }

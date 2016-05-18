@@ -2,7 +2,7 @@
 
 "use strict";
 
-var async = require("async");
+var eachLimit = require("async").eachLimit;
 var fs = require("fs");
 var minifyJS = require("uglify-js").minify;
 var mkdirp = require("mkdirp");
@@ -15,7 +15,7 @@ var minExt = ".min";
 var tmpdir = "../tmp/";
 
 tmpdir = path.resolve(__dirname, tmpdir);
-async.eachLimit(fs.readdirSync(tmpdir), cpuNum, function (src, next) {
+eachLimit(fs.readdirSync(tmpdir), cpuNum, function (src, next) {
   var basename = path.basename(src, jsExt);
   var dest;
 
