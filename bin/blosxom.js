@@ -22,7 +22,7 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var bar;
-var cpuNum = os.cpus().length;
+var cpuNum = cpuNum = Math.max(1, os.cpus().length - 1);
 var d;
 var data = "../src/weblog/plugins/state/files_index.dat";
 var dir = {
@@ -153,7 +153,6 @@ if (argv.all) {
   });
 }
 
-cpuNum = Math.max(1, cpuNum - 1);
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
