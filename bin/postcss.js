@@ -2,8 +2,10 @@
 
 "use strict";
 
+var async = require("async");
 var fs = require("fs");
 var mkdirp = require("mkdirp");
+var os = require("os");
 var path = require("path");
 var postcss = require("postcss")([
   require("css-mqpacker")({
@@ -12,17 +14,18 @@ var postcss = require("postcss")([
   require("csswring")()
 ]);
 
+var cpuNum = Math.max(1, os.cpus().length - 1);
 var cssExt = ".css";
 var minExt = ".min";
 var tmpdir = "../tmp/";
 
 tmpdir = path.resolve(__dirname, tmpdir);
-fs.readdirSync(tmpdir).forEach(function (input) {
+async.eachLimit(fs.readdirSync(tmpdir), cpuNum, function (input, next) {
   var basename = path.basename(input, cssExt);
   var output;
 
   if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
-    return;
+    return next();
   }
 
   input = path.join(tmpdir, input);
@@ -30,5 +33,10 @@ fs.readdirSync(tmpdir).forEach(function (input) {
   postcss.process(fs.readFileSync(input, "utf8")).then(function (result) {
     mkdirp.sync(path.dirname(output));
     fs.writeFileSync(output, result.css);
+    next();
   });
+}, function (err) {
+  if (err) {
+    throw err;
+  }
 });
