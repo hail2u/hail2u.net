@@ -153,6 +153,7 @@ if (argv.all) {
   });
 }
 
+cpuNum = Math.max(1, cpuNum - 1);
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
