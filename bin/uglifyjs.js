@@ -2,22 +2,25 @@
 
 "use strict";
 
+var async = require("async");
 var fs = require("fs");
 var minifyJS = require("uglify-js").minify;
 var mkdirp = require("mkdirp");
+var os = require("os");
 var path = require("path");
 
+var cpuNum = Math.max(1, os.cpus().length - 1);
 var jsExt = ".js";
 var minExt = ".min";
 var tmpdir = "../tmp/";
 
 tmpdir = path.resolve(__dirname, tmpdir);
-fs.readdirSync(tmpdir).forEach(function (src) {
+async.eachLimit(fs.readdirSync(tmpdir), cpuNum, function (src, next) {
   var basename = path.basename(src, jsExt);
   var dest;
 
   if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
-    return;
+    return next();
   }
 
   src = path.join(tmpdir, src);
@@ -28,4 +31,9 @@ fs.readdirSync(tmpdir).forEach(function (src) {
       comments: /^!/
     }
   }).code);
+  next();
+}, function (err) {
+  if (err) {
+    throw err;
+  }
 });
