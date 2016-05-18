@@ -2,11 +2,14 @@
 
 "use strict";
 
+var async = require("async");
+var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawnSync;
 var which = require("which").sync;
 
-[
+var cpuNum = Math.max(1, os.cpus().length - 1);
+var files = [
   {
     dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
     src: "../src/img/about/how-i-markup-and-style-this-website.svg",
@@ -47,7 +50,9 @@ var which = require("which").sync;
     src: "../src/img/favicon-large.svg",
     width: 64
   }
-].forEach(function (file) {
+];
+
+async.eachLimit(files, cpuNum, function (file, next) {
   var args = [
     "-f",
     path.resolve(__dirname, file.src),
@@ -71,8 +76,9 @@ var which = require("which").sync;
   }
 
   inkscape = spawn(which("inkscape"), args);
-
-  if (inkscape.error) {
-    throw inkscape.error;
+  next(inkscape.err);
+}, function (err) {
+  if (err) {
+    throw err;
   }
 });
