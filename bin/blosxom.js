@@ -22,7 +22,7 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var bar;
-var cpuNum = cpuNum = Math.max(1, os.cpus().length - 1);
+var cpuNum = Math.max(1, os.cpus().length - 1);
 var d;
 var data = "../src/weblog/plugins/state/files_index.dat";
 var dir = {
