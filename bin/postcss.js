@@ -8,6 +8,7 @@ var mkdirp = require("mkdirp");
 var os = require("os");
 var path = require("path");
 var postcss = require("postcss")([
+  require("postcss-round-float")(),
   require("css-mqpacker")({
     sort: true
   }),
