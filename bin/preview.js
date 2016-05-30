@@ -21,8 +21,7 @@ var previewTemplate = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
     <title><%TITLE%> - Weblog - Hail2u.net</title>
-    <link href="/styles/common.min.css" rel="stylesheet">
-    <link href="/styles/permalink.min.css" rel="stylesheet">
+    <link href="/styles/main.min.css" rel="stylesheet">
   </head>
   <body style="margin-bottom: 6rem">
     <main class="content">
