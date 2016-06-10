@@ -9,12 +9,13 @@ Environment
 
 - Bash
 - Git
+- ImageMagick
 - Node.js
+  - ESLint
   - npm
 - Ruby
   - sass
   - scss_lint
-- ImageMagick
 
 
 [1]: https://hail2u.net/
