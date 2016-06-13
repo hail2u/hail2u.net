@@ -23,6 +23,7 @@ var files = [
   {
     dest: "../dist/images/cover.png",
     src: "../src/img/favicon-large.svg",
+    area: "0:224:1024:800",
     width: 2560
   },
   {
