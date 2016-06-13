@@ -66,6 +66,13 @@ eachLimit(files, cpuNum, function (file, next) {
   ];
   var inkscape;
 
+  if (file.area) {
+    args = args.concat([
+      "-a",
+      file.area
+    ]);
+  }
+
   if (file.height) {
     args = args.concat([
       "-h",
