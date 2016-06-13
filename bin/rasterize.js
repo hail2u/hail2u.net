@@ -31,6 +31,11 @@ var files = [
     width: 1024
   },
   {
+    dest: "../dist/images/favicon-256.png",
+    src: "../src/img/favicon-large.svg",
+    width: 256
+  },
+  {
     dest: "../tmp/favicon-16.png",
     src: "../src/img/favicon.svg",
     width: 16
