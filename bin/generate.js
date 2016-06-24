@@ -61,6 +61,9 @@ var entityMap = {
 };
 var files = [
   {
+    src: "../src/html/404.mustache"
+  },
+  {
     src: "../src/html/about/index.mustache"
   },
   {
