@@ -25,7 +25,7 @@ var previewTemplate = `<!DOCTYPE html>
   </head>
   <body style="margin-bottom: 6rem">
     <main class="content">
-      <article role="main">
+      <article class="section" role="main">
         <footer class="section-footer">
           <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under <span class="tag"><a href="#">Preview</a></span></p>
         </footer>
