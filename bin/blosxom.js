@@ -127,20 +127,6 @@ if (argv.file) {
   }
 }
 
-if (argv.indexes) {
-  fs.readdirSync(dir.data).forEach(function (file) {
-    if (!fs.statSync(path.join(dir.data, file)).isDirectory()) {
-      return;
-    }
-
-    if (file === "themes") {
-      return;
-    }
-
-    files.push(path.join(file, "index.html"));
-  });
-}
-
 if (argv.all) {
   fs.readFileSync(
     path.resolve(__dirname, data),
@@ -151,6 +137,20 @@ if (argv.all) {
     }
 
     files.push(path.relative(dir.data, file.split("=>").shift()));
+  });
+}
+
+if (argv.indexes || files.length === 0) {
+  fs.readdirSync(dir.data).forEach(function (file) {
+    if (!fs.statSync(path.join(dir.data, file)).isDirectory()) {
+      return;
+    }
+
+    if (file === "themes") {
+      return;
+    }
+
+    files.push(path.join(file, "index.html"));
   });
 }
 
