@@ -14,8 +14,8 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var article = fs.readFileSync(argv.file, "utf8").split("\n");
-var previewFile = "../tmp/__preview.html";
-var previewTemplate = `<!DOCTYPE html>
+var preview = "../tmp/__preview.html";
+var template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -37,21 +37,21 @@ var previewTemplate = `<!DOCTYPE html>
 </html>`;
 var renderer = new marked.Renderer();
 
-function h(html) {
+function html(t) {
   var attributes;
   var contents;
   var tag;
   var tags = ["aside", "figure", "section"];
-  var tokens = html.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
+  var tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
   if (!tokens) {
-    return html;
+    return t;
   }
 
   tag = tokens[1];
 
   if (tags.indexOf(tag) === -1) {
-    return html;
+    return t;
   }
 
   attributes = tokens[2];
@@ -62,21 +62,21 @@ function h(html) {
   return "<" + tag + attributes + ">\n" + contents + "\n</" + tag + ">\n";
 }
 
-function p(text) {
+function p(t) {
   var close = "</p>\n";
   var open = "<p>";
-  var tokens = text.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
+  var tokens = t.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
   var type = "class";
 
-  if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(text)) {
-    return text + "\n";
+  if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(t)) {
+    return t + "\n";
   }
 
   if (!tokens) {
-    return open + text + close;
+    return open + t + close;
   }
 
-  text = tokens[1];
+  t = tokens[1];
 
   if (tokens[2] === "#") {
     type = "id";
@@ -86,16 +86,16 @@ function p(text) {
     open = "<p " + type + '="' + tokens[3] + '">';
   }
 
-  return open + text + close;
+  return open + t + close;
 }
 
-renderer.html = h;
+renderer.html = html;
 renderer.paragraph = p;
-previewFile = path.resolve(__dirname, previewFile);
-mkdirp.sync(path.dirname(previewFile));
+preview = path.resolve(__dirname, preview);
+mkdirp.sync(path.dirname(preview));
 fs.writeFileSync(
-  previewFile,
-  previewTemplate.replace(
+  preview,
+  template.replace(
     /<%TITLE%>/g,
     article.shift().replace(/\$/g, "$$$$")
   ).replace(
@@ -111,4 +111,4 @@ fs.writeFileSync(
     "=\"../dist/"
   )
 );
-spawn(which("open"), [previewFile]);
+spawn(which("open"), [preview]);
