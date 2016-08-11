@@ -38,28 +38,24 @@ var template = `<!DOCTYPE html>
 var renderer = new marked.Renderer();
 
 function html(t) {
-  var attributes;
-  var contents;
+  var sectionTags = ["aside", "figure", "section"];
   var tag;
-  var tags = ["aside", "figure", "section"];
   var tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
   if (!tokens) {
     return t;
   }
 
-  tag = tokens[1];
+  tag = tokens[1].toLowerCase();
 
-  if (tags.indexOf(tag) === -1) {
+  if (sectionTags.indexOf(tag) === -1) {
     return t;
   }
 
-  attributes = tokens[2];
-  contents = marked(tokens[3].replace(/&gt;/g, ">"), {
-    renderer: renderer
-  }).trim();
-
-  return "<" + tag + attributes + ">\n" + contents + "\n</" + tag + ">\n";
+  return "<" + tag + tokens[2] + ">\n" +
+    marked(tokens[3].replace(/&gt;/g, ">"), {
+      renderer: renderer
+    }).trim() + "\n</" + tag + ">\n";
 }
 
 function p(t) {
