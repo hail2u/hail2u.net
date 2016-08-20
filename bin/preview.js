@@ -21,6 +21,7 @@ var template = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
     <title><%TITLE%> - Weblog - Hail2u.net</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/notosansjapanese.css" media="not print" rel="stylesheet">
     <link href="/styles/main.min.css" rel="stylesheet">
   </head>
   <body style="margin-bottom: 6rem">
