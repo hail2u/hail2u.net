@@ -14,7 +14,9 @@ var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 var article = fs.readFileSync(argv.file, "utf8").split("\n");
+var body;
 var preview = "../tmp/__preview.html";
+var renderer;
 var template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -36,7 +38,7 @@ var template = `<!DOCTYPE html>
     </main>
   </body>
 </html>`;
-var renderer = new marked.Renderer();
+var title;
 
 function html(t) {
   var sectionTags = ["aside", "figure", "section"];
@@ -86,23 +88,29 @@ function p(t) {
   return open + t + close;
 }
 
-renderer.html = html;
-renderer.paragraph = p;
+title = article.shift().trim().replace(/\$/g, "$$$$");
+body = article.join("\n").trim().replace(/\$/g, "$$$$");
+
+if (!body.startsWith("<")) {
+  renderer = new marked.Renderer();
+  renderer.html = html;
+  renderer.paragraph = p;
+  body = marked({
+    renderer: renderer
+  });
+}
+
+body = body.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
 preview = path.resolve(__dirname, preview);
 mkdirp.sync(path.dirname(preview));
 fs.writeFileSync(
   preview,
   template.replace(
     /<%TITLE%>/g,
-    article.shift().replace(/\$/g, "$$$$")
+    title
   ).replace(
     /<%BODY%>/g,
-    marked(
-      article.join("\n").replace(/\$/g, "$$$$"),
-      {
-        renderer: renderer
-      }
-    ).replace(/(href|src)="\/images\//g, "$1=\"../src/img/")
+    body
   ).replace(
     /="\//g,
     "=\"../dist/"
