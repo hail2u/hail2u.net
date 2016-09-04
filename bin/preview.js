@@ -90,7 +90,7 @@ function p(t) {
 title = article.shift().trim().replace(/\$/g, "$$$$");
 body = article.join("\n").trim().replace(/\$/g, "$$$$");
 
-if (!body.startsWith("<")) {
+if (!body.endsWith(">")) {
   renderer = new marked.Renderer();
   renderer.html = html;
   renderer.paragraph = p;
