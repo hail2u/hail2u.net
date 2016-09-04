@@ -94,7 +94,7 @@ if (!body.startsWith("<")) {
   renderer = new marked.Renderer();
   renderer.html = html;
   renderer.paragraph = p;
-  body = marked({
+  body = marked(body, {
     renderer: renderer
   });
 }
