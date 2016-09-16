@@ -22,6 +22,9 @@ fs.writeFileSync(
     path.resolve(__dirname, src),
     "utf8"
   ).replace(
+    /\.\.\/\.\.\/node_modules\/@hail2u\/abbread\/dist\//,
+    dir.js
+  ).replace(
     /\.\.\/\.\.\/node_modules\/unutm\/build\//,
     dir.js
   ).replace(
