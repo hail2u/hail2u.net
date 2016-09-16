@@ -4,7 +4,7 @@
 
 var eachLimit = require("async").eachLimit;
 var fs = require("fs");
-var minifyJS = require("uglify-js").minify;
+var compile = require("google-closure-compiler-js").compile;
 var mkdirp = require("mkdirp");
 var os = require("os");
 var path = require("path");
@@ -26,11 +26,11 @@ eachLimit(fs.readdirSync(tmpdir), cpuNum, function (src, next) {
   src = path.join(tmpdir, src);
   dest = path.join(tmpdir, basename + minExt + jsExt);
   mkdirp.sync(path.dirname(dest));
-  fs.writeFileSync(dest, minifyJS(src, {
-    output: {
-      comments: /^!/
-    }
-  }).code);
+  fs.writeFileSync(dest, compile({
+    jsCode: [{
+      src: fs.readFileSync(src, "utf8")
+    }]
+  }).compiledCode);
   next();
 }, function (err) {
   if (err) {
