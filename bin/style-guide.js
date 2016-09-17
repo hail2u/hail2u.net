@@ -22,11 +22,8 @@ fs.writeFileSync(
     path.resolve(__dirname, src),
     "utf8"
   ).replace(
-    /\.\.\/\.\.\/node_modules\/@hail2u\/abbread\/dist\//,
-    dir.js
-  ).replace(
-    /\.\.\/\.\.\/node_modules\/unutm\/build\//,
-    dir.js
+    /\.\.\/\.\.\/node_modules\/.*?\/([^/]*?.js)/g,
+    dir.js + "$1"
   ).replace(
     /\b(href|src)(=)(")(.*?)(")/g,
     function (m, attribute, equal, openQuote, url, closeQuote) {
