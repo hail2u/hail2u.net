@@ -28,18 +28,18 @@ var blogFiles = [
   }
 ];
 var categoryNames = {
-  "Blog": "blog",
+  "ブログ": "blog",
   "Blosxom": "blosxom",
-  "Coding": "coding",
-  "Gadget": "gadget",
-  "Game": "game",
-  "Internet": "internet",
-  "Media": "media",
-  "Misc.": "misc",
+  "コーディング": "coding",
+  "買ったもの": "gadget",
+  "ゲーム": "game",
+  "インターネット": "internet",
+  "メディア": "media",
+  "その他": "misc",
   "RSS": "rss",
-  "Software": "software",
-  "Sports": "sports",
-  "Web Design": "webdesign"
+  "ソフトウェア": "software",
+  "スポーツ": "sports",
+  "ウェブデザイン": "webdesign"
 };
 var categoryNamesInv = (function (obj) {
   var newObj = {};
@@ -76,10 +76,6 @@ var files = [
 ];
 var homeFeed = "../src/index.rss";
 var metadataFile = "../src/html/metadata.json";
-var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-  "Sep", "Oct", "Nov", "Dec"];
-var monthNamesFull = ["January", "February", "March", "April", "May",
-  "June", "July", "August", "September", "October", "November", "December"];
 var partialDir = "../src/html/partial";
 var partials = {};
 var templateDir = "../src/html/";
@@ -133,7 +129,7 @@ function readRSS(file) {
       yy = date.getFullYear();
       mm = date.getMonth();
       dd = date.getDate();
-      val.strPubDate = monthNames[mm] + " " + dd + ", " + yy;
+      val.strPubDate = sprintf("%04d/%02d/%02d", yy, mm + 1, dd);
       val.html5PubDate = sprintf(
         "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
         yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds()
@@ -156,8 +152,7 @@ function readArticles() {
   articles.forEach(function (article, idx) {
     article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
     article.category = categoryNamesInv[article.cat];
-    article.strPubDate = monthNamesFull[article.month - 1] + " " +
-      article.day;
+    article.strPubDate = sprintf("%02d/%02d", article.month, article.day);
     article.html5PubDate = sprintf(
       "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
       article.year, article.month, article.day, article.hour, article.minute,
