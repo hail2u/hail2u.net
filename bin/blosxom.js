@@ -17,7 +17,6 @@ var which = require("which").sync;
 var argv = minimist(process.argv.slice(2), {
   boolean: [
     "all",
-    "indexes",
     "reindex"
   ],
   string: ["file"]
@@ -110,7 +109,6 @@ if (argv.file) {
   );
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
-  files.push(path.join(path.dirname(argv.file), "index.html"));
   files.push("index.rss");
   cpuNum = 1;
 
@@ -137,20 +135,6 @@ if (argv.all) {
     }
 
     files.push(path.relative(dir.data, file.split("=>").shift()));
-  });
-}
-
-if (argv.indexes || files.length === 0) {
-  fs.readdirSync(dir.data).forEach(function (file) {
-    if (!fs.statSync(path.join(dir.data, file)).isDirectory()) {
-      return;
-    }
-
-    if (file === "themes") {
-      return;
-    }
-
-    files.push(path.join(file, "index.html"));
   });
 }
 
