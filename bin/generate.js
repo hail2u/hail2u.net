@@ -27,30 +27,6 @@ var blogFiles = [
     src: "../src/html/index.mustache"
   }
 ];
-var categoryNames = {
-  "ブログ": "blog",
-  "Blosxom": "blosxom",
-  "コーディング": "coding",
-  "買ったもの": "gadget",
-  "ゲーム": "game",
-  "インターネット": "internet",
-  "メディア": "media",
-  "その他": "misc",
-  "RSS": "rss",
-  "ソフトウェア": "software",
-  "スポーツ": "sports",
-  "ウェブデザイン": "webdesign"
-};
-var categoryNamesInv = (function (obj) {
-  var newObj = {};
-  var prop;
-
-  for (prop in obj) {
-    newObj[obj[prop]] = prop;
-  }
-
-  return newObj;
-})(categoryNames);
 var cpuNum = Math.max(1, os.cpus().length - 1);
 var entityMap = {
   '"': "&quot;",
@@ -135,10 +111,6 @@ function readRSS(file) {
         yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds()
       );
     }
-
-    if (val.category) {
-      val.cat = categoryNames[val.category];
-    }
   });
 
   return feed;
@@ -150,8 +122,6 @@ function readArticles() {
   );
 
   articles.forEach(function (article, idx) {
-    article.cat = article.link.replace(/^\/blog\/(.*?)\/.*$/, "$1");
-    article.category = categoryNamesInv[article.cat];
     article.strPubDate = sprintf("%02d/%02d", article.month, article.day);
     article.html5PubDate = sprintf(
       "%04d-%02d-%02dT%02d:%02d:%02d+09:00",

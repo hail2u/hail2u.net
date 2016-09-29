@@ -23,18 +23,6 @@ var urls = [
   "/about/",
   "/about/style-guide/",
   "/blog/",
-  "/blog/blog/",
-  "/blog/blosxom/",
-  "/blog/coding/",
-  "/blog/gadget/",
-  "/blog/game/",
-  "/blog/internet/",
-  "/blog/media",
-  "/blog/misc/",
-  "/blog/rss/",
-  "/blog/software/",
-  "/blog/sports/",
-  "/blog/webdesign/",
   "/documents/"
 ];
 
