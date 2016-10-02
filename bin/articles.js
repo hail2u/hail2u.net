@@ -16,11 +16,16 @@ var cache = "../cache/articles.json";
 var data = "../src/weblog/plugins/state/files_index.dat";
 
 function readArticle(file, date) {
+  var cat = path.basename(path.dirname(file)) + "/";
+
+  if (cat === "entries/") {
+    cat = "/";
+  }
+
   return {
     day: date.getDate(),
     hour: date.getHours(),
-    link: "/blog/" + path.basename(path.dirname(file)) + "/" +
-      path.basename(file, ".txt") + ".html",
+    link: "/blog/" + cat + path.basename(file, ".txt") + ".html",
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
