@@ -19,7 +19,7 @@ function readArticle(file, date) {
   var cat = path.basename(path.dirname(file)) + "/";
 
   if (cat === "entries/") {
-    cat = "/";
+    cat = "";
   }
 
   return {
