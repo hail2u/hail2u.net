@@ -166,7 +166,7 @@ function readMetadata(file, callback) {
           item.hasImage = true;
         }
       });
-      metadata.articles.first = metadata.articles.item.shift();
+      metadata.articles.item[0].first = true;
       metadata.updates = readRSS(path.resolve(__dirname, homeFeed));
 
       break;
