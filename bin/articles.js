@@ -2,18 +2,19 @@
 
 "use strict";
 
-var fs = require("fs");
-var minimist = require("minimist");
-var mkdirp = require("mkdirp");
-var path = require("path");
+const fs = require("fs");
+const minimist = require("minimist");
+const mkdirp = require("mkdirp");
+const path = require("path");
+
+const cache = path.resolve(__dirname, "../cache/articles.json");
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
 
 var argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
 var articles = [];
-var cache = "../cache/articles.json";
-var data = "../src/weblog/plugins/state/files_index.dat";
 
 function readArticle(file, date) {
   var cat = path.basename(path.dirname(file)) + "/";
@@ -36,8 +37,6 @@ function readArticle(file, date) {
   };
 }
 
-cache = path.resolve(__dirname, cache);
-
 if (!argv.force && !argv.file) {
   return;
 }
@@ -46,10 +45,7 @@ if (!argv.force) {
   articles = JSON.parse(fs.readFileSync(cache, "utf8"));
 }
 
-fs.readFileSync(
-  path.resolve(__dirname, data),
-  "utf8"
-).split(/\r?\n/).forEach(function (line) {
+fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   var date;
   var file;
 

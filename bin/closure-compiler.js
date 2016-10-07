@@ -2,21 +2,20 @@
 
 "use strict";
 
-var eachLimit = require("async").eachLimit;
-var fs = require("fs");
-var compile = require("google-closure-compiler-js").compile;
-var mkdirp = require("mkdirp");
-var os = require("os");
-var path = require("path");
+const eachLimit = require("async").eachLimit;
+const fs = require("fs");
+const compile = require("google-closure-compiler-js").compile;
+const mkdirp = require("mkdirp");
+const os = require("os");
+const path = require("path");
 
-var cpuNum = Math.max(1, os.cpus().length - 1);
-var jsExt = ".js";
-var minExt = ".min";
-var tmpdir = "../tmp/";
+const jsExt = ".js";
+const minExt = ".min";
+const tmpdir = path.resolve(__dirname, "../tmp");
 
-tmpdir = path.resolve(__dirname, tmpdir);
-eachLimit(fs.readdirSync(tmpdir), cpuNum, function (src, next) {
-  var basename = path.basename(src, jsExt);
+eachLimit(fs.readdirSync(tmpdir), Math.max(1, os.cpus().length - 1), function (src, next) {
+  const basename = path.basename(src, jsExt);
+
   var dest;
 
   if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {

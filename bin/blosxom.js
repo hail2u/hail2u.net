@@ -2,17 +2,26 @@
 
 "use strict";
 
-var ProgressBar = require("progress");
-var eachLimit = require("async").eachLimit;
-var ensureAsync = require("async").ensureAsync;
-var execFile = require("child_process").execFile;
-var fs = require("fs");
-var minifyHTML = require("html-minifier").minify;
-var minimist = require("minimist");
-var mkdirp = require("mkdirp");
-var os = require("os");
-var path = require("path");
-var which = require("which").sync;
+const ProgressBar = require("progress");
+const eachLimit = require("async").eachLimit;
+const ensureAsync = require("async").ensureAsync;
+const execFile = require("child_process").execFile;
+const fs = require("fs");
+const minifyHTML = require("html-minifier").minify;
+const minimist = require("minimist");
+const mkdirp = require("mkdirp");
+const os = require("os");
+const path = require("path");
+const which = require("which").sync;
+
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+const reldir = {
+  data: "../src/weblog/entries/",
+  img: "../src/img/blog/",
+  root: "../src/weblog/",
+  static: "../dist/blog/",
+  staticimg: "../dist/images/blog/"
+};
 
 var argv = minimist(process.argv.slice(2), {
   boolean: [
@@ -24,14 +33,7 @@ var argv = minimist(process.argv.slice(2), {
 var bar;
 var cpuNum = Math.max(1, os.cpus().length - 1);
 var d;
-var data = "../src/weblog/plugins/state/files_index.dat";
-var dir = {
-  data: "../src/weblog/entries/",
-  img: "../src/img/blog/",
-  root: "../src/weblog/",
-  static: "../dist/blog/",
-  staticimg: "../dist/images/blog/"
-};
+var dir = {};
 var files = [];
 var images = [];
 
@@ -96,8 +98,8 @@ function build(file, next) {
   });
 }
 
-for (d in dir) {
-  dir[d] = path.resolve(__dirname, dir[d]);
+for (d in reldir) {
+  dir[d] = path.resolve(__dirname, reldir[d]);
 }
 
 if (argv.file) {
@@ -126,10 +128,7 @@ if (argv.file) {
 }
 
 if (argv.all) {
-  fs.readFileSync(
-    path.resolve(__dirname, data),
-    "utf8"
-  ).split(/\r?\n/).forEach(function (file) {
+  fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (file) {
     if (file === "") {
       return;
     }

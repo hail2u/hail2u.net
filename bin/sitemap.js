@@ -2,15 +2,15 @@
 
 "use strict";
 
-var fs = require("fs");
-var mkdirp = require("mkdirp");
-var path = require("path");
-var xml2js = require("xml2js");
+const fs = require("fs");
+const mkdirp = require("mkdirp");
+const path = require("path");
+const xml2js = require("xml2js");
 
-var cache = "../cache/articles.json";
-var dest = "../dist/sitemap.xml";
-var documentsDir = "../src/html/documents/";
-var sitemap = {
+const cache = "../cache/articles.json";
+const dest = path.resolve(__dirname, "../dist/sitemap.xml");
+const documentsDir = "../src/html/documents/";
+const sitemap = {
   urlset: {
     $: {
       xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -18,7 +18,7 @@ var sitemap = {
     url: []
   }
 };
-var urls = [
+const urls = [
   "/",
   "/about/",
   "/about/style-guide/",
@@ -26,7 +26,6 @@ var urls = [
   "/documents/"
 ];
 
-dest = path.resolve(__dirname, dest);
 fs.readdirSync(path.resolve(__dirname, documentsDir)).forEach(function (file) {
   if (file === "index.html" || path.extname(file) !== ".html") {
     return false;

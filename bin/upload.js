@@ -2,22 +2,22 @@
 
 "use strict";
 
-var minimist = require("minimist");
-var path = require("path");
-var spawn = require("child_process").spawnSync;
-var which = require("which").sync;
+const minimist = require("minimist");
+const path = require("path");
+const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
-var argv = minimist(process.argv.slice(2), {
+const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-var cmd = which("git");
-var cwd = "../dist/";
-var git;
-var opts = {
+const cmd = which("git");
+const cwd = path.resolve(__dirname, "../dist/");
+const opts = {
   stdio: "inherit"
 };
 
-cwd = path.resolve(__dirname, cwd);
+var git;
+
 opts.cwd = cwd;
 git = spawn(cmd, [
   "add",

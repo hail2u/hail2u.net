@@ -2,22 +2,20 @@
 
 "use strict";
 
-var fs = require("fs");
-var marked = require("marked");
-var minimist = require("minimist");
-var mkdirp = require("mkdirp");
-var path = require("path");
-var spawn = require("child_process").spawnSync;
-var which = require("which").sync;
+const fs = require("fs");
+const marked = require("marked");
+const minimist = require("minimist");
+const mkdirp = require("mkdirp");
+const path = require("path");
+const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
-var argv = minimist(process.argv.slice(2), {
+const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-var article = fs.readFileSync(argv.file, "utf8").split("\n");
-var body;
-var preview = "../tmp/__preview.html";
-var renderer;
-var template = `<!DOCTYPE html>
+const article = fs.readFileSync(argv.file, "utf8").split("\n");
+const preview = path.resolve(__dirname, "../tmp/__preview.html");
+const template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -37,12 +35,16 @@ var template = `<!DOCTYPE html>
     </main>
   </body>
 </html>`;
+
+var body;
+var renderer;
 var title;
 
 function html(t) {
-  var sectionTags = ["aside", "figure", "section"];
+  const sectionTags = ["aside", "figure", "section"];
+  const tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
+
   var tag;
-  var tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
   if (!tokens) {
     return t;
@@ -61,9 +63,10 @@ function html(t) {
 }
 
 function p(t) {
-  var close = "</p>\n";
+  const close = "</p>\n";
+  const tokens = t.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
+
   var open = "<p>";
-  var tokens = t.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
   var type = "class";
 
   if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(t)) {
@@ -100,7 +103,6 @@ if (!body.endsWith(">")) {
 }
 
 body = body.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
-preview = path.resolve(__dirname, preview);
 mkdirp.sync(path.dirname(preview));
 fs.writeFileSync(
   preview,

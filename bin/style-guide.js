@@ -2,19 +2,18 @@
 
 "use strict";
 
-var fs = require("fs");
-var mkdirp = require("mkdirp");
-var path = require("path");
+const fs = require("fs");
+const mkdirp = require("mkdirp");
+const path = require("path");
 
-var dest = "../dist/about/style-guide/index.html";
-var dir = {
+const dest = path.resolve(__dirname, "../dist/about/style-guide/index.html");
+const dir = {
   img: "../img/",
   js: "../js/"
 };
-var site = "https://hail2u.net/";
-var src = "../src/css/test.html";
+const site = "https://hail2u.net/";
+const src = "../src/css/test.html";
 
-dest = path.resolve(__dirname, dest);
 mkdirp.sync(path.dirname(dest));
 fs.writeFileSync(
   dest,

@@ -2,31 +2,31 @@
 
 "use strict";
 
-var csswring = require("csswring");
-var eachLimit = require("async").eachLimit;
-var fs = require("fs");
-var mkdirp = require("mkdirp");
-var mqpacker = require("css-mqpacker");
-var os = require("os");
-var path = require("path");
-var postcss = require("postcss");
-var roundFloat = require("postcss-round-float");
+const csswring = require("csswring");
+const eachLimit = require("async").eachLimit;
+const fs = require("fs");
+const mkdirp = require("mkdirp");
+const mqpacker = require("css-mqpacker");
+const os = require("os");
+const path = require("path");
+const postcss = require("postcss");
+const roundFloat = require("postcss-round-float");
 
-var cpuNum = Math.max(1, os.cpus().length - 1);
-var cssExt = ".css";
-var minExt = ".min";
-var processor = postcss([
+const cpuNum = Math.max(1, os.cpus().length - 1);
+const cssExt = ".css";
+const minExt = ".min";
+const processor = postcss([
   roundFloat(),
   mqpacker({
     sort: true
   }),
   csswring()
 ]);
-var tmpdir = "../tmp/";
+const tmpdir = path.resolve(__dirname, "../tmp/");
 
-tmpdir = path.resolve(__dirname, tmpdir);
 eachLimit(fs.readdirSync(tmpdir), cpuNum, function (input, next) {
-  var basename = path.basename(input, cssExt);
+  const basename = path.basename(input, cssExt);
+
   var output;
 
   if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {

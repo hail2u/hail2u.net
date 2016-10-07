@@ -2,14 +2,14 @@
 
 "use strict";
 
-var eachLimit = require("async").eachLimit;
-var os = require("os");
-var path = require("path");
-var spawn = require("child_process").spawnSync;
-var which = require("which").sync;
+const eachLimit = require("async").eachLimit;
+const os = require("os");
+const path = require("path");
+const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
-var cpuNum = Math.max(1, os.cpus().length - 1);
-var files = [
+const cpuNum = Math.max(1, os.cpus().length - 1);
+const files = [
   {
     dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
     src: "../src/img/about/how-i-markup-and-style-this-website.svg",

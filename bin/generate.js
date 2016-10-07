@@ -2,24 +2,20 @@
 
 "use strict";
 
-var eachLimit = require("async").eachLimit;
-var fs = require("fs");
-var minifyHTML = require("html-minifier").minify;
-var minimist = require("minimist");
-var mkdirp = require("mkdirp");
-var mustache = require("mustache");
-var os = require("os");
-var parseXML = require("xml2js").parseString;
-var path = require("path");
-var sprintf = require("sprintf").sprintf;
+const eachLimit = require("async").eachLimit;
+const fs = require("fs");
+const minifyHTML = require("html-minifier").minify;
+const minimist = require("minimist");
+const mkdirp = require("mkdirp");
+const mustache = require("mustache");
+const os = require("os");
+const parseXML = require("xml2js").parseString;
+const path = require("path");
+const sprintf = require("sprintf").sprintf;
 
-var argv = minimist(process.argv.slice(2), {
-  boolean: ["blog"]
-});
-var articlesCache = "../cache/articles.json";
-var basicMetadata;
-var blogFeed = "../dist/blog/feed";
-var blogFiles = [
+const articleCache = "../cache/articles.json";
+const blogFeed = "../dist/blog/feed";
+const blogFiles = [
   {
     src: "../src/html/blog/index.mustache"
   },
@@ -27,15 +23,8 @@ var blogFiles = [
     src: "../src/html/index.mustache"
   }
 ];
-var cpuNum = Math.max(1, os.cpus().length - 1);
-var entityMap = {
-  '"': "&quot;",
-  "&": "&amp;",
-  "'": "&#39;",
-  "<": "&lt;",
-  ">": "&gt;"
-};
-var files = [
+const cpuNum = Math.max(1, os.cpus().length - 1);
+const defaultFiles = [
   {
     src: "../src/html/404.mustache"
   },
@@ -50,11 +39,24 @@ var files = [
     src: "../src/html/documents/index.mustache"
   }
 ];
-var homeFeed = "../src/index.rss";
-var metadataFile = "../src/html/metadata.json";
-var partialDir = "../src/html/partial";
+const entityMap = {
+  '"': "&quot;",
+  "&": "&amp;",
+  "'": "&#39;",
+  "<": "&lt;",
+  ">": "&gt;"
+};
+const homeFeed = "../src/index.rss";
+const metadataFile = "../src/html/metadata.json";
+const partialDir = path.join(__dirname, "../src/html/partial");
+const templateDir = path.resolve(__dirname, "../src/html/");
+
+var argv = minimist(process.argv.slice(2), {
+  boolean: ["blog"]
+});
+var basicMetadata;
+var files = defaultFiles;
 var partials = {};
-var templateDir = "../src/html/";
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
@@ -118,7 +120,7 @@ function readRSS(file) {
 
 function readArticles() {
   var articles = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, articlesCache), "utf8")
+    fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
   );
 
   articles.forEach(function (article, idx) {
@@ -189,8 +191,6 @@ basicMetadata = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, metadataFile), "utf8")
 );
 mustache.escape = escape;
-partialDir = path.join(__dirname, partialDir);
-templateDir = path.resolve(__dirname, templateDir);
 fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
     path.join(partialDir, partial),
