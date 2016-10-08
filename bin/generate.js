@@ -12,52 +12,52 @@ const os = require("os");
 const path = require("path");
 const sprintf = require("sprintf").sprintf;
 
-const articleCache = "../cache/articles.json";
-const blogFiles = [
-  {
-    src: "../src/html/blog/index.mustache"
+const config = {
+  articleCache: "../cache/articles.json",
+  files: [
+    {
+      src: "../src/html/blog/index.mustache"
+    },
+    {
+      src: "../src/html/index.mustache"
+    }
+  ],
+  otherFiles: [
+    {
+      src: "../src/html/404.mustache"
+    },
+    {
+      src: "../src/html/about/index.mustache"
+    },
+    {
+      dest: "../src/weblog/entries/themes/html/page",
+      src: "../src/html/blog/theme.mustache"
+    },
+    {
+      src: "../src/html/documents/index.mustache"
+    }
+  ],
+  entityMap: {
+    '"': "&quot;",
+    "&": "&amp;",
+    "'": "&#39;",
+    "<": "&lt;",
+    ">": "&gt;"
   },
-  {
-    src: "../src/html/index.mustache"
-  }
-];
-const cpuNum = Math.max(1, os.cpus().length - 1);
-const defaultFiles = [
-  {
-    src: "../src/html/404.mustache"
-  },
-  {
-    src: "../src/html/about/index.mustache"
-  },
-  {
-    dest: "../src/weblog/entries/themes/html/page",
-    src: "../src/html/blog/theme.mustache"
-  },
-  {
-    src: "../src/html/documents/index.mustache"
-  }
-];
-const entityMap = {
-  '"': "&quot;",
-  "&": "&amp;",
-  "'": "&#39;",
-  "<": "&lt;",
-  ">": "&gt;"
+  metadataFile: "../src/html/metadata.json",
+  partialDir: "../src/html/partial",
+  templateDir: "../src/html/"
 };
-const metadataFile = "../src/html/metadata.json";
-const partialDir = path.join(__dirname, "../src/html/partial");
-const templateDir = path.resolve(__dirname, "../src/html/");
 
 var argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
 });
 var basicMetadata;
-var files = defaultFiles;
 var partials = {};
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
-    return entityMap[s];
+    return config.entityMap[s];
   });
 }
 
@@ -77,7 +77,7 @@ function extendObject(dest, src) {
 
 function readArticles() {
   var articles = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
+    fs.readFileSync(config.articleCache, "utf8")
   ).map(function (article, idx, arr) {
     article.strPubDate = sprintf("%02d/%02d", article.month, article.day);
     article.html5PubDate = sprintf(
@@ -110,7 +110,7 @@ function readMetadata(file, callback) {
   fs.readFile(file, function (err, data) {
     metadata = extendObject(metadata, JSON.parse(data));
 
-    switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
+    switch (path.relative(config.templateDir, file).replace(/\\/g, "/")) {
     case "blog/index.json":
       metadata.articles = readArticles();
 
@@ -125,74 +125,81 @@ function readMetadata(file, callback) {
   });
 }
 
-if (argv.blog) {
-  files = blogFiles;
-} else {
-  files = files.concat(blogFiles);
+config.articleCache = path.resolve(__dirname, config.articleCache);
+config.partialDir = path.join(__dirname, config.partialDir);
+config.templateDir = path.resolve(__dirname, config.templateDir);
+config.metadataFile = path.resolve(__dirname, config.metadataFile);
+
+if (!argv.blog) {
+  config.files = config.files.concat(config.otherFiles);
 }
 
 basicMetadata = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, metadataFile), "utf8")
+  fs.readFileSync(config.metadataFile, "utf8")
 );
 mustache.escape = escape;
-fs.readdirSync(partialDir).forEach(function (partial) {
+fs.readdirSync(config.partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
-    path.join(partialDir, partial),
+    path.join(config.partialDir, partial),
     "utf8"
   );
 });
-eachLimit(files, cpuNum, function (file, next) {
-  function processTemplate(data) {
-    var html = mustache.render(
-      fs.readFileSync(file.src, "utf8"),
-      data,
-      partials
-    );
+eachLimit(
+  config.files,
+  Math.max(1, os.cpus().length - 1),
+  function (file, next) {
+    function processTemplate(data) {
+      var html = mustache.render(
+        fs.readFileSync(file.src, "utf8"),
+        data,
+        partials
+      );
 
-    if (!file.dest.endsWith(path.sep + "page")) {
-      html = minifyHTML(html, {
-        collapseBooleanAttributes: true,
-        collapseWhitespace: true,
-        minifyCSS: true,
-        minifyJS: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-        removeEmptyElements: true,
-        removeOptionalTags: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        sortAttributes: true,
-        sortClassName: true,
-        useShortDoctype: true
-      });
+      if (!file.dest.endsWith(path.sep + "page")) {
+        html = minifyHTML(html, {
+          collapseBooleanAttributes: true,
+          collapseWhitespace: true,
+          minifyCSS: true,
+          minifyJS: true,
+          removeAttributeQuotes: true,
+          removeComments: true,
+          removeEmptyElements: true,
+          removeOptionalTags: true,
+          removeRedundantAttributes: true,
+          removeScriptTypeAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          sortAttributes: true,
+          sortClassName: true,
+          useShortDoctype: true
+        });
+      }
+
+      mkdirp.sync(path.dirname(file.dest));
+      fs.writeFileSync(file.dest, html);
+      next();
     }
 
-    mkdirp.sync(path.dirname(file.dest));
-    fs.writeFileSync(file.dest, html);
-    next();
-  }
+    file.src = path.resolve(__dirname, file.src);
 
-  file.src = path.resolve(__dirname, file.src);
+    if (!file.dest) {
+      file.dest = path.join(
+        "../dist/",
+        path.dirname(path.relative(config.templateDir, file.src)),
+        path.basename(file.src, ".mustache") + ".html"
+      );
+    }
 
-  if (!file.dest) {
-    file.dest = path.join(
-      "../dist/",
-      path.dirname(path.relative(templateDir, file.src)),
-      path.basename(file.src, ".mustache") + ".html"
+    file.dest = path.resolve(__dirname, file.dest);
+    readMetadata(
+      path.join(
+        path.dirname(file.src),
+        path.basename(file.src, ".mustache") + ".json"
+      ),
+      processTemplate
     );
+  }, function (err) {
+    if (err) {
+      throw err;
+    }
   }
-
-  file.dest = path.resolve(__dirname, file.dest);
-  readMetadata(
-    path.join(
-      path.dirname(file.src),
-      path.basename(file.src, ".mustache") + ".json"
-    ),
-    processTemplate
-  );
-}, function (err) {
-  if (err) {
-    throw err;
-  }
-});
+);

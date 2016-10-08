@@ -9,30 +9,40 @@ const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 
-const jsExt = ".js";
-const minExt = ".min";
-const tmpdir = path.resolve(__dirname, "../tmp");
+const config = {
+  jsExt: ".js",
+  minExt: ".min",
+  tmpdir: "../tmp"
+};
 
-eachLimit(fs.readdirSync(tmpdir), Math.max(1, os.cpus().length - 1), function (src, next) {
-  const basename = path.basename(src, jsExt);
+config.tmpdir = path.resolve(__dirname, config.tmpdir);
+eachLimit(
+  fs.readdirSync(config.tmpdir),
+  Math.max(1, os.cpus().length - 1),
+  function (src, next) {
+    const basename = path.basename(src, config.jsExt);
 
-  var dest;
+    var dest;
 
-  if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
-    return next();
+    if (
+      path.extname(src) !== config.jsExt ||
+      path.extname(basename) === config.minExt
+    ) {
+      return next();
+    }
+
+    src = path.join(config.tmpdir, src);
+    dest = path.join(config.tmpdir, basename + config.minExt + config.jsExt);
+    mkdirp.sync(path.dirname(dest));
+    fs.writeFileSync(dest, compile({
+      jsCode: [{
+        src: fs.readFileSync(src, "utf8")
+      }]
+    }).compiledCode);
+    next();
+  }, function (err) {
+    if (err) {
+      throw err;
+    }
   }
-
-  src = path.join(tmpdir, src);
-  dest = path.join(tmpdir, basename + minExt + jsExt);
-  mkdirp.sync(path.dirname(dest));
-  fs.writeFileSync(dest, compile({
-    jsCode: [{
-      src: fs.readFileSync(src, "utf8")
-    }]
-  }).compiledCode);
-  next();
-}, function (err) {
-  if (err) {
-    throw err;
-  }
-});
+);

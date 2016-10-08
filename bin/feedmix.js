@@ -7,16 +7,20 @@ const fs = require("fs");
 const mkdirp = require("mkdirp");
 const path = require("path");
 
-const dest = path.resolve(__dirname, "../dist/feed");
-const feeds = [
-  "../src/index.rss",
-  "../dist/blog/feed"
-].map(function (feed) {
+const config = {
+  dest: "../dist/feed",
+  feeds: [
+    "../src/index.rss",
+    "../dist/blog/feed"
+  ]
+};
+
+config.dest = path.resolve(__dirname, config.dest);
+config.feeds = config.feeds.map(function (feed) {
   return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
 });
-
-mkdirp.sync(path.dirname(dest));
-fs.writeFileSync(dest, feedmix.stringify(feedmix.merge(feeds, {
+mkdirp.sync(path.dirname(config.dest));
+fs.writeFileSync(config.dest, feedmix.stringify(feedmix.merge(config.feeds, {
   trim: true
 }), {
   cdata: true,

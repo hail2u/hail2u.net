@@ -7,22 +7,25 @@ const path = require("path");
 const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
-const argv = minimist(process.argv.slice(2), {
+const config = {
+  cwd: "../dist"
+};
+
+var argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-const cmd = which("git");
-const cwd = path.resolve(__dirname, "../dist/");
-const opts = {
+var cmd = which("git");
+var git;
+var opts = {
   stdio: "inherit"
 };
 
-var git;
-
-opts.cwd = cwd;
+config.cwd = path.resolve(__dirname, config.cwd);
+opts.cwd = config.cwd;
 git = spawn(cmd, [
   "add",
   "--",
-  path.relative(cwd, argv.file)
+  path.relative(config.cwd, argv.file)
 ], opts);
 
 if (git.error) {
