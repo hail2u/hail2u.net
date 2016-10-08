@@ -15,6 +15,18 @@ const sprintf = require("sprintf").sprintf;
 
 const config = {
   articleCache: "../cache/articles.json",
+  entityMap: {
+    '"': "&quot;",
+    "&": "&amp;",
+    "'": "&#39;",
+    "<": "&lt;",
+    ">": "&gt;"
+  },
+  feed: {
+    documents: "../src/documents.rss",
+    home: "../src/index.rss",
+    weblog: "../dist/blog/feed"
+  },
   files: [
     {
       src: "../src/html/blog/index.mustache"
@@ -23,6 +35,7 @@ const config = {
       src: "../src/html/index.mustache"
     }
   ],
+  metadataFile: "../src/html/metadata.json",
   otherFiles: [
     {
       src: "../src/html/404.mustache"
@@ -38,19 +51,6 @@ const config = {
       src: "../src/html/documents/index.mustache"
     }
   ],
-  entityMap: {
-    '"': "&quot;",
-    "&": "&amp;",
-    "'": "&#39;",
-    "<": "&lt;",
-    ">": "&gt;"
-  },
-  feed: {
-    documents: "../src/documents.rss",
-    home: "../src/index.rss",
-    weblog: "../dist/blog/feed"
-  },
-  metadataFile: "../src/html/metadata.json",
   partialDir: "../src/html/partial",
   templateDir: "../src/html/"
 };
