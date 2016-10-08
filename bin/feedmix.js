@@ -11,6 +11,7 @@ const config = {
   dest: "../dist/feed",
   feeds: [
     "../src/index.rss",
+    "../src/documents.rss",
     "../dist/blog/feed"
   ]
 };

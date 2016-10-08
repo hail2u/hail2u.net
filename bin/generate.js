@@ -9,6 +9,7 @@ const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const mustache = require("mustache");
 const os = require("os");
+const parseXML = require("xml2js").parseString;
 const path = require("path");
 const sprintf = require("sprintf").sprintf;
 
@@ -44,6 +45,11 @@ const config = {
     "<": "&lt;",
     ">": "&gt;"
   },
+  feed: {
+    documents: "../src/documents.rss",
+    home: "../src/index.rss",
+    weblog: "../dist/blog/feed"
+  },
   metadataFile: "../src/html/metadata.json",
   partialDir: "../src/html/partial",
   templateDir: "../src/html/"
@@ -53,6 +59,7 @@ var argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
 });
 var basicMetadata;
+var f;
 var partials = {};
 
 function escape(str) {
@@ -73,6 +80,47 @@ function extendObject(dest, src) {
   }
 
   return dest;
+}
+
+function readFeed(file) {
+  var feed = {};
+
+  parseXML(fs.readFileSync(file, "utf8"), {
+    trim: true,
+    explicitArray: false
+  }, function (error, data) {
+    if (error) {
+      throw error;
+    }
+
+    feed = data.rss.channel;
+  });
+
+  feed.item.forEach(function (val) {
+    var date;
+    var yy;
+    var mm;
+    var dd;
+
+    if (val.link) {
+      val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
+    }
+
+    if (val.pubDate) {
+      date = new Date(val.pubDate);
+      yy = date.getFullYear();
+      mm = date.getMonth();
+      dd = date.getDate();
+      val.strPubDate = sprintf("%04d/%02d/%02d", yy, mm + 1, dd);
+      val.html5PubDate = sprintf(
+        "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
+        yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds()
+      );
+    }
+  });
+  feed.item[0].isLatest = true;
+
+  return feed.item;
 }
 
 function readArticles() {
@@ -116,7 +164,8 @@ function readMetadata(file, callback) {
 
       break;
     case "index.json":
-      metadata.articles = readArticles().slice(0, 12);
+      metadata.features = readFeed(config.feed.documents);
+      metadata.articles = readFeed(config.feed.weblog);
 
       break;
     }
@@ -129,6 +178,10 @@ config.articleCache = path.resolve(__dirname, config.articleCache);
 config.partialDir = path.join(__dirname, config.partialDir);
 config.templateDir = path.resolve(__dirname, config.templateDir);
 config.metadataFile = path.resolve(__dirname, config.metadataFile);
+
+for (f in config.feed) {
+  config.feed[f] = path.resolve(__dirname, config.feed[f]);
+}
 
 if (!argv.blog) {
   config.files = config.files.concat(config.otherFiles);
