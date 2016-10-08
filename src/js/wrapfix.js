@@ -15,7 +15,7 @@
   for (i = 0, l = n.length; i < l; i += 1) {
     e = n[i];
 
-    if (e.childNodes.length !== 1) {
+    if (e.childNodes.length !== 1 || e.firstChild.nodeType !== 3) {
       continue;
     }
 
