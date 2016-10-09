@@ -6,11 +6,12 @@
 "use strict";
 
 (function (d) {
-  var e;
-  var h;
-  var i;
-  var l;
-  var n = d.querySelectorAll("main h1");
+  const n = d.querySelectorAll("main h1");
+
+  let e;
+  let h;
+  let i;
+  let l;
 
   for (i = 0, l = n.length; i < l; i += 1) {
     e = n[i];

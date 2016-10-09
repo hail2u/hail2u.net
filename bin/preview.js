@@ -36,15 +36,15 @@ const template = `<!DOCTYPE html>
   </body>
 </html>`;
 
-var body;
-var renderer;
-var title;
+let body;
+let renderer;
+let title;
 
 function html(t) {
   const sectionTags = ["aside", "figure", "section"];
   const tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
-  var tag;
+  let tag;
 
   if (!tokens) {
     return t;
@@ -66,8 +66,8 @@ function p(t) {
   const close = "</p>\n";
   const tokens = t.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
 
-  var open = "<p>";
-  var type = "class";
+  let open = "<p>";
+  let type = "class";
 
   if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(t)) {
     return t + "\n";

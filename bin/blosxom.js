@@ -14,8 +14,15 @@ const os = require("os");
 const path = require("path");
 const which = require("which").sync;
 
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "all",
+    "reindex"
+  ],
+  string: ["file"]
+});
 const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
-const reldir = {
+const dir = {
   data: "../src/weblog/entries/",
   img: "../src/img/blog/",
   root: "../src/weblog/",
@@ -23,22 +30,14 @@ const reldir = {
   staticimg: "../dist/images/blog/"
 };
 
-var argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "all",
-    "reindex"
-  ],
-  string: ["file"]
-});
-var bar;
-var cpuNum = Math.max(1, os.cpus().length - 1);
-var d;
-var dir = {};
-var files = [];
-var images = [];
+let bar;
+let cpuNum = Math.max(1, os.cpus().length - 1);
+let d;
+let files = [];
+let images = [];
 
 function build(file, next) {
-  var args = ["blosxom.cgi", "path=/" + file];
+  let args = ["blosxom.cgi", "path=/" + file];
 
   if (argv.reindex) {
     args = args.concat("reindex=1");
@@ -51,8 +50,8 @@ function build(file, next) {
       BLOSXOM_CONFIG_DIR: dir.root
     }
   }, function (err, stdout) {
-    var entry;
-    var contents;
+    let entry;
+    let contents;
 
     if (err) {
       return next(err);
@@ -98,8 +97,8 @@ function build(file, next) {
   });
 }
 
-for (d in reldir) {
-  dir[d] = path.resolve(__dirname, reldir[d]);
+for (d in dir) {
+  dir[d] = path.resolve(__dirname, dir[d]);
 }
 
 if (argv.file) {
@@ -116,8 +115,8 @@ if (argv.file) {
 
   if (images) {
     images.forEach(function (image) {
-      var dest;
-      var src;
+      let dest;
+      let src;
 
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
       src = path.join(dir.img, image);

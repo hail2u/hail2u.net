@@ -16,7 +16,7 @@ const opts = {
   stdio: "inherit"
 };
 
-var git;
+let git;
 
 opts.cwd = cwd;
 git = spawn(cmd, [

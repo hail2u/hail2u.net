@@ -7,17 +7,17 @@ const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const path = require("path");
 
-const cache = path.resolve(__dirname, "../cache/articles.json");
-const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
-
-var argv = minimist(process.argv.slice(2), {
+const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-var articles = [];
+const cache = path.resolve(__dirname, "../cache/articles.json");
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+
+let articles = [];
 
 function readArticle(file, date) {
-  var cat = path.basename(path.dirname(file)) + "/";
+  let cat = path.basename(path.dirname(file)) + "/";
 
   if (cat === "entries/") {
     cat = "";
@@ -46,8 +46,8 @@ if (!argv.force) {
 }
 
 fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
-  var date;
-  var file;
+  let date;
+  let file;
 
   if (!/\d+$/.test(line)) {
     return;

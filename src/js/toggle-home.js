@@ -1,7 +1,7 @@
 "use strict";
 
 (function (d) {
-  var className = "at-home";
+  const className = "at-home";
 
   function toggle(globalHeader, logo, siteNavigation, evt) {
     evt.preventDefault();

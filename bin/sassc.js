@@ -31,7 +31,7 @@ eachLimit(fs.readdirSync(srcDir), cpuNum, function (src, next) {
   execFile(which("sassc"), argv.concat([
     sl(path.join(srcDir, src))
   ]), function (err, stdout) {
-    var dest;
+    let dest;
 
     if (err) {
       return next(err);

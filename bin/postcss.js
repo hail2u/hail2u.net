@@ -27,7 +27,7 @@ const tmpdir = path.resolve(__dirname, "../tmp/");
 eachLimit(fs.readdirSync(tmpdir), cpuNum, function (input, next) {
   const basename = path.basename(input, cssExt);
 
-  var output;
+  let output;
 
   if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
     return next();

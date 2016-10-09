@@ -13,6 +13,9 @@ const parseXML = require("xml2js").parseString;
 const path = require("path");
 const sprintf = require("sprintf").sprintf;
 
+const argv = minimist(process.argv.slice(2), {
+  boolean: ["blog"]
+});
 const articleCache = path.resolve(__dirname, "../cache/articles.json");
 const blogFiles = [
   {
@@ -51,15 +54,12 @@ const entityMap = {
 };
 const metadataFile = path.resolve(__dirname, "../src/html/metadata.json");
 const partialDir = path.join(__dirname, "../src/html/partial");
+const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
 
-var argv = minimist(process.argv.slice(2), {
-  boolean: ["blog"]
-});
-var basicMetadata;
-var f;
-var files = blogFiles;
-var partials = {};
+let basicMetadata;
+let f;
+let files = blogFiles;
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
@@ -68,7 +68,7 @@ function escape(str) {
 }
 
 function extendObject(dest, src) {
-  var prop;
+  let prop;
 
   if (dest !== Object(dest)) {
     return dest;
@@ -82,7 +82,7 @@ function extendObject(dest, src) {
 }
 
 function readFeed(file) {
-  var feed = {};
+  let feed = {};
 
   parseXML(fs.readFileSync(file, "utf8"), {
     trim: true,
@@ -96,10 +96,10 @@ function readFeed(file) {
   });
 
   feed.item.forEach(function (val) {
-    var date;
-    var yy;
-    var mm;
-    var dd;
+    let date;
+    let yy;
+    let mm;
+    let dd;
 
     if (val.link) {
       val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
@@ -123,7 +123,7 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  var articles = JSON.parse(
+  const articles = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
   ).map(function (article, idx, arr) {
     article.strPubDate = sprintf("%02d/%02d", article.month, article.day);
@@ -152,7 +152,7 @@ function readArticles() {
 }
 
 function readMetadata(file, callback) {
-  var metadata = extendObject({}, basicMetadata);
+  let metadata = extendObject({}, basicMetadata);
 
   fs.readFile(file, function (err, data) {
     metadata = extendObject(metadata, JSON.parse(data));
@@ -196,7 +196,7 @@ eachLimit(
   Math.max(1, os.cpus().length - 1),
   function (file, next) {
     function processTemplate(data) {
-      var html = mustache.render(
+      let html = mustache.render(
         fs.readFileSync(file.src, "utf8"),
         data,
         partials

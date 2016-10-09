@@ -59,13 +59,13 @@ const files = [
 ];
 
 eachLimit(files, cpuNum, function (file, next) {
-  var args = [
+  let args = [
     "-f",
     path.resolve(__dirname, file.src),
     "-e",
     path.resolve(__dirname, file.dest)
   ];
-  var inkscape;
+  let inkscape;
 
   if (file.area) {
     args = args.concat([
