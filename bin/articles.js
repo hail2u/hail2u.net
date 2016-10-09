@@ -7,10 +7,8 @@ const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const path = require("path");
 
-const config = {
-  cache: "../cache/articles.json",
-  data: "../src/weblog/plugins/state/files_index.dat"
-};
+const cache = path.resolve(__dirname, "../cache/articles.json");
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
 
 var argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
@@ -39,18 +37,15 @@ function readArticle(file, date) {
   };
 }
 
-config.cache = path.resolve(__dirname, config.cache);
-config.data = path.resolve(__dirname, config.data);
-
 if (!argv.force && !argv.file) {
   return;
 }
 
 if (!argv.force) {
-  articles = JSON.parse(fs.readFileSync(config.cache, "utf8"));
+  articles = JSON.parse(fs.readFileSync(cache, "utf8"));
 }
 
-fs.readFileSync(config.data, "utf8").split(/\r?\n/).forEach(function (line) {
+fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   var date;
   var file;
 
@@ -76,8 +71,8 @@ fs.readFileSync(config.data, "utf8").split(/\r?\n/).forEach(function (line) {
     )
   );
 });
-mkdirp.sync(path.dirname(config.cache));
-fs.writeFileSync(config.cache, JSON.stringify(articles.sort(function (a, b) {
+mkdirp.sync(path.dirname(cache));
+fs.writeFileSync(cache, JSON.stringify(articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter(function (val, idx, arr) {
   return arr.indexOf(val) === idx;

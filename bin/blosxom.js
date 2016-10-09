@@ -14,15 +14,13 @@ const os = require("os");
 const path = require("path");
 const which = require("which").sync;
 
-const config = {
-  data: "../src/weblog/plugins/state/files_index.dat",
-  dir: {
-    data: "../src/weblog/entries/",
-    img: "../src/img/blog/",
-    root: "../src/weblog/",
-    static: "../dist/blog/",
-    staticimg: "../dist/images/blog/"
-  }
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+const reldir = {
+  data: "../src/weblog/entries/",
+  img: "../src/img/blog/",
+  root: "../src/weblog/",
+  static: "../dist/blog/",
+  staticimg: "../dist/images/blog/"
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -35,6 +33,7 @@ var argv = minimist(process.argv.slice(2), {
 var bar;
 var cpuNum = Math.max(1, os.cpus().length - 1);
 var d;
+var dir = {};
 var files = [];
 var images = [];
 
@@ -47,9 +46,9 @@ function build(file, next) {
   }
 
   execFile(which("perl"), args, {
-    cwd: config.dir.root,
+    cwd: dir.root,
     env: {
-      BLOSXOM_CONFIG_DIR: config.dir.root
+      BLOSXOM_CONFIG_DIR: dir.root
     }
   }, function (err, stdout) {
     var entry;
@@ -91,7 +90,7 @@ function build(file, next) {
       });
     }
 
-    entry = path.join(config.dir.static, file);
+    entry = path.join(dir.static, file);
     mkdirp.sync(path.dirname(entry));
     fs.writeFileSync(entry, contents);
     bar.tick();
@@ -99,10 +98,8 @@ function build(file, next) {
   });
 }
 
-config.data = path.resolve(__dirname, config.data);
-
-for (d in config.dir) {
-  config.dir[d] = path.resolve(__dirname, config.dir[d]);
+for (d in reldir) {
+  dir[d] = path.resolve(__dirname, reldir[d]);
 }
 
 if (argv.file) {
@@ -112,7 +109,7 @@ if (argv.file) {
   ).match(
     /\bsrc="\/images\/blog\/.*?"/g
   );
-  argv.file = path.relative(config.dir.data, argv.file);
+  argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
   cpuNum = 1;
@@ -123,20 +120,20 @@ if (argv.file) {
       var src;
 
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      src = path.join(config.dir.img, image);
-      dest = path.join(config.dir.staticimg, image);
+      src = path.join(dir.img, image);
+      dest = path.join(dir.staticimg, image);
       fs.createReadStream(src).pipe(fs.createWriteStream(dest));
     });
   }
 }
 
 if (argv.all) {
-  fs.readFileSync(config.data, "utf8").split(/\r?\n/).forEach(function (file) {
+  fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (file) {
     if (file === "") {
       return;
     }
 
-    files.push(path.relative(config.dir.data, file.split("=>").shift()));
+    files.push(path.relative(dir.data, file.split("=>").shift()));
   });
 }
 

@@ -10,9 +10,12 @@ const path = require("path");
 const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
-const config = {
-  preview: "../tmp/__preview.html",
-  template: `<!DOCTYPE html>
+const argv = minimist(process.argv.slice(2), {
+  string: ["file"]
+});
+const article = fs.readFileSync(argv.file, "utf8").split("\n");
+const preview = path.resolve(__dirname, "../tmp/__preview.html");
+const template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -31,13 +34,8 @@ const config = {
       </article>
     </main>
   </body>
-</html>`
-};
+</html>`;
 
-var argv = minimist(process.argv.slice(2), {
-  string: ["file"]
-});
-var article;
 var body;
 var renderer;
 var title;
@@ -92,8 +90,6 @@ function p(t) {
   return open + t + close;
 }
 
-config.preview = path.resolve(__dirname, config.preview);
-article = fs.readFileSync(argv.file, "utf8").split("\n");
 title = article.shift().trim().replace(/\$/g, "$$$$");
 body = article.join("\n").trim().replace(/\$/g, "$$$$");
 
@@ -107,15 +103,18 @@ if (!body.endsWith(">")) {
 }
 
 body = body.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
-mkdirp.sync(path.dirname(config.preview));
-fs.writeFileSync(config.preview, config.template.replace(
-  /<%TITLE%>/g,
-  title
-).replace(
-  /<%BODY%>/g,
-  body
-).replace(
-  /="\//g,
-  "=\"../dist/"
-));
-spawn(which("open"), [config.preview]);
+mkdirp.sync(path.dirname(preview));
+fs.writeFileSync(
+  preview,
+  template.replace(
+    /<%TITLE%>/g,
+    title
+  ).replace(
+    /<%BODY%>/g,
+    body
+  ).replace(
+    /="\//g,
+    "=\"../dist/"
+  )
+);
+spawn(which("open"), [preview]);

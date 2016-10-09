@@ -12,47 +12,36 @@ const path = require("path");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
 
-const config = {
-  cssExt: ".css",
-  minExt: ".min",
-  processor: postcss([
-    roundFloat(),
-    mqpacker({
-      sort: true
-    }),
-    csswring()
-  ]),
-  tmpdir: "../tmp/"
-};
+const cpuNum = Math.max(1, os.cpus().length - 1);
+const cssExt = ".css";
+const minExt = ".min";
+const processor = postcss([
+  roundFloat(),
+  mqpacker({
+    sort: true
+  }),
+  csswring()
+]);
+const tmpdir = path.resolve(__dirname, "../tmp/");
 
-config.tmpdir = path.resolve(__dirname, config.tmpdir);
-eachLimit(
-  fs.readdirSync(config.tmpdir),
-  Math.max(1, os.cpus().length - 1),
-  function (input, next) {
-    const basename = path.basename(input, config.cssExt);
+eachLimit(fs.readdirSync(tmpdir), cpuNum, function (input, next) {
+  const basename = path.basename(input, cssExt);
 
-    var output;
+  var output;
 
-    if (
-      path.extname(input) !== config.cssExt ||
-      path.extname(basename) === config.minExt
-    ) {
-      return next();
-    }
-
-    input = path.join(config.tmpdir, input);
-    output = path.join(config.tmpdir, basename + config.minExt + config.cssExt);
-    config.processor.process(
-      fs.readFileSync(input, "utf8")
-    ).then(function (result) {
-      mkdirp.sync(path.dirname(output));
-      fs.writeFileSync(output, result.css);
-      next();
-    });
-  }, function (err) {
-    if (err) {
-      throw err;
-    }
+  if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
+    return next();
   }
-);
+
+  input = path.join(tmpdir, input);
+  output = path.join(tmpdir, basename + minExt + cssExt);
+  processor.process(fs.readFileSync(input, "utf8")).then(function (result) {
+    mkdirp.sync(path.dirname(output));
+    fs.writeFileSync(output, result.css);
+    next();
+  });
+}, function (err) {
+  if (err) {
+    throw err;
+  }
+});
