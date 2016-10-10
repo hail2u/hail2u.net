@@ -11,39 +11,38 @@ const execFile = require("child_process").execFile;
 const which = require("which").sync;
 
 const argv = process.argv.slice(2);
-const cpuNum = Math.max(1, os.cpus().length - 1);
 const cssExt = ".css";
 const destDir = path.resolve(__dirname, "../tmp/");
 const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 
-function sl(p) {
-  return p.replace(/\\/g, "/");
-}
+eachLimit(
+  fs.readdirSync(srcDir),
+  Math.max(1, os.cpus().length - 1),
+  function (src, next) {
+    const basename = path.basename(src, scssExt);
 
-eachLimit(fs.readdirSync(srcDir), cpuNum, function (src, next) {
-  const basename = path.basename(src, scssExt);
-
-  if (path.extname(src) !== scssExt || basename.startsWith("_")) {
-    return next();
-  }
-
-  execFile(which("sassc"), argv.concat([
-    sl(path.join(srcDir, src))
-  ]), function (err, stdout) {
-    let dest;
-
-    if (err) {
-      return next(err);
+    if (path.extname(src) !== scssExt || basename.startsWith("_")) {
+      return next();
     }
 
-    dest = path.join(destDir, basename + cssExt);
-    mkdirp.sync(path.dirname(dest));
-    fs.writeFileSync(dest, stdout);
-    next();
-  });
-}, function (err) {
-  if (err) {
-    throw err;
+    execFile(which("sassc"), argv.concat([
+      path.join(srcDir, src).replace(/\\/g, "/")
+    ]), function (err, stdout) {
+      let dest;
+
+      if (err) {
+        return next(err);
+      }
+
+      dest = path.join(destDir, basename + cssExt);
+      mkdirp.sync(path.dirname(dest));
+      fs.writeFileSync(dest, stdout);
+      next();
+    });
+  }, function (err) {
+    if (err) {
+      throw err;
+    }
   }
-});
+);

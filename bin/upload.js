@@ -19,30 +19,19 @@ const opts = {
 let git;
 
 opts.cwd = cwd;
-git = spawn(cmd, [
-  "add",
-  "--",
-  path.relative(cwd, argv.file)
-], opts);
+git = spawn(cmd, ["add", "--", path.relative(cwd, argv.file)], opts);
 
 if (git.error) {
   throw git.error;
 }
 
-git = spawn(cmd, [
-  "commit",
-  "--message=Upload"
-], opts);
+git = spawn(cmd, ["commit", "--message=Upload"], opts);
 
 if (git.error) {
   throw git.error;
 }
 
-git = spawn(cmd, [
-  "push",
-  "origin",
-  "gh-pages"
-], opts);
+git = spawn(cmd, ["push", "origin", "gh-pages"], opts);
 
 if (git.error) {
   throw git.error;

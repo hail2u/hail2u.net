@@ -27,7 +27,8 @@ const template = `<!DOCTYPE html>
     <main class="content">
       <article class="section" role="main">
         <footer class="section-footer">
-          <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under <span class="tag"><a href="#">Preview</a></span></p>
+          <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under
+            <span class="tag"><a href="#">Preview</a></span></p>
         </footer>
         <h1 class="first-heading"><%TITLE%></h1>
         <%BODY%>

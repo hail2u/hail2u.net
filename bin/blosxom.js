@@ -21,7 +21,10 @@ const argv = minimist(process.argv.slice(2), {
   ],
   string: ["file"]
 });
-const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+const data = path.resolve(
+  __dirname,
+  "../src/weblog/plugins/state/files_index.dat"
+);
 const dir = {
   data: "../src/weblog/entries/",
   img: "../src/img/blog/",

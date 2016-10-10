@@ -12,7 +12,10 @@ const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 const cache = path.resolve(__dirname, "../cache/articles.json");
-const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+const data = path.resolve(
+  __dirname,
+  "../src/weblog/plugins/state/files_index.dat"
+);
 
 let articles = [];
 

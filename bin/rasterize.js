@@ -8,7 +8,6 @@ const path = require("path");
 const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
-const cpuNum = Math.max(1, os.cpus().length - 1);
 const files = [
   {
     dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
@@ -58,7 +57,7 @@ const files = [
   }
 ];
 
-eachLimit(files, cpuNum, function (file, next) {
+eachLimit(files, Math.max(1, os.cpus().length - 1), function (file, next) {
   let args = [
     "-f",
     path.resolve(__dirname, file.src),
