@@ -1,7 +1,7 @@
-[Hail2u.net][1]
-===============
+Hail2u.net
+==========
 
-The source files of Hail2u.net website.
+The source files of [Hail2u.net][1] website.
 
 
 Environment
@@ -10,12 +10,12 @@ Environment
 - Bash
 - Git
 - ImageMagick
+- Inkscaper
 - Node.js
   - ESLint
   - npm
-- Ruby
-  - sass
-  - scss_lint
+  - Stylelint
+- Sassc
 
 
 [1]: https://hail2u.net/
