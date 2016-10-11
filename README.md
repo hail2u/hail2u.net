@@ -13,6 +13,7 @@ Environment
 - Inkscaper
 - Node.js
   - ESLint
+  - HTMLHint
   - npm
   - Stylelint
 - Sassc
