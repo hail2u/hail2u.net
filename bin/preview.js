@@ -23,12 +23,11 @@ const template = `<!DOCTYPE html>
     <title><%TITLE%> - Weblog - Hail2u.net</title>
     <link href="/styles/main.min.css" rel="stylesheet">
   </head>
-  <body style="margin-bottom: 6rem">
+  <body>
     <main class="content">
-      <article class="section" role="main">
+      <article class="section">
         <footer class="section-footer">
-          <p>on <time datetime="1976-07-23">Jul 23, 1976</time> under
-            <span class="tag"><a href="#">Preview</a></span></p>
+          <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
         <h1 class="first-heading"><%TITLE%></h1>
         <%BODY%>
