@@ -1,23 +1,24 @@
-/**
- * @preserve unutm.js
+/*!
+ * unutm.js
  *
  * LICENSE: http://hail2u.mit-license.org/2013
  */
+"use strict";
+
 (function (l, h) {
   if (!l.search || !h.replaceState) {
     return;
   }
 
-  var unutm = function () {
-    var u = l.pathname +
-      l.search.replace(/[?&]utm_[^&]+/g, '').replace(/^&/, '?') +
-      l.hash;
-    h.replaceState(null, '', u);
-  };
-
-  if (typeof ga === 'function') {
-    ga(unutm());
-  } else {
-    unutm();
-  }
+  h.replaceState(
+    null,
+    "",
+    l.pathname + l.search.replace(
+      /[?&]utm_[^&]+/g,
+      ""
+    ).replace(
+      /^&/,
+      "?"
+    ) + l.hash
+  );
 })(location, history);

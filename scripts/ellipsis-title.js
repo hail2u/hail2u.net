@@ -6,16 +6,11 @@
 "use strict";
 
 (function () {
-  var e;
-  var i;
-  var l;
-  var n = document.querySelectorAll("*");
+  let elm;
 
-  for (i = 0, l = n.length; i < l; i += 1) {
-    e = n[i];
-
-    if (window.getComputedStyle(e)["text-overflow"] === "ellipsis") {
-      e.title = e.textContent;
+  for (elm of document.querySelectorAll("*")) {
+    if (window.getComputedStyle(elm)["text-overflow"] === "ellipsis") {
+      elm.title = elm.textContent;
     }
   }
 })();
