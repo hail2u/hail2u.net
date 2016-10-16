@@ -16,7 +16,7 @@
 
     diff = parseInt((now - then) / 1000, 10);
 
-    if (diff < 0) {
+    if (!Number.isInteger(diff) || diff < 0) {
       return;
     }
 
