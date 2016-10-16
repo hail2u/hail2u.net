@@ -10,12 +10,80 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Sat, 15 Oct 2016 02:27:31 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 16 Oct 2016 13:42:09 +0900</lastBuildDate>
     <generator>blosxom v2.1.2+dev</generator>
     <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>time要素の中身を相対日時へ変換</title>
+      <link>https://hail2u.net/blog/converting-time-element-content-to-relative-date.html</link>
+      <description>time要素にdatetime属性があったら、それを元に現在時刻からの相対日時を生成し、その中身を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～ヶ月前、12で割って～年前というものをそのままコードにした。車輪だ。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/converting-time-element-content-to-relative-date.html</guid>
+      <pubDate>Sun, 16 Oct 2016 13:41:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><code>time</code>要素に<code>datetime</code>属性があったら、それを元に現在時刻からの相対日時を生成し、その中身を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～ヶ月前、12で割って～年前というものをそのままコードにした。車輪だ。</p>
+
+<pre><code>const now = Date.now();
+const toRelativeDate = function (then) {
+  let diff = 0;
+
+  if (!Number.isInteger(then)) {
+    return;
+  }
+
+  diff = parseInt((now - then) / 1000, 10);
+
+  if (diff &lt; 0) {
+    return;
+  }
+
+  if (diff &lt; 60) {
+    return diff + &quot;秒前&quot;;
+  }
+
+  diff = parseInt(diff / 60, 10);
+
+  if (diff &lt; 60) {
+    return diff + &quot;分前&quot;;
+  }
+
+  diff = parseInt(diff / 60, 10);
+
+  if (diff &lt; 24) {
+    return diff + &quot;時間前&quot;;
+  }
+
+  diff = parseInt(diff / 24, 10);
+
+  if (diff &lt; 30) {
+    return diff + &quot;日前&quot;;
+  }
+
+  diff = parseInt(diff / 30, 10);
+
+  if (diff &lt; 12) {
+    return diff + &quot;ヶ月前&quot;;
+  }
+
+  return parseInt(diff / 12, 10) + &quot;年前&quot;;
+};
+</code></pre>
+
+<p>See test: <a href="https://hail2u.net/pub/test/658.html">Test Page for reldate.js</a></p>
+
+<p>日本語だと複数形のことを考えなくて良いのでシンプルなコードになった。2年前以上は日時をそのまま表示したいという場合は、最初の方でdiffが一定数以上の時に抜けるようにしてやると良さそうだ。</p>
+
+<p>タイムゾーンのことをまったく考えていない。<code>Date.now()</code>と<code>Date.parse()</code>でISO-8601をパースした時はUTCのミリ秒になるはずなので、大丈夫なんじゃないかと楽観している。また相対時刻がそもそもあやふやなので、最大24時間ずれるくらい大したこともなさそうだ。このあたりも含めて確実にしたいなら<a href="http://momentjs.com/">Moment.js</a>を使うべきだろう。そうすれば<code>moment#toNow()</code>などもあり、何も考える必要はなくなる。</p>
+
+<hr>
+
+<p>ウェブサイト上で動かすスクリプトを昔のことは忘れて書き、<a href="https://github.com/google/closure-compiler-js">Closure CompilerのJavaScriptバージョン</a>でES5への変換と最小化を同時にやるようにし始めた。もちろんgyp依存とかでもないため、Windowsで普通に動く。いくつか小さなプロジェクトでも使ってみているが、UglifyJS2を差し替えるくらいの感覚で移行できている。ちょっと処理が遅く、最小化後のサイズも大きくはなるが、それを補って余りある簡便さだ。</p>
+
+<p>規模の大きなJavaScriptコードを処理しようとするとメモリーを食い尽くすなど、パフォーマンスの点で問題がいくつかあるようだ。まだプロダクションで使うのは怖いが、小さいところではちょいちょい使っていきたい。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>何もしないためのデザイン</title>
@@ -288,42 +356,6 @@
 <p>特にナビゲーションでは長いとまずいことも多く、工夫が必要になることが多い。「About」などはその典型かもしれない。そのページで扱われているコンテンツを考慮すると「奥付」がかなり近いが、正確とはいえない上に一般的な単語でもない。よく見る「○○について」はウェブサイト名によっては致命的な長さになる。このウェブサイトでは正確に写すよりも、当該ページに書いてあることが雑多な情報なことから「いろいろ」としておいた。</p>
 
 <p>インターネットに日本語が向いていない。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>フォーム・バリデーションのヒントと画面外にあるinput要素</title>
-      <link>https://hail2u.net/blog/webdesign/form-validation-hint-and-out-of-bounds-input-element.html</link>
-      <description>input要素ではpattern属性でその入力された値をバリデーションできる。バリデーションに失敗した場合、title属性に指定された文字列がヒントとして表示されることが多い（ユーザー・エージェント側の実装に依存する）。事実Chromeでは古くから上記スクリーンショットのようなポップアップが表示される。多くのブラウザーで似たような実装を持つが、バリデーションに失敗した要素が画面外にある場合にはうまくヒントが表示されないことがあるようだ。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/webdesign/form-validation-hint-and-out-of-bounds-input-element.html</guid>
-      <pubDate>Tue, 27 Sep 2016 22:24:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-<a href="https://hail2u.net/images/blog/form-validation-hint-and-out-of-bounds-input-element.png"><img alt="フォーム・バリデーションが失敗した際、Chrome 53で提示されるヒントの例" height="540" src="https://hail2u.net/images/blog/form-validation-hint-and-out-of-bounds-input-element.png" width="960"></a>
-</figure>
-
-<p><code>input</code>要素では<a href="https://html.spec.whatwg.org/multipage/forms.html#the-pattern-attribute"><code>pattern</code>属性</a>でその入力された値をバリデーションできる。バリデーションに失敗した場合、<code>title</code>属性に指定された文字列がヒントとして表示されることが多い（ユーザー・エージェント側の実装に依存する）。事実Chromeでは古くから上記スクリーンショットのようなポップアップが表示される。多くのブラウザーで似たような実装を持つが、バリデーションに失敗した要素が画面外にある場合にはうまくヒントが表示されないことがあるようだ。</p>
-
-<p>See also: <a href="https://hail2u.net/pub/test/654.html">Form Validation Hint and Out of Bounds input Element</a></p>
-
-<p>デモにある入力ボックスは小文字アルファベットに制限してある。数字などを入力してフォームを送信しようとすると、バリデーションが失敗しヒントがポップアップされるはずだ。Chrome 53やInternet Explorer 11、Firefox 50では正常に表示される。</p>
-
-<figure>
-<a href="https://hail2u.net/images/blog/form-validation-hint-on-edge14-ng.gif"><img alt="画面外の入力ボックスでバリデーション・エラーが起こった場合、" height="300" src="https://hail2u.net/images/blog/form-validation-hint-on-edge14-ng.gif" width="400"></a>
-<figcaption>Form Validation w/o Hint on Edge 14</figcaption>
-</figure>
-
-<p>しかしEdge 14ではこのようにうまく表示されない。入力ボックスが画面外にあると、エラーが起こった入力ボックスが見えるようにスクロールされ、バリデーション・エラーを意味する赤い枠はつく。しかしポップアップだけが表示されない。Firefox 47でも入力後、スクロールして送信ボタンをマウスなどを使って押すと同じようにヒントが表示されない（上述の通りFirefox 50では修正されているようだ）。</p>
-
-<figure>
-<a href="https://hail2u.net/images/blog/form-validation-hint-on-edge14-ok.gif"><img alt="Enterキーでフォームを送信すると画面内に入力ボックスがあるため、ヒントが表示される" height="300" src="https://hail2u.net/images/blog/form-validation-hint-on-edge14-ok.gif" width="400"></a>
-<figcaption>Form Validation with Hint on Edge 14</figcaption>
-</figure>
-
-<p>バリデーション・エラーの起こった入力ボックスが画面内にある場合はもちろんポップアップが表示される。この場合はEnterキーでフォームを送信しようと試みているだけで、HTMLソースはまったく同じだ。フォーカスの制御あたりに問題があり、うまくポップアップが出てこないように推察できる。製作者側からできることは少なそうだ。</p>
-
-<hr>
-
-<p>画面外にバリデーション・エラーが起きた入力ボックスがあるというケースはかなりあると想像できる。ショッピング・サイトなどでは支払いや送付先のフォームではまずそれに該当するだろう。致命的とは言い難いが代替手段が提供しづらいことを考えると、フォームの作成においてはこのような不具合があることを常に頭に入れておくと良いだろう。長いフォームをうまく分割し、このようなバグに悩まされないように根本的に改善できるとなお良い。</p>]]></content:encoded>
     </item>
 
   </channel>
