@@ -8,9 +8,15 @@
 (function () {
   const now = Date.now();
   const toRelativeDate = function (then) {
-    let diff = parseInt((now - then) / 1000, 10);
+    let diff = 0;
 
-    if (diff < 0) {
+    if (!Number.isInteger(then)) {
+      return;
+    }
+
+    diff = parseInt((now - then) / 1000, 10);
+
+    if (!Number.isInteger(diff) || diff < 0) {
       return;
     }
 
@@ -49,7 +55,7 @@
     let abs = time.getAttribute("datetime");
     let rel = "";
 
-    if (!datetime) {
+    if (!abs) {
       continue;
     }
 
