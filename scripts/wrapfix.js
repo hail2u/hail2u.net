@@ -6,23 +6,19 @@
 "use strict";
 
 (function (d) {
-  const n = d.querySelectorAll("main h1");
+  let h1;
+  let text;
 
-  let e;
-  let h;
-  let i;
-  let l;
-
-  for (i = 0, l = n.length; i < l; i += 1) {
-    e = n[i];
-
-    if (e.childNodes.length !== 1 || e.firstChild.nodeType !== 3) {
+  for (h1 of d.querySelectorAll("main h1")) {
+    if (h1.childNodes.length !== 1 || h1.firstChild.nodeType !== 3) {
       continue;
     }
 
-    h = e.textContent.split("");
-    e.textContent = h.slice(0, -2).concat(h.slice(-2).map(function (c) {
-      return "\uFEFF" + c;
-    })).join("");
+    text = h1.textContent.split("");
+    h1.textContent = text.slice(0, -2).concat(
+      text.slice(-2).map(function (char) {
+        return "\uFEFF" + char;
+      })
+    ).join("");
   }
 })(document);

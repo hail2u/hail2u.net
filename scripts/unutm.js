@@ -5,12 +5,12 @@
  */
 "use strict";
 
-(function (l, h) {
-  if (!l.search || !h.replaceState) {
+(function (l) {
+  if (!l.search) {
     return;
   }
 
-  h.replaceState(
+  history.replaceState(
     null,
     "",
     l.pathname + l.search.replace(
@@ -21,4 +21,4 @@
       "?"
     ) + l.hash
   );
-})(location, history);
+})(location);

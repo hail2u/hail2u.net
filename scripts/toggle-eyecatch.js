@@ -1,25 +1,17 @@
 "use strict";
 
 (function (d) {
-  function toggle(eyecatch, article, evt) {
+  function toggle(eyecatch) {
     if (eyecatch.hidden) {
       eyecatch.hidden = false;
     } else {
       eyecatch.hidden = true;
     }
-
-    evt.preventDefault();
-    evt.stopPropagation();
-    article.classList.toggle("has-image");
   }
 
   d.querySelector(".section-footer").addEventListener(
     "click",
-    toggle.bind(
-      null,
-      d.querySelector(".fill"),
-      d.getElementById("introduction")
-    ),
+    toggle.bind(null, d.querySelector(".fill")),
     false
   );
 })(document);
