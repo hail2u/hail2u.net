@@ -20,6 +20,10 @@
       return;
     }
 
+    if (diff === 0) {
+      return "たった今";
+    }
+
     if (diff < 60) {
       return diff + "秒前";
     }
