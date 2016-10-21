@@ -29,6 +29,7 @@ eachLimit(
     dest = path.join(tmpdir, basename + minExt + jsExt);
     mkdirp.sync(path.dirname(dest));
     fs.writeFileSync(dest, compile({
+      compilationLevel: "ADVANCED_OPTIMIZATIONS",
       jsCode: [{
         src: fs.readFileSync(src, "utf8")
       }]
