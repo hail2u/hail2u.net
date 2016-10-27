@@ -2,20 +2,56 @@
 <rss version="2.0"
   xml:lang="ja"
   xmlns:atom="http://www.w3.org/2005/Atom"
-  xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule"
-  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule">
   <channel>
     <title>Weblog - Hail2u.net</title>
     <link>https://hail2u.net/blog/</link>
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <language>ja</language>
+    <copyright>Copyright © 1998–, Kyo Nagashima</copyright>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
-    <lastBuildDate>Mon, 24 Oct 2016 14:37:03 +0900</lastBuildDate>
-    <generator>blosxom v2.1.2+dev</generator>
-    <atom:link rel="self" href="https://hail2u.net/blog/feed"/>
-    <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+    <lastBuildDate>Thu, 27 Oct 2016 12:40:16 +0900</lastBuildDate>
+    <generator>Blosxom v2.1.2+dev</generator>
+    <atom:link href="https://hail2u.net/blog/feed" rel="self"/>
+    <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <title>ch単位を使ったカラム幅指定</title>
+      <link>https://hail2u.net/blog/sizing-column-with-ch-unit.html</link>
+      <description>コンテンツのカラム幅は半角英数で45–75文字という説がある。それをem単位に直すとおおよそ25emから35emと考えられるが、実際にはフォントの横幅に依存する。一方CSSにはch単位というフォントの横幅によって変化する単位がある。ということはこの単位を幅や横方向の余白に利用すると、使用されるフォントに応じてカラム幅が適切に変化するはずだ……が、そうは問屋が卸さなかった。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/sizing-column-with-ch-unit.html</guid>
+      <pubDate>Thu, 27 Oct 2016 12:39:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p>コンテンツのカラム幅は半角英数で45–75文字という説がある。それを<code>em</code>単位に直すとおおよそ<code>25em</code>から<code>35em</code>と考えられるが、実際にはフォントの横幅に依存する。一方CSSには<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位</a>というフォントの横幅によって変化する単位がある。ということはこの単位を幅や横方向の余白に利用すると、使用されるフォントに応じてカラム幅が適切に変化するはずだ……が、そうは問屋が卸さなかった。</p>
+
+<p>利用はそれほど難しくない。<code>ch</code>単位は半角数字の0の横幅で決定されることさえ頭に入れておけばそれでよい。45–75文字を直すならそのまま<code>45ch</code>から<code>75ch</code>になるわけだ。一部でどうしても<code>(r)em</code>単位と組み合わせたい場合も出てくるだろうが、その場合は<code>calc()</code>関数を使える。これでぱっと見はうまくいく。</p>
+
+<p>しかしながらウェブフォントとの相性が非常に悪い。ウェブフォントの読み込み中と読み込み完了後で<code>ch</code>単位の基準が変わってしまうので、リレイアウトされてしまう。少し複雑なレイアウトをしていると致命的な結果に終わるだろう。これだけならウェブフォントを使わない場合には役に立ちそうな気がするが、もう一つメディア・クエリーにおける問題がある。</p>
+
+<p>大雑把にそこそこ広い画面ならコンテンツ幅を<code>60ch</code>に制限したいとしよう。CSSではメディア・クエリーを使って以下のように書くことが多いだろう。</p>
+
+<pre><code>@media (min-width: 720px) {
+  main {
+    max-width: 75ch;
+  }
+}
+</code></pre>
+
+<p>Chrome 54ではArialの場合は<code>667.375px</code>相当となり収まるが、Verdanaの場合は<code>762.891px</code>となり収まらない。日本語フォントではＭＳ Ｐゴシックだと<code>600px</code>相当でかなり余裕があるが、メイリオの場合は<code>745.313px</code>となり同じく収まらない。</p>
+
+<p>これはかなり恣意的な例だが、大きなサイズを<code>ch</code>単位で表現しようとすると必ず突き当たる壁と考えられる。「これくらいならこれくらいになる」という予測が難しくなるからだ。</p>
+
+<p>では、とメディア・クエリーでも<code>ch</code>単位を使って統一すればうまくいきそうだが、そうはいかない。メディア・クエリーでの計算は初期状態で行われるので、フォント指定は反映されずもっと予測が難しい（プラットフォームに依存する）ものになってしまう。</p>
+
+<hr>
+
+<p>どういうフォントが使われるかを想定せずに行当たりの文字数をほぼ確定できる<code>ch</code>単位の利用は、方向性は良かった。ウェブフォントの読み込みが失敗しても、ユーザー・スタイルシートで想定外のフォントへ変えられていても、そもそもフォントを指定しておらずどのようなフォントで表示されるかわからない場合でも、うまく機能する。</p>
+
+<p>しかし実装に大きな壁があり、カラム幅のような箇所で使うのは無理があるようだ。今まで通りいくつかの特徴的なフォント（狭いMS UI Gothicや広いメイリオなど）を考慮に入れて行当たりの文字数のバランスをとる手法でいくしかないようだ。</p>]]></content:encoded>
+    </item>
 
     <item>
       <title>Drawic v2.13.0</title>
@@ -306,36 +342,6 @@ const toRelativeDate = function (then) {
 <h1>追記</h1>
 
 <p>ステータス・ページでHSTSが仕込まれるようになったため、事実上証明書を用意しないとカスタム・ドメインで運用できなくなった。自前で証明書を用意するか、Uptime Robot側が作ってくれるユニークなURLを利用する必要がありそうだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <title>本文のフォントサイズ</title>
-      <link>https://hail2u.net/blog/body-text-size.html</link>
-      <description>あなたの記事本文はフォントサイズが小さすぎる（原題: Your Body Text Is Too Small）という記事を読んだ。読める（legible）大きさではなく読みやすい（readable）大きさは、もはや20年以上前から続く伝統の16pxではないのではないかという主張だ。大きくすることの理由において僕の考えとはかなりずれがあった。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/body-text-size.html</guid>
-      <pubDate>Thu, 06 Oct 2016 00:52:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<figure>
-<a href="https://medium.com/@xtianmiller/your-body-text-is-too-small-5e02d36dc902"><img alt="Macrotypography" height="1440" src="https://hail2u.net/images/blog/body-text-size.png" width="2560"></a>
-</figure>
-
-<p><a href="https://medium.com/@xtianmiller/your-body-text-is-too-small-5e02d36dc902">あなたの記事本文はフォントサイズが小さすぎる</a>（原題: Your Body Text Is Too Small）という記事を読んだ。読める（legible）大きさではなく読みやすい（readable）大きさは、もはや20年以上前から続く伝統の16pxではないのではないかという主張だ。大きくすることの理由において僕の考えとはかなりずれがあった。</p>
-
-<p>16pxだと少し小さいかもしれないというケースも多々あることは確かだ。しかし<em>本文のフォントサイズを大きくすることは描画領域に対してのおさまりの良さを提供するためのもの</em>だろう。この記事が載っているMediumのような真ん中寄せ・1カラムのレイアウトで1行の文字数がこれくらいだと、16pxではなんともおさまりが悪い。描画領域が広くなればなるほど、余白と本文カラムのバランスがどんどん崩れていくからだ。</p>
-
-<p>そういう意味で18–21pxくらいにするのは理にかなっている。そうすることで余白のバランスが落ち着き、その結果として本文が読みやすくなるからだ。決して文字が大きいから読みやすいわけではない。この辺りのことはマクロ・タイポグラフィーなどと俗に言われている分野の話だろう。</p>
-
-<p>もうひとつはズームの扱いだ。この記事ではズームを補助的な機能に過ぎず依存するべきではないとしている。しかしズームはもうスクロール並みに低コストで自然に使われる機能なのではないだろうか。デスクトップ・ブラウザーを常に125%で使う人もいるだろうし、小さいなと思ったら<em>自分の好みで</em>サッとズームすることだろう。</p>
-
-<p>またタッチ機器でのマイナスのズームについてはどうだろうか。あるウェブページが本文のフォントサイズを大きくしたとして、ユーザーがそれを大きすぎると感じた場合に小さくする手法がないことになる。ユーザーの選択肢を潰すくらいならば、慣習的な16pxとしておき、ズームしても問題ないように工夫をしておくというのも悪くはないだろう。</p>
-
-<p>TVとの距離やVRなどについても書いているが、このあたりのことはデバイスの種類とスクリーン特性だけでは決まらないので難しい。例えば同じ大きさでも軽いタブレット（読書向け）と重いタブレット（屋外の工事現場向け）では自然と持ち方が違う。そうするとデバイスとの距離や入力に使うものも変わる。この辺りのことは<a href="https://hail2u.net/blog/webdesign/on-responsive-typography.html">もうちょっと突っ込んだ話</a>を以前書いた。</p>
-
-<p>（増え続ける）こういった多彩さに対して「これは対応、これは非対応」として妥当なデフォルト値を定期的に見直していくのは無理がある。検証と決定を行うコストという点でも、それらを切り分けるために必要な実装という点でも、将来予測が困難という点でも無理だ。</p>
-
-<hr>
-
-<p>本文のフォントサイズを上げることにはほとんど異論はないが、プライオリティーとしてはレイアウトより低くすべきだろう。コンテンツがレイアウトを決め、レイアウトがフォントサイズを決めるからだ。その際に少しだけメジャーなハードウェアのことを考えて微調整するくらいが安全なのではないだろうか。その微調整においてはこの記事に書かれている<a href="https://medium.com/@xtianmiller/your-body-text-is-too-small-5e02d36dc902#1f96">最適化手法</a>の2と4、そして5は参考になる。</p>]]></content:encoded>
     </item>
 
   </channel>
