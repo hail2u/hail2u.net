@@ -10,6 +10,43 @@
     <atom:link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/4.0/</creativeCommons:license>
     <item>
+      <title>CSSによる両端揃えの問題点とその解決へ向けて</title>
+      <link>https://hail2u.net/blog/css-jutification-problem-and-solving-some.html</link>
+      <description>日本語の文章の場合、両端が揃っているとおさまりが良い。CSSではその両端揃えを行うためにtext-alignプロパティーにjustifyという値が用意されている。完全に日本語だけの段落ならほぼ100%、和欧混在の段落でも9割以上の段落で想定通り機能するが、まれに無残な結果になる。それは自動折り返しで長めの英単語が行頭に来る場合だ。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/css-jutification-problem-and-solving-some.html</guid>
+      <pubDate>Fri, 04 Nov 2016 12:17:00 +0900</pubDate>
+      <content:encoded><![CDATA[<figure>
+<a href="https://hail2u.net/images/blog/css-justification-problem-and-solving-some.png"><img alt="Justfication" height="1440" src="https://hail2u.net/images/blog/css-justification-problem-and-solving-some.png" width="2560"></a>
+</figure>
+
+<p>日本語の文章の場合、両端が揃っているとおさまりが良い。CSSではその両端揃えを行うために<code>text-align</code>プロパティーに<code>justify</code>という値が用意されている。完全に日本語だけの段落ならほぼ100%、和欧混在の段落でも9割以上の段落で想定通り機能するが、まれに無残な結果になる。それは自動折り返しで長めの英単語が行頭に来る場合だ。</p>
+
+<p>両端揃えは文字と文字の間を開けることで行われる。日本語だけの段落の場合、ほとんどどこでも改行することができる上、行送りの禁則処理が起こっても最大2文字分なので、行の長さが十分にあればその調整は認識されないだろう。問題は和欧混在の段落だ。</p>
+
+<p>See demo: <a href="https://hail2u.net/pub/test/657.html">Justifying Problem</a></p>
+
+<aside>
+<p>この「contemporary」くらいの長さの単語だとまだマシな方で、あまり問題が起こることはない。しかし、このウェブサイトのように<code>compareDocumentPosition()</code>とか<code>DOCUMENT_POSITION_CONTAINS</code>などといった途中で改行できない長い語がよく出てくると、こういった問題は発生しやすくなる。</p>
+</aside>
+
+<p>「contemporary」という多少長めの単語が行頭に来るとその前の行でトラッキングが狂ってしまっている。デモは環境によって再現しないかもしれないが、掲載しておいたスクリーンショットのようになる環境は少なくない。ほとんどのブラウザーで、メイリオや游ゴシック、ヒラギノ明朝で表示された場合再現するはずだ。</p>
+
+<p>以下の2つの方法以外では解決できない（と思う）。</p>
+
+<ol>
+<li>全角の英数字を使う</li>
+<li><code>word-break: break-all</code>を使う</li>
+</ol>
+
+<p>間違いなく1を採用するのは馬鹿げているので、現実的な解は2ということになる。<code>break-all</code>はこの両端揃えでおかしくなるのは防ぐが、それと同時に他の場所にも顕著な影響を与えてしまう。どちらもあまり良い解ではない。</p>
+
+<p>このウェブサイトでは<code>hyphens</code>プロパティーの柔軟な実装を期待する形で両端揃えを試しつつ、<code>code</code>要素などのみで単語中で折り返せるようにした。これで95%くらいのケースでうまくいくはずだがどうだろうか。8文字以上の長い単語を自動で折り返せるようにするスクリプトでも書けば98%くらいまで解決できそうだが、コストに見合わないのでやめておいた。</p>
+
+<hr>
+
+<p>本当はここでハイフネーションができれば良い形で解決するのだが、Chromeではまだ<a href="http://caniuse.com/#search=hyphens"><code>hyphens</code>プロパティー</a>が実装されていない。しかし<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=652964">最近作られたイシュー</a>はあったので、ちょっと期待できそうになってきた。そのため現状の両端揃えにおける問題点には目を瞑って、<code>hyphens: auto</code>を併用するというのも悪くはなさそうだが、<code>lang=ja</code>だとハイフネーションが機能しないというまた別の問題もある。前途多難だ。</p>]]></content:encoded>
+    </item>
+    <item>
       <title>125%に拡大したWindows 10</title>
       <link>https://hail2u.net/blog/125-percent-win10.html</link>
       <description>立て続けに10pxや12pxで長文のウェブページを読まされ、いちいちズームするのが面倒になったため、思い切ってOSレベルで125%に拡大した。思った以上に快適で、なぜこれまでやらなかったのかというくらいだ。サインアウトする必要はあったものの、常用しているアプリケーションで対応していないものもほとんどなかった。姿勢も良くなりそうだ。</description>
@@ -297,16 +334,6 @@ const toRelativeDate = function (then) {
 <p>グローバル・ヘッダーに含まれるものがウェブサイトのタイトルとハンバーガー・アイコンだけならば、ウェブサイトのタイトルを左（右）上、ハンバーガー・アイコンを右（左）上、とそれぞれ<em>離して</em>置くのが良い。よくあるパターンだが確実だ。</p>]]></content:encoded>
     </item>
     <item>
-      <title>粉をこねて皮にし、何かを詰めて茹でたり揚げたりしたもの</title>
-      <link>https://hail2u.net/blog/dumpling-1f95f.html</link>
-      <description>Unicode 10.0でEmojiに餃子が入るというのは聞いていたが、正確にはDumplingでタイトルのようなもの全般を指すEmojiのようだ。ロシアではピロシキだったり、イタリアではラビオリだったり、そして日本では餃子ということになる。こういう言い方をされると良くわからない。日本人が日本でラビオリのつもりで使うEmojiも、イタリア人がロシアで餃子のつもりで使うEmojiも、同じこのEmojiで良いということで、つまり使う人と読む人、そして前後の流れなどに依存するハイコンテキストなやつ、ということになりそう。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/dumpling-1f95f.html</guid>
-      <pubDate>Sat, 08 Oct 2016 10:34:00 +0900</pubDate>
-      <content:encoded><![CDATA[<p>Unicode 10.0でEmojiに餃子が入るというのは聞いていたが、正確には<a href="http://www.unicode.org/L2/L2016/16024-dumpling-emoji.pdf">Dumpling</a>でタイトルのようなもの全般を指すEmojiのようだ。ロシアではピロシキだったり、イタリアではラビオリだったり、そして日本では餃子ということになる。こういう言い方をされると良くわからない。日本人が日本でラビオリのつもりで使うEmojiも、イタリア人がロシアで餃子のつもりで使うEmojiも、同じこのEmojiで良いということで、つまり使う人と読む人、そして前後の流れなどに依存するハイコンテキストなやつ、ということになりそう。</p>
-
-<p>どうせなら顔色変えるノリで「ラビオリです」とか「揚げてます」とかを明示できるところまであれば良さそうだ。👨の後ろに「焼いてます」と付けると💀になったりすると面白い。</p>]]></content:encoded>
-    </item>
-    <item>
       <title>民主的なデザイン</title>
       <link>https://hail2u.net/documents/democratic-design.html</link>
       <pubDate>Tue, 22 Dec 2015 17:21:23 +0900</pubDate>
@@ -348,6 +375,6 @@ const toRelativeDate = function (then) {
       <guid isPermaLink="true">http://hail2u.net/documents/sass-guide-ja.html</guid>
       <description><![CDATA[<p><a href="http://sass-lang.com/">Sass</a>がリニューアルされ、このサイトに訳を載せていたチュートリアルが消え、代わりに<a href="http://sass-lang.com/guide">Sass Basics</a>になりました。内容的にはあまり変わらないか多少薄くなっていますが、<code>@extend</code>への言及も追加されたので、日本語訳を作成しました。</p>]]></description>
     </item>
-    <lastBuildDate>Sun, 30 Oct 2016 11:32:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 04 Nov 2016 12:17:00 +0900</lastBuildDate>
   </channel>
 </rss>
