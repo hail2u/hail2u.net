@@ -2,7 +2,6 @@
 
 "use strict";
 
-const ProgressBar = require("progress");
 const eachLimit = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
@@ -33,7 +32,6 @@ const dir = {
 };
 const perl = "perl";
 
-let bar;
 let cpuNum = Math.max(1, os.cpus().length - 1);
 let d;
 let files = [];
@@ -95,7 +93,6 @@ function build(file, next) {
     entry = path.join(dir.static, file);
     mkdirp.sync(path.dirname(entry));
     fs.writeFileSync(entry, contents);
-    bar.tick();
     next();
   });
 }
@@ -142,11 +139,6 @@ if (argv.all) {
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-bar = new ProgressBar("Building [:bar] :percent :elapsed", {
-  total: files.length,
-  width: 25
-});
-bar.render();
 eachLimit(files, cpuNum, ensureAsync(build), function (err) {
   if (err) {
     throw err;
