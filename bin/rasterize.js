@@ -6,8 +6,8 @@ const eachLimit = require("async").eachLimit;
 const os = require("os");
 const path = require("path");
 const spawn = require("child_process").spawnSync;
-const which = require("which").sync;
 
+const cmd = "inkscape";
 const files = [
   {
     dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
@@ -87,7 +87,7 @@ eachLimit(files, Math.max(1, os.cpus().length - 1), function (file, next) {
     ]);
   }
 
-  inkscape = spawn(which("inkscape"), args);
+  inkscape = spawn(cmd, args);
   next(inkscape.err);
 }, function (err) {
   if (err) {

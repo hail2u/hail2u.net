@@ -12,7 +12,6 @@ const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
-const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
@@ -32,6 +31,7 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/images/blog/"
 };
+const perl = "perl";
 
 let bar;
 let cpuNum = Math.max(1, os.cpus().length - 1);
@@ -47,7 +47,7 @@ function build(file, next) {
     argv.reindex = false;
   }
 
-  execFile(which("perl"), args, {
+  execFile(perl, args, {
     cwd: dir.root,
     env: {
       BLOSXOM_CONFIG_DIR: dir.root

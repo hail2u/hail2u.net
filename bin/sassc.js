@@ -8,9 +8,9 @@ const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 const execFile = require("child_process").execFile;
-const which = require("which").sync;
 
 const argv = process.argv.slice(2);
+const cmd = "sassc";
 const cssExt = ".css";
 const destDir = path.resolve(__dirname, "../tmp/");
 const scssExt = ".scss";
@@ -26,7 +26,7 @@ eachLimit(
       return next();
     }
 
-    execFile(which("sassc"), argv.concat([
+    execFile(cmd, argv.concat([
       path.join(srcDir, src).replace(/\\/g, "/")
     ]), function (err, stdout) {
       let dest;
