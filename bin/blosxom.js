@@ -2,14 +2,13 @@
 
 "use strict";
 
-const eachLimit = require("async").eachLimit;
+const eachSeries = require("async").eachSeries;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
 const fs = require("fs");
 const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
-const os = require("os");
 const path = require("path");
 
 const argv = minimist(process.argv.slice(2), {
@@ -30,9 +29,9 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/images/blog/"
 };
+let each = require("async").each;
 const perl = "perl";
 
-let cpuNum = Math.max(1, os.cpus().length - 1);
 let d;
 let files = [];
 let images = [];
@@ -111,7 +110,7 @@ if (argv.file) {
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
-  cpuNum = 1;
+  each = eachSeries;
 
   if (images) {
     images.forEach(function (image) {
@@ -139,7 +138,7 @@ if (argv.all) {
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-eachLimit(files, cpuNum, ensureAsync(build), function (err) {
+each(files, ensureAsync(build), function (err) {
   if (err) {
     throw err;
   }

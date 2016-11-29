@@ -2,10 +2,9 @@
 
 "use strict";
 
-const eachLimit = require("async").eachLimit;
+const each = require("async").each;
 const fs = require("fs");
 const mkdirp = require("mkdirp");
-const os = require("os");
 const path = require("path");
 const execFile = require("child_process").execFile;
 
@@ -16,9 +15,8 @@ const destDir = path.resolve(__dirname, "../tmp/");
 const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 
-eachLimit(
+each(
   fs.readdirSync(srcDir),
-  Math.max(1, os.cpus().length - 1),
   function (src, next) {
     const basename = path.basename(src, scssExt);
 

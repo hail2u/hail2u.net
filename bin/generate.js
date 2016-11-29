@@ -2,13 +2,12 @@
 
 "use strict";
 
-const eachLimit = require("async").eachLimit;
+const each = require("async").each;
 const fs = require("fs");
 const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const mustache = require("mustache");
-const os = require("os");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
 const sprintf = require("sprintf").sprintf;
@@ -191,9 +190,8 @@ fs.readdirSync(partialDir).forEach(function (partial) {
     "utf8"
   );
 });
-eachLimit(
+each(
   files,
-  Math.max(1, os.cpus().length - 1),
   function (file, next) {
     function processTemplate(data) {
       let html = mustache.render(

@@ -2,8 +2,7 @@
 
 "use strict";
 
-const eachLimit = require("async").eachLimit;
-const os = require("os");
+const each = require("async").each;
 const path = require("path");
 const spawn = require("child_process").spawnSync;
 
@@ -57,7 +56,7 @@ const files = [
   }
 ];
 
-eachLimit(files, Math.max(1, os.cpus().length - 1), function (file, next) {
+each(files, function (file, next) {
   let args = [
     "-f",
     path.resolve(__dirname, file.src),

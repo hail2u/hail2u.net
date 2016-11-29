@@ -3,11 +3,10 @@
 "use strict";
 
 const csswring = require("csswring");
-const eachLimit = require("async").eachLimit;
+const each = require("async").each;
 const fs = require("fs");
 const mkdirp = require("mkdirp");
 const mqpacker = require("css-mqpacker");
-const os = require("os");
 const path = require("path");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
@@ -23,9 +22,8 @@ const processor = postcss([
 ]);
 const tmpdir = path.resolve(__dirname, "../tmp/");
 
-eachLimit(
+each(
   fs.readdirSync(tmpdir),
-  Math.max(1, os.cpus().length - 1),
   function (input, next) {
     const basename = path.basename(input, cssExt);
 

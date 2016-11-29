@@ -2,20 +2,18 @@
 
 "use strict";
 
-const eachLimit = require("async").eachLimit;
+const each = require("async").each;
 const fs = require("fs");
 const compile = require("google-closure-compiler-js").compile;
 const mkdirp = require("mkdirp");
-const os = require("os");
 const path = require("path");
 
 const jsExt = ".js";
 const minExt = ".min";
 const tmpdir = path.resolve(__dirname, "../tmp");
 
-eachLimit(
+each(
   fs.readdirSync(tmpdir),
-  Math.max(1, os.cpus().length - 1),
   function (src, next) {
     const basename = path.basename(src, jsExt);
 
