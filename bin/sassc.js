@@ -7,9 +7,9 @@ const fs = require("fs");
 const mkdirp = require("mkdirp");
 const path = require("path");
 const execFile = require("child_process").execFile;
+const which = require("which").sync;
 
 const argv = process.argv.slice(2);
-const cmd = "sassc";
 const cssExt = ".css";
 const destDir = path.resolve(__dirname, "../tmp/");
 const scssExt = ".scss";
@@ -24,7 +24,7 @@ each(
       return next();
     }
 
-    execFile(cmd, argv.concat([
+    execFile(which("sassc"), argv.concat([
       path.join(srcDir, src).replace(/\\/g, "/")
     ]), function (err, stdout) {
       let dest;

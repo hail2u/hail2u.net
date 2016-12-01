@@ -8,6 +8,7 @@ const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const path = require("path");
 const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   string: ["file"]
@@ -116,4 +117,4 @@ fs.writeFileSync(
     "=\"../dist/"
   )
 );
-spawn("open", [preview]);
+spawn(which("open"), [preview]);

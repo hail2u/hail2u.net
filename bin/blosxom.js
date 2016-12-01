@@ -10,6 +10,7 @@ const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const path = require("path");
+const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
@@ -29,10 +30,9 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/images/blog/"
 };
-let each = require("async").each;
-const perl = "perl";
 
 let d;
+let each = require("async").each;
 let files = [];
 let images = [];
 
@@ -44,7 +44,7 @@ function build(file, next) {
     argv.reindex = false;
   }
 
-  execFile(perl, args, {
+  execFile(which("perl"), args, {
     cwd: dir.root,
     env: {
       BLOSXOM_CONFIG_DIR: dir.root

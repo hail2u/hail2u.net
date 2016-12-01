@@ -5,11 +5,12 @@
 const minimist = require("minimist");
 const path = require("path");
 const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-const cmd = "git";
+const cmd = which("git");
 const cwd = path.resolve(__dirname, "../dist/");
 const opts = {
   stdio: "inherit"

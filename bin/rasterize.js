@@ -5,8 +5,8 @@
 const each = require("async").each;
 const path = require("path");
 const spawn = require("child_process").spawnSync;
+const which = require("which").sync;
 
-const cmd = "inkscape";
 const files = [
   {
     dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
@@ -86,7 +86,7 @@ each(files, function (file, next) {
     ]);
   }
 
-  inkscape = spawn(cmd, args);
+  inkscape = spawn(which("inkscape"), args);
   next(inkscape.err);
 }, function (err) {
   if (err) {
