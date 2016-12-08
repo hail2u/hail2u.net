@@ -2,6 +2,7 @@
 
 "use strict";
 
+const coreNum = require("os").cpus().length;
 const eachSeries = require("async").eachSeries;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
@@ -32,7 +33,7 @@ const dir = {
 };
 
 let d;
-let each = require("async").each;
+let each = require("async").eachLimit;
 let files = [];
 let images = [];
 
@@ -138,7 +139,7 @@ if (argv.all) {
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-each(files, ensureAsync(build), function (err) {
+each(files, coreNum - 1, ensureAsync(build), function (err) {
   if (err) {
     throw err;
   }
