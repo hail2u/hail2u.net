@@ -22,7 +22,8 @@ const urls = [
   "/",
   "/about/",
   "/about/style-guide/",
-  "/blog/"
+  "/blog/",
+  "/documents/"
 ];
 
 fs.readdirSync(documentsDir).forEach(function (file) {

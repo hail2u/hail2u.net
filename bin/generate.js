@@ -34,9 +34,13 @@ const defaultFiles = [
   {
     dest: "../src/weblog/entries/themes/html/page",
     src: "../src/html/blog/theme.mustache"
+  },
+  {
+    src: "../src/html/documents/index.mustache"
   }
 ];
 const feeds = {
+  documents: "../src/documents.rss",
   home: "../src/index.rss",
   weblog: "../dist/blog/feed"
 };
@@ -158,6 +162,7 @@ function readMetadata(file, callback) {
 
       break;
     case "index.json":
+      metadata.features = readFeed(feeds.documents);
       metadata.articles = readFeed(feeds.weblog);
 
       break;
