@@ -22,12 +22,11 @@ const urls = [
   "/",
   "/about/",
   "/about/style-guide/",
-  "/blog/",
-  "/documents/"
+  "/blog/"
 ];
 
 fs.readdirSync(documentsDir).forEach(function (file) {
-  if (file === "index.html" || path.extname(file) !== ".html") {
+  if (path.extname(file) !== ".html") {
     return false;
   }
 
