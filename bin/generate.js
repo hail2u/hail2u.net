@@ -10,7 +10,6 @@ const mkdirp = require("mkdirp");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
-const sprintf = require("sprintf").sprintf;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ["blog"]
@@ -80,6 +79,26 @@ function extendObject(dest, src) {
   return dest;
 }
 
+function pad(number) {
+  if (number >= 10) {
+    return number;
+  }
+
+  return "0" + number;
+}
+
+function toHTML5Date(yy, mm, dd, hh, nn, ss) {
+  return [
+    yy,
+    pad(mm),
+    pad(dd)
+  ].join("-") + "T" + [
+    pad(hh),
+    pad(nn),
+    pad(ss)
+  ].join(":") + "+09:00";
+}
+
 function readFeed(file) {
   let feed = {};
 
@@ -109,10 +128,14 @@ function readFeed(file) {
       yy = date.getFullYear();
       mm = date.getMonth();
       dd = date.getDate();
-      val.strPubDate = sprintf("%04d/%02d/%02d", yy, mm + 1, dd);
-      val.html5PubDate = sprintf(
-        "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
-        yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds()
+      val.strPubDate = yy + "/" + pad(mm + 1) + "/" + pad(dd);
+      val.html5PubDate = toHTML5Date(
+        yy,
+        mm + 1,
+        dd,
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds()
       );
     }
   });
@@ -125,10 +148,13 @@ function readArticles() {
   const articles = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
   ).map(function (article, idx, arr) {
-    article.strPubDate = sprintf("%02d/%02d", article.month, article.day);
-    article.html5PubDate = sprintf(
-      "%04d-%02d-%02dT%02d:%02d:%02d+09:00",
-      article.year, article.month, article.day, article.hour, article.minute,
+    article.strPubDate = pad(article.month) + "/" + pad(article.day);
+    article.html5PubDate = toHTML5Date(
+      article.year,
+      article.month,
+      article.day,
+      article.hour,
+      article.minute,
       article.second
     );
 
