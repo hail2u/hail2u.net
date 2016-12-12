@@ -13,14 +13,13 @@ const which = require("which").sync;
 const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-const article = fs.readFileSync(argv.file, "utf8").split("\n");
 const preview = path.resolve(__dirname, "../tmp/__preview.html");
 const template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta content="width=device-width" name="viewport">
-    <title><%TITLE%> - Weblog - Hail2u.net</title>
+    <title>プレビュー - ウェブログ - Hail2u.net</title>
     <link href="/styles/main.min.css" rel="stylesheet">
   </head>
   <body>
@@ -29,16 +28,14 @@ const template = `<!DOCTYPE html>
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        <h1 class="first-heading"><%TITLE%></h1>
-        <%BODY%>
+        <%CONTENT%>
       </article>
     </main>
   </body>
 </html>`;
 
-let body;
+let content = fs.readFileSync(argv.file, "utf8");
 let renderer;
-let title;
 
 function html(t) {
   const sectionTags = ["aside", "figure", "section"];
@@ -90,28 +87,22 @@ function p(t) {
   return open + t + close;
 }
 
-title = article.shift().trim().replace(/\$/g, "$$$$");
-body = article.join("\n").trim().replace(/\$/g, "$$$$");
-
-if (!body.endsWith(">")) {
+if (!content.endsWith(">")) {
   renderer = new marked.Renderer();
   renderer.html = html;
   renderer.paragraph = p;
-  body = marked(body, {
+  content = marked(content, {
     renderer: renderer
   });
 }
 
-body = body.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
+content = content.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
 mkdirp.sync(path.dirname(preview));
 fs.writeFileSync(
   preview,
   template.replace(
-    /<%TITLE%>/g,
-    title
-  ).replace(
-    /<%BODY%>/g,
-    body
+    /<%CONTENT%>/g,
+    content
   ).replace(
     /="\//g,
     "=\"../dist/"
