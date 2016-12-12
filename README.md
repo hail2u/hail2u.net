@@ -10,7 +10,7 @@ Environment
 - Bash
 - Git
 - ImageMagick
-- Inkscaper
+- Inkscape
 - Node.js
   - ESLint
   - HTMLHint
