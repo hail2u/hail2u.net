@@ -16,20 +16,17 @@ const data = path.resolve(
   __dirname,
   "../src/weblog/plugins/state/files_index.dat"
 );
+const root = path.resolve(__dirname, "../src/weblog/entries/");
 
 let articles = [];
 
 function readArticle(file, date) {
-  let cat = path.basename(path.dirname(file)) + "/";
-
-  if (cat === "entries/") {
-    cat = "";
-  }
-
   return {
     day: date.getDate(),
     hour: date.getHours(),
-    link: "/blog/" + cat + path.basename(file, ".txt") + ".html",
+    link: "/blog/" +
+      path.relative(root, path.dirname(file)).replace(/\\/g, "/") +
+      path.basename(file, ".txt") + ".html",
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
