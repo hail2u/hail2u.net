@@ -2,14 +2,14 @@
 
 "use strict";
 
-const coreNum = require("os").cpus().length;
-const eachSeries = require("async").eachSeries;
+const each = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
 const fs = require("fs");
 const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
+const os = require("os");
 const path = require("path");
 const which = require("which").sync;
 
@@ -32,8 +32,8 @@ const dir = {
   staticimg: "../dist/images/blog/"
 };
 
+let limit = os.cpus().length - 1;
 let d;
-let each = require("async").eachLimit;
 let files = [];
 let images = [];
 
@@ -111,7 +111,7 @@ if (argv.file) {
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
-  each = eachSeries;
+  limit = 1;
 
   if (images) {
     images.forEach(function (image) {
@@ -139,7 +139,7 @@ if (argv.all) {
 files = files.map(function (file) {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-each(files, coreNum - 1, ensureAsync(build), function (err) {
+each(files, limit, ensureAsync(build), function (err) {
   if (err) {
     throw err;
   }
