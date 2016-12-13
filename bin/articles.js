@@ -30,7 +30,10 @@ function readArticle(file, date) {
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
-    title: fs.readFileSync(file, "utf8").split(/\n/).shift(),
+    title: fs.readFileSync(file, "utf8").split(/\n/).shift().replace(
+      /<\/?h1>/g,
+      ""
+    ),
     tz: "+09:00",
     unixtime: date.getTime(),
     year: date.getFullYear()
