@@ -63,7 +63,6 @@ each(files, function (file, next) {
     "-e",
     path.resolve(__dirname, file.dest)
   ];
-  let inkscape;
 
   if (file.area) {
     args = args.concat([
@@ -86,8 +85,7 @@ each(files, function (file, next) {
     ]);
   }
 
-  inkscape = spawn(which("inkscape"), args);
-  next(inkscape.err);
+  next(spawn(which("inkscape"), args).err);
 }, function (err) {
   if (err) {
     throw err;

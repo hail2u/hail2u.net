@@ -17,12 +17,14 @@ const feeds = [
 });
 
 mkdirp.sync(path.dirname(dest));
-fs.writeFileSync(dest, feedmix.stringify(feedmix.merge(feeds, {
-  trim: true
-}), {
-  cdata: true,
-  xmldec: {
-    encoding: "UTF-8",
-    version: "1.0"
-  }
-}) + "\n");
+fs.writeFileSync(dest, `${
+  feedmix.stringify(feedmix.merge(feeds, {
+    trim: true
+  }), {
+    cdata: true,
+    xmldec: {
+      encoding: "UTF-8",
+      version: "1.0"
+    }
+  })
+}\n`);

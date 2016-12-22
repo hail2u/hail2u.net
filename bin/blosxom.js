@@ -38,7 +38,11 @@ let files = [];
 let images = [];
 
 function build(file, next) {
-  let args = ["blosxom.cgi", "path=/" + file];
+  let args = ["blosxom.cgi", `path=/${file}`];
+
+  if (file === "index.rss") {
+    file = "feed";
+  }
 
   if (argv.reindex) {
     args = args.concat("reindex=1");
@@ -51,21 +55,17 @@ function build(file, next) {
       BLOSXOM_CONFIG_DIR: dir.root
     }
   }, function (err, stdout) {
-    let entry;
+    const entry = path.join(dir.static, file);
+
     let contents;
 
     if (err) {
       return next(err);
     }
 
-    contents = stdout.replace(
-      /^[\s\S]*?\r?\n\r?\n/,
-      ""
-    ).trim() + "\n";
-
-    if (file === "index.rss") {
-      file = "feed";
-    }
+    contents = `${
+      stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()
+    }\n`;
 
     if (file.endsWith(".html")) {
       contents = contents.replace(
@@ -90,7 +90,6 @@ function build(file, next) {
       });
     }
 
-    entry = path.join(dir.static, file);
     mkdirp.sync(path.dirname(entry));
     fs.writeFileSync(entry, contents);
     next();
@@ -115,13 +114,12 @@ if (argv.file) {
 
   if (images) {
     images.forEach(function (image) {
-      let dest;
-      let src;
-
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      src = path.join(dir.img, image);
-      dest = path.join(dir.staticimg, image);
-      fs.createReadStream(src).pipe(fs.createWriteStream(dest));
+      fs.createReadStream(
+        path.join(dir.img, image)
+      ).pipe(fs.createWriteStream(
+        path.join(dir.staticimg, image)
+      ));
     });
   }
 }

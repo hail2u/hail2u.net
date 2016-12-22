@@ -24,9 +24,11 @@ function readArticle(file, date) {
   return {
     day: date.getDate(),
     hour: date.getHours(),
-    link: "/blog/" +
-      path.relative(root, path.dirname(file)).replace(/\\/g, "/") +
-      path.basename(file, ".txt") + ".html",
+    link: `/blog/${
+      path.relative(root, path.dirname(file)).replace(/\\/g, "/")
+    }${
+      path.basename(file, ".txt")
+    }.html`,
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
@@ -49,9 +51,6 @@ if (!argv.force) {
 }
 
 fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
-  let date;
-  let file;
-
   if (!/\d+$/.test(line)) {
     return;
   }
@@ -65,12 +64,10 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
   }
 
   line = line.split("=>");
-  file = line.shift();
-  date = line.shift();
   articles.unshift(
     readArticle(
-      file,
-      new Date(parseInt(date, 10) * 1000)
+      line.shift(),
+      new Date(parseInt(line.shift(), 10) * 1000)
     )
   );
 });

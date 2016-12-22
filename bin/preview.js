@@ -41,22 +41,19 @@ function html(t) {
   const sectionTags = ["aside", "figure", "section"];
   const tokens = t.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
-  let tag;
-
   if (!tokens) {
     return t;
   }
 
-  tag = tokens[1].toLowerCase();
-
-  if (sectionTags.indexOf(tag) === -1) {
+  if (sectionTags.indexOf(tokens[1]) === -1) {
     return t;
   }
 
-  return "<" + tag + tokens[2] + ">\n" +
+  return `<${tokens[1]}${tokens[2]}>\n${
     marked(tokens[3].replace(/&gt;/g, ">"), {
       renderer: renderer
-    }).trim() + "\n</" + tag + ">\n";
+    }).trim()
+  }\n</${tokens[1]}>\n`;
 }
 
 function p(t) {
@@ -67,11 +64,11 @@ function p(t) {
   let type = "class";
 
   if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(t)) {
-    return t + "\n";
+    return `${t}\n`;
   }
 
   if (!tokens) {
-    return open + t + close;
+    return `${open}${t}${close}`;
   }
 
   t = tokens[1];
@@ -81,10 +78,10 @@ function p(t) {
   }
 
   if (tokens[3]) {
-    open = "<p " + type + '="' + tokens[3] + '">';
+    open = `<p ${type}="${tokens[3]}">`;
   }
 
-  return open + t + close;
+  return `${open}${t}${close}`;
 }
 
 if (!content.endsWith(">")) {

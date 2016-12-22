@@ -51,11 +51,13 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = path.resolve(__dirname, "../src/html/metadata.json");
+const basicMetadata = JSON.parse(
+  fs.readFileSync(metadataFile, "utf8")
+);
 const partialDir = path.join(__dirname, "../src/html/partial");
 const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
 
-let basicMetadata;
 let f;
 let files = blogFiles;
 
@@ -84,19 +86,11 @@ function pad(number) {
     return number;
   }
 
-  return "0" + number;
+  return `0${number}`;
 }
 
 function toHTML5Date(yy, mm, dd, hh, nn, ss) {
-  return [
-    yy,
-    pad(mm),
-    pad(dd)
-  ].join("-") + "T" + [
-    pad(hh),
-    pad(nn),
-    pad(ss)
-  ].join(":") + "+09:00";
+  return `${yy}-${pad(mm)}-${pad(dd)}T${pad(hh)}:${pad(nn)}:${pad(ss)}+09:00`;
 }
 
 function readFeed(file) {
@@ -128,7 +122,7 @@ function readFeed(file) {
       yy = date.getFullYear();
       mm = date.getMonth();
       dd = date.getDate();
-      val.strPubDate = yy + "/" + pad(mm + 1) + "/" + pad(dd);
+      val.strPubDate = `${yy}/${pad(mm + 1)}/${pad(dd)}`;
       val.html5PubDate = toHTML5Date(
         yy,
         mm + 1,
@@ -148,7 +142,7 @@ function readArticles() {
   const articles = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
   ).map(function (article, idx, arr) {
-    article.strPubDate = pad(article.month) + "/" + pad(article.day);
+    article.strPubDate = `${pad(article.month)}/${pad(article.day)}`;
     article.html5PubDate = toHTML5Date(
       article.year,
       article.month,
@@ -206,9 +200,6 @@ if (!argv.blog) {
   files = files.concat(defaultFiles);
 }
 
-basicMetadata = JSON.parse(
-  fs.readFileSync(metadataFile, "utf8")
-);
 mustache.escape = escape;
 fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(
@@ -226,7 +217,7 @@ each(
         partials
       );
 
-      if (!file.dest.endsWith(path.sep + "page")) {
+      if (!file.dest.endsWith(`${path.sep}page`)) {
         html = minifyHTML(html, {
           collapseBooleanAttributes: true,
           collapseWhitespace: true,
@@ -256,7 +247,7 @@ each(
       file.dest = path.join(
         "../dist/",
         path.dirname(path.relative(templateDir, file.src)),
-        path.basename(file.src, ".mustache") + ".html"
+        `${path.basename(file.src, ".mustache")}.html`
       );
     }
 
@@ -264,7 +255,7 @@ each(
     readMetadata(
       path.join(
         path.dirname(file.src),
-        path.basename(file.src, ".mustache") + ".json"
+        `${path.basename(file.src, ".mustache")}.json`
       ),
       processTemplate
     );

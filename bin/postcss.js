@@ -26,15 +26,13 @@ each(
   fs.readdirSync(tmpdir),
   function (input, next) {
     const basename = path.basename(input, cssExt);
-
-    let output;
+    const output = path.join(tmpdir, `${basename}${minExt}${cssExt}`);
 
     if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
       return next();
     }
 
     input = path.join(tmpdir, input);
-    output = path.join(tmpdir, basename + minExt + cssExt);
     processor.process(fs.readFileSync(input, "utf8")).then(function (result) {
       mkdirp.sync(path.dirname(output));
       fs.writeFileSync(output, result.css);

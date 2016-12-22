@@ -6,8 +6,9 @@
 "use strict";
 
 (function () {
+  const def = {};
+
   let abbr;
-  let def = {};
   let desc = "";
   let text = "";
 

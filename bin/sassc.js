@@ -27,13 +27,12 @@ each(
     execFile(which("sassc"), argv.concat([
       path.join(srcDir, src).replace(/\\/g, "/")
     ]), function (err, stdout) {
-      let dest;
+      const dest = path.join(destDir, `${basename}${cssExt}`);
 
       if (err) {
         return next(err);
       }
 
-      dest = path.join(destDir, basename + cssExt);
       mkdirp.sync(path.dirname(dest));
       fs.writeFileSync(dest, stdout);
       next();

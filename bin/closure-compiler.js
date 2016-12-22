@@ -16,15 +16,13 @@ each(
   fs.readdirSync(tmpdir),
   function (src, next) {
     const basename = path.basename(src, jsExt);
-
-    let dest;
+    const dest = path.join(tmpdir, `${basename}${minExt}${jsExt}`);
 
     if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
       return next();
     }
 
     src = path.join(tmpdir, src);
-    dest = path.join(tmpdir, basename + minExt + jsExt);
     mkdirp.sync(path.dirname(dest));
     fs.writeFileSync(dest, compile({
       compilationLevel: "ADVANCED_OPTIMIZATIONS",

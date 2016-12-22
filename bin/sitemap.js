@@ -31,14 +31,14 @@ fs.readdirSync(documentsDir).forEach(function (file) {
     return false;
   }
 
-  urls.push("/" + path.basename(documentsDir) + "/" + file);
+  urls.push(`/${path.basename(documentsDir)}/${file}`);
 });
 JSON.parse(fs.readFileSync(cache, "utf8")).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
   sitemap.urlset.url.push({
-    loc: "https://hail2u.net" + url
+    loc: `https://hail2u.net${url}`
   });
 });
 mkdirp.sync(path.dirname(dest));
