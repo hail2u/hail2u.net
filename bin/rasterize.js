@@ -3,8 +3,8 @@
 "use strict";
 
 const each = require("async").each;
+const execFile = require("child_process").execFile;
 const path = require("path");
-const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
 const files = [
@@ -85,7 +85,7 @@ each(files, function (file, next) {
     ]);
   }
 
-  next(spawn(which("inkscape"), args).err);
+  execFile(which("inkscape"), args, next);
 }, function (err) {
   if (err) {
     throw err;

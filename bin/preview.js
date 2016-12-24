@@ -2,12 +2,12 @@
 
 "use strict";
 
+const execFile = require("child_process").execFile;
 const fs = require("fs");
 const marked = require("marked");
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
 const path = require("path");
-const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
@@ -105,4 +105,8 @@ fs.writeFileSync(
     "=\"../dist/"
   )
 );
-spawn(which("open"), [preview]);
+execFile(which("open"), [preview], function (err) {
+  if (err) {
+    throw err;
+  }
+});

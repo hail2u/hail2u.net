@@ -2,9 +2,9 @@
 
 "use strict";
 
+const execFile = require("child_process").execFileSync;
 const minimist = require("minimist");
 const path = require("path");
-const spawn = require("child_process").spawnSync;
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
@@ -13,26 +13,10 @@ const argv = minimist(process.argv.slice(2), {
 const cmd = which("git");
 const cwd = path.resolve(__dirname, "../dist/");
 const opts = {
+  cwd: cwd,
   stdio: "inherit"
 };
 
-let git;
-
-opts.cwd = cwd;
-git = spawn(cmd, ["add", "--", path.relative(cwd, argv.file)], opts);
-
-if (git.error) {
-  throw git.error;
-}
-
-git = spawn(cmd, ["commit", "--message=Upload"], opts);
-
-if (git.error) {
-  throw git.error;
-}
-
-git = spawn(cmd, ["push", "origin", "gh-pages"], opts);
-
-if (git.error) {
-  throw git.error;
-}
+execFile(cmd, ["add", "--", path.relative(cwd, argv.file)], opts);
+execFile(cmd, ["commit", "--message=Upload"], opts);
+execFile(cmd, ["push", "origin", "gh-pages"], opts);
