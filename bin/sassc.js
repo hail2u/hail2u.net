@@ -12,6 +12,7 @@ const which = require("which").sync;
 const argv = process.argv.slice(2);
 const cssExt = ".css";
 const destDir = path.resolve(__dirname, "../tmp/");
+const sassc = which("sassc");
 const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 
@@ -24,7 +25,7 @@ each(
       return next();
     }
 
-    execFile(which("sassc"), argv.concat([
+    execFile(sassc, argv.concat([
       path.join(srcDir, src).replace(/\\/g, "/")
     ]), function (err, stdout) {
       const dest = path.join(destDir, `${basename}${cssExt}`);

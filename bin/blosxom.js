@@ -31,6 +31,7 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/images/blog/"
 };
+const perl = which("perl");
 
 let limit = os.cpus().length - 1;
 let d;
@@ -49,7 +50,7 @@ function build(file, next) {
     argv.reindex = false;
   }
 
-  execFile(which("perl"), args, {
+  execFile(perl, args, {
     cwd: dir.root,
     env: {
       BLOSXOM_CONFIG_DIR: dir.root

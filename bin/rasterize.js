@@ -55,6 +55,7 @@ const files = [
     width: 64
   }
 ];
+const inkscape = which("inkscape");
 
 each(files, function (file, next) {
   let args = [
@@ -85,7 +86,7 @@ each(files, function (file, next) {
     ]);
   }
 
-  execFile(which("inkscape"), args, next);
+  execFile(inkscape, args, next);
 }, function (err) {
   if (err) {
     throw err;
