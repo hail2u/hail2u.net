@@ -25,6 +25,7 @@ each(
     src = path.join(tmpdir, src);
     mkdirp.sync(path.dirname(dest));
     fs.writeFileSync(dest, compile({
+      compilationLevel: "ADVANCED",
       outputWrapper: "(function () {%output%}).call(window);",
       jsCode: [{
         src: fs.readFileSync(src, "utf8")
