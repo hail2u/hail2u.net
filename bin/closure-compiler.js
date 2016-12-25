@@ -11,28 +11,24 @@ const jsExt = ".js";
 const minExt = ".min";
 const tmpdir = path.resolve(__dirname, "../tmp");
 
-each(
-  fs.readdirSync(tmpdir),
-  function (src, next) {
-    const basename = path.basename(src, jsExt);
-    const dest = path.join(tmpdir, `${basename}${minExt}${jsExt}`);
+each(fs.readdirSync(tmpdir), function (src, next) {
+  const basename = path.basename(src, jsExt);
+  const dest = path.join(tmpdir, `${basename}${minExt}${jsExt}`);
 
-    if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
-      return next();
-    }
-
-    src = path.join(tmpdir, src);
-    fs.outputFileSync(dest, compile({
-      compilationLevel: "ADVANCED",
-      outputWrapper: "(function () {%output%}).call(window);",
-      jsCode: [{
-        src: fs.readFileSync(src, "utf8")
-      }]
-    }).compiledCode);
-    next();
-  }, function (err) {
-    if (err) {
-      throw err;
-    }
+  if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
+    return next();
   }
-);
+
+  fs.outputFileSync(dest, compile({
+    compilationLevel: "ADVANCED",
+    outputWrapper: "(function () {%output%}).call(window);",
+    jsCode: [{
+      src: fs.readFileSync(path.join(tmpdir, src), "utf8")
+    }]
+  }).compiledCode);
+  next();
+}, function (err) {
+  if (err) {
+    throw err;
+  }
+});

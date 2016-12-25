@@ -21,24 +21,20 @@ const processor = postcss([
 ]);
 const tmpdir = path.resolve(__dirname, "../tmp/");
 
-each(
-  fs.readdirSync(tmpdir),
-  function (input, next) {
-    const basename = path.basename(input, cssExt);
-    const output = path.join(tmpdir, `${basename}${minExt}${cssExt}`);
+each(fs.readdirSync(tmpdir), function (input, next) {
+  const basename = path.basename(input, cssExt);
+  const output = path.join(tmpdir, `${basename}${minExt}${cssExt}`);
 
-    if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
-      return next();
-    }
-
-    input = path.join(tmpdir, input);
-    processor.process(fs.readFileSync(input, "utf8")).then(function (result) {
-      fs.outputFileSync(output, result.css);
-      next();
-    });
-  }, function (err) {
-    if (err) {
-      throw err;
-    }
+  if (path.extname(input) !== cssExt || path.extname(basename) === minExt) {
+    return next();
   }
-);
+
+  processor.process(fs.readFileSync(path.join(tmpdir, input), "utf8")).then(function (result) {
+    fs.outputFileSync(output, result.css);
+    next();
+  });
+}, function (err) {
+  if (err) {
+    throw err;
+  }
+});

@@ -19,10 +19,7 @@ const argv = minimist(process.argv.slice(2), {
   ],
   string: ["file"]
 });
-const data = path.resolve(
-  __dirname,
-  "../src/weblog/plugins/state/files_index.dat"
-);
+const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
 const dir = {
   data: "../src/weblog/entries/",
   img: "../src/img/blog/",
@@ -63,15 +60,10 @@ function build(file, next) {
       return next(err);
     }
 
-    contents = `${
-      stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()
-    }\n`;
+    contents = `${stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
 
     if (file.endsWith(".html")) {
-      contents = contents.replace(
-        /\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g,
-        "$1$2/"
-      );
+      contents = contents.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
       contents = minifyHTML(contents, {
         collapseBooleanAttributes: true,
         collapseWhitespace: true,
@@ -100,12 +92,7 @@ for (d in dir) {
 }
 
 if (argv.file) {
-  images = fs.readFileSync(
-    argv.file,
-    "utf8"
-  ).match(
-    /\bsrc="\/images\/blog\/.*?"/g
-  );
+  images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
@@ -114,23 +101,21 @@ if (argv.file) {
   if (images) {
     images.forEach(function (image) {
       image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      fs.createReadStream(
-        path.join(dir.img, image)
-      ).pipe(fs.createWriteStream(
-        path.join(dir.staticimg, image)
-      ));
+      fs.createReadStream(path.join(dir.img, image)).pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
     });
   }
 }
 
 if (argv.all) {
-  fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (file) {
-    if (file === "") {
-      return;
-    }
+  fs.readFileSync(data, "utf8")
+    .split(/\r?\n/)
+    .forEach(function (file) {
+      if (file === "") {
+        return;
+      }
 
-    files.push(path.relative(dir.data, file.split("=>").shift()));
-  });
+      files.push(path.relative(dir.data, file.split("=>").shift()));
+    });
 }
 
 files = files.map(function (file) {

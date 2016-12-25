@@ -10,11 +10,5 @@
     return;
   }
 
-  history.replaceState(
-    null,
-    "",
-    `${l.pathname}${
-      l.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")
-    }${l.hash}`
-  );
+  history.replaceState(null, "", `${l.pathname}${l.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${l.hash}`);
 })(location);

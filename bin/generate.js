@@ -50,9 +50,7 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = path.resolve(__dirname, "../src/html/metadata.json");
-const basicMetadata = JSON.parse(
-  fs.readFileSync(metadataFile, "utf8")
-);
+const basicMetadata = fs.readJsonSync(metadataFile);
 const partialDir = path.join(__dirname, "../src/html/partial");
 const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
@@ -122,14 +120,7 @@ function readFeed(file) {
       mm = date.getMonth();
       dd = date.getDate();
       val.strPubDate = `${yy}/${pad(mm + 1)}/${pad(dd)}`;
-      val.html5PubDate = toHTML5Date(
-        yy,
-        mm + 1,
-        dd,
-        date.getHours(),
-        date.getMinutes(),
-        date.getSeconds()
-      );
+      val.html5PubDate = toHTML5Date(yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds());
     }
   });
   feed.item[0].isLatest = true;
@@ -138,18 +129,9 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = fs.readJsonSync(
-    path.resolve(__dirname, articleCache)
-  ).map(function (article, idx, arr) {
+  const articles = fs.readJsonSync(path.resolve(__dirname, articleCache)).map(function (article, idx, arr) {
     article.strPubDate = `${pad(article.month)}/${pad(article.day)}`;
-    article.html5PubDate = toHTML5Date(
-      article.year,
-      article.month,
-      article.day,
-      article.hour,
-      article.minute,
-      article.second
-    );
+    article.html5PubDate = toHTML5Date(article.year, article.month, article.day, article.hour, article.minute, article.second);
 
     if (idx && this.y !== article.year) {
       article.isFirstInYear = true;
@@ -197,10 +179,7 @@ if (!argv.blog) {
 
 mustache.escape = escape;
 fs.readdirSync(partialDir).forEach(function (partial) {
-  partials[path.basename(partial, ".mustache")] = fs.readFileSync(
-    path.join(partialDir, partial),
-    "utf8"
-  );
+  partials[path.basename(partial, ".mustache")] = fs.readFileSync(path.join(partialDir, partial), "utf8");
 });
 each(files, function (file, next) {
   let html;
@@ -208,25 +187,11 @@ each(files, function (file, next) {
   file.src = path.resolve(__dirname, file.src);
 
   if (!file.dest) {
-    file.dest = path.join(
-      "../dist/",
-      path.dirname(path.relative(templateDir, file.src)),
-      `${path.basename(file.src, ".mustache")}.html`
-    );
+    file.dest = path.join("../dist/", path.dirname(path.relative(templateDir, file.src)), `${path.basename(file.src, ".mustache")}.html`);
   }
 
   file.dest = path.resolve(__dirname, file.dest);
-  html = mustache.render(
-    fs.readFileSync(file.src, "utf8"),
-    readMetadata(
-      extendObject({}, basicMetadata),
-      path.join(
-        path.dirname(file.src),
-        `${path.basename(file.src, ".mustache")}.json`
-      )
-    ),
-    partials
-  );
+  html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
 
   if (!file.dest.endsWith(`${path.sep}page`)) {
     html = minifyHTML(html, {

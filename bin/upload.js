@@ -3,10 +3,10 @@
 "use strict";
 
 const execFile = require("child_process").execFileSync;
+const fs = require("fs-extra");
 const path = require("path");
 const which = require("which").sync;
 
-const file = process.argv[2];
 const cmd = which("git");
 const cwd = path.resolve(__dirname, "../dist/");
 const opts = {
@@ -14,6 +14,10 @@ const opts = {
   stdio: "inherit"
 };
 
-execFile(cmd, ["add", "--", path.relative(cwd, file)], opts);
+process.argv.slice(2).forEach(function (f) {
+  if (fs.existsSync(f)) {
+    execFile(cmd, ["add", "--", path.relative(cwd, f)], opts);
+  }
+});
 execFile(cmd, ["commit", "--message=Upload"], opts);
 execFile(cmd, ["push", "origin", "gh-pages"], opts);
