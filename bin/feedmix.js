@@ -3,8 +3,7 @@
 "use strict";
 
 const feedmix = require("feedmix");
-const fs = require("fs");
-const mkdirp = require("mkdirp");
+const fs = require("fs-extra");
 const path = require("path");
 
 const dest = path.resolve(__dirname, "../dist/feed");
@@ -16,8 +15,7 @@ const feeds = [
   return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
 });
 
-mkdirp.sync(path.dirname(dest));
-fs.writeFileSync(dest, `${
+fs.outputFileSync(dest, `${
   feedmix.stringify(feedmix.merge(feeds, {
     trim: true
   }), {

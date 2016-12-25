@@ -2,8 +2,7 @@
 
 "use strict";
 
-const fs = require("fs");
-const mkdirp = require("mkdirp");
+const fs = require("fs-extra");
 const path = require("path");
 const xml2js = require("xml2js");
 
@@ -33,7 +32,7 @@ fs.readdirSync(documentsDir).forEach(function (file) {
 
   urls.push(`/${path.basename(documentsDir)}/${file}`);
 });
-JSON.parse(fs.readFileSync(cache, "utf8")).forEach(function (article) {
+fs.readJsonSync(cache).forEach(function (article) {
   urls.push(article.link);
 });
 urls.forEach(function (url) {
@@ -41,5 +40,4 @@ urls.forEach(function (url) {
     loc: `https://hail2u.net${url}`
   });
 });
-mkdirp.sync(path.dirname(dest));
-fs.writeFileSync(dest, new xml2js.Builder().buildObject(sitemap));
+fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));

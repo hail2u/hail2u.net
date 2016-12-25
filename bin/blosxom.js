@@ -5,10 +5,9 @@
 const each = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
-const fs = require("fs");
+const fs = require("fs-extra");
 const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
-const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 const which = require("which").sync;
@@ -91,8 +90,7 @@ function build(file, next) {
       });
     }
 
-    mkdirp.sync(path.dirname(entry));
-    fs.writeFileSync(entry, contents);
+    fs.outputFileSync(entry, contents);
     next();
   });
 }

@@ -3,9 +3,8 @@
 "use strict";
 
 const each = require("async").each;
-const fs = require("fs");
+const fs = require("fs-extra");
 const compile = require("google-closure-compiler-js").compile;
-const mkdirp = require("mkdirp");
 const path = require("path");
 
 const jsExt = ".js";
@@ -23,8 +22,7 @@ each(
     }
 
     src = path.join(tmpdir, src);
-    mkdirp.sync(path.dirname(dest));
-    fs.writeFileSync(dest, compile({
+    fs.outputFileSync(dest, compile({
       compilationLevel: "ADVANCED",
       outputWrapper: "(function () {%output%}).call(window);",
       jsCode: [{

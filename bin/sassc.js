@@ -3,8 +3,7 @@
 "use strict";
 
 const each = require("async").each;
-const fs = require("fs");
-const mkdirp = require("mkdirp");
+const fs = require("fs-extra");
 const path = require("path");
 const execFile = require("child_process").execFile;
 const which = require("which").sync;
@@ -34,8 +33,7 @@ each(
         return next(err);
       }
 
-      mkdirp.sync(path.dirname(dest));
-      fs.writeFileSync(dest, stdout);
+      fs.outputFileSync(dest, stdout);
       next();
     });
   }, function (err) {

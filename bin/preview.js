@@ -3,10 +3,9 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
-const fs = require("fs");
+const fs = require("fs-extra");
 const marked = require("marked");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp");
 const path = require("path");
 const which = require("which").sync;
 
@@ -94,8 +93,7 @@ if (!content.endsWith(">")) {
 }
 
 content = content.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
-mkdirp.sync(path.dirname(preview));
-fs.writeFileSync(
+fs.outputFileSync(
   preview,
   template.replace(
     /<%CONTENT%>/g,

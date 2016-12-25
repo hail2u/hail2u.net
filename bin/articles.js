@@ -2,9 +2,8 @@
 
 "use strict";
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp");
 const path = require("path");
 
 const argv = minimist(process.argv.slice(2), {
@@ -47,7 +46,7 @@ if (!argv.force && !argv.file) {
 }
 
 if (!argv.force) {
-  articles = JSON.parse(fs.readFileSync(cache, "utf8"));
+  articles = fs.readJsonSync(cache);
 }
 
 fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
@@ -71,9 +70,10 @@ fs.readFileSync(data, "utf8").split(/\r?\n/).forEach(function (line) {
     )
   );
 });
-mkdirp.sync(path.dirname(cache));
-fs.writeFileSync(cache, JSON.stringify(articles.sort(function (a, b) {
+fs.outputFileSync(cache, articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter(function (val, idx, arr) {
   return arr.indexOf(val) === idx;
-}), 2));
+}), {
+  spaces: 2
+});

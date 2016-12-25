@@ -2,8 +2,7 @@
 
 "use strict";
 
-const fs = require("fs");
-const mkdirp = require("mkdirp");
+const fs = require("fs-extra");
 const path = require("path");
 
 const dest = path.resolve(__dirname, "../dist/about/style-guide/index.html");
@@ -14,8 +13,7 @@ const dir = {
 const site = "https://hail2u.net/";
 const src = path.resolve(__dirname, "../src/css/test.html");
 
-mkdirp.sync(path.dirname(dest));
-fs.writeFileSync(dest, fs.readFileSync(src, "utf8").replace(
+fs.outputFileSync(dest, fs.readFileSync(src, "utf8").replace(
   /\.\.\/\.\.\/node_modules\/.*?\/([^/]*?.js)/g,
   `${dir.js}$1`
 ).replace(

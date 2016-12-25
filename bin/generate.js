@@ -3,10 +3,9 @@
 "use strict";
 
 const each = require("async").each;
-const fs = require("fs");
+const fs = require("fs-extra");
 const minifyHTML = require("html-minifier").minify;
 const minimist = require("minimist");
-const mkdirp = require("mkdirp");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
@@ -139,8 +138,8 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, articleCache), "utf8")
+  const articles = fs.readJsonSync(
+    path.resolve(__dirname, articleCache)
   ).map(function (article, idx, arr) {
     article.strPubDate = `${pad(article.month)}/${pad(article.day)}`;
     article.html5PubDate = toHTML5Date(
@@ -170,26 +169,22 @@ function readArticles() {
   return articles;
 }
 
-function readMetadata(file, callback) {
-  let metadata = extendObject({}, basicMetadata);
+function readMetadata(metadata, file) {
+  metadata = extendObject(metadata, fs.readJsonSync(file, "utf8"));
 
-  fs.readFile(file, function (err, data) {
-    metadata = extendObject(metadata, JSON.parse(data));
+  switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
+  case "index.json":
+    metadata.features = readFeed(feeds.documents);
+    metadata.articles = readFeed(feeds.weblog);
 
-    switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
-    case "blog/index.json":
-      metadata.articles = readArticles();
+    break;
+  case "blog/index.json":
+    metadata.articles = readArticles();
 
-      break;
-    case "index.json":
-      metadata.features = readFeed(feeds.documents);
-      metadata.articles = readFeed(feeds.weblog);
+    break;
+  }
 
-      break;
-    }
-
-    callback(metadata);
-  });
+  return metadata;
 }
 
 for (f in feeds) {
@@ -207,61 +202,55 @@ fs.readdirSync(partialDir).forEach(function (partial) {
     "utf8"
   );
 });
-each(
-  files,
-  function (file, next) {
-    function processTemplate(data) {
-      let html = mustache.render(
-        fs.readFileSync(file.src, "utf8"),
-        data,
-        partials
-      );
+each(files, function (file, next) {
+  let html;
 
-      if (!file.dest.endsWith(`${path.sep}page`)) {
-        html = minifyHTML(html, {
-          collapseBooleanAttributes: true,
-          collapseWhitespace: true,
-          minifyCSS: true,
-          minifyJS: true,
-          removeAttributeQuotes: true,
-          removeComments: true,
-          removeEmptyElements: true,
-          removeOptionalTags: true,
-          removeRedundantAttributes: true,
-          removeScriptTypeAttributes: true,
-          removeStyleLinkTypeAttributes: true,
-          sortAttributes: true,
-          sortClassName: true,
-          useShortDoctype: true
-        });
-      }
+  file.src = path.resolve(__dirname, file.src);
 
-      mkdirp.sync(path.dirname(file.dest));
-      fs.writeFileSync(file.dest, html);
-      next();
-    }
+  if (!file.dest) {
+    file.dest = path.join(
+      "../dist/",
+      path.dirname(path.relative(templateDir, file.src)),
+      `${path.basename(file.src, ".mustache")}.html`
+    );
+  }
 
-    file.src = path.resolve(__dirname, file.src);
-
-    if (!file.dest) {
-      file.dest = path.join(
-        "../dist/",
-        path.dirname(path.relative(templateDir, file.src)),
-        `${path.basename(file.src, ".mustache")}.html`
-      );
-    }
-
-    file.dest = path.resolve(__dirname, file.dest);
+  file.dest = path.resolve(__dirname, file.dest);
+  html = mustache.render(
+    fs.readFileSync(file.src, "utf8"),
     readMetadata(
+      extendObject({}, basicMetadata),
       path.join(
         path.dirname(file.src),
         `${path.basename(file.src, ".mustache")}.json`
-      ),
-      processTemplate
-    );
-  }, function (err) {
-    if (err) {
-      throw err;
-    }
+      )
+    ),
+    partials
+  );
+
+  if (!file.dest.endsWith(`${path.sep}page`)) {
+    html = minifyHTML(html, {
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true,
+      minifyCSS: true,
+      minifyJS: true,
+      removeAttributeQuotes: true,
+      removeComments: true,
+      removeEmptyElements: true,
+      removeOptionalTags: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      sortAttributes: true,
+      sortClassName: true,
+      useShortDoctype: true
+    });
   }
-);
+
+  fs.outputFileSync(file.dest, html);
+  next();
+}, function (err) {
+  if (err) {
+    throw err;
+  }
+});
