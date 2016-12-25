@@ -25,24 +25,9 @@ const files = [
     width: 2560
   },
   {
-    dest: "../dist/images/favicon-1024.png",
-    src: "../src/img/favicon-large.svg",
-    width: 1024
-  },
-  {
-    dest: "../dist/images/favicon-256.png",
-    src: "../src/img/favicon-large.svg",
-    width: 256
-  },
-  {
     dest: "../tmp/favicon-16.png",
     src: "../src/img/favicon.svg",
     width: 16
-  },
-  {
-    dest: "../tmp/favicon-256.png",
-    src: "../src/img/favicon-large.svg",
-    width: 256
   },
   {
     dest: "../tmp/favicon-32.png",
@@ -53,6 +38,11 @@ const files = [
     dest: "../tmp/favicon-64.png",
     src: "../src/img/favicon-large.svg",
     width: 64
+  },
+  {
+    dest: "../tmp/favicon-256.png",
+    src: "../src/img/favicon-large.svg",
+    width: 256
   }
 ];
 const inkscape = which("inkscape");
