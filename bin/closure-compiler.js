@@ -7,23 +7,42 @@ const fs = require("fs-extra");
 const compile = require("google-closure-compiler-js").compile;
 const path = require("path");
 
+const files = [
+  {
+    "dest": "debug.js",
+    "src": [
+      "toggle-column.js",
+      "toggle-eyecatch.js",
+      "toggle-outline.js"
+    ]
+  },
+  {
+    "dest": "main.js",
+    "src": [
+      "abbread.js",
+      "ellipsis-title.js",
+      "reldate.js",
+      "unutm.js",
+      "wrapfix.js"
+    ]
+  }
+];
 const jsExt = ".js";
 const minExt = ".min";
 const tmpdir = path.resolve(__dirname, "../tmp");
 
-each(fs.readdirSync(tmpdir), function (src, next) {
-  const basename = path.basename(src, jsExt);
-  const dest = path.join(tmpdir, `${basename}${minExt}${jsExt}`);
+each(files, function (file, next) {
+  const contents = file.src.reduce(function (c, s) {
+    return `${c}${fs.readFileSync(path.resolve(tmpdir, s), "utf8")}`;
+  }, "");
 
-  if (path.extname(src) !== jsExt || path.extname(basename) === minExt) {
-    return next();
-  }
-
-  fs.outputFileSync(dest, compile({
+  fs.outputFileSync(path.resolve(tmpdir, file.dest), contents);
+  file.dest = `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`;
+  fs.outputFileSync(path.resolve(tmpdir, file.dest), compile({
     compilationLevel: "ADVANCED",
     outputWrapper: "(function () {%output%}).call(window);",
     jsCode: [{
-      src: fs.readFileSync(path.join(tmpdir, src), "utf8")
+      src: contents
     }]
   }).compiledCode);
   next();
