@@ -15,10 +15,10 @@
     }
 
     text = h1.textContent.split("");
-    h1.textContent = text.slice(0, -2).concat(
-      text.slice(-2).map(function (char) {
+    h1.textContent = text.slice(0, -2)
+      .concat(text.slice(-2).map(function (char) {
         return `\uFEFF${char}`;
-      })
-    ).join("");
+      }))
+      .join("");
   }
 })(document);
