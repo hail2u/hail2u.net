@@ -30,7 +30,6 @@ const dir = {
 const perl = which("perl");
 
 let limit = os.cpus().length - 1;
-let d;
 let files = [];
 let images = [];
 
@@ -54,13 +53,11 @@ function build(file, next) {
   }, function (err, stdout) {
     const entry = path.join(dir.static, file);
 
-    let contents;
-
     if (err) {
       return next(err);
     }
 
-    contents = `${stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
+    let contents = `${stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
 
     if (file.endsWith(".html")) {
       contents = contents.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
@@ -87,12 +84,16 @@ function build(file, next) {
   });
 }
 
-for (d in dir) {
+for (const d in dir) {
   dir[d] = path.resolve(__dirname, dir[d]);
 }
 
 if (argv.file) {
-  images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
+  images = fs.readFileSync(argv.file, "utf8")
+    .match(/\bsrc="\/images\/blog\/.*?"/g)
+    .map(function (image) {
+      return path.basename(image.split(/"/)[1]);
+    });
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
@@ -100,8 +101,8 @@ if (argv.file) {
 
   if (images) {
     images.forEach(function (image) {
-      image = image.replace(/^src="\/images\/blog\/(.*?)"$/, "$1");
-      fs.createReadStream(path.join(dir.img, image)).pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
+      fs.createReadStream(path.join(dir.img, image))
+        .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
     });
   }
 }

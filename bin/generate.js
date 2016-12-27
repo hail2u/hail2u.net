@@ -55,7 +55,6 @@ const partialDir = path.join(__dirname, "../src/html/partial");
 const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
 
-let f;
 let files = blogFiles;
 
 function escape(str) {
@@ -65,13 +64,11 @@ function escape(str) {
 }
 
 function extendObject(dest, src) {
-  let prop;
-
   if (dest !== Object(dest)) {
     return dest;
   }
 
-  for (prop in src) {
+  for (const prop in src) {
     dest[prop] = src[prop];
   }
 
@@ -104,23 +101,20 @@ function readFeed(file) {
     feed = data.rss.channel;
   });
 
-  feed.item.forEach(function (val) {
-    let date;
-    let yy;
-    let mm;
-    let dd;
-
-    if (val.link) {
-      val.link = val.link.replace(/https?:\/\/hail2u\.net\//, "/");
+  feed.item.forEach(function (i) {
+    if (i.link) {
+      i.link = i.link.replace(/https?:\/\/hail2u\.net\//, "/");
     }
 
-    if (val.pubDate) {
-      date = new Date(val.pubDate);
-      yy = date.getFullYear();
-      mm = date.getMonth();
-      dd = date.getDate();
-      val.strPubDate = `${yy}/${pad(mm + 1)}/${pad(dd)}`;
-      val.html5PubDate = toHTML5Date(yy, mm + 1, dd, date.getHours(), date.getMinutes(), date.getSeconds());
+    if (i.pubDate) {
+      const d = new Date(i.pubDate);
+      const yy = d.getFullYear();
+      const mm = d.getMonth() + 1;
+      const dd = d.getDate();
+
+      i.strPubDate = `${yy}/${pad(mm)}/${pad(dd)}`;
+      i.html5PubDate = toHTML5Date(yy, mm, dd, d.getHours(), d.getMinutes(),
+        d.getSeconds());
     }
   });
   feed.item[0].isLatest = true;
@@ -129,18 +123,19 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = fs.readJsonSync(path.resolve(__dirname, articleCache)).map(function (article, idx, arr) {
-    article.strPubDate = `${pad(article.month)}/${pad(article.day)}`;
-    article.html5PubDate = toHTML5Date(article.year, article.month, article.day, article.hour, article.minute, article.second);
+  const articles = fs.readJsonSync(articleCache).map(function (a, idx, arr) {
+    a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
+    a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
+      a.second);
 
-    if (idx && this.y !== article.year) {
-      article.isFirstInYear = true;
+    if (idx && this.y !== a.year) {
+      a.isFirstInYear = true;
       arr[idx - 1].isLastInYear = true;
     }
 
-    this.y = article.year;
+    this.y = a.year;
 
-    return article;
+    return a;
   }, {
     y: true
   });
@@ -169,7 +164,7 @@ function readMetadata(metadata, file) {
   return metadata;
 }
 
-for (f in feeds) {
+for (const f in feeds) {
   feeds[f] = path.resolve(__dirname, feeds[f]);
 }
 
@@ -182,8 +177,6 @@ fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(path.join(partialDir, partial), "utf8");
 });
 each(files, function (file, next) {
-  let html;
-
   file.src = path.resolve(__dirname, file.src);
 
   if (!file.dest) {
@@ -191,7 +184,7 @@ each(files, function (file, next) {
   }
 
   file.dest = path.resolve(__dirname, file.dest);
-  html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
+  let html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
 
   if (!file.dest.endsWith(`${path.sep}page`)) {
     html = minifyHTML(html, {

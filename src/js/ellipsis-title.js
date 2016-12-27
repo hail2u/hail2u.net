@@ -6,9 +6,7 @@
 "use strict";
 
 (function () {
-  let elm;
-
-  for (elm of document.querySelectorAll("*")) {
+  for (const elm of document.querySelectorAll("*")) {
     if (window.getComputedStyle(elm)["text-overflow"] === "ellipsis") {
       elm.title = elm.textContent;
     }

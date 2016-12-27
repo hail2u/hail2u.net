@@ -13,6 +13,7 @@ const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 const preview = path.resolve(__dirname, "../tmp/__preview.html");
+const renderer = new marked.Renderer();
 const template = `<!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -34,7 +35,6 @@ const template = `<!DOCTYPE html>
 </html>`;
 
 let content = fs.readFileSync(argv.file, "utf8");
-let renderer;
 
 function html(t) {
   const sectionTags = ["aside", "figure", "section"];
@@ -84,7 +84,6 @@ function p(t) {
 }
 
 if (!content.endsWith(">")) {
-  renderer = new marked.Renderer();
   renderer.html = html;
   renderer.paragraph = p;
   content = marked(content, {

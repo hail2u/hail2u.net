@@ -17,6 +17,8 @@ const root = path.resolve(__dirname, "../src/weblog/entries/");
 let articles = [];
 
 function readArticle(file, date) {
+  date = new Date(parseInt(date, 10) * 1000);
+
   return {
     day: date.getDate(),
     hour: date.getHours(),
@@ -29,9 +31,9 @@ function readArticle(file, date) {
     month: date.getMonth() + 1,
     second: date.getSeconds(),
     title: fs.readFileSync(file, "utf8")
-        .split(/\n/)
-        .shift()
-        .replace(/<\/?h1>/g, ""),
+      .split(/\n/)
+      .shift()
+      .replace(/<\/?h1>/g, ""),
     tz: "+09:00",
     unixtime: date.getTime(),
     year: date.getFullYear()
@@ -58,7 +60,7 @@ fs.readFileSync(data, "utf8")
     }
 
     line = line.split("=>");
-    articles.unshift(readArticle(line.shift(), new Date(parseInt(line.shift(), 10) * 1000)));
+    articles.unshift(readArticle(line[0], line[1]));
   });
 fs.outputFileSync(cache, articles.sort(function (a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);

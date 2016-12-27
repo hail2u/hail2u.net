@@ -8,8 +8,6 @@
 (function () {
   const now = Date.now();
 
-  let time;
-
   function toRelativeDate(then) {
     let diff = 0;
 
@@ -58,7 +56,7 @@
     return `${parseInt(diff / 12, 10)}年前`;
   }
 
-  for (time of document.querySelectorAll("time")) {
+  for (const time of document.querySelectorAll("time")) {
     const abs = time.getAttribute("datetime");
     const rel = toRelativeDate(Date.parse(abs));
 
