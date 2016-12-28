@@ -8,8 +8,8 @@ const path = require("path");
 
 const dest = path.resolve(__dirname, "../dist/feed");
 const feeds = [
-  "../src/index.rss",
-  "../src/documents.rss",
+  "../src/feed/index.rss",
+  "../src/feed/documents.rss",
   "../dist/blog/feed"
 ].map(function (feed) {
   return fs.readFileSync(path.resolve(__dirname, feed), "utf8");

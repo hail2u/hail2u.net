@@ -38,8 +38,8 @@ const defaultFiles = [
   }
 ];
 const feeds = {
-  documents: "../src/documents.rss",
-  home: "../src/index.rss",
+  documents: "../src/feed/documents.rss",
+  home: "../src/feed/index.rss",
   weblog: "../dist/blog/feed"
 };
 const entityMap = {
