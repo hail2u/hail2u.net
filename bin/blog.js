@@ -89,21 +89,20 @@ for (const d in dir) {
 }
 
 if (argv.file) {
-  images = fs.readFileSync(argv.file, "utf8")
-    .match(/\bsrc="\/images\/blog\/.*?"/g)
-    .map(function (image) {
-      return path.basename(image.split(/"/)[1]);
-    });
+  images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
   limit = 1;
 
   if (images) {
-    images.forEach(function (image) {
-      fs.createReadStream(path.join(dir.img, image))
-        .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
-    });
+    images.map(function (image) {
+      return path.basename(image.split(/"/)[1]);
+    })
+      .forEach(function (image) {
+        fs.createReadStream(path.join(dir.img, image))
+          .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
+      });
   }
 }
 
