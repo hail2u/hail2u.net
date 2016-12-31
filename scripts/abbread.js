@@ -8,11 +8,10 @@
 (function () {
   const def = {};
 
-  let abbr;
   let desc = "";
   let text = "";
 
-  for (abbr of document.querySelectorAll("abbr")) {
+  for (const abbr of document.querySelectorAll("abbr")) {
     text = abbr.textContent;
     desc = abbr.title;
 

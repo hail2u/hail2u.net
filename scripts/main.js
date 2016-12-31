@@ -8,11 +8,10 @@
 (function () {
   const def = {};
 
-  let abbr;
   let desc = "";
   let text = "";
 
-  for (abbr of document.querySelectorAll("abbr")) {
+  for (const abbr of document.querySelectorAll("abbr")) {
     text = abbr.textContent;
     desc = abbr.title;
 
@@ -35,9 +34,7 @@
 "use strict";
 
 (function () {
-  let elm;
-
-  for (elm of document.querySelectorAll("*")) {
+  for (const elm of document.querySelectorAll("*")) {
     if (window.getComputedStyle(elm)["text-overflow"] === "ellipsis") {
       elm.title = elm.textContent;
     }
@@ -52,8 +49,6 @@
 
 (function () {
   const now = Date.now();
-
-  let time;
 
   function toRelativeDate(then) {
     let diff = 0;
@@ -103,7 +98,7 @@
     return `${parseInt(diff / 12, 10)}年前`;
   }
 
-  for (time of document.querySelectorAll("time")) {
+  for (const time of document.querySelectorAll("time")) {
     const abs = time.getAttribute("datetime");
     const rel = toRelativeDate(Date.parse(abs));
 
@@ -135,15 +130,13 @@
 "use strict";
 
 (function (d) {
-  let h1;
-  let text;
-
-  for (h1 of d.querySelectorAll("main h1")) {
+  for (const h1 of d.querySelectorAll("main h1")) {
     if (h1.childNodes.length !== 1 || h1.firstChild.nodeType !== 3) {
       continue;
     }
 
-    text = h1.textContent.split("");
+    const text = h1.textContent.split("");
+
     h1.textContent = text.slice(0, -2)
       .concat(text.slice(-2).map(function (char) {
         return `\uFEFF${char}`;
