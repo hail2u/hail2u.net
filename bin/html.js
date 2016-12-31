@@ -5,36 +5,35 @@
 const each = require("async").each;
 const fs = require("fs-extra");
 const minifyHTML = require("html-minifier").minify;
-const minimist = require("minimist");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
 
-const argv = minimist(process.argv.slice(2), {
-  boolean: ["blog"]
-});
 const articleCache = path.resolve(__dirname, "../cache/articles.json");
-const blogFiles = [
+const files = [
   {
-    src: "../src/html/blog/index.mustache"
-  },
-  {
-    src: "../src/html/index.mustache"
-  }
-];
-const defaultFiles = [
-  {
+    dest: "../dist/404.html",
     src: "../src/html/404.mustache"
   },
   {
+    dest: "../dist/about/index.html",
     src: "../src/html/about/index.mustache"
+  },
+  {
+    dest: "../dist/blog/index.html",
+    src: "../src/html/blog/index.mustache"
   },
   {
     dest: "../src/weblog/entries/themes/html/page",
     src: "../src/html/blog/theme.mustache"
   },
   {
+    dest: "../dist/documents/index.html",
     src: "../src/html/documents/index.mustache"
+  },
+  {
+    dest: "../dist/index.html",
+    src: "../src/html/index.mustache"
   }
 ];
 const feeds = {
@@ -54,8 +53,6 @@ const basicMetadata = fs.readJsonSync(metadataFile);
 const partialDir = path.join(__dirname, "../src/html/partial");
 const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
-
-let files = blogFiles;
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, function (s) {
@@ -168,22 +165,13 @@ for (const f in feeds) {
   feeds[f] = path.resolve(__dirname, feeds[f]);
 }
 
-if (!argv.blog) {
-  files = files.concat(defaultFiles);
-}
-
 mustache.escape = escape;
 fs.readdirSync(partialDir).forEach(function (partial) {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(path.join(partialDir, partial), "utf8");
 });
 each(files, function (file, next) {
-  file.src = path.resolve(__dirname, file.src);
-
-  if (!file.dest) {
-    file.dest = path.join("../dist/", path.dirname(path.relative(templateDir, file.src)), `${path.basename(file.src, ".mustache")}.html`);
-  }
-
   file.dest = path.resolve(__dirname, file.dest);
+  file.src = path.resolve(__dirname, file.src);
   let html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
 
   if (!file.dest.endsWith(`${path.sep}page`)) {
