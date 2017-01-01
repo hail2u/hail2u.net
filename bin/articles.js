@@ -22,9 +22,9 @@ function readArticle(file, date) {
   return {
     day: date.getDate(),
     hour: date.getHours(),
-    link: `/blog/${
-      path.relative(root, path.dirname(file)).replace(/\\/g, "/")
-    }${
+    link: `/${
+      path.join("blog", path.relative(root, path.dirname(file))).replace(/\\/g, "/")
+    }/${
       path.basename(file, ".txt")
     }.html`,
     minute: date.getMinutes(),
