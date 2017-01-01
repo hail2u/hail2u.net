@@ -56,7 +56,7 @@
     return `${parseInt(diff / 12, 10)}年前`;
   }
 
-  for (const time of document.querySelectorAll("time")) {
+  for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
     const abs = time.getAttribute("datetime");
     const rel = toRelativeDate(Date.parse(abs));
 
