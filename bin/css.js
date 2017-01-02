@@ -13,6 +13,7 @@ const roundFloat = require("postcss-round-float");
 const which = require("which").sync;
 
 const cssExt = ".css";
+const dos2unix = which("dos2unix");
 const minExt = ".min";
 const processor = postcss([
   roundFloat(),
@@ -26,9 +27,35 @@ const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 const tmpDir = path.resolve(__dirname, "../tmp/");
 
-each(fs.readdirSync(srcDir), function (src, next) {
+function postPostCSS(dest, next, result) {
+  fs.outputFileSync(dest, result.css);
+
+  return next();
+}
+
+function postDOS2Unix(basename, dest, next, err) {
+  if (err) {
+    return next(err);
+  }
+
+  const src = dest;
+
+  dest = path.join(tmpDir, `${basename}${minExt}${cssExt}`);
+  processor.process(fs.readFileSync(src, "utf8"))
+    .then(postPostCSS.bind(null, dest, next));
+}
+
+function postSassc(basename, dest, next, err) {
+  if (err) {
+    return next(err);
+  }
+
+  execFile(dos2unix, [dest], postDOS2Unix.bind(null, basename, dest, next));
+}
+
+function toCSS(src, next) {
   const basename = path.basename(src, scssExt);
-  let dest = path.join(tmpDir, `${basename}${cssExt}`);
+  const dest = path.join(tmpDir, `${basename}${cssExt}`);
 
   if (path.extname(src) !== scssExt || basename.startsWith("_")) {
     return next();
@@ -37,20 +64,13 @@ each(fs.readdirSync(srcDir), function (src, next) {
   execFile(sassc, [
     path.join(srcDir, src).replace(/\\/g, "/"),
     dest
-  ], function (err) {
-    if (err) {
-      next(err);
-    }
+  ], postSassc.bind(null, basename, dest, next));
+}
 
-    src = dest;
-    dest = path.join(tmpDir, `${basename}${minExt}${cssExt}`);
-    processor.process(fs.readFileSync(src, "utf8")).then(function (result) {
-      fs.outputFileSync(dest, result.css);
-      next();
-    });
-  });
-}, function (err) {
+function cb(err) {
   if (err) {
     throw err;
   }
-});
+}
+
+each(fs.readdirSync(srcDir), toCSS, cb);
