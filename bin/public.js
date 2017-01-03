@@ -15,9 +15,7 @@ const opts = {
 };
 
 process.argv.slice(2).forEach(function (f) {
-  if (fs.existsSync(f)) {
-    execFile(cmd, ["add", "--", path.relative(cwd, f)], opts);
-  }
+  execFile(cmd, ["add", "--", path.relative(cwd, f)], opts);
 });
 execFile(cmd, ["commit", "--message=Upload"], opts);
 execFile(cmd, ["push", "origin", "gh-pages"], opts);
