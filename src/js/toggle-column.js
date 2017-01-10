@@ -2,6 +2,6 @@
 
 (function () {
   document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("show-column");
+    this.classList.toggle("js-debug-columns");
   }, false);
 })();
