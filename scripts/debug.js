@@ -16,7 +16,7 @@
     }
   }
 
-  d.querySelector(".section-footer").addEventListener("click", toggle.bind(null, d.querySelector(".fill")), false);
+  d.querySelector("footer").addEventListener("click", toggle.bind(null, d.querySelector(".fill")), false);
 })(document);
 "use strict";
 
