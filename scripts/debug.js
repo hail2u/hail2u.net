@@ -2,7 +2,7 @@
 
 (function () {
   document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("show-column");
+    this.classList.toggle("js-debug-columns");
   }, false);
 })();
 "use strict";
@@ -22,6 +22,6 @@
 
 (function () {
   document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("show-outline");
+    this.classList.toggle("js-debug-elements");
   }, false);
 })();

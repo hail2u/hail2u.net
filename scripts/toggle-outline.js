@@ -2,6 +2,6 @@
 
 (function () {
   document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("show-outline");
+    this.classList.toggle("js-debug-elements");
   }, false);
 })();
