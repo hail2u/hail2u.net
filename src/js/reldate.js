@@ -8,14 +8,14 @@
 (function () {
   const now = Date.now();
 
-  function toRelativeDate(then) {
+  function toRelativeDate(from, to) {
     let diff = 0;
 
-    if (!Number.isInteger(then)) {
+    if (!Number.isInteger(to)) {
       return;
     }
 
-    diff = parseInt((now - then) / 1000, 10);
+    diff = parseInt((from - to) / 1000, 10);
 
     if (!Number.isInteger(diff) || diff < 0) {
       return;
@@ -58,7 +58,7 @@
 
   for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
     const abs = time.getAttribute("datetime");
-    const rel = toRelativeDate(Date.parse(abs));
+    const rel = toRelativeDate(now, Date.parse(abs));
 
     if (rel) {
       time.setAttribute("title", abs);
