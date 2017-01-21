@@ -17,9 +17,7 @@ const dos2unix = which("dos2unix");
 const minExt = ".min";
 const processor = postcss([
   roundFloat(),
-  mqpacker({
-    sort: true
-  }),
+  mqpacker(),
   csswring()
 ]);
 const sassc = which("sassc");
