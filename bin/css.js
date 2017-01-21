@@ -13,7 +13,6 @@ const roundFloat = require("postcss-round-float");
 const which = require("which").sync;
 
 const cssExt = ".css";
-const dos2unix = which("dos2unix");
 const minExt = ".min";
 const processor = postcss([
   roundFloat(),
@@ -31,7 +30,7 @@ function postPostCSS(dest, next, result) {
   return next();
 }
 
-function postDOS2Unix(basename, dest, next, err) {
+function postSassc(basename, dest, next, err) {
   if (err) {
     return next(err);
   }
@@ -41,14 +40,6 @@ function postDOS2Unix(basename, dest, next, err) {
   dest = path.join(tmpDir, `${basename}${minExt}${cssExt}`);
   processor.process(fs.readFileSync(src, "utf8"))
     .then(postPostCSS.bind(null, dest, next));
-}
-
-function postSassc(basename, dest, next, err) {
-  if (err) {
-    return next(err);
-  }
-
-  execFile(dos2unix, [dest], postDOS2Unix.bind(null, basename, dest, next));
 }
 
 function toCSS(src, next) {
