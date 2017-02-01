@@ -24,13 +24,13 @@ const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 const tmpDir = path.resolve(__dirname, "../tmp/");
 
-function postPostCSS(dest, next, result) {
+function writeCSS(dest, next, result) {
   fs.outputFileSync(dest, result.css);
 
   return next();
 }
 
-function postSassc(basename, dest, next, err) {
+function processCSS(basename, dest, next, err) {
   if (err) {
     return next(err);
   }
@@ -39,7 +39,8 @@ function postSassc(basename, dest, next, err) {
 
   dest = path.join(tmpDir, `${basename}${minExt}${cssExt}`);
   processor.process(fs.readFileSync(src, "utf8"))
-    .then(postPostCSS.bind(null, dest, next));
+    .then(writeCSS.bind(null, dest, next))
+    .catch(next);
 }
 
 function toCSS(src, next) {
@@ -53,7 +54,7 @@ function toCSS(src, next) {
   execFile(sassc, [
     path.join(srcDir, src).replace(/\\/g, "/"),
     dest
-  ], postSassc.bind(null, basename, dest, next));
+  ], processCSS.bind(null, basename, dest, next));
 }
 
 function cb(err) {
