@@ -5,10 +5,10 @@
  */
 "use strict";
 
-(function (l) {
-  if (!l.search) {
+(function () {
+  if (!location.search) {
     return;
   }
 
-  history.replaceState(null, "", `${l.pathname}${l.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${l.hash}`);
-})(location);
+  history.replaceState(null, "", `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${location.hash}`);
+})();

@@ -12,8 +12,8 @@
   let text = "";
 
   for (const abbr of document.querySelectorAll("abbr")) {
-    text = abbr.textContent;
     desc = abbr.title;
+    text = abbr.textContent;
 
     if (desc && !def[text]) {
       def[text] = desc;
@@ -50,14 +50,14 @@
 (function () {
   const now = Date.now();
 
-  function toRelativeDate(then) {
+  function toRelativeDate(from, to) {
     let diff = 0;
 
-    if (!Number.isInteger(then)) {
+    if (!Number.isInteger(to)) {
       return;
     }
 
-    diff = parseInt((now - then) / 1000, 10);
+    diff = parseInt((from - to) / 1000, 10);
 
     if (!Number.isInteger(diff) || diff < 0) {
       return;
@@ -100,7 +100,7 @@
 
   for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
     const abs = time.getAttribute("datetime");
-    const rel = toRelativeDate(Date.parse(abs));
+    const rel = toRelativeDate(now, Date.parse(abs));
 
     if (rel) {
       time.setAttribute("title", abs);
@@ -115,13 +115,13 @@
  */
 "use strict";
 
-(function (l) {
-  if (!l.search) {
+(function () {
+  if (!location.search) {
     return;
   }
 
-  history.replaceState(null, "", `${l.pathname}${l.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${l.hash}`);
-})(location);
+  history.replaceState(null, "", `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${location.hash}`);
+})();
 /*!
  * wrapfix.js
  *
@@ -129,8 +129,8 @@
  */
 "use strict";
 
-(function (d) {
-  for (const h1 of d.querySelectorAll("main h1")) {
+(function () {
+  for (const h1 of document.querySelectorAll("main h1")) {
     if (h1.childNodes.length !== 1 || h1.firstChild.nodeType !== 3) {
       continue;
     }
@@ -138,9 +138,9 @@
     const text = h1.textContent.split("");
 
     h1.textContent = text.slice(0, -2)
-      .concat(text.slice(-2).map(function (char) {
-        return `\uFEFF${char}`;
+      .concat(text.slice(-2).map((c) => {
+        return `\uFEFF${c}`;
       }))
       .join("");
   }
-})(document);
+})();

@@ -12,8 +12,8 @@
   let text = "";
 
   for (const abbr of document.querySelectorAll("abbr")) {
-    text = abbr.textContent;
     desc = abbr.title;
+    text = abbr.textContent;
 
     if (desc && !def[text]) {
       def[text] = desc;

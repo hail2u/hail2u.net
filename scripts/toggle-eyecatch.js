@@ -1,6 +1,6 @@
 "use strict";
 
-(function (d) {
+(function () {
   function toggle(eyecatch) {
     if (eyecatch.hidden) {
       eyecatch.hidden = false;
@@ -9,5 +9,6 @@
     }
   }
 
-  d.querySelector("footer").addEventListener("click", toggle.bind(null, d.querySelector(".fill")), false);
-})(document);
+  document.querySelector("footer")
+    .addEventListener("click", toggle.bind(null, document.querySelector(".fill")), false);
+})();
