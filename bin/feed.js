@@ -11,7 +11,7 @@ const feeds = [
   "../src/feed/index.rss",
   "../src/feed/documents.rss",
   "../dist/blog/feed"
-].map(function (feed) {
+].map((feed) => {
   return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
 });
 

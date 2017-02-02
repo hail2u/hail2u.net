@@ -31,8 +31,8 @@ const jsExt = ".js";
 const minExt = ".min";
 const tmpdir = path.resolve(__dirname, "../tmp");
 
-each(files, function (file, next) {
-  const contents = file.src.reduce(function (c, s) {
+function minify(file, next) {
+  const contents = file.src.reduce((c, s) => {
     return `${c}${fs.readFileSync(path.resolve(tmpdir, s), "utf8")}`;
   }, "");
 
@@ -46,7 +46,9 @@ each(files, function (file, next) {
     }]
   }).compiledCode);
   next();
-}, function (err) {
+}
+
+each(files, minify, (err) => {
   if (err) {
     throw err;
   }

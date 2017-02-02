@@ -50,7 +50,7 @@ if (!argv.force) {
 
 fs.readFileSync(data, "utf8")
   .split(/\r?\n/)
-  .forEach(function (line) {
+  .forEach((line) => {
     if (!/\d+$/.test(line)) {
       return;
     }
@@ -62,9 +62,9 @@ fs.readFileSync(data, "utf8")
     line = line.split("=>");
     articles.unshift(readArticle(line[0], line[1]));
   });
-fs.outputJsonSync(cache, articles.sort(function (a, b) {
+fs.outputJsonSync(cache, articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}).filter(function (val, idx, arr) {
+}).filter((val, idx, arr) => {
   return arr.indexOf(val) === idx;
 }), {
   spaces: 2

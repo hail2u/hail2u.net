@@ -12,11 +12,11 @@ const files = [
   "../tmp/favicon-64.png",
   "../tmp/favicon-256.png",
   "../dist/favicon.ico"
-].map(function (p) {
+].map((p) => {
   return path.resolve(__dirname, p);
 });
 
-execFile(which("convert"), ["-quiet"].concat(files), function (err) {
+execFile(which("convert"), ["-quiet"].concat(files), (err) => {
   if (err) {
     throw err;
   }

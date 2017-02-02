@@ -50,7 +50,7 @@ function build(file, next) {
     env: {
       BLOSXOM_CONFIG_DIR: dir.root
     }
-  }, function (err, stdout) {
+  }, (err, stdout) => {
     const entry = path.join(dir.static, file);
 
     if (err) {
@@ -96,20 +96,19 @@ if (argv.file) {
   limit = 1;
 
   if (images) {
-    images.map(function (image) {
+    images.map((image) => {
       return path.basename(image.split(/"/)[1]);
-    })
-      .forEach(function (image) {
-        fs.createReadStream(path.join(dir.img, image))
-          .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
-      });
+    }).forEach((image) => {
+      fs.createReadStream(path.join(dir.img, image))
+        .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
+    });
   }
 }
 
 if (argv.all) {
   fs.readFileSync(data, "utf8")
     .split(/\r?\n/)
-    .forEach(function (file) {
+    .forEach((file) => {
       if (file === "") {
         return;
       }
@@ -118,10 +117,10 @@ if (argv.all) {
     });
 }
 
-files = files.map(function (file) {
+files = files.map((file) => {
   return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-each(files, limit, ensureAsync(build), function (err) {
+each(files, limit, ensureAsync(build), (err) => {
   if (err) {
     throw err;
   }

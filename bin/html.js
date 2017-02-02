@@ -55,7 +55,7 @@ const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
 
 function escape(str) {
-  return String(str).replace(/[&<>"']/g, function (s) {
+  return String(str).replace(/[&<>"']/g, (s) => {
     return entityMap[s];
   });
 }
@@ -90,15 +90,15 @@ function readFeed(file) {
   parseXML(fs.readFileSync(file, "utf8"), {
     trim: true,
     explicitArray: false
-  }, function (error, data) {
-    if (error) {
-      throw error;
+  }, (err, data) => {
+    if (err) {
+      throw err;
     }
 
     feed = data.rss.channel;
   });
 
-  feed.item.forEach(function (i) {
+  feed.item.forEach((i) => {
     if (i.link) {
       i.link = i.link.replace(/https?:\/\/hail2u\.net\//, "/");
     }
@@ -166,10 +166,10 @@ for (const f in feeds) {
 }
 
 mustache.escape = escape;
-fs.readdirSync(partialDir).forEach(function (partial) {
+fs.readdirSync(partialDir).forEach((partial) => {
   partials[path.basename(partial, ".mustache")] = fs.readFileSync(path.join(partialDir, partial), "utf8");
 });
-each(files, function (file, next) {
+each(files, (file, next) => {
   file.dest = path.resolve(__dirname, file.dest);
   file.src = path.resolve(__dirname, file.src);
   let html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
@@ -195,7 +195,7 @@ each(files, function (file, next) {
 
   fs.outputFileSync(file.dest, html);
   next();
-}, function (err) {
+}, (err) => {
   if (err) {
     throw err;
   }

@@ -57,10 +57,8 @@ function toCSS(src, next) {
   ], processCSS.bind(null, basename, dest, next));
 }
 
-function cb(err) {
+each(fs.readdirSync(srcDir), toCSS, (err) => {
   if (err) {
     throw err;
   }
-}
-
-each(fs.readdirSync(srcDir), toCSS, cb);
+});

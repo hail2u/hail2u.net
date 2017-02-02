@@ -47,7 +47,7 @@ const files = [
 ];
 const inkscape = which("inkscape");
 
-each(files, function (file, next) {
+each(files, (file, next) => {
   let args = [
     "-f",
     path.resolve(__dirname, file.src),
@@ -77,7 +77,7 @@ each(files, function (file, next) {
   }
 
   execFile(inkscape, args, next);
-}, function (err) {
+}, (err) => {
   if (err) {
     throw err;
   }

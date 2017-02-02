@@ -14,7 +14,7 @@
     const text = h1.textContent.split("");
 
     h1.textContent = text.slice(0, -2)
-      .concat(text.slice(-2).map(function (c) {
+      .concat(text.slice(-2).map((c) => {
         return `\uFEFF${c}`;
       }))
       .join("");

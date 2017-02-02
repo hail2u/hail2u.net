@@ -25,17 +25,17 @@ const urls = [
   "/documents/"
 ];
 
-fs.readdirSync(documentsDir).forEach(function (file) {
+fs.readdirSync(documentsDir).forEach((file) => {
   if (path.extname(file) !== ".html") {
     return false;
   }
 
   urls.push(`/${path.basename(documentsDir)}/${file}`);
 });
-fs.readJsonSync(cache).forEach(function (article) {
+fs.readJsonSync(cache).forEach((article) => {
   urls.push(article.link);
 });
-urls.forEach(function (url) {
+urls.forEach((url) => {
   sitemap.urlset.url.push({
     loc: `https://hail2u.net${url}`
   });
