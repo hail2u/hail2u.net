@@ -16,8 +16,8 @@ const files = [
   return path.resolve(__dirname, p);
 });
 
-execFile(which("convert"), ["-quiet"].concat(files), (err) => {
-  if (err) {
-    throw err;
+execFile(which("convert"), ["-quiet"].concat(files), (e) => {
+  if (e) {
+    throw e;
   }
 });

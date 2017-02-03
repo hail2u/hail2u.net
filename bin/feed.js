@@ -11,8 +11,8 @@ const feeds = [
   "../src/feed/index.rss",
   "../src/feed/documents.rss",
   "../dist/blog/feed"
-].map((feed) => {
-  return fs.readFileSync(path.resolve(__dirname, feed), "utf8");
+].map((f) => {
+  return fs.readFileSync(path.resolve(__dirname, f), "utf8");
 });
 
 fs.outputFileSync(dest, `${feedmix.stringify(feedmix.merge(feeds, {

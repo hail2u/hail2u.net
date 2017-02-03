@@ -47,7 +47,7 @@ const files = [
 ];
 const inkscape = which("inkscape");
 
-each(files, (file, next) => {
+function toPNG(file, next) {
   let args = [
     "-f",
     path.resolve(__dirname, file.src),
@@ -77,8 +77,10 @@ each(files, (file, next) => {
   }
 
   execFile(inkscape, args, next);
-}, (err) => {
-  if (err) {
-    throw err;
+}
+
+each(files, toPNG, (e) => {
+  if (e) {
+    throw e;
   }
 });

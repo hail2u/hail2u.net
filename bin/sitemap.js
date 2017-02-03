@@ -25,19 +25,19 @@ const urls = [
   "/documents/"
 ];
 
-fs.readdirSync(documentsDir).forEach((file) => {
-  if (path.extname(file) !== ".html") {
+fs.readdirSync(documentsDir).forEach((f) => {
+  if (path.extname(f) !== ".html") {
     return false;
   }
 
-  urls.push(`/${path.basename(documentsDir)}/${file}`);
+  urls.push(`/${path.basename(documentsDir)}/${f}`);
 });
-fs.readJsonSync(cache).forEach((article) => {
-  urls.push(article.link);
+fs.readJsonSync(cache).forEach((a) => {
+  urls.push(a.link);
 });
-urls.forEach((url) => {
+urls.forEach((u) => {
   sitemap.urlset.url.push({
-    loc: `https://hail2u.net${url}`
+    loc: `https://hail2u.net${u}`
   });
 });
 fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));

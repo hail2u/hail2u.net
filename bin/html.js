@@ -90,12 +90,12 @@ function readFeed(file) {
   parseXML(fs.readFileSync(file, "utf8"), {
     trim: true,
     explicitArray: false
-  }, (err, data) => {
-    if (err) {
-      throw err;
+  }, (e, d) => {
+    if (e) {
+      throw e;
     }
 
-    feed = data.rss.channel;
+    feed = d.rss.channel;
   });
 
   feed.item.forEach((i) => {
@@ -161,15 +161,7 @@ function readMetadata(metadata, file) {
   return metadata;
 }
 
-for (const f in feeds) {
-  feeds[f] = path.resolve(__dirname, feeds[f]);
-}
-
-mustache.escape = escape;
-fs.readdirSync(partialDir).forEach((partial) => {
-  partials[path.basename(partial, ".mustache")] = fs.readFileSync(path.join(partialDir, partial), "utf8");
-});
-each(files, (file, next) => {
+function toHTML(file, next) {
   file.dest = path.resolve(__dirname, file.dest);
   file.src = path.resolve(__dirname, file.src);
   let html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
@@ -194,9 +186,20 @@ each(files, (file, next) => {
   }
 
   fs.outputFileSync(file.dest, html);
-  next();
-}, (err) => {
-  if (err) {
-    throw err;
+
+  return next();
+}
+
+for (const f in feeds) {
+  feeds[f] = path.resolve(__dirname, feeds[f]);
+}
+
+mustache.escape = escape;
+fs.readdirSync(partialDir).forEach((p) => {
+  partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(partialDir, p), "utf8");
+});
+each(files, toHTML, (e) => {
+  if (e) {
+    throw e;
   }
 });

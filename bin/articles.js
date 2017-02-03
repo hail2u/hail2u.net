@@ -50,22 +50,22 @@ if (!argv.force) {
 
 fs.readFileSync(data, "utf8")
   .split(/\r?\n/)
-  .forEach((line) => {
-    if (!/\d+$/.test(line)) {
+  .forEach((l) => {
+    if (!/\d+$/.test(l)) {
       return;
     }
 
-    if (!argv.force && argv.file && !line.startsWith(argv.file)) {
+    if (!argv.force && argv.file && !l.startsWith(argv.file)) {
       return;
     }
 
-    line = line.split("=>");
-    articles.unshift(readArticle(line[0], line[1]));
+    l = l.split("=>");
+    articles.unshift(readArticle(l[0], l[1]));
   });
 fs.outputJsonSync(cache, articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}).filter((val, idx, arr) => {
-  return arr.indexOf(val) === idx;
+}).filter((v, i, a) => {
+  return a.indexOf(v) === i;
 }), {
   spaces: 2
 });

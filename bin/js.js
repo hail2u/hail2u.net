@@ -48,8 +48,8 @@ function minify(file, next) {
   next();
 }
 
-each(files, minify, (err) => {
-  if (err) {
-    throw err;
+each(files, minify, (e) => {
+  if (e) {
+    throw e;
   }
 });

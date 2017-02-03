@@ -93,8 +93,8 @@ if (!content.endsWith(">")) {
 
 content = content.replace(/(href|src)="\/images\//g, "$1=\"../src/img/");
 fs.outputFileSync(preview, template.replace(/<%CONTENT%>/g, content).replace(/="\//g, "=\"../dist/"));
-execFile(which("open"), [preview], (err) => {
-  if (err) {
-    throw err;
+execFile(which("open"), [preview], (e) => {
+  if (e) {
+    throw e;
   }
 });

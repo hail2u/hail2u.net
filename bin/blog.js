@@ -50,14 +50,13 @@ function build(file, next) {
     env: {
       BLOSXOM_CONFIG_DIR: dir.root
     }
-  }, (err, stdout) => {
-    const entry = path.join(dir.static, file);
-
-    if (err) {
-      return next(err);
+  }, (e, o) => {
+    if (e) {
+      return next(e);
     }
 
-    let contents = `${stdout.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
+    const entry = path.join(dir.static, file);
+    let contents = `${o.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
 
     if (file.endsWith(".html")) {
       contents = contents.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
@@ -96,11 +95,11 @@ if (argv.file) {
   limit = 1;
 
   if (images) {
-    images.map((image) => {
-      return path.basename(image.split(/"/)[1]);
-    }).forEach((image) => {
-      fs.createReadStream(path.join(dir.img, image))
-        .pipe(fs.createWriteStream(path.join(dir.staticimg, image)));
+    images.map((i) => {
+      return path.basename(i.split(/"/)[1]);
+    }).forEach((i) => {
+      fs.createReadStream(path.join(dir.img, i))
+        .pipe(fs.createWriteStream(path.join(dir.staticimg, i)));
     });
   }
 }
@@ -108,20 +107,20 @@ if (argv.file) {
 if (argv.all) {
   fs.readFileSync(data, "utf8")
     .split(/\r?\n/)
-    .forEach((file) => {
-      if (file === "") {
+    .forEach((f) => {
+      if (f === "") {
         return;
       }
 
-      files.push(path.relative(dir.data, file.split("=>").shift()));
+      files.push(path.relative(dir.data, f.split("=>").shift()));
     });
 }
 
-files = files.map((file) => {
-  return file.replace(/\.txt$/, ".html").replace(/\\/g, "/");
+files = files.map((f) => {
+  return f.replace(/\.txt$/, ".html").replace(/\\/g, "/");
 });
-each(files, limit, ensureAsync(build), (err) => {
-  if (err) {
-    throw err;
+each(files, limit, ensureAsync(build), (e) => {
+  if (e) {
+    throw e;
   }
 });
