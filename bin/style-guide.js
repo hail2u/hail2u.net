@@ -14,7 +14,7 @@ const site = "https://hail2u.net/";
 const src = path.resolve(__dirname, "../src/css/test.html");
 
 fs.outputFileSync(dest, fs.readFileSync(src, "utf8")
-  .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, eq, oq, u, cq) => {
+  .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
     if (u.startsWith(site)) {
       u = u.substr(site.length - 1);
     } else if (u.startsWith(dir.img)) {
@@ -25,5 +25,5 @@ fs.outputFileSync(dest, fs.readFileSync(src, "utf8")
       u = `/styles/${u}`;
     }
 
-    return `${a}${eq}${oq}${u}${cq}`;
+    return `${a}${e}${o}${u}${c}`;
   }));
