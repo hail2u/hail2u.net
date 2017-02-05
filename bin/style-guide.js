@@ -14,7 +14,6 @@ const site = "https://hail2u.net/";
 const src = path.resolve(__dirname, "../src/css/test.html");
 
 fs.outputFileSync(dest, fs.readFileSync(src, "utf8")
-  .replace(/\.\.\/\.\.\/node_modules\/.*?\/([^/]*?.js)/g, `${dir.js}$1`)
   .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, eq, oq, u, cq) => {
     if (u.startsWith(site)) {
       u = u.substr(site.length - 1);
