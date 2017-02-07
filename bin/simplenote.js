@@ -208,7 +208,7 @@ function stageEntry(filepath, next) {
 function commitEntry(filepath, next) {
   execFile(git, [
     "commit",
-    `"--message=Add ${path.relative(rootDir, filepath).replace(/\\/g, "/")}"`
+    `--message="Add ${path.relative(rootDir, filepath).replace(/\\/g, "/")}"`
   ], {
     cwd: rootDir
   }, (e) => {
