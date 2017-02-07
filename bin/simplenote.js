@@ -307,8 +307,8 @@ waterfall([
   }
 
   if (argv.publish) {
-    publishSelected(r);
-  } else {
-    previewSelected(r);
+    return publishSelected(r);
   }
+
+  previewSelected(r);
 });
