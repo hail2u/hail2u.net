@@ -220,8 +220,29 @@ function commitEntry(filepath, next) {
   });
 }
 
-function openFile(filepath, next) {
-  execFile(which("open"), [filepath], (e) => {
+function createArticle(filepath, next) {
+  execFile(which("npm"), [
+    "run",
+    "blog",
+    "--",
+    `--file=${filepath}`,
+    "--reindex"
+  ], (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, filepath);
+  });
+}
+
+function publishArticle(filepath, next) {
+  execFile(which("npm"), [
+    "run",
+    "article",
+    "--",
+    `--file=${filepath}`
+  ], (e) => {
     if (e) {
       return next(e);
     }
@@ -237,7 +258,8 @@ function publishSelected(selected) {
     toHTML,
     stageEntry,
     commitEntry,
-    openFile
+    createArticle,
+    publishArticle
   ], (e) => {
     if (e) {
       throw e;
@@ -283,13 +305,23 @@ function savePreview(filepath, preview, next) {
   });
 }
 
+function openPreview(filepath, next) {
+  execFile(which("open"), [filepath], (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null);
+  });
+}
+
 function previewSelected(selected) {
   waterfall([
     saveSelected.bind(null, selected, tempDir, ".html"),
     toHTML,
     createPreview,
     savePreview,
-    openFile
+    openPreview
   ], (e) => {
     if (e) {
       throw e;
