@@ -119,7 +119,7 @@ function selectNote(notes, next) {
   notes.forEach((n, i) => {
     menu.write(`${i + 1}. ${n.content.trim().split("\n")[0]}\n`);
   });
-  menu.question("Which one? (0) ", (a) => {
+  menu.question("Which one: (0) ", (a) => {
     if (!a) {
       a = 0;
     }
