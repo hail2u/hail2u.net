@@ -5,6 +5,7 @@
 const execFile = require("child_process").execFile;
 const fs = require("fs");
 const map = require("async").map;
+const minimist = require("minimist");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
@@ -12,11 +13,17 @@ const request = require("request");
 const waterfall = require("async").waterfall;
 const which = require("which").sync;
 
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "publish"
+  ]
+});
 const config = pit.get("simplenote.com");
-const dir = path.resolve(__dirname, "../src/weblog/entries/");
+const entryDir = path.resolve(__dirname, "../src/weblog/entries/");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
+const tempDir = path.resolve(__dirname, "../tmp/");
 const url = {
   auth: "https://app.simplenote.com/api/login",
   data: "https://app.simplenote.com/api2/data",
@@ -130,7 +137,7 @@ function selectNote(notes, next) {
   });
 }
 
-function saveSelected(selected, next) {
+function saveSelected(selected, dir, ext, next) {
   if (!selected.tags.includes("draft")) {
     return next(new Error("This note is not tagged as draft."));
   }
@@ -142,7 +149,7 @@ function saveSelected(selected, next) {
   }
 
   const body = selected.content.split("\n");
-  const filepath = path.join(dir, `${body.pop()}.md`);
+  const filepath = path.join(dir, `${body.pop()}${ext}`);
 
   fs.writeFileSync(filepath, body.join("\n").trim());
   next(null, selected, filepath);
@@ -165,11 +172,11 @@ function deleteSelected(selected, filepath, next) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, filepath);
+    next(null, selected, filepath);
   });
 }
 
-function toHTML(filepath, next) {
+function toHTML(selected, filepath, next) {
   // TODO: Integrate Markdown processor
   execFile(which("markdown"), [filepath], (e) => {
     if (e) {
@@ -180,8 +187,7 @@ function toHTML(filepath, next) {
   });
 }
 
-function openEntry(filepath, next) {
-  // TODO: Publish or preview here
+function openFile(filepath, next) {
   execFile(which("open"), [filepath], (e) => {
     if (e) {
       return next(e);
@@ -191,16 +197,83 @@ function openEntry(filepath, next) {
   });
 }
 
+function publishSelected(selected) {
+  waterfall([
+    saveSelected.bind(null, selected, entryDir, ".txt"),
+    deleteSelected,
+    toHTML,
+    openFile
+  ], (e) => {
+    if (e) {
+      throw e;
+    }
+  });
+}
+
+function createPreview(filepath, next) {
+  fs.readFile(filepath, "utf8", (e, d) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, filepath, `<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    <title>プレビュー - ウェブログ - Hail2u.net</title>
+    <link href="/styles/main.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <main class="content">
+      <article class="section">
+        <footer class="section-footer">
+          <p><time datetime="1976-07-23">1976/07/23</time></p>
+        </footer>
+        ${d}
+      </article>
+    </main>
+  </body>
+</html>`);
+  });
+}
+
+function savePreview(filepath, preview, next) {
+  fs.writeFile(filepath, preview.replace(/="\//g, "=\"../dist/"), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, filepath);
+  });
+}
+
+function previewSelected(selected) {
+  waterfall([
+    saveSelected.bind(null, selected, tempDir, ".html"),
+    toHTML,
+    createPreview,
+    savePreview,
+    openFile
+  ], (e) => {
+    if (e) {
+      throw e;
+    }
+  });
+}
+
 waterfall([
   getToken,
   listNotes,
-  selectNote,
-  saveSelected,
-  deleteSelected,
-  toHTML,
-  openEntry
-], (e) => {
+  selectNote
+], (e, r) => {
   if (e) {
     throw e;
+  }
+
+  if (argv.publish) {
+    publishSelected(r);
+  } else {
+    previewSelected(r);
   }
 });
