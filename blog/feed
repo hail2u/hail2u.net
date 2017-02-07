@@ -9,7 +9,7 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <generator>Blosxom v2.1.2+dev</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 30 Jan 2017 19:28:30 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 7 Feb 2017 14:31:50 +0900</lastBuildDate>
     <link>https://hail2u.net/blog/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>ウェブログ - Hail2u.net</title>
@@ -17,6 +17,26 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by-nc/3.0/</creativeCommons:license>
 
+
+    <item>
+      <description>Simplenoteを使い始めたので、ここにウェブログの下書きを置くようにした。コピペでVimに持ってきて公開スクリプトを叩くというのが面倒そうなので、一覧から選択して公開するようなツールを書くことにした。しかしうまく認証が通らず、APIトークンを取得できなかった。原因はUser-Agentヘッダーの指定がなかったことだった。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/simplenote-api-and-user-agent-header.html</guid>
+      <link>https://hail2u.net/blog/simplenote-api-and-user-agent-header.html</link>
+      <pubDate>Tue, 07 Feb 2017 14:30:00 +0900</pubDate>
+      <content:encoded><![CDATA[
+<p><a href="https://simplenote.com/">Simplenote</a>を使い始めたので、ここにウェブログの下書きを置くようにした。コピペでVimに持ってきて公開スクリプトを叩くというのが面倒そうなので、一覧から選択して公開するようなツールを書くことにした。しかしうまく認証が通らず、APIトークンを取得できなかった。原因はUser-Agentヘッダーの指定がなかったことだった。</p>
+
+<p>SimplenoteのAPIは今は非公開扱いのようだが、旧来のものを変わらず使うことができる。<a href="http://kendersec.github.io/SimpleNote/SimpleNote-API-v2.1.3.pdf">Simplenote API2という文書</a>が詳しい。</p>
+
+<p>まずはとにかく認証を通してトークンをもらう必要がある。しかしその認証用のエンドポイントURLにUser-AgentヘッダーなしでPOSTリクエストを行うと500が返ってきてしまう。500なためヒントがゼロで、気づくまで大変だった……。多くの標準HTTPリクエスト・ライブラリーではデフォルトでUser-Agentが設定されるのでハマらない。しかしNode.jsのhttpsモジュールや<a href="https://www.npmjs.com/package/request">request</a>パッケージでは設定されないのでハマる。</p>
+
+<p>この認証用のエンドポイントURLに限らず、この文書で触れられているエンドポイントURLへPOSTリクエストを行う場合には、必ずUser-Agentヘッダーを指定しなければならない。GETリクエストの時は必要ないようだが、指定しておいた方が無難だろう。</p>
+
+<hr>
+
+<p>良く文書を見ると、<q>User-Agentヘッダーを使ってアプリを識別している</q>と書かれていた。もっとしっかりと読むべきだった。</p>]]></content:encoded>
+      <title>Simplenote APIとUser-Agentヘッダー</title>
+    </item>
 
     <item>
       <description>寝ているがトイレに起きる。トイレに入ると便器がない。窓の外で男が便器を抱えており、驚いて「ドロボー？」と半疑問形で尋ねる。男が口を開きかけたところで目が覚める。</description>
@@ -225,38 +245,6 @@ C:/Users/Kyo/Projects/node-git-release
 <p>僕がCSSを書いている過程で問題になることはほとんどないようだった。そのため普通に取り込んで<a href="https://github.com/hail2u/vim-css3-syntax/releases/tag/v0.19.0">v0.19.0</a>としてリリースした。</p>
 </section>]]></content:encoded>
       <title>vim-css3-syntaxへのSVG 2サポートの追加</title>
-    </item>
-
-    <item>
-      <description>SVGをインラインでHTMLに含める場合、SVGOを通した方が良い。HTMLファイルのサイズへ与える影響が大きいからだ。しかしデフォルトの設定だと、色々消えたり消えなかったりするのでそこそこ設定が必要になる。特にimg要素のalt属性に近いtitle要素のid属性とそれを参照するaria-labelledby属性は残さなければならない。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/inlining-svg-with-svgo.html</guid>
-      <link>https://hail2u.net/blog/inlining-svg-with-svgo.html</link>
-      <pubDate>Thu, 15 Dec 2016 13:20:00 +0900</pubDate>
-      <content:encoded><![CDATA[
-<p>SVGをインラインでHTMLに含める場合、SVGOを通した方が良い。HTMLファイルのサイズへ与える影響が大きいからだ。しかしデフォルトの設定だと、色々消えたり消えなかったりするのでそこそこ設定が必要になる。特に<code>img</code>要素の<code>alt</code>属性に近い<code>title</code>要素の<code>id</code>属性とそれを参照する<code>aria-labelledby</code>属性は残さなければならない。</p>
-
-<p>SVGOの設定はYAMLで書き、CLIに<code>--config</code>オプションでそのファイル名を渡して実行する。</p>
-
-<pre><samp>$ <kbd>svgo --config=.svgo.yml -o - src/img/logo.svg</kbd></samp>
-</pre>
-
-<p>YAMLでの設定は以下のようにした。</p>
-
-<pre><code>plugins:
-  - cleanupIDs: false
-  - removeUnknownsAndDefaults:
-      unknownAttrs: false
-  - removeXMLNS: true
-</code></pre>
-
-<p>SVGの要素から参照されていない<code>id</code>属性を消す機能と未知の属性を消す機能を無効にすることで、うまくいくようにする。併せてHTMLへインライン化する際には<code>xmlns</code>属性は不要なので、それを消す機能を有効にしておく。IllustratorやInkscape、Sketchなどが埋め込んでしまう様々な属性が残ってしまうので、事前にそこそこ処理しておく必要がある。</p>
-
-<hr>
-
-<p>ということでロゴやソーシャル・アイコンがインラインSVGになった。色の制御をCSSに集約できて楽になった。まだ自前でCLIを叩いてインライン化しているので、<code>img</code>要素でSVGファイルを参照していたらインライン化してしまうなど機械化したい。</p>
-
-<p>また<code>aria-*</code>属性残す機能はみなSVGOのコアに欲しい気がするので、<code>data-*</code>属性と同じように設定で残せるようにしたい。</p>]]></content:encoded>
-      <title>SVGOでSVGをインライン化</title>
     </item>
 
   </channel>
