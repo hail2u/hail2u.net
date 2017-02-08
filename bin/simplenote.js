@@ -76,7 +76,7 @@ function getNotes(notes, next) {
       return false;
     }
 
-    if (!n.tags.includes("draft")) {
+    if (argv.publish && !n.tags.includes("draft")) {
       return false;
     }
 
