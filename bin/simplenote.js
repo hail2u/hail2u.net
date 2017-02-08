@@ -14,6 +14,9 @@ const waterfall = require("async").waterfall;
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
+  alias: {
+    "p": "publish"
+  },
   boolean: [
     "publish"
   ]

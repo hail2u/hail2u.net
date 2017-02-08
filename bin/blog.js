@@ -13,6 +13,9 @@ const path = require("path");
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
+  alias: {
+    "a": "all"
+  },
   boolean: [
     "all",
     "reindex"
