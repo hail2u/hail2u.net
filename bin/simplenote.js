@@ -172,7 +172,7 @@ function selectNote(notes, next) {
     }
 
     if (a === 0) {
-      process.exit(1);
+      process.exit(0);
     }
 
     menu.close();
