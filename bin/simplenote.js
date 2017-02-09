@@ -194,8 +194,13 @@ function saveSelected(selected, dir, ext, next) {
   const body = selected.content.split("\n");
   const filepath = path.join(dir, `${body.pop()}${ext}`);
 
-  fs.writeFileSync(filepath, body.join("\n").trim());
-  next(null, selected, filepath);
+  fs.outputFile(filepath, body.join("\n").trim(), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, selected, filepath);
+  });
 }
 
 function deleteSelected(selected, filepath, next) {
