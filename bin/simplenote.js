@@ -21,6 +21,7 @@ const argv = minimist(process.argv.slice(2), {
     "publish"
   ]
 });
+const cache = path.join(__dirname, "../cache/", "simplenote.json");
 const config = pit.get("simplenote.com");
 const entryDir = path.resolve(__dirname, "../src/weblog/entries/");
 const git = which("git");
@@ -37,6 +38,15 @@ const url = {
 
 function getToken(next) {
   // TODO: Retrieve token from cache
+  next(null);
+}
+
+function renewToken(token, datetime, next) {
+  if (typeof token !== "function") {
+    return next(null, token);
+  }
+
+  next = token;
   request({
     body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
     headers: headers,
@@ -51,8 +61,24 @@ function getToken(next) {
       return next(new Error(r.statusMessage));
     }
 
-    // TODO: Cache token to file
-    next(null, encodeURIComponent(b.trim()));
+    next(null, encodeURIComponent(b.trim()), (new Date()).toJSON());
+  });
+}
+
+function storeToken(token, datetime, next) {
+  if (typeof datetime === "function") {
+    return next(null, token);
+  }
+
+  fs.writeFile(cache, JSON.stringify({
+    datetime: datetime,
+    token: token
+  }), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, token);
   });
 }
 
@@ -334,6 +360,8 @@ function previewSelected(selected) {
 
 waterfall([
   getToken,
+  renewToken,
+  storeToken,
   listNotes,
   getNotes,
   selectNote
