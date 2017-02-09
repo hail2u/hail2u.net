@@ -181,17 +181,7 @@ function selectNote(notes, next) {
 }
 
 function saveSelected(selected, dir, ext, next) {
-  if (!selected.tags.includes("draft")) {
-    return next(new Error("This note is not tagged as draft."));
-  }
-
-  selected.content = selected.content.trim();
-
-  if (!/\n[a-z0-9][-a-z0-9]*[a-z0-9]$/.test(selected.content)) {
-    return next(new Error("This note does not have file name."));
-  }
-
-  const body = selected.content.split("\n");
+  const body = selected.content.trim().split("\n");
   const filepath = path.join(dir, `${body.pop()}${ext}`);
 
   fs.outputFile(filepath, body.join("\n").trim(), (e) => {
@@ -393,14 +383,24 @@ waterfall([
   listNotes,
   getNotes,
   selectNote
-], (e, r) => {
+], (e, s) => {
   if (e) {
     throw e;
   }
 
-  if (argv.publish) {
-    return publishSelected(r);
+  if (!s.tags.includes("draft")) {
+    throw new Error("This note is not tagged as draft.");
   }
 
-  previewSelected(r);
+  s.content = s.content.trim();
+
+  if (!/\n[a-z0-9][-a-z0-9]*[a-z0-9]$/.test(s.content)) {
+    throw new Error("This note does not have file name.");
+  }
+
+  if (argv.publish) {
+    return publishSelected(s);
+  }
+
+  previewSelected(s);
 });
