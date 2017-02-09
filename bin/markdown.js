@@ -6,42 +6,35 @@ const marked = require("marked");
 
 const renderer = new marked.Renderer();
 
-function escape(s) {
-  return s.replace(/&/g, "&amp;")
+function escape(text) {
+  return text.replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
-function unescape(s) {
-  return s.replace(
-    /&gt;/g,
-    ">"
-  );
+function unescape(text) {
+  return text.replace(/&gt;/g, ">");
 }
 
-function hn(text, level) {
-  return `<h${level}>${text}</h${level}>
+function hn(content, level) {
+  return `<h${level}>${content}</h${level}>
 `;
 }
 
-function hr() {
-  return this.options.xhtml ? "<hr/>\n" : "<hr>\n";
-}
-
-function html(ht) {
+function html(content) {
   const sectionTags = ["aside", "figure", "section"];
-  const tokens = ht.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
+  const tokens = content.trim().match(/^<(\w+)(.*?)>([\s\S]*)<\/\1>/);
 
   if (!tokens) {
-    return ht;
+    return content;
   }
 
   const tag = tokens[1].toLowerCase();
 
   if (sectionTags.indexOf(tag) === -1) {
-    return ht;
+    return content;
   }
 
   return `<${tag}${tokens[2]}>
@@ -52,32 +45,32 @@ ${marked(unescape(tokens[3]), {
 `;
 }
 
-function img(href, title, text) {
-  let out = `<img alt="${text}" src="${href}"`;
+function img(src, title, alt) {
+  let out = `<img alt="${alt}" src="${src}"`;
 
   if (title) {
     out += ` title="${title}"`;
   }
 
-  return `${out}${(this.options.xhtml ? "/>" : ">")}`;
+  return `${out}>`;
 }
 
-function p(text) {
+function p(content) {
   const close = "</p>\n";
-  const tokens = text.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
+  const tokens = content.match(/^(.*?)(?:<!-- (#|\.)(.*?) -->)?$/);
   let open = "<p>";
   let type = "class";
 
-  if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(text)) {
-    return `${text}
+  if (/^(<img\s[^>]*|<a\s.*<\/a)>$/.exec(content)) {
+    return `${content}
 `;
   }
 
   if (!tokens) {
-    return open + text + close;
+    return open + content + close;
   }
 
-  text = tokens[1];
+  content = tokens[1];
 
   if (tokens[2] === "#") {
     type = "id";
@@ -87,7 +80,7 @@ function p(text) {
     open = `<p ${type}="${tokens[3]}">`;
   }
 
-  return open + text + close;
+  return open + content + close;
 }
 
 function pre(code, lang) {
@@ -104,13 +97,12 @@ function pre(code, lang) {
 
 renderer.code = pre;
 renderer.heading = hn;
-renderer.hr = hr;
 renderer.html = html;
 renderer.image = img;
 renderer.paragraph = p;
 
-module.exports = function (s) {
-  return marked(s.trim(), {
+module.exports = (t) => {
+  return marked(t.trim(), {
     renderer: renderer
   }).replace(/\n+(<(aside|blockquote|div|dl|figure|h[1-6]|hr|ol|p|pre|section|table|ul)\b)/g, "\n\n$1")
     .replace(/<(aside|figure|section)></g, "<$1>\n<")
