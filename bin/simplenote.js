@@ -56,6 +56,24 @@ function getToken(next) {
   });
 }
 
+function listNotes(token, next) {
+  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
+  request({
+    headers: headers,
+    url: `${url.index}?length=100&${config.auth}`
+  }, (e, r, b) => {
+    if (e) {
+      return next(e);
+    }
+
+    if (r.statusCode !== 200) {
+      return next(new Error(r.statusMessage));
+    }
+
+    next(null, JSON.parse(b).data);
+  });
+}
+
 function getNote(note, next) {
   request({
     headers: headers,
@@ -90,24 +108,6 @@ function getNotes(notes, next) {
     }
 
     next(null, r);
-  });
-}
-
-function listNotes(token, next) {
-  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
-  request({
-    headers: headers,
-    url: `${url.index}?length=100&${config.auth}`
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
-
-    if (r.statusCode !== 200) {
-      return next(new Error(r.statusMessage));
-    }
-
-    getNotes(JSON.parse(b).data, next);
   });
 }
 
@@ -335,6 +335,7 @@ function previewSelected(selected) {
 waterfall([
   getToken,
   listNotes,
+  getNotes,
   selectNote
 ], (e, r) => {
   if (e) {
