@@ -5,6 +5,7 @@
 const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const map = require("async").map;
+const markdown = require("./markdown");
 const minimist = require("minimist");
 const path = require("path");
 const pit = require("pit-ro");
@@ -219,8 +220,17 @@ function deleteSelected(selected, filepath, next) {
 }
 
 function toHTML(selected, filepath, next) {
-  // TODO: Integrate Markdown processor
-  execFile(which("markdown"), [filepath], (e) => {
+  fs.readFile(filepath, "utf8", (e, d) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, filepath, markdown(d));
+  });
+}
+
+function saveEntry(filepath, html, next) {
+  fs.outputFile(filepath, html, (e) => {
     if (e) {
       return next(e);
     }
@@ -296,6 +306,7 @@ function publishSelected(selected) {
     saveSelected.bind(null, selected, entryDir, ".txt"),
     deleteSelected,
     toHTML,
+    saveEntry,
     stageEntry,
     commitEntry,
     createArticle,
@@ -359,6 +370,7 @@ function previewSelected(selected) {
   waterfall([
     saveSelected.bind(null, selected, tempDir, ".html"),
     toHTML,
+    saveEntry,
     createPreview,
     savePreview,
     openPreview
