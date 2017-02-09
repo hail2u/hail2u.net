@@ -82,6 +82,8 @@ function storeToken(token, datetime, next) {
   fs.outputJSON(cache, {
     datetime: datetime,
     token: token
+  }, {
+    spaces: 2
   }, (e) => {
     if (e) {
       return next(e);
