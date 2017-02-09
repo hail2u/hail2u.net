@@ -48,7 +48,7 @@ if (!argv.force && !argv.file) {
 }
 
 if (!argv.force) {
-  articles = fs.readJsonSync(cache);
+  articles = fs.readJSONSync(cache);
 }
 
 fs.readFileSync(data, "utf8")
@@ -65,7 +65,7 @@ fs.readFileSync(data, "utf8")
     l = l.split("=>");
     articles.unshift(readArticle(l[0], l[1]));
   });
-fs.outputJsonSync(cache, articles.sort((a, b) => {
+fs.outputJSONSync(cache, articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter((v, i, a) => {
   return a.indexOf(v) === i;

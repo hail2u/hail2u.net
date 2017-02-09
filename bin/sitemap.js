@@ -32,7 +32,7 @@ fs.readdirSync(documentsDir).forEach((f) => {
 
   urls.push(`/${path.basename(documentsDir)}/${f}`);
 });
-fs.readJsonSync(cache).forEach((a) => {
+fs.readJSONSync(cache).forEach((a) => {
   urls.push(a.link);
 });
 urls.forEach((u) => {

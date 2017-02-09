@@ -49,7 +49,7 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = path.resolve(__dirname, "../src/html/metadata.json");
-const basicMetadata = fs.readJsonSync(metadataFile);
+const basicMetadata = fs.readJSONSync(metadataFile);
 const partialDir = path.join(__dirname, "../src/html/partial");
 const partials = {};
 const templateDir = path.resolve(__dirname, "../src/html/");
@@ -120,7 +120,7 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = fs.readJsonSync(articleCache).map(function (a, idx, arr) {
+  const articles = fs.readJSONSync(articleCache).map(function (a, idx, arr) {
     a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
     a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
       a.second);
@@ -144,7 +144,7 @@ function readArticles() {
 }
 
 function readMetadata(metadata, file) {
-  metadata = extendObject(metadata, fs.readJsonSync(file, "utf8"));
+  metadata = extendObject(metadata, fs.readJSONSync(file, "utf8"));
 
   switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
   case "index.json":
