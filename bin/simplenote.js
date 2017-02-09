@@ -180,16 +180,16 @@ function selectNote(notes, next) {
   });
 }
 
-function saveSelected(selected, dir, ext, next) {
-  const body = selected.content.trim().split("\n");
-  const filepath = path.join(dir, `${body.pop()}${ext}`);
+function saveEntry(selected, next) {
+  const body = selected.content.split("\n");
+  const filepath = path.join(entryDir, `${body.pop()}.txt`);
 
-  fs.outputFile(filepath, body.join("\n").trim(), (e) => {
+  fs.outputFile(filepath, markdown(body.join("\n")), (e) => {
     if (e) {
       return next(e);
     }
 
-    next(null, selected, filepath);
+    next(null, filepath);
   });
 }
 
@@ -211,26 +211,6 @@ function deleteSelected(selected, filepath, next) {
     }
 
     next(null, selected, filepath);
-  });
-}
-
-function toHTML(selected, filepath, next) {
-  fs.readFile(filepath, "utf8", (e, d) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, filepath, markdown(d));
-  });
-}
-
-function saveEntry(filepath, html, next) {
-  fs.outputFile(filepath, html, (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, filepath);
   });
 }
 
@@ -298,10 +278,8 @@ function publishArticle(filepath, next) {
 
 function publishSelected(selected) {
   waterfall([
-    saveSelected.bind(null, selected, entryDir, ".txt"),
+    saveEntry(null, selected),
     deleteSelected,
-    toHTML,
-    saveEntry,
     stageEntry,
     commitEntry,
     createArticle,
@@ -313,13 +291,10 @@ function publishSelected(selected) {
   });
 }
 
-function createPreview(filepath, next) {
-  fs.readFile(filepath, "utf8", (e, d) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, filepath, `<!DOCTYPE html>
+function savePreview(selected, next) {
+  const body = selected.content.split("\n");
+  const filepath = path.join(tempDir, `${body.pop()}.html`);
+  const preview = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -333,16 +308,13 @@ function createPreview(filepath, next) {
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        ${d}
+        ${markdown(body.join("\n"))}
       </article>
     </main>
   </body>
-</html>`);
-  });
-}
+</html>`;
 
-function savePreview(filepath, preview, next) {
-  fs.writeFile(filepath, preview.replace(/="\//g, "=\"../dist/"), (e) => {
+  fs.outputFile(filepath, preview.replace(/="\//g, "=\"../dist/"), (e) => {
     if (e) {
       return next(e);
     }
@@ -363,11 +335,7 @@ function openPreview(filepath, next) {
 
 function previewSelected(selected) {
   waterfall([
-    saveSelected.bind(null, selected, tempDir, ".html"),
-    toHTML,
-    saveEntry,
-    createPreview,
-    savePreview,
+    savePreview.bind(null, selected),
     openPreview
   ], (e) => {
     if (e) {
