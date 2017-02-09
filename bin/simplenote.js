@@ -180,16 +180,17 @@ function selectNote(notes, next) {
   });
 }
 
-function saveEntry(selected, next) {
-  const body = selected.content.split("\n");
-  const filepath = path.join(entryDir, `${body.pop()}.txt`);
+function toHTML(selected, body, filepath, next) {
+  next(null, selected, markdown(body), filepath);
+}
 
-  fs.outputFile(filepath, markdown(body.join("\n")), (e) => {
+function saveFile(selected, html, filepath, next) {
+  fs.outputFile(filepath, html, (e) => {
     if (e) {
       return next(e);
     }
 
-    next(null, filepath);
+    next(null, selected, filepath);
   });
 }
 
@@ -276,9 +277,10 @@ function publishArticle(filepath, next) {
   });
 }
 
-function publishSelected(selected) {
+function publishSelected(selected, body, filepath) {
   waterfall([
-    saveEntry(null, selected),
+    toHTML.bind(null, selected, body, filepath),
+    saveFile,
     deleteSelected,
     stageEntry,
     commitEntry,
@@ -291,10 +293,8 @@ function publishSelected(selected) {
   });
 }
 
-function savePreview(selected, next) {
-  const body = selected.content.split("\n");
-  const filepath = path.join(tempDir, `${body.pop()}.html`);
-  const preview = `<!DOCTYPE html>
+function createPreview(selected, html, filepath, next) {
+  next(null, selected, `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -308,22 +308,14 @@ function savePreview(selected, next) {
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        ${markdown(body.join("\n"))}
+        ${html}
       </article>
     </main>
   </body>
-</html>`;
-
-  fs.outputFile(filepath, preview.replace(/="\//g, "=\"../dist/"), (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, filepath);
-  });
+</html>`.replace(/="\//g, "=\"../dist/"), filepath);
 }
 
-function openPreview(filepath, next) {
+function openPreview(selected, filepath, next) {
   execFile(which("open"), [filepath], (e) => {
     if (e) {
       return next(e);
@@ -333,9 +325,11 @@ function openPreview(filepath, next) {
   });
 }
 
-function previewSelected(selected) {
+function previewSelected(selected, body, filepath) {
   waterfall([
-    savePreview.bind(null, selected),
+    toHTML.bind(null, selected, body, filepath),
+    createPreview,
+    saveFile,
     openPreview
   ], (e) => {
     if (e) {
@@ -366,9 +360,11 @@ waterfall([
     throw new Error("This note does not have file name.");
   }
 
+  const body = s.content.split("\n");
+
   if (argv.publish) {
-    return publishSelected(s);
+    return publishSelected(s, body.join("\n"), path.join(entryDir, `${body.pop()}.txt`));
   }
 
-  previewSelected(s);
+  previewSelected(s, body.join("\n"), path.join(tempDir, `${body.pop()}.html`));
 });
