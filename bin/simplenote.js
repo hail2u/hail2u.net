@@ -3,7 +3,7 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
-const fs = require("fs");
+const fs = require("fs-extra");
 const map = require("async").map;
 const minimist = require("minimist");
 const path = require("path");
@@ -37,13 +37,22 @@ const url = {
 };
 
 function getToken(next) {
-  // TODO: Retrieve token from cache
-  next(null);
+  fs.readJSON(cache, (e, d) => {
+    if (e) {
+      return next(null);
+    }
+
+    if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
+      return next(null);
+    }
+
+    next(null, d.token, d.datetime);
+  });
 }
 
 function renewToken(token, datetime, next) {
   if (typeof token !== "function") {
-    return next(null, token);
+    return next(null, token, datetime);
   }
 
   next = token;
@@ -70,10 +79,10 @@ function storeToken(token, datetime, next) {
     return next(null, token);
   }
 
-  fs.writeFile(cache, JSON.stringify({
+  fs.outputJSON(cache, {
     datetime: datetime,
     token: token
-  }), (e) => {
+  }, (e) => {
     if (e) {
       return next(e);
     }
