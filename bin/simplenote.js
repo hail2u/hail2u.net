@@ -332,7 +332,7 @@ waterfall([
   const html = markdown(body.join("\n"));
 
   if (argv.publish) {
-    return publishSelected(s, body, path.join(entryDir, `${filename}.txt`));
+    return publishSelected(s, html, path.join(entryDir, `${filename}.txt`));
   }
 
   previewSelected(s, `<!DOCTYPE html>
