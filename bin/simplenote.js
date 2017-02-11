@@ -350,10 +350,6 @@ waterfall([
     throw e;
   }
 
-  if (!s.tags.includes("draft")) {
-    throw new Error("This note is not tagged as draft.");
-  }
-
   s.content = s.content.trim();
 
   if (!/\n[a-z0-9][-a-z0-9]*[a-z0-9]$/.test(s.content)) {
