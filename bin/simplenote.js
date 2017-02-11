@@ -180,10 +180,6 @@ function selectNote(notes, next) {
   });
 }
 
-function toHTML(selected, body, filepath, next) {
-  next(null, selected, markdown(body), filepath);
-}
-
 function saveFile(selected, html, filepath, next) {
   fs.outputFile(filepath, html, (e) => {
     if (e) {
@@ -279,8 +275,7 @@ function publishArticle(filepath, next) {
 
 function publishSelected(selected, body, filepath) {
   waterfall([
-    toHTML.bind(null, selected, body, filepath),
-    saveFile,
+    saveFile.bind(null, selected, body, filepath),
     deleteSelected,
     stageEntry,
     commitEntry,
@@ -291,28 +286,6 @@ function publishSelected(selected, body, filepath) {
       throw e;
     }
   });
-}
-
-function createPreview(selected, html, filepath, next) {
-  next(null, selected, `<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width" name="viewport">
-    <title>プレビュー - ウェブログ - Hail2u.net</title>
-    <link href="/styles/main.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <main class="content">
-      <article class="section">
-        <footer class="section-footer">
-          <p><time datetime="1976-07-23">1976/07/23</time></p>
-        </footer>
-        ${html}
-      </article>
-    </main>
-  </body>
-</html>`.replace(/="\//g, "=\"../dist/"), filepath);
 }
 
 function openPreview(selected, filepath, next) {
@@ -327,9 +300,7 @@ function openPreview(selected, filepath, next) {
 
 function previewSelected(selected, body, filepath) {
   waterfall([
-    toHTML.bind(null, selected, body, filepath),
-    createPreview,
-    saveFile,
+    saveFile.bind(null, selected, body, filepath),
     openPreview
   ], (e) => {
     if (e) {
@@ -357,10 +328,30 @@ waterfall([
   }
 
   const body = s.content.split("\n");
+  const filename = body.pop();
+  const html = markdown(body.join("\n"));
 
   if (argv.publish) {
-    return publishSelected(s, body.join("\n"), path.join(entryDir, `${body.pop()}.txt`));
+    return publishSelected(s, body, path.join(entryDir, `${filename}.txt`));
   }
 
-  previewSelected(s, body.join("\n"), path.join(tempDir, `${body.pop()}.html`));
+  previewSelected(s, `<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+    <title>プレビュー - ウェブログ - Hail2u.net</title>
+    <link href="/styles/main.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <main class="content">
+      <article class="section">
+        <footer class="section-footer">
+          <p><time datetime="1976-07-23">1976/07/23</time></p>
+        </footer>
+        ${html}
+      </article>
+    </main>
+  </body>
+</html>`.replace(/="\//g, "=\"../dist/"), path.join(tempDir, `${filename}.html`));
 });
