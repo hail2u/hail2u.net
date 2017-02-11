@@ -324,16 +324,16 @@ waterfall([
   s.content = s.content.trim();
 
   if (!/\n[a-z0-9][-a-z0-9]*[a-z0-9]$/.test(s.content)) {
-    throw new Error("This note does not have file name.");
+    throw new Error("This note does not have a name for file.");
   }
 
   let body = s.content.split("\n");
-  const filename = body.pop();
+  const name = body.pop();
 
   body = markdown(body.join("\n"));
 
   if (argv.publish) {
-    return publishSelected(s, body, path.join(entryDir, `${filename}.txt`));
+    return publishSelected(s, body, path.join(entryDir, `${name}.txt`));
   }
 
   previewSelected(s, `<!DOCTYPE html>
@@ -354,5 +354,5 @@ waterfall([
       </article>
     </main>
   </body>
-</html>`.replace(/="\//g, "=\"../dist/"), path.join(tempDir, `${filename}.html`));
+</html>`.replace(/="\//g, "=\"../dist/"), path.join(tempDir, `${name}.html`));
 });
