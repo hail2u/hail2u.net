@@ -327,12 +327,13 @@ waterfall([
     throw new Error("This note does not have file name.");
   }
 
-  const body = s.content.split("\n");
+  let body = s.content.split("\n");
   const filename = body.pop();
-  const html = markdown(body.join("\n"));
+
+  body = markdown(body.join("\n"));
 
   if (argv.publish) {
-    return publishSelected(s, html, path.join(entryDir, `${filename}.txt`));
+    return publishSelected(s, body, path.join(entryDir, `${filename}.txt`));
   }
 
   previewSelected(s, `<!DOCTYPE html>
@@ -349,7 +350,7 @@ waterfall([
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        ${html}
+        ${body}
       </article>
     </main>
   </body>
