@@ -24,13 +24,15 @@ const argv = minimist(process.argv.slice(2), {
 });
 const cache = path.join(__dirname, "../cache/", "simplenote.json");
 const config = pit.get("simplenote.com");
-const entryDir = path.resolve(__dirname, "../src/weblog/entries/");
+const dir = {
+  entry: path.resolve(__dirname, "../src/weblog/entries/"),
+  root: path.resolve(__dirname, "../"),
+  temp: path.resolve(__dirname, "../tmp/")
+};
 const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
-const rootDir = path.resolve(__dirname, "../");
-const tempDir = path.resolve(__dirname, "../tmp/");
 const url = {
   auth: "https://app.simplenote.com/api/login",
   data: "https://app.simplenote.com/api2/data",
@@ -217,7 +219,7 @@ function stageEntry(filepath, next) {
     "--",
     filepath
   ], {
-    cwd: rootDir
+    cwd: dir.root
   }, (e) => {
     if (e) {
       return next(e);
@@ -230,9 +232,9 @@ function stageEntry(filepath, next) {
 function commitEntry(filepath, next) {
   execFile(git, [
     "commit",
-    `--message="Add ${path.relative(rootDir, filepath).replace(/\\/g, "/")}"`
+    `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`
   ], {
-    cwd: rootDir
+    cwd: dir.root
   }, (e) => {
     if (e) {
       return next(e);
@@ -333,7 +335,7 @@ waterfall([
   body = markdown(body.join("\n"));
 
   if (argv.publish) {
-    return publishSelected(s, body, path.join(entryDir, `${name}.txt`));
+    return publishSelected(s, body, path.join(dir.entry, `${name}.txt`));
   }
 
   previewSelected(s, `<!DOCTYPE html>
@@ -354,5 +356,5 @@ waterfall([
       </article>
     </main>
   </body>
-</html>`.replace(/="\//g, "=\"../dist/"), path.join(tempDir, `${name}.html`));
+</html>`.replace(/="\//g, "=\"../dist/"), path.join(dir.temp, `${name}.html`));
 });
