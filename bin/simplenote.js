@@ -215,26 +215,12 @@ function deleteSelected(selected, filepath, next) {
   });
 }
 
-function stageEntry(filepath, next) {
-  execFile(git, [
-    "add",
-    "--",
-    filepath
-  ], {
-    cwd: dir.root
-  }, (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, filepath);
-  });
-}
-
 function commitEntry(filepath, next) {
   execFile(git, [
     "commit",
-    `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`
+    `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`,
+    "--",
+    filepath
   ], {
     cwd: dir.root
   }, (e) => {
@@ -281,7 +267,6 @@ function publishSelected(selected, body, filepath) {
   waterfall([
     saveFile.bind(null, selected, body, filepath),
     deleteSelected,
-    stageEntry,
     commitEntry,
     createArticle,
     publishArticle
