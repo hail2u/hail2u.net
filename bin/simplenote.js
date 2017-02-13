@@ -33,6 +33,8 @@ const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
+const npm = which("npm");
+const open = which("open");
 const url = {
   auth: "https://app.simplenote.com/api/login",
   data: "https://app.simplenote.com/api2/data",
@@ -245,7 +247,7 @@ function commitEntry(filepath, next) {
 }
 
 function createArticle(filepath, next) {
-  execFile(which("npm"), [
+  execFile(npm, [
     "run",
     "blog",
     "--",
@@ -261,7 +263,7 @@ function createArticle(filepath, next) {
 }
 
 function publishArticle(filepath, next) {
-  execFile(which("npm"), [
+  execFile(npm, [
     "run",
     "articles",
     "--",
@@ -291,7 +293,7 @@ function publishSelected(selected, body, filepath) {
 }
 
 function openPreview(selected, filepath, next) {
-  execFile(which("open"), [filepath], (e) => {
+  execFile(open, [filepath], (e) => {
     if (e) {
       return next(e);
     }
