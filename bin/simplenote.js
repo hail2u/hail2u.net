@@ -209,7 +209,7 @@ function deleteSelected(selected, filepath, next) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, selected, filepath);
+    next(null, filepath);
   });
 }
 
