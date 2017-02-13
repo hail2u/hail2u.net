@@ -2,15 +2,27 @@
 
 "use strict";
 
-const execFile = require("child_process").execFileSync;
+const execFile = require("child_process").execFile;
 const path = require("path");
 const which = require("which").sync;
 
 const cwd = path.resolve(__dirname, "../dist/");
 
-process.argv.slice(2).forEach((f) => {
-  execFile(which("git"), ["add", "--", path.relative(cwd, f)], {
-    cwd: cwd,
-    stdio: "inherit"
-  });
+execFile(which("git"), [
+  "add",
+  "--",
+  process.argv
+    .slice(2)
+    .map((f) => {
+      return path.relative(cwd, f);
+    })
+    .join(" ")
+], {
+  cwd: cwd
+}, (e, o) => {
+  if (e) {
+    throw e;
+  }
+
+  process.stdout.write(o);
 });
