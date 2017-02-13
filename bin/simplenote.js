@@ -223,11 +223,12 @@ function commitEntry(filepath, next) {
     filepath
   ], {
     cwd: dir.root
-  }, (e) => {
+  }, (e, o) => {
     if (e) {
       return next(e);
     }
 
+    process.stdout.write(o);
     next(null, filepath);
   });
 }
@@ -239,11 +240,12 @@ function createArticle(filepath, next) {
     "--",
     `--file=${filepath}`,
     "--reindex"
-  ], (e) => {
+  ], (e, o) => {
     if (e) {
       return next(e);
     }
 
+    process.stdout.write(o);
     next(null, filepath);
   });
 }
@@ -254,11 +256,12 @@ function publishArticle(filepath, next) {
     "articles",
     "--",
     `--file=${filepath}`
-  ], (e) => {
+  ], (e, o) => {
     if (e) {
       return next(e);
     }
 
+    process.stdout.write(o);
     next(null);
   });
 }
