@@ -29,12 +29,10 @@ const dir = {
   root: path.resolve(__dirname, "../"),
   temp: path.resolve(__dirname, "../tmp/")
 };
-const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
 const npm = which("npm");
-const open = which("open");
 const url = {
   auth: "https://app.simplenote.com/api/login",
   data: "https://app.simplenote.com/api2/data",
@@ -216,7 +214,7 @@ function deleteSelected(selected, filepath, next) {
 }
 
 function commitEntry(filepath, next) {
-  execFile(git, [
+  execFile(which("git"), [
     "commit",
     `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`,
     "--",
@@ -281,7 +279,7 @@ function publishSelected(selected, body, filepath) {
 }
 
 function openPreview(selected, filepath, next) {
-  execFile(open, [filepath], (e) => {
+  execFile(which("open"), [filepath], (e) => {
     if (e) {
       return next(e);
     }
