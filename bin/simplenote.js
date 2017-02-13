@@ -263,7 +263,7 @@ function createArticle(filepath, next) {
 function publishArticle(filepath, next) {
   execFile(which("npm"), [
     "run",
-    "article",
+    "articles",
     "--",
     `--file=${filepath}`
   ], (e) => {
