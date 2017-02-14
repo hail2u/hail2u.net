@@ -210,52 +210,12 @@ function deleteSelected(selected, filepath, next) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, filepath);
+    next(null);
   });
 }
 
-function commitEntry(filepath, next) {
-  execFile(which("git"), [
-    "commit",
-    `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`,
-    "--",
-    filepath
-  ], {
-    cwd: dir.root
-  }, (e, o) => {
-    if (e) {
-      return next(e);
-    }
-
-    process.stdout.write(o);
-    next(null, filepath);
-  });
-}
-
-function createArticle(filepath, next) {
-  execFile(npm, [
-    "run",
-    "blog",
-    "--",
-    `--file=${filepath}`,
-    "--reindex"
-  ], (e, o) => {
-    if (e) {
-      return next(e);
-    }
-
-    process.stdout.write(o);
-    next(null, filepath);
-  });
-}
-
-function publishArticle(filepath, next) {
-  execFile(npm, [
-    "run",
-    "articles",
-    "--",
-    `--file=${filepath}`
-  ], (e, o) => {
+function runCommand(command, args, next) {
+  execFile(command, args, (e, o) => {
     if (e) {
       return next(e);
     }
@@ -269,9 +229,25 @@ function publishSelected(selected, body, filepath) {
   waterfall([
     saveFile.bind(null, selected, body, filepath),
     deleteSelected,
-    commitEntry,
-    createArticle,
-    publishArticle
+    runCommand.bind(null, which("git"), [
+      "commit",
+      `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`,
+      "--",
+      filepath
+    ]),
+    runCommand.bind(null, npm, [
+      "run",
+      "blog",
+      "--",
+      `--file=${filepath}`,
+      "--reindex"
+    ]),
+    runCommand.bind(null, npm, [
+      "run",
+      "articles",
+      "--",
+      `--file=${filepath}`
+    ])
   ], (e) => {
     if (e) {
       throw e;
