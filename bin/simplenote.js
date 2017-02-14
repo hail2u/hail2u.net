@@ -4,9 +4,10 @@
 
 const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
-const map = require("async").map;
+const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
+const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
@@ -142,7 +143,7 @@ function getNotes(notes, next) {
     }
 
     return true;
-  }), getNote, (e, r) => {
+  }), os.cpus().length - 1, getNote, (e, r) => {
     if (e) {
       return next(e);
     }
