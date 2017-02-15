@@ -19,19 +19,18 @@ const argv = minimist(process.argv.slice(2), {
   ],
   string: ["file"]
 });
-const data = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
 const dir = {
-  data: "../src/weblog/entries/",
-  img: "../src/img/blog/",
-  root: "../src/weblog/",
-  static: "../dist/blog/",
-  staticimg: "../dist/images/blog/"
+  data: path.resolve(__dirname, "../src/weblog/entries/"),
+  img: path.resolve(__dirname, "../src/img/blog/"),
+  root: path.resolve(__dirname, "../src/weblog/"),
+  static: path.resolve(__dirname, "../dist/blog/"),
+  staticimg: path.resolve(__dirname, "../dist/images/blog/")
 };
+const files = [];
+const index = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
 const perl = which("perl");
 
 let limit = os.cpus().length - 1;
-let files = [];
-let images = [];
 
 function build(file, next) {
   let args = ["blosxom.cgi", `path=/${file}`];
@@ -83,16 +82,24 @@ function build(file, next) {
   });
 }
 
-for (const d in dir) {
-  dir[d] = path.resolve(__dirname, dir[d]);
+if (argv.all) {
+  fs.readFileSync(index, "utf8")
+    .split(/\r?\n/)
+    .forEach((f) => {
+      if (f === "") {
+        return;
+      }
+
+      files.push(path.relative(dir.data, f.split("=>").shift()));
+    });
 }
 
 if (argv.file) {
-  images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
+  const images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
+
   argv.file = path.relative(dir.data, argv.file);
   files.push(argv.file);
   files.push("index.rss");
-  limit = 1;
 
   if (images) {
     images.map((i) => {
@@ -104,22 +111,13 @@ if (argv.file) {
   }
 }
 
-if (argv.all) {
-  fs.readFileSync(data, "utf8")
-    .split(/\r?\n/)
-    .forEach((f) => {
-      if (f === "") {
-        return;
-      }
-
-      files.push(path.relative(dir.data, f.split("=>").shift()));
-    });
+if (argv.reindex) {
+  limit = 1;
 }
 
-files = files.map((f) => {
+each(files.map((f) => {
   return f.replace(/\.txt$/, ".html").replace(/\\/g, "/");
-});
-each(files, limit, ensureAsync(build), (e) => {
+}), limit, ensureAsync(build), (e) => {
   if (e) {
     throw e;
   }
