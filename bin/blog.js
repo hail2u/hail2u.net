@@ -6,7 +6,7 @@ const each = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
-const minifyHTML = require("html-minifier").minify;
+const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const os = require("os");
 const path = require("path");
@@ -59,22 +59,7 @@ function build(file, next) {
 
     if (file.endsWith(".html")) {
       contents = contents.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
-      contents = minifyHTML(contents, {
-        collapseBooleanAttributes: true,
-        collapseWhitespace: true,
-        minifyCSS: true,
-        minifyJS: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-        removeEmptyElements: true,
-        removeOptionalTags: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        sortAttributes: true,
-        sortClassName: true,
-        useShortDoctype: true
-      });
+      contents = minifyHTML(contents);
     }
 
     fs.outputFileSync(entry, contents);

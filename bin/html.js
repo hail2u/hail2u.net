@@ -4,7 +4,7 @@
 
 const each = require("async").each;
 const fs = require("fs-extra");
-const minifyHTML = require("html-minifier").minify;
+const minifyHTML = require("../lib/html-minifier");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
@@ -156,22 +156,7 @@ function toHTML(file) {
   const html = mustache.render(template, data, partials);
 
   if (!file.dest.endsWith(`${path.sep}page`)) {
-    return minifyHTML(html, {
-      collapseBooleanAttributes: true,
-      collapseWhitespace: true,
-      minifyCSS: true,
-      minifyJS: true,
-      removeAttributeQuotes: true,
-      removeComments: true,
-      removeEmptyElements: true,
-      removeOptionalTags: true,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      sortAttributes: true,
-      sortClassName: true,
-      useShortDoctype: true
-    });
+    return minifyHTML(html);
   }
 
   return html;
