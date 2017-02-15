@@ -60,18 +60,6 @@ function escape(str) {
   });
 }
 
-function extendObject(dest, src) {
-  if (dest !== Object(dest)) {
-    return dest;
-  }
-
-  for (const prop in src) {
-    dest[prop] = src[prop];
-  }
-
-  return dest;
-}
-
 function pad(number) {
   if (number >= 10) {
     return number;
@@ -143,8 +131,8 @@ function readArticles() {
   return articles;
 }
 
-function readMetadata(metadata, file) {
-  metadata = extendObject(metadata, fs.readJSONSync(file, "utf8"));
+function readMetadata(file) {
+  const metadata = fs.readJSONSync(file, "utf8");
 
   switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
   case "index.json":
@@ -161,13 +149,14 @@ function readMetadata(metadata, file) {
   return metadata;
 }
 
-function toHTML(file, next) {
-  file.dest = path.resolve(__dirname, file.dest);
-  file.src = path.resolve(__dirname, file.src);
-  let html = mustache.render(fs.readFileSync(file.src, "utf8"), readMetadata(extendObject({}, basicMetadata), path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`)), partials);
+function toHTML(file) {
+  const template = fs.readFileSync(file.src, "utf8");
+  const json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
+  const data = Object.assign(basicMetadata, readMetadata(json));
+  const html = mustache.render(template, data, partials);
 
   if (!file.dest.endsWith(`${path.sep}page`)) {
-    html = minifyHTML(html, {
+    return minifyHTML(html, {
       collapseBooleanAttributes: true,
       collapseWhitespace: true,
       minifyCSS: true,
@@ -185,7 +174,13 @@ function toHTML(file, next) {
     });
   }
 
-  fs.outputFileSync(file.dest, html);
+  return html;
+}
+
+function saveAsHTML(file, next) {
+  file.dest = path.resolve(__dirname, file.dest);
+  file.src = path.resolve(__dirname, file.src);
+  fs.outputFileSync(file.dest, toHTML(file));
 
   return next();
 }
@@ -198,7 +193,7 @@ mustache.escape = escape;
 fs.readdirSync(partialDir).forEach((p) => {
   partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(partialDir, p), "utf8");
 });
-each(files, toHTML, (e) => {
+each(files, saveAsHTML, (e) => {
   if (e) {
     throw e;
   }
