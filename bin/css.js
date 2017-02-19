@@ -24,41 +24,50 @@ const scssExt = ".scss";
 const srcDir = path.resolve(__dirname, "../src/css/");
 const tmpDir = path.resolve(__dirname, "../tmp/");
 
-function writeCSS(dest, next, result) {
-  fs.outputFileSync(dest, result.css);
+function writeCSS(basename, next, result) {
+  fs.outputFile(path.join(tmpDir, `${basename}${minExt}${cssExt}`), result.css, (e) => {
+    if (e) {
+      return next(e);
+    }
 
-  return next();
+    next();
+  });
 }
 
-function processCSS(basename, dest, next, err) {
+function processCSS(basename, src, next, err) {
   if (err) {
     return next(err);
   }
 
-  const src = dest;
-
-  dest = path.join(tmpDir, `${basename}${minExt}${cssExt}`);
   processor.process(fs.readFileSync(src, "utf8"))
-    .then(writeCSS.bind(null, dest, next))
+    .then(writeCSS.bind(null, basename, next))
     .catch(next);
 }
 
-function toCSS(src, next) {
-  const basename = path.basename(src, scssExt);
-  const dest = path.join(tmpDir, `${basename}${cssExt}`);
+function toCSS(files) {
+  each(files, (f, next) => {
+    const basename = path.basename(f, scssExt);
+    const dest = path.join(tmpDir, `${basename}${cssExt}`);
 
-  if (path.extname(src) !== scssExt || basename.startsWith("_")) {
-    return next();
-  }
+    if (path.extname(f) !== scssExt || basename.startsWith("_")) {
+      return next();
+    }
 
-  execFile(sassc, [
-    path.join(srcDir, src).replace(/\\/g, "/"),
-    dest
-  ], processCSS.bind(null, basename, dest, next));
+    execFile(sassc, [
+      path.join(srcDir, f).replace(/\\/g, "/"),
+      dest
+    ], processCSS.bind(null, basename, dest, next));
+  }, (e) => {
+    if (e) {
+      throw e;
+    }
+  });
 }
 
-each(fs.readdirSync(srcDir), toCSS, (e) => {
+fs.readdir(srcDir, (e, f) => {
   if (e) {
     throw e;
   }
+
+  toCSS(f);
 });
