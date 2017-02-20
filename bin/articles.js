@@ -10,11 +10,12 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-const cache = path.resolve(__dirname, "../cache/articles.json");
-const index = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
-const root = path.resolve(__dirname, "../src/weblog/entries/");
-
+const cache = "../cache/articles.json";
+const index = "../src/weblog/plugins/state/files_index.dat";
+const root = "../src/weblog/entries/";
 let articles = [];
+
+process.chdir(__dirname);
 
 if (!argv.force && !argv.file) {
   return;

@@ -9,7 +9,16 @@ const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
 
-const articleCache = path.resolve(__dirname, "../cache/articles.json");
+const articleCache = "../cache/articles.json";
+const dir = {
+  partial: "../src/html/partial",
+  template: "../src/html/"
+};
+const feeds = {
+  documents: "../src/feed/documents.rss",
+  home: "../src/feed/index.rss",
+  weblog: "../dist/blog/feed"
+};
 const files = [
   {
     dest: "../dist/404.html",
@@ -36,11 +45,6 @@ const files = [
     src: "../src/html/index.mustache"
   }
 ];
-const feeds = {
-  documents: path.resolve(__dirname, "../src/feed/documents.rss"),
-  home: path.resolve(__dirname, "../src/feed/index.rss"),
-  weblog: path.resolve(__dirname, "../dist/blog/feed")
-};
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -48,11 +52,10 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const metadataFile = path.resolve(__dirname, "../src/html/metadata.json");
-const basicMetadata = fs.readJSONSync(metadataFile);
-const partialDir = path.join(__dirname, "../src/html/partial");
+const metadataFile = "../src/html/metadata.json";
 const partials = {};
-const templateDir = path.resolve(__dirname, "../src/html/");
+
+let basicMetadata = {};
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, (s) => {
@@ -134,7 +137,7 @@ function readArticles() {
 function readMetadata(file) {
   const metadata = fs.readJSONSync(file, "utf8");
 
-  switch (path.relative(templateDir, file).replace(/\\/g, "/")) {
+  switch (path.relative(dir.template, file).replace(/\\/g, "/")) {
   case "index.json":
     metadata.features = readFeed(feeds.documents);
     metadata.articles = readFeed(feeds.weblog);
@@ -155,7 +158,7 @@ function toHTML(file) {
   const data = Object.assign(basicMetadata, readMetadata(json));
   const html = mustache.render(template, data, partials);
 
-  if (!file.dest.endsWith(`${path.sep}page`)) {
+  if (!file.dest.endsWith(`/page`)) {
     return minifyHTML(html);
   }
 
@@ -163,16 +166,16 @@ function toHTML(file) {
 }
 
 function saveAsHTML(file, next) {
-  file.dest = path.resolve(__dirname, file.dest);
-  file.src = path.resolve(__dirname, file.src);
   fs.outputFileSync(file.dest, toHTML(file));
 
   return next();
 }
 
+process.chdir(__dirname);
+basicMetadata = fs.readJSONSync(metadataFile);
 mustache.escape = escape;
-fs.readdirSync(partialDir).forEach((p) => {
-  partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(partialDir, p), "utf8");
+fs.readdirSync(dir.partial).forEach((p) => {
+  partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
 });
 each(files, saveAsHTML, (e) => {
   if (e) {

@@ -4,15 +4,15 @@
 
 const feedmix = require("feedmix");
 const fs = require("fs-extra");
-const path = require("path");
 
-const dest = path.resolve(__dirname, "../dist/feed");
+const dest = "../dist/feed";
 const feeds = [
-  path.resolve(__dirname, "../src/feed/index.rss"),
-  path.resolve(__dirname, "../src/feed/documents.rss"),
-  path.resolve(__dirname, "../dist/blog/feed")
+  "../src/feed/index.rss",
+  "../src/feed/documents.rss",
+  "../dist/blog/feed"
 ];
 
+process.chdir(__dirname);
 fs.outputFileSync(dest, `${feedmix.stringify(feedmix.merge(feeds.map((f) => {
   return fs.readFileSync(f, "utf8");
 }), {

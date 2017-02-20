@@ -4,7 +4,6 @@
 
 const each = require("async").each;
 const execFile = require("child_process").execFile;
-const path = require("path");
 const which = require("which").sync;
 
 const files = [
@@ -48,12 +47,7 @@ const files = [
 const inkscape = which("inkscape");
 
 function toPNG(file, next) {
-  let args = [
-    "-f",
-    path.resolve(__dirname, file.src),
-    "-e",
-    path.resolve(__dirname, file.dest)
-  ];
+  let args = ["-f", file.src, "-e", file.dest];
 
   if (file.area) {
     args = args.concat([
@@ -79,6 +73,7 @@ function toPNG(file, next) {
   execFile(inkscape, args, next);
 }
 
+process.chdir(__dirname);
 each(files, toPNG, (e) => {
   if (e) {
     throw e;

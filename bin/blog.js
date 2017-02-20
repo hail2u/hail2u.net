@@ -20,14 +20,14 @@ const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 const dir = {
-  data: path.resolve(__dirname, "../src/weblog/entries/"),
-  img: path.resolve(__dirname, "../src/img/blog/"),
-  root: path.resolve(__dirname, "../src/weblog/"),
-  static: path.resolve(__dirname, "../dist/blog/"),
-  staticimg: path.resolve(__dirname, "../dist/images/blog/")
+  data: "../src/weblog/entries/",
+  img: "../src/img/blog/",
+  root: "../src/weblog/",
+  static: "../dist/blog/",
+  staticimg: "../dist/images/blog/"
 };
 const files = [];
-const index = path.resolve(__dirname, "../src/weblog/plugins/state/files_index.dat");
+const index = "../src/weblog/plugins/state/files_index.dat";
 const perl = which("perl");
 
 let limit = os.cpus().length - 1;
@@ -66,6 +66,8 @@ function build(file, next) {
     next();
   });
 }
+
+process.chdir(__dirname);
 
 if (argv.all) {
   fs.readFileSync(index, "utf8")

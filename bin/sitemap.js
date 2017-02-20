@@ -7,9 +7,9 @@ const path = require("path");
 const series = require("async").series;
 const xml2js = require("xml2js");
 
-const cache = path.resolve(__dirname, "../cache/articles.json");
-const dest = path.resolve(__dirname, "../dist/sitemap.xml");
-const documentsDir = path.resolve(__dirname, "../dist/documents/");
+const cache = "../cache/articles.json";
+const dest = "../dist/sitemap.xml";
+const documentsDir = "../dist/documents/";
 const sitemap = {
   urlset: {
     $: {
@@ -81,6 +81,7 @@ function saveSitemap(next) {
   });
 }
 
+process.chdir(__dirname);
 series([
   gatherDocuments,
   gatherBlogEntries,

@@ -20,12 +20,12 @@ const argv = minimist(process.argv.slice(2), {
     "publish"
   ]
 });
-const cache = path.join(__dirname, "../cache/", "simplenote.json");
+const cache = "../cache/simplenote.json";
 const config = pit.get("simplenote.com");
 const dir = {
-  entry: path.resolve(__dirname, "../src/weblog/entries/"),
-  root: path.resolve(__dirname, "../"),
-  temp: path.resolve(__dirname, "../tmp/")
+  entry: "../src/weblog/entries/",
+  root: "../",
+  temp: "../tmp/"
 };
 const headers = {
   "User-Agent": "sn/0.0.0"
@@ -273,6 +273,7 @@ function previewSelected(selected, body, filepath) {
   });
 }
 
+process.chdir(__dirname);
 waterfall([
   getToken,
   renewToken,

@@ -21,11 +21,13 @@ const processor = postcss([
 ]);
 const sassc = which("sassc");
 const scssExt = ".scss";
-const srcDir = path.resolve(__dirname, "../src/css/");
-const tmpDir = path.resolve(__dirname, "../tmp/");
+const dir = {
+  src: "../src/css/",
+  tmp: "../tmp/"
+};
 
 function writeCSS(basename, next, result) {
-  fs.outputFile(path.join(tmpDir, `${basename}${minExt}${cssExt}`), result.css, (e) => {
+  fs.outputFile(path.join(dir.tmp, `${basename}${minExt}${cssExt}`), result.css, (e) => {
     if (e) {
       return next(e);
     }
@@ -47,14 +49,14 @@ function processCSS(basename, src, next, err) {
 function toCSS(files) {
   each(files, (f, next) => {
     const basename = path.basename(f, scssExt);
-    const dest = path.join(tmpDir, `${basename}${cssExt}`);
+    const dest = path.join(dir.tmp, `${basename}${cssExt}`);
 
     if (path.extname(f) !== scssExt || basename.startsWith("_")) {
       return next();
     }
 
     execFile(sassc, [
-      path.join(srcDir, f).replace(/\\/g, "/"),
+      path.join(dir.src, f).replace(/\\/g, "/"),
       dest
     ], processCSS.bind(null, basename, dest, next));
   }, (e) => {
@@ -64,7 +66,9 @@ function toCSS(files) {
   });
 }
 
-fs.readdir(srcDir, (e, f) => {
+process.chdir(__dirname);
+
+fs.readdir(dir.src, (e, f) => {
   if (e) {
     throw e;
   }

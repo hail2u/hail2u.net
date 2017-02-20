@@ -6,8 +6,9 @@ const execFile = require("child_process").execFile;
 const path = require("path");
 const which = require("which").sync;
 
-const cwd = path.resolve(__dirname, "../dist/");
+const cwd = "../dist/";
 
+process.chdir(__dirname);
 execFile(which("git"), [
   "add",
   "--",

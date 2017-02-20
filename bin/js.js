@@ -32,11 +32,11 @@ const minExt = ".min";
 
 function minify(file, next) {
   file.contents = file.src.reduce((c, s) => {
-    return `${c}${fs.readFileSync(path.resolve(__dirname, s), "utf8")}`;
+    return `${c}${fs.readFileSync(s, "utf8")}`;
   }, "");
-  fs.outputFileSync(path.resolve(__dirname, file.dest), file.contents);
+  fs.outputFileSync(file.dest, file.contents);
   file.dest = `../tmp/${path.basename(file.dest, jsExt)}${minExt}${jsExt}`;
-  fs.outputFileSync(path.resolve(__dirname, file.dest), compile({
+  fs.outputFileSync(file.dest, compile({
     compilationLevel: "ADVANCED",
     jsCode: [{
       src: file.contents
@@ -46,6 +46,7 @@ function minify(file, next) {
   next();
 }
 
+process.chdir(__dirname);
 each(files, minify, (e) => {
   if (e) {
     throw e;
