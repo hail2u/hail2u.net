@@ -54,15 +54,14 @@ function build(file, next) {
       return next(e);
     }
 
-    const entry = path.join(dir.static, file);
-    let contents = `${o.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
+    o = `${o.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
 
     if (file.endsWith(".html")) {
-      contents = contents.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
-      contents = minifyHTML(contents);
+      o = o.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
+      o = minifyHTML(o);
     }
 
-    fs.outputFileSync(entry, contents);
+    fs.outputFileSync(path.join(dir.static, file), o);
     next();
   });
 }

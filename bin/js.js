@@ -2,9 +2,9 @@
 
 "use strict";
 
+const compile = require("google-closure-compiler-js").compile;
 const each = require("async").each;
 const fs = require("fs-extra");
-const compile = require("google-closure-compiler-js").compile;
 const path = require("path");
 
 const files = [
@@ -30,24 +30,23 @@ const files = [
 const jsExt = ".js";
 const minExt = ".min";
 
-function minify(file, next) {
-  file.contents = file.src.reduce((c, s) => {
-    return `${c}${fs.readFileSync(s, "utf8")}`;
+process.chdir(__dirname);
+each(files, (f, next) => {
+  f.contents = f.src.reduce((a, i) => {
+    return `${a}${fs.readFileSync(i, "utf8")}`;
   }, "");
-  fs.outputFileSync(file.dest, file.contents);
-  file.dest = `../tmp/${path.basename(file.dest, jsExt)}${minExt}${jsExt}`;
-  fs.outputFileSync(file.dest, compile({
+  fs.outputFileSync(f.dest, f.contents);
+  f.dest = `../tmp/${path.basename(f.dest, jsExt)}${minExt}${jsExt}`;
+  f.contents = compile({
     compilationLevel: "ADVANCED",
     jsCode: [{
-      src: file.contents
+      src: f.contents
     }],
     outputWrapper: "(function () {%output%}).call(window);"
-  }).compiledCode);
+  }).compiledCode;
+  fs.outputFileSync(f.dest, f.contents);
   next();
-}
-
-process.chdir(__dirname);
-each(files, minify, (e) => {
+}, (e) => {
   if (e) {
     throw e;
   }

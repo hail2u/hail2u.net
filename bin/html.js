@@ -158,7 +158,7 @@ function toHTML(file) {
   const data = Object.assign({}, basicMetadata, readMetadata(json));
   const html = mustache.render(template, data, partials);
 
-  if (!file.dest.endsWith(`/page`)) {
+  if (!file.dest.endsWith("/page")) {
     return minifyHTML(html);
   }
 
@@ -167,8 +167,7 @@ function toHTML(file) {
 
 function saveAsHTML(file, next) {
   fs.outputFileSync(file.dest, toHTML(file));
-
-  return next();
+  next();
 }
 
 process.chdir(__dirname);

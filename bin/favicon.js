@@ -2,7 +2,7 @@
 
 "use strict";
 
-const execFile = require("child_process").execFile;
+const execFile = require("child_process").execFileSync;
 const which = require("which").sync;
 
 const files = [
@@ -14,8 +14,4 @@ const files = [
 ];
 
 process.chdir(__dirname);
-execFile(which("convert"), ["-quiet"].concat(files), (e) => {
-  if (e) {
-    throw e;
-  }
-});
+execFileSync(which("convert"), ["-quiet"].concat(files));

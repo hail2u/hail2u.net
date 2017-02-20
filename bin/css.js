@@ -4,7 +4,7 @@
 
 const csswring = require("csswring");
 const each = require("async").each;
-const execFile = require("child_process").execFile;
+const execFileSync = require("child_process").execFileSync;
 const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
 const path = require("path");
@@ -26,52 +26,25 @@ const dir = {
   tmp: "../tmp/"
 };
 
-function writeCSS(basename, next, result) {
-  fs.outputFile(path.join(dir.tmp, `${basename}${minExt}${cssExt}`), result.css, (e) => {
-    if (e) {
-      return next(e);
-    }
+process.chdir(__dirname);
+each(fs.readdirSync(dir.src), (f, next) => {
+  const basename = path.basename(f, scssExt);
+  const dest = path.join(dir.tmp, `${basename}${cssExt}`);
 
-    next();
-  });
-}
-
-function processCSS(basename, src, next, err) {
-  if (err) {
-    return next(err);
+  if (path.extname(f) !== scssExt || basename.startsWith("_")) {
+    return false;
   }
 
-  processor.process(fs.readFileSync(src, "utf8"))
-    .then(writeCSS.bind(null, basename, next))
-    .catch(next);
-}
-
-function toCSS(files) {
-  each(files, (f, next) => {
-    const basename = path.basename(f, scssExt);
-    const dest = path.join(dir.tmp, `${basename}${cssExt}`);
-
-    if (path.extname(f) !== scssExt || basename.startsWith("_")) {
-      return next();
-    }
-
-    execFile(sassc, [
-      path.join(dir.src, f).replace(/\\/g, "/"),
-      dest
-    ], processCSS.bind(null, basename, dest, next));
-  }, (e) => {
-    if (e) {
-      throw e;
-    }
+  execFileSync(sassc, [
+    path.join(dir.src, f).replace(/\\/g, "/"),
+    dest
+  ]);
+  processor.process(fs.readFileSync(dest, "utf8")).then((r) => {
+    fs.outputFileSync(path.join(dir.tmp, `${basename}${minExt}${cssExt}`), r.css);
   });
-}
-
-process.chdir(__dirname);
-
-fs.readdir(dir.src, (e, f) => {
+  next();
+}, (e) => {
   if (e) {
     throw e;
   }
-
-  toCSS(f);
 });
