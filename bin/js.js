@@ -9,41 +9,39 @@ const path = require("path");
 
 const files = [
   {
-    "dest": "debug.js",
+    "dest": "../tmp/debug.js",
     "src": [
-      "toggle-column.js",
-      "toggle-eyecatch.js",
-      "toggle-outline.js"
+      "../src/js/toggle-column.js",
+      "../src/js/toggle-eyecatch.js",
+      "../src/js/toggle-outline.js"
     ]
   },
   {
-    "dest": "main.js",
+    "dest": "../tmp/main.js",
     "src": [
-      "abbread.js",
-      "ellipsis-title.js",
-      "reldate.js",
-      "unutm.js",
-      "wrapfix.js"
+      "../src/js/abbread.js",
+      "../src/js/ellipsis-title.js",
+      "../src/js/reldate.js",
+      "../src/js/unutm.js",
+      "../src/js/wrapfix.js"
     ]
   }
 ];
 const jsExt = ".js";
 const minExt = ".min";
-const tmpdir = path.resolve(__dirname, "../tmp");
 
 function minify(file, next) {
-  const contents = file.src.reduce((c, s) => {
-    return `${c}${fs.readFileSync(path.resolve(tmpdir, s), "utf8")}`;
+  file.contents = file.src.reduce((c, s) => {
+    return `${c}${fs.readFileSync(path.resolve(__dirname, s), "utf8")}`;
   }, "");
-
-  fs.outputFileSync(path.resolve(tmpdir, file.dest), contents);
-  file.dest = `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`;
-  fs.outputFileSync(path.resolve(tmpdir, file.dest), compile({
+  fs.outputFileSync(path.resolve(__dirname, file.dest), file.contents);
+  file.dest = `../tmp/${path.basename(file.dest, jsExt)}${minExt}${jsExt}`;
+  fs.outputFileSync(path.resolve(__dirname, file.dest), compile({
     compilationLevel: "ADVANCED",
-    outputWrapper: "(function () {%output%}).call(window);",
     jsCode: [{
-      src: contents
-    }]
+      src: file.contents
+    }],
+    outputWrapper: "(function () {%output%}).call(window);"
   }).compiledCode);
   next();
 }

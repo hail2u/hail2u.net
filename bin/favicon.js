@@ -7,14 +7,12 @@ const path = require("path");
 const which = require("which").sync;
 
 const files = [
-  "../tmp/favicon-16.png",
-  "../tmp/favicon-32.png",
-  "../tmp/favicon-64.png",
-  "../tmp/favicon-256.png",
-  "../dist/favicon.ico"
-].map((p) => {
-  return path.resolve(__dirname, p);
-});
+  path.resolve(__dirname, "../tmp/favicon-16.png"),
+  path.resolve(__dirname, "../tmp/favicon-32.png"),
+  path.resolve(__dirname, "../tmp/favicon-64.png"),
+  path.resolve(__dirname, "../tmp/favicon-256.png"),
+  path.resolve(__dirname, "../dist/favicon.ico")
+];
 
 execFile(which("convert"), ["-quiet"].concat(files), (e) => {
   if (e) {

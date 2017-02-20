@@ -8,14 +8,14 @@ const path = require("path");
 
 const dest = path.resolve(__dirname, "../dist/feed");
 const feeds = [
-  "../src/feed/index.rss",
-  "../src/feed/documents.rss",
-  "../dist/blog/feed"
-].map((f) => {
-  return fs.readFileSync(path.resolve(__dirname, f), "utf8");
-});
+  path.resolve(__dirname, "../src/feed/index.rss"),
+  path.resolve(__dirname, "../src/feed/documents.rss"),
+  path.resolve(__dirname, "../dist/blog/feed")
+];
 
-fs.outputFileSync(dest, `${feedmix.stringify(feedmix.merge(feeds, {
+fs.outputFileSync(dest, `${feedmix.stringify(feedmix.merge(feeds.map((f) => {
+  return fs.readFileSync(f, "utf8");
+}), {
   trim: true
 }), {
   cdata: true,
