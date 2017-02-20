@@ -37,9 +37,9 @@ const files = [
   }
 ];
 const feeds = {
-  documents: "../src/feed/documents.rss",
-  home: "../src/feed/index.rss",
-  weblog: "../dist/blog/feed"
+  documents: path.resolve(__dirname, "../src/feed/documents.rss"),
+  home: path.resolve(__dirname, "../src/feed/index.rss"),
+  weblog: path.resolve(__dirname, "../dist/blog/feed")
 };
 const entityMap = {
   '"': "&quot;",
@@ -168,10 +168,6 @@ function saveAsHTML(file, next) {
   fs.outputFileSync(file.dest, toHTML(file));
 
   return next();
-}
-
-for (const f in feeds) {
-  feeds[f] = path.resolve(__dirname, feeds[f]);
 }
 
 mustache.escape = escape;
