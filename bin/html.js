@@ -155,7 +155,7 @@ function readMetadata(file) {
 function toHTML(file) {
   const template = fs.readFileSync(file.src, "utf8");
   const json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
-  const data = Object.assign(basicMetadata, readMetadata(json));
+  const data = Object.assign({}, basicMetadata, readMetadata(json));
   const html = mustache.render(template, data, partials);
 
   if (!file.dest.endsWith(`/page`)) {
