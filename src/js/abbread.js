@@ -5,24 +5,22 @@
  */
 "use strict";
 
-(function () {
-  const def = {};
+const def = {};
 
-  let desc = "";
-  let text = "";
+let desc = "";
+let text = "";
 
-  for (const abbr of document.querySelectorAll("abbr")) {
-    desc = abbr.title;
-    text = abbr.textContent;
+for (const abbr of document.querySelectorAll("abbr")) {
+  desc = abbr.title;
+  text = abbr.textContent;
 
-    if (desc && !def[text]) {
-      def[text] = desc;
+  if (desc && !def[text]) {
+    def[text] = desc;
 
-      continue;
-    }
-
-    if (def[text]) {
-      abbr.title = def[text];
-    }
+    continue;
   }
-})();
+
+  if (def[text]) {
+    abbr.title = def[text];
+  }
+}

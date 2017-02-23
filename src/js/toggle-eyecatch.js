@@ -1,14 +1,11 @@
 "use strict";
 
-(function () {
-  function toggle(eyecatch) {
-    if (eyecatch.hidden) {
-      eyecatch.hidden = false;
-    } else {
-      eyecatch.hidden = true;
-    }
-  }
+const eyecatch = document.querySelector(".fill");
 
-  document.querySelector("footer")
-    .addEventListener("click", toggle.bind(null, document.querySelector(".fill")), false);
-})();
+document.querySelector("footer").addEventListener("click", () => {
+  if (eyecatch.hidden) {
+    eyecatch.hidden = false;
+  } else {
+    eyecatch.hidden = true;
+  }
+}, false);

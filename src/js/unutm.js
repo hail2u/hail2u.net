@@ -5,10 +5,6 @@
  */
 "use strict";
 
-(function () {
-  if (!location.search) {
-    return;
-  }
-
+if (location.search) {
   history.replaceState(null, "", `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${location.hash}`);
-})();
+}

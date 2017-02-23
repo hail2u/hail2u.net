@@ -2,7 +2,7 @@
 
 "use strict";
 
-const execFile = require("child_process").execFileSync;
+const execFileSync = require("child_process").execFileSync;
 const which = require("which").sync;
 
 const files = [
