@@ -1,28 +1,21 @@
 "use strict";
 
-(function () {
-  document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("js-debug-columns");
-  }, false);
-})();
+document.body.addEventListener("dblclick", (e) => {
+  e.target.classList.toggle("js-debug-columns");
+}, false);
 "use strict";
 
-(function () {
-  function toggle(eyecatch) {
-    if (eyecatch.hidden) {
-      eyecatch.hidden = false;
-    } else {
-      eyecatch.hidden = true;
-    }
+const eyecatch = document.querySelector(".fill");
+
+document.querySelector("footer").addEventListener("click", () => {
+  if (eyecatch.hidden) {
+    eyecatch.hidden = false;
+  } else {
+    eyecatch.hidden = true;
   }
-
-  document.querySelector("footer")
-    .addEventListener("click", toggle.bind(null, document.querySelector(".fill")), false);
-})();
+}, false);
 "use strict";
 
-(function () {
-  document.body.addEventListener("dblclick", function () {
-    this.classList.toggle("js-debug-elements");
-  }, false);
-})();
+document.body.addEventListener("dblclick", (e) => {
+  e.target.classList.toggle("js-debug-elements");
+}, false);
