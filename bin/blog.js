@@ -47,7 +47,7 @@ function build(file, next) {
   execFile(perl, args, {
     cwd: dir.root,
     env: {
-      BLOSXOM_CONFIG_DIR: dir.root
+      BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
     }
   }, (e, o) => {
     if (e) {
