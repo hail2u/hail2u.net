@@ -6,7 +6,7 @@ const each = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
-const minifyHTML = require("../lib/html-minifier");
+const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
 const os = require("os");
 const path = require("path");
@@ -35,13 +35,13 @@ let limit = os.cpus().length - 1;
 function build(file, next) {
   let args = ["blosxom.cgi", `path=/${file}`];
 
-  if (file === "index.rss") {
-    file = "feed";
-  }
-
   if (argv.reindex) {
     args = args.concat("reindex=1");
     argv.reindex = false;
+  }
+
+  if (file === "index.rss") {
+    file = "feed";
   }
 
   execFile(perl, args, {
@@ -58,7 +58,7 @@ function build(file, next) {
 
     if (file.endsWith(".html")) {
       o = o.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
-      o = minifyHTML(o);
+      o = minify(o);
     }
 
     fs.outputFileSync(path.join(dir.static, file), o);
