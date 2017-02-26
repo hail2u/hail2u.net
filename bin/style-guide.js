@@ -10,14 +10,14 @@ const dir = {
   img: "../img/",
   js: "../js/"
 };
-const site = "https://hail2u.net/";
 const src = "../src/css/test.html";
+const url = "https://hail2u.net/";
 
 process.chdir(__dirname);
 fs.outputFileSync(dest, fs.readFileSync(src, "utf8")
   .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
-    if (u.startsWith(site)) {
-      u = u.substr(site.length - 1);
+    if (u.startsWith(url)) {
+      u = u.substr(url.length - 1);
     } else if (u.startsWith(dir.css)) {
       u = `/styles${u.substr(dir.css.length - 1)}`;
     } else if (u.startsWith(dir.img)) {
