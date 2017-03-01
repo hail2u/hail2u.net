@@ -7,7 +7,7 @@ const each = require("async").each;
 const fs = require("fs-extra");
 const path = require("path");
 
-const files = [
+const src = [
   {
     "dest": "../tmp/debug.js",
     "src": [

@@ -10,9 +10,9 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-const cache = "../cache/articles.json";
-const index = "../src/weblog/plugins/state/files_index.dat";
+const dest = "../cache/articles.json";
 const root = "../src/weblog/entries/";
+const src = "../src/weblog/plugins/state/files_index.dat";
 let articles = [];
 
 process.chdir(__dirname);
@@ -22,10 +22,10 @@ if (!argv.force && !argv.file) {
 }
 
 if (!argv.force) {
-  articles = fs.readJSONSync(cache);
+  articles = fs.readJSONSync(dest);
 }
 
-fs.readFileSync(index, "utf8")
+fs.readFileSync(src, "utf8")
   .split(/\r?\n/)
   .forEach((l) => {
     if (!/\d+$/.test(l)) {
@@ -57,7 +57,7 @@ fs.readFileSync(index, "utf8")
       year: date.getFullYear()
     });
   });
-fs.outputJSONSync(cache, articles.sort((a, b) => {
+fs.outputJSONSync(dest, articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }).filter((v, i, a) => {
   return a.indexOf(v) === i;

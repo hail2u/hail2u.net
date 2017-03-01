@@ -21,26 +21,24 @@ const processor = postcss([
 ]);
 const sassc = which("sassc");
 const scssExt = ".scss";
-const dir = {
-  src: "../src/css/",
-  tmp: "../tmp/"
-};
+const src = "../src/css/";
+const tmp = "../tmp/";
 
 process.chdir(__dirname);
-each(fs.readdirSync(dir.src), (f, next) => {
+each(fs.readdirSync(src), (f, next) => {
   const basename = path.basename(f, scssExt);
-  const dest = path.join(dir.tmp, `${basename}${cssExt}`);
+  const dest = path.join(tmp, `${basename}${cssExt}`);
 
   if (path.extname(f) !== scssExt || basename.startsWith("_")) {
     return false;
   }
 
   execFileSync(sassc, [
-    path.join(dir.src, f).replace(/\\/g, "/"),
+    path.join(src, f).replace(/\\/g, "/"),
     dest
   ]);
   processor.process(fs.readFileSync(dest, "utf8")).then((r) => {
-    fs.outputFileSync(path.join(dir.tmp, `${basename}${minExt}${cssExt}`), r.css);
+    fs.outputFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
   });
   next();
 }, (e) => {
