@@ -48,27 +48,18 @@ const inkscape = which("inkscape");
 
 process.chdir(__dirname);
 each(files, (f, next) => {
-  let args = ["-f", f.src, "-e", f.dest];
+  const args = ["-f", f.src, "-e", f.dest];
 
   if (f.area) {
-    args = args.concat([
-      "-a",
-      f.area
-    ]);
+    args.push("-a", f.area);
   }
 
   if (f.height) {
-    args = args.concat([
-      "-h",
-      f.height
-    ]);
+    args.push("-h", f.height);
   }
 
   if (f.width) {
-    args = args.concat([
-      "-w",
-      f.width
-    ]);
+    args.push("-w", f.width);
   }
 
   execFileSync(inkscape, args);

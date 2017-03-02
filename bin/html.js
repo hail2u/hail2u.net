@@ -52,10 +52,9 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
+const metadata = {};
 const metadataFile = "../src/html/metadata.json";
 const partials = {};
-
-let basicMetadata = {};
 
 function escape(str) {
   return String(str).replace(/[&<>"']/g, (s) => {
@@ -76,7 +75,7 @@ function toHTML5Date(yy, mm, dd, hh, nn, ss) {
 }
 
 function readFeed(file) {
-  let feed = {};
+  const feed = {};
 
   parseXML(fs.readFileSync(file, "utf8"), {
     trim: true,
@@ -86,7 +85,7 @@ function readFeed(file) {
       throw e;
     }
 
-    feed = d.rss.channel;
+    Object.assign(feed, d.rss.channel);
   });
 
   feed.item.forEach((i) => {
@@ -134,28 +133,27 @@ function readArticles() {
   return articles;
 }
 
-function readMetadata(file) {
-  const metadata = fs.readJSONSync(file, "utf8");
+function buildData(file) {
+  const data = fs.readJSONSync(file, "utf8");
 
   switch (path.relative(dir.template, file).replace(/\\/g, "/")) {
   case "index.json":
-    metadata.features = readFeed(feeds.documents);
-    metadata.articles = readFeed(feeds.weblog);
+    data.features = readFeed(feeds.documents);
+    data.articles = readFeed(feeds.weblog);
 
     break;
   case "blog/index.json":
-    metadata.articles = readArticles();
+    data.articles = readArticles();
 
     break;
   }
 
-  return metadata;
+  return Object.assign({}, metadata, data);
 }
 
 function toHTML(file) {
   const template = fs.readFileSync(file.src, "utf8");
-  const json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
-  const data = Object.assign({}, basicMetadata, readMetadata(json));
+  const data = buildData(file.json);
   const html = mustache.render(template, data, partials);
 
   if (!file.dest.endsWith("/page")) {
@@ -166,13 +164,14 @@ function toHTML(file) {
 }
 
 function saveAsHTML(file, next) {
+  file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
   fs.outputFileSync(file.dest, toHTML(file));
   next();
 }
 
 process.chdir(__dirname);
-basicMetadata = fs.readJSONSync(metadataFile);
 mustache.escape = escape;
+Object.assign(metadata, fs.readJSONSync(metadataFile));
 fs.readdirSync(dir.partial).forEach((p) => {
   partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
 });

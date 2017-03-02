@@ -30,13 +30,19 @@ const files = [];
 const index = "../src/weblog/plugins/state/files_index.dat";
 const perl = which("perl");
 
-let limit = os.cpus().length - 1;
+function limit(reindex) {
+  if (reindex) {
+    return 1;
+  }
+
+  return os.cpus().length - 1;
+}
 
 function build(file, next) {
-  let args = ["blosxom.cgi", `path=/${file}`];
+  const args = ["blosxom.cgi", `path=/${file}`];
 
   if (argv.reindex) {
-    args = args.concat("reindex=1");
+    args.push("reindex=1");
     argv.reindex = false;
   }
 
@@ -97,13 +103,9 @@ if (argv.file) {
   }
 }
 
-if (argv.reindex) {
-  limit = 1;
-}
-
 each(files.map((f) => {
   return f.replace(/\.txt$/, ".html").replace(/\\/g, "/");
-}), limit, ensureAsync(build), (e) => {
+}), limit(argv.reindex), ensureAsync(build), (e) => {
   if (e) {
     throw e;
   }
