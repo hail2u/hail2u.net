@@ -51,7 +51,7 @@ fs.readFileSync(src, "utf8")
       return;
     }
 
-    if (!argv.force && argv.file && !l.startsWith(argv.file)) {
+    if (!argv.force && !l.startsWith(argv.file)) {
       return;
     }
 
