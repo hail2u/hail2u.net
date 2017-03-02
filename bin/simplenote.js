@@ -227,10 +227,13 @@ function publishSelected(selected, body, filepath) {
     saveFile.bind(null, selected, body, filepath),
     deleteSelected,
     runCommand.bind(null, which("git"), [
-      "commit",
-      `--message="Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}"`,
+      "add",
       "--",
       filepath
+    ]),
+    runCommand.bind(null, which("git"), [
+      "commit",
+      `--message=Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}`,
     ]),
     runCommand.bind(null, npm, [
       "run",
