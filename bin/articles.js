@@ -16,6 +16,9 @@ const root = "../src/weblog/entries/";
 const src = "../src/weblog/plugins/state/files_index.dat";
 
 function readArticle(file, date) {
+  file = path.normalize(file);
+  date = new Date(parseInt(date, 10) * 1000);
+
   return {
     day: date.getDate(),
     hour: date.getHours(),
@@ -55,11 +58,7 @@ fs.readFileSync(src, "utf8")
       return;
     }
 
-    const [file, date] = l.split("=>");
-
-    articles.unshift(
-      readArticle(path.normalize(file), new Date(parseInt(date, 10) * 1000))
-    );
+    articles.unshift(readArticle(...l.split("=>")));
   });
 fs.outputJSONSync(dest, articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
