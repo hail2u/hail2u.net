@@ -40,7 +40,7 @@ if (!argv.force && !argv.file) {
   return;
 }
 
-if (argv.force) {
+if (!argv.force) {
   articles.push(...fs.readJSONSync(dest));
 }
 
