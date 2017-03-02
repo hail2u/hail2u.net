@@ -246,7 +246,7 @@ function publishSelected(selected, body, filepath) {
       "run",
       "articles",
       "--",
-      `--file=${filepath}`
+      `--file=${path.resolve(filepath).replace(/\\/g, "/")}`
     ])
   ], (e) => {
     if (e) {
