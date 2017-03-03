@@ -60,10 +60,8 @@ fs.readFileSync(src, "utf8")
 
     articles.unshift(readArticle(...l.split("=>")));
   });
-fs.outputJSONSync(dest, articles.sort((a, b) => {
+fs.outputJSONSync(dest, [...new Set(articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}).filter((v, i, a) => {
-  return a.indexOf(v) === i;
-}), {
+}))], {
   spaces: 2
 });
