@@ -6,27 +6,28 @@ const fs = require("fs-extra");
 const path = require("path");
 const xml2js = require("xml2js");
 
-const cache = "../cache/articles.json";
 const dest = "../dist/sitemap.xml";
-const documentsDir = "../dist/documents/";
 const sitemap = {
   urlset: {
     $: {
       xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9"
     },
-    url: []
+    url: [
+      "/",
+      "/about/",
+      "/about/style-guide/",
+      "/blog/",
+      "/documents/"
+    ]
   }
 };
-const urls = [
-  "/",
-  "/about/",
-  "/about/style-guide/",
-  "/blog/",
-  "/documents/"
-];
+const src = {
+  articles: "../cache/articles.json",
+  documents: "../dist/documents/"
+};
 
 process.chdir(__dirname);
-fs.readdirSync(documentsDir).forEach((f) => {
+fs.readdirSync(src.documents).forEach((f) => {
   if (f === "index.html") {
     return false;
   }
@@ -35,14 +36,14 @@ fs.readdirSync(documentsDir).forEach((f) => {
     return false;
   }
 
-  urls.push(`/${path.basename(documentsDir)}/${f}`);
+  sitemap.urlset.url.push(`/${path.basename(src.documents)}/${f}`);
 });
-fs.readJSONSync(cache).forEach((a) => {
-  urls.push(a.link);
+fs.readJSONSync(src.articles).forEach((a) => {
+  sitemap.urlset.url.push(a.link);
 });
-urls.forEach((u) => {
-  sitemap.urlset.url.push({
+sitemap.urlset.url = sitemap.urlset.url.map((u) => {
+  return {
     loc: `https://hail2u.net${u}`
-  });
+  };
 });
 fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));
