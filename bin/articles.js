@@ -43,7 +43,8 @@ if (!argv.force && !argv.file) {
   return;
 }
 
-if (!argv.force) {
+if (argv.file) {
+  argv.file = path.resolve(argv.file).replace(/\\/g, "/");
   articles.push(...fs.readJSONSync(dest));
 }
 

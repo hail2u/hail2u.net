@@ -298,7 +298,7 @@ function runArticles(filepath, next) {
     "run",
     "articles",
     "--",
-    `--file=${path.resolve(filepath).replace(/\\/g, "/")}`
+    `--file=${filepath}`
   ], (e, o) => {
     if (e) {
       return next(e);
