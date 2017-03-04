@@ -180,8 +180,28 @@ function selectNote(notes, next) {
   });
 }
 
-function saveFile(selected, html, filepath, next) {
-  fs.outputFile(filepath, html, (e) => {
+function openFile(selected, html, filepath, next) {
+  fs.open(filepath, "wx", (e, f) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, selected, html, filepath, f);
+  });
+}
+
+function saveFile(selected, html, filepath, fd, next) {
+  fs.outputFile(fd, html, (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, selected, filepath, fd);
+  });
+}
+
+function closeFile(selected, filepath, fd, next) {
+  fs.close(fd, (e) => {
     if (e) {
       return next(e);
     }
@@ -224,7 +244,9 @@ function runCommand(command, args, next) {
 
 function publishSelected(selected, body, filepath) {
   waterfall([
-    saveFile.bind(null, selected, body, filepath),
+    openFile.bind(null, selected, body, filepath),
+    saveFile,
+    closeFile,
     deleteSelected,
     runCommand.bind(null, which("git"), [
       "add",
