@@ -291,7 +291,7 @@ waterfall([
 
   s.content = s.content.trim();
 
-  if (!/\n[a-z0-9][-a-z0-9]*[a-z0-9]$/.test(s.content)) {
+  if (!/\n[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(s.content)) {
     throw new Error("This note does not have a name for file.");
   }
 
