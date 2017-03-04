@@ -180,6 +180,21 @@ function selectNote(notes, next) {
   });
 }
 
+function checkNote(selected, next) {
+  const body = selected.content.trim().split("\n");
+  const name = body.pop();
+
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
+    throw new Error("This note does not have a name for file.");
+  }
+
+  next(null, selected, body, name);
+}
+
+function markupNote(selected, body, name, next) {
+  next(null, selected, markdown(body.join("\n")), name);
+}
+
 function openFile(selected, html, filepath, next) {
   fs.open(filepath, "wx", (e, f) => {
     if (e) {
@@ -305,23 +320,16 @@ waterfall([
   storeToken,
   listNotes,
   getNotes,
-  selectNote
-], (e, s) => {
+  selectNote,
+  checkNote,
+  markupNote
+], (e, s, h, n) => {
   if (e) {
     throw e;
   }
 
-  s.content = s.content.trim();
-
-  if (!/\n[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(s.content)) {
-    throw new Error("This note does not have a name for file.");
-  }
-
-  const body = s.content.split("\n");
-  const name = body.pop();
-
   if (argv.publish) {
-    return publishSelected(s, markdown(body.join("\n")), path.join(dir.entry, `${name}.txt`));
+    return publishSelected(s, h, path.join(dir.entry, `${n}.txt`));
   }
 
   previewSelected(s, `<!DOCTYPE html>
@@ -338,7 +346,7 @@ waterfall([
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        ${markdown(body.join("\n"))}
+        ${h}
       </article>
     </main>
   </body>
