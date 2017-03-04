@@ -27,6 +27,7 @@ const dir = {
   root: "../",
   temp: "../tmp/"
 };
+const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
@@ -180,7 +181,7 @@ function selectNote(notes, next) {
   });
 }
 
-function checkNote(selected, next) {
+function checkSelected(selected, next) {
   const body = selected.content.trim().split("\n");
   const name = body.pop();
 
@@ -191,11 +192,11 @@ function checkNote(selected, next) {
   next(null, selected, body, name);
 }
 
-function markupNote(selected, body, name, next) {
+function markupSelected(selected, body, name, next) {
   next(null, selected, markdown(body.join("\n")), name);
 }
 
-function openFile(selected, html, filepath, next) {
+function openEntry(selected, html, filepath, next) {
   fs.open(filepath, "wx", (e, f) => {
     if (e) {
       return next(e);
@@ -205,7 +206,7 @@ function openFile(selected, html, filepath, next) {
   });
 }
 
-function saveFile(selected, html, filepath, fd, next) {
+function saveEntry(selected, html, filepath, fd, next) {
   fs.outputFile(fd, html, (e) => {
     if (e) {
       return next(e);
@@ -215,7 +216,7 @@ function saveFile(selected, html, filepath, fd, next) {
   });
 }
 
-function closeFile(selected, filepath, fd, next) {
+function closeEntry(selected, filepath, fd, next) {
   fs.close(fd, (e) => {
     if (e) {
       return next(e);
@@ -242,12 +243,63 @@ function deleteSelected(selected, filepath, next) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null);
+    next(null, filepath);
   });
 }
 
-function runCommand(command, args, next) {
-  execFile(command, args, (e, o) => {
+function addEntry(filepath, next) {
+  execFile(git, [
+    "add",
+    "--",
+    filepath
+  ], (e, o) => {
+    if (e) {
+      return next(e);
+    }
+
+    process.stdout.write(o);
+    next(null, filepath);
+  });
+}
+
+function commitEntry(filepath, next) {
+  execFile(git, [
+    "commit",
+    `--message=Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}`,
+  ], (e, o) => {
+    if (e) {
+      return next(e);
+    }
+
+    process.stdout.write(o);
+    next(null, filepath);
+  });
+}
+
+function runBlog(filepath, next) {
+  execFile(npm, [
+    "run",
+    "blog",
+    "--",
+    `--file=${filepath}`,
+    "--reindex"
+  ], (e, o) => {
+    if (e) {
+      return next(e);
+    }
+
+    process.stdout.write(o);
+    next(null, filepath);
+  });
+}
+
+function runArticles(filepath, next) {
+  execFile(npm, [
+    "run",
+    "articles",
+    "--",
+    `--file=${path.resolve(filepath).replace(/\\/g, "/")}`
+  ], (e, o) => {
     if (e) {
       return next(e);
     }
@@ -257,34 +309,16 @@ function runCommand(command, args, next) {
   });
 }
 
-function publishSelected(selected, body, filepath) {
+function publishSelected(selected, html, filepath) {
   waterfall([
-    openFile.bind(null, selected, body, filepath),
-    saveFile,
-    closeFile,
+    openEntry.bind(null, selected, html, filepath),
+    saveEntry,
+    closeEntry,
     deleteSelected,
-    runCommand.bind(null, which("git"), [
-      "add",
-      "--",
-      filepath
-    ]),
-    runCommand.bind(null, which("git"), [
-      "commit",
-      `--message=Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}`,
-    ]),
-    runCommand.bind(null, npm, [
-      "run",
-      "blog",
-      "--",
-      `--file=${filepath}`,
-      "--reindex"
-    ]),
-    runCommand.bind(null, npm, [
-      "run",
-      "articles",
-      "--",
-      `--file=${path.resolve(filepath).replace(/\\/g, "/")}`
-    ])
+    addEntry,
+    commitEntry,
+    runBlog,
+    runArticles
   ], (e) => {
     if (e) {
       throw e;
@@ -292,7 +326,17 @@ function publishSelected(selected, body, filepath) {
   });
 }
 
-function openPreview(selected, filepath, next) {
+function savePreview(html, filepath, next) {
+  fs.outputFile(filepath, html, (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, filepath);
+  });
+}
+
+function openPreview(filepath, next) {
   execFile(which("open"), [filepath], (e) => {
     if (e) {
       return next(e);
@@ -302,9 +346,9 @@ function openPreview(selected, filepath, next) {
   });
 }
 
-function previewSelected(selected, body, filepath) {
+function previewSelected(html, filepath) {
   waterfall([
-    saveFile.bind(null, selected, body, filepath),
+    savePreview.bind(null, html, filepath),
     openPreview
   ], (e) => {
     if (e) {
@@ -321,8 +365,8 @@ waterfall([
   listNotes,
   getNotes,
   selectNote,
-  checkNote,
-  markupNote
+  checkSelected,
+  markupSelected
 ], (e, s, h, n) => {
   if (e) {
     throw e;
@@ -332,7 +376,7 @@ waterfall([
     return publishSelected(s, h, path.join(dir.entry, `${n}.txt`));
   }
 
-  previewSelected(s, `<!DOCTYPE html>
+  previewSelected(`<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -350,5 +394,5 @@ waterfall([
       </article>
     </main>
   </body>
-</html>`.replace(/="\//g, "=\"../dist/"), path.join(dir.temp, `${name}.html`));
+</html>`.replace(/="\//g, "=\"../dist/"), path.join(dir.temp, `${n}.html`));
 });
