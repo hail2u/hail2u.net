@@ -207,7 +207,7 @@ function openEntry(selected, html, filepath, next) {
 }
 
 function saveEntry(selected, html, filepath, fd, next) {
-  fs.outputFile(fd, html, (e) => {
+  fs.writeFile(fd, html, (e) => {
     if (e) {
       return next(e);
     }
