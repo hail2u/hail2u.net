@@ -8,7 +8,7 @@ const https = require("https");
 const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp").sync;
+const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
@@ -226,8 +226,17 @@ function markupSelected(selected, body, name, next) {
   next(null, selected, markdown(body.join("\n")), name);
 }
 
+function mkdirEntry(selected, html, filepath, next) {
+  mkdirp(path.dirname(filepath), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, selected, html, filepath);
+  });
+}
+
 function saveEntry(selected, html, filepath, next) {
-  mkdirp(path.dirname(filepath));
   fs.writeFile(filepath, html, {
     flag: "wx"
   }, (e) => {
@@ -327,7 +336,8 @@ function runArticles(filepath, next) {
 
 function publishSelected(selected, html, filepath) {
   waterfall([
-    saveEntry.bind(null, selected, html, filepath),
+    mkdirEntry.bind(null, selected, html, filepath),
+    saveEntry,
     deleteSelected,
     addEntry,
     commitEntry,
