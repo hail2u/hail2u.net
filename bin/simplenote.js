@@ -4,6 +4,7 @@
 
 const execFile = require("child_process").execFile;
 const fs = require("fs");
+const https = require("https");
 const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
@@ -11,7 +12,7 @@ const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
-const request = require("request");
+const url = require("url");
 const waterfall = require("async").waterfall;
 const which = require("which").sync;
 
@@ -27,16 +28,16 @@ const dir = {
   root: "../",
   temp: "../tmp/"
 };
+const endpoint = {
+  auth: "https://app.simplenote.com/api/login",
+  data: "https://app.simplenote.com/api2/data",
+  index: "https://app.simplenote.com/api2/index"
+};
 const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
 const npm = which("npm");
-const url = {
-  auth: "https://app.simplenote.com/api/login",
-  data: "https://app.simplenote.com/api2/data",
-  index: "https://app.simplenote.com/api2/index"
-};
 
 function getToken(next) {
   fs.readFile(cache, "utf8", (e, d) => {
@@ -56,31 +57,42 @@ function getToken(next) {
 
 function renewToken(token, datetime, next) {
   if (typeof token !== "function") {
-    return next(null, token, datetime);
+    return next(null, token);
   }
 
   next = token;
-  request({
-    body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
+  const request = https.request(Object.assign(url.parse(endpoint.auth), {
     headers: headers,
-    method: "POST",
-    url: url.auth
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
+    method: "POST"
+  }));
+
+  request.write(Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"));
+  request.on("error", (e) => {
+    return next(e);
+  });
+  request.on("response", (r) => {
+    const d = [];
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, encodeURIComponent(b.trim()), (new Date()).toJSON());
+    r.setEncoding("utf8");
+    r.on("data", (c) => {
+      d.push(c);
+    });
+    r.on("end", () => {
+      next(null, encodeURIComponent(d.join("").trim()), (new Date()).toJSON());
+    });
   });
+  request.end();
 }
 
 function storeToken(token, datetime, next) {
+  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
+
   if (typeof datetime === "function") {
-    return next(null, token);
+    return datetime(null, token);
   }
 
   fs.writeFile(cache, JSON.stringify({
@@ -96,38 +108,55 @@ function storeToken(token, datetime, next) {
 }
 
 function listNotes(token, next) {
-  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
-  request({
-    headers: headers,
-    url: `${url.index}?length=100&${config.auth}`
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
+  const request = https.request(Object.assign(url.parse(`${endpoint.index}?length=100&${config.auth}`), {
+    headers: headers
+  }));
+
+  request.on("error", (e) => {
+    return next(e);
+  });
+  request.on("response", (r) => {
+    const d = [];
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, JSON.parse(b).data);
+    r.setEncoding("utf8");
+    r.on("data", (c) => {
+      d.push(c);
+    });
+    r.on("end", () => {
+      next(null, JSON.parse(d.join("")).data);
+    });
   });
+  request.end();
 }
 
 function getNote(note, next) {
-  request({
-    headers: headers,
-    url: `${url.data}/${note.key}?${config.auth}`
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
+  const request = https.request(Object.assign(url.parse(`${endpoint.data}/${note.key}?${config.auth}`), {
+    headers: headers
+  }));
+
+  request.on("error", (e) => {
+    return next(e);
+  });
+  request.on("response", (r) => {
+    const d = [];
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, JSON.parse(b));
+    r.setEncoding("utf8");
+    r.on("data", (c) => {
+      d.push(c);
+    });
+    r.on("end", () => {
+      next(null, JSON.parse(d.join("")));
+    });
   });
+  request.end();
 }
 
 function getNotes(notes, next) {
@@ -227,24 +256,27 @@ function closeEntry(selected, filepath, fd, next) {
 }
 
 function deleteSelected(selected, filepath, next) {
-  request({
-    body: JSON.stringify({
-      deleted: 1
-    }),
+  const request = https.request(Object.assign(url.parse(`${endpoint.data}/${selected.key}?${config.auth}`), {
     headers: headers,
-    method: "POST",
-    url: `${url.data}/${selected.key}?${config.auth}`
-  }, (e, r) => {
-    if (e) {
-      return next(e);
-    }
+    method: "POST"
+  }));
 
+  request.write(JSON.stringify({
+    deleted: 1
+  }));
+  request.on("error", (e) => {
+    return next(e);
+  });
+  request.on("response", (r) => {
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, filepath);
+    r.on("end", () => {
+      next(null, filepath);
+    });
   });
+  request.end();
 }
 
 function addEntry(filepath, next) {
