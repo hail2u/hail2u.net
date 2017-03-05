@@ -5,6 +5,7 @@
 const each = require("async").each;
 const fs = require("fs");
 const minifyHTML = require("../lib/html-minifier");
+const mkdirp = require("mkdirp").sync;
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
@@ -166,6 +167,7 @@ function toHTML(file) {
 
 function saveAsHTML(file, next) {
   file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
+  mkdirp(path.dirname(file.dest));
   fs.writeFileSync(file.dest, toHTML(file));
   next();
 }

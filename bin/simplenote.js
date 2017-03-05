@@ -8,6 +8,7 @@ const https = require("https");
 const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
+const mkdirp = require("mkdirp").sync;
 const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
@@ -226,6 +227,7 @@ function markupSelected(selected, body, name, next) {
 }
 
 function saveEntry(selected, html, filepath, next) {
+  mkdirp(path.dirname(filepath));
   fs.writeFile(filepath, html, {
     flag: "wx"
   }, (e) => {

@@ -8,6 +8,7 @@ const execFile = require("child_process").execFile;
 const fs = require("fs");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
+const mkdirp = require("mkdirp").sync;
 const os = require("os");
 const path = require("path");
 const which = require("which").sync;
@@ -67,7 +68,9 @@ function build(file, next) {
       o = minify(o);
     }
 
-    fs.writeFileSync(path.join(dir.static, file), o);
+    file = path.join(dir.static, file);
+    mkdirp(path.dirname(file));
+    fs.writeFileSync(file, o);
     next();
   });
 }
