@@ -4,7 +4,7 @@
 
 const compile = require("google-closure-compiler-js").compile;
 const each = require("async").each;
-const fs = require("fs-extra");
+const fs = require("fs");
 const path = require("path");
 
 const src = [
@@ -31,11 +31,11 @@ const jsExt = ".js";
 const minExt = ".min";
 
 process.chdir(__dirname);
-each(files, (f, next) => {
+each(src, (f, next) => {
   f.contents = f.src.reduce((a, i) => {
     return `${a}${fs.readFileSync(i, "utf8")}`;
   }, "");
-  fs.outputFileSync(f.dest, f.contents);
+  fs.writeFileSync(f.dest, f.contents);
   f.dest = `../tmp/${path.basename(f.dest, jsExt)}${minExt}${jsExt}`;
   f.contents = compile({
     compilationLevel: "ADVANCED",
@@ -44,7 +44,7 @@ each(files, (f, next) => {
     }],
     outputWrapper: "(function () {%output%}).call(window);"
   }).compiledCode;
-  fs.outputFileSync(f.dest, f.contents);
+  fs.writeFileSync(f.dest, f.contents);
   next();
 }, (e) => {
   if (e) {

@@ -5,7 +5,7 @@
 const each = require("async").eachLimit;
 const ensureAsync = require("async").ensureAsync;
 const execFile = require("child_process").execFile;
-const fs = require("fs-extra");
+const fs = require("fs");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
 const os = require("os");
@@ -67,7 +67,7 @@ function build(file, next) {
       o = minify(o);
     }
 
-    fs.outputFileSync(path.join(dir.static, file), o);
+    fs.writeFileSync(path.join(dir.static, file), o);
     next();
   });
 }

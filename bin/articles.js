@@ -2,7 +2,7 @@
 
 "use strict";
 
-const fs = require("fs-extra");
+const fs = require("fs");
 const minimist = require("minimist");
 const path = require("path");
 
@@ -45,7 +45,7 @@ if ((!argv.file && !argv.force) || (argv.file && argv.force)) {
 
 if (argv.file) {
   argv.file = path.resolve(argv.file).replace(/\\/g, "/");
-  articles.push(...fs.readJSONSync(dest));
+  articles.push(...JSON.parse(fs.readFileSync(dest, "utf8")));
 }
 
 fs.readFileSync(src, "utf8")
@@ -61,8 +61,6 @@ fs.readFileSync(src, "utf8")
 
     articles.unshift(readArticle(...l.split("=>")));
   });
-fs.outputJSONSync(dest, [...new Set(articles.sort((a, b) => {
+fs.writeFileSync(dest, JSON.stringify([...new Set(articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}))], {
-  spaces: 2
-});
+}))], null, 2));

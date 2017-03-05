@@ -3,7 +3,7 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
-const fs = require("fs-extra");
+const fs = require("fs");
 const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
@@ -39,10 +39,12 @@ const url = {
 };
 
 function getToken(next) {
-  fs.readJSON(cache, (e, d) => {
+  fs.readFile(cache, "utf8", (e, d) => {
     if (e) {
       return next(null);
     }
+
+    d = JSON.parse(d);
 
     if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
       return next(null);
@@ -81,12 +83,10 @@ function storeToken(token, datetime, next) {
     return next(null, token);
   }
 
-  fs.outputJSON(cache, {
+  fs.writeFile(cache, JSON.stringify({
     datetime: datetime,
     token: token
-  }, {
-    spaces: 2
-  }, (e) => {
+  }, null, 2), (e) => {
     if (e) {
       return next(e);
     }
@@ -327,7 +327,7 @@ function publishSelected(selected, html, filepath) {
 }
 
 function savePreview(html, filepath, next) {
-  fs.outputFile(filepath, html, (e) => {
+  fs.writeFile(filepath, html, (e) => {
     if (e) {
       return next(e);
     }

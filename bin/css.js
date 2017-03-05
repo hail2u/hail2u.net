@@ -5,7 +5,7 @@
 const csswring = require("csswring");
 const each = require("async").each;
 const execFileSync = require("child_process").execFileSync;
-const fs = require("fs-extra");
+const fs = require("fs");
 const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
@@ -38,7 +38,7 @@ each(fs.readdirSync(src), (f, next) => {
     dest
   ]);
   processor.process(fs.readFileSync(dest, "utf8")).then((r) => {
-    fs.outputFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
+    fs.writeFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
   });
   next();
 }, (e) => {

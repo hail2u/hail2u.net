@@ -3,7 +3,7 @@
 "use strict";
 
 const each = require("async").each;
-const fs = require("fs-extra");
+const fs = require("fs");
 const minifyHTML = require("../lib/html-minifier");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
@@ -110,22 +110,23 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = fs.readJSONSync(articleCache).map(function (a, idx, arr) {
-    a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
-    a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
-      a.second);
+  const articles = JSON.parse(fs.readFileSync(articleCache, "utf8"))
+    .map(function (a, idx, arr) {
+      a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
+      a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
+        a.second);
 
-    if (idx && this.y !== a.year) {
-      a.isFirstInYear = true;
-      arr[idx - 1].isLastInYear = true;
-    }
+      if (idx && this.y !== a.year) {
+        a.isFirstInYear = true;
+        arr[idx - 1].isLastInYear = true;
+      }
 
-    this.y = a.year;
+      this.y = a.year;
 
-    return a;
-  }, {
-    y: true
-  });
+      return a;
+    }, {
+      y: true
+    });
 
   articles[0].isFirstInYear = true;
   articles[articles.length - 1].isLastInYear = true;
@@ -134,7 +135,7 @@ function readArticles() {
 }
 
 function buildData(file) {
-  const data = fs.readJSONSync(file, "utf8");
+  const data = JSON.parse(fs.readFileSync(file, "utf8"));
 
   switch (path.relative(dir.template, file).replace(/\\/g, "/")) {
   case "index.json":
@@ -165,13 +166,13 @@ function toHTML(file) {
 
 function saveAsHTML(file, next) {
   file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
-  fs.outputFileSync(file.dest, toHTML(file));
+  fs.writeFileSync(file.dest, toHTML(file));
   next();
 }
 
 process.chdir(__dirname);
 mustache.escape = escape;
-Object.assign(metadata, fs.readJSONSync(metadataFile));
+Object.assign(metadata, JSON.parse(fs.readFileSync(metadataFile, "utf8")));
 fs.readdirSync(dir.partial).forEach((p) => {
   partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
 });
