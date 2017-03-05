@@ -225,28 +225,10 @@ function markupSelected(selected, body, name, next) {
   next(null, selected, markdown(body.join("\n")), name);
 }
 
-function openEntry(selected, html, filepath, next) {
-  fs.open(filepath, "wx", (e, f) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, selected, html, filepath, f);
-  });
-}
-
-function saveEntry(selected, html, filepath, fd, next) {
-  fs.writeFile(fd, html, (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, selected, filepath, fd);
-  });
-}
-
-function closeEntry(selected, filepath, fd, next) {
-  fs.close(fd, (e) => {
+function saveEntry(selected, html, filepath, next) {
+  fs.writeFile(filepath, html, {
+    flag: "wx"
+  }, (e) => {
     if (e) {
       return next(e);
     }
@@ -343,9 +325,7 @@ function runArticles(filepath, next) {
 
 function publishSelected(selected, html, filepath) {
   waterfall([
-    openEntry.bind(null, selected, html, filepath),
-    saveEntry,
-    closeEntry,
+    saveEntry.bind(null, selected, html, filepath),
     deleteSelected,
     addEntry,
     commitEntry,
