@@ -15,7 +15,7 @@ const pit = require("pit-ro");
 const readline = require("readline");
 const url = require("url");
 const waterfall = require("async").waterfall;
-const which = require("which").sync;
+const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
@@ -34,11 +34,9 @@ const endpoint = {
   data: "https://app.simplenote.com/api2/data",
   index: "https://app.simplenote.com/api2/index"
 };
-const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
-const npm = which("npm");
 
 function getToken(next) {
   fs.readFile(cache, "utf8", (e, d) => {
@@ -272,7 +270,17 @@ function deleteSelected(selected, filepath, next) {
   request.end();
 }
 
-function addEntry(filepath, next) {
+function findGit(filepath, next) {
+  which("git", (e, p) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, p, filepath);
+  });
+}
+
+function addEntry(git, filepath, next) {
   execFile(git, [
     "add",
     "--",
@@ -283,11 +291,11 @@ function addEntry(filepath, next) {
     }
 
     process.stdout.write(o);
-    next(null, filepath);
+    next(null, git, filepath);
   });
 }
 
-function commitEntry(filepath, next) {
+function commitEntry(git, filepath, next) {
   execFile(git, [
     "commit",
     `--message=Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}`,
@@ -301,7 +309,17 @@ function commitEntry(filepath, next) {
   });
 }
 
-function runBlog(filepath, next) {
+function findNpm(filepath, next) {
+  which("npm", (e, p) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, p, filepath);
+  });
+}
+
+function runBlog(npm, filepath, next) {
   execFile(npm, [
     "run",
     "blog",
@@ -318,7 +336,7 @@ function runBlog(filepath, next) {
   });
 }
 
-function runArticles(filepath, next) {
+function runArticles(npm, filepath, next) {
   execFile(npm, [
     "run",
     "articles",
@@ -339,8 +357,10 @@ function publishSelected(selected, html, filepath) {
     mkdirEntry.bind(null, selected, html, filepath),
     saveEntry,
     deleteSelected,
+    findGit,
     addEntry,
     commitEntry,
+    findNpm,
     runBlog,
     runArticles
   ], (e) => {
@@ -360,8 +380,18 @@ function savePreview(html, filepath, next) {
   });
 }
 
-function openPreview(filepath, next) {
-  execFile(which("open"), [filepath], (e) => {
+function findOpen(filepath, next) {
+  which("open", (e, p) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, p, filepath);
+  });
+}
+
+function openPreview(open, filepath, next) {
+  execFile(open, [filepath], (e) => {
     if (e) {
       return next(e);
     }
@@ -373,6 +403,7 @@ function openPreview(filepath, next) {
 function previewSelected(html, filepath) {
   waterfall([
     savePreview.bind(null, html, filepath),
+    findOpen,
     openPreview
   ], (e) => {
     if (e) {
