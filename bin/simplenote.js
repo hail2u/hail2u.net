@@ -40,25 +40,24 @@ const headers = {
 function getToken(next) {
   fs.readFile(cache, "utf8", (e, d) => {
     if (e) {
-      return next(null);
+      return next(null, null);
     }
 
     d = JSON.parse(d);
 
     if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
-      return next(null);
+      return next(null, null);
     }
 
-    next(null, d.token, d.datetime);
+    next(null, d.token);
   });
 }
 
-function renewToken(token, datetime, next) {
-  if (typeof token !== "function") {
-    return next(null, token);
+function renewToken(token, next) {
+  if (token) {
+    return next(null, token, null);
   }
 
-  next = token;
   request.post(endpoint.auth, {
     body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
     headers: headers
@@ -78,8 +77,8 @@ function renewToken(token, datetime, next) {
 function storeToken(token, datetime, next) {
   config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
 
-  if (typeof datetime === "function") {
-    return datetime(null, token);
+  if (!datetime) {
+    return next(null, token);
   }
 
   fs.writeFile(cache, JSON.stringify({
