@@ -2,7 +2,6 @@
 
 "use strict";
 
-const each = require("async").each;
 const execFileSync = require("child_process").execFileSync;
 const which = require("which").sync;
 
@@ -47,7 +46,7 @@ const files = [
 const inkscape = which("inkscape");
 
 process.chdir(__dirname);
-each(files, (f, next) => {
+files.forEach((f) => {
   const args = ["-f", f.src, "-e", f.dest];
 
   if (f.area) {
@@ -63,9 +62,4 @@ each(files, (f, next) => {
   }
 
   execFileSync(inkscape, args);
-  next();
-}, (e) => {
-  if (e) {
-    throw e;
-  }
 });

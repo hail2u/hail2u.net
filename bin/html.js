@@ -2,7 +2,6 @@
 
 "use strict";
 
-const each = require("async").each;
 const fs = require("fs");
 const minifyHTML = require("../lib/html-minifier");
 const mkdirp = require("mkdirp").sync;
@@ -165,21 +164,14 @@ function toHTML(file) {
   return html;
 }
 
-function saveAsHTML(file, next) {
-  file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
-  mkdirp(path.dirname(file.dest));
-  fs.writeFileSync(file.dest, toHTML(file));
-  next();
-}
-
 process.chdir(__dirname);
 mustache.escape = escape;
 Object.assign(metadata, JSON.parse(fs.readFileSync(metadataFile, "utf8")));
 fs.readdirSync(dir.partial).forEach((p) => {
   partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
 });
-each(files, saveAsHTML, (e) => {
-  if (e) {
-    throw e;
-  }
+files.forEach((f) => {
+  f.json = path.join(path.dirname(f.src), `${path.basename(f.src, ".mustache")}.json`);
+  mkdirp(path.dirname(f.dest));
+  fs.writeFileSync(f.dest, toHTML(f));
 });

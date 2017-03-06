@@ -3,7 +3,6 @@
 "use strict";
 
 const compile = require("google-closure-compiler-js").compile;
-const each = require("async").each;
 const fs = require("fs");
 const mkdirp = require("mkdirp").sync;
 const path = require("path");
@@ -33,7 +32,7 @@ const minExt = ".min";
 const tmp = "../tmp/";
 
 process.chdir(__dirname);
-each(src, (f, next) => {
+src.forEach((f) => {
   f.contents = f.src.reduce((a, i) => {
     return `${a}${fs.readFileSync(i, "utf8")}`;
   }, "");
@@ -49,9 +48,4 @@ each(src, (f, next) => {
     outputWrapper: "(function () {%output%}).call(window);"
   }).compiledCode;
   fs.writeFileSync(f.dest, f.contents);
-  next();
-}, (e) => {
-  if (e) {
-    throw e;
-  }
 });

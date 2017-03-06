@@ -2,14 +2,11 @@
 
 "use strict";
 
-const each = require("async").eachLimit;
-const ensureAsync = require("async").ensureAsync;
-const execFile = require("child_process").execFile;
+const execFileSync = require("child_process").execFileSync;
 const fs = require("fs");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
 const mkdirp = require("mkdirp").sync;
-const os = require("os");
 const path = require("path");
 const which = require("which").sync;
 
@@ -30,50 +27,6 @@ const dir = {
 const files = [];
 const index = "../src/weblog/plugins/state/files_index.dat";
 const perl = which("perl");
-
-function limit(reindex) {
-  if (reindex) {
-    return 1;
-  }
-
-  return os.cpus().length - 1;
-}
-
-function build(file, next) {
-  const args = ["blosxom.cgi", `path=/${file}`];
-
-  if (argv.reindex) {
-    args.push("reindex=1");
-    argv.reindex = false;
-  }
-
-  if (file === "index.rss") {
-    file = "feed";
-  }
-
-  execFile(perl, args, {
-    cwd: dir.root,
-    env: {
-      BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
-    }
-  }, (e, o) => {
-    if (e) {
-      return next(e);
-    }
-
-    o = `${o.replace(/^[\s\S]*?\r?\n\r?\n/, "").trim()}\n`;
-
-    if (file.endsWith(".html")) {
-      o = o.replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/");
-      o = minify(o);
-    }
-
-    file = path.join(dir.static, file);
-    mkdirp(path.dirname(file));
-    fs.writeFileSync(file, o);
-    next();
-  });
-}
 
 process.chdir(__dirname);
 
@@ -106,10 +59,37 @@ if (argv.file) {
   }
 }
 
-each(files.map((f) => {
+files.map((f) => {
   return f.replace(/\.txt$/, ".html").replace(/\\/g, "/");
-}), limit(argv.reindex), ensureAsync(build), (e) => {
-  if (e) {
-    throw e;
+}).forEach((f) => {
+  const args = ["blosxom.cgi", `path=/${f}`];
+
+  if (argv.reindex) {
+    args.push("reindex=1");
+    argv.reindex = false;
   }
+
+  if (f === "index.rss") {
+    f = "feed";
+  }
+
+  let html = execFileSync(perl, args, {
+    cwd: dir.root,
+    env: {
+      BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
+    }
+  });
+
+  html = html.toString()
+    .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+    .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+    .trim();
+
+  if (f.endsWith(".html")) {
+    html = minify(html);
+  }
+
+  f = path.join(dir.static, f);
+  mkdirp(path.dirname(f));
+  fs.writeFileSync(f, html);
 });
