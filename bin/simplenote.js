@@ -4,7 +4,6 @@
 
 const execFile = require("child_process").execFile;
 const fs = require("fs");
-const https = require("https");
 const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
@@ -13,7 +12,7 @@ const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
-const url = require("url");
+const request = require("request");
 const waterfall = require("async").waterfall;
 const which = require("which");
 
@@ -60,31 +59,20 @@ function renewToken(token, datetime, next) {
   }
 
   next = token;
-  const request = https.request(Object.assign(url.parse(endpoint.auth), {
-    headers: headers,
-    method: "POST"
-  }));
-
-  request.write(Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"));
-  request.on("error", (e) => {
-    return next(e);
-  });
-  request.on("response", (r) => {
-    const d = [];
+  request.post(endpoint.auth, {
+    body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
+    headers: headers
+  }, (e, r, b) => {
+    if (e) {
+      return next(e);
+    }
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    r.setEncoding("utf8");
-    r.on("data", (c) => {
-      d.push(c);
-    });
-    r.on("end", () => {
-      next(null, encodeURIComponent(d.join("").trim()), (new Date()).toJSON());
-    });
+    next(null, encodeURIComponent(b.trim()), (new Date()).toJSON());
   });
-  request.end();
 }
 
 function storeToken(token, datetime, next) {
@@ -107,55 +95,35 @@ function storeToken(token, datetime, next) {
 }
 
 function listNotes(token, next) {
-  const request = https.request(Object.assign(url.parse(`${endpoint.index}?length=100&${config.auth}`), {
+  request.get(`${endpoint.index}?length=100&${config.auth}`, {
     headers: headers
-  }));
-
-  request.on("error", (e) => {
-    return next(e);
-  });
-  request.on("response", (r) => {
-    const d = [];
+  }, (e, r, b) => {
+    if (e) {
+      return next(e);
+    }
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    r.setEncoding("utf8");
-    r.on("data", (c) => {
-      d.push(c);
-    });
-    r.on("end", () => {
-      next(null, JSON.parse(d.join("")).data);
-    });
+    next(null, JSON.parse(b).data);
   });
-  request.end();
 }
 
 function getNote(note, next) {
-  const request = https.request(Object.assign(url.parse(`${endpoint.data}/${note.key}?${config.auth}`), {
+  request.get(`${endpoint.data}/${note.key}?${config.auth}`, {
     headers: headers
-  }));
-
-  request.on("error", (e) => {
-    return next(e);
-  });
-  request.on("response", (r) => {
-    const d = [];
+  }, (e, r, b) => {
+    if (e) {
+      return next(e);
+    }
 
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    r.setEncoding("utf8");
-    r.on("data", (c) => {
-      d.push(c);
-    });
-    r.on("end", () => {
-      next(null, JSON.parse(d.join("")));
-    });
+    next(null, JSON.parse(b));
   });
-  request.end();
 }
 
 function getNotes(notes, next) {
@@ -247,27 +215,22 @@ function saveEntry(selected, html, filepath, next) {
 }
 
 function deleteSelected(selected, filepath, next) {
-  const request = https.request(Object.assign(url.parse(`${endpoint.data}/${selected.key}?${config.auth}`), {
-    headers: headers,
-    method: "POST"
-  }));
+  request.post(`${endpoint.data}/${selected.key}?${config.auth}`, {
+    body: JSON.stringify({
+      deleted: 1
+    }),
+    headers: headers
+  }, (e, r) => {
+    if (e) {
+      return next(e);
+    }
 
-  request.write(JSON.stringify({
-    deleted: 1
-  }));
-  request.on("error", (e) => {
-    return next(e);
-  });
-  request.on("response", (r) => {
     if (r.statusCode !== 200) {
       return next(new Error(r.statusMessage));
     }
 
-    r.on("end", () => {
-      next(null, filepath);
-    });
+    next(null, filepath);
   });
-  request.end();
 }
 
 function findGit(filepath, next) {
