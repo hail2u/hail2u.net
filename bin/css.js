@@ -6,6 +6,7 @@ const csswring = require("csswring");
 const each = require("async").each;
 const execFileSync = require("child_process").execFileSync;
 const fs = require("fs");
+const mkdirp = require("mkdirp").sync;
 const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
@@ -33,6 +34,7 @@ each(fs.readdirSync(src), (f, next) => {
     return false;
   }
 
+  mkdirp(tmp);
   execFileSync(sassc, [
     path.join(src, f).replace(/\\/g, "/"),
     dest

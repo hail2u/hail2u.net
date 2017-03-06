@@ -10,10 +10,13 @@ const dir = {
   img: "../img/",
   js: "../js/"
 };
+const mkdirp = require("mkdirp").sync;
+const path = require("path");
 const src = "../src/css/test.html";
 const url = "https://hail2u.net/";
 
 process.chdir(__dirname);
+mkdirp(path.dirname(dest));
 fs.writeFileSync(dest, fs.readFileSync(src, "utf8")
   .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
     if (u.startsWith(url)) {

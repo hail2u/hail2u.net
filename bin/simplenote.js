@@ -74,7 +74,21 @@ function renewToken(token, next) {
   });
 }
 
-function storeToken(token, datetime, next) {
+function mkdirCache(token, datetime, next) {
+  if (!datetime) {
+    return next(null, token);
+  }
+
+  mkdirp(path.dirname(cache), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, token, datetime);
+  });
+}
+
+function saveCache(token, datetime, next) {
   if (!datetime) {
     return next(null, token);
   }
@@ -334,6 +348,16 @@ function publishSelected(selected) {
   });
 }
 
+function mkdirPreview(preview, next) {
+  mkdirp(path.dirname(preview.path), (e) => {
+    if (e) {
+      return next(e);
+    }
+
+    next(null, preview);
+  });
+}
+
 function savePreview(preview, next) {
   fs.writeFile(preview.path, preview.content, (e) => {
     if (e) {
@@ -366,7 +390,8 @@ function openPreview(preview, open, next) {
 
 function previewSelected(selected) {
   waterfall([
-    savePreview.bind(null, selected),
+    mkdirPreview.bind(null, selected),
+    savePreview,
     findOpen,
     openPreview
   ], (e) => {
@@ -380,7 +405,8 @@ process.chdir(__dirname);
 waterfall([
   getToken,
   renewToken,
-  storeToken,
+  mkdirCache,
+  saveCache,
   listNotes,
   getNotes,
   selectNote,

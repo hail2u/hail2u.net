@@ -3,6 +3,7 @@
 "use strict";
 
 const fs = require("fs");
+const mkdirp = require("mkdirp").sync;
 const path = require("path");
 const xml2js = require("xml2js");
 
@@ -46,4 +47,5 @@ sitemap.urlset.url = sitemap.urlset.url.map((u) => {
     loc: `https://hail2u.net${u}`
   };
 });
+mkdirp(path.dirname(dest));
 fs.writeFileSync(dest, new xml2js.Builder().buildObject(sitemap));
