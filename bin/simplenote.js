@@ -76,7 +76,7 @@ function renewToken(token, next) {
 
 function mkdirCache(token, datetime, next) {
   if (!datetime) {
-    return next(null, token);
+    return next(null, token, null);
   }
 
   mkdirp(path.dirname(cache), (e) => {
