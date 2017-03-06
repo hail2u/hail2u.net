@@ -4,16 +4,13 @@
 
 const execFile = require("child_process").execFile;
 const fs = require("fs");
-const map = require("async").mapLimit;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mkdirp = require("mkdirp");
-const os = require("os");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
 const request = require("request");
-const waterfall = require("async").waterfall;
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
@@ -37,302 +34,344 @@ const headers = {
   "User-Agent": "sn/0.0.0"
 };
 
-function getToken(next) {
-  fs.readFile(cache, "utf8", (e, d) => {
-    if (e) {
-      return next(null, null);
-    }
+function catcher(err) {
+  console.error(err.stack);
+  process.exit(1);
+}
 
-    d = JSON.parse(d);
+function waterfall(tasks, initialValue) {
+  return tasks.reduce((p, t) => {
+    return p.then(t);
+  }, Promise.resolve(initialValue));
+}
 
-    if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
-      return next(null, null);
-    }
+function readCache() {
+  return new Promise((resolve) => {
+    fs.readFile(cache, "utf8", (e, d) => {
+      if (e) {
+        return resolve([null, null]);
+      }
 
-    next(null, d.token);
+      d = JSON.parse(d);
+      resolve([d.token, d.datetime]);
+    });
   });
 }
 
-function renewToken(token, next) {
-  if (token) {
-    return next(null, token, null);
-  }
-
-  request.post(endpoint.auth, {
-    body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
-    headers: headers
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
+function getToken([token, datetime]) {
+  return new Promise((resolve, reject) => {
+    if ((Date.now() - Date.parse(datetime)) < (1000 * 60 * 60 * 23)) {
+      return resolve([token, null]);
     }
 
-    if (r.statusCode !== 200) {
-      return next(new Error(r.statusMessage));
-    }
+    request.post(endpoint.auth, {
+      body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
+      headers: headers
+    }, (e, r, b) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, encodeURIComponent(b.trim()), (new Date()).toJSON());
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
+
+      resolve([encodeURIComponent(b.trim()), new Date().toJSON()]);
+    });
   });
 }
 
-function mkdirCache(token, datetime, next) {
-  if (!datetime) {
-    return next(null, token, null);
-  }
-
-  mkdirp(path.dirname(cache), (e) => {
-    if (e) {
-      return next(e);
+function mkdirCache([token, datetime]) {
+  return new Promise((resolve, reject) => {
+    if (!datetime) {
+      return resolve([token, null]);
     }
 
-    next(null, token, datetime);
+    mkdirp(path.dirname(cache), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve([token, datetime]);
+    });
   });
 }
 
-function saveCache(token, datetime, next) {
-  if (!datetime) {
-    return next(null, token);
-  }
-
-  fs.writeFile(cache, JSON.stringify({
-    datetime: datetime,
-    token: token
-  }, null, 2), (e) => {
-    if (e) {
-      return next(e);
+function saveCache([token, datetime]) {
+  return new Promise((resolve, reject) => {
+    if (!datetime) {
+      return resolve(token);
     }
 
-    next(null, token);
+    fs.writeFile(cache, JSON.stringify({
+      datetime: datetime,
+      token: token
+    }, null, 2), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(token);
+    });
   });
 }
 
-function listNotes(token, next) {
-  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
-  request.get(`${endpoint.index}?length=100&${config.auth}`, {
-    headers: headers
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
+function listNotes(token) {
+  return new Promise((resolve, reject) => {
+    config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
+    request.get(`${endpoint.index}?length=100&${config.auth}`, {
+      headers: headers
+    }, (e, r, b) => {
+      if (e) {
+        return reject(e);
+      }
 
-    if (r.statusCode !== 200) {
-      return next(new Error(r.statusMessage));
-    }
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
 
-    next(null, JSON.parse(b).data);
+      resolve(JSON.parse(b).data.filter((n) => {
+        if (n.deleted === 1) {
+          return false;
+        }
+
+        if (argv.publish && !n.tags.includes("draft")) {
+          return false;
+        }
+
+        return true;
+      }));
+    });
   });
 }
 
-function getNote(note, next) {
-  request.get(`${endpoint.data}/${note.key}?${config.auth}`, {
-    headers: headers
-  }, (e, r, b) => {
-    if (e) {
-      return next(e);
-    }
+function getNote(note) {
+  return new Promise((resolve, reject) => {
+    request.get(`${endpoint.data}/${note.key}?${config.auth}`, {
+      headers: headers
+    }, (e, r, b) => {
+      if (e) {
+        return reject(e);
+      }
 
-    if (r.statusCode !== 200) {
-      return next(new Error(r.statusMessage));
-    }
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
 
-    next(null, JSON.parse(b));
+      resolve(JSON.parse(b));
+    });
   });
 }
 
-function getNotes(notes, next) {
-  map(notes.filter((n) => {
-    if (n.deleted === 1) {
-      return false;
-    }
-
-    if (argv.publish && !n.tags.includes("draft")) {
-      return false;
-    }
-
-    return true;
-  }), os.cpus().length - 1, getNote, (e, r) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, r);
+function getNotes(notes) {
+  return new Promise((resolve) => {
+    Promise.all(notes.map(getNote))
+      .then((r) => {
+        resolve(r);
+      })
+      .catch(catcher);
   });
 }
 
-function selectNote(notes, next) {
-  const menu = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+function selectNote(notes) {
+  return new Promise((resolve, reject) => {
+    const menu = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
 
-  menu.write("\n");
-  menu.write("0. QUIT\n");
-  notes.forEach((n, i) => {
-    menu.write(`${i + 1}. ${n.content.trim().split("\n")[0]}\n`);
-  });
-  menu.question("Which one: (0) ", (a) => {
-    if (!a) {
-      a = 0;
-    }
+    menu.write("\n");
+    menu.write("0. QUIT\n");
+    notes.forEach((n, i) => {
+      menu.write(`${i + 1}. ${n.content.trim().split("\n")[0]}\n`);
+    });
+    menu.question("Which one: (0) ", (a) => {
+      if (!a) {
+        a = 0;
+      }
 
-    a = parseInt(a, 10);
+      a = parseInt(a, 10);
 
-    if (!Number.isInteger(a) || a > notes.length) {
-      return next(new Error(`You must enter a number between 0 and ${notes.length}`));
-    }
+      if (!Number.isInteger(a) || a > notes.length) {
+        return reject(new Error(`You must enter a number between 0 and ${notes.length}`));
+      }
 
-    if (a === 0) {
-      process.exit(0);
-    }
+      if (a === 0) {
+        process.exit(0);
+      }
 
-    menu.close();
-    next(null, notes[a - 1]);
-  });
-}
-
-function checkSelected(selected, next) {
-  const body = selected.content.trim().split("\n");
-  const name = body.pop();
-
-  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
-    throw new Error("This note does not have a name for file.");
-  }
-
-  selected.content = body.join("\n");
-  selected.path = name;
-  next(null, selected);
-}
-
-function markupSelected(selected, next) {
-  selected.content = markdown(selected.content);
-  next(null, selected);
-}
-
-function mkdirEntry(entry, next) {
-  mkdirp(path.dirname(entry.path), (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null, entry);
+      menu.close();
+      resolve(notes[a - 1]);
+    });
   });
 }
 
-function saveEntry(entry, next) {
-  fs.writeFile(entry.path, entry.content, {
-    flag: "wx"
-  }, (e) => {
-    if (e) {
-      return next(e);
+function checkSelected(selected) {
+  return new Promise((resolve, reject) => {
+    const body = selected.content.trim().split("\n");
+    const name = body.pop();
+
+    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
+      return reject(new Error("This note does not have a name for file."));
     }
 
-    next(null, entry);
+    selected.content = body.join("\n");
+    selected.path = name;
+    resolve(selected);
   });
 }
 
-function deleteSelected(selected, next) {
-  request.post(`${endpoint.data}/${selected.key}?${config.auth}`, {
-    body: JSON.stringify({
-      deleted: 1
-    }),
-    headers: headers
-  }, (e, r) => {
-    if (e) {
-      return next(e);
-    }
-
-    if (r.statusCode !== 200) {
-      return next(new Error(r.statusMessage));
-    }
-
-    next(null, selected);
+function markupSelected(selected) {
+  return new Promise((resolve) => {
+    selected.content = markdown(selected.content);
+    resolve(selected);
   });
 }
 
-function findGit(entry, next) {
-  which("git", (e, p) => {
-    if (e) {
-      return next(e);
-    }
+function mkdirEntry(entry) {
+  return new Promise((resolve, reject) => {
+    mkdirp(path.dirname(entry.path), (e) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, entry, p);
+      resolve(entry);
+    });
   });
 }
 
-function addEntry(entry, git, next) {
-  execFile(git, [
-    "add",
-    "--",
-    entry.path
-  ], (e, o) => {
-    if (e) {
-      return next(e);
-    }
+function saveEntry(entry) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(entry.path, entry.content, {
+      flag: "wx"
+    }, (e) => {
+      if (e) {
+        return reject(e);
+      }
 
-    process.stdout.write(o);
-    next(null, entry, git);
+      resolve(entry);
+    });
   });
 }
 
-function commitEntry(entry, git, next) {
-  execFile(git, [
-    "commit",
-    `--message=Add ${path.relative(dir.root, entry.path).replace(/\\/g, "/")}`,
-  ], (e, o) => {
-    if (e) {
-      return next(e);
-    }
+function deleteSelected(selected) {
+  return new Promise((resolve, reject) => {
+    request.post(`${endpoint.data}/${selected.key}?${config.auth}`, {
+      body: JSON.stringify({
+        deleted: 1
+      }),
+      headers: headers
+    }, (e, r) => {
+      if (e) {
+        return reject(e);
+      }
 
-    process.stdout.write(o);
-    next(null, entry);
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
+
+      resolve(selected);
+    });
   });
 }
 
-function findNpm(entry, next) {
-  which("npm", (e, p) => {
-    if (e) {
-      return next(e);
-    }
+function findGit(entry) {
+  return new Promise((resolve, reject) => {
+    which("git", (e, p) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, entry, p);
+      resolve([entry, p]);
+    });
   });
 }
 
-function runBlog(entry, npm, next) {
-  execFile(npm, [
-    "run",
-    "blog",
-    "--",
-    `--file=${entry.path}`,
-    "--reindex"
-  ], (e, o) => {
-    if (e) {
-      return next(e);
-    }
+function addEntry([entry, git]) {
+  return new Promise((resolve, reject) => {
+    execFile(git, [
+      "add",
+      "--",
+      entry.path
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-    process.stdout.write(o);
-    next(null, entry, npm);
+      process.stdout.write(o);
+      resolve([entry, git]);
+    });
   });
 }
 
-function runArticles(entry, npm, next) {
-  execFile(npm, [
-    "run",
-    "articles",
-    "--",
-    `--file=${entry.path}`
-  ], (e, o) => {
-    if (e) {
-      return next(e);
-    }
+function commitEntry([entry, git]) {
+  return new Promise((resolve, reject) => {
+    execFile(git, [
+      "commit",
+      `--message=Add ${path.relative(dir.root, entry.path).replace(/\\/g, "/")}`,
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-    process.stdout.write(o);
-    next(null);
+      process.stdout.write(o);
+      resolve(entry);
+    });
+  });
+}
+
+function findNpm(entry) {
+  return new Promise((resolve, reject) => {
+    which("npm", (e, p) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(entry, p);
+    });
+  });
+}
+
+function runBlog([entry, npm]) {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "blog",
+      "--",
+      `--file=${entry.path}`,
+      "--reindex"
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(entry, npm);
+    });
+  });
+}
+
+function runArticles([entry, npm]) {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "articles",
+      "--",
+      `--file=${entry.path}`
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve();
+    });
   });
 }
 
 function publishSelected(selected) {
   waterfall([
-    mkdirEntry.bind(null, selected),
+    mkdirEntry,
     saveEntry,
     deleteSelected,
     findGit,
@@ -341,107 +380,106 @@ function publishSelected(selected) {
     findNpm,
     runBlog,
     runArticles
-  ], (e) => {
-    if (e) {
-      throw e;
-    }
+  ], selected).catch(catcher);
+}
+
+function mkdirPreview(preview) {
+  return new Promise((resolve, reject) => {
+    mkdirp(path.dirname(preview.path), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(preview);
+    });
   });
 }
 
-function mkdirPreview(preview, next) {
-  mkdirp(path.dirname(preview.path), (e) => {
-    if (e) {
-      return next(e);
-    }
+function savePreview(preview) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(preview.path, preview.content, (e) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, preview);
+      resolve(preview);
+    });
   });
 }
 
-function savePreview(preview, next) {
-  fs.writeFile(preview.path, preview.content, (e) => {
-    if (e) {
-      return next(e);
-    }
+function findOpen(preview) {
+  return new Promise((resolve, reject) => {
+    which("open", (e, p) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, preview);
+      resolve([preview, p]);
+    });
   });
 }
 
-function findOpen(preview, next) {
-  which("open", (e, p) => {
-    if (e) {
-      return next(e);
-    }
+function openPreview([preview, open]) {
+  return new Promise((resolve, reject) => {
+    execFile(open, [preview.path], (e) => {
+      if (e) {
+        return reject(e);
+      }
 
-    next(null, preview, p);
-  });
-}
-
-function openPreview(preview, open, next) {
-  execFile(open, [preview.path], (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    next(null);
+      resolve();
+    });
   });
 }
 
 function previewSelected(selected) {
   waterfall([
-    mkdirPreview.bind(null, selected),
+    mkdirPreview,
     savePreview,
     findOpen,
     openPreview
-  ], (e) => {
-    if (e) {
-      throw e;
-    }
-  });
+  ], selected).catch(catcher);
+}
+
+function processSelected(selected) {
+  if (argv.publish) {
+    selected.path = path.join(dir.entry, `${selected.path}.txt`);
+
+    return publishSelected(selected);
+  }
+
+  selected.content = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width" name="viewport">
+  <title>プレビュー - ウェブログ - Hail2u.net</title>
+  <link href="/styles/main.min.css" rel="stylesheet">
+</head>
+<body>
+  <main class="content">
+    <article class="section">
+      <footer class="section-footer">
+        <p><time datetime="1976-07-23">1976/07/23</time></p>
+      </footer>
+      ${selected.content}
+    </article>
+  </main>
+</body>
+</html>`.replace(/="\//g, "=\"../dist/");
+  selected.path = path.join(dir.temp, `${selected.path}.html`);
+  previewSelected(selected);
 }
 
 process.chdir(__dirname);
 waterfall([
+  readCache,
   getToken,
-  renewToken,
   mkdirCache,
   saveCache,
   listNotes,
   getNotes,
   selectNote,
   checkSelected,
-  markupSelected
-], (e, s) => {
-  if (e) {
-    throw e;
-  }
-
-  if (argv.publish) {
-    s.path = path.join(dir.entry, `${s.path}.txt`);
-
-    return publishSelected(s);
-  }
-
-  s.content = `<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width" name="viewport">
-    <title>プレビュー - ウェブログ - Hail2u.net</title>
-    <link href="/styles/main.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <main class="content">
-      <article class="section">
-        <footer class="section-footer">
-          <p><time datetime="1976-07-23">1976/07/23</time></p>
-        </footer>
-        ${s.content}
-      </article>
-    </main>
-  </body>
-</html>`.replace(/="\//g, "=\"../dist/");
-  s.path = path.join(dir.temp, `${s.path}.html`);
-  previewSelected(s);
-});
+  markupSelected,
+  processSelected
+], null).catch(catcher);
