@@ -183,36 +183,39 @@ function checkSelected(selected, next) {
     throw new Error("This note does not have a name for file.");
   }
 
-  next(null, selected, body, name);
+  selected.content = body.join("\n");
+  selected.path = name;
+  next(null, selected);
 }
 
-function markupSelected(selected, body, name, next) {
-  next(null, selected, markdown(body.join("\n")), name);
+function markupSelected(selected, next) {
+  selected.content = markdown(selected.content);
+  next(null, selected);
 }
 
-function mkdirEntry(selected, html, filepath, next) {
-  mkdirp(path.dirname(filepath), (e) => {
+function mkdirEntry(entry, next) {
+  mkdirp(path.dirname(entry.path), (e) => {
     if (e) {
       return next(e);
     }
 
-    next(null, selected, html, filepath);
+    next(null, entry);
   });
 }
 
-function saveEntry(selected, html, filepath, next) {
-  fs.writeFile(filepath, html, {
+function saveEntry(entry, next) {
+  fs.writeFile(entry.path, entry.content, {
     flag: "wx"
   }, (e) => {
     if (e) {
       return next(e);
     }
 
-    next(null, selected, filepath);
+    next(null, entry);
   });
 }
 
-function deleteSelected(selected, filepath, next) {
+function deleteSelected(selected, next) {
   request.post(`${endpoint.data}/${selected.key}?${config.auth}`, {
     body: JSON.stringify({
       deleted: 1
@@ -227,65 +230,65 @@ function deleteSelected(selected, filepath, next) {
       return next(new Error(r.statusMessage));
     }
 
-    next(null, filepath);
+    next(null, selected);
   });
 }
 
-function findGit(filepath, next) {
+function findGit(entry, next) {
   which("git", (e, p) => {
     if (e) {
       return next(e);
     }
 
-    next(null, p, filepath);
+    next(null, entry, p);
   });
 }
 
-function addEntry(git, filepath, next) {
+function addEntry(entry, git, next) {
   execFile(git, [
     "add",
     "--",
-    filepath
+    entry.path
   ], (e, o) => {
     if (e) {
       return next(e);
     }
 
     process.stdout.write(o);
-    next(null, git, filepath);
+    next(null, entry, git);
   });
 }
 
-function commitEntry(git, filepath, next) {
+function commitEntry(entry, git, next) {
   execFile(git, [
     "commit",
-    `--message=Add ${path.relative(dir.root, filepath).replace(/\\/g, "/")}`,
+    `--message=Add ${path.relative(dir.root, entry.path).replace(/\\/g, "/")}`,
   ], (e, o) => {
     if (e) {
       return next(e);
     }
 
     process.stdout.write(o);
-    next(null, filepath);
+    next(null, entry);
   });
 }
 
-function findNpm(filepath, next) {
+function findNpm(entry, next) {
   which("npm", (e, p) => {
     if (e) {
       return next(e);
     }
 
-    next(null, p, filepath);
+    next(null, entry, p);
   });
 }
 
-function runBlog(npm, filepath, next) {
+function runBlog(entry, npm, next) {
   execFile(npm, [
     "run",
     "blog",
     "--",
-    `--file=${filepath}`,
+    `--file=${entry.path}`,
     "--reindex"
   ], (e, o) => {
     if (e) {
@@ -293,16 +296,16 @@ function runBlog(npm, filepath, next) {
     }
 
     process.stdout.write(o);
-    next(null, filepath);
+    next(null, entry, npm);
   });
 }
 
-function runArticles(npm, filepath, next) {
+function runArticles(entry, npm, next) {
   execFile(npm, [
     "run",
     "articles",
     "--",
-    `--file=${filepath}`
+    `--file=${entry.path}`
   ], (e, o) => {
     if (e) {
       return next(e);
@@ -313,9 +316,9 @@ function runArticles(npm, filepath, next) {
   });
 }
 
-function publishSelected(selected, html, filepath) {
+function publishSelected(selected) {
   waterfall([
-    mkdirEntry.bind(null, selected, html, filepath),
+    mkdirEntry.bind(null, selected),
     saveEntry,
     deleteSelected,
     findGit,
@@ -331,28 +334,28 @@ function publishSelected(selected, html, filepath) {
   });
 }
 
-function savePreview(html, filepath, next) {
-  fs.writeFile(filepath, html, (e) => {
+function savePreview(preview, next) {
+  fs.writeFile(preview.path, preview.content, (e) => {
     if (e) {
       return next(e);
     }
 
-    next(null, filepath);
+    next(null, preview);
   });
 }
 
-function findOpen(filepath, next) {
+function findOpen(preview, next) {
   which("open", (e, p) => {
     if (e) {
       return next(e);
     }
 
-    next(null, p, filepath);
+    next(null, preview, p);
   });
 }
 
-function openPreview(open, filepath, next) {
-  execFile(open, [filepath], (e) => {
+function openPreview(preview, open, next) {
+  execFile(open, [preview.path], (e) => {
     if (e) {
       return next(e);
     }
@@ -361,9 +364,9 @@ function openPreview(open, filepath, next) {
   });
 }
 
-function previewSelected(html, filepath) {
+function previewSelected(selected) {
   waterfall([
-    savePreview.bind(null, html, filepath),
+    savePreview.bind(null, selected),
     findOpen,
     openPreview
   ], (e) => {
@@ -383,16 +386,18 @@ waterfall([
   selectNote,
   checkSelected,
   markupSelected
-], (e, s, h, n) => {
+], (e, s) => {
   if (e) {
     throw e;
   }
 
   if (argv.publish) {
-    return publishSelected(s, h, path.join(dir.entry, `${n}.txt`));
+    s.path = path.join(dir.entry, `${s.path}.txt`);
+
+    return publishSelected(s);
   }
 
-  previewSelected(`<!DOCTYPE html>
+  s.content = `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
@@ -406,9 +411,11 @@ waterfall([
         <footer class="section-footer">
           <p><time datetime="1976-07-23">1976/07/23</time></p>
         </footer>
-        ${h}
+        ${s.content}
       </article>
     </main>
   </body>
-</html>`.replace(/="\//g, "=\"../dist/"), path.join(dir.temp, `${n}.html`));
+</html>`.replace(/="\//g, "=\"../dist/");
+  s.path = path.join(dir.temp, `${s.path}.html`);
+  previewSelected(s);
 });
