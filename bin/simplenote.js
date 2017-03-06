@@ -75,8 +75,6 @@ function renewToken(token, next) {
 }
 
 function storeToken(token, datetime, next) {
-  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
-
   if (!datetime) {
     return next(null, token);
   }
@@ -94,6 +92,7 @@ function storeToken(token, datetime, next) {
 }
 
 function listNotes(token, next) {
+  config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
   request.get(`${endpoint.index}?length=100&${config.auth}`, {
     headers: headers
   }, (e, r, b) => {
