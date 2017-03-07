@@ -161,6 +161,31 @@ function getNotes(notes) {
   return Promise.all(notes.map(getNote));
 }
 
+function truncate(str, length) {
+  return str.split("")
+    .reduce((a, c) => {
+      if (length < 3) {
+        return a;
+      }
+
+      if (c.charCodeAt() > 255) {
+        length = length - 1;
+      }
+
+      length = length - 1;
+
+      if (length === 2) {
+        return `${a}${c}...`;
+      }
+
+      if (length === 1) {
+        return `${a}${c}....`;
+      }
+
+      return a + c;
+    }, "");
+}
+
 function selectNote(notes) {
   return new Promise((resolve, reject) => {
     const menu = readline.createInterface({
@@ -171,7 +196,15 @@ function selectNote(notes) {
     menu.write("\n");
     menu.write("0. QUIT\n");
     notes.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.content.trim().split("\n")[0]}\n`);
+      const lines = n.content.trim()
+        .split("\n")
+        .filter((l) => {
+          return l;
+        });
+
+      menu.write(`${i + 1}. ${lines[0]}
+   ${truncate(lines[1], 66)}
+`);
     });
     menu.question("Which one: (0) ", (a) => {
       if (!a) {
