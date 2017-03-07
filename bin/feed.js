@@ -3,9 +3,7 @@
 "use strict";
 
 const feedmix = require("feedmix");
-const fs = require("fs");
-const mkdirp = require("mkdirp").sync;
-const path = require("path");
+const fs = require("fs-extra");
 
 const dest = "../dist/feed";
 const src = [
@@ -15,8 +13,7 @@ const src = [
 ];
 
 process.chdir(__dirname);
-mkdirp(path.dirname(dest));
-fs.writeFileSync(dest, `${feedmix.stringify(feedmix.merge(src.map((f) => {
+fs.outputFileSync(dest, `${feedmix.stringify(feedmix.merge(src.map((f) => {
   return fs.readFileSync(f, "utf8");
 }), {
   trim: true

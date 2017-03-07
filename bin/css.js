@@ -4,8 +4,7 @@
 
 const csswring = require("csswring");
 const execFileSync = require("child_process").execFileSync;
-const fs = require("fs");
-const mkdirp = require("mkdirp").sync;
+const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
@@ -33,12 +32,12 @@ fs.readdirSync(src).forEach((f) => {
     return false;
   }
 
-  mkdirp(tmp);
-  execFileSync(sassc, [
+  fs.outputFileSync(dest, execFileSync(sassc, [
     path.join(src, f).replace(/\\/g, "/"),
-    dest
-  ]);
+  ], {
+    encoding: "utf8"
+  }));
   processor.process(fs.readFileSync(dest, "utf8")).then((r) => {
-    fs.writeFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
+    fs.outputFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
   });
 });

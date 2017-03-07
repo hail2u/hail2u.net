@@ -3,10 +3,9 @@
 "use strict";
 
 const execFileSync = require("child_process").execFileSync;
-const fs = require("fs");
+const fs = require("fs-extra");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp").sync;
 const path = require("path");
 const which = require("which").sync;
 
@@ -90,6 +89,5 @@ files.map((f) => {
   }
 
   f = path.join(dir.static, f);
-  mkdirp(path.dirname(f));
-  fs.writeFileSync(f, html);
+  fs.outputFileSync(f, html);
 });

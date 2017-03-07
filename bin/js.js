@@ -3,8 +3,7 @@
 "use strict";
 
 const compile = require("google-closure-compiler-js").compile;
-const fs = require("fs");
-const mkdirp = require("mkdirp").sync;
+const fs = require("fs-extra");
 const path = require("path");
 
 const src = [
@@ -37,8 +36,7 @@ src.forEach((f) => {
     return `${a}${fs.readFileSync(i, "utf8")}`;
   }, "");
   f.dest = path.join(tmp, f.dest);
-  mkdirp(tmp);
-  fs.writeFileSync(f.dest, f.contents);
+  fs.outputFileSync(f.dest, f.contents);
   f.dest = path.join(tmp, `${path.basename(f.dest, jsExt)}${minExt}${jsExt}`);
   f.contents = compile({
     compilationLevel: "ADVANCED",
@@ -47,5 +45,5 @@ src.forEach((f) => {
     }],
     outputWrapper: "(function () {%output%}).call(window);"
   }).compiledCode;
-  fs.writeFileSync(f.dest, f.contents);
+  fs.outputFileSync(f.dest, f.contents);
 });

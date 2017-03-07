@@ -2,9 +2,8 @@
 
 "use strict";
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp").sync;
 const path = require("path");
 
 const argv = minimist(process.argv.slice(2), {
@@ -46,7 +45,7 @@ if ((!argv.file && !argv.force) || (argv.file && argv.force)) {
 
 if (argv.file) {
   argv.file = path.resolve(argv.file).replace(/\\/g, "/");
-  articles.push(...JSON.parse(fs.readFileSync(dest, "utf8")));
+  articles.push(...fs.readJSONSync(dest, "utf8"));
 }
 
 fs.readFileSync(src, "utf8")
@@ -62,7 +61,8 @@ fs.readFileSync(src, "utf8")
 
     articles.unshift(readArticle(...l.split("=>")));
   });
-mkdirp(path.dirname(dest));
-fs.writeFileSync(dest, JSON.stringify([...new Set(articles.sort((a, b) => {
+fs.outputJSONSync(dest, [...new Set(articles.sort((a, b) => {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}))], null, 2));
+}))], {
+  spaces: 2
+});

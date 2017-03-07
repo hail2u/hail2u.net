@@ -3,10 +3,9 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
-const fs = require("fs");
+const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
-const mkdirp = require("mkdirp");
 const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
@@ -59,24 +58,14 @@ function renewToken() {
   });
 }
 
-function mkdirCache([token, datetime]) {
-  return new Promise((resolve, reject) => {
-    mkdirp(path.dirname(cache), (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve([token, datetime]);
-    });
-  });
-}
-
 function saveCache([token, datetime]) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(cache, JSON.stringify({
+    fs.outputJSONSync(cache, {
       datetime: datetime,
       token: token
-    }, null, 2), (e) => {
+    }, {
+      spaces: 2
+    }, (e) => {
       if (e) {
         return reject(e);
       }
@@ -88,12 +77,10 @@ function saveCache([token, datetime]) {
 
 function getToken() {
   return new Promise((resolve, reject) => {
-    fs.readFile(cache, "utf8", (e, d) => {
+    fs.readJSON(cache, "utf8", (e, d) => {
       if (e) {
         return reject();
       }
-
-      d = JSON.parse(d);
 
       if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
         return reject();
@@ -104,7 +91,6 @@ function getToken() {
   }).catch(() => {
     return waterfall([
       renewToken,
-      mkdirCache,
       saveCache
     ]);
   });
@@ -249,21 +235,9 @@ function markupSelected(selected) {
   });
 }
 
-function mkdirEntry(entry) {
-  return new Promise((resolve, reject) => {
-    mkdirp(path.dirname(entry.path), (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(entry);
-    });
-  });
-}
-
 function saveEntry(entry) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(entry.path, entry.content, {
+    fs.outputFile(entry.path, entry.content, {
       flag: "wx"
     }, (e) => {
       if (e) {
@@ -392,7 +366,6 @@ function runArticles([entry, npm]) {
 
 function publishSelected(selected) {
   return waterfall([
-    mkdirEntry,
     saveEntry,
     deleteSelected,
     findGit,
@@ -404,21 +377,9 @@ function publishSelected(selected) {
   ], selected);
 }
 
-function mkdirPreview(preview) {
-  return new Promise((resolve, reject) => {
-    mkdirp(path.dirname(preview.path), (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(preview);
-    });
-  });
-}
-
 function savePreview(preview) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(preview.path, preview.content, (e) => {
+    fs.outputFile(preview.path, preview.content, (e) => {
       if (e) {
         return reject(e);
       }
@@ -454,7 +415,6 @@ function openPreview([preview, open]) {
 
 function previewSelected(selected) {
   return waterfall([
-    mkdirPreview,
     savePreview,
     findOpen,
     openPreview

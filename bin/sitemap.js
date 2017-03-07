@@ -2,8 +2,7 @@
 
 "use strict";
 
-const fs = require("fs");
-const mkdirp = require("mkdirp").sync;
+const fs = require("fs-extra");
 const path = require("path");
 const xml2js = require("xml2js");
 
@@ -39,7 +38,7 @@ fs.readdirSync(src.documents).forEach((f) => {
 
   sitemap.urlset.url.push(`/${path.basename(src.documents)}/${f}`);
 });
-JSON.parse(fs.readFileSync(src.articles, "utf8")).forEach((a) => {
+fs.readJSONSync(src.articles, "utf8").forEach((a) => {
   sitemap.urlset.url.push(a.link);
 });
 sitemap.urlset.url = sitemap.urlset.url.map((u) => {
@@ -47,5 +46,4 @@ sitemap.urlset.url = sitemap.urlset.url.map((u) => {
     loc: `https://hail2u.net${u}`
   };
 });
-mkdirp(path.dirname(dest));
-fs.writeFileSync(dest, new xml2js.Builder().buildObject(sitemap));
+fs.outputFileSync(dest, new xml2js.Builder().buildObject(sitemap));

@@ -2,9 +2,8 @@
 
 "use strict";
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
-const mkdirp = require("mkdirp").sync;
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
@@ -110,7 +109,7 @@ function readFeed(file) {
 }
 
 function readArticles() {
-  const articles = JSON.parse(fs.readFileSync(articleCache, "utf8"))
+  const articles = fs.readJSONSync(articleCache, "utf8")
     .map(function (a, idx, arr) {
       a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
       a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
@@ -135,7 +134,7 @@ function readArticles() {
 }
 
 function buildData(file) {
-  const data = JSON.parse(fs.readFileSync(file, "utf8"));
+  const data = fs.readJSONSync(file, "utf8");
 
   switch (path.relative(dir.template, file).replace(/\\/g, "/")) {
   case "index.json":
@@ -166,12 +165,11 @@ function toHTML(file) {
 
 process.chdir(__dirname);
 mustache.escape = escape;
-Object.assign(metadata, JSON.parse(fs.readFileSync(metadataFile, "utf8")));
+Object.assign(metadata, fs.readJSONSync(metadataFile, "utf8"));
 fs.readdirSync(dir.partial).forEach((p) => {
   partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
 });
 files.forEach((f) => {
   f.json = path.join(path.dirname(f.src), `${path.basename(f.src, ".mustache")}.json`);
-  mkdirp(path.dirname(f.dest));
-  fs.writeFileSync(f.dest, toHTML(f));
+  fs.outputFileSync(f.dest, toHTML(f));
 });
