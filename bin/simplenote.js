@@ -40,7 +40,7 @@ function waterfall(tasks, initialValue) {
   }, Promise.resolve(initialValue));
 }
 
-function getToken() {
+function renewToken() {
   return new Promise((resolve, reject) => {
     request.post(endpoint.auth, {
       body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
@@ -86,7 +86,7 @@ function saveCache([token, datetime]) {
   });
 }
 
-function readCache() {
+function getToken() {
   return new Promise((resolve, reject) => {
     fs.readFile(cache, "utf8", (e, d) => {
       if (e) {
@@ -103,7 +103,7 @@ function readCache() {
     });
   }).catch(() => {
     return waterfall([
-      getToken,
+      renewToken,
       mkdirCache,
       saveCache
     ]);
@@ -471,7 +471,7 @@ function processSelected(selected) {
 
 process.chdir(__dirname);
 waterfall([
-  readCache,
+  getToken,
   listNotes,
   getNotes,
   selectNote,
