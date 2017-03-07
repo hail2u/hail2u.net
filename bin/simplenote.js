@@ -34,36 +34,14 @@ const headers = {
   "User-Agent": "sn/0.0.0"
 };
 
-function catcher(err) {
-  console.error(err.stack);
-  process.exit(1);
-}
-
 function waterfall(tasks, initialValue) {
   return tasks.reduce((p, t) => {
     return p.then(t);
   }, Promise.resolve(initialValue));
 }
 
-function readCache() {
-  return new Promise((resolve) => {
-    fs.readFile(cache, "utf8", (e, d) => {
-      if (e) {
-        return resolve([null, null]);
-      }
-
-      d = JSON.parse(d);
-      resolve([d.token, d.datetime]);
-    });
-  });
-}
-
-function getToken([token, datetime]) {
+function getToken() {
   return new Promise((resolve, reject) => {
-    if ((Date.now() - Date.parse(datetime)) < (1000 * 60 * 60 * 23)) {
-      return resolve([token, null]);
-    }
-
     request.post(endpoint.auth, {
       body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
       headers: headers
@@ -83,10 +61,6 @@ function getToken([token, datetime]) {
 
 function mkdirCache([token, datetime]) {
   return new Promise((resolve, reject) => {
-    if (!datetime) {
-      return resolve([token, null]);
-    }
-
     mkdirp(path.dirname(cache), (e) => {
       if (e) {
         return reject(e);
@@ -99,10 +73,6 @@ function mkdirCache([token, datetime]) {
 
 function saveCache([token, datetime]) {
   return new Promise((resolve, reject) => {
-    if (!datetime) {
-      return resolve(token);
-    }
-
     fs.writeFile(cache, JSON.stringify({
       datetime: datetime,
       token: token
@@ -113,6 +83,30 @@ function saveCache([token, datetime]) {
 
       resolve(token);
     });
+  });
+}
+
+function readCache() {
+  return new Promise((resolve, reject) => {
+    fs.readFile(cache, "utf8", (e, d) => {
+      if (e) {
+        return reject();
+      }
+
+      d = JSON.parse(d);
+
+      if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
+        return reject();
+      }
+
+      resolve(d.token);
+    });
+  }).catch(() => {
+    return waterfall([
+      getToken,
+      mkdirCache,
+      saveCache
+    ]);
   });
 }
 
@@ -161,6 +155,11 @@ function getNote(note) {
       resolve(JSON.parse(b));
     });
   });
+}
+
+function catcher(err) {
+  console.error(err.stack);
+  process.exit(1);
 }
 
 function getNotes(notes) {
@@ -473,9 +472,6 @@ function processSelected(selected) {
 process.chdir(__dirname);
 waterfall([
   readCache,
-  getToken,
-  mkdirCache,
-  saveCache,
   listNotes,
   getNotes,
   selectNote,
