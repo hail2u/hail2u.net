@@ -157,19 +157,8 @@ function getNote(note) {
   });
 }
 
-function catcher(err) {
-  console.error(err.stack);
-  process.exit(1);
-}
-
 function getNotes(notes) {
-  return new Promise((resolve) => {
-    Promise.all(notes.map(getNote))
-      .then((r) => {
-        resolve(r);
-      })
-      .catch(catcher);
-  });
+  return Promise.all(notes.map(getNote));
 }
 
 function selectNote(notes) {
@@ -369,7 +358,7 @@ function runArticles([entry, npm]) {
 }
 
 function publishSelected(selected) {
-  waterfall([
+  return waterfall([
     mkdirEntry,
     saveEntry,
     deleteSelected,
@@ -379,7 +368,7 @@ function publishSelected(selected) {
     findNpm,
     runBlog,
     runArticles
-  ], selected).catch(catcher);
+  ], selected);
 }
 
 function mkdirPreview(preview) {
@@ -431,12 +420,12 @@ function openPreview([preview, open]) {
 }
 
 function previewSelected(selected) {
-  waterfall([
+  return waterfall([
     mkdirPreview,
     savePreview,
     findOpen,
     openPreview
-  ], selected).catch(catcher);
+  ], selected);
 }
 
 function processSelected(selected) {
@@ -466,7 +455,8 @@ function processSelected(selected) {
 </body>
 </html>`.replace(/="\//g, "=\"../dist/");
   selected.path = path.join(dir.temp, `${selected.path}.html`);
-  previewSelected(selected);
+
+  return previewSelected(selected);
 }
 
 process.chdir(__dirname);
@@ -478,4 +468,7 @@ waterfall([
   checkSelected,
   markupSelected,
   processSelected
-], null).catch(catcher);
+], null).catch((e) => {
+  console.error(e.stack);
+  process.exit(1);
+});
