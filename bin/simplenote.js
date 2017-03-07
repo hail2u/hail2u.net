@@ -315,7 +315,7 @@ function findNpm(entry) {
         return reject(e);
       }
 
-      resolve(entry, p);
+      resolve([entry, p]);
     });
   });
 }
@@ -334,7 +334,7 @@ function runBlog([entry, npm]) {
       }
 
       process.stdout.write(o);
-      resolve(entry, npm);
+      resolve([entry, npm]);
     });
   });
 }
