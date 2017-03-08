@@ -2,11 +2,11 @@
 
 "use strict";
 
-const compile = require("google-closure-compiler-js").compile;
 const fs = require("fs-extra");
+const gccc = require("google-closure-compiler-js").compile;
 const path = require("path");
 
-const src = [
+const files = [
   {
     "dest": "debug.js",
     "src": [
@@ -30,20 +30,71 @@ const jsExt = ".js";
 const minExt = ".min";
 const tmp = "../tmp/";
 
-process.chdir(__dirname);
-src.forEach((f) => {
-  f.contents = f.src.reduce((a, i) => {
-    return `${a}${fs.readFileSync(i, "utf8")}`;
-  }, "");
-  f.dest = path.join(tmp, f.dest);
-  fs.outputFileSync(f.dest, f.contents);
-  f.dest = path.join(tmp, `${path.basename(f.dest, jsExt)}${minExt}${jsExt}`);
-  f.contents = compile({
+function read(file) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(d);
+    });
+  });
+}
+
+function gather(file) {
+  return Promise.all(file.src.map(read))
+    .then((r) => {
+      file.contents = r;
+
+      return file;
+    });
+}
+
+function concat(file) {
+  file.contents = file.contents.join("");
+  file.dest = path.join(tmp, file.dest);
+
+  return file;
+}
+
+function write(file) {
+  return new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.contents, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(file);
+    });
+  });
+}
+
+function compile(file) {
+  file.contents = gccc({
     compilationLevel: "ADVANCED",
     jsCode: [{
-      src: f.contents
+      src: file.contents
     }],
     outputWrapper: "(function () {%output%}).call(window);"
   }).compiledCode;
-  fs.outputFileSync(f.dest, f.contents);
-});
+  file.dest = path.join(tmp, `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`);
+
+  return file;
+}
+
+function build(file) {
+  return Promise.resolve(file)
+    .then(gather)
+    .then(concat)
+    .then(write)
+    .then(compile)
+    .then(write);
+}
+
+process.chdir(__dirname);
+Promise.all(files.map(build))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });

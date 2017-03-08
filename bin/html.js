@@ -55,9 +55,69 @@ const metadata = {};
 const metadataFile = "../src/html/metadata.json";
 const partials = {};
 
-function escape(str) {
-  return String(str).replace(/[&<>"']/g, (s) => {
-    return entityMap[s];
+function readMetadata() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(metadataFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      Object.assign(metadata, o);
+      resolve();
+    });
+  });
+}
+
+function readPartial(file) {
+  file = path.join(dir.partial, file);
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      partials[path.basename(file, ".mustache")] = d;
+      resolve(d);
+    });
+  });
+}
+
+function readPartials() {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dir.partial, (e, f) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(Promise.all(f.map(readPartial)));
+    });
+  });
+}
+
+function readTemplate(file) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file.src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      file.template = d;
+      resolve(file);
+    });
+  });
+}
+
+function readData(file) {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(file.json, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      file.data = Object.assign({}, metadata, o);
+      resolve(file);
+    });
   });
 }
 
@@ -73,103 +133,158 @@ function toHTML5Date(yy, mm, dd, hh, nn, ss) {
   return `${yy}-${pad(mm)}-${pad(dd)}T${pad(hh)}:${pad(nn)}:${pad(ss)}+09:00`;
 }
 
-function readFeed(file) {
-  const feed = {};
-
-  parseXML(fs.readFileSync(file, "utf8"), {
-    trim: true,
-    explicitArray: false
-  }, (e, d) => {
-    if (e) {
-      throw e;
-    }
-
-    Object.assign(feed, d.rss.channel);
-  });
-
-  feed.item.forEach((i) => {
-    if (i.link) {
-      i.link = i.link.replace(/https?:\/\/hail2u\.net\//, "/");
-    }
-
-    if (i.pubDate) {
-      const d = new Date(i.pubDate);
-      const yy = d.getFullYear();
-      const mm = d.getMonth() + 1;
-      const dd = d.getDate();
-
-      i.strPubDate = `${yy}/${pad(mm)}/${pad(dd)}`;
-      i.html5PubDate = toHTML5Date(yy, mm, dd, d.getHours(), d.getMinutes(),
-        d.getSeconds());
-    }
-  });
-  feed.item[0].isLatest = true;
-
-  return feed.item;
-}
-
-function readArticles() {
-  const articles = fs.readJSONSync(articleCache, "utf8")
-    .map(function (a, idx, arr) {
-      a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
-      a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
-        a.second);
-
-      if (idx && this.y !== a.year) {
-        a.isFirstInYear = true;
-        arr[idx - 1].isLastInYear = true;
+function getItems(feed) {
+  return new Promise((resolve, reject) => {
+    parseXML(feed, {
+      async: true,
+      trim: true,
+      explicitArray: false
+    }, (e, o) => {
+      if (e) {
+        return reject(e);
       }
 
-      this.y = a.year;
+      const items = o.rss.channel.item.map((i) => {
+        if (i.link) {
+          i.link = i.link.replace(/https?:\/\/hail2u\.net\//, "/");
+        }
 
-      return a;
-    }, {
-      y: true
+        if (i.pubDate) {
+          const dt = new Date(i.pubDate);
+          const yy = dt.getFullYear();
+          const mm = dt.getMonth() + 1;
+          const dd = dt.getDate();
+
+          i.strPubDate = `${yy}/${pad(mm)}/${pad(dd)}`;
+          i.html5PubDate = toHTML5Date(yy, mm, dd, dt.getHours(),
+            dt.getMinutes(), dt.getSeconds());
+        }
+
+        return i;
+      });
+
+      items[0].isLatest = true;
+      resolve(items);
     });
-
-  articles[0].isFirstInYear = true;
-  articles[articles.length - 1].isLastInYear = true;
-
-  return articles;
+  });
 }
 
-function buildData(file) {
-  const data = fs.readJSONSync(file, "utf8");
+function readFeed(file) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
 
-  switch (path.relative(dir.template, file).replace(/\\/g, "/")) {
-  case "index.json":
-    data.features = readFeed(feeds.documents);
-    data.articles = readFeed(feeds.weblog);
+      resolve(getItems(d));
+    });
+  });
+}
 
-    break;
-  case "blog/index.json":
-    data.articles = readArticles();
-
-    break;
+function readFeeds(file) {
+  if (!file.data.home) {
+    return file;
   }
 
-  return Object.assign({}, metadata, data);
+  return Promise.all([feeds.documents, feeds.weblog].map(readFeed))
+    .then(([d, w]) => {
+      file.data.features = d;
+      file.data.articles = w;
+
+      return file;
+    });
 }
 
-function toHTML(file) {
-  const template = fs.readFileSync(file.src, "utf8");
-  const data = buildData(file.json);
-  const html = mustache.render(template, data, partials);
+function readArticlesCache(file) {
+  if (!file.data.weblog || file.data.weblog_child) {
+    return file;
+  }
 
+  return new Promise((resolve, reject) => {
+    fs.readJSON(articleCache, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      o.map(function (a, idx, arr) {
+        a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
+        a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
+          a.second);
+
+        if (idx && this.y !== a.year) {
+          a.isFirstInYear = true;
+          arr[idx - 1].isLastInYear = true;
+        }
+
+        this.y = a.year;
+
+        return a;
+      }, {
+        y: true
+      });
+
+      o[0].isFirstInYear = true;
+      o[o.length - 1].isLastInYear = true;
+      file.data.articles = o;
+      resolve(file);
+    });
+  });
+}
+
+function render(file) {
+  file.contents = mustache.render(file.template, file.data, partials);
+
+  return file;
+}
+
+function minify(file) {
   if (!file.dest.endsWith("/page")) {
-    return minifyHTML(html);
+    file.contents = minifyHTML(file.contents);
   }
 
-  return html;
+  return file;
+}
+
+function write(file) {
+  return new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.contents, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(file);
+    });
+  });
+}
+
+function build(file) {
+  file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
+
+  return Promise.resolve(file)
+    .then(readTemplate)
+    .then(readData)
+    .then(readFeeds)
+    .then(readArticlesCache)
+    .then(render)
+    .then(minify)
+    .then(write);
+}
+
+function buildAll() {
+  return Promise.all(files.map(build));
 }
 
 process.chdir(__dirname);
-mustache.escape = escape;
-Object.assign(metadata, fs.readJSONSync(metadataFile, "utf8"));
-fs.readdirSync(dir.partial).forEach((p) => {
-  partials[path.basename(p, ".mustache")] = fs.readFileSync(path.join(dir.partial, p), "utf8");
-});
-files.forEach((f) => {
-  f.json = path.join(path.dirname(f.src), `${path.basename(f.src, ".mustache")}.json`);
-  fs.outputFileSync(f.dest, toHTML(f));
-});
+mustache.escape = (s) => {
+  return String(s).replace(/[&<>"']/g, (c) => {
+    return entityMap[c];
+  });
+};
+Promise.resolve()
+  .then(readMetadata)
+  .then(readPartials)
+  .then(buildAll)
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });

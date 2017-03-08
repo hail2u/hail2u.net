@@ -3,7 +3,7 @@
 "use strict";
 
 const csswring = require("csswring");
-const execFileSync = require("child_process").execFileSync;
+const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
 const path = require("path");
@@ -23,23 +23,88 @@ const scssExt = ".scss";
 const scss = "../src/css/";
 const tmp = "../tmp/";
 
-process.chdir(__dirname);
-fs.readdirSync(scss).forEach((f) => {
-  const basename = path.basename(f, scssExt);
+function toObject(file) {
+  return {
+    src: file
+  };
+}
 
-  if (path.extname(f) !== scssExt || basename.startsWith("_")) {
+function isSCSS(file) {
+  file.basename = path.basename(file.src, scssExt);
+
+  if (path.extname(file.src) !== scssExt || file.basename.startsWith("_")) {
     return false;
   }
 
-  const dest = path.join(tmp, `${basename}${cssExt}`);
-  const css = execFileSync(sassc, [
-    path.join(scss, f).replace(/\\/g, "/"),
-  ], {
-    encoding: "utf8"
-  });
+  return true;
+}
 
-  fs.outputFileSync(dest, css);
-  processor.process(css).then((r) => {
-    fs.outputFileSync(path.join(tmp, `${basename}${minExt}${cssExt}`), r.css);
+function listSCSSFiles() {
+  return new Promise((resolve, reject) => {
+    fs.readdir(scss, (e, f) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(f.map(toObject).filter(isSCSS));
+    });
   });
-});
+}
+
+function compile(file) {
+  return new Promise((resolve, reject) => {
+    execFile(sassc, [
+      path.join(scss, file.src).replace(/\\/g, "/")
+    ], (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      file.contents = d;
+      file.dest = path.join(tmp, `${file.basename}${cssExt}`);
+      resolve(file);
+    });
+  });
+}
+
+function write(file) {
+  return new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.contents, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(file);
+    });
+  });
+}
+
+function optimize(file) {
+  return processor.process(file.contents).then((r) => {
+    file.contents = r.css;
+    file.dest = path.join(tmp, `${file.basename}${minExt}${cssExt}`);
+
+    return file;
+  });
+}
+
+function build(file) {
+  return Promise.resolve(file)
+    .then(compile)
+    .then(write)
+    .then(optimize)
+    .then(write);
+}
+
+function buildAll(files) {
+  return Promise.all(files.map(build));
+}
+
+process.chdir(__dirname);
+Promise.resolve()
+  .then(listSCSSFiles)
+  .then(buildAll)
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });

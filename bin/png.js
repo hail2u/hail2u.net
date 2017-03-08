@@ -2,7 +2,7 @@
 
 "use strict";
 
-const execFileSync = require("child_process").execFileSync;
+const execFile = require("child_process").execFile;
 const which = require("which").sync;
 
 const files = [
@@ -45,21 +45,35 @@ const files = [
 ];
 const inkscape = which("inkscape");
 
+function toPNG(file) {
+  return new Promise((resolve, reject) => {
+    const args = ["-f", file.src, "-e", file.dest];
+
+    if (file.area) {
+      args.push("-a", file.area);
+    }
+
+    if (file.height) {
+      args.push("-h", file.height);
+    }
+
+    if (file.width) {
+      args.push("-w", file.width);
+    }
+
+    execFile(inkscape, args, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
+}
+
 process.chdir(__dirname);
-files.forEach((f) => {
-  const args = ["-f", f.src, "-e", f.dest];
-
-  if (f.area) {
-    args.push("-a", f.area);
-  }
-
-  if (f.height) {
-    args.push("-h", f.height);
-  }
-
-  if (f.width) {
-    args.push("-w", f.width);
-  }
-
-  execFileSync(inkscape, args);
-});
+Promise.all(files.map(toPNG))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
