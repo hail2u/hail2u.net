@@ -10,7 +10,7 @@ const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
 const request = require("request");
-const which = require("which");
+const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
@@ -29,9 +29,12 @@ const endpoint = {
   data: "https://app.simplenote.com/api2/data",
   index: "https://app.simplenote.com/api2/index"
 };
+const git = which("git");
 const headers = {
   "User-Agent": "sn/0.0.0"
 };
+const npm = which("npm");
+const open = which("open");
 
 function waterfall(tasks, initialValue) {
   return tasks.reduce((p, t) => {
@@ -270,19 +273,7 @@ function deleteSelected(selected) {
   });
 }
 
-function findGit(entry) {
-  return new Promise((resolve, reject) => {
-    which("git", (e, p) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve([entry, p]);
-    });
-  });
-}
-
-function addEntry([entry, git]) {
+function addEntry(entry) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "add",
@@ -294,12 +285,12 @@ function addEntry([entry, git]) {
       }
 
       process.stdout.write(o);
-      resolve([entry, git]);
+      resolve(entry);
     });
   });
 }
 
-function commitEntry([entry, git]) {
+function commitEntry(entry) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
@@ -315,19 +306,7 @@ function commitEntry([entry, git]) {
   });
 }
 
-function findNpm(entry) {
-  return new Promise((resolve, reject) => {
-    which("npm", (e, p) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve([entry, p]);
-    });
-  });
-}
-
-function runBlog([entry, npm]) {
+function runBlog(entry) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
@@ -341,12 +320,12 @@ function runBlog([entry, npm]) {
       }
 
       process.stdout.write(o);
-      resolve([entry, npm]);
+      resolve(entry);
     });
   });
 }
 
-function runArticles([entry, npm]) {
+function runArticles(entry) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
@@ -368,10 +347,8 @@ function publishSelected(selected) {
   return waterfall([
     saveEntry,
     deleteSelected,
-    findGit,
     addEntry,
     commitEntry,
-    findNpm,
     runBlog,
     runArticles
   ], selected);
@@ -389,19 +366,7 @@ function savePreview(preview) {
   });
 }
 
-function findOpen(preview) {
-  return new Promise((resolve, reject) => {
-    which("open", (e, p) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve([preview, p]);
-    });
-  });
-}
-
-function openPreview([preview, open]) {
+function openPreview(preview) {
   return new Promise((resolve, reject) => {
     execFile(open, [preview.path], (e) => {
       if (e) {
@@ -416,7 +381,6 @@ function openPreview([preview, open]) {
 function previewSelected(selected) {
   return waterfall([
     savePreview,
-    findOpen,
     openPreview
   ], selected);
 }
