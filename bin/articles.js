@@ -49,12 +49,9 @@ if (argv.file) {
 }
 
 fs.readFileSync(src, "utf8")
+  .trim()
   .split(/\r?\n/)
   .forEach((l) => {
-    if (!/\d+$/.test(l)) {
-      return;
-    }
-
     if (!argv.force && !l.startsWith(argv.file)) {
       return;
     }
