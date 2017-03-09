@@ -15,10 +15,15 @@ const dest = "../cache/articles.json";
 const root = "../src/weblog/entries/";
 const src = "../src/weblog/plugins/state/files_index.dat";
 
-function readArticle(file, date) {
-  date = new Date(parseInt(date, 10) * 1000);
+function readArticle(line) {
+  if (!argv.force && !line.startsWith(argv.file)) {
+    return;
+  }
 
-  return {
+  const [file, time] = line.split("=>");
+  const date = new Date(parseInt(time, 10) * 1000);
+
+  articles.unshift({
     day: date.getDate(),
     hour: date.getHours(),
     link: `/blog/${path.relative(root, path.dirname(file))}/${path.basename(file, ".txt")}.html`,
@@ -33,7 +38,11 @@ function readArticle(file, date) {
     tz: "+09:00",
     unixtime: date.getTime(),
     year: date.getFullYear()
-  };
+  });
+}
+
+function sortArticles(a, b) {
+  return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }
 
 process.chdir(__dirname);
@@ -50,15 +59,7 @@ if (argv.file) {
 fs.readFileSync(src, "utf8")
   .trim()
   .split(/\r?\n/)
-  .forEach((l) => {
-    if (!argv.force && !l.startsWith(argv.file)) {
-      return;
-    }
-
-    articles.unshift(readArticle(...l.split("=>")));
-  });
-fs.outputJSONSync(dest, [...new Set(articles)].sort((a, b) => {
-  return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-}), {
+  .forEach(readArticle);
+fs.outputJSONSync(dest, [...new Set(articles)].sort(sortArticles), {
   spaces: 2
 });
