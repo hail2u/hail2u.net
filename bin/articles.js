@@ -39,7 +39,7 @@ function readArticle(file, date) {
 
 process.chdir(__dirname);
 
-if ((!argv.file && !argv.force) || (argv.file && argv.force)) {
+if (!argv.file && !argv.force) {
   return;
 }
 
