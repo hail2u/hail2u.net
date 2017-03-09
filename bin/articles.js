@@ -16,7 +16,6 @@ const root = "../src/weblog/entries/";
 const src = "../src/weblog/plugins/state/files_index.dat";
 
 function readArticle(file, date) {
-  file = path.normalize(file);
   date = new Date(parseInt(date, 10) * 1000);
 
   return {
