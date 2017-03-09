@@ -63,7 +63,7 @@ function renewToken() {
 
 function saveCache([token, datetime]) {
   return new Promise((resolve, reject) => {
-    fs.outputJSONSync(cache, {
+    fs.outputJSON(cache, {
       datetime: datetime,
       token: token
     }, {
