@@ -26,7 +26,11 @@ function readArticle(line) {
   articles.unshift({
     day: date.getDate(),
     hour: date.getHours(),
-    link: `/blog/${path.relative(root, path.dirname(file))}/${path.basename(file, ".txt")}.html`,
+    link: `/${path.join(
+      "blog",
+      path.relative(root, path.dirname(file)),
+      `${path.basename(file, ".txt")}.html`
+    ).replace(/\\/g, "/")}`,
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
