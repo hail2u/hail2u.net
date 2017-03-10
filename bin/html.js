@@ -7,6 +7,7 @@ const minifyHTML = require("../lib/html-minifier");
 const mustache = require("mustache");
 const parseXML = require("xml2js").parseString;
 const path = require("path");
+const waterfall = require("../lib/waterfall");
 
 const articleCache = "../cache/articles.json";
 const dir = {
@@ -266,14 +267,15 @@ function write(file) {
 function build(metadata, partials, file) {
   file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
 
-  return Promise.resolve([metadata, partials, file])
-    .then(readTemplate)
-    .then(readData)
-    .then(readFeeds)
-    .then(readArticlesCache)
-    .then(render)
-    .then(minify)
-    .then(write);
+  return waterfall([
+    readTemplate,
+    readData,
+    readFeeds,
+    readArticlesCache,
+    render,
+    minify,
+    write
+  ], [metadata, partials, file]);
 }
 
 function buildAll([metadata, partials]) {
@@ -286,11 +288,11 @@ mustache.escape = (s) => {
     return entityMap[c];
   });
 };
-Promise.resolve()
-  .then(readMetadata)
-  .then(readPartials)
-  .then(buildAll)
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+waterfall([
+  readMetadata,
+  readPartials,
+  buildAll
+]).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

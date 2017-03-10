@@ -10,6 +10,7 @@ const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
 const request = require("request");
+const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
@@ -35,12 +36,6 @@ const headers = {
 };
 const npm = which("npm");
 const open = which("open");
-
-function waterfall(tasks, initialValue) {
-  return tasks.reduce((p, t) => {
-    return p.then(t);
-  }, Promise.resolve(initialValue));
-}
 
 function renewToken() {
   return new Promise((resolve, reject) => {
@@ -425,7 +420,7 @@ waterfall([
   checkSelected,
   markupSelected,
   processSelected
-], null).catch((e) => {
+]).catch((e) => {
   console.error(e.stack);
   process.exit(1);
 });

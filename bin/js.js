@@ -5,6 +5,7 @@
 const fs = require("fs-extra");
 const gccc = require("google-closure-compiler-js").compile;
 const path = require("path");
+const waterfall = require("../lib/waterfall");
 
 const files = [
   {
@@ -84,12 +85,13 @@ function compile(file) {
 }
 
 function build(file) {
-  return Promise.resolve(file)
-    .then(gather)
-    .then(concat)
-    .then(write)
-    .then(compile)
-    .then(write);
+  return waterfall([
+    gather,
+    concat,
+    write,
+    compile,
+    write
+  ], file);
 }
 
 process.chdir(__dirname);

@@ -4,6 +4,7 @@
 
 const feedmix = require("feedmix");
 const fs = require("fs-extra");
+const waterfall = require("../lib/waterfall");
 
 const dest = "../dist/feed";
 const src = [
@@ -22,6 +23,10 @@ function read(file) {
       resolve(d);
     });
   });
+}
+
+function readAll() {
+  return Promise.all(src.map(read));
 }
 
 function merge(feeds) {
@@ -54,11 +59,12 @@ function write([file, data]) {
 }
 
 process.chdir(__dirname);
-Promise.all(src.map(read))
-  .then(merge)
-  .then(stringify)
-  .then(write)
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+waterfall([
+  readAll,
+  merge,
+  stringify,
+  write
+]).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

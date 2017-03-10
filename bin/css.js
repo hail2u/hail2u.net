@@ -9,6 +9,7 @@ const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
+const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
 const cssExt = ".css";
@@ -89,11 +90,12 @@ function optimize(file) {
 }
 
 function build(file) {
-  return Promise.resolve(file)
-    .then(compile)
-    .then(write)
-    .then(optimize)
-    .then(write);
+  return waterfall([
+    compile,
+    write,
+    optimize,
+    write
+  ], file);
 }
 
 function buildAll(files) {
@@ -101,10 +103,10 @@ function buildAll(files) {
 }
 
 process.chdir(__dirname);
-Promise.resolve()
-  .then(listSCSSFiles)
-  .then(buildAll)
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+waterfall([
+  listSCSSFiles,
+  buildAll
+]).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
