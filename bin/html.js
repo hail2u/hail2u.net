@@ -51,9 +51,7 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const metadata = {};
 const metadataFile = "../src/html/metadata.json";
-const partials = {};
 
 function readMetadata() {
   return new Promise((resolve, reject) => {
@@ -62,8 +60,7 @@ function readMetadata() {
         return reject(e);
       }
 
-      Object.assign(metadata, o);
-      resolve();
+      resolve(o);
     });
   });
 }
@@ -77,25 +74,34 @@ function readPartial(file) {
         return reject(e);
       }
 
-      partials[path.basename(file, ".mustache")] = d;
-      resolve(d);
+      const partial = {};
+
+      partial[path.basename(file, ".mustache")] = d;
+      resolve(partial);
     });
   });
 }
 
-function readPartials() {
+function gatherPartials(resolve, metadata, partials) {
+  return resolve([metadata, partials.reduce((a, v) => {
+    return Object.assign(a, v);
+  })]);
+}
+
+function readPartials(metadata) {
   return new Promise((resolve, reject) => {
     fs.readdir(dir.partial, (e, f) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(Promise.all(f.map(readPartial)));
+      return Promise.all(f.map(readPartial))
+        .then(gatherPartials.bind(null, resolve, metadata));
     });
   });
 }
 
-function readTemplate(file) {
+function readTemplate([metadata, partials, file]) {
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
@@ -103,12 +109,12 @@ function readTemplate(file) {
       }
 
       file.template = d;
-      resolve(file);
+      resolve([metadata, partials, file]);
     });
   });
 }
 
-function readData(file) {
+function readData([metadata, partials, file]) {
   return new Promise((resolve, reject) => {
     fs.readJSON(file.json, "utf8", (e, o) => {
       if (e) {
@@ -116,7 +122,7 @@ function readData(file) {
       }
 
       file.data = Object.assign({}, metadata, o);
-      resolve(file);
+      resolve([partials, file]);
     });
   });
 }
@@ -181,9 +187,9 @@ function readFeed(file) {
   });
 }
 
-function readFeeds(file) {
+function readFeeds([partials, file]) {
   if (!file.data.home) {
-    return file;
+    return [partials, file];
   }
 
   return Promise.all([feeds.documents, feeds.weblog].map(readFeed))
@@ -191,13 +197,13 @@ function readFeeds(file) {
       file.data.features = d;
       file.data.articles = w;
 
-      return file;
+      return [partials, file];
     });
 }
 
-function readArticlesCache(file) {
+function readArticlesCache([partials, file]) {
   if (!file.data.weblog || file.data.weblog_child) {
-    return file;
+    return [partials, file];
   }
 
   return new Promise((resolve, reject) => {
@@ -226,12 +232,12 @@ function readArticlesCache(file) {
       o[0].isFirstInYear = true;
       o[o.length - 1].isLastInYear = true;
       file.data.articles = o;
-      resolve(file);
+      resolve([partials, file]);
     });
   });
 }
 
-function render(file) {
+function render([partials, file]) {
   file.contents = mustache.render(file.template, file.data, partials);
 
   return file;
@@ -257,10 +263,10 @@ function write(file) {
   });
 }
 
-function build(file) {
+function build(metadata, partials, file) {
   file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
 
-  return Promise.resolve(file)
+  return Promise.resolve([metadata, partials, file])
     .then(readTemplate)
     .then(readData)
     .then(readFeeds)
@@ -270,8 +276,8 @@ function build(file) {
     .then(write);
 }
 
-function buildAll() {
-  return Promise.all(files.map(build));
+function buildAll([metadata, partials]) {
+  return Promise.all(files.map(build.bind(null, metadata, partials)));
 }
 
 process.chdir(__dirname);
