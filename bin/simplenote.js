@@ -94,6 +94,18 @@ function getToken() {
   });
 }
 
+function isDraft(note) {
+  if (note.deleted === 1) {
+    return false;
+  }
+
+  if (argv.publish && !note.tags.includes("draft")) {
+    return false;
+  }
+
+  return true;
+}
+
 function listNotes(token) {
   return new Promise((resolve, reject) => {
     config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
@@ -108,17 +120,7 @@ function listNotes(token) {
         return reject(new Error(r.statusMessage));
       }
 
-      resolve(JSON.parse(b).data.filter((n) => {
-        if (n.deleted === 1) {
-          return false;
-        }
-
-        if (argv.publish && !n.tags.includes("draft")) {
-          return false;
-        }
-
-        return true;
-      }));
+      resolve(JSON.parse(b).data.filter(isDraft));
     });
   });
 }
@@ -145,29 +147,34 @@ function getNotes(notes) {
   return Promise.all(notes.map(getNote));
 }
 
-function truncate(str, length) {
-  return str.split("")
-    .reduce((a, c) => {
-      if (length < 3) {
-        return a;
-      }
+function cutTo(length, accumulator, current) {
+  if (length < 3) {
+    return accumulator;
+  }
 
-      if (c.charCodeAt() > 255) {
-        length = length - 1;
-      }
+  if (current.charCodeAt() > 255) {
+    length = length - 1;
+  }
 
-      length = length - 1;
+  length = length - 1;
 
-      if (length === 2) {
-        return `${a}${c}...`;
-      }
+  if (length === 2) {
+    return `${accumulator}${current}...`;
+  }
 
-      if (length === 1) {
-        return `${a}${c}....`;
-      }
+  if (length === 1) {
+    return `${accumulator}${current}....`;
+  }
 
-      return a + c;
-    }, "");
+  return `${accumulator}${current}`;
+}
+
+function showNote(menu, note, index) {
+  const [title, description] = note.content.trim().split(/\n+/);
+
+  menu.write(`${index + 1}. ${title.replace(/^# /, "")}
+   ${description.split("").reduce(cutTo.bind(null, 66), "")}
+`);
 }
 
 function selectNote(notes) {
@@ -179,17 +186,7 @@ function selectNote(notes) {
 
     menu.write("\n");
     menu.write("0. QUIT\n");
-    notes.forEach((n, i) => {
-      const lines = n.content.trim()
-        .split("\n")
-        .filter((l) => {
-          return l;
-        });
-
-      menu.write(`${i + 1}. ${lines[0]}
-   ${truncate(lines[1], 66)}
-`);
-    });
+    notes.forEach(showNote.bind(null, menu));
     menu.question("Which one: (0) ", (a) => {
       if (!a) {
         a = 0;
