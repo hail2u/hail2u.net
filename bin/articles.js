@@ -5,17 +5,33 @@
 const fs = require("fs-extra");
 const minimist = require("minimist");
 const path = require("path");
+const waterfall = require("../lib/waterfall");
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-const articles = [];
 const dest = "../cache/articles.json";
 const root = "../src/weblog/entries/";
 const src = "../src/weblog/plugins/state/files_index.dat";
 
-function readArticle(line) {
+function readCache() {
+  if (!argv.file) {
+    return [];
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readJSON(dest, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
+function readArticle(articles, line) {
   if (!argv.force && !line.startsWith(argv.file)) {
     return;
   }
@@ -23,7 +39,7 @@ function readArticle(line) {
   const [file, time] = line.split("=>");
   const date = new Date(parseInt(time, 10) * 1000);
 
-  articles.unshift({
+  articles.push({
     day: date.getDate(),
     hour: date.getHours(),
     link: `/${path.join(
@@ -45,12 +61,39 @@ function readArticle(line) {
   });
 }
 
+function addArticle(articles) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      d.trim()
+        .split(/\r?\n/)
+        .forEach(readArticle.bind(null, articles));
+      resolve(articles);
+    });
+  });
+}
+
 function sort(a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }
 
 function unique(value, index, self) {
   return self.indexOf(value) === index;
+}
+
+function writeCache(articles) {
+  return new Promise((resolve, reject) => {
+    fs.outputJSON(dest, articles.sort(sort).filter(unique), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
 }
 
 process.chdir(__dirname);
@@ -61,13 +104,13 @@ if (!argv.file && !argv.force) {
 
 if (argv.file) {
   argv.file = path.resolve(argv.file).replace(/\\/g, "/");
-  articles.push(...fs.readJSONSync(dest, "utf8"));
 }
 
-fs.readFileSync(src, "utf8")
-  .trim()
-  .split(/\r?\n/)
-  .forEach(readArticle);
-fs.outputJSONSync(dest, articles.sort(sort).filter(unique), {
-  spaces: 2
+waterfall([
+  readCache,
+  addArticle,
+  writeCache
+]).catch((e) => {
+  console.error(e);
+  process.exit(1);
 });

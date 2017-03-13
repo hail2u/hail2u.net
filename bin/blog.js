@@ -7,6 +7,7 @@ const fs = require("fs-extra");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
 const path = require("path");
+const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
@@ -23,71 +24,121 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/images/blog/"
 };
-const files = [];
 const index = "../src/weblog/plugins/state/files_index.dat";
 const perl = which("perl");
 
-process.chdir(__dirname);
+function listAll() {
+  if (!argv.all) {
+    return [];
+  }
 
-if (argv.all) {
-  fs.readFileSync(index, "utf8")
-    .split(/\r?\n/)
-    .forEach((f) => {
-      if (f === "") {
-        return;
+  return new Promise((resolve, reject) => {
+    fs.readFile(index, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
       }
 
-      files.push(path.relative(dir.data, f.split("=>").shift()));
+      resolve(d.split(/\r?\n/)
+        .filter((f) => {
+          return f;
+        })
+        .map((f) => {
+          return f.split("=>").shift();
+        }));
     });
-}
-
-if (argv.file) {
-  const images = fs.readFileSync(argv.file, "utf8").match(/\bsrc="\/images\/blog\/.*?"/g);
-
-  argv.file = path.relative(dir.data, argv.file);
-  files.push(argv.file);
-  files.push("index.rss");
-
-  if (images) {
-    images.map((i) => {
-      return path.basename(i.split(/"/)[1]);
-    }).forEach((i) => {
-      fs.createReadStream(path.join(dir.img, i))
-        .pipe(fs.createWriteStream(path.join(dir.staticimg, i)));
-    });
-  }
-}
-
-files.map((f) => {
-  return f.replace(/\.txt$/, ".html").replace(/\\/g, "/");
-}).forEach((f) => {
-  const args = ["blosxom.cgi", `path=/${f}`];
-
-  if (argv.reindex) {
-    args.push("reindex=1");
-    argv.reindex = false;
-  }
-
-  if (f === "index.rss") {
-    f = "feed";
-  }
-
-  let html = execFileSync(perl, args, {
-    cwd: dir.root,
-    env: {
-      BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
-    }
   });
+}
 
-  html = html.toString()
-    .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-    .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-    .trim();
-
-  if (f.endsWith(".html")) {
-    html = minify(html);
+function listFromArgv(files) {
+  if (!argv.file) {
+    return files;
   }
 
-  f = path.join(dir.static, f);
-  fs.outputFileSync(f, html);
+  files.push(path.resolve(argv.file));
+  files.push(path.join(dir.data, "index.rss"));
+
+  return files;
+}
+
+function copyImages(files) {
+  if (!argv.file) {
+    return files;
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(argv.file, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      const images = d.match(/\bsrc="\/images\/blog\/.*?"/g);
+
+      if (images) {
+        images.map((i) => {
+          return path.basename(i.split(/"/)[1]);
+        }).forEach((i) => {
+          fs.createReadStream(path.join(dir.img, i))
+            .pipe(fs.createWriteStream(path.join(dir.staticimg, i)));
+        });
+      }
+
+      resolve(files);
+    });
+  });
+}
+
+function fixFilename(file) {
+  return path.relative(dir.data, file)
+    .replace(/\.txt$/, ".html")
+    .replace(/\\/g, "/");
+}
+
+function fix(files) {
+  return files.map(fixFilename);
+}
+
+function buildAll(files) {
+  files.forEach((f) => {
+    const args = ["blosxom.cgi", `path=/${f}`];
+
+    if (argv.reindex) {
+      args.push("reindex=1");
+      argv.reindex = false;
+    }
+
+    if (f === "index.rss") {
+      f = "feed";
+    }
+
+    let html = execFileSync(perl, args, {
+      cwd: dir.root,
+      env: {
+        BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
+      }
+    });
+
+    html = html.toString()
+      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+      .trim();
+
+    if (f.endsWith(".html")) {
+      html = minify(html);
+    }
+
+    f = path.join(dir.static, f);
+    fs.outputFileSync(f, html);
+  });
+}
+
+process.chdir(__dirname);
+waterfall([
+  listAll,
+  listFromArgv,
+  fix,
+  copyImages,
+  buildAll
+]).catch((e) => {
+  console.error(e);
+  process.exit(1);
 });
