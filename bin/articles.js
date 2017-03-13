@@ -45,8 +45,12 @@ function readArticle(line) {
   });
 }
 
-function sortArticles(a, b) {
+function sort(a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
+}
+
+function unique(value, index, self) {
+  return self.indexOf(value) === index;
 }
 
 process.chdir(__dirname);
@@ -64,6 +68,6 @@ fs.readFileSync(src, "utf8")
   .trim()
   .split(/\r?\n/)
   .forEach(readArticle);
-fs.outputJSONSync(dest, [...new Set(articles)].sort(sortArticles), {
+fs.outputJSONSync(dest, articles.sort(sort).filter(unique), {
   spaces: 2
 });
