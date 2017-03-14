@@ -404,7 +404,7 @@ function processSelected(selected) {
     </article>
   </main>
 </body>
-</html>`.replace(/="\//g, "=\"../dist/");
+</html>`.replace(/="\/images\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
   selected.path = path.join(dir.temp, `${selected.path}.html`);
 
   return previewSelected(selected);
