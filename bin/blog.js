@@ -72,7 +72,7 @@ function fix(files) {
 
 function listImages(files) {
   if (!argv.file) {
-    return [files, []];
+    return [files, null];
   }
 
   return new Promise((resolve, reject) => {
