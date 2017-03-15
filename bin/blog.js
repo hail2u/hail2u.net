@@ -60,33 +60,6 @@ function listFromArgv(files) {
   return files;
 }
 
-function copyImages(files) {
-  if (!argv.file) {
-    return files;
-  }
-
-  return new Promise((resolve, reject) => {
-    fs.readFile(argv.file, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      const images = d.match(/\bsrc="\/images\/blog\/.*?"/g);
-
-      if (images) {
-        images.map((i) => {
-          return path.basename(i.split(/"/)[1]);
-        }).forEach((i) => {
-          fs.createReadStream(path.join(dir.img, i))
-            .pipe(fs.createWriteStream(path.join(dir.staticimg, i)));
-        });
-      }
-
-      resolve(files);
-    });
-  });
-}
-
 function fixFilename(file) {
   return path.relative(dir.data, file)
     .replace(/\.txt$/, ".html")
@@ -95,6 +68,46 @@ function fixFilename(file) {
 
 function fix(files) {
   return files.map(fixFilename);
+}
+
+function listImages(files) {
+  if (!argv.file) {
+    return [files, []];
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(argv.file, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve([files, d.match(/\bsrc="\/images\/blog\/.*?"/g)]);
+    });
+  });
+}
+
+function copyImage(image) {
+  image = path.basename(image.split(/"/)[1]);
+
+  return new Promise((resolve, reject) => {
+    fs.copy(path.join(dir.img, image), path.join(dir.staticimg, image), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
+}
+
+function copyImages([files, images]) {
+  if (!images) {
+    return files;
+  }
+
+  return Promise.all(images.map(copyImage)).then(() => {
+    return files;
+  });
 }
 
 function buildAll(files) {
@@ -136,6 +149,7 @@ waterfall([
   listAll,
   listFromArgv,
   fix,
+  listImages,
   copyImages,
   buildAll
 ]).catch((e) => {
