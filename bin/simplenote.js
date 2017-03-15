@@ -147,35 +147,38 @@ function getNotes(notes) {
   return Promise.all(notes.map(getNote));
 }
 
-function cut(str, length) {
-  return str.split("").reduce((a, c) => {
-    if (length < 2) {
-      return a;
-    }
+function cut(body, length) {
+  return body.join("")
+    .replace(/<.*?>/g, "")
+    .split("")
+    .reduce((a, c) => {
+      if (length < 2) {
+        return a;
+      }
 
-    if (c.charCodeAt() > 255) {
+      if (c.charCodeAt() > 255) {
+        length = length - 1;
+      }
+
       length = length - 1;
-    }
 
-    length = length - 1;
+      if (length === 1) {
+        return `${a}${c}....`;
+      }
 
-    if (length === 1) {
-      return `${a}${c}....`;
-    }
+      if (length === 0) {
+        return `${a}${c}...`;
+      }
 
-    if (length === 0) {
-      return `${a}${c}...`;
-    }
-
-    return `${a}${c}`;
-  }, "");
+      return `${a}${c}`;
+    }, "");
 }
 
 function showNote(menu, note, index) {
-  const [title, description] = note.content.trim().split(/\n+/);
+  const [title, ...body] = note.content.trim().split(/\n+/);
 
   menu.write(`${index + 1}. ${title.replace(/^# /, "")}
-   ${cut(description, 66)}
+   ${cut(body, 66)}
 `);
 }
 
