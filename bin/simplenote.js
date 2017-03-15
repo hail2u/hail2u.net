@@ -99,6 +99,10 @@ function isDraft(note) {
     return false;
   }
 
+  if (note.systemtags.includes("published")) {
+    return false;
+  }
+
   if (argv.publish && !note.tags.includes("draft")) {
     return false;
   }
