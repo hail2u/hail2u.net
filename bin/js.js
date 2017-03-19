@@ -19,11 +19,9 @@ const files = [
   {
     "dest": "main.js",
     "src": [
-      "../src/js/abbread.js",
       "../src/js/ellipsis-title.js",
       "../src/js/reldate.js",
-      "../src/js/unutm.js",
-      "../src/js/wrapfix.js"
+      "../src/js/unutm.js"
     ]
   }
 ];
