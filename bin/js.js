@@ -97,6 +97,6 @@ function build(file) {
 process.chdir(__dirname);
 Promise.all(files.map(build))
   .catch((e) => {
-    console.error(e);
+    console.error(e.stack);
     process.exit(1);
   });

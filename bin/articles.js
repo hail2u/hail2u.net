@@ -111,6 +111,6 @@ waterfall([
   addArticle,
   writeCache
 ]).catch((e) => {
-  console.error(e);
+  console.error(e.stack);
   process.exit(1);
 });
