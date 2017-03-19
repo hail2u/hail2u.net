@@ -1,30 +1,4 @@
 /*!
- * abbread.js
- *
- * LICENSE: http://hail2u.mit-license.org/2016
- */
-"use strict";
-
-const def = {};
-
-let desc = "";
-let text = "";
-
-for (const abbr of document.querySelectorAll("abbr")) {
-  desc = abbr.title;
-  text = abbr.textContent;
-
-  if (desc && !def[text]) {
-    def[text] = desc;
-
-    continue;
-  }
-
-  if (def[text]) {
-    abbr.title = def[text];
-  }
-}
-/*!
  * ellipsis-title.js
  *
  * LICENSE: http://hail2u.mit-license.org/2016
@@ -111,24 +85,4 @@ for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
 
 if (location.search) {
   history.replaceState(null, "", `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${location.hash}`);
-}
-/*!
- * wrapfix.js
- *
- * LICENSE: http://hail2u.mit-license.org/2016
- */
-"use strict";
-
-for (const h1 of document.querySelectorAll("main h1")) {
-  if (h1.childNodes.length !== 1 || h1.firstChild.nodeType !== 3) {
-    continue;
-  }
-
-  const text = h1.textContent.split("");
-
-  h1.textContent = text.slice(0, -2)
-    .concat(text.slice(-2).map((c) => {
-      return `\uFEFF${c}`;
-    }))
-    .join("");
 }
