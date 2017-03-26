@@ -14,11 +14,6 @@ const dir = {
   partial: "../src/html/partial",
   template: "../src/html/"
 };
-const feeds = {
-  documents: "../src/feed/documents.rss",
-  home: "../src/feed/index.rss",
-  weblog: "../dist/blog/feed"
-};
 const files = [
   {
     dest: "../dist/404.html",
@@ -37,10 +32,6 @@ const files = [
     src: "../src/html/blog/theme.mustache"
   },
   {
-    dest: "../dist/documents/index.html",
-    src: "../src/html/documents/index.mustache"
-  },
-  {
     dest: "../dist/index.html",
     src: "../src/html/index.mustache"
   }
@@ -53,6 +44,7 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = "../src/html/metadata.json";
+const weblogFeed = "../dist/blog/feed";
 
 function readMetadata() {
   return new Promise((resolve, reject) => {
@@ -176,27 +168,22 @@ function getItems(feed) {
   });
 }
 
-function readFeed(file) {
+function readWeblogFeed([partials, file]) {
+  if (!file.data.home) {
+    return [partials, file, null];
+  }
+
   return new Promise((resolve, reject) => {
-    fs.readFile(file, "utf8", (e, d) => {
+    fs.readFile(weblogFeed, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(getItems(d));
+      resolve(d);
     });
-  });
-}
-
-function readFeeds([partials, file]) {
-  if (!file.data.home) {
-    return [partials, file];
-  }
-
-  return Promise.all([feeds.documents, feeds.weblog].map(readFeed))
-    .then(([d, w]) => {
-      file.data.features = d;
-      file.data.articles = w;
+  }).then(getItems)
+    .then((i) => {
+      file.data.articles = i;
 
       return [partials, file];
     });
@@ -270,7 +257,7 @@ function build(metadata, partials, file) {
   return waterfall([
     readTemplate,
     readData,
-    readFeeds,
+    readWeblogFeed,
     readArticlesCache,
     render,
     minify,
