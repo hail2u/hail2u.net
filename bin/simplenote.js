@@ -326,6 +326,24 @@ function runBlog(entry) {
   });
 }
 
+function runTest(entry) {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "test_html_arg",
+      "--",
+      entry.path
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(entry);
+    });
+  });
+}
+
 function runArticles(entry) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
@@ -351,6 +369,7 @@ function publishSelected(selected) {
     addEntry,
     commitEntry,
     runBlog,
+    runTest,
     runArticles
   ], selected);
 }
