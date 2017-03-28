@@ -7,11 +7,6 @@ const which = require("which").sync;
 
 const files = [
   {
-    dest: "../dist/images/about/how-i-markup-and-style-this-website.png",
-    src: "../src/img/about/how-i-markup-and-style-this-website.svg",
-    width: 2560
-  },
-  {
     dest: "../dist/apple-touch-icon-precomposed.png",
     src: "../src/img/favicon-large.svg",
     width: 180
