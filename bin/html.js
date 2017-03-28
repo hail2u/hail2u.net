@@ -20,6 +20,10 @@ const files = [
     src: "../src/html/404.mustache"
   },
   {
+    dest: "../dist/about/index.html",
+    src: "../src/html/about/index.mustache"
+  },
+  {
     dest: "../dist/blog/index.html",
     src: "../src/html/blog/index.mustache"
   },
