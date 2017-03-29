@@ -15,9 +15,9 @@ const sitemap = {
     url: [
       "/",
       "/about/",
-      "/style-guide/",
       "/blog/",
-      "/documents/"
+      "/documents/",
+      "/style-guide/"
     ]
   }
 };
