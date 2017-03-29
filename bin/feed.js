@@ -8,7 +8,7 @@ const waterfall = require("../lib/waterfall");
 
 const dest = "../dist/feed";
 const src = [
-  "../src/index.rss",
+  "../src/feed/index.rss",
   "../dist/blog/feed"
 ];
 
