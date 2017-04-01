@@ -7,6 +7,7 @@ const path = require("path");
 const which = require("which").sync;
 
 const cwd = "../dist/";
+const root = "../";
 
 process.chdir(__dirname);
 execFileSync(which("git"), [
@@ -15,7 +16,7 @@ execFileSync(which("git"), [
   process.argv
     .slice(2)
     .map((f) => {
-      return path.relative(cwd, f);
+      return path.resolve(root, f);
     })
     .join(" ")
 ], {
