@@ -21,6 +21,7 @@ const files = [
     "src": [
       "../src/js/ellipsis-title.js",
       "../src/js/reldate.js",
+      "../src/js/site-search-focus.js",
       "../src/js/unutm.js"
     ]
   }
