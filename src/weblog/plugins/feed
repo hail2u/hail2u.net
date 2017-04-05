@@ -6,13 +6,16 @@
 package feed;
 
 use strict;
-use vars qw($last_build_date $excerpt $encoded_body);
+use vars qw($last_build_date $body $excerpt);
 
 # --- Configurable variables -----------
 
 my $tzd_rfc = '+0900';
 
 # --- Plug-in package variables --------
+
+my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+my @wdays  = qw(Sun Mon Tue Wed Thu Fri Sat);
 
 # --------------------------------------
 
@@ -25,16 +28,13 @@ sub start {
 sub story {
   my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
 
-  my $file = "$blosxom::datadir$path/$fn.$blosxom::file_extension";
-
+  $body = $$body_ref;
+  $body =~ s!\b(href|src)="(/.*?)"!$1="$blosxom::scheme//$blosxom::domain$2"!g;
+  $body =~ s! (class|itemprop)=".*?"!!g;
   $excerpt = $$body_ref;
   $excerpt =~ tr!\x0D\x0A!!d;
   $excerpt =~ s!^.*?<p.*?>(.*?)</p>.*?$!$1!;
   $excerpt =~ s!<.*?>!!g;
-
-  $encoded_body = $$body_ref;
-  $encoded_body =~ s!\b(href|src)="(/.*?)"!$1="$blosxom::scheme//$blosxom::domain$2"!g;
-  $encoded_body =~ s! (class|itemprop)=".*?"!!g;
 
   return 1;
 }
@@ -48,8 +48,6 @@ sub format_time_rfc {
   $hh = sprintf "%02d", $hh;
   $nn = sprintf "%02d", $nn;
   $ss = sprintf "%02d", $ss;
-  my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-  my @wdays  = qw(Sun Mon Tue Wed Thu Fri Sat);
   $time = "$wdays[$ww], $dd $months[$mm] $yy $hh:$nn:$ss $tzd_rfc";
 
   return $time;
