@@ -59,6 +59,24 @@ function build(file) {
       }
 
       process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
+
+function test(file) {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "test_html_arg",
+      "--",
+      file
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
       resolve();
     });
   });
@@ -85,6 +103,7 @@ waterfall([
   add,
   commit,
   build,
+  test,
   finalize
 ], path.resolve(argv.file)).catch((e) => {
   console.error(e.stack);
