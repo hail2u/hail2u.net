@@ -7,6 +7,10 @@ const gccc = require("google-closure-compiler-js").compile;
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
+const config = {
+  compilationLevel: "ADVANCED",
+  outputWrapper: "(function () {%output%}).call(window);"
+};
 const files = [
   {
     "dest": "debug.js",
@@ -71,13 +75,11 @@ function write(file) {
 }
 
 function compile(file) {
-  file.contents = gccc({
-    compilationLevel: "ADVANCED",
+  file.contents = gccc(Object.assign(config, {
     jsCode: [{
       src: file.contents
-    }],
-    outputWrapper: "(function () {%output%}).call(window);"
-  }).compiledCode;
+    }]
+  })).compiledCode;
   file.dest = path.join(tmp, `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`);
 
   return file;
