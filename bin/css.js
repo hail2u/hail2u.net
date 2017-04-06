@@ -21,18 +21,20 @@ const processor = postcss([
 ]);
 const sassc = which("sassc");
 const scssExt = ".scss";
-const scss = "../src/css/";
+const src = "../src/css/";
 const tmp = "../tmp/";
 
 function toObject(file) {
+  const basename = path.basename(file.src, scssExt);
+
   return {
-    src: file
+    basename: basename,
+    dest: path.join(tmp, `${basename}${cssExt}`),
+    src: path.join(src, file)
   };
 }
 
 function isSCSS(file) {
-  file.basename = path.basename(file.src, scssExt);
-
   if (path.extname(file.src) !== scssExt || file.basename.startsWith("_")) {
     return false;
   }
@@ -40,9 +42,9 @@ function isSCSS(file) {
   return true;
 }
 
-function listSCSSFiles() {
+function list(dir) {
   return new Promise((resolve, reject) => {
-    fs.readdir(scss, (e, f) => {
+    fs.readdir(dir, (e, f) => {
       if (e) {
         return reject(e);
       }
@@ -55,14 +57,13 @@ function listSCSSFiles() {
 function compile(file) {
   return new Promise((resolve, reject) => {
     execFile(sassc, [
-      path.join(scss, file.src).replace(/\\/g, "/")
+      file.src.replace(/\\/g, "/")
     ], (e, d) => {
       if (e) {
         return reject(e);
       }
 
       file.contents = d;
-      file.dest = path.join(tmp, `${file.basename}${cssExt}`);
       resolve(file);
     });
   });
@@ -104,9 +105,9 @@ function buildAll(files) {
 
 process.chdir(__dirname);
 waterfall([
-  listSCSSFiles,
+  list,
   buildAll
-]).catch((e) => {
+], src).catch((e) => {
   console.error(e.stack);
   process.exit(1);
 });
