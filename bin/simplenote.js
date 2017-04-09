@@ -10,6 +10,7 @@ const path = require("path");
 const pit = require("pit-ro");
 const readline = require("readline");
 const request = require("request");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
@@ -263,7 +264,7 @@ function commitEntry(entry) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${path.relative(dir.root, entry.path).replace(/\\/g, "/")}`,
+      `--message=Add ${toPOSIXPath(path.relative(dir.root, entry.path))}`,
     ], (e, o) => {
       if (e) {
         return reject(e);

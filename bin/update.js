@@ -5,6 +5,7 @@
 const execFile = require("child_process").execFile;
 const minimist = require("minimist");
 const path = require("path");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
@@ -34,7 +35,7 @@ function commit(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${path.relative(root, file).replace(/\\/g, "/")}`,
+      `--message=Add ${toPOSIXPath(path.relative(root, file))}`,
     ], (e, o) => {
       if (e) {
         return reject(e);

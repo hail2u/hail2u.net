@@ -7,6 +7,7 @@ const fs = require("fs-extra");
 const minify = require("../lib/html-minifier");
 const minimist = require("minimist");
 const path = require("path");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
@@ -61,9 +62,7 @@ function listFromArgv(files) {
 }
 
 function fixFilename(file) {
-  return path.relative(dir.data, file)
-    .replace(/\.txt$/, ".html")
-    .replace(/\\/g, "/");
+  return toPOSIXPath(path.relative(dir.data, file).replace(/\.txt$/, ".html"));
 }
 
 function fix(files) {

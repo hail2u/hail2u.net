@@ -5,6 +5,7 @@
 const fs = require("fs-extra");
 const minimist = require("minimist");
 const path = require("path");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 
 const argv = minimist(process.argv.slice(2), {
@@ -42,11 +43,11 @@ function readArticle(articles, line) {
   articles.push({
     day: date.getDate(),
     hour: date.getHours(),
-    link: `/${path.join(
+    link: `/${toPOSIXPath(path.join(
       "blog",
       path.relative(root, path.dirname(file)),
       `${path.basename(file, ".txt")}.html`
-    ).replace(/\\/g, "/")}`,
+    ))}`,
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
@@ -103,7 +104,7 @@ if (!argv.file && !argv.force) {
 }
 
 if (argv.file) {
-  argv.file = path.resolve(argv.file).replace(/\\/g, "/");
+  argv.file = toPOSIXPath(path.resolve(argv.file));
 }
 
 waterfall([

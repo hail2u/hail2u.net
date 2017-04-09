@@ -9,6 +9,7 @@ const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
@@ -57,7 +58,7 @@ function list(dir) {
 function compile(file) {
   return new Promise((resolve, reject) => {
     execFile(sassc, [
-      file.src.replace(/\\/g, "/")
+      toPOSIXPath(file.src)
     ], (e, d) => {
       if (e) {
         return reject(e);
