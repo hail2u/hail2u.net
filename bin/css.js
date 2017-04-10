@@ -26,7 +26,7 @@ const src = "../src/css/";
 const tmp = "../tmp/";
 
 function toObject(file) {
-  const basename = path.basename(file.src, scssExt);
+  const basename = path.basename(file, scssExt);
 
   return {
     basename: basename,
