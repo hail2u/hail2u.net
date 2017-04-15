@@ -20,35 +20,35 @@ function toRelativeDate(from, to) {
     return;
   }
 
-  if (diff === 0) {
+  if (diff < 30) {
     return "たった今";
   }
 
-  if (diff < 60) {
+  if (diff < 90) {
     return `${diff}秒前`;
   }
 
   diff = parseInt(diff / 60, 10);
 
-  if (diff < 60) {
+  if (diff < 90) {
     return `${diff}分前`;
   }
 
   diff = parseInt(diff / 60, 10);
 
-  if (diff < 24) {
+  if (diff < 36) {
     return `${diff}時間前`;
   }
 
   diff = parseInt(diff / 24, 10);
 
-  if (diff < 30) {
+  if (diff < 45) {
     return `${diff}日前`;
   }
 
   diff = parseInt(diff / 30, 10);
 
-  if (diff < 12) {
+  if (diff < 18) {
     return `${diff}ヶ月前`;
   }
 
