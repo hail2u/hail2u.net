@@ -5,7 +5,7 @@
  */
 "use strict";
 
-const now = Date.now();
+const now = performance.timing.navigationStart + performance.now();
 
 function toRelativeDate(from, to) {
   let diff = 0;
