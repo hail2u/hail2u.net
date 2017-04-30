@@ -390,7 +390,7 @@ function processSelected(selected) {
   <link href="/styles/main.min.css" rel="stylesheet">
 </head>
 <body>
-  <main class="content">
+  <main class="content" style="margin-top: 6rem">
     <article class="section">
       <footer class="section-footer">
         <p><time datetime="1976-07-23">1976/07/23</time></p>
