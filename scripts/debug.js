@@ -1,7 +1,7 @@
 "use strict";
 
-document.body.addEventListener("dblclick", (e) => {
-  e.target.classList.toggle("js-debug-columns");
+document.body.addEventListener("dblclick", () => {
+  document.body.classList.toggle("js-debug-columns");
 }, false);
 "use strict";
 
@@ -16,6 +16,6 @@ document.querySelector("footer").addEventListener("click", () => {
 }, false);
 "use strict";
 
-document.body.addEventListener("dblclick", (e) => {
-  e.target.classList.toggle("js-debug-elements");
+document.body.addEventListener("dblclick", () => {
+  document.body.classList.toggle("js-debug-elements");
 }, false);
