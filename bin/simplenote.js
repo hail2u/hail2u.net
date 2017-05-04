@@ -386,7 +386,7 @@ function processSelected(selected) {
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width" name="viewport">
-  <title>プレビュー - ウェブログ - Hail2u.net</title>
+  <title>プレビュー - ウェブログ - Hail2u</title>
   <link href="/styles/main.min.css" rel="stylesheet">
 </head>
 <body>

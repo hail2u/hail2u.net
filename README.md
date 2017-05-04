@@ -1,7 +1,7 @@
-Hail2u.net
-==========
+Hail2u
+======
 
-The source files of [Hail2u.net][1] website.
+The source files of [Hail2u][1] website.
 
 
 Environment
