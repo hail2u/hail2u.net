@@ -12,9 +12,8 @@ const files = [
     width: 180
   },
   {
-    area: "0:224:1024:800",
     dest: "../dist/images/cover.png",
-    src: "../src/img/favicon-large.svg",
+    src: "../src/img/cover.svg",
     width: 2560
   },
   {
@@ -29,12 +28,12 @@ const files = [
   },
   {
     dest: "../tmp/favicon-64.png",
-    src: "../src/img/favicon-large.svg",
+    src: "../src/img/favicon.svg",
     width: 64
   },
   {
     dest: "../tmp/favicon-256.png",
-    src: "../src/img/favicon-large.svg",
+    src: "../src/img/favicon.svg",
     width: 256
   }
 ];
