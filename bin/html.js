@@ -48,6 +48,7 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = "../src/html/metadata.json";
+const siteFeed = "../src/feed/index.rss";
 const weblogFeed = "../dist/blog/feed";
 
 function readMetadata() {
@@ -172,9 +173,30 @@ function getItems(feed) {
   });
 }
 
+function readSiteFeed([partials, file]) {
+  if (!file.data.home) {
+    return [partials, file];
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(siteFeed, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(d);
+    });
+  }).then(getItems)
+    .then((i) => {
+      file.data.updates = i;
+
+      return [partials, file];
+    });
+}
+
 function readWeblogFeed([partials, file]) {
   if (!file.data.home) {
-    return [partials, file, null];
+    return [partials, file];
   }
 
   return new Promise((resolve, reject) => {
@@ -261,6 +283,7 @@ function build(metadata, partials, file) {
   return waterfall([
     readTemplate,
     readData,
+    readSiteFeed,
     readWeblogFeed,
     readArticlesCache,
     render,
