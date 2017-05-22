@@ -5,15 +5,14 @@
  */
 "use strict";
 
-function focusSiteSearch() {
-  document.getElementById("site_search").focus();
-}
-
-function checkHash() {
+window.addEventListener("hashchange", () => {
   if (location.hash === "#site_search") {
-    focusSiteSearch();
+    document.getElementById("site_search").focus();
   }
-}
-
-document.getElementById("site_search_icon").addEventListener("click", focusSiteSearch, false);
-window.addEventListener("hashchange", checkHash, false);
+});
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("site_search_icon")
+    .addEventListener("click", () => {
+      document.getElementById("site_search").focus();
+    });
+});
