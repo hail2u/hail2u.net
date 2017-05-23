@@ -5,14 +5,22 @@
  */
 "use strict";
 
+const focusSiteSearch = () => {
+  document.getElementById("site_search").focus();
+};
+const siteSearchFocus = () => {
+  document.getElementById("site_search_icon")
+    .addEventListener("click", focusSiteSearch);
+};
+
 window.addEventListener("hashchange", () => {
   if (location.hash === "#site_search") {
-    document.getElementById("site_search").focus();
+    focusSiteSearch();
   }
 });
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("site_search_icon")
-    .addEventListener("click", () => {
-      document.getElementById("site_search").focus();
-    });
-});
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", siteSearchFocus);
+} else {
+  siteSearchFocus();
+}
