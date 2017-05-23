@@ -10,6 +10,26 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>http://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
     <item>
+      <description>Mobile Safari v10.3.2で文字が少し大きくなる現象がこのウェブサイトで起きていた。再現条件がはっきりとしたことがわからない。何かしらリペイントがかかると想定通りの文字サイズに変わるので、CSSがおかしいということはなさそうだ……と思ったがメディア・クエリーでのrem単位に絡むバグだった。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/rem-in-media-queries-on-mobile-safari-v10.3.2.html</guid>
+      <link>https://hail2u.net/blog/rem-in-media-queries-on-mobile-safari-v10.3.2.html</link>
+      <pubDate>Tue, 23 May 2017 17:24:00 +0900</pubDate>
+      <title>Mobile Safari v10.3.2におけるメディア・クエリーでのrem単位</title>
+      <content:encoded><![CDATA[<p><a href="https://github.com/hail2u/hail2u.net/issues/6">Mobile Safari v10.3.2で文字が少し大きくなる現象</a>がこのウェブサイトで起きていた。再現条件がはっきりとしたことがわからない。何かしらリペイントがかかると想定通りの文字サイズに変わるので、CSSがおかしいということはなさそうだ……と思ったがメディア・クエリーでの<code>rem</code>単位に絡むバグだった。</p>
+
+<p>最初、<code>defer</code>属性のある<code>script</code>要素を外すとちゃんと表示されるようだった。元に戻すのも簡単そうなので、まずは<code>async</code>属性で動くように書き換えることにした。しかしうまく直らない。直ったように見えたのは再読み込みした時だけのようで、これではないらしい。</p>
+
+<p>他にHTMLの最小化やコンテンツ・ブロッカーを疑ってみたが、それらでもないようだ。</p>
+
+<p>初心に戻ってCSSを見直したところ、CSSで<code>rem</code>単位を複数のメディア・クエリーで使い、かつその最後のクエリーの中で文字サイズを変更すると起こるようだ。どうも文字サイズの指定が<code>vw</code>単位の時だけでもあるようだが、定かではない。</p>
+
+<p>View demo: <a href="/pub/test/672.html">rem Unit in Media Queries</a></p>
+
+<p>Mobile Safari v10.3.2でしか再現しない。本来なら描画領域が<code>60rem</code>、つまり<code>960px</code>以上にならないと文字サイズが<code>200%</code>にならないはずだが、iPhone 5sのポートレート（縦）で<code>200%</code>になってしまう。何らかのリペイントがかかると正常な表示になるのは上記の通りだ。<a href="https://zellwk.com/blog/media-query-units/">知られているバグ</a>と違って、ブレークポイントが仕様通りに設定されない類のバグではない。</p>
+
+<p>対策は<code>px</code>か<code>em</code>単位を使うというだけで、今まで通りで良い。iOS v10が出たあたりのWebKitで<code>rem</code>単位の扱いが直ったようなので解禁したが、まだ早かったようだ。</p>]]></content:encoded>
+    </item>
+    <item>
       <description>3月の終わりにIFTTTでiOS Calendar（iCloudカレンダーというわけではなさそう）がついにサポートされた。今まではGoogleカレンダーを英語にしてやっていたが、これを機にGoogleカレンダーでは通常の予定のみにし、iOS Calendarに機械的な記録を集約させることにした。</description>
       <guid isPermaLink="true">https://hail2u.net/blog/date-format-on-ifttt-ios-calendar-service.html</guid>
       <link>https://hail2u.net/blog/date-format-on-ifttt-ios-calendar-service.html</link>
@@ -254,26 +274,12 @@
 <p>こういった単位は他で再利用することはまずないだろう。そう考えると、個々のルールセットではこれらの単位とカスタム・プロパティーの参照しか出てこないようなCSSコードが良さそうだ。</p>]]></content:encoded>
     </item>
     <item>
-      <description>Amazon.co.jpに問い合わせをしたら、5分くらいで人間っぽい返答が来た。返答までの時間が早いと、特に解決していなくても「なんとかしてくれそう」または「ちゃんとやっている」という気分になる。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/reply-time-of-customer-support.html</guid>
-      <link>https://hail2u.net/blog/reply-time-of-customer-support.html</link>
-      <pubDate>Wed, 10 May 2017 09:38:00 +0900</pubDate>
-      <title>サポートの返答時間</title>
-      <content:encoded><![CDATA[<p>Amazon.co.jpに問い合わせをしたら、5分くらいで人間っぽい返答が来た。返答までの時間が早いと、特に解決していなくても「なんとかしてくれそう」または「ちゃんとやっている」という気分になる。</p>
-
-<p>多くの会社では機械による自動応答と何らかの結論を出してからの解答の組み合わせが多い。これだと機械にあしらわれた上に待たされるという最悪の形になりがちだ。すぐに何らかの返答を人の手で行うというのはコストがかかるので、そういう風に落ち着いたのだろう。</p>
-
-<p>問い合わせを読んだ時点で、まずどう対処するつもりかは（無視するつもりでない限り）決まっているはずだ。その対処を簡単に説明した返答を素早く行うことが良い。ユーザーは必ずしも完全な解答を求めていないのだ。</p>
-
-<p>解答（ソリューション）でも応答（レスポンス）でもなく返答（リプライ）が必要だ、と言いかえても良い。</p>]]></content:encoded>
-    </item>
-    <item>
       <description><![CDATA[<p>このウェブサイトがHTTPSで提供されるようになりました。既存のHTTPであるURLからはHSTSを利用してクライアント・サイドでリダイレクトされるようになっています。</p>]]></description>
       <guid isPermaLink="true">https://hail2u.net/</guid>
       <link>https://hail2u.net/</link>
       <pubDate>Sun, 1 Nov 2015 00:00:00 +0900</pubDate>
       <title>HTTPSへの移行</title>
     </item>
-    <lastBuildDate>Sun, 21 May 2017 13:08:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 23 May 2017 17:24:00 +0900</lastBuildDate>
   </channel>
 </rss>
