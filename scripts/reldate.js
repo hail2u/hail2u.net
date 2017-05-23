@@ -5,7 +5,7 @@
  */
 "use strict";
 
-window.addEventListener("DOMContentLoaded", () => {
+const reldate = () => {
   const now = performance.timing.navigationStart + performance.now();
   const toRelativeDate = (from, to) => {
     let diff = 0;
@@ -64,4 +64,10 @@ window.addEventListener("DOMContentLoaded", () => {
       time.textContent = rel;
     }
   }
-});
+};
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", reldate);
+} else {
+  reldate();
+}

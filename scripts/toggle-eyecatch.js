@@ -1,6 +1,6 @@
 "use strict";
 
-window.addEventListener("DOMContentLoaded", () => {
+const toggleEyecatch = () => {
   const eyecatch = document.querySelector(".fill");
 
   document.querySelector("footer").addEventListener("click", () => {
@@ -10,4 +10,10 @@ window.addEventListener("DOMContentLoaded", () => {
       eyecatch.hidden = true;
     }
   });
-});
+};
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", toggleEyecatch);
+} else {
+  toggleEyecatch();
+}

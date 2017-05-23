@@ -5,13 +5,19 @@
  */
 "use strict";
 
-window.addEventListener("DOMContentLoaded", () => {
+const ellipsisTitle = () => {
   for (const elm of document.querySelectorAll("*")) {
     if (window.getComputedStyle(elm)["text-overflow"] === "ellipsis") {
       elm.title = elm.textContent;
     }
   }
-});
+};
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", ellipsisTitle);
+} else {
+  ellipsisTitle();
+}
 /*!
  * reldate.js
  *
@@ -19,7 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
  */
 "use strict";
 
-window.addEventListener("DOMContentLoaded", () => {
+const reldate = () => {
   const now = performance.timing.navigationStart + performance.now();
   const toRelativeDate = (from, to) => {
     let diff = 0;
@@ -78,7 +84,13 @@ window.addEventListener("DOMContentLoaded", () => {
       time.textContent = rel;
     }
   }
-});
+};
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", reldate);
+} else {
+  reldate();
+}
 /*!
  * site-search-focus.js
  *
@@ -86,17 +98,25 @@ window.addEventListener("DOMContentLoaded", () => {
  */
 "use strict";
 
+const focusSiteSearch = () => {
+  document.getElementById("site_search").focus();
+};
+const siteSearchFocus = () => {
+  document.getElementById("site_search_icon")
+    .addEventListener("click", focusSiteSearch);
+};
+
 window.addEventListener("hashchange", () => {
   if (location.hash === "#site_search") {
-    document.getElementById("site_search").focus();
+    focusSiteSearch();
   }
 });
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("site_search_icon")
-    .addEventListener("click", () => {
-      document.getElementById("site_search").focus();
-    });
-});
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", siteSearchFocus);
+} else {
+  siteSearchFocus();
+}
 /*!
  * unutm.js
  *

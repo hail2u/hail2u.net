@@ -5,10 +5,16 @@
  */
 "use strict";
 
-window.addEventListener("DOMContentLoaded", () => {
+const ellipsisTitle = () => {
   for (const elm of document.querySelectorAll("*")) {
     if (window.getComputedStyle(elm)["text-overflow"] === "ellipsis") {
       elm.title = elm.textContent;
     }
   }
-});
+};
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", ellipsisTitle);
+} else {
+  ellipsisTitle();
+}
