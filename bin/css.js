@@ -2,64 +2,34 @@
 
 "use strict";
 
+const atImport = require("postcss-import");
 const csswring = require("csswring");
-const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
-const path = require("path");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
-const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
-const which = require("which").sync;
 
-const cssExt = ".css";
-const minExt = ".min";
+const files = [
+  {
+    dest: "../tmp/main.min.css",
+    src: "../src/css/main.css"
+  },
+  {
+    dest: "../tmp/debug.min.css",
+    src: "../src/css/debug.css"
+  }
+];
 const processor = postcss([
+  atImport(),
   roundFloat(),
   mqpacker(),
   csswring()
 ]);
-const sassc = which("sassc");
-const scssExt = ".scss";
-const src = "../src/css/";
-const tmp = "../tmp/";
 
-function toObject(file) {
-  const basename = path.basename(file, scssExt);
-
-  return {
-    basename: basename,
-    dest: path.join(tmp, `${basename}${cssExt}`),
-    src: path.join(src, file)
-  };
-}
-
-function isSCSS(file) {
-  if (path.extname(file.src) !== scssExt || file.basename.startsWith("_")) {
-    return false;
-  }
-
-  return true;
-}
-
-function list(dir) {
+function read(file) {
   return new Promise((resolve, reject) => {
-    fs.readdir(dir, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(f.map(toObject).filter(isSCSS));
-    });
-  });
-}
-
-function compile(file) {
-  return new Promise((resolve, reject) => {
-    execFile(sassc, [
-      toPOSIXPath(file.src)
-    ], (e, d) => {
+    fs.readFile(file.src, (e, d) => {
       if (e) {
         return reject(e);
       }
@@ -67,6 +37,17 @@ function compile(file) {
       file.contents = d;
       resolve(file);
     });
+  });
+}
+
+function optimize(file) {
+  return processor.process(file.contents, {
+    from: file.src,
+    to: file.dest
+  }).then((r) => {
+    file.contents = r.css;
+
+    return file;
   });
 }
 
@@ -82,33 +63,17 @@ function write(file) {
   });
 }
 
-function optimize(file) {
-  return processor.process(file.contents).then((r) => {
-    file.contents = r.css;
-    file.dest = path.join(tmp, `${file.basename}${minExt}${cssExt}`);
-
-    return file;
-  });
-}
-
 function build(file) {
   return waterfall([
-    compile,
-    write,
+    read,
     optimize,
     write
   ], file);
 }
 
-function buildAll(files) {
-  return Promise.all(files.map(build));
-}
-
 process.chdir(__dirname);
-waterfall([
-  list,
-  buildAll
-], src).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+Promise.all(files.map(build))
+  .catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });
