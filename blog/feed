@@ -9,7 +9,7 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <generator>Blosxom v2.1.2+dev</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 27 May 2017 10:32:17 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 29 May 2017 08:22:11 +0900</lastBuildDate>
     <link>https://hail2u.net/blog/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>ウェブログ - Hail2u</title>
@@ -17,6 +17,26 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+
+    <item>
+      <description>どうもEdge 15にはcalc()絡みのバグがまだまだ残っているようだ。font-sizeプロパティーで数字と割合を掛けてみたらよくわからない結果になった。Internet Explorer 11でも再現するため、Edge 12–15に存在しそうだ。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/calc-number-percentage-in-font-size-property-on-edge-15.html</guid>
+      <link>https://hail2u.net/blog/calc-number-percentage-in-font-size-property-on-edge-15.html</link>
+      <pubDate>Mon, 29 May 2017 08:20:00 +0900</pubDate>
+      <title>Edge 15でのfont-size: calc(&lt;number&gt; * &lt;percentage&gt;)</title>
+      <content:encoded><![CDATA[
+<p>どうもEdge 15には<code>calc()</code>絡みのバグがまだまだ残っているようだ。<code>font-size</code>プロパティーで数字と割合を掛けてみたらよくわからない結果になった。Internet Explorer 11でも再現するため、Edge 12–15に存在しそうだ。</p>
+
+<p>View Demo: <a href="https://jsfiddle.net/rdbd5r7m/">calc(&lt;number&gt; * &lt;percentage&gt;) in font-size property</a></p>
+
+<p>Chrome 58やFirefox 53、Mobile Safari 10では<code>20px</code>になる。しかしEg15やIE11ではなぜか<code>3px</code>になってしまう。</p>
+
+<p>どのような<code>calc(&lt;number&gt; * &lt;percentage&gt;)</code>でもバグるというわけではない。例えば<a href="https://jsfiddle.net/L8134t0r/"><code>width</code>プロパティーで利用する場合</a>はEg15やIE11でも正しく解釈される。</p>
+
+<hr>
+
+<p>このバグについてもEdgeHTML issue trackerに<a href="https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/12154836/">報告</a>しておいた。<code>font-size</code>プロパティーに依存するようだが、他でも起こるかもしれない。</p>]]></content:encoded>
+    </item>
 
     <item>
       <description>カスタム・プロパティーを使い倒すには、どうしてもcalc()したり、そのcalc()した値を使ってまたcalc()したりする。Sassで複数の変数を使って計算した結果を変数にするのと同じだ。しかしカスタム・プロパティーをサポートしたはずのEdge 15ではcalc()が値のカスタム・プロパティーを使ってcalc()を使ったカスタム・プロパティーがうまく解決されない。</description>
@@ -27,7 +47,7 @@
       <content:encoded><![CDATA[
 <p><a href="http://www.w3.org/TR/2015/CR-css-variables-1-20151203/">カスタム・プロパティー</a>を使い倒すには、どうしても<code>calc()</code>したり、その<code>calc()</code>した値を使ってまた<code>calc()</code>したりする。Sassで複数の変数を使って計算した結果を変数にするのと同じだ。しかしカスタム・プロパティーをサポートしたはずのEdge 15では<code>calc()</code>が値のカスタム・プロパティーを使って<code>calc()</code>を使ったカスタム・プロパティーがうまく解決されない。</p>
 
-<p>View demo: <a href="https://jsfiddle.net/9h7vehLz/">calc() in calc() in custom properties</a></p>
+<p>View Demo: <a href="https://jsfiddle.net/9h7vehLz/">calc() in calc() in custom properties</a></p>
 
 <p>デモでは<code>--foo</code>を定義し、それを参照した<code>calc()</code>で<code>--bar</code>を定義している。更に<code>--baz</code>では<code>calc()</code>を使って<code>--bar</code>を参照している。そのため<code>--baz</code>は<code>calc(1rem * 2 * 2)</code>と解釈されるはずだが、Edge 15ではそうならない。Firefox 53.0.3、Chrome 58、Mobile Safari 10.3.2では問題ない。</p>
 
@@ -107,7 +127,7 @@
 
 <p>初心に戻ってCSSを見直したところ、CSSで<code>rem</code>単位を複数のメディア・クエリーで使い、かつその最後のクエリーの中で文字サイズを変更すると起こるようだ。どうも文字サイズの指定が<code>vw</code>単位の時だけでもあるようだが、定かではない。</p>
 
-<p>View demo: <a href="/pub/test/672.html">rem Unit in Media Queries</a></p>
+<p>View Demo: <a href="/pub/test/672.html">rem Unit in Media Queries</a></p>
 
 <p>Mobile Safari v10.3.2でしか再現しない。本来なら描画領域が<code>60rem</code>、つまり<code>960px</code>以上にならないと文字サイズが<code>200%</code>にならないはずだが、iPhone 5sのポートレート（縦）で<code>200%</code>になってしまう。何らかのリペイントがかかると正常な表示になるのは上記の通りだ。<a href="https://zellwk.com/blog/media-query-units/">知られているバグ</a>と違って、ブレークポイントが仕様通りに設定されない類のバグではない。</p>
 
@@ -235,76 +255,6 @@
 <hr>
 
 <p>夏過ぎくらいに一度、かかとを修繕したい。そして来年の冬くらいに全ソール交換を頼みたい。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <description>箱根神社は行ったことがあったが、元宮はなかった。暑くならないうちに行ったつもりだったが、ほぼ霧ですごく寒かった。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/hakone-shrine-motomiya-20170515.html</guid>
-      <link>https://hail2u.net/blog/hakone-shrine-motomiya-20170515.html</link>
-      <pubDate>Tue, 16 May 2017 10:09:00 +0900</pubDate>
-      <title>箱根神社元宮へ</title>
-      <content:encoded><![CDATA[
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515.jpg"><img alt="5mくらいしか離れていないところからでもうっすらとしか箱根神社元宮が見えない" src="/images/blog/hakone-shrine-motomiya-20170515.jpg"null></a>
-</figure>
-
-<p>箱根神社は行ったことがあったが、元宮はなかった。暑くならないうちに行ったつもりだったが、ほぼ霧ですごく寒かった。</p>
-
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515-asagiri.jpg"><img alt="あさぎりはすべてこのメタリックブルーの車体のようだ" src="/images/blog/hakone-shrine-motomiya-20170515-asagiri.jpg"null></a>
-<figcaption>特急ロマンスカーあさぎり号</figcaption>
-</figure>
-
-<p>行きはロマンスカーのあさぎりで御殿場まで一気に行った。沼津行きのはいつ頃なくなったんだろう。単線を特急で通るというのは新鮮だ。外を見ていたら<a href="https://lowreal.net/2017/05/05/2">カッコいい壁</a>があり、「あっこれカッコいいやつだ！」となったが、当然写真は撮れなかった。そうこうしているうちに静岡県に突入した。</p>
-
-<p>御殿場からは箱根高速バスで箱根園まで行く。高速では全席予約のようで乗れるのか不安だったけど、ちゃんと乗れた。御殿場からは普通の路線バスのようだ。</p>
-
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515-komagatake-ropeway.jpg"><img alt="霧がすごく、まったく駒ケ岳の頂上が見えない" src="/images/blog/hakone-shrine-motomiya-20170515-komagatake-ropeway.jpg"null></a>
-</figure>
-
-<p>箱根園からはロープウェイで駒ヶ岳の上（昔、スケートリンクあったらしい）に登る。切符売り場の人に「霧で何も見えませんよ」と言われるも「大丈夫です」と大丈夫じゃない返事をして乗る。ロープウェイ怖い。霧だと3倍怖い。</p>
-
-<p>頂上のハイキングコースはまだ閉鎖されていた。しかし、展望台などを回るコースは歩ける。霧で3歩先も見えないので、ゲームのダンジョンみたいに右手を壁にという感じで歩くしかない。遭難したらどうしようと半ば本気で考えていた。霧を考慮して、分岐に地図を置いて欲しい。</p>
-
-<p>元宮すごい。とにかくすごい。霧が……。これはもう一回行かなければならない。ので、写真はその時に比較して載せたい。</p>
-
-<p>木すらない山の頂上で霧に囲まれると、普通の霧の中と違い、まったく影もない。そのためまるで飛行機で雲の中にいる状態を肉体で体験しているようになり、新鮮な感覚だった。そう考えると霧も良い思い出にはなったのだろう。</p>
-
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515-ferry.jpg"><img alt="フェリーは湖面を無音で滑るようにやってきた" src="/images/blog/hakone-shrine-motomiya-20170515-ferry.jpg"null></a>
-<figcaption>芦ノ湖遊覧船十国丸</figcaption>
-</figure>
-
-<p>駒ヶ岳を降りた後はバスまで時間があったので、芦ノ湖を見ていた。広い湖見たのも随分久しぶりだ。そうしたらちょうどフェリーが来たので乗ることにした。他に誰も乗客が貸し切りの状態だった。</p>
-
-<p>桃源台からはまたロープウェイだ。1分に1本走っていて、山手線よりすごい。霧の中だとロープウェイが3倍増しくらいで怖い。</p>
-
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515-owakudani.jpg"><img alt="大涌谷だと霧なのか煙なのかよくわからなくなる" src="/images/blog/hakone-shrine-motomiya-20170515-owakudani.jpg"null></a>
-<figcaption>大涌谷</figcaption>
-</figure>
-
-<p>ロープウェイはいったん大涌谷で降りることになるので、ちょっと見てた。とてつもなく人がいたので、すぐ撤退する。黒たまごみたいな錬金術が欲しい。</p>
-
-<p>ロープウェイの終点、早雲山には何もなかった。ここからはケーブルカーになる。楽しい。線路の両側に建物があるのは不思議な感じする。</p>
-
-<figure>
-<a href="/images/blog/hakone-shrine-motomiya-20170515-hakone-tozan-line.jpg"><img alt="この車両は昭和25年製らしく、70歳近いようだ" src="/images/blog/hakone-shrine-motomiya-20170515-hakone-tozan-line.jpg"null></a>
-<figcaption>箱根登山線モハ1形</figcaption>
-</figure>
-
-<p>強羅で昼飯を食べようとフラフラしたが、<a href="http://www.hakoneninjya.com/">ニンジャ・カフェ</a>以外何もなかった。古い方の車両が来たので、登山線に乗って箱根湯本まで行くことにする。途中のスイッチバックの大盤振る舞いでテンションが上がる。</p>
-
-<p>箱根湯本で昼飯を食べ、普通に急行に乗り継いで帰った。小田急小田原線に乗るとホッとする。</p>
-
-<hr>
-
-<p>特急、単線、バス、ロープウェイ、フェリー、ケーブルカー、登山鉄道、急行と、色々な乗り物に乗った。乗り物好きではないが、これだけ乗ると楽しい。</p>
-
-<p>箱根フリーパス（4700円くらい）で御殿場線（500円）と駒ケ岳ロープウェイ（1300円）以外は（計6300円くらい）乗れるが、一日でこのように回るだけなら普通に支払って（6800円くらい）もあまり変わらないようだ。行きも帰りも箱根ロープウェイを使うとなるとフリーパスの方が大幅に安くなる。電車とバスは安い。</p>
-
-<p>平日かつ普通の観光ルートと逆回りだったせいか、大涌谷と箱根湯本以外は混んでて辛いということもなかった。箱根湯本～桃源台はもう良いが、元宮だけは晴れの日にもう一度挑戦したい。元箱根の方と一緒に回る経路を探そう。</p>]]></content:encoded>
     </item>
 
   </channel>
