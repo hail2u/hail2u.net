@@ -45,7 +45,7 @@ function optimize(file) {
     from: file.src,
     to: file.dest
   }).then((r) => {
-    file.contents = r.css;
+    file.contents = `@supports(top:0){${r.css}}`;
 
     return file;
   });
