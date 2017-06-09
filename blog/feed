@@ -9,7 +9,7 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <generator>Blosxom v2.1.2+dev</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 8 Jun 2017 13:07:15 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 9 Jun 2017 11:48:34 +0900</lastBuildDate>
     <link>https://hail2u.net/blog/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>ウェブログ - Hail2u</title>
@@ -17,6 +17,71 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+
+    <item>
+      <description>At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては@mediaと@supportsが相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/possibilities-of-nesting-at-rules.html</guid>
+      <link>https://hail2u.net/blog/possibilities-of-nesting-at-rules.html</link>
+      <pubDate>Fri, 09 Jun 2017 11:47:00 +0900</pubDate>
+      <title><![CDATA[At規則のネストが起こる可能性]]></title>
+      <content:encoded><![CDATA[
+<p>At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては<code>@media</code>と<code>@supports</code>が相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。</p>
+
+<pre><code>@media (max-width: 30em) {
+  .foo {
+    position: absolute;
+  }
+
+  @supports (position: sticky) {
+    .foo {
+      position: sticky;
+    }
+  }
+}
+</code></pre>
+
+<p>ひとつはこのようにプログレッシブ・エンハンスメントを実装する手段として使うパターンだ。とりあえずA、より優れたBの実装があるならB、というようなCSSになる。普通にCSSを書きつつ、条件付きで分岐させるためフィーチャー・クエリーが子になる（なりうる）。</p>
+
+<pre><code>@supports (display: flex) {
+  .foo {
+    display: flex;
+  }
+
+  @media (min-width: 60em) {
+    .bar {
+      order: 1;
+    }
+  }
+}
+</code></pre>
+
+<p>もうひとつはこのような、実装があるかによって0か1かになるパターンだ。実装がなかったら何もしない、というCSSになる。おおまかにフィーチャー・クエリーで分岐し、その中で普通のCSSを書いていくため、メディア・クエリーが子になる。</p>
+
+<p>前者と後者を組み合わせる可能性はなくもない。しかし現実としてそのようなCSSを設計・運用するのはかなり難しいだろう。それこそあらゆるルールセットで逐一<code>@supports</code>を書く羽目になりかねない。適切にベースラインを設定してある程度見切った方が安全で確実なCSSになる。</p>
+
+<hr>
+
+<p>後者の<code>@supports</code>内に‘@media`がくるパターンは以下のように書いても等価だ。</p>
+
+<pre><code>@supports (display: flex) {
+  .foo {
+    display: flex;
+  }
+}
+
+@media (min-width: 60em) {
+  @supports (display: flex) {
+    .bar {
+      order: 1;
+    }
+  }
+}
+</code></pre>
+
+<p>つまり分割してネストをひっくり返せる。CSS MQPackerではネスト可能性を考慮して、<code>@media</code>を常にルート直下になるように<a href="https://github.com/hail2u/node-css-mqpacker/pull/52">調整してからまとめる</a>ような実装にしつつある。可能性と効率を優先し、CSSの構造は大きく変えることにした。</p>
+
+<p>そろそろメディア・クエリーをまとめる意味合いも下がってきた。これくらいの単純な実装で済ませておき、これが効果的でなくなったらCSS全体の設計を見直すべきだと考えている。</p>]]></content:encoded>
+    </item>
 
     <item>
       <description>Internet Explorer 11以下では@supportsがサポートされていない。そのおかげで実装ベースで（CSSハックなどというものなしに）安全にCSSの新機能を試せるようになった。しかしそうなるとIE11などというもののために大量の@supportsが出てくることになり、精神衛生上良くない。実装がある方を優先させCSS全体を適当な@supportsで括ってしまえば良さそうだ。</description>
@@ -248,22 +313,6 @@
 <p>Mobile Safari v10.3.2でしか再現しない。本来なら描画領域が<code>60rem</code>、つまり<code>960px</code>以上にならないと文字サイズが<code>200%</code>にならないはずだが、iPhone 5sのポートレート（縦）で<code>200%</code>になってしまう。何らかのリペイントがかかると正常な表示になるのは上記の通りだ。<a href="https://zellwk.com/blog/media-query-units/">知られているバグ</a>と違って、ブレークポイントが仕様通りに設定されない類のバグではない。</p>
 
 <p>対策は<code>px</code>か<code>em</code>単位を使うというだけで、今まで通りで良い。iOS v10が出たあたりのWebKitで<code>rem</code>単位の扱いが直ったようなので解禁したが、まだ早かったようだ。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <description>3月の終わりにIFTTTでiOS Calendar（iCloudカレンダーというわけではなさそう）がついにサポートされた。今まではGoogleカレンダーを英語にしてやっていたが、これを機にGoogleカレンダーでは通常の予定のみにし、iOS Calendarに機械的な記録を集約させることにした。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/date-format-on-ifttt-ios-calendar-service.html</guid>
-      <link>https://hail2u.net/blog/date-format-on-ifttt-ios-calendar-service.html</link>
-      <pubDate>Sun, 21 May 2017 13:08:00 +0900</pubDate>
-      <title><![CDATA[IFTTTのiOS Calendarサービスにおける日付け]]></title>
-      <content:encoded><![CDATA[
-<p>3月の終わりにIFTTTで<a href="https://ifttt.com/ios_calendar">iOS Calendar</a>（iCloudカレンダーというわけではなさそう）がついにサポートされた。今まではGoogleカレンダーを英語にしてやっていたが、これを機にGoogleカレンダーでは通常の予定のみにし、iOS Calendarに機械的な記録を集約させることにした。</p>
-
-<p>いくつかアプレットを作って試したところ、日付の指定に癖があること以外は特に問題なさそうだ。日付の指定はイギリス式のフォーマットでやると確実だった。いわゆる<code>05/21/2017 13:01</code>というような<em>月/日/年 時刻</em>というフォーマットだ。</p>
-
-<hr>
-
-<p>しかしイベント追加されたトリガーがうまく動いてくれない。どうもIFTTTアプリをインストールしたデバイス側でイベントを追加した時にしか反応しないようだ。</p>]]></content:encoded>
     </item>
 
   </channel>
