@@ -154,6 +154,10 @@ function getNotes(notes) {
 
 function selectNote(notes) {
   return new Promise((resolve, reject) => {
+    if (!argv.publish && notes.length === 1) {
+      return resolve(notes[0]);
+    }
+
     const menu = readline.createInterface({
       input: process.stdin,
       output: process.stdout
