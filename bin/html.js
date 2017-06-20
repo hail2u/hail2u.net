@@ -36,6 +36,10 @@ const files = [
     src: "../src/html/documents/index.mustache"
   },
   {
+    dest: "../dist/projects/index.html",
+    src: "../src/html/projects/index.mustache"
+  },
+  {
     dest: "../dist/index.html",
     src: "../src/html/index.mustache"
   }

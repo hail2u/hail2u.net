@@ -17,6 +17,7 @@ const sitemap = {
       "/about/",
       "/blog/",
       "/documents/",
+      "/projects/",
       "/style-guide/"
     ]
   }
