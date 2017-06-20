@@ -76,24 +76,6 @@ for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
   }
 }
 /*!
- * site-search-focus.js
- *
- * LICENSE: http://hail2u.mit-license.org/2017
- */
-"use strict";
-
-const focusSiteSearch = () => {
-  document.getElementById("site_search").focus();
-};
-
-window.addEventListener("hashchange", () => {
-  if (location.hash === "#site_search") {
-    focusSiteSearch();
-  }
-});
-document.getElementById("site_search_icon")
-  .addEventListener("click", focusSiteSearch);
-/*!
  * unutm.js
  *
  * LICENSE: http://hail2u.mit-license.org/2013
