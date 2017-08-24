@@ -16,10 +16,6 @@ const dir = {
 };
 const files = [
   {
-    dest: "../dist/404.html",
-    src: "../src/html/404.mustache"
-  },
-  {
     dest: "../dist/about/index.html",
     src: "../src/html/about/index.mustache"
   },
