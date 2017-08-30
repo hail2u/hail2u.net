@@ -23,12 +23,12 @@ const files = [
   },
   {
     dest: "../tmp/favicon-64.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/favicon-large.svg",
     width: 64
   },
   {
     dest: "../tmp/favicon-256.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/favicon-large.svg",
     width: 256
   }
 ];
