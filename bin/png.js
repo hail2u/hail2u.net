@@ -12,11 +12,6 @@ const files = [
     width: 180
   },
   {
-    dest: "../dist/images/cover.png",
-    src: "../src/img/cover.svg",
-    width: 2560
-  },
-  {
     dest: "../tmp/favicon-16.png",
     src: "../src/img/favicon.svg",
     width: 16
