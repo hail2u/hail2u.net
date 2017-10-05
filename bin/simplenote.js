@@ -6,9 +6,10 @@ const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
-const os = require("os");
 const path = require("path");
+const pit = require("pit-ro");
 const readline = require("readline");
+const request = require("request");
 const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
@@ -18,54 +19,143 @@ const argv = minimist(process.argv.slice(2), {
     "publish"
   ]
 });
+const cache = "../cache/simplenote.json";
+const config = pit.get("simplenote.com");
 const dir = {
-  draft: path.join(os.homedir(), "Documents", "Drafts"),
   entry: "../src/weblog/entries/",
   root: "../",
   temp: "../tmp/"
 };
+const endpoint = {
+  auth: "https://app.simplenote.com/api/login",
+  data: "https://app.simplenote.com/api2/data",
+  index: "https://app.simplenote.com/api2/index"
+};
 const git = which("git");
+const headers = {
+  "User-Agent": "sn/0.0.0"
+};
 const npm = which("npm");
 const open = which("open");
 
-function listDrafts() {
+function renewToken() {
   return new Promise((resolve, reject) => {
-    fs.readdir(dir.draft, (e, f) => {
+    request.post(endpoint.auth, {
+      body: Buffer.from(`email=${config.email}&password=${config.password}`).toString("base64"),
+      headers: headers
+    }, (e, r, b) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(f);
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
+
+      resolve([encodeURIComponent(b.trim()), new Date().toJSON()]);
     });
   });
 }
 
-function getDraft(draft) {
+function saveCache([token, datetime]) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.join(dir.draft, draft), {
-      encoding: "utf8"
-    }, (e, d) => {
+    fs.outputJSON(cache, {
+      datetime: datetime,
+      token: token
+    }, {
+      spaces: 2
+    }, (e) => {
       if (e) {
         return reject(e);
       }
 
-      resolve({
-        content: d,
-        name: path.basename(draft, ".md"),
-        path: draft
-      });
+      resolve(token);
     });
   });
 }
 
-function getDrafts(drafts) {
-  return Promise.all(drafts.map(getDraft));
+function getToken() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(cache, "utf8", (e, d) => {
+      if (e) {
+        return reject();
+      }
+
+      if ((Date.now() - Date.parse(d.datetime)) > (1000 * 60 * 60 * 23)) {
+        return reject();
+      }
+
+      resolve(d.token);
+    });
+  }).catch(() => {
+    return waterfall([
+      renewToken,
+      saveCache
+    ]);
+  });
 }
 
-function selectDraft(drafts) {
+function isDraft(note) {
+  if (note.deleted === 1) {
+    return false;
+  }
+
+  if (note.systemtags.includes("published")) {
+    return false;
+  }
+
+  if (argv.publish && !note.tags.includes("draft")) {
+    return false;
+  }
+
+  return true;
+}
+
+function listNotes(token) {
   return new Promise((resolve, reject) => {
-    if (!argv.publish && drafts.length === 1) {
-      return resolve(drafts[0]);
+    config.auth = `auth=${token}&email=${encodeURIComponent(config.email)}`;
+    request.get(`${endpoint.index}?length=100&${config.auth}`, {
+      headers: headers
+    }, (e, r, b) => {
+      if (e) {
+        return reject(e);
+      }
+
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
+
+      resolve(JSON.parse(b).data.filter(isDraft));
+    });
+  });
+}
+
+function getNote(note) {
+  return new Promise((resolve, reject) => {
+    request.get(`${endpoint.data}/${note.key}?${config.auth}`, {
+      headers: headers
+    }, (e, r, b) => {
+      if (e) {
+        return reject(e);
+      }
+
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
+      }
+
+      resolve(JSON.parse(b));
+    });
+  });
+}
+
+function getNotes(notes) {
+  return Promise.all(notes.map(getNote));
+}
+
+function selectNote(notes) {
+  return new Promise((resolve, reject) => {
+    if (!argv.publish && notes.length === 1) {
+      return resolve(notes[0]);
     }
 
     const menu = readline.createInterface({
@@ -75,7 +165,7 @@ function selectDraft(drafts) {
 
     menu.write("\n");
     menu.write("0. QUIT\n");
-    drafts.forEach((n, i) => {
+    notes.forEach((n, i) => {
       menu.write(`${i + 1}. ${n.content.trim().split(/\n+/)[0].replace(/^# /, "")}
 `);
     });
@@ -86,8 +176,8 @@ function selectDraft(drafts) {
 
       a = parseInt(a, 10);
 
-      if (!Number.isInteger(a) || a > drafts.length) {
-        return reject(new Error(`You must enter a number between 0 and ${drafts.length}`));
+      if (!Number.isInteger(a) || a > notes.length) {
+        return reject(new Error(`You must enter a number between 0 and ${notes.length}`));
       }
 
       if (a === 0) {
@@ -95,17 +185,22 @@ function selectDraft(drafts) {
       }
 
       menu.close();
-      resolve(drafts[a - 1]);
+      resolve(notes[a - 1]);
     });
   });
 }
 
 function checkSelected(selected) {
   return new Promise((resolve, reject) => {
-    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
-      return reject(new Error("This draft does not have a valid name for file."));
+    const body = selected.content.trim().split("\n");
+    const name = body.pop();
+
+    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
+      return reject(new Error("This note does not have a name for file."));
     }
 
+    selected.content = body.join("\n");
+    selected.path = name;
     resolve(selected);
   });
 }
@@ -117,25 +212,34 @@ function markupSelected(selected) {
   });
 }
 
-function saveSelected(selected) {
+function saveEntry(entry) {
   return new Promise((resolve, reject) => {
-    fs.outputFile(selected.path, selected.content, {
+    fs.outputFile(entry.path, entry.content, {
       flag: "wx"
     }, (e) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(selected);
+      resolve(entry);
     });
   });
 }
 
 function deleteSelected(selected) {
   return new Promise((resolve, reject) => {
-    fs.unlink(path.join(dir.draft, `${selected.name}.md`), (e) => {
+    request.post(`${endpoint.data}/${selected.key}?${config.auth}`, {
+      body: JSON.stringify({
+        deleted: 1
+      }),
+      headers: headers
+    }, (e, r) => {
       if (e) {
         return reject(e);
+      }
+
+      if (r.statusCode !== 200) {
+        return reject(new Error(r.statusMessage));
       }
 
       resolve(selected);
@@ -233,7 +337,7 @@ function runArticles(entry) {
 
 function publishSelected(selected) {
   return waterfall([
-    saveSelected,
+    saveEntry,
     deleteSelected,
     addEntry,
     commitEntry,
@@ -276,7 +380,7 @@ function previewSelected(selected) {
 
 function processSelected(selected) {
   if (argv.publish) {
-    selected.path = path.join(dir.entry, `${selected.name}.txt`);
+    selected.path = path.join(dir.entry, `${selected.path}.txt`);
 
     return publishSelected(selected);
   }
@@ -300,16 +404,17 @@ function processSelected(selected) {
   </main>
 </body>
 </html>`.replace(/="\/images\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
-  selected.path = path.join(dir.temp, `${selected.name}.html`);
+  selected.path = path.join(dir.temp, `${selected.path}.html`);
 
   return previewSelected(selected);
 }
 
 process.chdir(__dirname);
 waterfall([
-  listDrafts,
-  getDrafts,
-  selectDraft,
+  getToken,
+  listNotes,
+  getNotes,
+  selectNote,
   checkSelected,
   markupSelected,
   processSelected
