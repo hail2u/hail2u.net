@@ -390,7 +390,7 @@ function processSelected(selected) {
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width" name="viewport">
-  <title>プレビュー - ウェブログ - Hail2u</title>
+  <title>プレビュー - Hail2u</title>
   <link href="/styles/main.min.css" rel="stylesheet">
 </head>
 <body>
@@ -404,7 +404,7 @@ function processSelected(selected) {
   </main>
 </body>
 </html>`.replace(/="\/images\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
-  selected.path = path.join(dir.temp, `${selected.path}.html`);
+  selected.path = path.join(dir.temp, "__preview.html");
 
   return previewSelected(selected);
 }
