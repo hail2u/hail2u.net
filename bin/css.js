@@ -26,6 +26,19 @@ const processor = postcss([
   mqpacker(),
   csswring()
 ]);
+const moveFontFace = postcss.plugin("move-font-face", () => {
+  return (css) => {
+    const faces = [];
+
+    css.walkAtRules("font-face", (r) => {
+      faces.push(r);
+      r.remove();
+    });
+    css.append(faces);
+
+    return css;
+  };
+});
 
 function read(file) {
   return new Promise((resolve, reject) => {
@@ -51,6 +64,17 @@ function optimize(file) {
   });
 }
 
+function hack(file) {
+  return moveFontFace.process(file.contents, {
+    from: file.src,
+    to: file.dest
+  }).then((r) => {
+    file.contents = r.css;
+
+    return file;
+  });
+}
+
 function write(file) {
   return new Promise((resolve, reject) => {
     fs.outputFile(file.dest, file.contents, (e) => {
@@ -67,6 +91,7 @@ function build(file) {
   return waterfall([
     read,
     optimize,
+    hack,
     write
   ], file);
 }
