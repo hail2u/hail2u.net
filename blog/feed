@@ -9,7 +9,7 @@
     <description>ウェブ制作やウェブ標準の話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログです。Blosxomを使って作られています。</description>
     <generator>Blosxom v2.1.2+dev</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 3 Oct 2017 09:26:49 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 9 Oct 2017 08:47:58 +0900</lastBuildDate>
     <link>https://hail2u.net/blog/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>ウェブログ - Hail2u</title>
@@ -17,6 +17,38 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+
+    <item>
+      <description>主にウェブフォントの利用やフォントの合成を行う時に使う@font-faceルールはまれに他のAt規則にネストされる。@mediaや@supportsルールを使って条件付きでフォントを変えたいことがあるからだ。しかしEdge 15ではそうやってネストされた@font-faceルールで作られたフォントを参照できない。</description>
+      <guid isPermaLink="true">https://hail2u.net/blog/nested-font-face-rule-on-edge-15.html</guid>
+      <link>https://hail2u.net/blog/nested-font-face-rule-on-edge-15.html</link>
+      <pubDate>Mon, 09 Oct 2017 08:46:00 +0900</pubDate>
+      <title><![CDATA[Edge 15でのネストされた@font-faceルール]]></title>
+      <content:encoded><![CDATA[
+<p>主にウェブフォントの利用やフォントの合成を行う時に使う<code>@font-face</code>ルールはまれに他のAt規則にネストされる。<code>@media</code>や<code>@supports</code>ルールを使って条件付きでフォントを変えたいことがあるからだ。しかしEdge 15ではそうやってネストされた<code>@font-face</code>ルールで作られたフォントを参照できない。</p>
+
+<p>ネストされているかどうかだけが問題になるようで、以下のようなほぼ無意味な<code>@supports</code>ルールでも表面化する。</p>
+
+<pre><code>@supports (top: 0) {
+  @font-face {
+    font-family: &quot;Foo&quot;;
+    src: url(&quot;https://example.com/woff2/foo.woff2&quot;) format(&quot;woff2&quot;);
+  }
+}
+
+body {
+  font-family: Foo, sans-serif;
+}
+</code></pre>
+
+<p>もうちょっと複雑にした<a href="https://jsfiddle.net/mypeuou0/">このようなコードを含むウェブページ</a>で挙動を確認できる。Firefox 57、Chrome 63、Mobile Safari 11ではFooを参照できるが、Edge 15では参照できず<code>sans-serif</code>になってしまう。</p>
+
+<p><code>@media</code>や<code>@supports</code>ルールと他のCSSコードのネストに関しては、 <a href="http://www.w3.org/TR/css3-conditional/">CSS Conditional Rules Module Level 3</a>に定められている。これによると条件節以降である<code>group_rule_body</code>は<code>{}</code>と<code>nested_statement</code>だけを持つ。そしてこの<code>nested_statement</code>には<code>font_face_rule</code>が含まれる。つまりネストできるので、無効になるEdge 15の挙動はバグだろう。</p>
+
+<hr>
+
+<p>ほぼ同じ内容の<a href="https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10328179/">放置されたイシュー</a>にはコメントしておいた（なぜかAnonymousになった）。Won’t Fixとなっており直りそうもない。</p>]]></content:encoded>
+    </item>
 
     <item>
       <description>府中の森公園の一角にある府中市美術館でやっていたフィンランド・デザイン展に行ってきた。ちょうど椅子を買おうかというところで、Artekのも良いななどと考えていたので渡りに船だった。</description>
@@ -194,28 +226,6 @@
 <p>夢で火を使ってると不安になる。特に何もなかったので良かった。</p>
 
 <p>家にネギが生えていると助かるが、育てるのは難しい。買ってきたネギを庭に植えると日持ちするのでよくやるが、どこに植えたか忘れ、植えようとしたら既にあった、みたいなことによくなる。</p>]]></content:encoded>
-    </item>
-
-    <item>
-      <description>カスタム・プロパティー（とPostCSS）を駆使してSassべったりなCSSを書きなおすという作業にどれくらいの労力が必要か知りたい。やってみるしかなさそうなので、このウェブサイトのCSSを書きなおしていた。</description>
-      <guid isPermaLink="true">https://hail2u.net/blog/bye-sass.html</guid>
-      <link>https://hail2u.net/blog/bye-sass.html</link>
-      <pubDate>Mon, 19 Jun 2017 09:51:00 +0900</pubDate>
-      <title><![CDATA[Sassなし]]></title>
-      <content:encoded><![CDATA[
-<p>カスタム・プロパティー（とPostCSS）を駆使してSassべったりなCSSを書きなおすという作業にどれくらいの労力が必要か知りたい。やってみるしかなさそうなので、このウェブサイトのCSSを書きなおしていた。</p>
-
-<p>ミックスインやプレースホルダー・セレクターがない状態でもかなり厳しい。<code>\$([a-z][-a-z_]*)</code>を<code>var(--$1)</code>に置換し、それから<code>calc()</code>に直していかなければならない。そして<code>calc()</code>が通らない（メディア・クエリーのパラメーターなど）では更に数値に直していく。最後にバグへの対応、という順序になる。</p>
-
-<p>とにかくバグを踏む。Edge 15が目立つがChrome 5xやSafari 10.xでもそこそこ踏む（Firefox 5xにはあまりない）。いちいち上げていくとキリがなさそうなくらいは踏むので、まだ製品レベルで導入するには早い、ということはわかった。</p>
-
-<p>行コメントを複数行コメントに直していくのが地味に辛かった。このあたりも踏まえSassの便利なだけ機能は積極的に使わないように書きかえておくという準備は必要だろう。</p>
-
-<p>Sassを脱出してPostCSSに強く依存してもしょうがないので、増やすのは<code>@import</code>をインライン展開するものだけにしておいた。その利用もCSSの仕様範囲内で行う。そうすることで普通のCSSを書き、ツールで最適化する、という安定した状態に戻れる。</p>
-
-<hr>
-
-<p>Internet Explorer 11以下は<code>@supports</code>を利用してCSSなしにするようにしてある。SVGが初期サイズで表示されているのを直す必要がありそうだが、それ以外は問題なさそうだ。</p>]]></content:encoded>
     </item>
 
   </channel>
