@@ -226,22 +226,23 @@ function readArticlesCache([partials, file]) {
         return reject(e);
       }
 
-      const previousYear = 0;
-
       o.map(function (a, idx, arr) {
         a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
         a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
           a.second);
 
-        if (idx && previousYear !== a.year) {
+        if (idx && this.y !== a.year) {
           a.isFirstInYear = true;
           arr[idx - 1].isLastInYear = true;
         }
 
-        previousYear = a.year;
+        this.y = a.year;
 
         return a;
+      }, {
+        y: true
       });
+
       o[0].isFirstInYear = true;
       o[o.length - 1].isLastInYear = true;
       file.data.articles = o;
