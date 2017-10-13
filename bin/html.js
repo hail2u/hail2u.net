@@ -228,7 +228,7 @@ function readArticlesCache([partials, file]) {
 
       let currentYear = 10000;
 
-      o.map(function (a, idx, arr) {
+      o.map((a, idx, arr) => {
         a.strPubDate = `${pad(a.month)}/${pad(a.day)}`;
         a.html5PubDate = toHTML5Date(a.year, a.month, a.day, a.hour, a.minute,
           a.second);
