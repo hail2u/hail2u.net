@@ -5,10 +5,12 @@
 const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");
+const moveFontFace = require("../lib/move-font-face");
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
 const roundFloat = require("postcss-round-float");
 const waterfall = require("../lib/waterfall");
+const wrapWithSupports = require("../lib/wrap-with-supports");
 
 const files = [
   {
@@ -24,21 +26,10 @@ const processor = postcss([
   atImport(),
   roundFloat(),
   mqpacker(),
-  csswring()
+  csswring(),
+  wrapWithSupports(),
+  moveFontFace()
 ]);
-const moveFontFace = postcss.plugin("move-font-face", () => {
-  return (css) => {
-    const faces = [];
-
-    css.walkAtRules("font-face", (r) => {
-      faces.push(r);
-      r.remove();
-    });
-    css.append(faces);
-
-    return css;
-  };
-});
 
 function read(file) {
   return new Promise((resolve, reject) => {
@@ -55,17 +46,6 @@ function read(file) {
 
 function optimize(file) {
   return processor.process(file.contents, {
-    from: file.src,
-    to: file.dest
-  }).then((r) => {
-    file.contents = `@supports(top:0){${r.css}}`;
-
-    return file;
-  });
-}
-
-function hack(file) {
-  return moveFontFace.process(file.contents, {
     from: file.src,
     to: file.dest
   }).then((r) => {
@@ -91,7 +71,6 @@ function build(file) {
   return waterfall([
     read,
     optimize,
-    hack,
     write
   ], file);
 }
