@@ -8,7 +8,6 @@ const fs = require("fs-extra");
 const moveFontFace = require("../lib/move-font-face");
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
-const roundFloat = require("postcss-round-float");
 const waterfall = require("../lib/waterfall");
 const wrapWithSupports = require("../lib/wrap-with-supports");
 
@@ -24,7 +23,6 @@ const files = [
 ];
 const processor = postcss([
   atImport(),
-  roundFloat(),
   mqpacker(),
   csswring(),
   wrapWithSupports(),
