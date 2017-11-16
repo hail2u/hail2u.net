@@ -403,7 +403,7 @@ function processSelected(selected) {
     </article>
   </main>
 </body>
-</html>`.replace(/="\/images\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
+</html>`.replace(/="\/img\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
   selected.path = path.join(dir.temp, "__preview.html");
 
   return previewSelected(selected);

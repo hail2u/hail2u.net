@@ -23,7 +23,7 @@ const dir = {
   img: "../src/img/blog/",
   root: "../src/weblog/",
   static: "../dist/blog/",
-  staticimg: "../dist/images/blog/"
+  staticimg: "../dist/img/blog/"
 };
 const index = "../src/weblog/plugins/state/files_index.dat";
 const perl = which("perl");
@@ -80,7 +80,7 @@ function listImages(files) {
         return reject(e);
       }
 
-      resolve([files, d.match(/\bsrc="\/images\/blog\/.*?"/g)]);
+      resolve([files, d.match(/\bsrc="\/img\/blog\/.*?"/g)]);
     });
   });
 }
