@@ -21,10 +21,15 @@ const files = [
     ]
   },
   {
-    "dest": "main.js",
+    "dest": "defer.js",
     "src": [
       "../src/js/ellipsis-title.js",
-      "../src/js/reldate.js",
+      "../src/js/reldate.js"
+    ]
+  },
+  {
+    "dest": "async.js",
+    "src": [
       "../src/js/unutm.js"
     ]
   }
