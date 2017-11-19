@@ -12,7 +12,13 @@ const file = process.argv.slice(2).shift();
 
 process.chdir(__dirname);
 execFileSync(which("htmlhint"), [
-  path.join(dest, path.relative(src, path.dirname(file)), `${path.basename(file, ".txt")}.html`)
+  "--config",
+  ".htmlhintrc",
+  path.join(
+    dest,
+    path.relative(src, path.dirname(file)),
+    `${path.basename(file, ".txt")}.html`
+  )
 ], {
   stdio: "inherit"
 });
