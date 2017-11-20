@@ -62,11 +62,11 @@ function commitEntry(file) {
   });
 }
 
-function runBlog(file) {
+function runBlosxom(file) {
   return new Promise((resolve, reject) => {
     const args = [
       "run",
-      "blog",
+      "blosxom",
       "--",
       `--file=${file}`
     ];
@@ -124,7 +124,7 @@ function updateEntry(file) {
   waterfall([
     addEntry,
     commitEntry,
-    runBlog,
+    runBlosxom,
     runTest,
     runPostArticles
   ], file).catch((e) => {
@@ -299,7 +299,7 @@ function publishSelected(selected) {
     deleteSelected,
     addEntry,
     commitEntry,
-    runBlog,
+    runBlosxom,
     runTest,
     runArticles
   ], selected);
