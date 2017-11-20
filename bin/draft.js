@@ -165,51 +165,51 @@ function deleteSelected(selected) {
         return reject(e);
       }
 
-      resolve(selected);
+      resolve(selected.path);
     });
   });
 }
 
-function addEntry(entry) {
+function addEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "add",
       "--",
-      entry.path
+      file
     ], (e, o) => {
       if (e) {
         return reject(e);
       }
 
       process.stdout.write(o);
-      resolve(entry);
+      resolve(file);
     });
   });
 }
 
-function commitEntry(entry) {
+function commitEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${toPOSIXPath(path.relative(dir.root, entry.path))}`,
+      `--message=Add ${toPOSIXPath(path.relative(dir.root, file))}`,
     ], (e, o) => {
       if (e) {
         return reject(e);
       }
 
       process.stdout.write(o);
-      resolve(entry);
+      resolve(file);
     });
   });
 }
 
-function runBlog(entry) {
+function runBlog(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
       "blog",
       "--",
-      `--file=${entry.path}`,
+      `--file=${file}`,
       "--reindex"
     ], (e, o) => {
       if (e) {
@@ -217,36 +217,36 @@ function runBlog(entry) {
       }
 
       process.stdout.write(o);
-      resolve(entry);
+      resolve(file);
     });
   });
 }
 
-function runTest(entry) {
+function runTest(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
       "test_html_arg",
       "--",
-      entry.path
+      file
     ], (e, o) => {
       if (e) {
         return reject(e);
       }
 
       process.stdout.write(o);
-      resolve(entry);
+      resolve(file);
     });
   });
 }
 
-function runArticles(entry) {
+function runArticles(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
       "articles",
       "--",
-      `--file=${entry.path}`
+      `--file=${file}`
     ], (e, o) => {
       if (e) {
         return reject(e);
