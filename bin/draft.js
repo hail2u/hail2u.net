@@ -327,7 +327,7 @@ function processSelected(selected) {
   </main>
 </body>
 </html>`.replace(/="\/img\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
-  selected.path = path.join(dir.temp, `${selected.name}.html`);
+  selected.path = path.join(dir.temp, "__preview.html");
 
   return previewSelected(selected);
 }
