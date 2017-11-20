@@ -15,7 +15,8 @@ const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
-    "publish"
+    "publish",
+    "update"
   ]
 });
 const dir = {
@@ -27,6 +28,110 @@ const dir = {
 const git = which("git");
 const npm = which("npm");
 const open = which("open");
+
+function addEntry(file) {
+  return new Promise((resolve, reject) => {
+    execFile(git, [
+      "add",
+      "--",
+      file
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
+
+function commitEntry(file) {
+  return new Promise((resolve, reject) => {
+    execFile(git, [
+      "commit",
+      `--message=Add ${toPOSIXPath(path.relative(dir.root, file))}`,
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
+
+function runBlog(file) {
+  return new Promise((resolve, reject) => {
+    const args = [
+      "run",
+      "blog",
+      "--",
+      `--file=${file}`
+    ];
+
+    if (!argv.update) {
+      args.push("--reindex=1");
+    }
+
+    execFile(npm, args, (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
+
+function runTest(file) {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "test_html_arg",
+      "--",
+      file
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
+
+function runPostArticles() {
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "postarticles"
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve();
+    });
+  });
+}
+
+function updateEntry(file) {
+  waterfall([
+    addEntry,
+    commitEntry,
+    runBlog,
+    runTest,
+    runPostArticles
+  ], file).catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });
+}
 
 function isDraft(file) {
   const ext = path.extname(file);
@@ -170,76 +275,6 @@ function deleteSelected(selected) {
   });
 }
 
-function addEntry(file) {
-  return new Promise((resolve, reject) => {
-    execFile(git, [
-      "add",
-      "--",
-      file
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-}
-
-function commitEntry(file) {
-  return new Promise((resolve, reject) => {
-    execFile(git, [
-      "commit",
-      `--message=Add ${toPOSIXPath(path.relative(dir.root, file))}`,
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-}
-
-function runBlog(file) {
-  return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "blog",
-      "--",
-      `--file=${file}`,
-      "--reindex"
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-}
-
-function runTest(file) {
-  return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "test_html_arg",
-      "--",
-      file
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-}
-
 function runArticles(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
@@ -332,15 +367,24 @@ function processSelected(selected) {
   return previewSelected(selected);
 }
 
+function processDrafts() {
+  waterfall([
+    listDrafts,
+    getDrafts,
+    selectDraft,
+    checkSelected,
+    markupSelected,
+    processSelected
+  ]).catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });
+}
+
 process.chdir(__dirname);
-waterfall([
-  listDrafts,
-  getDrafts,
-  selectDraft,
-  checkSelected,
-  markupSelected,
-  processSelected
-]).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+
+if (argv.update) {
+  updateEntry(path.resolve(argv.file));
+} else {
+  processDrafts();
+}
