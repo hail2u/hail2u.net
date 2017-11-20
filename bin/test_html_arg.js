@@ -18,7 +18,7 @@ if (file.endsWith(".txt")) {
     dest,
     path.relative(src, path.dirname(file)),
     `${path.basename(file, ".txt")}.html`
-  )
+  );
 }
 
 execFileSync(which("htmlhint"), [

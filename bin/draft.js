@@ -66,7 +66,8 @@ function getDraft(draft) {
 
       resolve({
         content: d,
-        name: path.basename(draft, ".md"),
+        filename: draft,
+        name: path.basename(draft, path.extname(draft)),
         path: draft
       });
     });
@@ -91,7 +92,11 @@ function selectDraft(drafts) {
     menu.write("\n");
     menu.write("0. QUIT\n");
     drafts.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.content.trim().split(/\n+/)[0].replace(/^# /, "")}
+      menu.write(`${i + 1}. ${n.content
+        .trim()
+        .split(/\n+/)[0]
+        .replace(/^# /, "")
+        .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
 `);
     });
     menu.question("Which one: (0) ", (a) => {
@@ -121,7 +126,10 @@ function checkSelected(selected) {
       return reject(new Error("This draft does not have a valid name for file."));
     }
 
-    if (!selected.content.startsWith("# ")) {
+    if (
+      !selected.content.startsWith("# ") &&
+      !selected.content.startsWith("<h1>")
+    ) {
       return reject(new Error("This draft does not have a title."));
     }
 
@@ -152,7 +160,7 @@ function saveSelected(selected) {
 
 function deleteSelected(selected) {
   return new Promise((resolve, reject) => {
-    fs.unlink(path.join(dir.draft, `${selected.name}.md`), (e) => {
+    fs.unlink(path.join(dir.draft, `${selected.filename}`), (e) => {
       if (e) {
         return reject(e);
       }
