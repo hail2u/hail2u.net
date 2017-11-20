@@ -13,7 +13,7 @@ const file = process.argv.slice(2).shift();
 process.chdir(__dirname);
 execFileSync(which("htmlhint"), [
   "--config",
-  ".htmlhintrc",
+  "../.htmlhintrc",
   path.join(
     dest,
     path.relative(src, path.dirname(file)),
