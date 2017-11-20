@@ -28,6 +28,21 @@ const git = which("git");
 const npm = which("npm");
 const open = which("open");
 
+function isDraft(file) {
+  const ext = path.extname(file);
+
+  if (
+    ext === ".html" ||
+    ext === ".markdown" ||
+    ext === ".md" ||
+    ext === ".txt"
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function listDrafts() {
   return new Promise((resolve, reject) => {
     fs.readdir(dir.draft, (e, f) => {
@@ -35,7 +50,7 @@ function listDrafts() {
         return reject(e);
       }
 
-      resolve(f);
+      resolve(f.filter(isDraft));
     });
   });
 }
