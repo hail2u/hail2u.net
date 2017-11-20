@@ -106,6 +106,10 @@ function checkSelected(selected) {
       return reject(new Error("This draft does not have a valid name for file."));
     }
 
+    if (!selected.content.startsWith("# ")) {
+      return reject(new Error("This draft does not have a title."));
+    }
+
     resolve(selected);
   });
 }
