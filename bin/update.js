@@ -14,7 +14,7 @@ const git = which("git");
 const npm = which("npm");
 const root = "../";
 
-function add(file) {
+function addEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "add",
@@ -31,7 +31,7 @@ function add(file) {
   });
 }
 
-function commit(file) {
+function commitEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
@@ -47,7 +47,7 @@ function commit(file) {
   });
 }
 
-function build(file) {
+function runBlog(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
@@ -65,7 +65,7 @@ function build(file) {
   });
 }
 
-function test(file) {
+function runTest(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
@@ -83,7 +83,7 @@ function test(file) {
   });
 }
 
-function finalize() {
+function runPostArticles() {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
@@ -101,11 +101,11 @@ function finalize() {
 
 process.chdir(__dirname);
 waterfall([
-  add,
-  commit,
-  build,
-  test,
-  finalize
+  addEntry,
+  commitEntry,
+  runBlog,
+  runTest,
+  runPostArticles
 ], path.resolve(argv.file)).catch((e) => {
   console.error(e.stack);
   process.exit(1);
