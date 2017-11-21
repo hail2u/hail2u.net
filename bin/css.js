@@ -5,7 +5,6 @@
 const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");
-const moveFontFace = require("../lib/move-font-face");
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
 const waterfall = require("../lib/waterfall");
@@ -25,8 +24,7 @@ const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
-  wrapWithSupports(),
-  moveFontFace()
+  wrapWithSupports()
 ]);
 
 function read(file) {
