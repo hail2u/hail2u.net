@@ -41,7 +41,7 @@
     "clear": "rm -fr ./tmp/ && mkdir tmp",
     "precss": "npm run test_css && npm run clear",
     "css": "node ./bin/css.js",
-    "postcss": "cp -rT ./src/css/ ./dist/css/ && rm ./dist/css/test.html && cp -rT ./tmp/ ./dist/css/ && cp ./tmp/main.min.css ./src/html/partial/css.mustache && npm run style_guide",
+    "postcss": "cp -rT ./src/css/ ./dist/css/ && rm ./dist/css/test.html && cp -rT ./tmp/ ./dist/css/ && cp ./tmp/main.min.css ./src/html/partial/css.mustache && node ./bin/style-guide.js",
     "deploy": "cd ./dist/ && git add --all && git commit --message=\"Build\" && git push origin gh-pages",
     "html": "node ./bin/html.js",
     "posthtml": "npm run test_html && node ./bin/sitemap.js && node ./bin/feed.js",
@@ -51,13 +51,11 @@
     "prejs": "npm run test_js && npm run clear",
     "js": "node ./bin/js.js",
     "postjs": "cp -rT ./src/js/ ./dist/js/ && cp -rT ./tmp/ ./dist/js/ && cp ./tmp/async.min.js ./src/html/partial/js-async.mustache && cp ./tmp/defer.min.js ./src/html/partial/js-defer.mustache",
-    "prepost": "npm run clear",
-    "post": "node ./bin/blog.js --publish",
-    "postpost": "npm run deploy",
     "preview": "npm run clear && node ./bin/blog.js",
-    "postpublic": "cd ./dist/ && git commit --message=\"Upload\" && git push origin gh-pages",
+    "prepublish": "npm run clear",
+    "publish": "node ./bin/blog.js --publish",
+    "postpublish": "npm run deploy",
     "start": "http-server ./dist/ -o",
-    "style_guide": "node ./bin/style-guide.js",
     "test": "npm run test_html && npm run test_css && npm run test_js",
     "test_css": "stylelint \"./src/css/**/*.css\"",
     "test_html": "htmlhint --config .htmlhintrc ./src/css/test.html \"./dist/**/index.html\" \"./dist/documents/**/*.html\"",
@@ -65,6 +63,6 @@
     "update": "node ./bin/blog.js --update",
     "postupdate": "npm run deploy",
     "upload": "node ./bin/static.js",
-    "postupload": "npm run deploy"
+    "postupload": "cd ./dist/ && git commit --message=\"Upload\" && git push origin gh-pages"
   }
 }
