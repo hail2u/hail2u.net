@@ -39,8 +39,12 @@ function readArticle(articles, line) {
 
   const [file, time] = line.split("=>");
   const date = new Date(parseInt(time, 10) * 1000);
+  const [title, ...body] = fs.readFileSync(file, "utf8")
+    .trim()
+    .split("\n");
 
   articles.push({
+    body: body.join(""),
     day: date.getDate(),
     hour: date.getHours(),
     link: `/${toPOSIXPath(path.join(
@@ -51,11 +55,7 @@ function readArticle(articles, line) {
     minute: date.getMinutes(),
     month: date.getMonth() + 1,
     second: date.getSeconds(),
-    title: fs.readFileSync(file, "utf8")
-      .trim()
-      .split(/\n/)
-      .shift()
-      .replace(/<\/?h1>/g, ""),
+    title: title.replace(/<\/?h1>/g, ""),
     tz: "+09:00",
     unixtime: date.getTime(),
     year: date.getFullYear()
