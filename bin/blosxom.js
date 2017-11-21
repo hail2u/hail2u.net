@@ -56,7 +56,6 @@ function listFromArgv(files) {
   }
 
   files.push(path.resolve(argv.file));
-  files.push(path.join(dir.data, "index.rss"));
 
   return files;
 }
@@ -116,10 +115,6 @@ function buildAll(files) {
     if (argv.reindex) {
       args.push("reindex=1");
       argv.reindex = false;
-    }
-
-    if (f === "index.rss") {
-      f = "feed";
     }
 
     let html = execFileSync(perl, args, {
