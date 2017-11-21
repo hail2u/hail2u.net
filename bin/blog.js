@@ -20,12 +20,14 @@ const argv = minimist(process.argv.slice(2), {
   ]
 });
 const dir = {
+  blog: "../dist/blog/",
   draft: path.join(os.homedir(), "Documents", "Drafts"),
   entry: "../src/weblog/entries/",
   root: "../",
   temp: "../tmp/"
 };
 const git = which("git");
+const htmlhint = which("htmlhint");
 const npm = which("npm");
 const open = which("open");
 
@@ -86,13 +88,16 @@ function runBlosxom(file) {
   });
 }
 
-function runTest(file) {
+function testEntry(file) {
   return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "test_html_arg",
-      "--",
-      file
+    execFile(htmlhint, [
+      "--config",
+      "../.htmlhintrc",
+      path.join(
+        dir.blog,
+        path.relative(dir.entry, path.dirname(file)),
+        `${path.basename(file, ".txt")}.html`
+      )
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -125,7 +130,7 @@ function updateEntry(file) {
     addEntry,
     commitEntry,
     runBlosxom,
-    runTest,
+    testEntry,
     runPostArticles
   ], file).catch((e) => {
     console.error(e.stack);
@@ -300,7 +305,7 @@ function publishSelected(selected) {
     addEntry,
     commitEntry,
     runBlosxom,
-    runTest,
+    testEntry,
     runArticles
   ], selected);
 }
