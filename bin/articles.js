@@ -46,6 +46,7 @@ function readArticle(articles, line) {
   articles.push({
     body: body.join(""),
     day: date.getDate(),
+    dow: date.getDay(),
     hour: date.getHours(),
     link: `/${toPOSIXPath(path.join(
       "blog",
