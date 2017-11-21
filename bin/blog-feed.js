@@ -6,7 +6,7 @@ const fs = require("fs-extra");
 const mustache = require("mustache");
 const waterfall = require("../lib/waterfall");
 
-const cache = "../cache/articles.json";
+const cacheFile = "../cache/articles.json";
 const dest = "../dist/blog/feed";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
@@ -16,30 +16,43 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
+const metadataFile = "../package.json";
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 const src = "../src/feed/blog/index.mustache";
 
-function readTemplate() {
+function readMetadata() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(metadataFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o.metadata);
+    });
+  });
+}
+
+function readTemplate(metadata) {
   return new Promise((resolve, reject) => {
     fs.readFile(src, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(d);
+      resolve([metadata, d]);
     });
   });
 }
 
-function readCache(template) {
+function readCache([metadata, template]) {
   return new Promise((resolve, reject) => {
-    fs.readFile(cache, "utf8", (e, d) => {
+    fs.readFile(cacheFile, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve([d, template]);
+      resolve([metadata, template, d]);
     });
   });
 }
@@ -58,7 +71,7 @@ function now() {
   return `${dow[d.getDay()]}, ${pad(d.getDate())} ${month[d.getMonth() - 1]} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${d.getSeconds()} +0900`;
 }
 
-function build([data, template]) {
+function build([metadata, template, data]) {
   data = JSON.parse(data)
     .slice(0, 10)
     .map((d) => {
@@ -70,11 +83,10 @@ function build([data, template]) {
 
       return d;
     });
+  metadata.items = data;
+  metadata.lastBuildDate = now();
 
-  return mustache.render(template, {
-    lastBuildDate: now(),
-    items: data
-  });
+  return mustache.render(template, metadata);
 }
 
 function write(feed) {
@@ -96,6 +108,7 @@ mustache.escape = (s) => {
   });
 };
 waterfall([
+  readMetadata,
   readTemplate,
   readCache,
   build,
