@@ -7,6 +7,7 @@ const mustache = require("mustache");
 const waterfall = require("../lib/waterfall");
 
 const cacheFile = "../cache/articles.json";
+const dataFile = "../src/html/blog/index.json";
 const dest = "../dist/blog/feed";
 const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
@@ -33,26 +34,14 @@ function readMetadata() {
   });
 }
 
-function readTemplate(metadata) {
+function readData(metadata) {
   return new Promise((resolve, reject) => {
-    fs.readFile(src, "utf8", (e, d) => {
+    fs.readJSON(dataFile, "utf8", (e, o) => {
       if (e) {
         return reject(e);
       }
 
-      resolve([metadata, d]);
-    });
-  });
-}
-
-function readCache([metadata, template]) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(cacheFile, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve([metadata, template, d]);
+      resolve(Object.assign(metadata, o));
     });
   });
 }
@@ -71,21 +60,44 @@ function now() {
   return `${dow[d.getDay()]}, ${pad(d.getDate())} ${month[d.getMonth() - 1]} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${d.getSeconds()} +0900`;
 }
 
-function build([metadata, template, data]) {
-  data = JSON.parse(data)
-    .slice(0, 10)
-    .map((d) => {
-      d.description = d.body
-        .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-        .replace(/<.*?>/g, "");
-      d.pubDate = `${dow[d.dow]}, ${d.day} ${month[d.month - 1]} ${d.year} ${pad(d.hour)}:${pad(d.minute)}:00 +0900`;
-      d.guid = d.link;
+function readCache(metadata) {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(cacheFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-      return d;
+      o = o.slice(0, 10)
+        .map((d) => {
+          d.description = d.body
+            .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+            .replace(/<.*?>/g, "");
+          d.pubDate = `${dow[d.dow]}, ${d.day} ${month[d.month - 1]} ${d.year} ${pad(d.hour)}:${pad(d.minute)}:00 +0900`;
+          d.guid = d.link;
+
+          return d;
+        });
+      metadata.items = o;
+      metadata.lastBuildDate = now();
+
+      resolve(metadata);
     });
-  metadata.items = data;
-  metadata.lastBuildDate = now();
+  });
+}
 
+function readTemplate(metadata) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve([metadata, d]);
+    });
+  });
+}
+
+function build([metadata, template]) {
   return mustache.render(template, metadata);
 }
 
@@ -109,8 +121,9 @@ mustache.escape = (s) => {
 };
 waterfall([
   readMetadata,
-  readTemplate,
+  readData,
   readCache,
+  readTemplate,
   build,
   write
 ]).catch((e) => {
