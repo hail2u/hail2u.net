@@ -26,10 +26,14 @@ const processor = postcss([
   csswring(),
   wrapWithSupports()
 ]);
+const styleGuide = {
+  dest: "../dist/style-guide/index.html",
+  src: "../src/css/test.html"
+};
 
 function read(file) {
   return new Promise((resolve, reject) => {
-    fs.readFile(file.src, (e, d) => {
+    fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
@@ -71,9 +75,37 @@ function build(file) {
   ], file);
 }
 
-process.chdir(__dirname);
-Promise.all(files.map(build))
-  .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+function buildAll() {
+  return Promise.all(files.map(build)).then(() => {
+    return styleGuide;
   });
+}
+
+function modifyStyleGuide(file) {
+  const dir = "../";
+  const url = "https://hail2u.net/";
+
+  file.contents = file.contents
+    .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
+      if (u.startsWith(url)) {
+        u = u.substr(url.length - 1);
+      } else if (u.startsWith(dir)) {
+        u = u.substr(dir.length - 1);
+      }
+
+      return `${a}${e}${o}${u}${c}`;
+    });
+
+  return file;
+}
+
+process.chdir(__dirname);
+waterfall([
+  buildAll,
+  read,
+  modifyStyleGuide,
+  write
+]).catch((e) => {
+  console.error(e.stack);
+  process.exit(1);
+});
