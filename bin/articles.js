@@ -44,7 +44,8 @@ function readArticle(articles, line) {
     .split("\n");
 
   articles.push({
-    body: body.join(""),
+    body: body.join("")
+      .replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
     day: date.getDate(),
     dow: date.getDay(),
     hour: date.getHours(),
