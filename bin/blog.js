@@ -167,9 +167,7 @@ function listDrafts() {
 
 function getDraft(draft) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.join(dir.draft, draft), {
-      encoding: "utf8"
-    }, (e, d) => {
+    fs.readFile(path.join(dir.draft, draft), "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
