@@ -23,7 +23,7 @@ const files = [
   },
   {
     caches: [
-      "../src/feed/updates.json",
+      "../src/updates.json",
       "../cache/articles.json",
     ],
     data: "../src/html/index.json",
