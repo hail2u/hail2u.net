@@ -48,7 +48,7 @@ const entityMap = {
   ">": "&gt;"
 };
 const metadataFile = "../package.json";
-const siteFeed = "../src/feed/index.rss";
+const siteFeed = "../dist/feed";
 const weblogFeed = "../dist/blog/feed";
 
 function readMetadata() {
