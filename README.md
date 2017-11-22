@@ -12,11 +12,7 @@ Environment
 - ImageMagick
 - Inkscape
 - Node.js
-  - ESLint
-  - HTMLHint
   - npm
-  - Stylelint
-- Sassc
 
 
 [1]: https://hail2u.net/
