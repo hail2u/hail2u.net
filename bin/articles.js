@@ -38,7 +38,6 @@ function readArticle(articles, line) {
   }
 
   const [file, time] = line.split("=>");
-  const date = new Date(parseInt(time, 10) * 1000);
   const [title, ...body] = fs.readFileSync(file, "utf8")
     .trim()
     .split("\n");
@@ -46,21 +45,13 @@ function readArticle(articles, line) {
   articles.push({
     body: body.join("")
       .replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
-    date: date.getDate(),
-    day: date.getDay(),
-    hour: date.getHours(),
     link: `/${toPOSIXPath(path.join(
       "blog",
       path.relative(root, path.dirname(file)),
       `${path.basename(file, ".txt")}.html`
     ))}`,
-    minute: date.getMinutes(),
-    month: date.getMonth() + 1,
-    second: date.getSeconds(),
     title: title.replace(/<\/?h1>/g, ""),
-    tz: "+09:00",
-    unixtime: date.getTime(),
-    year: date.getFullYear()
+    unixtime: parseInt(time, 10) * 1000
   });
 }
 
