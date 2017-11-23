@@ -12,7 +12,7 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-const dest = "../cache/articles.json";
+const dest = "../src/articles.json";
 const root = "../src/weblog/entries/";
 const src = "../src/weblog/plugins/state/files_index.dat";
 

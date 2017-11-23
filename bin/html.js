@@ -9,7 +9,7 @@ const parseXML = require("xml2js").parseString;
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
-const articleCache = "../cache/articles.json";
+const articleCache = "../src/articles.json";
 const dir = {
   metadata: "../src/metadata/",
   partial: "../src/html/partial",
