@@ -80,7 +80,9 @@ function unique(value, index, self) {
 
 function writeCache(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(dest, articles.sort(sort).filter(unique), (e) => {
+    fs.outputJSON(dest, articles.sort(sort).filter(unique), {
+      spaces: 2
+    }, (e) => {
       if (e) {
         return reject(e);
       }
