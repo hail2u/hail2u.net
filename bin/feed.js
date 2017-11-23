@@ -17,7 +17,7 @@ const entityMap = {
 const files = [
   {
     caches: ["../cache/articles.json"],
-    data: "../src/html/blog/index.json",
+    data: "../src/metadata/blog/index.json",
     dest: "../dist/blog/feed",
     src: "../src/feed/blog/index.mustache"
   },
@@ -26,7 +26,7 @@ const files = [
       "../src/updates.json",
       "../cache/articles.json",
     ],
-    data: "../src/html/index.json",
+    data: "../src/metadata/index.json",
     dest: "../dist/feed",
     src: "../src/feed/index.mustache"
   }

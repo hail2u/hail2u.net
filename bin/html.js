@@ -11,6 +11,7 @@ const waterfall = require("../lib/waterfall");
 
 const articleCache = "../cache/articles.json";
 const dir = {
+  metadata: "../src/metadata/",
   partial: "../src/html/partial",
   template: "../src/html/"
 };
@@ -280,7 +281,11 @@ function write(file) {
 }
 
 function build(metadata, partials, file) {
-  file.json = path.join(path.dirname(file.src), `${path.basename(file.src, ".mustache")}.json`);
+  file.json = path.join(
+    dir.metadata,
+    path.relative(dir.template, path.dirname(file.src)),
+    `${path.basename(file.src, ".mustache")}.json`
+  );
 
   return waterfall([
     readTemplate,
