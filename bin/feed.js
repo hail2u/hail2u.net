@@ -104,7 +104,7 @@ function readCaches([metadata, file]) {
           }
 
           if (!d.pubDate) {
-            d.pubDate = `${dow[d.dow]}, ${d.day} ${month[d.month - 1]} ${d.year} ${pad(d.hour)}:${pad(d.minute)}:00 +0900`;
+            d.pubDate = `${dow[d.day]}, ${d.date} ${month[d.month - 1]} ${d.year} ${pad(d.hour)}:${pad(d.minute)}:00 +0900`;
           }
 
           if (!d.guid) {

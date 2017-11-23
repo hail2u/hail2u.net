@@ -46,8 +46,8 @@ function readArticle(articles, line) {
   articles.push({
     body: body.join("")
       .replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
-    day: date.getDate(),
-    dow: date.getDay(),
+    date: date.getDate(),
+    day: date.getDay(),
     hour: date.getHours(),
     link: `/${toPOSIXPath(path.join(
       "blog",
