@@ -22,7 +22,7 @@ const argv = minimist(process.argv.slice(2), {
 const dir = {
   blog: "../dist/blog/",
   draft: path.join(os.homedir(), "Documents", "Drafts"),
-  entry: "../src/weblog/entries/",
+  entry: "../src/blosxom/entries/",
   root: "../",
   temp: "../tmp/"
 };

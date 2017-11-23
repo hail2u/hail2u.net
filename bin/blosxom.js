@@ -19,13 +19,13 @@ const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 const dir = {
-  data: "../src/weblog/entries/",
+  data: "../src/blosxom/entries/",
   img: "../src/img/blog/",
-  root: "../src/weblog/",
+  root: "../src/blosxom/",
   static: "../dist/blog/",
   staticimg: "../dist/img/blog/"
 };
-const index = "../src/weblog/plugins/state/files_index.dat";
+const index = "../src/blosxom/plugins/state/files_index.dat";
 const perl = which("perl");
 
 function listAll() {

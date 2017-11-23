@@ -12,9 +12,9 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["force"],
   string: ["file"]
 });
-const dest = "../src/articles.json";
-const root = "../src/weblog/entries/";
-const src = "../src/weblog/plugins/state/files_index.dat";
+const dest = "../src/blog/articles.json";
+const root = "../src/blosxom/entries/";
+const src = "../src/blosxom/plugins/state/files_index.dat";
 
 function readCache() {
   if (!argv.file) {

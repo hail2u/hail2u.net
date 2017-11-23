@@ -9,36 +9,32 @@ const parseXML = require("xml2js").parseString;
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
-const articleCache = "../src/articles.json";
-const dir = {
-  metadata: "../src/metadata/",
-  partial: "../src/html/partial",
-  template: "../src/html/"
-};
+const articleCache = "../src/blog/articles.json";
+const dirPartial = "../src/partial/";
 const files = [
   {
     dest: "../dist/about/index.html",
-    src: "../src/html/about/index.mustache"
+    src: "../src/about/index.mustache"
   },
   {
     dest: "../dist/blog/index.html",
-    src: "../src/html/blog/index.mustache"
+    src: "../src/blog/index.mustache"
   },
   {
-    dest: "../src/weblog/entries/themes/html/page",
-    src: "../src/html/blog/theme.mustache"
+    dest: "../src/blosxom/entries/themes/html/page",
+    src: "../src/blog/theme.mustache"
   },
   {
     dest: "../dist/documents/index.html",
-    src: "../src/html/documents/index.mustache"
+    src: "../src/documents/index.mustache"
   },
   {
     dest: "../dist/projects/index.html",
-    src: "../src/html/projects/index.mustache"
+    src: "../src/projects/index.mustache"
   },
   {
     dest: "../dist/index.html",
-    src: "../src/html/index.mustache"
+    src: "../src/index.mustache"
   }
 ];
 const entityMap = {
@@ -65,7 +61,7 @@ function readMetadata() {
 }
 
 function readPartial(file) {
-  file = path.join(dir.partial, file);
+  file = path.join(dirPartial, file);
 
   return new Promise((resolve, reject) => {
     fs.readFile(file, "utf8", (e, d) => {
@@ -89,7 +85,7 @@ function gatherPartials(resolve, metadata, partials) {
 
 function readPartials(metadata) {
   return new Promise((resolve, reject) => {
-    fs.readdir(dir.partial, (e, f) => {
+    fs.readdir(dirPartial, (e, f) => {
       if (e) {
         return reject(e);
       }
@@ -282,8 +278,7 @@ function write(file) {
 
 function build(metadata, partials, file) {
   file.json = path.join(
-    dir.metadata,
-    path.relative(dir.template, path.dirname(file.src)),
+    path.dirname(file.src),
     `${path.basename(file.src, ".mustache")}.json`
   );
 

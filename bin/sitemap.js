@@ -23,7 +23,7 @@ const sitemap = {
   }
 };
 const src = {
-  articles: "../src/articles.json",
+  articles: "../src/blog/articles.json",
   documents: "../dist/documents/"
 };
 

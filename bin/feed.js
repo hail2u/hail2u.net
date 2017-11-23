@@ -16,19 +16,19 @@ const entityMap = {
 };
 const files = [
   {
-    caches: ["../src/articles.json"],
-    data: "../src/metadata/blog/index.json",
+    caches: ["../src/blog/articles.json"],
+    data: "../src/blog/index.json",
     dest: "../dist/blog/feed",
-    src: "../src/feed/blog/index.mustache"
+    src: "../src/blog/feed.mustache"
   },
   {
     caches: [
-      "../src/updates.json",
-      "../src/articles.json",
+      "../src/blog/articles.json",
+      "../src/updates.json"
     ],
-    data: "../src/metadata/index.json",
+    data: "../src/index.json",
     dest: "../dist/feed",
-    src: "../src/feed/index.mustache"
+    src: "../src/feed.mustache"
   }
 ];
 const metadataFile = "../src/metadata.json";
