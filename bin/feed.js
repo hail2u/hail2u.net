@@ -31,7 +31,7 @@ const files = [
     src: "../src/feed/index.mustache"
   }
 ];
-const metadataFile = "../package.json";
+const metadataFile = "../src/metadata.json";
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 
@@ -42,7 +42,7 @@ function readMetadata() {
         return reject(e);
       }
 
-      resolve(o.metadata);
+      resolve(o);
     });
   });
 }
