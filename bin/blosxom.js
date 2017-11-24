@@ -44,7 +44,8 @@ function listAll() {
           return f;
         })
         .map((f) => {
-          return f.split("=>").shift();
+          return f.split("=>")
+            .shift();
         }));
     });
   });
@@ -61,7 +62,8 @@ function listFromArgv(files) {
 }
 
 function fixFilename(file) {
-  return toPOSIXPath(path.relative(dir.data, file).replace(/\.txt$/, ".html"));
+  return toPOSIXPath(path.relative(dir.data, file)
+    .replace(/\.txt$/, ".html"));
 }
 
 function fix(files) {
@@ -103,9 +105,10 @@ function copyImages([files, images]) {
     return files;
   }
 
-  return Promise.all(images.map(copyImage)).then(() => {
-    return files;
-  });
+  return Promise.all(images.map(copyImage))
+    .then(() => {
+      return files;
+    });
 }
 
 function buildAll(files) {
@@ -146,7 +149,8 @@ waterfall([
   listImages,
   copyImages,
   buildAll
-]).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+])
+  .catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });

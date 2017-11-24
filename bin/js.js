@@ -79,7 +79,7 @@ function write(file) {
 }
 
 function compile(file) {
-  file.contents = gccc(Object.assign(config, {
+  file.contents = gccc(Object.assign({}, config, {
     jsCode: [{
       src: file.contents
     }]

@@ -80,15 +80,18 @@ function unique(value, index, self) {
 
 function writeCache(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(dest, articles.sort(sort).filter(unique), {
-      spaces: 2
-    }, (e) => {
-      if (e) {
-        return reject(e);
-      }
+    fs.outputJSON(
+      dest,
+      articles.sort(sort)
+        .filter(unique),
+      (e) => {
+        if (e) {
+          return reject(e);
+        }
 
-      resolve();
-    });
+        resolve();
+      }
+    );
   });
 }
 
@@ -106,7 +109,8 @@ waterfall([
   readCache,
   addArticle,
   writeCache
-]).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+])
+  .catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });

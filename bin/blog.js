@@ -132,10 +132,11 @@ function updateEntry(file) {
     runBlosxom,
     testEntry,
     runPostArticles
-  ], file).catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
-  });
+  ], file)
+    .catch((e) => {
+      console.error(e.stack);
+      process.exit(1);
+    });
 }
 
 function isDraft(file) {
@@ -200,8 +201,7 @@ function selectDraft(drafts) {
     menu.write("\n");
     menu.write("0. QUIT\n");
     drafts.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.content
-        .trim()
+      menu.write(`${i + 1}. ${n.content.trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
         .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
@@ -364,7 +364,8 @@ function processSelected(selected) {
     </article>
   </main>
 </body>
-</html>`.replace(/="\/img\//g, "=\"../src/img/").replace(/="\//g, "=\"../dist/");
+</html>`.replace(/="\/img\//g, "=\"../src/img/")
+    .replace(/="\//g, "=\"../dist/");
   selected.path = path.join(dir.temp, "__preview.html");
 
   return previewSelected(selected);
@@ -378,10 +379,11 @@ function processDrafts() {
     checkSelected,
     markupSelected,
     processSelected
-  ]).catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
-  });
+  ])
+    .catch((e) => {
+      console.error(e.stack);
+      process.exit(1);
+    });
 }
 
 process.chdir(__dirname);

@@ -135,8 +135,7 @@ function extendItem(item, index, original) {
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
 
   if (!item.description) {
-    item.description = item.body
-      .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    item.description = item.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
       .replace(/<.*?>/g, "");
   }
 
@@ -199,7 +198,8 @@ function readPartials([metadata, items]) {
         return reject(e);
       }
 
-      return Promise.all(f.map(readPartial))
+      return Promise
+        .all(f.map(readPartial))
         .then(gatherPartials.bind(null, resolve, metadata, items));
     });
   });
@@ -295,16 +295,18 @@ function buildAll([metadata, items, partials]) {
 
 process.chdir(__dirname);
 mustache.escape = (s) => {
-  return String(s).replace(/[&<>"']/g, (c) => {
-    return entityMap[c];
-  });
+  return String(s)
+    .replace(/[&<>"']/g, (c) => {
+      return entityMap[c];
+    });
 };
 waterfall([
   readMetadata,
   readItems,
   readPartials,
   buildAll
-]).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+])
+  .catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });

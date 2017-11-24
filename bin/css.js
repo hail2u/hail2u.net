@@ -48,11 +48,12 @@ function optimize(file) {
   return processor.process(file.contents, {
     from: file.src,
     to: file.dest
-  }).then((r) => {
-    file.contents = r.css;
+  })
+    .then((r) => {
+      file.contents = r.css;
 
-    return file;
-  });
+      return file;
+    });
 }
 
 function write(file) {
@@ -76,25 +77,25 @@ function build(file) {
 }
 
 function buildAll() {
-  return Promise.all(files.map(build)).then(() => {
-    return styleGuide;
-  });
+  return Promise.all(files.map(build))
+    .then(() => {
+      return styleGuide;
+    });
 }
 
 function modifyStyleGuide(file) {
   const dir = "../";
   const url = "https://hail2u.net/";
 
-  file.contents = file.contents
-    .replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
-      if (u.startsWith(url)) {
-        u = u.substr(url.length - 1);
-      } else if (u.startsWith(dir)) {
-        u = u.substr(dir.length - 1);
-      }
+  file.contents = file.contents.replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
+    if (u.startsWith(url)) {
+      u = u.substr(url.length - 1);
+    } else if (u.startsWith(dir)) {
+      u = u.substr(dir.length - 1);
+    }
 
-      return `${a}${e}${o}${u}${c}`;
-    });
+    return `${a}${e}${o}${u}${c}`;
+  });
 
   return file;
 }
@@ -105,7 +106,8 @@ waterfall([
   read,
   modifyStyleGuide,
   write
-]).catch((e) => {
-  console.error(e.stack);
-  process.exit(1);
-});
+])
+  .catch((e) => {
+    console.error(e.stack);
+    process.exit(1);
+  });

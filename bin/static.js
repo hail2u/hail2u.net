@@ -13,8 +13,7 @@ process.chdir(__dirname);
 execFileSync(which("git"), [
   "add",
   "--",
-  process.argv
-    .slice(2)
+  process.argv.slice(2)
     .map((f) => {
       return path.resolve(root, f);
     })

@@ -14,4 +14,5 @@ const src = [
 ];
 
 process.chdir(__dirname);
-execFileSync(which("convert"), ["-quiet"].concat(src).concat(dest));
+execFileSync(which("convert"), ["-quiet"].concat(src)
+  .concat(dest));
