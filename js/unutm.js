@@ -6,5 +6,9 @@
 "use strict";
 
 if (location.search) {
-  history.replaceState(null, "", `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "").replace(/^&/, "?")}${location.hash}`);
+  history.replaceState(
+    null,
+    "",
+    `${location.pathname}${location.search.replace(/[?&]utm_[^&]+/g, "")
+      .replace(/^&/, "?")}${location.hash}`);
 }
