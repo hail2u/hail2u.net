@@ -6,6 +6,7 @@ const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
+const mustache = require("mustache");
 const os = require("os");
 const path = require("path");
 const readline = require("readline");
@@ -26,7 +27,8 @@ const dir = {
   root: "../"
 };
 const draftExts = [".html", ".markdown", ".md", ".txt"];
-const filePreview = "../tmp/__preview.html";
+const destPreview = "../tmp/__preview.html";
+const srcPreview = "../src/preview.mustache";
 const git = which("git");
 const htmlhint = which("htmlhint");
 const npm = which("npm");
@@ -300,6 +302,27 @@ function publishSelected(selected) {
   ], selected);
 }
 
+function readTemplate(file) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file.template, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      file.template = d;
+      resolve(file);
+    });
+  });
+}
+
+function buildPreview(preview) {
+  preview.content = mustache.render(preview.template, preview)
+    .replace(/="\/img\//g, "=\"../src/img/")
+    .replace(/="\//g, "=\"../dist/");
+
+  return preview;
+}
+
 function savePreview(preview) {
   return new Promise((resolve, reject) => {
     fs.outputFile(preview.path, preview.content, (e) => {
@@ -326,6 +349,8 @@ function openPreview(file) {
 
 function previewSelected(selected) {
   return waterfall([
+    readTemplate,
+    buildPreview,
     savePreview,
     openPreview
   ], selected);
@@ -338,27 +363,8 @@ function processSelected(selected) {
     return publishSelected(selected);
   }
 
-  selected.content = `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta content="width=device-width" name="viewport">
-  <title>プレビュー - ウェブログ - Hail2u</title>
-  <link href="../src/css/main.css" rel="stylesheet">
-</head>
-<body>
-  <main class="content" style="margin-top: 6rem">
-    <article class="section">
-      <footer class="section-footer">
-        <p><time datetime="1976-07-23">1976/07/23</time></p>
-      </footer>
-      ${selected.content}
-    </article>
-  </main>
-</body>
-</html>`.replace(/="\/img\//g, "=\"../src/img/")
-    .replace(/="\//g, "=\"../dist/");
-  selected.path = path.resolve(filePreview);
+  selected.path = path.resolve(destPreview);
+  selected.template = path.resolve(srcPreview);
 
   return previewSelected(selected);
 }
