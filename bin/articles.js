@@ -9,7 +9,6 @@ const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["force"],
   string: ["file"]
 });
 const dest = "../src/blog/articles.json";
@@ -20,6 +19,8 @@ function readCache() {
   if (!argv.file) {
     return [];
   }
+
+  argv.file = toPOSIXPath(path.resolve(argv.file));
 
   return new Promise((resolve, reject) => {
     fs.readJSON(dest, "utf8", (e, o) => {
@@ -33,7 +34,7 @@ function readCache() {
 }
 
 function readArticle(articles, line) {
-  if (!argv.force && !line.startsWith(argv.file)) {
+  if (argv.file && !line.startsWith(argv.file)) {
     return;
   }
 
@@ -70,41 +71,34 @@ function addArticle(articles) {
   });
 }
 
-function sort(a, b) {
+function sortByDate(a, b) {
   return parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 }
 
-function unique(value, index, self) {
-  return self.indexOf(value) === index;
+function isDuplicate(link, current) {
+  return current.link === link;
+}
+
+function uniqueByLink(value, index, self) {
+  return self.findIndex(isDuplicate.bind(null, value.link)) === index;
 }
 
 function writeCache(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(
-      dest,
-      articles.sort(sort)
-        .filter(unique),
-      (e) => {
-        if (e) {
-          return reject(e);
-        }
-
-        resolve();
+    fs.outputJSON(dest, articles.sort(sortByDate)
+      .filter(uniqueByLink), {
+      spaces: 2
+    }, (e) => {
+      if (e) {
+        return reject(e);
       }
-    );
+
+      resolve();
+    });
   });
 }
 
 process.chdir(__dirname);
-
-if (!argv.file && !argv.force) {
-  return;
-}
-
-if (argv.file) {
-  argv.file = toPOSIXPath(path.resolve(argv.file));
-}
-
 waterfall([
   readCache,
   addArticle,
