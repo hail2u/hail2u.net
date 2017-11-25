@@ -23,9 +23,10 @@ const dir = {
   blog: "../dist/blog/",
   draft: path.join(os.homedir(), "Documents", "Drafts"),
   entry: "../src/blosxom/entries/",
-  root: "../",
-  temp: "../tmp/"
+  root: "../"
 };
+const draftExts = [".html", ".markdown", ".md", ".txt"];
+const filePreview = "../tmp/__preview.html";
 const git = which("git");
 const htmlhint = which("htmlhint");
 const npm = which("npm");
@@ -91,8 +92,6 @@ function runBlosxom(file) {
 function testEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(htmlhint, [
-      "--config",
-      "../.htmlhintrc",
       path.join(
         dir.blog,
         path.relative(dir.entry, path.dirname(file)),
@@ -109,11 +108,11 @@ function testEntry(file) {
   });
 }
 
-function runPostArticles() {
+function runBuild() {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
-      "postarticles"
+      "html"
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -131,7 +130,7 @@ function updateEntry(file) {
     commitEntry,
     runBlosxom,
     testEntry,
-    runPostArticles
+    runBuild
   ], file)
     .catch((e) => {
       console.error(e.stack);
@@ -140,14 +139,7 @@ function updateEntry(file) {
 }
 
 function isDraft(file) {
-  const ext = path.extname(file);
-
-  if (
-    ext === ".html" ||
-    ext === ".markdown" ||
-    ext === ".md" ||
-    ext === ".txt"
-  ) {
+  if (draftExts.indexOf(path.extname(file)) !== -1) {
     return true;
   }
 
@@ -176,8 +168,7 @@ function getDraft(draft) {
       resolve({
         content: d,
         filename: draft,
-        name: path.basename(draft, path.extname(draft)),
-        path: draft
+        name: path.basename(draft, path.extname(draft))
       });
     });
   });
@@ -268,7 +259,7 @@ function saveSelected(selected) {
 
 function deleteSelected(selected) {
   return new Promise((resolve, reject) => {
-    fs.unlink(path.join(dir.draft, `${selected.filename}`), (e) => {
+    fs.unlink(path.join(dir.draft, selected.filename), (e) => {
       if (e) {
         return reject(e);
       }
@@ -304,7 +295,8 @@ function publishSelected(selected) {
     commitEntry,
     runBlosxom,
     testEntry,
-    runArticles
+    runArticles,
+    runBuild
   ], selected);
 }
 
@@ -315,14 +307,14 @@ function savePreview(preview) {
         return reject(e);
       }
 
-      resolve(preview);
+      resolve(preview.path);
     });
   });
 }
 
-function openPreview(preview) {
+function openPreview(file) {
   return new Promise((resolve, reject) => {
-    execFile(open, [preview.path], (e) => {
+    execFile(open, [file], (e) => {
       if (e) {
         return reject(e);
       }
@@ -366,7 +358,7 @@ function processSelected(selected) {
 </body>
 </html>`.replace(/="\/img\//g, "=\"../src/img/")
     .replace(/="\//g, "=\"../dist/");
-  selected.path = path.join(dir.temp, "__preview.html");
+  selected.path = path.resolve(filePreview);
 
   return previewSelected(selected);
 }

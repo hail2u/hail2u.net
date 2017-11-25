@@ -20,18 +20,12 @@ const files = [
     src: "../src/css/debug.css"
   }
 ];
-const processor = postcss([
-  atImport(),
-  mqpacker(),
-  csswring(),
-  wrapWithSupports()
-]);
 const styleGuide = {
   dest: "../dist/style-guide/index.html",
   src: "../src/css/test.html"
 };
 
-function read(file) {
+function read(processor, file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
@@ -39,12 +33,12 @@ function read(file) {
       }
 
       file.contents = d;
-      resolve(file);
+      resolve([processor, file]);
     });
   });
 }
 
-function optimize(file) {
+function optimize(processor, file) {
   return processor.process(file.contents, {
     from: file.src,
     to: file.dest
@@ -63,21 +57,21 @@ function write(file) {
         return reject(e);
       }
 
-      resolve(file);
+      resolve();
     });
   });
 }
 
-function build(file) {
+function build(processor, file) {
   return waterfall([
     read,
     optimize,
     write
-  ], file);
+  ], [processor, file]);
 }
 
-function buildAll() {
-  return Promise.all(files.map(build))
+function buildAll(processor) {
+  return Promise.all(files.map(build.bind(null, processor)))
     .then(() => {
       return styleGuide;
     });
@@ -106,7 +100,12 @@ waterfall([
   read,
   modifyStyleGuide,
   write
-])
+], postcss([
+  atImport(),
+  mqpacker(),
+  csswring(),
+  wrapWithSupports()
+]))
   .catch((e) => {
     console.error(e.stack);
     process.exit(1);

@@ -39,10 +39,8 @@ function listAll() {
         return reject(e);
       }
 
-      resolve(d.split(/\r?\n/)
-        .filter((f) => {
-          return f;
-        })
+      resolve(d.trim()
+        .split(/\r?\n/)
         .map((f) => {
           return f.split("=>")
             .shift();
@@ -51,23 +49,20 @@ function listAll() {
   });
 }
 
-function listFromArgv(files) {
-  if (!argv.file) {
-    return files;
-  }
-
-  files.push(path.resolve(argv.file));
-
-  return files;
-}
-
 function fixFilename(file) {
   return toPOSIXPath(path.relative(dir.data, file)
     .replace(/\.txt$/, ".html"));
 }
 
-function fix(files) {
-  return files.map(fixFilename);
+function listFromArgv(files) {
+  if (!argv.file) {
+    return files;
+  }
+
+  files.push(path.resolve(argv.file))
+    .map(fixFilename);
+
+  return files;
 }
 
 function listImages(files) {
@@ -136,8 +131,7 @@ function buildAll(files) {
       html = minify(html);
     }
 
-    f = path.join(dir.static, f);
-    fs.outputFileSync(f, html);
+    fs.outputFileSync(path.join(dir.static, f), html);
   });
 }
 
@@ -145,7 +139,6 @@ process.chdir(__dirname);
 waterfall([
   listAll,
   listFromArgv,
-  fix,
   listImages,
   copyImages,
   buildAll

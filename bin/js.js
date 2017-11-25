@@ -53,17 +53,11 @@ function read(file) {
 function gather(file) {
   return Promise.all(file.src.map(read))
     .then((r) => {
-      file.contents = r;
+      file.contents = r.join("");
+      file.dest = path.join(tmp, file.dest);
 
       return file;
     });
-}
-
-function concat(file) {
-  file.contents = file.contents.join("");
-  file.dest = path.join(tmp, file.dest);
-
-  return file;
 }
 
 function write(file) {
@@ -92,7 +86,6 @@ function compile(file) {
 function build(file) {
   return waterfall([
     gather,
-    concat,
     write,
     compile,
     write

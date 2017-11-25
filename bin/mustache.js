@@ -76,19 +76,7 @@ const metadataFile = "../src/metadata.json";
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 
-function readMetadata() {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(metadataFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
-}
-
-function readItem(file) {
+function readData(file) {
   return new Promise((resolve, reject) => {
     fs.readJSON(file, "utf8", (e, o) => {
       if (e) {
@@ -112,8 +100,8 @@ function flatten(previous, current) {
   return previous.concat(current);
 }
 
-function byDate(a, b) {
-  return a.unixtime - b.unixtime;
+function sortByDate(a, b) {
+  return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 }
 
 function extendItem(item, index, original) {
@@ -126,7 +114,6 @@ function extendItem(item, index, original) {
     item.minute = dt.getMinutes();
     item.month = dt.getMonth() + 1;
     item.second = dt.getSeconds();
-    item.tz = "+09:00";
     item.year = dt.getFullYear();
   }
 
@@ -156,7 +143,7 @@ function extendItem(item, index, original) {
 
 function gatherItems(metadata, items) {
   items = items.reduce(flatten)
-    .sort(byDate)
+    .sort(sortByDate)
     .reverse()
     .map(extendItem);
 
@@ -164,7 +151,7 @@ function gatherItems(metadata, items) {
 }
 
 function readItems(metadata) {
-  return Promise.all(itemFiles.map(readItem))
+  return Promise.all(itemFiles.map(readData))
     .then(gatherItems.bind(null, metadata));
 }
 
@@ -243,11 +230,11 @@ function mergeData([metadata, items, partials, file]) {
         return reject(e);
       }
 
-      file.data = Object.assign({}, metadata, o);
-      file.data.items = items.concat()
+      o.items = items.concat()
         .filter(filterUpdates.bind(null, file.includeUpdates))
         .slice(0, file.itemLength);
-      file.data.lastBuildDate = now();
+      o.lastBuildDate = now();
+      file.data = Object.assign({}, metadata, o);
       resolve([partials, file]);
     });
   });
@@ -301,11 +288,11 @@ mustache.escape = (s) => {
     });
 };
 waterfall([
-  readMetadata,
+  readData,
   readItems,
   readPartials,
   buildAll
-])
+], metadataFile)
   .catch((e) => {
     console.error(e.stack);
     process.exit(1);
