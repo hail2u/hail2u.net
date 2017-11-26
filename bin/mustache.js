@@ -120,6 +120,7 @@ function extendItem(item, index, original) {
   item.html5PubDate = `${item.year}-${pad(item.month)}-${pad(item.date)}T${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)}+09:00`;
   item.rfc822PubDate = `${day[item.day]}, ${item.date} ${month[item.month - 1]} ${item.year} ${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)} +0900`;
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
+  item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
 
   if (!item.description) {
     item.description = item.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")

@@ -44,8 +44,7 @@ function readArticle(articles, line) {
     .split("\n");
 
   articles.push({
-    body: body.join("")
-      .replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
+    body: body.join(""),
     link: `/${toPOSIXPath(path.join(
       "blog",
       path.relative(root, path.dirname(file)),
