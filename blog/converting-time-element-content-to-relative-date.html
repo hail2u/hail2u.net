@@ -7,51 +7,7 @@
 
  LICENSE: http://hail2u.mit-license.org/2013
 */
-location.search&&history.replaceState(null,"",""+location.pathname+location.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?")+location.hash);}).call(window);</script><header><h1><a href=/ ><svg aria-labelledby=logo-title height=256.02 role=img viewBox="0 0 152.402 256.02" width=152.402><title id=logo-title>Hail2u</title><path d="M38.287 8.003c-6.378-.133-11.867 4.504-14.714 9.902-6.259 11.192-8.482 24.05-10.473 36.559-2.827 19.943-3.517 40.108-4.279 60.212-1.162 40.155-.738 80.333-.769 120.498.164 4.548 1.817 9.802 6.254 11.857 3.469 1.613 7.625.634 10.492-1.743 5.251-3.89 7.255-10.467 10.326-15.929 6.194-12.062 12.765-23.971 20.455-35.148 3.181-4.378 6.696-8.821 11.313-11.685 1.899-1.134 4.692-1.004 5.887 1.045 2.141 3.364 1.355 7.609 1.215 11.355-.843 9.24-2.049 18.558-.941 27.84.722 7.721 3.216 15.885 9.42 20.979 4.78 4.06 11.464 4.819 17.474 3.958 7.8-1.122 14.345-6.05 19.929-11.309 7.892-7.71 13.906-17.115 19.195-26.735 1.827-3.591 3.696-7.191 5.181-10.931.915-3.761-2.424-8.056-6.405-7.513-3.021.006-5.097 2.715-5.95 5.35-5.912 12.349-13.194 24.445-23.594 33.514-4.233 3.577-9.848 6.635-15.525 5.212-4.364-1.281-6.261-6.021-6.986-10.108-1.716-10.483-.395-21.096.6-31.583.354-6.96-.946-14.634-5.962-19.827-4.54-4.455-11.822-5.351-17.521-2.723-7.548 3.066-12.55 9.911-17.107 16.334-9.612 13.566-17.577 28.22-24.967 43.087-.709 1.919-.353-1.124-.488-1.833-.289-11.117-.032-22.239-.119-33.358 13.645-25.069 26.081-51.026 33.748-78.609 6.399-22.706 10.215-46.37 8.956-70.007-.762-9.995-2.2-20.419-7.66-29.055-3.045-4.789-7.902-8.747-13.688-9.397a21.738 21.738 0 0 0-3.294-.21zm.768 12.202c3.577.147 6.146 3.178 7.393 6.277 4.123 8.873 4.304 18.89 4.509 28.487.222 30.847-7.826 61.226-19.156 89.746-3.566 8.951-7.479 17.951-11.42 26.624.052-36.741-.202-73.613 3.604-110.172 1.304-10.702 2.632-21.561 6.302-31.757 1.481-3.291 2.836-7.398 6.448-8.907.739-.293 1.537-.321 2.321-.298z"/></svg></a></h1><nav><ul><li><mark><a href=/blog/ >ウェブログ</a></mark><li><a href=/documents/ >特集</a><li><a href=/projects/ >作品</a><li><a href=/about/ >いろいろ</a></ul></nav></header><main><article><footer><p><time class=js-reldate datetime=2016-10-16T13:41:00+09:00>2016/10/16</time></footer><h1>time要素の中身を相対日時へ変換</h1><p><code>time</code>要素に<code>datetime</code>属性があったら、それを元に現在時刻からの相対日時を生成し、その中身を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～ヶ月前、12で割って～年前というものをそのままコードにした。車輪だ。<pre><code class=language-javascript>const now = Date.now();
-const toRelativeDate = function (then) {
-  let diff = 0;
-
-  if (!Number.isInteger(then)) {
-    return;
-  }
-
-  diff = parseInt((now - then) / 1000, 10);
-
-  if (diff &lt; 0) {
-    return;
-  }
-
-  if (diff &lt; 60) {
-    return diff + &quot;秒前&quot;;
-  }
-
-  diff = parseInt(diff / 60, 10);
-
-  if (diff &lt; 60) {
-    return diff + &quot;分前&quot;;
-  }
-
-  diff = parseInt(diff / 60, 10);
-
-  if (diff &lt; 24) {
-    return diff + &quot;時間前&quot;;
-  }
-
-  diff = parseInt(diff / 24, 10);
-
-  if (diff &lt; 30) {
-    return diff + &quot;日前&quot;;
-  }
-
-  diff = parseInt(diff / 30, 10);
-
-  if (diff &lt; 12) {
-    return diff + &quot;ヶ月前&quot;;
-  }
-
-  return parseInt(diff / 12, 10) + &quot;年前&quot;;
-};
-</code></pre><p>Demo: <a href=/pub/test/658.html>Test Page for reldate.js</a><p>日本語だと複数形のことを考えなくて良いのでシンプルなコードになった。2年前以上は日時をそのまま表示したいという場合は、最初の方でdiffが一定数以上の時に抜けるようにしてやると良い。<p>タイムゾーンのことをまったく考えていない。<code>Date.now()</code>と<code>Date.parse()</code>でISO-8601をパースした時はUTCのミリ秒になるはずなので、大丈夫なんじゃないかと楽観している。また相対時刻がそもそもあやふやなので、最大24時間ずれるくらい大したこともなさそうだ。このあたりも含めて確実にしたいなら<a href=http://momentjs.com/ >Moment.js</a>を使うべきだろう。そうすれば<code>moment#toNow()</code>などもあり、何も考える必要はなくなる。<hr><p>ウェブサイト上で動かすスクリプトを昔のことは忘れて書き、<a href=https://github.com/google/closure-compiler-js>Closure CompilerのJavaScriptバージョン</a>でES5への変換と最小化を同時にやるようにし始めた。もちろんgyp依存とかでもないため、Windowsで普通に動く。いくつか小さなプロジェクトでも使ってみているが、UglifyJS2を差し替えるくらいの感覚で移行できている。ちょっと処理が遅く、最小化後のサイズも大きくはなるが、それを補って余りある簡便さだ。<p>規模の大きなJavaScriptコードを処理しようとするとメモリーを食い尽くすなど、パフォーマンスの点で問題がいくつかあるようだ。まだプロダクションで使うのは怖いが、小さいところではちょいちょい使っていきたい。</article></main><footer><ul><li><a href=https://creativecommons.org/licenses/by/4.0/ rel=license>CC/BY</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><address><a href=https://kyonagashima.com/ rel=author>ながしまきょう</a>が作っています</address></footer><script>(function () {/*
+location.search&&history.replaceState(null,"",""+location.pathname+location.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?")+location.hash);}).call(window);</script><header><h1><a href=/ ><svg aria-labelledby=logo-title height=256.02 role=img viewBox="0 0 152.402 256.02" width=152.402><title id=logo-title>Hail2u</title><path d="M38.287 8.003c-6.378-.133-11.867 4.504-14.714 9.902-6.259 11.192-8.482 24.05-10.473 36.559-2.827 19.943-3.517 40.108-4.279 60.212-1.162 40.155-.738 80.333-.769 120.498.164 4.548 1.817 9.802 6.254 11.857 3.469 1.613 7.625.634 10.492-1.743 5.251-3.89 7.255-10.467 10.326-15.929 6.194-12.062 12.765-23.971 20.455-35.148 3.181-4.378 6.696-8.821 11.313-11.685 1.899-1.134 4.692-1.004 5.887 1.045 2.141 3.364 1.355 7.609 1.215 11.355-.843 9.24-2.049 18.558-.941 27.84.722 7.721 3.216 15.885 9.42 20.979 4.78 4.06 11.464 4.819 17.474 3.958 7.8-1.122 14.345-6.05 19.929-11.309 7.892-7.71 13.906-17.115 19.195-26.735 1.827-3.591 3.696-7.191 5.181-10.931.915-3.761-2.424-8.056-6.405-7.513-3.021.006-5.097 2.715-5.95 5.35-5.912 12.349-13.194 24.445-23.594 33.514-4.233 3.577-9.848 6.635-15.525 5.212-4.364-1.281-6.261-6.021-6.986-10.108-1.716-10.483-.395-21.096.6-31.583.354-6.96-.946-14.634-5.962-19.827-4.54-4.455-11.822-5.351-17.521-2.723-7.548 3.066-12.55 9.911-17.107 16.334-9.612 13.566-17.577 28.22-24.967 43.087-.709 1.919-.353-1.124-.488-1.833-.289-11.117-.032-22.239-.119-33.358 13.645-25.069 26.081-51.026 33.748-78.609 6.399-22.706 10.215-46.37 8.956-70.007-.762-9.995-2.2-20.419-7.66-29.055-3.045-4.789-7.902-8.747-13.688-9.397a21.738 21.738 0 0 0-3.294-.21zm.768 12.202c3.577.147 6.146 3.178 7.393 6.277 4.123 8.873 4.304 18.89 4.509 28.487.222 30.847-7.826 61.226-19.156 89.746-3.566 8.951-7.479 17.951-11.42 26.624.052-36.741-.202-73.613 3.604-110.172 1.304-10.702 2.632-21.561 6.302-31.757 1.481-3.291 2.836-7.398 6.448-8.907.739-.293 1.537-.321 2.321-.298z"/></svg></a></h1><nav><ul><li><mark><a href=/blog/ >ウェブログ</a></mark><li><a href=/documents/ >特集</a><li><a href=/projects/ >作品</a><li><a href=/about/ >いろいろ</a></ul></nav></header><main><article><footer><p><time class=js-reldate datetime=2016-10-16T13:41:43+09:00>2016/10/16</time></footer><h1>time要素の中身を相対日時へ変換</h1><p><code>time</code>要素に<code>datetime</code>属性があったら、それを元に現在時刻からの相対日時を生成し、その中身を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～ヶ月前、12で割って～年前というものをそのままコードにした。車輪だ。<pre><code class=language-javascript>const now = Date.now();const toRelativeDate = function (then) {  let diff = 0;  if (!Number.isInteger(then)) {    return;  }  diff = parseInt((now - then) / 1000, 10);  if (diff &lt; 0) {    return;  }  if (diff &lt; 60) {    return diff + &quot;秒前&quot;;  }  diff = parseInt(diff / 60, 10);  if (diff &lt; 60) {    return diff + &quot;分前&quot;;  }  diff = parseInt(diff / 60, 10);  if (diff &lt; 24) {    return diff + &quot;時間前&quot;;  }  diff = parseInt(diff / 24, 10);  if (diff &lt; 30) {    return diff + &quot;日前&quot;;  }  diff = parseInt(diff / 30, 10);  if (diff &lt; 12) {    return diff + &quot;ヶ月前&quot;;  }  return parseInt(diff / 12, 10) + &quot;年前&quot;;};</code></pre><p>Demo: <a href=/pub/test/658.html>Test Page for reldate.js</a><p>日本語だと複数形のことを考えなくて良いのでシンプルなコードになった。2年前以上は日時をそのまま表示したいという場合は、最初の方でdiffが一定数以上の時に抜けるようにしてやると良い。<p>タイムゾーンのことをまったく考えていない。<code>Date.now()</code>と<code>Date.parse()</code>でISO-8601をパースした時はUTCのミリ秒になるはずなので、大丈夫なんじゃないかと楽観している。また相対時刻がそもそもあやふやなので、最大24時間ずれるくらい大したこともなさそうだ。このあたりも含めて確実にしたいなら<a href=http://momentjs.com/ >Moment.js</a>を使うべきだろう。そうすれば<code>moment#toNow()</code>などもあり、何も考える必要はなくなる。<hr><p>ウェブサイト上で動かすスクリプトを昔のことは忘れて書き、<a href=https://github.com/google/closure-compiler-js>Closure CompilerのJavaScriptバージョン</a>でES5への変換と最小化を同時にやるようにし始めた。もちろんgyp依存とかでもないため、Windowsで普通に動く。いくつか小さなプロジェクトでも使ってみているが、UglifyJS2を差し替えるくらいの感覚で移行できている。ちょっと処理が遅く、最小化後のサイズも大きくはなるが、それを補って余りある簡便さだ。<p>規模の大きなJavaScriptコードを処理しようとするとメモリーを食い尽くすなど、パフォーマンスの点で問題がいくつかあるようだ。まだプロダクションで使うのは怖いが、小さいところではちょいちょい使っていきたい。</article></main><footer><ul><li><a href=https://creativecommons.org/licenses/by/4.0/ rel=license>CC/BY</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><address><a href=https://kyonagashima.com/ rel=author>ながしまきょう</a>が作っています</address></footer><script>(function () {/*
  ellipsis-title.js
 
  LICENSE: http://hail2u.mit-license.org/2016
