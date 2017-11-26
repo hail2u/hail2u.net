@@ -12,10 +12,7 @@ const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "all",
-    "reindex"
-  ],
+  boolean: ["reindex"],
   string: ["file"]
 });
 const dir = {
@@ -25,58 +22,25 @@ const dir = {
   static: "../dist/blog/",
   staticimg: "../dist/img/blog/"
 };
-const index = "../src/blosxom/plugins/state/files_index.dat";
 const perl = which("perl");
-
-function listAll() {
-  if (!argv.all) {
-    return [];
-  }
-
-  return new Promise((resolve, reject) => {
-    fs.readFile(index, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(d.trim()
-        .split(/\r?\n/)
-        .map((f) => {
-          return f.split("=>")
-            .shift();
-        }));
-    });
-  });
-}
 
 function fixFilename(file) {
   return toPOSIXPath(path.relative(dir.data, file)
     .replace(/\.txt$/, ".html"));
 }
 
-function listFromArgv(files) {
-  if (!argv.file) {
-    return files;
-  }
-
-  files.push(path.resolve(argv.file))
-    .map(fixFilename);
-
-  return files;
+function generatePath() {
+  return fixFilename(path.resolve(argv.file));
 }
 
-function listImages(files) {
-  if (!argv.file) {
-    return [files, null];
-  }
-
+function listImages(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(argv.file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve([files, d.match(/\bsrc="\/img\/blog\/.*?"/g)]);
+      resolve([file, d.match(/\bsrc="\/img\/blog\/.*?"/g)]);
     });
   });
 }
@@ -95,53 +59,50 @@ function copyImage(image) {
   });
 }
 
-function copyImages([files, images]) {
+function copyImages([file, images]) {
   if (!images) {
-    return files;
+    return file;
   }
 
   return Promise.all(images.map(copyImage))
     .then(() => {
-      return files;
+      return file;
     });
 }
 
-function buildAll(files) {
-  files.forEach((f) => {
-    const args = ["blosxom.cgi", `path=/${f}`];
+function build(file) {
+  const args = ["blosxom.cgi", `path=/${file}`];
 
-    if (argv.reindex) {
-      args.push("reindex=1");
-      argv.reindex = false;
+  if (argv.reindex) {
+    args.push("reindex=1");
+    argv.reindex = false;
+  }
+
+  let html = execFileSync(perl, args, {
+    cwd: dir.root,
+    env: {
+      BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
     }
-
-    let html = execFileSync(perl, args, {
-      cwd: dir.root,
-      env: {
-        BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
-      }
-    });
-
-    html = html.toString()
-      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-      .trim();
-
-    if (f.endsWith(".html")) {
-      html = minify(html);
-    }
-
-    fs.outputFileSync(path.join(dir.static, f), html);
   });
+
+  html = html.toString()
+    .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+    .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+    .trim();
+
+  if (file.endsWith(".html")) {
+    html = minify(html);
+  }
+
+  fs.outputFileSync(path.join(dir.static, file), html);
 }
 
 process.chdir(__dirname);
 waterfall([
-  listAll,
-  listFromArgv,
+  generatePath,
   listImages,
   copyImages,
-  buildAll
+  build
 ])
   .catch((e) => {
     console.error(e.stack);

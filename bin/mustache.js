@@ -120,7 +120,7 @@ function extendItem(item, index, original) {
   item.html5PubDate = `${item.year}-${pad(item.month)}-${pad(item.date)}T${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)}+09:00`;
   item.rfc822PubDate = `${day[item.day]}, ${item.date} ${month[item.month - 1]} ${item.year} ${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)} +0900`;
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
-  item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\""),
+  item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\"");
 
   if (!item.description) {
     item.description = item.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
@@ -173,12 +173,6 @@ function readPartial(file) {
   });
 }
 
-function gatherPartials(resolve, metadata, items, partials) {
-  return resolve([metadata, items, partials.reduce((a, v) => {
-    return Object.assign(a, v);
-  })]);
-}
-
 function readPartials([metadata, items]) {
   return new Promise((resolve, reject) => {
     fs.readdir(dirPartial, (e, f) => {
@@ -186,9 +180,12 @@ function readPartials([metadata, items]) {
         return reject(e);
       }
 
-      return Promise
-        .all(f.map(readPartial))
-        .then(gatherPartials.bind(null, resolve, metadata, items));
+      return Promise.all(f.map(readPartial))
+        .then((o) => {
+          resolve([metadata, items, o.reduce((a, v) => {
+            return Object.assign(a, v);
+          })]);
+        });
     });
   });
 }
