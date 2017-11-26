@@ -146,7 +146,10 @@ function build(data, template, partials, src) {
     render,
     minify,
     write
-  ], [Object.assign({}, data, src), template, partials]);
+  ], [Object.assign({}, data, src), template, partials])
+    .catch((e) => {
+      throw e;
+    });
 }
 
 function buildAll([metadata, extradata, cache, template, partials]) {
@@ -171,6 +174,5 @@ Promise.all([
 ])
   .then(buildAll)
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

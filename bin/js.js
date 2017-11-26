@@ -89,12 +89,14 @@ function build(file) {
     write,
     compile,
     write
-  ], file);
+  ], file)
+    .catch((e) => {
+      throw e;
+    });
 }
 
 process.chdir(__dirname);
 Promise.all(files.map(build))
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

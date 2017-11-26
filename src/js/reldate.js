@@ -1,6 +1,5 @@
 /*!
  * reldate.js
- *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
 "use strict";

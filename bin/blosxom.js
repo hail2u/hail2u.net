@@ -4,7 +4,7 @@
 
 const execFileSync = require("child_process").execFileSync;
 const fs = require("fs-extra");
-const minify = require("../lib/html-minifier");
+const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
@@ -24,23 +24,14 @@ const dir = {
 };
 const perl = which("perl");
 
-function fixFilename(file) {
-  return toPOSIXPath(path.relative(dir.data, file)
-    .replace(/\.txt$/, ".html"));
-}
-
-function generatePath() {
-  return fixFilename(path.resolve(argv.file));
-}
-
-function listImages(file) {
+function listImages() {
   return new Promise((resolve, reject) => {
     fs.readFile(argv.file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve([file, d.match(/\bsrc="\/img\/blog\/.*?"/g)]);
+      resolve(d.match(/\bsrc="\/img\/blog\/.*?"/g));
     });
   });
 }
@@ -59,18 +50,17 @@ function copyImage(image) {
   });
 }
 
-function copyImages([file, images]) {
+function copyImages(images) {
   if (!images) {
-    return file;
+    return;
   }
 
-  return Promise.all(images.map(copyImage))
-    .then(() => {
-      return file;
-    });
+  return Promise.all(images.map(copyImage));
 }
 
-function build(file) {
+function build() {
+  const file = toPOSIXPath(path.relative(dir.data, path.resolve(argv.file))
+    .replace(/\.txt$/, ".html"));
   const args = ["blosxom.cgi", `path=/${file}`];
 
   if (argv.reindex) {
@@ -78,33 +68,39 @@ function build(file) {
     argv.reindex = false;
   }
 
-  let html = execFileSync(perl, args, {
+  const html = execFileSync(perl, args, {
     cwd: dir.root,
     env: {
       BLOSXOM_CONFIG_DIR: path.resolve(dir.root)
     }
-  });
-
-  html = html.toString()
+  })
+    .toString()
     .replace(/^[\s\S]*?\r?\n\r?\n/, "")
     .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
     .trim();
 
-  if (file.endsWith(".html")) {
-    html = minify(html);
-  }
+  return [path.join(dir.static, file), minifyHTML(html)];
+}
 
-  fs.outputFileSync(path.join(dir.static, file), html);
+function write([file, data]) {
+  return new Promise((resolve, reject) => {
+    fs.outputFile(file, data, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
 }
 
 process.chdir(__dirname);
 waterfall([
-  generatePath,
   listImages,
   copyImages,
-  build
+  build,
+  write
 ])
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

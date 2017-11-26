@@ -135,8 +135,7 @@ function updateEntry(file) {
     runBuild
   ], file)
     .catch((e) => {
-      console.error(e.stack);
-      process.exit(1);
+      throw e;
     });
 }
 
@@ -212,7 +211,7 @@ function selectDraft(drafts) {
       }
 
       if (a === 0) {
-        process.exit(0);
+        throw new Error("Aborted.");
       }
 
       menu.close();
@@ -299,7 +298,10 @@ function publishSelected(selected) {
     testEntry,
     runArticles,
     runBuild
-  ], selected);
+  ], selected)
+    .catch((e) => {
+      throw e;
+    });
 }
 
 function readTemplate(file) {
@@ -353,7 +355,10 @@ function previewSelected(selected) {
     buildPreview,
     savePreview,
     openPreview
-  ], selected);
+  ], selected)
+    .catch((e) => {
+      throw e;
+    });
 }
 
 function processSelected(selected) {
@@ -379,8 +384,7 @@ function processDrafts() {
     processSelected
   ])
     .catch((e) => {
-      console.error(e.stack);
-      process.exit(1);
+      throw e;
     });
 }
 

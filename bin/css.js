@@ -67,7 +67,10 @@ function build(processor, file) {
     read,
     optimize,
     write
-  ], [processor, file]);
+  ], [processor, file])
+    .catch((e) => {
+      throw e;
+    });
 }
 
 function buildAll(processor) {
@@ -107,6 +110,5 @@ waterfall([
   wrapWithSupports()
 ]))
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

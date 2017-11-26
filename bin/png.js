@@ -63,6 +63,5 @@ function toPNG(file) {
 process.chdir(__dirname);
 Promise.all(files.map(toPNG))
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

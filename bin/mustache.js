@@ -105,6 +105,15 @@ function sortByDate(a, b) {
 }
 
 function extendItem(item, index, original) {
+  if (item.body) {
+    item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\"");
+  }
+
+  if (!item.description) {
+    item.description = item.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+      .replace(/<.*?>/g, "");
+  }
+
   if (!item.date) {
     const dt = new Date(item.unixtime);
 
@@ -120,12 +129,6 @@ function extendItem(item, index, original) {
   item.html5PubDate = `${item.year}-${pad(item.month)}-${pad(item.date)}T${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)}+09:00`;
   item.rfc822PubDate = `${day[item.day]}, ${item.date} ${month[item.month - 1]} ${item.year} ${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)} +0900`;
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
-  item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\"");
-
-  if (!item.description) {
-    item.description = item.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-      .replace(/<.*?>/g, "");
-  }
 
   if (index === 0) {
     item.isLatest = true;
@@ -142,18 +145,18 @@ function extendItem(item, index, original) {
   return item;
 }
 
-function gatherItems(metadata, items) {
+function gatherItems(items) {
   items = items.reduce(flatten)
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
 
-  return [metadata, items];
+  return items;
 }
 
-function readItems(metadata) {
+function readItems() {
   return Promise.all(itemFiles.map(readData))
-    .then(gatherItems.bind(null, metadata));
+    .then(gatherItems);
 }
 
 function readPartial(file) {
@@ -173,7 +176,7 @@ function readPartial(file) {
   });
 }
 
-function readPartials([metadata, items]) {
+function readPartials() {
   return new Promise((resolve, reject) => {
     fs.readdir(dirPartial, (e, f) => {
       if (e) {
@@ -182,9 +185,9 @@ function readPartials([metadata, items]) {
 
       return Promise.all(f.map(readPartial))
         .then((o) => {
-          resolve([metadata, items, o.reduce((a, v) => {
+          return resolve(o.reduce((a, v) => {
             return Object.assign(a, v);
-          })]);
+          }));
         });
     });
   });
@@ -271,7 +274,10 @@ function build(metadata, items, partials, file) {
     render,
     minify,
     write
-  ], [metadata, items, partials, file]);
+  ], [metadata, items, partials, file])
+    .catch((e) => {
+      throw e;
+    });
 }
 
 function buildAll([metadata, items, partials]) {
@@ -285,13 +291,12 @@ mustache.escape = (s) => {
       return entityMap[c];
     });
 };
-waterfall([
-  readData,
-  readItems,
-  readPartials,
-  buildAll
-], metadataFile)
+Promise.all([
+  readData(metadataFile),
+  readItems(),
+  readPartials()
+])
+  .then(buildAll)
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });

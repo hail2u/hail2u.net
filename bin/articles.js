@@ -15,7 +15,7 @@ const dest = "../src/blog/articles.json";
 const root = "../src/blosxom/entries/";
 const src = "../src/blosxom/plugins/state/files_index.dat";
 
-function readCache() {
+function read() {
   if (!argv.file) {
     return [];
   }
@@ -45,28 +45,13 @@ function readArticle(articles, line) {
 
   articles.push({
     body: body.join(""),
-    link: `/${toPOSIXPath(path.join(
-      "blog",
+    link: toPOSIXPath(path.join(
+      "/blog",
       path.relative(root, path.dirname(file)),
       `${path.basename(file, ".txt")}.html`
-    ))}`,
+    )),
     title: title.replace(/<\/?h1>/g, ""),
     unixtime: parseInt(time, 10) * 1000
-  });
-}
-
-function addArticle(articles) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      d.trim()
-        .split(/\r?\n/)
-        .forEach(readArticle.bind(null, articles));
-      resolve(articles);
-    });
   });
 }
 
@@ -82,10 +67,25 @@ function uniqueByLink(value, index, self) {
   return self.findIndex(isDuplicate.bind(null, value.link)) === index;
 }
 
-function writeCache(articles) {
+function add(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(dest, articles.sort(sortByDate)
-      .filter(uniqueByLink), {
+    fs.readFile(src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      d.trim()
+        .split(/\r?\n/)
+        .forEach(readArticle.bind(null, articles));
+      resolve(articles.sort(sortByDate)
+        .filter(uniqueByLink));
+    });
+  });
+}
+
+function write(articles) {
+  return new Promise((resolve, reject) => {
+    fs.outputJSON(dest, articles, {
       spaces: 2
     }, (e) => {
       if (e) {
@@ -99,11 +99,10 @@ function writeCache(articles) {
 
 process.chdir(__dirname);
 waterfall([
-  readCache,
-  addArticle,
-  writeCache
+  read,
+  add,
+  write
 ])
   .catch((e) => {
-    console.error(e.stack);
-    process.exit(1);
+    throw e;
   });
