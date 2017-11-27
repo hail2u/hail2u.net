@@ -114,7 +114,7 @@ function runBuild() {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
-      "html"
+      "build"
     ], (e, o) => {
       if (e) {
         return reject(e);
