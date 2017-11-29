@@ -3,8 +3,10 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
+const execFileSync = require("child_process").execFileSync;
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
+const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const os = require("os");
@@ -22,9 +24,13 @@ const argv = minimist(process.argv.slice(2), {
 });
 const dir = {
   blog: "../dist/blog/",
+  blosxom: "../src/blosxom/",
   draft: path.join(os.homedir(), "Documents", "Drafts"),
   entry: "../src/blosxom/entries/",
-  root: "../"
+  img: "../src/img/blog/",
+  root: "../",
+  static: "../dist/blog/",
+  staticimg: "../dist/img/blog/"
 };
 const draftExts = [".html", ".markdown", ".md", ".txt"];
 const destPreview = "../tmp/__preview.html";
@@ -33,13 +39,14 @@ const git = which("git");
 const htmlhint = which("htmlhint");
 const npm = which("npm");
 const open = which("open");
+const perl = which("perl");
 
 function addEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "add",
       "--",
-      file
+      file.src
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -55,7 +62,7 @@ function commitEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${toPOSIXPath(path.relative(dir.root, file))}`,
+      `--message=Add ${toPOSIXPath(path.relative(dir.root, file.src))}`,
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -67,20 +74,82 @@ function commitEntry(file) {
   });
 }
 
-function runBlosxom(file) {
+function listArticleImages(file) {
   return new Promise((resolve, reject) => {
-    const args = [
-      "run",
-      "blosxom",
-      "--",
-      `--file=${file}`
-    ];
+    fs.readFile(file.src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
 
-    if (!argv.update) {
-      args.push("--reindex=1");
-    }
+      file.images = d.match(/\bsrc="\/img\/blog\/.*?"/g);
+      resolve(file);
+    });
+  });
+}
 
-    execFile(npm, args, (e, o) => {
+function copyArticleImage(image) {
+  image = path.basename(image.split(/"/)[1]);
+
+  return new Promise((resolve, reject) => {
+    fs.copy(path.join(dir.img, image), path.join(dir.staticimg, image), (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
+}
+
+function copyArticleImages(file) {
+  if (!file.images) {
+    return file;
+  }
+
+  return Promise.all(file.images.map(copyArticleImage))
+    .then(() => {
+      return file;
+    });
+}
+
+function buildArticle(file) {
+  const args = ["blosxom.cgi", `path=/${toPOSIXPath(path.relative(dir.static, file.dest))}`];
+
+  if (!argv.update) {
+    args.push("reindex=1");
+  }
+
+  file.content = minifyHTML(
+    execFileSync(perl, args, {
+      cwd: dir.blosxom,
+      env: {
+        BLOSXOM_CONFIG_DIR: path.resolve(dir.blosxom)
+      }
+    })
+      .toString()
+      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+      .trim()
+  );
+
+  return file;
+}
+
+function saveFile(file) {
+  return new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.content, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(file);
+    });
+  });
+}
+
+function testArticle(file) {
+  return new Promise((resolve, reject) => {
+    execFile(htmlhint, [file.dest], (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -91,14 +160,13 @@ function runBlosxom(file) {
   });
 }
 
-function testEntry(file) {
+function runCache(file) {
   return new Promise((resolve, reject) => {
-    execFile(htmlhint, [
-      path.join(
-        dir.blog,
-        path.relative(dir.entry, path.dirname(file)),
-        `${path.basename(file, ".txt")}.html`
-      )
+    execFile(npm, [
+      "run",
+      "cache",
+      "--",
+      `--file=${file.src}`
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -127,11 +195,21 @@ function runBuild() {
 }
 
 function updateEntry(file) {
+  file.src = file.dest;
+  file.dest = path.join(
+    dir.static,
+    path.relative(dir.entry, path.dirname(file.src)),
+    `${path.basename(file.src, ".txt")}.html`
+  );
   waterfall([
     addEntry,
     commitEntry,
-    runBlosxom,
-    testEntry,
+    listArticleImages,
+    copyArticleImages,
+    buildArticle,
+    saveFile,
+    testArticle,
+    runCache,
     runBuild
   ], file)
     .catch((e) => {
@@ -159,30 +237,32 @@ function listDrafts() {
   });
 }
 
-function getDraft(draft) {
+function getDraft(file) {
+  file = path.join(dir.draft, file);
+
   return new Promise((resolve, reject) => {
-    fs.readFile(path.join(dir.draft, draft), "utf8", (e, d) => {
+    fs.readFile(file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
       resolve({
         content: d,
-        filename: draft,
-        name: path.basename(draft, path.extname(draft))
+        name: path.basename(file, path.extname(file)),
+        src: file
       });
     });
   });
 }
 
-function getDrafts(drafts) {
-  return Promise.all(drafts.map(getDraft));
+function getDrafts(files) {
+  return Promise.all(files.map(getDraft));
 }
 
-function selectDraft(drafts) {
+function selectDraft(files) {
   return new Promise((resolve, reject) => {
-    if (!argv.publish && drafts.length === 1) {
-      return resolve(drafts[0]);
+    if (!argv.publish && files.length === 1) {
+      return resolve(files[0]);
     }
 
     const menu = readline.createInterface({
@@ -192,7 +272,7 @@ function selectDraft(drafts) {
 
     menu.write("\n");
     menu.write("0. QUIT\n");
-    drafts.forEach((n, i) => {
+    files.forEach((n, i) => {
       menu.write(`${i + 1}. ${n.content.trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
@@ -206,8 +286,8 @@ function selectDraft(drafts) {
 
       a = parseInt(a, 10);
 
-      if (!Number.isInteger(a) || a > drafts.length) {
-        return reject(new Error(`You must enter a number between 0 and ${drafts.length}`));
+      if (!Number.isInteger(a) || a > files.length) {
+        return reject(new Error(`You must enter a number between 0 and ${files.length}`));
       }
 
       if (a === 0) {
@@ -215,90 +295,53 @@ function selectDraft(drafts) {
       }
 
       menu.close();
-      resolve(drafts[a - 1]);
+      resolve(files[a - 1]);
     });
   });
 }
 
-function checkSelected(selected) {
+function checkSelected(file) {
   return new Promise((resolve, reject) => {
-    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
+    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
       return reject(new Error("This draft does not have a valid name for file."));
     }
 
     if (
-      !selected.content.startsWith("# ") &&
-      !selected.content.startsWith("<h1>")
+      !file.content.startsWith("# ") &&
+      !file.content.startsWith("<h1>")
     ) {
       return reject(new Error("This draft does not have a title."));
     }
 
-    resolve(selected);
+    resolve(file);
   });
 }
 
-function markupSelected(selected) {
+function markupSelected(file) {
   return new Promise((resolve) => {
-    selected.content = markdown(selected.content);
-    resolve(selected);
+    file.content = markdown(file.content);
+    resolve(file);
   });
 }
 
-function saveSelected(selected) {
+function deleteDraft(file) {
   return new Promise((resolve, reject) => {
-    fs.outputFile(selected.path, selected.content, {
-      flag: "wx"
-    }, (e) => {
+    fs.unlink(file.src, (e) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(selected);
+      resolve(file);
     });
   });
 }
 
-function deleteSelected(selected) {
-  return new Promise((resolve, reject) => {
-    fs.unlink(path.join(dir.draft, selected.filename), (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(selected.path);
-    });
-  });
-}
-
-function runArticles(file) {
-  return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "articles",
-      "--",
-      `--file=${file}`
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve();
-    });
-  });
-}
-
-function publishSelected(selected) {
+function publishSelected(file) {
   return waterfall([
-    saveSelected,
-    deleteSelected,
-    addEntry,
-    commitEntry,
-    runBlosxom,
-    testEntry,
-    runArticles,
-    runBuild
-  ], selected)
+    saveFile,
+    deleteDraft,
+    updateEntry,
+  ], file)
     .catch((e) => {
       throw e;
     });
@@ -317,29 +360,17 @@ function readTemplate(file) {
   });
 }
 
-function buildPreview(preview) {
-  preview.content = mustache.render(preview.template, preview)
+function buildPreview(file) {
+  file.content = mustache.render(file.template, file)
     .replace(/="\/img\//g, "=\"../src/img/")
     .replace(/="\//g, "=\"../dist/");
 
-  return preview;
-}
-
-function savePreview(preview) {
-  return new Promise((resolve, reject) => {
-    fs.outputFile(preview.path, preview.content, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(preview.path);
-    });
-  });
+  return file;
 }
 
 function openPreview(file) {
   return new Promise((resolve, reject) => {
-    execFile(open, [file], (e) => {
+    execFile(open, [file.dest], (e) => {
       if (e) {
         return reject(e);
       }
@@ -349,32 +380,36 @@ function openPreview(file) {
   });
 }
 
-function previewSelected(selected) {
+function previewSelected(file) {
   return waterfall([
     readTemplate,
     buildPreview,
-    savePreview,
+    saveFile,
     openPreview
-  ], selected)
+  ], file)
     .catch((e) => {
       throw e;
     });
 }
 
-function processSelected(selected) {
+function processSelected(file) {
   if (argv.publish) {
-    selected.path = path.join(dir.entry, `${selected.name}.txt`);
+    file.dest = path.join(dir.entry, `${file.name}.txt`);
 
-    return publishSelected(selected);
+    return publishSelected(file);
   }
 
-  selected.path = path.resolve(destPreview);
-  selected.template = path.resolve(srcPreview);
+  file.dest = path.resolve(destPreview);
+  file.template = path.resolve(srcPreview);
 
-  return previewSelected(selected);
+  return previewSelected(file);
 }
 
-function processDrafts() {
+process.chdir(__dirname);
+
+if (argv.update) {
+  updateEntry(path.resolve(argv.file));
+} else {
   waterfall([
     listDrafts,
     getDrafts,
@@ -386,12 +421,4 @@ function processDrafts() {
     .catch((e) => {
       throw e;
     });
-}
-
-process.chdir(__dirname);
-
-if (argv.update) {
-  updateEntry(path.resolve(argv.file));
-} else {
-  processDrafts();
 }
