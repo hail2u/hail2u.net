@@ -408,7 +408,12 @@ function processSelected(file) {
 process.chdir(__dirname);
 
 if (argv.update) {
-  updateEntry(path.resolve(argv.file));
+  updateEntry({
+    dest: path.resolve(argv.file)
+  })
+    .catch((e) => {
+      throw e;
+    });
 } else {
   waterfall([
     listDrafts,
