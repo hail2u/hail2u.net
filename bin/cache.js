@@ -15,7 +15,7 @@ const dest = "../src/blog/articles.json";
 const root = "../src/blosxom/entries/";
 const src = "../src/blosxom/plugins/state/files_index.dat";
 
-function read() {
+function readCache() {
   if (!argv.file) {
     return [];
   }
@@ -33,7 +33,7 @@ function read() {
   });
 }
 
-function readArticle(articles, line) {
+function readArticle(data, line) {
   if (argv.file && !line.startsWith(argv.file)) {
     return;
   }
@@ -43,7 +43,7 @@ function readArticle(articles, line) {
     .trim()
     .split("\n");
 
-  articles.push({
+  data.push({
     body: body.join(""),
     link: toPOSIXPath(path.join(
       "/blog",
@@ -67,7 +67,7 @@ function uniqueByLink(value, index, self) {
   return self.findIndex(isDuplicate.bind(null, value.link)) === index;
 }
 
-function add(articles) {
+function addArticle(data) {
   return new Promise((resolve, reject) => {
     fs.readFile(src, "utf8", (e, d) => {
       if (e) {
@@ -76,16 +76,16 @@ function add(articles) {
 
       d.trim()
         .split(/\r?\n/)
-        .forEach(readArticle.bind(null, articles));
-      resolve(articles.sort(sortByDate)
+        .forEach(readArticle.bind(null, data));
+      resolve(data.sort(sortByDate)
         .filter(uniqueByLink));
     });
   });
 }
 
-function write(articles) {
+function writeCache(data) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(dest, articles, {
+    fs.outputJSON(dest, data, {
       spaces: 2
     }, (e) => {
       if (e) {
@@ -99,9 +99,9 @@ function write(articles) {
 
 process.chdir(__dirname);
 waterfall([
-  read,
-  add,
-  write
+  readCache,
+  addArticle,
+  writeCache
 ])
   .catch((e) => {
     throw e;

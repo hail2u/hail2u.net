@@ -27,7 +27,7 @@ const entityMap = {
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 
-function read(file) {
+function readFile(file) {
   let readSomething = fs.readFile;
 
   if (path.extname(file) === ".json") {
@@ -46,7 +46,7 @@ function read(file) {
 }
 
 function readPartial(file) {
-  return read(path.join(config.partial, file))
+  return readFile(path.join(config.partial, file))
     .then((v) => {
       return {
         [path.basename(file, ".mustache")]: v
@@ -117,20 +117,16 @@ function extendData([data, template, partials]) {
   return [data, template, partials];
 }
 
-function render([data, template, partials]) {
+function renderHTML([data, template, partials]) {
   return [
     path.join(config.root, data.link),
     mustache.render(template, data, partials)
   ];
 }
 
-function minify([dest, html]) {
-  return [dest, minifyHTML(html)];
-}
-
-function write([dest, html]) {
+function writeHTML([dest, html]) {
   return new Promise((resolve, reject) => {
-    fs.outputFile(dest, html, (e) => {
+    fs.outputFile(dest, minifyHTML(html), (e) => {
       if (e) {
         return reject(e);
       }
@@ -143,9 +139,8 @@ function write([dest, html]) {
 function build(data, template, partials, src) {
   waterfall([
     extendData,
-    render,
-    minify,
-    write
+    renderHTML,
+    writeHTML
   ], [Object.assign({}, data, src), template, partials])
     .catch((e) => {
       throw e;
@@ -166,10 +161,10 @@ mustache.escape = (s) => {
     });
 };
 Promise.all([
-  read(config.metadata),
-  read(config.extradata),
-  read(config.cache),
-  read(config.template),
+  readFile(config.metadata),
+  readFile(config.extradata),
+  readFile(config.cache),
+  readFile(config.template),
   readPartials()
 ])
   .then(buildAll)

@@ -38,7 +38,7 @@ const jsExt = ".js";
 const minExt = ".min";
 const tmp = "../tmp/";
 
-function read(file) {
+function readJS(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file, "utf8", (e, d) => {
       if (e) {
@@ -50,8 +50,8 @@ function read(file) {
   });
 }
 
-function gather(file) {
-  return Promise.all(file.src.map(read))
+function gatherJS(file) {
+  return Promise.all(file.src.map(readJS))
     .then((r) => {
       file.contents = r.join("");
       file.dest = path.join(tmp, file.dest);
@@ -60,7 +60,7 @@ function gather(file) {
     });
 }
 
-function write(file) {
+function writeJS(file) {
   return new Promise((resolve, reject) => {
     fs.outputFile(file.dest, file.contents, (e) => {
       if (e) {
@@ -72,7 +72,7 @@ function write(file) {
   });
 }
 
-function compile(file) {
+function compileJS(file) {
   file.contents = gccc(Object.assign({}, config, {
     jsCode: [{
       src: file.contents
@@ -83,12 +83,12 @@ function compile(file) {
   return file;
 }
 
-function build(file) {
+function buildJS(file) {
   return waterfall([
-    gather,
-    write,
-    compile,
-    write
+    gatherJS,
+    writeJS,
+    compileJS,
+    writeJS
   ], file)
     .catch((e) => {
       throw e;
@@ -96,7 +96,7 @@ function build(file) {
 }
 
 process.chdir(__dirname);
-Promise.all(files.map(build))
+Promise.all(files.map(buildJS))
   .catch((e) => {
     throw e;
   });

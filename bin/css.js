@@ -25,7 +25,7 @@ const styleGuide = {
   src: "../src/css/test.html"
 };
 
-function read(processor, file) {
+function readFile(processor, file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
@@ -38,7 +38,7 @@ function read(processor, file) {
   });
 }
 
-function optimize(processor, file) {
+function optimizeCSS(processor, file) {
   return processor.process(file.contents, {
     from: file.src,
     to: file.dest
@@ -50,7 +50,7 @@ function optimize(processor, file) {
     });
 }
 
-function write(file) {
+function writeFile(file) {
   return new Promise((resolve, reject) => {
     fs.outputFile(file.dest, file.contents, (e) => {
       if (e) {
@@ -62,11 +62,11 @@ function write(file) {
   });
 }
 
-function build(processor, file) {
+function buildCSS(processor, file) {
   return waterfall([
-    read,
-    optimize,
-    write
+    readFile,
+    optimizeCSS,
+    writeFile
   ], [processor, file])
     .catch((e) => {
       throw e;
@@ -74,7 +74,7 @@ function build(processor, file) {
 }
 
 function buildAll(processor) {
-  return Promise.all(files.map(build.bind(null, processor)))
+  return Promise.all(files.map(buildCSS.bind(null, processor)))
     .then(() => {
       return styleGuide;
     });
@@ -100,9 +100,9 @@ function modifyStyleGuide(file) {
 process.chdir(__dirname);
 waterfall([
   buildAll,
-  read,
+  readFile,
   modifyStyleGuide,
-  write
+  writeFile
 ], postcss([
   atImport(),
   mqpacker(),
