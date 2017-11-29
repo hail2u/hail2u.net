@@ -221,7 +221,7 @@ function filterUpdates(includeUpdates, item) {
 function now() {
   const d = new Date();
 
-  return `${day[d.getDay()]}, ${pad(d.getDate())} ${month[d.getMonth() - 1]} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} +0900`;
+  return `${day[d.getDay()]}, ${pad(d.getDate())} ${month[d.getMonth()]} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} +0900`;
 }
 
 function mergeData([metadata, items, partials, file]) {
