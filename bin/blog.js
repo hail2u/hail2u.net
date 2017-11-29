@@ -204,7 +204,8 @@ function updateEntry(file) {
     path.relative(dir.entry, path.dirname(file.src)),
     `${path.basename(file.src, ".txt")}.html`
   );
-  waterfall([
+
+  return waterfall([
     addEntry,
     commitEntry,
     listArticleImages,

@@ -137,7 +137,7 @@ function writeHTML([dest, html]) {
 }
 
 function build(data, template, partials, src) {
-  waterfall([
+  return waterfall([
     extendData,
     renderHTML,
     writeHTML
