@@ -119,7 +119,7 @@ function buildArticle(file) {
     args.push("reindex=1");
   }
 
-  file.content = minifyHTML(
+  file.contents = minifyHTML(
     execFileSync(perl, args, {
       cwd: dir.blosxom,
       env: {
@@ -137,7 +137,7 @@ function buildArticle(file) {
 
 function saveFile(file) {
   return new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.content, (e) => {
+    fs.outputFile(file.dest, file.contents, (e) => {
       if (e) {
         return reject(e);
       }
@@ -247,7 +247,7 @@ function getDraft(file) {
       }
 
       resolve({
-        content: d,
+        contents: d,
         name: path.basename(file, path.extname(file)),
         src: file
       });
@@ -273,7 +273,7 @@ function selectDraft(files) {
     menu.write("\n");
     menu.write("0. QUIT\n");
     files.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.content.trim()
+      menu.write(`${i + 1}. ${n.contents.trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
         .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
@@ -307,8 +307,8 @@ function checkSelected(file) {
     }
 
     if (
-      !file.content.startsWith("# ") &&
-      !file.content.startsWith("<h1>")
+      !file.contents.startsWith("# ") &&
+      !file.contents.startsWith("<h1>")
     ) {
       return reject(new Error("This draft does not have a title."));
     }
@@ -319,7 +319,7 @@ function checkSelected(file) {
 
 function markupSelected(file) {
   return new Promise((resolve) => {
-    file.content = markdown(file.content);
+    file.contents = markdown(file.contents);
     resolve(file);
   });
 }
@@ -361,7 +361,7 @@ function readTemplate(file) {
 }
 
 function buildPreview(file) {
-  file.content = mustache.render(file.template, file)
+  file.contents = mustache.render(file.template, file)
     .replace(/="\/img\//g, "=\"../src/img/")
     .replace(/="\//g, "=\"../dist/");
 
