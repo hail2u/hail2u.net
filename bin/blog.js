@@ -215,10 +215,7 @@ function updateEntry(file) {
     testArticle,
     runCache,
     runBuild
-  ], file)
-    .catch((e) => {
-      throw e;
-    });
+  ], file);
 }
 
 function isDraft(file) {
@@ -345,10 +342,7 @@ function publishSelected(file) {
     saveFile,
     deleteDraft,
     updateEntry,
-  ], file)
-    .catch((e) => {
-      throw e;
-    });
+  ], file);
 }
 
 function readTemplate(file) {
@@ -390,10 +384,7 @@ function previewSelected(file) {
     buildPreview,
     saveFile,
     openPreview
-  ], file)
-    .catch((e) => {
-      throw e;
-    });
+  ], file);
 }
 
 function processSelected(file) {
