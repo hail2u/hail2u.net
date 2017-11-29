@@ -113,7 +113,10 @@ function copyArticleImages(file) {
 }
 
 function buildArticle(file) {
-  const args = ["blosxom.cgi", `path=/${toPOSIXPath(path.relative(dir.static, file.dest))}`];
+  const args = [
+    "blosxom.cgi",
+    `path=/${toPOSIXPath(path.relative(dir.static, file.dest))}`
+  ];
 
   if (!argv.update) {
     args.push("reindex=1");
