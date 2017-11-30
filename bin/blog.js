@@ -119,7 +119,7 @@ function buildArticle(file) {
     `path=/${toPOSIXPath(path.relative(dir.static, file.dest))}`
   ];
 
-  if (!argv.update) {
+  if (argv.publish) {
     args.push("reindex=1");
   }
 
