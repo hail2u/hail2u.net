@@ -8,7 +8,7 @@ const which = require("which").sync;
 const files = [
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
-    src: "../src/img/favicon-large.svg",
+    src: "../src/img/touch-icon.svg",
     width: 180
   },
   {
@@ -22,14 +22,9 @@ const files = [
     width: 32
   },
   {
-    dest: "../tmp/favicon-64.png",
-    src: "../src/img/favicon-large.svg",
-    width: 64
-  },
-  {
-    dest: "../tmp/favicon-256.png",
-    src: "../src/img/favicon-large.svg",
-    width: 256
+    dest: "../tmp/favicon-48.png",
+    src: "../src/img/favicon.svg",
+    width: 48
   }
 ];
 const inkscape = which("inkscape");
