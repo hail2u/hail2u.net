@@ -20,12 +20,18 @@ const files = [
     src: "../src/css/debug.css"
   }
 ];
+const processor = postcss([
+  atImport(),
+  mqpacker(),
+  csswring(),
+  wrapWithSupports()
+]);
 const styleGuide = {
   dest: "../dist/style-guide/index.html",
   src: "../src/css/test.html"
 };
 
-function readFile(processor, file) {
+function readFile(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
@@ -33,12 +39,12 @@ function readFile(processor, file) {
       }
 
       file.contents = d;
-      resolve([processor, file]);
+      resolve(file);
     });
   });
 }
 
-function optimizeCSS(processor, file) {
+function optimizeCSS(file) {
   return processor.process(file.contents, {
     from: file.src,
     to: file.dest
@@ -62,21 +68,14 @@ function writeFile(file) {
   });
 }
 
-function buildCSS(processor, file) {
+function buildCSS(file) {
   return waterfall([
     readFile,
     optimizeCSS,
     writeFile
-  ], [processor, file])
+  ], file)
     .catch((e) => {
       throw e;
-    });
-}
-
-function buildAll(processor) {
-  return Promise.all(files.map(buildCSS.bind(null, processor)))
-    .then(() => {
-      return styleGuide;
     });
 }
 
@@ -98,17 +97,14 @@ function modifyStyleGuide(file) {
 }
 
 process.chdir(__dirname);
-waterfall([
-  buildAll,
-  readFile,
-  modifyStyleGuide,
-  writeFile
-], postcss([
-  atImport(),
-  mqpacker(),
-  csswring(),
-  wrapWithSupports()
-]))
+Promise.all(files.map(buildCSS))
+  .then(() => {
+    return waterfall([
+      readFile,
+      modifyStyleGuide,
+      writeFile
+    ], styleGuide);
+  })
   .catch((e) => {
     throw e;
   });
