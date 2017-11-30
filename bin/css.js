@@ -18,6 +18,10 @@ const files = [
   {
     dest: "../tmp/debug.min.css",
     src: "../src/css/debug.css"
+  },
+  {
+    dest: "../dist/style-guide/index.html",
+    src: "../src/css/test.html"
   }
 ];
 const processor = postcss([
@@ -26,10 +30,6 @@ const processor = postcss([
   csswring(),
   wrapWithSupports()
 ]);
-const styleGuide = {
-  dest: "../dist/style-guide/index.html",
-  src: "../src/css/test.html"
-};
 
 function readFile(file) {
   return new Promise((resolve, reject) => {
@@ -44,7 +44,28 @@ function readFile(file) {
   });
 }
 
-function optimizeCSS(file) {
+function modifyStyleGuide(contents) {
+  const dir = "../";
+  const url = "https://hail2u.net/";
+
+  return contents.replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
+    if (u.startsWith(url)) {
+      u = u.substr(url.length - 1);
+    } else if (u.startsWith(dir)) {
+      u = u.substr(dir.length - 1);
+    }
+
+    return `${a}${e}${o}${u}${c}`;
+  });
+}
+
+function optimizeFile(file) {
+  if (!file.src.endsWith(".css")) {
+    file.contents = modifyStyleGuide(file.contents);
+
+    return file;
+  }
+
   return processor.process(file.contents, {
     from: file.src,
     to: file.dest
@@ -68,10 +89,10 @@ function writeFile(file) {
   });
 }
 
-function buildCSS(file) {
+function buildFile(file) {
   return waterfall([
     readFile,
-    optimizeCSS,
+    optimizeFile,
     writeFile
   ], file)
     .catch((e) => {
@@ -79,32 +100,8 @@ function buildCSS(file) {
     });
 }
 
-function modifyStyleGuide(file) {
-  const dir = "../";
-  const url = "https://hail2u.net/";
-
-  file.contents = file.contents.replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
-    if (u.startsWith(url)) {
-      u = u.substr(url.length - 1);
-    } else if (u.startsWith(dir)) {
-      u = u.substr(dir.length - 1);
-    }
-
-    return `${a}${e}${o}${u}${c}`;
-  });
-
-  return file;
-}
-
 process.chdir(__dirname);
-Promise.all(files.map(buildCSS))
-  .then(() => {
-    return waterfall([
-      readFile,
-      modifyStyleGuide,
-      writeFile
-    ], styleGuide);
-  })
+Promise.all(files.map(buildFile))
   .catch((e) => {
     throw e;
   });
