@@ -1,9 +1,7 @@
 (function () {/*
  ellipsis-title.js
-
  LICENSE: http://hail2u.mit-license.org/2016
  reldate.js
-
  LICENSE: http://hail2u.mit-license.org/2016
 */
 var d="function"==typeof Object.defineProperties?Object.defineProperty:function(a,b,c){a!=Array.prototype&&a!=Object.prototype&&(a[b]=c.value)},f="undefined"!=typeof window&&window===this?this:"undefined"!=typeof global&&null!=global?global:this;function h(){h=function(){};f.Symbol||(f.Symbol=k)}var k=function(){var a=0;return function(b){return"jscomp_symbol_"+(b||"")+a++}}();
