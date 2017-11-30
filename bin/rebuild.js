@@ -107,7 +107,8 @@ function extendData([data, template, partials]) {
   data.rfc822PubDate = `${day[data.day]}, ${data.date} ${month[data.month - 1]} ${data.year} ${pad(data.hour)}:${pad(data.minute)}:${pad(data.second)} +0900`;
   data.strPubDate = `${pad(data.month)}/${pad(data.date)}`;
   data.canonical = data.link;
-  data.description = data.body.replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+  data.description = data.body.replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, "");
   data.short_title = data.title;
 
