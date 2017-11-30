@@ -27,20 +27,22 @@ const entityMap = {
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 
-function readFile(file) {
-  let readSomething = fs.readFile;
-
+function readSomething(file, ...args) {
   if (path.extname(file) === ".json") {
-    readSomething = fs.readJSON;
+    return fs.readJSON(file, ...args);
   }
 
+  return fs.readFile(file, ...args);
+}
+
+function readFile(file) {
   return new Promise((resolve, reject) => {
-    readSomething(file, "utf8", (e, o) => {
+    readSomething(file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(o);
+      resolve(d);
     });
   });
 }
