@@ -44,7 +44,7 @@ function readArticle(data, line) {
     .split("\n");
 
   data.push({
-    body: body.join(""),
+    body: body.join("\n"),
     link: toPOSIXPath(path.join(
       "/blog",
       path.relative(root, path.dirname(file)),
