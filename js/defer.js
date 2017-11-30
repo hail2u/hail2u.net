@@ -1,6 +1,5 @@
 /*!
  * ellipsis-title.js
- *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
 "use strict";
@@ -12,7 +11,6 @@ for (const elm of document.querySelectorAll("*")) {
 }
 /*!
  * reldate.js
- *
  * LICENSE: http://hail2u.mit-license.org/2016
  */
 "use strict";
