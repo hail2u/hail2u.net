@@ -206,6 +206,18 @@ function updateEntry(file) {
     `${path.basename(file.src, ".txt")}.html`
   );
 
+  // return waterfall([
+  //   readFile,
+  //   addEntry,
+  //   commitEntry,
+  //   runCache,
+  //   listArticleImages,
+  //   copyArticleImages,
+  //   runRebuild,
+  //   testArticle,
+  //   runBuild
+  // ], file);
+
   return waterfall([
     addEntry,
     commitEntry,
@@ -339,6 +351,30 @@ function deleteDraft(file) {
 }
 
 function publishSelected(file) {
+  // const [title, ...body] = file.contents.trim()
+  //   .split("\n");
+  //
+  // file.article = {
+  //   body: body.join("\n")
+  //     .trim(),
+  //   link: `/blog/${file.name}.html`,
+  //   title: title.replace(/<.*?>/g, ""),
+  //   unixtime: Date.now()
+  // };
+  //
+  // return waterfall([
+  //   saveFile,
+  //   deleteDraft,
+  //   addEntry,
+  //   commitEntry,
+  //   runCache,
+  //   listArticleImages,
+  //   copyArticleImages,
+  //   runRebuild,
+  //   testArticle,
+  //   runBuild
+  // ], file);
+
   return waterfall([
     saveFile,
     deleteDraft,
