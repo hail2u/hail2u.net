@@ -402,24 +402,23 @@ function processSelected(file) {
 }
 
 process.chdir(__dirname);
+Promise.resolve()
+  .then(() => {
+    if (argv.update) {
+      return updateEntry({
+        dest: path.resolve(argv.file)
+      });
+    }
 
-if (argv.update) {
-  updateEntry({
-    dest: path.resolve(argv.file)
+    return waterfall([
+      listDrafts,
+      getDrafts,
+      selectDraft,
+      checkSelected,
+      markupSelected,
+      processSelected
+    ]);
   })
-    .catch((e) => {
-      console.trace(e);
-    });
-} else {
-  waterfall([
-    listDrafts,
-    getDrafts,
-    selectDraft,
-    checkSelected,
-    markupSelected,
-    processSelected
-  ])
-    .catch((e) => {
-      console.trace(e);
-    });
-}
+  .catch((e) => {
+    console.trace(e);
+  });
