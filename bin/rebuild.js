@@ -144,10 +144,7 @@ function build(data, template, partials, src) {
     extendData,
     renderHTML,
     writeHTML
-  ], [Object.assign({}, data, src), template, partials])
-    .catch((e) => {
-      throw e;
-    });
+  ], [Object.assign({}, data, src), template, partials]);
 }
 
 function buildAll([metadata, extradata, cache, template, partials]) {
@@ -172,5 +169,5 @@ Promise.all([
 ])
   .then(buildAll)
   .catch((e) => {
-    throw e;
+    console.trace(e);
   });

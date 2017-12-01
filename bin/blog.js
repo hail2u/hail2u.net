@@ -408,7 +408,7 @@ if (argv.update) {
     dest: path.resolve(argv.file)
   })
     .catch((e) => {
-      throw e;
+      console.trace(e);
     });
 } else {
   waterfall([
@@ -420,6 +420,6 @@ if (argv.update) {
     processSelected
   ])
     .catch((e) => {
-      throw e;
+      console.trace(e);
     });
 }

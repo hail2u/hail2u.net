@@ -104,5 +104,5 @@ waterfall([
   writeCache
 ])
   .catch((e) => {
-    throw e;
+    console.trace(e);
   });

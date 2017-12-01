@@ -274,10 +274,7 @@ function buildSomething(metadata, items, partials, file) {
     renderFile,
     minifyFile,
     writeFile
-  ], [metadata, items, partials, file])
-    .catch((e) => {
-      throw e;
-    });
+  ], [metadata, items, partials, file]);
 }
 
 function buildAll([metadata, items, partials]) {
@@ -300,5 +297,5 @@ Promise.all([
 ])
   .then(buildAll)
   .catch((e) => {
-    throw e;
+    console.trace(e);
   });

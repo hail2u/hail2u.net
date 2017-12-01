@@ -58,5 +58,5 @@ function toPNG(file) {
 process.chdir(__dirname);
 Promise.all(files.map(toPNG))
   .catch((e) => {
-    throw e;
+    console.trace(e);
   });

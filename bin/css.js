@@ -94,14 +94,11 @@ function buildFile(file) {
     readFile,
     optimizeFile,
     writeFile
-  ], file)
-    .catch((e) => {
-      throw e;
-    });
+  ], file);
 }
 
 process.chdir(__dirname);
 Promise.all(files.map(buildFile))
   .catch((e) => {
-    throw e;
+    console.trace(e);
   });
