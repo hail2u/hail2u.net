@@ -4,10 +4,14 @@
 
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
+const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
+const argv = minimist(process.argv.slice(2), {
+  string: ["file"]
+});
 const config = {
   cache: "../src/blog/articles.json",
   extradata: "../src/blog/article.json",
@@ -148,6 +152,12 @@ function build(data, template, partials, src) {
 }
 
 function buildAll([metadata, extradata, cache, template, partials]) {
+  if (argv.file) {
+    cache = cache.filter((c) => {
+      return argv.file.endsWith(c.link);
+    });
+  }
+
   Object.assign(metadata, extradata);
 
   return Promise.all(cache.map(build.bind(null, metadata, template, partials)));
