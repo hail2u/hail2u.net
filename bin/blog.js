@@ -201,24 +201,20 @@ function runBuild() {
 }
 
 function updateEntry(file) {
-  file.src = file.dest;
+  file.src = path.relative("", file.dest);
   file.dest = path.join(
     dir.static,
     path.relative(dir.entry, path.dirname(file.src)),
     `${path.basename(file.src, ".txt")}.html`
   );
 
-  // return waterfall([
-  //   readFile,
-  //   addEntry,
-  //   commitEntry,
-  //   runCache,
-  //   listArticleImages,
-  //   copyArticleImages,
-  //   runRebuild,
-  //   testArticle,
-  //   runBuild
-  // ], file);
+  if (!file.name) {
+    file.name = path.basename(file.src, ".txt");
+  }
+
+  if (!file.contents) {
+    file.contents = fs.readFileSync(file.src, "utf8");
+  }
 
   return waterfall([
     addEntry,
@@ -353,34 +349,10 @@ function deleteDraft(file) {
 }
 
 function publishSelected(file) {
-  // const [title, ...body] = file.contents.trim()
-  //   .split("\n");
-  //
-  // file.article = {
-  //   body: body.join("\n")
-  //     .trim(),
-  //   link: `/blog/${file.name}.html`,
-  //   title: title.replace(/<.*?>/g, ""),
-  //   unixtime: Date.now()
-  // };
-  //
-  // return waterfall([
-  //   saveFile,
-  //   deleteDraft,
-  //   addEntry,
-  //   commitEntry,
-  //   runCache,
-  //   listArticleImages,
-  //   copyArticleImages,
-  //   runRebuild,
-  //   testArticle,
-  //   runBuild
-  // ], file);
-
   return waterfall([
     saveFile,
     deleteDraft,
-    updateEntry,
+    updateEntry
   ], file);
 }
 
