@@ -23,6 +23,7 @@ const argv = minimist(process.argv.slice(2), {
     "update"
   ]
 });
+// const cache = "../src/blog/articles.json";
 const dir = {
   blog: "../dist/blog/",
   blosxom: "../src/blosxom/",
@@ -77,6 +78,60 @@ function commitEntry(file) {
   });
 }
 
+// function readCache(article) {
+//   return new Promise((resolve, reject) => {
+//     fs.readJSON(cache, "utf8", (e, o) => {
+//       if (e) {
+//         return reject(e);
+//       }
+//
+//       resolve(o);
+//     });
+//   });
+// }
+//
+// function isDuplicate(link, value) {
+//   return value.link === link;
+// }
+//
+// function addArticle(article, articles) {
+//   const oldArticle = o.findIndex(isDuplicate.bind(null, article.link));
+//
+//   if (oldArticle !== -1) {
+//     o.splice(oldArticle, 1);
+//   }
+//
+//   return o.unshift(article);
+// }
+//
+// function saveCache(articles) {
+//   return new Promise((resolve, reject) => {
+//     fs.outputJSON(cache, articles, (e) => {
+//       if (e) {
+//         return reject(e);
+//       }
+//
+//       resolve();
+//     });
+//   });
+// }
+//
+// function updateCache(file) {
+//   const [title, ...body] = file.contents.split("\n");
+//
+//   return waterfall([
+//     readCache,
+//     addArticle.bind(null, {
+//       "body": body.join("\n")
+//         .trim(),
+//       "link": `/blog/${file.name}.html`,
+//       "title": title.replace(/<.*?>/g, ""),
+//       "unixtime": Date.now()
+//     }),
+//     saveCache
+//   ]);
+// }
+
 function listArticleImages(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
@@ -114,6 +169,23 @@ function copyArticleImages(file) {
       return file;
     });
 }
+
+// function runRebuild(file) {
+//   return new Promise((resolve, reject) => {
+//     execFile(npm, [
+//       "run",
+//       "rebuild",
+//       "--",
+//       `--file=/blog/${file.name}.html`
+//     ], (e, o) => {
+//       if (e) {
+//         return reject(e);
+//       }
+//
+//       resolve(file);
+//     });
+//   });
+// }
 
 function buildArticle(file) {
   const args = [
@@ -219,8 +291,10 @@ function updateEntry(file) {
   return waterfall([
     addEntry,
     commitEntry,
+    // updateCache,
     listArticleImages,
     copyArticleImages,
+    // runRebuild,
     buildArticle,
     saveFile,
     testArticle,
