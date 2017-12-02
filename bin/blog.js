@@ -34,13 +34,15 @@ const dir = {
   staticimg: "../dist/img/blog/"
 };
 const draftExts = [".html", ".markdown", ".md", ".txt"];
-const destPreview = "../tmp/__preview.html";
-const srcPreview = "../src/preview.mustache";
 const git = which("git");
 const htmlhint = which("htmlhint");
 const npm = which("npm");
 const open = which("open");
 const perl = which("perl");
+const preview = {
+  dest: "../tmp/__preview.html",
+  template: "../src/preview.mustache"
+};
 
 function addEntry(file) {
   return new Promise((resolve, reject) => {
@@ -431,10 +433,7 @@ function processSelected(file) {
     return publishSelected(file);
   }
 
-  file.dest = path.resolve(destPreview);
-  file.template = path.resolve(srcPreview);
-
-  return previewSelected(file);
+  return previewSelected(Object.assign(file, preview));
 }
 
 process.chdir(__dirname);
