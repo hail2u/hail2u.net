@@ -65,7 +65,7 @@ function commitEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${toPOSIXPath(path.relative(dir.root, file.src))}`,
+      `--message=Add ${toPOSIXPath(path.relative(dir.root, file.src))}`
     ], (e, o) => {
       if (e) {
         return reject(e);
