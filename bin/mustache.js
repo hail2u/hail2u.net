@@ -240,10 +240,6 @@ function mergeData([metadata, items, partials, file]) {
 function renderFile([partials, file]) {
   file.contents = mustache.render(file.template, file.data, partials);
 
-  return file;
-}
-
-function minifyFile(file) {
   if (file.dest.endsWith(".html")) {
     file.contents = minifyHTML(file.contents);
   }
@@ -263,20 +259,17 @@ function writeFile(file) {
   });
 }
 
-function buildSomething(metadata, items, partials, file) {
+function build(metadata, items, partials, file) {
   return waterfall([
     readTemplate,
     mergeData,
     renderFile,
-    minifyFile,
     writeFile
   ], [metadata, items, partials, file]);
 }
 
 function buildAll([metadata, items, partials]) {
-  return Promise.all(
-    files.map(buildSomething.bind(null, metadata, items, partials))
-  );
+  return Promise.all(files.map(build.bind(null, metadata, items, partials)));
 }
 
 process.chdir(__dirname);
