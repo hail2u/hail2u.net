@@ -110,8 +110,7 @@ function extendItem(item, index, original) {
   }
 
   if (!item.description) {
-    item.description = item.body.replace(/\r?\n/g, "")
-      .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    item.description = item.body.split(/\r?\n/)[0]
       .replace(/<.*?>/g, "");
   }
 
