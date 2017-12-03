@@ -225,20 +225,16 @@ function now() {
 }
 
 function mergeData([metadata, items, partials, file]) {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(file.json, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      o.items = items.concat()
+  return readData(file.json)
+    .then((extradata) => {
+      extradata.items = items.concat()
         .filter(filterUpdates.bind(null, file.includeUpdates))
         .slice(0, file.itemLength);
-      o.lastBuildDate = now();
-      file.data = Object.assign({}, metadata, o);
-      resolve([partials, file]);
+      extradata.lastBuildDate = now();
+      file.data = Object.assign({}, metadata, extradata);
+
+      return [partials, file];
     });
-  });
 }
 
 function renderFile([partials, file]) {
