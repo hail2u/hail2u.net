@@ -23,7 +23,7 @@ const argv = minimist(process.argv.slice(2), {
     "update"
   ]
 });
-// const cache = "../src/blog/articles.json";
+const cache = "../src/blog/articles.json";
 const dir = {
   blog: "../dist/blog/",
   blosxom: "../src/blosxom/",
@@ -78,59 +78,62 @@ function commitEntry(file) {
   });
 }
 
-// function readCache(article) {
-//   return new Promise((resolve, reject) => {
-//     fs.readJSON(cache, "utf8", (e, o) => {
-//       if (e) {
-//         return reject(e);
-//       }
-//
-//       resolve(o);
-//     });
-//   });
-// }
-//
-// function isDuplicate(link, value) {
-//   return value.link === link;
-// }
-//
-// function addArticle(article, articles) {
-//   const oldArticle = o.findIndex(isDuplicate.bind(null, article.link));
-//
-//   if (oldArticle !== -1) {
-//     o.splice(oldArticle, 1);
-//   }
-//
-//   return o.unshift(article);
-// }
-//
-// function saveCache(articles) {
-//   return new Promise((resolve, reject) => {
-//     fs.outputJSON(cache, articles, (e) => {
-//       if (e) {
-//         return reject(e);
-//       }
-//
-//       resolve();
-//     });
-//   });
-// }
-//
-// function updateCache(file) {
-//   const [title, ...body] = file.contents.split("\n");
-//
-//   return waterfall([
-//     readCache,
-//     addArticle.bind(null, {
-//       "body": body.join("\n")
-//         .trim(),
-//       "link": `/blog/${file.name}.html`,
-//       "title": title.replace(/<.*?>/g, ""),
-//       "unixtime": Date.now()
-//     }),
-//     saveCache
-//   ]);
-// }
+function readCache() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(cache, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
+function isDuplicate(link, value) {
+  return value.link === link;
+}
+
+function addArticle(article, articles) {
+  const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
+
+  if (oldArticle !== -1) {
+    articles.splice(oldArticle, 1);
+  }
+
+  return articles.unshift(article);
+}
+
+function saveCache(articles) {
+  return new Promise((resolve, reject) => {
+    fs.outputJSON(cache, articles, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve();
+    });
+  });
+}
+
+function updateCache(file) {
+  const [title, ...body] = file.contents.split("\n");
+
+  return waterfall([
+    readCache,
+    addArticle.bind(null, {
+      "body": body.join("\n")
+        .trim(),
+      "link": `/blog/${file.name}.html`,
+      "title": title.replace(/<.*?>/g, ""),
+      "unixtime": Date.now()
+    }),
+    saveCache
+  ])
+    .then(() => {
+      return file;
+    });
+}
 
 function listArticleImages(file) {
   return new Promise((resolve, reject) => {
@@ -238,24 +241,6 @@ function testArticle(file) {
   });
 }
 
-function runCache(file) {
-  return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "cache",
-      "--",
-      `--file=${file.src}`
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-}
-
 function runBuild() {
   return new Promise((resolve, reject) => {
     execFile(npm, [
@@ -291,14 +276,13 @@ function updateEntry(file) {
   return waterfall([
     addEntry,
     commitEntry,
-    // updateCache,
+    updateCache,
     listArticleImages,
     copyArticleImages,
     // runArticles,
     buildArticle,
     saveFile,
     testArticle,
-    runCache,
     runBuild
   ], file);
 }
