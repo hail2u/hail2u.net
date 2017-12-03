@@ -170,11 +170,11 @@ function copyArticleImages(file) {
     });
 }
 
-// function runRebuild(file) {
+// function runArticles(file) {
 //   return new Promise((resolve, reject) => {
 //     execFile(npm, [
 //       "run",
-//       "rebuild",
+//       "articles",
 //       "--",
 //       `--file=/blog/${file.name}.html`
 //     ], (e, o) => {
@@ -294,7 +294,7 @@ function updateEntry(file) {
     // updateCache,
     listArticleImages,
     copyArticleImages,
-    // runRebuild,
+    // runArticles,
     buildArticle,
     saveFile,
     testArticle,
