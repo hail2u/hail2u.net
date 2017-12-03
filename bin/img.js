@@ -3,8 +3,10 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
+const path = require("path");
 const which = require("which").sync;
 
+const convert = which("convert");
 const files = [
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
@@ -50,6 +52,25 @@ function toPNG(file) {
         return reject(e);
       }
 
+      resolve(file.dest);
+    });
+  });
+}
+
+function isFaviconSource(file) {
+  return path.basename(file)
+    .startsWith("favicon-");
+}
+
+function toFavicon(args) {
+  return new Promise((resolve, reject) => {
+    args = args.filter(isFaviconSource);
+    args.push("../dist/favicon.ico");
+    execFile(convert, args, (e) => {
+      if (e) {
+        return reject(e);
+      }
+
       resolve();
     });
   });
@@ -57,6 +78,7 @@ function toPNG(file) {
 
 process.chdir(__dirname);
 Promise.all(files.map(toPNG))
+  .then(toFavicon)
   .catch((e) => {
     console.trace(e);
   });
