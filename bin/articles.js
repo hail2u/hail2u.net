@@ -31,7 +31,7 @@ const entityMap = {
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
 
-function readSomething(file, ...args) {
+function readFileOrJSON(file, ...args) {
   if (path.extname(file) === ".json") {
     return fs.readJSON(file, ...args);
   }
@@ -41,7 +41,7 @@ function readSomething(file, ...args) {
 
 function readFile(file) {
   return new Promise((resolve, reject) => {
-    readSomething(file, "utf8", (e, d) => {
+    readFileOrJSON(file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
