@@ -16,7 +16,6 @@ const argv = minimist(process.argv.slice(2), {
     "sitemap"
   ]
 });
-const dirPartial = "../src/partial/";
 const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
   '"': "&quot;",
@@ -92,6 +91,7 @@ const itemFiles = [
 const metadataFile = "../src/metadata.json";
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
+const partialDir = "../src/partial/";
 
 function readData(file) {
   return new Promise((resolve, reject) => {
@@ -177,7 +177,7 @@ function readItems() {
 }
 
 function readPartial(file) {
-  file = path.join(dirPartial, file);
+  file = path.join(partialDir, file);
 
   return new Promise((resolve, reject) => {
     fs.readFile(file, "utf8", (e, d) => {
@@ -195,7 +195,7 @@ function readPartial(file) {
 
 function readPartials() {
   return new Promise((resolve, reject) => {
-    fs.readdir(dirPartial, (e, f) => {
+    fs.readdir(partialDir, (e, f) => {
       if (e) {
         return reject(e);
       }

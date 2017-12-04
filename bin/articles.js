@@ -12,14 +12,7 @@ const waterfall = require("../lib/waterfall");
 const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
-const config = {
-  cache: "../src/blog/articles.json",
-  extradata: "../src/blog/article.json",
-  metadata: "../src/metadata.json",
-  partial: "../src/partial/",
-  root: "../dist/",
-  template: "../src/blog/article.mustache"
-};
+const cacheFile = "../src/blog/articles.json";
 const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
   '"': "&quot;",
@@ -28,8 +21,13 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
+const extradataFile = "../src/blog/article.json";
+const metadataFile = "../src/metadata.json";
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
   "Oct", "Nov", "Dec"];
+const partialDir = "../src/partial/";
+const rootDir = "../dist/";
+const templateFile = "../src/blog/article.mustache";
 
 function readFileOrJSON(file, ...args) {
   if (path.extname(file) === ".json") {
@@ -52,7 +50,7 @@ function readFile(file) {
 }
 
 function readPartial(file) {
-  return readFile(path.join(config.partial, file))
+  return readFile(path.join(partialDir, file))
     .then((v) => {
       return {
         [path.basename(file, ".mustache")]: v
@@ -62,7 +60,7 @@ function readPartial(file) {
 
 function readPartials() {
   return new Promise((resolve, reject) => {
-    fs.readdir(config.partial, (e, f) => {
+    fs.readdir(partialDir, (e, f) => {
       if (e) {
         return reject(e);
       }
@@ -125,7 +123,7 @@ function extendData([data, template, partials]) {
 
 function renderHTML([data, template, partials]) {
   return [
-    path.join(config.root, data.link),
+    path.join(rootDir, data.link),
     mustache.render(template, data, partials)
   ];
 }
@@ -170,10 +168,10 @@ mustache.escape = (s) => {
     });
 };
 Promise.all([
-  readFile(config.metadata),
-  readFile(config.extradata),
-  readFile(config.cache),
-  readFile(config.template),
+  readFile(metadataFile),
+  readFile(extradataFile),
+  readFile(cacheFile),
+  readFile(templateFile),
   readPartials()
 ])
   .then(buildAll)

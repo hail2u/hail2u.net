@@ -23,27 +23,24 @@ const argv = minimist(process.argv.slice(2), {
     "update"
   ]
 });
-const cache = "../src/blog/articles.json";
-const dir = {
-  blog: "../dist/blog/",
-  blosxom: "../src/blosxom/",
-  draft: path.join(os.homedir(), "Documents", "Drafts"),
-  entry: "../src/blosxom/entries/",
-  img: "../src/img/blog/",
-  root: "../",
-  static: "../dist/blog/",
-  staticimg: "../dist/img/blog/"
-};
+const blosxomDir = "../src/blosxom/";
+const cacheFile = "../src/blog/articles.json";
+const destDir = "../dist/blog/";
+const destImgDir = "../dist/img/blog/";
+const draftDir = path.join(os.homedir(), "Documents", "Drafts");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
 const git = which("git");
 const htmlhint = which("htmlhint");
 const npm = which("npm");
 const open = which("open");
 const perl = which("perl");
-const preview = {
+const previewFile = {
   dest: "../tmp/__preview.html",
   template: "../src/preview.mustache"
 };
+const rootDir = "../";
+const srcDir = "../src/blosxom/entries/";
+const srcImgDir = "../src/img/blog/";
 
 function addEntry(file) {
   return new Promise((resolve, reject) => {
@@ -66,7 +63,7 @@ function commitEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
       "commit",
-      `--message=Add ${toPOSIXPath(path.relative(dir.root, file.src))}`
+      `--message=Add ${toPOSIXPath(path.relative(rootDir, file.src))}`
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -80,7 +77,7 @@ function commitEntry(file) {
 
 function readCache() {
   return new Promise((resolve, reject) => {
-    fs.readJSON(cache, "utf8", (e, o) => {
+    fs.readJSON(cacheFile, "utf8", (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -106,7 +103,7 @@ function addArticle(article, articles) {
 
 function saveCache(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(cache, articles, (e) => {
+    fs.outputJSON(cacheFile, articles, (e) => {
       if (e) {
         return reject(e);
       }
@@ -152,7 +149,7 @@ function copyArticleImage(image) {
   image = path.basename(image.split(/"/)[1]);
 
   return new Promise((resolve, reject) => {
-    fs.copy(path.join(dir.img, image), path.join(dir.staticimg, image), (e) => {
+    fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image), (e) => {
       if (e) {
         return reject(e);
       }
@@ -193,7 +190,7 @@ function copyArticleImages(file) {
 function buildArticle(file) {
   const args = [
     "blosxom.cgi",
-    `path=/${toPOSIXPath(path.relative(dir.static, file.dest))}`
+    `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`
   ];
 
   if (argv.publish) {
@@ -202,9 +199,9 @@ function buildArticle(file) {
 
   file.contents = minifyHTML(
     execFileSync(perl, args, {
-      cwd: dir.blosxom,
+      cwd: blosxomDir,
       env: {
-        BLOSXOM_CONFIG_DIR: path.resolve(dir.blosxom)
+        BLOSXOM_CONFIG_DIR: path.resolve(blosxomDir)
       }
     })
       .toString()
@@ -260,8 +257,8 @@ function runBuild() {
 function updateEntry(file) {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
-    dir.static,
-    path.relative(dir.entry, path.dirname(file.src)),
+    destDir,
+    path.relative(srcDir, path.dirname(file.src)),
     `${path.basename(file.src, ".txt")}.html`
   );
 
@@ -297,7 +294,7 @@ function isDraft(file) {
 
 function listDrafts() {
   return new Promise((resolve, reject) => {
-    fs.readdir(dir.draft, (e, f) => {
+    fs.readdir(draftDir, (e, f) => {
       if (e) {
         return reject(e);
       }
@@ -308,7 +305,7 @@ function listDrafts() {
 }
 
 function getDraft(file) {
-  file = path.join(dir.draft, file);
+  file = path.join(draftDir, file);
 
   return new Promise((resolve, reject) => {
     fs.readFile(file, "utf8", (e, d) => {
@@ -458,12 +455,12 @@ function previewSelected(file) {
 
 function processSelected(file) {
   if (argv.publish) {
-    file.dest = path.join(dir.entry, `${file.name}.txt`);
+    file.dest = path.join(srcDir, `${file.name}.txt`);
 
     return publishSelected(file);
   }
 
-  return previewSelected(Object.assign(file, preview));
+  return previewSelected(Object.assign(file, previewFile));
 }
 
 process.chdir(__dirname);
