@@ -4,10 +4,18 @@
 
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
+const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "feed",
+    "html",
+    "sitemap"
+  ]
+});
 const dirPartial = "../src/partial/";
 const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
@@ -21,51 +29,60 @@ const files = [
   {
     dest: "../dist/about/index.html",
     json: "../src/about/index.json",
-    src: "../src/about/index.mustache"
+    src: "../src/about/index.mustache",
+    type: "html"
   },
   {
     dest: "../dist/blog/feed",
     json: "../src/blog/index.json",
     itemLength: 10,
-    src: "../src/blog/feed.mustache"
+    src: "../src/blog/feed.mustache",
+    type: "feed"
   },
   {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
-    src: "../src/blog/index.mustache"
+    src: "../src/blog/index.mustache",
+    type: "html"
   },
   {
     dest: "../src/blosxom/entries/themes/html/page",
     json: "../src/blog/theme.json",
-    src: "../src/blog/theme.mustache"
+    src: "../src/blog/theme.mustache",
+    type: "html"
   },
   {
     dest: "../dist/documents/index.html",
     json: "../src/documents/index.json",
-    src: "../src/documents/index.mustache"
+    src: "../src/documents/index.mustache",
+    type: "html"
   },
   {
     dest: "../dist/projects/index.html",
     json: "../src/projects/index.json",
-    src: "../src/projects/index.mustache"
+    src: "../src/projects/index.mustache",
+    type: "html"
   },
   {
     dest: "../dist/feed",
     json: "../src/index.json",
     itemLength: 10,
-    src: "../src/feed.mustache"
+    src: "../src/feed.mustache",
+    type: "feed"
   },
   {
     dest: "../dist/index.html",
     json: "../src/index.json",
     includeUpdates: true,
     itemLength: 10,
-    src: "../src/index.mustache"
+    src: "../src/index.mustache",
+    type: "html"
   },
   {
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
-    src: "../src/sitemap.mustache"
+    src: "../src/sitemap.mustache",
+    type: "sitemap"
   }
 ];
 const itemFiles = [
@@ -268,8 +285,29 @@ function build(metadata, items, partials, file) {
   ], [metadata, items, partials, file]);
 }
 
+function refineByType(file) {
+  if (!argv.feed && !argv.html && !argv.sitemap) {
+    return true;
+  }
+
+  if (argv.feed && file.type === "feed") {
+    return true;
+  }
+
+  if (argv.html && file.type === "html") {
+    return true;
+  }
+
+  if (argv.sitemap && file.type === "sitemap") {
+    return true;
+  }
+
+  return false;
+}
+
 function buildAll([metadata, items, partials]) {
-  return Promise.all(files.map(build.bind(null, metadata, items, partials)));
+  return Promise.all(files.filter(refineByType)
+    .map(build.bind(null, metadata, items, partials)));
 }
 
 process.chdir(__dirname);
