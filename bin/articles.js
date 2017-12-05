@@ -29,17 +29,45 @@ const partialDir = "../src/partial/";
 const rootDir = "../dist/";
 const templateFile = "../src/blog/article.mustache";
 
-function readFileOrJSON(file, ...args) {
-  if (path.extname(file) === ".json") {
-    return fs.readJSON(file, ...args);
-  }
+function readMetadata() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(metadataFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-  return fs.readFile(file, ...args);
+      resolve(o);
+    });
+  });
 }
 
-function readFile(file) {
+function readExtradata() {
   return new Promise((resolve, reject) => {
-    readFileOrJSON(file, "utf8", (e, d) => {
+    fs.readJSON(extradataFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
+function readCache() {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(cacheFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
+function readTemplate() {
+  return new Promise((resolve, reject) => {
+    fs.readFile(templateFile, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
@@ -50,12 +78,17 @@ function readFile(file) {
 }
 
 function readPartial(file) {
-  return readFile(path.join(partialDir, file))
-    .then((v) => {
-      return {
-        [path.basename(file, ".mustache")]: v
-      };
+  return new Promise((resolve, reject) => {
+    fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve({
+        [path.basename(file, ".mustache")]: d
+      });
     });
+  });
 }
 
 function flatten(previous, current) {
@@ -175,10 +208,10 @@ mustache.escape = (s) => {
     });
 };
 Promise.all([
-  readFile(metadataFile),
-  readFile(extradataFile),
-  readFile(cacheFile),
-  readFile(templateFile),
+  readMetadata(),
+  readExtradata(),
+  readCache(),
+  readTemplate(),
   readPartials()
 ])
   .then(buildAll)
