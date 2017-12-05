@@ -170,24 +170,33 @@ function copyArticleImages(file) {
     });
 }
 
-// function runArticles(file) {
-//   return new Promise((resolve, reject) => {
-//     execFile(npm, [
-//       "run",
-//       "articles",
-//       "--",
-//       `--file=/blog/${file.name}.html`
-//     ], (e, o) => {
-//       if (e) {
-//         return reject(e);
-//       }
-//
-//       resolve(file);
-//     });
-//   });
-// }
+function runArticles(file) {
+  if (argv.publish) {
+    return file;
+  }
+
+  return new Promise((resolve, reject) => {
+    execFile(npm, [
+      "run",
+      "articles",
+      "--",
+      `--file=/blog/${file.name}.html`
+    ], (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      process.stdout.write(o);
+      resolve(file);
+    });
+  });
+}
 
 function buildArticle(file) {
+  if (argv.update) {
+    return file;
+  }
+
   const args = [
     "blosxom.cgi",
     `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`
@@ -276,7 +285,7 @@ function updateEntry(file) {
     updateCache,
     listArticleImages,
     copyArticleImages,
-    // runArticles,
+    runArticles,
     buildArticle,
     saveFile,
     testArticle,
