@@ -41,6 +41,23 @@ const rootDir = "../";
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
+function readEntry(file) {
+  if (file.contents) {
+    return file;
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(file.src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
+
+      file.contents = d;
+      resolve(file);
+    });
+  });
+}
+
 function addEntry(file) {
   return new Promise((resolve, reject) => {
     execFile(git, [
@@ -274,11 +291,8 @@ function updateEntry(file) {
     file.name = path.basename(file.src, ".txt");
   }
 
-  if (!file.contents) {
-    file.contents = fs.readFileSync(file.src, "utf8");
-  }
-
   return waterfall([
+    readEntry,
     addEntry,
     commitEntry,
     updateCache,
