@@ -114,7 +114,9 @@ function addArticle(article, articles) {
     articles.splice(oldArticle, 1);
   }
 
-  return articles.unshift(article);
+  articles.unshift(article);
+
+  return articles;
 }
 
 function saveCache(articles) {
