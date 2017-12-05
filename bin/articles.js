@@ -148,11 +148,13 @@ function build(data, template, partials, src) {
   ], [Object.assign({}, data, src), template, partials]);
 }
 
+function refineByLink(item) {
+  return argv.file.endsWith(item.link);
+}
+
 function buildAll([metadata, extradata, cache, template, partials]) {
   if (argv.file) {
-    cache = cache.filter((c) => {
-      return argv.file.endsWith(c.link);
-    });
+    cache = cache.filter(refineByLink);
   }
 
   Object.assign(metadata, extradata);
