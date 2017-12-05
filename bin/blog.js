@@ -3,7 +3,6 @@
 "use strict";
 
 const execFile = require("child_process").execFile;
-const execFileSync = require("child_process").execFileSync;
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minifyHTML = require("../lib/html-minifier");
@@ -199,27 +198,27 @@ function buildArticle(file) {
 
   const args = [
     "blosxom.cgi",
-    `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`
+    `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`,
+    "reindex=1"
   ];
 
-  if (argv.publish) {
-    args.push("reindex=1");
-  }
-
-  file.contents = minifyHTML(
-    execFileSync(perl, args, {
+  return new Promise((resolve, reject) => {
+    execFile(perl, args, {
       cwd: blosxomDir,
       env: {
         BLOSXOM_CONFIG_DIR: path.resolve(blosxomDir)
       }
-    })
-      .toString()
-      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-      .trim()
-  );
+    }, (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-  return file;
+      file.contents = minifyHTML(o.replace(/^[\s\S]*?\r?\n\r?\n/, "")
+        .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+        .trim());
+      resolve(file);
+    });
+  });
 }
 
 function saveFile(file) {
