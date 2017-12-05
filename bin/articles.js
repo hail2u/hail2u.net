@@ -58,6 +58,14 @@ function readPartial(file) {
     });
 }
 
+function flatten(previous, current) {
+  return Object.assign(previous, current);
+}
+
+function gatherPartials(resolve, partials) {
+  return resolve(partials.reduce(flatten));
+}
+
 function readPartials() {
   return new Promise((resolve, reject) => {
     fs.readdir(partialDir, (e, f) => {
@@ -66,11 +74,7 @@ function readPartials() {
       }
 
       return Promise.all(f.map(readPartial))
-        .then((v) => {
-          resolve(v.reduce((p, c) => {
-            return Object.assign(p, c);
-          }));
-        });
+        .then(gatherPartials.bind(null, resolve));
     });
   });
 }
