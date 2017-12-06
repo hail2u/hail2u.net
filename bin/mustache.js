@@ -4,10 +4,12 @@ const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
+const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 
 const argv = minimist(process.argv.slice(2), {
   boolean: [
+    "articles",
     "feed",
     "html",
     "sitemap"
@@ -19,6 +21,7 @@ const article = {
   src: "../src/blog/article.mustache",
   type: "html"
 };
+const destDir = "../dist/";
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -105,6 +108,18 @@ function readMetadata() {
   });
 }
 
+function readItem(itemFile) {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(itemFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
 function flatten(previous, current) {
   return previous.concat(current);
 }
@@ -113,8 +128,21 @@ function sortByDate(a, b) {
   return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 }
 
+function findCover(image, defaultCover) {
+  if (!image) {
+    return defaultCover;
+  }
+
+  return image[1];
+}
+
 function extendItem(item, index, original) {
-  if (item.body) {
+  const cover = findCover(
+    /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
+    item.cover
+  );
+
+  if (!argv.articles && !argv.file && item.body) {
     item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\"");
   }
 
@@ -142,6 +170,11 @@ function extendItem(item, index, original) {
     item.year, item.hour, item.minute, item.second);
   item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(item.date)}`;
 
+  if (cover !== item.cover) {
+    item.card_type = "summary_large_image";
+    item.cover = cover;
+  }
+
   if (index === 0) {
     item.isLatest = true;
     index = original.length;
@@ -155,18 +188,6 @@ function extendItem(item, index, original) {
   }
 
   return item;
-}
-
-function readItem(itemFile) {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(itemFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
 }
 
 function gatherItems(items) {
@@ -230,8 +251,8 @@ function readTemplate([metadata, items, partials, file]) {
   });
 }
 
-function pickupByLink(item) {
-  return argv.file.endsWith(item.link);
+function pickByLink(dest, item) {
+  return dest.endsWith(item.link);
 }
 
 function filterUpdates(includeUpdates, item) {
@@ -262,8 +283,8 @@ function mergeData([metadata, items, partials, file]) {
     });
   })
     .then((extradata) => {
-      if (argv.file) {
-        Object.assign(extradata, items[items.findIndex(pickupByLink)]);
+      if (argv.articles || argv.file) {
+        Object.assign(extradata, items.find(pickByLink.bind(null, file.dest)));
         extradata.canonical = extradata.link;
         extradata.short_title = extradata.title;
       } else {
@@ -335,6 +356,16 @@ function buildAll([metadata, items, partials]) {
     return build(metadata, items, partials, Object.assign({
       dest: argv.file
     }, article));
+  }
+
+  if (argv.articles) {
+    return Promise.all(items.filter(filterUpdates.bind(null, false))
+      .map((i) => {
+        return Object.assign({
+          dest: toPOSIXPath(path.join(destDir, i.link))
+        }, article);
+      })
+      .map(build.bind(null, metadata, items, partials)));
   }
 
   return Promise.all(files.filter(refineByType)
