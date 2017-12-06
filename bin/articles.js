@@ -2,6 +2,7 @@
 
 "use strict";
 
+const formatDate = require("../lib/format-date");
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
@@ -13,7 +14,6 @@ const argv = minimist(process.argv.slice(2), {
   string: ["file"]
 });
 const cacheFile = "../src/blog/articles.json";
-const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -23,8 +23,6 @@ const entityMap = {
 };
 const extradataFile = "../src/blog/article.json";
 const metadataFile = "../src/metadata.json";
-const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
-  "Oct", "Nov", "Dec"];
 const partialDir = "../src/partial/";
 const rootDir = "../dist/";
 const templateFile = "../src/blog/article.mustache";
@@ -120,14 +118,6 @@ function findCover(image, defaultCover) {
   return image[1];
 }
 
-function pad(number) {
-  if (number >= 10) {
-    return number;
-  }
-
-  return `0${number}`;
-}
-
 function extendData([data, template, partials]) {
   const dt = new Date(data.unixtime);
   const cover = findCover(
@@ -142,9 +132,11 @@ function extendData([data, template, partials]) {
   data.hour = dt.getHours();
   data.minute = dt.getMinutes();
   data.second = dt.getSeconds();
-  data.html5PubDate = `${data.year}-${pad(data.month)}-${pad(data.date)}T${pad(data.hour)}:${pad(data.minute)}:${pad(data.second)}+09:00`;
-  data.rfc822PubDate = `${day[data.day]}, ${data.date} ${month[data.month - 1]} ${data.year} ${pad(data.hour)}:${pad(data.minute)}:${pad(data.second)} +0900`;
-  data.strPubDate = `${pad(data.month)}/${pad(data.date)}`;
+  data.html5PubDate = formatDate.html5(data.day, data.date, data.month,
+    data.year, data.hour, data.minute, data.second);
+  data.rfc822PubDate = formatDate.rfc822(data.day, data.date, data.month,
+    data.year, data.hour, data.minute, data.second);
+  data.strPubDate = `${formatDate.pad(data.month)}/${formatDate.pad(data.date)}`;
   data.canonical = data.link;
   data.description = data.body.replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")

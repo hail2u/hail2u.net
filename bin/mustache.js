@@ -2,6 +2,7 @@
 
 "use strict";
 
+const formatDate = require("../lib/format-date");
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
@@ -16,7 +17,6 @@ const argv = minimist(process.argv.slice(2), {
     "sitemap"
   ]
 });
-const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -89,8 +89,6 @@ const itemFiles = [
   "../src/updates.json"
 ];
 const metadataFile = "../src/metadata.json";
-const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
-  "Oct", "Nov", "Dec"];
 const partialDir = "../src/partial/";
 
 function readData(file) {
@@ -103,14 +101,6 @@ function readData(file) {
       resolve(o);
     });
   });
-}
-
-function pad(number) {
-  if (number >= 10) {
-    return number;
-  }
-
-  return `0${number}`;
 }
 
 function flatten(previous, current) {
@@ -144,9 +134,11 @@ function extendItem(item, index, original) {
     item.year = dt.getFullYear();
   }
 
-  item.html5PubDate = `${item.year}-${pad(item.month)}-${pad(item.date)}T${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)}+09:00`;
-  item.rfc822PubDate = `${day[item.day]}, ${item.date} ${month[item.month - 1]} ${item.year} ${pad(item.hour)}:${pad(item.minute)}:${pad(item.second)} +0900`;
-  item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
+  item.html5PubDate = formatDate.html5(item.day, item.date, item.month,
+    item.year, item.hour, item.minute, item.second);
+  item.rfc822PubDate = formatDate.rfc822(item.day, item.date, item.month,
+    item.year, item.hour, item.minute, item.second);
+  item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(item.date)}`;
 
   if (index === 0) {
     item.isLatest = true;
@@ -236,10 +228,9 @@ function filterUpdates(includeUpdates, item) {
   return false;
 }
 
-function now() {
-  const d = new Date();
-
-  return `${day[d.getDay()]}, ${pad(d.getDate())} ${month[d.getMonth()]} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} +0900`;
+function now(date) {
+  return formatDate.rfc822(date.getDay(), date.getDate(), date.getMonth(),
+    date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds());
 }
 
 function mergeData([metadata, items, partials, file]) {
@@ -248,7 +239,7 @@ function mergeData([metadata, items, partials, file]) {
       extradata.items = items.concat()
         .filter(filterUpdates.bind(null, file.includeUpdates))
         .slice(0, file.itemLength);
-      extradata.lastBuildDate = now();
+      extradata.lastBuildDate = now(Date.now());
       file.data = Object.assign({}, metadata, extradata);
 
       return [partials, file];
