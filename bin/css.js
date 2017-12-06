@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-"use strict";
-
 const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");

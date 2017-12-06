@@ -2,8 +2,6 @@
  * reldate.js
  * LICENSE: http://hail2u.mit-license.org/2016
  */
-"use strict";
-
 const now = performance.timing.navigationStart + performance.now();
 const toRelativeDate = (from, to) => {
   let diff = 0;

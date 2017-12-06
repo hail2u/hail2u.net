@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-"use strict";
-
 const execFile = require("child_process").execFile;
 const path = require("path");
 const which = require("which").sync;

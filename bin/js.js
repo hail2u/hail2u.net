@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-"use strict";
-
 const fs = require("fs-extra");
 const gccc = require("google-closure-compiler-js").compile;
 const path = require("path");

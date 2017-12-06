@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-"use strict";
-
 const formatDate = require("../lib/format-date");
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");

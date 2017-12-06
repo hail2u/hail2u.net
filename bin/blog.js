@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-"use strict";
-
 const execFile = require("child_process").execFile;
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");

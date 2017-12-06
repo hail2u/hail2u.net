@@ -1,5 +1,3 @@
-"use strict";
-
 const eyecatch = document.querySelector(".fill");
 
 document.querySelector("footer")
