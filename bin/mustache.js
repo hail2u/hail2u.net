@@ -11,8 +11,14 @@ const argv = minimist(process.argv.slice(2), {
     "feed",
     "html",
     "sitemap"
-  ]
+  ],
+  string: ["file"]
 });
+const article = {
+  json: "../src/blog/article.json",
+  src: "../src/blog/article.mustache",
+  type: "html"
+};
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -212,6 +218,10 @@ function readTemplate([metadata, items, partials, file]) {
   });
 }
 
+function pickupByLink(item) {
+  return argv.file.endsWith(item.link);
+}
+
 function filterUpdates(includeUpdates, item) {
   if (item.link.startsWith("/blog/")) {
     return true;
@@ -232,9 +242,16 @@ function now(date) {
 function mergeData([metadata, items, partials, file]) {
   return readData(file.json)
     .then((extradata) => {
-      extradata.items = items.concat()
-        .filter(filterUpdates.bind(null, file.includeUpdates))
-        .slice(0, file.itemLength);
+      if (argv.file) {
+        Object.assign(extradata, items[items.findIndex(pickupByLink)]);
+        extradata.canonical = extradata.link;
+        extradata.short_title = extradata.title;
+      } else {
+        extradata.items = items.concat()
+          .filter(filterUpdates.bind(null, file.includeUpdates))
+          .slice(0, file.itemLength);
+      }
+
       extradata.lastBuildDate = now(new Date());
       file.data = Object.assign({}, metadata, extradata);
 
@@ -294,6 +311,12 @@ function refineByType(file) {
 }
 
 function buildAll([metadata, items, partials]) {
+  if (argv.file) {
+    return build(metadata, items, partials, Object.assign({
+      dest: argv.file
+    }, article));
+  }
+
   return Promise.all(files.filter(refineByType)
     .map(build.bind(null, metadata, items, partials)));
 }

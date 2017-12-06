@@ -184,7 +184,7 @@ function copyArticleImages(file) {
     });
 }
 
-function runArticles(file) {
+function runBuildFile(file) {
   if (argv.publish) {
     return file;
   }
@@ -192,9 +192,9 @@ function runArticles(file) {
   return new Promise((resolve, reject) => {
     execFile(npm, [
       "run",
-      "articles",
+      "build",
       "--",
-      `--file=/blog/${file.name}.html`
+      `--file=${destDir}${file.name}.html`
     ], (e, o) => {
       if (e) {
         return reject(e);
@@ -296,7 +296,7 @@ function updateEntry(file) {
     updateCache,
     listArticleImages,
     copyArticleImages,
-    runArticles,
+    runBuildFile,
     buildArticle,
     saveFile,
     testArticle,

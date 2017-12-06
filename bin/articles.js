@@ -1,14 +1,10 @@
 const formatDate = require("../lib/format-date");
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
-const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
-const argv = minimist(process.argv.slice(2), {
-  string: ["file"]
-});
 const cacheFile = "../src/blog/articles.json";
 const entityMap = {
   '"': "&quot;",
@@ -174,15 +170,7 @@ function build(data, template, partials, src) {
   ], [Object.assign({}, data, src), template, partials]);
 }
 
-function refineByLink(item) {
-  return argv.file.endsWith(item.link);
-}
-
 function buildAll([metadata, extradata, cache, template, partials]) {
-  if (argv.file) {
-    cache = cache.filter(refineByLink);
-  }
-
   Object.assign(metadata, extradata);
 
   return Promise.all(cache.map(build.bind(null, metadata, template, partials)));
