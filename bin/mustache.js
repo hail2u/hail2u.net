@@ -235,7 +235,7 @@ function mergeData([metadata, items, partials, file]) {
       extradata.items = items.concat()
         .filter(filterUpdates.bind(null, file.includeUpdates))
         .slice(0, file.itemLength);
-      extradata.lastBuildDate = now(Date.now());
+      extradata.lastBuildDate = now(new Date());
       file.data = Object.assign({}, metadata, extradata);
 
       return [partials, file];
