@@ -93,9 +93,9 @@ const itemFiles = [
 const metadataFile = "../src/metadata.json";
 const partialDir = "../src/partial/";
 
-function readData(file) {
+function readMetadata() {
   return new Promise((resolve, reject) => {
-    fs.readJSON(file, "utf8", (e, o) => {
+    fs.readJSON(metadataFile, "utf8", (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -157,6 +157,18 @@ function extendItem(item, index, original) {
   return item;
 }
 
+function readItem(itemFile) {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(itemFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  });
+}
+
 function gatherItems(items) {
   items = items.reduce(flatten)
     .sort(sortByDate)
@@ -167,7 +179,7 @@ function gatherItems(items) {
 }
 
 function readItems() {
-  return Promise.all(itemFiles.map(readData))
+  return Promise.all(itemFiles.map(readItem))
     .then(gatherItems);
 }
 
@@ -240,7 +252,15 @@ function now(date) {
 }
 
 function mergeData([metadata, items, partials, file]) {
-  return readData(file.json)
+  return new Promise((resolve, reject) => {
+    fs.readJSON(file.json, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(o);
+    });
+  })
     .then((extradata) => {
       if (argv.file) {
         Object.assign(extradata, items[items.findIndex(pickupByLink)]);
@@ -329,7 +349,7 @@ mustache.escape = (s) => {
     });
 };
 Promise.all([
-  readData(metadataFile),
+  readMetadata(),
   readItems(),
   readPartials()
 ])
