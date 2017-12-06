@@ -29,6 +29,8 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
+const escapeRe = new RegExp(`[${Object.keys(entityMap)
+  .join("")}]`, "g");
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -95,6 +97,15 @@ const itemFiles = [
 ];
 const metadataFile = "../src/metadata.json";
 const partialDir = "../src/partial/";
+
+function escapeChar(char) {
+  return entityMap[char];
+}
+
+function escapeString(string) {
+  return String(string)
+    .replace(escapeRe, escapeChar);
+}
 
 function readMetadata() {
   return new Promise((resolve, reject) => {
@@ -191,12 +202,10 @@ function extendItem(item, index, original) {
 }
 
 function gatherItems(items) {
-  items = items.reduce(flatten)
+  return items.reduce(flatten)
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
-
-  return items;
 }
 
 function readItems() {
@@ -205,10 +214,8 @@ function readItems() {
 }
 
 function readPartial(file) {
-  file = path.join(partialDir, file);
-
   return new Promise((resolve, reject) => {
-    fs.readFile(file, "utf8", (e, d) => {
+    fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
@@ -221,21 +228,26 @@ function readPartial(file) {
   });
 }
 
-function readPartials() {
+function gatherPartials(partials) {
+  return Object.assign(...partials);
+}
+
+function readPartials(partials) {
+  return Promise.all(partials.map(readPartial))
+    .then(gatherPartials);
+}
+
+function readPartialDir() {
   return new Promise((resolve, reject) => {
     fs.readdir(partialDir, (e, f) => {
       if (e) {
         return reject(e);
       }
 
-      return Promise.all(f.map(readPartial))
-        .then((o) => {
-          return resolve(o.reduce((a, v) => {
-            return Object.assign(a, v);
-          }));
-        });
+      resolve(f);
     });
-  });
+  })
+    .then(readPartials);
 }
 
 function readTemplate([metadata, items, partials, file]) {
@@ -247,6 +259,18 @@ function readTemplate([metadata, items, partials, file]) {
 
       file.template = d;
       resolve([metadata, items, partials, file]);
+    });
+  });
+}
+
+function readExtradata([metadata, items, partials, file]) {
+  return new Promise((resolve, reject) => {
+    fs.readJSON(file.json, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve([metadata, items, partials, file, o]);
     });
   });
 }
@@ -272,32 +296,21 @@ function now(date) {
     date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds());
 }
 
-function mergeData([metadata, items, partials, file]) {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(file.json, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
+function mergeData([metadata, items, partials, file, extradata]) {
+  if (argv.articles || argv.file) {
+    Object.assign(extradata, items.find(pickByLink.bind(null, file.dest)));
+    extradata.canonical = extradata.link;
+    extradata.short_title = extradata.title;
+  } else {
+    extradata.items = items.concat()
+      .filter(filterUpdates.bind(null, file.includeUpdates))
+      .slice(0, file.itemLength);
+  }
 
-      resolve(o);
-    });
-  })
-    .then((extradata) => {
-      if (argv.articles || argv.file) {
-        Object.assign(extradata, items.find(pickByLink.bind(null, file.dest)));
-        extradata.canonical = extradata.link;
-        extradata.short_title = extradata.title;
-      } else {
-        extradata.items = items.concat()
-          .filter(filterUpdates.bind(null, file.includeUpdates))
-          .slice(0, file.itemLength);
-      }
+  extradata.lastBuildDate = now(new Date());
+  file.data = Object.assign({}, metadata, extradata);
 
-      extradata.lastBuildDate = now(new Date());
-      file.data = Object.assign({}, metadata, extradata);
-
-      return [partials, file];
-    });
+  return [partials, file];
 }
 
 function renderFile([partials, file]) {
@@ -325,6 +338,7 @@ function writeFile(file) {
 function build(metadata, items, partials, file) {
   return waterfall([
     readTemplate,
+    readExtradata,
     mergeData,
     renderFile,
     writeFile
@@ -351,6 +365,12 @@ function refineByType(file) {
   return false;
 }
 
+function toArticleList(item) {
+  return Object.assign({
+    dest: toPOSIXPath(path.join(destDir, item.link))
+  }, article);
+}
+
 function buildAll([metadata, items, partials]) {
   if (argv.file) {
     return build(metadata, items, partials, Object.assign({
@@ -360,11 +380,7 @@ function buildAll([metadata, items, partials]) {
 
   if (argv.articles) {
     return Promise.all(items.filter(filterUpdates.bind(null, false))
-      .map((i) => {
-        return Object.assign({
-          dest: toPOSIXPath(path.join(destDir, i.link))
-        }, article);
-      })
+      .map(toArticleList)
       .map(build.bind(null, metadata, items, partials)));
   }
 
@@ -373,16 +389,11 @@ function buildAll([metadata, items, partials]) {
 }
 
 process.chdir(__dirname);
-mustache.escape = (s) => {
-  return String(s)
-    .replace(/[&<>"']/g, (c) => {
-      return entityMap[c];
-    });
-};
+mustache.escape = escapeString;
 Promise.all([
   readMetadata(),
   readItems(),
-  readPartials()
+  readPartialDir()
 ])
   .then(buildAll)
   .catch((e) => {
