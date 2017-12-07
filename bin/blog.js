@@ -296,7 +296,10 @@ function updateEntry(file) {
   );
 
   if (!file.name) {
-    file.name = path.basename(file.src, ".txt");
+    file.name = toPOSIXPath(path.join(
+      path.relative(srcDir, path.dirname(file.src)),
+      path.basename(file.src, ".txt")
+    ));
   }
 
   return waterfall([
