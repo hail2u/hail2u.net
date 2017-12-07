@@ -118,7 +118,9 @@ function addArticle(article, articles) {
 
 function saveCache(articles) {
   return new Promise((resolve, reject) => {
-    fs.outputJSON(cacheFile, articles, (e) => {
+    fs.outputJSON(cacheFile, articles, {
+      spaces: 2
+    }, (e) => {
       if (e) {
         return reject(e);
       }
