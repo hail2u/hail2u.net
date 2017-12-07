@@ -238,6 +238,10 @@ function buildArticle(file) {
 }
 
 function saveFile(file) {
+  if (argv.update) {
+    return file;
+  }
+
   return new Promise((resolve, reject) => {
     fs.outputFile(file.dest, file.contents, (e) => {
       if (e) {
