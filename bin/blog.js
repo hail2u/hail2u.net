@@ -403,27 +403,24 @@ function selectDraft(files) {
 }
 
 function checkSelected(file) {
-  return new Promise((resolve, reject) => {
-    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
-      return reject(new Error("This draft does not have a valid name for file."));
-    }
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
+    throw new Error("This draft does not have a valid name for file.");
+  }
 
-    if (
-      !file.contents.startsWith("# ") &&
-      !file.contents.startsWith("<h1>")
-    ) {
-      return reject(new Error("This draft does not have a title."));
-    }
+  if (
+    !file.contents.startsWith("# ") &&
+    !file.contents.startsWith("<h1>")
+  ) {
+    throw new Error("This draft does not have a title.");
+  }
 
-    resolve(file);
-  });
+  return file;
 }
 
 function markupSelected(file) {
-  return new Promise((resolve) => {
-    file.contents = markdown(file.contents);
-    resolve(file);
-  });
+  file.contents = markdown(file.contents);
+
+  return file;
 }
 
 function deleteDraft(file) {
