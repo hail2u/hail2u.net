@@ -2,7 +2,6 @@ const execFile = require("child_process").execFile;
 const path = require("path");
 const which = require("which").sync;
 
-const convert = which("convert");
 const files = [
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
@@ -25,6 +24,8 @@ const files = [
     width: 48
   }
 ];
+
+const convert = which("convert");
 const inkscape = which("inkscape");
 
 function toPNG(file) {

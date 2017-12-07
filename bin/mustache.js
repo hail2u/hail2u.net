@@ -7,15 +7,6 @@ const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 
-const argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "articles",
-    "feed",
-    "html",
-    "sitemap"
-  ],
-  string: ["file"]
-});
 const article = {
   json: "../src/blog/article.json",
   src: "../src/blog/article.mustache",
@@ -29,8 +20,6 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const escapeRe = new RegExp(`[${Object.keys(entityMap)
-  .join("")}]`, "g");
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -97,6 +86,18 @@ const itemFiles = [
 ];
 const metadataFile = "../src/metadata.json";
 const partialDir = "../src/partial/";
+
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "articles",
+    "feed",
+    "html",
+    "sitemap"
+  ],
+  string: ["file"]
+});
+const escapeRe = new RegExp(`[${Object.keys(entityMap)
+  .join("")}]`, "g");
 
 function escapeChar(char) {
   return entityMap[char];

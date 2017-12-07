@@ -11,24 +11,12 @@ const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
-const argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "preview",
-    "publish",
-    "update"
-  ]
-});
 const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.join(os.homedir(), "Documents", "Drafts");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
-const git = which("git");
-const htmlhint = which("htmlhint");
-const npm = which("npm");
-const open = which("open");
-const perl = which("perl");
 const previewFile = {
   dest: "../tmp/__preview.html",
   template: "../src/preview.mustache"
@@ -36,6 +24,19 @@ const previewFile = {
 const rootDir = "../";
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
+
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "preview",
+    "publish",
+    "update"
+  ]
+});
+const git = which("git");
+const htmlhint = which("htmlhint");
+const npm = which("npm");
+const open = which("open");
+const perl = which("perl");
 
 function readEntry(file) {
   if (file.contents) {
