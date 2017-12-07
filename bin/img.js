@@ -1,4 +1,4 @@
-const execFile = require("child_process").execFile;
+const {execFile} = require("child_process");
 const path = require("path");
 const which = require("which").sync;
 
@@ -25,53 +25,44 @@ const files = [
   }
 ];
 
-const convert = which("convert");
 const inkscape = which("inkscape");
+const toPNG = (file) => new Promise((resolve, reject) => {
+  const args = ["-f", file.src, "-e", file.dest];
 
-function toPNG(file) {
-  return new Promise((resolve, reject) => {
-    const args = ["-f", file.src, "-e", file.dest];
+  if (file.area) {
+    args.push("-a", file.area);
+  }
 
-    if (file.area) {
-      args.push("-a", file.area);
+  if (file.height) {
+    args.push("-h", file.height);
+  }
+
+  if (file.width) {
+    args.push("-w", file.width);
+  }
+
+  execFile(inkscape, args, (e) => {
+    if (e) {
+      return reject(e);
     }
 
-    if (file.height) {
-      args.push("-h", file.height);
-    }
-
-    if (file.width) {
-      args.push("-w", file.width);
-    }
-
-    execFile(inkscape, args, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(file.dest);
-    });
+    resolve(file.dest);
   });
-}
+});
+const isFaviconSource = (file) => path.basename(file)
+  .startsWith("favicon-");
+const convert = which("convert");
+const toFavicon = (args) => new Promise((resolve, reject) => {
+  args = args.filter(isFaviconSource);
+  args.push("../dist/favicon.ico");
+  execFile(convert, args, (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function isFaviconSource(file) {
-  return path.basename(file)
-    .startsWith("favicon-");
-}
-
-function toFavicon(args) {
-  return new Promise((resolve, reject) => {
-    args = args.filter(isFaviconSource);
-    args.push("../dist/favicon.ico");
-    execFile(convert, args, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
+    resolve();
   });
-}
+});
 
 process.chdir(__dirname);
 Promise.all(files.map(toPNG))

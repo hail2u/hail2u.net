@@ -21,27 +21,17 @@ const files = [
   }
 ];
 
-const processor = postcss([
-  atImport(),
-  mqpacker(),
-  csswring(),
-  wrapWithSupports()
-]);
+const readFile = (file) => new Promise((resolve, reject) => {
+  fs.readFile(file.src, "utf8", (e, d) => {
+    if (e) {
+      return reject(e);
+    }
 
-function readFile(file) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.contents = d;
-      resolve(file);
-    });
+    file.contents = d;
+    resolve(file);
   });
-}
-
-function modifyStyleGuide(contents) {
+});
+const modifyStyleGuide = (contents) => {
   const dir = "../";
   const url = "https://hail2u.net/";
 
@@ -54,9 +44,14 @@ function modifyStyleGuide(contents) {
 
     return `${a}${e}${o}${u}${c}`;
   });
-}
-
-function optimizeFile(file) {
+};
+const processor = postcss([
+  atImport(),
+  mqpacker(),
+  csswring(),
+  wrapWithSupports()
+]);
+const optimizeFile = (file) => {
   if (!file.src.endsWith(".css")) {
     file.contents = modifyStyleGuide(file.contents);
 
@@ -72,27 +67,21 @@ function optimizeFile(file) {
 
       return file;
     });
-}
+};
+const writeFile = (file) => new Promise((resolve, reject) => {
+  fs.outputFile(file.dest, file.contents, (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function writeFile(file) {
-  return new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
+    resolve();
   });
-}
-
-function buildFile(file) {
-  return waterfall([
-    readFile,
-    optimizeFile,
-    writeFile
-  ], file);
-}
+});
+const buildFile = (file) => waterfall([
+  readFile,
+  optimizeFile,
+  writeFile
+], file);
 
 process.chdir(__dirname);
 Promise.all(files.map(buildFile))

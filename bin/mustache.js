@@ -13,13 +13,6 @@ const article = {
   type: "html"
 };
 const destDir = "../dist/";
-const entityMap = {
-  '"': "&quot;",
-  "&": "&amp;",
-  "'": "&#39;",
-  "<": "&lt;",
-  ">": "&gt;"
-};
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -87,6 +80,46 @@ const itemFiles = [
 const metadataFile = "../src/metadata.json";
 const partialDir = "../src/partial/";
 
+const entityMap = {
+  '"': "&quot;",
+  "&": "&amp;",
+  "'": "&#39;",
+  "<": "&lt;",
+  ">": "&gt;"
+};
+const escapeRe = new RegExp(`[${Object.keys(entityMap)
+  .join("")}]`, "g");
+const escapeChar = (char) => entityMap[char];
+const escapeString = (string) => String(string)
+  .replace(escapeRe, escapeChar);
+const readMetadata = () => new Promise((resolve, reject) => {
+  fs.readJSON(metadataFile, "utf8", (e, o) => {
+    if (e) {
+      return reject(e);
+    }
+
+    resolve(o);
+  });
+});
+const readItem = (itemFile) => new Promise((resolve, reject) => {
+  fs.readJSON(itemFile, "utf8", (e, o) => {
+    if (e) {
+      return reject(e);
+    }
+
+    resolve(o);
+  });
+});
+const flatten = (previous, current) => previous.concat(current);
+const sortByDate = (a, b) => parseInt(a.unixtime, 10) -
+  parseInt(b.unixtime, 10);
+const findCover = (image, defaultCover) => {
+  if (!image) {
+    return defaultCover;
+  }
+
+  return image[1];
+};
 const argv = minimist(process.argv.slice(2), {
   boolean: [
     "articles",
@@ -96,59 +129,7 @@ const argv = minimist(process.argv.slice(2), {
   ],
   string: ["file"]
 });
-const escapeRe = new RegExp(`[${Object.keys(entityMap)
-  .join("")}]`, "g");
-
-function escapeChar(char) {
-  return entityMap[char];
-}
-
-function escapeString(string) {
-  return String(string)
-    .replace(escapeRe, escapeChar);
-}
-
-function readMetadata() {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(metadataFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
-}
-
-function readItem(itemFile) {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(itemFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
-}
-
-function flatten(previous, current) {
-  return previous.concat(current);
-}
-
-function sortByDate(a, b) {
-  return parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-}
-
-function findCover(image, defaultCover) {
-  if (!image) {
-    return defaultCover;
-  }
-
-  return image[1];
-}
-
-function extendItem(item, index, original) {
+const extendItem = (item, index, original) => {
   const cover = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
     item.cover
@@ -200,58 +181,39 @@ function extendItem(item, index, original) {
   }
 
   return item;
-}
+};
+const gatherItems = (items) => items.reduce(flatten)
+  .sort(sortByDate)
+  .reverse()
+  .map(extendItem);
+const readItems = () => Promise.all(itemFiles.map(readItem))
+  .then(gatherItems);
+const readPartial = (file) => new Promise((resolve, reject) => {
+  fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
+    if (e) {
+      return reject(e);
+    }
 
-function gatherItems(items) {
-  return items.reduce(flatten)
-    .sort(sortByDate)
-    .reverse()
-    .map(extendItem);
-}
+    const partial = {};
 
-function readItems() {
-  return Promise.all(itemFiles.map(readItem))
-    .then(gatherItems);
-}
-
-function readPartial(file) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      const partial = {};
-
-      partial[path.basename(file, ".mustache")] = d;
-      resolve(partial);
-    });
+    partial[path.basename(file, ".mustache")] = d;
+    resolve(partial);
   });
-}
+});
+const gatherPartials = (partials) => Object.assign(...partials);
+const readPartials = (partials) => Promise.all(partials.map(readPartial))
+  .then(gatherPartials);
+const readPartialDir = () => new Promise((resolve, reject) => {
+  fs.readdir(partialDir, (e, f) => {
+    if (e) {
+      return reject(e);
+    }
 
-function gatherPartials(partials) {
-  return Object.assign(...partials);
-}
-
-function readPartials(partials) {
-  return Promise.all(partials.map(readPartial))
-    .then(gatherPartials);
-}
-
-function readPartialDir() {
-  return new Promise((resolve, reject) => {
-    fs.readdir(partialDir, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(f);
-    });
-  })
-    .then(readPartials);
-}
-
-function readTemplate(file) {
+    resolve(f);
+  });
+})
+  .then(readPartials);
+const readTemplate = (file) => {
   if (file.template) {
     return file;
   }
@@ -266,9 +228,8 @@ function readTemplate(file) {
       resolve(file);
     });
   });
-}
-
-function readExtradata(file) {
+};
+const readExtradata = (file) => {
   if (file.extradata) {
     return file;
   }
@@ -283,13 +244,9 @@ function readExtradata(file) {
       resolve(file);
     });
   });
-}
-
-function pickByLink(dest, item) {
-  return dest.endsWith(item.link);
-}
-
-function filterUpdates(includeUpdates, item) {
+};
+const pickByLink = (dest, item) => dest.endsWith(item.link);
+const filterUpdates = (includeUpdates, item) => {
   if (item.link.startsWith("/blog/")) {
     return true;
   }
@@ -299,14 +256,11 @@ function filterUpdates(includeUpdates, item) {
   }
 
   return false;
-}
-
-function now(date) {
-  return formatDate.rfc822(date.getDay(), date.getDate(), date.getMonth(),
-    date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds());
-}
-
-function mergeData(file) {
+};
+const now = (date) => formatDate.rfc822(date.getDay(), date.getDate(),
+  date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes(),
+  date.getSeconds());
+const mergeData = (file) => {
   if (argv.articles || argv.file) {
     file.extradata = Object.assign({}, file.extradata,
       file.items.find(pickByLink.bind(null, file.dest)));
@@ -322,9 +276,8 @@ function mergeData(file) {
   file.data = Object.assign({}, file.metadata, file.extradata);
 
   return file;
-}
-
-function renderFile(file) {
+};
+const renderFile = (file) => {
   file.contents = mustache.render(file.template, file.data, file.partials);
 
   if (file.dest.endsWith(".html")) {
@@ -332,35 +285,28 @@ function renderFile(file) {
   }
 
   return file;
-}
+};
+const writeFile = (file) => new Promise((resolve, reject) => {
+  fs.outputFile(file.dest, file.contents, (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function writeFile(file) {
-  return new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(file);
-    });
+    resolve(file);
   });
-}
-
-function build(metadata, items, partials, file) {
-  return waterfall([
-    readTemplate,
-    readExtradata,
-    mergeData,
-    renderFile,
-    writeFile
-  ], Object.assign({
-    items: items,
-    metadata: metadata,
-    partials: partials
-  }, file));
-}
-
-function refineByType(file) {
+});
+const build = (metadata, items, partials, file) => waterfall([
+  readTemplate,
+  readExtradata,
+  mergeData,
+  renderFile,
+  writeFile
+], Object.assign({
+  items: items,
+  metadata: metadata,
+  partials: partials
+}, file));
+const refineByType = (file) => {
   if (!argv.feed && !argv.html && !argv.sitemap) {
     return true;
   }
@@ -378,34 +324,23 @@ function refineByType(file) {
   }
 
   return false;
-}
-
-function mergeArticle(file, item) {
-  return Object.assign({
-    extradata: file.extradata,
-    dest: toPOSIXPath(path.join(destDir, item.link)),
-    template: file.template
-  }, article);
-}
-
-function generateArticleList(items, file) {
-  return items.filter(filterUpdates.bind(null, false))
+};
+const mergeArticle = (file, item) => Object.assign({
+  extradata: file.extradata,
+  dest: toPOSIXPath(path.join(destDir, item.link)),
+  template: file.template
+}, article);
+const generateArticleList = (items, file) =>
+  items.filter(filterUpdates.bind(null, false))
     .map(mergeArticle.bind(null, file));
-}
-
-function toArticleList(items) {
-  return waterfall([
-    readTemplate,
-    readExtradata,
-    generateArticleList.bind(null, items)
-  ], article);
-}
-
-function buildArticles(metadata, items, partials, articles) {
-  return Promise.all(articles.map(build.bind(null, metadata, items, partials)));
-}
-
-function buildAll([metadata, items, partials]) {
+const toArticleList = (items) => waterfall([
+  readTemplate,
+  readExtradata,
+  generateArticleList.bind(null, items)
+], article);
+const buildArticles = (metadata, items, partials, articles) =>
+  Promise.all(articles.map(build.bind(null, metadata, items, partials)));
+const buildAll = ([metadata, items, partials]) => {
   if (argv.file) {
     return build(metadata, items, partials, Object.assign({
       dest: argv.file
@@ -419,7 +354,7 @@ function buildAll([metadata, items, partials]) {
 
   return Promise.all(files.filter(refineByType)
     .map(build.bind(null, metadata, items, partials)));
-}
+};
 
 process.chdir(__dirname);
 mustache.escape = escapeString;

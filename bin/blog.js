@@ -1,4 +1,4 @@
-const execFile = require("child_process").execFile;
+const {execFile} = require("child_process");
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minifyHTML = require("../lib/html-minifier");
@@ -25,20 +25,7 @@ const rootDir = "../";
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
-const argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "preview",
-    "publish",
-    "update"
-  ]
-});
-const git = which("git");
-const htmlhint = which("htmlhint");
-const npm = which("npm");
-const open = which("open");
-const perl = which("perl");
-
-function readEntry(file) {
+const readEntry = (file) => {
   if (file.contents) {
     return file;
   }
@@ -53,58 +40,46 @@ function readEntry(file) {
       resolve(file);
     });
   });
-}
+};
+const git = which("git");
+const addEntry = (file) => new Promise((resolve, reject) => {
+  execFile(git, [
+    "add",
+    "--",
+    file.src
+  ], (e, o) => {
+    if (e) {
+      return reject(e);
+    }
 
-function addEntry(file) {
-  return new Promise((resolve, reject) => {
-    execFile(git, [
-      "add",
-      "--",
-      file.src
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
+    process.stdout.write(o);
+    resolve(file);
   });
-}
+});
+const commitEntry = (file) => new Promise((resolve, reject) => {
+  execFile(git, [
+    "commit",
+    `--message=Add ${toPOSIXPath(path.relative(rootDir, file.src))}`
+  ], (e, o) => {
+    if (e) {
+      return reject(e);
+    }
 
-function commitEntry(file) {
-  return new Promise((resolve, reject) => {
-    execFile(git, [
-      "commit",
-      `--message=Add ${toPOSIXPath(path.relative(rootDir, file.src))}`
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
+    process.stdout.write(o);
+    resolve(file);
   });
-}
+});
+const readCache = () => new Promise((resolve, reject) => {
+  fs.readJSON(cacheFile, "utf8", (e, o) => {
+    if (e) {
+      return reject(e);
+    }
 
-function readCache() {
-  return new Promise((resolve, reject) => {
-    fs.readJSON(cacheFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
+    resolve(o);
   });
-}
-
-function isDuplicate(link, value) {
-  return value.link === link;
-}
-
-function addArticle(article, articles) {
+});
+const isDuplicate = (link, value) => value.link === link;
+const addArticle = (article, articles) => {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
 
   if (oldArticle === -1) {
@@ -115,23 +90,19 @@ function addArticle(article, articles) {
   articles[oldArticle] = article;
 
   return articles;
-}
+};
+const saveCache = (articles) => new Promise((resolve, reject) => {
+  fs.outputJSON(cacheFile, articles, {
+    spaces: 2
+  }, (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function saveCache(articles) {
-  return new Promise((resolve, reject) => {
-    fs.outputJSON(cacheFile, articles, {
-      spaces: 2
-    }, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
+    resolve();
   });
-}
-
-function updateCache(file) {
+});
+const updateCache = (file) => {
   const [title, ...body] = file.contents.split("\n");
 
   return waterfall([
@@ -145,25 +116,19 @@ function updateCache(file) {
     }),
     saveCache
   ])
-    .then(() => {
-      return file;
-    });
-}
+    .then(() => file);
+};
+const listArticleImages = (file) => new Promise((resolve, reject) => {
+  fs.readFile(file.src, "utf8", (e, d) => {
+    if (e) {
+      return reject(e);
+    }
 
-function listArticleImages(file) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.images = d.match(/\bsrc="\/img\/blog\/.*?"/g);
-      resolve(file);
-    });
+    file.images = d.match(/\bsrc="\/img\/blog\/.*?"/g);
+    resolve(file);
   });
-}
-
-function copyArticleImage(image) {
+});
+const copyArticleImage = (image) => {
   image = path.basename(image.split(/"/)[1]);
 
   return new Promise((resolve, reject) => {
@@ -175,20 +140,24 @@ function copyArticleImage(image) {
       resolve();
     });
   });
-}
-
-function copyArticleImages(file) {
+};
+const copyArticleImages = (file) => {
   if (!file.images) {
     return file;
   }
 
   return Promise.all(file.images.map(copyArticleImage))
-    .then(() => {
-      return file;
-    });
-}
-
-function runBuildFile(file) {
+    .then(() => file);
+};
+const argv = minimist(process.argv.slice(2), {
+  boolean: [
+    "preview",
+    "publish",
+    "update"
+  ]
+});
+const npm = which("npm");
+const runBuildFile = (file) => {
   if (argv.publish) {
     return file;
   }
@@ -208,9 +177,9 @@ function runBuildFile(file) {
       resolve(file);
     });
   });
-}
-
-function buildArticle(file) {
+};
+const perl = which("perl");
+const buildArticle = (file) => {
   if (argv.update) {
     return file;
   }
@@ -238,9 +207,8 @@ function buildArticle(file) {
       resolve(file);
     });
   });
-}
-
-function saveFile(file) {
+};
+const saveFile = (file) => {
   if (argv.update) {
     return file;
   }
@@ -254,42 +222,36 @@ function saveFile(file) {
       resolve(file);
     });
   });
-}
+};
+const htmlhint = which("htmlhint");
+const testArticle = (file) => new Promise((resolve, reject) => {
+  execFile(htmlhint, [
+    "--format",
+    "compact",
+    file.dest
+  ], (e, o) => {
+    if (e) {
+      return reject(e);
+    }
 
-function testArticle(file) {
-  return new Promise((resolve, reject) => {
-    execFile(htmlhint, [
-      "--format",
-      "compact",
-      file.dest
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve(file);
-    });
+    process.stdout.write(o);
+    resolve(file);
   });
-}
+});
+const runBuild = () => new Promise((resolve, reject) => {
+  execFile(npm, [
+    "run",
+    "build"
+  ], (e, o) => {
+    if (e) {
+      return reject(e);
+    }
 
-function runBuild() {
-  return new Promise((resolve, reject) => {
-    execFile(npm, [
-      "run",
-      "build"
-    ], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      process.stdout.write(o);
-      resolve();
-    });
+    process.stdout.write(o);
+    resolve();
   });
-}
-
-function updateEntry(file) {
+});
+const updateEntry = (file) => {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
     destDir,
@@ -317,29 +279,24 @@ function updateEntry(file) {
     testArticle,
     runBuild
   ], file);
-}
-
-function isDraft(file) {
+};
+const isDraft = (file) => {
   if (draftExts.indexOf(path.extname(file)) !== -1) {
     return true;
   }
 
   return false;
-}
+};
+const listDrafts = () => new Promise((resolve, reject) => {
+  fs.readdir(draftDir, (e, f) => {
+    if (e) {
+      return reject(e);
+    }
 
-function listDrafts() {
-  return new Promise((resolve, reject) => {
-    fs.readdir(draftDir, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(f.filter(isDraft));
-    });
+    resolve(f.filter(isDraft));
   });
-}
-
-function getDraft(file) {
+});
+const getDraft = (file) => {
   file = path.join(draftDir, file);
 
   return new Promise((resolve, reject) => {
@@ -355,54 +312,47 @@ function getDraft(file) {
       });
     });
   });
-}
+};
+const getDrafts = (files) => Promise.all(files.map(getDraft));
+const selectDraft = (files) => new Promise((resolve, reject) => {
+  if (!argv.publish && files.length === 1) {
+    return resolve(files[0]);
+  }
 
-function getDrafts(files) {
-  return Promise.all(files.map(getDraft));
-}
+  const menu = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-function selectDraft(files) {
-  return new Promise((resolve, reject) => {
-    if (!argv.publish && files.length === 1) {
-      return resolve(files[0]);
+  menu.write("\n");
+  menu.write("0. QUIT\n");
+  files.forEach((n, i) => {
+    menu.write(`${i + 1}. ${n.contents.trim()
+      .split(/\n+/)[0]
+      .replace(/^# /, "")
+      .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
+`);
+  });
+  menu.question("Which one: (0) ", (a) => {
+    if (!a) {
+      a = 0;
     }
 
-    const menu = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+    a = parseInt(a, 10);
 
-    menu.write("\n");
-    menu.write("0. QUIT\n");
-    files.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.contents.trim()
-        .split(/\n+/)[0]
-        .replace(/^# /, "")
-        .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
-`);
-    });
-    menu.question("Which one: (0) ", (a) => {
-      if (!a) {
-        a = 0;
-      }
+    if (!Number.isInteger(a) || a > files.length) {
+      return reject(new Error(`You must enter a number between 0 and ${files.length}`));
+    }
 
-      a = parseInt(a, 10);
+    if (a === 0) {
+      throw new Error("Aborted.");
+    }
 
-      if (!Number.isInteger(a) || a > files.length) {
-        return reject(new Error(`You must enter a number between 0 and ${files.length}`));
-      }
-
-      if (a === 0) {
-        throw new Error("Aborted.");
-      }
-
-      menu.close();
-      resolve(files[a - 1]);
-    });
+    menu.close();
+    resolve(files[a - 1]);
   });
-}
-
-function checkSelected(file) {
+});
+const checkSelected = (file) => {
   if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
     throw new Error("This draft does not have a valid name for file.");
   }
@@ -415,77 +365,60 @@ function checkSelected(file) {
   }
 
   return file;
-}
-
-function markupSelected(file) {
+};
+const markupSelected = (file) => {
   file.contents = markdown(file.contents);
 
   return file;
-}
+};
+const deleteDraft = (file) => new Promise((resolve, reject) => {
+  fs.unlink(file.src, (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function deleteDraft(file) {
-  return new Promise((resolve, reject) => {
-    fs.unlink(file.src, (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(file);
-    });
+    resolve(file);
   });
-}
+});
+const publishSelected = (file) => waterfall([
+  saveFile,
+  deleteDraft,
+  updateEntry
+], file);
+const readTemplate = (file) => new Promise((resolve, reject) => {
+  fs.readFile(file.template, "utf8", (e, d) => {
+    if (e) {
+      return reject(e);
+    }
 
-function publishSelected(file) {
-  return waterfall([
-    saveFile,
-    deleteDraft,
-    updateEntry
-  ], file);
-}
-
-function readTemplate(file) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file.template, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.template = d;
-      resolve(file);
-    });
+    file.template = d;
+    resolve(file);
   });
-}
-
-function buildPreview(file) {
+});
+const buildPreview = (file) => {
   file.contents = mustache.render(file.template, file)
     .replace(/="\/img\//g, "=\"../src/img/")
     .replace(/="\//g, "=\"../dist/");
 
   return file;
-}
+};
+const open = which("open");
+const openPreview = (file) => new Promise((resolve, reject) => {
+  execFile(open, [file.dest], (e) => {
+    if (e) {
+      return reject(e);
+    }
 
-function openPreview(file) {
-  return new Promise((resolve, reject) => {
-    execFile(open, [file.dest], (e) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
+    resolve();
   });
-}
-
-function previewSelected(file) {
-  return waterfall([
-    readTemplate,
-    buildPreview,
-    saveFile,
-    openPreview
-  ], file);
-}
-
-function processSelected(file) {
+});
+const previewSelected = (file) => waterfall([
+  readTemplate,
+  buildPreview,
+  saveFile,
+  openPreview
+], file);
+const processSelected = (file) => {
   if (argv.publish) {
     file.dest = path.join(srcDir, `${file.name}.txt`);
 
@@ -493,7 +426,7 @@ function processSelected(file) {
   }
 
   return previewSelected(Object.assign(file, preview));
-}
+};
 
 process.chdir(__dirname);
 Promise.resolve()
