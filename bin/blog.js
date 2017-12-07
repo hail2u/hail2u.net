@@ -108,10 +108,8 @@ function addArticle(article, articles) {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
 
   if (oldArticle !== -1) {
-    articles.splice(oldArticle, 1);
+    articles[oldArticle] = article;
   }
-
-  articles.unshift(article);
 
   return articles;
 }
