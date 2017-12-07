@@ -17,7 +17,7 @@ const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.join(os.homedir(), "Documents", "Drafts");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
-const previewFile = {
+const preview = {
   dest: "../tmp/__preview.html",
   template: "../src/preview.mustache"
 };
@@ -495,7 +495,7 @@ function processSelected(file) {
     return publishSelected(file);
   }
 
-  return previewSelected(Object.assign(file, previewFile));
+  return previewSelected(Object.assign(file, preview));
 }
 
 process.chdir(__dirname);
