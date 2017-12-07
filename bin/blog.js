@@ -107,10 +107,12 @@ function isDuplicate(link, value) {
 function addArticle(article, articles) {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
 
-  if (oldArticle !== -1) {
-    article.unixtime = articles[oldArticle].unixtime;
-    articles[oldArticle] = article;
+  if (oldArticle === -1) {
+    return [article].concat(articles);
   }
+
+  article.unixtime = articles[oldArticle].unixtime;
+  articles[oldArticle] = article;
 
   return articles;
 }
