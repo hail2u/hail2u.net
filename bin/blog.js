@@ -108,6 +108,7 @@ function addArticle(article, articles) {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
 
   if (oldArticle !== -1) {
+    article.unixtime = articles[oldArticle].unixtime;
     articles[oldArticle] = article;
   }
 
