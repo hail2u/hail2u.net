@@ -250,9 +250,9 @@ function readPartialDir() {
     .then(readPartials);
 }
 
-function readTemplate([metadata, items, partials, file]) {
+function readTemplate(file) {
   if (file.template) {
-    return [metadata, items, partials, file];
+    return file;
   }
 
   return new Promise((resolve, reject) => {
@@ -262,14 +262,14 @@ function readTemplate([metadata, items, partials, file]) {
       }
 
       file.template = d;
-      resolve([metadata, items, partials, file]);
+      resolve(file);
     });
   });
 }
 
-function readExtradata([metadata, items, partials, file]) {
+function readExtradata(file) {
   if (file.extradata) {
-    return [metadata, items, partials, file];
+    return file;
   }
 
   return new Promise((resolve, reject) => {
@@ -279,7 +279,7 @@ function readExtradata([metadata, items, partials, file]) {
       }
 
       file.extradata = o;
-      resolve([metadata, items, partials, file]);
+      resolve(file);
     });
   });
 }
@@ -305,26 +305,26 @@ function now(date) {
     date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds());
 }
 
-function mergeData([metadata, items, partials, file]) {
+function mergeData(file) {
   if (argv.articles || argv.file) {
     file.extradata = Object.assign({}, file.extradata,
-      items.find(pickByLink.bind(null, file.dest)));
+      file.items.find(pickByLink.bind(null, file.dest)));
     file.extradata.canonical = file.extradata.link;
     file.extradata.short_title = file.extradata.title;
   } else {
-    file.extradata.items = items.concat()
+    file.extradata.items = file.items.concat()
       .filter(filterUpdates.bind(null, file.includeUpdates))
       .slice(0, file.itemLength);
   }
 
   file.extradata.lastBuildDate = now(new Date());
-  file.data = Object.assign({}, metadata, file.extradata);
+  file.data = Object.assign({}, file.metadata, file.extradata);
 
-  return [partials, file];
+  return file;
 }
 
-function renderFile([partials, file]) {
-  file.contents = mustache.render(file.template, file.data, partials);
+function renderFile(file) {
+  file.contents = mustache.render(file.template, file.data, file.partials);
 
   if (file.dest.endsWith(".html")) {
     file.contents = minifyHTML(file.contents);
@@ -352,7 +352,11 @@ function build(metadata, items, partials, file) {
     mergeData,
     renderFile,
     writeFile
-  ], [metadata, items, partials, file]);
+  ], Object.assign({
+    items: items,
+    metadata: metadata,
+    partials: partials
+  }, file));
 }
 
 function refineByType(file) {
@@ -383,9 +387,9 @@ function mergeArticle(file, item) {
   }, article);
 }
 
-function generateArticleList(items, result) {
+function generateArticleList(items, file) {
   return items.filter(filterUpdates.bind(null, false))
-    .map(mergeArticle.bind(null, result.pop()));
+    .map(mergeArticle.bind(null, file));
 }
 
 function toArticleList(items) {
@@ -393,7 +397,7 @@ function toArticleList(items) {
     readTemplate,
     readExtradata,
     generateArticleList.bind(null, items)
-  ], [null, null, null, article]);
+  ], article);
 }
 
 function buildArticles(metadata, items, partials, articles) {
