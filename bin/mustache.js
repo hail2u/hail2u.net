@@ -251,6 +251,10 @@ function readPartialDir() {
 }
 
 function readTemplate([metadata, items, partials, file]) {
+  if (file.template) {
+    return [metadata, items, partials, file];
+  }
+
   return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
@@ -264,13 +268,18 @@ function readTemplate([metadata, items, partials, file]) {
 }
 
 function readExtradata([metadata, items, partials, file]) {
+  if (file.extradata) {
+    return [metadata, items, partials, file];
+  }
+
   return new Promise((resolve, reject) => {
     fs.readJSON(file.json, "utf8", (e, o) => {
       if (e) {
         return reject(e);
       }
 
-      resolve([metadata, items, partials, file, o]);
+      file.extradata = o;
+      resolve([metadata, items, partials, file]);
     });
   });
 }
@@ -296,19 +305,20 @@ function now(date) {
     date.getFullYear(), date.getHours(), date.getMinutes(), date.getSeconds());
 }
 
-function mergeData([metadata, items, partials, file, extradata]) {
+function mergeData([metadata, items, partials, file]) {
   if (argv.articles || argv.file) {
-    Object.assign(extradata, items.find(pickByLink.bind(null, file.dest)));
-    extradata.canonical = extradata.link;
-    extradata.short_title = extradata.title;
+    file.extradata = Object.assign({}, file.extradata,
+      items.find(pickByLink.bind(null, file.dest)));
+    file.extradata.canonical = file.extradata.link;
+    file.extradata.short_title = file.extradata.title;
   } else {
-    extradata.items = items.concat()
+    file.extradata.items = items.concat()
       .filter(filterUpdates.bind(null, file.includeUpdates))
       .slice(0, file.itemLength);
   }
 
-  extradata.lastBuildDate = now(new Date());
-  file.data = Object.assign({}, metadata, extradata);
+  file.extradata.lastBuildDate = now(new Date());
+  file.data = Object.assign({}, metadata, file.extradata);
 
   return [partials, file];
 }
@@ -365,10 +375,29 @@ function refineByType(file) {
   return false;
 }
 
-function toArticleList(item) {
+function mergeArticle(file, item) {
   return Object.assign({
-    dest: toPOSIXPath(path.join(destDir, item.link))
+    extradata: file.extradata,
+    dest: toPOSIXPath(path.join(destDir, item.link)),
+    template: file.template
   }, article);
+}
+
+function generateArticleList(items, result) {
+  return items.filter(filterUpdates.bind(null, false))
+    .map(mergeArticle.bind(null, result.pop()));
+}
+
+function toArticleList(items) {
+  return waterfall([
+    readTemplate,
+    readExtradata,
+    generateArticleList.bind(null, items)
+  ], [null, null, null, article]);
+}
+
+function buildArticles(metadata, items, partials, articles) {
+  return Promise.all(articles.map(build.bind(null, metadata, items, partials)));
 }
 
 function buildAll([metadata, items, partials]) {
@@ -379,9 +408,8 @@ function buildAll([metadata, items, partials]) {
   }
 
   if (argv.articles) {
-    return Promise.all(items.filter(filterUpdates.bind(null, false))
-      .map(toArticleList)
-      .map(build.bind(null, metadata, items, partials)));
+    return toArticleList(items)
+      .then(buildArticles.bind(null, metadata, items, partials));
   }
 
   return Promise.all(files.filter(refineByType)
