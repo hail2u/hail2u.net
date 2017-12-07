@@ -255,7 +255,11 @@ function saveFile(file) {
 
 function testArticle(file) {
   return new Promise((resolve, reject) => {
-    execFile(htmlhint, [file.dest], (e, o) => {
+    execFile(htmlhint, [
+      "--format",
+      "compact",
+      file.dest
+    ], (e, o) => {
       if (e) {
         return reject(e);
       }
