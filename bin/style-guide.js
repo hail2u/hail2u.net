@@ -4,16 +4,17 @@ const waterfall = require("../lib/waterfall");
 const destFile = "../dist/style-guide/index.html";
 const srcFile = "../src/css/test.html";
 
-const readStyleGuide = () => new Promise((resolve, reject) => {
-  fs.readFile(srcFile, "utf8", (e, d) => {
-    if (e) {
-      return reject(e);
-    }
+const readStyleGuide = () =>
+  new Promise((resolve, reject) => {
+    fs.readFile(srcFile, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve(d);
+      resolve(d);
+    });
   });
-});
-const modifyStyleGuide = (contents) => {
+const modifyStyleGuide = contents => {
   const dir = "../";
   const url = "https://hail2u.net/";
 
@@ -27,22 +28,18 @@ const modifyStyleGuide = (contents) => {
     return `${a}${e}${o}${u}${c}`;
   });
 };
-const writeStyleGuide = (contents) => new Promise((resolve, reject) => {
-  fs.outputFile(destFile, contents, (e) => {
-    if (e) {
-      return reject(e);
-    }
+const writeStyleGuide = contents =>
+  new Promise((resolve, reject) => {
+    fs.outputFile(destFile, contents, e => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve();
+      resolve();
+    });
   });
-});
 
 process.chdir(__dirname);
-waterfall([
-  readStyleGuide,
-  modifyStyleGuide,
-  writeStyleGuide
-])
-  .catch((e) => {
-    console.trace(e);
-  });
+waterfall([readStyleGuide, modifyStyleGuide, writeStyleGuide]).catch(e => {
+  console.trace(e);
+});

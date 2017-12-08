@@ -17,48 +17,47 @@ const files = [
   }
 ];
 
-const readCSS = (file) => new Promise((resolve, reject) => {
-  fs.readFile(file.src, "utf8", (e, d) => {
-    if (e) {
-      return reject(e);
-    }
+const readCSS = file =>
+  new Promise((resolve, reject) => {
+    fs.readFile(file.src, "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
 
-    file.contents = d;
-    resolve(file);
+      file.contents = d;
+      resolve(file);
+    });
   });
-});
 const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
   wrapWithSupports()
 ]);
-const optimizeCSS = (file) => processor.process(file.contents, {
-  from: file.src,
-  to: file.dest
-})
-  .then((r) => {
-    file.contents = r.css;
+const optimizeCSS = file =>
+  processor
+    .process(file.contents, {
+      from: file.src,
+      to: file.dest
+    })
+    .then(r => {
+      file.contents = r.css;
 
-    return file;
-  });
-const writeCSS = (file) => new Promise((resolve, reject) => {
-  fs.outputFile(file.dest, file.contents, (e) => {
-    if (e) {
-      return reject(e);
-    }
+      return file;
+    });
+const writeCSS = file =>
+  new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.contents, e => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve();
+      resolve();
+    });
   });
-});
-const buildCSS = (file) => waterfall([
-  readCSS,
-  optimizeCSS,
-  writeCSS
-], file);
+const buildCSS = file => waterfall([readCSS, optimizeCSS, writeCSS], file);
 
 process.chdir(__dirname);
-Promise.all(files.map(buildCSS))
-  .catch((e) => {
-    console.trace(e);
-  });
+Promise.all(files.map(buildCSS)).catch(e => {
+  console.trace(e);
+});

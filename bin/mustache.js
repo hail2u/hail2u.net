@@ -73,10 +73,7 @@ const files = [
     type: "sitemap"
   }
 ];
-const itemFiles = [
-  "../src/blog/articles.json",
-  "../src/updates.json"
-];
+const itemFiles = ["../src/blog/articles.json", "../src/updates.json"];
 const metadataFile = "../src/metadata.json";
 const partialDir = "../src/partial/";
 
@@ -87,32 +84,32 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const escapeRe = new RegExp(`[${Object.keys(entityMap)
-  .join("")}]`, "g");
-const escapeChar = (char) => entityMap[char];
-const escapeString = (string) => String(string)
-  .replace(escapeRe, escapeChar);
-const readMetadata = () => new Promise((resolve, reject) => {
-  fs.readJSON(metadataFile, "utf8", (e, o) => {
-    if (e) {
-      return reject(e);
-    }
+const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
+const escapeChar = char => entityMap[char];
+const escapeString = string => String(string).replace(escapeRe, escapeChar);
+const readMetadata = () =>
+  new Promise((resolve, reject) => {
+    fs.readJSON(metadataFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve(o);
+      resolve(o);
+    });
   });
-});
-const readItem = (itemFile) => new Promise((resolve, reject) => {
-  fs.readJSON(itemFile, "utf8", (e, o) => {
-    if (e) {
-      return reject(e);
-    }
+const readItem = itemFile =>
+  new Promise((resolve, reject) => {
+    fs.readJSON(itemFile, "utf8", (e, o) => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve(o);
+      resolve(o);
+    });
   });
-});
 const flatten = (previous, current) => previous.concat(current);
-const sortByDate = (a, b) => parseInt(a.unixtime, 10) -
-  parseInt(b.unixtime, 10);
+const sortByDate = (a, b) =>
+  parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 const findCover = (image, defaultCover) => {
   if (!image) {
     return defaultCover;
@@ -121,12 +118,7 @@ const findCover = (image, defaultCover) => {
   return image[1];
 };
 const argv = minimist(process.argv.slice(2), {
-  boolean: [
-    "articles",
-    "feed",
-    "html",
-    "sitemap"
-  ],
+  boolean: ["articles", "feed", "html", "sitemap"],
   string: ["file"]
 });
 const extendItem = (item, index, original) => {
@@ -136,11 +128,15 @@ const extendItem = (item, index, original) => {
   );
 
   if (!argv.articles && !argv.file && item.body) {
-    item.body = item.body.replace(/(href|src)="(\/.*?)"/g, "$1=\"https://hail2u.net$2\"");
+    item.body = item.body.replace(
+      /(href|src)="(\/.*?)"/g,
+      '$1="https://hail2u.net$2"'
+    );
   }
 
   if (!item.description) {
-    item.description = item.body.replace(/\r?\n/g, "")
+    item.description = item.body
+      .replace(/\r?\n/g, "")
       .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
       .replace(/<.*?>/g, "");
   }
@@ -157,11 +153,27 @@ const extendItem = (item, index, original) => {
     item.year = dt.getFullYear();
   }
 
-  item.html5PubDate = formatDate.html5(item.day, item.date, item.month,
-    item.year, item.hour, item.minute, item.second);
-  item.rfc822PubDate = formatDate.rfc822(item.day, item.date, item.month,
-    item.year, item.hour, item.minute, item.second);
-  item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(item.date)}`;
+  item.html5PubDate = formatDate.html5(
+    item.day,
+    item.date,
+    item.month,
+    item.year,
+    item.hour,
+    item.minute,
+    item.second
+  );
+  item.rfc822PubDate = formatDate.rfc822(
+    item.day,
+    item.date,
+    item.month,
+    item.year,
+    item.hour,
+    item.minute,
+    item.second
+  );
+  item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(
+    item.date
+  )}`;
 
   if (cover !== item.cover) {
     item.card_type = "summary_large_image";
@@ -182,38 +194,40 @@ const extendItem = (item, index, original) => {
 
   return item;
 };
-const gatherItems = (items) => items.reduce(flatten)
-  .sort(sortByDate)
-  .reverse()
-  .map(extendItem);
-const readItems = () => Promise.all(itemFiles.map(readItem))
-  .then(gatherItems);
-const readPartial = (file) => new Promise((resolve, reject) => {
-  fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
-    if (e) {
-      return reject(e);
-    }
+const gatherItems = items =>
+  items
+    .reduce(flatten)
+    .sort(sortByDate)
+    .reverse()
+    .map(extendItem);
+const readItems = () => Promise.all(itemFiles.map(readItem)).then(gatherItems);
+const readPartial = file =>
+  new Promise((resolve, reject) => {
+    fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
+      if (e) {
+        return reject(e);
+      }
 
-    const partial = {};
+      const partial = {};
 
-    partial[path.basename(file, ".mustache")] = d;
-    resolve(partial);
+      partial[path.basename(file, ".mustache")] = d;
+      resolve(partial);
+    });
   });
-});
-const gatherPartials = (partials) => Object.assign(...partials);
-const readPartials = (partials) => Promise.all(partials.map(readPartial))
-  .then(gatherPartials);
-const readPartialDir = () => new Promise((resolve, reject) => {
-  fs.readdir(partialDir, (e, f) => {
-    if (e) {
-      return reject(e);
-    }
+const gatherPartials = partials => Object.assign(...partials);
+const readPartials = partials =>
+  Promise.all(partials.map(readPartial)).then(gatherPartials);
+const readPartialDir = () =>
+  new Promise((resolve, reject) => {
+    fs.readdir(partialDir, (e, f) => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve(f);
-  });
-})
-  .then(readPartials);
-const readTemplate = (file) => {
+      resolve(f);
+    });
+  }).then(readPartials);
+const readTemplate = file => {
   if (file.template) {
     return file;
   }
@@ -229,7 +243,7 @@ const readTemplate = (file) => {
     });
   });
 };
-const readExtradata = (file) => {
+const readExtradata = file => {
   if (file.extradata) {
     return file;
   }
@@ -257,17 +271,28 @@ const filterUpdates = (includeUpdates, item) => {
 
   return false;
 };
-const now = (date) => formatDate.rfc822(date.getDay(), date.getDate(),
-  date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes(),
-  date.getSeconds());
-const mergeData = (file) => {
+const now = date =>
+  formatDate.rfc822(
+    date.getDay(),
+    date.getDate(),
+    date.getMonth(),
+    date.getFullYear(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+const mergeData = file => {
   if (argv.articles || argv.file) {
-    file.extradata = Object.assign({}, file.extradata,
-      file.items.find(pickByLink.bind(null, file.dest)));
+    file.extradata = Object.assign(
+      {},
+      file.extradata,
+      file.items.find(pickByLink.bind(null, file.dest))
+    );
     file.extradata.canonical = file.extradata.link;
     file.extradata.short_title = file.extradata.title;
   } else {
-    file.extradata.items = file.items.concat()
+    file.extradata.items = file.items
+      .concat()
       .filter(filterUpdates.bind(null, file.includeUpdates))
       .slice(0, file.itemLength);
   }
@@ -277,7 +302,7 @@ const mergeData = (file) => {
 
   return file;
 };
-const renderFile = (file) => {
+const renderFile = file => {
   file.contents = mustache.render(file.template, file.data, file.partials);
 
   if (file.dest.endsWith(".html")) {
@@ -286,27 +311,29 @@ const renderFile = (file) => {
 
   return file;
 };
-const writeFile = (file) => new Promise((resolve, reject) => {
-  fs.outputFile(file.dest, file.contents, (e) => {
-    if (e) {
-      return reject(e);
-    }
+const writeFile = file =>
+  new Promise((resolve, reject) => {
+    fs.outputFile(file.dest, file.contents, e => {
+      if (e) {
+        return reject(e);
+      }
 
-    resolve(file);
+      resolve(file);
+    });
   });
-});
-const build = (metadata, items, partials, file) => waterfall([
-  readTemplate,
-  readExtradata,
-  mergeData,
-  renderFile,
-  writeFile
-], Object.assign({
-  items: items,
-  metadata: metadata,
-  partials: partials
-}, file));
-const refineByType = (file) => {
+const build = (metadata, items, partials, file) =>
+  waterfall(
+    [readTemplate, readExtradata, mergeData, renderFile, writeFile],
+    Object.assign(
+      {
+        items: items,
+        metadata: metadata,
+        partials: partials
+      },
+      file
+    )
+  );
+const refineByType = file => {
   if (!argv.feed && !argv.html && !argv.sitemap) {
     return true;
   }
@@ -325,45 +352,56 @@ const refineByType = (file) => {
 
   return false;
 };
-const mergeArticle = (file, item) => Object.assign({
-  extradata: file.extradata,
-  dest: toPOSIXPath(path.join(destDir, item.link)),
-  template: file.template
-}, article);
+const mergeArticle = (file, item) =>
+  Object.assign(
+    {
+      extradata: file.extradata,
+      dest: toPOSIXPath(path.join(destDir, item.link)),
+      template: file.template
+    },
+    article
+  );
 const generateArticleList = (items, file) =>
-  items.filter(filterUpdates.bind(null, false))
+  items
+    .filter(filterUpdates.bind(null, false))
     .map(mergeArticle.bind(null, file));
-const toArticleList = (items) => waterfall([
-  readTemplate,
-  readExtradata,
-  generateArticleList.bind(null, items)
-], article);
+const toArticleList = items =>
+  waterfall(
+    [readTemplate, readExtradata, generateArticleList.bind(null, items)],
+    article
+  );
 const buildArticles = (metadata, items, partials, articles) =>
   Promise.all(articles.map(build.bind(null, metadata, items, partials)));
 const buildAll = ([metadata, items, partials]) => {
   if (argv.file) {
-    return build(metadata, items, partials, Object.assign({
-      dest: argv.file
-    }, article));
+    return build(
+      metadata,
+      items,
+      partials,
+      Object.assign(
+        {
+          dest: argv.file
+        },
+        article
+      )
+    );
   }
 
   if (argv.articles) {
-    return toArticleList(items)
-      .then(buildArticles.bind(null, metadata, items, partials));
+    return toArticleList(items).then(
+      buildArticles.bind(null, metadata, items, partials)
+    );
   }
 
-  return Promise.all(files.filter(refineByType)
-    .map(build.bind(null, metadata, items, partials)));
+  return Promise.all(
+    files.filter(refineByType).map(build.bind(null, metadata, items, partials))
+  );
 };
 
 process.chdir(__dirname);
 mustache.escape = escapeString;
-Promise.all([
-  readMetadata(),
-  readItems(),
-  readPartialDir()
-])
+Promise.all([readMetadata(), readItems(), readPartialDir()])
   .then(buildAll)
-  .catch((e) => {
+  .catch(e => {
     console.trace(e);
   });
