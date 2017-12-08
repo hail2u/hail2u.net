@@ -14,14 +14,10 @@ const files = [
   {
     dest: "../tmp/debug.min.css",
     src: "../src/css/debug.css"
-  },
-  {
-    dest: "../dist/style-guide/index.html",
-    src: "../src/css/test.html"
   }
 ];
 
-const readFile = (file) => new Promise((resolve, reject) => {
+const readCSS = (file) => new Promise((resolve, reject) => {
   fs.readFile(file.src, "utf8", (e, d) => {
     if (e) {
       return reject(e);
@@ -31,44 +27,22 @@ const readFile = (file) => new Promise((resolve, reject) => {
     resolve(file);
   });
 });
-const modifyStyleGuide = (contents) => {
-  const dir = "../";
-  const url = "https://hail2u.net/";
-
-  return contents.replace(/\b(href|src)(=)(")(.*?)(")/g, (m, a, e, o, u, c) => {
-    if (u.startsWith(url)) {
-      u = u.substr(url.length - 1);
-    } else if (u.startsWith(dir)) {
-      u = u.substr(dir.length - 1);
-    }
-
-    return `${a}${e}${o}${u}${c}`;
-  });
-};
 const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
   wrapWithSupports()
 ]);
-const optimizeFile = (file) => {
-  if (!file.src.endsWith(".css")) {
-    file.contents = modifyStyleGuide(file.contents);
+const optimizeCSS = (file) => processor.process(file.contents, {
+  from: file.src,
+  to: file.dest
+})
+  .then((r) => {
+    file.contents = r.css;
 
     return file;
-  }
-
-  return processor.process(file.contents, {
-    from: file.src,
-    to: file.dest
-  })
-    .then((r) => {
-      file.contents = r.css;
-
-      return file;
-    });
-};
-const writeFile = (file) => new Promise((resolve, reject) => {
+  });
+const writeCSS = (file) => new Promise((resolve, reject) => {
   fs.outputFile(file.dest, file.contents, (e) => {
     if (e) {
       return reject(e);
@@ -77,14 +51,14 @@ const writeFile = (file) => new Promise((resolve, reject) => {
     resolve();
   });
 });
-const buildFile = (file) => waterfall([
-  readFile,
-  optimizeFile,
-  writeFile
+const buildCSS = (file) => waterfall([
+  readCSS,
+  optimizeCSS,
+  writeCSS
 ], file);
 
 process.chdir(__dirname);
-Promise.all(files.map(buildFile))
+Promise.all(files.map(buildCSS))
   .catch((e) => {
     console.trace(e);
   });
