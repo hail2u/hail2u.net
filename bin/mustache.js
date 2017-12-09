@@ -117,7 +117,7 @@ const findCover = (image, defaultCover) => {
   return image[1];
 };
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["articles", "feed", "html", "sitemap"],
+  boolean: ["articles", "html"],
   string: ["article"]
 });
 const extendItem = (item, index, original) => {
@@ -333,19 +333,11 @@ const build = (metadata, items, partials, file) =>
     )
   );
 const refineByType = file => {
-  if (!argv.feed && !argv.html && !argv.sitemap) {
-    return true;
-  }
-
-  if (argv.feed && file.type === "feed") {
+  if (!argv.html) {
     return true;
   }
 
   if (argv.html && file.type === "html") {
-    return true;
-  }
-
-  if (argv.sitemap && file.type === "sitemap") {
     return true;
   }
 
