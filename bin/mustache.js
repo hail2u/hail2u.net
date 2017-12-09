@@ -119,7 +119,7 @@ const findCover = (image, defaultCover) => {
 };
 const argv = minimist(process.argv.slice(2), {
   boolean: ["articles", "feed", "html", "sitemap"],
-  string: ["file"]
+  string: ["article"]
 });
 const extendItem = (item, index, original) => {
   const cover = findCover(
@@ -127,7 +127,7 @@ const extendItem = (item, index, original) => {
     item.cover
   );
 
-  if (!argv.articles && !argv.file && item.body) {
+  if (!argv.article && !argv.articles && item.body) {
     item.body = item.body.replace(
       /(href|src)="(\/.*?)"/g,
       '$1="https://hail2u.net$2"'
@@ -282,7 +282,7 @@ const now = date =>
     date.getSeconds()
   );
 const mergeData = file => {
-  if (argv.articles || argv.file) {
+  if (argv.article || argv.articles) {
     file.extradata = Object.assign(
       {},
       file.extradata,
@@ -373,14 +373,14 @@ const toArticleList = items =>
 const buildArticles = (metadata, items, partials, articles) =>
   Promise.all(articles.map(build.bind(null, metadata, items, partials)));
 const buildAll = ([metadata, items, partials]) => {
-  if (argv.file) {
+  if (argv.article) {
     return build(
       metadata,
       items,
       partials,
       Object.assign(
         {
-          dest: argv.file
+          dest: argv.article
         },
         article
       )
