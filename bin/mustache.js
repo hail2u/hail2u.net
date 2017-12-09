@@ -9,8 +9,7 @@ const waterfall = require("../lib/waterfall");
 
 const article = {
   json: "../src/blog/article.json",
-  src: "../src/blog/article.mustache",
-  type: "html"
+  src: "../src/blog/article.mustache"
 };
 const destDir = "../dist/";
 const files = [
