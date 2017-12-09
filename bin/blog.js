@@ -160,7 +160,7 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
 const npm = which("npm");
-const runBuildFile = file => {
+const runDocsFile = file => {
   if (argv.publish) {
     return file;
   }
@@ -168,7 +168,7 @@ const runBuildFile = file => {
   return new Promise((resolve, reject) => {
     execFile(
       npm,
-      ["run", "build", "--", `--file=${destDir}${file.name}.html`],
+      ["run", "docs", "--", `--file=${destDir}${file.name}.html`],
       (e, o) => {
         if (e) {
           return reject(e);
@@ -245,15 +245,15 @@ const testArticle = file =>
       resolve(file);
     });
   });
-const runBuild = () =>
+const runDocs = file =>
   new Promise((resolve, reject) => {
-    execFile(npm, ["run", "build"], (e, o) => {
+    execFile(npm, ["run", "docs"], (e, o) => {
       if (e) {
         return reject(e);
       }
 
       process.stdout.write(o);
-      resolve();
+      resolve(file);
     });
   });
 const updateEntry = file => {
@@ -281,11 +281,11 @@ const updateEntry = file => {
       updateCache,
       listArticleImages,
       copyArticleImages,
-      runBuildFile,
+      runDocsFile,
       buildArticle,
       saveFile,
       testArticle,
-      runBuild
+      runDocs
     ],
     file
   );
