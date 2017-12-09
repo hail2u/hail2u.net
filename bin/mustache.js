@@ -109,20 +109,21 @@ const readItem = itemFile =>
 const flatten = (previous, current) => previous.concat(current);
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-const findCover = (image, defaultCover) => {
+const findCover = (image, defaultCardType, defaultCover) => {
   if (!image) {
-    return defaultCover;
+    return [defaultCardType, defaultCover];
   }
 
-  return image[1];
+  return ["summary_large_image", image[1]];
 };
 const argv = minimist(process.argv.slice(2), {
   boolean: ["articles", "html"],
   string: ["article"]
 });
 const extendItem = (item, index, original) => {
-  const cover = findCover(
+  [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
+    item.card_type,
     item.cover
   );
 
@@ -173,11 +174,6 @@ const extendItem = (item, index, original) => {
   item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(
     item.date
   )}`;
-
-  if (cover !== item.cover) {
-    item.card_type = "summary_large_image";
-    item.cover = cover;
-  }
 
   if (index === 0) {
     item.isLatest = true;
