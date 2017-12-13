@@ -1,12 +1,9 @@
 const fs = require("fs-extra");
 const waterfall = require("../lib/waterfall");
 
-const destFile = "../dist/style-guide/index.html";
-const srcFile = "../src/css/test.html";
-
 const readStyleGuide = () =>
   new Promise((resolve, reject) => {
-    fs.readFile(srcFile, "utf8", (e, d) => {
+    fs.readFile("../src/css/test.html", "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
@@ -30,7 +27,7 @@ const modifyStyleGuide = contents => {
 };
 const writeStyleGuide = contents =>
   new Promise((resolve, reject) => {
-    fs.outputFile(destFile, contents, e => {
+    fs.outputFile("../dist/style-guide/index.html", contents, e => {
       if (e) {
         return reject(e);
       }
