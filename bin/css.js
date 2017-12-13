@@ -2,21 +2,41 @@ const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
+const path = require("path");
 const postcss = require("postcss");
 const waterfall = require("../lib/waterfall");
 const wrapWithSupports = require("../lib/wrap-with-supports");
 
-const files = [
-  {
-    dest: "../tmp/main.min.css",
-    src: "../src/css/main.css"
-  },
-  {
-    dest: "../tmp/debug.min.css",
-    src: "../src/css/debug.css"
+const cssExt = ".css";
+const dest = "../tmp/";
+const minExt = ".min";
+const src = "../src/css/";
+const generateFileMappings = (files, file) => {
+  if (path.extname(file) !== cssExt) {
+    return files;
   }
-];
 
+  if (file.startsWith("_")) {
+    return files;
+  }
+
+  files.push({
+    dest: path.join(dest, `${path.basename(file, cssExt)}${minExt}${cssExt}`),
+    src: path.join(src, file)
+  });
+
+  return files;
+};
+const listFiles = () =>
+  new Promise((resolve, reject) => {
+    fs.readdir(src, (e, f) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve(f.reduce(generateFileMappings, []));
+    });
+  });
 const readCSS = file =>
   new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
@@ -56,8 +76,9 @@ const writeCSS = file =>
     });
   });
 const buildCSS = file => waterfall([readCSS, optimizeCSS, writeCSS], file);
+const buildAll = files => Promise.all(files.map(buildCSS));
 
 process.chdir(__dirname);
-Promise.all(files.map(buildCSS)).catch(e => {
+waterfall([listFiles, buildAll]).catch(e => {
   console.trace(e);
 });
