@@ -1,30 +1,27 @@
 const { execFile } = require("child_process");
 const path = require("path");
+const waterfall = require("../lib/waterfall");
 const which = require("which").sync;
 
-const files = [
-  {
-    dest: "../dist/apple-touch-icon-precomposed.png",
-    src: "../src/img/touch-icon.svg",
-    width: 180
-  },
-  {
-    dest: "../tmp/favicon-16.png",
-    src: "../src/img/favicon.svg",
-    width: 16
-  },
-  {
-    dest: "../tmp/favicon-32.png",
-    src: "../src/img/favicon.svg",
-    width: 32
-  },
-  {
-    dest: "../tmp/favicon-48.png",
-    src: "../src/img/favicon.svg",
-    width: 48
-  }
-];
+const tmp = "../tmp/";
+const src = "../src/img/";
+const toFaviconMapping = size => ({
+  dest: path.join(tmp, `favicon-${size}.png`),
+  src: path.join(src, "favicon.svg"),
+  width: size
+});
+const dest = "../dist/";
+const generateFileMappings = () => {
+  const touchIconBasename = "apple-touch-icon-precomposed";
 
+  return [16, 32, 48].map(toFaviconMapping).concat([
+    {
+      dest: path.join(dest, `${touchIconBasename}.png`),
+      src: path.join(src, `${touchIconBasename}.svg`),
+      width: 180
+    }
+  ]);
+};
 const inkscape = which("inkscape");
 const toPNG = file =>
   new Promise((resolve, reject) => {
@@ -50,12 +47,13 @@ const toPNG = file =>
       resolve(file.dest);
     });
   });
+const toPNGAll = files => Promise.all(files.map(toPNG));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
 const convert = which("convert");
 const toFavicon = args =>
   new Promise((resolve, reject) => {
     args = args.filter(isFaviconSource);
-    args.push("../dist/favicon.ico");
+    args.push(`${dest}favicon.ico`);
     execFile(convert, args, e => {
       if (e) {
         return reject(e);
@@ -66,8 +64,6 @@ const toFavicon = args =>
   });
 
 process.chdir(__dirname);
-Promise.all(files.map(toPNG))
-  .then(toFavicon)
-  .catch(e => {
-    console.trace(e);
-  });
+waterfall([generateFileMappings, toPNGAll, toFavicon]).catch(e => {
+  console.trace(e);
+});
