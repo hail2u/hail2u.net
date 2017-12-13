@@ -5,7 +5,7 @@ const waterfall = require("../lib/waterfall");
 
 const config = {
   compilationLevel: "ADVANCED",
-  outputWrapper: "(const  = () => {%output%}).call(window);"
+  outputWrapper: "(function () {%output%}).call(window);"
 };
 const files = [
   {
