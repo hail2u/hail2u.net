@@ -5,7 +5,6 @@ const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
 const waterfall = require("../lib/waterfall");
-const wrapWithSupports = require("../lib/wrap-with-supports");
 
 const cssExt = ".css";
 const dest = "../tmp/";
@@ -48,6 +47,14 @@ const readCSS = file =>
       resolve(file);
     });
   });
+const wrapWithSupports = postcss.plugin("wrap-with-supports", () => css => {
+  const supports = postcss.parse("@supports(top:0){}");
+
+  css.each(n => {
+    supports.first.append(n);
+  });
+  css.append(supports);
+});
 const processor = postcss([
   atImport(),
   mqpacker(),

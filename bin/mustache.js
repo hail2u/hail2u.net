@@ -1,4 +1,3 @@
-const formatDate = require("../lib/format-date");
 const fs = require("fs-extra");
 const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
@@ -120,6 +119,36 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["articles", "html"],
   string: ["article"]
 });
+const pad = number => {
+  if (number >= 10) {
+    return number;
+  }
+
+  return `0${number}`;
+};
+const toHTML5Date = (day, date, month, year, hour, minute, second) =>
+  `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
+    second
+  )}+09:00`;
+const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
+const toRFC822Date = (day, date, month, year, hour, minute, second) =>
+  `${dow[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(hour)}:${pad(
+    minute
+  )}:${pad(second)} +0900`;
 const extendItem = (item, index, original) => {
   [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
@@ -153,7 +182,7 @@ const extendItem = (item, index, original) => {
     item.year = dt.getFullYear();
   }
 
-  item.html5PubDate = formatDate.html5(
+  item.html5PubDate = toHTML5Date(
     item.day,
     item.date,
     item.month,
@@ -162,7 +191,7 @@ const extendItem = (item, index, original) => {
     item.minute,
     item.second
   );
-  item.rfc822PubDate = formatDate.rfc822(
+  item.rfc822PubDate = toRFC822Date(
     item.day,
     item.date,
     item.month,
@@ -171,9 +200,7 @@ const extendItem = (item, index, original) => {
     item.minute,
     item.second
   );
-  item.strPubDate = `${formatDate.pad(item.month)}/${formatDate.pad(
-    item.date
-  )}`;
+  item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
 
   if (index === 0) {
     item.isLatest = true;
@@ -267,7 +294,7 @@ const filterUpdates = (includeUpdates, item) => {
   return false;
 };
 const now = date =>
-  formatDate.rfc822(
+  toRFC822Date(
     date.getDay(),
     date.getDate(),
     date.getMonth(),
