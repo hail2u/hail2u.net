@@ -15,13 +15,7 @@ const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
-const draftDir = path.join(os.homedir(), "Documents", "Drafts");
-const draftExts = [".html", ".markdown", ".md", ".txt"];
-const preview = {
-  dest: "../tmp/__preview.html",
-  template: "../src/preview.mustache"
-};
-const rootDir = "../";
+const draftDir = path.resolve(os.homedir(), "./Documents/Drafts/");
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
@@ -59,7 +53,7 @@ const commitEntry = file =>
       git,
       [
         "commit",
-        `--message=Add ${toPOSIXPath(path.relative(rootDir, file.src))}`
+        `--message=Add ${toPOSIXPath(path.relative("../", file.src))}`
       ],
       (e, o) => {
         if (e) {
@@ -291,7 +285,9 @@ const updateEntry = file => {
   );
 };
 const isDraft = file => {
-  if (draftExts.indexOf(path.extname(file)) !== -1) {
+  if (
+    [".html", ".markdown", ".md", ".txt"].indexOf(path.extname(file)) !== -1
+  ) {
     return true;
   }
 
@@ -434,7 +430,12 @@ const processSelected = file => {
     return publishSelected(file);
   }
 
-  return previewSelected(Object.assign(file, preview));
+  return previewSelected(
+    Object.assign(file, {
+      dest: "../tmp/__preview.html",
+      template: "../src/preview.mustache"
+    })
+  );
 };
 
 process.chdir(__dirname);
