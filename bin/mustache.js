@@ -297,7 +297,7 @@ const now = date =>
   toRFC822Date(
     date.getDay(),
     date.getDate(),
-    date.getMonth(),
+    date.getMonth() + 1,
     date.getFullYear(),
     date.getHours(),
     date.getMinutes(),
