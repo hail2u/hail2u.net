@@ -314,6 +314,7 @@ const getDraft = file => {
 
       resolve({
         contents: d,
+        ext: path.extname(file),
         name: path.basename(file, path.extname(file)),
         src: file
       });
@@ -375,7 +376,9 @@ const checkSelected = file => {
   return file;
 };
 const markupSelected = file => {
-  file.contents = markdown(file.contents);
+  if (file.ext !== ".html") {
+    file.contents = markdown(file.contents);
+  }
 
   return file;
 };
