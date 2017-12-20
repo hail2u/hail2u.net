@@ -1,7 +1,7 @@
 const { execFile } = require("child_process");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
-const which = require("which").sync;
+const which = require("which");
 
 const tmp = "../tmp/";
 const src = "../src/img/";
@@ -22,7 +22,7 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const inkscape = which("inkscape");
+const inkscape = which.sync("inkscape");
 const toPNG = file =>
   new Promise((resolve, reject) => {
     const args = ["-f", file.src, "-e", file.dest];
@@ -49,7 +49,7 @@ const toPNG = file =>
   });
 const toPNGAll = files => Promise.all(files.map(toPNG));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const convert = which("convert");
+const convert = which.sync("convert");
 const toFavicon = args =>
   new Promise((resolve, reject) => {
     args = args.filter(isFaviconSource);

@@ -1,5 +1,5 @@
 const fs = require("fs-extra");
-const gccc = require("google-closure-compiler-js").compile;
+const { compile } = require("google-closure-compiler-js");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
@@ -73,7 +73,7 @@ const config = {
 };
 const minExt = ".min";
 const compileJS = file => {
-  file.contents = gccc(
+  file.contents = compile(
     Object.assign({}, config, {
       jsCode: [
         {

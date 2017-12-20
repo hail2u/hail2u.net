@@ -9,7 +9,7 @@ const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
-const which = require("which").sync;
+const which = require("which");
 
 const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
@@ -35,7 +35,7 @@ const readEntry = file => {
     });
   });
 };
-const git = which("git");
+const git = which.sync("git");
 const addEntry = file =>
   new Promise((resolve, reject) => {
     execFile(git, ["add", "--", file.src], (e, o) => {
@@ -153,7 +153,7 @@ const copyArticleImages = file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const npm = which("npm");
+const npm = which.sync("npm");
 const runDocsArticle = file => {
   if (argv.publish) {
     return file;
@@ -174,7 +174,7 @@ const runDocsArticle = file => {
     );
   });
 };
-const perl = which("perl");
+const perl = which.sync("perl");
 const buildArticle = file => {
   if (argv.update) {
     return file;
@@ -227,7 +227,7 @@ const saveFile = file => {
     });
   });
 };
-const htmlhint = which("htmlhint");
+const htmlhint = which.sync("htmlhint");
 const testArticle = file =>
   new Promise((resolve, reject) => {
     execFile(htmlhint, ["--format", "compact", file.dest], (e, o) => {
@@ -413,7 +413,7 @@ const buildPreview = file => {
 
   return file;
 };
-const open = which("open");
+const open = which.sync("open");
 const openPreview = file =>
   new Promise((resolve, reject) => {
     execFile(open, [file.dest], e => {
