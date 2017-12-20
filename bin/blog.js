@@ -16,9 +16,27 @@ const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "./Documents/Drafts/");
+const exec = {
+  git: "git",
+  htmlhint: "htmlhint",
+  npm: "npm",
+  open: "open",
+  perl: "perl"
+};
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
+const findExec = name =>
+  new Promise((resolve, reject) => {
+    which(name, (e, p) => {
+      if (e) {
+        return reject(e);
+      }
+
+      exec[name] = p;
+      resolve();
+    });
+  });
 const readEntry = file => {
   if (file.contents) {
     return file;
@@ -35,10 +53,9 @@ const readEntry = file => {
     });
   });
 };
-const git = which.sync("git");
 const addEntry = file =>
   new Promise((resolve, reject) => {
-    execFile(git, ["add", "--", file.src], (e, o) => {
+    execFile(exec.git, ["add", "--", file.src], (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -50,7 +67,7 @@ const addEntry = file =>
 const commitEntry = file =>
   new Promise((resolve, reject) => {
     execFile(
-      git,
+      exec.git,
       [
         "commit",
         `--message=Add ${toPOSIXPath(path.relative("../", file.src))}`
@@ -153,7 +170,6 @@ const copyArticleImages = file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const npm = which.sync("npm");
 const runDocsArticle = file => {
   if (argv.publish) {
     return file;
@@ -161,7 +177,7 @@ const runDocsArticle = file => {
 
   return new Promise((resolve, reject) => {
     execFile(
-      npm,
+      exec.npm,
       ["run", "docs", "--", `--article=${destDir}${file.name}.html`],
       (e, o) => {
         if (e) {
@@ -174,7 +190,6 @@ const runDocsArticle = file => {
     );
   });
 };
-const perl = which.sync("perl");
 const buildArticle = file => {
   if (argv.update) {
     return file;
@@ -188,7 +203,7 @@ const buildArticle = file => {
 
   return new Promise((resolve, reject) => {
     execFile(
-      perl,
+      exec.perl,
       args,
       {
         cwd: blosxomDir,
@@ -227,10 +242,9 @@ const saveFile = file => {
     });
   });
 };
-const htmlhint = which.sync("htmlhint");
 const testArticle = file =>
   new Promise((resolve, reject) => {
-    execFile(htmlhint, ["--format", "compact", file.dest], (e, o) => {
+    execFile(exec.htmlhint, ["--format", "compact", file.dest], (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -241,7 +255,7 @@ const testArticle = file =>
   });
 const runDocs = file =>
   new Promise((resolve, reject) => {
-    execFile(npm, ["run", "docs"], (e, o) => {
+    execFile(exec.npm, ["run", "docs"], (e, o) => {
       if (e) {
         return reject(e);
       }
@@ -413,10 +427,9 @@ const buildPreview = file => {
 
   return file;
 };
-const open = which.sync("open");
 const openPreview = file =>
   new Promise((resolve, reject) => {
-    execFile(open, [file.dest], e => {
+    execFile(exec.open, [file.dest], e => {
       if (e) {
         return reject(e);
       }
@@ -442,7 +455,7 @@ const processSelected = file => {
 };
 
 process.chdir(__dirname);
-Promise.resolve()
+Promise.all(Object.keys(exec).map(findExec))
   .then(() => {
     if (argv.update) {
       return updateEntry({

@@ -22,8 +22,17 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const inkscape = which.sync("inkscape");
-const toPNG = file =>
+const findExec = (name, args) =>
+  new Promise((resolve, reject) => {
+    which(name, (e, p) => {
+      if (e) {
+        return reject(e);
+      }
+
+      resolve([args, p]);
+    });
+  });
+const toPNG = (inkscape, file) =>
   new Promise((resolve, reject) => {
     const args = ["-f", file.src, "-e", file.dest];
 
@@ -47,10 +56,10 @@ const toPNG = file =>
       resolve(file.dest);
     });
   });
-const toPNGAll = files => Promise.all(files.map(toPNG));
+const toPNGAll = ([files, inkscape]) =>
+  Promise.all(files.map(toPNG.bind(null, inkscape)));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const convert = which.sync("convert");
-const toFavicon = args =>
+const toFavicon = ([args, convert]) =>
   new Promise((resolve, reject) => {
     args = args.filter(isFaviconSource);
     args.push(`${dest}favicon.ico`);
@@ -64,6 +73,12 @@ const toFavicon = args =>
   });
 
 process.chdir(__dirname);
-waterfall([generateFileMappings, toPNGAll, toFavicon]).catch(e => {
+waterfall([
+  generateFileMappings,
+  findExec.bind(null, "inkscape"),
+  toPNGAll,
+  findExec.bind(null, "convert"),
+  toFavicon
+]).catch(e => {
   console.trace(e);
 });
