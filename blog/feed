@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブ標準やフロントエンド、ウェブ・デザインの話題が中心ですが、それに限らず備忘録や日々の記録までを含めることで、10年以上続けることができたウェブログの記事一覧ページです。Blosxomを使って作られています。</description>
     <language>ja</language>
-    <lastBuildDate>Wed, 20 Dec 2017 08:41:13 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 21 Dec 2017 09:42:07 +0900</lastBuildDate>
     <link>https://hail2u.net/blog/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>ウェブログ - Hail2u</title>
@@ -15,6 +15,42 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[CSSやJavaScriptをインライン化してみている。速い。ラスター画像もBase64で埋め込めみたくなる。しかしインライン化はやはり気持ちが悪く、落ち着かない。この気持ち悪さはウェブサイトと言う単位に意味が薄くなってしまうことにあるのではないか。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/inlining-css-and-javascript.html</guid>
+        <link>https://hail2u.net/blog/inlining-css-and-javascript.html</link>
+        <pubDate>Thu, 21 Dec 2017 09:40:22 +0900</pubDate>
+        <title><![CDATA[CSSとJavaScriptのインライン化]]></title>
+        <content:encoded><![CDATA[<p>CSSやJavaScriptをインライン化してみている。速い。ラスター画像もBase64で埋め込めみたくなる。しかしインライン化はやはり気持ちが悪く、落ち着かない。この気持ち悪さはウェブサイトと言う単位に意味が薄くなってしまうことにあるのではないか。</p>
+
+<p>ウェブサイトは全体で一冊の本になっているようなイメージが漠然とある。フレーム全盛期を体験していることが大きい。このイメージではそれぞれのウェブページはその本のページにあたり、それぞれから参照されるCSSやJavaScript<em>ファイル</em>はそのページ群を留める接着剤やひもにあたる。それらをインライン化してしまうと、本のページそれぞれを切り離し、ペラペラな紙にしてしまっているような印象を持ってしまう。</p>
+
+<p>実際にはそれぞれのウェブページは半ば独立したもので、ユーザーからも様々なウェブサービスからもそう扱われるようになって久しい。直帰率が限りなく100%に近い時代だ。だから制作者がペラペラと感じようと、そうしてやることがユーザーには正しいだろう。今だに存在する分割されたウェブページがバカバカしいことと同様、そこに疑問の余地はない。</p>
+
+<hr>
+
+<p>一方でそういったコンテンツを—ペラペラであっても—自分が提供していることは明確に示したい。また示すべきだろう。AMPやMobile Safariのリーダー・モードの強制（単なる噂だが）を含めて、ウェブサイトという存在が薄まった世界では、価値のあるコンテンツであることは示せても、その帰属他を示すことはとても難しい。そしてそのことは短期的な収入（広告やチップなど）を生むことはできても、長期的な価値を生みづらくする。</p>
+
+<p>そうなるとペラペラであることはユーザーや巨大企業には利することになっても、制作者たる自分には何の益もないことになる。書くことによって自分の考えをまとめ、それが成長させる、などと達観するのは無理な話だ。するとたかがMediumのClapやQiitaのいいね、noteのお金などで満足するしか未来がないように思えてしまう。MediumもQiitaもnoteも色々と記事を読む機会はあり、内容はそれなりに覚えているが、誰が書いたかなどこれっぽっちも—お金を払ったものですら—覚えていない。</p>
+
+<hr>
+
+<p>ウェブサイトとは別の形で明示的にコンテンツをまとめる仕組み（RSSもそうだが、Apple Newsのようなものも含めて）が必要だったのかもしれない。そういった仕組みがもっとうまく利用される世界になっていたら、インライン化したペラペラなものを提供するだけで不満はなかっただろう。</p>
+
+<p>唯一の自家製コンテンツの集合体たりえるウェブサイトを維持するには、それらをゆるやかにつなぎ合わせることが重要だ。それはロゴやプロフィール・アイコンのような表層的部分だけではなく、共通のCSSやJavaScriptファイルを始め、リニアなウェブページ構築システムというような基盤から構成することで達成できるのではないか。問題は、単純に構成してしまうと実情（パフォーマンスはもちろん、ユーザーの閲覧スタイルなど）にそぐわないことで、そこをどうすり合わせていくか、それとも諦めるかということが課題になる。</p>
+
+<hr>
+
+<p>インライン化は、適切に処理して最小化したCSSやJavaScriptファイルをmustacheのパーシャルとして置き、それを展開するという手法を取った。普通に参照でHTMLファイルを作成し、後に<a href="https://github.com/tmpvar/jsdom">jsdom</a>なりで展開しても良さそうだったが、既存の環境を再利用しやすい方で行った。展開するパターンの方はjsdomと<a href="https://github.com/cheeriojs/cheerio">cheerio</a>で試してはみたが、あまり意味はなかった。</p>
+
+<p>素のmustacheだと<code>{{</code>の出現だけに気を付ければ良い。CSSやJavaScriptだとまず出てこないんじゃないかと想定しているが、どうなんだろう。もうちょっと調べる必要はありそうだ。CSSやJavaScriptのHTMLでのエスケープの問題も10年近く前に実装レベルでも仕様レベルでも解決しているはずなので、そのまま<code>style</code>や<code>script</code>要素へそのまま放り込めば（<code>{{{...}}}</code>を使えば）よい。</p>
+
+<p>既に利用している<a href="https://github.com/kangax/html-minifier">HTML minifier</a>でインライン化できれば効率的だが、そういった機能はない。もしできればパーシャル化する必要もなく、パースも一度で済むため、色々明快に処理できただろうが、ツールのフィールドがまったく違う。HTML minifierはファイル単位の最小化を行うもので、インライン化はプロジェクト・レベルでの最適化を目的とするものだ。</p>
+
+<hr>
+
+<p>このウェブサイトはウェブアプリではないので、遅くなければ良いくらいですっぱりと見切りをつけたい。つまりインライン化はやめたい。こういったことを考えているうちにHTMLの最小化ですらどうでもよくなってきたし、再びAdSenseを付けたくなってきた。お金が欲しい。</p>]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[Prettierで唯一辛いのはデフォルトの設定から変えたいみたいな希望があることだ。まったく設定を変えられなければ良かった。何人かが「なるほど」などと言い出して変更され、すぐに戻されるという経験も、はや3回目だ。vim-prettierはFacebookの内規に合わせて設定が変更されているとか言っていた。はい。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/on-20171220.html</guid>
@@ -150,34 +186,6 @@
 <hr>
 
 <p>去年に茶碗、今年はお椀とコップを新調した。ほんの少しだけ欠けてしまったり、漏れない程度に亀裂が入ってしまったり、微妙な感じで壊れていく……。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[少しの間Noto Sans Japaneseを利用していたが、すぐに止めた。やはりFOITが気になる。かといってFOUT強制も苦肉の策という印象しかない。……このような記事を書いていたら、先にうまくまとまったfont-displayデスクリプターについての記事が広まっていたので、そちらを読むのが良い。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/on-webfont-on-2018.html</guid>
-        <link>https://hail2u.net/blog/on-webfont-on-2018.html</link>
-        <pubDate>Sun, 3 Dec 2017 09:55:10 +0900</pubDate>
-        <title><![CDATA[2018年のウェブフォントについて]]></title>
-        <content:encoded><![CDATA[<p>少しの間Noto Sans Japaneseを利用していたが、すぐに止めた。やはりFOITが気になる。かといってFOUT強制も苦肉の策という印象しかない。……このような記事を書いていたら、先に<a href="https://font-display.glitch.me/">うまくまとまった<code>font-display</code>デスクリプターについての記事</a>が広まっていたので、そちらを読むのが良い。</p>
-
-<p>他が高速・即時化しつつある現在、1MBくらいを超えるウェブフォントはどうにもならない。動的なサブセット化はわからなくもないが、労多くして……という印象だ。自前で作るのも難しいし、安心して任せられる速さの提供者は知らない。</p>
-
-<p>回線の状況（種別ではなく）に応じてうまいこと切り替える仕組みを導入しなければならないだろう。そうなるとデバイスから「今、回線あんま速くないです……」といった動的な情報を得たいが、プライバシーにかかわるので難しい。残る可能性は<code>font-display</code>デスクリプターのみだ。</p>
-
-<pre><code class="language-lang-css">@font-face {
-  font-display: <mark>optional</mark>;
-  font-family: &quot;Noto Sans Japanese&quot;;
-  src: url(&quot;https://fonts.gstatic.com/ea/notosansjapanese/v6/NotoSansJP-Regular.woff2&quot;) format(&quot;woff2&quot;);
-}
-</code></pre>
-
-<p>鍵になるのは<code>optional</code>という値になる。この値にしておくと<em>100msと少しの間ダウンロードしてみた結果、ユーザー・エージェントが回線が遅いと判断した場合はフォントをダウンロードしなくなる</em>ため、数十秒後に突然フォントが切り替わり、読んでいた位置がどっかにいってしまうなどということがなくなる。</p>
-
-<ul>
-<li>ロゴなど重要なところでサブセット化したウェブフォントを使う場合は<code>block</code></li>
-<li>本文で普通に使う場合は<code>optional</code></li>
-</ul>
-
-<p>このように使い分けると良いだろう。</p>]]></content:encoded>
       </item>
 
   </channel>
