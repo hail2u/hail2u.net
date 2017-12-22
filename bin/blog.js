@@ -358,6 +358,8 @@ const selectDraft = files =>
     });
     menu.write("0. QUIT\n");
     menu.question("Which one: (0) ", a => {
+      menu.close();
+
       if (!a) {
         a = 0;
       }
@@ -374,7 +376,6 @@ const selectDraft = files =>
         return reject(new Error("Aborted by user."));
       }
 
-      menu.close();
       resolve(files[a - 1]);
     });
   });
