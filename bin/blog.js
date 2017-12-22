@@ -366,12 +366,12 @@ const selectDraft = files =>
 
       if (!Number.isInteger(a) || a > files.length) {
         return reject(
-          new Error(`You must enter a number between 0 and ${files.length}`)
+          new Error(`You must enter a number between 0 and ${files.length}.`)
         );
       }
 
       if (a === 0) {
-        return reject(new Error("Aborted."));
+        return reject(new Error("Aborted by user."));
       }
 
       menu.close();
