@@ -348,7 +348,6 @@ const selectDraft = files =>
     });
 
     menu.write("\n");
-    menu.write("0. QUIT\n");
     files.forEach((n, i) => {
       menu.write(`${i + 1}. ${n.contents
         .trim()
@@ -357,6 +356,7 @@ const selectDraft = files =>
         .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
 `);
     });
+    menu.write("0. QUIT\n");
     menu.question("Which one: (0) ", a => {
       if (!a) {
         a = 0;
@@ -371,24 +371,27 @@ const selectDraft = files =>
       }
 
       if (a === 0) {
-        throw new Error("Aborted.");
+        return reject(new Error("Aborted."));
       }
 
       menu.close();
       resolve(files[a - 1]);
     });
   });
-const checkSelected = file => {
-  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
-    throw new Error("This draft does not have a valid name for file.");
-  }
+const checkSelected = file =>
+  new Promise((resolve, reject) => {
+    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
+      return reject(
+        new Error("This draft does not have a valid name for file.")
+      );
+    }
 
-  if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
-    throw new Error("This draft does not have a title.");
-  }
+    if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
+      return reject(new Error("This draft does not have a title."));
+    }
 
-  return file;
-};
+    resolve(file);
+  });
 const markupSelected = file => {
   if (file.ext !== ".html") {
     file.contents = markdown(file.contents);
