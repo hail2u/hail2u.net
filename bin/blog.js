@@ -222,13 +222,21 @@ const buildArticle = file =>
       }
     );
   });
-const saveFile = file => {
-  if (argv.update) {
-    return file;
-  }
+const saveFile = file =>
+  new Promise((resolve, reject) => {
+    if (argv.update) {
+      return resolve(file);
+    }
 
-  return new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, e => {
+    const writeOptions = {
+      flags: "w"
+    };
+
+    if (argv.publish) {
+      writeOptions.flags = "wx";
+    }
+
+    fs.outputFile(file.dest, file.contents, writeOptions, e => {
       if (e) {
         return reject(e);
       }
@@ -236,7 +244,6 @@ const saveFile = file => {
       resolve(file);
     });
   });
-};
 const testArticle = file =>
   new Promise((resolve, reject) => {
     execFile(exec.htmlhint, ["--format", "compact", file.dest], (e, o) => {
