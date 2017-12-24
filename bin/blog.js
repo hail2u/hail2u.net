@@ -37,12 +37,12 @@ const findExec = name =>
       resolve();
     });
   });
-const readEntry = file => {
-  if (file.contents) {
-    return file;
-  }
+const readEntry = file =>
+  new Promise((resolve, reject) => {
+    if (file.contents) {
+      return resolve(file);
+    }
 
-  return new Promise((resolve, reject) => {
     fs.readFile(file.src, "utf8", (e, d) => {
       if (e) {
         return reject(e);
@@ -52,7 +52,6 @@ const readEntry = file => {
       resolve(file);
     });
   });
-};
 const addEntry = file =>
   new Promise((resolve, reject) => {
     execFile(exec.git, ["add", "--", file.src], (e, o) => {
@@ -147,10 +146,9 @@ const listArticleImages = file =>
       resolve(file);
     });
   });
-const copyArticleImage = image => {
-  image = path.basename(image.split(/"/)[1]);
-
-  return new Promise((resolve, reject) => {
+const copyArticleImage = image =>
+  new Promise((resolve, reject) => {
+    image = path.basename(image.split(/"/)[1]);
     fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image), e => {
       if (e) {
         return reject(e);
@@ -159,7 +157,6 @@ const copyArticleImage = image => {
       resolve();
     });
   });
-};
 const copyArticleImages = file => {
   if (!file.images) {
     return file;
@@ -170,12 +167,12 @@ const copyArticleImages = file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const runDocsArticle = file => {
-  if (argv.publish) {
-    return file;
-  }
+const runDocsArticle = file =>
+  new Promise((resolve, reject) => {
+    if (argv.publish) {
+      return resolve(file);
+    }
 
-  return new Promise((resolve, reject) => {
     execFile(
       exec.npm,
       ["run", "docs", "--", `--article=${destDir}${file.name}.html`],
@@ -189,19 +186,18 @@ const runDocsArticle = file => {
       }
     );
   });
-};
-const buildArticle = file => {
-  if (argv.update) {
-    return file;
-  }
+const buildArticle = file =>
+  new Promise((resolve, reject) => {
+    if (argv.update) {
+      return resolve(file);
+    }
 
-  const args = [
-    "blosxom.cgi",
-    `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`,
-    "reindex=1"
-  ];
+    const args = [
+      "blosxom.cgi",
+      `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`,
+      "reindex=1"
+    ];
 
-  return new Promise((resolve, reject) => {
     execFile(
       exec.perl,
       args,
@@ -226,7 +222,6 @@ const buildArticle = file => {
       }
     );
   });
-};
 const saveFile = file => {
   if (argv.update) {
     return file;
@@ -317,10 +312,9 @@ const listDrafts = () =>
       resolve(f.filter(isDraft));
     });
   });
-const getDraft = file => {
-  file = path.join(draftDir, file);
-
-  return new Promise((resolve, reject) => {
+const getDraft = file =>
+  new Promise((resolve, reject) => {
+    file = path.join(draftDir, file);
     fs.readFile(file, "utf8", (e, d) => {
       if (e) {
         return reject(e);
@@ -334,7 +328,6 @@ const getDraft = file => {
       });
     });
   });
-};
 const getDrafts = files => Promise.all(files.map(getDraft));
 const selectDraft = files =>
   new Promise((resolve, reject) => {
@@ -393,13 +386,14 @@ const checkSelected = file =>
 
     resolve(file);
   });
-const markupSelected = file => {
-  if (file.ext !== ".html") {
-    file.contents = markdown(file.contents);
-  }
+const markupSelected = file =>
+  new Promise(resolve => {
+    if (file.ext !== ".html") {
+      file.contents = markdown(file.contents);
+    }
 
-  return file;
-};
+    resolve(file);
+  });
 const deleteDraft = file =>
   new Promise((resolve, reject) => {
     fs.unlink(file.src, e => {
@@ -423,14 +417,14 @@ const readTemplate = file =>
       resolve(file);
     });
   });
-const buildPreview = file => {
-  file.contents = mustache
-    .render(file.template, file)
-    .replace(/="\/img\//g, '="../src/img/')
-    .replace(/="\//g, '="../dist/');
-
-  return file;
-};
+const buildPreview = file =>
+  new Promise(resolve => {
+    file.contents = mustache
+      .render(file.template, file)
+      .replace(/="\/img\//g, '="../src/img/')
+      .replace(/="\//g, '="../dist/');
+    resolve(file);
+  });
 const openPreview = file =>
   new Promise((resolve, reject) => {
     execFile(exec.open, [file.dest], e => {
