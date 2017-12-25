@@ -19,12 +19,12 @@ const generateFileMappings = (files, file) => {
     return files;
   }
 
-  files.push({
-    dest: path.join(dest, `${path.basename(file, cssExt)}${minExt}${cssExt}`),
-    src: path.join(src, file)
-  });
-
-  return files;
+  return files.concat([
+    {
+      dest: path.join(dest, `${path.basename(file, cssExt)}${minExt}${cssExt}`),
+      src: path.join(src, file)
+    }
+  ]);
 };
 const listFiles = () =>
   new Promise((resolve, reject) => {
