@@ -451,12 +451,13 @@ const processSelected = file => {
     return publishSelected(file);
   }
 
-  return previewSelected(
-    Object.assign(file, {
+  return previewSelected({
+    ...file,
+    ...{
       dest: "../tmp/__preview.html",
       template: "../src/preview.mustache"
-    })
-  );
+    }
+  });
 };
 
 process.chdir(__dirname);

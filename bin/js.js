@@ -73,15 +73,16 @@ const config = {
 };
 const minExt = ".min";
 const compileJS = file => {
-  file.contents = compile(
-    Object.assign({}, config, {
+  file.contents = compile({
+    ...config,
+    ...{
       jsCode: [
         {
           src: file.contents
         }
       ]
-    })
-  ).compiledCode;
+    }
+  }).compiledCode;
   file.dest = path.join(
     tmp,
     `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`

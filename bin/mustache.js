@@ -105,7 +105,6 @@ const readItem = itemFile =>
       resolve(o);
     });
   });
-const flatten = (previous, current) => previous.concat(current);
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 const findCover = (image, defaultCardType, defaultCover) => {
@@ -207,8 +206,8 @@ const extendItem = (item, index, original) => {
   return item;
 };
 const gatherItems = items =>
-  items
-    .reduce(flatten)
+  []
+    .concat(...items)
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
@@ -294,11 +293,10 @@ const now = date =>
   );
 const mergeData = file => {
   if (argv.article || argv.articles) {
-    file.extradata = Object.assign(
-      {},
-      file.extradata,
-      file.items.find(pickByLink.bind(null, file.dest))
-    );
+    file.extradata = {
+      ...file.extradata,
+      ...file.items.find(pickByLink.bind(null, file.dest))
+    };
     file.extradata.canonical = file.extradata.link;
     file.extradata.short_title = file.extradata.title;
   } else {
@@ -309,7 +307,10 @@ const mergeData = file => {
   }
 
   file.extradata.lastBuildDate = now(new Date());
-  file.data = Object.assign({}, file.metadata, file.extradata);
+  file.data = {
+    ...file.metadata,
+    ...file.extradata
+  };
 
   return file;
 };
@@ -333,17 +334,14 @@ const writeFile = file =>
     });
   });
 const build = (metadata, items, partials, file) =>
-  waterfall(
-    [readTemplate, readExtradata, mergeData, renderFile, writeFile],
-    Object.assign(
-      {
-        items: items,
-        metadata: metadata,
-        partials: partials
-      },
-      file
-    )
-  );
+  waterfall([readTemplate, readExtradata, mergeData, renderFile, writeFile], {
+    ...{
+      items: items,
+      metadata: metadata,
+      partials: partials
+    },
+    ...file
+  });
 const refineByType = file => {
   if (!argv.html) {
     return true;
@@ -355,15 +353,14 @@ const refineByType = file => {
 
   return false;
 };
-const mergeArticle = (file, item) =>
-  Object.assign(
-    {
-      extradata: file.extradata,
-      dest: toPOSIXPath(path.join(destDir, item.link)),
-      template: file.template
-    },
-    article
-  );
+const mergeArticle = (file, item) => ({
+  ...{
+    extradata: file.extradata,
+    dest: toPOSIXPath(path.join(destDir, item.link)),
+    template: file.template
+  },
+  ...article
+});
 const generateArticleList = (items, file) =>
   items
     .filter(filterUpdates.bind(null, false))
@@ -377,17 +374,12 @@ const buildArticles = (metadata, items, partials, articles) =>
   Promise.all(articles.map(build.bind(null, metadata, items, partials)));
 const buildAll = ([metadata, items, partials]) => {
   if (argv.article) {
-    return build(
-      metadata,
-      items,
-      partials,
-      Object.assign(
-        {
-          dest: argv.article
-        },
-        article
-      )
-    );
+    return build(metadata, items, partials, {
+      ...{
+        dest: argv.article
+      },
+      ...article
+    });
   }
 
   if (argv.articles) {
