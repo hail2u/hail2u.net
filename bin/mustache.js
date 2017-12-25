@@ -230,10 +230,9 @@ const readPartial = file =>
         return reject(e);
       }
 
-      const partial = {};
-
-      partial[path.basename(file, ".mustache")] = d;
-      resolve(partial);
+      resolve({
+        [path.basename(file, ".mustache")]: d
+      });
     });
   });
 const gatherPartials = partials => Object.assign(...partials);
