@@ -3,7 +3,9 @@ const { compile } = require("google-closure-compiler-js");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
 
+const tmp = "../tmp/";
 const jsExt = ".js";
+const minExt = ".min";
 const isSameDest = (dest, file) => file.dest === dest;
 const src = "../src/js/";
 const generateFileMappings = (files, srcFile) => {
@@ -11,9 +13,12 @@ const generateFileMappings = (files, srcFile) => {
     return files;
   }
 
-  const destFile = `${path
-    .extname(path.basename(srcFile, jsExt))
-    .replace(/^./, "")}${jsExt}`;
+  const destFile = path.join(
+    tmp,
+    `${path
+      .extname(path.basename(srcFile, jsExt))
+      .replace(/^./, "")}${minExt}${jsExt}`
+  );
   const file = files.find(isSameDest.bind(null, destFile));
 
   srcFile = path.join(src, srcFile);
@@ -39,59 +44,44 @@ const listFiles = () =>
       resolve(f.reduce(generateFileMappings, []));
     });
   });
-const readJS = file =>
+const readJS = (srcFile, index, srcFiles) =>
   new Promise((resolve, reject) => {
-    fs.readFile(file, "utf8", (e, d) => {
+    fs.readFile(srcFile, "utf8", (e, d) => {
       if (e) {
         return reject(e);
       }
 
-      resolve(d);
+      srcFiles[index] = {
+        src: d
+      };
+      resolve();
     });
   });
-const tmp = "../tmp/";
-const gatherJS = file =>
-  Promise.all(file.src.map(readJS)).then(r => {
-    file.contents = r.join("");
-    file.dest = path.join(tmp, file.dest);
-
-    return file;
-  });
-const writeJS = file =>
-  new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(file);
-    });
-  });
+const gatherJS = file => Promise.all(file.src.map(readJS)).then(() => file);
 const config = {
   compilationLevel: "ADVANCED",
   outputWrapper: "(function () {%output%}).call(window);"
 };
-const minExt = ".min";
-const compileJS = file => {
-  file.contents = compile({
-    ...config,
-    ...{
-      jsCode: [
-        {
-          src: file.contents
+const writeJS = file =>
+  new Promise((resolve, reject) => {
+    fs.outputFile(
+      file.dest,
+      compile({
+        ...config,
+        ...{
+          jsCode: file.src
         }
-      ]
-    }
-  }).compiledCode;
-  file.dest = path.join(
-    tmp,
-    `${path.basename(file.dest, jsExt)}${minExt}${jsExt}`
-  );
+      }).compiledCode,
+      e => {
+        if (e) {
+          return reject(e);
+        }
 
-  return file;
-};
-const buildJS = file =>
-  waterfall([gatherJS, writeJS, compileJS, writeJS], file);
+        resolve(file);
+      }
+    );
+  });
+const buildJS = file => waterfall([gatherJS, writeJS], file);
 const buildAll = files => Promise.all(files.map(buildJS));
 
 process.chdir(__dirname);
