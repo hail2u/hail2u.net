@@ -150,38 +150,28 @@ const toRFC822Date = (day, date, month, year, hour, minute, second) =>
     minute
   )}:${pad(second)} +0900`;
 const extendItem = (item, index, original) => {
+  const dt = new Date(item.unixtime);
+
   [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
     item.card_type,
     item.cover
   );
-
-  if (!argv.article && !argv.articles && item.body) {
-    item.body = item.body.replace(
-      /(href|src)="(\/.*?)"/g,
-      '$1="https://hail2u.net$2"'
-    );
-  }
-
-  if (!item.description) {
-    item.description = item.body
-      .replace(/\r?\n/g, "")
-      .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-      .replace(/<.*?>/g, "");
-  }
-
-  if (!item.date) {
-    const dt = new Date(item.unixtime);
-
-    item.date = dt.getDate();
-    item.day = dt.getDay();
-    item.hour = dt.getHours();
-    item.minute = dt.getMinutes();
-    item.month = dt.getMonth() + 1;
-    item.second = dt.getSeconds();
-    item.year = dt.getFullYear();
-  }
-
+  item.body = item.body.replace(
+    /(href|src)="(\/.*?)"/g,
+    '$1="https://hail2u.net$2"'
+  );
+  item.description = item.body
+    .replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    .replace(/<.*?>/g, "");
+  item.date = dt.getDate();
+  item.day = dt.getDay();
+  item.hour = dt.getHours();
+  item.minute = dt.getMinutes();
+  item.month = dt.getMonth() + 1;
+  item.second = dt.getSeconds();
+  item.year = dt.getFullYear();
   item.html5PubDate = toHTML5Date(
     item.day,
     item.date,
