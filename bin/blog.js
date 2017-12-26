@@ -69,7 +69,7 @@ const commitEntry = file =>
       exec.git,
       [
         "commit",
-        `--message=Add ${toPOSIXPath(path.relative("../", file.src))}`
+        `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
       ],
       (e, o) => {
         if (e) {
@@ -447,6 +447,7 @@ const previewSelected = file =>
 const processSelected = file => {
   if (argv.publish) {
     file.dest = path.join(srcDir, `${file.name}.txt`);
+    file.verb = "Add";
 
     return publishSelected(file);
   }
@@ -465,7 +466,8 @@ Promise.all(Object.keys(exec).map(findExec))
   .then(() => {
     if (argv.update) {
       return updateEntry({
-        dest: path.resolve(argv.file)
+        dest: path.resolve(argv.file),
+        verb: "Update"
       });
     }
 
