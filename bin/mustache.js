@@ -97,7 +97,7 @@ const findCover = (image, defaultCardType, defaultCover) => {
   return ["summary_large_image", image[1]];
 };
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["articles", "html"],
+  boolean: ["articles"],
   string: ["article"]
 });
 const pad = number => {
@@ -296,17 +296,6 @@ const build = (metadata, items, partials, file) =>
     },
     ...file
   });
-const refineByType = file => {
-  if (!argv.html) {
-    return true;
-  }
-
-  if (argv.html && file.type === "html") {
-    return true;
-  }
-
-  return false;
-};
 const mergeArticle = (file, item) => ({
   ...{
     extradata: file.extradata,
@@ -343,7 +332,7 @@ const buildAll = ([metadata, items, partials]) => {
   }
 
   return Promise.all(
-    files.filter(refineByType).map(build.bind(null, metadata, items, partials))
+    files.map(build.bind(null, metadata, items, partials))
   );
 };
 
