@@ -1,16 +1,7 @@
 const fs = require("fs-extra");
 const waterfall = require("../lib/waterfall");
 
-const readStyleGuide = () =>
-  new Promise((resolve, reject) => {
-    fs.readFile("../src/css/test.html", "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(d);
-    });
-  });
+const readStyleGuide = async () => fs.readFile("../src/css/test.html", "utf8");
 const modifyStyleGuide = contents => {
   const dir = "../";
   const url = "https://hail2u.net/";
@@ -25,16 +16,8 @@ const modifyStyleGuide = contents => {
     return `${a}${e}${o}${u}${c}`;
   });
 };
-const writeStyleGuide = contents =>
-  new Promise((resolve, reject) => {
-    fs.outputFile("../dist/style-guide/index.html", contents, e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+const writeStyleGuide = async contents =>
+  fs.outputFile("../dist/style-guide/index.html", contents);
 
 process.chdir(__dirname);
 waterfall([readStyleGuide, modifyStyleGuide, writeStyleGuide]).catch(e => {

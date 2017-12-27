@@ -34,53 +34,31 @@ const generateFileMappings = (files, srcFile) => {
 
   return files;
 };
-const listFiles = () =>
-  new Promise((resolve, reject) => {
-    fs.readdir(src, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
+const listFiles = async () => {
+  const files = await fs.readdir(src);
 
-      resolve(f.reduce(generateFileMappings, []));
-    });
-  });
-const readJS = (srcFile, index, srcFiles) =>
-  new Promise((resolve, reject) => {
-    fs.readFile(srcFile, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      srcFiles[index] = {
-        src: d
-      };
-      resolve();
-    });
-  });
+  return files.reduce(generateFileMappings, []);
+};
+const readJS = async (srcFile, index, srcFiles) => {
+  srcFiles[index] = {
+    src: await fs.readFile(srcFile, "utf8")
+  };
+};
 const gatherJS = file => Promise.all(file.src.map(readJS)).then(() => file);
 const config = {
   compilationLevel: "ADVANCED",
   outputWrapper: "(function () {%output%}).call(window);"
 };
-const writeJS = file =>
-  new Promise((resolve, reject) => {
-    fs.outputFile(
-      file.dest,
-      compile({
-        ...config,
-        ...{
-          jsCode: file.src
-        }
-      }).compiledCode,
-      e => {
-        if (e) {
-          return reject(e);
-        }
-
-        resolve(file);
+const writeJS = async file =>
+  fs.outputFile(
+    file.dest,
+    compile({
+      ...config,
+      ...{
+        jsCode: file.src
       }
-    );
-  });
+    }).compiledCode
+  );
 const buildJS = file => waterfall([gatherJS, writeJS], file);
 const buildAll = files => Promise.all(files.map(buildJS));
 

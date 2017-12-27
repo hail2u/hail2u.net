@@ -1,4 +1,4 @@
-const { execFile } = require("child_process");
+const execFile = require("../lib/exec-file");
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minifyHTML = require("../lib/html-minifier");
@@ -9,7 +9,7 @@ const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
 const waterfall = require("../lib/waterfall");
-const which = require("which");
+const which = require("../lib/which");
 
 const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
@@ -26,71 +26,39 @@ const exec = {
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
-const findExec = name =>
-  new Promise((resolve, reject) => {
-    which(name, (e, p) => {
-      if (e) {
-        return reject(e);
-      }
+const findExec = async name => {
+  exec[name] = await which(name);
+};
+const readEntry = async file => {
+  if (file.contents) {
+    return file;
+  }
 
-      exec[name] = p;
-      resolve();
-    });
-  });
-const readEntry = file =>
-  new Promise((resolve, reject) => {
-    if (file.contents) {
-      return resolve(file);
+  return {
+    ...file,
+    ...{
+      contents: await fs.readFile(file.src, "utf8")
     }
+  };
+};
+const addEntry = async file => {
+  const { stdout } = await execFile(exec.git, ["add", "--", file.src]);
 
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
+  process.stdout.write(stdout);
 
-      file.contents = d;
-      resolve(file);
-    });
-  });
-const addEntry = file =>
-  new Promise((resolve, reject) => {
-    execFile(exec.git, ["add", "--", file.src], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
+  return file;
+};
+const commitEntry = async file => {
+  const { stdout } = await execFile(exec.git, [
+    "commit",
+    `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
+  ]);
 
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-const commitEntry = file =>
-  new Promise((resolve, reject) => {
-    execFile(
-      exec.git,
-      [
-        "commit",
-        `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
-      ],
-      (e, o) => {
-        if (e) {
-          return reject(e);
-        }
+  process.stdout.write(stdout);
 
-        process.stdout.write(o);
-        resolve(file);
-      }
-    );
-  });
-const readCache = () =>
-  new Promise((resolve, reject) => {
-    fs.readJSON(cacheFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
+  return file;
+};
+const readCache = async () => fs.readJSON(cacheFile, "utf8");
 const isDuplicate = (link, value) => value.link === link;
 const addArticle = (article, articles) => {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
@@ -104,22 +72,9 @@ const addArticle = (article, articles) => {
 
   return articles;
 };
-const saveCache = articles =>
-  new Promise((resolve, reject) => {
-    fs.outputJSON(
-      cacheFile,
-      articles,
-      {
-        spaces: 2
-      },
-      e => {
-        if (e) {
-          return reject(e);
-        }
-
-        resolve();
-      }
-    );
+const saveCache = async articles =>
+  fs.outputJSON(cacheFile, articles, {
+    spaces: 2
   });
 const updateCache = file => {
   const [title, ...body] = file.contents.split("\n");
@@ -135,28 +90,20 @@ const updateCache = file => {
     saveCache
   ]).then(() => file);
 };
-const listArticleImages = file =>
-  new Promise((resolve, reject) => {
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
+const listArticleImages = async file => {
+  const data = await fs.readFile(file.src, "utf8");
 
-      file.images = d.match(/\bsrc="\/img\/blog\/.*?"/g);
-      resolve(file);
-    });
-  });
-const copyArticleImage = image =>
-  new Promise((resolve, reject) => {
-    image = path.basename(image.split(/"/)[1]);
-    fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image), e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+  return {
+    ...file,
+    ...{
+      images: data.match(/\bsrc="\/img\/blog\/.*?"/g)
+    }
+  };
+};
+const copyArticleImage = async image => {
+  image = path.basename(image.split(/"/)[1]);
+  fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
+};
 const copyArticleImages = file => {
   if (!file.images) {
     return file;
@@ -167,105 +114,89 @@ const copyArticleImages = file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const runDocsArticle = file =>
-  new Promise((resolve, reject) => {
-    if (argv.publish) {
-      return resolve(file);
-    }
+const runDocsArticle = async file => {
+  if (argv.publish) {
+    return file;
+  }
 
-    execFile(
-      exec.npm,
-      ["run", "docs", "--", `--article=${destDir}${file.name}.html`],
-      (e, o) => {
-        if (e) {
-          return reject(e);
-        }
+  const { stdout } = await execFile(exec.npm, [
+    "run",
+    "html",
+    "--",
+    `--article=${destDir}${file.name}.html`
+  ]);
 
-        process.stdout.write(o);
-        resolve(file);
-      }
-    );
-  });
-const buildArticle = file =>
-  new Promise((resolve, reject) => {
-    if (argv.update) {
-      return resolve(file);
-    }
+  process.stdout.write(stdout);
 
-    const args = [
+  return file;
+};
+const buildArticle = async file => {
+  if (argv.update) {
+    return file;
+  }
+
+  const { stdout } = await execFile(
+    exec.perl,
+    [
       "blosxom.cgi",
       `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`,
       "reindex=1"
-    ];
-
-    execFile(
-      exec.perl,
-      args,
-      {
-        cwd: blosxomDir,
-        env: {
-          BLOSXOM_CONFIG_DIR: path.resolve(blosxomDir)
-        }
-      },
-      (e, o) => {
-        if (e) {
-          return reject(e);
-        }
-
-        file.contents = minifyHTML(
-          o
-            .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-            .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-            .trim()
-        );
-        resolve(file);
+    ],
+    {
+      cwd: blosxomDir,
+      env: {
+        BLOSXOM_CONFIG_DIR: path.resolve(blosxomDir)
       }
-    );
-  });
-const saveFile = file =>
-  new Promise((resolve, reject) => {
-    if (argv.update) {
-      return resolve(file);
     }
+  );
 
-    const writeOptions = {
-      flags: "w"
-    };
-
-    if (argv.publish) {
-      writeOptions.flags = "wx";
+  return {
+    ...file,
+    ...{
+      contents: minifyHTML(
+        stdout
+          .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+          .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+          .trim()
+      )
     }
+  };
+};
+const saveFile = async file => {
+  if (argv.update) {
+    return file;
+  }
 
-    fs.outputFile(file.dest, file.contents, writeOptions, e => {
-      if (e) {
-        return reject(e);
-      }
+  const writeOptions = {
+    flags: "w"
+  };
 
-      resolve(file);
-    });
-  });
-const testArticle = file =>
-  new Promise((resolve, reject) => {
-    execFile(exec.htmlhint, ["--format", "compact", file.dest], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
+  if (argv.publish) {
+    writeOptions.flags = "wx";
+  }
 
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
-const runDocs = file =>
-  new Promise((resolve, reject) => {
-    execFile(exec.npm, ["run", "docs"], (e, o) => {
-      if (e) {
-        return reject(e);
-      }
+  await fs.outputFile(file.dest, file.contents, writeOptions);
 
-      process.stdout.write(o);
-      resolve(file);
-    });
-  });
+  return file;
+};
+const testArticle = async file => {
+  const { stdout } = await execFile(exec.htmlhint, [
+    "--format",
+    "compact",
+    file.dest
+  ]);
+
+  process.stdout.write(stdout);
+
+  return file;
+};
+const runDocs = async file => {
+  const { stdout } = await execFile(exec.npm, ["run", "html"]);
+
+  process.stdout.write(stdout);
+
+  return file;
+};
 const updateEntry = file => {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
@@ -309,32 +240,24 @@ const isDraft = file => {
 
   return false;
 };
-const listDrafts = () =>
-  new Promise((resolve, reject) => {
-    fs.readdir(draftDir, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
+const listDrafts = async () => {
+  const files = await fs.readdir(draftDir);
 
-      resolve(f.filter(isDraft));
-    });
-  });
-const getDraft = file =>
-  new Promise((resolve, reject) => {
-    file = path.join(draftDir, file);
-    fs.readFile(file, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
+  return files.filter(isDraft);
+};
+const getDraft = async file => {
+  file = path.join(draftDir, file);
 
-      resolve({
-        contents: d,
-        ext: path.extname(file),
-        name: path.basename(file, path.extname(file)),
-        src: file
-      });
-    });
-  });
+  return {
+    ...file,
+    ...{
+      contents: await fs.readFile(file, "utf8"),
+      ext: path.extname(file),
+      name: path.basename(file, path.extname(file)),
+      src: file
+    }
+  };
+};
 const getDrafts = files => Promise.all(files.map(getDraft));
 const selectDraft = files =>
   new Promise((resolve, reject) => {
@@ -379,69 +302,47 @@ const selectDraft = files =>
       resolve(files[a - 1]);
     });
   });
-const checkSelected = file =>
-  new Promise((resolve, reject) => {
-    if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
-      return reject(
-        new Error("This draft does not have a valid name for file.")
-      );
-    }
+const checkSelected = file => {
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
+    throw new Error("This draft does not have a valid name for file.");
+  }
 
-    if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
-      return reject(new Error("This draft does not have a title."));
-    }
+  if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
+    throw new Error("This draft does not have a title.");
+  }
 
-    resolve(file);
-  });
-const markupSelected = file =>
-  new Promise(resolve => {
-    if (file.ext !== ".html") {
-      file.contents = markdown(file.contents);
-    }
+  return file;
+};
+const markupSelected = file => {
+  if (file.ext !== ".html") {
+    file.contents = markdown(file.contents);
+  }
 
-    resolve(file);
-  });
-const deleteDraft = file =>
-  new Promise((resolve, reject) => {
-    fs.unlink(file.src, e => {
-      if (e) {
-        return reject(e);
-      }
+  return file;
+};
+const deleteDraft = async file => {
+  await fs.unlink(file.src);
 
-      resolve(file);
-    });
-  });
+  return file;
+};
 const publishSelected = file =>
   waterfall([saveFile, deleteDraft, updateEntry], file);
-const readTemplate = file =>
-  new Promise((resolve, reject) => {
-    fs.readFile(file.template, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.template = d;
-      resolve(file);
-    });
-  });
-const buildPreview = file =>
-  new Promise(resolve => {
-    file.contents = mustache
+const readTemplate = async file => ({
+  ...file,
+  ...{
+    template: await fs.readFile(file.template, "utf8")
+  }
+});
+const buildPreview = file => ({
+  ...file,
+  ...{
+    contents: mustache
       .render(file.template, file)
       .replace(/="\/img\//g, '="../src/img/')
-      .replace(/="\//g, '="../dist/');
-    resolve(file);
-  });
-const openPreview = file =>
-  new Promise((resolve, reject) => {
-    execFile(exec.open, [file.dest], e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+      .replace(/="\//g, '="../dist/')
+  }
+});
+const openPreview = async file => execFile(exec.open, [file.dest]);
 const previewSelected = file =>
   waterfall([readTemplate, buildPreview, saveFile, openPreview], file);
 const processSelected = file => {

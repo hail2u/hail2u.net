@@ -26,27 +26,17 @@ const generateFileMappings = (files, file) => {
     }
   ]);
 };
-const listFiles = () =>
-  new Promise((resolve, reject) => {
-    fs.readdir(src, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
+const listFiles = async () => {
+  const files = await fs.readdir(src);
 
-      resolve(f.reduce(generateFileMappings, []));
-    });
-  });
-const readCSS = file =>
-  new Promise((resolve, reject) => {
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.contents = d;
-      resolve(file);
-    });
-  });
+  return files.reduce(generateFileMappings, []);
+};
+const readCSS = async file => ({
+  ...file,
+  ...{
+    contents: await fs.readFile(file.src, "utf8")
+  }
+});
 const wrapWithSupports = postcss.plugin("wrap-with-supports", () => css => {
   const supports = postcss.parse("@supports(top:0){}");
 
@@ -61,27 +51,16 @@ const processor = postcss([
   csswring(),
   wrapWithSupports()
 ]);
-const optimizeCSS = file =>
-  processor
-    .process(file.contents, {
+const optimizeCSS = async file => ({
+  ...file,
+  ...{
+    contents: await processor.process(file.contents, {
       from: file.src,
       to: file.dest
     })
-    .then(r => {
-      file.contents = r.css;
-
-      return file;
-    });
-const writeCSS = file =>
-  new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+  }
+});
+const writeCSS = async file => fs.outputFile(file.dest, file.contents);
 const buildCSS = file => waterfall([readCSS, optimizeCSS, writeCSS], file);
 const buildAll = files => Promise.all(files.map(buildCSS));
 

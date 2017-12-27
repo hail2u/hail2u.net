@@ -85,26 +85,8 @@ const entityMap = {
 const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
 const escapeChar = char => entityMap[char];
 const escapeString = string => String(string).replace(escapeRe, escapeChar);
-const readMetadata = () =>
-  new Promise((resolve, reject) => {
-    fs.readJSON(metadataFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
-const readItem = itemFile =>
-  new Promise((resolve, reject) => {
-    fs.readJSON(itemFile, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(o);
-    });
-  });
+const readMetadata = async () => fs.readJSON(metadataFile, "utf8");
+const readItem = async itemFile => fs.readJSON(itemFile, "utf8");
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 const findCover = (image, defaultCardType, defaultCover) => {
@@ -212,62 +194,39 @@ const gatherItems = items =>
     .reverse()
     .map(extendItem);
 const readItems = () => Promise.all(itemFiles.map(readItem)).then(gatherItems);
-const readPartial = file =>
-  new Promise((resolve, reject) => {
-    fs.readFile(path.join(partialDir, file), "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve({
-        [path.basename(file, ".mustache")]: d
-      });
-    });
-  });
+const readPartial = async file => ({
+  [path.basename(file, ".mustache")]: await fs.readFile(
+    path.join(partialDir, file),
+    "utf8"
+  )
+});
 const gatherPartials = partials => Object.assign(...partials);
 const readPartials = partials =>
   Promise.all(partials.map(readPartial)).then(gatherPartials);
-const readPartialDir = () =>
-  new Promise((resolve, reject) => {
-    fs.readdir(partialDir, (e, f) => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(f);
-    });
-  }).then(readPartials);
-const readTemplate = file => {
+const readPartialDir = async () => readPartials(await fs.readdir(partialDir));
+const readTemplate = async file => {
   if (file.template) {
     return file;
   }
 
-  return new Promise((resolve, reject) => {
-    fs.readFile(file.src, "utf8", (e, d) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.template = d;
-      resolve(file);
-    });
-  });
+  return {
+    ...file,
+    ...{
+      template: await fs.readFile(file.src, "utf8")
+    }
+  };
 };
-const readExtradata = file => {
+const readExtradata = async file => {
   if (file.extradata) {
     return file;
   }
 
-  return new Promise((resolve, reject) => {
-    fs.readJSON(file.json, "utf8", (e, o) => {
-      if (e) {
-        return reject(e);
-      }
-
-      file.extradata = o;
-      resolve(file);
-    });
-  });
+  return {
+    ...file,
+    ...{
+      extradata: await fs.readJSON(file.json, "utf8")
+    }
+  };
 };
 const pickByLink = (dest, item) => dest.endsWith(item.link);
 const filterUpdates = (includeUpdates, item) => {
@@ -323,16 +282,11 @@ const renderFile = file => {
 
   return file;
 };
-const writeFile = file =>
-  new Promise((resolve, reject) => {
-    fs.outputFile(file.dest, file.contents, e => {
-      if (e) {
-        return reject(e);
-      }
+const writeFile = async file => {
+  await fs.outputFile(file.dest, file.contents);
 
-      resolve(file);
-    });
-  });
+  return file;
+};
 const build = (metadata, items, partials, file) =>
   waterfall([readTemplate, readExtradata, mergeData, renderFile, writeFile], {
     ...{

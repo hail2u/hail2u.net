@@ -1,7 +1,7 @@
-const { execFile } = require("child_process");
+const execFile = require("../lib/exec-file");
 const path = require("path");
 const waterfall = require("../lib/waterfall");
-const which = require("which");
+const which = require("../lib/which");
 
 const tmp = "../tmp/";
 const src = "../src/img/";
@@ -22,55 +22,32 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const findExec = (name, args) =>
-  new Promise((resolve, reject) => {
-    which(name, (e, p) => {
-      if (e) {
-        return reject(e);
-      }
+const findExec = async (name, args) => [args, await which(name)];
+const toPNG = async (inkscape, file) => {
+  const args = ["-f", file.src, "-e", file.dest];
 
-      resolve([args, p]);
-    });
-  });
-const toPNG = (inkscape, file) =>
-  new Promise((resolve, reject) => {
-    const args = ["-f", file.src, "-e", file.dest];
+  if (file.area) {
+    args.push("-a", file.area);
+  }
 
-    if (file.area) {
-      args.push("-a", file.area);
-    }
+  if (file.height) {
+    args.push("-h", file.height);
+  }
 
-    if (file.height) {
-      args.push("-h", file.height);
-    }
+  if (file.width) {
+    args.push("-w", file.width);
+  }
 
-    if (file.width) {
-      args.push("-w", file.width);
-    }
+  await execFile(inkscape, args);
 
-    execFile(inkscape, args, e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve(file.dest);
-    });
-  });
+  return file.dest;
+};
 const toPNGAll = ([files, inkscape]) =>
   Promise.all(files.map(toPNG.bind(null, inkscape)));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const toFavicon = ([args, convert]) =>
-  new Promise((resolve, reject) => {
-    args = args.filter(isFaviconSource);
-    args.push(`${dest}favicon.ico`);
-    execFile(convert, args, e => {
-      if (e) {
-        return reject(e);
-      }
-
-      resolve();
-    });
-  });
+const toFavicon = async ([args, convert]) => {
+  execFile(convert, [...args.filter(isFaviconSource), `${dest}favicon.ico`]);
+};
 
 process.chdir(__dirname);
 waterfall([
