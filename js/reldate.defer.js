@@ -4,13 +4,11 @@
  */
 const now = performance.timing.navigationStart + performance.now();
 const toRelativeDate = (from, to) => {
-  let diff = 0;
-
   if (!Number.isInteger(to)) {
     return;
   }
 
-  diff = parseInt((from - to) / 1000, 10);
+  let diff = parseInt((from - to) / 1000, 10);
 
   if (!Number.isInteger(diff) || diff < 0) {
     return;
@@ -52,11 +50,11 @@ const toRelativeDate = (from, to) => {
 };
 
 for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
-  const abs = time.getAttribute("datetime");
-  const rel = toRelativeDate(now, Date.parse(abs));
+  const absolute = time.getAttribute("datetime");
+  const relative = toRelativeDate(now, Date.parse(absolute));
 
-  if (rel) {
-    time.setAttribute("title", abs);
-    time.textContent = rel;
+  if (relative) {
+    time.setAttribute("title", absolute);
+    time.textContent = relative;
   }
 }
