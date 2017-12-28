@@ -43,7 +43,11 @@ const readJS = async (srcFile, index, srcFiles) => {
     src: await fs.readFile(srcFile, "utf8")
   };
 };
-const gatherJS = file => Promise.all(file.src.map(readJS)).then(() => file);
+const gatherJS = async file => {
+  await Promise.all(file.src.map(readJS));
+
+  return file;
+};
 const config = {
   compilationLevel: "ADVANCED",
   outputWrapper: "(function () {%output%}).call(window);"

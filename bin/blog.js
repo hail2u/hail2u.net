@@ -106,12 +106,12 @@ const copyArticleImage = async image => {
   image = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
 };
-const copyArticleImages = file => {
-  if (!file.images) {
-    return file;
+const copyArticleImages = async file => {
+  if (file.images) {
+    await Promise.all(file.images.map(copyArticleImage));
   }
 
-  return Promise.all(file.images.map(copyArticleImage)).then(() => file);
+  return file;
 };
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
