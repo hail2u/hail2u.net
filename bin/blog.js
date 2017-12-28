@@ -296,7 +296,7 @@ const checkSelected = file => {
   return file;
 };
 const markupSelected = file => {
-  if (!file.ext !== ".html") {
+  if (file.ext === ".html") {
     return file;
   }
 
