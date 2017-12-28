@@ -169,15 +169,9 @@ const saveFile = async file => {
     return file;
   }
 
-  const writeOptions = {
-    flags: "w"
-  };
-
-  if (argv.publish) {
-    writeOptions.flags = "wx";
-  }
-
-  await fs.outputFile(file.dest, file.contents, writeOptions);
+  await fs.outputFile(file.dest, file.contents, {
+    flags: "wx"
+  });
 
   return file;
 };
