@@ -4,7 +4,6 @@ const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
 const path = require("path");
 const postcss = require("postcss");
-const waterfall = require("../lib/waterfall");
 
 const cssExt = ".css";
 const dest = "../tmp/";
@@ -61,10 +60,19 @@ const optimizeCSS = async file => ({
   }
 });
 const writeCSS = async file => fs.outputFile(file.dest, file.contents);
-const buildCSS = file => waterfall([readCSS, optimizeCSS, writeCSS], file);
+const buildCSS = async file => {
+  file = await readCSS(file);
+  file = await optimizeCSS(file);
+  writeCSS(file);
+};
 const buildAll = files => Promise.all(files.map(buildCSS));
+const main = async () => {
+  const files = await listFiles();
+
+  buildAll(files);
+};
 
 process.chdir(__dirname);
-waterfall([listFiles, buildAll]).catch(e => {
+main().catch(e => {
   console.trace(e);
 });

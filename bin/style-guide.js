@@ -1,5 +1,4 @@
 const fs = require("fs-extra");
-const waterfall = require("../lib/waterfall");
 
 const readStyleGuide = async () => fs.readFile("../src/css/test.html", "utf8");
 const modifyStyleGuide = contents => {
@@ -18,8 +17,14 @@ const modifyStyleGuide = contents => {
 };
 const writeStyleGuide = async contents =>
   fs.outputFile("../dist/style-guide/index.html", contents);
+const main = async () => {
+  let html = await readStyleGuide();
+
+  html = await modifyStyleGuide(html);
+  writeStyleGuide(html);
+};
 
 process.chdir(__dirname);
-waterfall([readStyleGuide, modifyStyleGuide, writeStyleGuide]).catch(e => {
+main().catch(e => {
   console.trace(e);
 });

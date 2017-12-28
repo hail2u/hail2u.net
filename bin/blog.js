@@ -8,7 +8,6 @@ const os = require("os");
 const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
-const waterfall = require("../lib/waterfall");
 const which = require("../lib/which");
 
 const blosxomDir = "../src/blosxom/";
@@ -76,19 +75,22 @@ const saveCache = async articles =>
   fs.outputJSON(cacheFile, articles, {
     spaces: 2
   });
-const updateCache = file => {
+const updateCache = async file => {
   const [title, ...body] = file.contents.split("\n");
+  let cache = await readCache();
 
-  return waterfall([
-    readCache,
-    addArticle.bind(null, {
+  cache = addArticle(
+    {
       body: body.join("\n").trim(),
       link: `/blog/${file.name}.html`,
       title: title.replace(/<.*?>/g, ""),
       unixtime: Date.now()
-    }),
-    saveCache
-  ]).then(() => file);
+    },
+    cache
+  );
+  await saveCache(cache);
+
+  return file;
 };
 const listArticleImages = async file => {
   const data = await fs.readFile(file.src, "utf8");
@@ -197,7 +199,7 @@ const runDocs = async file => {
 
   return file;
 };
-const updateEntry = file => {
+const updateEntry = async file => {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
     destDir,
@@ -214,22 +216,17 @@ const updateEntry = file => {
     );
   }
 
-  return waterfall(
-    [
-      readEntry,
-      addEntry,
-      commitEntry,
-      updateCache,
-      listArticleImages,
-      copyArticleImages,
-      runDocsArticle,
-      buildArticle,
-      saveFile,
-      testArticle,
-      runDocs
-    ],
-    file
-  );
+  file = await readEntry(file);
+  file = await addEntry(file);
+  file = await commitEntry(file);
+  file = await updateCache(file);
+  file = await listArticleImages(file);
+  file = await copyArticleImages(file);
+  file = await runDocsArticle(file);
+  file = await buildArticle(file);
+  file = await saveFile(file);
+  file = await testArticle(file);
+  runDocs(file);
 };
 const isDraft = file => {
   if (
@@ -325,8 +322,11 @@ const deleteDraft = async file => {
 
   return file;
 };
-const publishSelected = file =>
-  waterfall([saveFile, deleteDraft, updateEntry], file);
+const publishSelected = async file => {
+  file = await saveFile(file);
+  file = await deleteDraft(file);
+  updateEntry(file);
+};
 const readTemplate = async file => ({
   ...file,
   ...{
@@ -343,8 +343,12 @@ const buildPreview = file => ({
   }
 });
 const openPreview = async file => execFile(exec.open, [file.dest]);
-const previewSelected = file =>
-  waterfall([readTemplate, buildPreview, saveFile, openPreview], file);
+const previewSelected = async file => {
+  file = await readTemplate(file);
+  file = await buildPreview(file);
+  file = await saveFile(file);
+  openPreview(file);
+};
 const processSelected = file => {
   if (argv.publish) {
     file.dest = path.join(srcDir, `${file.name}.txt`);
@@ -361,26 +365,28 @@ const processSelected = file => {
     }
   });
 };
+const main = async () => {
+  await Promise.all(Object.keys(exec).map(findExec));
+
+  if (argv.update) {
+    return updateEntry({
+      dest: path.resolve(argv.file),
+      verb: "Update"
+    });
+  }
+
+  let files = await listDrafts();
+
+  files = await getDrafts(files);
+
+  let file = await selectDraft(files);
+
+  file = await checkSelected(file);
+  file = await markupSelected(file);
+  processSelected(file);
+};
 
 process.chdir(__dirname);
-Promise.all(Object.keys(exec).map(findExec))
-  .then(() => {
-    if (argv.update) {
-      return updateEntry({
-        dest: path.resolve(argv.file),
-        verb: "Update"
-      });
-    }
-
-    return waterfall([
-      listDrafts,
-      getDrafts,
-      selectDraft,
-      checkSelected,
-      markupSelected,
-      processSelected
-    ]);
-  })
-  .catch(e => {
-    console.trace(e);
-  });
+main().catch(e => {
+  console.trace(e);
+});

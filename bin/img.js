@@ -1,6 +1,5 @@
 const execFile = require("../lib/exec-file");
 const path = require("path");
-const waterfall = require("../lib/waterfall");
 const which = require("../lib/which");
 
 const tmp = "../tmp/";
@@ -22,7 +21,7 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const findExec = async (name, args) => [args, await which(name)];
+const findExec = async name => which(name);
 const toPNG = async (inkscape, file) => {
   const args = ["-f", file.src, "-e", file.dest];
 
@@ -42,20 +41,21 @@ const toPNG = async (inkscape, file) => {
 
   return file.dest;
 };
-const toPNGAll = ([files, inkscape]) =>
+const toPNGAll = (files, inkscape) =>
   Promise.all(files.map(toPNG.bind(null, inkscape)));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const toFavicon = async ([args, convert]) => {
-  execFile(convert, [...args.filter(isFaviconSource), `${dest}favicon.ico`]);
+const toFavicon = async (files, convert) => {
+  execFile(convert, [...files, `${dest}favicon.ico`]);
+};
+const main = async () => {
+  let files = await generateFileMappings();
+
+  files = await toPNGAll(files, await findExec("inkscape"));
+  files = files.filter(isFaviconSource);
+  toFavicon(files, await findExec("convert"));
 };
 
 process.chdir(__dirname);
-waterfall([
-  generateFileMappings,
-  findExec.bind(null, "inkscape"),
-  toPNGAll,
-  findExec.bind(null, "convert"),
-  toFavicon
-]).catch(e => {
+main().catch(e => {
   console.trace(e);
 });

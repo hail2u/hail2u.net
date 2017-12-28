@@ -1,7 +1,6 @@
 const fs = require("fs-extra");
 const { compile } = require("google-closure-compiler-js");
 const path = require("path");
-const waterfall = require("../lib/waterfall");
 
 const tmp = "../tmp/";
 const jsExt = ".js";
@@ -59,10 +58,18 @@ const writeJS = async file =>
       }
     }).compiledCode
   );
-const buildJS = file => waterfall([gatherJS, writeJS], file);
+const buildJS = async file => {
+  file = await gatherJS(file);
+  writeJS(file);
+};
 const buildAll = files => Promise.all(files.map(buildJS));
+const main = async () => {
+  const files = await listFiles();
+
+  buildAll(files);
+};
 
 process.chdir(__dirname);
-waterfall([listFiles, buildAll]).catch(e => {
+main().catch(e => {
   console.trace(e);
 });

@@ -4,7 +4,6 @@ const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
-const waterfall = require("../lib/waterfall");
 
 const article = {
   json: "../src/blog/article.json",
@@ -287,15 +286,21 @@ const writeFile = async file => {
 
   return file;
 };
-const build = (metadata, items, partials, file) =>
-  waterfall([readTemplate, readExtradata, mergeData, renderFile, writeFile], {
+const build = async (metadata, items, partials, file) => {
+  file = {
     ...{
       items: items,
       metadata: metadata,
       partials: partials
     },
     ...file
-  });
+  };
+  file = await readTemplate(file);
+  file = await readExtradata(file);
+  file = await mergeData(file);
+  file = await renderFile(file);
+  writeFile(file);
+};
 const mergeArticle = (file, item) => ({
   ...{
     extradata: file.extradata,
@@ -308,11 +313,13 @@ const generateArticleList = (items, file) =>
   items
     .filter(filterUpdates.bind(null, false))
     .map(mergeArticle.bind(null, file));
-const toArticleList = items =>
-  waterfall(
-    [readTemplate, readExtradata, generateArticleList.bind(null, items)],
-    article
-  );
+const toArticleList = async items => {
+  let file = await readTemplate(article);
+
+  file = await readExtradata(file);
+
+  return generateArticleList(items, file);
+};
 const buildArticles = (metadata, items, partials, articles) =>
   Promise.all(articles.map(build.bind(null, metadata, items, partials)));
 const buildAll = ([metadata, items, partials]) => {
@@ -331,15 +338,20 @@ const buildAll = ([metadata, items, partials]) => {
     );
   }
 
-  return Promise.all(
-    files.map(build.bind(null, metadata, items, partials))
-  );
+  return Promise.all(files.map(build.bind(null, metadata, items, partials)));
+};
+const main = async () => {
+  const data = await Promise.all([
+    readMetadata(),
+    readItems(),
+    readPartialDir()
+  ]);
+
+  buildAll(data);
 };
 
 process.chdir(__dirname);
 mustache.escape = escapeString;
-Promise.all([readMetadata(), readItems(), readPartialDir()])
-  .then(buildAll)
-  .catch(e => {
-    console.trace(e);
-  });
+main().catch(e => {
+  console.trace(e);
+});
