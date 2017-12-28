@@ -33,11 +33,8 @@ const generateFileMappings = (files, srcFile) => {
 
   return files;
 };
-const listFiles = async () => {
-  const files = await fs.readdir(src);
-
-  return files.reduce(generateFileMappings, []);
-};
+const listFiles = async () =>
+  (await fs.readdir(src)).reduce(generateFileMappings, []);
 const readJS = async (srcFile, index, srcFiles) => {
   srcFiles[index] = {
     src: await fs.readFile(srcFile, "utf8")
@@ -62,16 +59,9 @@ const writeJS = async file =>
       }
     }).compiledCode
   );
-const buildJS = async file => {
-  file = await gatherJS(file);
-  writeJS(file);
-};
+const buildJS = async file => writeJS(await gatherJS(file));
 const buildAll = files => Promise.all(files.map(buildJS));
-const main = async () => {
-  const files = await listFiles();
-
-  buildAll(files);
-};
+const main = async () => buildAll(await listFiles());
 
 process.chdir(__dirname);
 main().catch(e => {

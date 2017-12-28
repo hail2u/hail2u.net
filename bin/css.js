@@ -25,11 +25,8 @@ const generateFileMappings = (files, file) => {
     }
   ]);
 };
-const listFiles = async () => {
-  const files = await fs.readdir(src);
-
-  return files.reduce(generateFileMappings, []);
-};
+const listFiles = async () =>
+  (await fs.readdir(src)).reduce(generateFileMappings, []);
 const readCSS = async file => ({
   ...file,
   ...{
@@ -66,11 +63,7 @@ const buildCSS = async file => {
   writeCSS(file);
 };
 const buildAll = files => Promise.all(files.map(buildCSS));
-const main = async () => {
-  const files = await listFiles();
-
-  buildAll(files);
-};
+const main = async () => buildAll(await listFiles());
 
 process.chdir(__dirname);
 main().catch(e => {

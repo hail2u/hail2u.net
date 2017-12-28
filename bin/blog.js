@@ -92,16 +92,14 @@ const updateCache = async file => {
 
   return file;
 };
-const listArticleImages = async file => {
-  const data = await fs.readFile(file.src, "utf8");
-
-  return {
-    ...file,
-    ...{
-      images: data.match(/\bsrc="\/img\/blog\/.*?"/g)
-    }
-  };
-};
+const listArticleImages = async file => ({
+  ...file,
+  ...{
+    images: (await fs.readFile(file.src, "utf8")).match(
+      /\bsrc="\/img\/blog\/.*?"/g
+    )
+  }
+});
 const copyArticleImage = async image => {
   image = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
@@ -231,22 +229,15 @@ const isDraft = file => {
 
   return false;
 };
-const listDrafts = async () => {
-  const files = await fs.readdir(draftDir);
-
-  return files.filter(isDraft);
-};
+const listDrafts = async () => (await fs.readdir(draftDir)).filter(isDraft);
 const getDraft = async file => {
   file = path.join(draftDir, file);
 
   return {
-    ...file,
-    ...{
-      contents: await fs.readFile(file, "utf8"),
-      ext: path.extname(file),
-      name: path.basename(file, path.extname(file)),
-      src: file
-    }
+    contents: await fs.readFile(file, "utf8"),
+    ext: path.extname(file),
+    name: path.basename(file, path.extname(file)),
+    src: file
   };
 };
 const getDrafts = files => Promise.all(files.map(getDraft));
@@ -305,11 +296,16 @@ const checkSelected = file => {
   return file;
 };
 const markupSelected = file => {
-  if (file.ext !== ".html") {
-    file.contents = markdown(file.contents);
+  if (!file.ext !== ".html") {
+    return file;
   }
 
-  return file;
+  return {
+    ...file,
+    ...{
+      contents: markdown(file.contents)
+    }
+  };
 };
 const deleteDraft = async file => {
   await fs.unlink(file.src);

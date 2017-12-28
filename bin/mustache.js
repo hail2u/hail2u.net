@@ -192,11 +192,8 @@ const gatherItems = items =>
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
-const readItems = async () => {
-  const items = await Promise.all(itemFiles.map(readItem));
-
-  gatherItems(items);
-};
+const readItems = async () =>
+  gatherItems(await Promise.all(itemFiles.map(readItem)));
 const readPartial = async file => ({
   [path.basename(file, ".mustache")]: await fs.readFile(
     path.join(partialDir, file),
@@ -204,11 +201,8 @@ const readPartial = async file => ({
   )
 });
 const gatherPartials = partials => Object.assign(...partials);
-const readPartials = async partials => {
-  partials = await Promise.all(partials.map(readPartial));
-
-  return gatherPartials(partials);
-};
+const readPartials = async partials =>
+  gatherPartials(await Promise.all(partials.map(readPartial)));
 const readPartialDir = async () => readPartials(await fs.readdir(partialDir));
 const readTemplate = async file => {
   if (file.template) {
@@ -347,15 +341,8 @@ const buildAll = async ([metadata, items, partials]) => {
 
   return Promise.all(files.map(build.bind(null, metadata, items, partials)));
 };
-const main = async () => {
-  const data = await Promise.all([
-    readMetadata(),
-    readItems(),
-    readPartialDir()
-  ]);
-
-  buildAll(data);
-};
+const main = async () =>
+  buildAll(await Promise.all([readMetadata(), readItems(), readPartialDir()]));
 
 process.chdir(__dirname);
 mustache.escape = escapeString;

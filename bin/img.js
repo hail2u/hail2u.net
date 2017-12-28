@@ -44,9 +44,8 @@ const toPNG = async (inkscape, file) => {
 const toPNGAll = (files, inkscape) =>
   Promise.all(files.map(toPNG.bind(null, inkscape)));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const toFavicon = async (files, convert) => {
+const toFavicon = async (files, convert) =>
   execFile(convert, [...files, `${dest}favicon.ico`]);
-};
 const main = async () => {
   let files = await generateFileMappings();
 
