@@ -50,11 +50,9 @@ const main = async () => {
     findExec("inkscape"),
     generateFileMappings()
   ]);
-  const favicons = (await Promise.all(
-    files.map(toPNG.bind(null, inkscape))
-  )).filter(isFaviconSource);
+  const favicons = await Promise.all(files.map(toPNG.bind(null, inkscape)));
 
-  toFavicon(favicons, convert);
+  toFavicon(favicons.filter(isFaviconSource), convert);
 };
 
 process.chdir(__dirname);

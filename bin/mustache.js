@@ -192,8 +192,11 @@ const gatherItems = items =>
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
-const readItems = async () =>
-  gatherItems(await Promise.all(itemFiles.map(readItem)));
+const readItems = async () => {
+  const items = await Promise.all(itemFiles.map(readItem));
+
+  return gatherItems(items);
+};
 const readPartial = async file => ({
   [path.basename(file, ".mustache")]: await fs.readFile(
     path.join(partialDir, file),
@@ -201,9 +204,16 @@ const readPartial = async file => ({
   )
 });
 const gatherPartials = partials => Object.assign(...partials);
-const readPartials = async partials =>
-  gatherPartials(await Promise.all(partials.map(readPartial)));
-const readPartialDir = async () => readPartials(await fs.readdir(partialDir));
+const readPartials = async partials => {
+  partials = await Promise.all(partials.map(readPartial));
+
+  return gatherPartials(partials);
+};
+const readPartialDir = async () => {
+  const partials = await fs.readdir(partialDir);
+
+  return readPartials(partials);
+};
 const readTemplate = async file => {
   if (file.template) {
     return file;
@@ -338,10 +348,10 @@ const main = async () => {
   }
 
   if (argv.articles) {
+    const articles = await toArticleList(items);
+
     return Promise.all(
-      (await toArticleList(items)).map(
-        build.bind(null, metadata, items, partials)
-      )
+      articles.map(build.bind(null, metadata, items, partials))
     );
   }
 

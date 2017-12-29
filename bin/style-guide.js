@@ -17,10 +17,10 @@ const modifyStyleGuide = contents =>
 const writeStyleGuide = contents =>
   fs.outputFile("../dist/style-guide/index.html", contents);
 const main = async () => {
-  let html = await readStyleGuide();
+  let styleGuide = await readStyleGuide();
 
-  html = await modifyStyleGuide(html);
-  writeStyleGuide(html);
+  styleGuide = await modifyStyleGuide(styleGuide);
+  writeStyleGuide(styleGuide);
 };
 
 process.chdir(__dirname);

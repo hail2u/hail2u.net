@@ -77,29 +77,30 @@ const saveCache = articles =>
   });
 const updateCache = async file => {
   const [title, ...body] = file.contents.split("\n");
-  let cache = await readCache();
-
-  cache = addArticle(
+  const cache = addArticle(
     {
       body: body.join("\n").trim(),
       link: `/blog/${file.name}.html`,
       title: title.replace(/<.*?>/g, ""),
       unixtime: Date.now()
     },
-    cache
+    await readCache()
   );
+
   await saveCache(cache);
 
   return file;
 };
-const listArticleImages = async file => ({
-  ...file,
-  ...{
-    images: (await fs.readFile(file.src, "utf8")).match(
-      /\bsrc="\/img\/blog\/.*?"/g
-    )
-  }
-});
+const listArticleImages = async file => {
+  const content = await fs.readFile(file.src, "utf8");
+
+  return {
+    ...file,
+    ...{
+      images: content.match(/\bsrc="\/img\/blog\/.*?"/g)
+    }
+  };
+};
 const copyArticleImage = image => {
   image = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
@@ -229,7 +230,11 @@ const isDraft = file => {
 
   return false;
 };
-const listDrafts = async () => (await fs.readdir(draftDir)).filter(isDraft);
+const listDrafts = async () => {
+  const files = await fs.readdir(draftDir);
+
+  return files.filter(isDraft);
+};
 const getDraft = async file => {
   file = path.join(draftDir, file);
 
