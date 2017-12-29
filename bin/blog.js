@@ -114,7 +114,7 @@ const copyArticleImages = async file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const runDocsArticle = async file => {
+const runHTMLArticle = async file => {
   if (argv.publish) {
     return file;
   }
@@ -184,7 +184,7 @@ const testArticle = async file => {
 
   return file;
 };
-const runDocs = async file => {
+const runHTML = async file => {
   const { stdout } = await execFile(exec.npm, ["run", "html"]);
 
   process.stdout.write(stdout);
@@ -214,11 +214,11 @@ const updateEntry = async file => {
   file = await updateCache(file);
   file = await listArticleImages(file);
   file = await copyArticleImages(file);
-  file = await runDocsArticle(file);
+  file = await runHTMLArticle(file);
   file = await buildArticle(file);
   file = await saveFile(file);
   file = await testArticle(file);
-  runDocs(file);
+  runHTML(file);
 };
 const isDraft = file => {
   if (
