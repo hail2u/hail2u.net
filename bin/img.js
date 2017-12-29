@@ -2,6 +2,7 @@ const execFile = require("../lib/exec-file");
 const path = require("path");
 const which = require("../lib/which");
 
+const findExec = name => which(name);
 const tmp = "../tmp/";
 const src = "../src/img/";
 const toFaviconMapping = size => ({
@@ -21,7 +22,6 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const findExec = name => which(name);
 const toPNG = async (inkscape, file) => {
   const args = ["-f", file.src, "-e", file.dest];
 
@@ -45,13 +45,16 @@ const isFaviconSource = file => path.basename(file).startsWith("favicon-");
 const toFavicon = (files, convert) =>
   execFile(convert, [...files, `${dest}favicon.ico`]);
 const main = async () => {
-  let files = await generateFileMappings();
+  const [convert, inkscape, files] = await Promise.all([
+    findExec("convert"),
+    findExec("inkscape"),
+    generateFileMappings()
+  ]);
+  const favicons = (await Promise.all(
+    files.map(toPNG.bind(null, inkscape))
+  )).filter(isFaviconSource);
 
-  files = await Promise.all(
-    files.map(toPNG.bind(null, await findExec("inkscape")))
-  );
-  files = files.filter(isFaviconSource);
-  toFavicon(files, await findExec("convert"));
+  toFavicon(favicons, convert);
 };
 
 process.chdir(__dirname);
