@@ -60,8 +60,7 @@ const writeJS = async file =>
     }).compiledCode
   );
 const buildJS = async file => writeJS(await gatherJS(file));
-const buildAll = files => Promise.all(files.map(buildJS));
-const main = async () => buildAll(await listFiles());
+const main = async () => Promise.all((await listFiles()).map(buildJS));
 
 process.chdir(__dirname);
 main().catch(e => {

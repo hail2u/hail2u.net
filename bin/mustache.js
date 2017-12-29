@@ -84,8 +84,8 @@ const entityMap = {
 const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
 const escapeChar = char => entityMap[char];
 const escapeString = string => String(string).replace(escapeRe, escapeChar);
-const readMetadata = async () => fs.readJSON(metadataFile, "utf8");
-const readItem = async itemFile => fs.readJSON(itemFile, "utf8");
+const readMetadata = () => fs.readJSON(metadataFile, "utf8");
+const readItem = itemFile => fs.readJSON(itemFile, "utf8");
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 const findCover = (image, defaultCardType, defaultCover) => {
@@ -321,9 +321,13 @@ const toArticleList = async items => {
 
   return generateArticleList(items, file);
 };
-const buildArticles = (metadata, items, partials, articles) =>
-  Promise.all(articles.map(build.bind(null, metadata, items, partials)));
-const buildAll = async ([metadata, items, partials]) => {
+const main = async () => {
+  const [metadata, items, partials] = await Promise.all([
+    readMetadata(),
+    readItems(),
+    readPartialDir()
+  ]);
+
   if (argv.article) {
     return build(metadata, items, partials, {
       ...{
@@ -334,15 +338,15 @@ const buildAll = async ([metadata, items, partials]) => {
   }
 
   if (argv.articles) {
-    const articles = await toArticleList(items);
-
-    return buildArticles(metadata, items, partials, articles);
+    return Promise.all(
+      (await toArticleList(items)).map(
+        build.bind(null, metadata, items, partials)
+      )
+    );
   }
 
   return Promise.all(files.map(build.bind(null, metadata, items, partials)));
 };
-const main = async () =>
-  buildAll(await Promise.all([readMetadata(), readItems(), readPartialDir()]));
 
 process.chdir(__dirname);
 mustache.escape = escapeString;

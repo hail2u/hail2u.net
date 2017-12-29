@@ -41,15 +41,15 @@ const toPNG = async (inkscape, file) => {
 
   return file.dest;
 };
-const toPNGAll = (files, inkscape) =>
-  Promise.all(files.map(toPNG.bind(null, inkscape)));
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
 const toFavicon = async (files, convert) =>
   execFile(convert, [...files, `${dest}favicon.ico`]);
 const main = async () => {
   let files = await generateFileMappings();
 
-  files = await toPNGAll(files, await findExec("inkscape"));
+  files = await Promise.all(
+    files.map(toPNG.bind(null, await findExec("inkscape")))
+  );
   files = files.filter(isFaviconSource);
   toFavicon(files, await findExec("convert"));
 };

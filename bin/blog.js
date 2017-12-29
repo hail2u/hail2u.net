@@ -26,7 +26,7 @@ const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
 const findExec = async name => {
-  exec[name] = await which(name);
+  exec[name] = await which(exec[name]);
 };
 const readEntry = async file => {
   if (file.contents) {
@@ -240,7 +240,6 @@ const getDraft = async file => {
     src: file
   };
 };
-const getDrafts = files => Promise.all(files.map(getDraft));
 const selectDraft = files =>
   new Promise((resolve, reject) => {
     if (!argv.publish && files.length === 1) {
@@ -367,7 +366,7 @@ const main = async () => {
 
   let files = await listDrafts();
 
-  files = await getDrafts(files);
+  files = await Promise.all(files.map(getDraft));
 
   let file = await selectDraft(files);
 

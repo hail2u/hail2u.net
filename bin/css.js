@@ -62,8 +62,7 @@ const buildCSS = async file => {
   file = await optimizeCSS(file);
   writeCSS(file);
 };
-const buildAll = files => Promise.all(files.map(buildCSS));
-const main = async () => buildAll(await listFiles());
+const main = async () => Promise.all((await listFiles()).map(buildCSS));
 
 process.chdir(__dirname);
 main().catch(e => {
