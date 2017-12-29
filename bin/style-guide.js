@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 
-const readStyleGuide = async () => fs.readFile("../src/css/test.html", "utf8");
+const readStyleGuide = () => fs.readFile("../src/css/test.html", "utf8");
 const url = "https://hail2u.net/";
 const dir = "../";
 const rewriteURL = (m, a, e, o, u, c) => {
@@ -14,7 +14,7 @@ const rewriteURL = (m, a, e, o, u, c) => {
 };
 const modifyStyleGuide = contents =>
   contents.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL);
-const writeStyleGuide = async contents =>
+const writeStyleGuide = contents =>
   fs.outputFile("../dist/style-guide/index.html", contents);
 const main = async () => {
   let html = await readStyleGuide();

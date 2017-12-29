@@ -57,7 +57,7 @@ const commitEntry = async file => {
 
   return file;
 };
-const readCache = async () => fs.readJSON(cacheFile, "utf8");
+const readCache = () => fs.readJSON(cacheFile, "utf8");
 const isDuplicate = (link, value) => value.link === link;
 const addArticle = (article, articles) => {
   const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
@@ -71,7 +71,7 @@ const addArticle = (article, articles) => {
 
   return articles;
 };
-const saveCache = async articles =>
+const saveCache = articles =>
   fs.outputJSON(cacheFile, articles, {
     spaces: 2
   });
@@ -100,7 +100,7 @@ const listArticleImages = async file => ({
     )
   }
 });
-const copyArticleImage = async image => {
+const copyArticleImage = image => {
   image = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
 };
@@ -331,7 +331,7 @@ const buildPreview = file => ({
       .replace(/="\//g, '="../dist/')
   }
 });
-const openPreview = async file => execFile(exec.open, [file.dest]);
+const openPreview = file => execFile(exec.open, [file.dest]);
 const previewSelected = async file => {
   file = await readTemplate(file);
   file = await buildPreview(file);

@@ -49,7 +49,7 @@ const config = {
   compilationLevel: "ADVANCED",
   outputWrapper: "(function () {%output%}).call(window);"
 };
-const writeJS = async file =>
+const writeJS = file =>
   fs.outputFile(
     file.dest,
     compile({

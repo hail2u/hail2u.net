@@ -56,7 +56,7 @@ const optimizeCSS = async file => ({
     })
   }
 });
-const writeCSS = async file => fs.outputFile(file.dest, file.contents);
+const writeCSS = file => fs.outputFile(file.dest, file.contents);
 const buildCSS = async file => {
   file = await readCSS(file);
   file = await optimizeCSS(file);

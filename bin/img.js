@@ -21,7 +21,7 @@ const generateFileMappings = () => {
     }
   ]);
 };
-const findExec = async name => which(name);
+const findExec = name => which(name);
 const toPNG = async (inkscape, file) => {
   const args = ["-f", file.src, "-e", file.dest];
 
@@ -42,7 +42,7 @@ const toPNG = async (inkscape, file) => {
   return file.dest;
 };
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
-const toFavicon = async (files, convert) =>
+const toFavicon = (files, convert) =>
   execFile(convert, [...files, `${dest}favicon.ico`]);
 const main = async () => {
   let files = await generateFileMappings();
