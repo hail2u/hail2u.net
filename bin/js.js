@@ -2,11 +2,17 @@ const fs = require("fs-extra");
 const { compile } = require("google-closure-compiler-js");
 const path = require("path");
 
-const tmp = "../tmp/";
+const config = {
+  compilationLevel: "ADVANCED",
+  outputWrapper: "(function () {%output%}).call(window);"
+};
 const jsExt = ".js";
 const minExt = ".min";
-const isSameDest = (dest, file) => file.dest === dest;
 const src = "../src/js/";
+const tmp = "../tmp/";
+
+const isSameDest = (dest, file) => file.dest === dest;
+
 const generateFileMappings = (files, srcFile) => {
   if (path.extname(srcFile) !== jsExt) {
     return files;
@@ -33,25 +39,25 @@ const generateFileMappings = (files, srcFile) => {
 
   return files;
 };
+
 const listFiles = async () => {
   const files = await fs.readdir(src);
 
   return files.reduce(generateFileMappings, []);
 };
+
 const readJS = async (srcFile, index, srcFiles) => {
   srcFiles[index] = {
     src: await fs.readFile(srcFile, "utf8")
   };
 };
+
 const gatherJS = async file => {
   await Promise.all(file.src.map(readJS));
 
   return file;
 };
-const config = {
-  compilationLevel: "ADVANCED",
-  outputWrapper: "(function () {%output%}).call(window);"
-};
+
 const writeJS = file =>
   fs.outputFile(
     file.dest,
@@ -62,10 +68,12 @@ const writeJS = file =>
       }
     }).compiledCode
   );
+
 const buildJS = async file => {
   file = await gatherJS(file);
   writeJS(file);
 };
+
 const main = async () => {
   const files = await listFiles();
 

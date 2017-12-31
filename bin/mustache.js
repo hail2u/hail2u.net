@@ -5,11 +5,24 @@ const mustache = require("mustache");
 const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
 
+const argv = minimist(process.argv.slice(2), {
+  boolean: ["articles"],
+  string: ["article"]
+});
 const article = {
   json: "../src/blog/article.json",
   src: "../src/blog/article.mustache"
 };
 const destDir = "../dist/";
+const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const entityMap = {
+  '"': "&quot;",
+  "&": "&amp;",
+  "'": "&#39;",
+  "<": "&lt;",
+  ">": "&gt;"
+};
+const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -72,45 +85,6 @@ const files = [
 ];
 const itemFiles = ["../src/blog/articles.json", "../src/updates.json"];
 const metadataFile = "../src/metadata.json";
-const partialDir = "../src/partial/";
-
-const entityMap = {
-  '"': "&quot;",
-  "&": "&amp;",
-  "'": "&#39;",
-  "<": "&lt;",
-  ">": "&gt;"
-};
-const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
-const escapeChar = char => entityMap[char];
-const escapeString = string => String(string).replace(escapeRe, escapeChar);
-const readMetadata = () => fs.readJSON(metadataFile, "utf8");
-const readItem = itemFile => fs.readJSON(itemFile, "utf8");
-const sortByDate = (a, b) =>
-  parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
-const findCover = (image, defaultCardType, defaultCover) => {
-  if (!image) {
-    return [defaultCardType, defaultCover];
-  }
-
-  return ["summary_large_image", image[1]];
-};
-const argv = minimist(process.argv.slice(2), {
-  boolean: ["articles"],
-  string: ["article"]
-});
-const pad = number => {
-  if (number >= 10) {
-    return number;
-  }
-
-  return `0${number}`;
-};
-const toHTML5Date = (day, date, month, year, hour, minute, second) =>
-  `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
-    second
-  )}+09:00`;
-const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const monthNames = [
   "Jan",
   "Feb",
@@ -125,10 +99,45 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
+const partialDir = "../src/partial/";
+
+const escapeChar = char => entityMap[char];
+
+const escapeString = string => String(string).replace(escapeRe, escapeChar);
+
+const readMetadata = () => fs.readJSON(metadataFile, "utf8");
+
+const readItem = itemFile => fs.readJSON(itemFile, "utf8");
+
+const sortByDate = (a, b) =>
+  parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
+
+const findCover = (image, defaultCardType, defaultCover) => {
+  if (!image) {
+    return [defaultCardType, defaultCover];
+  }
+
+  return ["summary_large_image", image[1]];
+};
+
+const pad = number => {
+  if (number >= 10) {
+    return number;
+  }
+
+  return `0${number}`;
+};
+
+const toHTML5Date = (day, date, month, year, hour, minute, second) =>
+  `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
+    second
+  )}+09:00`;
+
 const toRFC822Date = (day, date, month, year, hour, minute, second) =>
   `${dow[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(hour)}:${pad(
     minute
   )}:${pad(second)} +0900`;
+
 const extendItem = (item, index, original) => {
   const dt = new Date(item.unixtime);
 
@@ -186,34 +195,41 @@ const extendItem = (item, index, original) => {
 
   return item;
 };
+
 const gatherItems = items =>
   []
     .concat(...items)
     .sort(sortByDate)
     .reverse()
     .map(extendItem);
+
 const readItems = async () => {
   const items = await Promise.all(itemFiles.map(readItem));
 
   return gatherItems(items);
 };
+
 const readPartial = async file => ({
   [path.basename(file, ".mustache")]: await fs.readFile(
     path.join(partialDir, file),
     "utf8"
   )
 });
+
 const gatherPartials = partials => Object.assign(...partials);
+
 const readPartials = async partials => {
   partials = await Promise.all(partials.map(readPartial));
 
   return gatherPartials(partials);
 };
+
 const readPartialDir = async () => {
   const partials = await fs.readdir(partialDir);
 
   return readPartials(partials);
 };
+
 const readTemplate = async file => {
   if (file.template) {
     return file;
@@ -226,6 +242,7 @@ const readTemplate = async file => {
     }
   };
 };
+
 const readExtradata = async file => {
   if (file.extradata) {
     return file;
@@ -238,7 +255,9 @@ const readExtradata = async file => {
     }
   };
 };
+
 const pickByLink = (dest, item) => dest.endsWith(item.link);
+
 const filterUpdates = (includeUpdates, item) => {
   if (item.link.startsWith("/blog/")) {
     return true;
@@ -250,6 +269,7 @@ const filterUpdates = (includeUpdates, item) => {
 
   return false;
 };
+
 const now = date =>
   toRFC822Date(
     date.getDay(),
@@ -260,6 +280,7 @@ const now = date =>
     date.getMinutes(),
     date.getSeconds()
   );
+
 const mergeData = file => {
   if (argv.article || argv.articles) {
     file.extradata = {
@@ -283,6 +304,7 @@ const mergeData = file => {
 
   return file;
 };
+
 const renderFile = file => {
   file.contents = mustache.render(file.template, file.data, file.partials);
 
@@ -292,7 +314,9 @@ const renderFile = file => {
 
   return file;
 };
+
 const writeFile = file => fs.outputFile(file.dest, file.contents);
+
 const build = async (metadata, items, partials, file) => {
   file = {
     ...{
@@ -308,6 +332,7 @@ const build = async (metadata, items, partials, file) => {
   file = await renderFile(file);
   writeFile(file);
 };
+
 const mergeArticle = (file, item) => ({
   ...{
     extradata: file.extradata,
@@ -316,10 +341,12 @@ const mergeArticle = (file, item) => ({
   },
   ...article
 });
+
 const generateArticleList = (items, file) =>
   items
     .filter(filterUpdates.bind(null, false))
     .map(mergeArticle.bind(null, file));
+
 const toArticleList = async items => {
   let file = await readTemplate(article);
 
@@ -327,6 +354,7 @@ const toArticleList = async items => {
 
   return generateArticleList(items, file);
 };
+
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
     readMetadata(),

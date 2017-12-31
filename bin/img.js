@@ -2,15 +2,17 @@ const execFile = require("../lib/exec-file");
 const path = require("path");
 const which = require("../lib/which");
 
+const dest = "../dist/";
 const findExec = name => which(name);
-const tmp = "../tmp/";
 const src = "../src/img/";
+const tmp = "../tmp/";
+
 const toFaviconMapping = size => ({
   dest: path.join(tmp, `favicon-${size}.png`),
   src: path.join(src, "favicon.svg"),
   width: size
 });
-const dest = "../dist/";
+
 const generateFileMappings = () => {
   const touchIconBasename = "apple-touch-icon-precomposed";
 
@@ -22,6 +24,7 @@ const generateFileMappings = () => {
     }
   ]);
 };
+
 const toPNG = async (inkscape, file) => {
   const args = ["-f", file.src, "-e", file.dest];
 
@@ -41,9 +44,12 @@ const toPNG = async (inkscape, file) => {
 
   return file.dest;
 };
+
 const isFaviconSource = file => path.basename(file).startsWith("favicon-");
+
 const toFavicon = (files, convert) =>
   execFile(convert, [...files, `${dest}favicon.ico`]);
+
 const main = async () => {
   const [convert, inkscape, files] = await Promise.all([
     findExec("convert"),

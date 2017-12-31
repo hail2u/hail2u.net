@@ -1,8 +1,10 @@
 const fs = require("fs-extra");
 
-const readStyleGuide = () => fs.readFile("../src/css/test.html", "utf8");
-const url = "https://hail2u.net/";
 const dir = "../";
+const url = "https://hail2u.net/";
+
+const readStyleGuide = () => fs.readFile("../src/css/test.html", "utf8");
+
 const rewriteURL = (m, a, e, o, u, c) => {
   if (u.startsWith(url)) {
     u = u.substr(url.length - 1);
@@ -12,8 +14,10 @@ const rewriteURL = (m, a, e, o, u, c) => {
 
   return `${a}${e}${o}${u}${c}`;
 };
+
 const writeStyleGuide = contents =>
   fs.outputFile("../dist/style-guide/index.html", contents);
+
 const main = async () => {
   let styleGuide = await readStyleGuide();
 
