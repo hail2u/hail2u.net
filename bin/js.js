@@ -11,6 +11,8 @@ const minExt = ".min";
 const src = "../src/js/";
 const tmp = "../tmp/";
 
+const toFilePath = filename => path.join(src, filename);
+
 const isSameDest = (dest, file) => file.dest === dest;
 
 const generateFileMappings = (files, srcFile) => {
@@ -25,8 +27,6 @@ const generateFileMappings = (files, srcFile) => {
       .replace(/^./, "")}${minExt}${jsExt}`
   );
   const file = files.find(isSameDest.bind(null, destFile));
-
-  srcFile = path.join(src, srcFile);
 
   if (file) {
     file.src.push(srcFile);
@@ -43,34 +43,26 @@ const generateFileMappings = (files, srcFile) => {
 const listFiles = async () => {
   const files = await fs.readdir(src);
 
-  return files.reduce(generateFileMappings, []);
+  return files.map(toFilePath).reduce(generateFileMappings, []);
 };
 
-const readJS = async (srcFile, index, srcFiles) => {
-  srcFiles[index] = {
-    src: await fs.readFile(srcFile, "utf8")
-  };
-};
+const readJS = srcFile => fs.readFile(srcFile, "utf8");
 
-const gatherJS = async file => {
-  await Promise.all(file.src.map(readJS));
+const gatherJS = file => Promise.all(file.src.map(readJS));
 
-  return file;
-};
+const compileJS = file =>
+  compile({
+    ...config,
+    ...{
+      jsCode: file.src
+    }
+  }).compiledCode;
 
-const writeJS = file =>
-  fs.outputFile(
-    file.dest,
-    compile({
-      ...config,
-      ...{
-        jsCode: file.src
-      }
-    }).compiledCode
-  );
+const writeJS = file => fs.outputFile(file.dest, file.contents);
 
 const buildJS = async file => {
-  file = await gatherJS(file);
+  file.src = await gatherJS(file);
+  file.contents = compileJS(file);
   writeJS(file);
 };
 

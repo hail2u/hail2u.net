@@ -40,28 +40,20 @@ const listFiles = async () => {
   return files.reduce(generateFileMappings, []);
 };
 
-const readCSS = async file => ({
-  ...file,
-  ...{
-    contents: await fs.readFile(file.src, "utf8")
-  }
-});
+const readCSS = file =>
+  fs.readFile(file.src, "utf8");
 
-const optimizeCSS = async file => ({
-  ...file,
-  ...{
-    contents: await processor.process(file.contents, {
-      from: file.src,
-      to: file.dest
-    })
-  }
-});
+const optimizeCSS = file =>
+  processor.process(file.contents, {
+    from: file.src,
+    to: file.dest
+  });
 
 const writeCSS = file => fs.outputFile(file.dest, file.contents);
 
 const buildCSS = async file => {
-  file = await readCSS(file);
-  file = await optimizeCSS(file);
+  file.contents = await readCSS(file);
+  file.contents = await optimizeCSS(file);
   writeCSS(file);
 };
 

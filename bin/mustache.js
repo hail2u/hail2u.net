@@ -140,6 +140,7 @@ const toRFC822Date = (day, date, month, year, hour, minute, second) =>
 
 const extendItem = (item, index, original) => {
   const dt = new Date(item.unixtime);
+  let idx = index;
 
   [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
@@ -181,12 +182,12 @@ const extendItem = (item, index, original) => {
   );
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
 
-  if (index === 0) {
+  if (idx === 0) {
     item.isLatest = true;
-    index = original.length;
+    idx = original.length;
   }
 
-  const previousItem = original[index - 1];
+  const previousItem = original[idx - 1];
 
   if (item.year !== previousItem.year) {
     item.isFirstInYear = true;
@@ -218,42 +219,27 @@ const readPartial = async file => ({
 
 const gatherPartials = partials => Object.assign(...partials);
 
-const readPartials = async partials => {
+const readPartials = async () => {
+  let partials = await fs.readdir(partialDir);
   partials = await Promise.all(partials.map(readPartial));
 
   return gatherPartials(partials);
 };
 
-const readPartialDir = async () => {
-  const partials = await fs.readdir(partialDir);
-
-  return readPartials(partials);
-};
-
-const readTemplate = async file => {
+const readTemplate = file => {
   if (file.template) {
     return file;
   }
 
-  return {
-    ...file,
-    ...{
-      template: await fs.readFile(file.src, "utf8")
-    }
-  };
+  return fs.readFile(file.src, "utf8");
 };
 
-const readExtradata = async file => {
+const readExtradata = file => {
   if (file.extradata) {
     return file;
   }
 
-  return {
-    ...file,
-    ...{
-      extradata: await fs.readJSON(file.json, "utf8")
-    }
-  };
+  return fs.readJSON(file.json, "utf8");
 };
 
 const pickByLink = (dest, item) => dest.endsWith(item.link);
@@ -297,28 +283,27 @@ const mergeData = file => {
   }
 
   file.extradata.lastBuildDate = now(new Date());
-  file.data = {
+  return {
     ...file.metadata,
     ...file.extradata
   };
-
-  return file;
 };
 
-const renderFile = file => {
-  file.contents = mustache.render(file.template, file.data, file.partials);
+const renderFile = file =>
+  mustache.render(file.template, file.data, file.partials);
 
-  if (file.dest.endsWith(".html")) {
-    file.contents = minifyHTML(file.contents);
+const minifyContents = file => {
+  if (!file.dest.endsWith(".html")) {
+    return file.contents;
   }
 
-  return file;
+  return minifyHTML(file.contents);
 };
 
 const writeFile = file => fs.outputFile(file.dest, file.contents);
 
 const build = async (metadata, items, partials, file) => {
-  file = {
+  const built = {
     ...{
       items: items,
       metadata: metadata,
@@ -326,11 +311,12 @@ const build = async (metadata, items, partials, file) => {
     },
     ...file
   };
-  file = await readTemplate(file);
-  file = await readExtradata(file);
-  file = await mergeData(file);
-  file = await renderFile(file);
-  writeFile(file);
+  built.template = await readTemplate(built);
+  built.extradata = await readExtradata(built);
+  built.data = await mergeData(built);
+  built.contents = await renderFile(built);
+  built.contents = await minifyContents(built);
+  writeFile(built);
 };
 
 const mergeArticle = (file, item) => ({
@@ -359,7 +345,7 @@ const main = async () => {
   const [metadata, items, partials] = await Promise.all([
     readMetadata(),
     readItems(),
-    readPartialDir()
+    readPartials()
   ]);
 
   if (argv.article) {

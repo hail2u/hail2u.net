@@ -99,22 +99,17 @@ const updateCache = async file => {
 const listArticleImages = async file => {
   const content = await fs.readFile(file.src, "utf8");
 
-  return {
-    ...file,
-    ...{
-      images: content.match(/\bsrc="\/img\/blog\/.*?"/g)
-    }
-  };
+  return content.match(/\bsrc="\/img\/blog\/.*?"/g);
 };
 
 const copyArticleImage = image => {
-  image = path.basename(image.split(/"/)[1]);
-  fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
+  const imagePath = path.basename(image.split(/"/)[1]);
+  fs.copy(path.join(srcImgDir, imagePath), path.join(destImgDir, imagePath));
 };
 
 const buildArticle = async file => {
   if (argv.update) {
-    return file;
+    return file.contents;
   }
 
   const { stdout } = await execFile(
@@ -132,17 +127,12 @@ const buildArticle = async file => {
     }
   );
 
-  return {
-    ...file,
-    ...{
-      contents: minifyHTML(
-        stdout
-          .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-          .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-          .trim()
-      )
-    }
-  };
+  return minifyHTML(
+    stdout
+      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+      .trim()
+  );
 };
 
 const saveFile = file =>
@@ -167,17 +157,17 @@ const updateEntry = async file => {
     );
   }
 
-  file = await readEntry(file);
-  await runCommand(exec.git, ["add", "--", file.src]);
+  const entry = await readEntry(file);
+  await runCommand(exec.git, ["add", "--", entry.src]);
   await runCommand(exec.git, [
     "commit",
-    `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
+    `--message=${entry.verb} ${toPOSIXPath(path.relative("../", entry.src))}`
   ]);
-  await updateCache(file);
-  file = await listArticleImages(file);
+  await updateCache(entry);
+  const images = await listArticleImages(entry);
 
-  if (file.images) {
-    await Promise.all(file.images.map(copyArticleImage));
+  if (images) {
+    await Promise.all(images.map(copyArticleImage));
   }
 
   if (argv.update) {
@@ -185,13 +175,13 @@ const updateEntry = async file => {
       "run",
       "html",
       "--",
-      `--article=${destDir}${file.name}.html`
+      `--article=${destDir}${entry.name}.html`
     ]);
   }
 
-  file = await buildArticle(file);
-  await saveFile(file);
-  await runCommand(exec.htmlhint, ["--format", "compact", file.dest]);
+  entry.contents = await buildArticle(entry);
+  await saveFile(entry);
+  await runCommand(exec.htmlhint, ["--format", "compact", entry.dest]);
   runCommand(exec.npm, ["run", "html"]);
 };
 
@@ -212,13 +202,14 @@ const listDrafts = async () => {
 };
 
 const getDraft = async file => {
-  file = path.join(draftDir, file);
+  const src = path.join(draftDir, file);
+  const ext = path.extname(file);
 
   return {
-    contents: await fs.readFile(file, "utf8"),
-    ext: path.extname(file),
-    name: path.basename(file, path.extname(file)),
-    src: file
+    contents: await fs.readFile(src, "utf8"),
+    ext: ext,
+    name: path.basename(src, ext),
+    src: src
   };
 };
 
@@ -245,24 +236,25 @@ const selectDraft = files =>
     menu.write("0. QUIT\n");
     menu.question("Which one: (0) ", a => {
       menu.close();
+      let answer = a;
 
-      if (!a) {
-        a = 0;
+      if (!answer) {
+        answer = 0;
       }
 
-      a = parseInt(a, 10);
+      answer = parseInt(answer, 10);
 
-      if (!Number.isInteger(a) || a > files.length) {
+      if (!Number.isInteger(answer) || answer > files.length) {
         return reject(
           new Error(`You must enter a number between 0 and ${files.length}.`)
         );
       }
 
-      if (a === 0) {
+      if (answer === 0) {
         return reject(new Error("Aborted by user."));
       }
 
-      resolve(files[a - 1]);
+      resolve(files[answer - 1]);
     });
   });
 
@@ -297,26 +289,17 @@ const publishSelected = async file => {
   updateEntry(file);
 };
 
-const readTemplate = async file => ({
-  ...file,
-  ...{
-    template: await fs.readFile(file.template, "utf8")
-  }
-});
+const readTemplate = file => fs.readFile(file.template, "utf8");
 
-const buildPreview = file => ({
-  ...file,
-  ...{
-    contents: mustache
-      .render(file.template, file)
-      .replace(/="\/img\//g, '="../src/img/')
-      .replace(/="\//g, '="../dist/')
-  }
-});
+const buildPreview = file =>
+  mustache
+    .render(file.template, file)
+    .replace(/="\/img\//g, '="../src/img/')
+    .replace(/="\//g, '="../dist/');
 
 const previewSelected = async file => {
-  file = await readTemplate(file);
-  file = await buildPreview(file);
+  file.template = await readTemplate(file);
+  file.contents = await buildPreview(file);
   await saveFile(file);
   runCommand(exec.open, [file.dest]);
 };
@@ -348,9 +331,9 @@ const main = async () => {
     });
   }
 
-  let files = await listDrafts();
+  let drafts = await listDrafts();
 
-  files = await Promise.all(files.map(getDraft));
+  drafts = await Promise.all(drafts.map(getDraft));
 
   let file = await selectDraft(files);
 
