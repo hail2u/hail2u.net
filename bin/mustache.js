@@ -9,12 +9,10 @@ const argv = minimist(process.argv.slice(2), {
   boolean: ["articles"],
   string: ["article"]
 });
-const article = {
-  json: "../src/blog/article.json",
-  src: "../src/blog/article.mustache"
-};
+const articleJSON = "../src/blog/article.json";
+const articleSrc = "../src/blog/article.mustache";
 const destDir = "../dist/";
-const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const entityMap = {
   '"': "&quot;",
   "&": "&amp;",
@@ -103,11 +101,9 @@ const partialDir = "../src/partial/";
 
 const escapeChar = char => entityMap[char];
 
-const escapeString = string => String(string).replace(escapeRe, escapeChar);
+const escapeStr = str => String(str).replace(escapeRe, escapeChar);
 
-const readMetadata = () => fs.readJSON(metadataFile, "utf8");
-
-const readItem = itemFile => fs.readJSON(itemFile, "utf8");
+const readJSON = filepath => fs.readJSON(filepath, "utf8");
 
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
@@ -134,26 +130,17 @@ const toHTML5Date = (day, date, month, year, hour, minute, second) =>
   )}+09:00`;
 
 const toRFC822Date = (day, date, month, year, hour, minute, second) =>
-  `${dow[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(hour)}:${pad(
-    minute
-  )}:${pad(second)} +0900`;
+  `${dowNames[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(
+    hour
+  )}:${pad(minute)}:${pad(second)} +0900`;
 
-const extendItem = (item, index, original) => {
+const extendItem = (item, index, items) => {
   const dt = new Date(item.unixtime);
-  let idx = index;
   [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
     item.card_type,
     item.cover
   );
-  item.body = item.body.replace(
-    /(href|src)="(\/.*?)"/g,
-    '$1="https://hail2u.net$2"'
-  );
-  item.description = item.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, "");
   item.date = dt.getDate();
   item.day = dt.getDay();
   item.hour = dt.getHours();
@@ -180,13 +167,24 @@ const extendItem = (item, index, original) => {
     item.second
   );
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
+  item.body = item.body.replace(
+    /(href|src)="(\/.*?)"/g,
+    '$1="https://hail2u.net$2"'
+  );
+  item.description = item.body
+    .replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    .replace(/<.*?>/g, "");
 
-  if (idx === 0) {
+  if (index === 0) {
     item.isLatest = true;
-    idx = original.length;
+    item.isFirstInYear = true;
+    items[items.length - 1].isLastInYear = true;
+
+    return item;
   }
 
-  const previousItem = original[idx - 1];
+  const previousItem = items[index - 1];
 
   if (item.year !== previousItem.year) {
     item.isFirstInYear = true;
@@ -204,39 +202,24 @@ const gatherItems = items =>
     .map(extendItem);
 
 const readItems = async () => {
-  const items = await Promise.all(itemFiles.map(readItem));
+  const items = await Promise.all(itemFiles.map(readJSON));
   return gatherItems(items);
 };
 
-const readPartial = async file => ({
-  [path.basename(file, ".mustache")]: await fs.readFile(
-    path.join(partialDir, file),
-    "utf8"
+const readFile = filepath => fs.readFile(filepath, "utf8");
+
+const readPartial = async filename => ({
+  [path.basename(filename, ".mustache")]: await readFile(
+    path.join(partialDir, filename)
   )
 });
 
 const gatherPartials = partials => Object.assign(...partials);
 
 const readPartials = async () => {
-  let partials = await fs.readdir(partialDir);
-  partials = await Promise.all(partials.map(readPartial));
+  const filenames = await fs.readdir(partialDir);
+  const partials = await Promise.all(filenames.map(readPartial));
   return gatherPartials(partials);
-};
-
-const readTemplate = file => {
-  if (file.template) {
-    return file;
-  }
-
-  return fs.readFile(file.src, "utf8");
-};
-
-const readExtradata = file => {
-  if (file.extradata) {
-    return file;
-  }
-
-  return fs.readJSON(file.json, "utf8");
 };
 
 const pickByLink = (dest, item) => dest.endsWith(item.link);
@@ -308,47 +291,51 @@ const build = async (metadata, items, partials, file) => {
     },
     ...file
   };
-  built.template = await readTemplate(built);
-  built.extradata = await readExtradata(built);
+
+  if (!built.template) {
+    built.template = await readFile(built.src);
+  }
+
+  if (!built.extradata) {
+    built.extradata = await readJSON(built.json);
+  }
+
   built.data = await mergeData(built);
   built.contents = await renderFile(built);
   built.contents = await minifyContents(built);
-  writeFile(built);
+  await writeFile(built);
 };
 
-const mergeArticle = (file, item) => ({
+const mergeArticle = (article, item) => ({
+  ...article,
   ...{
-    extradata: file.extradata,
-    dest: toPOSIXPath(path.join(destDir, item.link)),
-    template: file.template
+    dest: toPOSIXPath(path.join(destDir, item.link))
   },
-  ...article
+  ...item
 });
 
-const generateArticleList = (items, file) =>
-  items
-    .filter(filterUpdates.bind(null, false))
-    .map(mergeArticle.bind(null, file));
-
 const toArticleList = async items => {
-  let file = await readTemplate(article);
-  file = await readExtradata(file);
-  return generateArticleList(items, file);
+  const article = {
+    extradata: await readJSON(articleJSON),
+    template: await readFile(articleSrc)
+  };
+  return items
+    .filter(filterUpdates.bind(null, false))
+    .map(mergeArticle.bind(null, article));
 };
 
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
-    readMetadata(),
+    readJSON(metadataFile),
     readItems(),
     readPartials()
   ]);
 
   if (argv.article) {
     return build(metadata, items, partials, {
-      ...{
-        dest: argv.article
-      },
-      ...article
+      dest: argv.article,
+      json: articleJSON,
+      src: articleSrc
     });
   }
 
@@ -363,7 +350,7 @@ const main = async () => {
 };
 
 process.chdir(__dirname);
-mustache.escape = escapeString;
+mustache.escape = escapeStr;
 main().catch(e => {
   console.trace(e);
 });

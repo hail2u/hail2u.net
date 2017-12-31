@@ -32,13 +32,7 @@ const findExec = async name => {
   exec[name] = await which(exec[name]);
 };
 
-const readEntry = file => {
-  if (file.contents) {
-    return file.contents;
-  }
-
-  return fs.readFile(file.src, "utf8");
-};
+const readFile = filepath => fs.readFile(filepath, "utf8");
 
 const runCommand = async (command, args) => {
   let stdout;
@@ -54,12 +48,12 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const readCache = () => fs.readJSON(cacheFile, "utf8");
-
-const isDuplicate = (link, value) => value.link === link;
+const isDuplicateArticle = (link, article) => article.link === link;
 
 const addArticle = (article, articles) => {
-  const oldArticle = articles.findIndex(isDuplicate.bind(null, article.link));
+  const oldArticle = articles.findIndex(
+    isDuplicateArticle.bind(null, article.link)
+  );
 
   if (oldArticle === -1) {
     return [article].concat(articles);
@@ -70,11 +64,6 @@ const addArticle = (article, articles) => {
   return articles;
 };
 
-const saveCache = articles =>
-  fs.outputJSON(cacheFile, articles, {
-    spaces: 2
-  });
-
 const updateCache = async file => {
   const [title, ...body] = file.contents.split("\n");
   const cache = addArticle(
@@ -84,22 +73,35 @@ const updateCache = async file => {
       title: title.replace(/<.*?>/g, ""),
       unixtime: Date.now()
     },
-    await readCache()
+    await fs.readJSON(cacheFile, "utf8")
   );
-  await saveCache(cache);
+  await fs.outputJSON(cacheFile, cache, {
+    spaces: 2
+  });
 };
 
-const copyArticleImage = image => {
-  const imagePath = path.basename(image.split(/"/)[1]);
-  fs.copy(path.join(srcImgDir, imagePath), path.join(destImgDir, imagePath));
-};
+const toImagePath = str => path.basename(str.split(/"/)[1]);
 
-const copyArticleImages = async file => {
-  const images = file.contents.match(/\bsrc="\/img\/blog\/.*?"/g);
+const listArticleImagePaths = html => {
+  const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
 
-  if (images) {
-    await Promise.all(images.map(copyArticleImage));
+  if (!images) {
+    return [];
   }
+
+  return images.map(toImagePath);
+};
+
+const copyArticleImage = async imagepath => {
+  await fs.copy(
+    path.join(srcImgDir, imagepath),
+    path.join(destImgDir, imagepath)
+  );
+};
+
+const copyArticleImages = async html => {
+  const imagePaths = listArticleImagePaths(html);
+  await Promise.all(imagePaths.map(copyArticleImage));
 };
 
 const buildArticle = async file => {
@@ -129,8 +131,8 @@ const buildArticle = async file => {
   );
 };
 
-const saveFile = file =>
-  fs.outputFile(file.dest, file.contents, {
+const saveFile = (filepath, data) =>
+  fs.outputFile(filepath, data, {
     flags: "wx"
   });
 
@@ -142,20 +144,27 @@ const updateEntry = async file => {
     path.relative(srcDir, path.dirname(entry.src)),
     `${path.basename(entry.src, ".txt")}.html`
   );
-  entry.name = toPOSIXPath(
-    path.join(
-      path.relative(srcDir, path.dirname(entry.src)),
-      path.basename(entry.src, ".txt")
-    )
-  );
-  entry.contents = await readEntry(entry);
+
+  if (!entry.name) {
+    entry.name = toPOSIXPath(
+      path.join(
+        path.relative(srcDir, path.dirname(entry.src)),
+        path.basename(entry.src, ".txt")
+      )
+    );
+  }
+
+  if (!entry.contents) {
+    entry.contents = await readFile(entry.src);
+  }
+
   await runCommand(exec.git, ["add", "--", entry.src]);
   await runCommand(exec.git, [
     "commit",
     `--message=${entry.verb} ${toPOSIXPath(path.relative("../", entry.src))}`
   ]);
   await updateCache(entry);
-  await copyArticleImages(entry);
+  await copyArticleImages(entry.contents);
 
   if (argv.update) {
     await runCommand(exec.npm, [
@@ -167,14 +176,14 @@ const updateEntry = async file => {
   }
 
   entry.contents = await buildArticle(entry);
-  await saveFile(entry);
+  await saveFile(entry.dest, entry.contents);
   await runCommand(exec.htmlhint, ["--format", "compact", entry.dest]);
-  runCommand(exec.npm, ["run", "html"]);
+  await runCommand(exec.npm, ["run", "html"]);
 };
 
-const isDraft = file => {
+const isDraft = filename => {
   if (
-    [".html", ".markdown", ".md", ".txt"].indexOf(path.extname(file)) !== -1
+    [".html", ".markdown", ".md", ".txt"].indexOf(path.extname(filename)) !== -1
   ) {
     return true;
   }
@@ -182,26 +191,26 @@ const isDraft = file => {
   return false;
 };
 
-const listDrafts = async () => {
-  const files = await fs.readdir(draftDir);
-  return files.filter(isDraft);
-};
-
-const getDraft = async file => {
-  const src = path.join(draftDir, file);
-  const ext = path.extname(file);
+const getDraft = async filename => {
+  const src = path.join(draftDir, filename);
+  const ext = path.extname(src);
   return {
-    contents: await fs.readFile(src, "utf8"),
+    contents: await readFile(src),
     ext: ext,
     name: path.basename(src, ext),
     src: src
   };
 };
 
-const selectDraft = files =>
+const listDrafts = async () => {
+  const filenames = await fs.readdir(draftDir);
+  return Promise.all(filenames.filter(isDraft).map(getDraft));
+};
+
+const selectDraft = drafts =>
   new Promise((resolve, reject) => {
-    if (!argv.publish && files.length === 1) {
-      return resolve(files[0]);
+    if (!argv.publish && drafts.length === 1) {
+      return resolve(drafts[0]);
     }
 
     const menu = readline.createInterface({
@@ -210,7 +219,7 @@ const selectDraft = files =>
     });
 
     menu.write("\n");
-    files.forEach((n, i) => {
+    drafts.forEach((n, i) => {
       menu.write(`${i + 1}. ${n.contents
         .trim()
         .split(/\n+/)[0]
@@ -219,19 +228,13 @@ const selectDraft = files =>
 `);
     });
     menu.write("0. QUIT\n");
-    menu.question("Which one: (0) ", a => {
+    menu.question("Which one: (0) ", (a = 0) => {
       menu.close();
-      let answer = a;
+      const answer = parseInt(a, 10);
 
-      if (!answer) {
-        answer = 0;
-      }
-
-      answer = parseInt(answer, 10);
-
-      if (!Number.isInteger(answer) || answer > files.length) {
+      if (!Number.isInteger(answer) || answer > drafts.length) {
         return reject(
-          new Error(`You must enter a number between 0 and ${files.length}.`)
+          new Error(`You must enter a number between 0 and ${drafts.length}.`)
         );
       }
 
@@ -239,60 +242,58 @@ const selectDraft = files =>
         return reject(new Error("Aborted by user."));
       }
 
-      resolve(files[answer - 1]);
+      resolve(drafts[answer - 1]);
     });
   });
 
-const checkSelected = file => {
-  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(file.name)) {
+const checkSelected = selected => {
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
     throw new Error("This draft does not have a valid name for file.");
   }
 
-  if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
+  if (
+    !selected.contents.startsWith("# ") &&
+    !selected.contents.startsWith("<h1>")
+  ) {
     throw new Error("This draft does not have a title.");
   }
 };
 
-const markupSelected = file => {
-  if (file.ext === ".html") {
-    return file.contents;
+const markupSelected = selected => {
+  if (selected.ext === ".html") {
+    return selected.contents;
   }
 
-  return markdown(file.contents);
+  return markdown(selected.contents);
 };
 
-const deleteDraft = file => fs.unlink(file.src);
+const deleteDraft = filepath => fs.unlink(filepath);
 
-const publishSelected = async file => {
-  await saveFile(file);
-  await deleteDraft(file);
-  updateEntry(file);
+const publishSelected = async selected => {
+  await saveFile(selected.dest, selected.contents);
+  await deleteDraft(selected.src);
+  await updateEntry(selected);
 };
 
-const readTemplate = file => fs.readFile(file.template, "utf8");
-
-const buildPreview = file =>
-  mustache
-    .render(file.template, file)
+const previewSelected = async selected => {
+  selected.template = await readFile(selected.template);
+  selected.contents = mustache
+    .render(selected.template, selected)
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
-
-const previewSelected = async file => {
-  file.template = await readTemplate(file);
-  file.contents = await buildPreview(file);
-  await saveFile(file);
-  runCommand(exec.open, [file.dest]);
+  await saveFile(selected.dest, selected.contents);
+  await runCommand(exec.open, [selected.dest]);
 };
 
-const processSelected = file => {
+const processSelected = selected => {
   if (argv.publish) {
-    file.dest = path.join(srcDir, `${file.name}.txt`);
-    file.verb = "Add";
-    return publishSelected(file);
+    selected.dest = path.join(srcDir, `${selected.name}.txt`);
+    selected.verb = "Add";
+    return publishSelected(selected);
   }
 
   return previewSelected({
-    ...file,
+    ...selected,
     ...{
       dest: "../tmp/__preview.html",
       template: "../src/preview.mustache"
@@ -310,12 +311,11 @@ const main = async () => {
     });
   }
 
-  let drafts = await listDrafts();
-  drafts = await Promise.all(drafts.map(getDraft));
+  const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
   await checkSelected(selected);
   selected.contents = await markupSelected(selected);
-  processSelected(selected);
+  await processSelected(selected);
 };
 
 process.chdir(__dirname);

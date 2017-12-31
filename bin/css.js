@@ -7,7 +7,7 @@ const postcss = require("postcss");
 const wrapWithSupports = require("../lib/wrap-with-supports");
 
 const cssExt = ".css";
-const dest = "../tmp/";
+const destDir = "../tmp/";
 const minExt = ".min";
 const processor = postcss([
   atImport(),
@@ -15,50 +15,46 @@ const processor = postcss([
   csswring(),
   wrapWithSupports()
 ]);
-const src = "../src/css/";
+const srcDir = "../src/css/";
 
-const generateFileMappings = (files, file) => {
-  if (path.extname(file) !== cssExt) {
-    return files;
+const isTarget = filename => {
+  if (path.extname(filename) !== cssExt) {
+    return false;
   }
 
-  if (file.startsWith("_")) {
-    return files;
+  if (filename.startsWith("_")) {
+    return false;
   }
 
-  return files.concat([
-    {
-      dest: path.join(dest, `${path.basename(file, cssExt)}${minExt}${cssExt}`),
-      src: path.join(src, file)
-    }
-  ]);
+  return true;
 };
 
-const listFiles = async () => {
-  const files = await fs.readdir(src);
-  return files.reduce(generateFileMappings, []);
+const listFilenames = async () => {
+  const filenames = await fs.readdir(srcDir);
+  return filenames.filter(isTarget);
 };
 
-const readCSS = file =>
-  fs.readFile(file.src, "utf8");
+const readCSS = filepath => fs.readFile(filepath, "utf8");
 
-const optimizeCSS = file =>
-  processor.process(file.contents, {
-    from: file.src,
-    to: file.dest
+const writeCSS = (filepath, css) => fs.outputFile(filepath, css);
+
+const buildCSS = async filename => {
+  const src = path.join(srcDir, filename);
+  const dest = path.join(
+    destDir,
+    `${path.basename(filename, cssExt)}${minExt}${cssExt}`
+  );
+  const css = await readCSS(src);
+  const processed = await processor.process(css, {
+    from: src,
+    to: dest
   });
-
-const writeCSS = file => fs.outputFile(file.dest, file.contents);
-
-const buildCSS = async file => {
-  file.contents = await readCSS(file);
-  file.contents = await optimizeCSS(file);
-  writeCSS(file);
+  await writeCSS(dest, processed.css);
 };
 
 const main = async () => {
-  const files = await listFiles();
-  Promise.all(files.map(buildCSS));
+  const filenames = await listFilenames();
+  return Promise.all(filenames.map(buildCSS));
 };
 
 process.chdir(__dirname);

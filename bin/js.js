@@ -8,66 +8,64 @@ const config = {
 };
 const jsExt = ".js";
 const minExt = ".min";
-const src = "../src/js/";
-const tmp = "../tmp/";
-
-const toFilePath = filename => path.join(src, filename);
+const srcDir = "../src/js/";
+const tmpDir = "../tmp/";
 
 const isSameDest = (dest, file) => file.dest === dest;
 
-const generateFileMappings = (files, srcFile) => {
-  if (path.extname(srcFile) !== jsExt) {
+const generateFileMappings = (files, filename) => {
+  if (path.extname(filename) !== jsExt) {
     return files;
   }
 
-  const destFile = path.join(
-    tmp,
+  const src = path.join(srcDir, filename);
+  const dest = path.join(
+    tmpDir,
     `${path
-      .extname(path.basename(srcFile, jsExt))
+      .extname(path.basename(src, jsExt))
       .replace(/^./, "")}${minExt}${jsExt}`
   );
-  const file = files.find(isSameDest.bind(null, destFile));
+  const target = files.find(isSameDest.bind(null, dest));
 
-  if (file) {
-    file.src.push(srcFile);
-  } else {
-    files.push({
-      dest: destFile,
-      src: [srcFile]
-    });
+  if (target) {
+    target.src = target.src.concat(src);
+    return files;
   }
 
-  return files;
+  return files.concat({
+    dest: dest,
+    src: [src]
+  });
 };
 
 const listFiles = async () => {
-  const files = await fs.readdir(src);
-  return files.map(toFilePath).reduce(generateFileMappings, []);
+  const filenames = await fs.readdir(srcDir);
+  return filenames.reduce(generateFileMappings, []);
 };
 
-const readJS = srcFile => fs.readFile(srcFile, "utf8");
+const readJS = filepath => fs.readFile(filepath, "utf8");
 
-const gatherJS = file => Promise.all(file.src.map(readJS));
+const gatherJS = srcs => Promise.all(srcs.map(readJS));
 
-const compileJS = file =>
+const compileJS = srcs =>
   compile({
     ...config,
     ...{
-      jsCode: file.src
+      jsCode: srcs
     }
   }).compiledCode;
 
-const writeJS = file => fs.outputFile(file.dest, file.contents);
+const writeJS = (filepath, js) => fs.outputFile(filepath, js);
 
 const buildJS = async file => {
-  file.src = await gatherJS(file);
-  file.contents = compileJS(file);
-  writeJS(file);
+  const srcs = await gatherJS(file.src);
+  const js = compileJS(srcs);
+  await writeJS(file.dest, js);
 };
 
 const main = async () => {
   const files = await listFiles();
-  Promise.all(files.map(buildJS));
+  return Promise.all(files.map(buildJS));
 };
 
 process.chdir(__dirname);
