@@ -40,7 +40,7 @@ const readEntry = async file => {
     }
   };
 };
-const runCommand = async (command, args, file) => {
+const runCommand = async (command, args) => {
   let stdout;
   let stderr;
 
@@ -52,8 +52,6 @@ const runCommand = async (command, args, file) => {
   }
 
   process.stdout.write(stdout);
-
-  return file;
 };
 const readCache = () => fs.readJSON(cacheFile, "utf8");
 const isDuplicate = (link, value) => value.link === link;
@@ -86,8 +84,6 @@ const updateCache = async file => {
   );
 
   await saveCache(cache);
-
-  return file;
 };
 const listArticleImages = async file => {
   const content = await fs.readFile(file.src, "utf8");
@@ -102,13 +98,6 @@ const listArticleImages = async file => {
 const copyArticleImage = image => {
   image = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, image), path.join(destImgDir, image));
-};
-const copyArticleImages = async file => {
-  if (file.images) {
-    await Promise.all(file.images.map(copyArticleImage));
-  }
-
-  return file;
 };
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
@@ -145,17 +134,10 @@ const buildArticle = async file => {
     }
   };
 };
-const saveFile = async file => {
-  if (argv.update) {
-    return file;
-  }
-
-  await fs.outputFile(file.dest, file.contents, {
+const saveFile = file =>
+  fs.outputFile(file.dest, file.contents, {
     flags: "wx"
   });
-
-  return file;
-};
 const updateEntry = async file => {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
@@ -174,35 +156,31 @@ const updateEntry = async file => {
   }
 
   file = await readEntry(file);
-  file = await runCommand(exec.git, ["add", "--", file.src], file);
-  file = await runCommand(
-    exec.git,
-    [
-      "commit",
-      `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
-    ],
-    file
-  );
-  file = await updateCache(file);
+  await runCommand(exec.git, ["add", "--", file.src]);
+  await runCommand(exec.git, [
+    "commit",
+    `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
+  ]);
+  await updateCache(file);
   file = await listArticleImages(file);
-  file = await copyArticleImages(file);
+
+  if (file.images) {
+    await Promise.all(file.images.map(copyArticleImage));
+  }
 
   if (argv.update) {
-    await runCommand(
-      exec.npm,
-      ["run", "html", "--", `--article=${destDir}${file.name}.html`],
-      file
-    );
+    await runCommand(exec.npm, [
+      "run",
+      "html",
+      "--",
+      `--article=${destDir}${file.name}.html`
+    ]);
   }
 
   file = await buildArticle(file);
-  file = await saveFile(file);
-  file = await runCommand(
-    exec.htmlhint,
-    ["--format", "compact", file.dest],
-    file
-  );
-  runCommand(exec.npm, ["run", "html"], file);
+  await saveFile(file);
+  await runCommand(exec.htmlhint, ["--format", "compact", file.dest]);
+  runCommand(exec.npm, ["run", "html"]);
 };
 const isDraft = file => {
   if (
@@ -279,8 +257,6 @@ const checkSelected = file => {
   if (!file.contents.startsWith("# ") && !file.contents.startsWith("<h1>")) {
     throw new Error("This draft does not have a title.");
   }
-
-  return file;
 };
 const markupSelected = file => {
   if (file.ext === ".html") {
@@ -294,14 +270,10 @@ const markupSelected = file => {
     }
   };
 };
-const deleteDraft = async file => {
-  await fs.unlink(file.src);
-
-  return file;
-};
+const deleteDraft = file => fs.unlink(file.src);
 const publishSelected = async file => {
-  file = await saveFile(file);
-  file = await deleteDraft(file);
+  await saveFile(file);
+  await deleteDraft(file);
   updateEntry(file);
 };
 const readTemplate = async file => ({
@@ -319,12 +291,11 @@ const buildPreview = file => ({
       .replace(/="\//g, '="../dist/')
   }
 });
-const openPreview = file => execFile(exec.open, [file.dest]);
 const previewSelected = async file => {
   file = await readTemplate(file);
   file = await buildPreview(file);
-  file = await saveFile(file);
-  openPreview(file);
+  await saveFile(file);
+  runCommand(exec.open, [file.dest]);
 };
 const processSelected = file => {
   if (argv.publish) {
@@ -358,7 +329,7 @@ const main = async () => {
 
   let file = await selectDraft(files);
 
-  file = await checkSelected(file);
+  await checkSelected(file);
   file = await markupSelected(file);
   processSelected(file);
 };

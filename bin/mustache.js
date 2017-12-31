@@ -292,11 +292,7 @@ const renderFile = file => {
 
   return file;
 };
-const writeFile = async file => {
-  await fs.outputFile(file.dest, file.contents);
-
-  return file;
-};
+const writeFile = file => fs.outputFile(file.dest, file.contents);
 const build = async (metadata, items, partials, file) => {
   file = {
     ...{
