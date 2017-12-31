@@ -89,14 +89,17 @@ const updateCache = async file => {
   await saveCache(cache);
 };
 
-const listArticleImages = async file => {
-  const content = await fs.readFile(file.src, "utf8");
-  return content.match(/\bsrc="\/img\/blog\/.*?"/g);
-};
-
 const copyArticleImage = image => {
   const imagePath = path.basename(image.split(/"/)[1]);
   fs.copy(path.join(srcImgDir, imagePath), path.join(destImgDir, imagePath));
+};
+
+const copyArticleImages = async file => {
+  const images = file.contents.match(/\bsrc="\/img\/blog\/.*?"/g);
+
+  if (images) {
+    await Promise.all(images.map(copyArticleImage));
+  }
 };
 
 const buildArticle = async file => {
@@ -156,11 +159,7 @@ const updateEntry = async file => {
     `--message=${entry.verb} ${toPOSIXPath(path.relative("../", entry.src))}`
   ]);
   await updateCache(entry);
-  const images = await listArticleImages(entry);
-
-  if (images) {
-    await Promise.all(images.map(copyArticleImage));
-  }
+  await copyArticleImages(entry);
 
   if (argv.update) {
     await runCommand(exec.npm, [
