@@ -42,7 +42,6 @@ const generateFileMappings = (files, srcFile) => {
 
 const listFiles = async () => {
   const files = await fs.readdir(src);
-
   return files.map(toFilePath).reduce(generateFileMappings, []);
 };
 
@@ -68,7 +67,6 @@ const buildJS = async file => {
 
 const main = async () => {
   const files = await listFiles();
-
   Promise.all(files.map(buildJS));
 };
 

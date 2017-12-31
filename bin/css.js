@@ -36,7 +36,6 @@ const generateFileMappings = (files, file) => {
 
 const listFiles = async () => {
   const files = await fs.readdir(src);
-
   return files.reduce(generateFileMappings, []);
 };
 
@@ -59,7 +58,6 @@ const buildCSS = async file => {
 
 const main = async () => {
   const files = await listFiles();
-
   Promise.all(files.map(buildCSS));
 };
 

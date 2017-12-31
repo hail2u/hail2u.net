@@ -32,17 +32,12 @@ const findExec = async name => {
   exec[name] = await which(exec[name]);
 };
 
-const readEntry = async file => {
+const readEntry = file => {
   if (file.contents) {
-    return file;
+    return file.contents;
   }
 
-  return {
-    ...file,
-    ...{
-      contents: await fs.readFile(file.src, "utf8")
-    }
-  };
+  return fs.readFile(file.src, "utf8");
 };
 
 const runCommand = async (command, args) => {
@@ -72,7 +67,6 @@ const addArticle = (article, articles) => {
 
   article.unixtime = articles[oldArticle].unixtime;
   articles[oldArticle] = article;
-
   return articles;
 };
 
@@ -92,13 +86,11 @@ const updateCache = async file => {
     },
     await readCache()
   );
-
   await saveCache(cache);
 };
 
 const listArticleImages = async file => {
   const content = await fs.readFile(file.src, "utf8");
-
   return content.match(/\bsrc="\/img\/blog\/.*?"/g);
 };
 
@@ -126,7 +118,6 @@ const buildArticle = async file => {
       }
     }
   );
-
   return minifyHTML(
     stdout
       .replace(/^[\s\S]*?\r?\n\r?\n/, "")
@@ -157,7 +148,8 @@ const updateEntry = async file => {
     );
   }
 
-  const entry = await readEntry(file);
+  const entry = file;
+  entry.contents = await readEntry(entry);
   await runCommand(exec.git, ["add", "--", entry.src]);
   await runCommand(exec.git, [
     "commit",
@@ -197,14 +189,12 @@ const isDraft = file => {
 
 const listDrafts = async () => {
   const files = await fs.readdir(draftDir);
-
   return files.filter(isDraft);
 };
 
 const getDraft = async file => {
   const src = path.join(draftDir, file);
   const ext = path.extname(file);
-
   return {
     contents: await fs.readFile(src, "utf8"),
     ext: ext,
@@ -270,15 +260,10 @@ const checkSelected = file => {
 
 const markupSelected = file => {
   if (file.ext === ".html") {
-    return file;
+    return file.contents;
   }
 
-  return {
-    ...file,
-    ...{
-      contents: markdown(file.contents)
-    }
-  };
+  return markdown(file.contents);
 };
 
 const deleteDraft = file => fs.unlink(file.src);
@@ -308,7 +293,6 @@ const processSelected = file => {
   if (argv.publish) {
     file.dest = path.join(srcDir, `${file.name}.txt`);
     file.verb = "Add";
-
     return publishSelected(file);
   }
 
@@ -332,14 +316,11 @@ const main = async () => {
   }
 
   let drafts = await listDrafts();
-
   drafts = await Promise.all(drafts.map(getDraft));
-
-  let file = await selectDraft(files);
-
-  await checkSelected(file);
-  file = await markupSelected(file);
-  processSelected(file);
+  const selected = await selectDraft(drafts);
+  await checkSelected(selected);
+  selected.contents = await markupSelected(selected);
+  processSelected(selected);
 };
 
 process.chdir(__dirname);

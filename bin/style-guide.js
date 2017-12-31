@@ -22,7 +22,6 @@ const writeStyleGuide = contents =>
 
 const main = async () => {
   let styleGuide = await readStyleGuide();
-
   styleGuide = styleGuide.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL);
   writeStyleGuide(styleGuide);
 };

@@ -141,7 +141,6 @@ const toRFC822Date = (day, date, month, year, hour, minute, second) =>
 const extendItem = (item, index, original) => {
   const dt = new Date(item.unixtime);
   let idx = index;
-
   [item.card_type, item.cover] = findCover(
     /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
     item.card_type,
@@ -206,7 +205,6 @@ const gatherItems = items =>
 
 const readItems = async () => {
   const items = await Promise.all(itemFiles.map(readItem));
-
   return gatherItems(items);
 };
 
@@ -222,7 +220,6 @@ const gatherPartials = partials => Object.assign(...partials);
 const readPartials = async () => {
   let partials = await fs.readdir(partialDir);
   partials = await Promise.all(partials.map(readPartial));
-
   return gatherPartials(partials);
 };
 
@@ -335,9 +332,7 @@ const generateArticleList = (items, file) =>
 
 const toArticleList = async items => {
   let file = await readTemplate(article);
-
   file = await readExtradata(file);
-
   return generateArticleList(items, file);
 };
 
@@ -359,7 +354,6 @@ const main = async () => {
 
   if (argv.articles) {
     const articles = await toArticleList(items);
-
     return Promise.all(
       articles.map(build.bind(null, metadata, items, partials))
     );

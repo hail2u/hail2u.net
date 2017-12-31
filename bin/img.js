@@ -15,7 +15,6 @@ const toFaviconMapping = size => ({
 
 const generateFileMappings = () => {
   const touchIconBasename = "apple-touch-icon-precomposed";
-
   return [16, 32, 48].map(toFaviconMapping).concat([
     {
       dest: path.join(dest, `${touchIconBasename}.png`),
@@ -41,7 +40,6 @@ const toPNG = async (inkscape, file) => {
   }
 
   await execFile(inkscape, args);
-
   return file.dest;
 };
 
@@ -57,7 +55,6 @@ const main = async () => {
     generateFileMappings()
   ]);
   const favicons = await Promise.all(files.map(toPNG.bind(null, inkscape)));
-
   toFavicon(favicons.filter(isFaviconSource), convert);
 };
 
