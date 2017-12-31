@@ -40,18 +40,16 @@ const readEntry = async file => {
     }
   };
 };
-const addEntry = async file => {
-  const { stdout } = await execFile(exec.git, ["add", "--", file.src]);
+const runCommand = async (command, args, file) => {
+  let stdout;
+  let stderr;
 
-  process.stdout.write(stdout);
-
-  return file;
-};
-const commitEntry = async file => {
-  const { stdout } = await execFile(exec.git, [
-    "commit",
-    `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
-  ]);
+  try {
+    ({ stdout, stderr } = await execFile(command, args));
+  } catch (e) {
+    console.error(stderr);
+    throw e;
+  }
 
   process.stdout.write(stdout);
 
@@ -115,22 +113,6 @@ const copyArticleImages = async file => {
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "publish", "update"]
 });
-const runHTMLArticle = async file => {
-  if (argv.publish) {
-    return file;
-  }
-
-  const { stdout } = await execFile(exec.npm, [
-    "run",
-    "html",
-    "--",
-    `--article=${destDir}${file.name}.html`
-  ]);
-
-  process.stdout.write(stdout);
-
-  return file;
-};
 const buildArticle = async file => {
   if (argv.update) {
     return file;
@@ -174,24 +156,6 @@ const saveFile = async file => {
 
   return file;
 };
-const testArticle = async file => {
-  const { stdout } = await execFile(exec.htmlhint, [
-    "--format",
-    "compact",
-    file.dest
-  ]);
-
-  process.stdout.write(stdout);
-
-  return file;
-};
-const runHTML = async file => {
-  const { stdout } = await execFile(exec.npm, ["run", "html"]);
-
-  process.stdout.write(stdout);
-
-  return file;
-};
 const updateEntry = async file => {
   file.src = path.relative("", file.dest);
   file.dest = path.join(
@@ -210,16 +174,35 @@ const updateEntry = async file => {
   }
 
   file = await readEntry(file);
-  file = await addEntry(file);
-  file = await commitEntry(file);
+  file = await runCommand(exec.git, ["add", "--", file.src], file);
+  file = await runCommand(
+    exec.git,
+    [
+      "commit",
+      `--message=${file.verb} ${toPOSIXPath(path.relative("../", file.src))}`
+    ],
+    file
+  );
   file = await updateCache(file);
   file = await listArticleImages(file);
   file = await copyArticleImages(file);
-  file = await runHTMLArticle(file);
+
+  if (argv.update) {
+    await runCommand(
+      exec.npm,
+      ["run", "html", "--", `--article=${destDir}${file.name}.html`],
+      file
+    );
+  }
+
   file = await buildArticle(file);
   file = await saveFile(file);
-  file = await testArticle(file);
-  runHTML(file);
+  file = await runCommand(
+    exec.htmlhint,
+    ["--format", "compact", file.dest],
+    file
+  );
+  runCommand(exec.npm, ["run", "html"], file);
 };
 const isDraft = file => {
   if (
