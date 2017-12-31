@@ -135,23 +135,19 @@ const saveFile = file =>
   });
 
 const updateEntry = async file => {
-  file.src = path.relative("", file.dest);
-  file.dest = path.join(
-    destDir,
-    path.relative(srcDir, path.dirname(file.src)),
-    `${path.basename(file.src, ".txt")}.html`
-  );
-
-  if (!file.name) {
-    file.name = toPOSIXPath(
-      path.join(
-        path.relative(srcDir, path.dirname(file.src)),
-        path.basename(file.src, ".txt")
-      )
-    );
-  }
-
   const entry = file;
+  entry.src = path.relative("", entry.dest);
+  entry.dest = path.join(
+    destDir,
+    path.relative(srcDir, path.dirname(entry.src)),
+    `${path.basename(entry.src, ".txt")}.html`
+  );
+  entry.name = toPOSIXPath(
+    path.join(
+      path.relative(srcDir, path.dirname(entry.src)),
+      path.basename(entry.src, ".txt")
+    )
+  );
   entry.contents = await readEntry(entry);
   await runCommand(exec.git, ["add", "--", entry.src]);
   await runCommand(exec.git, [
