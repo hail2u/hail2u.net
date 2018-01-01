@@ -47,11 +47,15 @@ const readJS = filepath => fs.readFile(filepath, "utf8");
 
 const gatherJS = srcs => Promise.all(srcs.map(readJS));
 
+const buildJSCode = src => ({
+  src: src
+});
+
 const compileJS = srcs =>
   compile({
     ...config,
     ...{
-      jsCode: srcs
+      jsCode: srcs.map(buildJSCode)
     }
   }).compiledCode;
 
