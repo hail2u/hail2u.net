@@ -276,7 +276,8 @@ const publishSelected = async selected => {
 };
 
 const renderSelected = selected =>
-  mustache.render(selected.template, selected)
+  mustache
+    .render(selected.template, selected)
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
 
