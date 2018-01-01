@@ -105,10 +105,6 @@ const copyArticleImages = async html => {
 };
 
 const buildArticle = async file => {
-  if (argv.update) {
-    return file.contents;
-  }
-
   const { stdout } = await execFile(
     exec.perl,
     [
@@ -175,8 +171,11 @@ const updateEntry = async file => {
     ]);
   }
 
-  entry.contents = await buildArticle(entry);
-  await saveFile(entry.dest, entry.contents);
+  if (argv.publish) {
+    entry.contents = await buildArticle(entry);
+    await saveFile(entry.dest, entry.contents);
+  }
+
   await runCommand(exec.htmlhint, ["--format", "compact", entry.dest]);
   await runCommand(exec.npm, ["run", "html"]);
 };
