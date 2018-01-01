@@ -158,7 +158,6 @@ const extendItem = (item, index, items) => {
     item.isLatest = true;
     item.isFirstInYear = true;
     items[items.length - 1].isLastInYear = true;
-
     return item;
   }
 
@@ -214,6 +213,14 @@ const filterUpdates = (includeUpdates, item) => {
   return false;
 };
 
+const findCover = (image, defaultCardType, defaultCover) => {
+  if (!image) {
+    return [defaultCardType, defaultCover];
+  }
+
+  return ["summary_large_image", image[1]];
+};
+
 const now = date =>
   toRFC822String(
     date.getDay(),
@@ -225,55 +232,48 @@ const now = date =>
     date.getSeconds()
   );
 
-const findCover = (image, defaultCardType, defaultCover) => {
-  if (!image) {
-    return [defaultCardType, defaultCover];
-  }
-
-  return ["summary_large_image", image[1]];
-};
-
 const mergeData = file => {
   if (argv.article || argv.articles) {
-    file.extradata = {
+    const data = {
       ...file.extradata,
       ...file.items.find(pickByLink.bind(null, file.dest))
     };
-    file.extradata.canonical = file.extradata.link;
-    file.extradata.short_title = file.extradata.title;
-    [file.extradata.card_type, file.extradata.cover] = findCover(
+    data.canonical = data.link;
+    [data.card_type, data.cover] = findCover(
       /<img\s.*?\bsrc="https:\/\/hail2u\.net(\/img\/blog\/.*?)"/.exec(
-        file.extradata.body
+        data.body
       ),
       file.metadata.card_type,
       file.metadata.cover
     );
-  } else {
-    file.extradata.items = file.items
-      .concat()
-      .filter(filterUpdates.bind(null, file.includeUpdates))
-      .slice(0, file.itemLength);
+    data.short_title = data.title;
+    return {
+      ...file.metadata,
+      ...data
+    };
   }
 
-  file.extradata.lastBuildDate = now(new Date());
   return {
     ...file.metadata,
-    ...file.extradata
+    ...file.extradata,
+    ...{
+      items: file.items
+        .concat()
+        .filter(filterUpdates.bind(null, file.includeUpdates))
+        .slice(0, file.itemLength),
+      lastBuildDate: now(new Date())
+    }
   };
 };
 
-const renderFile = file => {
-  const rendered = mustache.render(file.template, file.data, file.partials);
+const render = (template, data, partials) =>
+  mustache.render(template, data, partials);
 
-  if (!file.dest.endsWith(".html")) {
-    return rendered;
-  }
-
-  return minifyHTML(rendered).replace(
+const minifyContents = html =>
+  minifyHTML(html).replace(
     /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
     '$1="$2"'
   );
-};
 
 const writeFile = (filepath, data) => fs.outputFile(filepath, data);
 
@@ -290,28 +290,26 @@ const build = async (metadata, items, partials, file) => {
   built.template = await readFile(built.src);
   built.extradata = await readJSON(built.json);
   built.data = await mergeData(built);
-  built.contents = await renderFile(built);
+  built.contents = await render(built.template, built.data, built.partials);
+
+  if (file.dest.endsWith(".html")) {
+    built.contents = minifyContents(built.contents);
+  }
+
   await writeFile(built.dest, built.contents);
 };
 
-const mergeArticle = (article, item) => ({
-  ...article,
+const mergeArticle = item => ({
   ...{
-    dest: toPOSIXPath(path.join(destDir, item.link))
+    dest: toPOSIXPath(path.join(destDir, item.link)),
+    json: articleJSON,
+    src: articleSrc
   },
   ...item
 });
 
-const generateArticles = items => {
-  const article = {
-    dest: argv.article,
-    json: articleJSON,
-    src: articleSrc
-  };
-  return items
-    .filter(filterUpdates.bind(null, false))
-    .map(mergeArticle.bind(null, article));
-};
+const generateArticles = items =>
+  items.filter(filterUpdates.bind(null, false)).map(mergeArticle);
 
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
