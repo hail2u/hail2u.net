@@ -124,12 +124,12 @@ const pad = number => {
   return `0${number}`;
 };
 
-const toHTML5Date = (day, date, month, year, hour, minute, second) =>
+const toHTML5String = (day, date, month, year, hour, minute, second) =>
   `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
     second
   )}+09:00`;
 
-const toRFC822Date = (day, date, month, year, hour, minute, second) =>
+const toRFC822String = (day, date, month, year, hour, minute, second) =>
   `${dowNames[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(
     hour
   )}:${pad(minute)}:${pad(second)} +0900`;
@@ -148,7 +148,7 @@ const extendItem = (item, index, items) => {
   item.month = dt.getMonth() + 1;
   item.second = dt.getSeconds();
   item.year = dt.getFullYear();
-  item.html5PubDate = toHTML5Date(
+  item.html5PubDate = toHTML5String(
     item.day,
     item.date,
     item.month,
@@ -157,7 +157,7 @@ const extendItem = (item, index, items) => {
     item.minute,
     item.second
   );
-  item.rfc822PubDate = toRFC822Date(
+  item.rfc822PubDate = toRFC822String(
     item.day,
     item.date,
     item.month,
@@ -240,7 +240,7 @@ const filterUpdates = (includeUpdates, item) => {
 };
 
 const now = date =>
-  toRFC822Date(
+  toRFC822String(
     date.getDay(),
     date.getDate(),
     date.getMonth() + 1,
@@ -272,18 +272,17 @@ const mergeData = file => {
   };
 };
 
-const renderFile = file =>
-  mustache.render(file.template, file.data, file.partials);
+const renderFile = file => {
+  const rendered = mustache.render(file.template, file.data, file.partials);
 
-const minifyContents = file => {
-  if (!file.dest.endsWith(".html")) {
-    return file.contents;
+  if (!file.type === ".html") {
+    return rendered;
   }
 
-  return minifyHTML(file.contents);
+  return minifyHTML(rendered);
 };
 
-const writeFile = file => fs.outputFile(file.dest, file.contents);
+const writeFile = (filepath, data) => fs.outputFile(filepath, data);
 
 const build = async (metadata, items, partials, file) => {
   const built = {
@@ -295,33 +294,27 @@ const build = async (metadata, items, partials, file) => {
     ...file
   };
 
-  if (!built.template) {
-    built.template = await readFile(built.src);
-  }
-
-  if (!built.extradata) {
-    built.extradata = await readJSON(built.json);
-  }
-
+  built.template = await readFile(built.src);
+  built.extradata = await readJSON(built.json);
   built.data = await mergeData(built);
   built.contents = await renderFile(built);
-  built.contents = await minifyContents(built);
-  await writeFile(built);
+  await writeFile(built.dest, built.contents);
 };
 
 const mergeArticle = (article, item) => ({
   ...article,
   ...{
-    dest: toPOSIXPath(path.join(destDir, item.link)),
-    type: "html"
+    dest: toPOSIXPath(path.join(destDir, item.link))
   },
   ...item
 });
 
-const toArticleList = async items => {
+const generateArticles = items => {
   const article = {
-    extradata: await readJSON(articleJSON),
-    template: await readFile(articleSrc)
+    dest: argv.article,
+    json: articleJSON,
+    src: articleSrc,
+    type: "html"
   };
   return items
     .filter(filterUpdates.bind(null, false))
@@ -345,7 +338,7 @@ const main = async () => {
   }
 
   if (argv.articles) {
-    const articles = await toArticleList(items);
+    const articles = await generateArticles(items);
     return Promise.all(
       articles.map(build.bind(null, metadata, items, partials))
     );

@@ -202,8 +202,9 @@ const getDraft = async filename => {
 };
 
 const listDrafts = async () => {
-  const filenames = await fs.readdir(draftDir);
-  return Promise.all(filenames.filter(isDraft).map(getDraft));
+  let filenames = await fs.readdir(draftDir);
+  filenames = filenames.filter(isDraft);
+  return Promise.all(filenames.map(getDraft));
 };
 
 const selectDraft = drafts =>
@@ -274,30 +275,16 @@ const publishSelected = async selected => {
   await updateEntry(selected);
 };
 
-const previewSelected = async selected => {
-  selected.template = await readFile(selected.template);
-  selected.contents = mustache
-    .render(selected.template, selected)
+const renderSelected = selected =>
+  mustache.render(selected.template, selected)
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
+
+const previewSelected = async selected => {
+  selected.template = await readFile(selected.template);
+  selected.contents = renderSelected(selected);
   await saveFile(selected.dest, selected.contents);
   await runCommand(exec.open, [selected.dest]);
-};
-
-const processSelected = selected => {
-  if (argv.publish) {
-    selected.dest = path.join(srcDir, `${selected.name}.txt`);
-    selected.verb = "Add";
-    return publishSelected(selected);
-  }
-
-  return previewSelected({
-    ...selected,
-    ...{
-      dest: "../tmp/__preview.html",
-      template: "../src/preview.mustache"
-    }
-  });
 };
 
 const main = async () => {
@@ -312,9 +299,22 @@ const main = async () => {
 
   const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
-  await checkSelected(selected);
-  selected.contents = await markupSelected(selected);
-  await processSelected(selected);
+  checkSelected(selected);
+  selected.contents = markupSelected(selected);
+
+  if (argv.publish) {
+    selected.dest = path.join(srcDir, `${selected.name}.txt`);
+    selected.verb = "Add";
+    return publishSelected(selected);
+  }
+
+  return previewSelected({
+    ...selected,
+    ...{
+      dest: "../tmp/__preview.html",
+      template: "../src/preview.mustache"
+    }
+  });
 };
 
 process.chdir(__dirname);
