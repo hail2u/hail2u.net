@@ -25,60 +25,51 @@ const files = [
   {
     dest: "../dist/about/index.html",
     json: "../src/about/index.json",
-    src: "../src/about/index.mustache",
-    type: "html"
+    src: "../src/about/index.mustache"
   },
   {
     dest: "../dist/blog/feed",
     json: "../src/blog/index.json",
     itemLength: 10,
-    src: "../src/blog/feed.mustache",
-    type: "feed"
+    src: "../src/blog/feed.mustache"
   },
   {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
-    src: "../src/blog/index.mustache",
-    type: "html"
+    src: "../src/blog/index.mustache"
   },
   {
     dest: "../src/blosxom/entries/themes/html/page",
     json: "../src/blog/theme.json",
-    src: "../src/blog/theme.mustache",
-    type: "html"
+    src: "../src/blog/theme.mustache"
   },
   {
     dest: "../dist/documents/index.html",
     json: "../src/documents/index.json",
-    src: "../src/documents/index.mustache",
-    type: "html"
+    src: "../src/documents/index.mustache"
   },
   {
     dest: "../dist/projects/index.html",
     json: "../src/projects/index.json",
-    src: "../src/projects/index.mustache",
-    type: "html"
+    src: "../src/projects/index.mustache"
   },
   {
     dest: "../dist/feed",
     json: "../src/index.json",
     itemLength: 10,
-    src: "../src/feed.mustache",
-    type: "feed"
+    src: "../src/feed.mustache"
   },
   {
     dest: "../dist/index.html",
     json: "../src/index.json",
     includeUpdates: true,
     itemLength: 10,
-    src: "../src/index.mustache",
-    type: "html"
+    src: "../src/index.mustache"
   },
   {
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
-    src: "../src/sitemap.mustache",
-    type: "sitemap"
+    src: "../src/sitemap.mustache"
   }
 ];
 const itemFiles = ["../src/blog/articles.json", "../src/updates.json"];
@@ -108,14 +99,6 @@ const readJSON = filepath => fs.readJSON(filepath, "utf8");
 const sortByDate = (a, b) =>
   parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
 
-const findCover = (image, defaultCardType, defaultCover) => {
-  if (!image) {
-    return [defaultCardType, defaultCover];
-  }
-
-  return ["summary_large_image", image[1]];
-};
-
 const pad = number => {
   if (number >= 10) {
     return number;
@@ -136,11 +119,6 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
 
 const extendItem = (item, index, items) => {
   const dt = new Date(item.unixtime);
-  [item.card_type, item.cover] = findCover(
-    /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
-    item.card_type,
-    item.cover
-  );
   item.date = dt.getDate();
   item.day = dt.getDay();
   item.hour = dt.getHours();
@@ -171,13 +149,10 @@ const extendItem = (item, index, items) => {
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, "");
-
-  if (item.type !== "html") {
-    item.body = item.body.replace(
-      /(href|src)="(\/.*?)"/g,
-      '$1="https://hail2u.net$2"'
-    );
-  }
+  item.body = item.body.replace(
+    /(href|src)="(\/.*?)"/g,
+    '$1="https://hail2u.net$2"'
+  );
 
   if (index === 0) {
     item.isLatest = true;
@@ -250,6 +225,14 @@ const now = date =>
     date.getSeconds()
   );
 
+const findCover = (image, defaultCardType, defaultCover) => {
+  if (!image) {
+    return [defaultCardType, defaultCover];
+  }
+
+  return ["summary_large_image", image[1]];
+};
+
 const mergeData = file => {
   if (argv.article || argv.articles) {
     file.extradata = {
@@ -258,6 +241,13 @@ const mergeData = file => {
     };
     file.extradata.canonical = file.extradata.link;
     file.extradata.short_title = file.extradata.title;
+    [file.extradata.card_type, file.extradata.cover] = findCover(
+      /<img\s.*?\bsrc="https:\/\/hail2u\.net(\/img\/blog\/.*?)"/.exec(
+        file.extradata.body
+      ),
+      file.metadata.card_type,
+      file.metadata.cover
+    );
   } else {
     file.extradata.items = file.items
       .concat()
@@ -275,11 +265,14 @@ const mergeData = file => {
 const renderFile = file => {
   const rendered = mustache.render(file.template, file.data, file.partials);
 
-  if (!file.type === ".html") {
+  if (!file.dest.endsWith(".html")) {
     return rendered;
   }
 
-  return minifyHTML(rendered);
+  return minifyHTML(rendered).replace(
+    /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
+    '$1="$2"'
+  );
 };
 
 const writeFile = (filepath, data) => fs.outputFile(filepath, data);
@@ -313,8 +306,7 @@ const generateArticles = items => {
   const article = {
     dest: argv.article,
     json: articleJSON,
-    src: articleSrc,
-    type: "html"
+    src: articleSrc
   };
   return items
     .filter(filterUpdates.bind(null, false))
@@ -332,8 +324,7 @@ const main = async () => {
     return build(metadata, items, partials, {
       dest: argv.article,
       json: articleJSON,
-      src: articleSrc,
-      type: "html"
+      src: articleSrc
     });
   }
 
