@@ -167,14 +167,17 @@ const extendItem = (item, index, items) => {
     item.second
   );
   item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
-  item.body = item.body.replace(
-    /(href|src)="(\/.*?)"/g,
-    '$1="https://hail2u.net$2"'
-  );
   item.description = item.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, "");
+
+  if (item.type !== "html") {
+    item.body = item.body.replace(
+      /(href|src)="(\/.*?)"/g,
+      '$1="https://hail2u.net$2"'
+    );
+  }
 
   if (index === 0) {
     item.isLatest = true;
@@ -309,7 +312,8 @@ const build = async (metadata, items, partials, file) => {
 const mergeArticle = (article, item) => ({
   ...article,
   ...{
-    dest: toPOSIXPath(path.join(destDir, item.link))
+    dest: toPOSIXPath(path.join(destDir, item.link)),
+    type: "html"
   },
   ...item
 });
@@ -335,7 +339,8 @@ const main = async () => {
     return build(metadata, items, partials, {
       dest: argv.article,
       json: articleJSON,
-      src: articleSrc
+      src: articleSrc,
+      type: "html"
     });
   }
 
