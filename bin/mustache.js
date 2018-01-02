@@ -96,8 +96,8 @@ const escapeStr = str => String(str).replace(escapeRe, escapeChar);
 
 const readJSON = filepath => fs.readJSON(filepath, "utf8");
 
-const sortByDate = (a, b) =>
-  parseInt(a.unixtime, 10) - parseInt(b.unixtime, 10);
+const compareByUnixtime = (a, b) =>
+  parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 
 const pad = number => {
   if (number >= 10) {
@@ -174,8 +174,7 @@ const extendItem = (item, index, items) => {
 const gatherItems = items =>
   []
     .concat(...items)
-    .sort(sortByDate)
-    .reverse()
+    .sort(compareByUnixtime)
     .map(extendItem);
 
 const readItems = async () => {
@@ -199,7 +198,7 @@ const readPartials = async () => {
   return gatherPartials(partials);
 };
 
-const pickByLink = (dest, item) => dest.endsWith(item.link);
+const hasSameLink = (dest, item) => dest.endsWith(item.link);
 
 const filterUpdates = (includeUpdates, item) => {
   if (item.link.startsWith("/blog/")) {
@@ -236,7 +235,7 @@ const mergeData = file => {
   if (argv.article || argv.articles) {
     const data = {
       ...file.extradata,
-      ...file.items.find(pickByLink.bind(null, file.dest))
+      ...file.items.find(hasSameLink.bind(null, file.dest))
     };
     data.canonical = data.link;
     [data.card_type, data.cover] = findCover(
