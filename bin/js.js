@@ -54,9 +54,7 @@ const buildJSCode = src => ({
 const compileJS = jscode =>
   compile({
     ...config,
-    ...{
-      jsCode: jscode
-    }
+    jsCode: jscode
   }).compiledCode;
 
 const writeJS = (filepath, js) => fs.outputFile(filepath, js);

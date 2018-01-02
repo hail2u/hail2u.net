@@ -272,13 +272,11 @@ const mergeData = (
   return {
     ...metadata,
     ...extradata,
-    ...{
-      items: items
-        .concat()
-        .filter(filterUpdates.bind(null, includeUpdates))
-        .slice(0, itemLength),
-      lastBuildDate: now(new Date())
-    }
+    items: items
+      .concat()
+      .filter(filterUpdates.bind(null, includeUpdates))
+      .slice(0, itemLength),
+    lastBuildDate: now(new Date())
   };
 };
 
@@ -314,11 +312,9 @@ const build = async (metadata, items, partials, file) => {
 };
 
 const mergeArticle = item => ({
-  ...{
-    dest: toPOSIXPath(path.join(destDir, item.link)),
-    json: articleJSON,
-    src: articleSrc
-  },
+  dest: toPOSIXPath(path.join(destDir, item.link)),
+  json: articleJSON,
+  src: articleSrc,
   ...item
 });
 
