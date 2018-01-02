@@ -17,7 +17,7 @@ const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
-const draftDir = path.resolve(os.homedir(), "./Documents/Drafts/");
+const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const exec = {
   git: "git",
   htmlhint: "htmlhint",
