@@ -5,22 +5,22 @@ const which = require("../lib/which");
 const files = [
   {
     dest: "../tmp/favicon-16.png",
-    src: "../src/favicon.svg",
+    src: "../src/img/favicon.svg",
     width: 16
   },
   {
     dest: "../tmp/favicon-32.png",
-    src: "../src/favicon.svg",
+    src: "../src/img/favicon.svg",
     width: 32
   },
   {
     dest: "../tmp/favicon-48.png",
-    src: "../src/favicon.svg",
+    src: "../src/img/favicon.svg",
     width: 48
   },
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
-    src: "../src/favicon.svg",
+    src: "../src/img/favicon.svg",
     width: 180
   }
 ];
@@ -46,11 +46,11 @@ const generatePNG = async (inkscape, file) => {
   return file.dest;
 };
 
-const isFaviconSource = filepath =>
-  path.basename(filepath).startsWith("favicon-");
-
 const generateFavicon = (convert, filepaths) =>
   execFile(convert, [...filepaths, "../dist/favicon.ico"]);
+
+const isFaviconSource = filepath =>
+  path.basename(filepath).startsWith("favicon-");
 
 const main = async () => {
   const [convert, inkscape] = await Promise.all([
