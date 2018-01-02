@@ -27,20 +27,9 @@ const files = [
     src: "../src/about/index.mustache"
   },
   {
-    dest: "../dist/blog/feed",
-    json: "../src/blog/index.json",
-    itemLength: 10,
-    src: "../src/blog/feed.mustache"
-  },
-  {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
     src: "../src/blog/index.mustache"
-  },
-  {
-    dest: "../src/blosxom/entries/themes/html/page",
-    json: "../src/blog/theme.json",
-    src: "../src/blog/theme.mustache"
   },
   {
     dest: "../dist/documents/index.html",
