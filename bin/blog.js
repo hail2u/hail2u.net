@@ -48,36 +48,37 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const isDuplicateArticle = (link, article) => article.link === link;
+const readCache = () => fs.readJSON(cacheFile, "utf8");
 
-const addArticle = (article, articles) => {
-  const oldArticle = articles.findIndex(
-    isDuplicateArticle.bind(null, article.link)
-  );
+const hasSameLink = (link, article) => link === article.link;
 
-  if (oldArticle === -1) {
-    return [article].concat(articles);
-  }
+const compareByUnixtime = (a, b) =>
+  parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 
-  article.unixtime = articles[oldArticle].unixtime;
-  articles[oldArticle] = article;
-  return articles;
-};
-
-const updateCache = async file => {
-  const [title, ...body] = file.contents.split("\n");
-  const cache = addArticle(
-    {
-      body: body.join("\n").trim(),
-      link: `/blog/${file.name}.html`,
-      title: title.replace(/<.*?>/g, ""),
-      unixtime: Date.now()
-    },
-    await fs.readJSON(cacheFile, "utf8")
-  );
-  await fs.outputJSON(cacheFile, cache, {
+const writeCache = cache =>
+  fs.outputJSON(cacheFile, cache, {
     spaces: 2
   });
+
+const updateCache = async (html, name) => {
+  const [title, ...body] = html.split("\n");
+  const article = {
+    body: body.join("\n").trim(),
+    link: `/blog/${name}.html`,
+    title: title.replace(/<.*?>/g, ""),
+    unixtime: Date.now()
+  };
+  const cache = await readCache();
+  const sameArticleIndex = cache.findIndex(
+    hasSameLink.bind(null, article.link)
+  );
+
+  if (sameArticleIndex !== -1) {
+    article.unixtime = cache[sameArticleIndex].unixtime;
+    cache.splice(sameArticleIndex, 1);
+  }
+
+  return writeCache([article].concat(cache).sort(compareByUnixtime));
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -104,12 +105,12 @@ const copyArticleImages = async html => {
   await Promise.all(imagePaths.map(copyArticleImage));
 };
 
-const buildArticle = async file => {
+const buildArticle = async dest => {
   const { stdout } = await execFile(
     exec.perl,
     [
       "blosxom.cgi",
-      `path=/${toPOSIXPath(path.relative(destDir, file.dest))}`,
+      `path=/${toPOSIXPath(path.relative(destDir, dest))}`,
       "reindex=1"
     ],
     {
@@ -133,50 +134,50 @@ const saveFile = (filepath, data) =>
   });
 
 const updateEntry = async file => {
-  const entry = file;
-  entry.src = path.relative("", entry.dest);
-  entry.dest = path.join(
+  const src = path.relative("", file.dest);
+  const dest = path.join(
     destDir,
-    path.relative(srcDir, path.dirname(entry.src)),
-    `${path.basename(entry.src, ".txt")}.html`
+    path.relative(srcDir, path.dirname(src)),
+    `${path.basename(src, ".txt")}.html`
   );
+  let { contents, name } = file;
 
-  if (!entry.name) {
-    entry.name = toPOSIXPath(
+  if (!name) {
+    name = toPOSIXPath(
       path.join(
-        path.relative(srcDir, path.dirname(entry.src)),
-        path.basename(entry.src, ".txt")
+        path.relative(srcDir, path.dirname(src)),
+        path.basename(src, ".txt")
       )
     );
   }
 
-  if (!entry.contents) {
-    entry.contents = await readFile(entry.src);
+  if (!contents) {
+    contents = await readFile(src);
   }
 
-  await runCommand(exec.git, ["add", "--", entry.src]);
+  await runCommand(exec.git, ["add", "--", src]);
   await runCommand(exec.git, [
     "commit",
-    `--message=${entry.verb} ${toPOSIXPath(path.relative("../", entry.src))}`
+    `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}`
   ]);
-  await updateCache(entry);
-  await copyArticleImages(entry.contents);
+  await updateCache(contents, name);
+  await copyArticleImages(contents);
 
   if (argv.update) {
     await runCommand(exec.npm, [
       "run",
       "html",
       "--",
-      `--article=${destDir}${entry.name}.html`
+      `--article=${destDir}${name}.html`
     ]);
   }
 
   if (argv.publish) {
-    entry.contents = await buildArticle(entry);
-    await saveFile(entry.dest, entry.contents);
+    contents = await buildArticle(dest);
+    await saveFile(dest, contents);
   }
 
-  await runCommand(exec.htmlhint, ["--format", "compact", entry.dest]);
+  await runCommand(exec.htmlhint, ["--format", "compact", dest]);
   await runCommand(exec.npm, ["run", "html"]);
 };
 
@@ -246,25 +247,24 @@ const selectDraft = drafts =>
     });
   });
 
-const checkSelected = selected => {
-  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
+const checkSelectedName = name => {
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
     throw new Error("This draft does not have a valid name for file.");
   }
+};
 
-  if (
-    !selected.contents.startsWith("# ") &&
-    !selected.contents.startsWith("<h1>")
-  ) {
+const checkSelectedContents = contents => {
+  if (!contents.startsWith("# ") && !contents.startsWith("<h1>")) {
     throw new Error("This draft does not have a title.");
   }
 };
 
-const markupSelected = selected => {
-  if (selected.ext === ".html") {
-    return selected.contents;
+const markupSelected = (ext, contents) => {
+  if (ext === ".html") {
+    return contents;
   }
 
-  return markdown(selected.contents);
+  return markdown(contents);
 };
 
 const deleteDraft = filepath => fs.unlink(filepath);
@@ -275,16 +275,16 @@ const publishSelected = async selected => {
   await updateEntry(selected);
 };
 
-const renderSelected = selected =>
+const renderSelected = (template, selected) =>
   mustache
-    .render(selected.template, selected)
+    .render(template, selected)
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
 
 const previewSelected = async selected => {
-  selected.template = await readFile(selected.template);
-  selected.contents = renderSelected(selected);
-  await saveFile(selected.dest, selected.contents);
+  const template = await readFile(selected.template);
+  const rendered = renderSelected(template, selected);
+  await saveFile(selected.dest, rendered);
   await runCommand(exec.open, [selected.dest]);
 };
 
@@ -300,8 +300,9 @@ const main = async () => {
 
   const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
-  checkSelected(selected);
-  selected.contents = markupSelected(selected);
+  checkSelectedName(selected.name);
+  checkSelectedContents(selected.contents);
+  selected.contents = markupSelected(selected.ext, selected.contents);
 
   if (argv.publish) {
     selected.dest = path.join(srcDir, `${selected.name}.txt`);
@@ -309,13 +310,9 @@ const main = async () => {
     return publishSelected(selected);
   }
 
-  return previewSelected({
-    ...selected,
-    ...{
-      dest: "../tmp/__preview.html",
-      template: "../src/preview.mustache"
-    }
-  });
+  selected.dest = "../tmp/__preview.html";
+  selected.template = "../src/preview.mustache";
+  return previewSelected(selected);
 };
 
 process.chdir(__dirname);

@@ -51,11 +51,11 @@ const buildJSCode = src => ({
   src: src
 });
 
-const compileJS = srcs =>
+const compileJS = jscode =>
   compile({
     ...config,
     ...{
-      jsCode: srcs.map(buildJSCode)
+      jsCode: jscode
     }
   }).compiledCode;
 
@@ -63,7 +63,8 @@ const writeJS = (filepath, js) => fs.outputFile(filepath, js);
 
 const buildJS = async file => {
   const srcs = await gatherJS(file.src);
-  const js = compileJS(srcs);
+  const jscode = srcs.map(buildJSCode);
+  const js = compileJS(jscode);
   await writeJS(file.dest, js);
 };
 

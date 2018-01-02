@@ -28,39 +28,40 @@ const files = [
 const findExec = name => which(name);
 
 const generatePNG = async (inkscape, file) => {
-  let args = ["-f", file.src, "-e", file.dest];
+  const args = ["-f", file.src, "-e", file.dest];
 
   if (file.area) {
-    args = args.concat("-a", file.area);
+    args.push("-a", file.area);
   }
 
   if (file.height) {
-    args = args.concat("-h", file.height);
+    args.push("-h", file.height);
   }
 
   if (file.width) {
-    args = args.concat("-w", file.width);
+    args.push("-w", file.width);
   }
 
   await execFile(inkscape, args);
   return file.dest;
 };
 
-const generateFavicon = (convert, filepaths) =>
-  execFile(convert, [...filepaths, "../dist/favicon.ico"]);
-
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
+
+const generateFavicon = (convert, filepaths) =>
+  execFile(convert, [...filepaths, "../dist/favicon.ico"]);
 
 const main = async () => {
   const [convert, inkscape] = await Promise.all([
     findExec("convert"),
     findExec("inkscape")
   ]);
-  const filepaths = await Promise.all(
+  let filepaths = await Promise.all(
     files.map(generatePNG.bind(null, inkscape))
   );
-  await generateFavicon(convert, filepaths.filter(isFaviconSource));
+  filepaths = filepaths.filter(isFaviconSource);
+  await generateFavicon(convert, filepaths);
 };
 
 process.chdir(__dirname);

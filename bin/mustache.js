@@ -119,56 +119,66 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
 
 const extendItem = (item, index, items) => {
   const dt = new Date(item.unixtime);
-  item.date = dt.getDate();
-  item.day = dt.getDay();
-  item.hour = dt.getHours();
-  item.minute = dt.getMinutes();
-  item.month = dt.getMonth() + 1;
-  item.second = dt.getSeconds();
-  item.year = dt.getFullYear();
-  item.html5PubDate = toHTML5String(
-    item.day,
-    item.date,
-    item.month,
-    item.year,
-    item.hour,
-    item.minute,
-    item.second
+  const extension = {
+    date: dt.getDate(),
+    day: dt.getDay(),
+    hour: dt.getHours(),
+    minute: dt.getMinutes(),
+    month: dt.getMonth() + 1,
+    second: dt.getSeconds(),
+    year: dt.getFullYear()
+  };
+  extension.html5PubDate = toHTML5String(
+    extension.day,
+    extension.date,
+    extension.month,
+    extension.year,
+    extension.hour,
+    extension.minute,
+    extension.second
   );
-  item.rfc822PubDate = toRFC822String(
-    item.day,
-    item.date,
-    item.month,
-    item.year,
-    item.hour,
-    item.minute,
-    item.second
+  extension.rfc822PubDate = toRFC822String(
+    extension.day,
+    extension.date,
+    extension.month,
+    extension.year,
+    extension.hour,
+    extension.minute,
+    extension.second
   );
-  item.strPubDate = `${pad(item.month)}/${pad(item.date)}`;
-  item.description = item.body
+  extension.strPubDate = `${pad(extension.month)}/${pad(extension.date)}`;
+  extension.description = item.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, "");
-  item.body = item.body.replace(
+  extension.body = item.body.replace(
     /(href|src)="(\/.*?)"/g,
     '$1="https://hail2u.net$2"'
   );
-
-  if (index === 0) {
-    item.isLatest = true;
-    item.isFirstInYear = true;
-    items[items.length - 1].isLastInYear = true;
-    return item;
-  }
-
+  const nextItem = items[index + 1];
   const previousItem = items[index - 1];
 
-  if (item.year !== previousItem.year) {
-    item.isFirstInYear = true;
-    previousItem.isLastInYear = true;
+  if (index === 0) {
+    extension.isFirstInYear = true;
+    extension.isLatest = true;
   }
 
-  return item;
+  if (index === items.length - 1) {
+    extension.isLastInYear = true;
+  }
+
+  if (nextItem && extension.year !== nextItem.year) {
+    extension.isLastInYear = true;
+  }
+
+  if (previousItem && extension.year !== previousItem.year) {
+    extension.isFirstInYear = true;
+  }
+
+  return {
+    ...item,
+    ...extension
+  };
 };
 
 const gatherItems = items =>
@@ -231,35 +241,42 @@ const now = date =>
     date.getSeconds()
   );
 
-const mergeData = file => {
+const mergeData = (
+  extradata,
+  items,
+  dest,
+  metadata,
+  includeUpdates,
+  itemLength
+) => {
   if (argv.article || argv.articles) {
     const data = {
-      ...file.extradata,
-      ...file.items.find(hasSameLink.bind(null, file.dest))
+      ...extradata,
+      ...items.find(hasSameLink.bind(null, dest))
     };
     data.canonical = data.link;
     [data.card_type, data.cover] = findCover(
       /<img\s.*?\bsrc="https:\/\/hail2u\.net(\/img\/blog\/.*?)"/.exec(
         data.body
       ),
-      file.metadata.card_type,
-      file.metadata.cover
+      metadata.card_type,
+      metadata.cover
     );
     data.short_title = data.title;
     return {
-      ...file.metadata,
+      ...metadata,
       ...data
     };
   }
 
   return {
-    ...file.metadata,
-    ...file.extradata,
+    ...metadata,
+    ...extradata,
     ...{
-      items: file.items
+      items: items
         .concat()
-        .filter(filterUpdates.bind(null, file.includeUpdates))
-        .slice(0, file.itemLength),
+        .filter(filterUpdates.bind(null, includeUpdates))
+        .slice(0, itemLength),
       lastBuildDate: now(new Date())
     }
   };
@@ -277,25 +294,23 @@ const minifyContents = html =>
 const writeFile = (filepath, data) => fs.outputFile(filepath, data);
 
 const build = async (metadata, items, partials, file) => {
-  const built = {
-    ...{
-      items: items,
-      metadata: metadata,
-      partials: partials
-    },
-    ...file
-  };
-
-  built.template = await readFile(built.src);
-  built.extradata = await readJSON(built.json);
-  built.data = await mergeData(built);
-  built.contents = await render(built.template, built.data, built.partials);
+  const template = await readFile(file.src);
+  const extradata = await readJSON(file.json);
+  const data = await mergeData(
+    extradata,
+    items,
+    file.dest,
+    metadata,
+    file.includeUpdates,
+    file.itemLength
+  );
+  let contents = await render(template, data, partials);
 
   if (file.dest.endsWith(".html")) {
-    built.contents = minifyContents(built.contents);
+    contents = minifyContents(contents);
   }
 
-  await writeFile(built.dest, built.contents);
+  await writeFile(file.dest, contents);
 };
 
 const mergeArticle = item => ({
