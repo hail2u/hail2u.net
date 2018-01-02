@@ -20,7 +20,7 @@ const files = [
   },
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/apple-touch-icon-precomposed.svg",
     width: 180
   }
 ];
