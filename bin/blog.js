@@ -140,40 +140,25 @@ const updateEntry = async file => {
     path.relative(srcDir, path.dirname(src)),
     `${path.basename(src, ".txt")}.html`
   );
-  let { contents, name } = file;
-
-  if (!name) {
-    name = toPOSIXPath(
-      path.join(
-        path.relative(srcDir, path.dirname(src)),
-        path.basename(src, ".txt")
-      )
-    );
-  }
-
-  if (!contents) {
-    contents = await readFile(src);
-  }
-
   await runCommand(exec.git, ["add", "--", src]);
   await runCommand(exec.git, [
     "commit",
     `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}`
   ]);
-  await updateCache(contents, name);
-  await copyArticleImages(contents);
+  await updateCache(file.contents, file.name);
+  await copyArticleImages(file.contents);
 
   if (argv.update) {
     await runCommand(exec.npm, [
       "run",
       "html",
       "--",
-      `--article=${destDir}${name}.html`
+      `--article=${destDir}${file.name}.html`
     ]);
   }
 
   if (argv.publish) {
-    contents = await buildArticle(dest);
+    const contents = await buildArticle(dest);
     await saveFile(dest, contents);
   }
 
@@ -203,9 +188,8 @@ const getDraft = async filename => {
 };
 
 const listDrafts = async () => {
-  let filenames = await fs.readdir(draftDir);
-  filenames = filenames.filter(isDraft);
-  return Promise.all(filenames.map(getDraft));
+  const filenames = await fs.readdir(draftDir);
+  return Promise.all(filenames.filter(isDraft).map(getDraft));
 };
 
 const selectDraft = drafts =>
@@ -292,8 +276,18 @@ const main = async () => {
   await Promise.all(Object.keys(exec).map(findExec));
 
   if (argv.update) {
+    const ext = path.extname(argv.file);
+    const name = toPOSIXPath(
+      path.join(
+        path.relative(srcDir, path.dirname(argv.file)),
+        path.basename(argv.file, ext)
+      )
+    );
     return updateEntry({
+      contents: await readFile(argv.file),
       dest: path.resolve(argv.file),
+      ext: ext,
+      name: name,
       verb: "Update"
     });
   }
@@ -305,7 +299,8 @@ const main = async () => {
   selected.contents = markupSelected(selected.ext, selected.contents);
 
   if (argv.publish) {
-    selected.dest = path.join(srcDir, `${selected.name}.txt`);
+    selected.ext = ".txt";
+    selected.dest = path.join(srcDir, `${selected.name}${selected.ext}`);
     selected.verb = "Add";
     return publishSelected(selected);
   }

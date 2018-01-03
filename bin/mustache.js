@@ -280,14 +280,18 @@ const mergeData = (
   };
 };
 
-const render = (template, data, partials) =>
-  mustache.render(template, data, partials);
+const render = (template, data, partials, dest) => {
+  const rendered = mustache.render(template, data, partials);
 
-const minifyContents = html =>
-  minifyHTML(html).replace(
-    /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
-    '$1="$2"'
-  );
+  if (dest.endsWith(".html")) {
+    return minifyHTML(rendered).replace(
+      /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
+      '$1="$2"'
+    );
+  }
+
+  return rendered;
+};
 
 const writeFile = (filepath, data) => fs.outputFile(filepath, data);
 
@@ -302,13 +306,8 @@ const build = async (metadata, items, partials, file) => {
     file.includeUpdates,
     file.itemLength
   );
-  let contents = await render(template, data, partials);
-
-  if (file.dest.endsWith(".html")) {
-    contents = minifyContents(contents);
-  }
-
-  await writeFile(file.dest, contents);
+  const rendered = await render(template, data, partials, file.dest);
+  await writeFile(file.dest, rendered);
 };
 
 const mergeArticle = item => ({

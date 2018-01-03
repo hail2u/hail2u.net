@@ -21,9 +21,10 @@ const writeStyleGuide = html =>
   fs.outputFile("../dist/style-guide/index.html", html);
 
 const main = async () => {
-  let html = await readStyleGuide();
-  html = html.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL);
-  await writeStyleGuide(html);
+  const html = await readStyleGuide();
+  await writeStyleGuide(
+    html.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL)
+  );
 };
 
 process.chdir(__dirname);
