@@ -28,14 +28,17 @@ const generateFileMappings = (files, filename) => {
   const target = files.find(isSameDest.bind(null, dest));
 
   if (target) {
-    target.src = target.src.concat(src);
+    target.src = [...target.src, src];
     return files;
   }
 
-  return files.concat({
-    dest: dest,
-    src: [src]
-  });
+  return [
+    ...files,
+    {
+      dest: dest,
+      src: [src]
+    }
+  ];
 };
 
 const listFiles = async () => {

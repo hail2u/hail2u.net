@@ -78,7 +78,7 @@ const updateCache = async (html, name) => {
     cache.splice(sameArticleIndex, 1);
   }
 
-  return writeCache([article].concat(cache).sort(compareByUnixtime));
+  return writeCache([article, ...cache].sort(compareByUnixtime));
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
