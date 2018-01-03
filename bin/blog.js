@@ -18,19 +18,10 @@ const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
-const exec = {
-  git: "git",
-  htmlhint: "htmlhint",
-  npm: "npm",
-  open: "open",
-  perl: "perl"
-};
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
-const findExec = async name => {
-  exec[name] = await which(exec[name]);
-};
+const findExec = name => which(name);
 
 const readFile = filepath => fs.readFile(filepath, "utf8");
 
@@ -106,8 +97,9 @@ const copyArticleImages = async html => {
 };
 
 const buildArticle = async dest => {
+  const perl = await findExec("perl");
   const { stdout } = await execFile(
-    exec.perl,
+    perl,
     [
       "blosxom.cgi",
       `path=/${toPOSIXPath(path.relative(destDir, dest))}`,
@@ -140,8 +132,13 @@ const updateEntry = async file => {
     path.relative(srcDir, path.dirname(src)),
     `${path.basename(src, ".txt")}.html`
   );
-  await runCommand(exec.git, ["add", "--", src]);
-  await runCommand(exec.git, [
+  const [git, htmlhint, npm] = await Promise.all([
+    findExec("git"),
+    findExec("htmlhint"),
+    findExec("npm")
+  ]);
+  await runCommand(git, ["add", "--", src]);
+  await runCommand(git, [
     "commit",
     `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}`
   ]);
@@ -149,7 +146,7 @@ const updateEntry = async file => {
   await copyArticleImages(file.contents);
 
   if (argv.update) {
-    await runCommand(exec.npm, [
+    await runCommand(npm, [
       "run",
       "html",
       "--",
@@ -162,8 +159,7 @@ const updateEntry = async file => {
     await saveFile(dest, contents);
   }
 
-  await runCommand(exec.htmlhint, ["--format", "compact", dest]);
-  await runCommand(exec.npm, ["run", "html"]);
+  await runCommand(htmlhint, ["--format", "compact", dest]);
 };
 
 const isDraft = filename => {
@@ -269,12 +265,11 @@ const previewSelected = async selected => {
   const template = await readFile(selected.template);
   const rendered = renderSelected(template, selected);
   await saveFile(selected.dest, rendered);
-  await runCommand(exec.open, [selected.dest]);
+  const open = await findExec("open");
+  await runCommand(open, [selected.dest]);
 };
 
 const main = async () => {
-  await Promise.all(Object.keys(exec).map(findExec));
-
   if (argv.update) {
     const ext = path.extname(argv.file);
     const name = toPOSIXPath(
