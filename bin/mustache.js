@@ -117,7 +117,7 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
     hour
   )}:${pad(minute)}:${pad(second)} +0900`;
 
-const extendItem = (item, index, items) => {
+const extendItem = item => {
   const dt = new Date(item.unixtime);
   const extension = {
     date: dt.getDate(),
@@ -155,29 +155,41 @@ const extendItem = (item, index, items) => {
     /(href|src)="(\/.*?)"/g,
     '$1="https://hail2u.net$2"'
   );
+  return {
+    ...item,
+    ...extension
+  };
+};
+
+const markYearChanges = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
+  const yearMarker = {
+    isFirstInYear: false,
+    isLastInYear: false,
+    isLatest: false
+  };
 
   if (index === 0) {
-    extension.isFirstInYear = true;
-    extension.isLatest = true;
+    yearMarker.isFirstInYear = true;
+    yearMarker.isLatest = true;
+  }
+
+  if (nextItem && item.year !== nextItem.year) {
+    yearMarker.isLastInYear = true;
+  }
+
+  if (previousItem && item.year !== previousItem.year) {
+    yearMarker.isFirstInYear = true;
   }
 
   if (index === items.length - 1) {
-    extension.isLastInYear = true;
-  }
-
-  if (nextItem && extension.year !== nextItem.year) {
-    extension.isLastInYear = true;
-  }
-
-  if (previousItem && extension.year !== previousItem.year) {
-    extension.isFirstInYear = true;
+    yearMarker.isLastInYear = true;
   }
 
   return {
     ...item,
-    ...extension
+    ...yearMarker
   };
 };
 
@@ -185,7 +197,8 @@ const gatherItems = items =>
   []
     .concat(...items)
     .sort(compareByUnixtime)
-    .map(extendItem);
+    .map(extendItem)
+    .map(markYearChanges);
 
 const readItems = async () => {
   const items = await Promise.all(itemFiles.map(readJSON));
