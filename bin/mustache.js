@@ -120,8 +120,16 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
 const extendItem = item => {
   const dt = new Date(item.unixtime);
   const extension = {
+    body: item.body.replace(
+      /(href|src)="(\/.*?)"/g,
+      '$1="https://hail2u.net$2"'
+    ),
     date: dt.getDate(),
     day: dt.getDay(),
+    description: item.body
+      .replace(/\r?\n/g, "")
+      .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+      .replace(/<.*?>/g, ""),
     hour: dt.getHours(),
     minute: dt.getMinutes(),
     month: dt.getMonth() + 1,
@@ -147,14 +155,6 @@ const extendItem = item => {
     extension.second
   );
   extension.strPubDate = `${pad(extension.month)}/${pad(extension.date)}`;
-  extension.description = item.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, "");
-  extension.body = item.body.replace(
-    /(href|src)="(\/.*?)"/g,
-    '$1="https://hail2u.net$2"'
-  );
   return {
     ...item,
     ...extension
