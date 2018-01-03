@@ -286,7 +286,7 @@ const mergeData = (
     ...metadata,
     ...extradata,
     items: items
-      .concat()
+      .slice(0)
       .filter(filterUpdates.bind(null, includeUpdates))
       .slice(0, itemLength),
     lastBuildDate: now(new Date())
