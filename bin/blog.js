@@ -135,15 +135,15 @@ const updateEntry = async file => {
   const [git, htmlhint, npm] = await Promise.all([
     findExec("git"),
     findExec("htmlhint"),
-    findExec("npm")
+    findExec("npm"),
+    updateCache(file.contents, file.name),
+    copyArticleImages(file.contents)
   ]);
   await runCommand(git, ["add", "--", src]);
   await runCommand(git, [
     "commit",
     `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}`
   ]);
-  await updateCache(file.contents, file.name);
-  await copyArticleImages(file.contents);
 
   if (argv.update) {
     await runCommand(npm, [
@@ -249,11 +249,12 @@ const markupSelected = (ext, contents) => {
 
 const deleteDraft = filepath => fs.unlink(filepath);
 
-const publishSelected = async selected => {
-  await saveFile(selected.dest, selected.contents);
-  await deleteDraft(selected.src);
-  await updateEntry(selected);
-};
+const publishSelected = selected =>
+  Promise.all([
+    saveFile(selected.dest, selected.contents),
+    deleteDraft(selected.src),
+    updateEntry(selected)
+  ]);
 
 const renderSelected = (template, selected) =>
   mustache

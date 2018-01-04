@@ -309,8 +309,10 @@ const render = (template, data, partials, dest) => {
 const writeFile = (filepath, data) => fs.outputFile(filepath, data);
 
 const build = async (metadata, items, partials, file) => {
-  const template = await readFile(file.src);
-  const extradata = await readJSON(file.json);
+  const [template, extradata] = await Promise.all([
+    readFile(file.src),
+    readJSON(file.json)
+  ]);
   const data = await mergeData(
     extradata,
     items,
