@@ -62,7 +62,7 @@ const compileJS = jscode =>
 
 const buildJS = async file => {
   const srcs = await gatherJS(file.src);
-  const jscode = srcs.map(buildJSCode);
+  const jscode = await Promise.all(srcs.map(buildJSCode));
   const js = compileJS(jscode);
   await fs.outputFile(file.dest, js);
 };

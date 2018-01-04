@@ -72,7 +72,7 @@ const listArticleImagePaths = html => {
     return [];
   }
 
-  return images.map(toImagePath);
+  return Promise.all(images.map(toImagePath));
 };
 
 const copyArticleImage = async imagepath => {

@@ -193,16 +193,11 @@ const markYearChanges = (item, index, items) => {
   };
 };
 
-const gatherItems = items =>
-  []
-    .concat(...items)
-    .sort(compareByUnixtime)
-    .map(extendItem)
-    .map(markYearChanges);
-
 const readItems = async () => {
-  const items = await Promise.all(itemFiles.map(readItem));
-  return gatherItems(items);
+  let items = await Promise.all(itemFiles.map(readItem));
+  items = [].concat(...items).sort(compareByUnixtime);
+  items = await Promise.all(items.map(extendItem));
+  return items.map(markYearChanges);
 };
 
 const readPartial = async filename => ({
@@ -329,8 +324,10 @@ const mergeArticle = item => ({
   ...item
 });
 
-const generateArticles = items =>
-  items.filter(filterUpdates.bind(null, false)).map(mergeArticle);
+const generateArticles = items => {
+  const articles = items.filter(filterUpdates.bind(null, false));
+  return Promise.all(articles.map(mergeArticle));
+};
 
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
