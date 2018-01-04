@@ -261,7 +261,7 @@ const previewSelected = async selected => {
   const template = await readFile(selected.template);
   const rendered = renderSelected(template, selected);
   await fs.outputFile(selected.dest, rendered);
-  const open = await which("o:en");
+  const open = await which("open");
   await runCommand(open, [selected.dest]);
 };
 
