@@ -35,6 +35,15 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
+const commitEntry = async (file, verb) => {
+  const git = await which("git");
+  await runCommand(git, ["add", "--", file]);
+  await runCommand(git, [
+    "commit",
+    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}`
+  ]);
+};
+
 const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) =>
@@ -118,17 +127,12 @@ const updateEntry = async file => {
     path.relative(srcDir, path.dirname(src)),
     `${path.basename(src, ".txt")}.html`
   );
-  const [git, htmlhint, npm] = await Promise.all([
-    which("git"),
+  const [htmlhint, npm] = await Promise.all([
     which("htmlhint"),
     which("npm"),
+    commitEntry(src, file.verb),
     updateCache(file.contents, file.name),
     copyArticleImages(file.contents)
-  ]);
-  await runCommand(git, ["add", "--", src]);
-  await runCommand(git, [
-    "commit",
-    `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}`
   ]);
 
   if (argv.update) {
