@@ -26,18 +26,18 @@ const files = [
 ];
 
 const generatePNG = async (inkscape, file) => {
-  const args = ["-f", file.src, "-e", file.dest];
+  let args = ["-f", file.src, "-e", file.dest];
 
   if (file.area) {
-    args.push("-a", file.area);
+    args = [...args, "-a", file.area];
   }
 
   if (file.height) {
-    args.push("-h", file.height);
+    args = [...args, "-h", file.height];
   }
 
   if (file.width) {
-    args.push("-w", file.width);
+    args = [...args, "-w", file.width];
   }
 
   await execFile(inkscape, args);

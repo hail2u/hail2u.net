@@ -119,77 +119,66 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
 
 const extendItem = item => {
   const dt = new Date(item.unixtime);
-  const extension = {
+  const date = dt.getDate();
+  const day = dt.getDay();
+  const hour = dt.getHours();
+  const minute = dt.getMinutes();
+  const month = dt.getMonth() + 1;
+  const second = dt.getSeconds();
+  const year = dt.getFullYear();
+  const datetimes = [day, date, month, year, hour, minute, second];
+  return {
+    ...item,
     body: item.body.replace(
       /(href|src)="(\/.*?)"/g,
       '$1="https://hail2u.net$2"'
     ),
-    date: dt.getDate(),
-    day: dt.getDay(),
+    date: date,
+    day: day,
     description: item.body
       .replace(/\r?\n/g, "")
       .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
       .replace(/<.*?>/g, ""),
-    hour: dt.getHours(),
-    minute: dt.getMinutes(),
-    month: dt.getMonth() + 1,
-    second: dt.getSeconds(),
-    year: dt.getFullYear()
-  };
-  extension.html5PubDate = toHTML5String(
-    extension.day,
-    extension.date,
-    extension.month,
-    extension.year,
-    extension.hour,
-    extension.minute,
-    extension.second
-  );
-  extension.rfc822PubDate = toRFC822String(
-    extension.day,
-    extension.date,
-    extension.month,
-    extension.year,
-    extension.hour,
-    extension.minute,
-    extension.second
-  );
-  extension.strPubDate = `${pad(extension.month)}/${pad(extension.date)}`;
-  return {
-    ...item,
-    ...extension
+    hour: hour,
+    html5PubDate: toHTML5String(...datetimes),
+    minute: minute,
+    month: month,
+    rfc822PubDate: toRFC822String(...datetimes),
+    second: second,
+    strPubDate: `${pad(month)}/${pad(date)}`,
+    year: year
   };
 };
 
 const markYearChanges = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
-  const yearMarker = {
-    isFirstInYear: false,
-    isLastInYear: false,
-    isLatest: false
-  };
+  let isFirstInYear = false;
+  let isLastInYear = false;
+  let isLatest = false;
 
   if (index === 0) {
-    yearMarker.isFirstInYear = true;
-    yearMarker.isLatest = true;
+    isFirstInYear = true;
+    isLatest = true;
   }
 
   if (nextItem && item.year !== nextItem.year) {
-    yearMarker.isLastInYear = true;
+    isLastInYear = true;
   }
 
   if (previousItem && item.year !== previousItem.year) {
-    yearMarker.isFirstInYear = true;
+    isFirstInYear = true;
   }
 
   if (index === items.length - 1) {
-    yearMarker.isLastInYear = true;
+    isLastInYear = true;
   }
 
   return {
     ...item,
-    ...yearMarker
+    isFirstInYear: isFirstInYear,
+    isLastInYear: isLastInYear,
+    isLatest: isLatest
   };
 };
 
@@ -248,31 +237,33 @@ const now = date =>
     date.getSeconds()
   );
 
-const mergeData = (
-  extradata,
+const mergeData = async (
+  json,
   items,
   dest,
   metadata,
   includeUpdates,
   itemLength
 ) => {
+  const extradata = await fs.readJSON(json, "utf8");
+
   if (argv.article || argv.articles) {
-    const data = {
-      ...extradata,
-      ...items.find(hasSameLink.bind(null, dest))
-    };
-    data.canonical = data.link;
-    [data.card_type, data.cover] = findCover(
+    const item = items.find(hasSameLink.bind(null, dest));
+    const [cardType, cover] = findCover(
       /<img\s.*?\bsrc="https:\/\/hail2u\.net(\/img\/blog\/.*?)"/.exec(
-        data.body
+        item.body
       ),
       metadata.card_type,
       metadata.cover
     );
-    data.short_title = data.title;
     return {
       ...metadata,
-      ...data
+      ...extradata,
+      ...item,
+      canonical: item.link,
+      card_type: cardType,
+      cover: cover,
+      short_title: item.title
     };
   }
 
@@ -300,19 +291,18 @@ const render = (template, data, partials, dest) => {
   return rendered;
 };
 
-const build = async (metadata, items, partials, file) => {
-  const [template, extradata] = await Promise.all([
-    fs.readFile(file.src, "utf8"),
-    fs.readJSON(file.json, "utf8")
+const buildDoc = async (metadata, items, partials, file) => {
+  const [data, template] = await Promise.all([
+    mergeData(
+      file.json,
+      items,
+      file.dest,
+      metadata,
+      file.includeUpdates,
+      file.itemLength
+    ),
+    fs.readFile(file.src, "utf8")
   ]);
-  const data = await mergeData(
-    extradata,
-    items,
-    file.dest,
-    metadata,
-    file.includeUpdates,
-    file.itemLength
-  );
   const rendered = await render(template, data, partials, file.dest);
   await fs.outputFile(file.dest, rendered);
 };
@@ -337,7 +327,7 @@ const main = async () => {
   ]);
 
   if (argv.article) {
-    return build(metadata, items, partials, {
+    return buildDoc(metadata, items, partials, {
       dest: argv.article,
       json: articleJSON,
       src: articleSrc
@@ -347,11 +337,11 @@ const main = async () => {
   if (argv.articles) {
     const articles = await generateArticles(items);
     return Promise.all(
-      articles.map(build.bind(null, metadata, items, partials))
+      articles.map(buildDoc.bind(null, metadata, items, partials))
     );
   }
 
-  return Promise.all(files.map(build.bind(null, metadata, items, partials)));
+  return Promise.all(files.map(buildDoc.bind(null, metadata, items, partials)));
 };
 
 process.chdir(__dirname);

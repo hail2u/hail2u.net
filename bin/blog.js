@@ -18,6 +18,7 @@ const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
+const draftExts = [".html", ".markdown", ".md", ".txt"];
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
@@ -145,17 +146,15 @@ const updateEntry = async file => {
   }
 
   if (argv.publish) {
-    const contents = await buildArticle(dest);
-    await fs.outputFile(dest, contents);
+    const html = await buildArticle(dest);
+    await fs.outputFile(dest, html);
   }
 
   await runCommand(htmlhint, ["--format", "compact", dest]);
 };
 
 const isDraft = filename => {
-  if (
-    [".html", ".markdown", ".md", ".txt"].indexOf(path.extname(filename)) !== -1
-  ) {
+  if (draftExts.indexOf(path.extname(filename)) !== -1) {
     return true;
   }
 
@@ -174,8 +173,9 @@ const getDraft = async filename => {
 };
 
 const listDrafts = async () => {
-  const filenames = await fs.readdir(draftDir);
-  return Promise.all(filenames.filter(isDraft).map(getDraft));
+  let filenames = await fs.readdir(draftDir);
+  filenames = filenames.filter(isDraft);
+  return Promise.all(filenames.map(getDraft));
 };
 
 const selectDraft = drafts =>
@@ -263,17 +263,16 @@ const previewSelected = async selected => {
 const main = async () => {
   if (argv.update) {
     const ext = path.extname(argv.file);
-    const name = toPOSIXPath(
-      path.join(
-        path.relative(srcDir, path.dirname(argv.file)),
-        path.basename(argv.file, ext)
-      )
-    );
     return updateEntry({
       contents: await fs.readFile(argv.file, "utf8"),
       dest: path.resolve(argv.file),
       ext: ext,
-      name: name,
+      name: toPOSIXPath(
+        path.join(
+          path.relative(srcDir, path.dirname(argv.file)),
+          path.basename(argv.file, ext)
+        )
+      ),
       verb: "Update"
     });
   }
@@ -282,18 +281,25 @@ const main = async () => {
   const selected = await selectDraft(drafts);
   checkSelectedName(selected.name);
   checkSelectedContents(selected.contents);
-  selected.contents = markupSelected(selected.ext, selected.contents);
+  const html = markupSelected(selected.ext, selected.contents);
 
   if (argv.publish) {
-    selected.ext = ".txt";
-    selected.dest = path.join(srcDir, `${selected.name}${selected.ext}`);
-    selected.verb = "Add";
-    return publishSelected(selected);
+    const ext = ".txt";
+    return publishSelected({
+      ...selected,
+      contents: html,
+      ext: ext,
+      dest: path.join(srcDir, `${selected.name}${ext}`),
+      verb: "Add"
+    });
   }
 
-  selected.dest = "../tmp/__preview.html";
-  selected.template = "../src/preview.mustache";
-  return previewSelected(selected);
+  return previewSelected({
+    ...selected,
+    contenst: html,
+    dest: "../tmp/__preview.html",
+    template: "../src/preview.mustache"
+  });
 };
 
 process.chdir(__dirname);
