@@ -197,7 +197,7 @@ const readItems = async () => {
   let items = await Promise.all(itemFiles.map(readItem));
   items = [].concat(...items).sort(compareByUnixtime);
   items = await Promise.all(items.map(extendItem));
-  return items.map(markYearChanges);
+  return Promise.all(items.map(markYearChanges));
 };
 
 const readPartial = async filename => ({
