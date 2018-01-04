@@ -46,9 +46,9 @@ const listFiles = async () => {
   return filenames.reduce(generateFileMappings, []);
 };
 
-const readJS = filepath => fs.readFile(filepath, "utf8");
+const readSrc = srcpath => fs.readFile(srcpath, "utf8");
 
-const gatherJS = srcs => Promise.all(srcs.map(readJS));
+const gatherJS = srcs => Promise.all(srcs.map(readSrc));
 
 const buildJSCode = src => ({
   src: src

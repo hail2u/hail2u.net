@@ -34,15 +34,13 @@ const listFilenames = async () => {
   return filenames.filter(isTarget);
 };
 
-const readCSS = filepath => fs.readFile(filepath, "utf8");
-
 const buildCSS = async filename => {
   const src = path.join(srcDir, filename);
   const dest = path.join(
     destDir,
     `${path.basename(filename, cssExt)}${minExt}${cssExt}`
   );
-  const css = await readCSS(src);
+  const css = await fs.readFile(src, "utf8");
   const processed = await processor.process(css, {
     from: src,
     to: dest

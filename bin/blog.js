@@ -21,8 +21,6 @@ const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
-const readFile = filepath => fs.readFile(filepath, "utf8");
-
 const runCommand = async (command, args) => {
   let stdout;
   let stderr;
@@ -37,17 +35,10 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const readCache = () => fs.readJSON(cacheFile, "utf8");
-
 const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) =>
   parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
-
-const writeCache = cache =>
-  fs.outputJSON(cacheFile, cache, {
-    spaces: 2
-  });
 
 const updateCache = async (html, name) => {
   const [title, ...body] = html.split("\n");
@@ -57,7 +48,7 @@ const updateCache = async (html, name) => {
     title: title.replace(/<.*?>/g, ""),
     unixtime: Date.now()
   };
-  const cache = await readCache();
+  const cache = await fs.readJSON(cacheFile, "utf8");
   const sameArticleIndex = cache.findIndex(
     hasSameLink.bind(null, article.link)
   );
@@ -67,7 +58,9 @@ const updateCache = async (html, name) => {
     cache.splice(sameArticleIndex, 1);
   }
 
-  return writeCache([article, ...cache].sort(compareByUnixtime));
+  await fs.outputJSON(cacheFile, [article, ...cache].sort(compareByUnixtime), {
+    spaces: 2
+  });
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -169,7 +162,7 @@ const getDraft = async filename => {
   const src = path.join(draftDir, filename);
   const ext = path.extname(src);
   return {
-    contents: await readFile(src),
+    contents: await fs.readFile(src, "utf8"),
     ext: ext,
     name: path.basename(src, ext),
     src: src
@@ -240,14 +233,12 @@ const markupSelected = (ext, contents) => {
   return markdown(contents);
 };
 
-const deleteDraft = filepath => fs.unlink(filepath);
-
 const publishSelected = selected =>
   Promise.all([
     fs.outputFile(selected.dest, selected.contents, {
       flags: "wx"
     }),
-    deleteDraft(selected.src),
+    fs.unlink(selected.src),
     updateEntry(selected)
   ]);
 
@@ -258,10 +249,10 @@ const renderSelected = (template, selected) =>
     .replace(/="\//g, '="../dist/');
 
 const previewSelected = async selected => {
-  const template = await readFile(selected.template);
+  const template = await fs.readFile(selected.template, "utf8");
   const rendered = renderSelected(template, selected);
   await fs.outputFile(selected.dest, rendered);
-  const open = await which("open");
+  const open = await which("o:en");
   await runCommand(open, [selected.dest]);
 };
 
@@ -275,7 +266,7 @@ const main = async () => {
       )
     );
     return updateEntry({
-      contents: await readFile(argv.file),
+      contents: await fs.readFile(argv.file, "utf8"),
       dest: path.resolve(argv.file),
       ext: ext,
       name: name,

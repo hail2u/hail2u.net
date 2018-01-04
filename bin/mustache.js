@@ -94,7 +94,7 @@ const escapeChar = char => entityMap[char];
 
 const escapeStr = str => String(str).replace(escapeRe, escapeChar);
 
-const readJSON = filepath => fs.readJSON(filepath, "utf8");
+const readItem = itempath => fs.readJSON(itempath, "utf8");
 
 const compareByUnixtime = (a, b) =>
   parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
@@ -201,15 +201,14 @@ const gatherItems = items =>
     .map(markYearChanges);
 
 const readItems = async () => {
-  const items = await Promise.all(itemFiles.map(readJSON));
+  const items = await Promise.all(itemFiles.map(readItem));
   return gatherItems(items);
 };
 
-const readFile = filepath => fs.readFile(filepath, "utf8");
-
 const readPartial = async filename => ({
-  [path.basename(filename, ".mustache")]: await readFile(
-    path.join(partialDir, filename)
+  [path.basename(filename, ".mustache")]: await fs.readFile(
+    path.join(partialDir, filename),
+    "utf8"
   )
 });
 
@@ -308,8 +307,8 @@ const render = (template, data, partials, dest) => {
 
 const build = async (metadata, items, partials, file) => {
   const [template, extradata] = await Promise.all([
-    readFile(file.src),
-    readJSON(file.json)
+    fs.readFile(file.src, "utf8"),
+    fs.readJSON(file.json, "utf8")
   ]);
   const data = await mergeData(
     extradata,
@@ -335,7 +334,7 @@ const generateArticles = items =>
 
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
-    readJSON(metadataFile),
+    fs.readJSON(metadataFile, "utf8"),
     readItems(),
     readPartials()
   ]);
