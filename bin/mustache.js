@@ -306,8 +306,6 @@ const render = (template, data, partials, dest) => {
   return rendered;
 };
 
-const writeFile = (filepath, data) => fs.outputFile(filepath, data);
-
 const build = async (metadata, items, partials, file) => {
   const [template, extradata] = await Promise.all([
     readFile(file.src),
@@ -322,7 +320,7 @@ const build = async (metadata, items, partials, file) => {
     file.itemLength
   );
   const rendered = await render(template, data, partials, file.dest);
-  await writeFile(file.dest, rendered);
+  await fs.outputFile(file.dest, rendered);
 };
 
 const mergeArticle = item => ({

@@ -25,8 +25,6 @@ const files = [
   }
 ];
 
-const findExec = name => which(name);
-
 const generatePNG = async (inkscape, file) => {
   const args = ["-f", file.src, "-e", file.dest];
 
@@ -54,8 +52,8 @@ const generateFavicon = (convert, filepaths) =>
 
 const main = async () => {
   const [convert, inkscape] = await Promise.all([
-    findExec("convert"),
-    findExec("inkscape")
+    which("convert"),
+    which("inkscape")
   ]);
   const filepaths = await Promise.all(
     files.map(generatePNG.bind(null, inkscape))

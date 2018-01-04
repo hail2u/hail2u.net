@@ -36,8 +36,6 @@ const listFilenames = async () => {
 
 const readCSS = filepath => fs.readFile(filepath, "utf8");
 
-const writeCSS = (filepath, css) => fs.outputFile(filepath, css);
-
 const buildCSS = async filename => {
   const src = path.join(srcDir, filename);
   const dest = path.join(
@@ -49,7 +47,7 @@ const buildCSS = async filename => {
     from: src,
     to: dest
   });
-  await writeCSS(dest, processed.css);
+  await fs.outputFile(dest, processed.css);
 };
 
 const main = async () => {

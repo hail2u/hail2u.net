@@ -21,8 +21,6 @@ const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
-const findExec = name => which(name);
-
 const readFile = filepath => fs.readFile(filepath, "utf8");
 
 const runCommand = async (command, args) => {
@@ -97,7 +95,7 @@ const copyArticleImages = async html => {
 };
 
 const buildArticle = async dest => {
-  const perl = await findExec("perl");
+  const perl = await which("perl");
   const { stdout } = await execFile(
     perl,
     [
@@ -120,11 +118,6 @@ const buildArticle = async dest => {
   );
 };
 
-const saveFile = (filepath, data) =>
-  fs.outputFile(filepath, data, {
-    flags: "wx"
-  });
-
 const updateEntry = async file => {
   const src = path.relative("", file.dest);
   const dest = path.join(
@@ -133,9 +126,9 @@ const updateEntry = async file => {
     `${path.basename(src, ".txt")}.html`
   );
   const [git, htmlhint, npm] = await Promise.all([
-    findExec("git"),
-    findExec("htmlhint"),
-    findExec("npm"),
+    which("git"),
+    which("htmlhint"),
+    which("npm"),
     updateCache(file.contents, file.name),
     copyArticleImages(file.contents)
   ]);
@@ -156,7 +149,7 @@ const updateEntry = async file => {
 
   if (argv.publish) {
     const contents = await buildArticle(dest);
-    await saveFile(dest, contents);
+    await fs.outputFile(dest, contents);
   }
 
   await runCommand(htmlhint, ["--format", "compact", dest]);
@@ -251,7 +244,9 @@ const deleteDraft = filepath => fs.unlink(filepath);
 
 const publishSelected = selected =>
   Promise.all([
-    saveFile(selected.dest, selected.contents),
+    fs.outputFile(selected.dest, selected.contents, {
+      flags: "wx"
+    }),
     deleteDraft(selected.src),
     updateEntry(selected)
   ]);
@@ -265,8 +260,8 @@ const renderSelected = (template, selected) =>
 const previewSelected = async selected => {
   const template = await readFile(selected.template);
   const rendered = renderSelected(template, selected);
-  await saveFile(selected.dest, rendered);
-  const open = await findExec("open");
+  await fs.outputFile(selected.dest, rendered);
+  const open = await which("o:en");
   await runCommand(open, [selected.dest]);
 };
 

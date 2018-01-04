@@ -17,12 +17,10 @@ const rewriteURL = (m, a, e, o, u, c) => {
   return `${a}${e}${o}${u}${c}`;
 };
 
-const writeStyleGuide = html =>
-  fs.outputFile("../dist/style-guide/index.html", html);
-
 const main = async () => {
   const html = await readStyleGuide();
-  await writeStyleGuide(
+  await fs.outputFile(
+    "../dist/style-guide/index.html",
     html.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL)
   );
 };
