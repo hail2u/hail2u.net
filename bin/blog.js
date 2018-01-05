@@ -48,6 +48,30 @@ const commitEntry = async (file, verb) => {
   ]);
 };
 
+const toImagePath = str => path.basename(str.split(/"/)[1]);
+
+const listArticleImagePaths = html => {
+  const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
+
+  if (!images) {
+    return [];
+  }
+
+  return Promise.all(images.map(toImagePath));
+};
+
+const copyArticleImage = async imagepath => {
+  await fs.copy(
+    path.join(srcImgDir, imagepath),
+    path.join(destImgDir, imagepath)
+  );
+};
+
+const copyArticleImages = async html => {
+  const imagePaths = await listArticleImagePaths(html);
+  await Promise.all(imagePaths.map(copyArticleImage));
+};
+
 const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) =>
@@ -85,43 +109,22 @@ const updateCache = async (html, name) => {
   ]);
 };
 
-const toImagePath = str => path.basename(str.split(/"/)[1]);
-
-const listArticleImagePaths = html => {
-  const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
-
-  if (!images) {
-    return [];
-  }
-
-  return Promise.all(images.map(toImagePath));
-};
-
-const copyArticleImage = async imagepath => {
-  await fs.copy(
-    path.join(srcImgDir, imagepath),
-    path.join(destImgDir, imagepath)
-  );
-};
-
-const copyArticleImages = async html => {
-  const imagePaths = await listArticleImagePaths(html);
-  await Promise.all(imagePaths.map(copyArticleImage));
-};
-
-const updateEntry = async file => {
-  const src = path.relative("", file.dest);
-  const [npm] = await Promise.all([
-    whichAsync("npm"),
-    commitEntry(src, file.verb),
-    updateCache(file.contents, file.name),
-    copyArticleImages(file.contents)
-  ]);
+const buildArticle = async (contents, name) => {
+  const [npm] = await Promise.all([which("npm"), updateCache(contents, name)]);
   await runCommand(npm, [
     "run",
     "html",
     "--",
-    `--article=${destDir}${file.name}.html`
+    `--article=${destDir}${name}.html`
+  ]);
+};
+
+const updateEntry = file => {
+  const src = path.relative("", file.dest);
+  return Promise.all([
+    commitEntry(src, file.verb),
+    copyArticleImages(file.contents),
+    buildArticle(file.contents, file.name)
   ]);
 };
 
