@@ -2,58 +2,36 @@ const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");
 const mqpacker = require("css-mqpacker");
-const path = require("path");
 const postcss = require("postcss");
 const wrapWithSupports = require("../lib/wrap-with-supports");
 
-const cssExt = ".css";
-const destDir = "../tmp/";
-const minExt = ".min";
+const files = [
+  {
+    dest: "../tmp/debug.min.css",
+    src: "../src/css/debug.css"
+  },
+  {
+    dest: "../tmp/main.min.css",
+    src: "../src/css/main.css"
+  }
+];
 const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
   wrapWithSupports()
 ]);
-const srcDir = "../src/css/";
 
-const isTarget = filename => {
-  if (path.extname(filename) !== cssExt) {
-    return false;
-  }
-
-  if (filename.startsWith("_")) {
-    return false;
-  }
-
-  return true;
-};
-
-const listFilenames = async () => {
-  const filenames = await fs.readdir(srcDir);
-  return filenames.filter(isTarget);
-};
-
-const buildCSS = async filename => {
-  const src = path.join(srcDir, filename);
-  const dest = path.join(
-    destDir,
-    `${path.basename(filename, cssExt)}${minExt}${cssExt}`
-  );
-  const css = await fs.readFile(src, "utf8");
+const buildCSS = async file => {
+  const css = await fs.readFile(file.src, "utf8");
   const processed = await processor.process(css, {
-    from: src,
-    to: dest
+    from: file.src,
+    to: file.dest
   });
-  await fs.outputFile(dest, processed.css);
-};
-
-const main = async () => {
-  const filenames = await listFilenames();
-  return Promise.all(filenames.map(buildCSS));
+  await fs.outputFile(file.dest, processed.css);
 };
 
 process.chdir(__dirname);
-main().catch(e => {
+Promise.all(files.map(buildCSS)).catch(e => {
   console.trace(e);
 });

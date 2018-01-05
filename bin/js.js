@@ -1,50 +1,28 @@
 const fs = require("fs-extra");
 const { compile } = require("google-closure-compiler-js");
-const path = require("path");
 
 const config = {
   compilationLevel: "ADVANCED",
   outputWrapper: "(function () {%output%}).call(window);"
 };
-const jsExt = ".js";
-const minExt = ".min";
-const srcDir = "../src/js/";
-const tmpDir = "../tmp/";
-
-const isSameDest = (dest, file) => file.dest === dest;
-
-const generateFileMappings = (files, filename) => {
-  if (path.extname(filename) !== jsExt) {
-    return files;
+const files = [
+  {
+    dest: "../tmp/async.min.js",
+    src: ["../src/js/unutm.js"]
+  },
+  {
+    dest: "../tmp/defer.min.js",
+    src: ["../src/js/ellipsis-title.js", "../src/js/reldate.js"]
+  },
+  {
+    dest: "../tmp/debug.min.js",
+    src: [
+      "../src/js/toggle-outline.js",
+      "../src/js/toggle-column.js",
+      "../src/js/toggle-eyecatch.js"
+    ]
   }
-
-  const src = path.join(srcDir, filename);
-  const dest = path.join(
-    tmpDir,
-    `${path
-      .extname(path.basename(src, jsExt))
-      .replace(/^./, "")}${minExt}${jsExt}`
-  );
-  const target = files.find(isSameDest.bind(null, dest));
-
-  if (target) {
-    target.src = [...target.src, src];
-    return files;
-  }
-
-  return [
-    ...files,
-    {
-      dest: dest,
-      src: [src]
-    }
-  ];
-};
-
-const listFiles = async () => {
-  const filenames = await fs.readdir(srcDir);
-  return filenames.reduce(generateFileMappings, []);
-};
+];
 
 const readSrc = srcpath => fs.readFile(srcpath, "utf8");
 
@@ -67,12 +45,7 @@ const buildJS = async file => {
   await fs.outputFile(file.dest, js);
 };
 
-const main = async () => {
-  const files = await listFiles();
-  return Promise.all(files.map(buildJS));
-};
-
 process.chdir(__dirname);
-main().catch(e => {
+Promise.all(files.map(buildJS)).catch(e => {
   console.trace(e);
 });
