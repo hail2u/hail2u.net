@@ -93,7 +93,7 @@ const copyArticleImage = async imagepath => {
 };
 
 const copyArticleImages = async html => {
-  const imagePaths = listArticleImagePaths(html);
+  const imagePaths = await listArticleImagePaths(html);
   await Promise.all(imagePaths.map(copyArticleImage));
 };
 
