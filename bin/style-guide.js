@@ -1,6 +1,9 @@
 const fs = require("fs-extra");
 
+const dest = "../dist/style-guide/index.html";
 const dir = "../";
+const resourceRe = /\b(href|src)(=)(")(.*?)(")/g;
+const src = "../src/css/test.html";
 const url = "https://hail2u.net/";
 
 const rewriteURL = (m, a, e, o, u, c) => {
@@ -16,11 +19,8 @@ const rewriteURL = (m, a, e, o, u, c) => {
 };
 
 const main = async () => {
-  const html = await fs.readFile("../src/css/test.html", "utf8");
-  await fs.outputFile(
-    "../dist/style-guide/index.html",
-    html.replace(/\b(href|src)(=)(")(.*?)(")/g, rewriteURL)
-  );
+  const html = await fs.readFile(src, "utf8");
+  await fs.outputFile(dest, html.replace(resourceRe, rewriteURL));
 };
 
 process.chdir(__dirname);
