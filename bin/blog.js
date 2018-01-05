@@ -296,7 +296,7 @@ const main = async () => {
 
   return previewSelected({
     ...selected,
-    contenst: html,
+    contents: html,
     dest: "../tmp/__preview.html",
     template: "../src/preview.mustache"
   });
