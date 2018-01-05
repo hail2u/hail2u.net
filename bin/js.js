@@ -3,7 +3,9 @@ const { compile } = require("google-closure-compiler-js");
 
 const config = {
   compilationLevel: "ADVANCED",
-  outputWrapper: "(function () {%output%}).call(window);"
+  languageIn: "ECMASCRIPT_2017",
+  languageOut: "ECMASCRIPT5_STRICT",
+  outputWrapper: "(function(){\n%output%\n}).call(this);"
 };
 const files = [
   {
