@@ -1,21 +1,21 @@
 const fs = require("fs-extra");
 
 const dest = "../dist/style-guide/index.html";
-const dir = "../";
 const resourceRe = /\b(href|src)(=)(")(.*?)(")/g;
+const rootDir = "../";
+const rootURL = "https://hail2u.net/";
 const src = "../src/css/test.html";
-const url = "https://hail2u.net/";
 
-const rewriteURL = (m, a, e, o, u, c) => {
-  if (u.startsWith(url)) {
-    return `${a}${e}${o}${u.substr(url.length - 1)}${c}`;
+const rewriteURL = (whole, attr, eq, oq, url, cq) => {
+  if (url.startsWith(rootURL)) {
+    return `${attr}${eq}${oq}${url.substr(rootURL.length - 1)}${cq}`;
   }
 
-  if (u.startsWith(dir)) {
-    return `${a}${e}${o}${u.substr(dir.length - 1)}${c}`;
+  if (url.startsWith(rootDir)) {
+    return `${attr}${eq}${oq}${url.substr(rootDir.length - 1)}${cq}`;
   }
 
-  return `${a}${e}${o}${u}${c}`;
+  return `${attr}${eq}${oq}${url}${cq}`;
 };
 
 const main = async () => {
