@@ -128,8 +128,7 @@ const updateEntry = async file => {
     path.relative(srcDir, path.dirname(src)),
     `${path.basename(src, ".txt")}.html`
   );
-  const [htmlhint, npm] = await Promise.all([
-    which("htmlhint"),
+  const [npm] = await Promise.all([
     which("npm"),
     commitEntry(src, file.verb),
     updateCache(file.contents, file.name),
@@ -149,8 +148,6 @@ const updateEntry = async file => {
     const html = await buildArticle(dest);
     await fs.outputFile(dest, html);
   }
-
-  await runCommand(htmlhint, ["--format", "compact", dest]);
 };
 
 const isDraft = filename => {
