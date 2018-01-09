@@ -150,43 +150,52 @@ const extendItem = item => {
   };
 };
 
+const isFirstInYear = (current, previous) => {
+  if (!previous || current.year !== previous.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInYear = (current, next) => {
+  if (!next || current.year !== next.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLatest = index => {
+  if (index === 0) {
+    return true;
+  }
+
+  return false;
+};
+
 const markYearChanges = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
-  let isFirstInYear = false;
-  let isLastInYear = false;
-  let isLatest = false;
-
-  if (index === 0) {
-    isFirstInYear = true;
-    isLatest = true;
-  }
-
-  if (nextItem && item.year !== nextItem.year) {
-    isLastInYear = true;
-  }
-
-  if (previousItem && item.year !== previousItem.year) {
-    isFirstInYear = true;
-  }
-
-  if (index === items.length - 1) {
-    isLastInYear = true;
-  }
-
   return {
     ...item,
-    isFirstInYear: isFirstInYear,
-    isLastInYear: isLastInYear,
-    isLatest: isLatest
+    isFirstInYear: isFirstInYear(item, previousItem),
+    isLastInYear: isLastInYear(item, nextItem),
+    isLatest: isLatest(index)
   };
 };
 
+const extendItems = async items => {
+  const extendedItems = await Promise.all(items.map(extendItem));
+  return Promise.all(extendedItems.map(markYearChanges));
+};
+
+const optimizeItems = items =>
+  extendItems([].concat(...items).sort(compareByUnixtime));
+
 const readItems = async () => {
-  let items = await Promise.all(itemFiles.map(readItem));
-  items = [].concat(...items).sort(compareByUnixtime);
-  items = await Promise.all(items.map(extendItem));
-  return Promise.all(items.map(markYearChanges));
+  const items = await Promise.all(itemFiles.map(readItem));
+  return optimizeItems(items);
 };
 
 const readPartial = async filename => ({

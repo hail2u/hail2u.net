@@ -169,10 +169,11 @@ const getDraft = async filename => {
   };
 };
 
+const getDrafts = drafts => Promise.all(drafts.map(getDraft));
+
 const listDrafts = async () => {
-  let filenames = await fs.readdir(draftDir);
-  filenames = filenames.filter(isDraft);
-  return Promise.all(filenames.map(getDraft));
+  const filenames = await fs.readdir(draftDir);
+  return getDrafts(filenames.filter(isDraft));
 };
 
 const selectDraft = drafts =>
