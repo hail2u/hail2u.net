@@ -50,6 +50,11 @@ const hasSameLink = (link, article) => link === article.link;
 const compareByUnixtime = (a, b) =>
   parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
 
+const saveCache = cache =>
+  fs.outputJSON(cacheFile, cache.sort(compareByUnixtime), {
+    spaces: 2
+  });
+
 const updateCache = async (html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
@@ -63,14 +68,18 @@ const updateCache = async (html, name) => {
     hasSameLink.bind(null, article.link)
   );
 
-  if (sameArticleIndex !== -1) {
-    article.unixtime = cache[sameArticleIndex].unixtime;
-    cache.splice(sameArticleIndex, 1);
+  if (sameArticleIndex === -1) {
+    return saveCache([article, ...cache]);
   }
 
-  await fs.outputJSON(cacheFile, [article, ...cache].sort(compareByUnixtime), {
-    spaces: 2
-  });
+  return saveCache([
+    {
+      ...article,
+      unixtime: cache[sameArticleIndex].unixtime
+    },
+    ...cache.slice(0, sameArticleIndex),
+    ...cache.slice(sameArticleIndex + 1)
+  ]);
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
