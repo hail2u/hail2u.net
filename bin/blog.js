@@ -23,16 +23,7 @@ const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
 
 const runCommand = async (command, args) => {
-  let stdout;
-  let stderr;
-
-  try {
-    ({ stdout, stderr } = await execFile(command, args));
-  } catch (e) {
-    console.error(stderr);
-    throw e;
-  }
-
+  const { stdout } = await execFile(command, args);
   process.stdout.write(stdout);
 };
 
