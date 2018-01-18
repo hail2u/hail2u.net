@@ -7,7 +7,7 @@
   <channel>
     <description>主にウェブサイト制作関連の記事や文書、プロジェクトがあります。</description>
     <language>ja</language>
-    <lastBuildDate>Wed, 17 Jan 2018 11:36:48 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jan 2018 12:38:52 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u</title>
@@ -15,6 +15,20 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[Promiseで構成される処理のフローを最適化しようとするとよくわからなくなってくる。awaitで依存する処理同士を繋げ、それぞれをPromise.all()で並列に実行する、というのが基本のアプローチのようだ。しかし当然Promise.all()の中で更にPromise.all()することになり、それがどんどん入れ子になっていく。すると見通しが悪くなってくる。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/optimizing-promise-flow.html</guid>
+        <link>https://hail2u.net/blog/optimizing-promise-flow.html</link>
+        <pubDate>Thu, 18 Jan 2018 12:36:54 +0900</pubDate>
+        <title><![CDATA[Promiseフローの最適化]]></title>
+        <content:encoded><![CDATA[<p>Promiseで構成される処理のフローを最適化しようとするとよくわからなくなってくる。<code>await</code>で依存する処理同士を繋げ、それぞれを<code>Promise.all()</code>で並列に実行する、というのが基本のアプローチのようだ。しかし当然<code>Promise.all()</code>の中で更に<code>Promise.all()</code>することになり、それがどんどん入れ子になっていく。すると見通しが悪くなってくる。</p>
+
+<p>1年くらい前に<a href="https://medium.com/@bluepnume/even-with-async-await-you-probably-still-need-promises-9b259854c161">async/awaitがあってもやはりPromiseも必要</a>という記事を読んだ覚えがあったので、改めて読み直していた。ここでは頑張ってオレオレ便利関数を作ってやろう、というような結論だ。これならさすがに<code>Promise.all()</code>を入れ子にするだけの方が良さそうだ。</p>
+
+<p>しかしながら<code>await</code>と<code>Promise.all()</code>を混ぜると、Linterではどうにもならなそうなミスが頻発してしまう。<code>await</code>の書き忘れや書きすぎ、<code>Promise.all()</code>の<code>return</code>し忘れ、などだ。間違えて<code>Promise.all()</code>の中で<code>arr.filter(foo).map(bar)</code>などと書いてしまうこともある。こうなると依存関係を簡単な図で書くと<code>await</code>と<code>Promise.all()</code>でスケルトンを生成してくれるツールが欲しくなる。</p>
+
+<p>とにかく習作を書きまくるしかない。</p>]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[おばあさんが7人の子供たちを引き取ったものの、全員が近寄ってはいけないと注意しておいた長持の中に消えていく、という短編小説を読んだ。特におばあさんが魔女だという描写もなく、消えちゃったね……とフワッと終わる。白雪姫と7人の小人をモチーフにしているのかなとは思ったが、よくわからないままだ。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/on-20180117.html</guid>
@@ -153,40 +167,6 @@
 <p>宅配の時間指定も「予定を曲げてもらい、わざわざこの時間に来てもらう」というようなイメージなので苦手だ。宅配ボックス欲しい。とりあえず入れるだけの安いやつもあるみたいなので、真剣に検討したい。</p>
 
 <p>今日は宅配で荷物を受け取ったので休みにしたい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[少し前からCSSやJavaScriptファイル、ファビコンやタッチ・アイコンをビルドする時に入出力ファイルの対応を動的に生成していた。ファイル名を使って、ビルドするものかどうかの判断やまとめる先のファイル名を判断させる。そこそこ規模が大きくなると便利そうだが、数種類をビルドするだけには無駄なシステムだ。普通に対応関係を書くように戻した。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/building-files-with-dynamic-listing.html</guid>
-        <link>https://hail2u.net/blog/building-files-with-dynamic-listing.html</link>
-        <pubDate>Mon, 8 Jan 2018 12:30:34 +0900</pubDate>
-        <title><![CDATA[動的な一覧化を利用したファイルのビルド]]></title>
-        <content:encoded><![CDATA[<p>少し前からCSSやJavaScriptファイル、ファビコンやタッチ・アイコンをビルドする時に入出力ファイルの対応を動的に生成していた。ファイル名を使って、ビルドするものかどうかの判断やまとめる先のファイル名を判断させる。そこそこ規模が大きくなると便利そうだが、数種類をビルドするだけには無駄なシステムだ。普通に対応関係を書くように戻した。</p>
-
-<p>ファイル名での制御はプリフィックスや二重拡張子を利用して行っていた。</p>
-
-<pre>src/css/_bar.css
-src/css/foo.css
-src/img/favicon.svg
-src/img/touch-icon-precomposed.svg
-src/js/script1.foo.js
-src/js/script2.foo.js
-src/js/script3.bar.js
-</pre>
-
-<p>これらをビルド・ツールに通すと、以下のようなファイル群ができあがる。</p>
-
-<pre>dist/apple-touch-icon-precomposed.ico
-dist/css/foo.min.css
-dist/favicon.ico
-dist/js/bar.min.js
-dist/js/foo.min.js
-</pre>
-
-<p>CSSファイルのビルドでは<code>_</code>で始まるファイルを無視（<code>@import</code>で読むファイルということになる）していた。またJavaScriptファイルのビルドでは二重拡張子でまとめるビルド先のファイル名を指定しておくわけだ。ファビコン等は出力先のパスが固定なので、中間ファイルをうまく使うようにするだけで良い。</p>
-
-<hr>
-
-<p>古い（Front Matterが発明されていない時代）フラットファイルなCMSだとこういうアプローチがよくあった。ポータブルかつ敷居が低い反面、制限も多かった。小規模なウェブサイトなら一考の余地はあるかもしれないと考えてやってみていたが、規模に合わない柔軟さが不釣り合いだった。中規模以上ならばwebpackなどになるので、もう存在価値はないようだ。</p>]]></content:encoded>
       </item>
 
   </channel>
