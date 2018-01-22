@@ -2,52 +2,68 @@
  * reldate.js
  * LICENSE: http://hail2u.mit-license.org/2016
  */
-const now = performance.timing.navigationStart + performance.now();
+const millisecondsInSecond = 1000;
+const radix = 10;
+const unitNow = "たった今";
+const secondsInMinute = 60;
+const unitSecond = "秒";
+const suffix = "前";
+const minutesInHour = 60;
+const unitMinute = "分";
+const hoursInDay = 24;
+const unitHour = "時間";
+const daysInMonth = 30;
+const unitDay = "日";
+const monthsInYear = 12;
+const unitMonth = "ヶ月";
+const unitYear = "年";
+
 const toRelativeDate = (from, to) => {
   if (!Number.isInteger(to)) {
     return;
   }
 
-  let diff = parseInt((from - to) / 1000, 10);
+  let diff = parseInt((from - to) / millisecondsInSecond, radix);
 
   if (!Number.isInteger(diff) || diff < 0) {
     return;
   }
 
-  if (diff < 30) {
-    return "たった今";
+  if (diff < secondsInMinute / 2) {
+    return unitNow;
   }
 
-  if (diff < 90) {
-    return `${diff}秒前`;
+  if (diff < secondsInMinute) {
+    return `${diff}${unitSecond}${suffix}`;
   }
 
-  diff = parseInt(diff / 60, 10);
+  diff = parseInt(diff / secondsInMinute, radix);
 
-  if (diff < 90) {
-    return `${diff}分前`;
+  if (diff < minutesInHour) {
+    return `${diff}${unitMinute}${suffix}`;
   }
 
-  diff = parseInt(diff / 60, 10);
+  diff = parseInt(diff / minutesInHour, radix);
 
-  if (diff < 36) {
-    return `${diff}時間前`;
+  if (diff < hoursInDay) {
+    return `${diff}${unitHour}${suffix}`;
   }
 
-  diff = parseInt(diff / 24, 10);
+  diff = parseInt(diff / hoursInDay, radix);
 
-  if (diff < 45) {
-    return `${diff}日前`;
+  if (diff < daysInMonth) {
+    return `${diff}${unitDay}${suffix}`;
   }
 
-  diff = parseInt(diff / 30, 10);
+  diff = parseInt(diff / daysInMonth, radix);
 
-  if (diff < 18) {
-    return `${diff}ヶ月前`;
+  if (diff < monthsInYear) {
+    return `${diff}${unitMonth}${suffix}`;
   }
 
-  return `${parseInt(diff / 12, 10)}年前`;
+  return `${parseInt(diff / monthsInYear, radix)}${unitYear}${suffix}`;
 };
+const now = performance.timing.navigationStart + performance.now();
 
 for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
   const absolute = time.getAttribute("datetime");
