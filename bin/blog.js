@@ -11,7 +11,7 @@ const toPOSIXPath = require("../lib/to-posix-path");
 const which = require("../lib/which");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["preview", "publish", "update"]
+  boolean: ["preview", "contribute", "update"]
 });
 const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
@@ -144,7 +144,7 @@ const updateEntry = async file => {
     ]);
   }
 
-  if (argv.publish) {
+  if (argv.contribute) {
     const html = await buildArticle(dest);
     await fs.outputFile(dest, html);
   }
@@ -178,7 +178,7 @@ const listDrafts = async () => {
 
 const selectDraft = drafts =>
   new Promise((resolve, reject) => {
-    if (!argv.publish && drafts.length === 1) {
+    if (!argv.contribute && drafts.length === 1) {
       return resolve(drafts[0]);
     }
 
@@ -281,7 +281,7 @@ const main = async () => {
   checkSelectedContents(selected.contents);
   const html = markupSelected(selected.ext, selected.contents);
 
-  if (argv.publish) {
+  if (argv.contribute) {
     const ext = ".txt";
     return publishSelected({
       ...selected,
