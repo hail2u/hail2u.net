@@ -10,6 +10,7 @@ for(var r=p(document.querySelectorAll("*")),t=r.next();!t.done;t=r.next()){var u
  reldate.js
  LICENSE: http://hail2u.mit-license.org/2016
 */
-function v(){var a=w,b=Date.parse(x);if(Number.isInteger(b)&&(a=parseInt((a-b)/1E3,10),Number.isInteger(a)&&!(0>a))){if(30>a)return"\u305f\u3063\u305f\u4eca";if(60>a)return""+a+"\u79d2\u524d";a=parseInt(a/60,10);if(60>a)return""+a+"\u5206\u524d";a=parseInt(a/60,10);if(24>a)return""+a+"\u6642\u9593\u524d";a=parseInt(a/24,10);if(30>a)return""+a+"\u65e5\u524d";a=parseInt(a/30,10);return 12>a?""+a+"\u30f6\u6708\u524d":""+parseInt(a/12,10)+"\u5e74\u524d"}}
-for(var w=performance.timing.navigationStart+performance.now(),y=p(document.querySelectorAll("time.js-reldate[datetime]")),z=y.next();!z.done;z=y.next()){var A=z.value,x=A.getAttribute("datetime"),B=v();B&&(A.setAttribute("title",x),A.textContent=B)};
+var v=performance.timing.navigationStart+performance.now();
+function w(){var a=Date.parse(x);if(Number.isInteger(a)&&(a=Math.round((v-a)/1E3),Number.isInteger(a)&&!(0>a))){if(30>a)return"\u305f\u3063\u305f\u4eca";if(60>a)return""+a+"\u79d2\u524d";a=Math.round(a/60);if(60>a)return""+a+"\u5206\u524d";a=Math.round(a/60);if(24>a)return""+a+"\u6642\u9593\u524d";a=Math.round(a/24);if(30>a)return""+a+"\u65e5\u524d";a=Math.round(a/30);return 12>a?""+a+"\u30f6\u6708\u524d":""+Math.round(a/12)+"\u5e74\u524d"}}
+for(var y=p(document.querySelectorAll("time.js-reldate[datetime]")),z=y.next();!z.done;z=y.next()){var A=z.value,x=A.getAttribute("datetime"),B=w();B&&(A.setAttribute("title",x),A.textContent=B)};
 }).call(this);
