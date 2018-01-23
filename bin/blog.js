@@ -1,4 +1,4 @@
-const execFile = require("../lib/exec-file");
+const { execFile } = require("child_process");
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
 const minifyHTML = require("../lib/html-minifier");
@@ -8,7 +8,8 @@ const os = require("os");
 const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
-const which = require("../lib/which");
+const util = require("util");
+const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "contribute", "update"]
@@ -19,16 +20,18 @@ const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
+const execFileAsync = util.promisify(execFile);
 const srcDir = "../src/blosxom/entries/";
 const srcImgDir = "../src/img/blog/";
+const whichAsync = util.promisify(which);
 
 const runCommand = async (command, args) => {
-  const { stdout } = await execFile(command, args);
+  const { stdout } = await execFileAsync(command, args);
   process.stdout.write(stdout);
 };
 
 const commitEntry = async (file, verb) => {
-  const git = await which("git");
+  const git = await whichAsync("git");
   await runCommand(git, ["add", "--", file]);
   await runCommand(git, [
     "commit",
@@ -98,8 +101,8 @@ const copyArticleImages = async html => {
 };
 
 const buildArticle = async dest => {
-  const perl = await which("perl");
-  const { stdout } = await execFile(
+  const perl = await whichAsync("perl");
+  const { stdout } = await execFileAsync(
     perl,
     [
       "blosxom.cgi",
@@ -129,7 +132,7 @@ const updateEntry = async file => {
     `${path.basename(src, ".txt")}.html`
   );
   const [npm] = await Promise.all([
-    which("npm"),
+    whichAsync("npm"),
     commitEntry(src, file.verb),
     updateCache(file.contents, file.name),
     copyArticleImages(file.contents)
@@ -254,7 +257,7 @@ const previewSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");
   const rendered = renderSelected(template, selected);
   await fs.outputFile(selected.dest, rendered);
-  const open = await which("open");
+  const open = await whichAsync("open");
   await runCommand(open, [selected.dest]);
 };
 

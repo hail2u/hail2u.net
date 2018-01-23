@@ -1,7 +1,9 @@
-const execFile = require("../lib/exec-file");
+const { execFile } = require("child_process");
 const path = require("path");
-const which = require("../lib/which");
+const util = require("util");
+const which = require("which");
 
+const execFileAsync = util.promisify(execFile);
 const files = [
   {
     dest: "../tmp/favicon-16.png",
@@ -24,9 +26,17 @@ const files = [
     width: 180
   }
 ];
+const whichAsync = util.promisify(which);
 
 const generatePNG = async (inkscape, file) => {
-  await execFile(inkscape, ["-f", file.src, "-e", file.dest, "-w", file.width]);
+  await execFileAsync(inkscape, [
+    "-f",
+    file.src,
+    "-e",
+    file.dest,
+    "-w",
+    file.width
+  ]);
   return file.dest;
 };
 
@@ -34,12 +44,12 @@ const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
 
 const generateFavicon = (convert, filepaths) =>
-  execFile(convert, [...filepaths, "../dist/favicon.ico"]);
+  execFileAsync(convert, [...filepaths, "../dist/favicon.ico"]);
 
 const main = async () => {
   const [convert, inkscape] = await Promise.all([
-    which("convert"),
-    which("inkscape")
+    whichAsync("convert"),
+    whichAsync("inkscape")
   ]);
   const filepaths = await Promise.all(
     files.map(generatePNG.bind(null, inkscape))
