@@ -241,7 +241,7 @@ const markupSelected = (ext, contents) => {
 const publishSelected = selected =>
   Promise.all([
     fs.outputFile(selected.dest, selected.contents, {
-      flags: "wx"
+      flag: "wx"
     }),
     fs.unlink(selected.src),
     updateEntry(selected)
