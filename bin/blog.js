@@ -1,7 +1,6 @@
 const { execFile } = require("child_process");
 const fs = require("fs-extra");
 const markdown = require("../lib/markdown");
-const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const os = require("os");
@@ -116,12 +115,10 @@ const buildArticle = async dest => {
       }
     }
   );
-  return minifyHTML(
-    stdout
-      .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-      .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-      .trim()
-  );
+  return stdout
+    .replace(/^[\s\S]*?\r?\n\r?\n/, "")
+    .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
+    .trim();
 };
 
 const updateEntry = async file => {

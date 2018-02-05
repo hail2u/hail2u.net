@@ -1,5 +1,4 @@
 const fs = require("fs-extra");
-const minifyHTML = require("../lib/html-minifier");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -291,7 +290,7 @@ const render = (template, data, partials, dest) => {
   const rendered = mustache.render(template, data, partials);
 
   if (dest.endsWith(".html")) {
-    return minifyHTML(rendered).replace(
+    return rendered.replace(
       /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
       '$1="$2"'
     );
