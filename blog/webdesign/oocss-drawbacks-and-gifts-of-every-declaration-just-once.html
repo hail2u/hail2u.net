@@ -1,24 +1,129 @@
-<!DOCTYPE html><html lang=ja><meta charset=utf-8><meta content="width=device-width" name=viewport><title>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの - Hail2u</title><link href=/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html rel=canonical><link href="https://www.google.com/search?q=site:hail2u.net" rel=search><meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" name=description><meta content=summary name=twitter:card><meta content=@hail2u_ name=twitter:site><meta content=https://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html property=og:url><meta content="OOCSSの欠点とEvery Declaration Just Onceのもたらすもの" property=og:title><meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" property=og:description><meta content=Hail2u property=og:site_name><meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image><meta content=article property=og:type><meta content=ja_JP property=og:locale><style>@supports(top:0){/*!
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width" name="viewport">
+
+  <title>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの - Hail2u</title>
+
+  
+  <link href="/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html" rel="canonical">
+  <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
+  <meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" name="description">
+  <meta content="summary" name="twitter:card">
+  <meta content="@hail2u_" name="twitter:site">
+  <meta content="https://hail2u.net/blog/webdesign/oocss-drawbacks-and-gifts-of-every-declaration-just-once.html" property="og:url">
+  <meta content="OOCSSの欠点とEvery Declaration Just Onceのもたらすもの" property="og:title">
+  <meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" property="og:description">
+  <meta content="Hail2u" property="og:site_name">
+  <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+  <meta content="article" property="og:type">
+  <meta content="ja_JP" property="og:locale">
+
+  <style>@supports(top:0){/*!
  * main.css
  * LICENSE: http://hail2u.mit-license.org/2011
- */:root{--font-stack-system-ui:system-ui,"Segoe UI","Yu Gothic UI",sans-serif;--font-stack-monospace:"Menlo","Consolas",monospace;--color-fg:#1f1f1f;--color-bg:#fff;--color-fg-semilight:#525252;--color-fg-light:#c2c2c2;--color-bg-dark:#e0e0e0;--color-fg-a:#005ae0;--color-fg-a-visited:#ab0dd3;--ratio:1.7;--ratio-text:1;--ratio-text-gargantuan:calc(var(--ratio-text)*var(--ratio));--ratio-text-huge:calc((var(--ratio-text) + var(--ratio-text-gargantuan)) / 2);--ratio-text-large:calc((var(--ratio-text) + var(--ratio-text-huge)) / 2);--ratio-text-small:calc(var(--ratio-text-huge)/var(--ratio));--line-height:var(--ratio);--line-height-large:calc(var(--line-height)*1.25);--line-height-small:calc(var(--line-height)*.8);--margin:calc(var(--ratio)*1rem);--margin-small:calc(var(--margin)/var(--ratio)/var(--ratio));--margin-large:calc(var(--margin)*var(--ratio));--margin-huge:calc(var(--margin-large)*var(--ratio));--margin-gargantuan:calc(var(--margin-huge)*var(--ratio));--width-border:calc(var(--margin-small)/var(--ratio)/var(--ratio)/var(--ratio));--width-border-small:calc(var(--width-border)/var(--ratio));--padding:var(--margin-small);--padding-large:calc(var(--padding)*var(--ratio));--width-large:32rem;--width-gap:calc(var(--width-large)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio));--width-gap-small:calc(var(--width-gap)/var(--ratio));--width-large-outer:calc(var(--width-gap) + var(--width-large) + var(--width-gap));--width-supplement-outer:calc(var(--width-large-outer)/var(--ratio));--width-supplement:calc(var(--width-supplement-outer) - var(--width-gap) - var(--width-gap));--width-huge-outer:calc(var(--width-supplement-outer) + var(--width-large-outer));--width-huge:calc(var(--width-huge-outer) - var(--width-gap) - var(--width-gap))}html{font-family:var(--font-stack-system-ui);font-size:calc(var(--ratio-text)*1rem);line-height:var(--line-height)}body{background-color:var(--color-bg);color:var(--color-fg);margin:0 0 var(--margin)}h1{font-weight:inherit;line-height:var(--line-height-small);margin:0 0 var(--margin)}p{margin:0 0 var(--margin)}hr{background-color:transparent;border:0;box-sizing:content-box;clear:both;color:var(--color-fg-light);font-size:calc(var(--ratio-text-gargantuan)*1rem);font-weight:bolder;height:1em;line-height:1;margin:var(--margin-large) 0;text-align:center}hr:before{content:"*\a0\a0\a0*\a0\a0\a0*"}pre{clear:both;color:var(--color-fg-semilight);font-family:var(--font-stack-monospace);font-size:calc(var(--ratio-text-small)*1rem);line-height:calc(var(--ratio-text)*var(--line-height)*2/var(--ratio-text-small)/3);margin:0 0 var(--margin);overflow:auto}blockquote{border-left:var(--width-border) solid var(--color-fg-light);clear:both;margin:0;padding-left:calc(var(--margin) - var(--width-border))}figure blockquote>:last-child{margin-bottom:0}ul,ol{margin:0 0 var(--margin);padding-left:var(--margin)}ul ul,ul ol,ol ul,ol ol{margin-bottom:0}dl{margin:0 0 var(--margin)}dl dl{margin-bottom:0}dt{margin-bottom:var(--margin-small)}dd{margin-bottom:var(--margin-small);margin-left:var(--margin)}figure{margin:0 0 var(--margin);position:relative}figcaption{border-left:var(--width-border) solid var(--color-fg-light);display:inline-block;font-size:calc(var(--ratio-text-small)*1rem);margin-top:var(--margin-small);padding-left:var(--width-gap-small)}blockquote+figcaption{font-size:inherit;margin-top:0;padding-left:calc(var(--margin) - var(--width-border));padding-top:var(--margin)}main{display:block}a{color:var(--color-fg-a)}a:visited{color:var(--color-fg-a-visited)}em{font-style:normal;font-weight:bolder}strong{font-size:calc(var(--ratio-text-small)*1rem);-webkit-text-emphasis-style:dot;text-emphasis-style:dot}cite{font-style:normal}abbr{cursor:help}code,var,samp,kbd{font-family:var(--font-stack-monospace);font-size:1em}var{font-style:normal}mark{background-color:var(--color-bg-dark)}ins{text-decoration:none}del{text-decoration:line-through}img,video{border:0;box-sizing:border-box;height:auto;max-height:100%;max-width:100%}figure img,figure video{vertical-align:bottom}svg:not(:root){fill:currentcolor;max-height:100%;max-width:100%;overflow:hidden}table{border-bottom:var(--width-border-small) solid var(--color-fg-light);border-collapse:collapse;border-spacing:0;clear:both;display:inline-block;margin:0 0 var(--margin);max-width:100%;overflow-x:auto;table-layout:fixed}figure>table{margin-bottom:0}th,td{border-top:var(--width-border-small) solid var(--color-fg-light);padding:var(--padding);vertical-align:top;white-space:nowrap}th{text-align:inherit}thead th{border-bottom:var(--width-border) solid var(--color-fg-light)}form{margin:0 0 var(--margin)}body>header{display:flex;flex-wrap:wrap;font-size:calc(var(--ratio-text-small)*1rem);line-height:var(--line-height-large);margin:var(--margin) auto var(--margin-large);max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>header a{text-decoration:none}body>header h1{flex-grow:1;font-size:inherit;height:calc(var(--ratio-text-small)*var(--line-height-large)*1rem);line-height:inherit;margin-bottom:0;text-transform:uppercase}body>header h1 a,body>header h1 a:visited{color:inherit}body>header h1 svg{height:100%;vertical-align:text-bottom;width:auto}body>header nav{height:calc(var(--ratio-text-small)*var(--line-height-large)*1rem)}body>header nav ul{display:flex;margin-bottom:0;padding-left:0}body>header nav ul li{display:block;margin-left:var(--padding)}body>header nav ul li:last-child{margin-right:0}body>header nav mark{background-color:transparent;border-bottom:var(--width-border-small) solid var(--color-fg-light)}body>header p{font-size:calc(var(--ratio-text-gargantuan)*1rem);font-weight:lighter;line-height:var(--line-height-small);margin-bottom:0;margin-top:var(--margin-large);width:100%}body>main{margin-left:auto;margin-right:auto;max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>main section{position:relative}body>main article{position:relative}body>main>section>h1,body>main>article>h1{font-size:calc(var(--ratio-text-gargantuan)*1rem);margin-top:var(--margin-gargantuan)}body>main>:first-child>h1:first-of-type{margin-top:0}body>main section * h1,body>main article * h1{font-size:calc(var(--ratio-text-huge)*1rem);margin-bottom:var(--margin-small);margin-top:var(--margin-huge)}body>main>article>footer:first-child{float:left;width:100%}body>main>article>footer:first-child :last-child{margin-bottom:0}body>footer{display:flex;font-size:calc(var(--ratio-text-small)*1rem);margin-left:auto;margin-right:auto;margin-top:var(--margin-gargantuan);max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>footer ul{display:flex;margin-bottom:0;padding-left:0}body>footer ul li{display:block;margin-left:var(--padding)}body>footer address{flex-grow:1;font-style:normal;order:-1}.fill{clear:both;margin-left:calc(0px - var(--width-gap));margin-right:calc(0px - var(--width-gap))}.fill figcaption{margin-left:var(--width-gap);margin-right:var(--width-gap)}.fill img,.fill video,.fill canvas{width:100%}aside.hang{color:var(--color-fg-semilight);font-size:calc(var(--ratio-text-small)*1rem);line-height:var(--line-height-small)}.posts{padding-left:0}.posts li{display:flex;list-style-type:none;margin-bottom:var(--margin-small);white-space:nowrap}.posts time{display:block;flex-grow:1;margin-left:var(--width-gap-small);order:1;text-align:right}.posts a{display:block;overflow:hidden;text-overflow:ellipsis}@media(min-width:40em){body{margin-bottom:var(--margin-large)}pre{overflow:visible;overflow-wrap:break-word;white-space:pre-wrap}body>header{margin-bottom:var(--margin-huge);margin-top:var(--margin-large)}body>header nav ul li{margin-left:var(--padding-large)}body>header p{margin-top:var(--margin-huge)}body>footer ul li{margin-left:var(--padding-large)}.fill,.fill figcaption{margin-left:0;margin-right:0}.flat{clear:both;display:flex;flex-wrap:wrap;justify-content:space-between;padding-left:0}.flat li{display:block;width:calc((100% - var(--width-gap) * 2) / 3)}.flat li:nth-child(3n+2):last-child{width:calc((100% - var(--width-gap) * 2) / 3 * 2 + var(--width-gap))}}@media(min-width:80em){body{margin-bottom:var(--margin-huge)}figcaption{bottom:0;display:block;margin-right:calc(var(--width-gap) + var(--width-gap));margin-top:0;position:absolute;right:100%;width:calc(var(--width-supplement) - var(--width-border) - var(--width-gap-small));z-index:1}blockquote+figcaption{margin-right:0;position:static;width:auto}body>header{margin-bottom:var(--margin-gargantuan);margin-top:var(--margin-huge);padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>header h1{flex-grow:0;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));margin-right:calc(var(--width-gap) + var(--width-gap));width:var(--width-supplement)}body>header nav{flex-grow:1}body>header nav ul li{margin-left:0;margin-right:var(--padding-large)}body>header p{margin-top:var(--margin-gargantuan)}body>main{padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>main>article>footer:first-child{line-height:calc(var(--line-height-small)*var(--ratio-text-gargantuan)/var(--ratio-text));margin-right:calc(var(--width-gap) + var(--width-gap));position:absolute;right:100%;width:var(--width-supplement);z-index:1}body>footer{padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>footer ul li{margin-left:0;margin-right:var(--padding-large)}body>footer address{flex-grow:0;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));margin-right:calc(var(--width-gap) + var(--width-gap));width:var(--width-supplement)}.displace{clear:both;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));width:var(--width-large)}.displace figcaption{left:100%;margin-left:calc(var(--width-gap) + var(--width-gap));margin-right:0;right:auto}.fill{margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)))}.fill figcaption{bottom:auto;left:0;margin-top:var(--margin)}.hang{margin-right:calc(var(--width-gap) + var(--width-gap));position:absolute;right:100%;width:var(--width-supplement);z-index:1}.hang img{width:100%}h1.hang{margin-top:0}section>h1.hang:first-child+*{margin-top:var(--margin-gargantuan)}}@media(min-width:60em){html{font-size:calc(var(--ratio-text-large)*1rem)}}@media(min-width:100em){html{font-size:calc(var(--ratio-text-huge)*1rem)}}@media(min-width:120em){html{font-size:1.25vw}}@media not screen{table{display:table}}}</style><script>(function () {/*
+ */:root{--font-stack-system-ui:system-ui,"Segoe UI","Yu Gothic UI",sans-serif;--font-stack-monospace:"Menlo","Consolas",monospace;--color-fg:#1f1f1f;--color-bg:#fff;--color-fg-semilight:#525252;--color-fg-light:#c2c2c2;--color-bg-dark:#e0e0e0;--color-fg-a:#005ae0;--color-fg-a-visited:#ab0dd3;--ratio:1.7;--ratio-text:1;--ratio-text-gargantuan:calc(var(--ratio-text)*var(--ratio));--ratio-text-huge:calc((var(--ratio-text) + var(--ratio-text-gargantuan)) / 2);--ratio-text-large:calc((var(--ratio-text) + var(--ratio-text-huge)) / 2);--ratio-text-small:calc(var(--ratio-text-huge)/var(--ratio));--line-height:var(--ratio);--line-height-large:calc(var(--line-height)*1.25);--line-height-small:calc(var(--line-height)*.8);--margin:calc(var(--ratio)*1rem);--margin-small:calc(var(--margin)/var(--ratio)/var(--ratio));--margin-large:calc(var(--margin)*var(--ratio));--margin-huge:calc(var(--margin-large)*var(--ratio));--margin-gargantuan:calc(var(--margin-huge)*var(--ratio));--width-border:calc(var(--margin-small)/var(--ratio)/var(--ratio)/var(--ratio));--width-border-small:calc(var(--width-border)/var(--ratio));--padding:var(--margin-small);--padding-large:calc(var(--padding)*var(--ratio));--width-large:32rem;--width-gap:calc(var(--width-large)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio)/var(--ratio));--width-gap-small:calc(var(--width-gap)/var(--ratio));--width-large-outer:calc(var(--width-gap) + var(--width-large) + var(--width-gap));--width-supplement-outer:calc(var(--width-large-outer)/var(--ratio));--width-supplement:calc(var(--width-supplement-outer) - var(--width-gap) - var(--width-gap));--width-huge-outer:calc(var(--width-supplement-outer) + var(--width-large-outer));--width-huge:calc(var(--width-huge-outer) - var(--width-gap) - var(--width-gap))}html{font-family:var(--font-stack-system-ui);font-size:calc(var(--ratio-text)*1rem);line-height:var(--line-height)}body{background-color:var(--color-bg);color:var(--color-fg);margin:0 0 var(--margin)}h1{font-weight:inherit;line-height:var(--line-height-small);margin:0 0 var(--margin)}p{margin:0 0 var(--margin)}hr{background-color:transparent;border:0;box-sizing:content-box;clear:both;color:var(--color-fg-light);font-size:calc(var(--ratio-text-gargantuan)*1rem);font-weight:bolder;height:1em;line-height:1;margin:var(--margin-large) 0;text-align:center}hr:before{content:"*\a0\a0\a0*\a0\a0\a0*"}pre{clear:both;color:var(--color-fg-semilight);font-family:var(--font-stack-monospace);font-size:calc(var(--ratio-text-small)*1rem);line-height:calc(var(--ratio-text)*var(--line-height)*2/var(--ratio-text-small)/3);margin:0 0 var(--margin);overflow:auto}blockquote{border-left:var(--width-border) solid var(--color-fg-light);clear:both;margin:0;padding-left:calc(var(--margin) - var(--width-border))}figure blockquote>:last-child{margin-bottom:0}ul,ol{margin:0 0 var(--margin);padding-left:var(--margin)}ul ul,ul ol,ol ul,ol ol{margin-bottom:0}dl{margin:0 0 var(--margin)}dl dl{margin-bottom:0}dt{margin-bottom:var(--margin-small)}dd{margin-bottom:var(--margin-small);margin-left:var(--margin)}figure{margin:0 0 var(--margin);position:relative}figcaption{border-left:var(--width-border) solid var(--color-fg-light);display:inline-block;font-size:calc(var(--ratio-text-small)*1rem);margin-top:var(--margin-small);padding-left:var(--width-gap-small)}blockquote+figcaption{font-size:inherit;margin-top:0;padding-left:calc(var(--margin) - var(--width-border));padding-top:var(--margin)}main{display:block}a{color:var(--color-fg-a)}a:visited{color:var(--color-fg-a-visited)}em{font-style:normal;font-weight:bolder}strong{font-size:calc(var(--ratio-text-small)*1rem);-webkit-text-emphasis-style:dot;text-emphasis-style:dot}cite{font-style:normal}abbr{cursor:help}code,var,samp,kbd{font-family:var(--font-stack-monospace);font-size:1em}var{font-style:normal}mark{background-color:var(--color-bg-dark)}ins{text-decoration:none}del{text-decoration:line-through}img,video{border:0;box-sizing:border-box;height:auto;max-height:100%;max-width:100%}figure img,figure video{vertical-align:bottom}svg:not(:root){fill:currentcolor;max-height:100%;max-width:100%;overflow:hidden}table{border-bottom:var(--width-border-small) solid var(--color-fg-light);border-collapse:collapse;border-spacing:0;clear:both;display:inline-block;margin:0 0 var(--margin);max-width:100%;overflow-x:auto;table-layout:fixed}figure>table{margin-bottom:0}th,td{border-top:var(--width-border-small) solid var(--color-fg-light);padding:var(--padding);vertical-align:top;white-space:nowrap}th{text-align:inherit}thead th{border-bottom:var(--width-border) solid var(--color-fg-light)}form{margin:0 0 var(--margin)}body>header{display:flex;flex-wrap:wrap;font-size:calc(var(--ratio-text-small)*1rem);line-height:var(--line-height-large);margin:var(--margin) auto var(--margin-large);max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>header a{text-decoration:none}body>header h1{flex-grow:1;font-size:inherit;height:calc(var(--ratio-text-small)*var(--line-height-large)*1rem);line-height:inherit;margin-bottom:0;text-transform:uppercase}body>header h1 a,body>header h1 a:visited{color:inherit}body>header h1 svg{height:100%;vertical-align:text-bottom;width:auto}body>header nav{height:calc(var(--ratio-text-small)*var(--line-height-large)*1rem)}body>header nav ul{display:flex;margin-bottom:0;padding-left:0}body>header nav ul li{display:block;margin-left:var(--padding)}body>header nav ul li:last-child{margin-right:0}body>header nav mark{background-color:transparent;border-bottom:var(--width-border-small) solid var(--color-fg-light)}body>header p{font-size:calc(var(--ratio-text-gargantuan)*1rem);font-weight:lighter;line-height:var(--line-height-small);margin-bottom:0;margin-top:var(--margin-large);width:100%}body>main{margin-left:auto;margin-right:auto;max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>main section{position:relative}body>main article{position:relative}body>main>section>h1,body>main>article>h1{font-size:calc(var(--ratio-text-gargantuan)*1rem);margin-top:var(--margin-gargantuan)}body>main>:first-child>h1:first-of-type{margin-top:0}body>main section * h1,body>main article * h1{font-size:calc(var(--ratio-text-huge)*1rem);margin-bottom:var(--margin-small);margin-top:var(--margin-huge)}body>main>article>footer:first-child{float:left;width:100%}body>main>article>footer:first-child :last-child{margin-bottom:0}body>footer{display:flex;font-size:calc(var(--ratio-text-small)*1rem);margin-left:auto;margin-right:auto;margin-top:var(--margin-gargantuan);max-width:var(--width-large);padding-left:var(--width-gap);padding-right:var(--width-gap)}body>footer ul{display:flex;margin-bottom:0;padding-left:0}body>footer ul li{display:block;margin-left:var(--padding)}body>footer address{flex-grow:1;font-style:normal;order:-1}.fill{clear:both;margin-left:calc(0px - var(--width-gap));margin-right:calc(0px - var(--width-gap))}.fill figcaption{margin-left:var(--width-gap);margin-right:var(--width-gap)}.fill img,.fill video,.fill canvas{width:100%}aside.hang{color:var(--color-fg-semilight);font-size:calc(var(--ratio-text-small)*1rem);line-height:var(--line-height-small)}.posts{padding-left:0}.posts li{display:flex;list-style-type:none;margin-bottom:var(--margin-small);white-space:nowrap}.posts time{display:block;flex-grow:1;margin-left:var(--width-gap-small);order:1;text-align:right}.posts a{display:block;overflow:hidden;text-overflow:ellipsis}@media(min-width:40em){body{margin-bottom:var(--margin-large)}pre{overflow:visible;overflow-wrap:break-word;white-space:pre-wrap}body>header{margin-bottom:var(--margin-huge);margin-top:var(--margin-large)}body>header nav ul li{margin-left:var(--padding-large)}body>header p{margin-top:var(--margin-huge)}body>footer ul li{margin-left:var(--padding-large)}.fill,.fill figcaption{margin-left:0;margin-right:0}.flat{clear:both;display:flex;flex-wrap:wrap;justify-content:space-between;padding-left:0}.flat li{display:block;width:calc((100% - var(--width-gap) * 2) / 3)}.flat li:nth-child(3n+2):last-child{width:calc((100% - var(--width-gap) * 2) / 3 * 2 + var(--width-gap))}}@media(min-width:80em){body{margin-bottom:var(--margin-huge)}figcaption{bottom:0;display:block;margin-right:calc(var(--width-gap) + var(--width-gap));margin-top:0;position:absolute;right:100%;width:calc(var(--width-supplement) - var(--width-border) - var(--width-gap-small));z-index:1}blockquote+figcaption{margin-right:0;position:static;width:auto}body>header{margin-bottom:var(--margin-gargantuan);margin-top:var(--margin-huge);padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>header h1{flex-grow:0;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));margin-right:calc(var(--width-gap) + var(--width-gap));width:var(--width-supplement)}body>header nav{flex-grow:1}body>header nav ul li{margin-left:0;margin-right:var(--padding-large)}body>header p{margin-top:var(--margin-gargantuan)}body>main{padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>main>article>footer:first-child{line-height:calc(var(--line-height-small)*var(--ratio-text-gargantuan)/var(--ratio-text));margin-right:calc(var(--width-gap) + var(--width-gap));position:absolute;right:100%;width:var(--width-supplement);z-index:1}body>footer{padding-left:calc(var(--width-supplement-outer) + var(--width-gap))}body>footer ul li{margin-left:0;margin-right:var(--padding-large)}body>footer address{flex-grow:0;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));margin-right:calc(var(--width-gap) + var(--width-gap));width:var(--width-supplement)}.displace{clear:both;margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)));width:var(--width-large)}.displace figcaption{left:100%;margin-left:calc(var(--width-gap) + var(--width-gap));margin-right:0;right:auto}.fill{margin-left:calc(0px - (var(--width-gap) + var(--width-supplement) + var(--width-gap)))}.fill figcaption{bottom:auto;left:0;margin-top:var(--margin)}.hang{margin-right:calc(var(--width-gap) + var(--width-gap));position:absolute;right:100%;width:var(--width-supplement);z-index:1}.hang img{width:100%}h1.hang{margin-top:0}section>h1.hang:first-child+*{margin-top:var(--margin-gargantuan)}}@media(min-width:60em){html{font-size:calc(var(--ratio-text-large)*1rem)}}@media(min-width:100em){html{font-size:calc(var(--ratio-text-huge)*1rem)}}@media(min-width:120em){html{font-size:1.25vw}}@media not screen{table{display:table}}}</style>
+
+  <script>(function(){
+/*
  unutm.js
  LICENSE: http://hail2u.mit-license.org/2013
 */
-location.search&&history.replaceState(null,"",""+location.pathname+location.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?")+location.hash);}).call(window);</script><header><h1><a href=/ ><svg aria-labelledby=logo-title height=256.02 role=img viewBox="0 0 152.402 256.02" width=152.402 xmlns=http://www.w3.org/2000/svg><title id=logo-title>Hail2u</title><path d="m 38.287,8.003 c -6.378,-0.133 -11.867,4.504 -14.714,9.902 -6.259,11.192 -8.482,24.05 -10.473,36.559 -2.827,19.943 -3.517,40.108 -4.279,60.212 -1.162,40.155 -0.738,80.333 -0.769,120.498 0.164,4.548 1.817,9.802 6.254,11.857 3.469,1.613 7.625,0.634 10.492,-1.743 5.251,-3.89 7.255,-10.467 10.326,-15.929 6.194,-12.062 12.765,-23.971 20.455,-35.148 3.181,-4.378 6.696,-8.821 11.313,-11.685 1.899,-1.134 4.692,-1.004 5.887,1.045 2.141,3.364 1.355,7.609 1.215,11.355 -0.843,9.24 -2.049,18.558 -0.941,27.84 0.722,7.721 3.216,15.885 9.42,20.979 4.78,4.06 11.464,4.819 17.474,3.958 7.8,-1.122 14.345,-6.05 19.929,-11.309 7.892,-7.71 13.906,-17.115 19.195,-26.735 1.827,-3.591 3.696,-7.191 5.181,-10.931 0.915,-3.761 -2.424,-8.056 -6.405,-7.513 -3.021,0.006 -5.097,2.715 -5.95,5.35 -5.912,12.349 -13.194,24.445 -23.594,33.514 -4.233,3.577 -9.848,6.635 -15.525,5.212 -4.364,-1.281 -6.261,-6.021 -6.986,-10.108 -1.716,-10.483 -0.395,-21.096 0.6,-31.583 0.354,-6.96 -0.946,-14.634 -5.962,-19.827 -4.54,-4.455 -11.822,-5.351 -17.521,-2.723 -7.548,3.066 -12.55,9.911 -17.107,16.334 -9.612,13.566 -17.577,28.22 -24.967,43.087 -0.709,1.919 -0.353,-1.124 -0.488,-1.833 -0.289,-11.117 -0.032,-22.239 -0.119,-33.358 13.645,-25.069 26.081,-51.026 33.748,-78.609 6.399,-22.706 10.215,-46.37 8.956,-70.007 -0.762,-9.995 -2.2,-20.419 -7.66,-29.055 -3.045,-4.789 -7.902,-8.747 -13.688,-9.397 -1.091,-0.155 -2.193,-0.222 -3.294,-0.21 z m 0.768,12.202 c 3.577,0.147 6.146,3.178 7.393,6.277 4.123,8.873 4.304,18.89 4.509,28.487 0.222,30.847 -7.826,61.226 -19.156,89.746 -3.566,8.951 -7.479,17.951 -11.42,26.624 0.052,-36.741 -0.202,-73.613 3.604,-110.172 1.304,-10.702 2.632,-21.561 6.302,-31.757 1.481,-3.291 2.836,-7.398 6.448,-8.907 0.739,-0.293 1.537,-0.321 2.321,-0.298 z"/></svg></a></h1><nav><ul><li><mark><a href=/blog/ >ウェブログ</a></mark><li><a href=/documents/ >特集</a><li><a href=/projects/ >作品</a><li><a href=/about/ >いろいろ</a></ul></nav></header><main><article><footer><p><time class=js-reldate datetime=2015-01-15T11:29:38+09:00>2015/01/15</time></footer><h1>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの</h1><p>昨日も少し書いた<a href=https://developers.google.com/speed/articles/optimizing-css>Every Declaration Just Onceアプローチ</a>（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。<p>上記Googleの文書は、主にパフォーマンスの観点で書かれている。どうしても長くなりがちな定義を分散して書くよりも、能動的に短くすることができるセレクターを分散して書いた方が、プロダクションにおいてリリースされるCSSファイルのサイズを小さくすることが可能だろうというものだ。同時にこの文書の筆者は自身のブログで、<a href=http://meiert.com/en/blog/20141009/css-dry-and-optimization/ >より自然にCSSを書くための手法（原文: <q>The Natural Way of Writing CSS</q>）</a>としてこのEDJOという手法について述べている。<p>僕は主にそういったCSSの書き方という観点からEDJOに注目した。この記事もそれに従って書かれている上、パフォーマンスについてはGoogleの文書で十分に書かれているので、以下では特に触れない。<section><h1>OOCSSとは</h1><p>まずはOOCSSについてざっと触れておく。OOCSSではいくつかの<a href=http://www.w3.org/TR/CSS2/syndata.html#rule-sets>定義</a>（プロパティーとその値のセット）を組み合わせることにより再現できる見た目をオブジェクトとみなし、それを継承・拡張していく。オブジェクトは一定の意味を持つ単位で作成され、それを組み合わせることで振る舞いベースで、ウェブサイトのビジュアル・デザインを完成させていくことができるというわけだ。<p>実際に継承と拡張を行う手段は、オブジェクトとして定義されたクラスを複数組み合わせていく手法、いわゆる<em>マルチ・クラス</em>による。今ではCSSプリプロセッサーなどもあるが、例えばSassの<code>@extend</code>を使ったロジカルな継承は開発者間での濃いコミュニケーションによる意識の摺り合わせが必須とも言えるので、まだまだマルチ・クラスで行われている、行われるだろうと言って良い。<p>もし仮に後で書かれたセレクターの方が必ず強いというようなシンプルな仕組みであったら、マルチ・クラスはその想定通りうまく機能しただろう。しかしそうはいかない。</section><section><h1>セレクターの詳細度</h1><p>CSSでは<a href=http://www.w3.org/TR/CSS2/cascade.html#specificity>セレクターの詳細度</a>というものがある。例えば<code>.foo</code>より<code>.bar .foo</code>が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。<pre><code class=language-css>body h1 {
+'use strict';location.search&&history.replaceState(null,"",location.pathname+location.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?")+location.hash);
+}).call(this);</script>
+</head>
+
+  <body>
+<header>
+  <h1><a href="/"><svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="152.402"
+    height="256.02"
+    viewBox="0 0 152.402 256.02"
+    role="img"
+    aria-label="Hail2u">
+    <path
+      d="m 38.287,8.003 c -6.378,-0.133 -11.867,4.504 -14.714,9.902 -6.259,11.192 -8.482,24.05 -10.473,36.559 -2.827,19.943 -3.517,40.108 -4.279,60.212 -1.162,40.155 -0.738,80.333 -0.769,120.498 0.164,4.548 1.817,9.802 6.254,11.857 3.469,1.613 7.625,0.634 10.492,-1.743 5.251,-3.89 7.255,-10.467 10.326,-15.929 6.194,-12.062 12.765,-23.971 20.455,-35.148 3.181,-4.378 6.696,-8.821 11.313,-11.685 1.899,-1.134 4.692,-1.004 5.887,1.045 2.141,3.364 1.355,7.609 1.215,11.355 -0.843,9.24 -2.049,18.558 -0.941,27.84 0.722,7.721 3.216,15.885 9.42,20.979 4.78,4.06 11.464,4.819 17.474,3.958 7.8,-1.122 14.345,-6.05 19.929,-11.309 7.892,-7.71 13.906,-17.115 19.195,-26.735 1.827,-3.591 3.696,-7.191 5.181,-10.931 0.915,-3.761 -2.424,-8.056 -6.405,-7.513 -3.021,0.006 -5.097,2.715 -5.95,5.35 -5.912,12.349 -13.194,24.445 -23.594,33.514 -4.233,3.577 -9.848,6.635 -15.525,5.212 -4.364,-1.281 -6.261,-6.021 -6.986,-10.108 -1.716,-10.483 -0.395,-21.096 0.6,-31.583 0.354,-6.96 -0.946,-14.634 -5.962,-19.827 -4.54,-4.455 -11.822,-5.351 -17.521,-2.723 -7.548,3.066 -12.55,9.911 -17.107,16.334 -9.612,13.566 -17.577,28.22 -24.967,43.087 -0.709,1.919 -0.353,-1.124 -0.488,-1.833 -0.289,-11.117 -0.032,-22.239 -0.119,-33.358 13.645,-25.069 26.081,-51.026 33.748,-78.609 6.399,-22.706 10.215,-46.37 8.956,-70.007 -0.762,-9.995 -2.2,-20.419 -7.66,-29.055 -3.045,-4.789 -7.902,-8.747 -13.688,-9.397 -1.091,-0.155 -2.193,-0.222 -3.294,-0.21 z m 0.768,12.202 c 3.577,0.147 6.146,3.178 7.393,6.277 4.123,8.873 4.304,18.89 4.509,28.487 0.222,30.847 -7.826,61.226 -19.156,89.746 -3.566,8.951 -7.479,17.951 -11.42,26.624 0.052,-36.741 -0.202,-73.613 3.604,-110.172 1.304,-10.702 2.632,-21.561 6.302,-31.757 1.481,-3.291 2.836,-7.398 6.448,-8.907 0.739,-0.293 1.537,-0.321 2.321,-0.298 z"/>
+  </svg></a></h1>
+
+  <nav>
+    <ul>
+      <li><mark><a href="/blog/">ウェブログ</a></mark></li>
+      <li><a href="/documents/">特集</a></li>
+      <li><a href="/projects/">作品</a></li>
+      <li><a href="/about/">いろいろ</a></li>
+    </ul>
+  </nav>
+
+  
+</header>
+
+    <main>
+      <article>
+        <footer>
+          <p><time class="js-reldate" datetime="2015-01-15T11:29:38+09:00">2015/01/15</time></p>
+        </footer>
+
+        <h1>OOCSSの欠点とEvery Declaration Just Onceのもたらすもの</h1>
+
+        <p>昨日も少し書いた<a href="https://developers.google.com/speed/articles/optimizing-css">Every Declaration Just Onceアプローチ</a>（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。</p>
+
+<p>上記Googleの文書は、主にパフォーマンスの観点で書かれている。どうしても長くなりがちな定義を分散して書くよりも、能動的に短くすることができるセレクターを分散して書いた方が、プロダクションにおいてリリースされるCSSファイルのサイズを小さくすることが可能だろうというものだ。同時にこの文書の筆者は自身のブログで、<a href="http://meiert.com/en/blog/20141009/css-dry-and-optimization/">より自然にCSSを書くための手法（原文: <q>The Natural Way of Writing CSS</q>）</a>としてこのEDJOという手法について述べている。</p>
+
+<p>僕は主にそういったCSSの書き方という観点からEDJOに注目した。この記事もそれに従って書かれている上、パフォーマンスについてはGoogleの文書で十分に書かれているので、以下では特に触れない。</p>
+
+<section>
+<h1>OOCSSとは</h1>
+
+<p>まずはOOCSSについてざっと触れておく。OOCSSではいくつかの<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">定義</a>（プロパティーとその値のセット）を組み合わせることにより再現できる見た目をオブジェクトとみなし、それを継承・拡張していく。オブジェクトは一定の意味を持つ単位で作成され、それを組み合わせることで振る舞いベースで、ウェブサイトのビジュアル・デザインを完成させていくことができるというわけだ。</p>
+
+<p>実際に継承と拡張を行う手段は、オブジェクトとして定義されたクラスを複数組み合わせていく手法、いわゆる<em>マルチ・クラス</em>による。今ではCSSプリプロセッサーなどもあるが、例えばSassの<code>@extend</code>を使ったロジカルな継承は開発者間での濃いコミュニケーションによる意識の摺り合わせが必須とも言えるので、まだまだマルチ・クラスで行われている、行われるだろうと言って良い。</p>
+
+<p>もし仮に後で書かれたセレクターの方が必ず強いというようなシンプルな仕組みであったら、マルチ・クラスはその想定通りうまく機能しただろう。しかしそうはいかない。</p>
+</section>
+
+<section>
+<h1>セレクターの詳細度</h1>
+
+<p>CSSでは<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity">セレクターの詳細度</a>というものがある。例えば<code>.foo</code>より<code>.bar .foo</code>が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。</p>
+
+<pre><code class="language-css">body h1 {
   font-family: serif;
 }
 
 h1 {
   font-family: sans-serif;
 }
-</code></pre><p>このCSSの場合<a href=https://hail2u.net/pub/test/606.html><code>h1</code>は<code>serif</code>で表示されること</a>だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された<a href=http://www.w3.org/TR/CSS2/syndata.html#rule-sets>ルールセット</a>の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。<p>詳細度の仕組みは仕様を読むと簡単に書かれているが、実際にはそこそこ複雑だ。自然、その理解度が人によりまちまちであることも頭に入れておく必要がある（僕も正直8割強くらいしか理解している自信はない）。そうなるといかにしてこのような仕組みが発動しないようにCSSを書くか、ということになる。</section><section><h1>クラスの命名規則</h1><p>つまりセレクターでクラス名を二つ以上使わないようにし、すべてのセレクターの詳細度を等しくするわけだ。もちろん要素名やIDなどはこの世に存在しないものとみなして忘れ去ってしまえば良い。そうすることですべてのオブジェクト（=ルールセットに書かれた定義たち）はひとつのクラス名で表現されたセレクターにより割り当てられていくため、その書かれた順番に従ってその定義が上書きされていくようになる。<p>問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。<pre><code class=language-css>.global-header .nav .item .icon {
+</code></pre>
+
+<p>このCSSの場合<a href="/pub/test/606.html"><code>h1</code>は<code>serif</code>で表示されること</a>だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">ルールセット</a>の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。</p>
+
+<p>詳細度の仕組みは仕様を読むと簡単に書かれているが、実際にはそこそこ複雑だ。自然、その理解度が人によりまちまちであることも頭に入れておく必要がある（僕も正直8割強くらいしか理解している自信はない）。そうなるといかにしてこのような仕組みが発動しないようにCSSを書くか、ということになる。</p>
+</section>
+
+<section>
+<h1>クラスの命名規則</h1>
+
+<p>つまりセレクターでクラス名を二つ以上使わないようにし、すべてのセレクターの詳細度を等しくするわけだ。もちろん要素名やIDなどはこの世に存在しないものとみなして忘れ去ってしまえば良い。そうすることですべてのオブジェクト（=ルールセットに書かれた定義たち）はひとつのクラス名で表現されたセレクターにより割り当てられていくため、その書かれた順番に従ってその定義が上書きされていくようになる。</p>
+
+<p>問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。</p>
+
+<pre><code class="language-css">.global-header .nav .item .icon {
   ...
 }
-</code></pre><p>従ってこのようなクラス名を付けることになる。<pre><code class=language-css>.global-header-nav-item-icon {
+</code></pre>
+
+<p>従ってこのようなクラス名を付けることになる。</p>
+
+<pre><code class="language-css">.global-header-nav-item-icon {
   ...
 }
-</code></pre><p>HTMLは当然のようにこうなる。<pre><code class=language-html>&lt;header class=&quot;global-header&quot;&gt;
+</code></pre>
+
+<p>HTMLは当然のようにこうなる。</p>
+
+<pre><code class="language-html">&lt;header class=&quot;global-header&quot;&gt;
   ...
   &lt;nav class=&quot;global-header-nav&quot;&gt;
     &lt;li class=&quot;global-header-nav-item&quot;&gt;
@@ -28,7 +133,27 @@ h1 {
     ...
   &lt;/nav&gt;
 &lt;/header&gt;
-</code></pre><p>おおっと。<p>マルチ・クラスによる割り当てになるので、実際にはもう少しシンプルな値にはなる。が、それと同時に短いとはいえ別のクラス名が追加されていくので、<code>class</code>属性の値は概ねこのような複雑なものになっていく。更にこういった単純に連結したり組み合わせたりするだけの命名規則では表現できない概念を補足するように鍛えていくと、<a href=https://smacss.com/ >SMACSS</a>や<a href=http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/ >MindBEMding</a>、そして今最も注目度が高い<a href=https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md>SUIT CSSの命名規則</a>へと進化することになる。<p>かくしてHTMLでは各要素に<code>class</code>属性として20–50文字くらいの値がちょくちょく割り当てられていくようになった。CMSやビルド・ツールを前提にしないと保守できない状態だといえるだろう。</section><section><h1>Every Declaration Just Once</h1><p>すべての定義を一度だけしか書かないこのアプローチ、EDJOではOOCSSとはCSSを書く手順が逆になる。<p>OOCSSではオブジェクトといういくつかの定義の組み合わせであるルールセットをまず書き、それにクラス名を使って名付ける。そしてHTMLに戻り、そのオブジェクトを割り当てたい要素に対し、クラス名を振っていく。<p>EDJOではまずHTMLで適切なクラス名（IDでも良いだろう）を振っておく。誤解を恐れずに言うのならば、セマンティックなクラス名とかそのようなもので、ウェブページにおいてその要素がどのようなものかを表現するクラス名だ。IDでも良いだろうし、HTML5の強い意味付けを持つ要素をきちんと使い分けているならクラス名やIDを付けなくても良いこともあるかもしれない。またクラス名は再利用しないので、抽象化した名称（例えば<code>.clearfix</code>であったり<code>.column-wrapper</code>など）である必要もない。<p>そしてCSSではビジュアル・デザインを決定する定義をまず書き、それを適用するセレクターを割り当て、ひとつの定義ごとにルールセットを作っていく。例えばこのような形だ。わかりやすいように様々なパターンでセレクターを書いてみたが、実際には開発者やプロジェクトごとにパターン化されてくるだろう。とりあえず一意に確定する形で書いておけば、後で置換をかけることでそのフォーマットを統一することも容易いはずだ。<pre><code class=language-css>body &gt; header,
+</code></pre>
+
+<p>おおっと。</p>
+
+<p>マルチ・クラスによる割り当てになるので、実際にはもう少しシンプルな値にはなる。が、それと同時に短いとはいえ別のクラス名が追加されていくので、<code>class</code>属性の値は概ねこのような複雑なものになっていく。更にこういった単純に連結したり組み合わせたりするだけの命名規則では表現できない概念を補足するように鍛えていくと、<a href="https://smacss.com/">SMACSS</a>や<a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/">MindBEMding</a>、そして今最も注目度が高い<a href="https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md">SUIT CSSの命名規則</a>へと進化することになる。</p>
+
+<p>かくしてHTMLでは各要素に<code>class</code>属性として20–50文字くらいの値がちょくちょく割り当てられていくようになった。CMSやビルド・ツールを前提にしないと保守できない状態だといえるだろう。</p>
+</section>
+
+<section>
+<h1>Every Declaration Just Once</h1>
+
+<p>すべての定義を一度だけしか書かないこのアプローチ、EDJOではOOCSSとはCSSを書く手順が逆になる。</p>
+
+<p>OOCSSではオブジェクトといういくつかの定義の組み合わせであるルールセットをまず書き、それにクラス名を使って名付ける。そしてHTMLに戻り、そのオブジェクトを割り当てたい要素に対し、クラス名を振っていく。</p>
+
+<p>EDJOではまずHTMLで適切なクラス名（IDでも良いだろう）を振っておく。誤解を恐れずに言うのならば、セマンティックなクラス名とかそのようなもので、ウェブページにおいてその要素がどのようなものかを表現するクラス名だ。IDでも良いだろうし、HTML5の強い意味付けを持つ要素をきちんと使い分けているならクラス名やIDを付けなくても良いこともあるかもしれない。またクラス名は再利用しないので、抽象化した名称（例えば<code>.clearfix</code>であったり<code>.column-wrapper</code>など）である必要もない。</p>
+
+<p>そしてCSSではビジュアル・デザインを決定する定義をまず書き、それを適用するセレクターを割り当て、ひとつの定義ごとにルールセットを作っていく。例えばこのような形だ。わかりやすいように様々なパターンでセレクターを書いてみたが、実際には開発者やプロジェクトごとにパターン化されてくるだろう。とりあえず一意に確定する形で書いておけば、後で置換をかけることでそのフォーマットを統一することも容易いはずだ。</p>
+
+<pre><code class="language-css">body &gt; header,
 main,
 .searchbox,
 [role=&quot;contentinfo&quot;] {
@@ -47,16 +172,61 @@ main {
 .searchbox {
   background-color: #999;
 }
-</code></pre><p>EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。<p>このようにEDJOでは、セレクターの詳細度という<em>あまり理解されていない仕組み</em>とクラスの命名規則という<em>守らせることはおろかまず作ることからして難しい仕組み</em>を共に意識せずにCSSとHTMLを書いていくことができるということだ。それはつまりHTMLはHTMLで書くことができ、CSSはCSSで書くことができ、更にその両者の結びつけを同じ定義を二度書かないという単純明快なルールのみで行うことができるということでもある。</section><hr><p>OOCSSの欠点はその思想や哲学、ベースとなった技術の問題ではない。ツリー構造を持つHTMLやカスケーディングという独自の継承の仕組みを持つCSSとは根本的に相性が悪く、命名規則というような運用におけるルール付けでカバーしなくてはならないところだ。もしHTMLやCSSがもう少し違うものだったら、OOCSSは間違いなく論理的で明確な方向性をウェブデザインに与える唯一無二の手法であった、そしてありつづけるものだったろう。しかし現実は違うし、未来もそうなりそうもない（セレクターのネストが可能になるとわからないけれども）。<p>そこでCSSにおいてその力不足を補い、OOCSSのような論理的なアプローチを可能にしようとするために生まれたのがCSSプリプロセッサーだった。しかしこれもOOCSSの欠点を完全にはカバーすることは出来てはいない。そのため既に名前だけは何回か出したSUIT CSSの命名規則のようなものが、ここに至っても生まれた（生まれてしまった）というわけだ。<p>EDJOがCSSを本来あるような形に戻したものだと捉えると、もはやCSSプリプロセッサーはCSSを無闇に複雑にしてしまっただけにも感じられてしまう。EDJOならCSS Variableのみのプリプロセッサーで十分機能しそうだ。<hr><p>ひとつ、声を大きくして謝りたいのは、フロントエンド側じゃない人たちのCSSの書き方にダメ出しをしていたことだ。過去の僕はOOCSSをいかにして再現するかを重要視しており、OOCSSへの理解に欠ける人たちによるEDJO的な書き方（定義があるところに雑にセレクターを追加していく書き方）に対してかなり厳しく反論していたように思う。OOCSSを採用している以上、そういったEDJO的な書き方を否定することは間違っていたわけではないのだけど、その時の論理は「OOCSSだから～」というような、今思うと曖昧な、当時も理由としては弱いと薄々気付いていた言葉で押し通していた。<p>その頃にもう少しOOCSSの欠点について掘り下げていればそういった書き方にも一理以上の何かがあったことに気づけたはずだ。広く受け入れられているアプローチだからというような理由で盲信するのは良くないが、それを実践するのはなかなか難しい。もちろんこのEDJOというアプローチにも言えることだ。気をつけながらEDJOの世界をもうちょっと掘り起こしていこうと思う。<p>もしMindBEMdingのようなBEMライクな命名規則から、よりわかりやすく強力なSUIT CSSの命名規則に移行しようかなと考えている人がいたら、ちょっとだけEvery Declaration Just Onceというアプローチを試してみて欲しい。僕はこのアプローチを試した結果、OOCSSの実装の難しさにより嫌いになりかけたCSS（Sassでかろうじて理性を保ってやり過ごしてきていたが）を本気でもう一度好きになれそうな気がしてきている。HTMLとCSSが疎結合する未来を夢見ていた人達なら、OOCSSが唯一無二の解ではないという前提だと、このアプローチに未来を見出すことができるのではないだろうか。<section><h1>追記</h1><p>参照したGoogleのEDJOに関する文書とこの記事の内容が乖離していたことに気づいていなかったので、本来的に参照するべきJens Oliver Meiertのブログ記事へのリンクを追加した。両文書は同じ筆者による記事ではあるが、違う観点によって書かれているので、両方参照するべきだった。</section></article></main><footer><ul><li><a href=https://creativecommons.org/licenses/by/4.0/ rel=license>CC/BY</a><li><a href=/feed rel=alternate type=application/rss+xml>RSS</a></ul><address><a href=https://kyonagashima.com/ rel=author>ながしまきょう</a>が作っています</address></footer><script>(function () {/*
+</code></pre>
+
+<p>EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。</p>
+
+<p>このようにEDJOでは、セレクターの詳細度という<em>あまり理解されていない仕組み</em>とクラスの命名規則という<em>守らせることはおろかまず作ることからして難しい仕組み</em>を共に意識せずにCSSとHTMLを書いていくことができるということだ。それはつまりHTMLはHTMLで書くことができ、CSSはCSSで書くことができ、更にその両者の結びつけを同じ定義を二度書かないという単純明快なルールのみで行うことができるということでもある。</p>
+</section>
+
+<hr>
+
+<p>OOCSSの欠点はその思想や哲学、ベースとなった技術の問題ではない。ツリー構造を持つHTMLやカスケーディングという独自の継承の仕組みを持つCSSとは根本的に相性が悪く、命名規則というような運用におけるルール付けでカバーしなくてはならないところだ。もしHTMLやCSSがもう少し違うものだったら、OOCSSは間違いなく論理的で明確な方向性をウェブデザインに与える唯一無二の手法であった、そしてありつづけるものだったろう。しかし現実は違うし、未来もそうなりそうもない（セレクターのネストが可能になるとわからないけれども）。</p>
+
+<p>そこでCSSにおいてその力不足を補い、OOCSSのような論理的なアプローチを可能にしようとするために生まれたのがCSSプリプロセッサーだった。しかしこれもOOCSSの欠点を完全にはカバーすることは出来てはいない。そのため既に名前だけは何回か出したSUIT CSSの命名規則のようなものが、ここに至っても生まれた（生まれてしまった）というわけだ。</p>
+
+<p>EDJOがCSSを本来あるような形に戻したものだと捉えると、もはやCSSプリプロセッサーはCSSを無闇に複雑にしてしまっただけにも感じられてしまう。EDJOならCSS Variableのみのプリプロセッサーで十分機能しそうだ。</p>
+
+<hr>
+
+<p>ひとつ、声を大きくして謝りたいのは、フロントエンド側じゃない人たちのCSSの書き方にダメ出しをしていたことだ。過去の僕はOOCSSをいかにして再現するかを重要視しており、OOCSSへの理解に欠ける人たちによるEDJO的な書き方（定義があるところに雑にセレクターを追加していく書き方）に対してかなり厳しく反論していたように思う。OOCSSを採用している以上、そういったEDJO的な書き方を否定することは間違っていたわけではないのだけど、その時の論理は「OOCSSだから～」というような、今思うと曖昧な、当時も理由としては弱いと薄々気付いていた言葉で押し通していた。</p>
+
+<p>その頃にもう少しOOCSSの欠点について掘り下げていればそういった書き方にも一理以上の何かがあったことに気づけたはずだ。広く受け入れられているアプローチだからというような理由で盲信するのは良くないが、それを実践するのはなかなか難しい。もちろんこのEDJOというアプローチにも言えることだ。気をつけながらEDJOの世界をもうちょっと掘り起こしていこうと思う。</p>
+
+<p>もしMindBEMdingのようなBEMライクな命名規則から、よりわかりやすく強力なSUIT CSSの命名規則に移行しようかなと考えている人がいたら、ちょっとだけEvery Declaration Just Onceというアプローチを試してみて欲しい。僕はこのアプローチを試した結果、OOCSSの実装の難しさにより嫌いになりかけたCSS（Sassでかろうじて理性を保ってやり過ごしてきていたが）を本気でもう一度好きになれそうな気がしてきている。HTMLとCSSが疎結合する未来を夢見ていた人達なら、OOCSSが唯一無二の解ではないという前提だと、このアプローチに未来を見出すことができるのではないだろうか。</p>
+
+<section>
+<h1>追記</h1>
+
+<p>参照したGoogleのEDJOに関する文書とこの記事の内容が乖離していたことに気づいていなかったので、本来的に参照するべきJens Oliver Meiertのブログ記事へのリンクを追加した。両文書は同じ筆者による記事ではあるが、違う観点によって書かれているので、両方参照するべきだった。</p>
+</section>
+      </article>
+    </main>
+
+<footer>
+  <ul>
+    <li><a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC/BY</a></li>
+    <li><a href="/feed" rel="alternate" type="application/rss+xml">RSS</a></li>
+  </ul>
+
+  <address><a href="https://kyonagashima.com/" rel="author">ながしまきょう</a>が作っています</address>
+</footer>
+
+<script>(function(){
+/*
  ellipsis-title.js
  LICENSE: http://hail2u.mit-license.org/2016
 */
-var d="function"==typeof Object.defineProperties?Object.defineProperty:function(a,b,c){a!=Array.prototype&&a!=Object.prototype&&(a[b]=c.value)},f="undefined"!=typeof window&&window===this?this:"undefined"!=typeof global&&null!=global?global:this;function h(){h=function(){};f.Symbol||(f.Symbol=k)}var k=function(){var a=0;return function(b){return"jscomp_symbol_"+(b||"")+a++}}();
+'use strict';var d="function"==typeof Object.defineProperties?Object.defineProperty:function(a,b,c){a!=Array.prototype&&a!=Object.prototype&&(a[b]=c.value)},f="undefined"!=typeof window&&window===this?this:"undefined"!=typeof global&&null!=global?global:this;function h(){h=function(){};f.Symbol||(f.Symbol=k)}var k=function(){var a=0;return function(b){return"jscomp_symbol_"+(b||"")+a++}}();
 function l(){h();var a=f.Symbol.iterator;a||(a=f.Symbol.iterator=f.Symbol("iterator"));"function"!=typeof Array.prototype[a]&&d(Array.prototype,a,{configurable:!0,writable:!0,value:function(){return m(this)}});l=function(){}}function m(a){var b=0;return n(function(){return b<a.length?{done:!1,value:a[b++]}:{done:!0}})}function n(a){l();a={next:a};a[f.Symbol.iterator]=function(){return this};return a}function p(a){l();var b=a[Symbol.iterator];return b?b.call(a):m(a)}
 function q(a,b){if(b){var c=f;a=a.split(".");for(var e=0;e<a.length-1;e++){var g=a[e];g in c||(c[g]={});c=c[g]}a=a[a.length-1];e=c[a];b=b(e);b!=e&&null!=b&&d(c,a,{configurable:!0,writable:!0,value:b})}}q("Number.isFinite",function(a){return a?a:function(a){return"number"!==typeof a?!1:!isNaN(a)&&Infinity!==a&&-Infinity!==a}});q("Number.isInteger",function(a){return a?a:function(a){return Number.isFinite(a)?a===Math.floor(a):!1}});
 for(var r=p(document.querySelectorAll("*")),t=r.next();!t.done;t=r.next()){var u=t.value;"ellipsis"===window.getComputedStyle(u)["text-overflow"]&&(u.title=u.textContent)};/*
  reldate.js
  LICENSE: http://hail2u.mit-license.org/2016
 */
-var v=performance.timing.navigationStart+performance.now();function w(){var a=Date.parse(x);if(Number.isInteger(a)&&(a=parseInt((v-a)/1E3,10),Number.isInteger(a)&&!(0>a))){if(30>a)return"\u305f\u3063\u305f\u4eca";if(90>a)return a+"\u79d2\u524d";a=parseInt(a/60,10);if(90>a)return a+"\u5206\u524d";a=parseInt(a/60,10);if(36>a)return a+"\u6642\u9593\u524d";a=parseInt(a/24,10);if(45>a)return a+"\u65e5\u524d";a=parseInt(a/30,10);return 18>a?a+"\u30f6\u6708\u524d":parseInt(a/12,10)+"\u5e74\u524d"}}
-for(var y=p(document.querySelectorAll("time.js-reldate[datetime]")),z=y.next();!z.done;z=y.next()){var A=z.value,x=A.getAttribute("datetime"),B=w();B&&(A.setAttribute("title",x),A.textContent=B)};}).call(window);</script>
+var v=performance.timing.navigationStart+performance.now();
+function w(){var a=Date.parse(x);if(Number.isInteger(a)&&(a=Math.round((v-a)/1E3),Number.isInteger(a)&&!(0>a))){if(30>a)return"\u305f\u3063\u305f\u4eca";if(60>a)return""+a+"\u79d2\u524d";a=Math.round(a/60);if(60>a)return""+a+"\u5206\u524d";a=Math.round(a/60);if(24>a)return""+a+"\u6642\u9593\u524d";a=Math.round(a/24);if(30>a)return""+a+"\u65e5\u524d";a=Math.round(a/30);return 12>a?""+a+"\u30f6\u6708\u524d":""+Math.round(a/12)+"\u5e74\u524d"}}
+for(var y=p(document.querySelectorAll("time.js-reldate[datetime]")),z=y.next();!z.done;z=y.next()){var A=z.value,x=A.getAttribute("datetime"),B=w();B&&(A.setAttribute("title",x),A.textContent=B)};
+}).call(this);</script>
+  </body>
+</html>
