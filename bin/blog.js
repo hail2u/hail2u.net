@@ -235,7 +235,7 @@ const markupSelected = (ext, contents) => {
   return markdown(contents);
 };
 
-const publishSelected = selected =>
+const contributeSelected = selected =>
   Promise.all([
     fs.outputFile(selected.dest, selected.contents, {
       flag: "wx"
@@ -283,7 +283,7 @@ const main = async () => {
 
   if (argv.contribute) {
     const ext = ".txt";
-    return publishSelected({
+    return contributeSelected({
       ...selected,
       contents: html,
       ext: ext,
