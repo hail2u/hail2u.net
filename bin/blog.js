@@ -151,7 +151,13 @@ const updateEntry = async file => {
 };
 
 const isDraft = filename => {
-  if (draftExts.indexOf(path.extname(filename)) !== -1) {
+  const ext = path.extname(filename);
+
+  if (argv.contribute && path.basename(filename, ext).endsWith("_")) {
+    return false;
+  }
+
+  if (draftExts.indexOf(ext) !== -1) {
     return true;
   }
 
