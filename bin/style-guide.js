@@ -25,5 +25,6 @@ const main = async () => {
 
 process.chdir(__dirname);
 main().catch(e => {
+  process.exitCode = 1;
   console.trace(e);
 });

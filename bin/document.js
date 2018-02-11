@@ -355,5 +355,6 @@ const main = async () => {
 process.chdir(__dirname);
 mustache.escape = escapeStr;
 main().catch(e => {
+  process.exitCode = 1;
   console.trace(e);
 });

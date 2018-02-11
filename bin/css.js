@@ -33,5 +33,6 @@ const buildCSS = async file => {
 
 process.chdir(__dirname);
 Promise.all(files.map(buildCSS)).catch(e => {
+  process.exitCode = 1;
   console.trace(e);
 });
