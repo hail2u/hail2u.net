@@ -128,10 +128,6 @@ const extendItem = item => {
   const datetimes = [day, date, month, year, hour, minute, second];
   return {
     ...item,
-    body: item.body.replace(
-      /(href|src)="(\/.*?)"/g,
-      '$1="https://hail2u.net$2"'
-    ),
     date: date,
     day: day,
     description: item.body
@@ -258,9 +254,7 @@ const mergeData = async (
   if (argv.article || argv.articles) {
     const item = items.find(hasSameLink.bind(null, dest));
     const [cardType, cover] = findCover(
-      /<img\s.*?\bsrc="https:\/\/hail2u\.net(\/img\/blog\/.*?)"/.exec(
-        item.body
-      ),
+      /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
       metadata.card_type,
       metadata.cover
     );
@@ -287,16 +281,21 @@ const mergeData = async (
 };
 
 const render = (template, data, partials, dest) => {
-  const rendered = mustache.render(template, data, partials);
-
-  if (dest.endsWith(".html")) {
-    return rendered.replace(
-      /(href|src)="https:\/\/hail2u\.net(\/.*?)"/g,
-      '$1="$2"'
+  if (dest.endsWith("/feed")) {
+    return mustache.render(
+      template,
+      {
+        ...data,
+        body: data.body.replace(
+          /(href|src)="(\/.*?)"/g,
+          '$1="https://hail2u.net$2"'
+        )
+      },
+      partials
     );
   }
 
-  return rendered;
+  return mustache.render(template, data, partials);
 };
 
 const buildDoc = async (metadata, items, partials, file) => {
