@@ -33,6 +33,7 @@ const getArticleNum = async () => {
   if (argv.update) {
     return "";
   }
+  // Don’t read cache here
   const cache = await fs.readJSON(cacheFile, "utf8");
   return ` (${cache.length + 1})`;
 };
