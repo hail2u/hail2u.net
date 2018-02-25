@@ -29,12 +29,22 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
+const getArticleNum = async () => {
+  if (argv.update) {
+    return "";
+  }
+  const cache = await fs.readJSON(cacheFile, "utf8");
+  return ` (${cache.length + 1})`;
+};
+
 const commitEntry = async (file, verb) => {
   const git = await whichAsync("git");
   await runCommand(git, ["add", "--", file]);
   await runCommand(git, [
     "commit",
-    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}`
+    `--message=${verb} ${toPOSIXPath(
+      path.relative("../", file)
+    )}${await getArticleNum()}`
   ]);
 };
 
