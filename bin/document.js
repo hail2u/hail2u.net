@@ -280,16 +280,19 @@ const mergeData = async (
   };
 };
 
+const toAbsoluteURLinBody = item => ({
+  ...item,
+  body: item.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"')
+});
+
 const render = (template, data, partials, dest) => {
   if (dest.endsWith("/feed")) {
+    const items = data.items.map(toAbsoluteURLinBody);
     return mustache.render(
       template,
       {
         ...data,
-        body: data.body.replace(
-          /(href|src)="(\/.*?)"/g,
-          '$1="https://hail2u.net$2"'
-        )
+        items: items
       },
       partials
     );
