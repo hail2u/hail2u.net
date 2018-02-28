@@ -13,14 +13,13 @@ const which = require("which");
 const argv = minimist(process.argv.slice(2), {
   boolean: ["preview", "contribute", "update"]
 });
-const blosxomDir = "../src/blosxom/";
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
 const execFileAsync = util.promisify(execFile);
-const srcDir = "../src/blosxom/entries/";
+const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
 const whichAsync = util.promisify(which);
 
@@ -47,6 +46,30 @@ const commitEntry = async (file, verb) => {
       path.relative("../", file)
     )}${await getArticleNum()}`
   ]);
+};
+
+const toImagePath = str => path.basename(str.split(/"/)[1]);
+
+const listArticleImagePaths = html => {
+  const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
+
+  if (!images) {
+    return [];
+  }
+
+  return Promise.all(images.map(toImagePath));
+};
+
+const copyArticleImage = async imagepath => {
+  await fs.copy(
+    path.join(srcImgDir, imagepath),
+    path.join(destImgDir, imagepath)
+  );
+};
+
+const copyArticleImages = async html => {
+  const imagePaths = await listArticleImagePaths(html);
+  await Promise.all(imagePaths.map(copyArticleImage));
 };
 
 const hasSameLink = (link, article) => link === article.link;
@@ -86,79 +109,23 @@ const updateCache = async (html, name) => {
   ]);
 };
 
-const toImagePath = str => path.basename(str.split(/"/)[1]);
-
-const listArticleImagePaths = html => {
-  const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
-
-  if (!images) {
-    return [];
-  }
-
-  return Promise.all(images.map(toImagePath));
-};
-
-const copyArticleImage = async imagepath => {
-  await fs.copy(
-    path.join(srcImgDir, imagepath),
-    path.join(destImgDir, imagepath)
-  );
-};
-
-const copyArticleImages = async html => {
-  const imagePaths = await listArticleImagePaths(html);
-  await Promise.all(imagePaths.map(copyArticleImage));
-};
-
-const buildArticle = async dest => {
-  const perl = await whichAsync("perl");
-  const { stdout } = await execFileAsync(
-    perl,
-    [
-      "blosxom.cgi",
-      `path=/${toPOSIXPath(path.relative(destDir, dest))}`,
-      "reindex=1"
-    ],
-    {
-      cwd: blosxomDir,
-      env: {
-        BLOSXOM_CONFIG_DIR: path.resolve(blosxomDir)
-      }
-    }
-  );
-  return stdout
-    .replace(/^[\s\S]*?\r?\n\r?\n/, "")
-    .replace(/\b(href|src)(=")(https?:\/\/hail2u\.net\/)/g, "$1$2/")
-    .trim();
-};
-
-const updateEntry = async file => {
-  const src = path.relative("", file.dest);
-  const dest = path.join(
-    destDir,
-    path.relative(srcDir, path.dirname(src)),
-    `${path.basename(src, ".txt")}.html`
-  );
-  const [npm] = await Promise.all([
-    whichAsync("npm"),
-    commitEntry(src, file.verb),
-    updateCache(file.contents, file.name),
-    copyArticleImages(file.contents)
+const buildArticle = async (contents, name) => {
+  const [npm] = await Promise.all([which("npm"), updateCache(contents, name)]);
+  await runCommand(npm, [
+    "run",
+    "html",
+    "--",
+    `--article=${destDir}${name}.html`
   ]);
+};
 
-  if (argv.update) {
-    await runCommand(npm, [
-      "run",
-      "html",
-      "--",
-      `--article=${destDir}${file.name}.html`
-    ]);
-  }
-
-  if (argv.contribute) {
-    const html = await buildArticle(dest);
-    await fs.outputFile(dest, html);
-  }
+const updateEntry = file => {
+  const src = path.relative("", file.dest);
+  return Promise.all([
+    commitEntry(src, file.verb),
+    copyArticleImages(file.contents),
+    buildArticle(file.contents, file.name)
+  ]);
 };
 
 const isDraft = filename => {
@@ -299,12 +266,12 @@ const main = async () => {
   const html = markupSelected(selected.ext, selected.contents);
 
   if (argv.contribute) {
-    const ext = ".txt";
+    const ext = ".html";
     return contributeSelected({
       ...selected,
       contents: html,
-      ext: ext,
       dest: path.join(srcDir, `${selected.name}${ext}`),
+      ext: ext,
       verb: "Add"
     });
   }
