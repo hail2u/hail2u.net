@@ -7,7 +7,7 @@ const os = require("os");
 const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
-const util = require("util");
+const { promisify } = require("util");
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
@@ -18,10 +18,10 @@ const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
-const execFileAsync = util.promisify(execFile);
+const execFileAsync = promisify(execFile);
 const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
-const whichAsync = util.promisify(which);
+const whichAsync = promisify(which);
 
 const runCommand = async (command, args) => {
   const { stdout } = await execFileAsync(command, args);

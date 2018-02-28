@@ -1,9 +1,9 @@
 const { execFile } = require("child_process");
 const path = require("path");
-const util = require("util");
+const { promisify } = require("util");
 const which = require("which");
 
-const execFileAsync = util.promisify(execFile);
+const execFileAsync = promisify(execFile);
 const files = [
   {
     dest: "../tmp/favicon-16.png",
@@ -26,7 +26,7 @@ const files = [
     width: 180
   }
 ];
-const whichAsync = util.promisify(which);
+const whichAsync = promisify(which);
 
 const generatePNG = async (inkscape, file) => {
   await execFileAsync(inkscape, [
