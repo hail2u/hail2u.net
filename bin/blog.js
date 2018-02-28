@@ -99,7 +99,7 @@ const updateCache = (cache, html, name) => {
 
 const buildArticle = async (cache, contents, name) => {
   const [npm] = await Promise.all([
-    which("npm"),
+    whichAsync("npm"),
     updateCache(cache, contents, name)
   ]);
   await runCommand(npm, [
