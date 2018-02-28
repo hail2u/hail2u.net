@@ -28,23 +28,12 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const getArticleNum = async () => {
-  if (argv.update) {
-    return "";
-  }
-  // Don’t read cache here
-  const cache = await fs.readJSON(cacheFile, "utf8");
-  return ` (${cache.length + 1})`;
-};
-
-const commitEntry = async (file, verb) => {
+const commitEntry = async (num, file, verb) => {
   const git = await whichAsync("git");
   await runCommand(git, ["add", "--", file]);
   await runCommand(git, [
     "commit",
-    `--message=${verb} ${toPOSIXPath(
-      path.relative("../", file)
-    )}${await getArticleNum()}`
+    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}${num}`
   ]);
 };
 
@@ -82,7 +71,7 @@ const saveCache = cache =>
     spaces: 2
   });
 
-const updateCache = async (html, name) => {
+const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
     body: body.join("\n").trim(),
@@ -90,7 +79,6 @@ const updateCache = async (html, name) => {
     title: title.replace(/<.*?>/g, ""),
     unixtime: Date.now()
   };
-  const cache = await fs.readJSON(cacheFile, "utf8");
   const sameArticleIndex = cache.findIndex(
     hasSameLink.bind(null, article.link)
   );
@@ -109,8 +97,11 @@ const updateCache = async (html, name) => {
   ]);
 };
 
-const buildArticle = async (contents, name) => {
-  const [npm] = await Promise.all([which("npm"), updateCache(contents, name)]);
+const buildArticle = async (cache, contents, name) => {
+  const [npm] = await Promise.all([
+    which("npm"),
+    updateCache(cache, contents, name)
+  ]);
   await runCommand(npm, [
     "run",
     "html",
@@ -119,12 +110,13 @@ const buildArticle = async (contents, name) => {
   ]);
 };
 
-const updateEntry = file => {
+const updateEntry = async file => {
+  const cache = await fs.readJSON(cacheFile, "utf8");
   const src = path.relative("", file.dest);
-  return Promise.all([
-    commitEntry(src, file.verb),
+  Promise.all([
+    commitEntry(cache.length + 1, src, file.verb),
     copyArticleImages(file.contents),
-    buildArticle(file.contents, file.name)
+    buildArticle(cache, file.contents, file.name)
   ]);
 };
 
