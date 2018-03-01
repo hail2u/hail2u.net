@@ -28,12 +28,20 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
+const getArticleTotal = (num) => {
+  if (argv.update) {
+    return "";
+  }
+
+  return ` (${num})`;
+};
+
 const commitEntry = async (num, file, verb) => {
   const git = await whichAsync("git");
   await runCommand(git, ["add", "--", file]);
   await runCommand(git, [
     "commit",
-    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}${num}`
+    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}${getArticleTotal(num)}`
   ]);
 };
 
