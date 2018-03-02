@@ -19,7 +19,6 @@ const entityMap = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -77,6 +76,8 @@ const monthNames = [
   "Dec"
 ];
 const partialDir = "../src/partial/";
+
+const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
 
 const escapeChar = char => entityMap[char];
 
