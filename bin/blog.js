@@ -157,6 +157,11 @@ const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
 const listDrafts = async () => {
   const filenames = await fs.readdir(draftDir);
+
+  if (filenames.length < 1) {
+    throw new Error("There is no draft.");
+  }
+
   return getDrafts(filenames.filter(isDraft));
 };
 
