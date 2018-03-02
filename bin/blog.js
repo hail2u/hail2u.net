@@ -18,6 +18,7 @@ const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = path.resolve(os.homedir(), "Documents/Drafts/");
 const draftExts = [".html", ".markdown", ".md", ".txt"];
+const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]$/;
 const execFileAsync = promisify(execFile);
 const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
@@ -28,7 +29,7 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const getArticleTotal = (num) => {
+const getArticleTotal = num => {
   if (argv.update) {
     return "";
   }
@@ -41,7 +42,9 @@ const commitEntry = async (num, file, verb) => {
   await runCommand(git, ["add", "--", file]);
   await runCommand(git, [
     "commit",
-    `--message=${verb} ${toPOSIXPath(path.relative("../", file))}${getArticleTotal(num)}`
+    `--message=${verb} ${toPOSIXPath(
+      path.relative("../", file)
+    )}${getArticleTotal(num)}`
   ]);
 };
 
@@ -166,7 +169,7 @@ const listDrafts = async () => {
 };
 
 const selectDraft = drafts =>
-  new Promise((resolve, reject) => {
+  new Promise(resolve => {
     if (!argv.contribute && drafts.length === 1) {
       return resolve(drafts[0]);
     }
@@ -191,13 +194,13 @@ const selectDraft = drafts =>
       const answer = parseInt(a, 10);
 
       if (!Number.isInteger(answer) || answer > drafts.length) {
-        return reject(
-          new Error(`You must enter a number between 0 and ${drafts.length}.`)
+        throw new Error(
+          `You must enter a number between 0 and ${drafts.length}.`
         );
       }
 
       if (answer === 0) {
-        return reject(new Error("Aborted by user."));
+        throw new Error("Aborted by user.");
       }
 
       resolve(drafts[answer - 1]);
@@ -205,14 +208,18 @@ const selectDraft = drafts =>
   });
 
 const checkSelectedName = name => {
-  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
-    throw new Error("This draft does not have a valid name for file.");
+  if (!draftNameRe.test(name)) {
+    throw new Error(
+      'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
+    );
   }
 };
 
 const checkSelectedContents = contents => {
   if (!contents.startsWith("# ") && !contents.startsWith("<h1>")) {
-    throw new Error("This draft does not have a title.");
+    throw new Error(
+      "This draft does not have a title. A draft contents must start with `# ` or `<h1>`."
+    );
   }
 };
 
@@ -266,8 +273,10 @@ const main = async () => {
 
   const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
-  checkSelectedName(selected.name);
-  checkSelectedContents(selected.contents);
+  await Promise.all([
+    checkSelectedName(selected.name),
+    checkSelectedContents(selected.contents)
+  ]);
   const html = markupSelected(selected.ext, selected.contents);
 
   if (argv.contribute) {
