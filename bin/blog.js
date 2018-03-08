@@ -108,10 +108,10 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
-const buildArticle = async (cache, contents, name) => {
+const buildArticle = async (cache, content, name) => {
   const [npm] = await Promise.all([
     whichAsync("npm"),
-    updateCache(cache, contents, name)
+    updateCache(cache, content, name)
   ]);
   await runCommand(npm, [
     "run",
@@ -126,8 +126,8 @@ const updateEntry = async file => {
   const src = path.relative("", file.dest);
   Promise.all([
     commitEntry(cache.length + 1, src, file.verb),
-    copyArticleImages(file.contents),
-    buildArticle(cache, file.contents, file.name)
+    copyArticleImages(file.content),
+    buildArticle(cache, file.content, file.name)
   ]);
 };
 
@@ -149,7 +149,7 @@ const getDraft = async filename => {
   const src = path.join(draftDir, filename);
   const ext = path.extname(src);
   return {
-    contents: await fs.readFile(src, "utf8"),
+    content: await fs.readFile(src, "utf8"),
     ext: ext,
     name: path.basename(src, ext),
     src: src
@@ -181,7 +181,7 @@ const selectDraft = drafts =>
 
     menu.write("\n");
     drafts.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.contents
+      menu.write(`${i + 1}. ${n.content
         .trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
@@ -215,25 +215,25 @@ const checkSelectedName = name => {
   }
 };
 
-const checkSelectedContents = contents => {
-  if (!contents.startsWith("# ") && !contents.startsWith("<h1>")) {
+const checkSelectedContent = content => {
+  if (!content.startsWith("# ") && !content.startsWith("<h1>")) {
     throw new Error(
-      "This draft does not have a title. A draft contents must start with `# ` or `<h1>`."
+      "This draft does not have a title. A draft content must start with `# ` or `<h1>`."
     );
   }
 };
 
-const markupSelected = (ext, contents) => {
+const markupSelected = (ext, content) => {
   if (ext === ".html") {
-    return contents;
+    return content;
   }
 
-  return markdown(contents);
+  return markdown(content);
 };
 
 const contributeSelected = selected =>
   Promise.all([
-    fs.outputFile(selected.dest, selected.contents, {
+    fs.outputFile(selected.dest, selected.content, {
       flag: "wx"
     }),
     fs.unlink(selected.src),
@@ -258,7 +258,7 @@ const main = async () => {
   if (argv.update) {
     const ext = path.extname(argv.file);
     return updateEntry({
-      contents: await fs.readFile(argv.file, "utf8"),
+      content: await fs.readFile(argv.file, "utf8"),
       dest: path.resolve(argv.file),
       ext: ext,
       name: toPOSIXPath(
@@ -275,15 +275,15 @@ const main = async () => {
   const selected = await selectDraft(drafts);
   await Promise.all([
     checkSelectedName(selected.name),
-    checkSelectedContents(selected.contents)
+    checkSelectedContent(selected.content)
   ]);
-  const html = markupSelected(selected.ext, selected.contents);
+  const html = markupSelected(selected.ext, selected.content);
 
   if (argv.contribute) {
     const ext = ".html";
     return contributeSelected({
       ...selected,
-      contents: html,
+      content: html,
       dest: path.join(srcDir, `${selected.name}${ext}`),
       ext: ext,
       verb: "Add"
@@ -292,7 +292,7 @@ const main = async () => {
 
   return previewSelected({
     ...selected,
-    contents: html,
+    content: html,
     dest: "../tmp/__preview.html",
     template: "../src/preview.mustache"
   });
