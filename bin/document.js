@@ -135,48 +135,11 @@ const extendItem = item => {
   };
 };
 
-const isFirstInYear = (current, previous) => {
-  if (!previous || current.year !== previous.year) {
-    return true;
-  }
-
-  return false;
-};
-
-const isLastInYear = (current, next) => {
-  if (!next || current.year !== next.year) {
-    return true;
-  }
-
-  return false;
-};
-
-const isLatest = index => {
-  if (index === 0) {
-    return true;
-  }
-
-  return false;
-};
-
-const markYearChanges = (item, index, items) => {
-  const nextItem = items[index + 1];
-  const previousItem = items[index - 1];
-  return {
-    ...item,
-    isFirstInYear: isFirstInYear(item, previousItem),
-    isLastInYear: isLastInYear(item, nextItem),
-    isLatest: isLatest(index)
-  };
-};
-
-const extendItems = async items => {
-  const extendedItems = await Promise.all(items.map(extendItem));
-  return Promise.all(extendedItems.map(markYearChanges));
-};
-
 const optimizeItems = items =>
-  extendItems([].concat(...items).sort(compareByUnixtime));
+  []
+    .concat(...items)
+    .sort(compareByUnixtime)
+    .map(extendItem);
 
 const readItems = async () => {
   const items = await Promise.all(itemFiles.map(readItem));
@@ -218,6 +181,41 @@ const findCover = (image, defaultCardType, defaultCover) => {
   }
 
   return ["summary_large_image", image[1]];
+};
+
+const isFirstInYear = (current, previous) => {
+  if (!previous || current.year !== previous.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInYear = (current, next) => {
+  if (!next || current.year !== next.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLatest = index => {
+  if (index === 0) {
+    return true;
+  }
+
+  return false;
+};
+
+const markYearChanges = (item, index, items) => {
+  const nextItem = items[index + 1];
+  const previousItem = items[index - 1];
+  return {
+    ...item,
+    isFirstInYear: isFirstInYear(item, previousItem),
+    isLastInYear: isLastInYear(item, nextItem),
+    isLatest: isLatest(index)
+  };
 };
 
 const now = date =>
@@ -265,6 +263,7 @@ const mergeData = async (
     items: items
       .slice(0)
       .filter(filterUpdates.bind(null, includeUpdates))
+      .map(markYearChanges)
       .slice(0, itemLength),
     lastBuildDate: now(new Date())
   };
