@@ -75,7 +75,7 @@ const copyArticleImages = async html => {
 const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) =>
-  parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
+  parseInt(b.published, 10) - parseInt(a.published, 10);
 
 const saveCache = cache =>
   fs.outputJSON(cacheFile, cache.sort(compareByUnixtime), {
@@ -88,7 +88,7 @@ const updateCache = (cache, html, name) => {
     body: body.join("\n").trim(),
     link: `/blog/${name}.html`,
     title: title.replace(/<.*?>/g, ""),
-    unixtime: Date.now()
+    published: Date.now()
   };
   const sameArticleIndex = cache.findIndex(
     hasSameLink.bind(null, article.link)
@@ -101,7 +101,7 @@ const updateCache = (cache, html, name) => {
   return saveCache([
     {
       ...article,
-      unixtime: cache[sameArticleIndex].unixtime
+      published: cache[sameArticleIndex].unixtime
     },
     ...cache.slice(0, sameArticleIndex),
     ...cache.slice(sameArticleIndex + 1)

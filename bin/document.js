@@ -86,7 +86,7 @@ const escapeStr = str => String(str).replace(escapeRe, escapeChar);
 const readItem = itempath => fs.readJSON(itempath, "utf8");
 
 const compareByUnixtime = (a, b) =>
-  parseInt(b.unixtime, 10) - parseInt(a.unixtime, 10);
+  parseInt(b.published, 10) - parseInt(a.published, 10);
 
 const pad = number => {
   if (number >= 10) {
@@ -107,7 +107,7 @@ const toRFC822String = (day, date, month, year, hour, minute, second) =>
   )}:${pad(minute)}:${pad(second)} +0900`;
 
 const extendItem = item => {
-  const dt = new Date(item.unixtime);
+  const dt = new Date(item.published);
   const date = dt.getDate();
   const day = dt.getDay();
   const hour = dt.getHours();
