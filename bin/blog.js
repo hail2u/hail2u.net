@@ -11,7 +11,7 @@ const { promisify } = require("util");
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["preview", "contribute", "update"]
+  boolean: ["contribute", "test", "update"]
 });
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
@@ -246,7 +246,7 @@ const renderSelected = (template, selected) =>
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
 
-const previewSelected = async selected => {
+const testSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");
   const rendered = renderSelected(template, selected);
   await fs.outputFile(selected.dest, rendered);
@@ -290,11 +290,11 @@ const main = async () => {
     });
   }
 
-  return previewSelected({
+  return testSelected({
     ...selected,
     content: html,
-    dest: "../tmp/__preview.html",
-    template: "../src/preview.mustache"
+    dest: "../tmp/__test.html",
+    template: "../src/blog/test.mustache"
   });
 };
 
