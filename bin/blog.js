@@ -11,7 +11,8 @@ const { promisify } = require("util");
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["contribute", "test", "update"]
+  boolean: ["contribute", "test"],
+  string: ["update"]
 });
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
@@ -256,15 +257,15 @@ const testSelected = async selected => {
 
 const main = async () => {
   if (argv.update) {
-    const ext = path.extname(argv.file);
+    const ext = path.extname(argv.update);
     return updateEntry({
-      content: await fs.readFile(argv.file, "utf8"),
-      dest: path.resolve(argv.file),
+      content: await fs.readFile(argv.update, "utf8"),
+      dest: path.resolve(argv.update),
       ext: ext,
       name: toPOSIXPath(
         path.join(
-          path.relative(srcDir, path.dirname(argv.file)),
-          path.basename(argv.file, ext)
+          path.relative(srcDir, path.dirname(argv.update)),
+          path.basename(argv.update, ext)
         )
       ),
       verb: "Update"
