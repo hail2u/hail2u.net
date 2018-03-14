@@ -7,7 +7,7 @@
   <channel>
     <description>主にウェブサイト制作関連の記事や文書、プロジェクトがあります。</description>
     <language>ja</language>
-    <lastBuildDate>Mon, 12 Mar 2018 16:34:12 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 14 Mar 2018 14:28:05 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u</title>
@@ -15,6 +15,52 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。:target疑似クラスを使う方法が最もコストが低いように思えた。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/css-font-size-changer.html</guid>
+        <link>https://hail2u.net/blog/css-font-size-changer.html</link>
+        <pubDate>Wed, 14 Mar 2018 14:27:51 +0900</pubDate>
+        <title><![CDATA[フォント・サイズ変更機能をCSSで]]></title>
+        <content:encoded><![CDATA[<p>実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。<code>:target</code>疑似クラスを使う方法が最もコストが低いように思えた。</p>
+
+<p>Demo: <a href="https://hail2u.net/pub/test/677.html">CSS Font Size Changer</a></p>
+
+<p><code>id</code>属性を振った<code>div</code>要素でフォント・サイズを変更したいコンテンツを括り、それにページ内アンカーでジャンプすることによって<code>:target</code>疑似クラスを有効化するという仕組みだ。<code>:target</code>属性を使った画像のズーム機能の実装と考え方としては同じだ。フラグメント識別子を消したり、ブラウザーの履歴をクリーンに保つにはJavaScriptが必要になる。</p>
+
+<p>このままではページ移動が起きてしまうので、HTMLコードにはもう少し工夫が必要かもしれない。<code>div</code>要素で括らずに空要素として固定位置に隠して配置し、兄弟セレクターで制御するとうまくいきそうだ。</p>
+
+<pre><code class="language-css">#large:target ~ main {
+  font-size: 24px;
+}
+</code></pre>
+
+<p>既存のウェブページへCSSにおける副作用なしに追加するには、こちらの方法が優れている。</p>
+
+<hr>
+
+<p>もし<code>has()</code>疑似クラスの実装があると、カスタム・プロパティーと組み合わせられる。例えば以下のようにも書けるだろう。</p>
+
+<pre><code class="language-css">:root {
+  --base-font-size: 16px;
+}
+
+body {
+  font-size: var(--base-text-size);
+}
+
+:root:has(#large:target) {
+  --base-text-size: 24px;
+}
+</code></pre>
+
+<p>この場合はページ内アンカーそのものに<code>id</code>要素を振れば良いので、<code>div</code>要素が必要なくなる。ただし自身を参照するアンカーという存在そのものが微妙になる。</p>
+
+<p>しかし<code>has()</code>があるなら<code>:checked</code>疑似クラスから親を参照できるので、アンカー（や<code>id</code>属性）を使わず、ラジオボタンだけで実装できる。<code>:root:has(.large:checked)</code>というようなセレクターで良い。この場合はHTMLコードがフォーム要素だけでよくなるため、誰でも操作しやすくなる可能性が高い。</p>
+
+<hr>
+
+<p><code>has()</code>はかなりのポテンシャルを秘めている。想像しやすいところだとウェブログの記事にカバー画像がある場合とない場合でレイアウトを変えるとかだ。セレクターに簡単な条件節が追加できると考えるとわかりやすいかもしれない。</p>]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[Patrickの直営店がMark isみなとみらいにできたようだ。靴ひもを買いに行こう。そろそろオールソール交換を……する前にSpingle Moveの方をかかとだけ直した。空いていたので1時間買い出ししている間に直った。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/on-20180312.html</guid>
@@ -146,22 +192,6 @@
         <content:encoded><![CDATA[<p>街で食事をしている。すると30くらいのゴツい男性が近づいてきて、折りたたんだ5000円札をテーブルに置く。「なんですか、これ？」と聞くと「ま、いいから、いいから」と要領を得ない答えしか返ってこないので、無理やり返す。食事を終え、店を出ると先ほどの男性に他の客が絡まれているところで目が覚めた。</p>
 
 <p>よくわからないが、安全なお金が欲しいのかもしれない。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[npmスクリプトでrm -rfなどとやっているところをnpx経由のrimrafなどに置き換える遊びをしていた。mkdirはmkdirp、cpはcpxが良さそうだ。cdはnpx経由でやっても意味がない。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/on-20180301.html</guid>
-        <link>https://hail2u.net/blog/on-20180301.html</link>
-        <pubDate>Thu, 1 Mar 2018 12:52:26 +0900</pubDate>
-        <title><![CDATA[2018-03-01]]></title>
-        <content:encoded><![CDATA[<p>npmスクリプトで<code>rm -rf</code>などとやっているところをnpx経由の<a href="https://github.com/isaacs/rimraf">rimraf</a>などに置き換える遊びをしていた。<code>mkdir</code>は<a href="https://github.com/substack/node-mkdirp">mkdirp</a>、<code>cp</code>は<a href="https://github.com/mysticatea/cpx">cpx</a>が良さそうだ。<code>cd</code>はnpx経由でやっても意味がない。</p>
-
-<p>遅い。これしか感想が出てこなかった。</p>
-
-<p>本当はNode.js製のUnixコマンドっぽい雑なCLIツールをとにかく信用できないので使いたくない。何かおかしくなった時にググって解決できないのも嫌だ。しかし面倒な説明をするよりはマシなのではないかと考え、遊びでやってみた。遅くて採用が無理と言うことがわかって良かった。</p>
-
-<hr>
-
-<p>MinGitに移行できるかと思って作業をしてみたが、ページャーがうまく動かない。今までの環境で使っていた何か（設定かどこかのパスにある実行ファイルなど）が競合していそうだ。よくわからなくなってきた。</p>]]></content:encoded>
       </item>
 
   </channel>
