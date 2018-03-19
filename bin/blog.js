@@ -102,7 +102,7 @@ const updateCache = (cache, html, name) => {
   return saveCache([
     {
       ...article,
-      published: cache[sameArticleIndex].unixtime
+      published: cache[sameArticleIndex].published
     },
     ...cache.slice(0, sameArticleIndex),
     ...cache.slice(sameArticleIndex + 1)
