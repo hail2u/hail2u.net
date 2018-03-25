@@ -30,25 +30,6 @@ const runCommand = async (command, args) => {
   process.stdout.write(stdout);
 };
 
-const getArticleTotal = num => {
-  if (argv.update) {
-    return "";
-  }
-
-  return ` (${num})`;
-};
-
-const commitEntry = async (num, file, verb) => {
-  const git = await whichAsync("git");
-  await runCommand(git, ["add", "--", file]);
-  await runCommand(git, [
-    "commit",
-    `--message=${verb} ${toPOSIXPath(
-      path.relative("../", file)
-    )}${getArticleTotal(num)}`
-  ]);
-};
-
 const toImagePath = str => path.basename(str.split(/"/)[1]);
 
 const listArticleImagePaths = html => {
@@ -109,27 +90,44 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
-const buildArticle = async (cache, content, name) => {
-  const [npm] = await Promise.all([
-    whichAsync("npm"),
-    updateCache(cache, content, name)
-  ]);
-  await runCommand(npm, [
-    "run",
-    "html",
-    "--",
-    `--article=${destDir}${name}.html`
-  ]);
+const buildArticle = (npm, name) =>
+  runCommand(npm, ["run", "html", "--", `--article=${destDir}${name}.html`]);
+
+const getArticleTotal = num => {
+  if (argv.update) {
+    return "";
+  }
+
+  return ` (${num})`;
 };
 
-const updateEntry = async file => {
-  const cache = await fs.readJSON(cacheFile, "utf8");
-  const src = path.relative("", file.dest);
-  Promise.all([
-    commitEntry(cache.length + 1, src, file.verb),
-    copyArticleImages(file.content),
-    buildArticle(cache, file.content, file.name)
+const addFile = (git, file) => runCommand(git, ["add", "--", file]);
+
+const commitEntryAndCache = (git, verb, file, num) =>
+  runCommand(git, [
+    "commit",
+    `--message=${verb} ${toPOSIXPath(
+      path.relative("../", file)
+    )}${getArticleTotal(num)}`
   ]);
+
+const updateEntry = async file => {
+  const [cache, git] = await Promise.all([
+    fs.readJSON(cacheFile, "utf8"),
+    whichAsync("git"),
+    copyArticleImages(file.content)
+  ]);
+  const src = path.relative("", file.dest);
+  const [npm] = await Promise.all([
+    whichAsync("npm"),
+    updateCache(cache, file.content, file.name),
+    addFile(git, src)
+  ]);
+  await Promise.all([
+    addFile(git, path.relative("", cacheFile)),
+    buildArticle(npm, file.name)
+  ]);
+  commitEntryAndCache(git, file.verb, src, cache.length + 1);
 };
 
 const isDraft = filename => {
