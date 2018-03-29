@@ -287,7 +287,7 @@ const main = async () => {
       content: html,
       dest: path.join(srcDir, `${selected.name}${ext}`),
       ext: ext,
-      verb: "Add"
+      verb: "Contribute"
     });
   }
 
