@@ -90,24 +90,21 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
+const addFiles = (git, ...files) => runCommand(git, ["add", "--", ...files]);
+
 const buildArticle = (npm, name) =>
   runCommand(npm, ["run", "html", "--", `--article=${destDir}${name}.html`]);
 
-const getArticleTotal = num => {
+const commitFiles = (git, verb, file, num) =>
+  runCommand(git, ["commit", `--message=${verb} ${file}${num}`]);
+
+const getArticleTotal = cache => {
   if (argv.update) {
     return "";
   }
 
-  return ` (${num})`;
+  return ` (${cache.length + 1})`;
 };
-
-const commitEntryAndCache = (git, verb, file, num) =>
-  runCommand(git, [
-    "commit",
-    `--message=${verb} ${toPOSIXPath(
-      path.relative("../", file)
-    )}${getArticleTotal(num)}`
-  ]);
 
 const updateEntry = async file => {
   const [cache, git] = await Promise.all([
@@ -121,10 +118,15 @@ const updateEntry = async file => {
     updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
-    runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
+    addFiles(git, src, path.relative("", cacheFile)),
     buildArticle(npm, file.name)
   ]);
-  commitEntryAndCache(git, file.verb, src, cache.length + 1);
+  await commitFiles(
+    git,
+    file.verb,
+    toPOSIXPath(path.relative("../", src)),
+    getArticleTotal(cache)
+  );
 };
 
 const isDraft = filename => {
