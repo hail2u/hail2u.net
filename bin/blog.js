@@ -101,8 +101,6 @@ const getArticleTotal = num => {
   return ` (${num})`;
 };
 
-const addFile = (git, file) => runCommand(git, ["add", "--", file]);
-
 const commitEntryAndCache = (git, verb, file, num) =>
   runCommand(git, [
     "commit",
@@ -120,11 +118,10 @@ const updateEntry = async file => {
   const src = path.relative("", file.dest);
   const [npm] = await Promise.all([
     whichAsync("npm"),
-    updateCache(cache, file.content, file.name),
-    addFile(git, src)
+    updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
-    addFile(git, path.relative("", cacheFile)),
+    runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
     buildArticle(npm, file.name)
   ]);
   commitEntryAndCache(git, file.verb, src, cache.length + 1);
