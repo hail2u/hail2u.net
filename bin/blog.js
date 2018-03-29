@@ -27,7 +27,7 @@ const whichAsync = promisify(which);
 
 const runCommand = async (command, args) => {
   const { stdout } = await execFileAsync(command, args);
-  process.stdout.write(stdout);
+  return process.stdout.write(stdout);
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -42,16 +42,15 @@ const listArticleImagePaths = html => {
   return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = async imagepath => {
-  await fs.copy(
+const copyArticleImage = imagepath =>
+  fs.copy(
     path.join(srcImgDir, imagepath),
     path.join(destImgDir, imagepath)
   );
-};
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
-  await Promise.all(imagePaths.map(copyArticleImage));
+  return Promise.all(imagePaths.map(copyArticleImage));
 };
 
 const hasSameLink = (link, article) => link === article.link;
@@ -121,7 +120,7 @@ const updateEntry = async file => {
     addFiles(git, src, path.relative("", cacheFile)),
     buildArticle(npm, file.name)
   ]);
-  await commitFiles(
+  return commitFiles(
     git,
     file.verb,
     toPOSIXPath(path.relative("../", src)),
@@ -201,7 +200,7 @@ const selectDraft = drafts =>
         throw new Error("Aborted by user.");
       }
 
-      resolve(drafts[answer - 1]);
+      return resolve(drafts[answer - 1]);
     });
   });
 
@@ -211,6 +210,8 @@ const checkSelectedName = name => {
       'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
     );
   }
+
+  return true;
 };
 
 const checkSelectedContent = content => {
@@ -219,6 +220,8 @@ const checkSelectedContent = content => {
       "This draft does not have a title. A draft content must start with `# ` or `<h1>`."
     );
   }
+
+  return true;
 };
 
 const markupSelected = (ext, content) => {
@@ -249,7 +252,7 @@ const testSelected = async selected => {
   const rendered = renderSelected(template, selected);
   await fs.outputFile(selected.dest, rendered);
   const open = await whichAsync("open");
-  await runCommand(open, [selected.dest]);
+  return runCommand(open, [selected.dest]);
 };
 
 const main = async () => {
