@@ -176,7 +176,7 @@ const selectDraft = drafts =>
       output: process.stdout
     });
 
-    menu.write("\n");
+    menu.write("0. QUIT\n");
     drafts.forEach((n, i) => {
       menu.write(`${i + 1}. ${n.content
         .trim()
@@ -185,7 +185,6 @@ const selectDraft = drafts =>
         .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
 `);
     });
-    menu.write("0. QUIT\n");
     menu.question("Which one: (0) ", (a = 0) => {
       menu.close();
       const answer = parseInt(a, 10);
