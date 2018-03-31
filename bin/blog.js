@@ -56,7 +56,7 @@ const copyArticleImages = async html => {
 const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) =>
-  parseInt(b.published, 10) - parseInt(a.published, 10);
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const saveCache = cache =>
   fs.outputJSON(cacheFile, cache.sort(compareByUnixtime), {
@@ -187,7 +187,7 @@ const selectDraft = drafts =>
     });
     menu.question("Which one: (0) ", (a = 0) => {
       menu.close();
-      const answer = parseInt(a, 10);
+      const answer = Number.parseInt(a, 10);
 
       if (!Number.isInteger(answer) || answer > drafts.length) {
         throw new Error(

@@ -86,7 +86,7 @@ const escapeStr = str => String(str).replace(escapeRe, escapeChar);
 const readItem = itempath => fs.readJSON(itempath, "utf8");
 
 const compareByUnixtime = (a, b) =>
-  parseInt(b.published, 10) - parseInt(a.published, 10);
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const pad = number => {
   if (number >= 10) {
