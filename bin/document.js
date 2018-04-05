@@ -1,5 +1,5 @@
+const { decode, encode } = require("../lib/html-entities");
 const fs = require("fs-extra");
-const he = require("he");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -13,13 +13,6 @@ const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
 const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const entityMap = {
-  '"': "&quot;",
-  "&": "&amp;",
-  "'": "&#39;",
-  "<": "&lt;",
-  ">": "&gt;"
-};
 const files = [
   {
     dest: "../dist/about/index.html",
@@ -78,12 +71,6 @@ const monthNames = [
 ];
 const partialDir = "../src/partial/";
 
-const escapeRe = new RegExp(`[${Object.keys(entityMap).join("")}]`, "g");
-
-const escapeChar = char => entityMap[char];
-
-const escapeStr = str => String(str).replace(escapeRe, escapeChar);
-
 const readItem = itempath => fs.readJSON(itempath, "utf8");
 
 const compareByUnixtime = (a, b) =>
@@ -121,10 +108,12 @@ const extendItem = item => {
     ...item,
     date: date,
     day: day,
-    description: he.decode(item.body
-      .replace(/\r?\n/g, "")
-      .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-      .replace(/<.*?>/g, "")),
+    description: decode(
+      item.body
+        .replace(/\r?\n/g, "")
+        .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+        .replace(/<.*?>/g, "")
+    ),
     hour: hour,
     html5PubDate: toHTML5String(...datetimes),
     minute: minute,
@@ -345,7 +334,7 @@ const main = async () => {
 };
 
 process.chdir(__dirname);
-mustache.escape = escapeStr;
+mustache.escape = encode;
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

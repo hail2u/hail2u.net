@@ -1,6 +1,6 @@
+const { decode } = require("../lib/html-entities");
 const { execFile } = require("child_process");
 const fs = require("fs-extra");
-const he = require("he");
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mustache = require("mustache");
@@ -44,10 +44,7 @@ const listArticleImagePaths = html => {
 };
 
 const copyArticleImage = imagepath =>
-  fs.copy(
-    path.join(srcImgDir, imagepath),
-    path.join(destImgDir, imagepath)
-  );
+  fs.copy(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
@@ -69,7 +66,7 @@ const updateCache = (cache, html, name) => {
   const article = {
     body: body.join("\n").trim(),
     link: `/blog/${name}.html`,
-    title: he.decode(title.replace(/<.*?>/g, "")),
+    title: decode(title.replace(/<.*?>/g, "")),
     published: Date.now()
   };
   const sameArticleIndex = cache.findIndex(
