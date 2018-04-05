@@ -1,4 +1,5 @@
 const fs = require("fs-extra");
+const he = require("he");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -120,10 +121,10 @@ const extendItem = item => {
     ...item,
     date: date,
     day: day,
-    description: item.body
+    description: he.decode(item.body
       .replace(/\r?\n/g, "")
       .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-      .replace(/<.*?>/g, ""),
+      .replace(/<.*?>/g, "")),
     hour: hour,
     html5PubDate: toHTML5String(...datetimes),
     minute: minute,
