@@ -64,7 +64,7 @@ const saveCache = cache =>
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
-    body: body.join("\n").trim(),
+    body: `${body.join("\n").trim()}\n`,
     link: `/blog/${name}.html`,
     title: decode(title.replace(/<.*?>/g, "")),
     published: Date.now()
@@ -281,7 +281,7 @@ const main = async () => {
     const ext = ".html";
     return contributeSelected({
       ...selected,
-      content: html,
+      content: `${html.trim()}\n`,
       dest: path.join(srcDir, `${selected.name}${ext}`),
       ext: ext,
       verb: "Contribute"
