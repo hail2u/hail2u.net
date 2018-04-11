@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連をはじめとした記事や文書、プロジェクトを公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Tue, 10 Apr 2018 18:20:21 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 11 Apr 2018 09:21:33 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,38 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[長らくパスワード・マネージャーとしてKeePassを使っていたが、そのクロスプラットフォームのクライアント・アプリケーションであるKeePassXCに乗り換えようとしている。KeePassのデータベースをそのまま利用できるのでインターフェイスが変わるだけだ。操作感も少し変わる。データベース・ファイルの扱いに多少の不安があるが、今のところ問題なく動いているようだ。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/hello-keepassxc.html</guid>
+        <link>https://hail2u.net/blog/hello-keepassxc.html</link>
+        <pubDate>Wed, 11 Apr 2018 09:21:25 +0900</pubDate>
+        <title><![CDATA[KeePassXCへ]]></title>
+        <content:encoded><![CDATA[<p>長らくパスワード・マネージャーとしてKeePassを使っていたが、そのクロスプラットフォームのクライアント・アプリケーションである<a href="https://keepassxc.org/">KeePassXC</a>に乗り換えようとしている。KeePassのデータベースをそのまま利用できるのでインターフェイスが変わるだけだ。操作感も少し変わる。データベース・ファイルの扱いに多少の不安があるが、今のところ問題なく動いているようだ。</p>
+
+<p>ともかくCLIアプリケーションが<em>別に</em>存在するので助かる。本体を常駐させなくても動くため、自由度は（もちろん危険度も）かなり高い。<code>show</code>コマンドなどは平文でパスワードをターミナルに表示するので、ログに残る（ConEmuで完全なログを取っている場合はそれにも残る）ことは頭に入れておいた方が良い。</p>
+
+<pre><samp>$ <kbd>keepassxc-cli clip default.kdbx Twitter 13</kbd>
+</samp></pre>
+
+<p>このようなコマンドによって、<code>default.kbdx</code>のルートにあるTwitterという名前のエントリーからパスワードがクリップボードにコピーされる（13秒後に削除される）。データベースにマスター・キーとしてパスワードが設定されていた場合は、プロンプトを使って確認される。</p>
+
+<p>Node.jsからKeePassのデータベース・ファイルを扱いたい場合にも、このCLIアプリケーションを叩くのが現実的な気がしてきた。もちろん自作で個人用のツールに限った話にはなるが、かなり効率が良さそうだ。</p>
+
+<p>CLIアプリケーションはマスター・キーとしてキー・ファイルを指定するオプションも持っている。そのためデータベースにはパスワードはかけず、持ち歩くUSBドライブにキー・ファイルを置いておくという運用もできそうだった。しかしパスワードなしでキー・ファイルのみだと、CLIアプリケーションではうまく開けない（GUIアプリケーションでは開ける）ようだ。イシューを立てたいが勘違いしていそうなので、すこし頭を冷やしている。</p>
+
+<hr>
+
+<p>操作感でつまづいたのはロックすると即クリップボードが削除されるところだ。つまりクリップボードにコピーした時に最小化するように設定し、かつ最小化した時にロックするように設定してしまうと、クリップボードからペーストできない。最小化でのロックを諦め、無操作でのロックのタイムアウトをクリップボードのタイムアウトと揃えると良さそうだった。</p>
+
+<p>またiOSでメジャーな<a href="https://github.com/MiniKeePass/MiniKeePass">MiniKeePass</a>はKDBX v4をサポートしていないので、既存のデータベース・ファイルの設定は変えない方が良い。不安があるのなら編集をMiniKeePassで行うようにしても良いかもしれない。過去バージョンでデータベース・ファイルが壊れる不具合はかなりあったようなので、バックアップは — 安全なストレージがあるのならCSVファイルで — しておくべきだろう。</p>
+
+<hr>
+
+<p>ChromeやFirefoxとはデフォルトで連携可能になっている。もちろんブラウザー側で拡張（アドオン）をインストールする必要はあるが、それだけなので難しくない。<a href="https://github.com/pfn/keepasshttp">KeePassHttp</a>と比べるとセキュアな形でオートフィルされるらしい。Edge対応は難しそう（ループバック！）だが、頑張ってほしい。</p>
+
+<p>現時点でも足りなさそうな機能はあまりない。強いて挙げるなら2段階認証への対応だろうか。認証部分なので別にした方がセキュアだ、という考え方もありそうなので難しいところだ。とにかくKeePassであまり困っていない人くらいなら、CLIアプリケーションのためだけでも乗り換える価値はあるだろう。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[久しぶりにMSYS2のbashをやめてコマンド・プロンプトで活動している。といってもUnxUtilsは入れてしまったので、よくわからない環境になってしまったような気もしている。とにかくバックスラッシュが苦行だ。これさえ乗り切ればなんとかなりそう……なってくれないと困る。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/back-to-cmd.html</guid>
@@ -155,26 +187,6 @@
 <p>まだまだ「マークアップ」というフェーズは必要だと思っている。そこを機械的にどうにかできれば良いのかなとは思う。HTML文法が進化し続ける以上、記法ベースには限界があるので、コード・ハイライターのような中身ベースの仕組みだと良い。だが、ただの文章を扱うには大仰すぎる実装になりそうだ。だからMarkdownに落ち着いてしまうのだろう。</p>
 
 <p>そんなこんなで下書きからHTMLでマークアップして書くように戻っている。<code>img</code>要素の<code>height</code>や<code>width</code>属性を書くのが面倒くさい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[19世紀初頭のヨーロッパを舞台にして始まるテメレア戦記の既刊を読み終えた。ナポレオンがヨーロッパを制覇しつつある時代の小説だが、主戦力が歩兵・砲兵、そしてドラゴン、という小説だ。一応は現実の歴史を追ってはいるが、ドラゴンですべてどうにかされる。史上では気球で試みられるナポレオンのブリテン島上陸作戦はドラゴンで行われ、2度目には成功しちゃったりする。大変だ。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/temeraire.html</guid>
-        <link>https://hail2u.net/blog/temeraire.html</link>
-        <pubDate>Sun, 25 Mar 2018 23:35:34 +0900</pubDate>
-        <title><![CDATA[テメレア戦記]]></title>
-        <content:encoded><![CDATA[<figure class="hang">
-<a href="https://www.amazon.co.jp/%E3%83%86%E3%83%A1%E3%83%AC%E3%82%A2%E6%88%A6%E8%A8%98%E3%80%881%E3%80%89%E6%B0%97%E9%AB%98%E3%81%8D%E7%8E%8B%E5%AE%B6%E3%81%AE%E7%BF%BC-%E3%83%8A%E3%82%AA%E3%83%9F-%E3%83%8E%E3%83%B4%E3%82%A3%E3%82%AF/dp/4863325967/ref=as_li_ss_il?s=books&ie=UTF8&qid=1521986458&sr=1-1&keywords=%E3%83%86%E3%83%AC%E3%83%A1%E3%82%A2%E6%88%A6%E8%A8%98&linkCode=li2&tag=hail2unet-22&linkId=53f7130a43a6d0e2d29ff38375339850"><img alt="テメレア戦記〈1〉気高き王家の翼" height="500" src="https://images-fe.ssl-images-amazon.com/images/I/51bAP0sHruL.jpg" width="345"></a>
-</figure>
-
-<p>19世紀初頭のヨーロッパを舞台にして始まる<a href="https://www.amazon.co.jp/%E3%83%86%E3%83%A1%E3%83%AC%E3%82%A2%E6%88%A6%E8%A8%98%E3%80%881%E3%80%89%E6%B0%97%E9%AB%98%E3%81%8D%E7%8E%8B%E5%AE%B6%E3%81%AE%E7%BF%BC-%E3%83%8A%E3%82%AA%E3%83%9F-%E3%83%8E%E3%83%B4%E3%82%A3%E3%82%AF/dp/4863325967/ref=as_li_ss_il?s=books&amp;ie=UTF8&amp;qid=1521986458&amp;sr=1-1&amp;keywords=%E3%83%86%E3%83%AC%E3%83%A1%E3%82%A2%E6%88%A6%E8%A8%98&amp;linkCode=li2&amp;tag=hail2unet-22&amp;linkId=53f7130a43a6d0e2d29ff38375339850">テメレア戦記</a>の既刊を読み終えた。ナポレオンがヨーロッパを制覇しつつある時代の小説だが、主戦力が歩兵・砲兵、そしてドラゴン、という小説だ。一応は現実の歴史を追ってはいるが、ドラゴンですべてどうにかされる。史上では気球で試みられるナポレオンのブリテン島上陸作戦はドラゴンで行われ、2度目には成功しちゃったりする。大変だ。</p>
-
-<p>この小説の地球にはドラゴンがそれなりに繁殖している。ほぼすべてのドラゴンが空を飛べ、一部は炎を吐いたり、腐蝕性の酸を吐けたりと、頭数以外では生物の頂点に位置するようだ。知能もかなり高く、独自の言語をもつものもいれば、英語やフランス語をあっさり喋ったりもする。こういった基本性能の高さの割にはおおむね人間に隷属していたり、よくわからない。</p>
-
-<p>各巻が長いわりに展開はすごく遅い。メイン・シリーズをずっとナポレオンと戦ってるだけにしたら3巻くらいで終わりそうだ。ナポレオン戦争の終了で完結するらしい。Kindle版はおろか文庫本すらないので、買うのはためらうレベルの重さの本、という感想が一番大きい。</p>
-
-<hr>
-
-<p>那波かおりの翻訳した小説を読む機会が多い。好きとか嫌いとかは特にない。</p>]]></content:encoded>
       </item>
 
   </channel>
