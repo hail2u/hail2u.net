@@ -1,6 +1,7 @@
 const { execFile } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
+const sharp = require("sharp");
 const which = require("which");
 
 const execFileAsync = promisify(execFile);
@@ -28,17 +29,12 @@ const files = [
 ];
 const whichAsync = promisify(which);
 
-const generatePNG = async (inkscape, file) => {
-  await execFileAsync(inkscape, [
-    "-f",
-    file.src,
-    "-e",
-    file.dest,
-    "-w",
-    file.width
-  ]);
+const generatePNG = async (file) => {
+  await sharp(file.src).resize(file.width).toFile(file.dest);
   return file.dest;
 };
+
+const generatePNGs = () => Promise.all(files.map(generatePNG));
 
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
@@ -47,13 +43,10 @@ const generateFavicon = (convert, filepaths) =>
   execFileAsync(convert, [...filepaths, "../dist/favicon.ico"]);
 
 const main = async () => {
-  const [convert, inkscape] = await Promise.all([
+  const [convert, filepaths] = await Promise.all([
     whichAsync("convert"),
-    whichAsync("inkscape")
+    generatePNGs()
   ]);
-  const filepaths = await Promise.all(
-    files.map(generatePNG.bind(null, inkscape))
-  );
   await generateFavicon(convert, filepaths.filter(isFaviconSource));
 };
 
