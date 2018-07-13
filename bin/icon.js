@@ -1,10 +1,8 @@
-const { execFile } = require("child_process");
+const fs = require("fs-extra");
 const path = require("path");
-const { promisify } = require("util");
 const sharp = require("sharp");
-const which = require("which");
+const toIco = require("to-ico");
 
-const execFileAsync = promisify(execFile);
 const files = [
   {
     dest: "../tmp/favicon-16.png",
@@ -27,27 +25,25 @@ const files = [
     width: 180
   }
 ];
-const whichAsync = promisify(which);
 
 const generatePNG = async (file) => {
   await sharp(file.src).resize(file.width).toFile(file.dest);
   return file.dest;
 };
 
-const generatePNGs = () => Promise.all(files.map(generatePNG));
-
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
 
-const generateFavicon = (convert, filepaths) =>
-  execFileAsync(convert, [...filepaths, "../dist/favicon.ico"]);
+const readPNG = async (png) => 
+  fs.readFile(png, {
+    encoding: null
+  });
 
 const main = async () => {
-  const [convert, filepaths] = await Promise.all([
-    whichAsync("convert"),
-    generatePNGs()
-  ]);
-  await generateFavicon(convert, filepaths.filter(isFaviconSource));
+  const pngs = await Promise.all(files.map(generatePNG));
+  const srcs = await Promise.all(pngs.filter(isFaviconSource).map(readPNG));
+  const favicon = await toIco(srcs);
+  await fs.outputFile("../dist/favicon.ico", favicon);
 };
 
 process.chdir(__dirname);
