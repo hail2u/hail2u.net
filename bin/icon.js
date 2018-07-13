@@ -26,15 +26,17 @@ const files = [
   }
 ];
 
-const generatePNG = async (file) => {
-  await sharp(file.src).resize(file.width).toFile(file.dest);
+const generatePNG = async file => {
+  await sharp(file.src)
+    .resize(file.width)
+    .toFile(file.dest);
   return file.dest;
 };
 
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
 
-const readPNG = async (png) => 
+const readPNG = async png =>
   fs.readFile(png, {
     encoding: null
   });
