@@ -1,4 +1,4 @@
-const eyecatch = document.querySelector(".fill");
+const eyecatch = document.querySelector("body > main > article > h1 + figure");
 
 document.querySelector("footer").addEventListener("click", () => {
   if (eyecatch.hidden) {
