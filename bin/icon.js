@@ -36,7 +36,7 @@ const generatePNG = async file => {
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
 
-const readPNG = async png =>
+const readPNG = png =>
   fs.readFile(png, {
     encoding: null
   });
