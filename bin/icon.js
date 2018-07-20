@@ -36,10 +36,7 @@ const generatePNG = async file => {
 const isFaviconSource = filepath =>
   path.basename(filepath).startsWith("favicon-");
 
-const readPNG = png =>
-  fs.readFile(png, {
-    encoding: null
-  });
+const readPNG = png => fs.readFile(png, { encoding: null });
 
 const main = async () => {
   const pngs = await Promise.all(files.map(generatePNG));
