@@ -43,7 +43,6 @@ const files = [
   {
     dest: "../dist/index.html",
     json: "../src/index.json",
-    includeUpdates: true,
     itemLength: 10,
     src: "../src/index.mustache"
   },
