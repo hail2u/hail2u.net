@@ -35,20 +35,17 @@
         max-width: 41.033rem;
       }
 
-      h1,
-      h2 {
+      h1 {
         line-height: 1.25;
-        margin: 2.89rem 0 0;
       }
 
       header h1 {
         font-size: 1.7rem;
-        margin-top: 1.7rem;
+        margin: 1.7rem 0 0;
       }
 
       @media (min-width: 960px) {
         header h1 {
-          font-size: 1.953rem;
           margin-top: 4.913rem;
         }
       }
@@ -57,35 +54,47 @@
         margin: 1.7rem 0 0;
       }
 
-      h1 + p,
-      h2 + p {
+      h1 + p {
         margin-top: .588rem;
       }
 
-      header ol {
+      ol {
         margin: 1.7rem 0 0;
         padding-left: 1.7rem;
       }
 
       @media (min-width: 960px) {
-        header ol {
+        header nav ol {
           padding-left: 0;
         }
       }
 
-      header ol ol {
+      ol ol {
         margin-top: 0;
       }
 
       @media (min-width: 960px) {
-        header ol ol {
+        header nav ol ol {
           padding-left: 1.7rem;
         }
       }
 
+      main {
+        counter-reset: section;
+      }
+
+      main > section {
+        counter-reset: subsection;
+      }
+
       main > section > h1 {
-        font-size: 1.7rem;
-        margin-top: 4.913rem;
+        font-size: 1.53rem;
+        margin: 4.913rem 0 0;
+      }
+
+      main > section > h1::before {
+        content: counter(section) ". ";
+        counter-increment: section;
       }
 
       main > section > section::after {
@@ -98,9 +107,14 @@
       }
 
       main > section > section > h1 {
-        font-size: 1.563rem;
-        margin-top: 1.89rem;
+        font-size: 1.25rem;
+        margin: 1.89rem 0 0;
         padding-top: 1rem;
+      }
+
+      main > section > section > h1::before {
+        content: counter(section) "." counter(subsection) ". ";
+        counter-increment: subsection;
       }
 
       pre {
@@ -123,18 +137,6 @@
 
       code {
         font-family: "Menlo", "Consolas", monospace;
-      }
-
-      main > section > section > pre:first-of-type {
-        background-color: #fbb;
-      }
-
-      main > section > section > pre:nth-of-type(2) {
-        background-color: #bfb;
-      }
-
-      main > section > section > h2 {
-        font-size: 1.25rem;
       }
 
       em {
@@ -348,7 +350,6 @@
   ...
 &lt;/html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様では、DOCTYPEそのものに意味はほとんどありません。これは過去、現在、そして残念ながら未来のブラウザーとの互換性のためだけに存在します。ではこのDOCYPEを書かないとどうなるのでしょうか？</p>
           <p>ブラウザーには<a href="https://developer.mozilla.org/ja/docs/Quirks_Mode_and_Standards_Mode"><em>モード</em>というとても残念な仕組み</a>があり、そしてこれからもあり続けることでしょう。このモードは、標準仕様に基いてレンダリングすると表示が崩れてしまうウェブページを、HTMLを修正することなくどうにかうまく表示してやろうという対策の結果、生まれました。モードそのものは過去のしがらみとも言えますが、問題はこのモードの切り替えにDOCTYPEのあるなしが流用されているということです。その流用の結果、HTML文書へDOCTYPEを書かない場合に、仕様とは互換性のない形でレンダリングされてしまうという不幸な仕組みになってしまいました。</p>
           <p>仕様と互換性のないこのレンダリングについて正確に知ることは困難を極めます。単に昔の仕様に基づいたものであるだけでなく、過去のブラウザーにおけるバグをも内包するものだからです。つまりこのモードでレンダリングされてしまうと（DOCTYPEを書かないと）、どのようにレンダリングされるかは経験と勘というとても曖昧なものでしか判断できません。チーム開発では致命的でしょう。</p>
@@ -364,7 +365,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;!DOCTYPE html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>過去のHTML仕様ではDOCTYPEはもっと複雑なものでした。例えばHTML 4.01では、悪い例で挙げたようなDOCTYPEを書くことでようやくHTML 4.01 Strict DTDに基いてHTML文書が解釈されるように指示できます。現在のHTML仕様では、後方互換性を維持したままこの長いDOCTYPEを短くする方法を模索し、最終的に15文字という短いものに決まりました。この短さは書きやすいだけでなく、更新されることのない古いブラウザーでの安定した挙動を保証するものです。</p>
           <p>現在のHTML仕様では、短いDOCTYPEを出力できない、つまりもはや手を入れられないレガシーな仕組みに限り、この長い呪文のようなDOCTYPEを使っても良いとされています。こういった面からも長いDOCTYPEを書く必要はまったくないでしょう。</p>
         </section>
@@ -378,7 +378,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;!DOCTYPE html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>XHTML 1.xでは、XML 1.0にも従うことが要求されます。そのためXML宣言（またはプロローグ）と呼ばれる、悪い例として挙げたようなバージョンと文字エンコーディングを指定するための文字列をDOCTYPEの更に前に書くことが望ましいとされていました。またそう書くことでHTML文書がXML文書として、つまりXHTML 1.xと高い互換性を維持して解釈されることが期待できます。</p>
           <p>仕様ではXHTML構文として章が割かれているため、あたかもXHTML 1.xに準じた形でHTML文書を書きたい場合に、XML宣言が必要に思えますが、実際にはそうではありません。なぜなら仕様でHTML構文の方にもXHTML 1.xの機能や特徴のいくつかが取り込まれているからです（全てではありません）。例えばXHTML 1.xで最もわかりやすい特徴といえる空要素の閉じ方がそうです。</p>
           <pre><code class="language-html">&lt;hr&gt;
@@ -397,7 +396,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;p&gt;&lt;small&gt;Copyright © 2014 W3C&lt;sup&gt;®&lt;/sup&gt;&lt;/small&gt;&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01では、HTML文書で利用している文字コードで表現できない文字は文字参照を使うとされていました。そのため、シフトJISやEUC-JPが主に利用されていた日本では、自然と文字参照を使う機会は多くなっていました。</p>
           <p>現在のHTML仕様では、文字参照についての項は大幅に削減されています。</p>
           <blockquote>
@@ -415,7 +413,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;h1&gt;The &amp;quot;&amp;amp;&amp;quot; character&lt;/h1&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>いくつかの文字は文字参照を使う必要があります。正確には文字参照を使わなければならない場合にのみ使えば良いのですが、その条件はかなり複雑なものです。そういった条件をきちんと正確に理解することは大切ですが、常に文字参照を使ってエスケープするとしておくのが確実でしょう。</p>
           <p>文字参照にする必要がある文字は以下の5つです。</p>
           <table>
@@ -458,7 +455,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;p&gt;This book can read in 1&amp;#xA0;hour.&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML文書において特別な意味を持つ文字以外にも、いくつかの文字は文字参照を使った方が無難な場合があります。例えばemスペースやゼロ幅スペースなどがそうです。これらは、エディター等のソフトウェア上で、通常の空白文字とまったく区別がつきません。そのため必要なのにも関わらず消されてしまったり、また不必要なのにも関わらず他へコピーされてしまったりします。</p>
           <p>このようなホワイトスペース文字だけでなく、ユニコードでは様々な図形表現を持たない特殊用途文字が存在し、場合によってはそれらを利用する必要が出てきます。文字参照でエスケープすることで、そのような特殊な制御文字の存在を明示でき、よりわかりやすいHTML文書となるはずです。例えば以下の文字は文字参照の方が無難でしょう。enスペースは半角スペースと、emスペースは全角スペースと区別がつかないですし、ゼロ幅スペースはその存在を認識できないからです。</p>
           <table>
@@ -504,7 +500,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;!-- This section is non-normative --&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>コメントは比較的自由に書けます。数少ない制限のひとつとして、コメント内の最初と最後に使えない文字（列）があります。具体的には以下の3つです。</p>
           <ol>
             <li>&gt;で開始</li>
@@ -528,7 +523,6 @@
   &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML文書では、いくつかのルールに従って終了タグ（閉じタグ）を省略できます。<code>img</code>要素のようにそもそも終了タグを持たない要素もあります。仕様では、各要素の説明で「Tag omission in text/html（text/htmlにおけるタグ省略）」としてすべて解説されており、それに従って省略することになります。</p>
           <p>例えば<code>p</code>要素では、ほとんどの場合で終了タグを省略することが可能です。</p>
           <pre><code class="language-html">&lt;p&gt;吾輩は猫である。名前はまだない。
@@ -555,7 +549,6 @@
           <pre><code class="language-html">&lt;img alt=&quot;HTML Best Practices&quot; src=&quot;/img/logo.png&quot;&gt;
 &lt;hr&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><a href="#dont-use-xml-declaration">XML宣言の項</a>において述べたように、現在のHTMLではXHTML 1.1の機能や特徴をいくつか取り込んでいます。空要素の書き方はその1つで、XHTML 1.1のようにスラッシュを追加して閉じても間違いではありません。</p>
           <pre><code class="language-html">&lt;hr&gt;
 &lt;br/&gt;
@@ -573,7 +566,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;h1 class=&quot;title&quot;&gt;HTML Best Practices&lt;/h1&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様によると、タグの最後や属性値の前後、属性名と属性値をつなぐ等号の前後には空白を入れることが可能です。タグの先頭には空白を入れることはできませんが、他ではかなり自由にタブや改行を含めた空白を任意に挿入できます。</p>
           <p>悪い例は極端なものですが、等号の前後や属性値の前後に空白を入れたHTML文書を見かけることはあるでしょう。こういった空白は任意の数を挿入できるので、うまく使えば読みやすくなるかもしれません。例えば、属性ごとに改行を入れて整形したHTMLコードを見かけることはあるでしょう。しかし、その読みやすさが他人の賛同を得られるかどうかは未知で、逆に読みづらいととらえる人もいるかもしれません。</p>
           <p>空白を入れることなく書かれているHTMLコードが一般的に多いことは感覚的にわかるはずです。そのことを考慮すると、良い例で挙げたような書き方をしておけばすくなくとも読みづらいとは思われないでしょう。</p>
@@ -590,7 +582,6 @@
           <p>同じく良い例:</p>
           <pre><code class="language-html">&lt;A HREF=&quot;#general&quot;&gt;General&lt;/A&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>複数の開発者により書かれる場合に限らず、タグの書き方に一貫性がないHTML文書を見かけることはよくあります。その一貫性のなさは要素同士だけでなく、開始タグと終了タグ、要素名と属性名でもあります。</p>
           <pre><code class="language-html">&lt;P&gt;W3Cについて、より詳しくは
 &lt;a Href=&quot;http://www.w3.org/&quot;&gt;W3CのWebサイト&lt;/A&gt;
@@ -612,7 +603,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;img alt=&quot;HTML Best Practices&quot; src=&quot;/img/logo.jpg&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>要素の各属性は空白文字で区切られるため、必要に応じてその値は引用符で括ります。しかしながら引用符は省略できない場合もあるため、なるべくあらゆる属性値は下記のいずれかの引用符を使って括ると良いでしょう。テキスト・エディターの構文強調においても有利に働くことも見逃せません。</p>
           <ol>
             <li>&#39;一重引用符&#39;</li>
@@ -637,7 +627,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;input name=&quot;q&quot; type=&quot;search&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>要素の属性を区切る空白文字は、1つ以上ならいくつでも許可されています。悪い例で挙げたように半角空白を3つ入れても間違いではありません。この文法上のルールを利用すると、様々な形でHTMLを整形することが可能です。</p>
           <pre><code class="language-html">&lt;input
         class=&quot;q&quot;
@@ -660,7 +649,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;audio autoplay src=&quot;/audio/theme.mp3&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>属性の多くは不定の値を取りますが、中には真偽値を取る属性もあります。例えば<code>input</code>要素における<code>checked</code>属性はHTML 4.01から存在した真偽値を取る属性です。真偽値を取る属性では、その値に属性名をそのまま指定するか、空文字列を指定することで有効にできます。</p>
           <pre><code class="language-html">&lt;input checked=&quot;checked&quot; disabled=&quot;&quot; type=&quot;checkbox&quot;&gt;
 </code></pre>
@@ -683,7 +671,6 @@
   ...
 &lt;/svg&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTMLでもXHTML 1.xのように名前空間を指定して拡張できます。XML構文を使う必要がありますが、今まで通り<code>xmlns</code>属性を使うだけです。しかし、XHTML 2.0の策定が頓挫した理由の1つとして、柔軟な拡張がそれほど求められていなかったことが挙げられるように、名前空間を指定してまで拡張する機会はまずないはずです。</p>
           <p>比較的利用する機会があると考えられたMathMLや、存在感を増してきたSVGに関しては、限定的ではありますがインラインでそのまま利用できるように仕様で定義されています。そのため、悪い例で挙げたように指定する必要はまったくありません。</p>
         </section>
@@ -696,7 +683,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;span lang=&quot;ja&quot;&gt;...&lt;/span&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>XHTML 1.xでは、必要に応じてXML属性も併記する必要がありました。例えば<code>lang</code>属性を使用する場合には、悪い例で挙げたように同じ値の<code>xml:lang</code>属性も併記する、と指示されています。</p>
           <p>現在のHTMLでは、この<code>lang</code>属性と<code>xml:lang</code>属性についてわざわざ項が割かれています。おおまかに抜粋すると、HTML文書では書いてはならないとされており、XML文書でも書いても良い（MAY）程度に変更されています。</p>
           <p>HTML文書を書き、<a href="#omit-namespaces">名前空間を使わないと</a>、事実上<code>xml:lang</code>属性以外にXML属性が使われそうな状況はありません。良い例で挙げたように書くべきです。</p>
@@ -710,7 +696,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;img alt=&quot;HTML Best Practices&quot; src=&quot;/img/logo.png&quot; data-width=&quot;88&quot; data-height=&quot;31&quot; itemprop=&quot;image&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様では、MicrodataやRDFa Liteのための属性や、ユーザーが独自に定義することのできるカスタムデータ属性を、前置きなしで（<code>head</code>要素の<code>profile</code>属性を使って定義したりせずに）そのまま書けるようになりました。具体的な使い方については触れませんが、漫然と追加すれば良いというわけではありません。</p>
           <p>例えば良くあるコーディング規約として<em>属性をアルファベット順に記述する</em>というものがあります。それに忠実に従ってカスタムデータ属性やMicrodataの属性を要素に追加すると、悪い例で挙げたようなコードになります。カスタムデータ属性は<code>data-</code>で必ず始まり、Microdataの属性は<code>item</code>で必ず始まるので、このように要素ごとの属性の間に挟まってしまうでしょう。ある程度はまとまっていますが、要素ごとの属性が分断されてしまっていると、どのような属性が指定されているのか把握しづらくしてしまいます。</p>
           <p>良い例で挙げたように、まずはそれぞれの要素ごとに定義されている属性を書くと、そこでその要素がどういう振る舞いをするのかが概ね決定できるので、どのような意図を持った要素なのかが明確になります。続けてカスタムデータ属性はカスタムデータ属性でまとめ、Microdataの属性もMicrodataの属性でまとめて書くようにするのが良いでしょう。</p>
@@ -732,7 +717,6 @@
 
 &lt;hr&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様では、それぞれの要素がどのような機能を持つのかをWAI-ARIAと連携する形で定義されています。これにより定義されているデフォルトの機能と、実際にドキュメント上で提供する機能とが食い違っている場合、<code>role</code>属性でその役目をきちんと教えてやる必要があります。そうすることでよりアクセシブルなHTML文書を作成できるでしょう。</p>
           <p>しかし、<code>role</code>属性を使えば自由に要素の機能を変えられるわけではありません。多くの要素は限られたいくつかの機能の中から1つ指定するだけにとどまります。例えば<code>a</code>要素に<code>article</code>ロールは割り当てられません。中には仕様で定義されているデフォルトの機能以外に変更することはできない要素もあります。こういった変更できない<em>強いネイティブセマンティクス</em>を持つ要素では、事実上<code>role</code>属性を使うことはできません。</p>
           <p>ブラウザーにおいて、現在のHTML仕様への準拠がまだまだ進んでいなかった時代には、悪い例で挙げたように書いていましたが、もはやこのように書く必要はないでしょう。良い例で挙げたように何も指定せずとも<code>nav</code>要素がデフォルトで持つ<code>navigation</code>ロールが割り当てられるはずです。アクセシブルなHTML文書のためには他にも気をつけることは色々ありますが、少なくとも余計な混乱を招かないよう、無駄な<code>role</code>属性をできる限り省くことは意識すると良いでしょう。</p>
@@ -749,7 +733,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;html lang=&quot;en-US&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML文書はどのような言語でも書くことができます。もちろんタグに関しては主にアルファベットと記号の組み合わせになりますが、コンテンツは英語であろうと日本語であろうと、ヴィラモヴィアン語であろうと、はたまたマンダロリアン語であろうと構いません。ただしどのような言語で書かれているのかを<code>lang</code>属性を使ってユーザー・エージェントやユーザーに教えてやる必要はあります。</p>
           <pre><code class="language-html">&lt;html lang=&quot;en-GB&quot;&gt;
   ...
@@ -776,7 +759,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;html lang=&quot;ja&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>英語のHTML文書では、まず<code>html</code>要素の<code>lang</code>属性で言語タグを使って、英語であることを明示します。</p>
           <pre><code class="language-html">&lt;html lang=&quot;en-US&quot;&gt;
   ...
@@ -808,7 +790,6 @@
 ...
 &lt;strong class=&quot;warning&quot;&gt;Do not wash!&lt;/strong&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML要素にはそれぞれ多くの属性があらかじめ定義されています。仕様では何をどうやって表現するための属性かきちんと定められているので、（対応しているのならば）どのようなツールからもきちんと解釈してもらえることが期待できるでしょう。</p>
           <p>カスタム・データ属性は便利で手軽ですが、あくまでも自身のJavaScriptやCSSから扱われるべきものです。ブラウザーやスクリーン・リーダーがそれらをうまく扱えることは期待することはできません。悪い例で挙げたようなコードは、仕様で定義されている属性で表現できるはずです。</p>
           <p>良い例で挙げたように、なおかつ仕様の実装例に従うと、複雑なケースもうまく処理してもらえる可能性が高くなるでしょう。</p>
@@ -830,7 +811,6 @@
   &lt;title&gt;HTML Best Practices&lt;/title&gt;
 &lt;/head&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様では<code>title</code>要素は場合によって省略できる、とされています。タイトルが必要とされないような文書の場合がそれにあたり、具体的な例として、仕様では<code>head</code>要素の項で以下のように言及されています。</p>
           <blockquote>
             <p>上位プロトコルがタイトル情報、たとえばHTMLが電子メールのオーサリング形式として使用されるときの電子メールの件名が提供される場合、title要素は省略できる。</p>
@@ -856,7 +836,6 @@
   ...
 &lt;/head&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>base</code>要素でHTML文書内のハイパーリンクの挙動を一括して変更できます。<code>href</code>属性はその解決に、<code>target</code>属性はその開き方に、それぞれ変更が加わります。うまく使えばHTML文書全体でのURLの書き方などを簡潔にできるでしょう。しかしその反面、<code>a</code>要素や<code>form</code>要素などを書く時は、常に<code>base</code>要素にどのような値が指定されているかを意識しなくてはなりません。</p>
           <p>今は断片的なHTML文書を書き、何かしらのツールがそれらをまとめ、ウェブページとして完成させる時代です。そのような環境で、他の断片的なHTML文書に書かれている（かもしれない）<code>base</code>要素を意識するのは苦痛でしょう。あるひ突然削除されているかもしれません。</p>
           <p><code>href</code>属性の利用は、外部のリソースには意味がありません。内部リソースにはスラッシュで始まる絶対パスを、外部リソースには<code>https:</code>などで始まる絶対URLを利用するのが単純でわかりやすいはずです。</p>
@@ -875,7 +854,6 @@
 &lt;link href=&quot;/feed&quot; rel=&quot;alternate&quot; type=&quot;application/rss+xml&quot;&gt;
 &lt;link href=&quot;/css/screen.css&quot; rel=&quot;stylesheet&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>a</code>や<code>link</code>要素では<code>type</code>属性でリソースのMIMEタイプを指定できます。この指定によりユーザーが直接恩恵を受けることはほとんどありません。しかし、例えばブラウザーが指定したMIMEタイプをサポートしていない場合、外部リソースを無理に表示しようとせずローカルにファイルとしてダウンロードさせるだけに留めるという安全な挙動をしてもらえます。</p>
           <p>また、この仕組みを応用した具体的な実装として<a href="http://www.rssboard.org/rss-autodiscovery">RSS Autodiscovery</a>があります。RSS AutodiscoveryはウェブページのRSSバージョンのURLを機械的に探せるようにする仕組みの仕様です。この仕様では、別バージョンであることを示す<code>rel=alternate</code>に加えて、RSSファイルの公式MIMEタイプである<code>application/rss+xml</code>を指定することで、RSSバージョンのURLであることを明示できます。こうすることでブラウザーからフィード・リーダーへの登録を自動化できるわけです。この仕様は少し拡張されHTML仕様にも取り込まれています。</p>
           <p>逆に（アイコン形式の）ファビコンやCSSファイルなどの既知で扱いが安定しているものへは指定する必要はありません。</p>
@@ -889,7 +867,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;!-- Place &grave;favicon.ico&grave; in the root directory. --&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>ブックマークを始め、タブ、スマートフォンのホーム画面でのアイコンなど、ファビコンは様々な場面で使われます。古くからあったこの機能は、仕様でも触れられており、<code>link</code>要素の<code>rel</code>属性で<code>icon</code>という値を指定することで明示的に参照するようになっています。またオプションとしてメディア・タイプや縦横サイズも合わせて指定できるようになってもいます。しかしこのような参照は冗長と言えるでしょう。</p>
           <p>そもそもこの機能が実装された当時より、ドメインのルートにある<code>favicon.ico</code>というファイルを強制的に探すようになっていました。そのためほとんどすべてのブラウザーが<code>favicon.ico</code>というファイル名でファビコンを置くだけで機能するようになっています。つまり、わざわざ指定しなくても機能します。</p>
           <p>指定しない場合、パフォーマンスという観点でもメリットがあります。<code>link</code>要素を使ってファビコンを指定してしまうと、ブラウザーがその<code>link</code>要素をパースした直後にファビコンを読みに行くのに対し、書かない場合は、ウェブページの読み込みが完了した後にドメインのルートにある<code>favicon.ico</code>というファイルを探しに行きます。ファビコンはウェブページの閲覧においてクリティカルなものではないので、このように遅延読み込みされるとウェブページの表示が少し改善するでしょう。</p>
@@ -904,7 +881,6 @@
           <p>Good:</p>
           <pre><code class="language-html">&lt;link href=&quot;/apple-touch-icon.png&quot; rel=&quot;apple-touch-icon&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>iOSで最初にサポートされたタッチ・アイコンは、長らく暗黙的に探すパスが決まっていました。つまりファビコンと同じようにわざわざリンクを追加する必要はなかったわけです。しかしiOS 8でその挙動に変更が加わりました。今はまた変わっているかもしれませんし、こういった変更がもうないとは言い切れない状況に変化しました。</p>
           <p>リンクがない場合に探しに行くようになっているため、リンクしないことはパフォーマンスの面でもメリットはありません。良い例で挙げたように素直に指定すると良いでしょう。後方互換性を意識して、パスは<code>/apple-touch-icon(-precomposed).png</code>にしておくのも悪くありません。</p>
         </section>
@@ -919,7 +895,6 @@
           <pre><code class="language-html">&lt;link href=&quot;/css/screen.css&quot; rel=&quot;stylesheet&quot;&gt;
 &lt;link href=&quot;/css/high-contrast.css&quot; rel=&quot;alternate stylesheet&quot; title=&quot;High contrast&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>スタイルシートはHTML文書の体裁を整えるために使用します。場合によっては特定のユーザーへ別のスタイルシートを提供したいこともあるでしょう。しかし、<code>media</code>属性やCSSの<code>@media</code>ルールを駆使してデバイスの特性に応じて切り替えることや、ユーザーエージェント文字列を利用してサーバーサイドで動的に切り替えることには限界があります。そういった場合にも<em>代替スタイルシート</em>という手段を使って専用のスタイルシートを提供できます。</p>
           <p>悪い例の2行目ではコントラストを大幅に高めたスタイルシートを提供しようとしています。このように<code>rel</code>属性で<code>alternate</code>と<code>stylesheet</code>の2つのキーワードを組み合わせて指定することで、ブラウザーは代替スタイルシートとして認識し、デフォルトでは反映しません。</p>
           <p>ブラウザーでの切り替え操作はブラウザーによって違います。例えばFirefoxではメニューから切り替えられるようになっており、必要とするユーザーはそのありかを知っているので、比較的容易に切り替えることができることでしょう。他のブラウザーでは拡張をインストールする必要があるかもしれません。</p>
@@ -941,7 +916,6 @@
   ...
 &lt;/section&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>a</code>や<code>link</code>要素の<code>href</code>属性はHTML文書のURLを基準にして解決されます。つまり絶対URLでなくても良く、JavaScriptなどで走査する時に解決済みのURLを得られます。対して<code>meta</code>要素の<code>content</code>属性は汎用的な値をとるため、URLを指定したい場合は必ず絶対URLであるべきです。そうでないとURLの解決を自前で実装する必要が出てくるでしょう。つまり、URLとしてマークアップしたいのならば、URLとして解決されるであろう<code>link</code>要素の<code>href</code>属性を使うべきだ、と言い換えられます。</p>
           <p>Facebookのいいねボタンのように、<code>meta</code>要素の利用が義務付けられている場合はしょうがありませんが、そうでないならば<code>link</code>要素などを使い絶対パスでURLを指定した方が効率的です。<code>https:</code>の「s」を忘れるようなケアレスミスも減ることでしょう。</p>
         </section>
@@ -959,7 +933,6 @@
   &lt;title&gt;HTML Best Practices&lt;/title&gt;
 &lt;/head&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#use-utf-8">UTF-8を使う</a>」を参照してください。</p>
         </section>
         <section id="dont-use-legacy-character-encoding-format">
@@ -971,7 +944,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;meta charset=&quot;UTF-8&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01でももちろん文字コードを指定できましたが、それはHTTPヘッダーを介して行うものでした。具体的には、悪い例で挙げたようにContent-Typeヘッダーの<code>charset</code>パラメーターを通して指定していました。</p>
           <p>実は現在のHTMLでもこのように記述できます。しかしかなり古いブラウザーでも先述の簡潔な記述による文字コード指定を適切に解釈してくれるので、もはやこのような長い<code>meta</code>要素を書く必要はありません。良い例で挙げたような簡潔な記述がなぜ古いブラウザーでもうまく解釈されるかというと、それには歴史的な事情があります。</p>
           <p>多くの人々はあまり正確にHTMLを記述せず、例えば必要にも関わらず属性の値を括る引用符をよく省略してしまいました。</p>
@@ -996,7 +968,6 @@
   ...
 &lt;/head&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>文字コードの指定は<code>head</code>要素内で行う必要がありますが、その位置までは明確な規定はありません。しかしなるべく先頭、できれば一番最初に指定しておくべきでしょう。それはブラウザーの文字コード自動判別機能と密接な関係があります。</p>
           <p>ブラウザーの文字コード判別はHTMLドキュメント全体を読み込んでから行われるとは限りません。あるブラウザーはファイルの先頭部分のみから判別を行います。また、<code>title</code>要素が文字コード指定より前にあると、うまく判別できないという問題もかつてありました。そのため<a href="https://html.spec.whatwg.org/multipage/semantics.html#charset">ファイルの先頭から1024バイトまでに書くように制限</a>されています。</p>
           <p>現在のHTML仕様では、DOCTYPE宣言他、多くの記述がシンプルになってはいます。そのため特に何も考えずに書いても1024バイトまでに収まることでしょう。しかし、良い例で挙げたように<code>head</code>要素の先頭に書くと決めておけば、確実に達成できます。</p>
@@ -1010,7 +981,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;meta charset=&quot;UTF-8&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTMLはそれだけではなく、CSSやJavaScriptと共に配信されるものです。そのためそれらは密接に関わり合うことになります。それは単に機能や見た目でというだけでなく、コードというレベルでもそうです。その代表的な関わり合いのひとつがファイルの文字コードでしょう。</p>
           <p>ウェブでは様々な文字コードが用いられていました。過去にはほとんどの人がWindowsのパソコンで制作していたこともあり、よくシフトJISが利用されていましたが、CGIによるサーバーサイドでの動的なウェブページの作成においては多くの問題が起こるため、そういったウェブページではEUC-JPが使われていました。</p>
           <p>シフトJISとEUC-JPのどちらが優れているかは様々な問題が絡むため一概には言えませんでしたが、現在はUnicodeの符号化形式のひとつであるUTF-8が広く使われるようになっています。シフトJISやEUC-JPのように明らかなデメリットがないので、余程の理由がない限りはUTF-8でHTML文書は書くべきでしょう。</p>
@@ -1030,7 +1000,6 @@
   ...
 &lt;/style&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTMLでは、CSSやJavaScriptを使って、HTMLだけでは実現できない多彩な表現や機能を提供できます。その場合、<code>style</code>や<code>script</code>要素を利用してCSSやJavaScriptをHTMLに追加することになります。</p>
           <p>これまでは、悪い例で挙げたように<code>type</code>属性を使ってスタイルとスクリプトに使う言語を<em>必ず</em>明示する必要がありました。HTML 4.01では<code>type</code>属性が必須とされており、かつデフォルトの値が決まっていなかったからです。対して現在のHTMLでは<code>style</code>と<code>script</code>要素の内容は、それぞれデフォルトでCSSとJavaScriptとして解釈されることが明文化されました。</p>
           <p>CSSとJavaScriptを使うならば良い例で挙げたように<code>type</code>属性を省略できます。もしかすると将来的には<code>type</code>属性を使ってより高度なスタイル言語やスクリプト言語を利用できるかもしれません。その場合には適切なMIMEタイプを指定する必要があるのることは頭に入れておきましょう。</p>
@@ -1050,7 +1019,6 @@
   ...
 &lt;/style&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#dont-comment-out-contents-of-script-element"><code>script</code>要素の中をコメントアウトしない</a>」を参照してください。</p>
         </section>
         <section id="dont-mix-tag-for-css-and-javascript">
@@ -1071,7 +1039,6 @@
 &lt;script src=&quot;/js/main.js&quot;&gt;&lt;/script&gt;
 &lt;link href=&quot;/css/screen.css&quot; rel=&quot;stylesheet&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>CSSファイルを参照する<code>link</code>要素やJavaScriptファイルを参照する<code>script</code>要素の記述順は特に決められていません。規模の大きなウェブサイトでは時に無作為に並べて書かれていることが多いようです。またCSSフレームワークやJavaScriptライブラリーを利用している場合も、悪い例で挙げたように分散してしまいます。</p>
           <p>古いブラウザーではそのように書くとJavaScriptファイルの読み込みと実行で逐一ブロックされてしまうため、CSSファイルやJavaScriptファイルが並列ダウンロードされず、ウェブページの読み込みに時間がかかってしまいます。そのため最初の良い例で挙げたようにCSSファイルを先に読ませるように書くべきとされていました。しかし現行のブラウザーには<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Optimizing_your_pages_for_speculative_parsing">Speculative Parsing</a>という仕組みが実装されており、バラバラに書いてもきちんと並列ダウンロードされます。こういった点ではそれぞれまとめるこのような書き方の意味は少なくなりました。</p>
           <p>それでもCSSファイルをできうる限り早く読み込ませることで、そのパースが早く終わり、結果としてウェブページのレンダリング開始が早くなります。ブラウザーでは並行ダウンロードできる数に制限があることから、なるべくCSSファイルを優先して読み込ませるようにまとめて先に書くのはまだ有効なテクニックだと言えるでしょう。</p>
@@ -1102,7 +1069,6 @@
   &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様ではやや難しい言い回しになっていますが、<code>body</code>タグは開始・終了ともに省略できます。<code>body</code>要素の最初が空白文字やコメントでなく、かつ特定の要素でもない場合に省略でき、ユーザー・エージェントはその位置に<code>body</code>要素を補完します。悪い例で挙げたようなコードでも、最近のブラウザーの開発者ツールの類で確認すると、<code>head</code>要素の終了タグの直後に<code>body</code>要素が追加されていることでしょう。この補完においては古いブラウザーのバグもありますが、もうこの点を気にすることはありません。</p>
           <p>しかしJavaScriptによりHTML要素が追加されたりした結果、思ってもみない位置に<code>body</code>要素が補完されてしまうかもしれません。自身で書いたJavaScriptファイルではそのようなことはないでしょうが、サードパーティー製のウィジェットを導入するJavaScriptファイルでは十分にありえます。今は大丈夫でも、その更新により突然そうなることもありえるでしょう。</p>
           <p><code>html</code>や<code>head</code>要素を含め<code>body</code>要素も常に書くというルールは一般的で、わかりやすさという点でも多少メリットがあると考えられます。デメリットがないことと、少しではありますがバグに嵌る可能性があることを合わせて考えると、必ず書くと決めると簡単でしょう。ページ・サイズの節約などという観点で省略したい場合は、何かしらのツール（例えば<a href="http://kangax.github.io/html-minifier/">HTML minifier</a>やCDNの最適化機能）を使って自動化するべきです。</p>
@@ -1120,7 +1086,6 @@
           <pre><code class="language-html">&lt;h1&gt;HTML Best Practices&lt;/h1&gt;
 &lt;p&gt;For writing maintainable and scalable HTML documents.&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様で挙げられているような例がピッタリくるようなコンテンツなら利用を考えても良いでしょう。しかし、現実としてなかなかそういう機会はありません。また、歴史的な事情から<code>hgroup</code>要素はほとんど使われていません。</p>
           <p>この状況が容易に変化するとも思えず、あえて使うこともないでしょう。</p>
         </section>
@@ -1133,7 +1098,6 @@
           <p>良い例:</p>
           <pre><code class="language-html">&lt;address&gt;Contact: &lt;a href=&quot;https://twitter.com/hail2u_&quot;&gt;Kyo Nagashima&lt;/a&gt;&lt;/address&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>歴史的に<code>address</code>要素は様々な文章に使われてきました。元々HTML 4.01でも連絡手段のためのみとされていましたが、例示が悪く、付随する情報なども書いて良いものに見えたからです。悪い例で挙げたような著作権関連の情報への利用や、他には最終更新日の言及などがその例でしょう。</p>
           <p>しかし、現在のHTML仕様では、厳格に連絡手段だけになりました。合わせて利用例も修正されたので、難しいことはないでしょう。最終更新日などへの言及も例示付きではっきりと禁じられています。</p>
           <p>厳格化された理由に、ウェブページが複数人で運営されることが多くなったことがあります。そういった場合にセクションごとに<code>address</code>要素を使うことで、それぞれの文責を明確にできるわけです。</p>
@@ -1153,7 +1117,6 @@
           <pre><code class="language-html">&lt;pre&gt;&amp;lt;!DOCTYPE html&amp;gt;
 &lt;/pre&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>改行が意味を持つ唯一の要素として<code>pre</code>要素があります。特に何もしなければ、この要素では改行は改行としてそのまま扱われ、ブラウザー上でも改行されます。ただし例外があり、<em>開始タグ直後の改行文字1つ</em>だけは削除されてしまいます。</p>
           <pre><code class="language-html">&lt;pre&gt;&lt;code&gt;
 
@@ -1187,7 +1150,6 @@ function isArray(o) {
   &lt;p&gt;For writing maintainable and scalable HTML documents.&lt;/p&gt;
 &lt;/blockquote&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>blockquote</code>要素は、主に他のウェブページなどからの引用に使います。仕様の例示ではフォーラムでの投稿への返信にも使っていますが、それはかなり特殊なケースだと考えて良いでしょう。</p>
           <p>引用ということは改変することは許されません。省略くらいは許可されるでしょうが、段落であれば段落として、そのまま持ってくるべきです。ウェブページからならば元のマークアップを維持するべきですし、紙の文献からならば適切にマークアップすることになるでしょう。いずれにしても悪い例で挙げたように中身がプレーンテキストではありません。</p>
           <p>引用対象がプレーンテキストや実生活での会話である場合、<code>p</code>要素を始めとしたHTML要素で適切にマークアップすることが難しいかもしれません。そういった限られたケースではプレーンテキストでの引用にならざるを得ませんが、概ね良い例で挙げたようにマークアップしてやるべきです。</p>
@@ -1218,7 +1180,6 @@ function isArray(o) {
   &lt;figcaption&gt;— HTML Best Practices&lt;/figcaption&gt;
 &lt;/figure&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様でも2つの例示を通して帰属情報（引用元）のわかりやすい併記を行う方法を解説しています。<code>blockquote</code>要素は引用を意味し、その中には引用そのものしか含められないからです。悪い例で挙げたように書くとまとまっていますが、2つの<code>p</code>要素の扱いの違いを機械的に判断することは難しく、人ならぬ何かには混乱をもたらしてしまうかもしれません。</p>
           <p>良い例で挙げたように必ず<code>blockquote</code>要素の外に出してやりましょう。これでも引用と引用元の対応関係は必ずしも明確ではありませんが、仕様で実装例として触れられていることから、適切に解釈されることを期待しても良いはずです。対応関係を明確にしたい場合は、冗長ですが、<code>figure</code>と<code>figcaption</code>要素を使うと良いでしょう。</p>
         </section>
@@ -1238,7 +1199,6 @@ function isArray(o) {
   ...
 &lt;/ul&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>リスト項目や表のセル、メニュー項目などは、複数のデータ等を並列して列挙するために使われます。リスト項目やメニュー項目は、通常、項目ごとに縦並びでレンダリングされるため、良い例で挙げたように、1行に1つずつ書いてやるとより読みやすいHTML文書となるでしょう。</p>
           <pre><code class="language-html">&lt;ol&gt;
   &lt;li&gt;東京都&lt;/li&gt;
@@ -1288,7 +1248,6 @@ function isArray(o) {
   &lt;/ol&gt;
 &lt;/body&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>ol</code>要素を使い序列のあるリストを作成できますが、場合によってはデフォルトのアラビア数字以外をマーカーとして使いたいこともあるでしょう。このマーカーはCSSで<code>list-style-type</code>プロパティーを利用すると高度に制御できます。しかし、このCSSによるマーカーのスタイリングは、前後の段落でリストの項目を参照する時に問題が起こります。</p>
           <p>前後の段落ではマーカーに使われた数字や文字を使って参照することになります。通常、CSSで当てたスタイルを前提として参照するわけです。例えば「いろは～」をマーカーにした場合、前後では「条件『ろ』においては～」などと書くことでしょう。しかし、何らかの理由でCSSが無効になっていると、参照に使われた文字と、実際に表示されているマーカーが食い違ってしまうことになります。</p>
           <p><code>ol</code>要素には<code>type</code>属性として何種類かマーカーのプリセットが用意されています。これを利用すればそういった食い違いは起こりません。残念ながら日本語向けのプリセットは用意されていませんが、できる限りこれらのプリセットを利用することで、環境に依存しないHTML文書を提供できます。</p>
@@ -1322,7 +1281,6 @@ function isArray(o) {
 &lt;p&gt;Costello: When you pay off the first baseman every month, who gets the money?&lt;/p&gt;
 &lt;p&gt;Abbott: Every dollar of it.&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01では、<code>dl</code>要素の利用例として会話をマークアップできる、と明言されていました。しかし現在のHTMLでは、会話のマークアップには不適切であると明言されました。元々あまり会話のマークアップに利用されていませんでしたが、現在のHTML仕様で加わった破壊的な変更のひとつであることや、<code>dl</code>要素が「名前と値」の組み合わせに限定されるという意識を強くするためにも覚えておくべきでしょう。</p>
           <p>会話のマークアップについては適当なマークアップ方法は明示されていません。仕様では<a href="https://html.spec.whatwg.org/multipage/semantics-other.html#conversations">いくつかの案</a>が提示されており、良い例で挙げたものはそのひとつです。会話がどういう文脈で扱われているか、に依存して適切な要素は変化するので、慎重にマークアップしましょう。</p>
         </section>
@@ -1343,7 +1301,6 @@ function isArray(o) {
   &lt;figcaption&gt;“HTML Best Practices” Cover Art&lt;/figcaption&gt;
 &lt;/figure&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>figcaption</code>要素は必須ではありませんが、多くの場合は書くことでしょう。<code>figure</code>及び<code>figcaption</code>要素は図や画像の注釈にだけでなく、あるコンテンツ（群）へ明示的にキャプションを提供するためにも使われるからです。<code>figure</code>要素は複数の図を持つかもしれないので、その場合にそれぞれにキャプションを付けたくなるかもしれません。</p>
           <pre><code class="language-html">&lt;figure&gt;
   &lt;img
@@ -1382,7 +1339,6 @@ function isArray(o) {
   ...
 &lt;/main&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>CMSによる生成が主流となって以降、複数のセクションをまとめるために<code>div</code>要素が使われてきました。そういった<code>div</code>要素のうち、悪い例で挙げたようなものは<code>main</code>要素で置き換えることが可能です。HTML 4.01やXHTML 1.xでは<code>div</code>要素でどうにかしていたよくあるパターンを、現在のHTML仕様では新しい要素として定義されています。</p>
           <p><code>main</code>要素については何度か修正がなされています。現在は<em>文書の支配的なコンテンツ</em>をマークアップするもの、と定義されており、ひとつのHTML文書にひとつの<code>main</code>要素しか許されていません。以前の仕様で例示されていたような<code>section</code>要素内での利用はできなくなりました。</p>
           <p>ブラウザー他でほぼ問題ないレベルまでサポートされています。積極的に使う理由を挙げられるわけではないですが、同時に使わない理由もほとんどありません。<code>div</code>要素ではなく、できる限り<code>main</code>要素を優先して使うことをお勧めします。ただし<code>main</code>要素は汎用的なラッパーのための要素ではないので、スタイル目的で使うべきものではありません。そういった場合には今まで通り<code>div</code>要素を使用するべきです。</p>
@@ -1400,7 +1356,6 @@ function isArray(o) {
   ...
 &lt;/section&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様では<code>div</code>と<code>span</code>要素は何も意味しないとなっています。歴史的には様々な形でコンテンツをグルーピングするために利用されてきましたが、それらの多くはもはや必要のないでしょう。</p>
           <pre><code class="language-html">&lt;div id=&quot;contents&quot;&gt;
   &lt;div class=&quot;entry&quot;&gt;
@@ -1439,7 +1394,6 @@ function isArray(o) {
   &lt;p&gt;A community maintaining and evolving HTML since 2004.&lt;/p&gt;
 &lt;/a&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTMLでは、<code>a</code>要素の自由度が高くなりました。インタラクティブな要素（<code>a</code>要素やフォーム要素）以外のほとんどすべての要素を括れます。実際には古いブラウザーでそのような挙動だったため、仕様がそれに近づいた形ですが、明示的に仕様で定められたことにより、今は安心して利用できるでしょう。</p>
           <p>このことはユーザビリティーの面でもメリットがあります。悪い例で挙げたような書き方だと、見出しと概要の間にある余白がリンクになりません。リンクにするためには特別に余白を<code>padding</code>プロパティーで行うなどの対処が必要です。対して良い例で挙げたような書き方では、概ね全体がリンクになります。こういった余白がリンクになっていると、モバイル機器のように<code>:hover</code>相当のインタラクションが存在しない場合でもリンクを扱いやすくなるでしょう。またスクリーン・リーダーで何回も同じリンクが読み上げられないという点でもユーザーに優しいはずです。</p>
         </section>
@@ -1452,7 +1406,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;a download href=&quot;/downloads/offline.zip&quot;&gt;offline version&lt;/a&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>ブラウザーはリンク先のリソースについて予測しません。実際にアクセスし、その時に返される<code>Content-Type</code>ヘッダーに従って処理します。本来ならばサーバーがリソースを正しい<code>Content-Type</code>ヘッダーで返すべきですが、様々な理由によって設定できないこともあるでしょう。例えばGitHub Pagesなどでは自由に設定できません。</p>
           <p>このことはブラウザーで開くリソース（HTML文書や画像ファイル、PDFドキュメントなど）ではあまり問題になりませんが、ZIPファイルやインストーラーなど、ユーザーにダウンロードさせたいファイルでは問題になります。間違った<code>Content-Type</code>ヘッダーがついていると、無理やりブラウザーで開かれ、意味不明な文字が表示されてしまうでしょう。これではユーザーはどうしていいかわかりません。</p>
           <p>良い例で挙げたように書くと、最近のブラウザーではダウンロードされることが保障されます。ブラウザーで無理やり開かれる場合と比べてセキュリティーの問題も減るので、ダウンロードさせたいリソースにはこのように指定してやりましょう。</p>
@@ -1466,7 +1419,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;a href=&quot;/ja/pdf&quot; hreflang=&quot;ja&quot; rel=&quot;alternate&quot; type=&quot;application/pdf&quot;&gt;Japanese PDF version&lt;/a&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>a</code>要素には<a href="#use-download-attribute-for-downloading-a-resource"><code>download</code>属性</a>以外にもリンク先のリソースについての情報を提供する属性があります。悪い例で挙げたように書くと、そのページの日本語版PDFドキュメントへのリンクを張れますが、リンク先が日本語なのかどうか、PDFドキュメントなのかどうか、そもそも何の「Japanese PDF version」なのか、はっきりしません。このことは検索エンジンのクローラーやスクリーン・リーダーには致命的です。</p>
           <p>良い例で挙げたように書くと、リンク先について以下の点がはっきりします。</p>
           <ol>
@@ -1485,7 +1437,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;p&gt;&lt;a href=&quot;/pdf&quot; rel=&quot;alternate&quot; type=&quot;application/pdf&quot;&gt;PDF version&lt;/a&gt; is also available.&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>リンクはウェブページにのみ張られるものではありません。ポップアップ・ウィンドウを出したり、ダウンロードさせたり、最近では別のアプリを立ち上げるために張られることもあります。明確な文字列でリンクされていれば、そのリンクを利用するとどのようなことが起こるか、をユーザーが推測できます。</p>
           <p>そのユーザーには検索エンジンも含めて良いでしょう。検索エンジンが自然文をうまく扱える現在、明確な文字列によるリンクは、ウェブページ同士の関係をも推測可能にします。そのことがひいては検索エンジンおよびそのユーザーの利益につながるかもしれません。</p>
           <p>明確に、とは、良い例で挙げたように、リンクの目的について端的に表現することです。悪い例で挙げたように、リンクの使い方について表現することではありません。</p>
@@ -1499,7 +1450,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;strong&gt;Caution!&lt;/strong&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01では、<code>em</code>と<code>strong</code>要素はどちらも強調で、その度合いだけが違うものでした。対して現在のHTMLでは、強調は<code>em</code>要素になり、<code>strong</code>要素は用途が変わり、重要性や深刻さ、緊急性を意味するものになりました。警告や注意は深刻なもののため、良い例で挙げたように<code>strong</code>要素が適切になります。</p>
           <p>より強い強調を表現する場合は<code>em</code>要素をネストします。同じようにより高い重要性を表現する場合は<code>strong</code>要素をネストします。このことは仕様の例示でも触れられており、具体的には以下のようにマークアップすることになるでしょう。</p>
           <pre><code class="language-html">&lt;p&gt;&lt;em&gt;猫はとても&lt;em&gt;可愛い&lt;/em&gt;動物です！&lt;/em&gt;&lt;/p&gt;
@@ -1515,7 +1465,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;span class=&quot;icon-search&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01時代には俗に<em>物理要素</em>と言われていた要素達は、現在のHTML仕様では削除されるか、その意味合いを再定義されました。<code>big</code>や<code>center</code>要素などが削除された要素で、<code>b</code>や<code>small</code>要素などが意味合いが変更された要素です。中でも<code>s</code>や<code>i</code>、<code>b</code>、<code>u</code>要素はその意味合いが大きく変更され、その使い方はとても難しいものになりました。</p>
           <p>例えば<code>i</code>要素は「代わりの声やムードでテキストの範囲を表す」とされています。具体的な使用例もありますが、他の要素が適切でありそうなものであったり、そもそもマークアップしてやる意味が薄いものであったりするでしょう。仕様の例示で触れられている「多言語の慣用句」は、多くの場合は文脈として自然に使われるものであるはずで、まずマークアップする必要はないでしょう。</p>
           <p>これらの要素は物理要素であった頃の名残りとして、デフォルトでブラウザーから様々なスタイルが割り当てられています。利用の際には適切な形でスタイルを変更してやる必要が出てくる可能性が高く、そういった点でも取り扱いが難しいでしょう。</p>
@@ -1533,7 +1482,6 @@ function isArray(o) {
           <p>同じく良い例:</p>
           <pre><code class="language-html">“For writing maintainable and scalable HTML documents”
 </code></pre>
-          <h2>解説</h2>
           <p>段落内で他のソースから引用を行う場合に使う<code>q</code>要素では、引用符は主にブラウザー（もしくはCSS）によって提供されます。仕様では明確に<code>q</code>要素の内部等に引用符が「現れてはならない」とされています。</p>
           <pre><code class="language-html">&lt;p&gt;漱石はその小説内で猫の鳴き声を&lt;q&gt;ニャーニャー泣いていた&lt;/q&gt;としている。&lt;/p&gt;
 </code></pre>
@@ -1552,7 +1500,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;abbr title=&quot;HTML Best Practices&quot;&gt;HBP&lt;/abbr&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>略語に対して常に<code>abbr</code>要素を使ってマークアップする必要はありません。例えばウェブ開発者向けの文書において、常に「HTML」を<code>abbr</code>要素を使ってマークアップするのは馬鹿げています。<code>abbr</code>要素はいくつかの状況において有用であると仕様でも言及されており、その状況の時だけ使います。</p>
           <ol>
             <li>完全表記を括弧付きで書く代わりに単に提示したいだけ場合</li>
@@ -1574,7 +1521,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;ruby&gt;HTML&lt;rp&gt; (&lt;/rp&gt;&lt;rt&gt;えいちてぃーえむえる&lt;/rt&gt;&lt;rp&gt;) &lt;/rp&gt;&lt;/ruby&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>ruby</code>要素群はフリガナをマークアップできます。その表示に多くの不具合がありますが、基本的なサポートは揃っており、必要ならば積極的に利用すべきです。しかし、インラインでプレーンテキストが挟まる結果、そのサポート状況に表示が強く依存してしまうので、マークアップは慎重に行うべきでしょう。</p>
           <p>悪い例で挙げたように書いても、<code>ruby</code>要素群を完全にサポートしているアプリケーションでは問題ありません。しかし、サポートが完全でないアプリケーションでは、テキストとそのフリガナがつながった「HTMLえいちてぃーえむえる」という文字列になってしまうかもしれません。CSSを工夫すれば、<code>rt</code>要素をサポートしている場合は表示してやることもできるかもしれません。ですが、そういった古い環境への対策はCSSをむやみに複雑化するので、あまりおすすめできません。</p>
           <p>良い例で挙げたように冗長にマークアップしておくと、完全なサポートがあればフリガナで、そうでない場合は「HTML (えいちてぃーえむえる)」と表示されます。こうすることでどんな環境でも違和感のない結果を提供できるでしょう。</p>
@@ -1588,7 +1534,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;time datetime=&quot;2014-12-19&quot;&gt;Dec 19, 2014&lt;/time&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>time</code>要素は日時をマークアップしますが、そのコンテンツは<a href="https://html.spec.whatwg.org/multipage/text-level-semantics.html#datetime-value">既定のフォーマット</a>に従う必要があります。<code>datetime</code>属性があるならばかなり自由に — 「誕生日」や「あの日」、「夕飯時」など主観的な日時の表現でも許可されることに — なります。</p>
           <p>既定のフォーマットは俗にW3CDTFと呼ばれている形式に近いものです。ただし年なしの月日が許可されていたり、時刻のみが許可されていたり、上位互換で自然文向けのフォーマットになっています。いずれにせよ、日時を表現するには、それなりに書きやすくパースしやすいものです。しかし読みやすいとは言えない程度に素っ気ないものでもあります。そのため良い例で挙げたように（ロケールに応じた）わかりやすそうな表現で日時を提供し、<code>datetime</code>属性で正確な日時を提供すると、公平に日時を伝えられるでしょう。</p>
         </section>
@@ -1601,7 +1546,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;code class=&quot;language-html&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/code&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>あらゆるコード断片は、何らかのプログラミング言語のコード断片であるはずです。できればそのプログラミング言語を表現する属性があればよかったのですが、残念ながら仕様では用意されていません。しかし同時にPascalのコードを例に<code>class</code>属性で<code>language-pascal</code>という値を指定して表現しても良い、と例示されてもいます。</p>
           <p>多くのマークアップ・ジェネレーターでも採用されており、事実上の業界標準でしょう。また、場合によってはJavaScriptとCSSによる構文強調も期待できます。後々追加できるようなものではないため、今は必要なくてもできうる限り追加しておくと良いでしょう。</p>
         </section>
@@ -1614,7 +1558,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">&lt;kbd&gt;Ctrl+F5&lt;/kbd&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>kbd</code>要素は、うまく組み合わせると複雑なキー入力を正確に表現できます。しかしその結果として悪い例で挙げたようにとても煩雑なものになってしまいます。これが実際に何かの役に立つかどうかは未知の世界ですが、仕様の例示では良い例で挙げたように簡潔なものでも構わない、とされています。</p>
           <p><a href="#markup-ruby-element-verbosely"><code>ruby</code>要素の場合</a>は既に存在する環境への配慮として、複雑にするべきでした。しかし、<code>kbd</code>要素の場合はまだ存在しない環境への配慮になります。コストの割りに得るものがなく、将来も得られるかわからないため、割り切ってしまって良いでしょう。</p>
         </section>
@@ -1627,7 +1570,6 @@ function isArray(o) {
           <p>良い例:</p>
           <pre><code class="language-html">HTML &lt;em&gt;Best&lt;/em&gt; Practices
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#avoid-div-element-as-much-as-possible">できる限り<code>div</code>要素は避ける</a>」を参照してください。</p>
         </section>
         <section id="break-after-br-element">
@@ -1641,7 +1583,6 @@ function isArray(o) {
 Best&lt;br&gt;
 Practices&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTMLコードにおいて改行を必要とするケースはほとんどありません。<code>pre</code>要素内での改行が唯一と言って良いでしょう。ただし、読みやすいHTMLコードを書くためには、それなりに改行を入れるべきです。多くの場合は終了タグの後ろに入れますが、それに加えて<code>br</code>要素でも改行を入れたほうが良いでしょう。</p>
           <pre><code class="language-html">&lt;p&gt;3-2-2 Kasumigaseki&lt;br&gt;Chiyoda-ku&lt;br&gt;Tokyo&lt;/p&gt;
 </code></pre>
@@ -1665,7 +1606,6 @@ Tokyo&lt;/p&gt;
 &lt;p&gt;&lt;label&gt;Rule description:&lt;br&gt;
 &lt;textarea name=&quot;rule-description&quot;&gt;&lt;/textarea&gt;&lt;/label&gt;&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>改行をするために<code>br</code>要素があるわけではなく、改行をマークアップするためにこの要素を使います。詩に必要な改行や、手紙の住所表記で必要になる改行などに利用するものです。</p>
           <p>悪い例で挙げたフォーム要素の間にある最初の<code>br</code>要素は、<em>テキスト入力ボックスの後ろで改行したい</em>から見た目上の都合で加えたものでしょう。対して2つめの<code>br</code>要素は、<em>複数行に渡る入力エリアをインライン入力と区別するために改行が必要</em>だから加えたものかもしれません。前者は根拠に欠けますが、後者はコンテンツに必要な改行とみなせます。</p>
           <p><code>br</code>要素はコンテンツに存在すべきである改行を表現するものだ、ということで、それ以上でもそれ以下でもありません。単純な見た目上の改行の制御にはCSSを利用すると良いでしょう。</p>
@@ -1686,7 +1626,6 @@ Tokyo&lt;/p&gt;
 
 &lt;del&gt;&lt;p&gt;Don’t trust!&lt;/p&gt;&lt;/del&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>編集したことを明示的に残すため、<code>ins</code>や<code>del</code>要素を使うことは大切ですが、その編集により文章の構成が変わってしまうことがあります。例えば日本語では、修正により、文の締め方だけでなく、次の文の頭に接続詞を追加したりするでしょう。場合によっては段落をまたいで修正する必要が出てくるわけです。</p>
           <p>単純に考えると編集箇所を括るようにマークアップすれば良いように思えます。しかし悪い例で挙げたように要素をまたいで<code>ins</code>や<code>del</code>要素は使えません。この場合は<code>p</code>要素をまたいでおり、正常にタグが閉じられていない（この例では<code>ins</code>要素の終了タグがない）とみなされてしまいます。</p>
           <p>良い例で挙げたように要素内で完結するように分割してマークアップします。<code>ins</code>と<code>del</code>要素では他にも文法上は間違いではないにも関わらず、特定の条件下では推奨されない書き方があります。できるかぎり分割してマークアップすると、そういった推奨されない書き方もうまく避けられるでしょう。</p>
@@ -1713,7 +1652,6 @@ Tokyo&lt;/p&gt;
   &lt;img src=&quot;/img/logo.jpg&quot;&gt;
 &lt;/picture&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様では、<code>picture</code>要素を始め、いくつかのマルチメディア向け要素が追加されました。この新しい要素では、複数のソースから最適なものを選択、表示できます。悪い例で挙げたようなコードでは<code>source</code>要素をサポートしているのなら最悪でもJPEG形式の画像が表示されるでしょう。こうなっていることでサポート状況が不安な新しいフォーマットでも気軽に利用できます。</p>
           <p>しかし、このままでは<code>source</code>要素をサポートしていないブラウザーでは何も表示できません。そこで最後のフォールバックとして<code>img</code>要素を使えるように仕様では決められました。良い例で挙げたように書くことで、適切なフォーマットを選ぶ自由さを維持しつつ、古いブラウザーでは<code>img</code>要素で指定された画像が表示されます。このフォールバックの仕組みが必要なブラウザーはごく少数になりつつありますが、<code>source</code>要素を書く場合と手間は変わらないことですし、<code>img</code>要素で書くべきでしょう。</p>
         </section>
@@ -1726,7 +1664,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;img alt=&quot;HTML Best Practices&quot; src=&quot;/img/logo.png&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>仕様で<a href="https://html.spec.whatwg.org/multipage/images.html#alt">明言されているように</a>、<code>alt</code>属性は必ず指定すべきで、空であってはいけません。ここに異論の余地はまったくないでしょう。ネットワークが不安定でHTML文書はダウンロードできても画像ができない場合、<code>alt</code>属性がきちんと書かれていればコンテンツの閲覧を助けられます。もちろん画像のダウンロードを無効にしているユーザーにも公平ですし、スクリーン・リーダーではその値を使って読み上げてくれます。</p>
           <p><code>alt</code>属性の値は単なる画像の説明ではなく、その画像が<code>img</code>要素で使われている位置ではどのように扱われているかを端的に示したものであるべきです。つまりまったく同じ画像でも違う<code>alt</code>属性を持つことは十分にあり得ます。このあたりのことについては慣れを要しますが、前後のコンテンツに続けて<code>alt</code>属性の値を読み上げても違和感がないかというあたりを基準にして考えると良いでしょう。</p>
         </section>
@@ -1739,7 +1676,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;img alt=&quot;&quot; src=&quot;/img/icon/help.png&quot;&gt; Help
 </code></pre>
-          <h2>解説</h2>
           <p><code>alt</code>属性は必須ですが、その値を空にすべきケースも存在します。難しい言い方をすれば、周囲に<code>alt</code>属性で指定されるべき値と同等のコンテンツが存在する時、です。そういう画像は補助的なものであり、コンテンツ全体へは寄与することはありません。スクリーン・リーダーでの読み上げを想像するとわかりやすいでしょう。周囲に同等のコンテンツが存在する場合、同じことを（場合によっては何度も）繰り返すことになってしまいます。</p>
           <p>例えばアイコン付きのメニュー項目です。アイコンと、その前後にあるラベルは、ほぼ同等の意味を持ちます。そのため悪い例で挙げたように書いてしまうと、コンテンツが重複してしまうでしょう。良い例で挙げたように空にすべきです。グラフの提示に<code>img</code>要素使っており、かつその前後でそのグラフについて細かく解説している場合も空にすべきです。これも同等のコンテンツが周囲に存在すると考えられます。</p>
           <p>「補助的」という言葉は曖昧で、判断に迷うこともあります。ブラウザーやOSに内蔵されているスクリーン・リーダーをうまく使って確認し、適切な値を<code>alt</code>属性へ指定しましょう。</p>
@@ -1754,7 +1690,6 @@ Tokyo&lt;/p&gt;
           <pre><code class="language-html">&lt;img src=&quot;captcha.cgi?id=82174&quot; title=&quot;CAPTCHA&quot;&gt;
 (If you cannot see the image, you can use an &lt;a href=&quot;?audio&quot;&gt;audio&lt;/a&gt; test instead.)
 </code></pre>
-          <h2>解説</h2>
           <p>必須であるはずの<code>alt</code>属性も、ごく限られた状況では使うべきではありません。というよりも適切な<code>alt</code>属性の値がどうやっても指定できない場合には指定できません。</p>
           <p>例えばCAPTCHAの画像です。このサービスの仕組み上、その中身を機械的にたどれるようでは無意味になってしまうからです。こういった場合は良い例で挙げたように、何も指定せず、かつ別の方法でフォールバックするべきです。</p>
           <p>他には、ユーザーがアップロードした画像をサービスがマークアップして表示する場合も指定すべきではありません。ユーザーからその画像について説明を受けない限り、どのような写真でどのような意図をもっているのかを確定できないからです。一部で画像を機械学習で処理することで<code>alt</code>属性の値を生成する試みもありますが、<code>alt</code>属性の値が画像の説明ではないことを考えると、あくまでも次善の策でしょう。画像の閲覧者に誤解させないようにするためにも空にするもの、と考えた方が無難です。</p>
@@ -1770,7 +1705,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;iframe src=&quot;/ads/default.html&quot;&gt;&lt;/iframe&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML 4.01では、フレームをサポートしないブラウザーが考慮されていました。<code>iframe</code>要素では、代替コンテンツをそのコンテンツとして指定する、と指示されています。</p>
           <pre><code class="language-html">&lt;iframe src=&quot;foo.html&quot;&gt;
   こちらの&lt;a href=&quot;foo.html&quot;&gt;関連文書&lt;/a&gt;を御覧ください。
@@ -1807,7 +1741,6 @@ Tokyo&lt;/p&gt;
   &lt;/p&gt;
 &lt;/map&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>クリッカブル・マップを作成する<code>map</code>要素の中身は、<code>area</code>要素さえあれば機能します。そのため、悪い例で挙げたように書いてもブラウザーでは問題なく利用できます。必要なのは<code>area</code>要素の<code>coords</code>と<code>href</code>属性だけ、というわけです。</p>
           <p>しかし、ブラウザーでないツールでは話が変わってきます。例えばスクリーン・リーダーは、その仕組み上インタラクティブにクリッカブル・マップを扱うことは難しいでしょう。そのため<code>map</code>要素の中身を普通のコンテンツとして読み上げます。良い例で挙げたように<code>p</code>要素で済む場合もありますが、<code>ol</code>要素を使ったり、場合によっては<code>table</code>要素を使うかもしれません。いずれにせよきちんとマークアップしないと、適切に読み上げられないでしょう。</p>
         </section>
@@ -1829,7 +1762,6 @@ Tokyo&lt;/p&gt;
   &lt;iframe src=&quot;//www.youtube.com/embed/...&quot; allowfullscreen&gt;&lt;/iframe&gt;
 &lt;/video&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#provide-fallback-img-element-for-picture-element"><code>picture</code>要素ではフォールバックのための<code>img</code>要素を提供する</a>」を参照してください。</p>
         </section>
       </section>
@@ -1850,7 +1782,6 @@ Tokyo&lt;/p&gt;
   &lt;td&gt;Sections&lt;/td&gt;
 &lt;/tr&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#write-one-list-item-per-line">リスト項目は1行に1つずつ書く</a>」を参照してください。</p>
         </section>
         <section id="use-th-element-for-header-cell">
@@ -1902,7 +1833,6 @@ Tokyo&lt;/p&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>表で最初の行や列をヘッダーとして使い、各行や列にどのようなデータが表示されるのかを示したいこともあるでしょう。しかしその場合も、悪い例で挙げたように<code>td</code>要素で<code>strong</code>要素を使ったり、クラス名を振ったりして、見た目だけを変更している場合がほとんどです。</p>
           <p>ヘッダー・セルには<code>th</code>要素が使えます。振る舞いとしては特に何もせず、ブラウザーによりスタイルが割り当てられているくらいしか<code>td</code>要素との違いはありません。しかしながら<code>th</code>要素を使うことでしかヘッダー・セルであることは示せません。</p>
           <p>最初の行をすべてヘッダー・セルとして扱う場合は<code>thead</code>要素を使うだけでも十分です。ただし良い例で挙げたように最初の<em>列</em>もヘッダーにしたい場合は<code>th</code>要素を使うしかありません。また、<code>thead</code>要素にはヘッダー以外のセルが（ごくまれに）含まれるため、そういった点でも<code>thead</code>要素だけでなく<code>td</code>と<code>th</code>要素を使い分けるべきでしょう。そうすることでありとあらゆるツールがヘッダー・セルと普通のセルを明確に区別できるようになります。</p>
@@ -1920,7 +1850,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;p&gt;&lt;label&gt;Query: &lt;input name=&quot;q&quot; type=&quot;text&quot;&gt;&lt;/label&gt;&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>label</code>要素を使うことでフォーム要素とラベルの対応を明示できます。それだけでなく、多くのブラウザーではラベルをクリックすると、対応するフォーム要素へフォーカスを移してくれます。特に、チェックボックスやラジオボタンのように小さなものでは効果的に利用できます。チェックボックスそのものだけでなく、ラベルをクリックすることでもチェックを切り替えられるからです。</p>
           <p>この対応関係は<code>for</code>属性を使うことで確実にできますが、<code>label</code>要素の子にフォーム要素を配置することでも可能です。ラベルそのものをクリックした時の挙動に両者はほとんど違いはありませんが、フォーム要素を子に配置する方がラベルそのもの以外でクリックできる範囲が大きくなるかもしれません。</p>
           <p>HTMLを出力するツールや、CSSを使ったレイアウトの都合で、<code>for</code>属性を使うことは構いません。しかし、できる限り括ってやることで簡潔でわかりやすいHTMLコードに、そして使いやすいウェブページになるはずです。また、ウェブページごとにユニークであるべき<code>id</code>属性の値を考えずに済むので、ウェブサイトごとにそういったユニークな値を管理せずに済むという点も見逃せないでしょう。</p>
@@ -1934,7 +1863,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;label&gt;Query: &lt;input name=&quot;q&quot; type=&quot;text&quot;&gt;&lt;/label&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#wrap-form-control-with-label-element">フォームコントロールは<code>label</code>要素で括る</a>」を参照してください。</p>
         </section>
         <section id="use-appropriate-type-attribute-for-input-element">
@@ -1946,7 +1874,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;label&gt;Search keyword: &lt;input name=&quot;q&quot; type=&quot;search&quot;&gt;&lt;/label&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様では、<code>input</code>要素で使える<code>type</code>属性が大幅に拡充されました。HTML 4.01では10種類でしたが、20種類以上になっています。これは機械的に値を扱いやすくなったことも意味しますが、同時に様々なツールが最適なインターフェイスを提供できるということでもあります。デバイスに保存された情報で自動的に埋めてくれたり、専用の補完候補を出したり、キーボードを切り替えたりするのはそのひとつです。</p>
           <p>例えば検索フォームを例にしてみましょう。HTML 4.01の時代は、悪い例で挙げたように<code>type=&quot;text&quot;</code>を利用していました。もちろんこのままで機能しますが、良い例で挙げたように、より適した<code>type=&quot;search&quot;</code>を使うと、例えばデスクトップ・ブラウザーでは入力ボックスの端に✕のアイコンを表示し、キーワードをクリアする機能を提供します。</p>
           <p>このことは検索結果ページなどで検索文字列が入力済みの場合に大いに役立ちます。新しく検索する時、今までは入力ボックスにフォーカスを当ててから、選択して削除するかBackspaceキーを連打する必要がありました。しかし<code>type=&quot;search&quot;</code>を指定してあれば、✕のアイコンを押すだけで消えてくれます。アイコンを押すと同時に入力ボックスへフォーカスも移るので、今まで必ず3アクション以上かかっていた操作が、1アクションで済むわけです。</p>
@@ -1961,7 +1888,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;input type=&quot;submit&quot; value=&quot;Search&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>フォームの送信には、できる限り<code>type</code>属性の値を<code>submit</code>にした<code>input</code>要素を使用すべきです。そうでないフォーム、例えば<code>type=submit</code>である送信ボタンがなかったり、送信ボタンらしきものがあっても<code>type=button</code>であったりすると、他の入力フォーム要素でEnterキーを押しても何も起こりません。たまに、検索フォームのキーワードを入れ、Enterキーを押しても無反応なウェブサイトを見かけることはないでしょうか？こういった一般的ではない挙動をするフォームにユーザーは戸惑ってしまいます。</p>
           <p><code>type=submit</code>である<code>input</code>要素を設置すればそれでよいか、というとそれだけではありません。そのままだとボタンに表示される文字列が、ブラウザーとユーザーの環境の両方に依存するからです。</p>
           <p>悪い例で挙げたように<code>type</code>属性だけを指定してもフォーム送信ボタンとしては問題なく機能します。しかしInternet Explorer 10が日本語に設定されている場合は「クエリ送信」と、Chrome 45が英語に設定されている場合は「Submit」と、まったく違った文字が表示されます。残念ながらブラウザーによる違いはもちろん、言語設定による違いも吸収することはできません。</p>
@@ -1977,7 +1903,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;input name=&quot;security-code&quot; pattern=&quot;[0-9]{3}&quot; title=&quot;A security code is a number in three figures.&quot; type=&quot;text&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p><code>input</code>要素では<code>pattern</code>属性を使ってクライアント側での入力チェックを行うことができます。主に、ユーザーへ入力に制限があることを明示的に示すために利用します。例えば非対応のブラウザーではチェックされないので、サーバー側で値を信頼することはできないため、そのような用途にのみ制限されることでしょう。このクライアント側でのチェック機能は<code>pattern</code>属性の値として正規表現を指定して行います。</p>
           <p>例えばセキュリティー・コードとして3桁の数字を要求するケースを考えてみましょう。悪い例で挙げたように書くと、対応しているブラウザーは不正な値を送信（入力ではありません）しようとした時にキャンセルされます。しかしこのままだとユーザーは<em>なぜキャンセルされたのか</em>はわかりません。</p>
           <p>良い例で挙げたように、合わせて<code>title</code>属性が指定してあると様々な形でその値を警告として表示してくれます。<code>title</code>属性の値は自然文であると良いでしょう。どのように表示されるかはブラウザーによりますが、おおむね自然文であることが想定されています。</p>
@@ -1992,7 +1917,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;label&gt;Email: &lt;input name=&quot;email&quot; placeholder=&quot;john.doe@example.com&quot; type=&quot;text&quot;&gt;&lt;/label&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>フォーム要素にラベルは絶対に必要です。ラベルがあれば、そのフォーム要素がなんのためのものかを入力する前にも後にも確認できるでしょう。しかし、ラベルはきれいに収めるのはとても難しいものです。対して、ブラウザーでフォーム要素に重ねて表示される<code>placeholder</code>属性はとても収まりが良く、すっきりとレイアウトされます。そのためこの属性をラベルに流用するウェブページはあとをたちません。</p>
           <p>ラベル用途に使うことはできない、と仕様で明言されていることもありますが、それ以上にユーザーが入力すると消えてしまうため、ラベルとして機能しないことが問題です。ラベルは対応したもの（HTMLではフォーム要素）を識別しやすくする効果があります。もしラベルがないとフォーム要素の入力をひとつひとつ確認してなんのためのフォーム要素かを調べなければなりません。それだけでなく、似たような文字で入力されるフォーム要素の区別も容易につけられるようになります。数字のみで構成されるクレジットカード番号と電話番号を見分けるのは至難ですが、ラベルがあれば簡単でしょう。</p>
           <p>また、<code>placeholder</code>属性で指定した文字列は、ユーザーが入力しはじめると消えてしまいます。そのためパッと見て理解できないような複雑なルールを書くには適しません。また、わかりやすく単純な入力例を書いてしまうと、ユーザーが入力済みだと誤解してしまうかもしれません。</p>
@@ -2013,7 +1937,6 @@ Tokyo&lt;/p&gt;
   &lt;option label=&quot;Sections&quot;&gt;
 &lt;/datalist&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#write-one-list-item-per-line">リスト項目は1行に1つずつ書く</a>」を参照してください。</p>
         </section>
         <section id="add-max-attribute-to-progress-element">
@@ -2025,7 +1948,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;progress max=&quot;100&quot; value=&quot;50&quot;&gt; 50%&lt;/progress&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>現在のHTML仕様で新設された<code>progress</code>や<code>meter</code>要素は経過や蓄積を表現する要素です。どれくらい過ぎたかや溜まったかは<code>value</code>属性を使って表現します。その<code>value</code>属性では0から1の間で指定しますが、同時に<code>min</code>属性や<em>特に<code>max</code>属性</em>を指定しておくことでその範囲を変更できます。</p>
           <p>悪い例では「50%進んでいる」ことを表現するのに<code>value</code>属性で<code>0.5</code>を指定しています。対して良い例で挙げたように<code>max</code>属性で<code>100</code>を指定しておくと、同じ表現を<code>50</code>でできるようになります。どちらがわかりやすいかは明白でしょう。</p>
           <p>このことは<code>progress</code>や<code>meter</code>要素をJavaScriptで操作する時にもメリットがあります。悪い例で挙げたように<code>max</code>属性がないと、<code>value</code>属性の値と中身のために、数字を整形するコードを書き分けなければなりません。良い例で挙げたように両者を同じ数字で扱えるようにしておけば、より簡潔にコードが書けるはずです。</p>
@@ -2039,7 +1961,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;meter min=&quot;0&quot; max=&quot;1024&quot; value=&quot;512&quot;&gt; 512GB used (1024GB total)&lt;/meter&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#add-max-attribute-to-progress-element"><code>progress</code>要素には<code>max</code>属性を追加する</a>」を参照してください。</p>
         </section>
         <section id="place-legend-element-as-the-first-child-of-fieldset-element">
@@ -2059,7 +1980,6 @@ Tokyo&lt;/p&gt;
   ...
 &lt;/fieldset&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>長いフォームを分割する時、関連するフォーム・コントロールを<code>fieldset</code>要素を使ってまとめると、一括した操作を行えるようになります。その際、<code>legend</code>要素を使いそのグループにキャプションをつけることが可能です。<code>figure</code>と<code>figcaption</code>要素の関係に似ていますが、<code>legend</code>要素は<code>fieldset</code>要素の最初にしか書くことができません。</p>
           <p>このことは仕様で明示されています。多くの現行ブラウザーでは、どこに書いても正常に表示されるようですが、通常<code>fieldset</code>要素でグループ化された枠線で括られ、<code>legend</code>要素がある場合はその上部枠線に重なる形で表示されます。キャプションの水平方向の位置は記述方向に依存しますが、まず間違いなく上に表示されるでしょう。仕様で決められているからというだけでなく、HTMLソースとその表示の対応性も考慮すると、<code>legend</code>要素は最初に書くべきです。</p>
         </section>
@@ -2079,7 +1999,6 @@ Tokyo&lt;/p&gt;
   ...
 &lt;/script&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>「<a href="#omit-type-attribute-for-css">CSSの<code>type</code>属性は省略する</a>」を参照してください。</p>
         </section>
         <section id="dont-comment-out-contents-of-script-element">
@@ -2104,7 +2023,6 @@ Tokyo&lt;/p&gt;
   ...
 &lt;/script&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>歴史的な事情によりいくつかの要素内は安全のためコメントで括るとされていました。例えば<code>style</code>要素内が以下のように書かれているのを見たことがあるかもしれません。</p>
           <pre><code class="language-html">&lt;style&gt;
 &lt;!--
@@ -2137,7 +2055,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;script async defer src=&quot;https://example.com/widget.js&quot;&gt;&lt;/script&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>Google Analyticsを始め、多くのサードパーティー製JavaScriptアプリケーションは、悪い例で挙げたようなコードを使ってウェブページに導入します。これは動的に<code>script</code>要素を挿入することによって、どのようなブラウザーでもHTML文書の読み込みをブロックすることなく読み込めるからです。これはパフォーマンスにおいてメリットがある、とされてきました。</p>
           <p>しかし、この<a href="https://www.igvita.com/2014/05/20/script-injected-async-scripts-considered-harmful/">適切に使えばパフォーマンスにおいて大きなメリットがあるという勘違い</a>は否定されました。そこそこ古いブラウザーにもプリロード・スキャナーの仕組みがあり、それによる読み込みの効率化の方が、DOMを構築した後に発火される動的な生成による効率化を上回るわけです。</p>
           <p>しかも今のブラウザーは<code>async</code>属性という非同期に<code>src</code>属性で指定されたJavaScriptファイルを読み込む手段をサポートしています。JavaScriptの実行順について以外は上位互換と考えて良く、使わない理由はありません。</p>
@@ -2168,7 +2085,6 @@ Tokyo&lt;/p&gt;
   &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML文書はツリー構造です。タグを省略しない場合、インデントするとツリー構造とコードを対比させられます。そのことはタグの閉じ忘れのようなケアレスミスを防止するだけでなく、他の人がHTMLコードを確認する時にも大いに役に立つでしょう。</p>
           <p>ただし、それも同じ量を使ってインデントしていた場合に限ります。最近の高性能なエディターではインデントにガイドが用意されている（縦線でつないでわかりやすくしてくれる）ことも多いですが、各人の設定に依存しますし、そういった環境であることを前提にはできないでしょう。GitHubなどでレビューする時も含め、同じ量によるインデントは環境に依存しません。</p>
           <p>インデントに使う文字として、タブとスペースは一長一短で、優劣はありません。タブの場合はコード・サイズが少なく済みますが、環境にインデント量が依存します。スペースは環境に依存しませんが、コード・サイズは増えます。どちらがメジャーかということもこのままフォーマッターが浸透していくとツール次第になるでしょうし、統一さえされていればどちらでも良いでしょう。悪い例で挙げたようなタブとスペースを混ぜるなどということだけは<em>絶対に</em>避けるべきです。</p>
@@ -2186,7 +2102,6 @@ Tokyo&lt;/p&gt;
 ...
 &lt;p&gt;You can find more at &lt;a href=&quot;/contact.html&quot;&gt;contact page&lt;/a&gt;.&lt;/p&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>HTML文書に書かれたURLは、そのHTML文書のURLを元に解決されるため、かなり省略できます。限界まで省略するとコード・サイズが抑えられますが、省略しすぎると再利用性が薄れてしまいます。特にウェブサイトの内部リソース、つまり同じドメイン配下のファイルへは絶対パスを使うとバランスが良いはずです。</p>
           <p>絶対URL（<code>https:</code>で始まるURL）は、内部リンクには明らかに冗長です。一番短くしやすい相対パスは、リソースの移動に対して一括置換などで対処するのを難しくするでしょう。</p>
           <p>絶対パス（スラッシュで始まるパス）は多少の冗長さと引き換えになりますが、どのリソースからもどのリソースへも同じ文字列でリンクできます。リソースの移動には書き換えはもちろん必要ですが、一括置換で対処できるでしょう。また<code>http:</code>から<code>https:</code>へ切り替えようと考えている場合にもそのままで運用を続けられるはずです。</p>
@@ -2200,7 +2115,6 @@ Tokyo&lt;/p&gt;
           <p>良い例:</p>
           <pre><code class="language-html">&lt;script src=&quot;https://example.com/js/library.js&quot;&gt;
 </code></pre>
-          <h2>解説</h2>
           <p>かつて、古いブラウザーが安全なリソースとそうでないリソースが混在しているという警告を、モーダル・ダイアログで出していました。こういったモーダル・ダイアログはユーザーに深刻な状況を想起させてしまうだけでなく、煩わしいものです。ウェブページ制作者としてはなんとしても避けたい事態でしょう。</p>
           <p>そのため悪い例で挙げたようなコードがベスト・プラクティスとされていました。こうすることでユーザーが閲覧している状況に応じて、外部リソースのプロトコルが適宜選択されるので、ブラウザーが警告が出さないからです。</p>
           <p>しかし、外部リソースの読み込みは常に危険を伴います。しばらく前には<a href="https://www.netresec.com/?page=Blog&amp;month=2015-03&amp;post=China%27s-Man-on-the-Side-Attack-on-GitHub">GitHubがダウンするような事態</a>も引き起こされています。できうる限りHTTPSで提供される外部リソースのみを読み込むべきです。プロトコルを省略しないという簡単なルールにより、<code>https:</code>ならば安全が保障され、<code>http:</code>ならば危険を伴うことが意識できるでしょう。</p>
