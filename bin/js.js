@@ -19,9 +19,10 @@ const files = [
   {
     dest: "../tmp/debug.min.js",
     src: [
-      "../src/js/toggle-outline.js",
       "../src/js/toggle-column.js",
-      "../src/js/toggle-eyecatch.js"
+      "../src/js/toggle-eyecatch.js",
+      "../src/js/toggle-outline.js",
+      "../src/js/toggle-tagline.js"
     ]
   }
 ];
