@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連をはじめとした記事や文書、プロジェクトを公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Mon, 23 Jul 2018 14:23:02 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 24 Jul 2018 13:10:47 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,40 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[黄金比を始めとした固定比によるサイズ決めは、SassやCSS Custome Propertiesによって一定の市民権を得たように思う。ただ黄金比（1.618）と1の間のサイズが欲しくなることも多い。例えば見出しのline-heightプロパティーの値だったり、フォーマット済みテキストの文字サイズだったり、だ。HTML版・普通のHTMLの書き方では固定比を1.7にして、それを1と1.25にかけ合わせていくというアプローチにした。最近よく使う手法で、僕の中ではDual Scale Sizingという名前で呼ばれている。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/dual-scale-sizing.html</guid>
+        <link>https://hail2u.net/blog/dual-scale-sizing.html</link>
+        <pubDate>Tue, 24 Jul 2018 13:10:29 +0900</pubDate>
+        <title><![CDATA[2値基準のサイズ決め]]></title>
+        <content:encoded><![CDATA[<p>黄金比を始めとした固定比によるサイズ決めは、SassやCSS Custome Propertiesによって一定の市民権を得たように思う。ただ黄金比（<code>1.618</code>）と<code>1</code>の間のサイズが欲しくなることも多い。例えば見出しの<code>line-height</code>プロパティーの値だったり、フォーマット済みテキストの文字サイズだったり、だ。<a href="https://hail2u.net/documents/html-best-practices.html">HTML版・普通のHTMLの書き方</a>では固定比を<code>1.7</code>にして、それを<code>1</code>と<code>1.25</code>にかけ合わせていくというアプローチにした。最近よく使う手法で、僕の中ではDual Scale Sizingという名前で呼ばれている。</p>
+
+<p><code>1</code>と<code>1.25</code>にそれぞれ<code>1.7</code>を掛ける（で割る）だけなので、以下のようにきれいにばらけた数値が生成される。</p>
+
+<pre>0.204   0.346   0.588   1.000   1.700   2.890   4.913
+    0.254   0.433   0.735   1.250   2.125   3.613   6.141
+</pre>
+
+<p>例えば<code>1.7</code>を通常の<code>line-height</code>プロパティーに使いつつ、<code>1.25</code>を見出しや整形済みテキストに使う。また整形済みテキストの文字サイズを<code>0.735rem</code>にしたり、表の枠線幅を<code>0.254rem</code>にしたりもする。ここに載っていない大きいサイズは、<code>17.748rem</code>（<code>1.25 * (1.7 ** 5)</code>）をサイドバーの幅に使い、<code>41.034rem</code>（<code>1 * (1.7 ** 7)</code>）をコンテンツの幅に使ったりする。</p>
+
+<p><code>margin</code>プロパティーでも<code>1</code>系を上下に、<code>1.25</code>系を左右に、と使い分けるのも良い。行間に伴う余白の微妙な不揃い感が、意図的に余白を作りだしているように変わる（気がする）。</p>
+
+<p>コンテキストで<code>1.7</code>固定比を調節するのも悪くないが、それだとせっかく排した主観に依存するように戻ってしまう。また、固定比を増やすと、ばらけ方がまちまちになり、「これくらいのサイズがほしい」という時にどれを使えばよいか直感的でなくなってしまう。この記事で書いてきたようにベースを増やすと、わかりやすく、そこそこ使い勝手の良い数値が手に入る。</p>
+
+<hr>
+
+<p>HTML版・普通のHTMLの書き方ではあまり真面目にCSSは書いていない。セレクターを見ればわかる。とにかく自動生成の手間をかけない都合上、<code>class</code>属性を排除したので、大きな制限があるからだ。ただできることはなるべきやってあげようとはした。</p>
+
+<pre><code class="language-css">main section h1 {
+  /* 3.913 = 4.913 - 1 */
+  margin-top: 3.913rem;
+  padding-top: 1rem;
+}
+</code></pre>
+
+<p><a href="https://hail2u.net/blog/webdesign/target-pseudo-class-and-padding-top.html"><code>:target</code>でやる手法</a>もお気に入りだが、このような形であらかじめ<code>padding-top</code>プロパティーを確保するのもお手軽だ。<code>calc()</code>と<code>var()</code>を使うともうちょっとかっこよく書ける。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[普通のHTMLの書き方（またはHTML Best Practices）の校正を終えた。1週間くらい寝かせてから始め、なんとか直せたように思う。ということで静的なHTML版を「普通のHTMLの書き方」という同じ名称で生成し、このウェブサイトで公開した。まとめたら200KB超のボリュームになってしまった。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/html-best-practices-in-detail-in-static-html.html</guid>
@@ -191,21 +225,6 @@
 <p>解説と言ってもあまり長くはない。長くて4段落くらいで、短めのブログ記事くらいにとどめた。例示のみの方を見てもらって、なんでだろうとなったらサッと参照する程度のものにしたかった。完全で包括的な知識はもはや誰も持ってはいない（し、<code>main</code>要素のように劇的に変わる）ので、本当のところは定期的に仕様を読んで想像するしかない。この解説は僕の想像を文書化したものに過ぎない。</p>
 
 <p>まずはとにかく書く。今週中に終えて、7月末までかけて手直しをしようと考えている。そして「HTMLを書く最後の世代に向けて」とかいうサブタイトルを付けて、Kindleで100円くらいで売りたい。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[Edge 17でのショートハンド・プロパティーにおけるリグレッション・バグが内部では修正されたようだ。ひと安心というところだが、いつ直るかとの問いに担当開発者が「秋のアップデートで直る」と答えていた。Edge 16で問題なく動いていたものが17で動かなくなり、既存のウェブサイトに影響があるのだから、月例アップデートで直すべきバグだろう。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/regression-bug-and-its-fix.html</guid>
-        <link>https://hail2u.net/blog/regression-bug-and-its-fix.html</link>
-        <pubDate>Sun, 24 Jun 2018 14:55:08 +0900</pubDate>
-        <title><![CDATA[リグレッション・バグとその修正]]></title>
-        <content:encoded><![CDATA[<p>Edge 17でのショートハンド・プロパティーにおけるリグレッション・バグが内部では修正されたようだ。ひと安心というところだが、いつ直るかとの問いに担当開発者が「秋のアップデートで直る」と答えていた。Edge 16で問題なく動いていたものが17で動かなくなり、既存のウェブサイトに影響があるのだから、月例アップデートで直すべきバグだろう。</p>
-
-<p>今までも存在していたがたまたま新たに見つかったバグや新しい機能に依存したバグは、既存のウェブサイトに影響を与えない。そういったバグが悪用できないのなら、メジャー・リリースに先延ばしするという判断は理解できる。</p>
-
-<p>しかしリグレッション・バグで既存のウェブサイトに影響するならすぐ修正しないとならない。なぜなら一時的な対応が可能だとしても、修正されたからといってその一時的な対応を削除できないからだ。そのうちになぜ存在するのかよくわからない謎の呪文としてコードに残ることになる。</p>
-
-<p>Edgeになってから、CSSのちょっとしたバグも月例アップデートで修正されるようになっていた。そのためEdgeにはかなり好意的だったが、開発者の気分次第とわかりとても残念だ。</p>
 ]]></content:encoded>
       </item>
 
