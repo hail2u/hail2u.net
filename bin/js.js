@@ -15,15 +15,6 @@ const files = [
   {
     dest: "../tmp/defer.min.js",
     src: ["../src/js/ellipsis-title.js", "../src/js/reldate.js"]
-  },
-  {
-    dest: "../tmp/debug.min.js",
-    src: [
-      "../src/js/toggle-column.js",
-      "../src/js/toggle-eyecatch.js",
-      "../src/js/toggle-outline.js",
-      "../src/js/toggle-tagline.js"
-    ]
   }
 ];
 
