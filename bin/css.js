@@ -11,6 +11,10 @@ const files = [
     src: "../src/css/debug.css"
   },
   {
+    dest: "../tmp/documents.min.css",
+    src: "../src/css/documents.css"
+  },
+  {
     dest: "../tmp/main.min.css",
     src: "../src/css/main.css"
   }
