@@ -11,8 +11,13 @@ document.querySelector("main h1").addEventListener("click", () => {
 });
 
 tagline.addEventListener("click", () => {
-  const current = tagline.textContent;
-  const next = tagline.dataset.long;
-  tagline.textContent = next;
-  tagline.dataset.long = current; 
+  if (tagline.dataset.multi === "yes") {
+    tagline.parentNode.removeChild(tagline.parentNode.lastChild);
+    tagline.dataset.multi = "no";
+
+    return;
+  }
+
+  tagline.parentNode.appendChild(tagline.cloneNode(true));
+  tagline.dataset.multi = "yes";
 });
