@@ -52,7 +52,7 @@ const files = [
     src: "../src/sitemap.mustache"
   }
 ];
-const itemFiles = ["../src/blog/articles.json", "../src/updates.json"];
+const itemFile = "../src/blog/articles.json";
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -69,8 +69,6 @@ const monthNames = [
   "Dec"
 ];
 const partialDir = "../src/partial/";
-
-const readItem = itempath => fs.readJSON(itempath, "utf8");
 
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
@@ -124,15 +122,9 @@ const extendItem = item => {
   };
 };
 
-const optimizeItems = items =>
-  []
-    .concat(...items)
-    .sort(compareByUnixtime)
-    .map(extendItem);
-
 const readItems = async () => {
-  const items = await Promise.all(itemFiles.map(readItem));
-  return optimizeItems(items);
+  const items = await fs.readJSON(itemFile, "utf8");
+  return items.sort(compareByUnixtime).map(extendItem);
 };
 
 const readPartial = async filename => ({
