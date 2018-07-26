@@ -1,10 +1,11 @@
 const tagline = document.querySelector("body > header > p");
+const taglineDebugClass = "js-debug-multiline-tagline";
 
 document.querySelector("main h1").addEventListener("click", () => {
   if (tagline.hidden) {
     tagline.hidden = false;
 
-    if (tagline.dataset.multi === "yes") {
+    if (tagline.classList.contains(taglineDebugClass)) {
       tagline.nextElementSibling.hidden = false;
     }
 
@@ -13,19 +14,19 @@ document.querySelector("main h1").addEventListener("click", () => {
 
   tagline.hidden = true;
 
-  if (tagline.dataset.multi === "yes") {
+  if (tagline.classList.contains(taglineDebugClass)) {
     tagline.nextElementSibling.hidden = true;
   }
 });
 
 tagline.addEventListener("click", () => {
-  if (tagline.dataset.multi === "yes") {
+  tagline.classList.toggle(taglineDebugClass);
+
+  if (!tagline.classList.contains(taglineDebugClass)) {
     tagline.parentNode.removeChild(tagline.parentNode.lastChild);
-    tagline.dataset.multi = "no";
 
     return;
   }
 
   tagline.parentNode.appendChild(tagline.cloneNode(true));
-  tagline.dataset.multi = "yes";
 });
