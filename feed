@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連をはじめとした記事や文書、プロジェクトを公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Wed, 25 Jul 2018 11:44:13 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 26 Jul 2018 14:29:28 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,50 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換にsharpパッケージを使うように変えたところで発生したらしい。sharpがSVGでhsl()をサポートしていない（正確にはSVG 1.1までのサポートのため、その仕様で定義済みの色しかサポートしていない）ことが原因だった（バグではない）。SVG側で#rrggbbに変更し、無事修正できた。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/sharp-package-and-hsl-color-in-svg.html</guid>
+        <link>https://hail2u.net/blog/sharp-package-and-hsl-color-in-svg.html</link>
+        <pubDate>Thu, 26 Jul 2018 14:29:10 +0900</pubDate>
+        <title><![CDATA[sharpパッケージとSVGでのhsl()]]></title>
+        <content:encoded><![CDATA[<p>このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換に<a href="https://github.com/lovell/sharp">sharpパッケージ</a>を使うように変えたところで発生したらしい。sharpがSVGで<code>hsl()</code>をサポートしていない（正確にはSVG 1.1までのサポートのため、<a href="https://www.w3.org/TR/SVG/types.html#DataTypeColor">その仕様で定義済みの色</a>しかサポートしていない）ことが原因だった（バグではない）。SVG側で<code>#rrggbb</code>に変更し、無事修正できた。</p>
+
+<p>ファビコンへのコンバートはうまくいっているように見えたが、こちらも実は線が黒（<code>#000000</code>）になっていたようだ。実際には<code>hsl(0, 0%, 16%)</code>なので、<code>#292929</code>になっているべきだったが、さすがに目視ではチェックできなかった。こちらも<code>#rrggbb</code>に変更して修正した。</p>
+
+<p>SVGの安定仕様は1.1（2.0はCR）で、それはきちんとサポートしているようなので、イシューは立てづらい。もうちょっと考えよう。</p>
+
+<hr>
+
+<p>ほぼ最小で確認できるSVGは以下のようなものだ。</p>
+
+<pre><code class="language-svg">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  width=&quot;100&quot;
+  height=&quot;100&quot;
+  viewport=&quot;0 0 100 100&quot;&gt;
+  &lt;rect width=&quot;100&quot;
+    height=&quot;100&quot;
+    x=&quot;0&quot;
+    y=&quot;0&quot;
+    style=&quot;fill:hsl(0, 0%, 50%)&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>縦横100ピクセルの正方形を<code>hsl(0, 0%, 50%)</code>というグレーで塗りつぶしたものだ。<code>version</code>属性を削除してSVG 2.0として解釈されることを期待しているくらいだ。</p>
+
+<p>PNGに変換するコードはこのような簡単なものだ。特に何もしない。</p>
+
+<pre><code class="language-javascript">require(&quot;sharp&quot;)(&quot;test.svg&quot;)
+  .png()
+  .toFile(&quot;test.png&quot;);
+</code></pre>
+
+<p>出力される<code>test.png</code>は真っ黒（<code>#000000</code>）になる。</p>
+
+<hr>
+
+<p>そもそもsharpに乗り換えたのは、<a href="https://www.microsoft.com/ja-jp/p/inkscape/9pd9bhglfc7h">Inkscapeのストア版</a>に乗り換えたため、コマンドライン・アプリケーションへのアクセスが難しくなったからだ。ついでにImageMagikからも脱却させたりしたので不満はないが、ストア版アプリでのコマンドラインでの対応はまだまだだなと感じた。EdgeとiTunesしか対応しているのを見かけていない。頑張ってアプリ実行エイリアスを周知してほしい。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[色々あって、このウェブサイトのグローバル・ヘッダーを少しいじっている。その過程でオシャレっぽいウェブサイトを見て回っていたら、以下のようなマークアップになっているウェブサイトがあった。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/on-20180725.html</guid>
@@ -220,31 +264,6 @@
 <p>無印良品週間に店舗受け取りで買った。この場合は週間が終わっていても10%オフが効くようだ。買うかどうか迷っている商品がある場合、とりあえず店舗受け取りで頼んでおくと、商品を確保しつつじっくりと考えられる気がする。頼む時に支払いは不要だし、買いに行かなければ自動でキャンセルになるため、表立ったリスクはない。</p>
 
 <p>何回かやったら怒られそうだ。僕はまだ試していない。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[今月の20日くらいからiPhone 5sの調子がまた悪くなったので、えいやっと新しいiPhoneとして復元した。その2時間後にフリーズしたので、ついにApple Storeに持ち込んだ。ソフトウェアで検査しても異常は見つからず、バッテリーにもおかしいところはないので、やるとしたら基盤交換か本体交換しかない、と言われた。高いし、万が一直らなかったら（自分の環境かiOSやiCloudに問題があったら）金の無駄なので諦めた。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/on-20180627.html</guid>
-        <link>https://hail2u.net/blog/on-20180627.html</link>
-        <pubDate>Wed, 27 Jun 2018 19:18:40 +0900</pubDate>
-        <title><![CDATA[メモ]]></title>
-        <content:encoded><![CDATA[<p>今月の20日くらいからiPhone 5sの調子がまた悪くなったので、えいやっと新しいiPhoneとして復元した。その2時間後にフリーズしたので、ついにApple Storeに持ち込んだ。ソフトウェアで検査しても異常は見つからず、バッテリーにもおかしいところはないので、やるとしたら基盤交換か本体交換しかない、と言われた。高いし、万が一直らなかったら（自分の環境かiOSやiCloudに問題があったら）金の無駄なので諦めた。</p>
-
-<p>新しくiPhoneを買うにはちょっとタイミングが悪そうで、これはもうAndroidにするしかなさそうと、真面目に探し始めた。設定した条件は以下の通りだ。</p>
-
-<ul>
-<li>生体認証あり</li>
-<li>USB-C</li>
-<li>11ac対応</li>
-<li>32GB以上のストレージ</li>
-<li>前面に物理ボタンなし</li>
-<li>税込み50000円まで</li>
-<li>今年発売</li>
-</ul>
-
-<p>この条件だとdocomo withで出ている富士通のF-04KやLGのL-03K、SIMフリーだとMotorolaのg6 PlusやHuaweiのP20 liteくらいのようだ。まだdocomoをやめるつもりがないことを考えると、そこそこ良い印象だったL-03Kでdocomo with化しておくのが無難そうだ。これなら後にSIMフリーでiPhoneを買う時に36000円引きで買うようなもの、と主張できる（はずだ）。</p>
-
-<p>Apple Storeに持っていくことを決めて以降フリーズしていないが、次に日に複数回フリーズしたら買うことにした。期間限定のdポイント使わなければ良かったな。</p>
 ]]></content:encoded>
       </item>
 
