@@ -7,16 +7,14 @@
 <pre><code class="language-html">&lt;div class="row"&gt;
   &lt;div class="span4"&gt;...&lt;/div&gt;
   &lt;div class="span8"&gt;...&lt;/div&gt;
-&lt;/div&gt;
-</code></pre>
+&lt;/div&gt;</code></pre>
 
 <p><code>div</code>要素は<code>section</code>や<code>aside</code>要素などを使っても良いが、クラス名はこうでなくてはならない。Sass（や<a href="http://lesscss.org/">LESS</a>）があるとまず変わるのはここ。</p>
 
 <pre><code class="language-html">&lt;div class="wrapper"&gt;
   &lt;aside&gt;...&lt;/aside&gt;
   &lt;div role="main"&gt;...&lt;/div&gt;
-&lt;/div&gt;
-</code></pre>
+&lt;/div&gt;</code></pre>
 
 <p>ほとんどのケースでこのようにHTML文書側では適切な要素の使用やクラス名の割り振りだけで良くなる。このことが意味するのはHTML文書のソースが（自己満足的に）キレイになるとかそういう話でもあるんだけど、もっと重要なのはコンテンツを把握できるバックエンド側で適切に<em>マークアップ</em>することができるようになるという点だと思う。クラス名の命名規則等のコーディング規約で少しは改善できるが、根本的な解決にはならない。</p>
 
@@ -30,8 +28,7 @@
 
 [role="main"] {
   @extend .span8;
-}
-</code></pre>
+}</code></pre>
 
 <p>CSSのHTML文書への適用はSassでCSSで定義したデザインを継承する形で行う。CSSフレームワークやOOCSSではHTMLで複数のクラスを割り当てる形なわけだけど、SassやLESSでそれを代行できると言い換えても良い。</p>
 
@@ -47,8 +44,7 @@
     repeat: no-repeat;
     size: 48px 48px;
   }
-}
-</code></pre>
+}</code></pre>
 
 <p>例えば<code>blockquote</code>要素で使うために引用符の画像を背景に仕込むというようなデザインを定義するなら、こういう形でそのためのプロパティーだけを書けば良い。マージンやフォントの変更などもそれぞれ別に定義する。</p>
 
@@ -61,15 +57,13 @@
     family: "Palatino", "Palatino Linotype", serif;
     style: italic;
   }
-}
-</code></pre>
+}</code></pre>
 
 <p>テストは個々のデザインごとにテストすれば良いので、<code>blockquote</code>要素で使われるデザインだからといってテストでも<code>blockquote</code>要素を使う必要はない。</p>
 
 <pre><code class="language-html">&lt;div class="add-quote-mark"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
 &lt;div class="default-margin"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
-&lt;span class="quote-text"&gt;Lorem ipsum dolor sit amet.&lt;/span&gt;
-</code></pre>
+&lt;span class="quote-text"&gt;Lorem ipsum dolor sit amet.&lt;/span&gt;</code></pre>
 
 <p>実際にはそれぞれを<code>section</code>要素で括って見出しをつけたり、テストページといえども見やすいように構造と体裁を整えた方が良いけど、基本はこんなもので良い。長い行の折り返しを省略する<code>text-overflow: ellipsis</code>を使うならサンプル文字列を長文にするとか、<em>デザインに合わせて</em>テストをちゃんと書くだけ。ここでも最終的にこのデザインが利用されるHTML文書のことを考える必要はほとんどない。</p>
 
@@ -79,15 +73,13 @@
   @extend .default-margin;
   @extend .add-quote-mark;
   @extend .quote-text;
-}
-</code></pre>
+}</code></pre>
 
 <p>最後にSassでこのデザインを継承する。理想的に書くことが出来ればワンオフになるのはこの<code>@extend</code>を使うファイル（とコンパイルされたCSS）だけ。</p>
 
 <pre><code class="language-html">&lt;div role="main"&gt;
   &lt;blockquote class="add-quote-mark default-margin quote-text"&gt;...&lt;/blockquote&gt;
-&lt;/div&gt;
-</code></pre>
+&lt;/div&gt;</code></pre>
 
 <p>CSSフレームワークやOOCSS的なアプローチだとHTMLでこうする必要がある。CSSをよく知らないバックエンド開発者に「<code>add-quote-mark</code>と<code>default-margin</code>、<code>quote-text</code>を<code>role="main"</code>配下の<code>blockquote</code>要素のクラスに追加してください」とか「デザイン変えるためにテンプレートを更新したけどGitわからないので取り込んでください」とかお願いしているところを想像して欲しい。</p>
 
