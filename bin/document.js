@@ -43,7 +43,7 @@ const files = [
   {
     dest: "../dist/index.html",
     json: "../src/index.json",
-    itemLength: 10,
+    itemLength: 5,
     src: "../src/index.mustache"
   },
   {
