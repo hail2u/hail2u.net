@@ -1,4 +1,4 @@
-const tagline = document.querySelector("body > header > p");
+const tagline = document.querySelector("p");
 const taglineDebugClass = "js-debug-multiline-tagline";
 
 document.querySelector("main h1").addEventListener("click", () => {
