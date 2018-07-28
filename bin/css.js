@@ -1,6 +1,7 @@
 const atImport = require("postcss-import");
 const csswring = require("csswring");
 const fs = require("fs-extra");
+const moveFontFaces = require("../lib/move-font-faces");
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
 const wrapWithSupports = require("../lib/wrap-with-supports");
@@ -23,7 +24,8 @@ const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
-  wrapWithSupports()
+  wrapWithSupports(),
+  moveFontFaces()
 ]);
 
 const buildCSS = async file => {
