@@ -6,11 +6,13 @@
 
 <p>昨今のWebサイトではCMSなどを利用することが多く、共通のHTMLコードはテンプレートとして作成されます。その場合そのテンプレートの利用されるパスが様々な場所や階層になりうるので、例えばJavaScriptファイルのインクルードを行う場合、以下のようにスラッシュで始まる相対URLを利用することが多いでしょう。</p>
 
-<pre><code class="language-html">&lt;script src="/js/foo.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code class="language-html">&lt;script src="/js/foo.js"&gt;&lt;/script&gt;
+</code></pre>
 
 <p>しかしこのようなURLを利用していると何かと便利な<a href="http://vim-jp.org/vimdoc-ja/editing.html#gf"><code>gf</code></a>でカーソル下のファイル（この場合は<code>foo.js</code>）を（多くの場合）開くことが出来ません。ローカル（やリモート）のファイルシステム上のパス構成をURL構成とマッチするように整えてやれば開くことができるようになりますが、それは面倒でしょう。それを解決するのが以下の一行です。</p>
 
-<pre><code class="language-vim">autocmd FileType html setlocal includeexpr=substitute(v:fname,'^\\/','','') | setlocal path+=;/</code></pre>
+<pre><code class="language-vim">autocmd FileType html setlocal includeexpr=substitute(v:fname,'^\\/','','') | setlocal path+=;/
+</code></pre>
 
 <p>こう~/.vimrcに書いておくだけで<code>gf</code>で開くことができるようになります。<code>includeexpr</code>でファイル名の先頭のスラッシュを削り、<code>path</code>に<code>;/</code>を追加して上流を探すようにすることにより、大体うまく開くことが可能になるわけです。<code>path</code>によって<code>gf</code>や<code>:find</code>などでファイルを探すパスを細かく設定できます。値の<code>;/</code>については、</p>
 
