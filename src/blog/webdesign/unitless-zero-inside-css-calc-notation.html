@@ -2,7 +2,7 @@
 
 <p>感覚として<code>calc(1rem + 1)</code>は明らかにダメそうだとわかるが、なんとなく通りそうに見える<code>calc(1rem + 0)</code>もダメになるということを<a href="https://github.com/hail2u/node-csswring/pull/62">CSSWringへのPR</a>で知った。<code>0</code>ならユニットを省略できることが多いが、<code>calc()</code>内では別のようだ。最初良くわからなかったが、この辺りを定義している<a href="http://www.w3.org/TR/css3-values/">CSS Values and Units Module Level 3仕様</a>でもちゃんとそうなっていた。</p>
 
-<p>仕様では<code>calc()</code>の中身を処理する時に、<a href="http://www.w3.org/TR/css3-values/#calc-type-checking">右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>（乗算）の場合は両辺のどちらかが数字であることが、<code>/</code>（除算）では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>（加算）と<code>-</code>（減算）では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
+<p>仕様では<code>calc()</code>の内容を処理する時に、<a href="http://www.w3.org/TR/css3-values/#calc-type-checking">右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>（乗算）の場合は両辺のどちらかが数字であることが、<code>/</code>（除算）では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>（加算）と<code>-</code>（減算）では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
 
 <p>問題の<code>calc(1em + 0)</code>は左辺が<code>&lt;length&gt;</code>で右辺が<code>&lt;integer&gt;</code>となる。そのため両辺の型が一致せず文法違反になる。実際に各ブラウザーでもことごとく無視されるようになる。</p>
 
