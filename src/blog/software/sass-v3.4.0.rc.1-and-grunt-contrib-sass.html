@@ -8,15 +8,15 @@
 <p>普通に実行する場合は問題ないが、<code>--load-path</code>オプション付きで実行しようとすると以下の様にSassコンパイラーが<code>NoMethodError</code>で落ち、タスクが止まってしまうことがある。</p>
 
 <figure>
-  <blockquote>
-    <pre><samp>Running "sass:main" (sass) task
+<blockquote>
+<pre><samp>Running "sass:main" (sass) task
 NoMethodError: undefined method `&lt;&lt;&#39; for nil:NilClass
   Use --trace for backtrace.
 Warning: Exited with error code 1 Use --force to continue.NoMethodError:
 
 Aborted due to warnings.
 </samp></pre>
-  </blockquote>
+</blockquote>
 </figure>
 
 <p>これはv3.4.0.rc.1でライブラリをロードするパスとして入力ファイルと同じディレクトリが含まれなくなったことに起因する問題のようだ。grunt-contrib-sass経由の場合、<code>--load-path</code>が常に指定されて実行されるので起こりやすい。CHANGELOGで触れられているように<code>SASS_PATH</code>という環境変数を設定しておくと落ちなくなる。</p>
@@ -33,14 +33,14 @@ Aborted due to warnings.
 <p>Sass v3.4.0.rc.1ではSource Mapがデフォルトで出力されるようになり、それに伴ってオプションも変更になった。</p>
 
 <figure>
-  <blockquote>
-    <pre><samp>--sourcemap=TYPE             How link generated output to the source files.
+<blockquote>
+<pre><samp>--sourcemap=TYPE             How link generated output to the source files.
                                auto (default): relative paths where possible, file URIs elsewhere
                                file: always absolute file URIs
                                inline: include the source text in the sourcemap
                                none: no sourcemaps
 </samp></pre>
-  </blockquote>
+</blockquote>
 </figure>
 
 <p>今までのような真偽値のオプションではなくなり、文字列でSource Mapの出力方法を指定するように変わっている。また他の<code>--style</code>や<code>--default-encoding</code>と違って、このオプションのみ<code>=</code>で値を指定する必要がある。grunt-contrib-sassではこの新しい値の文字列に対応していないのみならず、内部で利用している<a href="https://github.com/sindresorhus/dargs"><code>dargs</code>パッケージ</a>が<code>=</code>で値を指定する方法に対応していないので、<a href="/pub/grunt-contrib-sass-source-map.patch">結構大胆に手をいれる必要</a>があった。</p>

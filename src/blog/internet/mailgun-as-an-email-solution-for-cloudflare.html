@@ -13,9 +13,9 @@
 <p>これらDNSレコードをCloudFlareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff CloudFlareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。</p>
 
 <figure>
-  <a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"></a>
+<a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"><img alt="Mailgunで提供される5つのDNSレコードをCloudFlareのコントロールパネルから設定した様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png"></a>
 
-  <figcaption>DNS Settings on CloudFlare</figcaption>
+<figcaption>DNS Settings on CloudFlare</figcaption>
 </figure>
 
 <p>次にMailgun側でドメインの照合を行うわけだが、その前にMailgunで設定しようとしているドメインのDomain SettingsでInbound Spam FilterをBlock Detected Spamに変更しておくと良い。こうしないとスパムメールをちょくちょく受信するようなメールアドレスをMailgunで処理しようとする場合、即座にDisabledにされてしまう。もしDisabledにされた場合は、まだメールの送信はしていないことなどを添えてサポートから連絡すれば簡単に復活させてはくれる。</p>
@@ -23,17 +23,17 @@
 <p>続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる（待っていても自動で照合してはくれない）。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。</p>
 
 <figure>
-  <a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"></a>
+<a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"><img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-2.png"></a>
 
-  <figcaption>Domain Verification on Mailgun</figcaption>
+<figcaption>Domain Verification on Mailgun</figcaption>
 </figure>
 
 <p>次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。</p>
 
 <figure>
-  <a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"></a>
+<a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"><img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-3.png"></a>
 
-  <figcaption>Mail Forwarding Setting on Mailgun</figcaption>
+<figcaption>Mail Forwarding Setting on Mailgun</figcaption>
 </figure>
 
 <p>Filter Expressionで<code>match_recipient()</code>を使って利用したいメールアドレスを指定し、Actionsで<code>forward()</code>を使って自分のGmailのメールアドレスを指定する。Priorityは他に何もしないのなら0のままで良い。Descriptionはわかりやすい名前を付けておくべきだろう。Filter Expressionで<code>catch_all()</code>を使うといわゆるキャッチオール的な転送も可能だ。</p>
@@ -41,9 +41,9 @@
 <p>ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。</p>
 
 <figure>
-  <a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"></a>
+<a href="/img/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"><img alt="Mailgunで正常にメールが転送されていることを確認している様子" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-4.png"></a>
 
-  <figcaption>Viewing Logs on Mailgun</figcaption>
+<figcaption>Viewing Logs on Mailgun</figcaption>
 </figure>
 
 <p>Mailgunはクレジットカード情報を登録しない場合、常にFreeアカウントでの運営になる。その場合、<a href="http://documentation.mailgun.com/faqs.html#what-are-the-differences-between-free-and-paid-accounts">いくつかの制限</a>があるが、送信せず転送のみならば問題ない制限だろう。</p>
