@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連をはじめとした記事や文書、プロジェクトを公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Wed, 1 Aug 2018 13:10:43 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 2 Aug 2018 09:43:03 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,87 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[普通のHTMLの書き方では目次にol要素を使っ（てしまっ）たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、counters()による連結だけでいけるかと考えたが、うまくいかなかった。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/adding-counters-to-heading-inside-section.html</guid>
+        <link>https://hail2u.net/blog/adding-counters-to-heading-inside-section.html</link>
+        <pubDate>Thu, 2 Aug 2018 09:42:56 +0900</pubDate>
+        <title><![CDATA[セクション内見出しへの通し番号の追加]]></title>
+        <content:encoded><![CDATA[<p><a href="https://hail2u.net/documents/html-best-practices.html">普通のHTMLの書き方</a>では目次に<code>ol</code>要素を使っ（てしまっ）たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、<code>counters()</code>による連結だけでいけるかと考えたが、うまくいかなかった。</p>
+
+<p>セクションのレベルごとに<code>couter()</code>を作る、というのが結論だ。<code>counters()</code>はこのケースでは利用できない、というよりもほぼリスト系のためだけに存在することがわかった。</p>
+
+<section>
+<h1><code>counters()</code>の利用</h1>
+
+<p>対象のHTML文書では、<code>section</code>と<code>h1</code>要素のみというストイックな記述になっている。そのため<code>section</code>要素でリセットして、<code>h1</code>要素でインクリメントすれば良いだろうと、まずは以下のように書いた。</p>
+
+<pre><code class="language-css">section {
+  counter-reset: section;
+}
+
+section h1::before {
+  content: counters(section, &quot;.&quot;) &quot;. &quot;;
+  counter-increment: section;
+}
+</code></pre>
+
+<p>これだとすべての見出しに「1.」や「1.1.」が付く。当たり前だが<code>section</code>要素ごとにリセットされるからだ。このパターンは<code>ol</code>と<code>li</code>要素のような構造ではうまく振られる。</p>
+</section>
+
+<section>
+<h1><code>counter-reset</code>の工夫</h1>
+
+<p>数字をリセットするタイミングが悪い、と勘違いした。そのため次はそれを制御しようと以下のように書いた。</p>
+
+<pre><code class="language-css">main,
+main &gt; section {
+  counter-reset: section;
+}
+
+section h1::before {
+  content: counters(section, &quot;.&quot;) &quot;. &quot;;
+  counter-increment: section;
+}
+</code></pre>
+
+<p>これだとカウンターとその利用がうまくマッピングされない。そのため「0.1」や「0.3」などセクションのネストを無視した連番になってしまう。</p>
+</section>
+
+<section>
+<h1>複数のカウンターの利用</h1>
+
+<p>落ち着いて考えると<code>counters()</code>で連番を振れるのはネストしあう要素同士だけで、それに含まれる要素へは無理だった。最後にたどり着いたのはカウンターを大見出しと小見出しでわける方法だ。</p>
+
+<pre><code class="language-css">main {
+  counter-reset: section;
+}
+
+main &gt; section {
+  counter-reset: subsection;
+}
+
+main &gt; section &gt; h1::before {
+  content: counter(section) &quot;. &quot;;
+  counter-increment: section;
+}
+
+main &gt; section &gt; section &gt; h1::before {
+  content: counter(section) &quot;.&quot; counter(subsection) &quot;. &quot;;
+  counter-increment: subsection;
+}
+</code></pre>
+
+<p><code>section</code>要素がある分、<code>h1</code>や<code>h2</code>要素でフラットな構造を持つ場合と違って複雑になるが、これでうまく振れる。</p>
+</section>
+
+<hr>
+
+<p>結局は採用を見送ったので、もはやどうでも良い話だ。頭の体操と仕様を見直すきっかけにはなった。</p>
+
+<p>CSSのカウンターは、CSS2時代から存在するが、Internet Explorer 6などで実装されなかったので日の目を見なかった。ChromeやFirefoxでのサポートで一瞬脚光を浴びたが、同時に使いどころがあまりないことも判明してしまい、そのまま忘れ去られたのだろう。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[疑似2カラムで右しか使わないのも飽きてきたので、右にもカラムを追加して、擬似3カラムにした。幅は1.7:2.89:1という比率になっている。使うのはほぼ真ん中のカラムだけで、今までとあまり変わらない。左右のカラムは幅が違い、真ん中寄せ風だが真ん中寄せではない、というイロモノだ。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/fake-3-column.html</guid>
@@ -259,37 +340,6 @@ This is a subsection paragraph.
 <hr>
 
 <p>いわゆる不要不急の外出だったので、展覧会を見た後は、昼ごはんだけ食べてフラフラしないことにした。セールの谷間なので見て回りたいということもない。おいしいサバのサンドイッチを食べ、ルバーブとオレンジのパンをお土産に速やかに帰宅した。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[5～8年くらい使っている3種類のフライパンが、どれもダメになってきたので、買い替えることにした。今までは18cmと22cm深型、26cmの3つを使っていたが、フタが複数必要で面倒だった。22cmのガラスのフタが気に入っており、それだけにしたかったので、それに合わせて22cmで2種類買うことにした。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/t-fal-d55183.html</guid>
-        <link>https://hail2u.net/blog/t-fal-d55183.html</link>
-        <pubDate>Tue, 17 Jul 2018 12:41:45 +0900</pubDate>
-        <title><![CDATA[ティファール グランブルー・プレミア ディープパン 22cm]]></title>
-        <content:encoded><![CDATA[<aside>
-<figure>
-<a href="https://www.amazon.co.jp/%E3%83%86%E3%82%A3%E3%83%95%E3%82%A1%E3%83%BC%E3%83%AB-5%E5%B1%A4%E3%82%B3%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0-D55183-T-fal-%E3%80%90IH%E9%9D%9E%E5%AF%BE%E5%BF%9C%E3%80%91/dp/B01BCWT9CE/ref=as_li_ss_il?ie=UTF8&amp;qid=1531368475&amp;sr=8-4&amp;keywords=%E3%83%86%E3%82%A3%E3%83%95%E3%82%A1%E3%83%BC%E3%83%AB+22cm&amp;linkCode=li2&amp;tag=hail2unet-22&amp;linkId=99edd013b8ada30adcef060f880f6117"><img alt="ティファール 炒め鍋 22cm 極深 フライパン ガス火専用 「 グランブルー プレミア ディープパン 」 チタン プレミア 5層コーティング D55183 取っ手つき T-fal 【IH非対応】" src="https://images-fe.ssl-images-amazon.com/images/I/41fg3f7mq2L.jpg"></a>
-</figure>
-</aside>
-
-<p>5～8年くらい使っている3種類のフライパンが、どれもダメになってきたので、買い替えることにした。今までは18cmと22cm深型、26cmの3つを使っていたが、フタが複数必要で面倒だった。22cmのガラスのフタが気に入っており、それだけにしたかったので、それに合わせて22cmで2種類買うことにした。</p>
-
-<p>1つは近所のティファールで2800円で売っていた<a href="https://www.amazon.co.jp/%E3%83%86%E3%82%A3%E3%83%95%E3%82%A1%E3%83%BC%E3%83%AB-5%E5%B1%A4%E3%82%B3%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0-D55183-T-fal-%E3%80%90IH%E9%9D%9E%E5%AF%BE%E5%BF%9C%E3%80%91/dp/B01BCWT9CE/ref=as_li_ss_il?ie=UTF8&amp;qid=1531368475&amp;sr=8-4&amp;keywords=%E3%83%86%E3%82%A3%E3%83%95%E3%82%A1%E3%83%BC%E3%83%AB+22cm&amp;linkCode=li2&amp;tag=hail2unet-22&amp;linkId=99edd013b8ada30adcef060f880f6117">グランブルー・プレミアの22cm深型</a>にすんなり決まったが、浅い22cmのフライパンがなかなか見つからなくて苦労した。結局は同じティファールで投げ売りされていた、アシスティオという謎のシリーズ（古いのか、アウトレット専用モデルなのか、まったく情報が出てこない）の22cmで2268円のものにした。</p>
-
-<p>22cm深型は、ティファールでもうちょっと安いものもあったが、店先では100円しか変わらなかったので、高い方にしてみた。使い勝手は普通だ。重さも普通で、軽くはないが、重くもない。揚げ物ができる程度に深さがあり、アジフライもうまく揚がった。底の薄茶色のマーブル模様が気にいらない。</p>
-
-<p>アシスティオの方はちょっと重い。880gくらいあり、洗うのが少し大変だ。取っ手は持ちやすい。それ以外は普通だ。付属の温度センサーは、コンロ側に同様の機能があるので使っていない（開封さえしていない）。カジキのステーキと餃子はうまく焼けた。これも底の細かい三角形の模様が気に入らない。</p>
-
-<hr>
-
-<p>ざっと見て回ったりググったりしたところ、浅い普通のフライパンは20cmと26cmがメインで、24cmと28cmならそこそこある、という情勢のようだ。22cmもないことはないが、かなり品揃えが豊富な店でないと扱いがない。イオンやホームセンター、キッチン用品を扱う雑貨屋などでは、ほとんど見つからなかった。逆に深型は22cmがメインだった。フタの流用を防ぐビジネス・モデルかと勘ぐってしまう。</p>
-
-<p>フタを減らすには複数のサイズに対応するフタを買う手段もある。しかしこれはこれでフライパンの取っ手と干渉しやすく、ちゃんとフタとして機能しなかったり、面倒くさい。22cmのガラスのフタを買ったのも、26cm/22cm兼用のフタが22cm深型にうまく乗っからなかったからだった。商売上手だな。</p>
-
-<hr>
-
-<p>厚さが2cmくらいある牛肉を焼きたい。</p>
 ]]></content:encoded>
       </item>
 
