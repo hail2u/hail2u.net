@@ -237,15 +237,18 @@ const contributeSelected = selected =>
     updateEntry(selected)
   ]);
 
-const renderSelected = (template, selected) =>
+const renderSelected = (template, selected, partials) =>
   mustache
-    .render(template, selected)
+    .render(template, selected, partials)
     .replace(/="\/img\//g, '="../src/img/')
     .replace(/="\//g, '="../dist/');
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");
-  const rendered = renderSelected(template, selected);
+  const partials = {
+    css: await fs.readFile(selected.css, "utf8")
+  };
+  const rendered = renderSelected(template, selected, partials);
   await fs.outputFile(selected.dest, rendered);
   const open = await whichAsync("open");
   return runCommand(open, [selected.dest]);
@@ -290,6 +293,7 @@ const main = async () => {
   return testSelected({
     ...selected,
     content: html,
+    css: "../src/partial/css.mustache",
     dest: "../tmp/__test.html",
     template: "../src/blog/test.mustache"
   });
