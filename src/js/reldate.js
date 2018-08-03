@@ -2,66 +2,70 @@
  * reldate.js
  * LICENSE: http://hail2u.mit-license.org/2016
  */
-const divisorDay = 24;
-const divisorHour = 60;
-const divisorMinute = 60;
-const divisorMonth = 30;
-const divisorSecond = 1000;
-const divisorYear = 12;
+const divisor = {
+  day: 24,
+  hour: 60,
+  minute: 60,
+  month: 30,
+  second: 1000,
+  year: 12
+};
 const now = performance.timing.navigationStart + performance.now();
 const suffix = "前";
-const unitDay = "日";
-const unitHour = "時間";
-const unitMinute = "分";
-const unitMonth = "ヶ月";
-const unitNow = "たった今";
-const unitSecond = "秒";
-const unitYear = "年";
+const unit = {
+  Day: "日",
+  Hour: "時間",
+  Minute: "分",
+  Month: "ヶ月",
+  Now: "たった今",
+  Second: "秒",
+  Year: "年"
+};
 
 const toRelativeDate = (from, to) => {
   if (!Number.isInteger(to)) {
     return;
   }
 
-  let diff = Math.round((from - to) / divisorSecond);
+  let diff = Math.round((from - to) / divisor.second);
 
   if (!Number.isInteger(diff) || diff < 0) {
     return;
   }
 
-  if (diff < divisorMinute / 2) {
-    return unitNow;
+  if (diff < divisor.minute / 2) {
+    return unit.now;
   }
 
-  if (diff < divisorMinute) {
-    return `${diff}${unitSecond}${suffix}`;
+  if (diff < divisor.minute) {
+    return `${diff}${unit.second}${suffix}`;
   }
 
-  diff = Math.round(diff / divisorMinute);
+  diff = Math.round(diff / divisor.minute);
 
-  if (diff < divisorHour) {
-    return `${diff}${unitMinute}${suffix}`;
+  if (diff < divisor.hour) {
+    return `${diff}${unit.minute}${suffix}`;
   }
 
-  diff = Math.round(diff / divisorHour);
+  diff = Math.round(diff / divisor.hour);
 
-  if (diff < divisorDay) {
-    return `${diff}${unitHour}${suffix}`;
+  if (diff < divisor.day) {
+    return `${diff}${unit.hour}${suffix}`;
   }
 
-  diff = Math.round(diff / divisorDay);
+  diff = Math.round(diff / divisor.day);
 
-  if (diff < divisorMonth) {
-    return `${diff}${unitDay}${suffix}`;
+  if (diff < divisor.month) {
+    return `${diff}${unit.day}${suffix}`;
   }
 
-  diff = Math.round(diff / divisorMonth);
+  diff = Math.round(diff / divisor.month);
 
-  if (diff < divisorYear) {
-    return `${diff}${unitMonth}${suffix}`;
+  if (diff < divisor.year) {
+    return `${diff}${unit.month}${suffix}`;
   }
 
-  return `${Math.round(diff / divisorYear)}${unitYear}${suffix}`;
+  return `${Math.round(diff / divisor.year)}${unit.year}${suffix}`;
 };
 
 for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
