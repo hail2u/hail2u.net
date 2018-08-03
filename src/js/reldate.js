@@ -13,13 +13,13 @@ const divisor = {
 const now = performance.timing.navigationStart + performance.now();
 const suffix = "前";
 const unit = {
-  Day: "日",
-  Hour: "時間",
-  Minute: "分",
-  Month: "ヶ月",
-  Now: "たった今",
-  Second: "秒",
-  Year: "年"
+  day: "日",
+  hour: "時間",
+  minute: "分",
+  month: "ヶ月",
+  now: "たった今",
+  second: "秒",
+  year: "年"
 };
 
 const toRelativeDate = (from, to) => {
