@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連をはじめとした記事や文書、プロジェクトを公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Sun, 5 Aug 2018 13:31:03 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 6 Aug 2018 09:40:11 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,136 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[このウェブサイトでは、画像や引用をfigure要素でマークアップしている。Markdownで書いているわけだが、もちろんそんな記法はないので、今までは生HTMLを書いていた。しかし、marked v0.4.0でのバグでハマりどうしようもなさそうだったため、markedの拡張機構を使って、なんとなくうまい感じになるようにする必要がでてきてしまった。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/inserting-figure-element-in-marked.html</guid>
+        <link>https://hail2u.net/blog/inserting-figure-element-in-marked.html</link>
+        <pubDate>Mon, 6 Aug 2018 09:39:18 +0900</pubDate>
+        <title><![CDATA[figure要素をmarkedで]]></title>
+        <content:encoded><![CDATA[<p>このウェブサイトでは、画像や引用を<code>figure</code>要素でマークアップしている。Markdownで書いているわけだが、もちろんそんな記法はないので、今までは生HTMLを書いていた。しかし、<a href="https://hail2u.net/blog/raw-html-parsing-bug-in-marked-v0.4.0.html">marked v0.4.0でのバグ</a>でハマりどうしようもなさそうだったため、<a href="https://marked.js.org/">marked</a>の拡張機構を使って、なんとなくうまい感じになるようにする必要がでてきてしまった。</p>
+
+<p>現在のHTML仕様では<code>p</code>要素が柔軟に使えるので、わざわざ<code>figure</code>要素を使うべき、というわけではない。しかしMarkdownだとクラス名を自由に振れるわけではないので、普通の段落と画像だけの段落を区別できない。<a href="https://www.w3.org/TR/selectors-4/">Selectors Level 4</a>が自由に使えるようになるまでは、スタイル都合で画像や引用と普通の段落を明示的に区別したいという気持ちが強い。</p>
+
+<section>
+<h1>画像を括る<code>figure</code>要素</h1>
+
+<p>想定するパターンはキャプションのあるなしの2つだ。キャプションの記述には、Markdownのいくつかの記法にある<code>title</code>属性を流用するようにした（使ったことがない）。画像記法のそれだと実装が面倒くさかったため、リンクを張ることを前提に、ハイパーリンク記法のそれを利用する。</p>
+
+<pre><code class="language-markdown">[![alt](src)](href &quot;caption&quot;)
+
+[![alt](src)](href)
+</code></pre>
+
+<p>このMarkdownから以下のHTMLを生成したい。</p>
+
+<pre><code class="language-html">&lt;figure&gt;
+&lt;a href=&quot;href&quot;&gt;&lt;img alt=&quot;alt&quot; src=&quot;src&quot;&gt;&lt;/a&gt;
+&lt;figcaption&gt;caption&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+&lt;a href=&quot;href&quot;&gt;&lt;img alt=&quot;alt&quot; src=&quot;src&quot;&gt;&lt;/a&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<p>実装は2つのフェーズに分けて行った。リンク側ではキャプションがあり、かつ内容が画像だったら、<code>figcaption</code>要素でキャプションをマークアップして追加する。段落側では、リンクが張られた画像だけか、それに加えて<code>figcaption</code>要素があるなら、全体を<code>p</code>要素ではなく<code>figure</code>要素でマークアップする。</p>
+
+<pre><code class="language-javascript">const markupHyperlink = (href, title, content) =&gt; {
+  if (!title) {
+    return `&lt;a href=&quot;${href}&quot;&gt;${content}&lt;/a&gt;`;
+  }
+
+  if (!content.startsWith(&quot;&lt;img &quot;)) {
+    return `&lt;a href=&quot;${href}&quot; title=&quot;${title}&gt;${content}&lt;/a&gt;`;
+  }
+
+  return `&lt;a href=&quot;${href}&quot;&gt;${content}&lt;/a&gt;
+&lt;figcaption&gt;${title}&lt;/figcaption&gt;`;
+};
+
+const markupParagaraph = content =&gt; {
+  if (!/^&lt;a\b.*?&gt;&lt;img\b.*?&gt;&lt;\/a&gt;(\n&lt;(figcaption)&gt;.*?&lt;\/\1&gt;)?$/.exec(content)) {
+    return `&lt;p&gt;${content}&lt;/p&gt;
+`;
+  }
+
+  return `&lt;figure&gt;
+${content}
+&lt;/figure&gt;
+`;
+};
+</code></pre>
+</section>
+
+<section>
+<h1>引用を括る<code>figure</code>要素</h1>
+
+<p>画像とは違い、引用元の表記があるかないかで分ける。流用出来そうな記法はないので、最終行が<code>—</code>（EMダッシュ）で始まっていた場合は引用元とみなす、ということにする。そうでない場合は<code>figure</code>要素でマークアップしなくても良いので、何もしない。</p>
+
+<pre><code class="language-markdown">&gt; This is a quote.
+&gt;
+&gt; — &lt;cite&gt;[text](href)&lt;/cite&gt;
+
+&gt; This is a quote.
+
+— &lt;cite&gt;[text](href)&lt;/cite&gt;
+
+&gt; This is a quote.
+&gt;
+&gt; This is a quote.
+</code></pre>
+
+<p>最初のみ<code>figure</code>要素でマークアップし、以下のHTMLを生成したい。</p>
+
+<pre><code class="language-html">&lt;figure&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This is a quote.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figcaption&gt;— &lt;cite&gt;&lt;a href=&quot;href&quot;&gt;text&lt;/a&gt;&lt;/cite&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This is a quote.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;— &lt;cite&gt;&lt;a href=&quot;href&quot;&gt;text&lt;/a&gt;&lt;/cite&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This is a quote.&lt;/p&gt;
+&lt;p&gt;This is a quote.&lt;/p&gt;
+&lt;/blockquote&gt;
+</code></pre>
+
+<p>実装は引用内の最後の行のみをチェックして行った。EMダッシュで始まっていないなら通常通り出力する。始まっていた場合は最後の行を<code>p</code>要素から<code>figcaption</code>要素へ変換し、さらに<code>figure</code>要素で全体をマークアップする。</p>
+
+<pre><code class="language-javascript">const markupQuote = content =&gt; {
+  const lines = content.trim().split(&quot;\n&quot;);
+
+  if (!lines[lines.length - 1].startsWith(&quot;&lt;p&gt;—&quot;)) {
+    return `&lt;blockquote&gt;
+${lines.join(&quot;\n&quot;)}
+&lt;/blockquote&gt;
+`;
+  }
+
+  lines.push(lines.pop().replace(/&lt;(\/)?p&gt;/g, &quot;&lt;$1figcaption&gt;&quot;));
+  return `&lt;figure&gt;
+&lt;blockquote&gt;
+${lines.join(&quot;\n&quot;)}
+&lt;/blockquote&gt;
+&lt;/figure&gt;
+`;
+};
+</code></pre>
+</section>
+
+<hr>
+
+<p>もうちょっと特別なルールをなくしたい。画像の方はリンクを強要したくないし、引用と同じようにキャプションのあるなしで分けた方が良いかもしれない。EMダッシュはそこそこ書きやすいので、引用はこのような形でベストかもしれない。とにかくなんとなくで書いたら、スカッとしたHTMLになってほしい。</p>
+
+<p>また、コードから正規表現をなくしたいところだが、それは難しそうだ。<code>arr.push(arr.pop())</code>とやっているところもどうにかしたい。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[SafariやmacOSのChromeのinput[type=search]が装飾過多で、そのままではどうにもならないのは、-webkit-appearanceプロパティーを使ってどうにかする。しばらく前まではtextfieldにすれば済んでいたが、どうもnoneまでしないとダメになってしまったようだ。まだちゃんと調べていないが、Mobile Safari 11ではtextfieldだと内側の影や丸い角が殺せなかった。:focusの時も謎の挙動をする。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/on-20180803.html</guid>
@@ -300,27 +430,6 @@ This is a subsection paragraph.
 </code></pre>
 
 <p><a href="https://hail2u.net/blog/webdesign/target-pseudo-class-and-padding-top.html"><code>:target</code>でやる手法</a>もお気に入りだが、このような形であらかじめ<code>padding-top</code>プロパティーを確保するのもお手軽だ。<code>calc()</code>と<code>var()</code>を使うともうちょっとかっこよく書ける。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[普通のHTMLの書き方（またはHTML Best Practices）の校正を終えた。1週間くらい寝かせてから始め、なんとか直せたように思う。ということで静的なHTML版を「普通のHTMLの書き方」という同じ名称で生成し、このウェブサイトで公開した。まとめたら200KB超のボリュームになってしまった。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/html-best-practices-in-detail-in-static-html.html</guid>
-        <link>https://hail2u.net/blog/html-best-practices-in-detail-in-static-html.html</link>
-        <pubDate>Sun, 22 Jul 2018 13:11:51 +0900</pubDate>
-        <title><![CDATA[静的HTML版・普通のHTMLの書き方]]></title>
-        <content:encoded><![CDATA[<p>普通のHTMLの書き方（またはHTML Best Practices）の校正を終えた。1週間くらい寝かせてから始め、なんとか直せたように思う。ということで静的なHTML版を「<a href="https://hail2u.net/documents/html-best-practices.html">普通のHTMLの書き方</a>」という同じ名称で生成し、このウェブサイトで公開した。まとめたら200KB超のボリュームになってしまった。</p>
-
-<p>GitHub側での追加は、ある程度の数を追加したら反映させる、かもしれない。校正しきれていないところや、投げやりなCSSは気が向いたら直すつもりだ。印刷向けに改ページのCSSを仕込みたいところだが、印刷するほどのものではなさそうだ。</p>
-
-<hr>
-
-<p>HTML版の生成はGitHub Pages（つまりJekyll）に頼っても良かったが、それほどでもなさそうなことと、単ページにしたかったので自前で生成した。<a href="https://github.com/hail2u/html-best-practices/blob/master/in-detail/README.ja.md">目次</a>までは作ってあったので、これを読んでToCっぽいものを生成しつつ、MarkdownをHTMLにしたものを連結していくだけだった。50行くらいの書き捨てスクリプトでうまく生成できた。</p>
-
-<p>こういうものの生成には、<a href="https://ia.net/writer">iA Writer</a>に独自実装されたインクルードする仕組みが広まれば、もっと手軽になりそうだ。見出しレベルの自動調節などが面倒そうだが、これこそ<code>section</code>要素で括ってしまえばいいだけかもしれない。</p>
-
-<hr>
-
-<p>⁂が好きなので、使えてうれしい。<code>class</code>属性なしでCSSを書く趣味も堪能できた。</p>
 ]]></content:encoded>
       </item>
 
