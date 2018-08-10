@@ -30,11 +30,6 @@ const files = [
     src: "../src/documents/index.mustache"
   },
   {
-    dest: "../dist/projects/index.html",
-    json: "../src/projects/index.json",
-    src: "../src/projects/index.mustache"
-  },
-  {
     dest: "../dist/feed",
     json: "../src/index.json",
     itemLength: 10,
