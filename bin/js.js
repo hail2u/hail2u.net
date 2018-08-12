@@ -16,8 +16,8 @@ const files = [
     dest: "../tmp/defer.min.js",
     src: [
       "../src/js/ellipsis-title.js",
-      "../src/js/reldate.js",
-      "../src/js/title-break.js"
+      "../src/js/heading-break.js",
+      "../src/js/reldate.js"
     ]
   }
 ];

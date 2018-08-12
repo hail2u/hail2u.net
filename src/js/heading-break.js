@@ -1,6 +1,6 @@
 /*!
- * title-break.js
- * LICENSE: http://hail2u.mit-license.org/2016
+ * heading-break.js
+ * LICENSE: http://hail2u.mit-license.org/2018
  */
 
 const addWordJoiner = (added, value, index) => {
