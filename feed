@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連の記事や特集を公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Mon, 13 Aug 2018 18:36:33 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 14 Aug 2018 08:49:29 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,57 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/mapping-viewport-width-and-column-number.html</guid>
+        <link>https://hail2u.net/blog/mapping-viewport-width-and-column-number.html</link>
+        <pubDate>Tue, 14 Aug 2018 08:49:07 +0900</pubDate>
+        <title><![CDATA[ビューポート幅と列数の対応]]></title>
+        <content:encoded><![CDATA[<p>サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。</p>
+
+<p>狭い画面では3列、ちょっと広い画面では4列、もっと広い画面では5列と、段階的に列数を増やす仕組みを単純化して例に挙げる。実際にどのような感じかは、<a href="https://hail2u.net/">このウェブサイトのホーム</a>の一番下で確認できるだろう。こちらは折り返さず隠すものだが、基本は同じだ。</p>
+
+<pre><code class="language-css">.container {
+  --num-column: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.thumbnail {
+  width: calc((100% - 1rem * (var(--num-column) - 1)) / var(--num-column));
+}
+
+@media (min-width: 720px) {
+  .container {
+    --num-column: 4;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    --num-column: 5;
+  }
+}
+</code></pre>
+
+<p>親の<code>.container</code>では、子の<code>.thumbnail</code>を折り返しつつ並べるため、列数を定義しつつFlexboxをうまく使う。後に<code>calc()</code>で使うので、列数は単位なしの整数で定義する。サムネイルの余白は子で制御しても良いが、<code>space-between</code>を使ってFlexboxに任せると<em>必ずキレイに</em>収まるので、考慮することが減る。（多分CSSプリプロセッサーで作られた）小数の扱いがブラウザーによって違うことに由来する「<code>1px</code>はみだした！」や「<code>1px</code>足りない……」という事態がまず起きないからだ。</p>
+
+<p>子の<code>.thumbnail</code>では列数の定義を利用して幅を計算する。<code>100%</code>から各列の間の余白（ここでは<code>1rem</code>とした）を引き、残りを列数で割る。各列の間の数は常に列数から1を引いたものなので、これも計算できる。動的な値から計算するこの手の<code>calc()</code>はCSSプリプロセッサーでは実現できない。</p>
+
+<p>メディア・クエリーでは列数を上書きしていく。それだけで、余白の割り当てや幅の計算をブラウザーが調節してくれる。この場合は、今まで通りに書いても<code>width</code>プロパティーで上書きするだけと、あまり手間が変わらない。そのため中途半端に抽象化しただけに過ぎないが、<code>--num-column</code>を複数の要素とプロパティーで利用していると、それぞれに伝播させられるので効率が良くなる。</p>
+
+<hr>
+
+<p>本当は列数もビューポート幅から計算できると良い。理論的には、サムネイルの最大サイズを決め、それでビューポート幅を割れば計算できる。しかし今の<code>calc()</code>では単位ありの数値から単位なしの整数を作れないので、実装に落とし込むのは難しそうだ。別の方向からのアプローチがないか考えているが、まだうまく思いつかない。</p>
+
+<p>また、<code>calc()</code>では単位を付けることは簡単だが、その逆はできないことも覚えておきたい。<code>100rem</code>を<code>1rem</code>で割っても<code>100</code>にはならないのだ。つまり、<code>calc()</code>でカスタム・プロパティーを使う場合は、できるだけ単位なしの数字で係数や定数として定義しておくべきだろう。</p>
+
+<hr>
+
+<p>まだカスタム・プロパティーどころか<code>calc()</code>すらも怪しい時勢なので使いどころは限られる。しかし、これまでのCSSプリプロセッサーの概念とは大きく違った使い方なので、意識改革をしつつ使えるところ（絶対に動く環境）では積極的に使っていきたい。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[久々にジレットの替刃を買った。今は10個入りが定期おトク便で2628円と、そこそこ安いようだ。ジレットの替刃は、プライム専用になってたり、そうでない場合はぼったくり価格だったり、が多かった。もう安く買えないかも……と考えていたが、手ごろな価格で手に入ってうれしい。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/gillette-fusion5-proglide-razor-blades-10-blade-refills.html</guid>
@@ -370,48 +421,6 @@ This is a subsection paragraph.
 <p>ビューポート幅<code>320px</code>を基準に、ビューポート幅が<code>400px</code>増えるごとに<code>2px</code>ずつフォント・サイズが増える。ユーザーのテキスト・サイズ設定が<code>16px</code>で、ビューポート幅が<code>1920px</code>だと、フォント・サイズは<code>24px</code>になる。<code>3840px</code>だと<code>33.6px</code>だ！</p>
 
 <p>良さそうだが、ユーザー設定をうまく反映していないような気もする。ユーザーが<code>18px</code>に上げていた場合は、<code>2.25px</code>ずつ増やしてやりたい。<code>calc()</code>で単位を消して係数化できないので、実現は難しそうだ。ブラウザーにはテキスト・サイズとズームの設定が別々に存在することを考えると、テキスト・サイズの設定は固定数の増減であって倍率での拡大縮小ではないと考えられるので、この実装で良いのかもしれない。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換にsharpパッケージを使うように変えたところで発生したらしい。sharpがSVGでhsl()をサポートしていない（正確にはSVG 1.1までのサポートのため、その仕様で定義済みの色しかサポートしていない）ことが原因だった（バグではない）。SVG側で#rrggbbに変更し、無事修正できた。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/sharp-package-and-hsl-color-in-svg.html</guid>
-        <link>https://hail2u.net/blog/sharp-package-and-hsl-color-in-svg.html</link>
-        <pubDate>Thu, 26 Jul 2018 14:29:10 +0900</pubDate>
-        <title><![CDATA[sharpパッケージとSVGでのhsl()]]></title>
-        <content:encoded><![CDATA[<p>このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換に<a href="https://github.com/lovell/sharp">sharpパッケージ</a>を使うように変えたところで発生したらしい。sharpがSVGで<code>hsl()</code>をサポートしていない（正確にはSVG 1.1までのサポートのため、<a href="https://www.w3.org/TR/SVG/types.html#DataTypeColor">その仕様で定義済みの色</a>しかサポートしていない）ことが原因だった（バグではない）。SVG側で<code>#rrggbb</code>に変更し、無事修正できた。</p>
-
-<p>ファビコンへのコンバートはうまくいっているように見えたが、こちらも実は線が黒（<code>#000000</code>）になっていたようだ。実際には<code>hsl(0, 0%, 16%)</code>なので、<code>#292929</code>になっているべきだったが、さすがに目視ではチェックできなかった。こちらも<code>#rrggbb</code>に変更して修正した。</p>
-
-<p>SVGの安定仕様は1.1（2.0はCR）で、それはきちんとサポートしているようなので、イシューは立てづらい。もうちょっと考えよう。</p>
-
-<hr>
-
-<p>ほぼ最小で確認できるSVGは以下のようなものだ。</p>
-
-<pre><code class="language-svg">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;
-  width=&quot;100&quot;
-  height=&quot;100&quot;
-  viewport=&quot;0 0 100 100&quot;&gt;
-  &lt;rect width=&quot;100&quot;
-    height=&quot;100&quot;
-    x=&quot;0&quot;
-    y=&quot;0&quot;
-    style=&quot;fill:hsl(0, 0%, 50%)&quot;/&gt;
-&lt;/svg&gt;</code></pre>
-
-<p>縦横100ピクセルの正方形を<code>hsl(0, 0%, 50%)</code>というグレーで塗りつぶしたものだ。<code>version</code>属性を削除してSVG 2.0として解釈されることを期待しているくらいだ。</p>
-
-<p>PNGに変換するコードはこのような簡単なものだ。特に何もしない。</p>
-
-<pre><code class="language-javascript">require(&quot;sharp&quot;)(&quot;test.svg&quot;)
-  .png()
-  .toFile(&quot;test.png&quot;);</code></pre>
-
-<p>出力される<code>test.png</code>は真っ黒（<code>#000000</code>）になる。</p>
-
-<hr>
-
-<p>そもそもsharpに乗り換えたのは、<a href="https://www.microsoft.com/ja-jp/p/inkscape/9pd9bhglfc7h">Inkscapeのストア版</a>に乗り換えたため、コマンドライン・アプリケーションへのアクセスが難しくなったからだ。ついでにImageMagikからも脱却させたりしたので不満はないが、ストア版アプリでのコマンドラインでの対応はまだまだだなと感じた。EdgeとiTunesしか対応しているのを見かけていない。頑張ってアプリ実行エイリアスを周知してほしい。</p>
 ]]></content:encoded>
       </item>
 
