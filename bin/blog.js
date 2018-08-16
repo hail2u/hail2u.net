@@ -299,6 +299,7 @@ const main = async () => {
   });
 };
 
+argv.file = path.resolve(argv.file);
 process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
