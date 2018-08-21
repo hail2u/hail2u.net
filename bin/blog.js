@@ -12,6 +12,9 @@ const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
   boolean: ["contribute", "test", "update"],
+  default: {
+    file: ""
+  },
   string: ["file"]
 });
 const cacheFile = "../src/blog/articles.json";
