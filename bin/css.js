@@ -4,6 +4,7 @@ const fs = require("fs-extra");
 const moveFontFaces = require("../lib/move-font-faces");
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
+const toLonghand = require("../lib/to-longhand");
 const wrapWithSupports = require("../lib/wrap-with-supports");
 
 const files = [
@@ -24,6 +25,7 @@ const processor = postcss([
   atImport(),
   mqpacker(),
   csswring(),
+  toLonghand(),
   wrapWithSupports(),
   moveFontFaces()
 ]);
