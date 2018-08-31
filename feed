@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連の記事や特集を公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Tue, 28 Aug 2018 07:41:13 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 31 Aug 2018 14:50:08 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u by Kyo Nagashima</title>
@@ -15,6 +15,56 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[Edge 17にあるカスタム・プロパティーとショートハンド・プロパティーでのバグが、パッチ・レベルでは直りそうもない。つまり、そう簡単には世界から消えてくれないことが確定してしまったため、しばらく（最低1年半くらい）の間ロングハンド・プロパティーで書かなくてはならない。しかし、そう書き直されたCSSを見ていると、とにかく悲しいので、to-longhandというPostCSSプラグインを書いて誤魔化すことにした。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/postcss-plugin-to-longhand.html</guid>
+        <link>https://hail2u.net/blog/postcss-plugin-to-longhand.html</link>
+        <pubDate>Fri, 31 Aug 2018 14:49:41 +0900</pubDate>
+        <title><![CDATA[PostCSSプラグイン: to-longhand]]></title>
+        <content:encoded><![CDATA[<p>Edge 17にあるカスタム・プロパティーとショートハンド・プロパティーでのバグが、パッチ・レベルでは直りそうもない。つまり、そう簡単には世界から消えてくれないことが確定してしまったため、しばらく（最低1年半くらい）の間ロングハンド・プロパティーで書かなくてはならない。しかし、そう書き直されたCSSを見ていると、とにかく悲しいので、<a href="https://github.com/hail2u/hail2u.net/blob/6a84d5993084df8002737563c10c940f94448495/lib/to-longhand.js"><code>to-longhand</code>というPostCSSプラグイン</a>を書いて誤魔化すことにした。</p>
+
+<p><code>margin</code>や<code>padding</code>プロパティーの変換は簡単だ。まず4値の指定に変換し、それから上右下左に割り当てるだけだ。</p>
+
+<p><code>border</code>プロパティー群のショートハンドの変換は難しい。歴史的に幅、スタイル、色の順で書かれることが多いようだし、僕もそう書いているので、それで決め打ちということにした。</p>
+
+<hr>
+
+<p>ヒマがあったら順不同に対応できるように書き直したい、と考えていたが、どうやら無理そうだ。どのような値が指定されているのかざっと調べれば良いと単純にとらえていたが、問題になるのはカスタム・プロパティーなので、ランタイム、すなわちブラウザーでレンダリングされるまで値がどのようなものか確定しない。</p>
+
+<pre><code class="language-css">:root {
+  --foo: double;
+  --bar: 3px;
+}
+
+.test {
+  border: var(--foo) var(--bar);
+}
+</code></pre>
+
+<p>恣意的なコードを出すと、こういう<code>border</code>プロパティーがありうる。<code>--foo</code>を辿ると<code>double</code>、同じように<code>--bar</code>を辿ると<code>3px</code>なので、このプロパティーからは以下のようなロングハンド・プロパティー群が生成できるだろう。</p>
+
+<pre><code class="language-css">.test {
+  border-style: var(--foo);
+  border-width: var(--bar);
+}
+</code></pre>
+
+<p>一見、これで良さそうだが、カスタム・プロパティーなので、その値がいつも同じタイプであるとは限らない。別のルールセット内で上書き定義されることもあるからだ。</p>
+
+<pre><code class="language-css">.test2 {
+  --foo: #f0f;
+}
+</code></pre>
+
+<p>トリッキーに書くなら、このようにして色とスタイルを同時に変更できる。この場合、生成した<code>border-style</code>プロパティーで色を指定することになってしまうので、無視される。</p>
+
+<p>「このCSSがおかしい」というのは確かだろう。しかし、カスタム・プロパティーは汎用的なものなので、思っても見ない形でこういったケースに遭遇する可能性が高い。ロングハンド・プロパティーへの展開を汎用的に作ることはあきらめ、ショートハンド・プロパティーの書き方に（意見の一致が見られそうな）制限をかける方が無難だろう。</p>
+
+<hr>
+
+<p>変数（的な何か）がある、すなわち型が必要という話であるのかもしれない。TypeScript+CSSOMで書くみたいな未来もありえそうだ。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[調子が最悪だったiPhone 5sが安定してきた。2ヶ月ほど前にApple Storeに持ち込み、何もできずに帰ったら、調子が良くなり、とても不思議だ。あのApple Store専用のiPadアプリにすごい秘密が隠されているに違いない。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/my-5s-and-new-7.html</guid>
@@ -371,87 +421,6 @@ ${lines.join(&quot;\n&quot;)}
 <p>元々頑張りたい場合は<code>none</code>にしていたので、既存のプロジェクトへの影響はほとんどなかったが、最小限のCSSでやろうとしていたらハマった。もうフォーム要素はそのままにするしかなさそうだ。新しいmacOSのDark Modeの影響とか考えたくもないし……。なんかこう<code>manifest.json</code>に書いた<code>background_color</code>の値でうまいことやってもらうしかないし、そうなっていくのかもしれない。</p>
 
 <p>ちょっとだけ設置した検索フォームは、面倒くさくなったのでまたGoogleへのリンクに戻した。🔍便利だな。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[普通のHTMLの書き方では目次にol要素を使っ（てしまっ）たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、counters()による連結だけでいけるかと考えたが、うまくいかなかった。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/adding-counters-to-heading-inside-section.html</guid>
-        <link>https://hail2u.net/blog/adding-counters-to-heading-inside-section.html</link>
-        <pubDate>Thu, 2 Aug 2018 09:42:56 +0900</pubDate>
-        <title><![CDATA[セクション内見出しへの通し番号の追加]]></title>
-        <content:encoded><![CDATA[<p><a href="https://hail2u.net/documents/html-best-practices.html">普通のHTMLの書き方</a>では目次に<code>ol</code>要素を使っ（てしまっ）たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、<code>counters()</code>による連結だけでいけるかと考えたが、うまくいかなかった。</p>
-
-<p>セクションのレベルごとに<code>couter()</code>を作る、というのが結論だ。<code>counters()</code>はこのケースでは利用できない、というよりもほぼリスト系のためだけに存在することがわかった。</p>
-
-<section>
-<h1><code>counters()</code>の利用</h1>
-
-<p>対象のHTML文書では、<code>section</code>と<code>h1</code>要素のみというストイックな記述になっている。そのため<code>section</code>要素でリセットして、<code>h1</code>要素でインクリメントすれば良いだろうと、まずは以下のように書いた。</p>
-
-<pre><code class="language-css">section {
-  counter-reset: section;
-}
-
-section h1::before {
-  content: counters(section, &quot;.&quot;) &quot;. &quot;;
-  counter-increment: section;
-}
-</code></pre>
-
-<p>これだとすべての見出しに「1.」や「1.1.」が付く。当たり前だが<code>section</code>要素ごとにリセットされるからだ。このパターンは<code>ol</code>と<code>li</code>要素のような構造ではうまく振られる。</p>
-</section>
-
-<section>
-<h1><code>counter-reset</code>の工夫</h1>
-
-<p>数字をリセットするタイミングが悪い、と勘違いした。そのため次はそれを制御しようと以下のように書いた。</p>
-
-<pre><code class="language-css">main,
-main &gt; section {
-  counter-reset: section;
-}
-
-section h1::before {
-  content: counters(section, &quot;.&quot;) &quot;. &quot;;
-  counter-increment: section;
-}
-</code></pre>
-
-<p>これだとカウンターとその利用がうまくマッピングされない。そのため「0.1」や「0.3」などセクションのネストを無視した連番になってしまう。</p>
-</section>
-
-<section>
-<h1>複数のカウンターの利用</h1>
-
-<p>落ち着いて考えると<code>counters()</code>で連番を振れるのはネストしあう要素同士だけで、それに含まれる要素へは無理だった。最後にたどり着いたのはカウンターを大見出しと小見出しでわける方法だ。</p>
-
-<pre><code class="language-css">main {
-  counter-reset: section;
-}
-
-main &gt; section {
-  counter-reset: subsection;
-}
-
-main &gt; section &gt; h1::before {
-  content: counter(section) &quot;. &quot;;
-  counter-increment: section;
-}
-
-main &gt; section &gt; section &gt; h1::before {
-  content: counter(section) &quot;.&quot; counter(subsection) &quot;. &quot;;
-  counter-increment: subsection;
-}
-</code></pre>
-
-<p><code>section</code>要素がある分、<code>h1</code>や<code>h2</code>要素でフラットな構造を持つ場合と違って複雑になるが、これでうまく振れる。</p>
-</section>
-
-<hr>
-
-<p>結局は採用を見送ったので、もはやどうでも良い話だ。頭の体操と仕様を見直すきっかけにはなった。</p>
-
-<p>CSSのカウンターは、CSS2時代から存在するが、Internet Explorer 6などで実装されなかったので日の目を見なかった。ChromeやFirefoxでのサポートで一瞬脚光を浴びたが、同時に使いどころがあまりないことも判明してしまい、そのまま忘れ去られたのだろう。</p>
 ]]></content:encoded>
       </item>
 
