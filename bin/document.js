@@ -108,6 +108,7 @@ const extendItem = item => {
     ),
     hour: hour,
     html5PubDate: toHTML5String(...datetimes),
+    html5YearMonth: `${year}-${pad(month)}`,
     minute: minute,
     month: month,
     rfc822PubDate: toRFC822String(...datetimes),
@@ -147,8 +148,24 @@ const findCover = (image, defaultCardType, defaultCover) => {
   return ["summary_large_image", image[1]];
 };
 
+const isFirstInMonth = (current, previous) => {
+  if (!previous || current.month !== previous.month) {
+    return true;
+  }
+
+  return false;
+};
+
 const isFirstInYear = (current, previous) => {
   if (!previous || current.year !== previous.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInMonth = (current, next) => {
+  if (!next || current.month !== next.month) {
     return true;
   }
 
@@ -171,12 +188,14 @@ const isLatest = index => {
   return false;
 };
 
-const markYearChanges = (item, index, items) => {
+const markItemChanges = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
   return {
     ...item,
+    isFirstInMonth: isFirstInMonth(item, previousItem),
     isFirstInYear: isFirstInYear(item, previousItem),
+    isLastInMonth: isLastInMonth(item, nextItem),
     isLastInYear: isLastInYear(item, nextItem),
     isLatest: isLatest(index)
   };
@@ -226,7 +245,7 @@ const mergeData = async (
     ...extradata,
     items: items
       .slice(0)
-      .map(markYearChanges)
+      .map(markItemChanges)
       .slice(0, itemLength),
     lastBuildDate: now(new Date())
   };
