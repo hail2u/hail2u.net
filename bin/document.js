@@ -139,18 +139,6 @@ const readPartials = async () => {
 
 const hasSameLink = (dest, item) => dest.endsWith(item.link);
 
-const filterUpdates = (includeUpdates, item) => {
-  if (item.link.startsWith("/blog/")) {
-    return true;
-  }
-
-  if (includeUpdates) {
-    return true;
-  }
-
-  return false;
-};
-
 const findCover = (image, defaultCardType, defaultCover) => {
   if (!image) {
     return [defaultCardType, defaultCover];
@@ -238,7 +226,6 @@ const mergeData = async (
     ...extradata,
     items: items
       .slice(0)
-      .filter(filterUpdates.bind(null, includeUpdates))
       .map(markYearChanges)
       .slice(0, itemLength),
     lastBuildDate: now(new Date())
@@ -289,11 +276,6 @@ const mergeArticle = item => ({
   ...item
 });
 
-const generateArticles = items => {
-  const articles = items.filter(filterUpdates.bind(null, false));
-  return Promise.all(articles.map(mergeArticle));
-};
-
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
     fs.readJSON(metadataFile, "utf8"),
@@ -310,7 +292,7 @@ const main = async () => {
   }
 
   if (argv.articles) {
-    const articles = await generateArticles(items);
+    const articles = await Promise.all(items.map(mergeArticle));
     return Promise.all(
       articles.map(buildDoc.bind(null, metadata, items, partials))
     );
