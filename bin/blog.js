@@ -223,12 +223,18 @@ const checkSelectedContent = content => {
   return true;
 };
 
-const markupSelected = (ext, content) => {
+const markupSelected = async (ext, content) => {
   if (ext === ".html") {
     return content;
   }
 
-  return markdown(content);
+  const [html, included] = markdown(content);
+
+  if (argv.contribute && included.length > 0) {
+    await Promise.all(included.map(fs.unlink));
+  }
+
+  return html;
 };
 
 const contributeSelected = selected =>
@@ -280,7 +286,7 @@ const main = async () => {
     checkSelectedName(selected.name),
     checkSelectedContent(selected.content)
   ]);
-  const html = markupSelected(selected.ext, selected.content);
+  const html = await markupSelected(selected.ext, selected.content);
 
   if (argv.contribute) {
     const ext = ".html";
