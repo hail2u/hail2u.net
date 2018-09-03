@@ -10,7 +10,7 @@ const config = {
 const files = [
   {
     dest: "../tmp/async.min.js",
-    src: ["../src/js/unutm.js"]
+    src: ["../src/js/night-mode.js", "../src/js/unutm.js"]
   },
   {
     dest: "../tmp/defer.min.js",
