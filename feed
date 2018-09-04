@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連の記事や特集を公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Mon, 3 Sep 2018 22:59:16 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 4 Sep 2018 11:37:01 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u </title>
@@ -15,6 +15,141 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[このブログではサブセクションを作る場合、直接&lt;section&gt;タグを書き、その内容を再帰的にmarkedで処理してやっていた。あまり困ってはいないが、普通に書かれたMarkdownをうまく処理して、好みのHTMLコードで出力してやる作業を少しずつ重ねてきたので、ついでに自動セクショニングらしきものを実装した。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/auto-sectioning-in-marked.html</guid>
+        <link>https://hail2u.net/blog/auto-sectioning-in-marked.html</link>
+        <pubDate>Tue, 4 Sep 2018 11:36:38 +0900</pubDate>
+        <title><![CDATA[markedで自動セクショニング]]></title>
+        <content:encoded><![CDATA[<p>このブログではサブセクションを作る場合、直接<code>&lt;section&gt;</code>タグを書き、その内容を<a href="https://hail2u.net/blog/coding/recurisive-markdown.html">再帰的にmarkedで処理</a>してやっていた。あまり困ってはいないが、普通に書かれたMarkdownをうまく処理して、好みのHTMLコードで出力してやる作業を少しずつ重ねてきたので、ついでに自動セクショニングらしきものを実装した。</p>
+
+<p>自動セクショニングは以下の条件で発動させたい:</p>
+
+<ol>
+<li>見出しレベルが増加</li>
+<li>同じ見出しレベルが出現</li>
+<li>見出しレベルが減少</li>
+<li>テーマの区切り（<code>hr</code>要素）が出現</li>
+</ol>
+
+<p>1では<code>section</code>開始タグが、2では<code>section</code>タグの終了と開始が、3と4では<code>section</code>終了タグが、それぞれ追加される。見出しは常に<code>h1</code>要素でマークアップする。またMarkdownの性質上、何かしらのテンプレートに流し込まれることが多く、そのテンプレートがセクションかセクショニング・ルートを持っている（<code>body</code>や<code>article</code>、または<code>blockquote</code>要素が直近に存在する）ので、トップ・レベルは例外としてセクショニングしない。</p>
+
+<pre><code class="language-markdown"># Section 1
+
+This is a level 1 section.
+
+## Section 1-1
+
+This is a level 2 section.
+
+## Section 1-2
+
+This is a level 2 section.
+
+### Section 1-2-1
+
+This is a level 3 section.
+
+---
+
+## Section 1-3
+
+This is a level 2 section.
+
+* * *
+
+This is a level 1 section.
+
+</code></pre>
+
+<p>こういうMarkdownを以下のようなHTMLにしたい。</p>
+
+<pre><code class="language-html">&lt;h1&gt;Section 1&lt;/h1&gt;
+&lt;p&gt;This is a level 1 section.&lt;/p&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-1&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-2&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+  &lt;section&gt;
+    &lt;h1&gt;Section 1-2-1&lt;/h1&gt;
+    &lt;p&gt;This is a level 3 section.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;hr&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-3&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+&lt;/section&gt;
+&lt;hr&gt;
+&lt;p&gt;This is a level 1 section.&lt;/p&gt;
+
+</code></pre>
+
+<p>実装は、グローバルで現在の見出しレベルを管理し、それを増減しつつ比較することで、出力すべきタグを決めていく。markedのブロック・レンダラーのうち、<code>heading</code>と<code>hr</code>を使う。</p>
+
+<pre><code class="language-javascript">const marked = require(&quot;marked&quot;);
+
+let currentLevel = 1;
+
+const markupHeading = (text, level) =&gt; {
+  if (currentLevel === 1 &amp;&amp; level === 1) {
+    return `&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  if (currentLevel &gt; 1 &amp;&amp; level === currentLevel) {
+    return `&lt;/section&gt;
+&lt;section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  if (currentLevel &gt; 1 &amp;&amp; level &lt; currentLevel) {
+    currentLevel = level;
+    return `&lt;/section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  currentLevel = level;
+  return `&lt;section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+};
+
+const markupThematicBreak = () =&gt; {
+  if (currentLevel === 1) {
+    return `&lt;hr&gt;
+`;
+  }
+
+  currentLevel = currentLevel - 1;
+  return `&lt;/section&gt;
+&lt;hr&gt;
+`;
+};
+
+const renderer = new marked.Renderer();
+renderer.heading = markupHeading;
+renderer.hr = markupThematicBreak;
+
+module.exports = t =&gt;
+  marked(t, {
+    renderer: renderer
+  });
+
+</code></pre>
+
+<hr>
+
+<p>既に判明している問題は、サブセクションでテーマの区切りが使えないこと、引用やリスト内で見出しが使えないこと、の2つだ。両者ともに使う機会は少ないと思うので目をつぶっている。トップ・レベルでレベル1見出しを複数使えないという制限もあるが、Markdownの使われ方を考慮すると、この点は問題ないだろう。</p>
+
+<p>副作用として生HTMLをmarkedに任せられるようになった。そのため野良Markdownを食わせても、HTMLをそのまま食わせても、うまく扱える。どこかに書いたMarkdown（らしきテキスト）をそのまま処理できるようになったので、相互運用性が高まった……かもしれない。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[Edge 17にあるカスタム・プロパティーとショートハンド・プロパティーでのバグが、パッチ・レベルでは直りそうもない。つまり、そう簡単には世界から消えてくれないことが確定してしまったため、しばらく（最低1年半くらい）の間ロングハンド・プロパティーで書かなくてはならない。しかし、そう書き直されたCSSを見ていると、とにかく悲しいので、to-longhandというPostCSSプラグインを書いて誤魔化すことにした。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/postcss-plugin-to-longhand.html</guid>
@@ -408,19 +543,6 @@ ${lines.join(&quot;\n&quot;)}
 <p>もうちょっと特別なルールをなくしたい。画像の方はリンクを強要したくないし、引用と同じようにキャプションのあるなしで分けた方が良いかもしれない。EMダッシュはそこそこ書きやすいので、引用はこのような形でベストかもしれない。とにかくなんとなくで書いたら、スカッとしたHTMLになってほしい。</p>
 
 <p>また、コードから正規表現をなくしたいところだが、それは難しそうだ。<code>arr.push(arr.pop())</code>とやっているところもどうにかしたい。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[SafariやmacOSのChromeのinput[type=search]が装飾過多で、そのままではどうにもならないのは、-webkit-appearanceプロパティーを使ってどうにかする。しばらく前まではtextfieldにすれば済んでいたが、どうもnoneまでしないとダメになってしまったようだ。まだちゃんと調べていないが、Mobile Safari 11ではtextfieldだと内側の影や丸い角が殺せなかった。:focusの時も謎の挙動をする。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/on-20180803.html</guid>
-        <link>https://hail2u.net/blog/on-20180803.html</link>
-        <pubDate>Fri, 3 Aug 2018 13:39:26 +0900</pubDate>
-        <title><![CDATA[メモ]]></title>
-        <content:encoded><![CDATA[<p>SafariやmacOSのChromeの<code>input[type=search]</code>が装飾過多で、そのままではどうにもならないのは、<code>-webkit-appearance</code>プロパティーを使ってどうにかする。しばらく前までは<code>textfield</code>にすれば済んでいたが、どうも<code>none</code>までしないとダメになってしまったようだ。まだちゃんと調べていないが、Mobile Safari 11では<code>textfield</code>だと内側の影や丸い角が殺せなかった。<code>:focus</code>の時も謎の挙動をする。</p>
-
-<p>元々頑張りたい場合は<code>none</code>にしていたので、既存のプロジェクトへの影響はほとんどなかったが、最小限のCSSでやろうとしていたらハマった。もうフォーム要素はそのままにするしかなさそうだ。新しいmacOSのDark Modeの影響とか考えたくもないし……。なんかこう<code>manifest.json</code>に書いた<code>background_color</code>の値でうまいことやってもらうしかないし、そうなっていくのかもしれない。</p>
-
-<p>ちょっとだけ設置した検索フォームは、面倒くさくなったのでまたGoogleへのリンクに戻した。🔍便利だな。</p>
 ]]></content:encoded>
       </item>
 
