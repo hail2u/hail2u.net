@@ -1,6 +1,3 @@
-document.querySelector("h1").addEventListener("click", e => {
-  if (e.button === 0) {
-    document.documentElement.classList.toggle("night");
-    e.preventDefault();
-  }
+document.querySelector("footer").addEventListener("click", e => {
+  document.documentElement.classList.toggle("night");
 });
