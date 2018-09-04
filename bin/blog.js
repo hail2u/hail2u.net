@@ -223,6 +223,9 @@ const checkSelectedContent = content => {
   return true;
 };
 
+const deleteFile = file =>
+  fs.unlink(file);
+
 const markupSelected = async (ext, content) => {
   if (ext === ".html") {
     return content;
@@ -231,7 +234,7 @@ const markupSelected = async (ext, content) => {
   const [html, included] = markdown(content);
 
   if (argv.contribute && included.length > 0) {
-    await Promise.all(included.map(fs.unlink));
+    await Promise.all(included.map(deleteFile));
   }
 
   return html;
@@ -242,7 +245,7 @@ const contributeSelected = selected =>
     fs.outputFile(selected.dest, selected.content, {
       flag: "wx"
     }),
-    fs.unlink(selected.src),
+    deleteFile(selected.src),
     updateEntry(selected)
   ]);
 
