@@ -223,8 +223,7 @@ const checkSelectedContent = content => {
   return true;
 };
 
-const deleteFile = file =>
-  fs.unlink(file);
+const deleteFile = file => fs.unlink(file);
 
 const markupSelected = async (ext, content) => {
   if (ext === ".html") {
