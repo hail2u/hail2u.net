@@ -2,27 +2,26 @@
  * reldate.js
  * LICENSE: http://hail2u.mit-license.org/2016
  */
-const divisor = {
-  day: 24,
-  hour: 60,
-  minute: 60,
-  month: 30,
-  second: 1000,
-  year: 12
-};
-const now = performance.timing.navigationStart + performance.now();
-const suffix = "前";
-const unit = {
-  day: "日",
-  hour: "時間",
-  minute: "分",
-  month: "ヶ月",
-  now: "たった今",
-  second: "秒",
-  year: "年"
-};
-
 const toRelativeDate = (from, to) => {
+  const divisor = {
+    day: 24,
+    hour: 60,
+    minute: 60,
+    month: 30,
+    second: 1000,
+    year: 12
+  };
+  const suffix = "前";
+  const unit = {
+    day: "日",
+    hour: "時間",
+    minute: "分",
+    month: "ヶ月",
+    now: "たった今",
+    second: "秒",
+    year: "年"
+  };
+
   if (!Number.isInteger(to)) {
     return;
   }
@@ -68,12 +67,22 @@ const toRelativeDate = (from, to) => {
   return `${Math.round(diff / divisor.year)}${unit.year}${suffix}`;
 };
 
-for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
-  const absolute = time.getAttribute("datetime");
-  const relative = toRelativeDate(now, Date.parse(absolute));
+const reldate = () => {
+  const now = performance.timing.navigationStart + performance.now();
 
-  if (relative) {
-    time.setAttribute("title", absolute);
-    time.textContent = relative;
+  for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
+    const absolute = time.getAttribute("datetime");
+    const relative = toRelativeDate(now, Date.parse(absolute));
+
+    if (relative) {
+      time.setAttribute("title", absolute);
+      time.textContent = relative;
+    }
   }
+};
+
+if (document.readyState !== "loading") {
+  reldate();
+} else {
+  document.addEventListener("DOMContentLoaded", reldate);
 }

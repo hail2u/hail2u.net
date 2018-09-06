@@ -14,14 +14,11 @@ const files = [
   },
   {
     dest: "../tmp/async.min.js",
-    src: ["../src/js/unutm.js"]
-  },
-  {
-    dest: "../tmp/defer.min.js",
     src: [
       "../src/js/ellipsis-title.js",
       "../src/js/heading-break.js",
-      "../src/js/reldate.js"
+      "../src/js/reldate.js",
+      "../src/js/unutm.js"
     ]
   }
 ];
