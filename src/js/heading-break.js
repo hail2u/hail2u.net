@@ -11,9 +11,13 @@ const addWordJoiner = (added, value, index) => {
 };
 
 const headingBreak = () => {
+  if (typeof RegExp.prototype.unicode !== "boolean") {
+    return;
+  }
+
   for (const heading of document.querySelectorAll("main > article > h1")) {
     heading.textContent = heading.textContent
-      .split("")
+      .match(/./gu)
       .reverse()
       .reduce(addWordJoiner);
   }
