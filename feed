@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連の記事や特集を公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Sun, 9 Sep 2018 09:13:33 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 11 Sep 2018 00:15:56 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u </title>
@@ -15,6 +15,69 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[このウェブサイトを、夜（19–5時）の間は黒背景になるようにした。夜間モードかどうかは表示しないので、白かったり黒かったりするウェブサイトになった。通常は、モードを切り替えるボタン等を設置するが、日に何度も訪れるウェブサイトではないので、有無を言わさず適用することにした。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/night-mode.html</guid>
+        <link>https://hail2u.net/blog/night-mode.html</link>
+        <pubDate>Tue, 11 Sep 2018 00:15:23 +0900</pubDate>
+        <title><![CDATA[夜間モード]]></title>
+        <content:encoded><![CDATA[<p>このウェブサイトを、夜（19–5時）の間は黒背景になるようにした。夜間モードかどうかは表示しないので、白かったり黒かったりするウェブサイトになった。通常は、モードを切り替えるボタン等を設置するが、日に何度も訪れるウェブサイトではないので、有無を言わさず適用することにした。</p>
+
+<p>実装は、クラス名を追加する数行のJavaScriptと、カスタム・プロパティーだけを変える数行のCSSで行った。</p>
+
+<pre><code class="language-javascript">const currentHour = new Date().getHours();
+
+if (currentHour &lt; 5 || currentHour &gt; 18) {
+  document.documentElement.classList.add(&quot;night&quot;);
+}
+
+</code></pre>
+
+<p>ルート要素に<code>night</code>クラスを追加するだけの簡単なものだ。これを<code>head</code>要素内で同期的に実行しておくと、スムーズに切り替わるだろう。</p>
+
+<pre><code class="language-css">:root.night {
+  --color-fg: hsl(0, 0%, 88%);
+  --color-fg-near: hsl(0, 0%, 66%);
+  --color-fg-far: hsl(0, 0%, 33%);
+  --color-bg: hsl(0, 0%, 11%);
+  --color-accent: hsl(30, 100%, 44%);
+  --color-accent-near: hsl(30, 100%, 77%);
+  --color-accent-far: hsl(30, 100%, 33%);
+}
+
+</code></pre>
+
+<p>一方、CSSでは色を定義するカスタム・プロパティーを上書きする。このウェブサイトではすべての色をカスタム・プロパティーで集中管理しているので、これだけで黒背景に白い文字へ変更できる。</p>
+
+<p>将来は、ユーザーの環境をトリガーにしたメディア・クエリーだけで書けるはずだ。周辺光量を拾えるようにもなるので、昼から雨戸を閉めていて部屋が暗いというような場合にも適応できるかもしれない。</p>
+
+<section>
+<h1>夜間モードの必要性</h1>
+
+<p>夜間モードは、夜間の照明環境における目への負担を軽減することが目的だ。最近は多くのアプリケーション（やウェブアプリ、以下同様）で見かけるようになった。</p>
+
+<p>OSで提供される色の反転などは、ユーザーの抱える問題を画一的に解決する。それに対し、アプリケーションで提供される夜間モードは、<em>そのアプリケーションが夜間にのみ抱える問題</em>の解決策を提示する。結果と実装は似るか、同じだが、解決する問題が違う。</p>
+
+<p>また、夜間モードはそのアプリケーションに最適化した形で実装できるので、よりよい結果を提供できるかもしれない。色の反転では失われてしまうかもしれないコーポレート・カラーを維持することも不可能ではないはずだ。</p>
+
+<p>このように一定の効果が夜間モードには見込める。主に文書を扱うアプリケーションでは、採用を積極的に考えても良いだろう。</p>
+</section>
+
+<section>
+<h1>ウェブサイトでの振る舞い</h1>
+
+<p>多くのブラウザーがウェブページを読みやすくするリーダー・モードを持っているので、ウェブサイトではそれで十分かもしれない。しかし、リーダー・モードは主に<em>ウェブページが読みづらいため使われる機能</em>なので、ユーザーが使う時点でそのウェブページは何らかの問題を抱えている、と言える。ウェブサイトに最適化された夜間モードにより、問題がいくつか解決され、リーダー・モードが使われてしまう機会を減らせるかもしれない。</p>
+
+<p>また、アプリケーションと違い、ウェブサイトでは夜間モードを強制しても良いだろう。アプリケーションの色がコロコロ変わると操作性に著しい悪影響を及ぼす。しかし、ウェブサイトは操作性という観点が薄く、短期間の滞在に終わり、通常は日に何度も訪れない。そのため時間によって色が違っていてもユーザーに影響はほとんどないからだ。</p>
+
+<p>その一方で、ユーザーが明示的に有効にしない場合、いつも色が違う印象になりかねない。すると、ユーザーのウェブサイトに対するイメージが安定しない、という問題が発生する。そういった点は、ロゴや強調色をうまく最適化することで対処するしかないだろう。</p>
+</section>
+
+<hr>
+
+<p>当初採用した、オレンジ色のハイパーリンクは、なんというかしっくりこない。白背景で青なので、黒背景ならオレンジでも良いはずだが、なぜかしっくりこない。リンクは青色というような先入観の話ではなく、オレンジが持つ印象がしっくりこないのかもしれない。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[むしゃくしゃして消したIFTTTのアカウントだが、RSSをWebSub（元PubSubHubbub）で公開したくなったので出戻った。GitHubのWebhookからWebSubへつなげるアプレットは、前に書いたMakerを使ったものがそのまま使えた。標準仕様は大事だ。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/back-to-ifttt.html</guid>
@@ -356,57 +419,6 @@ module.exports = t =&gt;
 <p>しかし、これはこれでscss.css3やless.css3、場合によってはhtml.css3とかも管理しないとならなくなる。しかも<code>after</code>でやる場合とくらべて明確なメリットがあるわけでもない。</p>
 
 <p>残念ながらこのままでいくしかなさそうだ。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/mapping-viewport-width-and-column-number.html</guid>
-        <link>https://hail2u.net/blog/mapping-viewport-width-and-column-number.html</link>
-        <pubDate>Tue, 14 Aug 2018 08:49:07 +0900</pubDate>
-        <title><![CDATA[ビューポート幅と列数の対応]]></title>
-        <content:encoded><![CDATA[<p>サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。</p>
-
-<p>狭い画面では3列、ちょっと広い画面では4列、もっと広い画面では5列と、段階的に列数を増やす仕組みを単純化して例に挙げる。実際にどのような感じかは、<a href="https://hail2u.net/">このウェブサイトのホーム</a>の一番下で確認できるだろう。こちらは折り返さず隠すものだが、基本は同じだ。</p>
-
-<pre><code class="language-css">.container {
-  --num-column: 3;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.thumbnail {
-  width: calc((100% - 1rem * (var(--num-column) - 1)) / var(--num-column));
-}
-
-@media (min-width: 720px) {
-  .container {
-    --num-column: 4;
-  }
-}
-
-@media (min-width: 1280px) {
-  .container {
-    --num-column: 5;
-  }
-}
-</code></pre>
-
-<p>親の<code>.container</code>では、子の<code>.thumbnail</code>を折り返しつつ並べるため、列数を定義しつつFlexboxをうまく使う。後に<code>calc()</code>で使うので、列数は単位なしの整数で定義する。サムネイルの余白は子で制御しても良いが、<code>space-between</code>を使ってFlexboxに任せると<em>必ずキレイに</em>収まるので、考慮することが減る。（多分CSSプリプロセッサーで作られた）小数の扱いがブラウザーによって違うことに由来する「<code>1px</code>はみだした！」や「<code>1px</code>足りない……」という事態がまず起きないからだ。</p>
-
-<p>子の<code>.thumbnail</code>では列数の定義を利用して幅を計算する。<code>100%</code>から各列の間の余白（ここでは<code>1rem</code>とした）を引き、残りを列数で割る。各列の間の数は常に列数から1を引いたものなので、これも計算できる。動的な値から計算するこの手の<code>calc()</code>はCSSプリプロセッサーでは実現できない。</p>
-
-<p>メディア・クエリーでは列数を上書きしていく。それだけで、余白の割り当てや幅の計算をブラウザーが調節してくれる。この場合は、今まで通りに書いても<code>width</code>プロパティーで上書きするだけと、あまり手間が変わらない。そのため中途半端に抽象化しただけに過ぎないが、<code>--num-column</code>を複数の要素とプロパティーで利用していると、それぞれに伝播させられるので効率が良くなる。</p>
-
-<hr>
-
-<p>本当は列数もビューポート幅から計算できると良い。理論的には、サムネイルの最大サイズを決め、それでビューポート幅を割れば計算できる。しかし今の<code>calc()</code>では単位ありの数値から単位なしの整数を作れないので、実装に落とし込むのは難しそうだ。別の方向からのアプローチがないか考えているが、まだうまく思いつかない。</p>
-
-<p>また、<code>calc()</code>では単位を付けることは簡単だが、その逆はできないことも覚えておきたい。<code>100rem</code>を<code>1rem</code>で割っても<code>100</code>にはならないのだ。つまり、<code>calc()</code>でカスタム・プロパティーを使う場合は、できるだけ単位なしの数字で係数や定数として定義しておくべきだろう。</p>
-
-<hr>
-
-<p>まだカスタム・プロパティーどころか<code>calc()</code>すらも怪しい時勢なので使いどころは限られる。しかし、これまでのCSSプリプロセッサーの概念とは大きく違った使い方なので、意識改革をしつつ使えるところ（絶対に動く環境）では積極的に使っていきたい。</p>
 ]]></content:encoded>
       </item>
 
