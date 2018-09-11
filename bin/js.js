@@ -13,7 +13,7 @@ const files = [
     src: ["../src/js/night-mode.js"]
   },
   {
-    dest: "../tmp/async.min.js",
+    dest: "../tmp/main.min.js",
     src: [
       "../src/js/ellipsis-title.js",
       "../src/js/heading-break.js",
