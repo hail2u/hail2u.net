@@ -68,13 +68,8 @@ const partialDir = "../src/partial/";
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const pad = number => {
-  if (number >= 10) {
-    return number;
-  }
-
-  return `0${number}`;
-};
+const pad = number =>
+  String(number).padStart(2, "0");
 
 const toHTML5String = (day, date, month, year, hour, minute, second) =>
   `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
