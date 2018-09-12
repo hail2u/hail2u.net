@@ -182,7 +182,7 @@ const selectDraft = drafts =>
         .trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
-        .replace(/^<h1>(.*?)<\/h1>$/, "$1")} (${n.name})
+        .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
 `);
     });
     menu.question("Which one: (0) ", (a = 0) => {
