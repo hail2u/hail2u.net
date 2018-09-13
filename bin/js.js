@@ -1,4 +1,4 @@
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 const { compile } = require("google-closure-compiler-js");
 
 const config = {
@@ -41,7 +41,7 @@ const buildJS = async file => {
   const srcs = await gatherJS(file.src);
   const jscode = await Promise.all(srcs.map(buildJSCode));
   const js = compileJS(jscode);
-  await fs.outputFile(file.dest, js);
+  await fs.writeFile(file.dest, js);
 };
 
 process.chdir(__dirname);

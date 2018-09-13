@@ -1,6 +1,6 @@
 const atImport = require("postcss-import");
 const csswring = require("csswring");
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
 const toLonghand = require("../lib/to-longhand");
@@ -34,7 +34,7 @@ const buildCSS = async file => {
     from: file.src,
     to: file.dest
   });
-  await fs.outputFile(file.dest, processed.css);
+  await fs.writeFile(file.dest, processed.css);
 };
 
 process.chdir(__dirname);

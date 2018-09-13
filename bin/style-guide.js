@@ -1,4 +1,4 @@
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 
 const dest = "../dist/style-guide/index.html";
 const resourceRe = /\b(href|src)(=)(")(.*?)(")/g;
@@ -20,7 +20,7 @@ const rewriteURL = (whole, attr, eq, oq, url, cq) => {
 
 const main = async () => {
   const html = await fs.readFile(src, "utf8");
-  await fs.outputFile(dest, html.replace(resourceRe, rewriteURL));
+  await fs.writeFile(dest, html.replace(resourceRe, rewriteURL));
 };
 
 process.chdir(__dirname);

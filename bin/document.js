@@ -1,5 +1,5 @@
 const { decode, encode } = require("../lib/html-entities");
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -65,11 +65,15 @@ const monthNames = [
 ];
 const partialDir = "../src/partial/";
 
+const readJSONFile = async file => {
+  const json = await fs.readFile(file, "utf8");
+  return JSON.parse(json);
+};
+
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const pad = number =>
-  String(number).padStart(2, "0");
+const pad = number => String(number).padStart(2, "0");
 
 const toHTML5String = (day, date, month, year, hour, minute, second) =>
   `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
@@ -114,7 +118,7 @@ const extendItem = item => {
 };
 
 const readItems = async () => {
-  const items = await fs.readJSON(itemFile, "utf8");
+  const items = await readJSONFile(itemFile);
   return items.sort(compareByUnixtime).map(extendItem);
 };
 
@@ -208,14 +212,14 @@ const now = date =>
   );
 
 const mergeData = async (
-  json,
+  extradataFile,
   items,
   dest,
   metadata,
   includeUpdates,
   itemLength
 ) => {
-  const extradata = await fs.readJSON(json, "utf8");
+  const extradata = await readJSONFile(extradataFile);
 
   if (argv.article || argv.articles) {
     const item = items.find(hasSameLink.bind(null, dest));
@@ -280,7 +284,7 @@ const buildDoc = async (metadata, items, partials, file) => {
     fs.readFile(file.src, "utf8")
   ]);
   const rendered = await render(template, data, partials, file.dest);
-  await fs.outputFile(file.dest, rendered);
+  await fs.writeFile(file.dest, rendered);
 };
 
 const mergeArticle = item => ({
@@ -292,7 +296,7 @@ const mergeArticle = item => ({
 
 const main = async () => {
   const [metadata, items, partials] = await Promise.all([
-    fs.readJSON(metadataFile, "utf8"),
+    readJSONFile(metadataFile),
     readItems(),
     readPartials()
   ]);

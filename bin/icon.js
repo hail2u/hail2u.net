@@ -1,4 +1,4 @@
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 const path = require("path");
 const sharp = require("sharp");
 const toIco = require("to-ico");
@@ -42,7 +42,7 @@ const main = async () => {
   const pngs = await Promise.all(files.map(generatePNG));
   const srcs = await Promise.all(pngs.filter(isFaviconSource).map(readPNG));
   const favicon = await toIco(srcs);
-  await fs.outputFile("../dist/favicon.ico", favicon);
+  await fs.writeFile("../dist/favicon.ico", favicon);
 };
 
 process.chdir(__dirname);

@@ -1,6 +1,6 @@
 const { decode } = require("../lib/html-entities");
 const { execFile } = require("child_process");
-const fs = require("fs-extra");
+const fs = require("fs").promises;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mustache = require("mustache");
@@ -28,9 +28,9 @@ const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
 const whichAsync = promisify(which);
 
-const runCommand = async (command, args) => {
-  const { stdout } = await execFileAsync(command, args);
-  return process.stdout.write(stdout);
+const readJSONFile = async file => {
+  const json = await fs.readFile(file, "utf8");
+  return JSON.parse(json);
 };
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -46,7 +46,10 @@ const listArticleImagePaths = html => {
 };
 
 const copyArticleImage = imagepath =>
-  fs.copy(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
+  fs.copyFile(
+    path.join(srcImgDir, imagepath),
+    path.join(destImgDir, imagepath)
+  );
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
@@ -59,9 +62,12 @@ const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const saveCache = cache =>
-  fs.outputJSON(cacheFile, cache.sort(compareByUnixtime), {
-    spaces: 2
-  });
+  fs.writeFile(
+    cacheFile,
+    JSON.stringify(cache.sort(compareByUnixtime), {
+      spaces: 2
+    })
+  );
 
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
@@ -89,6 +95,11 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
+const runCommand = async (command, args) => {
+  const { stdout } = await execFileAsync(command, args);
+  return process.stdout.write(stdout);
+};
+
 const addFiles = (git, ...files) => runCommand(git, ["add", "--", ...files]);
 
 const buildArticle = (npm, name) =>
@@ -107,7 +118,7 @@ const getArticleTotal = cache => {
 
 const updateEntry = async file => {
   const [cache, git] = await Promise.all([
-    fs.readJSON(cacheFile, "utf8"),
+    readJSONFile(cacheFile),
     whichAsync("git"),
     copyArticleImages(file.content)
   ]);
@@ -241,7 +252,7 @@ const markupSelected = async (ext, content) => {
 
 const contributeSelected = selected =>
   Promise.all([
-    fs.outputFile(selected.dest, selected.content, {
+    fs.writeFile(selected.dest, selected.content, {
       flag: "wx"
     }),
     deleteFile(selected.src),
@@ -260,7 +271,7 @@ const testSelected = async selected => {
     css: await fs.readFile(selected.css, "utf8")
   };
   const rendered = renderSelected(template, selected, partials);
-  await fs.outputFile(selected.dest, rendered);
+  await fs.writeFile(selected.dest, rendered);
   const open = await whichAsync("open");
   return runCommand(open, [selected.dest]);
 };
