@@ -7,7 +7,7 @@
   <channel>
     <description>ウェブサイト制作関連の記事や特集を公開しているウェブサイトです。</description>
     <language>ja</language>
-    <lastBuildDate>Wed, 12 Sep 2018 11:24:17 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 13 Sep 2018 12:58:53 +0900</lastBuildDate>
     <link>https://hail2u.net/</link>
     <managingEditor>hail2u@gmail.com (Kyo Nagashima)</managingEditor>
     <title>Hail2u </title>
@@ -15,6 +15,48 @@
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
+      <item>
+        <description><![CDATA[懸念だった転送サイズによる問題がほとんど見られなかったので、本文を明朝、見出しをゴシックにした。すべてはGoogle FontsとHTTPS+HTTP/2のおかげだ。小さく分割されたWOFF2ファイルが、並列で高速に必要なだけダウンロードされる。それぞれが小さいので、キャッシュからも並列で超高速（それぞれ数ms）にロードされるだろう。]]></description>
+        <guid isPermaLink="true">https://hail2u.net/blog/serif-for-body-sans-serif-for-heading.html</guid>
+        <link>https://hail2u.net/blog/serif-for-body-sans-serif-for-heading.html</link>
+        <pubDate>Thu, 13 Sep 2018 12:58:22 +0900</pubDate>
+        <title><![CDATA[本文明朝、見出しゴシック]]></title>
+        <content:encoded><![CDATA[<figure>
+<a href="https://hail2u.net/img/blog/serif-for-body-sans-serif-for-heading.png"><img alt="HTTPS+HTTP/2環境下でのGoogle Fontsの利用は、特にページの表示速度等を犠牲にすることなく、素晴らしい速さでウェブ・フォントが読み込まれ、反映されるようだ" src="https://hail2u.net/img/blog/serif-for-body-sans-serif-for-heading.png"></a>
+</figure>
+
+<p>懸念だった転送サイズによる問題がほとんど見られなかったので、本文を明朝、見出しをゴシックにした。すべては<a href="https://fonts.google.com/">Google Fonts</a>とHTTPS+HTTP/2のおかげだ。小さく分割されたWOFF2ファイルが、並列で高速に必要なだけダウンロードされる。それぞれが小さいので、キャッシュからも並列で超高速（それぞれ数ms）にロードされるだろう。</p>
+
+<p>もちろん話題のNoto Serif JPを本文に、見出しやヘッダー、フッターにはNoto Sans JPを使っている。CSSファイルを見た時には不安になったが、さすがGoogleという結果だった。</p>
+
+<section>
+<h1>先読み</h1>
+
+<p><a href="https://www.w3.org/TR/resource-hints/">リソース・ヒント</a>を使った先読みを仕込んでおくと一定の高速化が見込めるのではないか、という仮説は立て、検証をした。巨大なHTMLに、同期的に実行されるスクリプトが組み合わさっているウェブサイトがあり、それに導入する場合には、考慮すべきだろう。</p>
+
+<p>Google Fontsで配信されるフォント・ファイルは、ビルドごとにURLが変わる。そのため直接フォント・ファイルを先読み（<code>rel=prefetch</code>）することは難しい。また、HTTPSでの配信なので、名前解決だけの<code>rel=dns-prefetch</code>より、SSL/TLSハンドシェイクなどまでやってくれる<code>rel=preconnect</code>の方が適切だろう。</p>
+
+<pre><code class="language-html">&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com&quot; <mark>rel=&quot;preconnect&quot;</mark>&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.gstatic.com&quot; <mark>rel=&quot;preconnect&quot;</mark>&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; rel=&quot;stylesheet&quot;&gt;
+
+</code></pre>
+
+<p>しかし、CSSファイルのURLは将来に渡って固定（のはず）だ。ならば投機的にリソースのダウンロードを行える<a href="https://www.w3.org/TR/preload/"><code>rel=preload</code></a>の方が適切かもしれない。また、このCSSファイルが応答ヘッダーでフォント・ファイル用の<code>rel=preconnect</code>を返してくれている。そのためフォント・ファイルへの<code>rel=preconnect</code>は必要ない。</p>
+
+<pre><code class="language-html">&lt;link <mark>as=&quot;style&quot;</mark> crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; <mark>rel=&quot;preload&quot;</mark>&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; rel=&quot;stylesheet&quot;&gt;
+
+</code></pre>
+
+<p>このウェブサイトではどのように先読みしても、また先読みしなくても、結果に有意な差は見つけられなかった。元々CSSファイルは投機的に読み込みが始まるため、<code>rel=preload</code>程度ならば不要なのかもしれない。もうちょっと探査する必要がありそうだ。</p>
+</section>
+
+<hr>
+
+<p>気軽に使えそうで、とにかく助かる。この勢いでNoto Mono JPやNoto Sans Mono JPも欲しい。</p>
+]]></content:encoded>
+      </item>
       <item>
         <description><![CDATA[近所のスーパーでは、ほぼ毎週水曜日に明治のおいしい牛乳が安売りされる。安売り自体はあったものの、チラシに記載がなかったり、数がものすごく少なかったり、不穏な気配がする。今月に入って野菜は安くなりつつあったが、今度は乳製品となると辛い。今年は、何かしらがずっと高いまま終わりそうだ。]]></description>
         <guid isPermaLink="true">https://hail2u.net/blog/memo-20180912.html</guid>
@@ -362,55 +404,6 @@ module.exports = t =&gt;
 </pre>
 
 <p>これで良いようだが、パラメーターによるリサイズなどはうまく効かず、縮小くらいしかできない。また書影が存在するにもかかわらず、このASINによる参照でのみ404を返してきたりする。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[やっといつもの夏の暑さ、というくらいにはなった。涼しくなるのを待っていたが、そうなった時には終わっていそうな新宿（初台）のオペラシティへイサム・ノグチを見に行ってきた。オペラシティも竣工してもう20年か。]]></description>
-        <guid isPermaLink="true">https://hail2u.net/blog/shinjuku-20180814.html</guid>
-        <link>https://hail2u.net/blog/shinjuku-20180814.html</link>
-        <pubDate>Tue, 21 Aug 2018 11:29:19 +0900</pubDate>
-        <title><![CDATA[参宮橋～初台～新宿]]></title>
-        <content:encoded><![CDATA[<figure>
-<a href="https://hail2u.net/img/blog/shinjuku-20180814.jpg"><img alt="甲州街道脇にある玉川上水跡の緑地は気に入っている" src="https://hail2u.net/img/blog/shinjuku-20180814.jpg"></a>
-</figure>
-
-<p>やっといつもの夏の暑さ、というくらいにはなった。涼しくなるのを待っていたが、そうなった時には終わっていそうな新宿（初台）のオペラシティへ<a href="http://www.operacity.jp/ag/exh211/">イサム・ノグチ</a>を見に行ってきた。オペラシティも竣工してもう20年か。</p>
-
-<p>行きは新宿周りで初台に出ようかと考えていた。しかしそれほど日差しが強くなかったので、参宮橋からやや北西に向かって住宅地をテクテク歩くことにした。</p>
-
-<figure>
-<a href="https://hail2u.net/img/blog/shinjuku-20180814-abandoned-sento.jpg"><img alt="途中にあった廃業した銭湯の煙突は、蔦がつなぎとめているのかもしれないが、所々にひびが入っている" src="https://hail2u.net/img/blog/shinjuku-20180814-abandoned-sento.jpg"></a>
-</figure>
-
-<p>甲州街道まで出たら道路を渡るだけだ。開館まで少しあったので、甲州街道の南側にある玉川上水跡となっている緑地をフラフラした。特に何もないが、とても落ち着く。ぴったりとはまる「隙間」という感覚なのかもしれない。</p>
-
-<hr>
-
-<figure>
-<a href="https://hail2u.net/img/blog/shinjuku-20180814-isamu-noguchi.jpg"><img alt="改めて甲州街道を渡り、オペラシティのエントランス・ホールから昇ると、アートギャラリーに着く" src="https://hail2u.net/img/blog/shinjuku-20180814-isamu-noguchi.jpg"></a>
-</figure>
-
-<p>盆休みだからか、開館直後に行ったにもかかわらず20人くらい並んでいた。展覧会は、アンノーンとか、ペルソナ4の敵とか、そういったものでいっぱいだ。無機的な有機物の固まりは見ていて不安になるが、それが癖になる。</p>
-
-<p>途中にずらっと並べられていたAKARIシリーズの吊り照明は、天井まで少なくとも3mくらいないと映えなそうだった。いつか買おうとずっと思っていたが、家を建てないと無理そうだ。</p>
-
-<p>イサム・ノグチの庭園や建築はあまり好みではないことがわかった。とにかくやはり彫刻には狭い会場で、これならこどもの国に行って<a href="http://www.kodomonokuni.org/m_guide/tanbo1.html">残っているもの</a>を触ってた方が楽しめたかもしれない。</p>
-
-<hr>
-
-<p>帰りも歩くのはさすがに大変そうだったので、<a href="https://www.shinjukuparktower.com/access/#bus">新宿までの無料シャトルバス</a>に乗ることも考えて、パークタワーに行った。オペラシティとは1ブロック挟んで隣で、歩いて1分もかからないだろう。</p>
-
-<p>パークタワーにはコンラン・ショップがある。当然のようにAKARIシリーズの特設コーナーがあったりして、ゆるやかに便乗していた。ぶらぶらして見つけたスタンディング・デスクはかっこよかったが、値札に25万円と書いてある。はい。</p>
-
-<p>昼ごはんはパークタワーの地下で済ませ、シャトルバスで新宿まで移動した。このシャトルバスは10から15分毎に出発するので、とても便利だ。</p>
-
-<p>新宿はとにかく人でいっぱいだったので、ヨドバシカメラでスマフォを見て回ったくらいで帰途に就いた。小田急線の改札を通ってからハンズに行きたかったのを思い出して、ちょっと失敗した。</p>
-
-<figure>
-<a href="https://hail2u.net/img/blog/shinjuku-20180814-sagami-ono.jpg"><img alt="小田急線では、エスカレーターの2列乗車を、単なる啓発ポスターだけではなく、駅構内表示でも推奨し始めている" src="https://hail2u.net/img/blog/shinjuku-20180814-sagami-ono.jpg"></a>
-</figure>
-
-<p>人類は果たして進化できるのか。</p>
 ]]></content:encoded>
       </item>
 
