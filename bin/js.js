@@ -15,7 +15,6 @@ const files = [
   {
     dest: "../tmp/main.min.js",
     src: [
-      "../src/js/ellipsis-title.js",
       "../src/js/heading-break.js",
       "../src/js/reldate.js",
       "../src/js/unutm.js"
