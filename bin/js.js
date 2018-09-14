@@ -14,10 +14,7 @@ const files = [
   },
   {
     dest: "../tmp/main.min.js",
-    src: [
-      "../src/js/reldate.js",
-      "../src/js/unutm.js"
-    ]
+    src: ["../src/js/reldate.js", "../src/js/unutm.js"]
   }
 ];
 
