@@ -61,13 +61,12 @@ const hasSameLink = (link, article) => link === article.link;
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const saveCache = cache =>
-  fs.writeFile(
+const saveCache = async cache => {
+  await fs.writeFile(
     cacheFile,
-    JSON.stringify(cache.sort(compareByUnixtime), {
-      spaces: 2
-    })
+    JSON.stringify(cache.sort(compareByUnixtime), 2)
   );
+};
 
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
