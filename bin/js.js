@@ -18,13 +18,14 @@ const files = [
   }
 ];
 
-const readSrc = srcpath => fs.readFile(srcpath, "utf8");
+const readFile = file => fs.readFile(file, "utf8");
 
-const gatherJS = srcs => Promise.all(srcs.map(readSrc));
-
-const buildJSCode = src => ({
-  src: src
-});
+const buildJSCode = async src => {
+  const js = await readFile(src);
+  return {
+    src: js
+  };
+};
 
 const compileJS = jscode =>
   compile({
@@ -33,8 +34,7 @@ const compileJS = jscode =>
   }).compiledCode;
 
 const buildJS = async file => {
-  const srcs = await gatherJS(file.src);
-  const jscode = await Promise.all(srcs.map(buildJSCode));
+  const jscode = await Promise.all(file.src.map(buildJSCode));
   const js = compileJS(jscode);
   await fs.writeFile(file.dest, js);
 };
