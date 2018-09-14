@@ -211,6 +211,14 @@ const now = date =>
     date.getSeconds()
   );
 
+const addWordJoiner = (text, char, index) => {
+  if (index > 3) {
+    return `${char}${text}`;
+  }
+
+  return `${char}\u2060${text}`;
+};
+
 const mergeData = async (
   extradataFile,
   items,
@@ -235,7 +243,11 @@ const mergeData = async (
       canonical: item.link,
       card_type: cardType,
       cover: cover,
-      short_title: item.title
+      short_title: item.title,
+      title: item.title
+        .match(/./gu)
+        .reverse()
+        .reduce(addWordJoiner)
     };
   }
 
