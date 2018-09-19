@@ -64,7 +64,8 @@ const compareByUnixtime = (a, b) =>
 const saveCache = async cache => {
   await fs.writeFile(
     cacheFile,
-    JSON.stringify(cache.sort(compareByUnixtime), null, 2)
+    `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
+`
   );
 };
 
