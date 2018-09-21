@@ -75,16 +75,6 @@ const compareByUnixtime = (a, b) =>
 
 const pad = number => String(number).padStart(2, "0");
 
-const toHTML5String = (day, date, month, year, hour, minute, second) =>
-  `${year}-${pad(month)}-${pad(date)}T${pad(hour)}:${pad(minute)}:${pad(
-    second
-  )}+09:00`;
-
-const toRFC822String = (day, date, month, year, hour, minute, second) =>
-  `${dowNames[day]}, ${date} ${monthNames[month - 1]} ${year} ${pad(
-    hour
-  )}:${pad(minute)}:${pad(second)} +0900`;
-
 const extendItem = item => {
   const dt = new Date(item.published);
   const date = dt.getDate();
@@ -94,7 +84,6 @@ const extendItem = item => {
   const month = dt.getMonth() + 1;
   const second = dt.getSeconds();
   const year = dt.getFullYear();
-  const datetimes = [day, date, month, year, hour, minute, second];
   return {
     ...item,
     date: date,
@@ -106,13 +95,17 @@ const extendItem = item => {
         .replace(/<.*?>/g, "")
     ),
     hour: hour,
-    html5PubDate: toHTML5String(...datetimes),
-    html5YearMonth: `${year}-${pad(month)}`,
     minute: minute,
     month: month,
-    rfc822PubDate: toRFC822String(...datetimes),
     second: second,
-    strPubDate: `${pad(month)}/${pad(date)}`,
+    strDate: pad(date),
+    strDowName: dowNames[day],
+    strHour: pad(hour),
+    strMinute: pad(minute),
+    strMonth: pad(month),
+    strMonthName: monthNames[month - 1],
+    strSecond: pad(second),
+    strYear: pad(year),
     year: year
   };
 };
@@ -201,15 +194,11 @@ const markItemChanges = (item, index, items) => {
 };
 
 const now = date =>
-  toRFC822String(
-    date.getDay(),
-    date.getDate(),
-    date.getMonth() + 1,
-    date.getFullYear(),
-    date.getHours(),
-    date.getMinutes(),
-    date.getSeconds()
-  );
+  `${dowNames[date.getDay()]}, ${date.getDate()} ${
+    monthNames[date.getMonth()]
+  } ${date.getFullYear()} ${pad(date.getHours())}:${pad(
+    date.getMinutes()
+  )}:${pad(date.getSeconds())} +0900`;
 
 const addWordJoiner = (text, char, index) => {
   if (index > 3) {
