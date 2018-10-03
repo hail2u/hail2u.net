@@ -1,12 +1,13 @@
+const ClosureCompiler = require("google-closure-compiler").jsCompiler;
 const fs = require("fs").promises;
-const { compile } = require("google-closure-compiler-js");
 
-const config = {
-  compilationLevel: "ADVANCED",
+const compiler = new ClosureCompiler({
+  compilationLevel: "ADVANCED_OPTIMIZATIONS",
   languageIn: "ECMASCRIPT_2017",
   languageOut: "ECMASCRIPT5_STRICT",
   outputWrapper: "(function(){\n%output%\n}).call(this);"
-};
+});
+
 const files = [
   {
     dest: "../src/partial/js.mustache",
@@ -23,20 +24,26 @@ const readFile = file => fs.readFile(file, "utf8");
 const buildJSCode = async src => {
   const js = await readFile(src);
   return {
+    sourceMap: null,
     src: js
   };
 };
 
-const compileJS = jscode =>
-  compile({
-    ...config,
-    jsCode: jscode
-  }).compiledCode;
+const compileJS = jsCode =>
+  new Promise((resolve, reject) => {
+    compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
+      if (exitCode !== 0) {
+        return reject(stdErr);
+      }
+
+      return resolve(stdOut[0].src);
+    });
+  });
 
 const buildJS = async file => {
-  const jscode = await Promise.all(file.src.map(buildJSCode));
-  const js = compileJS(jscode);
-  await fs.writeFile(file.dest, js);
+  const jsCode = await Promise.all(file.src.map(buildJSCode));
+  const compiled = await compileJS(jsCode);
+  await fs.writeFile(file.dest, compiled);
 };
 
 process.chdir(__dirname);
