@@ -218,6 +218,10 @@ const mergeData = async (
 ) => {
   const extradata = await readJSONFile(extradataFile);
 
+  if (extradata.books) {
+    extradata.books = extradata.books.reverse().slice(0, 5);
+  }
+
   if (argv.article || argv.articles) {
     const item = items.find(hasSameLink.bind(null, dest));
     const [cardType, cover] = findCover(
