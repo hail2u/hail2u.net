@@ -3,8 +3,6 @@ const csswring = require("csswring");
 const fs = require("fs").promises;
 const mqpacker = require("css-mqpacker");
 const postcss = require("postcss");
-const toLonghand = require("../lib/to-longhand");
-const wrapWithSupports = require("../lib/wrap-with-supports");
 
 const files = [
   {
@@ -23,9 +21,7 @@ const files = [
 const processor = postcss([
   atImport(),
   mqpacker(),
-  csswring(),
-  toLonghand(),
-  wrapWithSupports()
+  csswring()
 ]);
 
 const buildCSS = async file => {
