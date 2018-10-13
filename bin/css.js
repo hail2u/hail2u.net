@@ -18,11 +18,7 @@ const files = [
     src: "../src/css/main.css"
   }
 ];
-const processor = postcss([
-  atImport(),
-  mqpacker(),
-  csswring()
-]);
+const processor = postcss([atImport(), mqpacker(), csswring()]);
 
 const buildCSS = async file => {
   const css = await fs.readFile(file.src, "utf8");

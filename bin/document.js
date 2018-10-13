@@ -228,7 +228,7 @@ const mergeData = async (
       canonical: item.link,
       card_type: cardType,
       cover: cover,
-      short_title: item.title,
+      short_title: item.title
     };
   }
 
