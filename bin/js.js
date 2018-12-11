@@ -11,7 +11,7 @@ const compiler = new ClosureCompiler({
 const files = [
   {
     dest: "../src/partial/js.mustache",
-    src: ["../src/js/night-mode.js"]
+    src: ["../src/js/dark-mode.js"]
   },
   {
     dest: "../tmp/main.min.js",

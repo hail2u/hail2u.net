@@ -1,3 +1,3 @@
 document.querySelector("footer").addEventListener("click", () => {
-  document.documentElement.classList.toggle("js-night-mode");
+  document.documentElement.classList.toggle("js-dark-mode");
 });
