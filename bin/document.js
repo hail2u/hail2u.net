@@ -15,11 +15,6 @@ const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
-    dest: "../dist/about/index.html",
-    json: "../src/about/index.json",
-    src: "../src/about/index.mustache"
-  },
-  {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
     src: "../src/blog/index.mustache"
