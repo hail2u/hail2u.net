@@ -11,6 +11,7 @@ const argv = minimist(process.argv.slice(2), {
 });
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
+const booksFile = "../src/read/books.json";
 const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
@@ -200,10 +201,6 @@ const mergeData = async (
 ) => {
   const extradata = await readJSONFile(extradataFile);
 
-  if (extradata.books) {
-    extradata.books = extradata.books.reverse().slice(0, 5);
-  }
-
   if (argv.article || argv.articles) {
     const item = items.find(hasSameLink.bind(null, dest));
     const [cardType, cover] = findCover(
@@ -278,11 +275,13 @@ const mergeArticle = item => ({
 });
 
 const main = async () => {
-  const [metadata, items, partials] = await Promise.all([
+  const [metadata, books, items, partials] = await Promise.all([
     readJSONFile(metadataFile),
+    readJSONFile(booksFile),
     readItems(),
     readPartials()
   ]);
+  metadata.books = books.reverse().slice(0, 5);
 
   if (argv.article) {
     return buildDoc(metadata, items, partials, {
