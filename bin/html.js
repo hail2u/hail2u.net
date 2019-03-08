@@ -42,9 +42,15 @@ const files = [
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
     src: "../src/sitemap.mustache"
+  },
+  {
+    dest: "../dist/view/index.html",
+    json: "../src/view/index.json",
+    src: "../src/view/index.mustache"
   }
 ];
 const itemFile = "../src/blog/articles.json";
+const linksFile = "../src/view/links.json";
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -68,13 +74,10 @@ const readJSONFile = async file => {
   return JSON.parse(json);
 };
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
 const pad = number => String(number).padStart(2, "0");
 
-const extendItem = item => {
-  const dt = new Date(item.published);
+const expandDatetime = unixtime => {
+  const dt = new Date(unixtime);
   const date = dt.getDate();
   const day = dt.getDay();
   const hour = dt.getHours();
@@ -83,15 +86,8 @@ const extendItem = item => {
   const second = dt.getSeconds();
   const year = dt.getFullYear();
   return {
-    ...item,
     date: date,
     day: day,
-    description: decode(
-      item.body
-        .replace(/\r?\n/g, "")
-        .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-        .replace(/<.*?>/g, "")
-    ),
     hour: hour,
     minute: minute,
     month: month,
@@ -105,6 +101,36 @@ const extendItem = item => {
     strSecond: pad(second),
     strYear: pad(year),
     year: year
+  };
+};
+
+const extendLink = link => {
+  const dt = expandDatetime(link.added);
+  return {
+    ...link,
+    ...dt
+  };
+};
+
+const readLinks = async () => {
+  const links = await readJSONFile(linksFile);
+  return links.map(extendLink);
+};
+
+const compareByUnixtime = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
+const extendItem = item => {
+  const dt = expandDatetime(item.published);
+  return {
+    ...item,
+    ...dt,
+    description: decode(
+      item.body
+        .replace(/\r?\n/g, "")
+        .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+        .replace(/<.*?>/g, "")
+    )
   };
 };
 
@@ -282,17 +308,19 @@ const mergeArticle = item => ({
 });
 
 const main = async () => {
-  const [metadata, books, comics, novels, items, partials] = await Promise.all([
+  const [metadata, books, comics, novels, links, items, partials] = await Promise.all([
     readJSONFile(metadataFile),
     readJSONFile(booksFile),
     readJSONFile(comicsFile),
     readJSONFile(novelsFile),
+    readLinks(),
     readItems(),
     readPartials()
   ]);
   metadata.books = books.reverse().slice(0, 5);
   metadata.comics = comics.reverse().slice(0, 5);
   metadata.novels = novels.reverse().slice(0, 5);
+  metadata.links = links.reverse();
 
   if (argv.article) {
     return buildDoc(metadata, items, partials, {
