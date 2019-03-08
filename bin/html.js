@@ -12,6 +12,7 @@ const argv = minimist(process.argv.slice(2), {
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
 const booksFile = "../src/read/books.json";
+const comicsFile = "../src/read/comics.json";
 const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
@@ -31,6 +32,11 @@ const files = [
     json: "../src/index.json",
     itemLength: 5,
     src: "../src/index.mustache"
+  },
+  {
+    dest: "../dist/read/index.html",
+    json: "../src/read/index.json",
+    src: "../src/read/index.mustache"
   },
   {
     dest: "../dist/sitemap.xml",
@@ -54,6 +60,7 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
+const novelsFile = "../src/read/novels.json";
 const partialDir = "../src/partial/";
 
 const readJSONFile = async file => {
@@ -275,13 +282,17 @@ const mergeArticle = item => ({
 });
 
 const main = async () => {
-  const [metadata, books, items, partials] = await Promise.all([
+  const [metadata, books, comics, novels, items, partials] = await Promise.all([
     readJSONFile(metadataFile),
     readJSONFile(booksFile),
+    readJSONFile(comicsFile),
+    readJSONFile(novelsFile),
     readItems(),
     readPartials()
   ]);
   metadata.books = books.reverse().slice(0, 5);
+  metadata.comics = comics.reverse().slice(0, 5);
+  metadata.novels = novels.reverse().slice(0, 5);
 
   if (argv.article) {
     return buildDoc(metadata, items, partials, {
