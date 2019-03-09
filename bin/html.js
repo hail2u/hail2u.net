@@ -6,7 +6,7 @@ const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["articles"],
+  boolean: ["all"],
   string: ["article"]
 });
 const articleJSON = "../src/blog/article.json";
@@ -284,7 +284,7 @@ const render = (template, data, partials, dest) => {
   return mustache.render(template, data, partials);
 };
 
-const buildDoc = async (metadata, items, partials, file) => {
+const buildHTML = async (metadata, items, partials, file) => {
   const [data, template] = await Promise.all([
     mergeData(
       file.json,
@@ -323,7 +323,7 @@ const main = async () => {
   metadata.links = links.reverse();
 
   if (argv.article) {
-    return buildDoc(metadata, items, partials, {
+    return buildHTML(metadata, items, partials, {
       dest: argv.article,
       json: articleJSON,
       src: articleSrc
@@ -333,11 +333,11 @@ const main = async () => {
   if (argv.articles) {
     const articles = await Promise.all(items.map(mergeArticle));
     return Promise.all(
-      articles.map(buildDoc.bind(null, metadata, items, partials))
+      articles.map(buildHTML.bind(null, metadata, items, partials))
     );
   }
 
-  return Promise.all(files.map(buildDoc.bind(null, metadata, items, partials)));
+  return Promise.all(files.map(buildHTML.bind(null, metadata, items, partials)));
 };
 
 process.chdir(__dirname);
