@@ -10,6 +10,10 @@ const compiler = new ClosureCompiler({
 
 const files = [
   {
+    dest: "../src/partial/js.mustache",
+    src: ["../src/js/dark-mode.js"]
+  },
+  {
     dest: "../tmp/main.min.js",
     src: ["../src/js/reldate.js", "../src/js/unutm.js"]
   }
