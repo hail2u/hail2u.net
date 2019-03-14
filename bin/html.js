@@ -42,15 +42,10 @@ const files = [
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
     src: "../src/sitemap.mustache"
-  },
-  {
-    dest: "../dist/view/index.html",
-    json: "../src/view/index.json",
-    src: "../src/view/index.mustache"
   }
 ];
 const itemFile = "../src/blog/articles.json";
-const linksFile = "../src/view/links.json";
+const linksFile = "../src/read/links.json";
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -320,7 +315,7 @@ const main = async () => {
   metadata.books = books.reverse().slice(0, 5);
   metadata.comics = comics.reverse().slice(0, 5);
   metadata.novels = novels.reverse().slice(0, 5);
-  metadata.links = links.reverse();
+  metadata.links = links.reverse().slice(0, 10);
 
   if (argv.article) {
     return buildHTML(metadata, items, partials, {
