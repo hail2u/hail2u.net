@@ -11,8 +11,8 @@ const argv = minimist(process.argv.slice(2), {
 });
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
-const booksFile = "../src/read/books.json";
-const comicsFile = "../src/read/comics.json";
+const booksFile = "../src/links/books.json";
+const comicsFile = "../src/links/comics.json";
 const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
@@ -34,9 +34,9 @@ const files = [
     src: "../src/index.mustache"
   },
   {
-    dest: "../dist/read/index.html",
-    json: "../src/read/index.json",
-    src: "../src/read/index.mustache"
+    dest: "../dist/links/index.html",
+    json: "../src/links/index.json",
+    src: "../src/links/index.mustache"
   },
   {
     dest: "../dist/sitemap.xml",
@@ -45,7 +45,6 @@ const files = [
   }
 ];
 const itemFile = "../src/blog/articles.json";
-const linksFile = "../src/read/links.json";
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -61,8 +60,9 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
-const novelsFile = "../src/read/novels.json";
+const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
+const urlsFile = "../src/links/urls.json";
 
 const readJSONFile = async file => {
   const json = await fs.readFile(file, "utf8");
@@ -99,17 +99,17 @@ const expandDatetime = unixtime => {
   };
 };
 
-const extendLink = link => {
-  const dt = expandDatetime(link.added);
+const extendURL = url => {
+  const dt = expandDatetime(url.added);
   return {
-    ...link,
+    ...url,
     ...dt
   };
 };
 
-const readLinks = async () => {
-  const links = await readJSONFile(linksFile);
-  return links.map(extendLink);
+const readURLs = async () => {
+  const urls = await readJSONFile(urlsFile);
+  return urls.map(extendURL);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -303,19 +303,19 @@ const mergeArticle = item => ({
 });
 
 const main = async () => {
-  const [metadata, books, comics, novels, links, items, partials] = await Promise.all([
+  const [metadata, books, comics, novels, urls, items, partials] = await Promise.all([
     readJSONFile(metadataFile),
     readJSONFile(booksFile),
     readJSONFile(comicsFile),
     readJSONFile(novelsFile),
-    readLinks(),
+    readURLs(),
     readItems(),
     readPartials()
   ]);
   metadata.books = books.reverse().slice(0, 5);
   metadata.comics = comics.reverse().slice(0, 5);
   metadata.novels = novels.reverse().slice(0, 5);
-  metadata.links = links.reverse().slice(0, 10);
+  metadata.urls = urls.reverse().slice(0, 10);
 
   if (argv.article) {
     return buildHTML(metadata, items, partials, {
