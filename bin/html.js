@@ -11,6 +11,7 @@ const argv = minimist(process.argv.slice(2), {
 });
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
+const articlesFile = "../src/blog/articles.json";
 const booksFile = "../src/links/books.json";
 const comicsFile = "../src/links/comics.json";
 const destDir = "../dist/";
@@ -44,7 +45,6 @@ const files = [
     src: "../src/sitemap.mustache"
   }
 ];
-const itemFile = "../src/blog/articles.json";
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -115,13 +115,13 @@ const readURLs = async () => {
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const extendItem = item => {
-  const dt = expandDatetime(item.published);
+const extendArticle = article => {
+  const dt = expandDatetime(article.published);
   return {
-    ...item,
+    ...article,
     ...dt,
     description: decode(
-      item.body
+      article.body
         .replace(/\r?\n/g, "")
         .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
         .replace(/<.*?>/g, "")
@@ -129,9 +129,9 @@ const extendItem = item => {
   };
 };
 
-const readItems = async () => {
-  const items = await readJSONFile(itemFile);
-  return items.sort(compareByUnixtime).map(extendItem);
+const readArticles = async () => {
+  const articles = await readJSONFile(articlesFile);
+  return articles.sort(compareByUnixtime).map(extendArticle);
 };
 
 const readPartial = async filename => ({
@@ -149,7 +149,7 @@ const readPartials = async () => {
   return gatherPartials(partials);
 };
 
-const hasSameLink = (dest, item) => dest.endsWith(item.link);
+const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
 const findCover = (image, defaultCardType, defaultCover) => {
   if (!image) {
@@ -199,15 +199,15 @@ const isLatest = index => {
   return false;
 };
 
-const markItemChanges = (item, index, items) => {
-  const nextItem = items[index + 1];
-  const previousItem = items[index - 1];
+const markArticleChanges = (article, index, articles) => {
+  const nextArticle = articles[index + 1];
+  const previousArticle = articles[index - 1];
   return {
-    ...item,
-    isFirstInMonth: isFirstInMonth(item, previousItem),
-    isFirstInYear: isFirstInYear(item, previousItem),
-    isLastInMonth: isLastInMonth(item, nextItem),
-    isLastInYear: isLastInYear(item, nextItem),
+    ...article,
+    isFirstInMonth: isFirstInMonth(article, previousArticle),
+    isFirstInYear: isFirstInYear(article, previousArticle),
+    isLastInMonth: isLastInMonth(article, nextArticle),
+    isLastInYear: isLastInYear(article, nextArticle),
     isLatest: isLatest(index)
   };
 };
@@ -221,7 +221,7 @@ const now = date =>
 
 const mergeData = async (
   extradataFile,
-  items,
+  articles,
   dest,
   metadata,
   includeUpdates,
@@ -229,48 +229,48 @@ const mergeData = async (
 ) => {
   const extradata = await readJSONFile(extradataFile);
 
-  if (argv.article || argv.articles) {
-    const item = items.find(hasSameLink.bind(null, dest));
+  if (argv.article || argv.all) {
+    const article = articles.find(hasSameLink.bind(null, dest));
     const [cardType, cover] = findCover(
-      /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(item.body),
+      /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body),
       metadata.card_type,
       metadata.cover
     );
     return {
       ...metadata,
       ...extradata,
-      ...item,
-      canonical: item.link,
+      ...article,
+      canonical: article.link,
       card_type: cardType,
       cover: cover,
-      short_title: item.title
+      short_title: article.title
     };
   }
 
   return {
     ...metadata,
     ...extradata,
-    items: items
+    articles: articles
       .slice(0)
-      .map(markItemChanges)
+      .map(markArticleChanges)
       .slice(0, itemLength),
     lastBuildDate: now(new Date())
   };
 };
 
-const toAbsoluteURLinBody = item => ({
-  ...item,
-  body: item.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"')
+const toAbsoluteURLinBody = article => ({
+  ...article,
+  body: article.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"')
 });
 
 const render = (template, data, partials, dest) => {
   if (dest.endsWith("/feed")) {
-    const items = data.items.map(toAbsoluteURLinBody);
+    const articles = data.articles.map(toAbsoluteURLinBody);
     return mustache.render(
       template,
       {
         ...data,
-        items: items
+        articles: articles
       },
       partials
     );
@@ -279,11 +279,11 @@ const render = (template, data, partials, dest) => {
   return mustache.render(template, data, partials);
 };
 
-const buildHTML = async (metadata, items, partials, file) => {
+const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
     mergeData(
       file.json,
-      items,
+      articles,
       file.dest,
       metadata,
       file.includeUpdates,
@@ -295,21 +295,29 @@ const buildHTML = async (metadata, items, partials, file) => {
   await fs.writeFile(file.dest, rendered);
 };
 
-const mergeArticle = item => ({
-  dest: toPOSIXPath(path.join(destDir, item.link)),
+const toFilesFormat = article => ({
+  dest: toPOSIXPath(path.join(destDir, article.link)),
   json: articleJSON,
   src: articleSrc,
-  ...item
+  ...article
 });
 
 const main = async () => {
-  const [metadata, books, comics, novels, urls, items, partials] = await Promise.all([
+  const [
+    metadata,
+    books,
+    comics, 
+    novels, 
+    urls, 
+    articles, 
+    partials
+  ] = await Promise.all([
     readJSONFile(metadataFile),
     readJSONFile(booksFile),
     readJSONFile(comicsFile),
     readJSONFile(novelsFile),
     readURLs(),
-    readItems(),
+    readArticles(),
     readPartials()
   ]);
   metadata.books = books.reverse().slice(0, 5);
@@ -318,21 +326,23 @@ const main = async () => {
   metadata.urls = urls.reverse().slice(0, 10);
 
   if (argv.article) {
-    return buildHTML(metadata, items, partials, {
+    return buildHTML(metadata, articles, partials, {
       dest: argv.article,
       json: articleJSON,
       src: articleSrc
     });
   }
 
-  if (argv.articles) {
-    const articles = await Promise.all(items.map(mergeArticle));
+  if (argv.all) {
+    const allFiles = await Promise.all(articles.map(toFilesFormat));
     return Promise.all(
-      articles.map(buildHTML.bind(null, metadata, items, partials))
+      allFiles.map(buildHTML.bind(null, metadata, articles, partials))
     );
   }
 
-  return Promise.all(files.map(buildHTML.bind(null, metadata, items, partials)));
+  return Promise.all(
+    files.map(buildHTML.bind(null, metadata, articles, partials))
+  );
 };
 
 process.chdir(__dirname);
