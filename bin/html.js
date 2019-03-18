@@ -40,6 +40,11 @@ const files = [
     src: "../src/links/index.mustache"
   },
   {
+    dest: "../dist/photos/index.html",
+    json: "../src/photos/index.json",
+    src: "../src/photos/index.mustache"
+  },
+  {
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
     src: "../src/sitemap.mustache"
@@ -62,6 +67,7 @@ const monthNames = [
 ];
 const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
+const photofilesDir = "../src/img/photos/";
 const urlsFile = "../src/links/urls.json";
 
 const readJSONFile = async file => {
@@ -110,6 +116,24 @@ const extendURL = url => {
 const readURLs = async () => {
   const urls = await readJSONFile(urlsFile);
   return urls.map(extendURL);
+};
+
+const isPhotofile = filename => {
+  if (path.extname(filename) === ".jpg") {
+    return true;
+  }
+
+  return false;
+}
+
+const extendPhotofile = photofile => ({
+  filename: photofile,
+  url: `/img/photos/${photofile}`
+});
+
+const listPhotofiles = async () => {
+  const photofiles = await fs.readdir(photofilesDir);
+  return photofiles.filter(isPhotofile).sort().map(extendPhotofile);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -306,10 +330,11 @@ const main = async () => {
   const [
     metadata,
     books,
-    comics, 
-    novels, 
-    urls, 
-    articles, 
+    comics,
+    novels,
+    urls,
+    photofiles,
+    articles,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
@@ -317,6 +342,7 @@ const main = async () => {
     readJSONFile(comicsFile),
     readJSONFile(novelsFile),
     readURLs(),
+    listPhotofiles(),
     readArticles(),
     readPartials()
   ]);
@@ -324,6 +350,7 @@ const main = async () => {
   metadata.comics = comics.reverse().slice(0, 5);
   metadata.novels = novels.reverse().slice(0, 5);
   metadata.urls = urls.reverse().slice(0, 10);
+  metadata.photofiles = photofiles.reverse().slice(0, 60);
 
   if (argv.article) {
     return buildHTML(metadata, articles, partials, {
