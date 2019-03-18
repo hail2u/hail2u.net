@@ -12,7 +12,6 @@ const argv = minimist(process.argv.slice(2), {
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
 const articlesFile = "../src/blog/articles.json";
-const booksFile = "../src/links/books.json";
 const comicsFile = "../src/links/comics.json";
 const destDir = "../dist/";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -65,10 +64,11 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
+const nonfictionsFile = "../src/links/nonfictions.json";
 const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
-const photofilesDir = "../src/img/photos/";
-const urlsFile = "../src/links/urls.json";
+const snapshotsDir = "../src/img/photos/";
+const webpagesFile = "../src/links/webpages.json";
 
 const readJSONFile = async file => {
   const json = await fs.readFile(file, "utf8");
@@ -105,17 +105,17 @@ const expandDatetime = unixtime => {
   };
 };
 
-const extendURL = url => {
-  const dt = expandDatetime(url.added);
+const extendWebpage = webpage => {
+  const dt = expandDatetime(webpage.added);
   return {
-    ...url,
+    ...webpage,
     ...dt
   };
 };
 
-const readURLs = async () => {
-  const urls = await readJSONFile(urlsFile);
-  return urls.map(extendURL);
+const readWebpages = async () => {
+  const webpages = await readJSONFile(webpagesFile);
+  return webpages.map(extendWebpage);
 };
 
 const isPhotofile = filename => {
@@ -131,9 +131,9 @@ const extendPhotofile = photofile => ({
   url: `/img/photos/${photofile}`
 });
 
-const listPhotofiles = async () => {
-  const photofiles = await fs.readdir(photofilesDir);
-  return photofiles.filter(isPhotofile).sort().map(extendPhotofile);
+const listSnapshots = async () => {
+  const snapshots = await fs.readdir(snapshotsDir);
+  return snapshots.filter(isPhotofile).sort().map(extendPhotofile);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -329,28 +329,28 @@ const toFilesFormat = article => ({
 const main = async () => {
   const [
     metadata,
-    books,
+    nonfictions,
     comics,
     novels,
-    urls,
-    photofiles,
+    webpages,
+    snapshots,
     articles,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
-    readJSONFile(booksFile),
+    readJSONFile(nonfictionsFile),
     readJSONFile(comicsFile),
     readJSONFile(novelsFile),
-    readURLs(),
-    listPhotofiles(),
+    readWebpages(),
+    listSnapshots(),
     readArticles(),
     readPartials()
   ]);
-  metadata.books = books.reverse().slice(0, 5);
+  metadata.nonfictions = nonfictions.reverse().slice(0, 5);
   metadata.comics = comics.reverse().slice(0, 5);
   metadata.novels = novels.reverse().slice(0, 5);
-  metadata.urls = urls.reverse().slice(0, 10);
-  metadata.photofiles = photofiles.reverse().slice(0, 60);
+  metadata.webpages = webpages.reverse().slice(0, 10);
+  metadata.snapshots = snapshots.reverse().slice(0, 60);
 
   if (argv.article) {
     return buildHTML(metadata, articles, partials, {

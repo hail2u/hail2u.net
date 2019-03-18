@@ -15,7 +15,7 @@ const argv = minimist(process.argv.slice(2), {
   string: ["asin", "title", "type", "url"],
   unknown: false
 });
-const booksFile = "../src/links/books.json";
+const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";
 const execFileAsync = promisify(execFile);
 const novelsFile = "../src/links/novels.json";
@@ -89,7 +89,7 @@ const main = async () => {
     return addBook(novelsFile, argv.asin, argv.title, git);
   }
 
-  return addBook(booksFile, argv.asin, argv.title, git);
+  return addBook(nonfictionsFile, argv.asin, argv.title, git);
 };
 
 process.chdir(__dirname);
