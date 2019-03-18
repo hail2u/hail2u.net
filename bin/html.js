@@ -22,6 +22,11 @@ const files = [
     src: "../src/blog/index.mustache"
   },
   {
+    dest: "../dist/documents/index.html",
+    json: "../src/documents/index.json",
+    src: "../src/documents/index.mustache"
+  },
+  {
     dest: "../dist/feed",
     json: "../src/index.json",
     itemLength: 10,
