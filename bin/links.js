@@ -6,6 +6,12 @@ const { promisify } = require("util");
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
+  alias: {
+    a: "asin",
+    t: "title",
+    y: "type",
+    u: "url"
+  },
   default: {
     asin: "",
     title: "",

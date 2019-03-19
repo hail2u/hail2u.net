@@ -11,6 +11,12 @@ const { promisify } = require("util");
 const which = require("which");
 
 const argv = minimist(process.argv.slice(2), {
+  alias: {
+    c: "contribute",
+    f: "file",
+    t: "test",
+    u: "update"
+  },
   boolean: ["contribute", "test", "update"],
   default: {
     file: ""

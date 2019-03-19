@@ -6,6 +6,10 @@ const path = require("path");
 const toPOSIXPath = require("../lib/to-posix-path");
 
 const argv = minimist(process.argv.slice(2), {
+  alias: {
+    A: "all",
+    a: "article"
+  },
   boolean: ["all"],
   string: ["article"]
 });
