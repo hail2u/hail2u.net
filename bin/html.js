@@ -127,7 +127,7 @@ const readWebpages = async () => {
   return webpages.map(extendWebpage);
 };
 
-const isPhotofile = filename => {
+const isSnapshot = filename => {
   if (path.extname(filename) === ".jpg") {
     return true;
   }
@@ -135,14 +135,14 @@ const isPhotofile = filename => {
   return false;
 }
 
-const extendPhotofile = photofile => ({
-  filename: photofile,
-  url: `/img/photos/${photofile}`
+const extendSnapshot = snapshot => ({
+  filename: snapshot,
+  url: `/img/photos/${snapshot}`
 });
 
 const listSnapshots = async () => {
   const snapshots = await fs.readdir(snapshotsDir);
-  return snapshots.filter(isPhotofile).sort().map(extendPhotofile);
+  return snapshots.filter(isSnapshot).sort().map(extendSnapshot);
 };
 
 const compareByUnixtime = (a, b) =>
