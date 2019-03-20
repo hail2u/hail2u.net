@@ -52,10 +52,7 @@ const listArticleImagePaths = html => {
 };
 
 const copyArticleImage = imagepath =>
-  fs.copyFile(
-    path.join(srcImgDir, imagepath),
-    path.join(destImgDir, imagepath)
-  );
+  fs.copyFile(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
@@ -67,13 +64,9 @@ const hasSameLink = (link, article) => link === article.link;
 const compareByUnixtime = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const saveCache = async cache => {
-  await fs.writeFile(
-    cacheFile,
-    `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
-`
-  );
-};
+const saveCache = cache =>
+  fs.writeFile(cacheFile, `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
+`);
 
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
@@ -83,9 +76,7 @@ const updateCache = (cache, html, name) => {
     title: decode(title.replace(/<.*?>/g, "")),
     published: Date.now()
   };
-  const sameArticleIndex = cache.findIndex(
-    hasSameLink.bind(null, article.link)
-  );
+  const sameArticleIndex = cache.findIndex(hasSameLink.bind(null, article.link));
 
   if (sameArticleIndex === -1) {
     return saveCache([article, ...cache]);
@@ -137,12 +128,7 @@ const updateEntry = async file => {
     addFiles(git, src, path.relative("", cacheFile)),
     buildArticle(npm, file.name)
   ]);
-  return commitFiles(
-    git,
-    file.verb,
-    toPOSIXPath(path.relative("../", src)),
-    getArticleTotal(cache)
-  );
+  return commitFiles(git, file.verb, toPOSIXPath(path.relative("../", src)), getArticleTotal(cache));
 };
 
 const isDraft = filename => {
@@ -195,11 +181,12 @@ const selectDraft = drafts =>
 
     menu.write("0. QUIT\n");
     drafts.forEach((n, i) => {
-      menu.write(`${i + 1}. ${n.content
+      const menuitem = n.content
         .trim()
         .split(/\n+/)[0]
         .replace(/^# /, "")
-        .replace(/^<h1>(.*?)<\/h1>$/, "$1")}
+        .replace(/^<h1>(.*?)<\/h1>$/, "$1");
+      menu.write(`${i + 1}. ${menuitem}
 `);
     });
     menu.question("Which one: (0) ", (a = 0) => {
@@ -207,9 +194,7 @@ const selectDraft = drafts =>
       const answer = Number.parseInt(a, 10);
 
       if (!Number.isInteger(answer) || answer > drafts.length) {
-        throw new Error(
-          `You must enter a number between 0 and ${drafts.length}.`
-        );
+        throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
       }
 
       if (answer === 0) {
@@ -222,9 +207,7 @@ const selectDraft = drafts =>
 
 const checkSelectedName = name => {
   if (!draftNameRe.test(name)) {
-    throw new Error(
-      'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
-    );
+    throw new Error('This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".');
   }
 
   return true;
@@ -232,9 +215,7 @@ const checkSelectedName = name => {
 
 const checkSelectedContent = content => {
   if (!content.startsWith("# ") && !content.startsWith("<h1>")) {
-    throw new Error(
-      "This draft does not have a title. A draft content must start with `# ` or `<h1>`."
-    );
+    throw new Error("This draft does not have a title. A draft content must start with `# ` or `<h1>`.");
   }
 
   return true;
@@ -289,12 +270,7 @@ const main = async () => {
       content: await fs.readFile(argv.file, "utf8"),
       dest: path.resolve(argv.file),
       ext: ext,
-      name: toPOSIXPath(
-        path.join(
-          path.relative(srcDir, path.dirname(argv.file)),
-          path.basename(argv.file, ext)
-        )
-      ),
+      name: toPOSIXPath(path.join(path.relative(srcDir, path.dirname(argv.file)), path.basename(argv.file, ext))),
       verb: "Update"
     });
   }

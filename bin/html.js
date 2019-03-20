@@ -142,7 +142,10 @@ const extendSnapshot = snapshot => ({
 
 const listSnapshots = async () => {
   const snapshots = await fs.readdir(snapshotsDir);
-  return snapshots.filter(isSnapshot).sort().map(extendSnapshot);
+  return snapshots
+    .filter(isSnapshot)
+    .sort()
+    .map(extendSnapshot);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -150,29 +153,31 @@ const compareByUnixtime = (a, b) =>
 
 const extendArticle = article => {
   const dt = expandDatetime(article.published);
+  const description = decode(article.body
+    .replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    .replace(/<.*?>/g, ""));
   return {
     ...article,
     ...dt,
-    description: decode(
-      article.body
-        .replace(/\r?\n/g, "")
-        .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-        .replace(/<.*?>/g, "")
-    )
+    description: description
   };
 };
 
 const readArticles = async () => {
   const articles = await readJSONFile(articlesFile);
-  return articles.sort(compareByUnixtime).map(extendArticle);
+  return articles
+    .sort(compareByUnixtime)
+    .map(extendArticle);
 };
 
-const readPartial = async filename => ({
-  [path.basename(filename, ".mustache")]: await fs.readFile(
-    path.join(partialDir, filename),
-    "utf8"
-  )
-});
+const readPartial = async filename => {
+  const name = path.basename(filename, ".mustache");
+  const content = await fs.readFile(path.join(partialDir, filename), "utf8");
+  return {
+    [name]: content
+  };
+};
 
 const gatherPartials = partials => Object.assign(...partials);
 
@@ -246,11 +251,7 @@ const markArticleChanges = (article, index, articles) => {
 };
 
 const now = date =>
-  `${dowNames[date.getDay()]}, ${date.getDate()} ${
-    monthNames[date.getMonth()]
-  } ${date.getFullYear()} ${pad(date.getHours())}:${pad(
-    date.getMinutes()
-  )}:${pad(date.getSeconds())} +0900`;
+  `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
 
 const mergeData = async (
   extradataFile,
@@ -264,11 +265,8 @@ const mergeData = async (
 
   if (argv.article || argv.all) {
     const article = articles.find(hasSameLink.bind(null, dest));
-    const [cardType, cover] = findCover(
-      /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body),
-      metadata.card_type,
-      metadata.cover
-    );
+    const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
+    const [cardType, cover] = findCover(firstImage, metadata.card_type, metadata.cover);
     return {
       ...metadata,
       ...extradata,
@@ -299,14 +297,10 @@ const toAbsoluteURLinBody = article => ({
 const render = (template, data, partials, dest) => {
   if (dest.endsWith("/feed")) {
     const articles = data.articles.map(toAbsoluteURLinBody);
-    return mustache.render(
-      template,
-      {
-        ...data,
-        articles: articles
-      },
-      partials
-    );
+    return mustache.render(template, {
+      ...data,
+      articles: articles
+    }, partials);
   }
 
   return mustache.render(template, data, partials);
@@ -314,14 +308,7 @@ const render = (template, data, partials, dest) => {
 
 const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
-    mergeData(
-      file.json,
-      articles,
-      file.dest,
-      metadata,
-      file.includeUpdates,
-      file.itemLength
-    ),
+    mergeData(file.json, articles, file.dest, metadata, file.includeUpdates, file.itemLength),
     fs.readFile(file.src, "utf8")
   ]);
   const rendered = await render(template, data, partials, file.dest);
@@ -355,11 +342,21 @@ const main = async () => {
     readArticles(),
     readPartials()
   ]);
-  metadata.nonfictions = nonfictions.reverse().slice(0, 5);
-  metadata.comics = comics.reverse().slice(0, 5);
-  metadata.novels = novels.reverse().slice(0, 5);
-  metadata.webpages = webpages.reverse().slice(0, 10);
-  metadata.snapshots = snapshots.reverse().slice(0, 60);
+  metadata.nonfictions = nonfictions
+    .reverse()
+    .slice(0, 5);
+  metadata.comics = comics
+    .reverse()
+    .slice(0, 5);
+  metadata.novels = novels
+    .reverse()
+    .slice(0, 5);
+  metadata.webpages = webpages
+    .reverse()
+    .slice(0, 10);
+  metadata.snapshots = snapshots
+    .reverse()
+    .slice(0, 60);
 
   if (argv.article) {
     return buildHTML(metadata, articles, partials, {
@@ -371,14 +368,10 @@ const main = async () => {
 
   if (argv.all) {
     const allFiles = await Promise.all(articles.map(toFilesFormat));
-    return Promise.all(
-      allFiles.map(buildHTML.bind(null, metadata, articles, partials))
-    );
+    return Promise.all(allFiles.map(buildHTML.bind(null, metadata, articles, partials)));
   }
 
-  return Promise.all(
-    files.map(buildHTML.bind(null, metadata, articles, partials))
-  );
+  return Promise.all(files.map(buildHTML.bind(null, metadata, articles, partials)));
 };
 
 process.chdir(__dirname);

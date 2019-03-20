@@ -53,30 +53,24 @@ const runCommand = async (command, args) => {
 const addBook = async (asin, title, type, git) => {
   const file = selectFile(type);
   const books = await readJSONFile(file);
-  await fs.writeFile(
-    file,
-    `${JSON.stringify([...books, {
-      added: Date.now(),
-      asin: asin,
-      title: title
-    }], null, 2)}
-`
-  );
+  await fs.writeFile(file, `${JSON.stringify([...books, {
+    added: Date.now(),
+    asin: asin,
+    title: title
+  }], null, 2)}
+`);
   await runCommand(git, ["add", "--", path.relative("", file)]);
   await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
 const addURL = async (title, url, git) => {
   const urls = await readJSONFile(urlsFile);
-  await fs.writeFile(
-    urlsFile,
-    `${JSON.stringify([...urls, {
-      added: Date.now(),
-      title: title,
-      url: url
-    }], null, 2)}
-`
-  );
+  await fs.writeFile(urlsFile, `${JSON.stringify([...urls, {
+    added: Date.now(),
+    title: title,
+    url: url
+  }], null, 2)}
+`);
   await runCommand(git, ["add", "--", path.relative("", urlsFile)]);
   await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
 };
