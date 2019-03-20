@@ -1,8 +1,5 @@
-const atImport = require("postcss-import");
-const csswring = require("csswring");
+const CleanCSS = require("clean-css");
 const fs = require("fs").promises;
-const mqpacker = require("css-mqpacker");
-const postcss = require("postcss");
 
 const files = [
   {
@@ -18,15 +15,14 @@ const files = [
     src: "../src/css/main.css"
   }
 ];
-const processor = postcss([atImport(), mqpacker(), csswring()]);
+const minifier = new CleanCSS({
+  level: 2,
+  returnPromise: true
+});
 
 const buildCSS = async file => {
-  const css = await fs.readFile(file.src, "utf8");
-  const processed = await processor.process(css, {
-    from: file.src,
-    to: file.dest
-  });
-  await fs.writeFile(file.dest, processed.css);
+  const minified = await minifier.minify([file.src]);
+  await fs.writeFile(file.dest, minified.styles);
 };
 
 process.chdir(__dirname);
