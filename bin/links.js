@@ -28,6 +28,18 @@ const novelsFile = "../src/links/novels.json";
 const urlsFile = "../src/links/urls.json";
 const whichAsync = promisify(which);
 
+const selectFile = type => {
+  if (type === "comic") {
+    return comicsFile;
+  }
+
+  if (type === "novel") {
+    return novelsFile;
+  }
+
+  return nonfictionsFile;
+};
+
 const readJSONFile = async file => {
   const json = await fs.readFile(file, "utf8");
   return JSON.parse(json);
@@ -38,7 +50,8 @@ const runCommand = async (command, args) => {
   return process.stdout.write(stdout);
 };
 
-const addBook = async (file, asin, title, git) => {
+const addBook = async (asin, title, type, git) => {
+  const file = selectFile(type);
   const books = await readJSONFile(file);
   await fs.writeFile(
     file,
@@ -69,33 +82,21 @@ const addURL = async (title, url, git) => {
 };
 
 const main = async () => {
-  if (argv._.length > 0) {
-    throw new Error("Unknown option is passed.")
-  }
-
   if (!argv.title) {
     throw new Error("Title must be passed.");
   }
 
-  if (!argv.asin && !argv.url) {
-    throw new Error("ASIN or URL must be passed.");
-  }
-
   const git = await whichAsync("git");
+
+  if (argv.asin) {
+    return addBook(argv.asin, argv.title, argv.type, git);
+  }
 
   if (argv.url) {
     return addURL(argv.title, argv.url, git);
   }
 
-  if (argv.type === "comic") {
-    return addBook(comicsFile, argv.asin, argv.title, git);
-  }
-
-  if (argv.type === "novel") {
-    return addBook(novelsFile, argv.asin, argv.title, git);
-  }
-
-  return addBook(nonfictionsFile, argv.asin, argv.title, git);
+  throw new Error("ASIN or URL must be passed.");
 };
 
 process.chdir(__dirname);
