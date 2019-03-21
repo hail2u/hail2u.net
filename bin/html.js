@@ -277,7 +277,6 @@ const mergeData = async (
   articles,
   dest,
   metadata,
-  includeUpdates,
   itemLength
 ) => {
   const extradata = await readJSONFile(extradataFile);
@@ -327,7 +326,7 @@ const render = (template, data, partials, dest) => {
 
 const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
-    mergeData(file.json, articles, file.dest, metadata, file.includeUpdates, file.itemLength),
+    mergeData(file.json, articles, file.dest, metadata, file.itemLength),
     fs.readFile(file.src, "utf8")
   ]);
   const rendered = await render(template, data, partials, file.dest);
