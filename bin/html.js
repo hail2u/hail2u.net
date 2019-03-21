@@ -56,6 +56,11 @@ const files = [
     dest: "../dist/sitemap.xml",
     json: "../src/index.json",
     src: "../src/sitemap.mustache"
+  },
+  {
+    dest: "../dist/statuses/index.html",
+    json: "../src/statuses/index.json",
+    src: "../src/statuses/index.mustache"
   }
 ];
 const metadataFile = "../src/metadata.json";
@@ -77,6 +82,7 @@ const nonfictionsFile = "../src/links/nonfictions.json";
 const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
 const snapshotsDir = "../src/img/photos/";
+const textsFile = "../src/statuses/texts.json";
 const webpagesFile = "../src/links/webpages.json";
 
 const readJSONFile = async file => {
@@ -146,6 +152,19 @@ const listSnapshots = async () => {
     .filter(isSnapshot)
     .sort()
     .map(extendSnapshot);
+};
+
+const extendText = text => {
+  const dt = expandDatetime(text.published);
+  return {
+    ...text,
+    ...dt
+  };
+};
+
+const readTexts = async () => {
+  const texts = await readJSONFile(textsFile);
+  return texts.map(extendText);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -330,6 +349,7 @@ const main = async () => {
     novels,
     webpages,
     snapshots,
+    texts,
     articles,
     partials
   ] = await Promise.all([
@@ -339,6 +359,7 @@ const main = async () => {
     readJSONFile(novelsFile),
     readWebpages(),
     listSnapshots(),
+    readTexts(),
     readArticles(),
     readPartials()
   ]);
@@ -357,6 +378,10 @@ const main = async () => {
   metadata.snapshots = snapshots
     .reverse()
     .slice(0, 60);
+  metadata.texts = texts
+    .reverse()
+    .slice(0, 100);
+  metadata.texts[0].isLatest = true;
 
   if (argv.article) {
     return buildHTML(metadata, articles, partials, {
