@@ -31,12 +31,6 @@ const files = [
     src: "../src/documents/index.mustache"
   },
   {
-    dest: "../dist/feed",
-    json: "../src/index.json",
-    itemLength: 10,
-    src: "../src/feed.mustache"
-  },
-  {
     dest: "../dist/index.html",
     json: "../src/index.json",
     itemLength: 5,
@@ -307,29 +301,15 @@ const mergeData = async (
   };
 };
 
-const toAbsoluteURLinBody = article => ({
-  ...article,
-  body: article.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"')
-});
-
-const render = (template, data, partials, dest) => {
-  if (dest.endsWith("/feed")) {
-    const articles = data.articles.map(toAbsoluteURLinBody);
-    return mustache.render(template, {
-      ...data,
-      articles: articles
-    }, partials);
-  }
-
-  return mustache.render(template, data, partials);
-};
+const render = (template, data, partials) =>
+  mustache.render(template, data, partials);
 
 const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
     mergeData(file.json, articles, file.dest, metadata, file.itemLength),
     fs.readFile(file.src, "utf8")
   ]);
-  const rendered = await render(template, data, partials, file.dest);
+  const rendered = await render(template, data, partials);
   await fs.writeFile(file.dest, rendered);
 };
 
