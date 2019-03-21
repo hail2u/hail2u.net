@@ -18,8 +18,7 @@ const argv = minimist(process.argv.slice(2), {
     type: "",
     url: ""
   },
-  string: ["asin", "title", "type", "url"],
-  unknown: false
+  string: ["asin", "title", "type", "url"]
 });
 const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";

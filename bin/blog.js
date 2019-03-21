@@ -51,8 +51,7 @@ const listArticleImagePaths = html => {
   return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = imagepath =>
-  fs.copyFile(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
+const copyArticleImage = imagepath => fs.copyFile(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
@@ -61,11 +60,9 @@ const copyArticleImages = async html => {
 
 const hasSameLink = (link, article) => link === article.link;
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const saveCache = cache =>
-  fs.writeFile(cacheFile, `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
+const saveCache = cache => fs.writeFile(cacheFile, `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
 `);
 
 const updateCache = (cache, html, name) => {
@@ -99,11 +96,9 @@ const runCommand = async (command, args) => {
 
 const addFiles = (git, ...files) => runCommand(git, ["add", "--", ...files]);
 
-const buildArticle = (npm, name) =>
-  runCommand(npm, ["run", "html", "--", `--article=${destDir}${name}.html`]);
+const buildArticle = (npm, name) => runCommand(npm, ["run", "html", "--", `--article=${destDir}${name}.html`]);
 
-const commitFiles = (git, verb, file, num) =>
-  runCommand(git, ["commit", `--message=${verb} ${file}${num}`]);
+const commitFiles = (git, verb, file, num) => runCommand(git, ["commit", `--message=${verb} ${file}${num}`]);
 
 const getArticleTotal = cache => {
   if (argv.update) {
@@ -168,42 +163,41 @@ const listDrafts = async () => {
   return getDrafts(filenames.filter(isDraft));
 };
 
-const selectDraft = drafts =>
-  new Promise(resolve => {
-    if (!argv.contribute && drafts.length === 1) {
-      return resolve(drafts[0]);
+const selectDraft = drafts => new Promise(resolve => {
+  if (!argv.contribute && drafts.length === 1) {
+    return resolve(drafts[0]);
+  }
+
+  const menu = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  menu.write("0. QUIT\n");
+  drafts.forEach((n, i) => {
+    const menuitem = n.content
+      .trim()
+      .split(/\n+/)[0]
+      .replace(/^# /, "")
+      .replace(/^<h1>(.*?)<\/h1>$/, "$1");
+    menu.write(`${i + 1}. ${menuitem}
+`);
+  });
+  menu.question("Which one: (0) ", (a = 0) => {
+    menu.close();
+    const answer = Number.parseInt(a, 10);
+
+    if (!Number.isInteger(answer) || answer > drafts.length) {
+      throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
     }
 
-    const menu = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+    if (answer === 0) {
+      throw new Error("Aborted by user.");
+    }
 
-    menu.write("0. QUIT\n");
-    drafts.forEach((n, i) => {
-      const menuitem = n.content
-        .trim()
-        .split(/\n+/)[0]
-        .replace(/^# /, "")
-        .replace(/^<h1>(.*?)<\/h1>$/, "$1");
-      menu.write(`${i + 1}. ${menuitem}
-`);
-    });
-    menu.question("Which one: (0) ", (a = 0) => {
-      menu.close();
-      const answer = Number.parseInt(a, 10);
-
-      if (!Number.isInteger(answer) || answer > drafts.length) {
-        throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
-      }
-
-      if (answer === 0) {
-        throw new Error("Aborted by user.");
-      }
-
-      return resolve(drafts[answer - 1]);
-    });
+    return resolve(drafts[answer - 1]);
   });
+});
 
 const checkSelectedName = name => {
   if (!draftNameRe.test(name)) {
@@ -237,20 +231,18 @@ const markupSelected = async (ext, content) => {
   return html;
 };
 
-const contributeSelected = selected =>
-  Promise.all([
-    fs.writeFile(selected.dest, selected.content, {
-      flag: "wx"
-    }),
-    deleteFile(selected.src),
-    updateEntry(selected)
-  ]);
+const contributeSelected = selected => Promise.all([
+  fs.writeFile(selected.dest, selected.content, {
+    flag: "wx"
+  }),
+  deleteFile(selected.src),
+  updateEntry(selected)
+]);
 
-const renderSelected = (template, selected, partials) =>
-  mustache
-    .render(template, selected, partials)
-    .replace(/="\/img\//g, '="../src/img/')
-    .replace(/="\//g, '="../dist/');
+const renderSelected = (template, selected, partials) => mustache
+  .render(template, selected, partials)
+  .replace(/="\/img\//g, '="../src/img/')
+  .replace(/="\//g, '="../dist/');
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");

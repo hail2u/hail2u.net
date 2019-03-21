@@ -69,12 +69,11 @@ const hasPublished = book => book.published;
 
 const extendBook = book => {
   const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
-  const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
   return {
     ...book,
     body: `<p><img src="${image}"></p>`,
     description: image,
-    link: url,
+    link: `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`,
     type: "book"
   };
 };
@@ -161,8 +160,7 @@ const readArticles = async () => {
   return articles.map(extendArticle);
 };
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const pickByType = (type, item) => {
   if (!type) {

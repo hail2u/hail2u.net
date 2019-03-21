@@ -19,8 +19,7 @@ const isSnapshot = filename => {
 
 const pad = number => String(number).padStart(2, "0");
 
-const generateFilename = dt =>
-  `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}.jpg`;
+const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}.jpg`;
 
 const copy = (src, dest) => fs.copyFile(src, dest);
 

@@ -162,8 +162,7 @@ const readTexts = async () => {
   return texts.map(extendText);
 };
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const extendArticle = article => {
   const dt = expandDatetime(article.published);
@@ -264,8 +263,7 @@ const markArticleChanges = (article, index, articles) => {
   };
 };
 
-const now = date =>
-  `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
+const now = date => `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
 
 const mergeData = async (
   extradataFile,
@@ -302,15 +300,12 @@ const mergeData = async (
   };
 };
 
-const render = (template, data, partials) =>
-  mustache.render(template, data, partials);
-
 const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
     mergeData(file.json, articles, file.dest, metadata, file.itemLength),
     fs.readFile(file.src, "utf8")
   ]);
-  const rendered = await render(template, data, partials);
+  const rendered = mustache.render(template, data, partials);
   await fs.writeFile(file.dest, rendered);
 };
 

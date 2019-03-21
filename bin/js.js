@@ -19,10 +19,8 @@ const files = [
   }
 ];
 
-const readFile = file => fs.readFile(file, "utf8");
-
 const buildJSCode = async src => {
-  const js = await readFile(src);
+  const js = await fs.readFile(src, "utf8");
   return {
     sourceMap: null,
     src: js
