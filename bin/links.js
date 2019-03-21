@@ -54,7 +54,7 @@ const addBook = async (asin, title, type, git) => {
   const file = selectFile(type);
   const books = await readJSONFile(file);
   await fs.writeFile(file, `${JSON.stringify([...books, {
-    added: Date.now(),
+    published: Date.now(),
     asin: asin,
     title: title
   }], null, 2)}
@@ -66,7 +66,7 @@ const addBook = async (asin, title, type, git) => {
 const addURL = async (title, url, git) => {
   const urls = await readJSONFile(urlsFile);
   await fs.writeFile(urlsFile, `${JSON.stringify([...urls, {
-    added: Date.now(),
+    published: Date.now(),
     title: title,
     url: url
   }], null, 2)}

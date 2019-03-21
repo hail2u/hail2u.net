@@ -121,7 +121,7 @@ const expandDatetime = unixtime => {
 };
 
 const extendWebpage = webpage => {
-  const dt = expandDatetime(webpage.added);
+  const dt = expandDatetime(webpage.published);
   return {
     ...webpage,
     ...dt
