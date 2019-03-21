@@ -24,10 +24,10 @@ const main = async () => {
     whichAsync("git")
   ]);
   const text = process.argv.slice(2).shift();
-  await fs.writeFile(textsFile, `${JSON.stringify([...texts, {
+  await fs.writeFile(textsFile, `${JSON.stringify([{
     published: Date.now(),
     text: text
-  }], null, 2)}
+  }, ...texts], null, 2)}
 `);
   await runCommand(git, ["add", "--", path.relative("", textsFile)]);
   await runCommand(git, ["commit", `--message=Update status`]);

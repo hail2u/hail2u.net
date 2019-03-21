@@ -145,6 +145,7 @@ const listSnapshots = async () => {
   return snapshots
     .filter(isSnapshot)
     .sort()
+    .reverse()
     .map(extendSnapshot);
 };
 
@@ -342,24 +343,12 @@ const main = async () => {
     readArticles(),
     readPartials()
   ]);
-  metadata.nonfictions = nonfictions
-    .reverse()
-    .slice(0, 5);
-  metadata.comics = comics
-    .reverse()
-    .slice(0, 5);
-  metadata.novels = novels
-    .reverse()
-    .slice(0, 5);
-  metadata.webpages = webpages
-    .reverse()
-    .slice(0, 10);
-  metadata.snapshots = snapshots
-    .reverse()
-    .slice(0, 60);
-  metadata.texts = texts
-    .reverse()
-    .slice(0, 100);
+  metadata.nonfictions = nonfictions.slice(0, 5);
+  metadata.comics = comics.slice(0, 5);
+  metadata.novels = novels.slice(0, 5);
+  metadata.webpages = webpages.slice(0, 10);
+  metadata.snapshots = snapshots.slice(0, 60);
+  metadata.texts = texts.slice(0, 100);
   metadata.texts[0].isLatest = true;
 
   if (argv.article) {
