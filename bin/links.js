@@ -24,7 +24,7 @@ const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";
 const execFileAsync = promisify(execFile);
 const novelsFile = "../src/links/novels.json";
-const urlsFile = "../src/links/urls.json";
+const urlsFile = "../src/links/webpages.json";
 const whichAsync = promisify(which);
 
 const selectFile = type => {
