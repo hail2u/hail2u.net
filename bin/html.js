@@ -341,9 +341,9 @@ const main = async () => {
   metadata.nonfictions = nonfictions.slice(0, 5);
   metadata.comics = comics.slice(0, 5);
   metadata.novels = novels.slice(0, 5);
-  metadata.webpages = webpages.slice(0, 10);
+  metadata.webpages = webpages.slice(0, 60);
   metadata.snapshots = snapshots.slice(0, 60);
-  metadata.texts = texts.slice(0, 100);
+  metadata.texts = texts.slice(0, 60);
   metadata.texts[0].isLatest = true;
 
   if (argv.article) {
