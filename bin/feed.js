@@ -5,6 +5,7 @@ const path = require("path");
 
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
+const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
@@ -12,6 +13,12 @@ const files = [
     json: "../src/blog/index.json",
     src: "../src/feed.mustache",
     type: ["article"]
+  },
+  {
+    dest: "../dist/documents/feed",
+    json: "../src/documents/index.json",
+    src: "../src/feed.mustache",
+    type: ["document"]
   },
   {
     dest: "../dist/feed",
@@ -142,6 +149,17 @@ const readTexts = async () => {
   return texts.map(extendText);
 };
 
+const extendDocument = document => ({
+  ...document,
+  description: document.link,
+  type: "document"
+});
+
+const readDocuments = async () => {
+  const documents = await readJSONFile(documentsFile);
+  return documents.map(extendDocument);
+};
+
 const extendArticle = article => {
   const description = decode(article.body
     .replace(/\r?\n/g, "")
@@ -248,6 +266,7 @@ const main = async () => {
     webpages,
     snapshots,
     texts,
+    documents,
     articles
   ] = await Promise.all([
     readJSONFile(metadataFile),
@@ -257,6 +276,7 @@ const main = async () => {
     readWebpages(),
     listSnapshots(),
     readTexts(),
+    readDocuments(),
     readArticles()
   ]);
   metadata.items = [
@@ -266,6 +286,7 @@ const main = async () => {
     ...webpages,
     ...snapshots,
     ...texts,
+    ...documents,
     ...articles
   ].sort(compareByUnixtime);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));
