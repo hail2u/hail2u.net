@@ -180,7 +180,7 @@ const readArticles = async () => {
 
 const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const pickByType = (type, item) => {
+const isValidType = (type, item) => {
   if (!type) {
     return true;
   }
@@ -241,7 +241,7 @@ const mergeData = async (extradataFile, metadata, type) => {
     ...metadata,
     ...extradata,
     items: metadata.items
-      .filter(pickByType.bind(null, type))
+      .filter(isValidType.bind(null, type))
       .slice(0, itemLength)
       .map(extendItem),
     lastBuildDate: now(new Date())
