@@ -132,17 +132,26 @@ const expandDatetime = unixtime => {
   };
 };
 
-const extendWebpage = webpage => {
-  const dt = expandDatetime(webpage.published);
+const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
+const extendArticle = article => {
+  const dt = expandDatetime(article.published);
+  const description = decode(article.body
+    .replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    .replace(/<.*?>/g, ""));
   return {
-    ...webpage,
-    ...dt
+    ...article,
+    ...dt,
+    description: description
   };
 };
 
-const readWebpages = async () => {
-  const webpages = await readJSONFile(webpagesFile);
-  return webpages.map(extendWebpage);
+const readArticles = async () => {
+  const articles = await readJSONFile(articlesFile);
+  return articles
+    .sort(compareByUnixtime)
+    .map(extendArticle);
 };
 
 const isSnapshot = filename => {
@@ -180,26 +189,17 @@ const readTexts = async () => {
   return texts.map(extendText);
 };
 
-const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
-const extendArticle = article => {
-  const dt = expandDatetime(article.published);
-  const description = decode(article.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, ""));
+const extendWebpage = webpage => {
+  const dt = expandDatetime(webpage.published);
   return {
-    ...article,
-    ...dt,
-    description: description
+    ...webpage,
+    ...dt
   };
 };
 
-const readArticles = async () => {
-  const articles = await readJSONFile(articlesFile);
-  return articles
-    .sort(compareByUnixtime)
-    .map(extendArticle);
+const readWebpages = async () => {
+  const webpages = await readJSONFile(webpagesFile);
+  return webpages.map(extendWebpage);
 };
 
 const readPartial = async filename => {
@@ -281,16 +281,11 @@ const markArticleChanges = (article, index, articles) => {
   };
 };
 
-const mergeData = async (
-  extradataFile,
-  articles,
-  dest,
-  metadata
-) => {
+const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
   if (argv.article || argv.all) {
-    const article = articles.find(hasSameLink.bind(null, dest));
+    const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
     const [cardType, cover] = findCover(firstImage, metadata.card_type, metadata.cover);
     return {
@@ -307,15 +302,13 @@ const mergeData = async (
   return {
     ...metadata,
     ...extradata,
-    articles: articles
-      .slice(0)
-      .map(markArticleChanges)
+    articles: metadata.articles.map(markArticleChanges)
   };
 };
 
-const buildHTML = async (metadata, articles, partials, file) => {
+const buildHTML = async (metadata, partials, file) => {
   const [data, template] = await Promise.all([
-    mergeData(file.json, articles, file.dest, metadata),
+    mergeData(file.json, file.dest, metadata),
     fs.readFile(file.src, "utf8")
   ]);
 
@@ -343,35 +336,36 @@ const toFilesFormat = article => ({
 const main = async () => {
   const [
     metadata,
-    nonfictions,
+    articles,
     comics,
+    nonfictions,
     novels,
-    webpages,
     snapshots,
     texts,
-    articles,
+    webpages,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
-    readJSONFile(nonfictionsFile),
+    readArticles(),
     readJSONFile(comicsFile),
+    readJSONFile(nonfictionsFile),
     readJSONFile(novelsFile),
-    readWebpages(),
     listSnapshots(),
     readTexts(),
-    readArticles(),
+    readWebpages(),
     readPartials()
   ]);
-  metadata.nonfictions = nonfictions;
+  metadata.articles = articles;
   metadata.comics = comics;
+  metadata.nonfictions = nonfictions;
   metadata.novels = novels;
-  metadata.webpages = webpages;
   metadata.snapshots = snapshots;
   metadata.texts = texts;
   metadata.texts[0].isLatest = true;
+  metadata.webpages = webpages;
 
   if (argv.article) {
-    return buildHTML(metadata, articles, partials, {
+    return buildHTML(metadata, partials, {
       dest: argv.article,
       json: articleJSON,
       src: articleSrc
@@ -380,10 +374,10 @@ const main = async () => {
 
   if (argv.all) {
     const allFiles = await Promise.all(articles.map(toFilesFormat));
-    return Promise.all(allFiles.map(buildHTML.bind(null, metadata, articles, partials)));
+    return Promise.all(allFiles.map(buildHTML.bind(null, metadata, partials)));
   }
 
-  return Promise.all(files.map(buildHTML.bind(null, metadata, articles, partials)));
+  return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
 };
 
 process.chdir(__dirname);
