@@ -27,7 +27,7 @@ const novelsFile = "../src/links/novels.json";
 const urlsFile = "../src/links/webpages.json";
 const whichAsync = promisify(which);
 
-const selectFile = type => {
+const selectBooksFile = type => {
   if (type === "comic") {
     return comicsFile;
   }
@@ -50,15 +50,15 @@ const runCommand = async (command, args) => {
 };
 
 const addBook = async (asin, title, type, git) => {
-  const file = selectFile(type);
-  const books = await readJSONFile(file);
-  await fs.writeFile(file, `${JSON.stringify([{
+  const booksFile = selectBooksFile(type);
+  const books = await readJSONFile(booksFile);
+  await fs.writeFile(booksFile, `${JSON.stringify([{
     published: Date.now(),
     asin: asin,
     title: title
   }, ...books], null, 2)}
 `);
-  await runCommand(git, ["add", "--", path.relative("", file)]);
+  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
   await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
