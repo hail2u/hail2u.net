@@ -295,7 +295,6 @@ const mergeData = async (extradataFile, dest, metadata) => {
       canonical: article.link,
       card_type: cardType,
       cover: cover,
-      feed_url: "/blog/feed",
       short_title: article.title
     };
   }
@@ -303,8 +302,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
   return {
     ...metadata,
     ...extradata,
-    articles: metadata.articles.map(markArticleChanges),
-    feed_url: `${extradata.canonical}feed`
+    articles: metadata.articles.map(markArticleChanges)
   };
 };
 
@@ -324,7 +322,7 @@ const buildHTML = async (metadata, partials, file) => {
     data.webpages = data.webpages.slice(0, 15);
   }
 
-  if (file.isLog) {
+  if (file.isLog && file.dest.endsWith("/log.html")) {
     data.canonical = `${data.canonical}log.html`;
   }
 
