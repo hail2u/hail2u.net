@@ -29,6 +29,10 @@ const runCommand = async (command, args) => {
 };
 
 const main = async () => {
+  if (process.argv.length > 3) {
+    throw new Error("Only filename must be passed.");
+  }
+
   const snapshot = process.argv.slice(2).shift();
 
   if (!isSnapshot(snapshot)) {

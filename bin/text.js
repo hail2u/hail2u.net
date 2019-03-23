@@ -19,6 +19,10 @@ const runCommand = async (command, args) => {
 };
 
 const main = async () => {
+  if (process.argv.length > 3) {
+    throw new Error("Only text must be passed.");
+  }
+
   const [texts, git] = await Promise.all([
     readJSONFile(textsFile, "utf8"),
     whichAsync("git")
