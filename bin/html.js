@@ -295,6 +295,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
       canonical: article.link,
       card_type: cardType,
       cover: cover,
+      feed_url: "/blog/feed",
       short_title: article.title
     };
   }
@@ -302,7 +303,8 @@ const mergeData = async (extradataFile, dest, metadata) => {
   return {
     ...metadata,
     ...extradata,
-    articles: metadata.articles.map(markArticleChanges)
+    articles: metadata.articles.map(markArticleChanges),
+    feed_url: `${extradata.canonical}feed`
   };
 };
 
