@@ -281,8 +281,6 @@ const markArticleChanges = (article, index, articles) => {
   };
 };
 
-const now = date => `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
-
 const mergeData = async (
   extradataFile,
   articles,
@@ -311,8 +309,7 @@ const mergeData = async (
     ...extradata,
     articles: articles
       .slice(0)
-      .map(markArticleChanges),
-    lastBuildDate: now(new Date())
+      .map(markArticleChanges)
   };
 };
 
