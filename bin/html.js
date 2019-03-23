@@ -324,6 +324,10 @@ const buildHTML = async (metadata, partials, file) => {
     data.webpages = data.webpages.slice(0, 15);
   }
 
+  if (file.isLog) {
+    data.canonical = `${data.canonical}log.html`;
+  }
+
   const rendered = mustache.render(template, data, partials);
   await fs.writeFile(file.dest, rendered);
 };
