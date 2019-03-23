@@ -50,6 +50,10 @@ const runCommand = async (command, args) => {
 };
 
 const addBook = async (asin, title, type, git) => {
+  if (/^[A-Z0-9]{10}$/i.test(asin)) {
+    throw new Error("ASIN must be 10 alphanumeric characters.");
+  }
+
   const booksFile = selectBooksFile(type);
   const books = await readJSONFile(booksFile);
   await fs.writeFile(booksFile, `${JSON.stringify([{
