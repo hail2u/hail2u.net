@@ -24,7 +24,7 @@ const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";
 const execFileAsync = promisify(execFile);
 const novelsFile = "../src/links/novels.json";
-const urlsFile = "../src/links/webpages.json";
+const webpagesFile = "../src/links/webpages.json";
 const whichAsync = promisify(which);
 
 const selectBooksFile = type => {
@@ -62,15 +62,15 @@ const addBook = async (asin, title, type, git) => {
   await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
-const addURL = async (title, url, git) => {
-  const urls = await readJSONFile(urlsFile);
-  await fs.writeFile(urlsFile, `${JSON.stringify([{
+const addWebpage = async (title, url, git) => {
+  const webpages = await readJSONFile(webpagesFile);
+  await fs.writeFile(webpagesFile, `${JSON.stringify([{
     published: Date.now(),
     title: title,
     url: url
-  }, ...urls], null, 2)}
+  }, ...webpages], null, 2)}
 `);
-  await runCommand(git, ["add", "--", path.relative("", urlsFile)]);
+  await runCommand(git, ["add", "--", path.relative("", webpagesFile)]);
   await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
 };
 
@@ -86,7 +86,7 @@ const main = async () => {
   }
 
   if (argv.url) {
-    return addURL(argv.title, argv.url, git);
+    return addWebpage(argv.title, argv.url, git);
   }
 
   throw new Error("ASIN or URL must be passed.");
