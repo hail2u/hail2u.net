@@ -75,21 +75,20 @@ const addWebpage = async (title, url, git) => {
 };
 
 const main = async () => {
-  if (!argv.title) {
-    throw new Error("Title must be passed.");
-  }
-
   const git = await whichAsync("git");
 
-  if (argv.asin) {
+  if (argv.asin && argv.title && argv.type) {
     return addBook(argv.asin, argv.title, argv.type, git);
   }
 
-  if (argv.url) {
+  if (argv.title && argv.url) {
     return addWebpage(argv.title, argv.url, git);
   }
 
-  throw new Error("ASIN or URL must be passed.");
+  throw new Error(`Arguments must be one of these combinations:
+  --asin --title --type => Add book
+  --title --url         => Add webpage
+`);
 };
 
 process.chdir(__dirname);
