@@ -23,6 +23,7 @@ const files = [
   {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
+    isLog: true,
     src: "../src/blog/index.mustache"
   },
   {
@@ -33,7 +34,6 @@ const files = [
   {
     dest: "../dist/index.html",
     json: "../src/index.json",
-    itemLength: 5,
     src: "../src/index.mustache"
   },
   {
@@ -42,9 +42,21 @@ const files = [
     src: "../src/links/index.mustache"
   },
   {
+    dest: "../dist/links/log.html",
+    json: "../src/links/index.json",
+    isLog: true,
+    src: "../src/links/log.mustache"
+  },
+  {
     dest: "../dist/photos/index.html",
     json: "../src/photos/index.json",
     src: "../src/photos/index.mustache"
+  },
+  {
+    dest: "../dist/photos/log.html",
+    json: "../src/photos/index.json",
+    isLog: true,
+    src: "../src/photos/log.mustache"
   },
   {
     dest: "../dist/sitemap.xml",
@@ -55,6 +67,12 @@ const files = [
     dest: "../dist/statuses/index.html",
     json: "../src/statuses/index.json",
     src: "../src/statuses/index.mustache"
+  },
+  {
+    dest: "../dist/statuses/log.html",
+    json: "../src/statuses/index.json",
+    isLog: true,
+    src: "../src/statuses/log.mustache"
   }
 ];
 const metadataFile = "../src/metadata.json";
@@ -269,8 +287,7 @@ const mergeData = async (
   extradataFile,
   articles,
   dest,
-  metadata,
-  itemLength
+  metadata
 ) => {
   const extradata = await readJSONFile(extradataFile);
 
@@ -294,17 +311,27 @@ const mergeData = async (
     ...extradata,
     articles: articles
       .slice(0)
-      .map(markArticleChanges)
-      .slice(0, itemLength),
+      .map(markArticleChanges),
     lastBuildDate: now(new Date())
   };
 };
 
 const buildHTML = async (metadata, articles, partials, file) => {
   const [data, template] = await Promise.all([
-    mergeData(file.json, articles, file.dest, metadata, file.itemLength),
+    mergeData(file.json, articles, file.dest, metadata),
     fs.readFile(file.src, "utf8")
   ]);
+
+  if (!file.isLog) {
+    data.articles = data.articles.slice(0, 5);
+    data.comics = data.comics.slice(0, 5);
+    data.nonfictions = data.nonfictions.slice(0, 5);
+    data.novels = data.novels.slice(0, 5);
+    data.snapshots = data.snapshots.slice(0, 60);
+    data.texts = data.texts.slice(0, 15);
+    data.webpages = data.webpages.slice(0, 15);
+  }
+
   const rendered = mustache.render(template, data, partials);
   await fs.writeFile(file.dest, rendered);
 };
@@ -338,12 +365,12 @@ const main = async () => {
     readArticles(),
     readPartials()
   ]);
-  metadata.nonfictions = nonfictions.slice(0, 5);
-  metadata.comics = comics.slice(0, 5);
-  metadata.novels = novels.slice(0, 5);
-  metadata.webpages = webpages.slice(0, 60);
-  metadata.snapshots = snapshots.slice(0, 60);
-  metadata.texts = texts.slice(0, 60);
+  metadata.nonfictions = nonfictions;
+  metadata.comics = comics;
+  metadata.novels = novels;
+  metadata.webpages = webpages;
+  metadata.snapshots = snapshots;
+  metadata.texts = texts;
   metadata.texts[0].isLatest = true;
 
   if (argv.article) {
