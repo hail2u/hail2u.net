@@ -37,7 +37,7 @@ const selectBooksFile = type => {
 };
 
 const addBook = async (asin, title, type, git) => {
-  if (/^[A-Z0-9]{10}$/i.test(asin)) {
+  if (!/^[A-Z0-9]{10}$/i.test(asin)) {
     throw new Error("ASIN must be 10 alphanumeric characters.");
   }
 
