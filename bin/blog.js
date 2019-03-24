@@ -1,11 +1,11 @@
 const { decode } = require("../lib/html-entities");
-const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const readline = require("readline");
+const runCommand = require("../lib/run-command");
 const toPOSIXPath = require("../lib/to-posix-path");
 const whichAsync = require("../lib/which-async");
 
@@ -86,17 +86,6 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
-const runCommand = async (command, args) => {
-  const { stdout } = await execFileAsync(command, args);
-  return process.stdout.write(stdout);
-};
-
-const addFiles = (git, ...files) => runCommand(git, ["add", "--", ...files]);
-
-const buildArticle = (npm, name) => runCommand(npm, ["run", "html", "--", `--article=${destDir}${name}.html`]);
-
-const commitFiles = (git, verb, file, num) => runCommand(git, ["commit", `--message=${verb} ${file}${num}`]);
-
 const getArticleTotal = cache => {
   if (argv.update) {
     return "";
@@ -117,10 +106,10 @@ const updateEntry = async file => {
     updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
-    addFiles(git, src, path.relative("", cacheFile)),
-    buildArticle(npm, file.name)
+    runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
+    runCommand(npm, ["run", "html", "--", `--article=${destDir}${file.name}.html`]),
   ]);
-  return commitFiles(git, file.verb, toPOSIXPath(path.relative("../", src)), getArticleTotal(cache));
+  return runCommand(git, ["commit", `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}${getArticleTotal(cache)}`]);
 };
 
 const isDraft = filename => {
@@ -247,8 +236,10 @@ const testSelected = async selected => {
     css: await fs.readFile(selected.css, "utf8")
   };
   const rendered = renderSelected(template, selected, partials);
-  await fs.writeFile(selected.dest, rendered);
-  const open = await whichAsync("open");
+  const [open] = await Promise.all([
+    whichAsync("open"),
+    fs.writeFile(selected.dest, rendered)
+  ]);
   return runCommand(open, [selected.dest]);
 };
 

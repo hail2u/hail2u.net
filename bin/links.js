@@ -1,7 +1,7 @@
-const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const minimist = require("minimist");
 const path = require("path");
+const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
 const argv = minimist(process.argv.slice(2), {
@@ -39,11 +39,6 @@ const selectBooksFile = type => {
 const readJSONFile = async file => {
   const json = await fs.readFile(file, "utf8");
   return JSON.parse(json);
-};
-
-const runCommand = async (command, args) => {
-  const { stdout } = await execFileAsync(command, args);
-  return process.stdout.write(stdout);
 };
 
 const addBook = async (asin, title, type, git) => {

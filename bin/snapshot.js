@@ -1,6 +1,6 @@
-const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const path = require("path");
+const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
 const distDir = "../dist/img/photos/";
@@ -19,11 +19,6 @@ const pad = number => String(number).padStart(2, "0");
 const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}.jpg`;
 
 const copy = (src, dest) => fs.copyFile(src, dest);
-
-const runCommand = async (command, args) => {
-  const { stdout } = await execFileAsync(command, args);
-  return process.stdout.write(stdout);
-};
 
 const main = async () => {
   if (process.argv.length > 3) {
