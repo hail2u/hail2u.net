@@ -228,8 +228,7 @@ const extendItem = item => {
   };
 };
 
-const now = date =>
-  `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
+const now = date => `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
 
 const mergeData = async (extradataFile, metadata, type) => {
   const extradata = await readJSONFile(extradataFile);

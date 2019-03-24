@@ -27,16 +27,15 @@ const buildJSCode = async src => {
   };
 };
 
-const compileJS = jsCode =>
-  new Promise((resolve, reject) => {
-    compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
-      if (exitCode !== 0) {
-        return reject(stdErr);
-      }
+const compileJS = jsCode => new Promise((resolve, reject) => {
+  compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
+    if (exitCode !== 0) {
+      return reject(stdErr);
+    }
 
-      return resolve(stdOut[0].src);
-    });
+    return resolve(stdOut[0].src);
   });
+});
 
 const buildJS = async file => {
   const jsCode = await Promise.all(file.src.map(buildJSCode));
