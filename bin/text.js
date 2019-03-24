@@ -1,14 +1,9 @@
-const fs = require("fs").promises;
 const path = require("path");
+const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
 const textsFile = "../src/statuses/texts.json";
-
-const readJSONFile = async file => {
-  const json = await fs.readFile(file, "utf8");
-  return JSON.parse(json);
-};
 
 const main = async () => {
   if (process.argv.length > 3) {
@@ -20,11 +15,10 @@ const main = async () => {
     whichAsync("git")
   ]);
   const text = process.argv.slice(2).shift();
-  await fs.writeFile(textsFile, `${JSON.stringify([{
+  await writeJSONFile(textsFile, [{
     published: Date.now(),
     text: text
-  }, ...texts], null, 2)}
-`);
+  }, ...texts]);
   await runCommand(git, ["add", "--", path.relative("", textsFile)]);
   await runCommand(git, ["commit", `--message=Update status`]);
 };

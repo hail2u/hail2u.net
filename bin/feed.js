@@ -2,6 +2,7 @@ const { decode, encode } = require("../lib/html-entities");
 const fs = require("fs").promises;
 const mustache = require("mustache");
 const path = require("path");
+const { readJSONFile } = require("../lib/json");
 
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
@@ -66,11 +67,6 @@ const novelsFile = "../src/links/novels.json";
 const snapshotsDir = "../src/img/photos/";
 const textsFile = "../src/statuses/texts.json";
 const webpagesFile = "../src/links/webpages.json";
-
-const readJSONFile = async file => {
-  const json = await fs.readFile(file, "utf8");
-  return JSON.parse(json);
-};
 
 const hasPublished = book => book.published;
 

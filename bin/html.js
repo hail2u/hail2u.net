@@ -3,6 +3,7 @@ const fs = require("fs").promises;
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
+const { readJSONFile } = require("../lib/json");
 const toPOSIXPath = require("../lib/to-posix-path");
 
 const argv = minimist(process.argv.slice(2), {
@@ -96,11 +97,6 @@ const partialDir = "../src/partial/";
 const snapshotsDir = "../src/img/photos/";
 const textsFile = "../src/statuses/texts.json";
 const webpagesFile = "../src/links/webpages.json";
-
-const readJSONFile = async file => {
-  const json = await fs.readFile(file, "utf8");
-  return JSON.parse(json);
-};
 
 const pad = number => String(number).padStart(2, "0");
 

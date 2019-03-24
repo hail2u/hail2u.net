@@ -1,6 +1,6 @@
-const fs = require("fs").promises;
 const minimist = require("minimist");
 const path = require("path");
+const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
@@ -36,11 +36,6 @@ const selectBooksFile = type => {
   return nonfictionsFile;
 };
 
-const readJSONFile = async file => {
-  const json = await fs.readFile(file, "utf8");
-  return JSON.parse(json);
-};
-
 const addBook = async (asin, title, type, git) => {
   if (/^[A-Z0-9]{10}$/i.test(asin)) {
     throw new Error("ASIN must be 10 alphanumeric characters.");
@@ -48,24 +43,22 @@ const addBook = async (asin, title, type, git) => {
 
   const booksFile = selectBooksFile(type);
   const books = await readJSONFile(booksFile);
-  await fs.writeFile(booksFile, `${JSON.stringify([{
+  await writeJSONFile(booksFile, [{
     published: Date.now(),
     asin: asin,
     title: title
-  }, ...books], null, 2)}
-`);
+  }, ...books]);
   await runCommand(git, ["add", "--", path.relative("", booksFile)]);
   await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
 const addWebpage = async (title, url, git) => {
   const webpages = await readJSONFile(webpagesFile);
-  await fs.writeFile(webpagesFile, `${JSON.stringify([{
+  await writeJSONFile(webpagesFile, [{
     published: Date.now(),
     title: title,
     url: url
-  }, ...webpages], null, 2)}
-`);
+  }, ...webpages]);
   await runCommand(git, ["add", "--", path.relative("", webpagesFile)]);
   await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
 };

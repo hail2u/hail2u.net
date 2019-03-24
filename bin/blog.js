@@ -4,6 +4,7 @@ const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
+const { readJSONFile, writeJSONFile } = require("../lib/json");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
 const toPOSIXPath = require("../lib/to-posix-path");
@@ -31,11 +32,6 @@ const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/;
 const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
 
-const readJSONFile = async file => {
-  const json = await fs.readFile(file, "utf8");
-  return JSON.parse(json);
-};
-
 const toImagePath = str => path.basename(str.split(/"/)[1]);
 
 const listArticleImagePaths = html => {
@@ -59,9 +55,6 @@ const hasSameLink = (link, article) => link === article.link;
 
 const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
-const saveCache = cache => fs.writeFile(cacheFile, `${JSON.stringify(cache.sort(compareByUnixtime), null, 2)}
-`);
-
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
@@ -73,17 +66,17 @@ const updateCache = (cache, html, name) => {
   const sameArticleIndex = cache.findIndex(hasSameLink.bind(null, article.link));
 
   if (sameArticleIndex === -1) {
-    return saveCache([article, ...cache]);
+    return writeJSONFile(cacheFile, [article, ...cache].sort(compareByUnixtime));
   }
 
-  return saveCache([
+  return writeJSONFile(cacheFile, [
     {
       ...article,
       published: cache[sameArticleIndex].published
     },
     ...cache.slice(0, sameArticleIndex),
     ...cache.slice(sameArticleIndex + 1)
-  ]);
+  ].sort(compareByUnixtime));
 };
 
 const getArticleTotal = cache => {
