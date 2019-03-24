@@ -1,9 +1,8 @@
-const { execFile } = require("child_process");
+const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const minimist = require("minimist");
 const path = require("path");
-const { promisify } = require("util");
-const which = require("which");
+const whichAsync = require("../lib/which-async");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
@@ -22,10 +21,8 @@ const argv = minimist(process.argv.slice(2), {
 });
 const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";
-const execFileAsync = promisify(execFile);
 const novelsFile = "../src/links/novels.json";
 const webpagesFile = "../src/links/webpages.json";
-const whichAsync = promisify(which);
 
 const selectBooksFile = type => {
   if (type === "comic") {

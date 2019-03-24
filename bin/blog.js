@@ -1,5 +1,5 @@
 const { decode } = require("../lib/html-entities");
-const { execFile } = require("child_process");
+const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const markdown = require("../lib/markdown");
 const minimist = require("minimist");
@@ -7,8 +7,7 @@ const mustache = require("mustache");
 const path = require("path");
 const readline = require("readline");
 const toPOSIXPath = require("../lib/to-posix-path");
-const { promisify } = require("util");
-const which = require("which");
+const whichAsync = require("../lib/which-async");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
@@ -29,10 +28,8 @@ const destImgDir = "../dist/img/blog/";
 const draftDir = "../src/drafts/";
 const draftExts = [".html", ".markdown", ".md"];
 const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/;
-const execFileAsync = promisify(execFile);
 const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
-const whichAsync = promisify(which);
 
 const readJSONFile = async file => {
   const json = await fs.readFile(file, "utf8");

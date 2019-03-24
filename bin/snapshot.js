@@ -1,13 +1,10 @@
-const { execFile } = require("child_process");
+const execFileAsync = require("../lib/exec-file-async");
 const fs = require("fs").promises;
 const path = require("path");
-const { promisify } = require("util");
-const which = require("which");
+const whichAsync = require("../lib/which-async");
 
 const distDir = "../dist/img/photos/";
-const execFileAsync = promisify(execFile);
 const srcDir = "../src/img/photos/";
-const whichAsync = promisify(which);
 
 const isSnapshot = filename => {
   if (path.extname(filename).toLowerCase() === ".jpg") {
