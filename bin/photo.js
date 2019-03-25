@@ -40,7 +40,10 @@ const main = async () => {
     path.join(distDir, filename),
     src
   ].map(copy.bind(null, photo)));
-  await runCommand(git, ["add", "--", path.relative("", src)]);
+  await Promise.all([
+    runCommand(git, ["add", "--", path.relative("", src)]),
+    fs.unlink(photo)
+  ]);
   await runCommand(git, ["commit", `--message=Add ${filename}`]);
 };
 
