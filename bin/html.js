@@ -19,7 +19,7 @@ const articleSrc = "../src/blog/article.mustache";
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
 const destDir = "../dist/";
-const specialsFile = "../src/documents/specials.json";
+const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
@@ -96,8 +96,8 @@ const monthNames = [
 const nonfictionsFile = "../src/links/nonfictions.json";
 const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
-const snapshotsDir = "../src/img/photos/";
-const textsFile = "../src/statuses/texts.json";
+const photosDir = "../src/img/photos/";
+const statusesFile = "../src/statuses/statuses.json";
 const webpagesFile = "../src/links/webpages.json";
 
 const pad = number => String(number).padStart(2, "0");
@@ -152,20 +152,20 @@ const readArticles = async () => {
     .map(extendArticle);
 };
 
-const extendSpecial = special => {
-  const dt = expandDatetime(special.published);
+const extendDocument = document => {
+  const dt = expandDatetime(document.published);
   return {
-    ...special,
+    ...document,
     ...dt
   };
 };
 
-const readSpecials = async () => {
-  const specials = await readJSONFile(specialsFile);
-  return specials.map(extendSpecial);
+const readDocuments = async () => {
+  const documents = await readJSONFile(documentsFile);
+  return documents.map(extendDocument);
 }
 
-const isSnapshot = filename => {
+const isPhoto = filename => {
   if (path.extname(filename) === ".jpg") {
     return true;
   }
@@ -173,31 +173,31 @@ const isSnapshot = filename => {
   return false;
 }
 
-const extendSnapshot = snapshot => ({
-  filename: snapshot,
-  url: `/img/photos/${snapshot}`
+const extendPhoto = photo => ({
+  filename: photo,
+  url: `/img/photos/${photo}`
 });
 
-const listSnapshots = async () => {
-  const snapshots = await fs.readdir(snapshotsDir);
-  return snapshots
-    .filter(isSnapshot)
+const listPhotos = async () => {
+  const photos = await fs.readdir(photosDir);
+  return photos
+    .filter(isPhoto)
     .sort()
     .reverse()
-    .map(extendSnapshot);
+    .map(extendPhoto);
 };
 
-const extendText = text => {
-  const dt = expandDatetime(text.published);
+const extendStatus = status => {
+  const dt = expandDatetime(status.published);
   return {
-    ...text,
+    ...status,
     ...dt
   };
 };
 
-const readTexts = async () => {
-  const texts = await readJSONFile(textsFile);
-  return texts.map(extendText);
+const readStatuses = async () => {
+  const statuses = await readJSONFile(statusesFile);
+  return statuses.map(extendStatus);
 };
 
 const extendWebpage = webpage => {
@@ -292,13 +292,13 @@ const markArticleChanges = (article, index, articles) => {
   };
 };
 
-const markspecialChanges = (special, index, specials) => {
-  const nextspecial = specials[index + 1];
-  const previousspecial = specials[index - 1];
+const markDocumentChanges = (document, index, documents) => {
+  const nextDocument = documents[index + 1];
+  const previousDocument = documents[index - 1];
   return {
-    ...special,
-    isFirstInYear: isFirstInYear(special, previousspecial),
-    isLastInYear: isLastInYear(special, nextspecial),
+    ...document,
+    isFirstInYear: isFirstInYear(document, previousDocument),
+    isLastInYear: isLastInYear(document, nextDocument),
     isLatest: isLatest(index)
   };
 };
@@ -309,15 +309,15 @@ const mergeData = async (extradataFile, dest, metadata) => {
   if (argv.article || argv.all) {
     const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
-    const [cardType, cover] = findCover(firstImage, metadata.card_type, metadata.cover);
+    const [cardType, cover] = findCover(firstImage, metadata.cardType, metadata.cover);
     return {
       ...metadata,
       ...extradata,
       ...article,
       canonical: article.link,
-      card_type: cardType,
+      cardType: cardType,
       cover: cover,
-      short_title: article.title
+      shortTitle: article.title
     };
   }
 
@@ -325,7 +325,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
     ...metadata,
     ...extradata,
     articles: metadata.articles.map(markArticleChanges),
-    specials: metadata.specials.map(markspecialChanges)
+    documents: metadata.documents.map(markDocumentChanges)
   };
 };
 
@@ -338,11 +338,11 @@ const buildHTML = async (metadata, partials, file) => {
   if (!file.isLog) {
     data.articles = data.articles.slice(0, 5);
     data.comics = data.comics.slice(0, 5);
-    data.specials = data.specials.slice(0, 5);
+    data.documents = data.documents.slice(0, 5);
     data.nonfictions = data.nonfictions.slice(0, 5);
     data.novels = data.novels.slice(0, 5);
-    data.snapshots = data.snapshots.slice(0, 60);
-    data.texts = data.texts.slice(0, 15);
+    data.photos = data.photos.slice(0, 60);
+    data.statuses = data.statuses.slice(0, 15);
     data.webpages = data.webpages.slice(0, 15);
   }
 
@@ -350,7 +350,7 @@ const buildHTML = async (metadata, partials, file) => {
     data.canonical = `${data.canonical}log.html`;
   }
 
-  if (data.home) {
+  if (data.isHome) {
     data.books = [
       data.novels[0],
       data.nonfictions[0],
@@ -358,8 +358,8 @@ const buildHTML = async (metadata, partials, file) => {
       data.nonfictions[1],
       data.novels[1]
     ];
-    data.snapshots = data.snapshots.slice(0, 5);
-    data.texts = data.texts.slice(0, 1);
+    data.photos = data.photos.slice(0, 5);
+    data.statuses = data.statuses.slice(0, 1);
     data.webpages = data.webpages.slice(0, 5);
   }
 
@@ -379,32 +379,32 @@ const main = async () => {
     metadata,
     articles,
     comics,
+    documents,
     nonfictions,
     novels,
-    snapshots,
-    specials,
-    texts,
+    photos,
+    statuses,
     webpages,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
     readJSONFile(comicsFile),
+    readDocuments(),
     readJSONFile(nonfictionsFile),
     readJSONFile(novelsFile),
-    listSnapshots(),
-    readSpecials(),
-    readTexts(),
+    listPhotos(),
+    readStatuses(),
     readWebpages(),
     readPartials()
   ]);
   metadata.articles = articles;
   metadata.comics = comics;
+  metadata.documents = documents;
   metadata.nonfictions = nonfictions;
   metadata.novels = novels;
-  metadata.snapshots = snapshots;
-  metadata.specials = specials;
-  metadata.texts = texts;
+  metadata.photos = photos;
+  metadata.statuses = statuses;
   metadata.webpages = webpages;
 
   if (argv.article) {

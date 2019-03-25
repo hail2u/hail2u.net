@@ -3,23 +3,23 @@ const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
-const textsFile = "../src/statuses/texts.json";
+const statusesFile = "../src/statuses/statuses.json";
 
 const main = async () => {
   if (process.argv.length > 3) {
     throw new Error("Only text must be passed.");
   }
 
-  const [texts, git] = await Promise.all([
-    readJSONFile(textsFile, "utf8"),
+  const [statuses, git] = await Promise.all([
+    readJSONFile(statusesFile, "utf8"),
     whichAsync("git")
   ]);
   const text = process.argv.slice(2).shift();
-  await writeJSONFile(textsFile, [{
+  await writeJSONFile(statusesFile, [{
     published: Date.now(),
     text: text
-  }, ...texts]);
-  await runCommand(git, ["add", "--", path.relative("", textsFile)]);
+  }, ...statuses]);
+  await runCommand(git, ["add", "--", path.relative("", statusesFile)]);
   await runCommand(git, ["commit", `--message=Update status`]);
 };
 

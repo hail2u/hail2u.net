@@ -6,7 +6,7 @@ const { readJSONFile } = require("../lib/json");
 
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
-const specialsFile = "../src/documents/specials.json";
+const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
@@ -19,7 +19,7 @@ const files = [
     dest: "../dist/documents/feed",
     json: "../src/documents/index.json",
     src: "../src/feed.mustache",
-    type: ["special"]
+    type: ["document"]
   },
   {
     dest: "../dist/feed",
@@ -37,13 +37,13 @@ const files = [
     dest: "../dist/photos/feed",
     json: "../src/photos/index.json",
     src: "../src/feed.mustache",
-    type: ["snapshot"]
+    type: ["photo"]
   },
   {
     dest: "../dist/statuses/feed",
     json: "../src/statuses/index.json",
     src: "../src/feed.mustache",
-    type: ["text"]
+    type: ["status"]
   }
 ];
 const itemLength = 10;
@@ -64,8 +64,8 @@ const monthNames = [
 ];
 const nonfictionsFile = "../src/links/nonfictions.json";
 const novelsFile = "../src/links/novels.json";
-const snapshotsDir = "../src/img/photos/";
-const textsFile = "../src/statuses/texts.json";
+const photosDir = "../src/img/photos/";
+const statusesFile = "../src/statuses/statuses.json";
 const webpagesFile = "../src/links/webpages.json";
 
 const extendArticle = article => {
@@ -106,7 +106,18 @@ const readBooks = async file => {
     .map(extendBook);
 };
 
-const isSnapshot = filename => {
+const extendDocument = document => ({
+  ...document,
+  description: document.link,
+  type: "document"
+});
+
+const readDocuments = async () => {
+  const documents = await readJSONFile(documentsFile);
+  return documents.map(extendDocument);
+};
+
+const isPhoto = filename => {
   if (path.extname(filename) === ".jpg") {
     return true;
   }
@@ -114,9 +125,9 @@ const isSnapshot = filename => {
   return false;
 }
 
-const extendSnapshot = snapshot => {
-  const link = `/img/photos/${snapshot}`;
-  const [year, month, date] = snapshot
+const extendPhoto = photo => {
+  const link = `/img/photos/${photo}`;
+  const [year, month, date] = photo
     .replace(/\.jpg$/, "")
     .match(/(\d{4})(\d{2})(\d{2})/)
     .slice(1, 4);
@@ -125,41 +136,30 @@ const extendSnapshot = snapshot => {
     description: link,
     link: link,
     published: Date.parse(`${year}-${month}-${date}T00:00:00`),
-    type: "snapshot"
+    type: "photo"
   };
 };
 
-const hasValidDate = snapshot => !Number.isNaN(snapshot.published);
+const hasValidDate = photo => !Number.isNaN(photo.published);
 
-const listSnapshots = async () => {
-  const snapshots = await fs.readdir(snapshotsDir);
-  return snapshots
-    .filter(isSnapshot)
-    .map(extendSnapshot)
+const listPhotos = async () => {
+  const photos = await fs.readdir(photosDir);
+  return photos
+    .filter(isPhoto)
+    .map(extendPhoto)
     .filter(hasValidDate);
 };
 
-const extendSpecial = special => ({
-  ...special,
-  description: special.link,
-  type: "special"
+const extendStatus = status => ({
+  ...status,
+  description: status.text,
+  link: `/statuses/#${status.published}`,
+  type: "status"
 });
 
-const readSpecials = async () => {
-  const specials = await readJSONFile(specialsFile);
-  return specials.map(extendSpecial);
-};
-
-const extendText = text => ({
-  ...text,
-  description: text.text,
-  link: `/statuses/#${text.published}`,
-  type: "text"
-});
-
-const readTexts = async () => {
-  const texts = await readJSONFile(textsFile);
-  return texts.map(extendText);
+const readStatuses = async () => {
+  const statuses = await readJSONFile(statusesFile);
+  return statuses.map(extendStatus);
 };
 
 const extendWebpage = webpage => ({
@@ -257,31 +257,31 @@ const main = async () => {
     metadata,
     articles,
     comics,
+    documents,
     nonfictions,
     novels,
-    snapshots,
-    specials,
-    texts,
+    photos,
+    statuses,
     webpages,
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
     readBooks(comicsFile),
+    readDocuments(),
     readBooks(nonfictionsFile),
     readBooks(novelsFile),
-    listSnapshots(),
-    readSpecials(),
-    readTexts(),
+    listPhotos(),
+    readStatuses(),
     readWebpages()
   ]);
   metadata.items = [
     ...articles,
     ...comics,
+    ...documents,
     ...nonfictions,
     ...novels,
-    ...snapshots,
-    ...specials,
-    ...texts,
+    ...photos,
+    ...statuses,
     ...webpages
   ].sort(compareByUnixtime);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));

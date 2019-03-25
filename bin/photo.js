@@ -6,7 +6,7 @@ const whichAsync = require("../lib/which-async");
 const distDir = "../dist/img/photos/";
 const srcDir = "../src/img/photos/";
 
-const isSnapshot = filename => {
+const isPhoto = filename => {
   if (path.extname(filename).toLowerCase() === ".jpg") {
     return true;
   }
@@ -25,9 +25,9 @@ const main = async () => {
     throw new Error("Only filename must be passed.");
   }
 
-  const snapshot = process.argv.slice(2).shift();
+  const photo = process.argv.slice(2).shift();
 
-  if (!isSnapshot(snapshot)) {
+  if (!isPhoto(photo)) {
     throw new Error("JPEG file must be passed.");
   }
 
@@ -39,7 +39,7 @@ const main = async () => {
   await Promise.all([
     path.join(distDir, filename),
     src
-  ].map(copy.bind(null, snapshot)));
+  ].map(copy.bind(null, photo)));
   await runCommand(git, ["add", "--", path.relative("", src)]);
   await runCommand(git, ["commit", `--message=Add ${filename}`]);
 };
