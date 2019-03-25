@@ -322,6 +322,19 @@ const buildHTML = async (metadata, partials, file) => {
     data.canonical = `${data.canonical}log.html`;
   }
 
+  if (data.home) {
+    data.books = [
+      data.novels[0],
+      data.nonfictions[0],
+      data.comics[0],
+      data.nonfictions[1],
+      data.novels[1]
+    ];
+    data.snapshots = data.snapshots.slice(0, 5);
+    data.texts = data.texts.slice(0, 1);
+    data.webpages = data.webpages.slice(0, 5);
+  }
+
   const rendered = mustache.render(template, data, partials);
   await fs.writeFile(file.dest, rendered);
 };
@@ -361,7 +374,6 @@ const main = async () => {
   metadata.novels = novels;
   metadata.snapshots = snapshots;
   metadata.texts = texts;
-  metadata.texts[0].isLatest = true;
   metadata.webpages = webpages;
 
   if (argv.article) {
