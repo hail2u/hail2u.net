@@ -19,6 +19,7 @@ const articleSrc = "../src/blog/article.mustache";
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
 const destDir = "../dist/";
+const specialsFile = "../src/documents/specials.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
@@ -30,6 +31,7 @@ const files = [
   {
     dest: "../dist/documents/index.html",
     json: "../src/documents/index.json",
+    isLog: true,
     src: "../src/documents/index.mustache"
   },
   {
@@ -149,6 +151,19 @@ const readArticles = async () => {
     .sort(compareByUnixtime)
     .map(extendArticle);
 };
+
+const extendSpecial = special => {
+  const dt = expandDatetime(special.published);
+  return {
+    ...special,
+    ...dt
+  };
+};
+
+const readSpecials = async () => {
+  const specials = await readJSONFile(specialsFile);
+  return specials.map(extendSpecial);
+}
 
 const isSnapshot = filename => {
   if (path.extname(filename) === ".jpg") {
@@ -277,6 +292,17 @@ const markArticleChanges = (article, index, articles) => {
   };
 };
 
+const markspecialChanges = (special, index, specials) => {
+  const nextspecial = specials[index + 1];
+  const previousspecial = specials[index - 1];
+  return {
+    ...special,
+    isFirstInYear: isFirstInYear(special, previousspecial),
+    isLastInYear: isLastInYear(special, nextspecial),
+    isLatest: isLatest(index)
+  };
+};
+
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
@@ -298,7 +324,8 @@ const mergeData = async (extradataFile, dest, metadata) => {
   return {
     ...metadata,
     ...extradata,
-    articles: metadata.articles.map(markArticleChanges)
+    articles: metadata.articles.map(markArticleChanges),
+    specials: metadata.specials.map(markspecialChanges)
   };
 };
 
@@ -311,6 +338,7 @@ const buildHTML = async (metadata, partials, file) => {
   if (!file.isLog) {
     data.articles = data.articles.slice(0, 5);
     data.comics = data.comics.slice(0, 5);
+    data.specials = data.specials.slice(0, 5);
     data.nonfictions = data.nonfictions.slice(0, 5);
     data.novels = data.novels.slice(0, 5);
     data.snapshots = data.snapshots.slice(0, 60);
@@ -354,6 +382,7 @@ const main = async () => {
     nonfictions,
     novels,
     snapshots,
+    specials,
     texts,
     webpages,
     partials
@@ -364,6 +393,7 @@ const main = async () => {
     readJSONFile(nonfictionsFile),
     readJSONFile(novelsFile),
     listSnapshots(),
+    readSpecials(),
     readTexts(),
     readWebpages(),
     readPartials()
@@ -373,6 +403,7 @@ const main = async () => {
   metadata.nonfictions = nonfictions;
   metadata.novels = novels;
   metadata.snapshots = snapshots;
+  metadata.specials = specials;
   metadata.texts = texts;
   metadata.webpages = webpages;
 

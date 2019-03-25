@@ -6,7 +6,7 @@ const { readJSONFile } = require("../lib/json");
 
 const articlesFile = "../src/blog/articles.json";
 const comicsFile = "../src/links/comics.json";
-const documentsFile = "../src/documents/documents.json";
+const specialsFile = "../src/documents/specials.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
@@ -19,7 +19,7 @@ const files = [
     dest: "../dist/documents/feed",
     json: "../src/documents/index.json",
     src: "../src/feed.mustache",
-    type: ["document"]
+    type: ["special"]
   },
   {
     dest: "../dist/feed",
@@ -68,6 +68,24 @@ const snapshotsDir = "../src/img/photos/";
 const textsFile = "../src/statuses/texts.json";
 const webpagesFile = "../src/links/webpages.json";
 
+const extendArticle = article => {
+  const description = decode(article.body
+    .replace(/\r?\n/g, "")
+    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
+    .replace(/<.*?>/g, ""));
+  return {
+    ...article,
+    body: article.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"'),
+    description: description,
+    type: "article"
+  };
+};
+
+const readArticles = async () => {
+  const articles = await readJSONFile(articlesFile);
+  return articles.map(extendArticle);
+};
+
 const hasPublished = book => book.published;
 
 const extendBook = book => {
@@ -86,18 +104,6 @@ const readBooks = async file => {
   return books
     .filter(hasPublished)
     .map(extendBook);
-};
-
-const extendWebpage = webpage => ({
-  ...webpage,
-  description: webpage.url,
-  link: webpage.url,
-  type: "webpage"
-});
-
-const readWebpages = async () => {
-  const webpages = await readJSONFile(webpagesFile);
-  return webpages.map(extendWebpage);
 };
 
 const isSnapshot = filename => {
@@ -133,6 +139,17 @@ const listSnapshots = async () => {
     .filter(hasValidDate);
 };
 
+const extendSpecial = special => ({
+  ...special,
+  description: special.link,
+  type: "special"
+});
+
+const readSpecials = async () => {
+  const specials = await readJSONFile(specialsFile);
+  return specials.map(extendSpecial);
+};
+
 const extendText = text => ({
   ...text,
   description: text.text,
@@ -145,33 +162,16 @@ const readTexts = async () => {
   return texts.map(extendText);
 };
 
-const extendDocument = document => ({
-  ...document,
-  description: document.link,
-  type: "document"
+const extendWebpage = webpage => ({
+  ...webpage,
+  description: webpage.url,
+  link: webpage.url,
+  type: "webpage"
 });
 
-const readDocuments = async () => {
-  const documents = await readJSONFile(documentsFile);
-  return documents.map(extendDocument);
-};
-
-const extendArticle = article => {
-  const description = decode(article.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, ""));
-  return {
-    ...article,
-    body: article.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"'),
-    description: description,
-    type: "article"
-  };
-};
-
-const readArticles = async () => {
-  const articles = await readJSONFile(articlesFile);
-  return articles.map(extendArticle);
+const readWebpages = async () => {
+  const webpages = await readJSONFile(webpagesFile);
+  return webpages.map(extendWebpage);
 };
 
 const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
@@ -255,34 +255,34 @@ const buildFeed = async (metadata, file) => {
 const main = async () => {
   const [
     metadata,
-    nonfictions,
+    articles,
     comics,
+    nonfictions,
     novels,
-    webpages,
     snapshots,
+    specials,
     texts,
-    documents,
-    articles
+    webpages,
   ] = await Promise.all([
     readJSONFile(metadataFile),
-    readBooks(nonfictionsFile),
+    readArticles(),
     readBooks(comicsFile),
+    readBooks(nonfictionsFile),
     readBooks(novelsFile),
-    readWebpages(),
     listSnapshots(),
+    readSpecials(),
     readTexts(),
-    readDocuments(),
-    readArticles()
+    readWebpages()
   ]);
   metadata.items = [
-    ...nonfictions,
+    ...articles,
     ...comics,
+    ...nonfictions,
     ...novels,
-    ...webpages,
     ...snapshots,
+    ...specials,
     ...texts,
-    ...documents,
-    ...articles
+    ...webpages
   ].sort(compareByUnixtime);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));
 };
