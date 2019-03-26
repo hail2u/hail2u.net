@@ -44,8 +44,8 @@ const addBook = async (asin, title, type, git) => {
   const booksFile = selectBooksFile(type);
   const books = await readJSONFile(booksFile);
   await writeJSONFile(booksFile, [{
-    published: Date.now(),
     asin: asin,
+    published: Date.now(),
     title: title
   }, ...books]);
   await runCommand(git, ["add", "--", path.relative("", booksFile)]);
