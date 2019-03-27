@@ -343,6 +343,7 @@ const buildHTML = async (metadata, partials, file) => {
   if (!file.isLog) {
     data.articles = data.articles.slice(0, 15);
     data.comics = data.comics.slice(0, 5);
+    data.documents = data.documents.slice(0, 5);
     data.nonfictions = data.nonfictions.slice(0, 5);
     data.novels = data.novels.slice(0, 5);
     data.photos = data.photos.slice(0, 60);
@@ -363,7 +364,6 @@ const buildHTML = async (metadata, partials, file) => {
       data.nonfictions[1],
       data.novels[1]
     ];
-    data.documents = data.documents.slice(0, 5);
     data.photos = data.photos.slice(0, 5);
     data.statuses = data.statuses.slice(0, 1);
     data.webpages = data.webpages.slice(0, 5);
