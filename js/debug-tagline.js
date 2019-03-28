@@ -11,6 +11,23 @@ document.querySelector("main h1").addEventListener("click", () => {
 
 tagline.addEventListener("click", () => {
   const oldTagline = tagline.textContent;
-  tagline.textContent = tagline.dataset.longtagline;
-  tagline.dataset.longtagline = oldTagline;
+
+  if (tagline.dataset.taglinestatus === "default") {
+    tagline.textContent = tagline.dataset.longtagline;
+    tagline.dataset.longtagline = oldTagline;
+    tagline.dataset.taglinestatus = "long";
+    return;
+  }
+
+  if (tagline.dataset.taglinestatus === "long") {
+    tagline.textContent = tagline.dataset.shorttagline;
+    tagline.dataset.shorttagline = tagline.dataset.longtagline;
+    tagline.dataset.longtagline = oldTagline;
+    tagline.dataset.taglinestatus = "short";
+    return;
+  }
+
+  tagline.textContent = tagline.dataset.shorttagline;
+  tagline.dataset.shorttagline = oldTagline;
+  tagline.dataset.taglinestatus = "default";
 });
