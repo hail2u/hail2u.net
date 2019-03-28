@@ -353,8 +353,13 @@ const buildHTML = async (metadata, partials, file) => {
     mergeData(file.json, file.dest, metadata),
     fs.readFile(file.src, "utf8")
   ]);
+  data.isLog = file.isLog;
 
-  if (!file.isLog) {
+  if (data.isLog && file.dest.endsWith("/log.html")) {
+    data.canonical = `${data.canonical}log.html`;
+  }
+
+  if (!data.isLog) {
     data.articles = data.articles.slice(0, 15);
     data.comics = data.comics.slice(0, 5);
     data.documents = data.documents.slice(0, 5);
@@ -363,10 +368,6 @@ const buildHTML = async (metadata, partials, file) => {
     data.photos = data.photos.slice(0, 60);
     data.statuses = data.statuses.slice(0, 15);
     data.webpages = data.webpages.slice(0, 15);
-  }
-
-  if (file.isLog && file.dest.endsWith("/log.html")) {
-    data.canonical = `${data.canonical}log.html`;
   }
 
   if (data.isHome) {
