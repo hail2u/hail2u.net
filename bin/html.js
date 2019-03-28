@@ -308,6 +308,19 @@ const markDocumentChanges = (document, index, documents) => {
   };
 };
 
+const markStatusChanges = (status, index, statuses) => {
+  const nextStatus = statuses[index + 1];
+  const previousStatus = statuses[index - 1];
+  return {
+    ...status,
+    isFirstInMonth: isFirstInMonth(status, previousStatus),
+    isFirstInYear: isFirstInYear(status, previousStatus),
+    isLastInMonth: isLastInMonth(status, nextStatus),
+    isLastInYear: isLastInYear(status, nextStatus),
+    isLatest: isLatest(index)
+  };
+};
+
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
@@ -330,7 +343,8 @@ const mergeData = async (extradataFile, dest, metadata) => {
     ...metadata,
     ...extradata,
     articles: metadata.articles.map(markArticleChanges),
-    documents: metadata.documents.map(markDocumentChanges)
+    documents: metadata.documents.map(markDocumentChanges),
+    statuses: metadata.statuses.map(markStatusChanges)
   };
 };
 
