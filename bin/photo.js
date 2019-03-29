@@ -1,6 +1,7 @@
 const fs = require("fs").promises;
 const path = require("path");
 const runCommand = require("../lib/run-command");
+const sharp = require("sharp");
 const whichAsync = require("../lib/which-async");
 
 const distDir = "../dist/img/photos/";
@@ -13,6 +14,16 @@ const isPhoto = filename => {
 
   return false;
 }
+
+const isValidWidth = async filename => {
+  const metadata = await sharp(filename).metadata();
+
+  if (metadata.width < 1600) {
+    return true;
+  }
+
+  return false;
+};
 
 const pad = number => String(number).padStart(2, "0");
 
@@ -29,6 +40,10 @@ const main = async () => {
 
   if (!isPhoto(photo)) {
     throw new Error("JPEG file must be passed.");
+  }
+
+  if (!isValidWidth(photo)) {
+    throw new Error("JPEG file must be 1600px width or lower");
   }
 
   const [filename, git] = await Promise.all([
