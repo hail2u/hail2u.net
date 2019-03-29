@@ -123,7 +123,7 @@ const isPhoto = filename => {
   }
 
   return false;
-}
+};
 
 const extendPhoto = photo => {
   const link = `/img/photos/${photo}`;
@@ -174,19 +174,20 @@ const readWebpages = async () => {
   return webpages.map(extendWebpage);
 };
 
-const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const isValidType = (type, item) => {
   if (!type) {
     return true;
   }
-  
+
   if (type.includes(item.type)) {
     return true;
   }
 
   return false;
-}
+};
 
 const toAbsoluteURL = url => {
   if (url.startsWith("/")) {
@@ -262,7 +263,7 @@ const main = async () => {
     novels,
     photos,
     statuses,
-    webpages,
+    webpages
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),

@@ -29,14 +29,14 @@ const files = [
   },
   {
     dest: "../dist/blog/log.html",
-    json: "../src/blog/index.json",
     isLog: true,
+    json: "../src/blog/index.json",
     src: "../src/blog/log.mustache"
   },
   {
     dest: "../dist/documents/index.html",
-    json: "../src/documents/index.json",
     isLog: true,
+    json: "../src/documents/index.json",
     src: "../src/documents/index.mustache"
   },
   {
@@ -51,8 +51,8 @@ const files = [
   },
   {
     dest: "../dist/links/log.html",
-    json: "../src/links/index.json",
     isLog: true,
+    json: "../src/links/index.json",
     src: "../src/links/log.mustache"
   },
   {
@@ -62,8 +62,8 @@ const files = [
   },
   {
     dest: "../dist/photos/log.html",
-    json: "../src/photos/index.json",
     isLog: true,
+    json: "../src/photos/index.json",
     src: "../src/photos/log.mustache"
   },
   {
@@ -78,8 +78,8 @@ const files = [
   },
   {
     dest: "../dist/statuses/log.html",
-    json: "../src/statuses/index.json",
     isLog: true,
+    json: "../src/statuses/index.json",
     src: "../src/statuses/log.mustache"
   }
 ];
@@ -135,7 +135,8 @@ const expandDatetime = unixtime => {
   };
 };
 
-const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const extendArticle = article => {
   const dt = expandDatetime(article.published);
@@ -168,7 +169,7 @@ const extendDocument = document => {
 const readDocuments = async () => {
   const documents = await readJSONFile(documentsFile);
   return documents.map(extendDocument);
-}
+};
 
 const isPhoto = filename => {
   if (path.extname(filename) === ".jpg") {
@@ -176,7 +177,7 @@ const isPhoto = filename => {
   }
 
   return false;
-}
+};
 
 const extendPhoto = photo => ({
   filename: photo,
@@ -327,7 +328,11 @@ const mergeData = async (extradataFile, dest, metadata) => {
   if (argv.article || argv.all) {
     const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
-    const [cardType, cover] = findCover(firstImage, metadata.cardType, metadata.cover);
+    const [cardType, cover] = findCover(
+      firstImage,
+      metadata.cardType,
+      metadata.cover
+    );
     return {
       ...metadata,
       ...extradata,

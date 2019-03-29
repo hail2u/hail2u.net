@@ -13,7 +13,7 @@ const isPhoto = filename => {
   }
 
   return false;
-}
+};
 
 const isValidWidth = async filename => {
   const metadata = await sharp(filename).metadata();

@@ -20,7 +20,7 @@ const main = async () => {
     text: text
   }, ...statuses]);
   await runCommand(git, ["add", "--", path.relative("", statusesFile)]);
-  await runCommand(git, ["commit", `--message=Update status`]);
+  await runCommand(git, ["commit", "--message=Update status"]);
 };
 
 process.chdir(__dirname);

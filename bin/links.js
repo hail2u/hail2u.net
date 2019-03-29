@@ -8,8 +8,8 @@ const argv = minimist(process.argv.slice(2), {
   alias: {
     a: "asin",
     t: "title",
-    y: "type",
-    u: "url"
+    u: "url",
+    y: "type"
   },
   default: {
     asin: "",

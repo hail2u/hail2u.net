@@ -44,7 +44,10 @@ const listArticleImagePaths = html => {
   return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = imagepath => fs.copyFile(path.join(srcImgDir, imagepath), path.join(destImgDir, imagepath));
+const copyArticleImage = imagepath => fs.copyFile(
+  path.join(srcImgDir, imagepath),
+  path.join(destImgDir, imagepath)
+);
 
 const copyArticleImages = async html => {
   const imagePaths = await listArticleImagePaths(html);
@@ -53,20 +56,27 @@ const copyArticleImages = async html => {
 
 const hasSameLink = (link, article) => link === article.link;
 
-const compareByUnixtime = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByUnixtime = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
     body: `${body.join("\n").trim()}\n`,
     link: `/blog/${name}.html`,
-    title: decode(title.replace(/<.*?>/g, "")),
-    published: Date.now()
+    published: Date.now(),
+    title: decode(title.replace(/<.*?>/g, ""))
   };
-  const sameArticleIndex = cache.findIndex(hasSameLink.bind(null, article.link));
+  const sameArticleIndex = cache.findIndex(hasSameLink.bind(
+    null,
+    article.link
+  ));
 
   if (sameArticleIndex === -1) {
-    return writeJSONFile(cacheFile, [article, ...cache].sort(compareByUnixtime));
+    return writeJSONFile(
+      cacheFile,
+      [article, ...cache].sort(compareByUnixtime)
+    );
   }
 
   return writeJSONFile(cacheFile, [
@@ -100,7 +110,7 @@ const updateEntry = async file => {
   ]);
   await Promise.all([
     runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
-    runCommand(npm, ["run", "html", "--", `--article=${destDir}${file.name}.html`]),
+    runCommand(npm, ["run", "html", "--", `--article=${destDir}${file.name}.html`])
   ]);
   return runCommand(git, ["commit", `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}${getArticleTotal(cache)}`]);
 };
@@ -243,7 +253,10 @@ const main = async () => {
       content: await fs.readFile(argv.file, "utf8"),
       dest: path.resolve(argv.file),
       ext: ext,
-      name: toPOSIXPath(path.join(path.relative(srcDir, path.dirname(argv.file)), path.basename(argv.file, ext))),
+      name: toPOSIXPath(path.join(
+        path.relative(srcDir, path.dirname(argv.file)),
+        path.basename(argv.file, ext)
+      )),
       verb: "Update"
     });
   }

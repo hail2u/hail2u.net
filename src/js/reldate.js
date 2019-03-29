@@ -80,8 +80,8 @@ const reldate = () => {
   }
 };
 
-if (document.readyState !== "loading") {
-  reldate();
-} else {
+if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", reldate);
+} else {
+  reldate();
 }
