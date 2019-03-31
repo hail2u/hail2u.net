@@ -22,7 +22,7 @@ const argv = minimist(process.argv.slice(2), {
 const nonfictionsFile = "../src/links/nonfictions.json";
 const comicsFile = "../src/links/comics.json";
 const novelsFile = "../src/links/novels.json";
-const webpagesFile = "../src/links/webpages.json";
+const linksFile = "../src/links/links.json";
 
 const selectBooksFile = type => {
   if (type === "comic") {
@@ -52,14 +52,14 @@ const addBook = async (asin, title, type, git) => {
   await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
-const addWebpage = async (title, url, git) => {
-  const webpages = await readJSONFile(webpagesFile);
-  await writeJSONFile(webpagesFile, [{
+const addLink = async (title, url, git) => {
+  const links = await readJSONFile(linksFile);
+  await writeJSONFile(linksFile, [{
     published: Date.now(),
     title: title,
     url: url
-  }, ...webpages]);
-  await runCommand(git, ["add", "--", path.relative("", webpagesFile)]);
+  }, ...links]);
+  await runCommand(git, ["add", "--", path.relative("", linksFile)]);
   await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
 };
 
@@ -71,12 +71,12 @@ const main = async () => {
   }
 
   if (argv.title && argv.url) {
-    return addWebpage(argv.title, argv.url, git);
+    return addLink(argv.title, argv.url, git);
   }
 
   throw new Error(`Arguments must be one of these combinations:
   --asin --title --type => Add book
-  --title --url         => Add webpage
+  --title --url         => Add link
 `);
 };
 

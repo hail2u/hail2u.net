@@ -31,7 +31,7 @@ const files = [
     dest: "../dist/links/feed",
     json: "../src/links/index.json",
     src: "../src/feed.mustache",
-    type: ["book", "webpage"]
+    type: ["book", "link"]
   },
   {
     dest: "../dist/photos/feed",
@@ -66,7 +66,7 @@ const nonfictionsFile = "../src/links/nonfictions.json";
 const novelsFile = "../src/links/novels.json";
 const photosDir = "../src/img/photos/";
 const statusesFile = "../src/statuses/statuses.json";
-const webpagesFile = "../src/links/webpages.json";
+const linksFile = "../src/links/links.json";
 
 const extendArticle = article => {
   const description = decode(article.body
@@ -162,16 +162,16 @@ const readStatuses = async () => {
   return statuses.map(extendStatus);
 };
 
-const extendWebpage = webpage => ({
-  ...webpage,
-  description: webpage.url,
-  link: webpage.url,
-  type: "webpage"
+const extendLink = link => ({
+  ...link,
+  description: link.url,
+  link: link.url,
+  type: "link"
 });
 
-const readWebpages = async () => {
-  const webpages = await readJSONFile(webpagesFile);
-  return webpages.map(extendWebpage);
+const readLinks = async () => {
+  const links = await readJSONFile(linksFile);
+  return links.map(extendLink);
 };
 
 const compareByUnixtime = (a, b) =>
@@ -263,7 +263,7 @@ const main = async () => {
     novels,
     photos,
     statuses,
-    webpages
+    links
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
@@ -273,7 +273,7 @@ const main = async () => {
     readBooks(novelsFile),
     listPhotos(),
     readStatuses(),
-    readWebpages()
+    readLinks()
   ]);
   metadata.items = [
     ...articles,
@@ -283,7 +283,7 @@ const main = async () => {
     ...novels,
     ...photos,
     ...statuses,
-    ...webpages
+    ...links
   ].sort(compareByUnixtime);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));
 };

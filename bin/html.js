@@ -103,7 +103,7 @@ const novelsFile = "../src/links/novels.json";
 const partialDir = "../src/partial/";
 const photosDir = "../src/img/photos/";
 const statusesFile = "../src/statuses/statuses.json";
-const webpagesFile = "../src/links/webpages.json";
+const linksFile = "../src/links/links.json";
 
 const pad = number => String(number).padStart(2, "0");
 
@@ -206,17 +206,17 @@ const readStatuses = async () => {
   return statuses.map(extendStatus);
 };
 
-const extendWebpage = webpage => {
-  const dt = expandDatetime(webpage.published);
+const extendLink = link => {
+  const dt = expandDatetime(link.published);
   return {
-    ...webpage,
+    ...link,
     ...dt
   };
 };
 
-const readWebpages = async () => {
-  const webpages = await readJSONFile(webpagesFile);
-  return webpages.map(extendWebpage);
+const readLinks = async () => {
+  const links = await readJSONFile(linksFile);
+  return links.map(extendLink);
 };
 
 const readPartial = async filename => {
@@ -372,7 +372,7 @@ const buildHTML = async (metadata, partials, file) => {
     data.novels = data.novels.slice(0, 5);
     data.photos = data.photos.slice(0, 60);
     data.statuses = data.statuses.slice(0, 15);
-    data.webpages = data.webpages.slice(0, 15);
+    data.links = data.links.slice(0, 15);
   }
 
   if (data.isHome) {
@@ -386,7 +386,7 @@ const buildHTML = async (metadata, partials, file) => {
     ];
     data.photos = data.photos.slice(0, 5);
     data.statuses = data.statuses.slice(0, 1);
-    data.webpages = data.webpages.slice(0, 5);
+    data.links = data.links.slice(0, 5);
   }
 
   const rendered = mustache.render(template, data, partials);
@@ -410,7 +410,7 @@ const main = async () => {
     novels,
     photos,
     statuses,
-    webpages,
+    links,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
@@ -421,7 +421,7 @@ const main = async () => {
     readJSONFile(novelsFile),
     listPhotos(),
     readStatuses(),
-    readWebpages(),
+    readLinks(),
     readPartials()
   ]);
   metadata.articles = articles;
@@ -431,7 +431,7 @@ const main = async () => {
   metadata.novels = novels;
   metadata.photos = photos;
   metadata.statuses = statuses;
-  metadata.webpages = webpages;
+  metadata.links = links;
 
   if (argv.article) {
     return buildHTML(metadata, partials, {
