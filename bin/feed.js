@@ -153,7 +153,7 @@ const listPhotos = async () => {
 const extendStatus = status => ({
   ...status,
   description: status.text,
-  link: `/statuses/#${status.published}`,
+  link: `/statuses/log.html#on-${status.published}`,
   type: "status"
 });
 
