@@ -325,7 +325,7 @@ const markStatusChanges = (status, index, statuses) => {
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
-  if (argv.article || argv.all) {
+  if (extradataFile === articleJSON) {
     const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
     const [cardType, cover] = findCover(
@@ -442,8 +442,11 @@ const main = async () => {
   }
 
   if (argv.all) {
-    const allFiles = await Promise.all(articles.map(toFilesFormat));
-    return Promise.all(allFiles.map(buildHTML.bind(null, metadata, partials)));
+    const articleFiles = await Promise.all(articles.map(toFilesFormat));
+    return Promise.all([
+      ...files,
+      ...articleFiles
+    ].map(buildHTML.bind(null, metadata, partials)));
   }
 
   return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
