@@ -17,11 +17,22 @@ const argv = minimist(process.argv.slice(2), {
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
 const articlesFile = "../src/blog/articles.json";
-const comicsFile = "../src/links/comics.json";
+const comicsFile = "../src/bookshelf/comics.json";
 const destDir = "../dist/";
 const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
+  {
+    dest: "../dist/bookshelf/index.html",
+    json: "../src/bookshelf/index.json",
+    src: "../src/bookshelf/index.mustache"
+  },
+  {
+    dest: "../dist/bookshelf/log.html",
+    isLog: true,
+    json: "../src/bookshelf/index.json",
+    src: "../src/bookshelf/log.mustache"
+  },
   {
     dest: "../dist/blog/index.html",
     json: "../src/blog/index.json",
@@ -99,8 +110,8 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
-const nonfictionsFile = "../src/links/nonfictions.json";
-const novelsFile = "../src/links/novels.json";
+const nonfictionsFile = "../src/bookshelf/nonfictions.json";
+const novelsFile = "../src/bookshelf/novels.json";
 const partialDir = "../src/partial/";
 const photosDir = "../src/img/photos/";
 const statusesFile = "../src/statuses/statuses.json";
@@ -345,7 +356,7 @@ const buildHTML = async (metadata, partials, file) => {
     data.novels = data.novels.slice(0, 5);
     data.photos = data.photos.slice(0, 60);
     data.statuses = data.statuses.slice(0, 15);
-    data.links = data.links.slice(0, 15);
+    data.links = data.links.slice(0, 30);
   }
 
   if (data.isHome) {

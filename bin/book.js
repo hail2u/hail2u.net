@@ -17,44 +17,57 @@ const argv = minimist(process.argv.slice(2), {
   },
   string: ["asin", "title", "type"]
 });
-const booksFile = {
-  comic: "../src/links/comics.json",
-  nonfiction: "../src/links/nonfictions.json",
-  novel: "../src/links/novels.json"
+const comicsFile = "../src/bookshelf/comics.json";
+const nonfictionsFile = "../src/bookshelf/nonfictions.json";
+const novelsFile = "../src/bookshelf/novels.json";
+
+const selectBooksFile = type => {
+  if (type === "comic") {
+    return comicsFile;
+  }
+
+  if (type === "novel") {
+    return novelsFile;
+  }
+
+  if (type === "novel") {
+    return nonfictionsFile;
+  }
+
+  throw new Error("Book type must be one of comic, novel, and nonfiction.");
+};
+
+const addBook = async (asin, title, type, git) => {
+  if (!/^[A-Z0-9]{10}$/i.test(asin)) {
+    throw new Error("ASIN must be 10 alphanumeric characters.");
+  }
+
+  const booksFile = selectBooksFile(type);
+  const books = await readJSONFile(booksFile);
+  await writeJSONFile(booksFile, [{
+    asin: asin,
+    published: Date.now(),
+    title: title
+  }, ...books]);
+  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
+  await runCommand(git, ["commit", `--message=Read ${asin}`]);
 };
 
 const main = async () => {
   if (!argv.asin) {
-    throw new Error("ASIN must be passed.");
-  }
-
-  if (!/^[A-Z0-9]{10}$/i.test(argv.asin)) {
-    throw new Error("ASIN must be 10 alphanumeric characters.");
+    throw new Error("ASIN code must be passed.");
   }
 
   if (!argv.title) {
-    throw new Error("Title must be passed.");
+    throw new Error("Book title must be passed.");
   }
 
   if (!argv.type) {
-    throw new Error("Type must be passed.");
+    throw new Error("Book type must  be passed.");
   }
 
-  if (!booksFile[argv.type]) {
-    throw new Error("Type must be one of these string: comic, nonfiction, or novel");
-  }
-
-  const [git, books] = await Promise.all([
-    whichAsync("git"),
-    readJSONFile(booksFile[argv.type])
-  ]);
-  await writeJSONFile(booksFile[argv.type], [{
-    asin: argv.asin,
-    published: Date.now(),
-    title: argv.title
-  }, ...books]);
-  await runCommand(git, ["add", "--", path.relative("", booksFile[argv.type])]);
-  await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
+  const git = await whichAsync("git");
+  return addBook(argv.asin, argv.title, argv.type, git);
 };
 
 process.chdir(__dirname);

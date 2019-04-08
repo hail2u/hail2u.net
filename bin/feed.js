@@ -5,10 +5,16 @@ const path = require("path");
 const { readJSONFile } = require("../lib/json");
 
 const articlesFile = "../src/blog/articles.json";
-const comicsFile = "../src/links/comics.json";
+const comicsFile = "../src/bookshelf/comics.json";
 const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
+  {
+    dest: "../dist/bookshelf/feed",
+    json: "../src/bookshelf/index.json",
+    src: "../src/feed.mustache",
+    type: ["book"]
+  },
   {
     dest: "../dist/blog/feed",
     json: "../src/blog/index.json",
@@ -31,7 +37,7 @@ const files = [
     dest: "../dist/links/feed",
     json: "../src/links/index.json",
     src: "../src/feed.mustache",
-    type: ["book", "link"]
+    type: ["link"]
   },
   {
     dest: "../dist/photos/feed",
@@ -62,8 +68,8 @@ const monthNames = [
   "Nov",
   "Dec"
 ];
-const nonfictionsFile = "../src/links/nonfictions.json";
-const novelsFile = "../src/links/novels.json";
+const nonfictionsFile = "../src/bookshelf/nonfictions.json";
+const novelsFile = "../src/bookshelf/novels.json";
 const photosDir = "../src/img/photos/";
 const statusesFile = "../src/statuses/statuses.json";
 const linksFile = "../src/links/links.json";
