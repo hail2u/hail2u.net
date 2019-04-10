@@ -285,39 +285,15 @@ const isLatest = index => {
   return false;
 };
 
-const markArticleChanges = (article, index, articles) => {
-  const nextArticle = articles[index + 1];
-  const previousArticle = articles[index - 1];
+const markItemChanges = (item, index, items) => {
+  const nextItem = items[index + 1];
+  const previousItem = items[index - 1];
   return {
-    ...article,
-    isFirstInMonth: isFirstInMonth(article, previousArticle),
-    isFirstInYear: isFirstInYear(article, previousArticle),
-    isLastInMonth: isLastInMonth(article, nextArticle),
-    isLastInYear: isLastInYear(article, nextArticle),
-    isLatest: isLatest(index)
-  };
-};
-
-const markDocumentChanges = (document, index, documents) => {
-  const nextDocument = documents[index + 1];
-  const previousDocument = documents[index - 1];
-  return {
-    ...document,
-    isFirstInYear: isFirstInYear(document, previousDocument),
-    isLastInYear: isLastInYear(document, nextDocument),
-    isLatest: isLatest(index)
-  };
-};
-
-const markStatusChanges = (status, index, statuses) => {
-  const nextStatus = statuses[index + 1];
-  const previousStatus = statuses[index - 1];
-  return {
-    ...status,
-    isFirstInMonth: isFirstInMonth(status, previousStatus),
-    isFirstInYear: isFirstInYear(status, previousStatus),
-    isLastInMonth: isLastInMonth(status, nextStatus),
-    isLastInYear: isLastInYear(status, nextStatus),
+    ...item,
+    isFirstInMonth: isFirstInMonth(item, previousItem),
+    isFirstInYear: isFirstInYear(item, previousItem),
+    isLastInMonth: isLastInMonth(item, nextItem),
+    isLastInYear: isLastInYear(item, nextItem),
     isLatest: isLatest(index)
   };
 };
@@ -347,9 +323,10 @@ const mergeData = async (extradataFile, dest, metadata) => {
   return {
     ...metadata,
     ...extradata,
-    articles: metadata.articles.map(markArticleChanges),
-    documents: metadata.documents.map(markDocumentChanges),
-    statuses: metadata.statuses.map(markStatusChanges)
+    articles: metadata.articles.map(markItemChanges),
+    documents: metadata.documents.map(markItemChanges),
+    links: metadata.links.map(markItemChanges),
+    statuses: metadata.statuses.map(markItemChanges)
   };
 };
 
