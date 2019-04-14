@@ -83,7 +83,9 @@ const extendArticle = article => {
 
 const readArticles = async () => {
   const articles = await readJSONFile(articlesFile);
-  return articles.map(extendArticle);
+  return articles
+    .slice(0, itemLength)
+    .map(extendArticle);
 };
 
 const hasPublished = book => book.published;
@@ -103,6 +105,7 @@ const readBooks = async file => {
   const books = await readJSONFile(file);
   return books
     .filter(hasPublished)
+    .slice(0, itemLength)
     .map(extendBook);
 };
 
@@ -114,7 +117,9 @@ const extendDocument = document => ({
 
 const readDocuments = async () => {
   const documents = await readJSONFile(documentsFile);
-  return documents.map(extendDocument);
+  return documents
+    .slice(0, itemLength)
+    .map(extendDocument);
 };
 
 const isPhoto = filename => {
@@ -146,6 +151,9 @@ const listPhotos = async () => {
   const photos = await fs.readdir(photosDir);
   return photos
     .filter(isPhoto)
+    .sort()
+    .reverse()
+    .slice(0, itemLength)
     .map(extendPhoto)
     .filter(hasValidDate);
 };
@@ -159,7 +167,9 @@ const extendStatus = status => ({
 
 const readStatuses = async () => {
   const statuses = await readJSONFile(statusesFile);
-  return statuses.map(extendStatus);
+  return statuses
+    .slice(0, itemLength)
+    .map(extendStatus);
 };
 
 const extendLink = link => ({
@@ -171,10 +181,12 @@ const extendLink = link => ({
 
 const readLinks = async () => {
   const links = await readJSONFile(linksFile);
-  return links.map(extendLink);
+  return links
+    .slice(0, itemLength)
+    .map(extendLink);
 };
 
-const compareByUnixtime = (a, b) =>
+const compareByPublished = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const isValidType = (type, item) => {
@@ -284,7 +296,7 @@ const main = async () => {
     ...photos,
     ...statuses,
     ...links
-  ].sort(compareByUnixtime);
+  ].sort(compareByPublished);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));
 };
 
