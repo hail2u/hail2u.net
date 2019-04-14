@@ -56,9 +56,6 @@ const copyArticleImages = async html => {
 
 const hasSameLink = (link, article) => link === article.link;
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
 const updateCache = (cache, html, name) => {
   const [title, ...body] = html.split("\n");
   const article = {
@@ -75,18 +72,18 @@ const updateCache = (cache, html, name) => {
   if (sameArticleIndex === -1) {
     return writeJSONFile(
       cacheFile,
-      [article, ...cache].sort(compareByUnixtime)
+      [article, ...cache]
     );
   }
 
   return writeJSONFile(cacheFile, [
+    ...cache.slice(0, sameArticleIndex),
     {
       ...article,
       published: cache[sameArticleIndex].published
     },
-    ...cache.slice(0, sameArticleIndex),
     ...cache.slice(sameArticleIndex + 1)
-  ].sort(compareByUnixtime));
+  ]);
 };
 
 const getArticleTotal = cache => {

@@ -135,9 +135,6 @@ const expandDatetime = unixtime => {
   };
 };
 
-const compareByUnixtime = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
 const extendArticle = article => {
   const dt = expandDatetime(article.published);
   const description = decode(article.body
@@ -153,9 +150,7 @@ const extendArticle = article => {
 
 const readArticles = async () => {
   const articles = await readJSONFile(articlesFile);
-  return articles
-    .sort(compareByUnixtime)
-    .map(extendArticle);
+  return articles.map(extendArticle);
 };
 
 const extendDocument = document => {
