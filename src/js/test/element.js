@@ -1,3 +1,3 @@
 document.body.addEventListener("dblclick", () => {
-  document.body.classList.toggle("js-debug-elements");
+  document.body.classList.toggle("js-test-element");
 });
