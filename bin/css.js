@@ -3,8 +3,8 @@ const fs = require("fs").promises;
 
 const files = [
   {
-    dest: "../tmp/debug.min.css",
-    src: "../src/css/debug.css"
+    dest: "../tmp/test.min.css",
+    src: "../src/css/test.css"
   },
   {
     dest: "../tmp/documents.min.css",
