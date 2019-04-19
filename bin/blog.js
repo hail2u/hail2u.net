@@ -101,13 +101,13 @@ const updateEntry = async file => {
     copyArticleImages(file.content)
   ]);
   const src = path.relative("", file.dest);
-  const [npm] = await Promise.all([
-    whichAsync("npm"),
+  const [node] = await Promise.all([
+    whichAsync("node"),
     updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
     runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
-    runCommand(npm, ["run", "html", "--", `--article=${destDir}${file.name}.html`])
+    runCommand(node, ["html.js", `--article=${destDir}${file.name}.html`])
   ]);
   return runCommand(git, ["commit", `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}${getArticleTotal(cache)}`]);
 };
