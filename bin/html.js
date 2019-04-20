@@ -69,7 +69,7 @@ const files = [
   {
     dest: "../dist/sitemap.xml",
     isLog: true,
-    json: "../src/index.json",
+    json: "../src/sitemap.json",
     src: "../src/sitemap.mustache"
   },
   {
@@ -348,7 +348,7 @@ const buildHTML = async (metadata, partials, file) => {
     data.links = data.links.slice(0, 15);
   }
 
-  if (!data.isLog && data.isHome) {
+  if (data.isHome) {
     data.articles = data.articles.slice(0, 5);
     data.books = [
       data.novels[0],
