@@ -21,7 +21,7 @@ const files = [
   },
   {
     dest: "../dist/apple-touch-icon-precomposed.png",
-    src: "../src/img/apple-touch-icon-precomposed.svg",
+    src: "../src/img/icon.svg",
     width: 180
   }
 ];
