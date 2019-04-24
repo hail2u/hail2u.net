@@ -6,78 +6,39 @@ const whichAsync = require("../lib/which-async");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
-    a: "asin",
     t: "title",
-    u: "url",
-    y: "type"
+    u: "url"
   },
   default: {
-    asin: "",
     title: "",
-    type: "",
     url: ""
   },
-  string: ["asin", "title", "type", "url"]
+  string: ["title", "url"]
 });
-const nonfictionsFile = "../src/links/nonfictions.json";
-const comicsFile = "../src/links/comics.json";
-const novelsFile = "../src/links/novels.json";
 const linksFile = "../src/links/links.json";
 
-const selectBooksFile = type => {
-  if (type === "comic") {
-    return comicsFile;
+const main = async () => {
+  if (!argv.title) {
+    throw new Error(`Title must be passed.
+`);
   }
 
-  if (type === "novel") {
-    return novelsFile;
+  if (!argv.url) {
+    throw new Error(`URL must be passed.
+`);
   }
 
-  return nonfictionsFile;
-};
-
-const addBook = async (asin, title, type, git) => {
-  if (!/^[A-Z0-9]{10}$/i.test(asin)) {
-    throw new Error("ASIN must be 10 alphanumeric characters.");
-  }
-
-  const booksFile = selectBooksFile(type);
-  const books = await readJSONFile(booksFile);
-  await writeJSONFile(booksFile, [{
-    asin: asin,
-    published: Date.now(),
-    title: title
-  }, ...books]);
-  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
-  await runCommand(git, ["commit", `--message=Read ${asin}`]);
-};
-
-const addLink = async (title, url, git) => {
-  const links = await readJSONFile(linksFile);
+  const [git, links] = await Promise.all([
+    whichAsync("git"),
+    readJSONFile(linksFile)
+  ]);
   await writeJSONFile(linksFile, [{
     published: Date.now(),
-    title: title,
-    url: url
+    title: argv.title,
+    url: argv.url
   }, ...links]);
   await runCommand(git, ["add", "--", path.relative("", linksFile)]);
-  await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
-};
-
-const main = async () => {
-  const git = await whichAsync("git");
-
-  if (argv.asin && argv.title && argv.type) {
-    return addBook(argv.asin, argv.title, argv.type, git);
-  }
-
-  if (argv.title && argv.url) {
-    return addLink(argv.title, argv.url, git);
-  }
-
-  throw new Error(`Arguments must be one of these combinations:
-  --asin --title --type => Add book
-  --title --url         => Add link
-`);
+  await runCommand(git, ["commit", `--message=Bookmark ${argv.url}`]);
 };
 
 process.chdir(__dirname);
