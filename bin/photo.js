@@ -15,21 +15,9 @@ const isPhoto = filename => {
   return false;
 };
 
-const isValidWidth = async filename => {
-  const metadata = await sharp(filename).metadata();
-
-  if (metadata.width < 1600) {
-    return true;
-  }
-
-  return false;
-};
-
 const pad = number => String(number).padStart(2, "0");
 
 const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}.jpg`;
-
-const copy = (src, dest) => fs.copyFile(src, dest);
 
 const main = async () => {
   if (process.argv.length > 3) {
@@ -42,22 +30,21 @@ const main = async () => {
     throw new Error("JPEG file must be passed.");
   }
 
-  if (!isValidWidth(photo)) {
-    throw new Error("JPEG file must be 1600px width or lower");
-  }
-
   const [filename, git] = await Promise.all([
     generateFilename(new Date()),
     whichAsync("git")
   ]);
   const src = path.join(srcDir, filename);
+  await sharp(photo)
+    .resize({
+      width: 1280
+    })
+    .toFile(src);
+  const dest = path.join(distDir, filename);
   await Promise.all([
-    path.join(distDir, filename),
-    src
-  ].map(copy.bind(null, photo)));
-  await Promise.all([
-    runCommand(git, ["add", "--", path.relative("", src)]),
-    fs.unlink(photo)
+    fs.copyFile(src, dest),
+    fs.unlink(photo),
+    runCommand(git, ["add", "--", path.relative("", src)])
   ]);
   await runCommand(git, ["commit", `--message=Add ${filename}`]);
 };
