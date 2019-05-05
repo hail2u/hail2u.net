@@ -25,8 +25,7 @@ const booksFile = {
 
 const main = async () => {
   if (!argv.asin) {
-    throw new Error(`ASIN must be passed.
-`);
+    throw new Error("ASIN must be passed.");
   }
 
   if (!/^[A-Z0-9]{10}$/i.test(argv.asin)) {
@@ -34,18 +33,15 @@ const main = async () => {
   }
 
   if (!argv.title) {
-    throw new Error(`Title must be passed.
-`);
+    throw new Error("Title must be passed.");
   }
 
   if (!argv.type) {
-    throw new Error(`Type must be passed.
-`);
+    throw new Error("Type must be passed.");
   }
 
   if (!booksFile[argv.type]) {
-    throw new Error(`Type must be one of these string: comic, nonfiction, or novel
-`);
+    throw new Error("Type must be one of these string: comic, nonfiction, or novel");
   }
 
   const [git, books] = await Promise.all([

@@ -19,13 +19,11 @@ const linksFile = "../src/links/links.json";
 
 const main = async () => {
   if (!argv.title) {
-    throw new Error(`Title must be passed.
-`);
+    throw new Error("Title must be passed.");
   }
 
   if (!argv.url) {
-    throw new Error(`URL must be passed.
-`);
+    throw new Error("URL must be passed.");
   }
 
   const [git, links] = await Promise.all([
