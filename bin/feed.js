@@ -30,8 +30,7 @@ const files = [
   {
     dest: "../dist/feed",
     json: "../src/index.json",
-    src: "../src/feed.mustache",
-    type: ["article"]
+    src: "../src/feed.mustache"
   },
   {
     dest: "../dist/links/feed",
