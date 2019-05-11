@@ -8,10 +8,10 @@ const toPOSIXPath = require("../lib/to-posix-path");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
-    A: "all",
+    A: "articles",
     a: "article"
   },
-  boolean: ["all"],
+  boolean: ["articles"],
   string: ["article"]
 });
 const articleJSON = "../src/blog/article.json";
@@ -425,12 +425,13 @@ const main = async () => {
     });
   }
 
-  if (argv.all) {
+  if (argv.articles) {
     const articleFiles = await Promise.all(articles.map(toFilesFormat));
-    return Promise.all([
-      ...files,
-      ...articleFiles
-    ].map(buildHTML.bind(null, metadata, partials)));
+    return Promise.all(articleFiles.map(buildHTML.bind(
+      null,
+      metadata,
+      partials
+    )));
   }
 
   return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
