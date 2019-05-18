@@ -30,7 +30,7 @@ const selectBooksFile = type => {
     return novelsFile;
   }
 
-  if (type === "novel") {
+  if (type === "nonfiction") {
     return nonfictionsFile;
   }
 
