@@ -115,7 +115,7 @@ const updateEntry = async file => {
 const isDraft = filename => {
   const ext = path.extname(filename);
 
-  if (argv.contribute && path.basename(filename, ext).endsWith("_")) {
+  if (argv.contribute && path.basename(filename, ext).startsWith("_")) {
     return false;
   }
 
