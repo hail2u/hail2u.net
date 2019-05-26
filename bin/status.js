@@ -6,8 +6,8 @@ const whichAsync = require("../lib/which-async");
 const statusesFile = "../src/statuses/statuses.json";
 
 const main = async () => {
-  if (process.argv.length > 3) {
-    throw new Error("Only text must be passed.");
+  if (process.argv.length !== 3) {
+    throw new Error("Text and only text must be passed.");
   }
 
   const [statuses, git] = await Promise.all([
