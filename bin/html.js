@@ -384,6 +384,9 @@ const toFilesFormat = article => ({
   ...article
 });
 
+const compareByPublished = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
 const main = async () => {
   const [
     metadata,
@@ -434,6 +437,11 @@ const main = async () => {
     )));
   }
 
+  metadata.books = [
+    ...comics,
+    ...nonfictions,
+    ...novels
+  ].sort(compareByPublished);
   return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
 };
 
