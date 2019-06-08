@@ -35,12 +35,6 @@ const main = async () => {
     whichAsync("git")
   ]);
   const src = path.join(srcDir, filename);
-  const isPosted = await fs.access(src);
-
-  if (!isPosted) {
-    throw new Error("Cannot post a photo twice a day.");
-  }
-
   await sharp(photo)
     .resize({
       width: 1280
