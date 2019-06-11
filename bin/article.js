@@ -7,21 +7,14 @@ const path = require("path");
 const { readJSONFile, writeJSONFile } = require("../lib/json");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
-const toPOSIXPath = require("../lib/to-posix-path");
 const whichAsync = require("../lib/which-async");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
     c: "contribute",
-    f: "file",
-    t: "test",
-    u: "update"
+    t: "test"
   },
-  boolean: ["contribute", "test", "update"],
-  default: {
-    file: ""
-  },
-  string: ["file"]
+  boolean: ["contribute", "test"]
 });
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
@@ -29,7 +22,6 @@ const destImgDir = "../dist/img/blog/";
 const draftDir = "../src/drafts/";
 const draftExts = [".html", ".markdown", ".md"];
 const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/;
-const srcDir = "../src/blog/";
 const srcImgDir = "../src/img/blog/";
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -86,30 +78,21 @@ const updateCache = (cache, html, name) => {
   ]);
 };
 
-const getArticleTotal = cache => {
-  if (argv.update) {
-    return "";
-  }
-
-  return ` (${cache.length + 1})`;
-};
+const getArticleTotal = cache => ` (${cache.length + 1})`;
 
 const updateEntry = async file => {
-  const [cache, git] = await Promise.all([
-    readJSONFile(cacheFile),
+  const cache = await readJSONFile(cacheFile);
+  const [git, node] = await Promise.all([
     whichAsync("git"),
-    copyArticleImages(file.content)
-  ]);
-  const src = path.relative("", file.dest);
-  const [node] = await Promise.all([
     whichAsync("node"),
+    copyArticleImages(file.content),
     updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
-    runCommand(git, ["add", "--", src, path.relative("", cacheFile)]),
+    runCommand(git, ["add", "--", path.relative("", cacheFile)]),
     runCommand(node, ["html.js", `--article=${destDir}${file.name}.html`])
   ]);
-  return runCommand(git, ["commit", `--message=${file.verb} ${toPOSIXPath(path.relative("../", src))}${getArticleTotal(cache)}`]);
+  return runCommand(git, ["commit", `--message=${file.verb} ${file.name}${getArticleTotal(cache)}`]);
 };
 
 const isDraft = filename => {
@@ -150,10 +133,6 @@ const listDrafts = async () => {
 };
 
 const selectDraft = drafts => new Promise(resolve => {
-  if (!argv.contribute && drafts.length === 1) {
-    return resolve(drafts[0]);
-  }
-
   const menu = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -218,9 +197,6 @@ const markupSelected = async (ext, content) => {
 };
 
 const contributeSelected = selected => Promise.all([
-  fs.writeFile(selected.dest, selected.content, {
-    flag: "wx"
-  }),
   deleteFile(selected.src),
   updateEntry(selected)
 ]);
@@ -244,20 +220,6 @@ const testSelected = async selected => {
 };
 
 const main = async () => {
-  if (argv.update) {
-    const ext = path.extname(argv.file);
-    return updateEntry({
-      content: await fs.readFile(argv.file, "utf8"),
-      dest: path.resolve(argv.file),
-      ext: ext,
-      name: toPOSIXPath(path.join(
-        path.relative(srcDir, path.dirname(argv.file)),
-        path.basename(argv.file, ext)
-      )),
-      verb: "Update"
-    });
-  }
-
   const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
   await Promise.all([
@@ -267,12 +229,10 @@ const main = async () => {
   const html = await markupSelected(selected.ext, selected.content);
 
   if (argv.contribute) {
-    const ext = ".html";
     return contributeSelected({
       ...selected,
       content: `${html.trim()}\n`,
-      dest: path.join(srcDir, `${selected.name}${ext}`),
-      ext: ext,
+      ext: ".html",
       verb: "Contribute"
     });
   }
@@ -286,7 +246,6 @@ const main = async () => {
   });
 };
 
-argv.file = path.resolve(argv.file);
 process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
