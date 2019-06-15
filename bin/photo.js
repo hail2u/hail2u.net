@@ -17,11 +17,11 @@ const isPhoto = filename => {
 
 const pad = number => String(number).padStart(2, "0");
 
-const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}.jpg`;
+const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}${pad(dt.getHours())}${pad(dt.getMinutes())}${pad(dt.getSeconds())}.jpg`;
 
 const main = async () => {
   if (process.argv.length !== 3) {
-    throw new Error("FIlename and only filename must be passed.");
+    throw new Error("Filename and only filename must be passed.");
   }
 
   const photo = process.argv.slice(2).shift();

@@ -137,15 +137,15 @@ const isPhoto = filename => {
 
 const extendPhoto = photo => {
   const link = `/img/photos/${photo}`;
-  const [year, month, date] = photo
-    .replace(/\.jpg$/, "")
-    .match(/(\d{4})(\d{2})(\d{2})/)
-    .slice(1, 4);
+  const [year, month, date, hour, minute, second] = photo
+    .replace(/\.jpg$/, "000000")
+    .match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/)
+    .slice(1, 7);
   return {
     body: `<p><img src="https://hail2u.net${link}"></p>`,
     description: link,
     link: link,
-    published: Date.parse(`${year}-${month}-${date}T00:00:00`),
+    published: Date.parse(`${year}-${month}-${date}T${hour}:${minute}:${second}`),
     type: "photo"
   };
 };
