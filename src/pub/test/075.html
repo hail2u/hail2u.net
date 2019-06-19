@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>hail2u.net - はてなブックマークをインクルード</title>
+
+<link rel="shotcut icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="../default.css" media="screen, tv" />
+<link rel="stylesheet" type="text/css" href="../../styles/print.css" media="print" />
+
+<script type="text/javascript" src="../../scripts/prototype.js"></script>
+
+</head>
+
+<body>
+
+<div id="header">
+<h1><a href="/" title="hail2u.net">hail2u.net</a></h1>
+</div><!-- div#header -->
+
+<hr class="hidden" />
+
+<div id="aux_menu" class="hidden">
+<ul>
+<li><a href="#header" title="ヘッダーへジャンプ">Jump to Header</a></li>
+<li><a href="#contents" title="本文へジャンプ">Jump to Contents</a></li>
+<li><a href="#search" title="検索へジャンプ">Jump to Search</a></li>
+<li><a href="#navigation" title="ナビゲーションへジャンプ">Jump to Navigation</a></li>
+<li><a href="#footer" title="フッターへジャンプ">Jump to Footer</a></li>
+</ul>
+</div><!-- div#aux_menu -->
+
+<hr class="hidden" />
+
+<div id="contents">
+
+<h2>はてなブックマークをインクルード</h2>
+
+<?$path_info like="\.html$"><div class="story" id="comments">
+<h3>Comments</h3>
+<p>JavaScriptに対応または有効な環境の場合、ここに<a href="http://b.hatena.ne.jp/">はてなブックマーク</a>でのこのエントリに対するコメントが表示されます。</p>
+</div>
+<script type="text/javascript">
+// <![CDATA[
+function loadBookmarkData() {
+  var url = 'http://b.hatena.ne.jp/entry/json/?callback=handleBookmarkData&url=' + encodeURIComponent('/blog/webdesign/styling-pre.html');
+  // var url = 'http://b.hatena.ne.jp/entry/json/?callback=handleBookmarkData&url=' + encodeURIComponent('$url$path/$fn.$default_flavour');
+
+  $('comments').innerHTML = '<h3>Comments</h3><p><em>ブックマークのデータを取得中・・・</em></p>';
+
+  var script = document.createElement("script");
+  script.setAttribute("type", "text/javascript");
+  script.setAttribute("src", url);
+  script.setAttribute("charset", "UTF-8");
+  document.getElementsByTagName('head').item(0).appendChild(script);
+}
+
+function handleBookmarkData(bookmarkData) {
+  var comments = $('comments');
+
+  if (bookmarkData == null) {
+    comments.innerHTML = [
+      '<h3>Comments</h3><p>このエントリはまだ誰にもブックマークされていないようです。',
+      '<a href="http://b.hatena.ne.jp/add?mode=confirm&url=',
+      encodeURIComponent(location.href),
+      '">はてなブックマークでブックマークする</a>ことによりコメントを投稿することができます。</p>'
+    ].join("")
+    return;
+  }
+
+  comments.innerHTML = '';
+
+  var i = 0;
+  var comment_count = {
+    toString: function() { return i }
+  };
+  var buf = [
+    '<h3>Comments</h3><p>このエントリは ',
+    bookmarkData.count,
+    ' 人からブックマークされており、うち ',
+    comment_count,
+    ' 人からコメントが付けられています。',
+    '<a href="http://b.hatena.ne.jp/add?mode=confirm&amp;url=',
+    encodeURIComponent(bookmarkData.url),
+    '">はてなブックマークでブックマーク</a>することによりあなたもコメントを投稿することができます。</p><dl>'
+  ];
+  bookmarkData.bookmarks.reverse().each(function (b) {
+    if (b.comment == '') return;
+    i++;
+    buf.push([
+      '<dt id="c',
+      i,
+      '"><a href="http://b.hatena.ne.jp/',
+      b.user,
+      '/" style="background-image: url(\'http://www.hatena.ne.jp/users/',
+      b.user.slice(0, 2),
+      '/',
+      b.user,
+      '/profile_s.gif\')">',
+      b.user,
+      '</a> @ <span class="date">',
+      b.timestamp,
+      '</span></dt><dd>',
+      b.comment.escapeHTML(),
+      '</dd>'
+    ].join(""))
+  });
+  buf.push(['</dl>']);
+  comments.innerHTML = buf.join("")
+}
+
+Event.observe(window, 'load', loadBookmarkData, false);
+// ]]>
+</script></?>
+
+</div><!-- div#contents -->
+
+<hr class="hidden" />
+
+<div id="sidebar">
+
+<dl>
+<dt id="search">Search</dt>
+<dd>
+<form method="get" action="/">
+<dl>
+<dt><label for="q">Search this site:</label></dt>
+<dd><input type="text" name="q" value="" class="edit" id="q" /></dd>
+</dl>
+<div>
+<input type="hidden" name="key" value="site:hail2u.net" />
+<input type="submit" value="Search" class="button" />
+</div>
+</form>
+<p>Powered by <a href="http://www.google.com/" title="Google">Google</a>.</p>
+</dd>
+
+<dt>Ads</dt>
+<dd>
+<div class="adsense"><iframe src="about:blank" width="250" height="250" frameborder="0"></iframe></div>
+</dd>
+
+<dt id="nav_header">Navigation</dt>
+<dd id="nav_main">
+<ul>
+<li class="active"><a href="/blog/" title="Weblog">Weblog</a></li>
+<li><a href="/archives/" title="Archives">Archives</a>
+<ul>
+<li><a href="/archives/bsk.html" title="blosxom starter kit">blosxom starter kit</a></li>
+<li><a href="/archives/blugins.html" title="blosxom plugins">blosxom plugins</a></li>
+<li><a href="/archives/fxexts.html" title="Firefox Extensions">Firefox Extensions</a></li>
+</ul>
+</li>
+<li><a href="/documents/" title="Documents">Documents</a></li>
+<li>RSS
+<ul>
+<li>Syndications</li>
+<li>RssMemo</li>
+<li>Bloglines Checker</li>
+<li>Pigeonhole</li>
+</ul>
+</li>
+<li><a href="/about/" title="About">About</a></li>
+</ul>
+</dd>
+
+</dl>
+
+</div><!-- div#menu -->
+
+<hr class="hidden" />
+
+<div id="footer">
+<p id="copyright">All contents of this site, unless otherwise noted, &#169; 2002-2005 <a href="#" title="Personal information of Webmaster">Kyo Nagashima</a>, and <a rel="license" href="http://creativecommons.org/licenses/by-nc/2.1/jp/" title="Creative Commons Deed: Attribution-NonCommercial">some rights reserved</a>.</p>
+<p id="contact">If you have any questions or suggestions, please <a href="mailto:&#x6b;&#x79;&#x6f;&#x40;&#x68;&#x61;&#x69;&#x6c;&#x32;&#x75;&#x2e;&#x6e;&#x65;&#x74;">contact me</a> via e-mail.</p>
+<ul id="banners">
+<li><a href="http://validator.w3.org/check/referer" title="Valid XHTML 1.0!"><img src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%03%00%00%00%03%08%02%00%00%00%D9J%22%E8%00%00%00%1BIDATx%9C%25%C5!%01%00%00%00%02%20%3F%F9%7F%1B%06)%04h%9B%87%3C%0C(%04%13%BA%AD%DE%22M%00%00%00%00IEND%AEB%60%82" alt="Valid XHTML 1.0!" width="80" height="15" /></a></li>
+<li><a href="http://jigsaw.w3.org/css-validator/check/referer" title="Valid CSS!"><img src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%03%00%00%00%03%08%02%00%00%00%D9J%22%E8%00%00%00%1BIDATx%9C%25%C5!%01%00%00%00%02%20%3F%F9%7F%1B%06)%04h%9B%87%3C%0C(%04%13%BA%AD%DE%22M%00%00%00%00IEND%AEB%60%82" alt="Valid CSS!" width="80" height="15" /></a></li>
+<li><a href="http://creativecommons.org/licenses/by-nc/2.1/jp/" title="Creative Commons Deed: Attribution-NonCommercial"><img src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%03%00%00%00%03%08%02%00%00%00%D9J%22%E8%00%00%00%1BIDATx%9C%25%C5!%01%00%00%00%02%20%3F%F9%7F%1B%06)%04h%9B%87%3C%0C(%04%13%BA%AD%DE%22M%00%00%00%00IEND%AEB%60%82" alt="Creative Commons Deed: Attribution-NonCommercial" width="80" height="15" /></a></li>
+</ul>
+</div><!-- div#footer -->
+
+</body>
+</html>

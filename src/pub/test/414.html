@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Google Blog Search</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Google Blog Search</h1>
+    </header>
+
+    <nav>
+      <p><input type="search" value="blosxom" id="q"><button id="do">検索</button></p>
+    </nav>
+
+    <section id="results"></section>
+
+    <script src="https://www.google.com/jsapi"></script>
+    <script>
+google.load('search', '1');
+
+var blogSearch;
+
+function searchComplete() {
+  var results = document.getElementById('results');
+  results.innerHTML = '';
+  console.log(blogSearch.results);
+
+  if (blogSearch.results && blogSearch.results.length > 0) {
+    var ul = document.createElement('ul');
+
+    for (var i = 0, l = blogSearch.results.length; i < l; i++) {
+      var re = blogSearch.results[i],
+        li = document.createElement('li'),
+        a = document.createElement('a');
+      a.href = re.postUrl;
+      a.innerHTML = re.title;
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+
+    results.appendChild(ul);
+  }
+}
+
+function buildSearch() {
+  blogSearch = new google.search.BlogSearch();
+  blogSearch.setSearchCompleteCallback(this, searchComplete, null);
+  blogSearch.setResultSetSize(8);
+  blogSearch.setSiteRestriction('hail2u.net');
+}
+
+function doSearch() {
+  blogSearch.execute(document.getElementById('q').value);
+}
+
+google.setOnLoadCallback(buildSearch);
+document.getElementById('do').addEventListener('click', doSearch, false);
+    </script>
+  </body>
+</html>

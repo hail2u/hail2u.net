@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Detect Web Font Loading</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic">
+
+    <style>
+      @font-face {
+        font-family: "Adobe Blank";
+        src: url("data:application/font-woff;base64,d09GRgABAAAAAARIABEAAAAABdwAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABgAAAABsAAAAcaLMRlEdERUYAAAGcAAAAHQAAACAAMAAET1MvMgAAAbwAAABJAAAAVlXgZ5BjbWFwAAACCAAAAEIAAAFKAC0DsGN2dCAAAAJMAAAABAAAAAQAIQJ5Z2FzcAAAAlAAAAAIAAAACP//AANnbHlmAAACWAAAAFQAAABUPaWWPmhlYWQAAAKsAAAAMAAAADb9ErJRaGhlYQAAAtwAAAAeAAAAJAT2A3RobXR4AAAC/AAAAAwAAAAMC7gAIWxvY2EAAAMIAAAACAAAAAgAKgBUbWF4cAAAAxAAAAAfAAAAIABHADluYW1lAAADMAAAALoAAAGEGgY1yXBvc3QAAAPsAAAAKgAAADcc+EvmdmhlYQAABBgAAAAgAAAAJAItE0N2bXR4AAAEOAAAAAgAAAAIA+gCmndlYmYAAARAAAAABgAAAAYG6lIVeNpjYGBgZACCM7aLzoPoc1bbE6B0CgBKMwa+AHjaY2BkYGDgA2IJBhBgYmAEQhDJAuYxAAAEYAA1AAAAeNpjYGR+wTiBgZWBhamLaQ8DA0MPhGZ8wGDIyMTAwMTAyswAB0ABBhYoOyDNNYXBgYGXgZdZ4b8FQxRzAUMFUJgRJAcA60YKJQAAAHjaY2BgYGaAYBkGRgYQcAHyGMF8FgYNIM0GpBkZmIAs3v//wSpANOP/r1D1QMDIxgDnMIJUMjGgAkaGYQ8AgK0G2wAAACECeQAAAAH//wACAAIAIQAAASoCmgADAAcALrEBAC88sgcEAO0ysQYF3DyyAwIA7TIAsQMALzyyBQQA7TKyBwYB/DyyAQIA7TIzESERJzMRIyEBCejHxwKa/WYhAlgAeNpjYGRgYABib3UXqXh+m68M9swvgCIM56y2Z8JpRaASLaZZQC4HAxNIFAAEsAjeeNpjYGRgYC7438EQxfyCAQgYtRgYGVABMwBfOwNwAAAD6AAhA+gAAAPoAAAAAAAqACoAKnjaY2BkYGBgZuBgYGIAARDJyAASc2DQAwkAAARmAIEAeNqFkE0OwVAUhb9SwgYMm47EhGgRdMbAEhhriggh8TOzHKuwAnZgFdbgtL0MGbzck/Pz7nkPqLCkiONWcfDAcEG8Z7jIlLphlwYXwyVqXA2X5b4Zvot/Gn7Q5sWIhD0xC8ZsmbNjQ5NQWpfhd07k2XHK5oGV3L60llSfSOf3LbknJBA3MD6g8zf1QVM5DhxZZy18ZdPNv9Mz8bH+L+/9yaRskvU96xV5p1TrqmGobhE9+rZZDd+rAy/wAAB42mNgYgCD/80MRkCKkQEdMAMFmRiZ2dJzKgsyDNlL8zINDAxcAHY1BkQAAHjaY2AUYPhv9o+HIYr5BQMDox/TLAYgxYAMGAF6hwSDA+gCmgAAAAAAAVIVBukAAA==") format("woff");
+        font-style: normal;
+        font-weight: normal;
+      }
+
+      .source_sans_pro body {
+        font-family: "Source Sans Pro", sans-serif;
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Detect Web Font Loading</h1>
+    </header>
+
+    <section>
+      <h1>Lorem Ipsum Dolor Sit Amet</h1>
+
+      <p>Pellentesque ac enim nisl. Nullam vehicula iaculis justo ac tempus. Suspendisse in pretium mauris. Duis quis magna in turpis eleifend gravida quis ac massa. Nam cursus diam tellus, nec dictum mauris aliquam ac. In hac habitasse platea dictumst. Vestibulum mollis, metus nec sodales gravida, libero turpis eleifend eros, quis suscipit ante nisl non neque. Duis a ligula ac tortor pellentesque facilisis. Nunc vulputate suscipit sapien, a vestibulum lorem venenatis non. Donec at mollis sapien, non consequat leo. Sed pulvinar sapien vel dictum gravida.</p>
+    </section>
+
+    <script>
+      function detectWebFontLoading(fontName) {
+        var tester = document.createElement('span');
+        tester.style.fontFamily = '"' + fontName + '", "Adobe Blank"';
+        tester.style.position = 'absolute';
+        tester.style.top = '-100px';
+        tester.appendChild(document.createTextNode('a'));
+        document.body.appendChild(tester);
+
+        var timerId = setInterval(checkSize, 100);
+
+        function checkSize() {
+          var w = tester.offsetWidth;
+
+          if (w > 0) {
+            clearInterval(timerId);
+            document.documentElement.className += ' ' + fontName.toLowerCase().replace(/\s/g, '_');
+            tester.parentNode.removeChild(tester);
+          }
+        }
+      }
+
+      detectWebFontLoading("Source Sans Pro");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,118 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+my $target = "ログ・ファイルへのパス";
+my $baseurl = "http://www2u.biglobe.ne.jp/%7Ekyo-n/bbs/bbs.cgi";
+
+open(FILE, $target) or die "open error!";
+my @content = <FILE>;
+close(FILE);
+
+my $latest_mid = (split(/:/, $content[0]))[2];
+chomp($latest_mid);
+
+my($items, @itemlink, @itemname, @itemcoen, @itemdesc, @itemdate, $i, $lmod);
+while($i < 15){
+	foreach(@content){
+		if(m/^\t?($latest_mid.*?)\n/){
+			my $temp = $1;
+
+			my $value = "$baseurl\#$latest_mid";
+			$items .= qq|\t\t\t\t<rdf:li rdf:resource="$value"/>\n|;
+			$itemlink[$i] = $value;
+
+			$value = (split(/,/, $temp))[1] . "さんの投稿";
+			$itemname[$i] = $value;
+
+			$value = (split(/,/, $temp))[5];
+			$itemcoen[$i] = $value;
+			$value =~ s/<a href="(.*?)".*?<\/a>/&lt;$1&gt;/g;
+			$value =~ s/(<br \/><br \/>)+//g;
+			$value =~ s/<.*?>//g;
+			$itemdesc[$i] = $value;
+
+			$value = (split(/,/, $temp))[8];
+			if ($i == 0) {
+				$lmod = $value;
+			}
+			my($ss, $nn, $hh, $dd, $mm, $yy) = gmtime($value + 32400);
+			$value = sprintf("%04d-%02d-%02dT%02d:%02d:%02d+09:00", $yy + 1900, $mm + 1, $dd, $hh, $nn, $ss);
+			$itemdate[$i] = $value;
+
+			$i++;
+			last;
+		}
+	}
+	--$latest_mid;
+}
+
+$lmod = gmtime($lmod);
+$lmod =~ s/^(\w+) (\w+) (\d+) (\d\d:\d\d:\d\d) (\d{4})/$1, $3 $2 $5 $4 GMT/;
+
+my $output = <<"_HTTP-HEADER_";
+Content-Type: application/xml; charset=UTF-8
+Pragma: no-cache
+Last-Modified: $lmod
+
+_HTTP-HEADER_
+
+$output .= <<"_RSS_";
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns="http://purl.org/rss/1.0/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xml:lang="ja">
+
+	<channel rdf:about="http://www2u.biglobe.ne.jp/%7Ekyo-n/bbs/gen_rss.cgi">
+		<title>hail2u.net - BBS</title>
+		<link>http://www2u.biglobe.ne.jp/%7Ekyo-n/bbs/bbs.cgi</link>
+		<description>hail2u.netのBBSから最新10件の投稿を抜き出したRSSファイルです。</description>
+		<dc:date>$itemdate[0]</dc:date>
+
+		<items>
+			<rdf:Seq>
+_RSS_
+
+$i = 0;
+for $i (0..$#itemlink){
+	$output .= <<"_RSS_";
+				<rdf:li rdf:resource="$itemlink[$i]"/>
+_RSS_
+}
+$output .= <<"_RSS_";
+			</rdf:Seq>
+		</items>
+
+	</channel>
+
+_RSS_
+
+$i = 0;
+for $i (0..$#itemlink){
+	$output .= <<"_RSS_";
+	<item rdf:about="$itemlink[$i]">
+		<title>$itemname[$i]</title>
+		<link>$itemlink[$i]</link>
+		<description>$itemdesc[$i]</description>
+		<dc:date>$itemdate[$i]</dc:date>
+		<content:encoded>
+<![CDATA[
+$itemcoen[$i]
+]]>
+		</content:encoded>
+	</item>
+
+_RSS_
+}
+
+$output .= <<"_RSS_";
+</rdf:RDF>
+_RSS_
+
+print $output;
+
+exit;

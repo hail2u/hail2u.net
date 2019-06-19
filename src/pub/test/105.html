@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>Twitter timeline</title>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("jquery", "1.3.2");
+</script>
+<script type="text/javascript">
+var username = "hell2u";
+
+$(function () {
+  $("#result").empty();
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    format: "json",
+    q:      "select * from atom where url='http://twitter.com/statuses/user_timeline/" + username + ".atom'"
+  }, function (data) {
+    $.each(data.query.results.entry, function (i, e) {
+      var title = e.title.replace(/^.*?: /, "");
+      var dt = new Date(e.published.replace(/T/, " ").replace(/-/g, "/").replace(/\+/, " +"));
+      $("#result").append($("<li/>").append(formatDateTime(dt) + " " +title));
+    });
+  });
+});
+
+function formatDateTime (d) {
+  var yy = d.getFullYear().toString();
+  var mm = ("00" + (d.getMonth() + 1)).slice(-2);
+  var dd = ("00" + d.getDate()).slice(-2);
+  var hh = ("00" + d.getHours()).slice(-2);
+  var nn = ("00" + d.getMinutes()).slice(-2);
+  var ss = ("00" + d.getSeconds()).slice(-2);
+
+  return yy + "/" + mm + "/" + dd + " " + hh + ":" + nn + ":" + ss;
+}
+</script>
+
+<link rel="stylesheet" type="text/css" href="../../styles/font.css" media="screen, tv" />
+</head>
+<body>
+<h1>Twitter timeline</h1>
+
+<ol id="result">
+  <li>つぶやき</li>
+</ol>
+</body>
+</html>

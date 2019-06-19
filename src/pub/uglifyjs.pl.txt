@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+# uglifyjs.pl - Compile your JavaScript code with UglifyJS HTTP API
+# Usage:    uglifyjs.pl < <original file> > <compiled file>
+# License:  http://hail2u.mit-license.org/2012
+# Modified: 2012-04-13T05:20:28+09:00
+
+use strict;
+use warnings;
+
+use LWP::UserAgent;
+use Path::Class qw();
+
+my $ua = LWP::UserAgent->new();
+
+&main;
+exit;
+
+sub main {
+  my @code = <STDIN>;
+  my $idx = 0;
+  my $found_metadata = 0;
+  my $js_code = '';
+  my $params = [];
+
+  while (my $line = $code[$idx++]) {
+    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
+      $found_metadata = 1;
+
+      last;
+    }
+  }
+
+  if ($found_metadata) {
+    while (my $line = $code[$idx++]) {
+      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
+        last;
+      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
+        if ($1 eq 'code_path' && -e $2) {
+          $js_code .= ';' . Path::Class::File->new($2)->slurp(iomode => '<:raw:utf8');
+        } elsif ($1 eq 'code_url') {
+          my $res = $ua->get($2);
+
+          if ($res->is_success) {
+            $js_code .= ';' . $res->decoded_content;
+          } else {
+            die $res->status_line;
+          }
+        } else {
+          push(@$params, $1, $2);
+        }
+      }
+    }
+  }
+
+  push(@$params, 'js_code', $js_code . ";" . join('', @code));
+
+  my $res = $ua->post('http://marijnhaverbeke.nl/uglifyjs', $params);
+
+  if ($res->is_success) {
+    binmode STDOUT, ':utf8';
+    print $res->decoded_content;
+  } else {
+    die $res->status_line;
+  }
+}

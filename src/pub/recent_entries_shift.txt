@@ -1,0 +1,68 @@
+# Blosxom Plugin: recent_entries_shift
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2004-10-27
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package recent_entries_shift;
+
+use strict;
+use vars qw($list);
+
+# --- Configurable variables -----------
+
+my $shift_num = "10";
+my $count     = "10";
+
+# --- Plug-in package variables --------
+
+my %entries;
+
+# --------------------------------------
+
+use FileHandle;
+
+my $fh = new FileHandle;
+
+sub start {
+  return 1;
+}
+
+sub filter {
+  my($pkg, $files_ref) = @_;
+
+  %entries = %$files_ref;
+
+  return 1;
+}
+
+sub head {
+  my($pkg, $path, $head_ref) = @_;
+
+  my @files = sort { $entries{$b} <=> $entries{$a} } keys %entries;
+
+  foreach my $file (@files[$shift_num..$shift_num + $count - 1]) {
+    my($url, $title) = &getinfo($file);
+    $list .= qq!<li><a href="$url" title="$title">$title</a></li>\n!;
+  }
+
+  $list = "<ol>\n$list</ol>\n" if $list;
+
+  return 1;
+}
+
+sub getinfo {
+  my $file = shift;
+
+  my($path, $fn) = $file =~ m!^$blosxom::datadir/(?:(.*)/)?(.*)\.$blosxom::file_extension!;
+  my $url = "$blosxom::url/$path/$fn.$blosxom::flavour";
+  my $title = '';
+
+  if (-f $file and $fh->open("< $file")) {
+    chomp($title = <$fh>);
+    $fh->close;
+  }
+
+  return($url, $title);
+}
+
+1;

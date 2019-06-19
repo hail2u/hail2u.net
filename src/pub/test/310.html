@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>JavaScript rdd.me Shortener</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>JavaScript rdd.me Shortener</h1>
+    </header>
+
+    <p>Create a <a href="http://rdd.me/">rdd.me (Readbility shorturl)</a> url with JavaScript and YQL.</p>
+
+    <form method="POST" id="shorten">
+      <p><input type="text" size="64" value="http://hail2u.net/documents/diveintohtml5-semantics.html" id="url"> <input type="submit" value="Shorten"></p>
+    </form>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://github.com/hail2u/jquery.query-yql/raw/master/jquery.query-yql.js"></script>
+    <script>
+      $(function () {
+        $("#shorten").submit(function () {
+          var statement = "SELECT * FROM jsonpost WHERE url='https://readability.com/api/shortener/v1/urls' AND postdata='url=" + $("#url").val() + "'",
+            inputs = $("input").prop("disabled", true);
+
+          $.queryYQL(statement, "all", function (data) {
+            $("#url").val(data.query.results.postresult.json.meta.rdd_url);
+            inputs.prop("disabled", false);
+          });
+
+          return false;
+        });
+      });
+    </script>
+  </body>
+</html>

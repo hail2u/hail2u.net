@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>del.icio.usのブックマークを順番に表示</title>
+
+
+
+<script type="text/javascript">
+var urls = [
+  'http://del.icio.us/feeds/json/cho45',
+  'http://del.icio.us/feeds/json/drawnboy',
+  'http://del.icio.us/feeds/json/gorou',
+  'http://del.icio.us/feeds/json/hail2u',
+  'http://del.icio.us/feeds/json/miyagawa',
+  'http://del.icio.us/feeds/json/nagayama',
+  'http://del.icio.us/feeds/json/typester',
+  'http://del.icio.us/feeds/json/yoko'
+];
+
+addScript(urls[0] + '?callback=diplayPosts');
+
+function addScript(url) {
+  var script = document.createElement('script');
+  script.setAttribute('type', 'text/javascript');
+  script.setAttribute('src', url);
+  script.setAttribute('charset', 'UTF-8');
+  document.getElementsByTagName('head').item(0).appendChild(script);
+}
+
+function diplayPosts(posts) {
+  var div = document.createElement('div');
+  div.className = 'bookmarks';
+
+  var h2 = document.createElement('h2');
+  h2.appendChild(document.createTextNode(urls[0]));
+  div.appendChild(h2);
+
+  var ul = document.createElement('ul');
+
+  for (var i = 0; i < posts.length; i++) {
+    var post = posts[i];
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.setAttribute('href', post.u);
+    a.appendChild(document.createTextNode(post.d));
+    li.appendChild(a);
+    ul.appendChild(li);
+  }
+
+  div.appendChild(ul);
+
+  document.getElementById('results').appendChild(div);
+
+  loadNext();
+}
+
+function loadNext() {
+  if (urls.length <= 1) return;
+  urls.shift();
+  addScript(urls[0] + '?callback=diplayPosts');
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>del.icio.usのブックマークを順番に表示</h1>
+
+<div id="results"></div>
+
+</body>
+
+</html>

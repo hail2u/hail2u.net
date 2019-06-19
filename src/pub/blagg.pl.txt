@@ -1,0 +1,115 @@
+#!/usr/local/bin/perl
+
+# Blagg: the Blosxom RSS aggregator
+# Author: Rael Dornfest <rael@oreilly.com>
+# Contributor: Benjamin Trott <ben@rhumba.pair.com>
+# Modifier: Kyo Nagashima <kyo@hail2u.net>
+# Version: 0.4k4
+# Home/Docs/Licensing: http://www.oreillynet.com/~rael/lang/perl/blagg/
+
+use strict;
+
+# --- Configurable variables -----
+
+# Where are my blog entries kept?
+my $datadir = '/path/to/blagg/entries';
+
+# --------------------------------
+
+use CGI qw(:standard);
+use FileHandle;
+use HTML::Entities qw(encode_entities);
+use HTTP::Date qw(time2str str2time);
+use Jcode;
+use LWP::Simple qw(get);
+use XML::RSS;
+
+# Check parameter named "-blog"
+unless (!param('-blog') or param('-blog') =~ /^([a-zA-Z]\w*)$/) {
+	die "Usage: perl blagg.pl -blog={blogname} [-plugin={pluginname}]\n\n";
+}
+
+# Launch Blagg
+print "Blagg: the Blosxom RSS aggregator.\n";
+
+# Set datadir per blogname
+$datadir .= '/' . param('-blog');
+
+# Import and initialize plugin, if specified.
+if (param('-plugin')) {
+	require('./plugins/' . param('-plugin') . '.pl');
+	blaggplug::init();
+}
+
+# Create object of modules
+my $fh  = new FileHandle;
+my $j   = new Jcode;
+my $rss = new XML::RSS;
+
+# Open RSS list file
+$fh->open("< $datadir/rss.dat") or die "Failed to open RSS list file.\n\n";
+
+# Loop through the feeds in the list and aggregate
+foreach (<$fh>) {
+	# Extract nickname and URL
+	my($f_nick, $f_url) = split;
+	next unless (($f_nick =~ /^\w+$/) && ($f_url =~ m!^https?://!));
+
+	# Get content of RSS
+	my $content = LWP::Simple::get($f_url);
+	next unless $content;
+	print "  > ${f_url}\n";
+
+	# Convert a character-set to UTF-8, and modify XML prolog
+	$content = $j->set($content)->utf8;
+	$content =~ s/<\?xml.*?\?>/<\?xml version="1.0" encoding="UTF-8"\?>/;
+
+	# Parse content of RSS
+	eval { $rss->parse($content) };
+	next if $@;
+
+	# Get RSS title and link
+	my $f_title = encode_entities($rss->{channel}->{title}, '<&>\'"');
+	my $f_link  = encode_entities($rss->{channel}->{link}, '<&>\'"');
+
+	for my $item (@{$rss->{items}}) {
+		# Get RSS item's title, link, description and dc:date
+		my $i_title = encode_entities($item->{title}, '<&>\'"');
+		my $i_link  = encode_entities($item->{link}, '<&>\'"');
+		my $i_desc  = encode_entities($item->{description}, '<&>\'"');
+		my $i_date  = str2time($item->{dc}->{date});
+		my $i_fn    = undef;
+
+		# Go next, if no title
+		next unless $i_title;
+
+		# Generate filename based on item's link
+		($i_fn = $i_link) =~ s/\W/_/g;
+		$i_fn =~ s/^https?___//;
+		$i_fn = "$datadir/$f_nick.$i_fn.txt";
+
+		# Skip already-aggregated items (aka filename already exists)
+		next if -e $i_fn;
+
+		# Generate entry
+		my $i_date_http = time2str($i_date);
+		my $item = <<"_ITEM_";
+$i_title
+meta-feed_title: $f_title
+meta-feed_url: $f_link
+meta-permanent_link: $i_link
+meta-creation_date: $i_date_http
+<p>$i_desc</p>
+_ITEM_
+
+		# Save item as an entry, modify timestamp, and launch plugin
+		$fh->open("> $i_fn") && print($fh $item) && $fh->close() && utime($i_date, $i_date, $i_fn) && param('-plugin') && blaggplug::post($i_title, $i_link, $i_desc, $i_date, $i_fn, $f_title, $f_link);
+	}
+}
+
+# Clean up plugin, if specified.
+param('-plugin') and blaggplug::destroy();
+
+# Quit Blagg
+print "Finished.\n\n";
+exit;

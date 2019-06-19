@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>New Homepage Mockup</title>
+
+
+
+
+  </head>
+
+  <body>
+    <header>
+      <h1>New Homepage Mockup</h1>
+    </header>
+
+    <section id="news">
+      <p>placeholder</p>
+    </section>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+/*!
+ * weblog-entries.js
+ *
+ * Copyright (c) 2009 Kyo Nagashima <kyo@hail2u.net>
+ * This library licensed under MIT license:
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+/*global jQuery, $ */
+
+$(function () {
+  "use strict";
+
+  var t = $("#news");
+
+  if (t === undefined) {
+    return false;
+  }
+
+  t.empty().append(
+    $("<p/>").append(
+      $("<em/>").append("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026")
+    )
+  );
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from rss where url='http://feeds.feedburner.com/hail2u/blog'",
+    format: "json"
+  }, function (data) {
+    t.empty().addClass("news");
+
+    if (data.query.results && data.query.results.item) {
+      $.each(data.query.results.item, function (i, item) {
+        if (i === 0) {
+          $("<h2/>").append(
+            $("<a/>").attr({
+              href: item.link
+            }).append(item.title)
+          ).appendTo(t);
+          $("<p/>").append(item.description).appendTo(t);
+          $("<nav/>").addClass("seemore").append(
+            $("<p/>").append(
+              $("<a/>").attr({
+                href: item.link
+              }).append("Read full entry")
+            )
+          ).appendTo(t);
+          $("<hr/>").appendTo(t);
+        } else {
+          $("<section/>").addClass("sub-news").append(
+            $("<h3/>").append(
+              $("<a/>").attr({
+                href: item.link
+              }).append(item.title)
+            )
+          ).append(
+            $("<p/>").append(item.description)
+          ).appendTo(t);
+        }
+      });
+    } else {
+      $("<p/>").append("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002").appendTo(t);
+    }
+  });
+
+  return true;
+});
+    </script>
+    <style>
+      .sub-news {
+        margin: 0 0.7%;
+        float: left;
+        width: 32%;
+        font-size: 75%;
+      }
+
+      .sub-news h3 {
+        margin: 24px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .sub-news p {
+        margin: 24px 0;
+        height: 84px;
+        display: block;
+        overflow: hidden;
+      }
+    </style>
+  </body>
+</html>

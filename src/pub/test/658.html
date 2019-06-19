@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width" name="viewport">
+
+    <title>Test Page for reldate.js</title>
+  </head>
+  <body>
+    <header>
+      <h1>Test Page for reldate.js</h1>
+
+      <p><code>time</code>要素の中身を<code>datetime</code>属性の値を元に相対日時に変換する<code>reldate.js</code>のテスト・ページです。</p>
+    </header>
+
+    <div id="test"></div>
+
+    <script>
+      var n = Date.now();
+      var frag = document.createDocumentFragment();
+      var tests = [n];
+
+      for (let i = 3; i < 12; i++) {
+        tests.push(n - (Math.floor(Math.random() * 12) + 1) * Math.pow(10, i));
+      }
+
+      tests.forEach(function (ms) {
+        let iso = new Date(ms).toISOString();
+        let p = document.createElement("p");
+        let time = document.createElement("time");
+
+        time.appendChild(document.createTextNode(iso));
+        time.setAttribute("datetime", iso);
+        p.appendChild(document.createTextNode(iso + ": "));
+        p.appendChild(time);
+        frag.appendChild(p);
+      });
+      document.getElementById("test").appendChild(frag);
+      test.innerHTML += `<p>Invalid datetime value: <time datetime="nonsense">2016-02-03T11:51:11Z</time></p>`;
+
+      const now = Date.now();
+      const toRelativeDate = function (then) {
+        let diff = 0;
+
+        if (!Number.isInteger(then)) {
+          return;
+        }
+
+        diff = parseInt((now - then) / 1000, 10);
+
+        if (!Number.isInteger(diff) || diff < 0) {
+          return;
+        }
+
+        if (diff < 60) {
+          return diff + "秒前";
+        }
+
+        diff = parseInt(diff / 60, 10);
+
+        if (diff < 60) {
+          return diff + "分前";
+        }
+
+        diff = parseInt(diff / 60, 10);
+
+        if (diff < 24) {
+          return diff + "時間前";
+        }
+
+        diff = parseInt(diff / 24, 10);
+
+        if (diff < 30) {
+          return diff + "日前";
+        }
+
+        diff = parseInt(diff / 30, 10);
+
+        if (diff < 12) {
+          return diff + "ヶ月前";
+        }
+
+        return parseInt(diff / 12, 10) + "年前";
+      };
+
+      for (let time of document.querySelectorAll("time")) {
+        let abs = time.getAttribute("datetime");
+        let rel = "";
+
+        if (!abs) {
+          continue;
+        }
+
+        rel = toRelativeDate(Date.parse(abs));
+
+        if (rel) {
+          time.setAttribute("title", abs);
+          time.textContent = rel;
+        }
+      }
+    </script>
+  </body>
+</html>

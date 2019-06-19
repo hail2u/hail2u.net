@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<title>My Bloglines</title>
+</head>
+<body>
+<h1>My Bloglines</h1>
+<hr />
+<script type="text/javascript">
+var urlListSub  = "http://rpc.bloglines.com/listsubs";
+var urlGetItems = "http://rpc.bloglines.com/getitems";
+
+var xmlHttp = new ActiveXObject("Msxml2.XMLHTTP.3.0");
+var xmlDoc  = new ActiveXObject("Msxml2.DOMDocument.3.0");
+
+xmlHttp.open("GET", urlListSub, false);
+xmlHttp.send();
+
+if (xmlHttp.status == 200) {
+	xmlDoc.async = false;
+	xmlDoc.loadXML(xmlHttp.responseText);
+
+	if (xmlDoc.parseError.errorCode == 0) {
+		var outlineNodes = xmlDoc.getElementsByTagName("outline");
+		var titles = new Array();
+		var subIds = new Array();
+
+		for (var i = 0; i <  outlineNodes.length; i++) {
+			var outline = outlineNodes.item(i);
+
+			if (!outline.hasChildNodes()) {
+				var unread  = parseInt(outline.getAttribute("BloglinesUnread"));
+
+				if (unread > 0) {
+					titles.push(outline.getAttribute("title"))
+					subIds.push(outline.getAttribute("BloglinesSubId"));
+				}
+			}
+		}
+	}
+}
+
+if (subIds.length > 0) {
+	for (var i = 0; i <  subIds.length; i++) {
+		var url = urlGetItems + "?n=0&s=" + subIds[i];
+		xmlHttp.open("GET", url, false);
+		xmlHttp.send();
+
+		if (xmlHttp.status != 200) {
+			continue;
+		}
+
+		xmlDoc.async = false;
+		xmlDoc.loadXML(xmlHttp.responseText);
+
+		if (xmlDoc.parseError.errorCode != 0) {
+			continue;
+		}
+
+		var channelNode = xmlDoc.documentElement.selectSingleNode("channel");
+		var title = channelNode.selectSingleNode("title").text;
+		var link  = channelNode.selectSingleNode("link").text;
+		document.write('<h2><a href="' + link + '">' + title + '</a></h2>');
+		var itemNodes = channelNode.selectNodes("item");
+
+		for (j = 0; j < itemNodes.length; j++) {
+			var item        = itemNodes[j];
+			var title       = item.selectSingleNode("title").text;
+			var link        = item.selectSingleNode("link").text;
+			var description = item.selectSingleNode("description").text;
+			var pubDate     = item.selectSingleNode("pubDate").text;
+			document.write('<h3><a href="' + link + '">' + title + '</a></h3>');
+			document.write('<p>' + pubDate + '</p>');
+			document.write('<div>' + description + '</div>');
+		}
+
+		document.write('<hr />');
+	}
+}
+</script>
+<p>Powered by <a href="http://www.bloglines.com/services/">Bloglines Web Services</a></p>
+</body>
+</html>

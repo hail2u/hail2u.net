@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+
+    <title>Easy Loading Marker for Infinite Scroll</title>
+
+
+    <style>
+      #content {
+        background-image: url("634.svg");
+        background-position: center bottom;
+        background-repeat: no-repeat;
+        background-size: 2rem 2rem;
+        max-width: 36rem;
+        padding-bottom: 4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Easy Loading Marker for Infinite Scroll</h1>
+
+      <p>ローディング画像の処理をまったく行わず、雑に表示しっぱなしにしておく。</p>
+    </header>
+
+    <main id="content">
+      <section class="test">
+        <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
+
+        <p>Praesent finibus mattis egestas. Ut varius eu lorem suscipit hendrerit. Curabitur non suscipit ipsum. Sed pharetra et justo sed ornare. Duis pharetra viverra justo sit amet tincidunt. Integer a mollis diam. Sed imperdiet in diam at viverra. Nam nec diam blandit, elementum metus non, tempor metus. Ut ultricies ipsum a iaculis maximus. Maecenas id mollis dui. Sed consectetur augue magna, eget interdum libero cursus vel.</p>
+      </section>
+
+      <section class="test">
+        <h1>Quisque in egestas nunc</h1>
+
+        <p>Phasellus vehicula diam et nisl interdum efficitur. Vestibulum eu aliquet tellus, vitae ullamcorper nisl. Phasellus a eros id tortor volutpat porttitor. Suspendisse ornare aliquam dui sed tristique. Aliquam et sapien a quam egestas fringilla in sit amet enim. Nulla vestibulum dictum ornare. Cras nisl ligula, pellentesque eu dui ut, dignissim mollis arcu. Nulla eu dictum lectus. Mauris ac risus et dui fringilla ornare. Sed vel aliquet orci. Vestibulum cursus orci nec ultrices sollicitudin. Fusce interdum eget leo nec iaculis.</p>
+      </section>
+
+      <section class="test">
+        <h1>Suspendisse ultricies congue magna sit amet laoreet</h1>
+
+        <p>Donec sit amet eros quis ex posuere maximus vel nec justo. Pellentesque sit amet suscipit ante, vel hendrerit justo. Maecenas faucibus fringilla nulla a tincidunt. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque tempor, est eu posuere semper, sem urna cursus ante, eu convallis ex nulla nec ex. Phasellus sit amet vulputate risus. Aliquam id dapibus felis. Nulla libero quam, rutrum quis scelerisque et, pretium a augue. Suspendisse quis semper orci. Nam eget mi nunc. Suspendisse id leo ante. Nam nec tellus eget massa pharetra placerat.</p>
+      </section>
+
+      <section class="test">
+        <h1>Phasellus at bibendum diam</h1>
+
+        <p>Fusce placerat quam eu sapien tristique egestas. Mauris interdum rhoncus est et sollicitudin. Maecenas porta nulla ipsum, in porta arcu finibus sodales. Fusce imperdiet fermentum quam, vel mattis arcu. Aliquam vitae ullamcorper turpis. Donec id nunc ac sem dignissim sodales. Maecenas sodales urna quam, sit amet dignissim mi hendrerit id. Ut euismod risus feugiat magna venenatis, ac cursus lectus euismod. Nullam gravida, massa placerat consequat auctor, quam lectus viverra nulla, nec fringilla ligula urna id justo. Mauris maximus est vitae placerat dignissim.</p>
+      </section>
+
+      <section class="test">
+        <h1>Duis elementum tincidunt dolor eu malesuada</h1>
+
+        <p>Duis in dolor non leo lacinia dapibus. Aenean quis mi nunc. Aliquam iaculis finibus erat pulvinar varius. Nam porta ornare orci. Duis ante tortor, facilisis sit amet laoreet vitae, porta eu velit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nec felis egestas, sagittis diam id, mollis libero. Nunc sit amet quam vitae risus accumsan pellentesque quis ut lacus. Curabitur sit amet felis scelerisque, lobortis lacus vel, gravida lectus. Ut diam nisi, vestibulum sit amet nibh quis, interdum eleifend nulla. Praesent orci ex, viverra mollis molestie ac, bibendum non velit. Sed in erat et velit ultrices viverra non id erat.</p>
+      </section>
+    </main>
+
+    <script>
+      (function (w, d) {
+        var page = d.createDocumentFragment();
+
+        var debounce = function (fn, delay) {
+          var timeout = null;
+
+          return function () {
+            var args = arguments;
+            var context = this;
+            var delayed = function () {
+              fn.apply(context, args);
+              timeout = null;
+            };
+
+            if (timeout) {
+              w.clearTimeout(timeout);
+            }
+
+            timeout = w.setTimeout(delayed, delay);
+          };
+        };
+
+        var addPage = debounce(function () {
+          if (w.scrollY < (d.documentElement.scrollHeight - w.innerHeight) * 0.9) {
+            return;
+          }
+
+          w.removeEventListener("scroll", addPage, false);
+          w.setTimeout(function () {
+            d.getElementById("content").appendChild(page.cloneNode(true));
+            w.addEventListener("scroll", addPage, false);
+          }, 1000);
+        }, 500);
+
+        var init = function () {
+          var origin = d.getElementById("content").cloneNode(true);
+          var i = origin.childNodes.length;
+
+          while (i--) {
+            page.appendChild(origin.childNodes[0]);
+          }
+
+          w.addEventListener("scroll", addPage, false);
+        };
+
+        if (d.readyState === "loading") {
+          d.addEventListener("DOMContentLoaded", init, false);
+        } else {
+          init();
+        }
+      })(window, document);
+    </script>
+  </body>
+</html>

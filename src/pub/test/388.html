@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>iine!</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>iine!</h1>
+    </header>
+
+    <section id="iine">
+      <p>JavaScriptが有効な場合、ここに<a href="http://iine.hail2u.net/">iine!</a>に投稿された画像が表示されます。</p>
+    </section>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var js = document.createElement("script"),
+          s = document.getElementsByTagName("script")[0];
+        js.async = true;
+        js.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D'http%3A%2F%2Ffeeds.feedburner.com%2Fhail2u%2Fiine'&format=json&callback=displayIine";
+        s.parentNode.insertBefore(js, s);
+      }());
+
+      function displayIine(d) {
+        "use strict";
+
+        var placeholder = document.getElementById("iine"),
+          items,
+          buf = [],
+          i,
+          l,
+          item,
+          desc,
+          link,
+          image;
+
+        if (d === undefined || d.query.results === undefined) {
+          placeholder.innerHTML = "\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002";
+
+          return;
+        }
+
+        items = d.query.results.item;
+        buf.push(
+          '<h2>Screenshots from <a href="http://iine.hail2u.net/">iine!</a></h2>',
+          '<ol>'
+        );
+
+        for (i = 0, l = items.length; i < l; i += 1) {
+          item = items[i];
+          desc  = item.description;
+          link  = desc.replace(/^[\s\S]*?<a href="([\s\S]*?)"[\s\S]*$/, "$1");
+          image = desc.replace(/^[\s\S]*?(<img [\s\S]*?>)[\s\S]*$/, "$1");
+          buf.push(
+            '<li>',
+            '<figure>',
+            '<a href="',
+            link,
+            '">',
+            image,
+            '<figcaption>',
+            item.title,
+            '</figcaption>',
+            '</a>',
+            '</figure>',
+            '</li>'
+          );
+        }
+
+        buf.push('</ol>');
+        placeholder.innerHTML = buf.join("");
+      }
+    </script>
+  </body>
+</html>

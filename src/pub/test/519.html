@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Font re-creation &amp; unicode-range on Chrome 31</title>
+
+
+    <style>
+      @font-face {
+        font-family: "Trebuchet MS";
+        src: local("Georgia");
+        unicode-range: U+E000;
+      }
+
+      .test {
+        font-family: "Trebuchet MS", sans-serif;
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Font re-creation &amp; unicode-range on Chrome 31</h1>
+
+      <p>Chrome 31で<code>@font-face</code>定義で<code>unicode-range</code>プロパティーを使ってローカルに既に存在するフォントのグリフを一部変更すると、元のグリフが一旦全て失われるようになった。仕様に忠実になり、IE11と同じ挙動になった。</p>
+    </header>
+
+    <section class="test">
+      <h1>Lorem Ipsum Dolor Sit Amet</h1>
+
+      <p>Consectetur adipiscing elit. In nec tellus et elit ultrices scelerisque. Donec id mi ac nibh commodo varius eu sed elit. Sed vestibulum vehicula lorem, quis aliquet turpis commodo in. Ut faucibus dui at ultricies ornare. Suspendisse vestibulum sed erat quis lacinia. Pellentesque mattis enim tempor metus dapibus, non iaculis ligula consequat. Aenean a augue in dolor sagittis pretium id accumsan nulla. Praesent quis massa in nisl molestie laoreet facilisis nec sapien. Integer posuere, velit a viverra pretium, dui ligula malesuada tortor, nec vehicula enim nunc ornare ante. Pellentesque id arcu vulputate orci molestie tincidunt. Etiam fringilla sem porttitor ipsum fermentum porta. Donec et mollis risus.</p>
+
+      <p>Trebuchet MSの一部だけをGeorgiaにしたフォントを指定しているが、Trebuchet MSにならない。</p>
+    </section>
+
+    <section>
+      <h1>再現コード</h1>
+
+      <p>Trebuchet MSの一部(何でも良い)をGeorgiaに差し替えようとして以下のように書くと、Trebuchet MSのグリフが全て失われる。</p>
+
+<pre><code>@font-face {
+  font-family: &quot;Trebuchet MS&quot;;
+  src: local(&quot;Georgia&quot;);
+  unicode-range: U+E000;
+}</code></pre>
+    </section>
+
+    <section>
+      <h1>修正方法</h1>
+
+      <p>一部書き換えたいローカルのフォントを再定義してやってから、一部差し替える定義を追加するとうまくいく。</p>
+
+<pre><code>@font-face {
+  font-family: &quot;Trebuchet MS&quot;;
+  src: local(&quot;Trebuchet MS&quot;);
+}
+
+@font-face {
+  font-family: &quot;Trebuchet MS&quot;;
+  src: local(&quot;Georgia&quot;);
+  unicode-range: U+E000;
+}</code></pre>
+    </section>
+  </body>
+</html>

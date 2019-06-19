@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl
+
+# Žg—p—á:
+# BlogRolling‚É‘—‚éê‡
+# ping_update.pl http://rpc.blogrolling.com/pinger/
+# ping.bloggers.jp‚É‘—‚éê‡
+# ping_update.pl http://ping.bloggers.jp/rpc/
+
+use strict;
+
+use XMLRPC::Lite;
+
+my $blog_title = 'hail2u.net - Weblog';
+my $blog_url = 'http://hail2u.net/blog/';
+
+my $ping_url = shift;
+
+print "Sending update ping to $ping_url\n";
+my $response = XMLRPC::Lite
+	->proxy($ping_url, timeout => 15)
+	->call('weblogUpdates.ping', $blog_title, $blog_url)
+	->result;
+
+if ($response->{flerror}) {
+	print "Error: " . $response->{message} . "\n";
+}
+
+print "\n";
+
+exit;

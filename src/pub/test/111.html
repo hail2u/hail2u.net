@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Test page for Pxfón</title>
+<script type="text/javascript" src="http://cufon.shoqolate.com/js/cufon.js"></script>
+<script type="text/javascript" src="111.js"></script>
+<style type="text/css">
+p {
+  font-size: 10px;
+}
+</style>
+<script type="text/javascript">
+Cufon.replace('p');
+</script>
+</head>
+<body>
+<h1>Test page for Pxfón</h1>
+<p>
+/**<br>
+ * jQuery Plugin: Highlight Search Terms - version 0.1<br>
+ * Highlight search terms in referrer URL from Google, Yahoo!, Bing and custom site.<br>
+ *<br>
+ * Copyright (c) 2009 Kyo Nagashima &lt;kyo@hail2u.net&gt;<br>
+ * This library licensed under MIT license:<br>
+ * http://opensource.org/licenses/mit-license.php<br>
+ *<br>
+ * Usage:<br>
+ *   Highlight all contents of body element:<br>
+ *   $(&quot;body&quot;).highlightSearchTerms();<br>
+ *<br>
+ *   Highlight with custom class name:<br>
+ *   $(&quot;body&quot;).highlightSearchTerms({<br>
+ *     className: &quot;keyword&quot;<br>
+ *   });<br>
+ *<br>
+ *   Support custom referrer pattern:<br>
+ *   $(&quot;body&quot;).highlightSearchTerms({<br>
+ *     referrerPatterns: [<br>
+ *       &quot;^http://example\.com.+[&amp;?]query=([^&amp;]+).*$&quot;<br>
+ *     ]<br>
+ *   });<br>
+ */<br>
+(function($) {<br>
+  $.fn.highlightSearchTerms = function (options) {<br>
+    var o = $.extend({}, $.fn.highlightSearchTerms.defaults, options);<br>
+    $.merge(o.referrerPatterns, $.fn.highlightSearchTerms.builtinReferrerPatterns);<br>
+    var ref = o.referrer || document.referrer;<br>
+<br>
+    if (ref) {<br>
+      var terms = extractSearchTerms(ref, o);<br>
+<br>
+      // Highlight terms<br>
+      if (terms !== &quot;&quot;) {<br>
+        terms = new RegExp(&quot;(&quot; + terms + &quot;)&quot;, &quot;gi&quot;);<br>
+        this.find(&quot;:not(iframe, option, script, textarea)&quot;).contents().each(function () {<br>
+          if (this.nodeType === 3) {<br>
+            var s = this.nodeValue.replace(terms, &quot;&lt;em class=\&quot;&quot; + o.className + &quot;\&quot;&gt;$1&lt;/em&gt;&quot;);<br>
+            $(this).replaceWith(s);<br>
+          }<br>
+        });<br>
+      }<br>
+    }<br>
+<br>
+    return this;<br>
+  };<br>
+<br>
+  // Private: Extract terms from referrer<br>
+  extractSearchTerms = function (ref, o) {<br>
+    var terms = &quot;&quot;;<br>
+<br>
+    $.each(o.referrerPatterns, function () {<br>
+      var pattern = new RegExp(this, &quot;i&quot;);<br>
+<br>
+      if (pattern.exec(ref)) {<br>
+        var unsafe = new RegExp(o.unsafeChars, &quot;g&quot;);<br>
+        terms = decodeURIComponent(RegExp.$1).replace(unsafe, &quot;+&quot;).replace(/^\+*(.*?)\+*$/, &quot;$1&quot;).replace(/\++/g, &quot;|&quot;);<br>
+        return false; // break $.each<br>
+      }<br>
+    });<br>
+<br>
+    return terms;<br>
+  };<br>
+<br>
+  // Public: default options<br>
+  $.fn.highlightSearchTerms.defaults = {<br>
+    className: &quot;highlight&quot;,<br>
+    referrerPatterns: [],<br>
+    unsafeChars: &quot;[!-*,-/:-@[-`{-~]&quot;<br>
+  };<br>
+<br>
+  // Public: built-in referrer patterns for Google(com|co.jp), Yahoo!(com|co.jp), Bing.<br>
+  $.fn.highlightSearchTerms.builtinReferrerPatterns = [<br>
+    &quot;^http://www\.google\.com.+[&amp;?]q=([^&amp;]+).*$&quot;,<br>
+    &quot;^http://www\.google\.co\.jp.+[&amp;?]q=([^&amp;]+).*$&quot;,<br>
+    &quot;^http://search\.yahoo\.com.+[&amp;?]p=([^&amp;]+).*$&quot;,<br>
+    &quot;^http://search\.yahoo\.co\.jp.+[&amp;?]p=([^&amp;]+).*$&quot;,<br>
+    &quot;^http://www\.bing\.com.+[&amp;?]q=([^&amp;]+).*$&quot;<br>
+  ];<br>
+})(jQuery);<br>
+</p>
+<script type="text/javascript">
+Cufon.now();
+</script>
+</body>
+</html>

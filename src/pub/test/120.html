@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Your FriendFeed Subscribers</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://hail2u.github.com/minA/lib/jquery.xhashchange.min.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        $(window).hashchange(listSubscribers);
+
+        $("#listSubscribersForm").submit(function () {
+          var userId = $("#userId").val();
+
+          if (userId) {
+            location.hash = "#" + encodeURIComponent(userId);
+          }
+
+          return false;
+        });
+
+        if (location.hash) {
+          listSubscribers();
+        }
+      });
+
+      function listSubscribers () {
+        var userId = decodeURIComponent(location.hash.replace(/^#/, ""));
+        $("#userId").val(userId);
+        var t = $("#subscribers").empty();
+        $("<p/>").append($("<em/>").append("データを取得中……")).appendTo(t);
+
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+          q:      "select * from json where url='http://friendfeed-api.com/v2/feedinfo/" + userId + "' and itemPath = 'json.subscribers'",
+          format: "json"
+        }, function (data) {
+          t.empty();
+
+          if (data.query.results && data.query.results.subscribers) {
+            var ol = $("<ol/>");
+            $.each(data.query.results.subscribers, function () {
+              $("<li/>").append($("<a/>").attr({
+                href: "http://friendfeed.com/" + this.id
+              }).append(this.name)).append(" ").append($("<a/>").attr({
+                href: "#" + this.id
+              }).append("#")).appendTo(ol);
+            });
+            ol.appendTo(t);
+          } else {
+            $("<p/>").append("データを取得できませんでした。").appendTo(t);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Your FriendFeed Subscribers</h1>
+    <form action="./120.html" id="listSubscribersForm">
+      <p><input type="text" name="userId" size="16" id="userId"></p>
+    </form>
+    <div id="subscribers">
+      <p>FrindFeedでの購読者が表示されます。</p>
+    </div>
+  </body>
+</html>
