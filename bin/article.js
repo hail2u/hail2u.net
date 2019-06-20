@@ -1,6 +1,5 @@
 const { decode } = require("../lib/html-entities");
 const fs = require("fs").promises;
-const markdown = require("../lib/markdown");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -20,7 +19,6 @@ const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
 const draftDir = "../src/drafts/";
-const draftExts = [".html", ".markdown", ".md"];
 const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/;
 const srcImgDir = "../src/img/blog/";
 
@@ -96,13 +94,7 @@ const updateEntry = async file => {
 };
 
 const isDraft = filename => {
-  const ext = path.extname(filename);
-
-  if (argv.contribute && path.basename(filename, ext).startsWith("_")) {
-    return false;
-  }
-
-  if (draftExts.indexOf(ext) !== -1) {
+  if (path.extname(filename) === ".html") {
     return true;
   }
 
@@ -111,11 +103,9 @@ const isDraft = filename => {
 
 const getDraft = async filename => {
   const src = path.join(draftDir, filename);
-  const ext = path.extname(src);
   return {
     content: await fs.readFile(src, "utf8"),
-    ext: ext,
-    name: path.basename(src, ext),
+    name: path.basename(src, path.extname(src)),
     src: src
   };
 };
@@ -182,20 +172,6 @@ const checkSelectedContent = content => {
 
 const deleteFile = file => fs.unlink(file);
 
-const markupSelected = async (ext, content) => {
-  if (ext === ".html") {
-    return content;
-  }
-
-  const [html, included] = markdown(content);
-
-  if (argv.contribute && included.length > 0) {
-    await Promise.all(included.map(deleteFile));
-  }
-
-  return html;
-};
-
 const contributeSelected = selected => Promise.all([
   deleteFile(selected.src),
   updateEntry(selected)
@@ -226,20 +202,16 @@ const main = async () => {
     checkSelectedName(selected.name),
     checkSelectedContent(selected.content)
   ]);
-  const html = await markupSelected(selected.ext, selected.content);
 
   if (argv.contribute) {
     return contributeSelected({
       ...selected,
-      content: `${html.trim()}\n`,
-      ext: ".html",
       verb: "Contribute"
     });
   }
 
   return testSelected({
     ...selected,
-    content: html,
     css: "../src/partial/css.mustache",
     dest: "../tmp/__test.html",
     template: "../src/blog/test.mustache"
