@@ -17,17 +17,6 @@ const argv = minimist(process.argv.slice(2), {
 });
 const linksFile = "../src/links/links.json";
 
-const addLink = async (title, url, git) => {
-  const links = await readJSONFile(linksFile);
-  await writeJSONFile(linksFile, [{
-    published: Date.now(),
-    title: argv.title,
-    url: argv.url
-  }, ...links]);
-  await runCommand(git, ["add", "--", path.relative("", linksFile)]);
-  await runCommand(git, ["commit", `--message=Bookmark ${url}`]);
-};
-
 const main = async () => {
   if (!argv.title) {
     throw new Error("Title must be passed.");
@@ -37,8 +26,17 @@ const main = async () => {
     throw new Error("URL must be passed.");
   }
 
-  const git = await whichAsync("git");
-  return addLink(argv.title, argv.url, git);
+  const [links, git] = await Promise.all([
+    readJSONFile(linksFile),
+    whichAsync("git")
+  ]);
+  await writeJSONFile(linksFile, [{
+    published: Date.now(),
+    title: argv.title,
+    url: argv.url
+  }, ...links]);
+  await runCommand(git, ["add", "--", path.relative("", linksFile)]);
+  await runCommand(git, ["commit", `--message=Bookmark ${argv.url}`]);
 };
 
 process.chdir(__dirname);

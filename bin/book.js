@@ -37,25 +37,13 @@ const selectBooksFile = type => {
   throw new Error("Book type must be one of comic, novel, and nonfiction.");
 };
 
-const addBook = async (asin, title, type, git) => {
-  if (!/^[A-Z0-9]{10}$/i.test(asin)) {
-    throw new Error("ASIN must be 10 alphanumeric characters.");
-  }
-
-  const booksFile = selectBooksFile(type);
-  const books = await readJSONFile(booksFile);
-  await writeJSONFile(booksFile, [{
-    asin: asin,
-    published: Date.now(),
-    title: title
-  }, ...books]);
-  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
-  await runCommand(git, ["commit", `--message=Read ${asin}`]);
-};
-
 const main = async () => {
   if (!argv.asin) {
     throw new Error("ASIN code must be passed.");
+  }
+
+  if (!/^[A-Z0-9]{10}$/i.test(argv.asin)) {
+    throw new Error("ASIN must be 10 alphanumeric characters.");
   }
 
   if (!argv.title) {
@@ -63,11 +51,21 @@ const main = async () => {
   }
 
   if (!argv.type) {
-    throw new Error("Book type must  be passed.");
+    throw new Error("Book type must be passed.");
   }
 
-  const git = await whichAsync("git");
-  return addBook(argv.asin, argv.title, argv.type, git);
+  const booksFile = selectBooksFile(argv.type);
+  const [books, git] = await Promise.all([
+    readJSONFile(booksFile),
+    whichAsync("git")
+  ]);
+  await writeJSONFile(booksFile, [{
+    asin: argv.asin,
+    published: Date.now(),
+    title: argv.title
+  }, ...books]);
+  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
+  await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
 };
 
 process.chdir(__dirname);
