@@ -368,6 +368,7 @@ const buildHTML = async (metadata, partials, file) => {
       data.nonfictions[1],
       data.novels[1]
     ];
+    data.documents = data.documents.slice(0, 3);
     data.photos = data.photos.slice(0, 5);
     data.statuses = data.statuses.slice(0, 1);
     data.links = data.links.slice(0, 5);
