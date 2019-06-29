@@ -59,6 +59,11 @@ const main = async () => {
     readJSONFile(booksFile),
     whichAsync("git")
   ]);
+
+  if (books.find(book => argv.asin === book.asin)) {
+    throw new Error(`${argv.title} had been added.`);
+  }
+
   await writeJSONFile(booksFile, [{
     asin: argv.asin,
     published: Date.now(),
