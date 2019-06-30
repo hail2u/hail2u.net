@@ -35,14 +35,9 @@ const files = [
   },
   {
     dest: "../dist/blog/index.html",
-    json: "../src/blog/index.json",
-    src: "../src/blog/index.mustache"
-  },
-  {
-    dest: "../dist/blog/log.html",
     isLog: true,
     json: "../src/blog/index.json",
-    src: "../src/blog/log.mustache"
+    src: "../src/blog/index.mustache"
   },
   {
     dest: "../dist/documents/index.html",
@@ -57,14 +52,9 @@ const files = [
   },
   {
     dest: "../dist/links/index.html",
-    json: "../src/links/index.json",
-    src: "../src/links/index.mustache"
-  },
-  {
-    dest: "../dist/links/log.html",
     isLog: true,
     json: "../src/links/index.json",
-    src: "../src/links/log.mustache"
+    src: "../src/links/index.mustache"
   },
   {
     dest: "../dist/photos/index.html",
@@ -85,14 +75,9 @@ const files = [
   },
   {
     dest: "../dist/statuses/index.html",
-    json: "../src/statuses/index.json",
-    src: "../src/statuses/index.mustache"
-  },
-  {
-    dest: "../dist/statuses/log.html",
     isLog: true,
     json: "../src/statuses/index.json",
-    src: "../src/statuses/log.mustache"
+    src: "../src/statuses/index.mustache"
   }
 ];
 const metadataFile = "../src/metadata.json";
