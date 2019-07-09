@@ -135,17 +135,18 @@ const isPhoto = filename => {
   return false;
 };
 
+const getPhotoDatetime = photo => {
+  const dt = path.basename(photo, ".jpg").split("");
+  return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
+};
+
 const extendPhoto = photo => {
   const link = `/img/photos/${photo}`;
-  const [year, month, date, hour, minute, second] = photo
-    .replace(/\.jpg$/, "000000")
-    .match(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/)
-    .slice(1, 7);
   return {
     body: `<p><img src="https://hail2u.net${link}"></p>`,
     description: link,
     link: link,
-    published: Date.parse(`${year}-${month}-${date}T${hour}:${minute}:${second}`),
+    published: getPhotoDatetime(photo),
     type: "photo"
   };
 };
