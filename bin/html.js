@@ -150,6 +150,24 @@ const readArticles = async () => {
   return articles.map(extendArticle);
 };
 
+const extendBook = book => {
+  const dt = expandDatetime(book.published);
+  const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
+  return {
+    ...book,
+    ...dt,
+    body: `<p><img src="${image}"></p>`,
+    description: image,
+    link: `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`,
+    type: "book"
+  };
+};
+
+const readBooks = async file => {
+  const books = await readJSONFile(file);
+  return books.map(extendBook);
+};
+
 const extendDocument = document => {
   const dt = expandDatetime(document.published);
   return {
@@ -171,10 +189,21 @@ const isPhoto = filename => {
   return false;
 };
 
-const extendPhoto = photo => ({
-  filename: photo,
-  url: `/img/photos/${photo}`
-});
+const getPhotoDatetime = photo => {
+  const dt = path.basename(photo, ".jpg").split("");
+  return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
+};
+
+const extendPhoto = photo => {
+  const published = getPhotoDatetime(photo);
+  const dt = expandDatetime(published);
+  return {
+    ...dt,
+    filename: photo,
+    published: published,
+    url: `/img/photos/${photo}`
+  };
+};
 
 const listPhotos = async () => {
   const photos = await fs.readdir(photosDir);
@@ -316,8 +345,10 @@ const mergeData = async (extradataFile, dest, metadata) => {
     ...metadata,
     ...extradata,
     articles: metadata.articles.map(markItemChanges),
+    books: metadata.books.map(markItemChanges),
     documents: metadata.documents.map(markItemChanges),
     links: metadata.links.map(markItemChanges),
+    photos: metadata.photos.map(markItemChanges),
     statuses: metadata.statuses.map(markItemChanges)
   };
 };
@@ -388,10 +419,10 @@ const main = async () => {
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
-    readJSONFile(comicsFile),
+    readBooks(comicsFile),
     readDocuments(),
-    readJSONFile(nonfictionsFile),
-    readJSONFile(novelsFile),
+    readBooks(nonfictionsFile),
+    readBooks(novelsFile),
     listPhotos(),
     readStatuses(),
     readLinks(),
