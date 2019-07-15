@@ -319,6 +319,8 @@ const markItemChanges = (item, index, items) => {
   };
 };
 
+const markItems = items => Promise.all(items.map(markItemChanges));
+
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
@@ -341,15 +343,31 @@ const mergeData = async (extradataFile, dest, metadata) => {
     };
   }
 
+  const [
+    articles,
+    books,
+    documents,
+    links,
+    photos,
+    statuses
+  ] = await Promise.all([
+    metadata.articles,
+    metadata.books,
+    metadata.documents,
+    metadata.links,
+    metadata.photos,
+    metadata.statuses
+  ].map(markItems));
+
   return {
     ...metadata,
     ...extradata,
-    articles: metadata.articles.map(markItemChanges),
-    books: metadata.books.map(markItemChanges),
-    documents: metadata.documents.map(markItemChanges),
-    links: metadata.links.map(markItemChanges),
-    photos: metadata.photos.map(markItemChanges),
-    statuses: metadata.statuses.map(markItemChanges)
+    articles: articles,
+    books: books,
+    documents: documents,
+    links: links,
+    photos: photos,
+    statuses: statuses
   };
 };
 
