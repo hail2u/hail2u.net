@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
 
-  <title>Hail2u</title>
+  <title>Date.parse(&quot;2015-02-31&quot;) - Hail2u</title>
 
   <meta content="light dark" name="color-scheme">
-  <meta content="ウェブサイト制作関連の特集や雑記を主に、近況、写真、本やウェブページのメモなど、細々としたものも公開しているウェブサイトです。" name="description">
+  <meta content="ES5以降では、Date.parse()に不正な日時を渡した場合、NaNを返す……が、不正な日時の解釈に実装によって違いがあることを今さら知った。タイトルのように2015-02-31を渡すと、Firefox 67はNaNを返すが、Chrome 75などでは良きにはからって、つまり2015-03-03とみなしてくれる。書式そのものの解釈の違いだけでなく、こんなところにも非互換性が埋まっていて、まんまとハマった。" name="description">
   <meta content="hsl(220, 100%, 40%)" name="theme-color">
   <meta content="width=device-width" name="viewport">
 
-  <link href="/feed" rel="alternate" type="application/rss+xml">
+  <link href="/blog/feed" rel="alternate" type="application/rss+xml">
   <link href="https://kyonagashima.com/" rel="author">
-  <link href="/" rel="canonical">
+  <link href="/blog/date-parse-2015-02-31.html" rel="canonical">
   <link href="/img/icon.svg" rel="icon" sizes="any" type="image/svg+xml">
   <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
   <link href="https://duckduckgo.com/?q=site:hail2u.net" rel="search">
@@ -37,7 +37,7 @@
   <nav>
     <ul>
       <li><a href="/documents/">特集</a></li>
-      <li><a href="/blog/">雑記</a></li>
+      <li><mark><a href="/blog/">雑記</a></mark></li>
       <li><a href="/statuses/">近況</a></li>
       <li><a href="/photos/">写真</a></li>
       <li><a href="/bookshelf/">書棚</a></li>
@@ -46,145 +46,41 @@
     </ul>
   </nav>
 
-  <p>ウェブサイト。日本語へ。ウェブページ。HTML。CSS。JavaScript。遊ぶ。買う。作る。右から左へ。落ちている。壁と床。読む。見る。読&#x2060;む&#x2060;。</p>
+  
 </header>
 
     <main>
-      <section>
-        <h1>選りすぐりの特集</h1>
+      <article>
+        <footer>
+          <p><time datetime="2019-07-19T08:25:40+09:00">2019年7月19日</time></p>
+        </footer>
 
-        <ol>
-            <li><a href="/documents/html-best-practices.html">普通のHTMLの書き方</a></li>
-            <li><a href="/documents/democratic-design.html">民主的なデザイン</a></li>
-            <li><a href="/documents/markup.html">“マークアップ”するということ ～ HTML5勧告に寄せて ～</a></li>
-        </ol>
-      </section>
+        <h1>Date.parse(&quot;2015-02-31&quot;)</h1>
 
-      <section>
-        <h1>雑多な記録</h1>
+        <p>ES5以降では、<code>Date.parse()</code>に不正な日時を渡した場合、<code>NaN</code>を返す……が、不正な日時の解釈に実装によって違いがあることを今さら知った。タイトルのように2015-02-31を渡すと、Firefox 67は<code>NaN</code>を返すが、Chrome 75などでは良きにはからって、つまり2015-03-03とみなしてくれる。書式そのものの解釈の違いだけでなく、こんなところにも非互換性が埋まっていて、まんまとハマった。</p>
 
-        <ol>
-            <li>
-              <time datetime="2019-07-19T08:25:40+09:00">2019年7月19日</time>
-              <a href="/blog/date-parse-2015-02-31.html">Date.parse(&quot;2015-02-31&quot;)</a>
-            </li>
-            <li>
-              <time datetime="2019-07-14T09:12:12+09:00">2019年7月14日</time>
-              <a href="/blog/futakotamagawa-20190712.html">TAMAGAWA Special Days</a>
-            </li>
-            <li>
-              <time datetime="2019-07-08T08:43:25+09:00">2019年7月8日</time>
-              <a href="/blog/mn-20190707.html">MN v20190707</a>
-            </li>
-            <li>
-              <time datetime="2019-07-05T12:33:35+09:00">2019年7月5日</time>
-              <a href="/blog/spark-app-and-docomo-mail.html">Sparkとドコモメール</a>
-            </li>
-            <li>
-              <time datetime="2019-06-28T08:48:59+09:00">2019年6月28日</time>
-              <a href="/blog/routers-for-ocn-virtual-connect.html">OCNバーチャルコネクト向けルーター</a>
-            </li>
-        </ol>
-      </section>
+<p>Chrome 75やEdge 18、Node.js v12.0.0では以下のようになる。対してFirefox 67は2番目のみ<code>NaN</code>を返す。</p>
 
-      <section>
-          <h1>最近の状況</h1>
+<pre><code>console.log(Date.parse("2015-02-28")); // 1425081600000
+console.log(Date.parse("2015-02-31")); // 1425340800000
+console.log(Date.parse("2015-03-03")); // 1425340800000
+</code></pre>
 
-          <p>ニンニククサイ • <time datetime="2019-07-18T21:01:06+09:00"><a href="/statuses/#on-1563451266929">2019年7月18日21時1分</a></time></p>
-      </section>
+<p>セケンでは<a href="https://momentjs.com/">Moment.js</a>か何かを使い、<code>Date</code>オブジェクトには一切触らないはずなので、あまり問題にならない。小さな書き捨てスクリプトで、おおむね日時っぽい文字列を何やらやる時にハマるかもしれない。</p>
 
-      <section>
-        <h1>日々の写真</h1>
+<hr>
 
-        <ul class="oneline">
-            <li><a href="/img/photos/20190718180732.jpg"><img alt="20190718180732.jpg" src="/img/photos/20190718180732.jpg"></a></li>
-            <li><a href="/img/photos/20190717151618.jpg"><img alt="20190717151618.jpg" src="/img/photos/20190717151618.jpg"></a></li>
-            <li><a href="/img/photos/20190716082324.jpg"><img alt="20190716082324.jpg" src="/img/photos/20190716082324.jpg"></a></li>
-            <li><a href="/img/photos/20190715153344.jpg"><img alt="20190715153344.jpg" src="/img/photos/20190715153344.jpg"></a></li>
-            <li><a href="/img/photos/20190713092036.jpg"><img alt="20190713092036.jpg" src="/img/photos/20190713092036.jpg"></a></li>
-        </ul>
-      </section>
+<p>ES5の仕様では不正な日時なら<code>NaN</code>を返すとなっているが、どうなっていると不正なのかは明確ではない。日付と時刻の書式でDDは01から31まで許可されているので、2015-02-31は書式として正しく、不正な日時ではないと考えられる。一方で2015-02-31は存在しない日付なので、不正な日時だとも考えられる。</p>
 
-      <section>
-        <h1>読み終えた本</h1>
+<p>不正な日時の定義があいまいである以上、どちらの実装も間違ってはいない。のかもしれない。と思う。よう知らんけど。</p>
 
-        <ul class="oneline">
-            <li><a href="https://www.amazon.co.jp/exec/obidos/ASIN/B01N51WUH9/hail2unet-22"><img alt="風の牧場" src="https://images-fe.ssl-images-amazon.com/images/P/B01N51WUH9.jpg"></a></li>
-            <li><a href="https://www.amazon.co.jp/exec/obidos/ASIN/4760136630/hail2unet-22"><img alt="猫と魔術と神話事典" src="https://images-fe.ssl-images-amazon.com/images/P/4760136630.jpg"></a></li>
-            <li><a href="https://www.amazon.co.jp/exec/obidos/ASIN/B07TKVKSHG/hail2unet-22"><img alt="金剛寺さんは面倒臭い (4)" src="https://images-fe.ssl-images-amazon.com/images/P/B07TKVKSHG.jpg"></a></li>
-            <li><a href="https://www.amazon.co.jp/exec/obidos/ASIN/4286147568/hail2unet-22"><img alt="FBI美術捜査官" src="https://images-fe.ssl-images-amazon.com/images/P/4286147568.jpg"></a></li>
-            <li><a href="https://www.amazon.co.jp/exec/obidos/ASIN/B00STF0KRG/hail2unet-22"><img alt="みんなバーに帰る" src="https://images-fe.ssl-images-amazon.com/images/P/B00STF0KRG.jpg"></a></li>
-        </ul>
-      </section>
-
-      <section>
-        <h1>気になったウェブページ</h1>
-
-        <ol>
-            <li>
-              <time datetime="2019-07-18T08:29:53+09:00">2019年7月18日</time>
-              <a href="https://www.scottohara.me/note/2019/07/17/placeholder-link.html">The accessibility of placeholder links</a>
-            </li>
-            <li>
-              <time datetime="2019-07-17T16:22:19+09:00">2019年7月17日</time>
-              <a href="https://css-tricks.com/color-inputs-a-deep-dive-into-cross-browser-differences/">Color Inputs: A Deep Dive into Cross-Browser Differences</a>
-            </li>
-            <li>
-              <time datetime="2019-07-15T16:27:02+09:00">2019年7月15日</time>
-              <a href="https://www.beams.co.jp/news/1563/">BEAMSならではの目線で日本各地を紹介する “BEAMS EYE ON” シティガイドが登場</a>
-            </li>
-            <li>
-              <time datetime="2019-07-13T14:26:39+09:00">2019年7月13日</time>
-              <a href="https://underpassapp.com/StopTheMadness/">StopTheMadness</a>
-            </li>
-            <li>
-              <time datetime="2019-07-11T08:20:15+09:00">2019年7月11日</time>
-              <a href="https://fosterelli.co/developers-dont-understand-cors">Developers don&apos;t understand CORS</a>
-            </li>
-        </ol>
-      </section>
-
-      <section>
-        <h1>色々</h1>
-
-        <p>Hail2uは、ウェブサイト制作関連の特集や雑記を主に、近況、写真、本やウェブページのメモなど、細々としたものも公開しているウェブサイトです。</p>
-
-        <section id="license">
-          <h1>ライセンス</h1>
-
-          <p>このウェブサイト内の全ての文書とファイル（画像やスタイルシートを含みます）は、そのファイル自体に別のライセンス情報が明記または添付されていない限り<a href="https://creativecommons.org/licenses/by/4.0/" rel="license">Creative Commons — Attribution</a>の元で公開されています。</p>
-        </section>
-
-        <section id="subscribe">
-          <h1>購読</h1>
-
-          <p>このウェブサイトの更新情報は、ページごとにRSSフィードで配信しています。購読には好みのフィード・リーダー（RSSリーダー）を利用してください。</p>
-
-          <ul>
-            <li><a href="/feed" rel="alternate" type="application/rss+xml">ウェブサイト全体のRSSフィード</a></li>
-            <li><a href="/documents/feed" rel="alternate" type="application/rss+xml">特集のRSSフィード</a></li>
-            <li><a href="/blog/feed" rel="alternate" type="application/rss+xml">雑記のRSSフィード</a></li>
-            <li><a href="/statuses/feed" rel="alternate" type="application/rss+xml">近況のRSSフィード</a></li>
-            <li><a href="/photos/feed" rel="alternate" type="application/rss+xml">写真のRSSフィード</a></li>
-            <li><a href="/bookshelf/feed" rel="alternate" type="application/rss+xml">書棚のRSSフィード</a></li>
-            <li><a href="/links/feed" rel="alternate" type="application/rss+xml">参照のRSSフィード</a></li>
-          </ul>
-
-          <p>ウェブサイト全体のRSSフィードには、特集から書棚まで、すべての更新情報が含まれます。更新頻度がかなり高いので、注意してください。</p>
-        </section>
-
-        <section id="contact">
-          <h1>問い合わせ</h1>
-
-          <p>このウェブサイトおよびウェブサイト内のコンテンツについて、報告や問い合わせ、クレーム等、何か連絡をしたいことがある場合は、<a href="mailto:hail2u@gmail.com">メール</a>または<a href="https://github.com/hail2u/hail2u.net/issues">GitHub</a>で連絡してください。</p>
-        </section>
-      </section>
+      </article>
     </main>
 
 <footer>
   <ul>
     <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-    <li><a href="/feed" type="application/rss+xml">RSS</a></li>
+    <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
   </ul>
 
   <address><a href="https://kyonagashima.com/">ながしまきょう</a></address>

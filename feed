@@ -11,6 +11,29 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[ES5以降では、Date.parse()に不正な日時を渡した場合、NaNを返す……が、不正な日時の解釈に実装によって違いがあることを今さら知った。タイトルのように2015-02-31を渡すと、Firefox 67はNaNを返すが、Chrome 75などでは良きにはからって、つまり2015-03-03とみなしてくれる。書式そのものの解釈の違いだけでなく、こんなところにも非互換性が埋まっていて、まんまとハマった。]]></description>
+        <link>https://hail2u.net/blog/date-parse-2015-02-31.html</link>
+        <pubDate>Fri, 19 Jul 2019 08:25:40 +0900</pubDate>
+        <title><![CDATA[Date.parse(&quot;2015-02-31&quot;)]]></title>
+        <content:encoded><![CDATA[<p>ES5以降では、<code>Date.parse()</code>に不正な日時を渡した場合、<code>NaN</code>を返す……が、不正な日時の解釈に実装によって違いがあることを今さら知った。タイトルのように2015-02-31を渡すと、Firefox 67は<code>NaN</code>を返すが、Chrome 75などでは良きにはからって、つまり2015-03-03とみなしてくれる。書式そのものの解釈の違いだけでなく、こんなところにも非互換性が埋まっていて、まんまとハマった。</p>
+
+<p>Chrome 75やEdge 18、Node.js v12.0.0では以下のようになる。対してFirefox 67は2番目のみ<code>NaN</code>を返す。</p>
+
+<pre><code>console.log(Date.parse("2015-02-28")); // 1425081600000
+console.log(Date.parse("2015-02-31")); // 1425340800000
+console.log(Date.parse("2015-03-03")); // 1425340800000
+</code></pre>
+
+<p>セケンでは<a href="https://momentjs.com/">Moment.js</a>か何かを使い、<code>Date</code>オブジェクトには一切触らないはずなので、あまり問題にならない。小さな書き捨てスクリプトで、おおむね日時っぽい文字列を何やらやる時にハマるかもしれない。</p>
+
+<hr>
+
+<p>ES5の仕様では不正な日時なら<code>NaN</code>を返すとなっているが、どうなっていると不正なのかは明確ではない。日付と時刻の書式でDDは01から31まで許可されているので、2015-02-31は書式として正しく、不正な日時ではないと考えられる。一方で2015-02-31は存在しない日付なので、不正な日時だとも考えられる。</p>
+
+<p>不正な日時の定義があいまいである以上、どちらの実装も間違ってはいない。のかもしれない。と思う。よう知らんけど。</p>
+]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[ニンニククサイ]]></description>
         <link>https://hail2u.net/statuses/#on-1563451266929</link>
         <pubDate>Thu, 18 Jul 2019 21:01:06 +0900</pubDate>
@@ -72,13 +95,6 @@
         <pubDate>Wed, 17 Jul 2019 15:16:18 +0900</pubDate>
         
         <content:encoded><![CDATA[<p><img src="https://hail2u.net/img/photos/20190717151618.jpg"></p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[https://images-fe.ssl-images-amazon.com/images/P/4760136630.jpg]]></description>
-        <link>https://www.amazon.co.jp/exec/obidos/ASIN/4760136630/hail2unet-22</link>
-        <pubDate>Wed, 17 Jul 2019 12:46:47 +0900</pubDate>
-        <title><![CDATA[猫と魔術と神話事典]]></title>
-        <content:encoded><![CDATA[<p><img src="https://images-fe.ssl-images-amazon.com/images/P/4760136630.jpg"></p>]]></content:encoded>
       </item>
 
   </channel>
