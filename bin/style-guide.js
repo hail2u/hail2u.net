@@ -1,22 +1,9 @@
 const fs = require("fs").promises;
 
 const dest = "../dist/style-guide/index.html";
-const resourceRe = /\b(href|src)(=)(")(.*?)(")/g;
-const rootDir = "../";
-const rootURL = "https://hail2u.net/";
+const resourceRe = /\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g;
+const rewriteURL = '$1="$3"';
 const src = "../src/css/test.html";
-
-const rewriteURL = (whole, attr, eq, oq, url, cq) => {
-  if (url.startsWith(rootURL)) {
-    return `${attr}${eq}${oq}${url.substr(rootURL.length - 1)}${cq}`;
-  }
-
-  if (url.startsWith(rootDir)) {
-    return `${attr}${eq}${oq}${url.substr(rootDir.length - 1)}${cq}`;
-  }
-
-  return `${attr}${eq}${oq}${url}${cq}`;
-};
 
 const main = async () => {
   const html = await fs.readFile(src, "utf8");
