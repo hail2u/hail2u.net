@@ -80,6 +80,7 @@ const files = [
     src: "../src/statuses/index.mustache"
   }
 ];
+const itemLength = 10;
 const metadataFile = "../src/metadata.json";
 const monthNames = [
   "Jan",
@@ -141,7 +142,8 @@ const extendArticle = article => {
   return {
     ...article,
     ...dt,
-    description: description
+    description: description,
+    isArticle: true
   };
 };
 
@@ -152,14 +154,10 @@ const readArticles = async () => {
 
 const extendBook = book => {
   const dt = expandDatetime(book.published);
-  const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
   return {
     ...book,
     ...dt,
-    body: `<p><img src="${image}"></p>`,
-    description: image,
-    link: `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`,
-    type: "book"
+    isBook: true
   };
 };
 
@@ -172,7 +170,8 @@ const extendDocument = document => {
   const dt = expandDatetime(document.published);
   return {
     ...document,
-    ...dt
+    ...dt,
+    isDocument: true
   };
 };
 
@@ -185,7 +184,8 @@ const extendLink = link => {
   const dt = expandDatetime(link.published);
   return {
     ...link,
-    ...dt
+    ...dt,
+    isLink: true
   };
 };
 
@@ -213,6 +213,7 @@ const extendPhoto = photo => {
   return {
     ...dt,
     filename: photo,
+    isPhoto: true,
     published: published,
     url: `/img/photos/${photo}`
   };
@@ -231,7 +232,8 @@ const extendStatus = status => {
   const dt = expandDatetime(status.published);
   return {
     ...status,
-    ...dt
+    ...dt,
+    isStatus: true
   };
 };
 
@@ -476,6 +478,17 @@ const main = async () => {
     ...nonfictions,
     ...novels
   ].sort(compareByPublished);
+  metadata.items = [
+    ...articles.slice(0, itemLength),
+    ...comics.slice(0, itemLength),
+    ...documents.slice(0, itemLength),
+    ...links.slice(0, itemLength),
+    ...nonfictions.slice(0, itemLength),
+    ...novels.slice(0, itemLength),
+    ...photos.slice(0, itemLength),
+    ...statuses.slice(0, itemLength)
+  ].sort(compareByPublished)
+    .slice(0, itemLength);
   return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
 };
 
