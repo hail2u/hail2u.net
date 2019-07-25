@@ -127,6 +127,20 @@ const readDocuments = async () => {
     .map(extendDocument);
 };
 
+const extendLink = link => ({
+  ...link,
+  description: link.url,
+  link: link.url,
+  type: "link"
+});
+
+const readLinks = async () => {
+  const links = await readJSONFile(linksFile);
+  return links
+    .slice(0, itemLength)
+    .map(extendLink);
+};
+
 const isPhoto = filename => {
   if (path.extname(filename) === ".jpg") {
     return true;
@@ -176,20 +190,6 @@ const readStatuses = async () => {
   return statuses
     .slice(0, itemLength)
     .map(extendStatus);
-};
-
-const extendLink = link => ({
-  ...link,
-  description: link.url,
-  link: link.url,
-  type: "link"
-});
-
-const readLinks = async () => {
-  const links = await readJSONFile(linksFile);
-  return links
-    .slice(0, itemLength)
-    .map(extendLink);
 };
 
 const compareByPublished = (a, b) =>
@@ -277,31 +277,31 @@ const main = async () => {
     articles,
     comics,
     documents,
+    links,
     nonfictions,
     novels,
     photos,
-    statuses,
-    links
+    statuses
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
     readBooks(comicsFile),
     readDocuments(),
+    readLinks(),
     readBooks(nonfictionsFile),
     readBooks(novelsFile),
     listPhotos(),
-    readStatuses(),
-    readLinks()
+    readStatuses()
   ]);
   metadata.items = [
     ...articles,
     ...comics,
     ...documents,
+    ...links,
     ...nonfictions,
     ...novels,
     ...photos,
-    ...statuses,
-    ...links
+    ...statuses
   ].sort(compareByPublished);
   return Promise.all(files.map(buildFeed.bind(null, metadata)));
 };

@@ -181,6 +181,19 @@ const readDocuments = async () => {
   return documents.map(extendDocument);
 };
 
+const extendLink = link => {
+  const dt = expandDatetime(link.published);
+  return {
+    ...link,
+    ...dt
+  };
+};
+
+const readLinks = async () => {
+  const links = await readJSONFile(linksFile);
+  return links.map(extendLink);
+};
+
 const isPhoto = filename => {
   if (path.extname(filename) === ".jpg") {
     return true;
@@ -225,19 +238,6 @@ const extendStatus = status => {
 const readStatuses = async () => {
   const statuses = await readJSONFile(statusesFile);
   return statuses.map(extendStatus);
-};
-
-const extendLink = link => {
-  const dt = expandDatetime(link.published);
-  return {
-    ...link,
-    ...dt
-  };
-};
-
-const readLinks = async () => {
-  const links = await readJSONFile(linksFile);
-  return links.map(extendLink);
 };
 
 const readPartial = async filename => {
@@ -358,7 +358,6 @@ const mergeData = async (extradataFile, dest, metadata) => {
     metadata.photos,
     metadata.statuses
   ].map(markItems));
-
   return {
     ...metadata,
     ...extradata,
@@ -386,11 +385,11 @@ const buildHTML = async (metadata, partials, file) => {
     data.articles = data.articles.slice(0, 15);
     data.comics = data.comics.slice(0, 5);
     data.documents = data.documents.slice(0, 5);
+    data.links = data.links.slice(0, 30);
     data.nonfictions = data.nonfictions.slice(0, 5);
     data.novels = data.novels.slice(0, 5);
     data.photos = data.photos.slice(0, 60);
     data.statuses = data.statuses.slice(0, 15);
-    data.links = data.links.slice(0, 30);
   }
 
   if (data.isHome) {
@@ -403,9 +402,9 @@ const buildHTML = async (metadata, partials, file) => {
       data.novels[1]
     ];
     data.documents = data.documents.slice(0, 3);
+    data.links = data.links.slice(0, 5);
     data.photos = data.photos.slice(0, 5);
     data.statuses = data.statuses.slice(0, 1);
-    data.links = data.links.slice(0, 5);
   }
 
   const rendered = mustache.render(template, data, partials);
@@ -428,32 +427,32 @@ const main = async () => {
     articles,
     comics,
     documents,
+    links,
     nonfictions,
     novels,
     photos,
     statuses,
-    links,
     partials
   ] = await Promise.all([
     readJSONFile(metadataFile),
     readArticles(),
     readBooks(comicsFile),
     readDocuments(),
+    readLinks(),
     readBooks(nonfictionsFile),
     readBooks(novelsFile),
     listPhotos(),
     readStatuses(),
-    readLinks(),
     readPartials()
   ]);
   metadata.articles = articles;
   metadata.comics = comics;
   metadata.documents = documents;
+  metadata.links = links;
   metadata.nonfictions = nonfictions;
   metadata.novels = novels;
   metadata.photos = photos;
   metadata.statuses = statuses;
-  metadata.links = links;
 
   if (argv.article) {
     return buildHTML(metadata, partials, {
