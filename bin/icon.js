@@ -6,17 +6,17 @@ const toIco = require("to-ico");
 const files = [
   {
     dest: "../tmp/favicon-16.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/icon.svg",
     width: 16
   },
   {
     dest: "../tmp/favicon-32.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/icon.svg",
     width: 32
   },
   {
     dest: "../tmp/favicon-48.png",
-    src: "../src/img/favicon.svg",
+    src: "../src/img/icon.svg",
     width: 48
   },
   {
