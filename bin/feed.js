@@ -161,6 +161,7 @@ const extendPhoto = photo => {
     description: link,
     link: link,
     published: getPhotoDatetime(photo),
+    title: photo,
     type: "photo"
   };
 };
@@ -182,6 +183,7 @@ const extendStatus = status => ({
   ...status,
   description: status.text,
   link: `/statuses/#on-${status.published}`,
+  title: status.text,
   type: "status"
 });
 
