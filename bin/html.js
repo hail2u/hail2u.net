@@ -452,6 +452,22 @@ const main = async () => {
   metadata.novels = novels;
   metadata.photos = photos;
   metadata.statuses = statuses;
+  metadata.books = [
+    ...comics,
+    ...nonfictions,
+    ...novels
+  ].sort(compareByPublished);
+  metadata.items = [
+    ...articles.slice(0, itemLength),
+    ...comics.slice(0, itemLength),
+    ...documents.slice(0, itemLength),
+    ...links.slice(0, itemLength),
+    ...nonfictions.slice(0, itemLength),
+    ...novels.slice(0, itemLength),
+    ...photos.slice(0, itemLength),
+    ...statuses.slice(0, itemLength)
+  ].sort(compareByPublished)
+    .slice(0, itemLength);
 
   if (argv.article) {
     return buildHTML(metadata, partials, {
@@ -470,22 +486,6 @@ const main = async () => {
     )));
   }
 
-  metadata.books = [
-    ...comics,
-    ...nonfictions,
-    ...novels
-  ].sort(compareByPublished);
-  metadata.items = [
-    ...articles.slice(0, itemLength),
-    ...comics.slice(0, itemLength),
-    ...documents.slice(0, itemLength),
-    ...links.slice(0, itemLength),
-    ...nonfictions.slice(0, itemLength),
-    ...novels.slice(0, itemLength),
-    ...photos.slice(0, itemLength),
-    ...statuses.slice(0, itemLength)
-  ].sort(compareByPublished)
-    .slice(0, itemLength);
   return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
 };
 
