@@ -28,12 +28,6 @@ const files = [
     src: "../src/bookshelf/index.mustache"
   },
   {
-    dest: "../dist/bookshelf/log.html",
-    isLog: true,
-    json: "../src/bookshelf/index.json",
-    src: "../src/bookshelf/log.mustache"
-  },
-  {
     dest: "../dist/blog/index.html",
     isLog: true,
     json: "../src/blog/index.json",
@@ -60,12 +54,6 @@ const files = [
     dest: "../dist/photos/index.html",
     json: "../src/photos/index.json",
     src: "../src/photos/index.mustache"
-  },
-  {
-    dest: "../dist/photos/log.html",
-    isLog: true,
-    json: "../src/photos/index.json",
-    src: "../src/photos/log.mustache"
   },
   {
     dest: "../dist/sitemap.xml",
@@ -372,6 +360,16 @@ const mergeData = async (extradataFile, dest, metadata) => {
   };
 };
 
+const markFirstItem = items => {
+  const firstItem = items.shift();
+  firstItem.isFirstInMonth = true;
+  firstItem.isFirstInYear = true;
+  return [
+    firstItem,
+    ...items
+  ];
+};
+
 const buildHTML = async (metadata, partials, file) => {
   const [data, template] = await Promise.all([
     mergeData(file.json, file.dest, metadata),
@@ -379,12 +377,11 @@ const buildHTML = async (metadata, partials, file) => {
   ]);
   data.isLog = file.isLog;
 
-  if (data.isLog && file.dest.endsWith("/log.html")) {
-    data.canonical = `${data.canonical}log.html`;
-  }
-
   if (!data.isLog) {
+    data.otherBooks = markFirstItem(data.books.slice(60));
+    data.otherPhotos = markFirstItem(data.photos.slice(60));
     data.articles = data.articles.slice(0, 15);
+    data.books = data.books.slice(0, 60);
     data.comics = data.comics.slice(0, 5);
     data.documents = data.documents.slice(0, 5);
     data.links = data.links.slice(0, 30);
