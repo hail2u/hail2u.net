@@ -1,10 +1,9 @@
 (() => {
   const appendOthers = event => {
     const button = event.target;
-    const to = document.querySelector("main");
-    const others = document.querySelector("template").content;
+    const others = document.querySelector("template");
     button.hidden = true;
-    to.appendChild(others);
+    others.parentNode.appendChild(others.content);
   };
 
   document.querySelector("button").addEventListener("click", appendOthers);
