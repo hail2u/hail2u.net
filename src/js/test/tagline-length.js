@@ -1,15 +1,6 @@
 const tagline = document.querySelector("p");
 
-document.querySelector("main h1").addEventListener("click", () => {
-  if (tagline.hidden) {
-    tagline.hidden = false;
-    return;
-  }
-
-  tagline.hidden = true;
-});
-
-tagline.addEventListener("click", () => {
+document.getElementById("test-tagline-length").addEventListener("click", () => {
   const oldTagline = tagline.textContent;
 
   if (tagline.dataset.taglinestatus === "default") {
@@ -27,6 +18,13 @@ tagline.addEventListener("click", () => {
     return;
   }
 
+  if (tagline.dataset.taglinestatus === "short") {
+    tagline.hidden = true;
+    tagline.dataset.taglinestatus = "hidden";
+    return;
+  }
+
+  tagline.hidden = false;
   tagline.textContent = tagline.dataset.shorttagline;
   tagline.dataset.shorttagline = oldTagline;
   tagline.dataset.taglinestatus = "default";
