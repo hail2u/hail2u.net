@@ -29,13 +29,11 @@ const files = [
   },
   {
     dest: "../dist/blog/index.html",
-    isLog: true,
     json: "../src/blog/index.json",
     src: "../src/blog/index.mustache"
   },
   {
     dest: "../dist/documents/index.html",
-    isLog: true,
     json: "../src/documents/index.json",
     src: "../src/documents/index.mustache"
   },
@@ -46,7 +44,6 @@ const files = [
   },
   {
     dest: "../dist/links/index.html",
-    isLog: true,
     json: "../src/links/index.json",
     src: "../src/links/index.mustache"
   },
@@ -57,13 +54,11 @@ const files = [
   },
   {
     dest: "../dist/sitemap.xml",
-    isLog: true,
     json: "../src/sitemap.json",
     src: "../src/sitemap.mustache"
   },
   {
     dest: "../dist/statuses/index.html",
-    isLog: true,
     json: "../src/statuses/index.json",
     src: "../src/statuses/index.mustache"
   }
@@ -375,7 +370,6 @@ const buildHTML = async (metadata, partials, file) => {
     mergeData(file.json, file.dest, metadata),
     fs.readFile(file.src, "utf8")
   ]);
-  data.isLog = file.isLog;
 
   if (!data.isLog) {
     data.otherBooks = markFirstItem(data.books.slice(36));
