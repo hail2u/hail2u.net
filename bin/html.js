@@ -378,31 +378,25 @@ const buildHTML = async (metadata, partials, file) => {
   data.isLog = file.isLog;
 
   if (!data.isLog) {
-    data.otherBooks = markFirstItem(data.books.slice(60));
-    data.otherPhotos = markFirstItem(data.photos.slice(60));
-    data.articles = data.articles.slice(0, 15);
-    data.books = data.books.slice(0, 60);
-    data.comics = data.comics.slice(0, 5);
-    data.documents = data.documents.slice(0, 5);
-    data.links = data.links.slice(0, 30);
-    data.nonfictions = data.nonfictions.slice(0, 5);
-    data.novels = data.novels.slice(0, 5);
-    data.photos = data.photos.slice(0, 60);
-    data.statuses = data.statuses.slice(0, 15);
+    data.otherBooks = markFirstItem(data.books.slice(36));
+    data.otherPhotos = markFirstItem(data.photos.slice(36));
+    data.books = data.books.slice(0, 36);
+    data.photos = data.photos.slice(0, 36);
   }
 
   if (data.isHome) {
     data.articles = data.articles.slice(0, 5);
     data.books = [
-      data.novels[0],
       data.nonfictions[0],
+      data.novels[0],
       data.comics[0],
       data.nonfictions[1],
-      data.novels[1]
+      data.novels[1],
+      data.comics[1]
     ];
     data.documents = data.documents.slice(0, 3);
     data.links = data.links.slice(0, 5);
-    data.photos = data.photos.slice(0, 5);
+    data.photos = data.photos.slice(0, 6);
     data.statuses = data.statuses.slice(0, 1);
   }
 
