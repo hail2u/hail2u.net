@@ -1,10 +1,8 @@
 (() => {
-  const appendOthers = event => {
-    const button = event.target;
+  document.querySelector("button").addEventListener("click", event => {
     const others = document.querySelector("template");
-    button.hidden = true;
     others.parentNode.appendChild(others.content);
-  };
-
-  document.querySelector("button").addEventListener("click", appendOthers);
+    const button = event.target;
+    button.hidden = true;
+  });
 })();
