@@ -133,8 +133,7 @@ const selectDraft = drafts => new Promise(resolve => {
     const menuitem = n.content
       .trim()
       .split(/\n+/)[0]
-      .replace(/^# /, "")
-      .replace(/^<h1>(.*?)<\/h1>$/, "$1");
+      .replace(/^<h2>(.*?)<\/h2>$/, "$1");
     menu.write(`${i + 1}. ${menuitem}
 `);
   });
@@ -163,8 +162,8 @@ const checkSelectedName = name => {
 };
 
 const checkSelectedContent = content => {
-  if (!content.startsWith("# ") && !content.startsWith("<h1>")) {
-    throw new Error("This draft does not have a title. A draft content must start with `# ` or `<h1>`.");
+  if (!content.startsWith("<h2>")) {
+    throw new Error("This draft does not have a title. A draft content must start with `<h2>`.");
   }
 
   return true;
