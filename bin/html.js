@@ -243,9 +243,9 @@ const readPartials = async () => {
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
-const findCover = (image, defaultCardType, defaultCover) => {
+const findCover = (image, defaultTwitterCard, defaultCover) => {
   if (!image) {
-    return [defaultCardType, defaultCover];
+    return [defaultTwitterCard, defaultCover];
   }
 
   return ["summary_large_image", image[1]];
@@ -312,9 +312,9 @@ const mergeData = async (extradataFile, dest, metadata) => {
   if (extradataFile === articleJSON) {
     const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
-    const [cardType, cover] = findCover(
+    const [twitterCard, cover] = findCover(
       firstImage,
-      metadata.cardType,
+      metadata.twitterCard,
       metadata.cover
     );
     return {
@@ -322,9 +322,9 @@ const mergeData = async (extradataFile, dest, metadata) => {
       ...extradata,
       ...article,
       canonical: article.link,
-      cardType: cardType,
       cover: cover,
-      shortTitle: article.title
+      shortTitle: article.title,
+      twitterCard: twitterCard
     };
   }
 
