@@ -1,5 +1,6 @@
 const CleanCSS = require("clean-css");
 const fs = require("fs").promises;
+const { version } = require("../package.json");
 
 const files = [
   {
@@ -11,7 +12,7 @@ const files = [
     src: "../src/css/documents.css"
   },
   {
-    dest: "../tmp/main.min.css",
+    dest: "../tmp/main.{{version}}.min.css",
     src: "../src/css/main.css"
   }
 ];
@@ -20,9 +21,11 @@ const minifier = new CleanCSS({
   returnPromise: true
 });
 
+const versioning = filename => filename.replace(/{{version}}/g, version);
+
 const buildCSS = async file => {
   const minified = await minifier.minify([file.src]);
-  await fs.writeFile(file.dest, minified.styles);
+  await fs.writeFile(versioning(file.dest), minified.styles);
 };
 
 process.chdir(__dirname);

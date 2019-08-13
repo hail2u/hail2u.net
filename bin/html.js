@@ -5,6 +5,7 @@ const mustache = require("mustache");
 const path = require("path");
 const { readJSONFile } = require("../lib/json");
 const toPOSIXPath = require("../lib/to-posix-path");
+const { version } = require("../package.json");
 
 const argv = minimist(process.argv.slice(2), {
   alias: {
@@ -433,18 +434,13 @@ const main = async () => {
     readPartials()
   ]);
   metadata.articles = articles;
-  metadata.comics = comics;
-  metadata.documents = documents;
-  metadata.links = links;
-  metadata.nonfictions = nonfictions;
-  metadata.novels = novels;
-  metadata.photos = photos;
-  metadata.statuses = statuses;
   metadata.books = [
     ...comics,
     ...nonfictions,
     ...novels
   ].sort(compareByPublished);
+  metadata.comics = comics;
+  metadata.documents = documents;
   metadata.items = [
     ...articles.slice(0, itemLength),
     ...comics.slice(0, itemLength),
@@ -456,6 +452,12 @@ const main = async () => {
     ...statuses.slice(0, itemLength)
   ].sort(compareByPublished)
     .slice(0, itemLength);
+  metadata.links = links;
+  metadata.nonfictions = nonfictions;
+  metadata.novels = novels;
+  metadata.photos = photos;
+  metadata.statuses = statuses;
+  metadata.version = version;
 
   if (argv.article) {
     return buildHTML(metadata, partials, {
