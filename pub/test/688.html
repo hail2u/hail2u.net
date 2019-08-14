@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+
+    <title>Implementing A Back-to-Top Button with the Intersection Observer API</title>
+
+    <style>
+      body {
+        margin-bottom: 400vh;
+      }
+
+      #to-top {
+        bottom: 1rem;
+        position: fixed;
+        right: 1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Implementing A Back-to-Top Button with the Intersection Observer API</h1>
+
+      <p><code>IntersectionObserver</code>を使って、いわゆるトップに戻るボタンを実装する簡単な例です。</p>
+
+      <p>このグローバル・ヘッダーにあたる要素が画面から消えたら、ページの右下にトップに戻るボタンが現れます。逆にグローバル・ヘッダーが少しでも表示されていると、ボタンは消えます。</p>
+    </header>
+
+    <main>
+      <h2>実装コード</h2>
+
+      <p>グローバル・ヘッダーが見えないくらいスクロールしたら……というシナリオを想定しています。その場合、細かい調整は不要になるので、以下のようにごく短いコードで実装できます。</p>
+
+      <h3>HTML</h3>
+
+      <pre class="language-html"><code>&lt;header&gt;
+  ...
+&lt;/header&gt;
+
+&lt;button id="to-top" hidden&gt;↑ Back to Top&lt;/button&gt;
+</code></pre>
+
+      <h3>CSS</h3>
+
+      <pre class="language-css"><code>#to-top {
+  bottom: 1rem;
+  position: fixed;
+  right: 1rem;
+}
+</code></pre>
+
+      <h3>JavaScript</h3>
+
+      <pre class="language-javascript"><code>var toTop = document.getElementById("to-top");
+toTop.addEventListener("click", function () {
+  window.scrollTo(0, 0);
+});
+(new IntersectionObserver(function (entries) {
+  toTop.hidden = entries[0].isIntersecting;
+})).observe(document.querySelector("header"));
+</code></pre>
+    </main>
+
+    <button id="to-top" hidden>↑ Back to Top</button>
+
+    <script>
+      var toTop = document.getElementById("to-top");
+      toTop.addEventListener("click", function () {
+        window.scrollTo(0, 0);
+      });
+      (new IntersectionObserver(function (entries) {
+        toTop.hidden = entries[0].isIntersecting;
+      })).observe(document.querySelector("header"));
+    </script>
+  </body>
+</html>
