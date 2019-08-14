@@ -183,10 +183,7 @@ const renderSelected = (template, selected, partials) => mustache
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");
-  const partials = {
-    css: await fs.readFile(selected.css, "utf8")
-  };
-  const rendered = renderSelected(template, selected, partials);
+  const rendered = renderSelected(template, selected);
   const [open] = await Promise.all([
     whichAsync("open"),
     fs.writeFile(selected.dest, rendered)
@@ -211,7 +208,6 @@ const main = async () => {
 
   return testSelected({
     ...selected,
-    css: "../src/partial/css.mustache",
     dest: "../tmp/__test.html",
     template: "../src/blog/test.mustache"
   });
