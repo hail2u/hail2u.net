@@ -123,11 +123,12 @@ const listDrafts = async () => {
 };
 
 const selectDraft = drafts => new Promise(resolve => {
+  process.stdin.isTTY = true;
+  process.stdout.isTTY = true;
   const menu = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
-
   menu.write("0. QUIT\n");
   drafts.forEach((n, i) => {
     const menuitem = n.content
