@@ -1,4 +1,4 @@
-const tagline = document.querySelector("body > header p:first-of-type");
+const tagline = document.querySelector("body > header h1");
 
 document.getElementById("test-tagline-length").addEventListener("click", () => {
   const oldTagline = tagline.textContent;
