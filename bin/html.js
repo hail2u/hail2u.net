@@ -374,7 +374,9 @@ const buildHTML = async (metadata, partials, file) => {
 
   if (!data.isLog) {
     data.otherBooks = markFirstItem(data.books.slice(36));
+    data.numOtherBooks = data.otherBooks.length;
     data.otherPhotos = markFirstItem(data.photos.slice(36));
+    data.numOtherPhotos = data.otherPhotos.length;
     data.books = data.books.slice(0, 36);
     data.photos = data.photos.slice(0, 36);
   }
