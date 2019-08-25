@@ -7,4 +7,5 @@
     self.parentNode.hidden = true;
   });
   button.parentNode.appendChild(button.content);
+  document.getElementById("append-others-nav").hidden = true;
 })();
