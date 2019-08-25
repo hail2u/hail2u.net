@@ -24,6 +24,11 @@ const documentsFile = "../src/documents/documents.json";
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
+    dest: "../dist/bookshelf/log.html",
+    json: "../src/bookshelf/log.json",
+    src: "../src/bookshelf/log.mustache"
+  },
+  {
     dest: "../dist/bookshelf/index.html",
     json: "../src/bookshelf/index.json",
     src: "../src/bookshelf/index.mustache"
@@ -52,6 +57,11 @@ const files = [
     dest: "../dist/opensearch.xml",
     json: "../src/opensearch.json",
     src: "../src/opensearch.mustache"
+  },
+  {
+    dest: "../dist/photos/log.html",
+    json: "../src/photos/log.json",
+    src: "../src/photos/log.mustache"
   },
   {
     dest: "../dist/photos/index.html",
