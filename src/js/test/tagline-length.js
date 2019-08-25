@@ -1,6 +1,6 @@
-const tagline = document.querySelector("body > header h1");
+const tagline = document.querySelector(".js-test-tagline-length-tagline");
 
-document.getElementById("test-tagline-length").addEventListener("click", () => {
+document.querySelector(".js-test-tagline-length-button").addEventListener("click", () => {
   const oldTagline = tagline.textContent;
 
   if (tagline.dataset.status === "default") {
