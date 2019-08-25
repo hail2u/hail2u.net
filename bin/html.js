@@ -25,7 +25,7 @@ const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const files = [
   {
     dest: "../dist/bookshelf/log.html",
-    json: "../src/bookshelf/log.json",
+    json: "../src/bookshelf/index.json",
     src: "../src/bookshelf/log.mustache"
   },
   {
@@ -60,7 +60,7 @@ const files = [
   },
   {
     dest: "../dist/photos/log.html",
-    json: "../src/photos/log.json",
+    json: "../src/photos/index.json",
     src: "../src/photos/log.mustache"
   },
   {
@@ -387,7 +387,9 @@ const buildHTML = async (metadata, partials, file) => {
     fs.readFile(file.src, "utf8")
   ]);
 
-  if (!data.isLog) {
+  if (file.dest.endsWith("/log.html")) {
+    data.canonical = `${data.canonical}log.html`;
+  } else {
     data.otherBooks = markFirstItem(data.books.slice(36));
     data.numOtherBooks = data.otherBooks.length;
     data.otherPhotos = markFirstItem(data.photos.slice(36));
