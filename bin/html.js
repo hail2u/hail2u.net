@@ -54,11 +54,6 @@ const files = [
     src: "../src/links/index.mustache"
   },
   {
-    dest: "../dist/opensearch.xml",
-    json: "../src/opensearch.json",
-    src: "../src/opensearch.mustache"
-  },
-  {
     dest: "../dist/photos/log.html",
     json: "../src/photos/index.json",
     src: "../src/photos/log.mustache"
