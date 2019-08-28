@@ -1,6 +1,7 @@
 const ClosureCompiler = require("google-closure-compiler").jsCompiler;
 const fs = require("fs").promises;
 const path = require("path");
+const { version } = require("../package.json");
 
 const compiler = new ClosureCompiler({
   isolationMode: "IIFE",
@@ -20,6 +21,8 @@ const compileJS = jsCode => new Promise((resolve, reject) => {
   });
 });
 
+const versioning = filename => filename.replace(/.js$/g, `.${version}.js`);
+
 const buildJS = async filename => {
   if (!filename.endsWith(".js")) {
     return;
@@ -33,7 +36,7 @@ const buildJS = async filename => {
       src: code
     }
   ]);
-  const dest = path.join(destDir, filename);
+  const dest = path.join(destDir, versioning(filename));
   await fs.writeFile(dest, compiled);
 };
 
