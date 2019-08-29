@@ -21,7 +21,7 @@ const compileJS = jsCode => new Promise((resolve, reject) => {
   });
 });
 
-const versioning = filename => filename.replace(/.js$/g, `.${version}.js`);
+const versioning = filename => filename.replace(/.js$/g, `.${version}.min.js`);
 
 const buildJS = async filename => {
   if (!filename.endsWith(".js")) {
