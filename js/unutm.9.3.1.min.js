@@ -1,0 +1,1 @@
+(function(){'use strict';if(location.search){var a=location.search.replace(/[?&]utm_[^&]+/g,"").replace(/^&/,"?");history.replaceState(null,"",""+location.pathname+a+location.hash)};}).call(this);
