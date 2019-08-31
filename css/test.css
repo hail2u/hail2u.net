@@ -4,7 +4,30 @@
 :root {
   --color-fuchsia: hsl(300, 100%, 50%);
   --color-lime: hsl(120, 100%, 50%);
-  --image-column: linear-gradient(
+}
+
+/* Dark Mode */
+.js-dark-mode:root {
+  --color-bg: var(--color-black);
+  --color-bg-near: var(--color-charcoal);
+  --color-link: var(--color-sky);
+  --color-fg: var(--color-white);
+  --color-fg-near: var(--color-gray);
+}
+
+@media (prefers-color-scheme: dark) {
+  .js-dark-mode:root {
+    --color-bg: var(--color-white);
+    --color-bg-near: var(--color-gray);
+    --color-link: var(--color-blue);
+    --color-fg: var(--color-black);
+    --color-fg-near: var(--color-charcoal);
+  }
+}
+
+/* Column */
+.js-test-column::before {
+  --background-image: linear-gradient(
     to right,
     var(--color-fuchsia) 0,
     var(--color-fuchsia) var(--width-gap),
@@ -13,13 +36,26 @@
     var(--color-fuchsia) calc(100% - var(--width-gap)),
     var(--color-fuchsia) 100%
   );
-  --text-breakpoint: "Default";
-  --width-column: 100%;
+  --background-size-x: 100%;
+
+  background-image: var(--background-image);
+  background-position: center;
+  background-repeat: repeat-y;
+  background-size: var(--background-size-x) 1px;
+  bottom: 0;
+  content: "";
+  left: 0;
+  opacity: 0.2;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1;
 }
 
 @media (min-width: 657px) {
-  :root {
-    --image-column: linear-gradient(
+  .js-test-column::before {
+    --background-image: linear-gradient(
       to right,
       var(--color-fuchsia) 0,
       var(--color-fuchsia) var(--width-gap),
@@ -28,14 +64,13 @@
       var(--color-fuchsia) calc(var(--width-gap) + var(--width-main)),
       var(--color-fuchsia) var(--width-main-outer)
       );
-    --text-breakpoint: "Large: 657px";
-    --width-column: var(--width-main-outer);
+    --background-size-x: var(--width-main-outer);
   }
 }
 
 @media (min-width: 1208px) {
-  :root {
-    --image-column: linear-gradient(
+  .js-test-column::before {
+    --background-image: linear-gradient(
       to right,
       var(--color-fuchsia) 0,
       var(--color-fuchsia) var(--width-gap),
@@ -52,45 +87,8 @@
       var(--color-fuchsia) calc(var(--width-gap) + var(--width-whole)),
       var(--color-fuchsia) var(--width-whole-outer)
     );
-    --text-breakpoint: "Huge: 1208px";
-    --width-column: var(--width-whole-outer);
+    --background-size-x: var(--width-whole-outer);
   }
-}
-
-/* Dark Mode */
-.js-dark-mode:root {
-  --color-bg: var(--color-black);
-  --color-bg-near: var(--color-charcoal);
-  --color-content-links: var(--color-sky);
-  --color-fg: var(--color-white);
-  --color-fg-near: var(--color-gray);
-}
-
-@media (prefers-color-scheme: dark) {
-  .js-dark-mode:root {
-    --color-bg: var(--color-white);
-    --color-bg-near: var(--color-gray);
-    --color-content-links: var(--color-blue);
-    --color-fg: var(--color-black);
-    --color-fg-near: var(--color-charcoal);
-  }
-}
-
-/* Column */
-.js-test-column::before {
-  background-image: var(--image-column);
-  background-position: center;
-  background-repeat: repeat-y;
-  background-size: var(--width-column) 1px;
-  bottom: 0;
-  content: "";
-  left: 0;
-  opacity: 0.2;
-  pointer-events: none;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 1;
 }
 
 /* Element */
@@ -100,15 +98,29 @@
 
 /* Breakpoint */
 body::after {
+  --content: "Default";
+
   background-color: var(--color-bg-near);
   bottom: var(--margin-small);
-  content: var(--text-breakpoint);
+  content: var(--content);
   display: block;
   font-size: calc(var(--ratio-text-small) * 1rem);
   line-height: 1;
   padding: var(--width-gap-small);
   position: fixed;
   right: var(--margin-small);
+}
+
+@media (min-width: 657px) {
+  body::after {
+    --content: "Large: 657px";
+  }
+}
+
+@media (min-width: 1208px) {
+  body::after {
+    --content: "Huge: 1208px";
+  }
 }
 
 /* Color */
@@ -146,7 +158,7 @@ body::after {
 }
 
 .test-color li:nth-child(5) {
-  background-color: var(--color-content-links);
+  background-color: var(--color-link);
   color: var(--color-bg);
 }
 
