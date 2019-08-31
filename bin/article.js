@@ -184,7 +184,12 @@ const renderSelected = (template, selected, partials) => mustache
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.template, "utf8");
-  const rendered = renderSelected(template, selected);
+  const [title, ...body] = selected.content.split("\n");
+  const rendered = renderSelected(template, {
+    ...selected,
+    body: body.join(""),
+    title: title
+  });
   const [open] = await Promise.all([
     whichAsync("open"),
     fs.writeFile(selected.dest, rendered)
