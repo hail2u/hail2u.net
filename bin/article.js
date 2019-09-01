@@ -187,7 +187,7 @@ const testSelected = async selected => {
   const [title, ...body] = selected.content.split("\n");
   const rendered = renderSelected(template, {
     ...selected,
-    body: body.join(""),
+    body: body.join("\n"),
     title: title
   });
   const [open] = await Promise.all([
