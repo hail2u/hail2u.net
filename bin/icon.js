@@ -3,6 +3,7 @@ const path = require("path");
 const sharp = require("sharp");
 const toIco = require("to-ico");
 
+const faviconFile = "../dist/favicon.ico";
 const files = [
   {
     dest: "../tmp/favicon-16.png",
@@ -43,7 +44,7 @@ const main = async () => {
   const pngs = await Promise.all(files.map(generatePNG));
   const srcs = await Promise.all(pngs.filter(isFaviconSource).map(readPNG));
   const favicon = await toIco(srcs);
-  await fs.writeFile("../dist/favicon.ico", favicon);
+  await fs.writeFile(faviconFile, favicon);
 };
 
 process.chdir(__dirname);
