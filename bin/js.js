@@ -1,6 +1,5 @@
 const ClosureCompiler = require("google-closure-compiler").jsCompiler;
 const fs = require("fs").promises;
-const path = require("path");
 const { version } = require("../package.json");
 
 const compiler = new ClosureCompiler({
@@ -8,8 +7,20 @@ const compiler = new ClosureCompiler({
   languageIn: "ECMASCRIPT_2018",
   languageOut: "ECMASCRIPT5_STRICT"
 });
-const destDir = "../dist/js/";
-const srcDir = "../src/js/";
+const files = [
+  {
+    dest: "../tmp/append-others.{{version}}.min.js",
+    src: "../src/js/append-others.js"
+  },
+  {
+    dest: "../tmp/reldate.{{version}}.min.js",
+    src: "../src/js/reldate.js"
+  },
+  {
+    dest: "../tmp/unutm.{{version}}.min.js",
+    src: "../src/js/unutm.js"
+  }
+];
 
 const compileJS = jsCode => new Promise((resolve, reject) => {
   compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
@@ -21,32 +32,21 @@ const compileJS = jsCode => new Promise((resolve, reject) => {
   });
 });
 
-const versioning = filename => filename.replace(/.js$/g, `.${version}.min.js`);
+const versioning = filename => filename.replace(/{{version}}/g, version);
 
-const buildJS = async filename => {
-  if (!filename.endsWith(".js")) {
-    return;
-  }
-
-  const src = path.join(srcDir, filename);
-  const code = await fs.readFile(src, "utf8");
+const buildJS = async file => {
+  const code = await fs.readFile(file.src, "utf8");
   const compiled = await compileJS([
     {
       sourceMap: null,
       src: code
     }
   ]);
-  const dest = path.join(destDir, versioning(filename));
-  await fs.writeFile(dest, compiled);
-};
-
-const main = async () => {
-  const filenames = await fs.readdir(srcDir);
-  Promise.all(filenames.map(buildJS));
+  await fs.writeFile(versioning(file.dest), compiled);
 };
 
 process.chdir(__dirname);
-main().catch(e => {
+Promise.all(files.map(buildJS)).catch(e => {
   process.exitCode = 1;
   console.trace(e);
 });
