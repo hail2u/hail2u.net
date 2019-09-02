@@ -117,7 +117,6 @@ const readBooks = async file => {
 
 const extendDocument = document => ({
   ...document,
-  description: document.link,
   type: "document"
 });
 

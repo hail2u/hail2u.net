@@ -394,7 +394,7 @@ const buildHTML = async (metadata, partials, file) => {
   }
 
   if (data.isHome) {
-    data.articles = data.articles.slice(0, 5);
+    data.articles = data.articles.slice(0, 6);
     data.books = [
       data.nonfictions[0],
       data.novels[0],
@@ -404,7 +404,7 @@ const buildHTML = async (metadata, partials, file) => {
       data.comics[1]
     ];
     data.documents = data.documents.slice(0, 3);
-    data.links = data.links.slice(0, 5);
+    data.links = data.links.slice(0, 6);
     data.photos = data.photos.slice(0, 6);
     data.statuses = data.statuses.slice(0, 1);
   }
