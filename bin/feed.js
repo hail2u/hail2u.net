@@ -100,8 +100,8 @@ const extendBook = book => {
   const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
   return {
     ...book,
-    body: `<p><a href="${link}"><img src="${image}"></a></p>`,
-    description: image,
+    body: `<p><a href="${link}"><img alt="${book.title}" src="${image}"></a></p>`,
+    description: book.title,
     link: link,
     type: "book"
   };
