@@ -97,11 +97,12 @@ const hasPublished = book => book.published;
 
 const extendBook = book => {
   const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
+  const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
   return {
     ...book,
-    body: `<p><img src="${image}"></p>`,
+    body: `<p><a href="${link}"><img src="${image}"></a></p>`,
     description: image,
-    link: `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`,
+    link: link,
     type: "book"
   };
 };
@@ -149,6 +150,14 @@ const isPhoto = filename => {
   return false;
 };
 
+const toAbsoluteURL = url => {
+  if (url.startsWith("/")) {
+    return `https://hail2u.net${url}`;
+  }
+
+  return url;
+};
+
 const getPhotoDatetime = photo => {
   const dt = path.basename(photo, ".jpg").split("");
   return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
@@ -156,8 +165,9 @@ const getPhotoDatetime = photo => {
 
 const extendPhoto = photo => {
   const link = `/img/photos/${photo}`;
+  const image = toAbsoluteURL(link);
   return {
-    body: `<p><img src="https://hail2u.net${link}"></p>`,
+    body: `<p><a href="${image}"><img src="${image}"></a></p>`,
     description: link,
     link: link,
     published: getPhotoDatetime(photo),
@@ -207,14 +217,6 @@ const isValidType = (type, item) => {
   }
 
   return false;
-};
-
-const toAbsoluteURL = url => {
-  if (url.startsWith("/")) {
-    return `https://hail2u.net${url}`;
-  }
-
-  return url;
 };
 
 const pad = number => String(number).padStart(2, "0");
