@@ -73,6 +73,16 @@ const photosDir = "../src/img/photos/";
 const statusesFile = "../src/statuses/statuses.json";
 const linksFile = "../src/links/links.json";
 
+const toAbsoluteURL = url => {
+  if (url.startsWith("/")) {
+    return `https://hail2u.net${url}`;
+  }
+
+  return url;
+};
+
+const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
+
 const extendArticle = article => {
   const description = decode(article.body
     .replace(/\r?\n/g, "")
@@ -80,7 +90,7 @@ const extendArticle = article => {
     .replace(/<.*?>/g, ""));
   return {
     ...article,
-    body: article.body.replace(/(href|src)="(\/.*?)"/g, '$1="https://hail2u.net$2"'),
+    body: article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
     description: description,
     type: "article"
   };
@@ -147,14 +157,6 @@ const isPhoto = filename => {
   }
 
   return false;
-};
-
-const toAbsoluteURL = url => {
-  if (url.startsWith("/")) {
-    return `https://hail2u.net${url}`;
-  }
-
-  return url;
 };
 
 const getPhotoDatetime = photo => {
