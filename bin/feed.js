@@ -168,8 +168,8 @@ const extendPhoto = photo => {
   const link = `/img/photos/${photo}`;
   const image = toAbsoluteURL(link);
   return {
-    body: `<p><a href="${image}"><img src="${image}"></a></p>`,
-    description: link,
+    body: `<p><a href="${image}"><img alt="${photo}" src="${image}"></a></p>`,
+    description: photo,
     link: link,
     published: getPhotoDatetime(photo),
     title: photo,
