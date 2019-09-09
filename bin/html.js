@@ -1,5 +1,6 @@
 const { decode, encode } = require("../lib/html-entities");
 const fs = require("fs").promises;
+const highlight = require("../lib/highlight");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -410,7 +411,7 @@ const buildHTML = async (metadata, partials, file) => {
   }
 
   const rendered = mustache.render(template, data, partials);
-  await fs.writeFile(file.dest, rendered);
+  await fs.writeFile(file.dest, highlight(rendered));
 };
 
 const toFilesFormat = article => ({

@@ -1,5 +1,6 @@
 const { decode } = require("../lib/html-entities");
 const fs = require("fs").promises;
+const highlight = require("../lib/highlight");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
@@ -192,7 +193,7 @@ const testSelected = async selected => {
   });
   const [open] = await Promise.all([
     whichAsync("open"),
-    fs.writeFile(selected.dest, rendered)
+    fs.writeFile(selected.dest, highlight(rendered))
   ]);
   return runCommand(open, [selected.dest]);
 };
