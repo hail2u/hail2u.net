@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="PubSubHubbub Working Draftのv0.4が出た。某氏のブックマーク→MLを流し読んでPublisher側では何か作業する必要はないように読んでしまったけど、どうもatom:linkの代わりにLink HTTPヘッダーを使って購読先を探せるようにするようにということのようだ。JSONや画像を筆頭にあらゆるもののPub/Subもサポートするようにするためみたい。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,18 +66,18 @@
 
 <figure>
 <blockquote>
-<p>The HTTP [RFC2616] response from the publisher <mark>MUST</mark> include at least one Link Header [RFC5988] with <code>rel=hub</code> (a hub link header) as well as exactly one Link Header [RFC5988] with <code>rel=self</code> (the self link header).</p>
+<p>The HTTP [RFC2616] response from the publisher MUST include at least one Link Header [RFC5988] with <code>rel=hub</code> (a hub link header) as well as exactly one Link Header [RFC5988] with <code>rel=self</code> (the self link header).</p>
 </blockquote>
 <figcaption><cite><a href="http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.4.html#discovery">4. Discovery</a></cite></figcaption>
 </figure>
 
 <p>HTTPレスポンスにおいてMUSTとなっており、従来の<code>atom:link</code>は後方互換性のためという扱い。値は固定のはずなのでApache HTTP Serverでは<a href="http://httpd.apache.org/docs/2.4/en/mod/mod_headers.html">mod_headers</a>を使うだけで良さそう。</p>
 
-<pre><code class="language-config">&lt;FilesMatch "^feed$"&gt;
-  ForceType "application/rss+xml"
-  Header append Link "&lt;http://hail2u.net/feed&gt;; rel=\"self\""
-  Header append Link "&lt;https://pubsubhubbub.appspot.com/&gt;; rel=\"hub\""
-&lt;/FilesMatch&gt;
+<pre><code class="hljs language-apache"><span class="hljs-section">&lt;FilesMatch "^feed$"&gt;</span>
+  <span class="hljs-attribute">ForceType</span> <span class="hljs-string">"application/rss+xml"</span>
+  <span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">"&lt;http://hail2u.net/feed&gt;; rel=\"self\""</span>
+  <span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">"&lt;https://pubsubhubbub.appspot.com/&gt;; rel=\"hub\""</span>
+<span class="hljs-section">&lt;/FilesMatch&gt;</span>
 </code></pre>
 
 <p>1行で無理やり書いたりせずに、<code>Header append</code>を使ってやると安全でキレイに書ける。<code>rel=hub</code>の追加も後ろに並べて追加するだけ。もちろんSubscriber側の対応には時間がかかると思うので従来の<code>atom:link</code>を使ったものも続けてサポートするべき。</p></div>

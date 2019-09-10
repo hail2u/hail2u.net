@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" itemprop="description">
     <link href="/img/blog/remove-utm_xxx-for-page-owner.png" itemprop="image">
@@ -70,20 +70,20 @@
 
 <p>正規化する関数を発火させるタイミングの制御には色々アプローチがあると思うけど、素で書くといろいろ面倒そうなので<a href="http://www.google.com/analytics/">Google Analytics</a>のコードに混ぜることにした。</p>
 
-<pre><code class="language-js">var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-XXXXXX-X']);
-_gaq.push(['_trackPageview']);
-_gaq.push(function() {
-  var h = history, l = location, u;
-  if (!l.search || !h.replaceState) return;
-  u = l.pathname + l.search.replace(/[?&amp;]utm_[^&amp;]+/g, '').replace(/^&amp;/, '?') + l.hash;
-  h.replaceState(null, '', u);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> _gaq = _gaq || [];
+_gaq.push([<span class="hljs-string">'_setAccount'</span>, <span class="hljs-string">'UA-XXXXXX-X'</span>]);
+_gaq.push([<span class="hljs-string">'_trackPageview'</span>]);
+_gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">var</span> h = history, l = location, u;
+  <span class="hljs-keyword">if</span> (!l.search || !h.replaceState) <span class="hljs-keyword">return</span>;
+  u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) + l.hash;
+  h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
 });
 
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>); ga.type = <span class="hljs-string">'text/javascript'</span>; ga.async = <span class="hljs-literal">true</span>;
+  ga.src = (<span class="hljs-string">'https:'</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">'https://ssl'</span> : <span class="hljs-string">'http://www'</span>) + <span class="hljs-string">'.google-analytics.com/ga.js'</span>;
+  <span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
 })();
 </code></pre>
 

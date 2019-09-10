@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="前に作って愛用しているClosure Compiler ServiceのREST APIを叩くPerlスクリプトにローカルのJavaScriptファイルを読み込んでコンパイルに含められる機能を付けた。Closure CompilerのJARファイルを使ってローカルで動かしても良かったんだけど、APIやWeb UIのコメントでオプション設定を書く方法（Greasemonkey的な奴）が気に入っているので@code_pathというパラメーターを追加する形にした。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,11 +66,11 @@
 
 <p>コンパイルするJavaScriptファイルでは</p>
 
-<pre><code class="language-js">// ==ClosureCompiler==
-// @code_path foo.js
-// @code_path bar.js
-// @code_url  http://example.com/js/buz.js
-// ==/ClosureCompiler==
+<pre><code class="hljs language-js"><span class="hljs-comment">// ==ClosureCompiler==</span>
+<span class="hljs-comment">// @code_path foo.js</span>
+<span class="hljs-comment">// @code_path bar.js</span>
+<span class="hljs-comment">// @code_url  http://example.com/js/buz.js</span>
+<span class="hljs-comment">// ==/ClosureCompiler==</span>
 </code></pre>
 
 <p>というように<code>@code_path</code>で取り込むJavaScriptファイルのパスを指定するだけ。<code>@code_url</code>等の他のオプションとはバッティングしないけど、依存関係によって書く順序には注意する必要がある。これらに続けて普通にJavaScriptコードも書けるとかそこらへんはWeb UIと一緒。</p>
@@ -82,51 +82,51 @@
 
 <p>肝心のgccs.plは以下の通り。</p>
 
-<pre><code class="language-perl">#!/usr/bin/env perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/bin/env perl</span>
 
-# gccs.pl - Compile your JavaScript code with Google Closure Compiler Service
-# Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;
-# License:  http://hail2u.mit-license.org/2009
-# Modified: 2012-01-04T18:43:15+09:00
+<span class="hljs-comment"># gccs.pl - Compile your JavaScript code with Google Closure Compiler Service</span>
+<span class="hljs-comment"># Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;</span>
+<span class="hljs-comment"># License:  http://hail2u.mit-license.org/2009</span>
+<span class="hljs-comment"># Modified: 2012-01-04T18:43:15+09:00</span>
 
-use strict;
-use warnings;
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> warnings;
 
-use JSON;
-use LWP::UserAgent;
-use Path::Class qw();
+<span class="hljs-keyword">use</span> JSON;
+<span class="hljs-keyword">use</span> LWP::UserAgent;
+<span class="hljs-keyword">use</span> Path::Class <span class="hljs-string">qw()</span>;
 
-my @params = (
-  "output_info",   "compiled_code",
-  "output_format", "json",
+<span class="hljs-keyword">my</span> @params = (
+  <span class="hljs-string">"output_info"</span>,   <span class="hljs-string">"compiled_code"</span>,
+  <span class="hljs-string">"output_format"</span>, <span class="hljs-string">"json"</span>,
 );
 
 &amp;main;
-exit;
+<span class="hljs-keyword">exit</span>;
 
-sub main {
-  my @code = &lt;STDIN&gt;;
-  push @params, "js_code", join("", @code);
-  my $idx = 0;
-  my $found_metadata = 0;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">main</span> </span>{
+  <span class="hljs-keyword">my</span> @code = &lt;STDIN&gt;;
+  <span class="hljs-keyword">push</span> @params, <span class="hljs-string">"js_code"</span>, <span class="hljs-keyword">join</span>(<span class="hljs-string">""</span>, @code);
+  <span class="hljs-keyword">my</span> $idx = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">my</span> $found_metadata = <span class="hljs-number">0</span>;
 
-  while (my $line = $code[$idx++]) {
-    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
-      $found_metadata = 1;
-      last;
+  <span class="hljs-keyword">while</span> (<span class="hljs-keyword">my</span> $line = $code[$idx++]) {
+    <span class="hljs-keyword">if</span> ($line =~ <span class="hljs-regexp">/^\/\/ ==ClosureCompiler==/</span>) {
+      $found_metadata = <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">last</span>;
     }
   }
 
-  if ($found_metadata) {
-    while (my $line = $code[$idx++]) {
-      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
-        last;
-      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
-        if ($1 eq "code_path" &amp;&amp; -e $2) {
-          my $js_code = ";" . Path::Class::File-&gt;new($2)-&gt;slurp() . ";";
-          push @params, "js_code", $js_code;
-        } else {
-          push @params, $1, $2;
+  <span class="hljs-keyword">if</span> ($found_metadata) {
+    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">my</span> $line = $code[$idx++]) {
+      <span class="hljs-keyword">if</span> ($line =~ <span class="hljs-regexp">/^\/\/ ==\/ClosureCompiler==/</span>) {
+        <span class="hljs-keyword">last</span>;
+      } <span class="hljs-keyword">elsif</span> ($line =~ <span class="hljs-regexp">/^\/\/ @(\S+)\s*(.*)$/</span>) {
+        <span class="hljs-keyword">if</span> ($1 eq <span class="hljs-string">"code_path"</span> &amp;&amp; -e $2) {
+          <span class="hljs-keyword">my</span> $js_code = <span class="hljs-string">";"</span> . Path::Class::File-&gt;new($2)-&gt;slurp() . <span class="hljs-string">";"</span>;
+          <span class="hljs-keyword">push</span> @params, <span class="hljs-string">"js_code"</span>, $js_code;
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">push</span> @params, $1, $2;
         }
       }
     }
@@ -135,25 +135,25 @@ sub main {
   &amp;compile(@params);
 }
 
-sub compile {
-  my $ua = LWP::UserAgent-&gt;new;
-  my $res = $ua-&gt;post("http://closure-compiler.appspot.com/compile", \@_);
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">compile</span> </span>{
+  <span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new;
+  <span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">"http://closure-compiler.appspot.com/compile"</span>, \@_);
 
-  if ($res-&gt;is_success) {
-    my $c = from_json($res-&gt;decoded_content);
+  <span class="hljs-keyword">if</span> ($res-&gt;is_success) {
+    <span class="hljs-keyword">my</span> $c = from_json($res-&gt;decoded_content);
 
-    if (defined $c-&gt;{"serverErrors"}) {
-      foreach (@{$c-&gt;{"serverErrors"}}) {
-        warn "Error(" . $_-&gt;{"code"} . "): " . $_-&gt;{"error"};
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">defined</span> $c-&gt;{<span class="hljs-string">"serverErrors"</span>}) {
+      <span class="hljs-keyword">foreach</span> (@{$c-&gt;{<span class="hljs-string">"serverErrors"</span>}}) {
+        <span class="hljs-keyword">warn</span> <span class="hljs-string">"Error("</span> . $_-&gt;{<span class="hljs-string">"code"</span>} . <span class="hljs-string">"): "</span> . $_-&gt;{<span class="hljs-string">"error"</span>};
       }
 
-      die "Failed to compile";
-    } else {
-      binmode STDOUT;
-      print $c-&gt;{"compiledCode"};
+      <span class="hljs-keyword">die</span> <span class="hljs-string">"Failed to compile"</span>;
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">binmode</span> STDOUT;
+      <span class="hljs-keyword">print</span> $c-&gt;{<span class="hljs-string">"compiledCode"</span>};
     }
-  } else {
-    die $res-&gt;status_line;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">die</span> $res-&gt;status_line;
   }
 }
 </code></pre>

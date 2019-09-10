@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,47 +64,47 @@
 
     <div itemprop="articleBody"><p>最近になってGoogleの<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を良く使うようになった。今まで使っていた<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>と比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、<a href="http://code.google.com/intl/ja/closure/compiler/docs/gettingstarted_api.html">REST API</a>を利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！</p>
 
-<pre><code class="language-perl">#!/usr/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/bin/perl</span>
 
-# gccs.pl - Compile your JavaScript code with Google Closure Compiler Service
-# Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;
-# Author:   Kyo Nagashima &lt;kyo@hail2u.net&gt;, http://hail2u.net/
-# License:  MIT license (http://opensource.org/licenses/mit-license.php)
-# Modified: 2009-12-12T00:57:02+09:00
+<span class="hljs-comment"># gccs.pl - Compile your JavaScript code with Google Closure Compiler Service</span>
+<span class="hljs-comment"># Usage:    gccs.pl &lt; &lt;original file&gt; &gt; &lt;compiled file&gt;</span>
+<span class="hljs-comment"># Author:   Kyo Nagashima &lt;kyo@hail2u.net&gt;, http://hail2u.net/</span>
+<span class="hljs-comment"># License:  MIT license (http://opensource.org/licenses/mit-license.php)</span>
+<span class="hljs-comment"># Modified: 2009-12-12T00:57:02+09:00</span>
 
-use strict;
-use warnings;
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> warnings;
 
-use JSON;
-use LWP::UserAgent;
+<span class="hljs-keyword">use</span> JSON;
+<span class="hljs-keyword">use</span> LWP::UserAgent;
 
-my @params = (
-  &quot;output_info&quot;,   &quot;compiled_code&quot;,
-  &quot;output_format&quot;, &quot;json&quot;,
+<span class="hljs-keyword">my</span> @params = (
+  <span class="hljs-string">"output_info"</span>,   <span class="hljs-string">"compiled_code"</span>,
+  <span class="hljs-string">"output_format"</span>, <span class="hljs-string">"json"</span>,
 );
 
 &amp;main;
-exit;
+<span class="hljs-keyword">exit</span>;
 
-sub main {
-  my @code = &lt;STDIN&gt;;
-  push @params, &quot;js_code&quot;, join(&quot;&quot;, @code);
-  my $idx = 0;
-  my $found_metadata = 0;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">main</span> </span>{
+  <span class="hljs-keyword">my</span> @code = &lt;STDIN&gt;;
+  <span class="hljs-keyword">push</span> @params, <span class="hljs-string">"js_code"</span>, <span class="hljs-keyword">join</span>(<span class="hljs-string">""</span>, @code);
+  <span class="hljs-keyword">my</span> $idx = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">my</span> $found_metadata = <span class="hljs-number">0</span>;
 
-  while (my $line = $code[$idx++]) {
-    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
-      $found_metadata = 1;
-      last;
+  <span class="hljs-keyword">while</span> (<span class="hljs-keyword">my</span> $line = $code[$idx++]) {
+    <span class="hljs-keyword">if</span> ($line =~ <span class="hljs-regexp">/^\/\/ ==ClosureCompiler==/</span>) {
+      $found_metadata = <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">last</span>;
     }
   }
 
-  if ($found_metadata) {
-    while (my $line = $code[$idx++]) {
-      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
-        last;
-      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
-        push @params, $1, $2;
+  <span class="hljs-keyword">if</span> ($found_metadata) {
+    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">my</span> $line = $code[$idx++]) {
+      <span class="hljs-keyword">if</span> ($line =~ <span class="hljs-regexp">/^\/\/ ==\/ClosureCompiler==/</span>) {
+        <span class="hljs-keyword">last</span>;
+      } <span class="hljs-keyword">elsif</span> ($line =~ <span class="hljs-regexp">/^\/\/ @(\S+)\s*(.*)$/</span>) {
+        <span class="hljs-keyword">push</span> @params, $1, $2;
       }
     }
   }
@@ -112,24 +112,24 @@ sub main {
   &amp;compile(@params);
 }
 
-sub compile {
-  my $ua = LWP::UserAgent-&gt;new;
-  my $res = $ua-&gt;post(&quot;http://closure-compiler.appspot.com/compile&quot;, \@_);
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">compile</span> </span>{
+  <span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new;
+  <span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">"http://closure-compiler.appspot.com/compile"</span>, \@_);
 
-  if ($res-&gt;is_success) {
-    my $c = from_json($res-&gt;decoded_content);
+  <span class="hljs-keyword">if</span> ($res-&gt;is_success) {
+    <span class="hljs-keyword">my</span> $c = from_json($res-&gt;decoded_content);
 
-    if (defined $c-&gt;{&quot;serverErrors&quot;}) {
-      foreach (@{$c-&gt;{&quot;serverErrors&quot;}}) {
-        warn &quot;Error(&quot; . $_-&gt;{&quot;code&quot;} . &quot;): &quot; . $_-&gt;{&quot;error&quot;};
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">defined</span> $c-&gt;{<span class="hljs-string">"serverErrors"</span>}) {
+      <span class="hljs-keyword">foreach</span> (@{$c-&gt;{<span class="hljs-string">"serverErrors"</span>}}) {
+        <span class="hljs-keyword">warn</span> <span class="hljs-string">"Error("</span> . $_-&gt;{<span class="hljs-string">"code"</span>} . <span class="hljs-string">"): "</span> . $_-&gt;{<span class="hljs-string">"error"</span>};
       }
 
-      die &quot;Failed to compile&quot;;
-    } else {
-      print $c-&gt;{&quot;compiledCode&quot;};
+      <span class="hljs-keyword">die</span> <span class="hljs-string">"Failed to compile"</span>;
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">print</span> $c-&gt;{<span class="hljs-string">"compiledCode"</span>};
     }
-  } else {
-    die $res-&gt;status_line;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">die</span> $res-&gt;status_line;
   }
 }
 </code></pre>
@@ -141,14 +141,14 @@ sub compile {
 
 <p>コンパイルするfoobar.jsにはコンパイル設定を書くこともできる（設定を書かなくても圧縮される）。設定は以下のようにコメントとして記述（ウェブUIと同じ）。</p>
 
-<pre><code class="language-js">// ==ClosureCompiler==
-// @code_url          http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js
-// @compilation_level ADVANCED_OPTIMIZATIONS
-// ==/ClosureCompiler==
+<pre><code class="hljs language-js"><span class="hljs-comment">// ==ClosureCompiler==</span>
+<span class="hljs-comment">// @code_url          http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js</span>
+<span class="hljs-comment">// @compilation_level ADVANCED_OPTIMIZATIONS</span>
+<span class="hljs-comment">// ==/ClosureCompiler==</span>
  
-$(function () {
-  var who = &quot;Google Closure Compiler Service&quot;;
-  alert(&quot;Hello &quot; + who + &quot;!&quot;);
+$(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">var</span> who = <span class="hljs-string">"Google Closure Compiler Service"</span>;
+  alert(<span class="hljs-string">"Hello "</span> + who + <span class="hljs-string">"!"</span>);
 });
 </code></pre>
 
@@ -156,11 +156,11 @@ $(function () {
 
 <p>foobar.jsには設定だけ書いても構わない。その場合は<code>code_url</code>が必須になる。</p>
 
-<pre><code class="language-js">// ==ClosureCompiler==
-// @code_url          http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js
-// @code_url          http://hail2u.net/scripts/prettify/lang-css.js
-// @code_url          http://hail2u.net/scripts/prettify/loader.js
-// ==/ClosureCompiler==
+<pre><code class="hljs language-js"><span class="hljs-comment">// ==ClosureCompiler==</span>
+<span class="hljs-comment">// @code_url          http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js</span>
+<span class="hljs-comment">// @code_url          http://hail2u.net/scripts/prettify/lang-css.js</span>
+<span class="hljs-comment">// @code_url          http://hail2u.net/scripts/prettify/loader.js</span>
+<span class="hljs-comment">// ==/ClosureCompiler==</span>
 </code></pre>
 
 <p>以上のように書いただけでもちゃんとコンパイルされる。</p>
@@ -169,19 +169,19 @@ $(function () {
 
 <p>Vimから簡単に使えるように<code>$MYVIMRC</code>には以下のように書いた。</p>
 
-<pre><code class="language-vim">&quot; Compile JavaScript file with Google Closure Compiler Service
-&quot; :GCCS [&lt;path&gt;]
-command! -nargs=? -complete=file GCCS :call s:CompileScript(&apos;&lt;args&gt;&apos;)
+<pre><code class="hljs language-vim"><span class="hljs-comment">" Compile JavaScript file with Google Closure Compiler Service</span>
+<span class="hljs-comment">" :GCCS [&lt;path&gt;]</span>
+command! -nargs=? -<span class="hljs-built_in">complete</span>=<span class="hljs-keyword">file</span> GCCS :<span class="hljs-keyword">call</span> <span class="hljs-variable">s:CompileScript</span>(<span class="hljs-string">'&lt;args&gt;'</span>)
 
-function! s:CompileScript(file)
-  if a:file == &apos;&apos;
-    silent normal ggVG
-    &apos;&lt;,&apos;&gt;!perl -S gccs.pl
-    silent normal V
-  else
-    execute &apos;!perl -S gccs.pl &lt; &apos; . expand(&apos;%&apos;) . &apos; &gt; &apos; . a:file
-  endif
-endfunction
+<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CompileScript</span><span class="hljs-params">(file)</span></span>
+  <span class="hljs-keyword">if</span> <span class="hljs-variable">a:file</span> == <span class="hljs-string">''</span>
+    <span class="hljs-keyword">silent</span> <span class="hljs-keyword">normal</span> ggVG
+    <span class="hljs-string">'&lt;,'</span>&gt;!perl -S gccs.pl
+    <span class="hljs-keyword">silent</span> <span class="hljs-keyword">normal</span> V
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">execute</span> <span class="hljs-string">'!perl -S gccs.pl &lt; '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%'</span>) . <span class="hljs-string">' &gt; '</span> . <span class="hljs-variable">a:file</span>
+  <span class="hljs-keyword">endif</span>
+<span class="hljs-keyword">endfunction</span>
 </code></pre>
 
 <p>コマンド<code>GCCS</code>にファイルのパスが渡されたらそのファイルに出力、そうでない場合は全選択して差し替えるというもの。</p></div>

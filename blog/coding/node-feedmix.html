@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="xml2jsを使って複数のRSS 2.0をマージするパッケージ、FeedMixを作った。手元で結構前から使っていたGruntタスクをNode.jsパッケージにして、それを叩くだけのGruntタスクを同梱するという形にした。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,24 +66,24 @@
 
 <p>混ぜたいRSSファイルを配列として<code>merge()</code>の引数に指定する。XMLファイルではない場合はxml2jsが、RSSファイルではなさそうな場合はFeedMixがそれぞれ例外を吐いて落ちる。落ちる。</p>
 
-<pre><code class="language-javascript">var feedmix = require(&apos;feedmix&apos;);
-var fs = require(&apos;fs&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> feedmix = <span class="hljs-built_in">require</span>(<span class="hljs-string">'feedmix'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
 
-var a = f.readFileSync(&apos;a.rss&apos;, &apos;utf8&apos;);
-var b = f.readFileSync(&apos;b.rss&apos;, &apos;utf8&apos;);
-var c = f.readFileSync(&apos;c.rss&apos;, &apos;utf8&apos;);
-var m = feedmix.merge([a, b, c], {
-  trim: true
+<span class="hljs-keyword">var</span> a = f.readFileSync(<span class="hljs-string">'a.rss'</span>, <span class="hljs-string">'utf8'</span>);
+<span class="hljs-keyword">var</span> b = f.readFileSync(<span class="hljs-string">'b.rss'</span>, <span class="hljs-string">'utf8'</span>);
+<span class="hljs-keyword">var</span> c = f.readFileSync(<span class="hljs-string">'c.rss'</span>, <span class="hljs-string">'utf8'</span>);
+<span class="hljs-keyword">var</span> m = feedmix.merge([a, b, c], {
+  <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>
 });
 </code></pre>
 
 <p>これで<code>m</code>の内容が<code>b.rss</code>と<code>c.rss</code>のすべての<code>item</code>要素を<code>a.rss</code>へ混ぜ込んだJavaScriptオブジェクトになる。<code>item</code>は<code>pubDate</code>要素の値を使ってソートされるが、切り詰められたりはしない。<code>channel</code>要素は<code>a.rss</code>のものが採用されるが、<code>lastBuildDate</code>要素の値のみ最初の<code>item</code>要素の<code>pubDate</code>要素の値がコピーされ書き換えられる。</p>
 
-<pre><code class="language-javascript">console.log(feedmix.stringify(m, {
-  cdata: true,
-  xmldec: {
-    encoding: &apos;UTF-8&apos;,
-    version: &apos;1.0&apos;
+<pre><code class="hljs language-javascript"><span class="hljs-built_in">console</span>.log(feedmix.stringify(m, {
+  <span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">xmldec</span>: {
+    <span class="hljs-attr">encoding</span>: <span class="hljs-string">'UTF-8'</span>,
+    <span class="hljs-attr">version</span>: <span class="hljs-string">'1.0'</span>
   }
 }));
 </code></pre>
@@ -96,26 +96,26 @@ var m = feedmix.merge([a, b, c], {
 
 <p>同梱されているGruntタスクも凝ってはいない。</p>
 
-<pre><code class="language-javascript">feedmix: {
-  main: {
-    options: {
-      builder: {
-        cdata: true,
-        xmldec: {
-          encoding: &apos;UTF-8&apos;,
-          version: &apos;1.0&apos;
+<pre><code class="hljs language-javascript">feedmix: {
+  <span class="hljs-attr">main</span>: {
+    <span class="hljs-attr">options</span>: {
+      <span class="hljs-attr">builder</span>: {
+        <span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">xmldec</span>: {
+          <span class="hljs-attr">encoding</span>: <span class="hljs-string">'UTF-8'</span>,
+          <span class="hljs-attr">version</span>: <span class="hljs-string">'1.0'</span>
         }
       },
 
-      parser: {
-        trim: true
+      <span class="hljs-attr">parser</span>: {
+        <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>
       }
     },
 
-    dest: &apos;build/feed&apos;,
-    src: [
-      &apos;src/feed/index.rss&apos;,
-      &apos;build/blog/feed&apos;
+    <span class="hljs-attr">dest</span>: <span class="hljs-string">'build/feed'</span>,
+    <span class="hljs-attr">src</span>: [
+      <span class="hljs-string">'src/feed/index.rss'</span>,
+      <span class="hljs-string">'build/blog/feed'</span>
     ]
   }
 }

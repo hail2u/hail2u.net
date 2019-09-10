@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="総エントリー数が、一度に表示するエントリー数で割り切れる場合、最古のページが妙なことになるような。空ページが出力されないですか？" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -63,25 +63,25 @@
     <h1>paginateプラグインの最古のページでのバグ</h1>
 
     <div itemprop="articleBody"><p>総エントリー数が、一度に表示するエントリー数で割り切れる場合、最古のページが妙なことになるような。空ページが出力されないですか？</p>
-<pre><code class="language-perl">$pages = ($num_files / $blosxom::num_entries) + 1;
+<pre><code class="hljs language-perl">$pages = ($num_files / $blosxom::num_entries) + <span class="hljs-number">1</span>;
 </code></pre>
 <p>サブルーチン<code>filter</code>のあたりかな。1足すとかじゃなくて、切り上げにすれば良いのか。</p>
-<pre><code class="language-perl">$pages = $num_files / $blosxom::num_entries;
-$pages = int($pages + 1) unless $pages == int($pages);
+<pre><code class="hljs language-perl">$pages = $num_files / $blosxom::num_entries;
+$pages = <span class="hljs-keyword">int</span>($pages + <span class="hljs-number">1</span>) <span class="hljs-keyword">unless</span> $pages == <span class="hljs-keyword">int</span>($pages);
 </code></pre>
 <p>と、変えてみる。</p>
 <p>てか、最古のページで空エントリが出力されてる。エントリ無いのにstory出力しようとしてるっぽいですね。</p>
-<pre><code class="language-perl">return @sorted[$skip .. $num_files - 1];
+<pre><code class="hljs language-perl"><span class="hljs-keyword">return</span> @sorted[$skip .. $num_files - <span class="hljs-number">1</span>];
 </code></pre>
 <p>サブルーチン<code>sort</code>のところをこう変えればいいみたい。配列の添え字は個数 - 1までなのでということあたりのお話かな。</p>
 <p>とか、最古のページあたりをチェックしてたら、サブルーチン<code>head</code>のところもバグらしきものを・・・。次へのリンクを生成する<code>if</code>ステートメントが、</p>
-<pre><code class="language-perl">if (($page + 1) &lt; $pages) {
+<pre><code class="hljs language-perl"><span class="hljs-keyword">if</span> (($page + <span class="hljs-number">1</span>) &lt; $pages) {
 ...
 }
 </code></pre>
 <p>と、なってるのですが、これだと最古のページの1つ手前で、次へのリンクが生成されなかったです。</p>
-<pre><code class="language-perl">
-if (($page + 1) &lt;= $pages) {
+<pre><code class="hljs language-perl">
+<span class="hljs-keyword">if</span> (($page + <span class="hljs-number">1</span>) &lt;= $pages) {
 ...
 }
 </code></pre>

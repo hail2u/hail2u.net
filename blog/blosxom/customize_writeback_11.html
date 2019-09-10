@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="writebackの投稿されたコメントのマークアップをpでうまくどうにかするようにしてみました。うまいこと動いてる模様。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,9 +64,9 @@
 
     <div itemprop="articleBody"><p><a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writeback</a>の投稿されたコメントのマークアップを<code>p</code>でうまくどうにかするようにしてみました。うまいこと動いてる模様。</p>
 <p>実装的には単純で、予め改行をタブ文字（<code>\t</code>）に変換しておき、</p>
-<pre><code class="language-perl">$str =~ s!\t{2,}!&lt;/p&gt;&lt;p&gt;!g;
-$str =~ s!\t!&lt;br /&gt;!g;
-$str = &quot;&lt;p&gt;$str&lt;/p&gt;&quot;;
+<pre><code class="hljs language-perl">$str =~ <span class="hljs-keyword">s</span>!\t{<span class="hljs-number">2</span>,}!&lt;<span class="hljs-regexp">/p&gt;&lt;p&gt;!g;
+$str =~ s!\t!&lt;br /</span>&gt;!g;
+$str = <span class="hljs-string">"&lt;p&gt;$str&lt;/p&gt;"</span>;
 </code></pre>
 <p>というコードで。2個以上の連続した改行を<code>&lt;/p&gt;&lt;p&gt;</code>に変換→残った改行を<code>&lt;br /&gt;</code>に変換→全体を<code>&lt;/p&gt;</code>と<code>&lt;p&gt;</code>要素で括るということですね。</p>
 <pre>writebackの新しいマークアップ機能のテストの始まり。
@@ -80,17 +80,17 @@ $str = &quot;&lt;p&gt;$str&lt;/p&gt;&quot;;
 writebackの新しいマークアップ機能のテストの終わり。
 </pre>
 <p>と、投稿すると、</p>
-<pre><code class="language-html">&lt;p&gt;writebackの新しいマークアップ機能のテストの始まり。&lt;/p&gt;
-&lt;p&gt;改行*1はbr要素に、改行*2以上はp要素に変換した上で、最後に全体をp要素で括るというありがちなもの。&lt;/p&gt;
-&lt;p&gt;できるかな？&lt;br /&gt;
-できるかな？&lt;br /&gt;
-できるかな？&lt;/p&gt;
-&lt;p&gt;writebackの新しいマークアップ機能のテストの終わり。&lt;/p&gt;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>writebackの新しいマークアップ機能のテストの始まり。<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>改行*1はbr要素に、改行*2以上はp要素に変換した上で、最後に全体をp要素で括るというありがちなもの。<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>できるかな？<span class="hljs-tag">&lt;<span class="hljs-name">br</span> /&gt;</span>
+できるかな？<span class="hljs-tag">&lt;<span class="hljs-name">br</span> /&gt;</span>
+できるかな？<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>writebackの新しいマークアップ機能のテストの終わり。<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
 </code></pre>
 <p>となります（データファイル上では改行は消えます）。</p>
 <p>同時にテンプレにベタ書きしていた<code>p</code>要素を取っ払いました。そのため、今までのコメントを変換する必要がある（<code>p</code>要素で括られていないので）のですが、grepして置換するのすらメンドウなので、</p>
-<pre><code class="language-perl">$param{&apos;comment&apos;} = &quot;&lt;p&gt;&quot; . $param{&apos;comment&apos;} . &quot;&lt;/p&gt;&quot; if $param{&apos;comment&apos;} !~ m!^&lt;p&gt;.+&lt;/p&gt;$!;
-</code></pre>
+<pre><code class="hljs language-perl">$param{<span class="hljs-string">'comment'</span>} = <span class="hljs-string">"&lt;p&gt;"</span> . $param{<span class="hljs-string">'comment'</span>} . <span class="hljs-string">"&lt;/p&gt;"</span> <span class="hljs-keyword">if</span> $param{<span class="hljs-string">'comment'</span>} !~ <span class="hljs-keyword">m</span>!^&lt;p&gt;.+&lt;<span class="hljs-regexp">/p&gt;$!;
+</span></code></pre>
 <p>という<code>p</code>要素で括られていなかったら括るというコードで逃げました。ヒマな時にちゃんと変換して、このコードは外すようにしよう。</p>
 <p><a href="/archives/bsk.html" title="hail2u.net - Archives - blosxom starter kit">blosxom starter kit</a>にも導入したいところだけど、どうだろうな。互換性が失われるのが難。利点もコレといってないしなぁ。</p>
 <section>

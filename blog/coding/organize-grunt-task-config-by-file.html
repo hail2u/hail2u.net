@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -78,36 +78,36 @@
 
 <p><code>grunt.file.expand()</code>を使って<code>.grunt/config/*.json</code>をグロブし、それぞれのファイル名をキーにして、ファイルの内容を値にして設定を組み立てていく。最後に<code>grunt.initConfig()</code>して読み込む。</p>
 
-<pre><code class="language-javascript">&apos;use strcit&apos;;
+<pre><code class="hljs language-javascript"><span class="hljs-string">'use strcit'</span>;
 
-var path = require(&apos;path&apos;);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
 
-module.exports = function (grunt) {
-  var config = {
-    pkg: grunt.file.readJSON(&apos;package.json&apos;)
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) </span>{
+  <span class="hljs-keyword">var</span> config = {
+    <span class="hljs-attr">pkg</span>: grunt.file.readJSON(<span class="hljs-string">'package.json'</span>)
   };
 
-  grunt.file.expand(&apos;.grunt/config/*.json&apos;).forEach(function (file) {
-    config[path.basename(file, &apos;.json&apos;)] = grunt.file.readJSON(file);
+  grunt.file.expand(<span class="hljs-string">'.grunt/config/*.json'</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
+    config[path.basename(file, <span class="hljs-string">'.json'</span>)] = grunt.file.readJSON(file);
   });
 
   grunt.initConfig(config);
 
-  grunt.loadNpmTasks(&apos;grunt-contrib-clean&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-copy&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-cssmin&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-uglify&apos;);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-clean'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-copy'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-cssmin'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-uglify'</span>);
 
-  grunt.registerTask(&apos;rebuild:css&apos;, [
-    &apos;clean:css&apos;,
-    &apos;copy:css&apos;,
-    &apos;cssmin&apos;
+  grunt.registerTask(<span class="hljs-string">'rebuild:css'</span>, [
+    <span class="hljs-string">'clean:css'</span>,
+    <span class="hljs-string">'copy:css'</span>,
+    <span class="hljs-string">'cssmin'</span>
   ]);
 
-  grunt.registerTask(&apos;rebuild:js&apos;, [
-    &apos;clean:js&apos;,
-    &apos;copy:js&apos;,
-    &apos;uglify&apos;
+  grunt.registerTask(<span class="hljs-string">'rebuild:js'</span>, [
+    <span class="hljs-string">'clean:js'</span>,
+    <span class="hljs-string">'copy:js'</span>,
+    <span class="hljs-string">'uglify'</span>
   ]);
 };
 </code></pre>
@@ -124,19 +124,19 @@ module.exports = function (grunt) {
 
 <p>例えば<code>.grunt/config/uglify.json</code>は以下のようになる。</p>
 
-<pre><code class="language-javascript">{
-  &quot;options&quot;: {
-    &quot;beautify&quot;: {
-      &quot;ascii_only&quot;: true
+<pre><code class="hljs language-javascript">{
+  <span class="hljs-string">"options"</span>: {
+    <span class="hljs-string">"beautify"</span>: {
+      <span class="hljs-string">"ascii_only"</span>: <span class="hljs-literal">true</span>
     },
-    &quot;preserveComments&quot;: &quot;some&quot;
+    <span class="hljs-string">"preserveComments"</span>: <span class="hljs-string">"some"</span>
   },
-  &quot;main&quot;: {
-    &quot;expand&quot;: true,
-    &quot;cwd&quot;: &quot;.grunt/tmp/&quot;,
-    &quot;src&quot;: [&quot;*.js&quot;],
-    &quot;dest&quot;: &quot;scripts/&quot;,
-    &quot;ext&quot;: &quot;.min.js&quot;
+  <span class="hljs-string">"main"</span>: {
+    <span class="hljs-string">"expand"</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">"cwd"</span>: <span class="hljs-string">".grunt/tmp/"</span>,
+    <span class="hljs-string">"src"</span>: [<span class="hljs-string">"*.js"</span>],
+    <span class="hljs-string">"dest"</span>: <span class="hljs-string">"scripts/"</span>,
+    <span class="hljs-string">"ext"</span>: <span class="hljs-string">".min.js"</span>
   }
 }
 </code></pre>

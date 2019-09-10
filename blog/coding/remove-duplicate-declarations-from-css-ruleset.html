@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="CSSWringに同じルールセット内で重複する定義（プロパティーとその値のセット）をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,12 +66,12 @@
 
 <p><a href="https://github.com/ai/postcss">PostCSS</a>でCSSをパースすると、各定義は以下のような構造になる（一部省略）。</p>
 
-<pre><code class="language-javascript">{
-  type: &apos;decl&apos;,
-  before: &apos;\n  &apos;,
-  prop: &apos;color&apos;,
-  between: &apos;: &apos;,
-  value: &apos;white&apos;
+<pre><code class="hljs language-javascript">{
+  <span class="hljs-attr">type</span>: <span class="hljs-string">'decl'</span>,
+  <span class="hljs-attr">before</span>: <span class="hljs-string">'\n  '</span>,
+  <span class="hljs-attr">prop</span>: <span class="hljs-string">'color'</span>,
+  <span class="hljs-attr">between</span>: <span class="hljs-string">': '</span>,
+  <span class="hljs-attr">value</span>: <span class="hljs-string">'white'</span>
 }
 </code></pre>
 
@@ -81,16 +81,16 @@
 
 <p>PostCSSでは全定義をなめるイテレータ(<code>eachDecl()</code>)もあるけど、この場合はルールセット単位で作業するべきなので<code>eachRule()</code>の方で行う。</p>
 
-<pre><code class="language-javascript">var postcss = require(&apos;postcss&apos;);
-var css = fs.readFileSync(&apos;test.css&apos;, &apos;utf-8&apos;);
-var root = postcss.parse(css);
-root.eachRule(function (rule) {
-  var d = &apos;&apos;;
-  var decls = {};
-  rule.each(function (decl, index) {
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'postcss'</span>);
+<span class="hljs-keyword">var</span> css = fs.readFileSync(<span class="hljs-string">'test.css'</span>, <span class="hljs-string">'utf-8'</span>);
+<span class="hljs-keyword">var</span> root = postcss.parse(css);
+root.eachRule(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">rule</span>) </span>{
+  <span class="hljs-keyword">var</span> d = <span class="hljs-string">''</span>;
+  <span class="hljs-keyword">var</span> decls = {};
+  rule.each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">decl, index</span>) </span>{
     d = decl.prop + decl.value;
 
-    if (decls.hasOwnProperty(d)) {
+    <span class="hljs-keyword">if</span> (decls.hasOwnProperty(d)) {
       decl.parent.remove(decls[d]);
     }
 
@@ -101,7 +101,7 @@ root.eachRule(function (rule) {
 
 <p>通常はこのように<code>prop</code>と<code>value</code>が一致すれば良いけど、CSSWringには一部CSSハックを維持する設定がある。この設定がONの時にこれでは判別できない。対応しているCSSハックが格納されているのは<code>before</code>と<code>between</code>なので、それらも含めて完全一致させる必要があった。空白の違いにより重複が判別できなくなりそうだけど、CSSWringでは空白文字の圧縮は事前に行われているのでそこは考えなくて良さそう。上記コードだと8行目を以下のようにするだけ。</p>
 
-<pre><code class="language-javascript">d = decl.before + decl.prop + decl.between + decl.value;
+<pre><code class="hljs language-javascript">d = decl.before + decl.prop + decl.between + decl.value;
 </code></pre>
 
 <p>最初<code>hasOwnProperty</code>ではなく<code>decls[d]</code>で存在チェックをしていて、インデックスが0の定義が重複していた時にちゃんとチェックできてないみたいなのやらかした……。</p></div>

@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニックはすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。Qiitaの記事が参照しているIssueでも似たようなことが推奨されている。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,15 +66,15 @@
 
 <p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する（昔どこかで読んだ気がするけど見つからなかった）ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
 
-<pre><code class="language-javascript">module.exports = function (grunt) {
-  grunt.registerMultiTask(&apos;example&apos;, &apos;Grunt multi task example.&apos;, function () {
-    // Loading Node packages inside taskFunction
-    var _ = require(&apos;lodash&apos;);
-    var async = require(&apos;async&apos;);
-    var foo = require(&apos;foo&apos;);
-    var bar = require(&apos;./bar.js&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) </span>{
+  grunt.registerMultiTask(<span class="hljs-string">'example'</span>, <span class="hljs-string">'Grunt multi task example.'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-comment">// Loading Node packages inside taskFunction</span>
+    <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'lodash'</span>);
+    <span class="hljs-keyword">var</span> <span class="hljs-keyword">async</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'async'</span>);
+    <span class="hljs-keyword">var</span> foo = <span class="hljs-built_in">require</span>(<span class="hljs-string">'foo'</span>);
+    <span class="hljs-keyword">var</span> bar = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./bar.js'</span>);
 
-    // Do whatever you want.
+    <span class="hljs-comment">// Do whatever you want.</span>
   });
 };
 </code></pre>

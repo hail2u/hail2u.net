@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,36 +66,36 @@
 
 <p>色々遠回りしたけど、結局はテンプレート・ファイルを読んでコンパイル→レンダーする関数を作ってそれをヘルパー関数にすれば良いだけだった。Handlebars.jsがカシコイのでコンテキストとかは自動的に良しなにしてくれる。</p>
 
-<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
-var hbs = require(&apos;handlebars&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'handlebars'</span>);
 
-function applyTemplate(file, data) {
-  var tmpl = hbs.compile(fs.readFileSync(file, &apos;UTF-8&apos;));
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyTemplate</span>(<span class="hljs-params">file, data</span>) </span>{
+  <span class="hljs-keyword">var</span> tmpl = hbs.compile(fs.readFileSync(file, <span class="hljs-string">'UTF-8'</span>));
 
-  return tmpl(data);
+  <span class="hljs-keyword">return</span> tmpl(data);
 }
 
-hbs.registerHelper(&apos;include&apos;, function (file, options) {
-  return new hbs.SafeString(applyTemplate(file, this));
+hbs.registerHelper(<span class="hljs-string">'include'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.SafeString(applyTemplate(file, <span class="hljs-keyword">this</span>));
 });
 
-console.log(applyTemplate(&apos;./template.hbs&apos;, {
-  &quot;he&quot;: {
-    &quot;name&quot;: &quot;John&quot;
+<span class="hljs-built_in">console</span>.log(applyTemplate(<span class="hljs-string">'./template.hbs'</span>, {
+  <span class="hljs-string">"he"</span>: {
+    <span class="hljs-string">"name"</span>: <span class="hljs-string">"John"</span>
   },
-  &quot;she&quot;: {
-    &quot;name&quot;: &quot;Jane&quot;
+  <span class="hljs-string">"she"</span>: {
+    <span class="hljs-string">"name"</span>: <span class="hljs-string">"Jane"</span>
   }
 }));</code></pre>
 
 <p>使うテンプレート・ファイルは、<code>template.hbs</code></p>
 
-<pre><code class="language-handlebars">{{#he}}His name is {{include &quot;./include.hbs&quot;}}{{/he}}
-{{#she}}His girlfriend name is {{include &quot;./include.hbs&quot;}}{{/she}}</code></pre>
+<pre><code class="hljs language-handlebars"><span class="xml"></span><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="xml">His name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="xml"></span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="xml">His girlfriend name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="xml"></span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span><span class="xml"></span></code></pre>
 
 <p>と、<code>include.hbs</code></p>
 
-<pre><code class="language-handlebars">{{name}}</code></pre>
+<pre><code class="hljs language-handlebars"><span class="xml"></span><span class="hljs-template-variable">{{name}}</span><span class="xml"></span></code></pre>
 
 <p>の2つ。実行すると結果はこうなる。</p>
 

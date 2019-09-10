@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="かなり前に書いた不明なflavourというエントリで紹介したパッチは概ねうまく機能しているのだけど、検索エンジンなどで意図しないURLが検索結果に出てきてしまうことがあるという問題が。通常は多くのページでリンクを張られている.htmlで終わるURLの方が圧倒的に強く、Web全体からの検索などではあまり問題にならないが、サイト内検索などではかなりゴミとして目立ってしまう。ので、redirectif_noflavourを使い、存在しないflavourの場合は.htmlで終わるURLにリダイレクトさせることにした。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,42 +66,42 @@
 
 <p>redirectif_noflavourはflavourが見つからなかった場合、設定で指定したflavourのURLに302 Foundでリダイレクトさせるというプラグイン。301 Moved Permanentlyを使いたかったり、設定させなくても<code>$blosxom::default_flavour</code>使えば良さそうと思ったので、</p>
 
-<pre><code class="language-perl"># Blosxom Plugin: redirectif_noflavour
-# Author(s): motormean, Kyo Nagashima &lt;kyo@hail2u.net&gt;
-# Version: 2006-10-04
-# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+<pre><code class="hljs language-perl"><span class="hljs-comment"># Blosxom Plugin: redirectif_noflavour</span>
+<span class="hljs-comment"># Author(s): motormean, Kyo Nagashima &lt;kyo@hail2u.net&gt;</span>
+<span class="hljs-comment"># Version: 2006-10-04</span>
+<span class="hljs-comment"># Blosxom Home/Docs/Licensing: http://www.blosxom.com/</span>
 
-package redirectif_noflavour;
+<span class="hljs-keyword">package</span> redirectif_noflavour;
 
-use strict;
+<span class="hljs-keyword">use</span> strict;
 
-# --- Configurable variables -----------
+<span class="hljs-comment"># --- Configurable variables -----------</span>
 
-# --- Plug-in package variables --------
+<span class="hljs-comment"># --- Plug-in package variables --------</span>
 
-# --------------------------------------
+<span class="hljs-comment"># --------------------------------------</span>
 
-sub start {
-  1;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+  <span class="hljs-number">1</span>;
 }
 
-sub skip {
-  my $path = $blosxom::path_info;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">skip</span> </span>{
+  <span class="hljs-keyword">my</span> $path = $blosxom::path_info;
 
-  do {
-    return 0 if -e &quot;$blosxom::datadir/$path/story.$blosxom::flavour&quot;;
-  } while ($path =~ s/(\/*[^\/]*)$// and $1);
+  <span class="hljs-keyword">do</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> -e <span class="hljs-string">"$blosxom::datadir/$path/story.$blosxom::flavour"</span>;
+  } <span class="hljs-keyword">while</span> ($path =~ <span class="hljs-regexp">s/(\/*[^\/]*)$//</span> <span class="hljs-keyword">and</span> $1);
 
   $path = $blosxom::path_info;
-  $path =~ s/\..+?$/.$blosxom::default_flavour/;
-  $blosxom::header-&gt;{-status} = &apos;301 Moved Permanently&apos;;
-  $blosxom::header-&gt;{-Location} = &quot;$blosxom::url/$path&quot;;
-  $blosxom::output = &apos;&apos;;
+  $path =~ <span class="hljs-regexp">s/\..+?$/.$blosxom::default_flavour/</span>;
+  $blosxom::header-&gt;{-status} = <span class="hljs-string">'301 Moved Permanently'</span>;
+  $blosxom::header-&gt;{-Location} = <span class="hljs-string">"$blosxom::url/$path"</span>;
+  $blosxom::output = <span class="hljs-string">''</span>;
 
-  return 1;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }
 
-1;
+<span class="hljs-number">1</span>;
 </code></pre>
 
 <p>と、少しだけ改造した。自前でflavourを漁らなくても何とかなりそうな気はする。けどコード考えるのがめんどくさい。303 See Otherのが良いかな？微妙だ。移動させたわけじゃないから303 See Otherのほうが妥当かもしれない。</p>
@@ -110,7 +110,7 @@ sub skip {
 
 <p>redirectif_noflavourは使いたくないけどerror flavourなページを検索エンジンに拾わせたくないなどという場合は、blosxom.cgiの最後のに書いてあるerror flavourの定義に、</p>
 
-<pre><code class="language-html">&lt;meta name=&quot;robots&quot; content=&quot;noindex, nofollow&quot; /&gt;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"robots"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"noindex, nofollow"</span> /&gt;</span>
 </code></pre>
 
 <p>といったロボット対策の<code>meta</code>要素を追加するとかが良さそう。</p>

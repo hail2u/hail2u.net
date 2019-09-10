@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="本文とメインとなる見出しの文字サイズを決めて、その両者に黄金比を適用して他の見出しやボタンのラベル、少し小さくしたい部分（フッターとか）、アイコンの幅などの文字サイズを決定するというメモ。要改善。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,58 +64,58 @@
 
     <div itemprop="articleBody"><p>本文とメインとなる見出しの文字サイズを決めて、その両者に黄金比を適用して他の見出しやボタンのラベル、少し小さくしたい部分（フッターとか）、アイコンの幅などの文字サイズを決定するというメモ。要改善。</p>
 
-<pre><code class="language-scss">// Ratio
-$golden-ratio: 1.61803;
+<pre><code class="hljs language-scss"><span class="hljs-comment">// Ratio</span>
+<span class="hljs-variable">$golden-ratio</span>: <span class="hljs-number">1.61803</span>;
 
-// Function: pow()
-@function pow($base, $exponent) {
-  $raised: 1;
+<span class="hljs-comment">// Function: pow()</span>
+@function pow(<span class="hljs-variable">$base</span>, <span class="hljs-variable">$exponent</span>) {
+  <span class="hljs-variable">$raised</span>: <span class="hljs-number">1</span>;
 
-  @for $i from 1 through $exponent {
-    $raised: $raised * $base;
+  @<span class="hljs-keyword">for</span> <span class="hljs-variable">$i</span> from 1 through <span class="hljs-variable">$exponent</span> {
+    <span class="hljs-variable">$raised</span>: <span class="hljs-variable">$raised</span> * <span class="hljs-variable">$base</span>;
   }
 
-  @return $raised;
+  @return <span class="hljs-variable">$raised</span>;
 }
 
-// Standard Text Size
-$body-size:    16px;
-$heading-size: 30px;
+<span class="hljs-comment">// Standard Text Size</span>
+<span class="hljs-variable">$body-size</span>:    <span class="hljs-number">16px</span>;
+<span class="hljs-variable">$heading-size</span>: <span class="hljs-number">30px</span>;
 
-// Text Size Ratio
-$body-text-ratio:    ($body-size / 16px);
-$heading-size-ratio: ($heading-size / 16px);
+<span class="hljs-comment">// Text Size Ratio</span>
+<span class="hljs-variable">$body-text-ratio</span>:    (<span class="hljs-variable">$body-size</span> / <span class="hljs-number">16px</span>);
+<span class="hljs-variable">$heading-size-ratio</span>: (<span class="hljs-variable">$heading-size</span> / <span class="hljs-number">16px</span>);
 
-// Heading Ratio
-$h1-ratio: ($body-text-ratio * pow($golden-ratio, 2));
-$h2-ratio: $heading-text-ratio;
-$h3-ratio: ($body-text-ratio * $golden-ratio);
-$h4-ratio: ($heading-text-ratio / $golden-ratio);
-$h5-ratio: $body-text-ratio;
-$h6-ratio: ($heading-text-ratio / pow($golden-ratio, 2));
+<span class="hljs-comment">// Heading Ratio</span>
+<span class="hljs-variable">$h1-ratio</span>: (<span class="hljs-variable">$body-text-ratio</span> * pow(<span class="hljs-variable">$golden-ratio</span>, <span class="hljs-number">2</span>));
+<span class="hljs-variable">$h2-ratio</span>: <span class="hljs-variable">$heading-text-ratio</span>;
+<span class="hljs-variable">$h3-ratio</span>: (<span class="hljs-variable">$body-text-ratio</span> * <span class="hljs-variable">$golden-ratio</span>);
+<span class="hljs-variable">$h4-ratio</span>: (<span class="hljs-variable">$heading-text-ratio</span> / <span class="hljs-variable">$golden-ratio</span>);
+<span class="hljs-variable">$h5-ratio</span>: <span class="hljs-variable">$body-text-ratio</span>;
+<span class="hljs-variable">$h6-ratio</span>: (<span class="hljs-variable">$heading-text-ratio</span> / pow(<span class="hljs-variable">$golden-ratio</span>, <span class="hljs-number">2</span>));
 </code></pre>
 
 <p>設定すべき定義は<code>$body-text-size</code>と<code>$heading-text-size</code>で、それ以外は計算で行う。この設定例では<code>42px</code>・<code>30px</code>・<code>26px</code>・<code>19px</code>・<code>16px</code>・<code>11px</code>とスケールしていく。後に直接利用することになる変数が<code>$h4-ratio</code>などと古い世代に引きずられた名称になってて嫌な感じなので、スケールダウン・スケールアップする関数とかを作った方がキレイかもしれない。これら変数は単位なしなので、<code>1em</code>などを掛けるその単位に変換できる。</p>
 
-<pre><code class="language-scss">body {
-  font-size: percentage($body-text-ratio);
+<pre><code class="hljs language-scss"><span class="hljs-selector-tag">body</span> {
+  <span class="hljs-attribute">font-size</span>: percentage(<span class="hljs-variable">$body-text-ratio</span>);
 }
 
-.logo {
-  font-size: percentage($h1-ratio);
+<span class="hljs-selector-class">.logo</span> {
+  <span class="hljs-attribute">font-size</span>: percentage(<span class="hljs-variable">$h1-ratio</span>);
 }
 
-article h1 {
-  font-size: percentage($heading-size-ratio);
+<span class="hljs-selector-tag">article</span> <span class="hljs-selector-tag">h1</span> {
+  <span class="hljs-attribute">font-size</span>: percentage(<span class="hljs-variable">$heading-size-ratio</span>);
 }
 
-footer {
-  font-size: percentage($h6-ratio);
+<span class="hljs-selector-tag">footer</span> {
+  <span class="hljs-attribute">font-size</span>: percentage(<span class="hljs-variable">$h6-ratio</span>);
 }
 
-.icon {
-  width:  ($h4-ratio * 1em);
-  height: ($h4-ratio * 1em);
+<span class="hljs-selector-class">.icon</span> {
+  <span class="hljs-attribute">width</span>:  (<span class="hljs-variable">$h4-ratio</span> * <span class="hljs-number">1em</span>);
+  <span class="hljs-attribute">height</span>: (<span class="hljs-variable">$h4-ratio</span> * <span class="hljs-number">1em</span>);
 }
 </code></pre>
 

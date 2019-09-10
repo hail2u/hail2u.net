@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Source Mapは、JavaScriptやCSSをモニョモニョしてなんかするツールのすべてでサポートされていないと、その恩恵は受け切れない。しかしその一方でSource Mapはエンドユーザーに必要なものではないので、開発上必要になるわけではない単純な空白削除等を行うツール程度では生成する意味は無いとも言える。破壊的な、例えばCSSだとCSSプリプロセッサーだけにあれば良いとも言える。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -78,26 +78,26 @@
 
 <p>簡単な使い方は以下のようになる。</p>
 
-<pre><code class="language-javascript">#!/usr/bin/env node
+<pre><code class="hljs language-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-meta">
+'use strict'</span>;
 
-&apos;use strict&apos;;
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">'csswring'</span>);
 
-var fs = require(&apos;fs&apos;);
-var csswring = require(&apos;csswring&apos;);
+<span class="hljs-keyword">var</span> input = <span class="hljs-string">'test.css'</span>;
+<span class="hljs-keyword">var</span> output = <span class="hljs-string">'test.min.css'</span>;
 
-var input = &apos;test.css&apos;;
-var output = &apos;test.min.css&apos;;
-
-var css = fs.readFileSync(input, {
-  encoding: &apos;utf8&apos;
+<span class="hljs-keyword">var</span> css = fs.readFileSync(input, {
+  <span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span>
 });
-var min = csswring.wring(css, {
-  map: true,
-  from: input,
-  to: output
+<span class="hljs-keyword">var</span> min = csswring.wring(css, {
+  <span class="hljs-attr">map</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">from</span>: input,
+  <span class="hljs-attr">to</span>: output
 });
 fs.writeFileSync(output, min.css);
-fs.writeFileSync(output + &apos;.map&apos;, min.map);
+fs.writeFileSync(output + <span class="hljs-string">'.map'</span>, min.map);
 </code></pre>
 
 <p><code>csswirng.wring()</code>の第二引数はPostCSSの<code>process()</code>関数と同じ引数を取る。<code>map</code>を<code>true</code>にすることによって、Source Mapの生成を必ず行うようになるだろう（自動的に保存されるかは場合による）。<code>from</code>と<code>to</code>は処理前・処理後のCSSファイルのパスを指定する。これらをちゃんと指定しないと出力されるCSSに追加される<code>sourceMappingURL</code>やSource Mapファイル内の参照先パスがおかしくなる。</p>

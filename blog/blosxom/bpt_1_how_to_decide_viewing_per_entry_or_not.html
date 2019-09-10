@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="blosxomのプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、one_year_agoなんかがそうですね。その判定はどうやるのかということですよ。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -67,12 +67,12 @@
 <pre>foo/bar.html
 </pre>
 <p>というようなものになるので、</p>
-<pre><code class="language-perl">sub start {
-  if ($blosxom::path_info !~ /\./) {
-    return 0;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+  <span class="hljs-keyword">if</span> ($blosxom::path_info !~ <span class="hljs-regexp">/\./</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
   }
 
-  return 1;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }
 </code></pre>
 <p>一番単純に考えると、こんな感じでしょう。<code>$blosxom::path_info</code>にピリオド（.）が含まれるかどうかをチェックしており、含まれなかった場合は0を返し、プラグインを停止させています。コレは単純明快で良いのですが、場合によっては不具合があります。具体的な例を挙げると、「.を含むディレクトリでカテゴリを掘っている場合」です。例えば、</p>
@@ -84,12 +84,12 @@
 <p>などとなり、一見してエントリごとのページを閲覧している場合と判別できません。この判定には<code>.$blosxom::flavour</code>で終わるかどうかというチェックが必要になります。</p>
 <p>また、<code>$blosxom::path_info</code>は<code>$ENV{PATH_INFO}</code>をちょっと加工したものなので、この両者は似て非なるものです。その違いはindex.htmlなどは含まれないことや最初と最後のスラッシュ（/）が削除されることなどで、そのあたりのチェックは無用だったりします。</p>
 <p>以上を踏まえると、エントリごとのページを閲覧している場合かどうかを判定するコードは、</p>
-<pre><code class="language-perl">sub start {
-  if ($blosxom::path_info !~ /\.$blosxom::flavour$/) {
-    return 0;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+  <span class="hljs-keyword">if</span> ($blosxom::path_info !~ <span class="hljs-regexp">/\.$blosxom::flavour$/</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
   }
 
-  return 1;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }
 </code></pre>
 <p>となると思います。これでも万能ではなく、いろいろ考えるとメンドウなので、最初に書いたコードでも良いかも知れません。</p>

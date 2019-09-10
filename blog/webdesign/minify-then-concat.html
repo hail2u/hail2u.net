@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -82,94 +82,94 @@
 
 <p>これを踏まえて、Bowerでインストールした<code>lib-a.min.js</code>と<code>lib-b.min.js</code>、そして自分で書いた<code>foo.js</code>と<code>bar.js</code>を最小化してから連結し、最終的に<code>main.min.js</code>を作るとする。タスクの設定は以下のようになることだろう。</p>
 
-<pre><code class="language-javascript">module.exports = function (grunt) {
+<pre><code class="hljs language-javascript"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) </span>{
   grunt.initConfig({
-    clean: {
-      // `tmp/`ディレクトリーを掃除するタスク
+    <span class="hljs-attr">clean</span>: {
+      <span class="hljs-comment">// `tmp/`ディレクトリーを掃除するタスク</span>
       main: {
-        src: ['tmp/**/*']
+        <span class="hljs-attr">src</span>: [<span class="hljs-string">'tmp/**/*'</span>]
       }
     },
 
-    concat: {
-      // 最小化済みのファイルをソース・マップ付きで連結するタスク
+    <span class="hljs-attr">concat</span>: {
+      <span class="hljs-comment">// 最小化済みのファイルをソース・マップ付きで連結するタスク</span>
       js: {
-        options: {
-          seperator: &apos;;&apos;,
-          sourceMap: true,
-          sourceMapStyle: &apos;link&apos;
+        <span class="hljs-attr">options</span>: {
+          <span class="hljs-attr">seperator</span>: <span class="hljs-string">';'</span>,
+          <span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span>,
+          <span class="hljs-attr">sourceMapStyle</span>: <span class="hljs-string">'link'</span>
         },
 
-        files: {
-          &apos;tmp/main.min.js&apos;: [
-            &apos;tmp/lib-a.min.js&apos;,
-            &apos;tmp/lib-b.min.js&apos;,
-            &apos;tmp/foo.min.js&apos;,
-            &apos;tmp/bar.min.js&apos;
+        <span class="hljs-attr">files</span>: {
+          <span class="hljs-string">'tmp/main.min.js'</span>: [
+            <span class="hljs-string">'tmp/lib-a.min.js'</span>,
+            <span class="hljs-string">'tmp/lib-b.min.js'</span>,
+            <span class="hljs-string">'tmp/foo.min.js'</span>,
+            <span class="hljs-string">'tmp/bar.min.js'</span>
           ]
         }
       }
     },
 
-    copy: {
-      // プロダクション向けに公開ディレクトリーへコピーするタスク
+    <span class="hljs-attr">copy</span>: {
+      <span class="hljs-comment">// プロダクション向けに公開ディレクトリーへコピーするタスク</span>
       js: {
-        cwd: &apos;tmp/&apos;,
-        dest: &apos;build/js/&apos;,
-        expand: true,
-        src: [
-          &apos;**/*.js&apos;,
-          &apos;**/*.js.map&apos;
+        <span class="hljs-attr">cwd</span>: <span class="hljs-string">'tmp/'</span>,
+        <span class="hljs-attr">dest</span>: <span class="hljs-string">'build/js/'</span>,
+        <span class="hljs-attr">expand</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">src</span>: [
+          <span class="hljs-string">'**/*.js'</span>,
+          <span class="hljs-string">'**/*.js.map'</span>
         ]
       },
 
-      // 一時ディレクトリーへ必要なファイルをコピーするタスク
-      // 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも
+      <span class="hljs-comment">// 一時ディレクトリーへ必要なファイルをコピーするタスク</span>
+      <span class="hljs-comment">// 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも</span>
       prejs: {
-        files: {
-          &apos;tmp/bar.js&apos;: &apos;src/js/bar.js&apos;,
-          &apos;tmp/foo.js&apos;: &apos;src/js/foo.js&apos;,
-          &apos;tmp/lib-a.js&apos;: &apos;bower_component/lib-a/dist/lib-a.js&apos;,
-          &apos;tmp/lib-a.min.js&apos;: &apos;bower_component/lib-a/dist/lib-a.min.js&apos;,
-          &apos;tmp/lib-a.min.js.map&apos;: &apos;bower_component/lib-a/dist/lib-a.min.js.map&apos;,
-          &apos;tmp/lib-b.js&apos;: &apos;bower_component/lib-a/dist/lib-b.js&apos;,
-          &apos;tmp/lib-b.min.js&apos;: &apos;bower_component/lib-b/dist/lib-b.min.js&apos;,
-          &apos;tmp/lib-b.min.js.map&apos;: &apos;bower_component/lib-b/dist/lib-b.min.js.map&apos;
+        <span class="hljs-attr">files</span>: {
+          <span class="hljs-string">'tmp/bar.js'</span>: <span class="hljs-string">'src/js/bar.js'</span>,
+          <span class="hljs-string">'tmp/foo.js'</span>: <span class="hljs-string">'src/js/foo.js'</span>,
+          <span class="hljs-string">'tmp/lib-a.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.js'</span>,
+          <span class="hljs-string">'tmp/lib-a.min.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.min.js'</span>,
+          <span class="hljs-string">'tmp/lib-a.min.js.map'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.min.js.map'</span>,
+          <span class="hljs-string">'tmp/lib-b.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-b.js'</span>,
+          <span class="hljs-string">'tmp/lib-b.min.js'</span>: <span class="hljs-string">'bower_component/lib-b/dist/lib-b.min.js'</span>,
+          <span class="hljs-string">'tmp/lib-b.min.js.map'</span>: <span class="hljs-string">'bower_component/lib-b/dist/lib-b.min.js.map'</span>
         }
       }
     },
 
-    uglify: {
-      options: {
-        preserveComments: &apos;some&apos;,
-        sourceMap: true
+    <span class="hljs-attr">uglify</span>: {
+      <span class="hljs-attr">options</span>: {
+        <span class="hljs-attr">preserveComments</span>: <span class="hljs-string">'some'</span>,
+        <span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span>
       },
 
-      // まだ最小化されていないファイルをソース・マップ付きで最小化するタスク
+      <span class="hljs-comment">// まだ最小化されていないファイルをソース・マップ付きで最小化するタスク</span>
       main: {
-        cwd: &apos;tmp/&apos;,
-        dest: &apos;tmp/&apos;,
-        expand: true,
-        ext: &apos;.min.js&apos;,
-        src: [
-          &apos;**/*.js&apos;,
-          &apos;!**/*.min.js&apos;
+        <span class="hljs-attr">cwd</span>: <span class="hljs-string">'tmp/'</span>,
+        <span class="hljs-attr">dest</span>: <span class="hljs-string">'tmp/'</span>,
+        <span class="hljs-attr">expand</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">ext</span>: <span class="hljs-string">'.min.js'</span>,
+        <span class="hljs-attr">src</span>: [
+          <span class="hljs-string">'**/*.js'</span>,
+          <span class="hljs-string">'!**/*.min.js'</span>
         ]
       }
     }
   });
 
-  grunt.loadNpmTasks(&apos;grunt-contrib-clean&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-copy&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-concat&apos;);
-  grunt.loadNpmTasks(&apos;grunt-contrib-uglify&apos;);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-clean'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-copy'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-concat'</span>);
+  grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-uglify'</span>);
 
-  grunt.registerTask(&apos;build:js&apos;, [
-    &apos;clean&apos;,
-    &apos;copy:prejs&apos;,
-    &apos;uglify&apos;,
-    &apos;concat:js&apos;,
-    &apos;copy:js&apos;
+  grunt.registerTask(<span class="hljs-string">'build:js'</span>, [
+    <span class="hljs-string">'clean'</span>,
+    <span class="hljs-string">'copy:prejs'</span>,
+    <span class="hljs-string">'uglify'</span>,
+    <span class="hljs-string">'concat:js'</span>,
+    <span class="hljs-string">'copy:js'</span>
   ]);
 };
 </code></pre>

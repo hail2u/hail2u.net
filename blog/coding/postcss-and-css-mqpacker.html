@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="PostCSSというCSSのパースと変更を行うNode.jsパッケージを知った。Autoprefixerで使われている。名前からわかるように、主にCSSをポストプロセスするためのパッケージだけど、単にパーサーとして使っても良さそう。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -68,36 +68,36 @@
 
 <p>PostCSSの<code>parse()</code>を呼んだ返り値や<code>process()</code>で呼ばれる自前の関数に渡されるオブジェクトは、その子の配列<code>rules</code>の各要素にルールセット（かメディアクエリなど）が格納され、それらは以下のような構造になっている。</p>
 
-<pre><code class="language-javascript">{
-  type: &apos;rule&apos;,
-  decls: [
+<pre><code class="hljs language-javascript">{
+  <span class="hljs-attr">type</span>: <span class="hljs-string">'rule'</span>,
+  <span class="hljs-attr">decls</span>: [
     {
-      type: &apos;decl&apos;,
-      parent: [Object],
-      source: {
-        start: [Object],
-        end: [Object]
+      <span class="hljs-attr">type</span>: <span class="hljs-string">'decl'</span>,
+      <span class="hljs-attr">parent</span>: [<span class="hljs-built_in">Object</span>],
+      <span class="hljs-attr">source</span>: {
+        <span class="hljs-attr">start</span>: [<span class="hljs-built_in">Object</span>],
+        <span class="hljs-attr">end</span>: [<span class="hljs-built_in">Object</span>]
       },
-      before: &apos; &apos;,
-      prop: &apos;color&apos;,
-      between: &apos;: &apos;,
-      _value: &apos;black&apos;
+      <span class="hljs-attr">before</span>: <span class="hljs-string">' '</span>,
+      <span class="hljs-attr">prop</span>: <span class="hljs-string">'color'</span>,
+      <span class="hljs-attr">between</span>: <span class="hljs-string">': '</span>,
+      <span class="hljs-attr">_value</span>: <span class="hljs-string">'black'</span>
     }
   ],
-  parent: {
-    type: &apos;root&apos;,
-    rules: [Circular],
-    after: &apos;&apos;
+  <span class="hljs-attr">parent</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-string">'root'</span>,
+    <span class="hljs-attr">rules</span>: [Circular],
+    <span class="hljs-attr">after</span>: <span class="hljs-string">''</span>
   },
-  source: {
-    start: [Object],
-    end: [Object]
+  <span class="hljs-attr">source</span>: {
+    <span class="hljs-attr">start</span>: [<span class="hljs-built_in">Object</span>],
+    <span class="hljs-attr">end</span>: [<span class="hljs-built_in">Object</span>]
   },
-  before: &apos;&apos;,
-  _selector: &apos;.foo&apos;,
-  between: &apos; &apos;,
-  semicolon: true,
-  after: &apos; &apos;
+  <span class="hljs-attr">before</span>: <span class="hljs-string">''</span>,
+  <span class="hljs-attr">_selector</span>: <span class="hljs-string">'.foo'</span>,
+  <span class="hljs-attr">between</span>: <span class="hljs-string">' '</span>,
+  <span class="hljs-attr">semicolon</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">after</span>: <span class="hljs-string">' '</span>
 }
 </code></pre>
 
@@ -119,81 +119,81 @@
 
 <p>スクリプトは以下のように<code>pack()</code>をCSSコードを引数に呼ぶだけ。PostCSSの<code>process()</code>と同じ引数を取れるようにしたので、Source Mapの作成・更新も可能だと思う（自動判別も含めて）。</p>
 
-<pre><code class="language-javascript">#!/usr/bin/env node
+<pre><code class="hljs language-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-meta">
+'use strict'</span>;
 
-&apos;use strict&apos;;
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> mqpacker = <span class="hljs-built_in">require</span>(<span class="hljs-string">'css-mqpacker'</span>);
 
-var fs = require(&apos;fs&apos;);
-var mqpacker = require(&apos;css-mqpacker&apos;);
+<span class="hljs-keyword">var</span> filenameIn = <span class="hljs-string">'in.css'</span>;
+<span class="hljs-keyword">var</span> filenameOut = <span class="hljs-string">'out.css'</span>;
 
-var filenameIn = &apos;in.css&apos;;
-var filenameOut = &apos;out.css&apos;;
-
-var css = fs.readFileSync(fileNameIn, {
-  encoding: &apos;utf8&apos;
+<span class="hljs-keyword">var</span> css = fs.readFileSync(fileNameIn, {
+  <span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span>
 });
-var processed = mqpacker.pack(css, {
-  from: fileNameIn,
-  to: filenameOut,
-  map: true
+<span class="hljs-keyword">var</span> processed = mqpacker.pack(css, {
+  <span class="hljs-attr">from</span>: fileNameIn,
+  <span class="hljs-attr">to</span>: filenameOut,
+  <span class="hljs-attr">map</span>: <span class="hljs-literal">true</span>
 });
 fs.writeFileSync(filenameOut, processed.css);
-fs.writeFileSync(filenameOut + &apos;.map&apos;, processed.map);
+fs.writeFileSync(filenameOut + <span class="hljs-string">'.map'</span>, processed.map);
 </code></pre>
 
 <p>例えば以下のような<code>in.css</code>があると、</p>
 
-<pre><code class="language-css">.foo:before {
-  content: &quot;foo on small&quot;;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.foo</span><span class="hljs-selector-pseudo">:before</span> {
+  <span class="hljs-attribute">content</span>: <span class="hljs-string">"foo on small"</span>;
 }
 
-@media (min-width: 769px) {
-  .foo:before {
-    content: &quot;foo on medium&quot;;
+@<span class="hljs-keyword">media</span> (min-width: <span class="hljs-number">769px</span>) {
+  <span class="hljs-selector-class">.foo</span><span class="hljs-selector-pseudo">:before</span> {
+    <span class="hljs-attribute">content</span>: <span class="hljs-string">"foo on medium"</span>;
   }
 }
 
-.bar:before {
-  content: &quot;bar on small&quot;;
+<span class="hljs-selector-class">.bar</span><span class="hljs-selector-pseudo">:before</span> {
+  <span class="hljs-attribute">content</span>: <span class="hljs-string">"bar on small"</span>;
 }
 
-@media (min-width: 769px) {
-  .bar:before {
-    content: &quot;bar on medium&quot;;
+@<span class="hljs-keyword">media</span> (min-width: <span class="hljs-number">769px</span>) {
+  <span class="hljs-selector-class">.bar</span><span class="hljs-selector-pseudo">:before</span> {
+    <span class="hljs-attribute">content</span>: <span class="hljs-string">"bar on medium"</span>;
   }
 }
 </code></pre>
 
 <p>以下のようにメディアクエリが後ろにまとめられて<code>out.css</code>として吐かれる。</p>
 
-<pre><code class="language-css">.foo:before {
-  content: &quot;foo on small&quot;;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.foo</span><span class="hljs-selector-pseudo">:before</span> {
+  <span class="hljs-attribute">content</span>: <span class="hljs-string">"foo on small"</span>;
 }
 
-.bar:before {
-  content: &quot;bar on small&quot;;
+<span class="hljs-selector-class">.bar</span><span class="hljs-selector-pseudo">:before</span> {
+  <span class="hljs-attribute">content</span>: <span class="hljs-string">"bar on small"</span>;
 }
 
-@media (min-width: 769px) {
-  .foo:before {
-    content: &quot;foo on medium&quot;;
+@<span class="hljs-keyword">media</span> (min-width: <span class="hljs-number">769px</span>) {
+  <span class="hljs-selector-class">.foo</span><span class="hljs-selector-pseudo">:before</span> {
+    <span class="hljs-attribute">content</span>: <span class="hljs-string">"foo on medium"</span>;
   }
-  .bar:before {
-    content: &quot;bar on medium&quot;;
+  <span class="hljs-selector-class">.bar</span><span class="hljs-selector-pseudo">:before</span> {
+    <span class="hljs-attribute">content</span>: <span class="hljs-string">"bar on medium"</span>;
   }
 }
 
-/*# sourceMappingURL=out.css.map */
+<span class="hljs-comment">/*# sourceMappingURL=out.css.map */</span>
 </code></pre>
 
 <p>同時にSource Mapファイルも正常に吐かれる。</p>
 
-<pre><code class="language-javascript">{
-  &quot;version&quot;: 3,
-  &quot;file&quot;: &quot;out.css&quot;,
-  &quot;sources&quot;: [&quot;in.css&quot;],
-  &quot;names&quot;: [],
-  &quot;mappings&quot;: &quot;AAAA;EACE,yBAAwB;EACzB;;AAQD;EACE,yBAAwB;EACzB;;AAED;EATE;IACE,0BAAyB;IAC1B;EAQD;IACE,0BAAyB;IAC1B;EACF&quot;
+<pre><code class="hljs language-javascript">{
+  <span class="hljs-string">"version"</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-string">"file"</span>: <span class="hljs-string">"out.css"</span>,
+  <span class="hljs-string">"sources"</span>: [<span class="hljs-string">"in.css"</span>],
+  <span class="hljs-string">"names"</span>: [],
+  <span class="hljs-string">"mappings"</span>: <span class="hljs-string">"AAAA;EACE,yBAAwB;EACzB;;AAQD;EACE,yBAAwB;EACzB;;AAED;EATE;IACE,0BAAyB;IAC1B;EAQD;IACE,0BAAyB;IAC1B;EACF"</span>
 }
 </code></pre>
 

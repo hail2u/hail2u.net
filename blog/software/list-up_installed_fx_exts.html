@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Firefoxにインストール済みのExtensionは、もちろんExtension Managerで確認できるわけですが、なんかの拍子にプロファイル作り直しの刑を受けてしまうと当然Extensionも入れ直しなわけです。この作業は、新たなExtensionを導入する作業と違ってかったるいだけの作業だったりするわけで。てなわけでその作業の手間を少し楽にするためにインストール済みのExtensionの情報が書かれているExtension.rdfを（かなり適当に）パースして、Extensionの名前とバージョン、配布サイトのURLをリスト・アップするスクリプトを書いてみました。・・・WSH with JScriptで。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,45 +64,45 @@
 
     <div itemprop="articleBody"><p><a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>にインストール済みのExtensionは、もちろんExtension Managerで確認できるわけですが、なんかの拍子にプロファイル作り直しの刑を受けてしまうと当然Extensionも入れ直しなわけです。この作業は、新たなExtensionを導入する作業と違ってかったるいだけの作業だったりするわけで。てなわけでその作業の手間を少し楽にするためにインストール済みのExtensionの情報が書かれているExtension.rdfを（かなり適当に）パースして、Extensionの名前とバージョン、配布サイトのURLをリスト・アップするスクリプトを書いてみました。・・・WSH with JScriptで。</p>
 <p>Extensions.rdfの構造はちゃんと調べてないのでよく知らない（最低）のですが、どうもインストールしたExtensionについては<code>em:version</code>とか<code>em:name</code>とかいう属性を持つ<code>RDF:Description</code>要素が追加されるようなので、それを単純にリストアップしてみました。</p>
-<pre><code class="language-js">// fxexts.js
+<pre><code class="hljs language-js"><span class="hljs-comment">// fxexts.js</span>
 
-var oArgs = WScript.Arguments;
-var fFxExtsRdf = oArgs(0);
+<span class="hljs-keyword">var</span> oArgs = WScript.Arguments;
+<span class="hljs-keyword">var</span> fFxExtsRdf = oArgs(<span class="hljs-number">0</span>);
 
-var oFileSys = new ActiveXObject(&quot;Scripting.FileSystemObject&quot;);
+<span class="hljs-keyword">var</span> oFileSys = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Scripting.FileSystemObject"</span>);
 
-if (!oFileSys.FileExists(fFxExtsRdf)) {
-  WScript.Echo(fFxExtsRdf + &quot;\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。&quot;);
+<span class="hljs-keyword">if</span> (!oFileSys.FileExists(fFxExtsRdf)) {
+  WScript.Echo(fFxExtsRdf + <span class="hljs-string">"\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。"</span>);
   WScript.Quit();
 }
 
-var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
+<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Msxml2.DOMDocument.3.0"</span>);
 
-xmlDoc.async = false;
+xmlDoc.async = <span class="hljs-literal">false</span>;
 xmlDoc.load(fFxExtsRdf);
 
-if (xmlDoc.parseError.errorCode != 0) {
+<span class="hljs-keyword">if</span> (xmlDoc.parseError.errorCode != <span class="hljs-number">0</span>) {
   WScript.Echo(xmlDoc.parseError.reason);
   WScript.Quit();
 }
 
-var descriptionNodes = xmlDoc.getElementsByTagName(&quot;RDF:Description&quot;);
-var sExtsList = &quot;&quot;;
+<span class="hljs-keyword">var</span> descriptionNodes = xmlDoc.getElementsByTagName(<span class="hljs-string">"RDF:Description"</span>);
+<span class="hljs-keyword">var</span> sExtsList = <span class="hljs-string">""</span>;
 
-for (var i = 0; i &lt; descriptionNodes.length; i++) {
-  var description   = descriptionNodes.item(i);
-  var emName        = description.getAttribute(&quot;em:name&quot;);
-  var emVersion     = description.getAttribute(&quot;em:version&quot;);
-  var emHomepageUrl = description.getAttribute(&quot;em:homepageURL&quot;);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; descriptionNodes.length; i++) {
+  <span class="hljs-keyword">var</span> description   = descriptionNodes.item(i);
+  <span class="hljs-keyword">var</span> emName        = description.getAttribute(<span class="hljs-string">"em:name"</span>);
+  <span class="hljs-keyword">var</span> emVersion     = description.getAttribute(<span class="hljs-string">"em:version"</span>);
+  <span class="hljs-keyword">var</span> emHomepageUrl = description.getAttribute(<span class="hljs-string">"em:homepageURL"</span>);
 
-  if (emName &amp;&amp; emVersion &amp;&amp; emHomepageUrl) {
-    sExtsList += emName + &quot; version &quot; + emVersion + &quot;\n&quot; + emHomepageUrl + &quot;\n&quot;;
-    sExtsList += &quot;----------------------------------------\n&quot;;
+  <span class="hljs-keyword">if</span> (emName &amp;&amp; emVersion &amp;&amp; emHomepageUrl) {
+    sExtsList += emName + <span class="hljs-string">" version "</span> + emVersion + <span class="hljs-string">"\n"</span> + emHomepageUrl + <span class="hljs-string">"\n"</span>;
+    sExtsList += <span class="hljs-string">"----------------------------------------\n"</span>;
   }
 }
 
-if (sExtsList) {
-  sExtsList = &quot;Firefox installed Extensions\n========================================\n&quot; + sExtsList;
+<span class="hljs-keyword">if</span> (sExtsList) {
+  sExtsList = <span class="hljs-string">"Firefox installed Extensions\n========================================\n"</span> + sExtsList;
   WScript.Echo(sExtsList);
 }
 

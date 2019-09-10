@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,20 +66,20 @@
 
 <p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
 
-<pre><code class="language-js">} else if (selector == 'link[rel="canonical"]') {
-  var z = document.getElementsByTagName("link"),
+<pre><code class="hljs language-js">} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selector == <span class="hljs-string">'link[rel="canonical"]'</span>) {
+  <span class="hljs-keyword">var</span> z = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"link"</span>),
     y,
     x = z.length,
     w,
-    v = document.createElement("a");
+    v = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"a"</span>);
 
-  for (y = 0; y &lt; x; y++) {
+  <span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
     w = z[y];
 
-    if (w.rel === "canonical") {
-      v.setAttribute("href", w.href);
-      result = v.cloneNode(false);
-      break;
+    <span class="hljs-keyword">if</span> (w.rel === <span class="hljs-string">"canonical"</span>) {
+      v.setAttribute(<span class="hljs-string">"href"</span>, w.href);
+      result = v.cloneNode(<span class="hljs-literal">false</span>);
+      <span class="hljs-keyword">break</span>;
     }
   }
 </code></pre>
@@ -92,22 +92,22 @@
 
 <p>このブログのように、Blosxomで一覧ページとpermalinkで対象とするURLを切り替える場合は<a href="http://blosxom.sourceforge.net/plugins/interpolate/interpolate_fancy.htm">interpolcate_fancy</a>を使って以下のようにすれば良いでしょう。</p>
 
-<pre><code class="language-html">&lt;script type="text/javascript"&gt;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="handlebars"><span class="xml">
 Hatena.Star.SiteConfig = {
   entryNodes: {
     "article": {
-&lt;?$path_info like="\.html$"&gt;
-      uri:       "link[rel=\"canonical\"]",
-&lt;/?&gt;
-&lt;?$path_info unlike="\.html$"&gt;
-      uri:       "h2 a",
-&lt;/?&gt;
+<span class="php"><span class="hljs-meta">&lt;?</span>$path_info like=<span class="hljs-string">"\.html$"</span>&gt;
+      uri:       <span class="hljs-string">"link[rel=\"canonical\"]"</span>,
+&lt;/<span class="hljs-meta">?&gt;</span></span>
+<span class="php"><span class="hljs-meta">&lt;?</span>$path_info unlike=<span class="hljs-string">"\.html$"</span>&gt;
+      uri:       <span class="hljs-string">"h2 a"</span>,
+&lt;/<span class="hljs-meta">?&gt;</span></span>
       title:     "h2",
       container: "footer p"
     }
   }
 };
-&lt;/script&gt;
+</span></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 
 <p>これでスター通知でニヤニヤする日々が帰ってきますね！</p></div>

@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="gfmtoc（mdtocから名前を変えた）を作っている時にGitHub flavored Markdown（本当はHTML Pipeline）互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -75,24 +75,24 @@
 
 <p>つまりこれらを連結した正規表現パターンを作れば良い。まともにやったら日が暮れるので、Node.jsでは<a href="https://www.npmjs.com/package/unicode-7.0.0">unicode-7.0.0</a>と<a href="https://www.npmjs.com/package/regenerate">regenerate</a>の両パッケージを使って生成してやる。</p>
 
-<pre><code class="language-javascript">var regenerate = require(&apos;regenerate&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> regenerate = <span class="hljs-built_in">require</span>(<span class="hljs-string">'regenerate'</span>);
 
-var word = regenerate().add(
-  require(&apos;unicode-7.0.0/properties/Any/code-points&apos;)
+<span class="hljs-keyword">var</span> word = regenerate().add(
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/properties/Any/code-points'</span>)
 ).remove(
-  require(&apos;unicode-7.0.0/categories/L/code-points&apos;)
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/L/code-points'</span>)
 ).remove(
-  require(&apos;unicode-7.0.0/categories/M/code-points&apos;)
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/M/code-points'</span>)
 ).remove(
-  require(&apos;unicode-7.0.0/categories/N/code-points&apos;)
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/N/code-points'</span>)
 ).remove(
-  require(&apos;unicode-7.0.0/categories/Pc/code-points&apos;)
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/Pc/code-points'</span>)
 ).remove(
-  &apos;-&apos;,
-  &apos; &apos;
+  <span class="hljs-string">'-'</span>,
+  <span class="hljs-string">' '</span>
 );
 
-console.log(word.toString());
+<span class="hljs-built_in">console</span>.log(word.toString());
 </code></pre>
 
 <p>ここでは否定形が欲しいので、Anyプロパティーを<code>add()</code>してから上記カテゴリーを<code>remove()</code>していく。最終的には特別視される<code>-</code>と<code> </code>もここでついでに削除しておく。gfmtocでは<a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js">生成結果をファイルに保存したもの</a>をライブラリとして使っている。普通はそのまま書けば良い（毎回動的に生成させるととても遅いことには注意が必要）。あとはHTML Pipelineがやっていることをなぞるのみだ。</p>
@@ -106,26 +106,26 @@ console.log(word.toString());
 
 <p>HTML Pipelineではこのような<a href="https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb">生成手順</a>になっているようだ。</p>
 
-<pre><code class="language-javascript">var h = {};
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> h = {};
 
-function genID(s, h) {
-  var u = &apos;&apos;;
-  var word = /.../g;
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">genID</span>(<span class="hljs-params">s, h</span>) </span>{
+  <span class="hljs-keyword">var</span> u = <span class="hljs-string">''</span>;
+  <span class="hljs-keyword">var</span> word = <span class="hljs-regexp">/.../g</span>;
   s = s.toLowerCase();
-  s = s.replace(word, &apos;&apos;);
-  s = s.replace(/ /g, &apos;-&apos;);
+  s = s.replace(word, <span class="hljs-string">''</span>);
+  s = s.replace(<span class="hljs-regexp">/ /g</span>, <span class="hljs-string">'-'</span>);
 
-  if (h[s] &gt; 0) {
-    u = &apos;-&apos; + h[s];
+  <span class="hljs-keyword">if</span> (h[s] &gt; <span class="hljs-number">0</span>) {
+    u = <span class="hljs-string">'-'</span> + h[s];
   }
 
-  if (!h[s]) {
-    h[s] = 0;
+  <span class="hljs-keyword">if</span> (!h[s]) {
+    h[s] = <span class="hljs-number">0</span>;
   }
 
-  h[s] += 1;
+  h[s] += <span class="hljs-number">1</span>;
 
-  return s + u;
+  <span class="hljs-keyword">return</span> s + u;
 }
 </code></pre>
 

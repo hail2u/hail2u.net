@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -65,29 +65,29 @@
     <div itemprop="articleBody"><p>Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していた<a href="http://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtでは<code>event.src</code>とかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースの<code>img</code>要素を全部調べ、<code>src</code>属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。</p>
 <p>Amazonの個別商品ページには画像があればかならず正しいURLで画像へのリンクが張られている（と思う）ので、<code>document.images</code>で拾うことができる<code>img</code>要素でループを回してやり、正規表現でMZZZZZZZが含まれているかどうかチェックするというわけ。</p>
 <p>JavaScriptのコードは以下のような構造になってます。</p>
-<pre><code class="language-js">var aid  = &apos;hail2unet-22&apos;;
-var t    = document.title;
-var u    = document.location.href;
-var i    = u.indexOf(&apos;ASIN&apos;);
-var asin = u.substring(i+5,i+15);
-u        = &apos;http://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;
-var img;
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> aid  = <span class="hljs-string">'hail2unet-22'</span>;
+<span class="hljs-keyword">var</span> t    = <span class="hljs-built_in">document</span>.title;
+<span class="hljs-keyword">var</span> u    = <span class="hljs-built_in">document</span>.location.href;
+<span class="hljs-keyword">var</span> i    = u.indexOf(<span class="hljs-string">'ASIN'</span>);
+<span class="hljs-keyword">var</span> asin = u.substring(i+<span class="hljs-number">5</span>,i+<span class="hljs-number">15</span>);
+u        = <span class="hljs-string">'http://www.amazon.co.jp/exec/obidos/ASIN/'</span>+asin+<span class="hljs-string">'/'</span>+aid;
+<span class="hljs-keyword">var</span> img;
 
-for (i=0; i &lt; document.images.length; i++) {
-  if (document.images[i].src.match(/MZZZZZZZ/)) {
-    img = document.images[i].src;
-    break;
+<span class="hljs-keyword">for</span> (i=<span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">document</span>.images.length; i++) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">document</span>.images[i].src.match(<span class="hljs-regexp">/MZZZZZZZ/</span>)) {
+    img = <span class="hljs-built_in">document</span>.images[i].src;
+    <span class="hljs-keyword">break</span>;
   }
 }
 
-prompt(&apos;Associate This (with image)!&apos;,
-  &apos;&lt;a href=&quot;&apos; + u + &apos;&quot; title=&quot;&apos; + t + &apos;&quot;&gt;&lt;img src=&quot;&apos; + img + &apos;&quot; alt=&quot;&apos; + t +
-  &apos;&quot; /&gt;&lt;/a&gt;&apos;);
+prompt(<span class="hljs-string">'Associate This (with image)!'</span>,
+  <span class="hljs-string">'&lt;a href="'</span> + u + <span class="hljs-string">'" title="'</span> + t + <span class="hljs-string">'"&gt;&lt;img src="'</span> + img + <span class="hljs-string">'" alt="'</span> + t +
+  <span class="hljs-string">'" /&gt;&lt;/a&gt;'</span>);
 </code></pre>
 <p>Bookmarkletはこちら。</p>
 <p>Bookmarklet: <em><a href="javascript:var aid=&apos;hail2unet-22&apos;;var t=document.title;var u=document.location.href;var i=u.indexOf(&apos;ASIN&apos;);var asin=u.substring(i+5,i+15); u=&apos;http://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;var img;for(i=0;i&lt;document.images.length;i++){if(document.images[i].src.match(/MZZZZZZZ/)){img=document.images[i].src;break;}}prompt(&apos;Associate This (with image)!&apos;, &apos;&lt;a href=&quot;&apos;+u+&apos;&quot; title=&quot;&apos;+t+&apos;&quot;&gt;&lt;img src=&quot;&apos;+img+&apos;&quot; alt=&quot;&apos;+t+&apos;&quot; /&gt;&lt;/a&gt;&apos;);" title="Associate This (with image)!">Associate This (with image)!</a></em></p>
 <p>使い方は、上記リンクをBookmarks Toolbarにドラッグ・アンド・ドロップし、Amazonの個別商品ページを開いた状態でそれをクリックするだけ！すると、</p>
-<pre><code class="language-html">&lt;a href=&quot;http://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22&quot; title=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot;&gt;&lt;img src=&quot;https://images-fe.ssl-images-amazon.com/images/P/B00028G7J8.jpg&quot; alt=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot; /&gt;&lt;/a&gt;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"http://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22"</span> <span class="hljs-attr">title</span>=<span class="hljs-string">"Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)"</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://images-fe.ssl-images-amazon.com/images/P/B00028G7J8.jpg"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)"</span> /&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
 </code></pre>
 <p>というコードがプロンプトで出てきます。hail2unet-22となっているアソシエイトIDは自分のアソシエイトIDに書き換えましょう。</p>
 <p>コピーするのメンドイ（なんてズボラな・・・）。</p>

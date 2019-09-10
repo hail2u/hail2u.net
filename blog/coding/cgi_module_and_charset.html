@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="PerlでCGIモジュールを利用する時、Content-Typeヘッダにcharsetパラメータを加えるには、headerメソッドで-charset =&gt; &apos;UTF-8&apos;などと指定するわけですが、どうもtext/*なもの以外では無視され、Content-Typeヘッダにcharsetパラメータを加えてくれないみたいです。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,9 +64,9 @@
 
     <div itemprop="articleBody"><p>Perlで<a href="http://search.cpan.org/search?module=CGI" title="search.cpan.org: CGI - Simple Common Gateway Interface Class">CGIモジュール</a>を利用する時、Content-Typeヘッダにcharsetパラメータを加えるには、<code>header</code>メソッドで<code>-charset =&gt; &apos;UTF-8&apos;</code>などと指定するわけですが、どうもtext/*なもの以外では無視され、Content-Typeヘッダにcharsetパラメータを加えてくれないみたいです。</p>
 <p>要は、</p>
-<pre><code class="language-perl">print header(
-  -type    =&gt; &apos;application/xml&apos;,
-  -charset =&gt; &apos;UTF-8&apos;,
+<pre><code class="hljs language-perl"><span class="hljs-keyword">print</span> header(
+  <span class="hljs-string">-type    =&gt;</span> <span class="hljs-string">'application/xml'</span>,
+  <span class="hljs-string">-charset =&gt;</span> <span class="hljs-string">'UTF-8'</span>,
 );
 </code></pre>
 <p>だと、</p>
@@ -74,11 +74,11 @@
 </pre>
 <p>としか出力されないってことです。</p>
 <p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>に<code>$blog_charset</code>という文字コードを指定する設定を追加しようとして、ゴニョゴニョやっていた時に気づきました。CGIモジュールのソースでcharsetパラメータを付け加えるコードが、</p>
-<pre><code class="language-perl">$type .= &quot;; charset=$charset&quot; if $type ne &apos;&apos; and $type =~ m!^text/! and $type !~ /\bcharset\b/ and $charset ne &apos;&apos;;
+<pre><code class="hljs language-perl">$type .= <span class="hljs-string">"; charset=$charset"</span> <span class="hljs-keyword">if</span> $type <span class="hljs-keyword">ne</span> <span class="hljs-string">''</span> <span class="hljs-keyword">and</span> $type =~ <span class="hljs-keyword">m</span>!^text/! <span class="hljs-keyword">and</span> $type !~ <span class="hljs-regexp">/\bcharset\b/</span> <span class="hljs-keyword">and</span> $charset <span class="hljs-keyword">ne</span> <span class="hljs-string">''</span>;
 </code></pre>
 <p>となってたので、text/*以外では無視というのはどうやら当たっていたみたいです。なので、</p>
-<pre><code class="language-perl">print header(
-  -type =&gt; &apos;application/xml; charset=UTF-8&apos;,
+<pre><code class="hljs language-perl"><span class="hljs-keyword">print</span> header(
+  <span class="hljs-string">-type =&gt;</span> <span class="hljs-string">'application/xml; charset=UTF-8'</span>,
 );
 </code></pre>
 <p>こうやってやらないとダメぽ。またひとつ賢くなりました。</p>

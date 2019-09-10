@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -68,40 +68,40 @@
 
 <p>つまり、</p>
 
-<pre><code class="language-js">var urls = [
-  &apos;http://del.icio.us/feeds/json/cho45&apos;,
-  &apos;http://del.icio.us/feeds/json/drawnboy&apos;,
-  &apos;http://del.icio.us/feeds/json/gorou&apos;,
-  &apos;http://del.icio.us/feeds/json/hail2u&apos;,
-  &apos;http://del.icio.us/feeds/json/miyagawa&apos;,
-  &apos;http://del.icio.us/feeds/json/nagayama&apos;,
-  &apos;http://del.icio.us/feeds/json/typester&apos;,
-  &apos;http://del.icio.us/feeds/json/yoko&apos;
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> urls = [
+  <span class="hljs-string">'http://del.icio.us/feeds/json/cho45'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/drawnboy'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/gorou'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/hail2u'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/miyagawa'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/nagayama'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/typester'</span>,
+  <span class="hljs-string">'http://del.icio.us/feeds/json/yoko'</span>
 ];
 </code></pre>
 
 <p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
 
-<pre><code class="language-js">addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
+<pre><code class="hljs language-js">addScript(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">'?callback=diplayPosts'</span>);
 
-function addScript(url) {
-  var script = document.createElement(&apos;script&apos;);
-  script.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
-  script.setAttribute(&apos;src&apos;, url);
-  script.setAttribute(&apos;charset&apos;, &apos;UTF-8&apos;);
-  document.getElementsByTagName(&apos;head&apos;).item(0).appendChild(script);
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addScript</span>(<span class="hljs-params">url</span>) </span>{
+  <span class="hljs-keyword">var</span> script = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>);
+  script.setAttribute(<span class="hljs-string">'type'</span>, <span class="hljs-string">'text/javascript'</span>);
+  script.setAttribute(<span class="hljs-string">'src'</span>, url);
+  script.setAttribute(<span class="hljs-string">'charset'</span>, <span class="hljs-string">'UTF-8'</span>);
+  <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'head'</span>).item(<span class="hljs-number">0</span>).appendChild(script);
 }
 
-function diplayPosts(posts) {
-  // JSONフィードに含まれるブックマークのJSONデータに対する処理色々
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diplayPosts</span>(<span class="hljs-params">posts</span>) </span>{
+  <span class="hljs-comment">// JSONフィードに含まれるブックマークのJSONデータに対する処理色々</span>
 
-  <em>loadNext()</em>;
+  &lt;em&gt;loadNext()&lt;<span class="hljs-regexp">/em&gt;;
 }
 
 function loadNext() {
   if (urls.length &lt;= 1) return;
   urls.shift();
-  addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
+  addScript(&lt;em&gt;urls[0]&lt;/</span>em&gt; + <span class="hljs-string">'?callback=diplayPosts'</span>);
 }
 </code></pre>
 

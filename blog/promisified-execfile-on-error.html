@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="child_processモジュールの関数群もutil.promisify()を使ってPromise化できる。しかしexecFile()などは元々のコールバックに3つ引数が渡されることから少し使い方が違ってくる。ここまでは皆が通る道だろう。実はそれだけでなくリジェクトされた時も少し違うことが公式ドキュメントの該当する項の最後に記載されていた。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -73,21 +73,21 @@
 
 <p>ちゃんと<code>catch()</code>されているなら、エラーが起きた場合にその中で標準出力と標準エラーにアクセスできるわけだ。こうなっていることでプロミス化した<code>execFile()</code>を<code>await</code>してエラーになった時、その解決に必要になる重要なメッセージを記録でき、実行したファイルが起こしたエラーの解決につなげられる。</p>
 
-<pre><code class="language-javascript">const util = require(&quot;util&quot;);
-const { execFile } = require(&quot;child_process&quot;);
-const execFileAsync = util.promisify(execFile);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">"util"</span>);
+<span class="hljs-keyword">const</span> { execFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">"child_process"</span>);
+<span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
 
-const getVersion = async () =&gt; {
-  const { stdout } = await execFile(&quot;node&quot;, [&quot;--version&quot;]);
-  console.log(stdout);
+<span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
+  <span class="hljs-keyword">const</span> { stdout } = <span class="hljs-keyword">await</span> execFile(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
+  <span class="hljs-built_in">console</span>.log(stdout);
 };
 
-getVersion().catch(e =&gt; {
-  if (<mark>e.stderr</mark>) {
-    console.error(<mark>e.stderr</mark>);
+getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+  <span class="hljs-keyword">if</span> (e.stderr) {
+    <span class="hljs-built_in">console</span>.error(e.stderr);
   }
 
-  console.trace(e);
+  <span class="hljs-built_in">console</span>.trace(e);
 });
 </code></pre>
 
@@ -97,26 +97,26 @@ getVersion().catch(e =&gt; {
 
 <p>僕は当初<code>try..catch</code>でやるものと考えていて、書きづらいな……と感じていた。</p>
 
-<pre><code class="language-javascript">const util = require(&quot;util&quot;);
-const { execFile } = require(&quot;child_process&quot;);
-const execFileAsync = util.promisify(execFile);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">"util"</span>);
+<span class="hljs-keyword">const</span> { execFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">"child_process"</span>);
+<span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
 
-const getVersion = async () =&gt; {
-  let stdout;
-  let stderr;
+<span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
+  <span class="hljs-keyword">let</span> stdout;
+  <span class="hljs-keyword">let</span> stderr;
 
-  try {
-    ({ stdout, stderr }) = await execFileAsync(&quot;node&quot;, [&quot;--version&quot;]);
-  } catch (e) {
-    console.error(stderr);
-    throw e;
+  <span class="hljs-keyword">try</span> {
+    ({ stdout, stderr }) = <span class="hljs-keyword">await</span> execFileAsync(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
+  } <span class="hljs-keyword">catch</span> (e) {
+    <span class="hljs-built_in">console</span>.error(stderr);
+    <span class="hljs-keyword">throw</span> e;
   }
 
-  console.log(stdout);
+  <span class="hljs-built_in">console</span>.log(stdout);
 };
 
-getVersion().catch(e =&gt; {
-  console.trace(e);
+getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+  <span class="hljs-built_in">console</span>.trace(e);
 });
 </code></pre>
 

@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="CtrlPのヘルプのカスタム・コマンドの項に記載があるように、Gitのls-filesサブコマンドを使ったカスタム・コマンドを定義すると、.gitignoreを考慮してファイルをリストアップすることができる。ただ常にこちらである必要はないので、Git管理下だけでそうなるようにしたい。その場合、ラッパー関数を作成して、その中でb:ctrlp_user_commandを設定してやると良さそうだ。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,24 +66,24 @@
 
 <p><a href="/blog/software/call-ctrlp-vim-based-on-git-status.html">Git配下のファイルかどうかでCtrlPを切り替える</a>で作成した関数を元にして、<code>v:shell_error</code>が<code>0</code>の時も特別視してやるようにすることで実装した。カスタム・コマンドはヘルプのまま、Gitリポジトリーのルートへ移動して<code>ls-files</code>サブコマンドを呼んでいる。</p>
 
-<pre><code class="language-vim">nnoremap &lt;Leader&gt;f :call &lt;SID&gt;CallCtrlPBasedOnGitStatus()&lt;Return&gt;
+<pre><code class="hljs language-vim"><span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;Leader&gt;</span><span class="hljs-keyword">f</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CallCtrlPBasedOnGitStatus()<span class="hljs-symbol">&lt;Return&gt;</span>
 
-function! s:CallCtrlPBasedOnGitStatus()
-  if exists(&apos;b:ctrlp_user_command&apos;)
-    unlet b:ctrlp_user_command
-  endif
+<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CallCtrlPBasedOnGitStatus</span><span class="hljs-params">()</span></span>
+  <span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">'b:ctrlp_user_command'</span>)
+    <span class="hljs-keyword">unlet</span> <span class="hljs-variable">b:ctrlp_user_command</span>
+  <span class="hljs-keyword">endif</span>
 
-  let s:git_status = system(&apos;git rev-parse --is-inside-git-dir&apos;)
+  <span class="hljs-keyword">let</span> <span class="hljs-variable">s:git_status</span> = <span class="hljs-built_in">system</span>(<span class="hljs-string">'git rev-parse --is-inside-git-dir'</span>)
 
-  if v:shell_error == 0
-    let b:ctrlp_user_command = [&apos;.git&apos;, &apos;cd %s &amp;&amp; git ls-files&apos;]
-    execute &apos;CtrlP&apos;
-  elseif v:shell_error == 128
-    execute &apos;CtrlPCurFile&apos;
-  else
-    execute &apos;CtrlP&apos;
-  endif
-endfunction
+  <span class="hljs-keyword">if</span> <span class="hljs-variable">v:shell_error</span> == <span class="hljs-number">0</span>
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">b:ctrlp_user_command</span> = [<span class="hljs-string">'.git'</span>, <span class="hljs-string">'cd %s &amp;&amp; git ls-files'</span>]
+    <span class="hljs-keyword">execute</span> <span class="hljs-string">'CtrlP'</span>
+  <span class="hljs-keyword">elseif</span> <span class="hljs-variable">v:shell_error</span> == <span class="hljs-number">128</span>
+    <span class="hljs-keyword">execute</span> <span class="hljs-string">'CtrlPCurFile'</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">execute</span> <span class="hljs-string">'CtrlP'</span>
+  <span class="hljs-keyword">endif</span>
+<span class="hljs-keyword">endfunction</span>
 </code></pre>
 
 <p>まずバッファー・ローカルの変数にカスタム・コマンドの設定があったら削除しておく。そうしないと変数の型の問題で、定義を上書き出来なかったりすることがあるからだ。</p>

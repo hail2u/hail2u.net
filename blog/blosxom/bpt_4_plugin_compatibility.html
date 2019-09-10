@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="blosxomのプラグイン同士には相性というものがあります。これはblosxomの仕様上の制限に基づくものですが、プラグイン側で対応することは可能です。なんですが、blosxomユーザーの多くは（僕を含め）ライトなユーザーが多く、あまり自分の環境以外での挙動を詰めるということはやりません（やれよ）。ので、しばしばプラグインがバッティングしてしまうと言うことは良くあります。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -73,12 +73,12 @@
 </ul>
 <p>以上の5つで、プラグイン内でこれらのサブルーチンを利用し、かつそのサブルーチンで<code>undef</code>以外を返すと、blosxomはその他のプラグインのそのサブルーチンを二度と呼ばないので、プラグインは複数利用できないということです。</p>
 <p>例えば、<code>template</code>サブルーチンは、</p>
-<pre><code class="language-perl">foreach my $plugin ( @plugins ) {
-  $plugins{$plugin} &gt; 0
-    and $plugin-&gt;can(&apos;template&apos;)
-    and defined($tmp = $plugin-&gt;template())
-    and $template = $tmp
-    and last;
+<pre><code class="hljs language-perl"><span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $plugin ( @plugins ) {
+  $plugins{$plugin} &gt; <span class="hljs-number">0</span>
+    <span class="hljs-keyword">and</span> $plugin-&gt;can(<span class="hljs-string">'template'</span>)
+    <span class="hljs-keyword">and</span> <span class="hljs-keyword">defined</span>($tmp = $plugin-&gt;template())
+    <span class="hljs-keyword">and</span> $template = $tmp
+    <span class="hljs-keyword">and</span> <span class="hljs-keyword">last</span>;
 }
 </code></pre>
 <p>というように呼び出されます。上記のコードの断片の4行目でプラグインの<code>template</code>サブルーチンが返す値を受け取り、チェックする仕組みになっており、<code>undef</code>以外が返ってきた場合はデフォルトのテンプレートを上書きし、ループを抜けるということになっているわけです。つまり最初に呼び出されたプラグインの<code>template</code>サブルーチン以外は呼び出されることは無いわけで、排他的な利用ということになるわけです。</p>

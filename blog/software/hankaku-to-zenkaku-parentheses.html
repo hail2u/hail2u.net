@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="このウェブログの本文で使っていた半角カッコを全角カッコに変えたくなった。文章校正的な理由ではなく、将来の縦書き化を見据えて今のうちに調節しておこうかなという程度の理由だ（半角カッコに戻すのは簡単そうだ、ということもある）。だが単純な置換ではなかなか難しく、手作業でやろうかと思ったが開き半角カッコだけで8000近くあったので無理そう……ということで一時間くらい色々考えた結果、ASCII範囲外の文字を含む開き半角カッコと閉じ半角カッコのペアを探して置換するのがよさそうという結論に至った。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,7 +66,7 @@
 
 <p>Perlの正規表現ならばかなりかっこよく書けそうだったが、ファイル探索から読み込み、置換、保存まで書くのはさすがに面倒そうだ。普通にVimで<a href="https://github.com/thinca/vim-qfreplace">qfreplace</a>を使って行うようにした。</p>
 
-<pre><code class="language-vim">:%s/(\(.*[^!-~ ].\{-}\))/（\1）/gc
+<pre><code class="hljs language-vim">:%s/(\(.*[^!-~ ].\{-}\))/（\<span class="hljs-number">1</span>）/gc
 </code></pre>
 
 <p>Vimの正規表現なので気持ち悪いやつになっている。ASCII範囲外の文字はアバウトに<code>!</code>から<code>~</code>と半角スペースを指定して反転するというアバウトなものにした。これで大抵のプログラム・コードでの半角カッコはスキップすることができる。問題は半角カッコのネストと同じ行に半角カッコを使うコードが複数回出てくるパターン（「`foo()`や`bar()`」というようなパターンだと「()`や`bar()」にマッチしてしまう）だが、うろ覚えのVimの正規表現では考慮するのが厳しく、そこは<code>c</code>フラグも付けて手作業で行うことにした。</p>

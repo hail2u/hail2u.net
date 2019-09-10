@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の（&lt;C-x&gt;だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,39 +64,39 @@
 
     <div itemprop="articleBody"><p>メタ構文変数とか呼ばれてるらしい<code>foo</code>とか<code>bar</code>とかのアレがまったく覚えられない。のでVimに<a href="http://en.wikipedia.org/wiki/Metasyntactic_variable#English">一般的なメタ構文変数のリスト</a>を覚えさせておいて、<code>foo</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>bar</code>に、<code>bar</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>buz</code>に、と順に次の（<kbd>&lt;C-x&gt;</kbd>だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。</p>
 
-<pre><code class="language-vim">&quot; Cycle metasyntactic variables
-function! s:CycleMetasyntacticVariables(num)
-  if type(a:num) != type(0)
-    return
-  endif
+<pre><code class="hljs language-vim"><span class="hljs-comment">" Cycle metasyntactic variables</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CycleMetasyntacticVariables</span><span class="hljs-params">(num)</span></span>
+  <span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(<span class="hljs-variable">a:num</span>) != <span class="hljs-built_in">type</span>(<span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span>
+  <span class="hljs-keyword">endif</span>
 
-  let vars = [&apos;foo&apos;, &apos;bar&apos;, &apos;baz&apos;, &apos;qux&apos;, &apos;quux&apos;, &apos;corge&apos;, &apos;grault&apos;, &apos;garply&apos;, &apos;waldo&apos;, &apos;fred&apos;, &apos;plugh&apos;, &apos;xyzzy&apos;, &apos;thud&apos;]
-  let i = index(vars, expand(&apos;&lt;cword&gt;&apos;))
+  <span class="hljs-keyword">let</span> vars = [<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>, <span class="hljs-string">'baz'</span>, <span class="hljs-string">'qux'</span>, <span class="hljs-string">'quux'</span>, <span class="hljs-string">'corge'</span>, <span class="hljs-string">'grault'</span>, <span class="hljs-string">'garply'</span>, <span class="hljs-string">'waldo'</span>, <span class="hljs-string">'fred'</span>, <span class="hljs-string">'plugh'</span>, <span class="hljs-string">'xyzzy'</span>, <span class="hljs-string">'thud'</span>]
+  <span class="hljs-keyword">let</span> i = <span class="hljs-built_in">index</span>(vars, <span class="hljs-built_in">expand</span>(<span class="hljs-string">'&lt;cword&gt;'</span>))
 
-  if (i == -1)
-    if (a:num &gt; 0)
-      execute &quot;normal! \&lt;C-a&gt;&quot;
-    else
-      execute &quot;normal! \&lt;C-x&gt;&quot;
-    endif
+  <span class="hljs-keyword">if</span> (i == -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable">a:num</span> &gt; <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-a&gt;"</span>
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-x&gt;"</span>
+    <span class="hljs-keyword">endif</span>
 
-    return
-  endif
+    <span class="hljs-keyword">return</span>
+  <span class="hljs-keyword">endif</span>
 
-  let i += a:num
+  <span class="hljs-keyword">let</span> i += <span class="hljs-variable">a:num</span>
 
-  if (i == -1)
-    let i = len(vars) - 1
-  elseif (i == len(vars))
-    let i = 0
-  endif
+  <span class="hljs-keyword">if</span> (i == -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">let</span> i = <span class="hljs-built_in">len</span>(vars) - <span class="hljs-number">1</span>
+  <span class="hljs-keyword">elseif</span> (i == <span class="hljs-built_in">len</span>(vars))
+    <span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">endif</span>
 
-  let @w = vars[i]
-  execute &quot;normal! viw\&quot;wp&quot;
-endfunction
+  <span class="hljs-keyword">let</span> @w = vars[i]
+  <span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! viw\"wp"</span>
+<span class="hljs-keyword">endfunction</span>
 
-nnoremap &lt;C-a&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(1)&lt;Enter&gt;
-nnoremap &lt;C-x&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(-1)&lt;Enter&gt;</code></pre>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-a&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CycleMetasyntacticVariables(<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Enter&gt;</span>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-x&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CycleMetasyntacticVariables(-<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Enter&gt;</span></code></pre>
 
 <p>レジスターを使ってることに注意。<kbd>&lt;C-a&gt;</kbd>と<kbd>&lt;C-x&gt;</kbd>にマッピングする前提で書いたので、数字の上とかだとデフォルトと同じようにインクリメント・デクリメントする。あんまり行儀よくない気もするのでフォールバックさせるのやめて、<kbd>&lt;Leader&gt;a</kbd>とかにマッピングさせるように書いた方が良さそう……な気もするけど、自分で使う分には良いか。</p></div>
   </article>

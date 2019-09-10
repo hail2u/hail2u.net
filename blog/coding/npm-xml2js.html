@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="Node.jsでRSSを処理するの何がいいのかなーと色々試していた。その中で一番考えなくて済みそうなのがxml2jsだった。XMLをparseString()に渡すと、コールバックの引数にオブジェクトに変換して渡してくれる。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,29 +66,29 @@
 
 <p>このウェブサイトのフィードをパースして標準出力に吐くならこんな感じで簡単。</p>
 
-<pre><code class="language-javascript">var http = require(&apos;http&apos;);
-var parseXML = require(&apos;xml2js&apos;).parseString;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+<span class="hljs-keyword">var</span> parseXML = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>).parseString;
 
-http.get(&apos;http://hail2u.net/feed&apos;, function (res) {
-  var chunks = &apos;&apos;;
+http.get(<span class="hljs-string">'http://hail2u.net/feed'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
+  <span class="hljs-keyword">var</span> chunks = <span class="hljs-string">''</span>;
 
-  res.setEncoding = &apos;UTF-8&apos;;
+  res.setEncoding = <span class="hljs-string">'UTF-8'</span>;
 
-  res.on(&apos;data&apos;, function (chunk) {
+  res.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
     chunks += chunk;
   });
 
-  res.on(&apos;end&apos;, function () {
+  res.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     parseXML(chunks, {
-      trim: true,
-      explicitArray: false
-    }, function (err, data) {
-      if (err) {
-        throw err;
+      <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">explicitArray</span>: <span class="hljs-literal">false</span>
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) </span>{
+      <span class="hljs-keyword">if</span> (err) {
+        <span class="hljs-keyword">throw</span> err;
       }
 
-      data.rss.channel.item.forEach(function (val, index, array) {
-        console.log(val.title + &apos;: &apos; + val.link);
+      data.rss.channel.item.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val, index, array</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(val.title + <span class="hljs-string">': '</span> + val.link);
       });
     });
   });

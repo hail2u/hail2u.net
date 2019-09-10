@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="CSSを書く時に「セレクタ内でCSS仕様書でのプロパティの出現順序に従ってソートする」という個人的なルールを守っている。何かコーディングにおいて便利な理由があるからというわけではなく、第三者に説明する時に「仕様書の出現順で書いてます！」とかで済ませられるから。今まではファイル全体を処理するオレオレPerlスクリプトで適当にやっていたのだけど、Vimで選択範囲だけをソートとかやりたくなったので、普通に標準入力を読んで結果を標準出力に吐くように書き直した。ついでにCSS3のプロパティとFirefox（Mozilla）やSafari（WebKit）、Opera（Presto）、Internet Explorer（Trident）の独自拡張などへも対応させたりとか。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,18 +64,18 @@
 
     <div itemprop="articleBody"><p>CSSを書く時に「セレクタ内でCSS仕様書でのプロパティの出現順序に従ってソートする」という個人的なルールを守っている。何かコーディングにおいて便利な理由があるからというわけではなく、第三者に説明する時に「仕様書の出現順で書いてます！」とかで済ませられるから。今まではファイル全体を処理するオレオレPerlスクリプトで適当にやっていたのだけど、Vimで選択範囲だけをソートとかやりたくなったので、普通に標準入力を読んで結果を標準出力に吐くように書き直した。ついでにCSS3のプロパティとFirefox（Mozilla）やSafari（WebKit）、Opera（Presto）、Internet Explorer（Trident）の独自拡張などへも対応させたりとか。</p>
 
-<pre><code class="language-perl">#!/usr/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/bin/perl</span>
 
-# Author:   Kyo Nagashima &lt;kyo@hail2u.net&gt;, http://hail2u.net/
-#           xaicron, http://blog.livedoor.jp/xaicron/
-# License:  MIT license (http://opensource.org/licenses/mit-license.php)
-# Modified: 2009-11-17T23:09:27+09:00
+<span class="hljs-comment"># Author:   Kyo Nagashima &lt;kyo@hail2u.net&gt;, http://hail2u.net/</span>
+<span class="hljs-comment">#           xaicron, http://blog.livedoor.jp/xaicron/</span>
+<span class="hljs-comment"># License:  MIT license (http://opensource.org/licenses/mit-license.php)</span>
+<span class="hljs-comment"># Modified: 2009-11-17T23:09:27+09:00</span>
 
-use strict;
-use warnings;
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> warnings;
 
-# CSS2.1
-my @property_order = qw(
+<span class="hljs-comment"># CSS2.1</span>
+<span class="hljs-keyword">my</span> @property_order = <span class="hljs-string">qw(
 margin
 margin-top
 margin-right
@@ -192,10 +192,10 @@ richness
 speak-punctuation
 speak-numeral
 speak-header
-);
+)</span>;
 
-# CSS3 and vendor extension for CSS3 
-push @property_order, qw(
+<span class="hljs-comment"># CSS3 and vendor extension for CSS3 </span>
+<span class="hljs-keyword">push</span> @property_order, <span class="hljs-string">qw(
 background-clip
 -moz-background-clip
 -webkit-background-clip
@@ -428,10 +428,10 @@ animation-play-state
 -webkit-animation-play-state
 animation-delay
 -webkit-animation-delay
-);
+)</span>;
 
-# Vendor extension
-push @property_order, qw(
+<span class="hljs-comment"># Vendor extension</span>
+<span class="hljs-keyword">push</span> @property_order, <span class="hljs-string">qw(
 -moz-background-inline-policy
 -moz-binding
 -moz-border-bottom-colors
@@ -533,62 +533,62 @@ push @property_order, qw(
 -ms-scrollbar-highlight-color
 -ms-scrollbar-shadow-color
 -ms-zoom
-);
+)</span>;
 
-# Other CSS extensions (without vendor prefix)
-push @property_order, qw(
+<span class="hljs-comment"># Other CSS extensions (without vendor prefix)</span>
+<span class="hljs-keyword">push</span> @property_order, <span class="hljs-string">qw(
 image-rendering
 ime-mode
 pointer-events
 text-rendering
-);
+)</span>;
 
-# Create hash: key =&gt; property, value =&gt; index
-# See also: http://blog.livedoor.jp/xaicron/archives/50913074.html
-my %property = do {
-  my $i = 0;
-  map { $_ =&gt; $i++ } @property_order;
+<span class="hljs-comment"># Create hash: key =&gt; property, value =&gt; index</span>
+<span class="hljs-comment"># See also: http://blog.livedoor.jp/xaicron/archives/50913074.html</span>
+<span class="hljs-keyword">my</span> %property = <span class="hljs-keyword">do</span> {
+  <span class="hljs-keyword">my</span> $i = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">map</span> { $_ =&gt; $i++ } @property_order;
 };
 
-my $css = join &quot;&quot;, &lt;STDIN&gt;;
-$css =~ s/{(.*?)}/&quot;{&quot;.sort_properties($1).&quot;}&quot;/imgse;
+<span class="hljs-keyword">my</span> $css = <span class="hljs-keyword">join</span> <span class="hljs-string">""</span>, &lt;STDIN&gt;;
+$css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</span>;
 
-print $css;
+<span class="hljs-keyword">print</span> $css;
 
-sub sort_properties {
-  # Remove leading line-breaks
-  (my $rules = shift) =~ s/^\n+//;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">sort_properties</span> </span>{
+  <span class="hljs-comment"># Remove leading line-breaks</span>
+  (<span class="hljs-keyword">my</span> $rules = <span class="hljs-keyword">shift</span>) =~ <span class="hljs-regexp">s/^\n+//</span>;
 
-  # Orcish Maneuver
-  # my %temp;
-  # my @sorted_rules = sort {
-  #   ($temp{$a} ||= check_order($a)) &lt;=&gt; ($temp{$b} ||= check_order($b))
-  # } split &quot;\n&quot;, $rules;
+  <span class="hljs-comment"># Orcish Maneuver</span>
+  <span class="hljs-comment"># my %temp;</span>
+  <span class="hljs-comment"># my @sorted_rules = sort {</span>
+  <span class="hljs-comment">#   ($temp{$a} ||= check_order($a)) &lt;=&gt; ($temp{$b} ||= check_order($b))</span>
+  <span class="hljs-comment"># } split "\n", $rules;</span>
 
-  # Schwartzian Transform
-  # See also: http://gist.github.com/236860
-  my @sorted_rules
-    = map  { $_-&gt;[0] }
-      sort { $a-&gt;[1] &lt;=&gt; $b-&gt;[1] }
-      map  { [ $_, check_order($_) ] }
-      split &quot;\n&quot;, $rules;
+  <span class="hljs-comment"># Schwartzian Transform</span>
+  <span class="hljs-comment"># See also: http://gist.github.com/236860</span>
+  <span class="hljs-keyword">my</span> @sorted_rules
+    = <span class="hljs-keyword">map</span>  { $_-&gt;[<span class="hljs-number">0</span>] }
+      <span class="hljs-keyword">sort</span> { $a-&gt;[<span class="hljs-number">1</span>] &lt;=&gt; $b-&gt;[<span class="hljs-number">1</span>] }
+      <span class="hljs-keyword">map</span>  { [ $_, check_order($_) ] }
+      <span class="hljs-keyword">split</span> <span class="hljs-string">"\n"</span>, $rules;
 
-  return &quot;\n&quot; . join(&quot;\n&quot;, @sorted_rules) . &quot;\n&quot;;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">"\n"</span> . <span class="hljs-keyword">join</span>(<span class="hljs-string">"\n"</span>, @sorted_rules) . <span class="hljs-string">"\n"</span>;
 }
 
-sub check_order {
-  my $line = shift;
-  my $order = 10000;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_order</span> </span>{
+  <span class="hljs-keyword">my</span> $line = <span class="hljs-keyword">shift</span>;
+  <span class="hljs-keyword">my</span> $order = <span class="hljs-number">10000</span>;
 
-  if ($line =~ /^\s*(.+?)\s*:/) {
-    if (defined $property{$1}) {
+  <span class="hljs-keyword">if</span> ($line =~ <span class="hljs-regexp">/^\s*(.+?)\s*:/</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">defined</span> $property{$1}) {
       $order = $property{$1};
     }
-  # } else {
-  #   warn &quot;Unknown property: $1&quot;;
+  <span class="hljs-comment"># } else {</span>
+  <span class="hljs-comment">#   warn "Unknown property: $1";</span>
   }
 
-  return $order;
+  <span class="hljs-keyword">return</span> $order;
 }
 </code></pre>
 
@@ -596,25 +596,25 @@ sub check_order {
 
 <p>まとめると「CSS2.1 &gt; CSS3 &gt; 独自拡張 &gt; プリフィックスの無い独自拡張」という順序で並ぶことになり、具体的には以下のように並ぶ。</p>
 
-<pre><code class="language-css">div#header ul#navigation li a {
-  /* CSS2.1 */
-  margin-left: 6px;
-  padding: 0 6px;
-  display: block;
-  width: auto;
-  height: 24px;
-  line-height: 24px;
-  color: #c9c6c0;
-  background-image: url(&quot;../images/bg-navigation.png&quot;);
-  background-repeat: repeat-x;
-  /* CSS3 */
-  border-radius: 3px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  /* Vendor extension */
-  -moz-margin-start: 6px;
-  /* Vendor extension (without prefix) */
-  ime-mode: auto;
+<pre><code class="hljs language-css"><span class="hljs-selector-tag">div</span><span class="hljs-selector-id">#header</span> <span class="hljs-selector-tag">ul</span><span class="hljs-selector-id">#navigation</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span> {
+  <span class="hljs-comment">/* CSS2.1 */</span>
+  <span class="hljs-attribute">margin-left</span>: <span class="hljs-number">6px</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span> <span class="hljs-number">6px</span>;
+  <span class="hljs-attribute">display</span>: block;
+  <span class="hljs-attribute">width</span>: auto;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">24px</span>;
+  <span class="hljs-attribute">line-height</span>: <span class="hljs-number">24px</span>;
+  <span class="hljs-attribute">color</span>: <span class="hljs-number">#c9c6c0</span>;
+  <span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">"../images/bg-navigation.png"</span>);
+  <span class="hljs-attribute">background-repeat</span>: repeat-x;
+  <span class="hljs-comment">/* CSS3 */</span>
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">3px</span>;
+  <span class="hljs-attribute">-moz-border-radius</span>: <span class="hljs-number">3px</span>;
+  <span class="hljs-attribute">-webkit-border-radius</span>: <span class="hljs-number">3px</span>;
+  <span class="hljs-comment">/* Vendor extension */</span>
+  <span class="hljs-attribute">-moz-margin-start</span>: <span class="hljs-number">6px</span>;
+  <span class="hljs-comment">/* Vendor extension (without prefix) */</span>
+  <span class="hljs-attribute">ime-mode</span>: auto;
 }
 </code></pre>
 
@@ -663,12 +663,12 @@ sub check_order {
 
 <p>とすれば良い。セレクタ全体を選択（正確には中括弧の間を中括弧を含めて選択）するにはビジュアル・モードでの<kbd>a}</kbd>を使えば良いので、以下のようなキーバインドとコマンドを用意しておくと便利。</p>
 
-<pre><code class="language-vim">nmap gso va}:SortCSS&lt;CR&gt;
-vmap gso a}:SortCSS&lt;CR&gt;
+<pre><code class="hljs language-vim"><span class="hljs-keyword">nmap</span> gso va}:SortCSS<span class="hljs-symbol">&lt;CR&gt;</span>
+<span class="hljs-keyword">vmap</span> gso <span class="hljs-keyword">a</span>}:SortCSS<span class="hljs-symbol">&lt;CR&gt;</span>
 
-&quot; Sort CSS properties
-&quot; :SortCSS
-command! -range=% SortCSS :&lt;line1&gt;,&lt;line2&gt;!perl -S sortcss.pl
+<span class="hljs-comment">" Sort CSS properties</span>
+<span class="hljs-comment">" :SortCSS</span>
+command! -<span class="hljs-built_in">range</span>=% SortCSS :<span class="hljs-symbol">&lt;line1&gt;</span>,<span class="hljs-symbol">&lt;line2&gt;</span>!perl -S sortcss.pl
 </code></pre>
 
 <p>これで<kbd>gso</kbd>でソートできる他、<code>:SortCSS</code>でもソートできる（<code>-range=%</code>なので選択していない場合はファイル全体を処理する）。CSSファイル以外ではアクティブにする必要が無いので、<code>$MYVIMRC</code>ではなく<code>$HOME/.vim/ftplugin/css.vim</code>（Windowsなら<code>$HOME\vimfiles\ftplugin\css.vim</code>）とかに書いた方が良い<a href="http://subtech.g.hatena.ne.jp/secondlife/20060831/1157012844">かも</a>。</p>

@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -78,17 +78,17 @@
 @=&quot;wscript.exe C:\\Scripts\\SetDataToClipBoard.js \&quot;%1\&quot;&quot;
 </pre>
 <p>SetDataToClipBoard.jsはこんな感じ。</p>
-<pre><code class="language-js">var oArgs = WScript.Arguments
-var s = oArgs(0);
-s = s.replace(/^set-data-to-clipboard:\/\//, &quot;&quot;);
-s = s.replace(/\/$/, &quot;&quot;);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> oArgs = WScript.Arguments
+<span class="hljs-keyword">var</span> s = oArgs(<span class="hljs-number">0</span>);
+s = s.replace(<span class="hljs-regexp">/^set-data-to-clipboard:\/\//</span>, <span class="hljs-string">""</span>);
+s = s.replace(<span class="hljs-regexp">/\/$/</span>, <span class="hljs-string">""</span>);
 
-var oIe = new ActiveXObject(&quot;InternetExplorer.Application&quot;);
-oIe.Navigate(&quot;about:blank&quot;);
+<span class="hljs-keyword">var</span> oIe = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"InternetExplorer.Application"</span>);
+oIe.Navigate(<span class="hljs-string">"about:blank"</span>);
 
-while (oIe.Busy) WScript.Sleep(100);
+<span class="hljs-keyword">while</span> (oIe.Busy) WScript.Sleep(<span class="hljs-number">100</span>);
 
-oIe.Document.parentWindow.clipboardData.setData(&quot;text&quot;, unescape(s));
+oIe.Document.parentWindow.clipboardData.setData(<span class="hljs-string">"text"</span>, <span class="hljs-built_in">unescape</span>(s));
 oIe.Quit();
 </code></pre>
 <p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。</p>

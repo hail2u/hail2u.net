@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -74,94 +74,94 @@
 
 <p>を<code>build/js/main.min.js</code>へとビルドするくらいにしておく。</p>
 
-<pre><code class="language-javascript">#!/usr/bin/env node
+<pre><code class="hljs language-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-meta">
+'use strict'</span>;
 
-&apos;use strict&apos;;
+<span class="hljs-keyword">var</span> <span class="hljs-keyword">async</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'async'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs-extra'</span>);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
+<span class="hljs-keyword">var</span> uglifyjs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'uglify-js'</span>);
 
-var async = require(&apos;async&apos;);
-var fs = require(&apos;fs-extra&apos;);
-var path = require(&apos;path&apos;);
-var uglifyjs = require(&apos;uglify-js&apos;);
-
-async.waterfall([
-  function (next) {
-    fs.remove(&apos;tmp/&apos;, function (err) {
+<span class="hljs-keyword">async</span>.waterfall([
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.remove(<span class="hljs-string">'tmp/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   },
 
-  function (next) {
-    fs.remove(&apos;build/&apos;, function (err) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.remove(<span class="hljs-string">'build/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   },
 
-  function (next) {
-    fs.ensureDir(&apos;tmp/&apos;, function (err) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.ensureDir(<span class="hljs-string">'tmp/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   },
 
-  function (next) {
-    fs.ensureDir(&apos;tmp/js/&apos;, function (err) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.ensureDir(<span class="hljs-string">'tmp/js/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   },
 
-  function (next) {
-    fs.readFile(&apos;src/js/bar.js&apos;, &apos;utf8&apos;, function (err, data) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.readFile(<span class="hljs-string">'src/js/bar.js'</span>, <span class="hljs-string">'utf8'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) </span>{
       next(err, data);
     });
   },
 
-  function (js, next) {
-    fs.readFile(&apos;src/js/baz.js&apos;, &apos;utf8&apos;, function (err, data) {
-      next(err, js + &apos;;&apos; + data);
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">js, next</span>) </span>{
+    fs.readFile(<span class="hljs-string">'src/js/baz.js'</span>, <span class="hljs-string">'utf8'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) </span>{
+      next(err, js + <span class="hljs-string">';'</span> + data);
     });
   },
 
-  function (js, next) {
-    try {
-      next(null, uglifyjs.minify(js, {
-        fromString: true
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">js, next</span>) </span>{
+    <span class="hljs-keyword">try</span> {
+      next(<span class="hljs-literal">null</span>, uglifyjs.minify(js, {
+        <span class="hljs-attr">fromString</span>: <span class="hljs-literal">true</span>
       }).code);
-    } catch (err) {
+    } <span class="hljs-keyword">catch</span> (err) {
       next(err);
     }
   },
 
-  function (js, next) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">js, next</span>) </span>{
     fs.readFile(
       path.join(
         __dirname,
-        &apos;node_modules&apos;,
-        &apos;foo&apos;,
-        &apos;dist&apos;,
-        &apos;foo.min.js&apos;
+        <span class="hljs-string">'node_modules'</span>,
+        <span class="hljs-string">'foo'</span>,
+        <span class="hljs-string">'dist'</span>,
+        <span class="hljs-string">'foo.min.js'</span>
       ),
-      &apos;utf8&apos;,
-      function (err, data) {
-        next(err, data + &apos;;&apos; + js);
+      <span class="hljs-string">'utf8'</span>,
+      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) </span>{
+        next(err, data + <span class="hljs-string">';'</span> + js);
       }
     );
   },
 
-  function (js, next) {
-    fs.writeFile(&apos;tmp/js/main.min.js&apos;, js, function (err) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">js, next</span>) </span>{
+    fs.writeFile(<span class="hljs-string">'tmp/js/main.min.js'</span>, js, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   },
 
-  function (next) {
-    fs.move(&apos;tmp/&apos;, &apos;build/&apos;, function (err) {
+  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">next</span>) </span>{
+    fs.move(<span class="hljs-string">'tmp/'</span>, <span class="hljs-string">'build/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
       next(err);
     });
   }
 ],
 
-function (err) {
-  if (err) {
-    throw err;
+<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
+  <span class="hljs-keyword">if</span> (err) {
+    <span class="hljs-keyword">throw</span> err;
   }
 });
 </code></pre>

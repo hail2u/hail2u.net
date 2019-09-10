@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする（XML::RSSも含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,18 +64,18 @@
 
     <div itemprop="articleBody"><p><a href="http://mylog.ishinao.net/">ishinao.net/mylog</a>の<a href="http://mylog.ishinao.net/id/1174">微妙にinvalidなRSSを手軽にvalidにする方法</a>で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSを<a href="http://search.cpan.org/search?module=XML::Parser">XML::Parser</a>を利用してゴニョゴニョする（<a href="http://search.cpan.org/search?module=XML::RSS">XML::RSS</a>も含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。</p>
 <p>僕はこんなコードで、この両方の問題をまとめて回避しています。</p>
-<pre><code class="language-perl">#!/usr/local/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
 
-use strict;
-use Jcode;
-use LWP::Simple;
-use XML::RSS;
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> Jcode;
+<span class="hljs-keyword">use</span> LWP::Simple;
+<span class="hljs-keyword">use</span> XML::RSS;
 
-my $res = LWP::Simple::get(&apos;http://example.com/path/to/rss&apos;);
-my $content = Jcode-&gt;new($res)-&gt;utf8;
-$content =~ s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/;
-my $rss = new XML::RSS;
-eval { $rss-&gt;parse($content); };
+<span class="hljs-keyword">my</span> $res = LWP::Simple::get(<span class="hljs-string">'http://example.com/path/to/rss'</span>);
+<span class="hljs-keyword">my</span> $content = Jcode-&gt;new($res)-&gt;utf8;
+$content =~ <span class="hljs-regexp">s/&lt;\?xml.*?\?&gt;/&lt;\?xml version="1.0" encoding="UTF-8"\?&gt;/</span>;
+<span class="hljs-keyword">my</span> $rss = new XML::RSS;
+<span class="hljs-keyword">eval</span> { $rss-&gt;parse($content); };
 ...
 </code></pre>
 <ol>

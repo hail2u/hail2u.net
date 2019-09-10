@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="A List Apartに掲載されたA Vision for Our Sassという記事を読んでいた。ここに書かれていることが正しいとすると、やはりOOCSSあってのSassなのかなという思いを強くした。でも、今のSassの変数の仕組みとCSSのフラットな構造を考えると、Sassを使ったOOCSSの実現は既に詰みかけている局面だと考えることが多い。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,40 +66,40 @@
 
 <p>例えば<a href="http://alistapart.com/article/a-vision-for-our-sass#section9">Function over Presentation</a>の例を見てみよう。</p>
 
-<pre><code class="language-scss">$primary-color: #b32293; //magenta
-$secondary-color: #2f6b49; //green
+<pre><code class="hljs language-scss"><span class="hljs-variable">$primary-color</span>: <span class="hljs-number">#b32293</span>; <span class="hljs-comment">//magenta</span>
+<span class="hljs-variable">$secondary-color</span>: <span class="hljs-number">#2f6b49</span>; <span class="hljs-comment">//green</span>
 </code></pre>
 
 <p>これは確かに機能すると思う。しかし大体においてカラーパレットは最低でもあと5色くらいは必要になることが多いだろう。もちろん<code>$primary-color</code>のバリエーションであったりするわけだが、それらの名前付けはどうするのだろうか。例えば名前付けをせずに実際に使われる場所でSassの様々な色関数を利用するという手段がある。</p>
 
-<pre><code class="language-scss">a {
-  color: $primary-color;
+<pre><code class="hljs language-scss"><span class="hljs-selector-tag">a</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-variable">$primary-color</span>;
 
   &amp;:hover {
-    color: darken($primary-color, 20%);
+    <span class="hljs-attribute">color</span>: darken(<span class="hljs-variable">$primary-color</span>, <span class="hljs-number">20%</span>);
   }
 }
 </code></pre>
 
 <p>これもうまく機能することだろう。だが今度はこの微調整した色の再利用性は失われる。とするとやはり名前付けを行う必要があるということになるだろう。</p>
 
-<pre><code class="language-scss">$primary-color-dark: darken($primary-color, 20%);
+<pre><code class="hljs language-scss"><span class="hljs-variable">$primary-color-dark</span>: darken(<span class="hljs-variable">$primary-color</span>, <span class="hljs-number">20%</span>);
 </code></pre>
 
 <p>こうして変数を定義していくとどんどん変数の名前付けが苦しくなっていく。BEMを利用して変数でも頑張って命名規則を細かく規定しても良いだろうが、今度は複数のBEMを取り扱う必要が出てくるかもしれない。カラーパレット用のBEM、ウェブサイト用のBEM、下手をするとプレースホルダー・セレクター用のBEMなどだ。</p>
 
 <p>別のアプローチとしては変数をさらに挟むという手法もある。</p>
 
-<pre><code class="language-scss">$primary-color: #b32293;
+<pre><code class="hljs language-scss"><span class="hljs-variable">$primary-color</span>: <span class="hljs-number">#b32293</span>;
 
-$color-a: $primary-color;
-$color-a-hover: darken($primary-color, 20%);
+<span class="hljs-variable">$color-a</span>: <span class="hljs-variable">$primary-color</span>;
+<span class="hljs-variable">$color-a-hover</span>: darken(<span class="hljs-variable">$primary-color</span>, <span class="hljs-number">20%</span>);
 
-a {
-  color: $color-a;
+<span class="hljs-selector-tag">a</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-variable">$color-a</span>;
 
   &amp;:hover {
-    color: $color-a-hover;
+    <span class="hljs-attribute">color</span>: <span class="hljs-variable">$color-a-hover</span>;
   }
 }
 </code></pre>

@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="/dev/stdinとかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今はprocess.stdin.fdのsizeを調べてそのサイズでBufferオブジェクトを作り、fs.readSync()で読み込むのが良いみたいだ。本当なのかな？" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,28 +64,28 @@
 
     <div itemprop="articleBody"><p><code>/dev/stdin</code>とかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今は<code>process.stdin.fd</code>の<code>size</code>を調べてそのサイズでBufferオブジェクトを作り、<code>fs.readSync()</code>で読み込むのが良いみたいだ。本当なのかな？</p>
 
-<pre><code class="language-js">#!/usr/bin/env node
+<pre><code class="hljs language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-var fs = require('fs');
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
 
-var fd = process.stdin.fd;
-var length = fs.fstatSync(fd).size;
-var buffer = new Buffer(length);
-var bytesRead = fs.readSync(fd, buffer, 0, length, 0);
-var input = buffer.toString('utf8', 0, bytesRead);
-console.log(input);
+<span class="hljs-keyword">var</span> fd = process.stdin.fd;
+<span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
+<span class="hljs-keyword">var</span> buffer = <span class="hljs-keyword">new</span> Buffer(length);
+<span class="hljs-keyword">var</span> bytesRead = fs.readSync(fd, buffer, <span class="hljs-number">0</span>, length, <span class="hljs-number">0</span>);
+<span class="hljs-keyword">var</span> input = buffer.toString(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, bytesRead);
+<span class="hljs-built_in">console</span>.log(input);
 </code></pre>
 
 <p><code>fs.readSync()</code>はその第二引数がBufferオブジェクトじゃない場合はレガシーなモードになるので、Bufferオブジェクトを経由しなくて良かったりもする。</p>
 
-<pre><code class="language-js">#!/usr/bin/env node
+<pre><code class="hljs language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-var fs = require('fs');
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
 
-var fd = process.stdin.fd;
-var length = fs.fstatSync(fd).size;
-var input = fs.readSync(fd, length)[0];
-console.log(input);
+<span class="hljs-keyword">var</span> fd = process.stdin.fd;
+<span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
+<span class="hljs-keyword">var</span> input = fs.readSync(fd, length)[<span class="hljs-number">0</span>];
+<span class="hljs-built_in">console</span>.log(input);
 </code></pre>
 
 <p>レガシーなモードでは返り値は<code>[string, bytesRead]</code>という配列になってるので、最初の要素だけを抜き出せば良い。短い。でもv0.8.4のドキュメントではこのことについて<a href="http://nodejs.org/docs/v0.8.4/api/fs.html#fs_fs_readsync_fd_buffer_offset_length_position">もう書かれていない</a>ので使わない方が良さそう。</p>
@@ -94,9 +94,9 @@ console.log(input);
 <h2>追記</h2>
 <p>Node.js v5以降では<code>fs.*File()</code>の第一引数でファイル識別子が利用できるようになった。そのためもはやこのような冗長な記述をする必要はなく、以下のような形で一気に読むことができる。</p>
 
-<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
 
-var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);
+<span class="hljs-keyword">var</span> input = fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>);
 </code></pre>
 
 <p>標準入力のファイル識別子は<code>process.stdin.fd</code>で参照できるので、それを第一引数で指定するだけだ。</p>

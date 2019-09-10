@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -64,39 +64,39 @@
 
     <div itemprop="articleBody"><p>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でも<a href="http://eslint.org/docs/rules/no-magic-numbers">no-magic-numbers</a>にとりわけ怒られた。怒られたコードをメモしておく。</p>
 
-<pre><code class="language-javascript">var d = new Date();
-var m = d.getMonth() + 1;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+<span class="hljs-keyword">var</span> m = d.getMonth() + <span class="hljs-number">1</span>;
 </code></pre>
 
 <p>月を数字で取得しようとすると怒られる。</p>
 
-<pre><code class="language-javascript">var a = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;, &quot;qux&quot;];
-var firstElement = a[0];
-var lastElement = a[a.length - 1];
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> a = [<span class="hljs-string">"foo"</span>, <span class="hljs-string">"bar"</span>, <span class="hljs-string">"baz"</span>, <span class="hljs-string">"qux"</span>];
+<span class="hljs-keyword">var</span> firstElement = a[<span class="hljs-number">0</span>];
+<span class="hljs-keyword">var</span> lastElement = a[a.length - <span class="hljs-number">1</span>];
 </code></pre>
 
 <p>最初と最後の要素を参照しようとすると怒られる。<code>Array#shift()</code>や<code>Array#pop()</code>で済むものは置き換えても良いが、若干コストがかかりそうだ。</p>
 
-<pre><code class="language-javascript">var s = &quot;foobarbazqux&quot;;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> s = <span class="hljs-string">"foobarbazqux"</span>;
 
-if (s.indexOf(&quot;foo&quot;) === 0) {
+<span class="hljs-keyword">if</span> (s.indexOf(<span class="hljs-string">"foo"</span>) === <span class="hljs-number">0</span>) {
   ...
 }
 </code></pre>
 
 <p>特定の文字列で始まるかどうか調べようとすると怒られる。これはちゃんと<code>Sring#startsWith()</code>で書き換えた。</p>
 
-<pre><code class="language-javascript">var s = &quot;foobarbazqux&quot;;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> s = <span class="hljs-string">"foobarbazqux"</span>;
 
-if (s.startsWith(foo)) {
-  s = s.substr(foo - 1);
+<span class="hljs-keyword">if</span> (s.startsWith(foo)) {
+  s = s.substr(foo - <span class="hljs-number">1</span>);
 }
 </code></pre>
 
 <p>特定の文字列で始まっていたら削除しようとすると怒られる。素直に正規表現を使うのが良いだろう。</p>
 
-<pre><code class="language-javascript">var minimist = require(&quot;minimist&quot;);
-var argv = minimist(process.argv.slice(2));
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> minimist = <span class="hljs-built_in">require</span>(<span class="hljs-string">"minimist"</span>);
+<span class="hljs-keyword">var</span> argv = minimist(process.argv.slice(<span class="hljs-number">2</span>));
 </code></pre>
 
 <p><a href="https://github.com/substack/minimist">minimist</a>で処理するためにNode.jsの実行ファイルとスクリプトのパスを捨てようとすると怒られる。えっ、これどうしよう……。</p>
@@ -105,12 +105,12 @@ var argv = minimist(process.argv.slice(2));
 
 <p>つまり配列へのテキトウなアクセスで怒られるということだ。配列の長さと添え字のずれを矯正する<code>1</code>と<code>0</code>が問題と言いかえることもできるだろう。代替手段はあるものはあるが、ないものはかなり苦しい対応になる。</p>
 
-<pre><code class="language-json">{
-  &quot;rules&quot;: {
-    &quot;no-magic-numbers&quot;: [
-      &quot;error&quot;,
+<pre><code class="hljs language-json">{
+  <span class="hljs-attr">"rules"</span>: {
+    <span class="hljs-attr">"no-magic-numbers"</span>: [
+      <span class="hljs-string">"error"</span>,
       {
-        &quot;ignores&quot;: [0, 1]
+        <span class="hljs-attr">"ignores"</span>: [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>]
       }
     ]
   }
@@ -121,8 +121,8 @@ var argv = minimist(process.argv.slice(2));
 
 <hr>
 
-<pre><code class="language-javascript">var d = new Date();
-var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;][d.getMonth()];
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+<span class="hljs-keyword">var</span> m = [<span class="hljs-string">"1"</span>, <span class="hljs-string">"2"</span>, <span class="hljs-string">"3"</span>, <span class="hljs-string">"4"</span>, <span class="hljs-string">"5"</span>, <span class="hljs-string">"6"</span>, <span class="hljs-string">"7"</span>, <span class="hljs-string">"8"</span>, <span class="hljs-string">"9"</span>, <span class="hljs-string">"10"</span>, <span class="hljs-string">"11"</span>, <span class="hljs-string">"12"</span>][d.getMonth()];
 </code></pre>
 
 <p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p></div>

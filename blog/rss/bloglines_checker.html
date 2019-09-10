@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="しつこく引いてみる。" itemprop="description">
     <link href="/img/blog/bloglines_update.png" itemprop="image">
@@ -69,42 +69,42 @@
 <p>http://www.bloglines.com/notifier?user=&lt;登録したメールアドレス&gt;</p>
 </blockquote>
 <p>というURLにアクセスするだけなので、このURLの内容を簡単に解析すれば良いわけです。更新が無い場合は、<code>title</code>要素にNo Updateという文字列が入るようなので、この文字列が無かった場合に何らかのアクションをするスクリプトを書いてやればOK。で、どうやって通知するかということをいろいろ考えたんですが、クイック起動を使うことにしました。クイック起動のフォルダに、更新があった場合は黄色のスマイリー・アイコン、更新が無い場合は灰色のスマイリー・アイコンのMy Blogsへのインターネット・ショートカットを作ってやるということです。スクリプトはこんな感じ。</p>
-<pre><code class="language-perl">#!/usr/local/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
 
-use strict;
+<span class="hljs-keyword">use</span> strict;
 
-use LWP::Simple;
+<span class="hljs-keyword">use</span> LWP::Simple;
 
-my $lnkfile = &apos;C:\Documents and Settings\UserName\Application Data\Microsoft\Internet Explorer\Quick Launch\Bloglines.url&apos;;
+<span class="hljs-keyword">my</span> $lnkfile = <span class="hljs-string">'C:\Documents and Settings\UserName\Application Data\Microsoft\Internet Explorer\Quick Launch\Bloglines.url'</span>;
 
-my $email = &apos;your@mail.address&apos;;
+<span class="hljs-keyword">my</span> $email = <span class="hljs-string">'your@mail.address'</span>;
 
-my $content = get(&quot;http://www.bloglines.com/notifier?user=$email&quot;);
+<span class="hljs-keyword">my</span> $content = get(<span class="hljs-string">"http://www.bloglines.com/notifier?user=$email"</span>);
 
-if ($content) {
-  if ($content !~ /No Update/) {
-    open(LNKFILE, &quot;&gt;$lnkfile&quot;) or exit;
-    print LNKFILE &lt;&lt;&quot;_EOF_&quot;;
+<span class="hljs-keyword">if</span> ($content) {
+  <span class="hljs-keyword">if</span> ($content !~ <span class="hljs-regexp">/No Update/</span>) {
+    <span class="hljs-keyword">open</span>(LNKFILE, <span class="hljs-string">"&gt;$lnkfile"</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">exit</span>;
+    <span class="hljs-keyword">print</span> LNKFILE &lt;&lt;<span class="hljs-string">"_EOF_"</span>;
 [InternetShortcut]
-URL=http://www.bloglines.com/myblogs
+URL=http:<span class="hljs-regexp">//www</span>.bloglines.com/myblogs
 IconFile=C:\\Icons\\Update.ico
-IconIndex=0
-_EOF_
-    close(LNKFILE);
+IconIndex=<span class="hljs-number">0</span>
+_EOF<span class="hljs-number">_</span>
+    <span class="hljs-keyword">close</span>(LNKFILE);
   }
-  else {
-    open(LNKFILE, &quot;&gt;$lnkfile&quot;) or exit;
-    print LNKFILE &lt;&lt;&quot;_EOF_&quot;;
+  <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">open</span>(LNKFILE, <span class="hljs-string">"&gt;$lnkfile"</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">exit</span>;
+    <span class="hljs-keyword">print</span> LNKFILE &lt;&lt;<span class="hljs-string">"_EOF_"</span>;
 [InternetShortcut]
-URL=http://www.bloglines.com/myblogs
+URL=http:<span class="hljs-regexp">//www</span>.bloglines.com/myblogs
 IconFile=C:\\Icons\\NoUpdate.ico
-IconIndex=0
-_EOF_
-    close(LNKFILE);
+IconIndex=<span class="hljs-number">0</span>
+_EOF<span class="hljs-number">_</span>
+    <span class="hljs-keyword">close</span>(LNKFILE);
   }
 }
 
-exit;
+<span class="hljs-keyword">exit</span>;
 </code></pre>
 <p>インターネット・ショートカットは、普通のショートカットと違い、INI形式の単純なテキストファイルなので、こんなんで楽勝です。アイコンはこんな感じです。</p>
 <figure><a href="/img/blog/bloglines_update.png"><img alt="Bloglines checker - Update" src="/img/blog/bloglines_update.png"></a></figure>

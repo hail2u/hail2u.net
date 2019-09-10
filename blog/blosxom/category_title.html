@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="カテゴリ単位での閲覧の時に、title要素やh2要素にそのカテゴリの名前を潜り込ませることが出来るように、category_titleというプラグインを作りました。月単位での閲覧の時は、list_title_at_monthで実装してるので、カテゴリ単位での閲覧の時にも実装しないのは片手落ちかなとか突然思い至ったので。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -65,13 +65,13 @@
     <div itemprop="articleBody"><p>カテゴリ単位での閲覧の時に、<code>title</code>要素や<code>h2</code>要素にそのカテゴリの名前を潜り込ませることが出来るように、category_titleというプラグインを作りました。月単位での閲覧の時は、<a href="/blog/blosxom/list_title_at_month.html" title="hail2u.net - Weblog - list_title_at_month plugin">list_title_at_month</a>で実装してるので、カテゴリ単位での閲覧の時にも実装しないのは片手落ちかなとか突然思い至ったので。</p>
 <p><a href="/blog/blosxom/" title="hail2u.net - Weblog - blosxom">blosxomカテゴリにアクセスすると、<code>title</code>要素や<code>h2</code>要素にblosxomという文字列が追加されてるのを見て</a></p>
 <p>ソースは短いので直接書いてみる。</p>
-<pre><code class="language-perl">package category_title;
+<pre><code class="hljs language-perl"><span class="hljs-keyword">package</span> category_title;
 
-use strict;
-use vars qw($title);
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> vars <span class="hljs-string">qw($title)</span>;
 
-sub start {
-  if (!$blosxom::path_info or $blosxom::path_info_yr or ($blosxom::path_info =~ m|.*?/?\w+\.\w+$|)) {
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+  <span class="hljs-keyword">if</span> (!$blosxom::path_info <span class="hljs-keyword">or</span> $blosxom::path_info_yr <span class="hljs-keyword">or</span> ($blosxom::path_info =~ <span class="hljs-keyword">m</span>|.*?<span class="hljs-regexp">/?\w+\.\w+$|)) {
     return 0;
   }
 
@@ -79,24 +79,24 @@ sub start {
 }
 
 sub head {
-  $title = &quot; - $blosxom::path_info&quot;;
+  $title = " - $blosxom::path_info";
 
   return 1;
 }
 
 1;
-</code></pre>
+</span></code></pre>
 <p>flavourに書くのは$category_title::titleになります。仕組みは、<code>start</code>で<code>$blosxom::path_info</code>あたりをチェックし、カテゴリ単位での閲覧である場合はプラグインを実行してやり、<code>$title</code>という変数に<code>$blosxom::path_info</code>をぶち込んでやると。if文は3つの条件で判断しています。最初の条件は「<code>$blosxom::path_info</code>があるかどうか」で、これによってトップ・ページにアクセスした場合を弾きます。2番目の条件は「<code>$blosxom::path_info_yr</code>があるかどうか」で、これによって年・月・日単位での閲覧の場合を弾きます。最後の条件は「<code>$blosxom::path_info</code>にピリオドが含まれているかどうか」で、これによってエントリ単位での閲覧（このサイトの場合はPramanent linkに使用している）を弾きます。最後の条件がかなり適当なので、ピリオドのあるカテゴリを作ってたりすると、そのカテゴリでは表示されないとか言う不具合がありますが、気にしない。</p>
 <p>このサイトではまだサブカテゴリを使ってないので、これだけにしてありますが、サブカテゴリの区切り文字を任意のものに変えたい場合は、<code>head</code>を、</p>
-<pre><code class="language-perl">sub head {
-  my $sep = &quot;区切りに使う任意の文字列&quot;;
-  $title = &quot;$blosxom::path_info&quot;;
-  $title =~ s!/!$sep!g;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">head</span> </span>{
+  <span class="hljs-keyword">my</span> $sep = <span class="hljs-string">"区切りに使う任意の文字列"</span>;
+  $title = <span class="hljs-string">"$blosxom::path_info"</span>;
+  $title =~ <span class="hljs-keyword">s</span>!<span class="hljs-regexp">/!$sep!g;
   $title = $sep . $title;
 
   return 1;
 }
-</code></pre>
+</span></code></pre>
 <p>こんな感じでいいと思います。試してないので知りませんが（ぉ。</p></div>
   </article>
 </main>

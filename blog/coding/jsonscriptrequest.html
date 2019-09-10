@@ -15,9 +15,9 @@
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
     <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
 
-    <link href="/css/main.9.3.5.min.css" rel="stylesheet">
+    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
 
-    <script async defer src="/js/unutm.9.3.5.min.js"></script>
+    <script async defer src="/js/unutm.9.3.7.min.js"></script>
 
     <meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" itemprop="description">
     <link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -66,36 +66,36 @@
 
 <p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
 
-<pre><code class="language-js">callback({
-  foo:    &apos;This is foo.&apos;,
-  bar:    &apos;This is bar.&apos;,
-  foobar: &apos;This is foobar.&apos;
+<pre><code class="hljs language-js">callback({
+  <span class="hljs-attr">foo</span>:    <span class="hljs-string">'This is foo.'</span>,
+  <span class="hljs-attr">bar</span>:    <span class="hljs-string">'This is bar.'</span>,
+  <span class="hljs-attr">foobar</span>: <span class="hljs-string">'This is foobar.'</span>
 });
 </code></pre>
 
 <p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
 
-<pre><code class="language-html">&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
-&lt;script type=&quot;text/javascript&quot;&gt;
-var oJsr = new JSONscriptRequest(&apos;http://example.com/json/data.json?dummy=1&apos;);
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"jsr_class.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="actionscript">
+<span class="hljs-keyword">var</span> oJsr = <span class="hljs-keyword">new</span> JSONscriptRequest(<span class="hljs-string">'http://example.com/json/data.json?dummy=1'</span>);
 oJsr.buildScriptTag();
 oJsr.addScriptTag();
 
-function callback(data) {
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">callback</span><span class="hljs-params">(data)</span> </span>{
   alert(data.foo);
   alert(data.bar);
   alert(data.foobar);
   oJsr.removeScriptTag();
 }
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
 </code></pre>
 
 <p>HTML（やJavaScript）ファイル側でcallback関数を定義しておく必要もある（<a href="/pub/test/054.html" title="JSONScriptRequest Test">サンプル</a>）。</p>
