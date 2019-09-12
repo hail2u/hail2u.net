@@ -13,6 +13,75 @@
     <atom:link href="https://hail2u.net/blog/feed" rel="self"/>
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
       <item>
+        <description><![CDATA[スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと10行に満たないJavaScriptで実装できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。]]></description>
+        <link>https://hail2u.net/blog/back-to-top-button-with-intersection-observer-api.html</link>
+        <pubDate>Thu, 12 Sep 2019 14:38:41 +0900</pubDate>
+        <title><![CDATA[Intersection Observer APIを使ったトップに戻るボタン]]></title>
+        <content:encoded><![CDATA[<figure>
+<a href="https://hail2u.net/img/blog/back-to-top-button-with-intersection-observer-api.gif"><img alt="スクロールすると出てきて、トップに戻ったり少し戻ったりすると消えるやつ" src="https://hail2u.net/img/blog/back-to-top-button-with-intersection-observer-api.gif"></a>
+</figure>
+
+<p>スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと<a href="https://hail2u.net/pub/test/688.html">10行に満たないJavaScriptで実装</a>できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。</p>
+
+<section>
+<h2>HTML</h2>
+
+<p>HTMLでは<code>body</code>要素直下の最後にでも<code>button</code>要素を置いておく。最後の方に置くのは重なり順のため。位置はCSSで行うので、あまり考える必要はない。イベントの発生までラグがあるかもしれないので、デフォルトで<code>hidden</code>属性は追加しておく。</p>
+
+<pre><code class="language-html">&lt;body&gt;
+  &lt;header class="global-header"&gt;
+    ...
+  &lt;/header&gt;
+
+  ...
+
+  &lt;button id="to-top" hidden&gt;↑ Back to Top&lt;/button&gt;
+&lt;/body&gt;
+</code></pre>
+</section>
+
+<section>
+<h2>CSS</h2>
+
+<p>ボタンをビューポートの右下に配置する。位置を固定するだけ。<code>z-index</code>プロパティーが必要なら細心の注意を払う。</p>
+
+<pre><code class="language-css">#to-top {
+  bottom: 1rem;
+  position: fixed;
+  right: 1rem;
+}
+</code></pre>
+</section>
+
+<section>
+<h2>JavaScript</h2>
+
+<p>ボタンを押すとスクロールするコードと、グローバル・ヘッダーが見えなくなったらボタンを表示するコードを書く。スクロールするコードは<code>window.scrollTo(0, 0)</code>を使う。</p>
+
+<p><code>IntersectionObserver</code>オブジェクトを作る時に渡すコールバック関数で、表示の切り替えを行う。引数から監視するグローバル・ヘッダーの位置情報が手に入るので、そのうちの見えるか見えないかだけを真偽値で返してくれる<code>isIntersecting</code>プロパティーを利用する。ボタンの<code>hidden</code>属性へコピーするだけで、グローバル・ヘッダーとボタンのどちらかのみが表示されるようになるはず。</p>
+
+<pre><code class="language-javascript">var toTop = document.getElementById("to-top");
+toTop.addEventListener("click", function () {
+  window.scrollTo(0, 0);
+});
+(new IntersectionObserver(function (entries) {
+  toTop.hidden = entries[0].isIntersecting;
+})).observe(document.querySelector(".global-header"));
+</code></pre>
+</section>
+
+<hr>
+
+<p>位置を計算して、見えなくなったかどうかを判定する必要がなくなると、これだけ簡単な実装になる。ボタンにアイコンを使いたい！とか、ボタンを徐々に表示したい！とか、スクロールをアニメーションしたい！とか、グローバル・ヘッダーが見えなくなってから半ページくらいスクロールしたらボタンを表示したい！とか、要件が増えると、ちょっとややこしくなる。</p>
+
+<p>そういった要件も、様々な標準技術が実装されている現在なら、それぞれに最適な技術の選定さえできれば、基本を変えることなく追加できる。ボタンならインラインSVGの採用、表示のアニメーションなら<code>transition</code>プロパティーの利用、スクロールのアニメーションなら<code>requestAnimationFrame()</code>での制御、スクロール判定のあそびなら<code>rootMargin</code>や<code>threshold</code>の調節、それぞれで達成できるだろう。</p>
+
+<hr>
+
+<p>コード・ハイライトを復活させた。<a href="https://highlightjs.org/">highlight.js</a>を使って、HTMLファイルを作成する時にハイライトしている（RSSやデータでは生のまま）。カラー・スキームは、ダーク・モードで切り替えずに済むように、<a href="https://ethanschoonover.com/solarized/">Solarized</a>のアクセント色を流用した。もうちょっと抑え気味でも良さそう。</p>
+]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[Pixel 3aでFeliCaデビューしたので、調子にのってWaonを作った。Suicaを自分専用にして、家用の買い物をWaonにする、というつもりだった。Suicaのチャージに使うクレジットカードを使い分けた方がよかったっぽい。使いきらないと消せず、使いきるのは難しそうだし、もうちょっと考えればよかった。]]></description>
         <link>https://hail2u.net/blog/on-20190906.html</link>
         <pubDate>Fri, 6 Sep 2019 16:47:50 +0900</pubDate>
@@ -227,28 +296,6 @@
 <p>鍋の蓋はだいたい6mmのねじで止めるようになっているようだ。ガラス蓋（重く、湾曲している）やフライパンの蓋（直径が大きい）ものは微妙に構造が違うようなので、うまくハマらなかったりもするらしい。</p>
 
 <p>地元のイオンやシマホ他では、微妙な形の小さいやつしか売っていなかった。都会に出たタイミングで東急ハンズを見たら、そこそこな感じのものが150円くらいで売っていたので買った。ぴったりとはまり、快適に使えている。鍋の寿命が、たぶん10年くらい伸びた。</p>
-]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[雨の中、横浜美術館へ原三渓の美術を見に行った。ポスター他に使われているロゴの「の」がかっこいい。高野切を見て、そのまま常設のセザンヌとピカソを見れるので、1600円でもいいかな……となるかは人による。せめて孔雀明王像がある間に行った方が良い。]]></description>
-        <link>https://hail2u.net/blog/hara-sankei-20190716.html</link>
-        <pubDate>Wed, 24 Jul 2019 08:36:15 +0900</pubDate>
-        <title><![CDATA[原三渓の美術]]></title>
-        <content:encoded><![CDATA[<figure>
-<a href="https://hail2u.net/img/blog/hara-sankei-20190716.jpg"><img alt="" src="https://hail2u.net/img/blog/hara-sankei-20190716.jpg"></a>
-</figure>
-
-<p>雨の中、横浜美術館へ<a href="https://harasankei2019.exhn.jp/">原三渓の美術</a>を見に行った。ポスター他に使われているロゴの「の」がかっこいい。高野切を見て、そのまま常設のセザンヌとピカソを見れるので、1600円でもいいかな……となるかは人による。せめて孔雀明王像がある間に行った方が良い。</p>
-
-<p>展示の傾向についてはウェブサイトでそこそこ書かれているので割愛する。作品のジャンルとかテーマではなく、別の視点から展示を分けるのは最近多いが、楽しいと思うのでどんどんやって欲しい。作品では国宝をのぞいても迫力あるサイズのものが多く、見ててドキドキしてくる。無地志野は初めて見た気がする。自画像はとてもかわいかった。</p>
-
-<p>作品の保護のため、照明がとても暗いので、かなり見づらい。作品にあせが進んでいるものが多いのもあって、さらに見づらい。人がべったりと張り付くので、ことさら見づらい。という負の連鎖がやはり気になった。展示の順序はあるようでないので、空いているところを優先してどんどん見ていくのが良さそうだ。</p>
-
-<hr>
-
-<p>セールの名残りなどを見ていたけれど、特に収穫もない。色がない、サイズが合わない、安くなってない、という感じで、最後のセール前というのもありそう。ヨドバシカメラでジレットの替え刃を買っただけで終わった。Amazonでの値段が不安定になってしまったので、ヨドバシの安定した値段であきらめることにした。</p>
-
-<p>帰りに高島屋を通ったら、<a href="https://www.ukai.co.jp/atelier/">うかい亭の洋菓子店</a>が出店していた。塩クッキーがおいしそうだったので、それの安い方をおみやげにした。トマト、ハーブミックス、タマネギ、チーズの4種類入りだったが、どれもなかなかおいしい。箱もきれいなので、手土産にも良さそう。</p>
 ]]></content:encoded>
       </item>
   </channel>
