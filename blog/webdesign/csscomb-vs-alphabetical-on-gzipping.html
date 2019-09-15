@@ -1,127 +1,98 @@
-<!DOCTYPE html>
-<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
-  <head>
-    <meta charset="UTF-8">
-
-    <title>gzip下における、CSScombの昇順ソートに対する優位性 - Hail2u</title>
-
-    <meta content="light dark" name="color-scheme">
-    <meta content="CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。" name="description">
-    <meta content="width=device-width" name="viewport">
-
-    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
-    <link href="https://kyonagashima.com/" rel="author me">
-    <link href="/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html" rel="canonical">
-    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-    <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
-
-    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
-
-    <script async defer src="/js/unutm.9.3.7.min.js"></script>
-
-    <meta content="CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。" itemprop="description">
-    <link href="/img/blog/csscomb-vs-alphabetical-on-gzipping.png" itemprop="image">
-    <meta content="gzip下における、CSScombの昇順ソートに対する優位性" itemprop="name">
-    <link href="/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html" itemprop="url">
-
-    <meta content="CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。" property="og:description">
-    <meta content="https://hail2u.net/img/blog/csscomb-vs-alphabetical-on-gzipping.png" property="og:image">
-    <meta content="gzip下における、CSScombの昇順ソートに対する優位性" property="og:title">
-    <meta content="article" property="og:type">
-    <meta content="https://hail2u.net/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html" property="og:url">
-    <meta content="2016-04-15T09:33:00+09:00" property="article:published_time">
-
-    <meta content="summary_large_image" name="twitter:card">
-    <meta content="@hail2u_" name="twitter:site">
-  </head>
-
-  <body>
-    <header>
-      <nav>
-        <a href="/">        <svg xmlns="http://www.w3.org/2000/svg" height="256" viewBox="0 0 152 256" width="152" role="img" aria-labelledby="site-logo"><title id="site-logo">Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-
-        <ul>
-          <li><mark><a href="/blog/">雑記</a></mark></li>
-          <li><a href="/links/">参照</a></li>
-          <li><a href="/statuses/">近況</a></li>
-          <li><a href="/photos/">写真</a></li>
-          <li><a href="/documents/">特集</a></li>
-          <li><a href="/bookshelf/">書棚</a></li>
-          <li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-        </ul>
-      </nav>
-
-      
-    </header>
-
+<!doctypehtml>
+<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
+<head>
+<meta charset=UTF-8>
+<title>gzip下における、CSScombの昇順ソートに対する優位性 - Hail2u</title>
+<meta content="light dark"name=color-scheme>
+<meta content=CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。 name=description>
+<meta content="width=device-width"name=viewport>
+<link href=/blog/feed rel=alternate type=application/rss+xml>
+<link href=https://kyonagashima.com/ rel="author me">
+<link href=/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html rel=canonical>
+<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
+<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
+<link href=/css/main.9.3.8.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.8.min.js></script>
+<meta content=CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。 itemprop=description>
+<link href=/img/blog/csscomb-vs-alphabetical-on-gzipping.png itemprop=image>
+<meta content=gzip下における、CSScombの昇順ソートに対する優位性 itemprop=name>
+<link href=/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html itemprop=url>
+<meta content=CSScombを最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。 property=og:description>
+<meta content=https://hail2u.net/img/blog/csscomb-vs-alphabetical-on-gzipping.png property=og:image>
+<meta content=gzip下における、CSScombの昇順ソートに対する優位性 property=og:title>
+<meta content=article property=og:type>
+<meta content=https://hail2u.net/blog/webdesign/csscomb-vs-alphabetical-on-gzipping.html property=og:url>
+<meta content=2016-04-15T09:33:00+09:00 property=article:published_time>
+<meta content=summary_large_image name=twitter:card>
+<meta content=@hail2u_ name=twitter:site>
+</head>
+<body>
+<header>
+<nav>
+<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul>
+<li><mark><a href=/blog/ >雑記</a></mark></li>
+<li><a href=/links/ >参照</a></li>
+<li><a href=/statuses/ >近況</a></li>
+<li><a href=/photos/ >写真</a></li>
+<li><a href=/documents/ >特集</a></li>
+<li><a href=/bookshelf/ >書棚</a></li>
+<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
+</ul>
+</nav>
+</header>
 <main>
-  <article>
-    <footer>
-      <p><time datetime="2016-04-15T09:33:00+09:00" itemprop="datePublished">2016年4月15日</time></p>
-    </footer>
-
-    <h1>gzip下における、CSScombの昇順ソートに対する優位性</h1>
-
-    <div itemprop="articleBody"><figure>
-<a href="/img/blog/csscomb-vs-alphabetical-on-gzipping.png"><img alt="alpha.css.gzは19392バイト、csscomb.css.gzは19323バイト" src="/img/blog/csscomb-vs-alphabetical-on-gzipping.png"></a>
+<article>
+<footer>
+<p><time datetime=2016-04-15T09:33:00+09:00 itemprop=datePublished>2016年4月15日</time></p>
+</footer>
+<h1>gzip下における、CSScombの昇順ソートに対する優位性</h1>
+<div itemprop=articleBody><figure>
+<a href=/img/blog/csscomb-vs-alphabetical-on-gzipping.png><img alt=alpha.css.gzは19392バイト、csscomb.css.gzは19323バイト src=/img/blog/csscomb-vs-alphabetical-on-gzipping.png></a>
 </figure>
-
-<p><a href="http://csscomb.com/">CSScomb</a>を最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。</p>
-
+<p><a href=http://csscomb.com/ >CSScomb</a>を最小化ツールなどと共にデプロイ時に通すというプロジェクトはちょくちょくあるようだ。僕はCSScomb（を始めとしたルールセット内のプロパティーのソート）は可読性のためで、Linterやフォーマッターなどで処理すべきであると考えている。また最終的な転送量においても昇順ソートに比べさほど差が出ないのではないかとも考えている。そのためそういったデプロイ時での処理には疑問を持っている。</p>
 <p>可読性のため<em>だけ</em>であるとすると、Linterが、そうでないならフォーマッターによる自動修正で処理すべき事柄であることに疑問の余地はないだろう。なぜならばデプロイ時の処理ではリリース環境のデバッグにおいてしか役に立たず、CSSを書いている時、または読んでいる時にその可読性が役立つことはないからだ。</p>
-
 <p>最終的な転送量、つまり完全に処理をしたCSSのファイルサイズには差が出る可能性はある。うまくソートしてやればgzipが効率的に圧縮してくれるかもしれない。もしCSScombを通したCSSを、最小化、そしてgzipした結果の方が小さくなるのならば、そのためだけにデプロイ時に通す意味はあるということになるだろう。</p>
-
 <p>実際にどうなるかはBootstrap v2.3.2のCSSファイルを使って、プロパティーを昇順ソートしただけのものと比較した。昇順ソートは実装が容易で幅広い人々が使っているため、それを基本とした。</p>
-
 <table>
 <thead>
 <tr>
-<th></th>
-<th style="text-align:right">オリジナル</th>
-<th style="text-align:right">ソート後</th>
-<th style="text-align:right">最小化後</th>
-<th style="text-align:right">gzip後</th>
+
+<th style=text-align:right>オリジナル</th>
+<th style=text-align:right>ソート後</th>
+<th style=text-align:right>最小化後</th>
+<th style=text-align:right>gzip後</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>CSScomb</td>
-<td style="text-align:right">146082</td>
-<td style="text-align:right">155761</td>
-<td style="text-align:right">116952</td>
-<td style="text-align:right">19323</td>
+<td style=text-align:right>146082</td>
+<td style=text-align:right>155761</td>
+<td style=text-align:right>116952</td>
+<td style=text-align:right>19323</td>
 </tr>
 <tr>
 <td>昇順ソート</td>
-<td style="text-align:right">〃</td>
-<td style="text-align:right">155319</td>
-<td style="text-align:right">116926</td>
-<td style="text-align:right">19392</td>
+<td style=text-align:right>〃</td>
+<td style=text-align:right>155319</td>
+<td style=text-align:right>116926</td>
+<td style=text-align:right>19392</td>
 </tr>
 </tbody>
 </table>
-
-<p>CSScombを使うと元CSSファイルへ空行やインデントの追加が行われるのでこの時点ではファイルサイズが少し大きくなる。それぞれを<a href="https://github.com/jakubpawlowicz/clean-css">Clean CSS</a>（デフォルトの設定）を通すとそれなりに小さくなる。最後にgzipで圧縮（<code>--best</code>のみ指定して行った）すると、わずか69バイトの差でCSScombがかろうじて有利というものになった。</p>
-
+<p>CSScombを使うと元CSSファイルへ空行やインデントの追加が行われるのでこの時点ではファイルサイズが少し大きくなる。それぞれを<a href=https://github.com/jakubpawlowicz/clean-css>Clean CSS</a>（デフォルトの設定）を通すとそれなりに小さくなる。最後にgzipで圧縮（<code>--best</code>のみ指定して行った）すると、わずか69バイトの差でCSScombがかろうじて有利というものになった。</p>
 <p>なおTwitterやAmazon.co.jpの巨大なCSSファイルでも比較を試みたが、CSScombのパーサーが落ち、処理することができなかった。</p>
-
 <hr>
-
-<p>69バイトという転送量の差に意味はあるとすることはできるが、それはアクセス数が半端ではないウェブサイトでようやく、という程度だろう。そういったウェブサイトではCSSが巨大になりやすく、上記のようにパーサーが落ちる可能性も高くなる。<a href="https://github.com/csscomb/csscomb.js/issues">2016/04/14現在、イシューが100以上あること</a>も加えると、デプロイ時に通すというアプローチは無謀と言って良いだろう。</p>
-
-<p>CSScombのソート順にコーディング規約としての意味は一定以上にある。しかしそれはLinterかフォーマッターで使われて初めて効果を発揮するということで間違っていなかったようだ。</p></div>
-  </article>
+<p>69バイトという転送量の差に意味はあるとすることはできるが、それはアクセス数が半端ではないウェブサイトでようやく、という程度だろう。そういったウェブサイトではCSSが巨大になりやすく、上記のようにパーサーが落ちる可能性も高くなる。<a href=https://github.com/csscomb/csscomb.js/issues>2016/04/14現在、イシューが100以上あること</a>も加えると、デプロイ時に通すというアプローチは無謀と言って良いだろう。</p>
+<p>CSScombのソート順にコーディング規約としての意味は一定以上にある。しかしそれはLinterかフォーマッターで使われて初めて効果を発揮するということで間違っていなかったようだ。</div>
+</article>
 </main>
-
-    <footer>
-      <ul>
-        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
-        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
-      </ul>
-
-      <address><a href="/#contact">問い合わせ</a></address>
-    </footer>
-  </body>
-</html>
+<footer>
+<ul>
+<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
+<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
+<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
+</ul>
+<address><a href=/#contact>問い合わせ</a></address>
+</footer>

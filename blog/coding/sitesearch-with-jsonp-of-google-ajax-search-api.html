@@ -1,126 +1,96 @@
-<!DOCTYPE html>
-<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
-  <head>
-    <meta charset="UTF-8">
-
-    <title>Google AJAX Search APIのJSONPを利用したサイト内検索 - Hail2u</title>
-
-    <meta content="light dark" name="color-scheme">
-    <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" name="description">
-    <meta content="width=device-width" name="viewport">
-
-    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
-    <link href="https://kyonagashima.com/" rel="author me">
-    <link href="/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" rel="canonical">
-    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-    <link href="https://www.google.com/search?q=site:hail2u.net" rel="search">
-
-    <link href="/css/main.9.3.7.min.css" rel="stylesheet">
-
-    <script async defer src="/js/unutm.9.3.7.min.js"></script>
-
-    <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" itemprop="description">
-    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
-    <meta content="Google AJAX Search APIのJSONPを利用したサイト内検索" itemprop="name">
-    <link href="/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" itemprop="url">
-
-    <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" property="og:description">
-    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
-    <meta content="Google AJAX Search APIのJSONPを利用したサイト内検索" property="og:title">
-    <meta content="article" property="og:type">
-    <meta content="https://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" property="og:url">
-    <meta content="2006-09-27T13:49:32+09:00" property="article:published_time">
-
-    <meta content="summary" name="twitter:card">
-    <meta content="@hail2u_" name="twitter:site">
-  </head>
-
-  <body>
-    <header>
-      <nav>
-        <a href="/">        <svg xmlns="http://www.w3.org/2000/svg" height="256" viewBox="0 0 152 256" width="152" role="img" aria-labelledby="site-logo"><title id="site-logo">Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-
-        <ul>
-          <li><mark><a href="/blog/">雑記</a></mark></li>
-          <li><a href="/links/">参照</a></li>
-          <li><a href="/statuses/">近況</a></li>
-          <li><a href="/photos/">写真</a></li>
-          <li><a href="/documents/">特集</a></li>
-          <li><a href="/bookshelf/">書棚</a></li>
-          <li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-        </ul>
-      </nav>
-
-      
-    </header>
-
+<!doctypehtml>
+<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
+<head>
+<meta charset=UTF-8>
+<title>Google AJAX Search APIのJSONPを利用したサイト内検索 - Hail2u</title>
+<meta content="light dark"name=color-scheme>
+<meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。"name=description>
+<meta content="width=device-width"name=viewport>
+<link href=/blog/feed rel=alternate type=application/rss+xml>
+<link href=https://kyonagashima.com/ rel="author me">
+<link href=/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html rel=canonical>
+<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
+<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
+<link href=/css/main.9.3.8.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.8.min.js></script>
+<meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。"itemprop=description>
+<link href=/apple-touch-icon-precomposed.png itemprop=image>
+<meta content="Google AJAX Search APIのJSONPを利用したサイト内検索"itemprop=name>
+<link href=/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html itemprop=url>
+<meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。"property=og:description>
+<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
+<meta content="Google AJAX Search APIのJSONPを利用したサイト内検索"property=og:title>
+<meta content=article property=og:type>
+<meta content=https://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html property=og:url>
+<meta content=2006-09-27T13:49:32+09:00 property=article:published_time>
+<meta content=summary name=twitter:card>
+<meta content=@hail2u_ name=twitter:site>
+</head>
+<body>
+<header>
+<nav>
+<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul>
+<li><mark><a href=/blog/ >雑記</a></mark></li>
+<li><a href=/links/ >参照</a></li>
+<li><a href=/statuses/ >近況</a></li>
+<li><a href=/photos/ >写真</a></li>
+<li><a href=/documents/ >特集</a></li>
+<li><a href=/bookshelf/ >書棚</a></li>
+<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
+</ul>
+</nav>
+</header>
 <main>
-  <article>
-    <footer>
-      <p><time datetime="2006-09-27T13:49:32+09:00" itemprop="datePublished">2006年9月27日</time></p>
-    </footer>
-
-    <h1>Google AJAX Search APIのJSONPを利用したサイト内検索</h1>
-
-    <div itemprop="articleBody"><p><a href="http://code.google.com/apis/ajaxsearch/">Google AJAX Search API</a>は、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通に<code>GwebSearch</code>クラスの<code>setSiteRestriction()</code>メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。</p>
-
+<article>
+<footer>
+<p><time datetime=2006-09-27T13:49:32+09:00 itemprop=datePublished>2006年9月27日</time></p>
+</footer>
+<h1>Google AJAX Search APIのJSONPを利用したサイト内検索</h1>
+<div itemprop=articleBody><p><a href=http://code.google.com/apis/ajaxsearch/ >Google AJAX Search API</a>は、動的にGoogle検索結果を自分のページに挿入することができるAPI（あまり使っているサイトを見ないけど）。Ajaxっつっても内部はJSONP（みたいなもの）だったりするので、普通に<code>GwebSearch</code>クラスの<code>setSiteRestriction()</code>メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。</p>
 <p>Google AJAX Search APIの<code>GwebSearch</code>クラスによる検索は、</p>
-
 <pre>http://www.google.com/uds/GwebSearch?callback=<em>{コールバック関数名}</em>&amp;context=0&amp;lstkp=0&amp;hl=ja&amp;q=<em>{検索文字列}</em>&amp;key=<em>{Google AJAX Search API key}</em>&amp;v=0.1
 </pre>
-
-<p>というURLへリクエストすることによって検索結果を取得している。また、<code>setSiteRestriction()</code>メソッドによるサイト内検索は特別なURLへのリクエストではなく、検索文字列に<em>site:{ドメイン名}</em>を追加しているだけ（ここらへんのことは<a href="http://livehttpheaders.mozdev.org/">Live HTTP Headers</a>なんかでリクエストを監視していれば直ぐにわかる）。つまり、簡単な文字列の連結でリクエストするURLが作成できるので、コールバック関数さえ定義してやれば簡単にサイト内検索をすることができる。というわけで<a href="/pub/test/086.html">Google AJAX Search APIのJSONPを利用したサイト内検索のサンプル</a>を作成してみた。</p>
-
-<p>上記サンプルでは<a href="/scripts/google/sitesearch.js">google-sitesearch.js</a>という外部JavaScriptファイルで実現している（<a href="http://prototype.conio.net/">prototype.js</a>やJSONPにリクエストするための<a href="/scripts/odj.js">odj.js</a>とかいう自作ライブラリも使ってるけど）。google-sitesearch.jsでは、</p>
-
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> url = <span class="hljs-string">'http://www.google.com/uds/GwebSearch?'</span> + $H({
-  <span class="hljs-attr">lstkp</span>:   <span class="hljs-number">0</span>,
-  <span class="hljs-attr">context</span>: <span class="hljs-number">0</span>,
-  <span class="hljs-attr">rsz</span>:     <span class="hljs-string">'small'</span>,
-  <span class="hljs-attr">hl</span>:      <span class="hljs-string">'ja'</span>,
-  <span class="hljs-attr">q</span>:       $F(<span class="hljs-string">'q'</span>) + <span class="hljs-string">' site:hail2u.net'</span>,
-  <span class="hljs-attr">key</span>:     apikey,
-  <span class="hljs-attr">v</span>:       <span class="hljs-number">0.1</span>
+<p>というURLへリクエストすることによって検索結果を取得している。また、<code>setSiteRestriction()</code>メソッドによるサイト内検索は特別なURLへのリクエストではなく、検索文字列に<em>site:{ドメイン名}</em>を追加しているだけ（ここらへんのことは<a href=http://livehttpheaders.mozdev.org/ >Live HTTP Headers</a>なんかでリクエストを監視していれば直ぐにわかる）。つまり、簡単な文字列の連結でリクエストするURLが作成できるので、コールバック関数さえ定義してやれば簡単にサイト内検索をすることができる。というわけで<a href=/pub/test/086.html>Google AJAX Search APIのJSONPを利用したサイト内検索のサンプル</a>を作成してみた。</p>
+<p>上記サンプルでは<a href=/scripts/google/sitesearch.js>google-sitesearch.js</a>という外部JavaScriptファイルで実現している（<a href=http://prototype.conio.net/ >prototype.js</a>やJSONPにリクエストするための<a href=/scripts/odj.js>odj.js</a>とかいう自作ライブラリも使ってるけど）。google-sitesearch.jsでは、</p>
+<pre><code class="hljs language-js"><span class=hljs-keyword>var</span> url = <span class=hljs-string>'http://www.google.com/uds/GwebSearch?'</span> + $H({
+  <span class=hljs-attr>lstkp</span>:   <span class=hljs-number>0</span>,
+  <span class=hljs-attr>context</span>: <span class=hljs-number>0</span>,
+  <span class=hljs-attr>rsz</span>:     <span class=hljs-string>'small'</span>,
+  <span class=hljs-attr>hl</span>:      <span class=hljs-string>'ja'</span>,
+  <span class=hljs-attr>q</span>:       $F(<span class=hljs-string>'q'</span>) + <span class=hljs-string>' site:hail2u.net'</span>,
+  <span class=hljs-attr>key</span>:     apikey,
+  <span class=hljs-attr>v</span>:       <span class=hljs-number>0.1</span>
 }).toQueryString();
 </code></pre>
-
 <p>とprototype.jsを使ってJSONPへのリクエストURLを作成しているが、もちろん文字列の連結とかでも問題ない(<code>encodeURIComponent()</code>する必要はあるけど)。コールバック関数は、</p>
-
-<pre><code class="hljs language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">handleGwebSearchResults</span>(<span class="hljs-params">i, r, n, m</span>) </span>{
-  r.results.each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">result</span>) </span>{
-    <span class="hljs-comment">// 各検索結果に対する処理</span>
+<pre><code class="hljs language-js"><span class=hljs-function><span class=hljs-keyword>function</span> <span class=hljs-title>handleGwebSearchResults</span>(<span class=hljs-params>i, r, n, m</span>) </span>{
+  r.results.each(<span class=hljs-function><span class=hljs-keyword>function</span> (<span class=hljs-params>result</span>) </span>{
+    <span class=hljs-comment>// 各検索結果に対する処理</span>
   });
 }
 </code></pre>
-
 <p>と四つ引数があることと第二引数に検索結果が格納されていることを意識して作れば良い。prototype.jsの<code>Array</code>クラスに対する拡張の<code>each()</code>メソッドとか使ってるけど、普通に<code>for</code>ループでも書ける。各検索結果は、</p>
-
 <pre><code class="hljs language-js">{
-  <span class="hljs-attr">GsearchResultClass</span>:<span class="hljs-string">"GwebSearch"</span>,
-  <span class="hljs-attr">unescapedUrl</span> : <span class="hljs-string">"http://hail2u.net/archives/bsk.html"</span>,
-  <span class="hljs-attr">url</span> : <span class="hljs-string">"http://hail2u.net/archives/bsk.html"</span>,
-  <span class="hljs-attr">visibleUrl</span> : <span class="hljs-string">"hail2u.net"</span>,
-  <span class="hljs-attr">cacheUrl</span> : <span class="hljs-string">"http://www.google.com/search?q=cache:2EslMvGB3FEJ:hail2u.net"</span>,
-  <span class="hljs-attr">title</span> : <span class="hljs-string">"hail2u.net - Archives - &lt;b&gt;blosxom&lt;/b&gt; starter kit"</span>,
-  <span class="hljs-attr">titleNoFormatting</span> : <span class="hljs-string">"hail2u.net - Archives - blosxom starter kit"</span>,
-  <span class="hljs-attr">content</span> : <span class="hljs-string">"できることならこれを利用し、&lt;b&gt;blosxom&lt;/b&gt;の挙動を知った上で、一から&lt;b&gt;blosxom&lt;/b&gt;を構築すること&lt;br&gt;  をお薦めします。 &lt;b&gt;...&lt;/b&gt; オリジナルの&lt;b&gt;blosxom&lt;/b&gt;の使い方については説明する気はないです。&lt;br&gt;  公式サイトで公開されているプラグインも、オリジナルで使うときと同様に利用 &lt;b&gt;...&lt;/b&gt;"</span>
+  <span class=hljs-attr>GsearchResultClass</span>:<span class=hljs-string>"GwebSearch"</span>,
+  <span class=hljs-attr>unescapedUrl</span> : <span class=hljs-string>"http://hail2u.net/archives/bsk.html"</span>,
+  <span class=hljs-attr>url</span> : <span class=hljs-string>"http://hail2u.net/archives/bsk.html"</span>,
+  <span class=hljs-attr>visibleUrl</span> : <span class=hljs-string>"hail2u.net"</span>,
+  <span class=hljs-attr>cacheUrl</span> : <span class=hljs-string>"http://www.google.com/search?q=cache:2EslMvGB3FEJ:hail2u.net"</span>,
+  <span class=hljs-attr>title</span> : <span class=hljs-string>"hail2u.net - Archives - &lt;b&gt;blosxom&lt;/b&gt; starter kit"</span>,
+  <span class=hljs-attr>titleNoFormatting</span> : <span class=hljs-string>"hail2u.net - Archives - blosxom starter kit"</span>,
+  <span class=hljs-attr>content</span> : <span class=hljs-string>"できることならこれを利用し、&lt;b&gt;blosxom&lt;/b&gt;の挙動を知った上で、一から&lt;b&gt;blosxom&lt;/b&gt;を構築すること&lt;br&gt;  をお薦めします。 &lt;b&gt;...&lt;/b&gt; オリジナルの&lt;b&gt;blosxom&lt;/b&gt;の使い方については説明する気はないです。&lt;br&gt;  公式サイトで公開されているプラグインも、オリジナルで使うときと同様に利用 &lt;b&gt;...&lt;/b&gt;"</span>
 }
 </code></pre>
-
 <p>という明快な構造になっているので、あとは適当にHTMLを作って吐き出すだけ。特に難しいところはない。ただ、Google AJAX Search APIでは最高でも8件までしか検索結果を取得することができないので、8件以上検索結果がありそうな場合は、最後にGoogleのサイトへ誘導するリンクを付け足すようにした（<code>start</code>パラメータを利用して検索結果を重ならないようにしてある）。このサイトくらいの規模ならば8件とかでも充分だったりするのだけれども。</p>
-
-<p>実際にこういった検索結果を動的に挿入云々をサイトで実装したい場合は、公式にJSON(P)がサポートされている<a href="http://developer.yahoo.com/search/web/V1/webSearch.html">Yahoo! Search Web ServicesのWeb Search</a>を利用するべき（<a href="/pub/test/087.html">Yahoo! Search Web ServicesのJSONPを利用したサイト内検索のサンプル</a>）。ただ、サイト内検索なんかではGoogleの方が明らかに検索結果が優秀なイメージがあって悩ましい。とりあえず<a href="http://siteexplorer.search.yahoo.com/">Yahoo!のSite Explorer</a>でサイトマップ送信してみた。改善したらうれしい。</p></div>
-  </article>
+<p>実際にこういった検索結果を動的に挿入云々をサイトで実装したい場合は、公式にJSON(P)がサポートされている<a href=http://developer.yahoo.com/search/web/V1/webSearch.html>Yahoo! Search Web ServicesのWeb Search</a>を利用するべき（<a href=/pub/test/087.html>Yahoo! Search Web ServicesのJSONPを利用したサイト内検索のサンプル</a>）。ただ、サイト内検索なんかではGoogleの方が明らかに検索結果が優秀なイメージがあって悩ましい。とりあえず<a href=http://siteexplorer.search.yahoo.com/ >Yahoo!のSite Explorer</a>でサイトマップ送信してみた。改善したらうれしい。</div>
+</article>
 </main>
-
-    <footer>
-      <ul>
-        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
-        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
-      </ul>
-
-      <address><a href="/#contact">問い合わせ</a></address>
-    </footer>
-  </body>
-</html>
+<footer>
+<ul>
+<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
+<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
+<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
+</ul>
+<address><a href=/#contact>問い合わせ</a></address>
+</footer>
