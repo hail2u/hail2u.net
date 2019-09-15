@@ -434,8 +434,7 @@ const buildHTML = async (metadata, partials, file) => {
     removeTagWhitespace: true,
     sortAttributes: true,
     sortClassName: true,
-    trimCustomFragments: true,
-    useShortDoctype: true
+    trimCustomFragments: true
   });
   await fs.writeFile(file.dest, minified);
 };
