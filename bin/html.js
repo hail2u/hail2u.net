@@ -1,4 +1,6 @@
+const config = require("./index.json");
 const { decode, encode } = require("../lib/html-entities");
+const { extendDate } = require("../lib/dt");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
 const htmlMinifier = require("html-minifier");
@@ -9,120 +11,8 @@ const { readJSONFile } = require("../lib/json");
 const toPOSIXPath = require("../lib/to-posix-path");
 const { version } = require("../package.json");
 
-const articleJSON = "../src/blog/article.json";
-const articleSrc = "../src/blog/article.mustache";
-const articlesFile = "../src/blog/articles.json";
-const comicsFile = "../src/bookshelf/comics.json";
-const destDir = "../dist/";
-const documentsFile = "../src/documents/documents.json";
-const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const files = [
-  {
-    dest: "../dist/bookshelf/log.html",
-    json: "../src/bookshelf/index.json",
-    src: "../src/bookshelf/log.mustache"
-  },
-  {
-    dest: "../dist/bookshelf/index.html",
-    json: "../src/bookshelf/index.json",
-    src: "../src/bookshelf/index.mustache"
-  },
-  {
-    dest: "../dist/blog/index.html",
-    json: "../src/blog/index.json",
-    src: "../src/blog/index.mustache"
-  },
-  {
-    dest: "../dist/documents/index.html",
-    json: "../src/documents/index.json",
-    src: "../src/documents/index.mustache"
-  },
-  {
-    dest: "../dist/index.html",
-    json: "../src/index.json",
-    src: "../src/index.mustache"
-  },
-  {
-    dest: "../dist/links/index.html",
-    json: "../src/links/index.json",
-    src: "../src/links/index.mustache"
-  },
-  {
-    dest: "../dist/photos/log.html",
-    json: "../src/photos/index.json",
-    src: "../src/photos/log.mustache"
-  },
-  {
-    dest: "../dist/photos/index.html",
-    json: "../src/photos/index.json",
-    src: "../src/photos/index.mustache"
-  },
-  {
-    dest: "../dist/sitemap.xml",
-    json: "../src/sitemap.json",
-    src: "../src/sitemap.mustache"
-  },
-  {
-    dest: "../dist/statuses/index.html",
-    json: "../src/statuses/index.json",
-    src: "../src/statuses/index.mustache"
-  }
-];
-const itemLength = 10;
-const metadataFile = "../src/metadata.json";
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec"
-];
-const nonfictionsFile = "../src/bookshelf/nonfictions.json";
-const novelsFile = "../src/bookshelf/novels.json";
-const partialDir = "../src/partial/";
-const photosDir = "../src/img/photos/";
-const statusesFile = "../src/statuses/statuses.json";
-const linksFile = "../src/links/links.json";
-
-const pad = number => String(number).padStart(2, "0");
-
-const expandDatetime = unixtime => {
-  const dt = new Date(unixtime);
-  const date = dt.getDate();
-  const day = dt.getDay();
-  const hour = dt.getHours();
-  const minute = dt.getMinutes();
-  const month = dt.getMonth() + 1;
-  const second = dt.getSeconds();
-  const year = dt.getFullYear();
-  return {
-    date: date,
-    day: day,
-    hour: hour,
-    minute: minute,
-    month: month,
-    second: second,
-    strDate: pad(date),
-    strDowName: dowNames[day],
-    strHour: pad(hour),
-    strMinute: pad(minute),
-    strMonth: pad(month),
-    strMonthName: monthNames[month - 1],
-    strSecond: pad(second),
-    strYear: pad(year),
-    year: year
-  };
-};
-
 const extendArticle = article => {
-  const dt = expandDatetime(article.published);
+  const dt = extendDate(new Date(article.published));
   const description = decode(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
@@ -136,12 +26,12 @@ const extendArticle = article => {
 };
 
 const readArticles = async () => {
-  const articles = await readJSONFile(articlesFile);
+  const articles = await readJSONFile(config.data.articles);
   return articles.map(extendArticle);
 };
 
 const extendBook = book => {
-  const dt = expandDatetime(book.published);
+  const dt = extendDate(new Date(book.published));
   return {
     ...book,
     ...dt,
@@ -155,7 +45,7 @@ const readBooks = async file => {
 };
 
 const extendDocument = document => {
-  const dt = expandDatetime(document.published);
+  const dt = extendDate(new Date(document.published));
   return {
     ...document,
     ...dt,
@@ -164,12 +54,12 @@ const extendDocument = document => {
 };
 
 const readDocuments = async () => {
-  const documents = await readJSONFile(documentsFile);
+  const documents = await readJSONFile(config.data.documents);
   return documents.map(extendDocument);
 };
 
 const extendLink = link => {
-  const dt = expandDatetime(link.published);
+  const dt = extendDate(new Date(link.published));
   return {
     ...link,
     ...dt,
@@ -178,7 +68,7 @@ const extendLink = link => {
 };
 
 const readLinks = async () => {
-  const links = await readJSONFile(linksFile);
+  const links = await readJSONFile(config.data.links);
   return links.map(extendLink);
 };
 
@@ -197,7 +87,7 @@ const getPhotoDatetime = photo => {
 
 const extendPhoto = photo => {
   const published = getPhotoDatetime(photo);
-  const dt = expandDatetime(published);
+  const dt = extendDate(new Date(published));
   return {
     ...dt,
     filename: photo,
@@ -208,7 +98,7 @@ const extendPhoto = photo => {
 };
 
 const listPhotos = async () => {
-  const photos = await fs.readdir(photosDir);
+  const photos = await fs.readdir(config.src.photos);
   return photos
     .filter(isPhoto)
     .sort()
@@ -217,7 +107,7 @@ const listPhotos = async () => {
 };
 
 const extendStatus = status => {
-  const dt = expandDatetime(status.published);
+  const dt = extendDate(new Date(status.published));
   return {
     ...status,
     ...dt,
@@ -226,13 +116,13 @@ const extendStatus = status => {
 };
 
 const readStatuses = async () => {
-  const statuses = await readJSONFile(statusesFile);
+  const statuses = await readJSONFile(config.data.statuses);
   return statuses.map(extendStatus);
 };
 
 const readPartial = async filename => {
   const name = path.basename(filename, ".mustache");
-  const content = await fs.readFile(path.join(partialDir, filename), "utf8");
+  const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
   return {
     [name]: content
   };
@@ -241,7 +131,7 @@ const readPartial = async filename => {
 const gatherPartials = partials => Object.assign(...partials);
 
 const readPartials = async () => {
-  const filenames = await fs.readdir(partialDir);
+  const filenames = await fs.readdir(config.src.partial);
   const partials = await Promise.all(filenames.map(readPartial));
   return gatherPartials(partials);
 };
@@ -314,7 +204,7 @@ const markItems = items => Promise.all(items.map(markItemChanges));
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
 
-  if (extradataFile === articleJSON) {
+  if (extradataFile === config.data.article) {
     const article = metadata.articles.find(hasSameLink.bind(null, dest));
     const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
     const [twitterCard, cover] = findCover(
@@ -432,9 +322,9 @@ const buildHTML = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = article => ({
-  dest: toPOSIXPath(path.join(destDir, article.link)),
-  json: articleJSON,
-  src: articleSrc,
+  dest: toPOSIXPath(path.join(config.dest.root, article.link)),
+  json: config.data.article,
+  src: config.src.article,
   ...article
 });
 
@@ -462,13 +352,13 @@ const main = async () => {
     statuses,
     partials
   ] = await Promise.all([
-    readJSONFile(metadataFile),
+    readJSONFile(config.data.metadata),
     readArticles(),
-    readBooks(comicsFile),
+    readBooks(config.data.comics),
     readDocuments(),
     readLinks(),
-    readBooks(nonfictionsFile),
-    readBooks(novelsFile),
+    readBooks(config.data.nonfictions),
+    readBooks(config.data.novels),
     listPhotos(),
     readStatuses(),
     readPartials()
@@ -481,17 +371,6 @@ const main = async () => {
   ].sort(compareByPublished);
   metadata.comics = comics;
   metadata.documents = documents;
-  metadata.items = [
-    ...articles.slice(0, itemLength),
-    ...comics.slice(0, itemLength),
-    ...documents.slice(0, itemLength),
-    ...links.slice(0, itemLength),
-    ...nonfictions.slice(0, itemLength),
-    ...novels.slice(0, itemLength),
-    ...photos.slice(0, itemLength),
-    ...statuses.slice(0, itemLength)
-  ].sort(compareByPublished)
-    .slice(0, itemLength);
   metadata.links = links;
   metadata.nonfictions = nonfictions;
   metadata.novels = novels;
@@ -502,8 +381,8 @@ const main = async () => {
   if (argv.article) {
     return buildHTML(metadata, partials, {
       dest: argv.article,
-      json: articleJSON,
-      src: articleSrc
+      json: config.data.article,
+      src: config.src.article
     });
   }
 
@@ -516,10 +395,13 @@ const main = async () => {
     )));
   }
 
-  return Promise.all(files.map(buildHTML.bind(null, metadata, partials)));
+  return Promise.all(config.files.html.map(buildHTML.bind(
+    null,
+    metadata,
+    partials
+  )));
 };
 
-process.chdir(__dirname);
 mustache.escape = encode;
 main().catch(e => {
   process.exitCode = 1;

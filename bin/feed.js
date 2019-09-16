@@ -1,77 +1,10 @@
+const config = require("./index.json");
 const { decode, encode } = require("../lib/html-entities");
+const { extendDate } = require("../lib/dt");
 const fs = require("fs").promises;
 const mustache = require("mustache");
 const path = require("path");
 const { readJSONFile } = require("../lib/json");
-
-const articlesFile = "../src/blog/articles.json";
-const comicsFile = "../src/bookshelf/comics.json";
-const documentsFile = "../src/documents/documents.json";
-const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const files = [
-  {
-    dest: "../dist/bookshelf/feed",
-    json: "../src/bookshelf/index.json",
-    src: "../src/feed.mustache",
-    type: ["book"]
-  },
-  {
-    dest: "../dist/blog/feed",
-    json: "../src/blog/index.json",
-    src: "../src/feed.mustache",
-    type: ["article"]
-  },
-  {
-    dest: "../dist/documents/feed",
-    json: "../src/documents/index.json",
-    src: "../src/feed.mustache",
-    type: ["document"]
-  },
-  {
-    dest: "../dist/feed",
-    json: "../src/index.json",
-    src: "../src/feed.mustache"
-  },
-  {
-    dest: "../dist/links/feed",
-    json: "../src/links/index.json",
-    src: "../src/feed.mustache",
-    type: ["link"]
-  },
-  {
-    dest: "../dist/photos/feed",
-    json: "../src/photos/index.json",
-    src: "../src/feed.mustache",
-    type: ["photo"]
-  },
-  {
-    dest: "../dist/statuses/feed",
-    json: "../src/statuses/index.json",
-    src: "../src/feed.mustache",
-    type: ["status"]
-  }
-];
-const itemLength = 10;
-const metadataFile = "../src/metadata.json";
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec"
-];
-const nonfictionsFile = "../src/bookshelf/nonfictions.json";
-const novelsFile = "../src/bookshelf/novels.json";
-const photosDir = "../src/img/photos/";
-const statusesFile = "../src/statuses/statuses.json";
-const linksFile = "../src/links/links.json";
 
 const toAbsoluteURL = url => {
   if (url.startsWith("/")) {
@@ -97,9 +30,9 @@ const extendArticle = article => {
 };
 
 const readArticles = async () => {
-  const articles = await readJSONFile(articlesFile);
+  const articles = await readJSONFile(config.data.articles);
   return articles
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendArticle);
 };
 
@@ -121,7 +54,7 @@ const readBooks = async file => {
   const books = await readJSONFile(file);
   return books
     .filter(hasPublished)
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendBook);
 };
 
@@ -131,9 +64,9 @@ const extendDocument = document => ({
 });
 
 const readDocuments = async () => {
-  const documents = await readJSONFile(documentsFile);
+  const documents = await readJSONFile(config.data.documents);
   return documents
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendDocument);
 };
 
@@ -145,9 +78,9 @@ const extendLink = link => ({
 });
 
 const readLinks = async () => {
-  const links = await readJSONFile(linksFile);
+  const links = await readJSONFile(config.data.links);
   return links
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendLink);
 };
 
@@ -180,12 +113,12 @@ const extendPhoto = photo => {
 const hasValidDate = photo => !Number.isNaN(photo.published);
 
 const listPhotos = async () => {
-  const photos = await fs.readdir(photosDir);
+  const photos = await fs.readdir(config.src.photos);
   return photos
     .filter(isPhoto)
     .sort()
     .reverse()
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendPhoto)
     .filter(hasValidDate);
 };
@@ -199,9 +132,9 @@ const extendStatus = status => ({
 });
 
 const readStatuses = async () => {
-  const statuses = await readJSONFile(statusesFile);
+  const statuses = await readJSONFile(config.data.statuses);
   return statuses
-    .slice(0, itemLength)
+    .slice(0, 10)
     .map(extendStatus);
 };
 
@@ -220,39 +153,14 @@ const isValidType = (type, item) => {
   return false;
 };
 
-const pad = number => String(number).padStart(2, "0");
-
 const extendItem = item => {
-  const dt = new Date(item.published);
-  const date = dt.getDate();
-  const day = dt.getDay();
-  const hour = dt.getHours();
-  const minute = dt.getMinutes();
-  const month = dt.getMonth() + 1;
-  const second = dt.getSeconds();
-  const year = dt.getFullYear();
+  const dt = extendDate(new Date(item.published));
   return {
     ...item,
-    date: date,
-    day: day,
-    hour: hour,
-    link: toAbsoluteURL(item.link),
-    minute: minute,
-    month: month,
-    second: second,
-    strDate: pad(date),
-    strDowName: dowNames[day],
-    strHour: pad(hour),
-    strMinute: pad(minute),
-    strMonth: pad(month),
-    strMonthName: monthNames[month - 1],
-    strSecond: pad(second),
-    strYear: pad(year),
-    year: year
+    ...dt,
+    link: toAbsoluteURL(item.link)
   };
 };
-
-const now = date => `${dowNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} +0900`;
 
 const mergeData = async (extradataFile, metadata, type) => {
   const extradata = await readJSONFile(extradataFile);
@@ -261,9 +169,8 @@ const mergeData = async (extradataFile, metadata, type) => {
     ...extradata,
     items: metadata.items
       .filter(isValidType.bind(null, type))
-      .slice(0, itemLength)
-      .map(extendItem),
-    lastBuildDate: now(new Date())
+      .slice(0, 10)
+      .map(extendItem)
   };
 };
 
@@ -288,13 +195,13 @@ const main = async () => {
     photos,
     statuses
   ] = await Promise.all([
-    readJSONFile(metadataFile),
+    readJSONFile(config.data.metadata),
     readArticles(),
-    readBooks(comicsFile),
+    readBooks(config.data.comics),
     readDocuments(),
     readLinks(),
-    readBooks(nonfictionsFile),
-    readBooks(novelsFile),
+    readBooks(config.data.nonfictions),
+    readBooks(config.data.novels),
     listPhotos(),
     readStatuses()
   ]);
@@ -308,10 +215,9 @@ const main = async () => {
     ...photos,
     ...statuses
   ].sort(compareByPublished);
-  return Promise.all(files.map(buildFeed.bind(null, metadata)));
+  return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
 };
 
-process.chdir(__dirname);
 mustache.escape = encode;
 main().catch(e => {
   process.exitCode = 1;

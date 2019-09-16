@@ -1,4 +1,5 @@
 const ClosureCompiler = require("google-closure-compiler").jsCompiler;
+const config = require("./index.json");
 const fs = require("fs").promises;
 const { version } = require("../package.json");
 
@@ -7,20 +8,6 @@ const compiler = new ClosureCompiler({
   languageIn: "ECMASCRIPT_2019",
   languageOut: "ECMASCRIPT5_STRICT"
 });
-const files = [
-  {
-    dest: "../tmp/append-others.{{version}}.min.js",
-    src: "../src/js/append-others.js"
-  },
-  {
-    dest: "../tmp/reldate.{{version}}.min.js",
-    src: "../src/js/reldate.js"
-  },
-  {
-    dest: "../tmp/unutm.{{version}}.min.js",
-    src: "../src/js/unutm.js"
-  }
-];
 
 const compileJS = jsCode => new Promise((resolve, reject) => {
   compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
@@ -45,8 +32,7 @@ const buildJS = async file => {
   await fs.writeFile(versioning(file.dest), compiled);
 };
 
-process.chdir(__dirname);
-Promise.all(files.map(buildJS)).catch(e => {
+Promise.all(config.files.js.map(buildJS)).catch(e => {
   process.exitCode = 1;
   console.trace(e);
 });

@@ -1,11 +1,9 @@
+const config = require("./index.json");
 const fs = require("fs").promises;
 const path = require("path");
 const runCommand = require("../lib/run-command");
 const sharp = require("sharp");
 const whichAsync = require("../lib/which-async");
-
-const distDir = "../dist/img/photos/";
-const srcDir = "../src/img/photos/";
 
 const isPhoto = filename => {
   if (path.extname(filename).toLowerCase() === ".jpg") {
@@ -34,22 +32,21 @@ const main = async () => {
     generateFilename(new Date()),
     whichAsync("git")
   ]);
-  const src = path.join(srcDir, filename);
+  const src = path.join(config.src.photos, filename);
   await sharp(photo)
     .resize({
       width: 1280
     })
     .toFile(src);
-  const dest = path.join(distDir, filename);
+  const dest = path.join(config.dest.photos, filename);
   await Promise.all([
     fs.copyFile(src, dest),
     fs.unlink(photo),
-    runCommand(git, ["add", "--", path.relative("", src)])
+    runCommand(git, ["add", "--", src])
   ]);
   await runCommand(git, ["commit", `--message=Add ${filename}`]);
 };
 
-process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

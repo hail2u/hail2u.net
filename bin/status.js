@@ -1,9 +1,7 @@
-const path = require("path");
+const config = require("./index.json");
 const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
-
-const statusesFile = "../src/statuses/statuses.json";
 
 const main = async () => {
   if (process.argv.length !== 3) {
@@ -11,19 +9,18 @@ const main = async () => {
   }
 
   const [statuses, git] = await Promise.all([
-    readJSONFile(statusesFile, "utf8"),
+    readJSONFile(config.data.statuses, "utf8"),
     whichAsync("git")
   ]);
   const text = process.argv.slice(2).shift();
-  await writeJSONFile(statusesFile, [{
+  await writeJSONFile(config.data.statuses, [{
     published: Date.now(),
     text: text
   }, ...statuses]);
-  await runCommand(git, ["add", "--", path.relative("", statusesFile)]);
+  await runCommand(git, ["add", "--", config.data.statuses]);
   await runCommand(git, ["commit", "--message=Update status"]);
 };
 
-process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

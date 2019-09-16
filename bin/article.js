@@ -1,3 +1,4 @@
+const config = require("./index.json");
 const { decode } = require("../lib/html-entities");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
@@ -8,13 +9,6 @@ const { readJSONFile, writeJSONFile } = require("../lib/json");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
-
-const cacheFile = "../src/blog/articles.json";
-const destDir = "../dist/blog/";
-const destImgDir = "../dist/img/blog/";
-const draftDir = "../src/drafts/";
-const draftNameRe = /^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/;
-const srcImgDir = "../src/img/blog/";
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
 
@@ -29,8 +23,8 @@ const listArticleImagePaths = html => {
 };
 
 const copyArticleImage = imagepath => fs.copyFile(
-  path.join(srcImgDir, imagepath),
-  path.join(destImgDir, imagepath)
+  path.join(config.src.articleImages, imagepath),
+  path.join(config.dest.articleImages, imagepath)
 );
 
 const copyArticleImages = async html => {
@@ -55,12 +49,12 @@ const updateCache = (cache, html, name) => {
 
   if (sameArticleIndex === -1) {
     return writeJSONFile(
-      cacheFile,
+      config.data.articles,
       [article, ...cache]
     );
   }
 
-  return writeJSONFile(cacheFile, [
+  return writeJSONFile(config.data.articles, [
     ...cache.slice(0, sameArticleIndex),
     {
       ...article,
@@ -73,7 +67,7 @@ const updateCache = (cache, html, name) => {
 const getArticleTotal = cache => ` (${cache.length + 1})`;
 
 const updateEntry = async file => {
-  const cache = await readJSONFile(cacheFile);
+  const cache = await readJSONFile(config.data.articles);
   const [git, node] = await Promise.all([
     whichAsync("git"),
     whichAsync("node"),
@@ -81,8 +75,8 @@ const updateEntry = async file => {
     updateCache(cache, file.content, file.name)
   ]);
   await Promise.all([
-    runCommand(git, ["add", "--", path.relative("", cacheFile)]),
-    runCommand(node, ["html.js", `--article=${destDir}${file.name}.html`])
+    runCommand(git, ["add", "--", config.data.articles]),
+    runCommand(node, ["bin/html.js", `--article=${config.dest.articles}${file.name}.html`])
   ]);
   return runCommand(git, ["commit", `--message=${file.verb} ${file.name}${getArticleTotal(cache)}`]);
 };
@@ -96,7 +90,7 @@ const isDraft = filename => {
 };
 
 const getDraft = async filename => {
-  const src = path.join(draftDir, filename);
+  const src = path.join(config.src.drafts, filename);
   return {
     content: await fs.readFile(src, "utf8"),
     name: path.basename(src, path.extname(src)),
@@ -107,7 +101,7 @@ const getDraft = async filename => {
 const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
 const listDrafts = async () => {
-  const filenames = await fs.readdir(draftDir);
+  const filenames = await fs.readdir(config.src.drafts);
 
   if (filenames.length < 1) {
     throw new Error("There is no draft.");
@@ -149,7 +143,7 @@ const selectDraft = drafts => new Promise(resolve => {
 });
 
 const checkSelectedName = name => {
-  if (!draftNameRe.test(name)) {
+  if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/.test(name)) {
     throw new Error('This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".');
   }
 
@@ -177,7 +171,7 @@ const renderSelected = (template, selected, partials) => mustache
   .replace(/(?<==")\//g, "../dist/");
 
 const testSelected = async selected => {
-  const template = await fs.readFile(selected.template, "utf8");
+  const template = await fs.readFile(selected.src, "utf8");
   const [title, ...body] = selected.content.split("\n");
   const rendered = renderSelected(template, {
     ...selected,
@@ -215,12 +209,11 @@ const main = async () => {
 
   return testSelected({
     ...selected,
-    dest: "../tmp/__test.html",
-    template: "../src/blog/test.mustache"
+    dest: config.dest.test,
+    src: config.src.test
   });
 };
 
-process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

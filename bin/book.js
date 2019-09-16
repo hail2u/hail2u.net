@@ -1,24 +1,20 @@
+const config = require("./index.json");
 const minimist = require("minimist");
-const path = require("path");
 const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
-const comicsFile = "../src/bookshelf/comics.json";
-const nonfictionsFile = "../src/bookshelf/nonfictions.json";
-const novelsFile = "../src/bookshelf/novels.json";
-
 const selectBooksFile = type => {
   if (type === "comic") {
-    return comicsFile;
+    return config.data.comics;
   }
 
   if (type === "novel") {
-    return novelsFile;
+    return config.data.novels;
   }
 
   if (type === "nonfiction") {
-    return nonfictionsFile;
+    return config.data.nonfictions;
   }
 
   throw new Error("Book type must be one of comic, novel, and nonfiction.");
@@ -70,11 +66,10 @@ const main = async () => {
     published: Date.now(),
     title: argv.title
   }, ...books]);
-  await runCommand(git, ["add", "--", path.relative("", booksFile)]);
+  await runCommand(git, ["add", "--", booksFile]);
   await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
 };
 
-process.chdir(__dirname);
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);
