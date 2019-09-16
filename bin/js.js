@@ -4,7 +4,7 @@ const { version } = require("../package.json");
 
 const compiler = new ClosureCompiler({
   isolationMode: "IIFE",
-  languageIn: "ECMASCRIPT_2018",
+  languageIn: "ECMASCRIPT_2019",
   languageOut: "ECMASCRIPT5_STRICT"
 });
 const files = [
