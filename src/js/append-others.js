@@ -6,4 +6,4 @@ button.content.querySelector("button").addEventListener("click", event => {
   self.parentNode.hidden = true;
 });
 button.parentNode.appendChild(button.content);
-document.querySelector(".js-append-others-nav").hidden = true;
+document.querySelector(".js-append-others-link").hidden = true;
