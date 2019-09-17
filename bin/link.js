@@ -4,20 +4,21 @@ const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
-const argv = minimist(process.argv.slice(2), {
-  alias: {
-    t: "title",
-    u: "url"
-  },
-  default: {
-    title: "",
-    url: ""
-  },
-  string: ["title", "url"]
-});
 const linksFile = "../src/links/links.json";
 
 const main = async () => {
+  const argv = minimist(process.argv.slice(2), {
+    alias: {
+      t: "title",
+      u: "url"
+    },
+    default: {
+      title: "",
+      url: ""
+    },
+    string: ["title", "url"]
+  });
+
   if (!argv.title) {
     throw new Error("Title must be passed.");
   }

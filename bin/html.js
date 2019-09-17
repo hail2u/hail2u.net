@@ -9,14 +9,6 @@ const { readJSONFile } = require("../lib/json");
 const toPOSIXPath = require("../lib/to-posix-path");
 const { version } = require("../package.json");
 
-const argv = minimist(process.argv.slice(2), {
-  alias: {
-    A: "articles",
-    a: "article"
-  },
-  boolean: ["articles"],
-  string: ["article"]
-});
 const articleJSON = "../src/blog/article.json";
 const articleSrc = "../src/blog/article.mustache";
 const articlesFile = "../src/blog/articles.json";
@@ -450,6 +442,14 @@ const compareByPublished = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
+  const argv = minimist(process.argv.slice(2), {
+    alias: {
+      A: "articles",
+      a: "article"
+    },
+    boolean: ["articles"],
+    string: ["article"]
+  });
   const [
     metadata,
     articles,

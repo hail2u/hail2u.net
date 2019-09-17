@@ -4,19 +4,6 @@ const { readJSONFile, writeJSONFile } = require("../lib/json");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
-const argv = minimist(process.argv.slice(2), {
-  alias: {
-    a: "asin",
-    t: "title",
-    y: "type"
-  },
-  default: {
-    asin: "",
-    title: "",
-    type: ""
-  },
-  string: ["asin", "title", "type"]
-});
 const comicsFile = "../src/bookshelf/comics.json";
 const nonfictionsFile = "../src/bookshelf/nonfictions.json";
 const novelsFile = "../src/bookshelf/novels.json";
@@ -38,6 +25,20 @@ const selectBooksFile = type => {
 };
 
 const main = async () => {
+  const argv = minimist(process.argv.slice(2), {
+    alias: {
+      a: "asin",
+      t: "title",
+      y: "type"
+    },
+    default: {
+      asin: "",
+      title: "",
+      type: ""
+    },
+    string: ["asin", "title", "type"]
+  });
+
   if (!argv.asin) {
     throw new Error("ASIN code must be passed.");
   }

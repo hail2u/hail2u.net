@@ -9,13 +9,6 @@ const readline = require("readline");
 const runCommand = require("../lib/run-command");
 const whichAsync = require("../lib/which-async");
 
-const argv = minimist(process.argv.slice(2), {
-  alias: {
-    c: "contribute",
-    t: "test"
-  },
-  boolean: ["contribute", "test"]
-});
 const cacheFile = "../src/blog/articles.json";
 const destDir = "../dist/blog/";
 const destImgDir = "../dist/img/blog/";
@@ -199,6 +192,13 @@ const testSelected = async selected => {
 };
 
 const main = async () => {
+  const argv = minimist(process.argv.slice(2), {
+    alias: {
+      c: "contribute",
+      t: "test"
+    },
+    boolean: ["contribute", "test"]
+  });
   const drafts = await listDrafts();
   const selected = await selectDraft(drafts);
   await Promise.all([
