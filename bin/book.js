@@ -1,8 +1,8 @@
 const config = require("./index.json");
 const minimist = require("minimist");
-const { readJSONFile, writeJSONFile } = require("../lib/json");
+const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
-const whichAsync = require("../lib/which-async");
+const findCommand = require("../lib/find-command");
 
 const selectBooksFile = type => {
   if (type === "comic") {
@@ -54,7 +54,7 @@ const main = async () => {
   const booksFile = selectBooksFile(argv.type);
   const [books, git] = await Promise.all([
     readJSONFile(booksFile),
-    whichAsync("git")
+    findCommand("git")
   ]);
 
   if (books.find(book => argv.asin === book.asin)) {

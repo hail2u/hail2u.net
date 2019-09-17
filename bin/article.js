@@ -1,14 +1,14 @@
 const config = require("./index.json");
-const { decode } = require("../lib/html-entities");
+const { decodeHTMLEntities } = require("../lib/html-entities");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
-const { readJSONFile, writeJSONFile } = require("../lib/json");
+const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
-const whichAsync = require("../lib/which-async");
+const findCommand = require("../lib/find-command");
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
 
@@ -40,7 +40,7 @@ const updateCache = (cache, html, name) => {
     body: `${body.join("\n").trim()}\n`,
     link: `/blog/${name}.html`,
     published: Date.now(),
-    title: decode(title.replace(/<.*?>/g, ""))
+    title: decodeHTMLEntities(title.replace(/<.*?>/g, ""))
   };
   const sameArticleIndex = cache.findIndex(hasSameLink.bind(
     null,
@@ -69,8 +69,8 @@ const getArticleTotal = cache => ` (${cache.length + 1})`;
 const updateEntry = async file => {
   const cache = await readJSONFile(config.data.articles);
   const [git, node] = await Promise.all([
-    whichAsync("git"),
-    whichAsync("node"),
+    findCommand("git"),
+    findCommand("node"),
     copyArticleImages(file.content),
     updateCache(cache, file.content, file.name)
   ]);
@@ -179,7 +179,7 @@ const testSelected = async selected => {
     title: title
   });
   const [open] = await Promise.all([
-    whichAsync("open"),
+    findCommand("open"),
     fs.writeFile(selected.dest, highlight(rendered))
   ]);
   return runCommand(open, [selected.dest]);

@@ -1,7 +1,7 @@
 const config = require("./index.json");
-const { readJSONFile, writeJSONFile } = require("../lib/json");
+const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
-const whichAsync = require("../lib/which-async");
+const findCommand = require("../lib/find-command");
 
 const main = async () => {
   if (process.argv.length !== 3) {
@@ -10,7 +10,7 @@ const main = async () => {
 
   const [statuses, git] = await Promise.all([
     readJSONFile(config.data.statuses, "utf8"),
-    whichAsync("git")
+    findCommand("git")
   ]);
   const text = process.argv.slice(2).shift();
   await writeJSONFile(config.data.statuses, [{

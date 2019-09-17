@@ -3,7 +3,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const runCommand = require("../lib/run-command");
 const sharp = require("sharp");
-const whichAsync = require("../lib/which-async");
+const findCommand = require("../lib/find-command");
 
 const isPhoto = filename => {
   if (path.extname(filename).toLowerCase() === ".jpg") {
@@ -30,7 +30,7 @@ const main = async () => {
 
   const [filename, git] = await Promise.all([
     generateFilename(new Date()),
-    whichAsync("git")
+    findCommand("git")
   ]);
   const src = path.join(config.src.photos, filename);
   await sharp(photo)

@@ -1,19 +1,19 @@
 const config = require("./index.json");
-const { decode, encode } = require("../lib/html-entities");
-const { extendDate } = require("../lib/dt");
+const { decodeHTMLEntities, encodeHTMLEntities } = require("../lib/html-entities");
 const fs = require("fs").promises;
+const getDateDetails = require("../lib/get-date-details");
 const highlight = require("../lib/highlight");
 const htmlMinifier = require("html-minifier");
 const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
-const { readJSONFile } = require("../lib/json");
-const toPOSIXPath = require("../lib/to-posix-path");
+const { readJSONFile } = require("../lib/json-file");
+const convertToPOSIXPath = require("../lib/convert-to-posix-path");
 const { version } = require("../package.json");
 
 const extendArticle = article => {
-  const dt = extendDate(new Date(article.published));
-  const description = decode(article.body
+  const dt = getDateDetails(new Date(article.published));
+  const description = decodeHTMLEntities(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, ""));
@@ -31,7 +31,7 @@ const readArticles = async () => {
 };
 
 const extendBook = book => {
-  const dt = extendDate(new Date(book.published));
+  const dt = getDateDetails(new Date(book.published));
   return {
     ...book,
     ...dt,
@@ -45,7 +45,7 @@ const readBooks = async file => {
 };
 
 const extendDocument = document => {
-  const dt = extendDate(new Date(document.published));
+  const dt = getDateDetails(new Date(document.published));
   return {
     ...document,
     ...dt,
@@ -59,7 +59,7 @@ const readDocuments = async () => {
 };
 
 const extendLink = link => {
-  const dt = extendDate(new Date(link.published));
+  const dt = getDateDetails(new Date(link.published));
   return {
     ...link,
     ...dt,
@@ -87,7 +87,7 @@ const getPhotoDatetime = photo => {
 
 const extendPhoto = photo => {
   const published = getPhotoDatetime(photo);
-  const dt = extendDate(new Date(published));
+  const dt = getDateDetails(new Date(published));
   return {
     ...dt,
     filename: photo,
@@ -107,7 +107,7 @@ const listPhotos = async () => {
 };
 
 const extendStatus = status => {
-  const dt = extendDate(new Date(status.published));
+  const dt = getDateDetails(new Date(status.published));
   return {
     ...status,
     ...dt,
@@ -322,7 +322,7 @@ const buildHTML = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = article => ({
-  dest: toPOSIXPath(path.join(config.dest.root, article.link)),
+  dest: convertToPOSIXPath(path.join(config.dest.root, article.link)),
   json: config.data.article,
   src: config.src.article,
   ...article
@@ -402,7 +402,7 @@ const main = async () => {
   )));
 };
 
-mustache.escape = encode;
+mustache.escape = encodeHTMLEntities;
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

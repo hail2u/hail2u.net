@@ -1,10 +1,10 @@
 const config = require("./index.json");
-const { decode, encode } = require("../lib/html-entities");
-const { extendDate } = require("../lib/dt");
+const { decodeHTMLEntities, encodeHTMLEntities } = require("../lib/html-entities");
 const fs = require("fs").promises;
+const getDateDetails = require("../lib/get-date-details");
 const mustache = require("mustache");
 const path = require("path");
-const { readJSONFile } = require("../lib/json");
+const { readJSONFile } = require("../lib/json-file");
 
 const toAbsoluteURL = url => {
   if (url.startsWith("/")) {
@@ -17,7 +17,7 @@ const toAbsoluteURL = url => {
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
 const extendArticle = article => {
-  const description = decode(article.body
+  const description = decodeHTMLEntities(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, ""));
@@ -154,7 +154,7 @@ const isValidType = (type, item) => {
 };
 
 const extendItem = item => {
-  const dt = extendDate(new Date(item.published));
+  const dt = getDateDetails(new Date(item.published));
   return {
     ...item,
     ...dt,
@@ -218,7 +218,7 @@ const main = async () => {
   return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
 };
 
-mustache.escape = encode;
+mustache.escape = encodeHTMLEntities;
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);
