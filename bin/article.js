@@ -167,8 +167,8 @@ const contributeSelected = selected => Promise.all([
 
 const renderSelected = (template, selected, partials) => mustache
   .render(template, selected, partials)
-  .replace(/(?<==")\/img\//g, "../src/img/")
-  .replace(/(?<==")\//g, "../dist/");
+  .replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
+  .replace(/(?<=\bhref=")\//g, "../dist/");
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.src, "utf8");
