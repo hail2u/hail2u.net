@@ -34,13 +34,12 @@ const copyArticleImages = async html => {
 
 const hasSameLink = (link, article) => link === article.link;
 
-const updateCache = (cache, html, name) => {
-  const [title, ...body] = html.split("\n");
+const updateCache = (cache, file) => {
   const article = {
-    body: `${body.join("\n").trim()}\n`,
-    link: `/blog/${name}.html`,
+    body: file.body,
+    link: `/blog/${file.name}.html`,
     published: Date.now(),
-    title: decodeHTMLEntities(title.replace(/<.*?>/g, ""))
+    title: file.title
   };
   const sameArticleIndex = cache.findIndex(hasSameLink.bind(
     null,
@@ -71,8 +70,8 @@ const updateEntry = async file => {
   const [git, node] = await Promise.all([
     findCommand("git"),
     findCommand("node"),
-    copyArticleImages(file.content),
-    updateCache(cache, file.content, file.name)
+    copyArticleImages(file.body),
+    updateCache(cache, file)
   ]);
   await Promise.all([
     runCommand(git, ["add", "--", config.data.articles]),
@@ -91,10 +90,13 @@ const isDraft = filename => {
 
 const getDraft = async filename => {
   const src = path.join(config.src.drafts, filename);
+  const content = await fs.readFile(src, "utf8");
+  const [title, ...body] = content.split("\n");
   return {
-    content: await fs.readFile(src, "utf8"),
+    body: `${body.join("\n").trim()}\n`,
     name: path.basename(src, path.extname(src)),
-    src: src
+    src: src,
+    title: decodeHTMLEntities(title.replace(/<.*?>/g, ""))
   };
 };
 
@@ -119,11 +121,7 @@ const selectDraft = drafts => new Promise(resolve => {
   });
   menu.write("0. QUIT\n");
   drafts.forEach((n, i) => {
-    const menuitem = n.content
-      .trim()
-      .split(/\n+/)[0]
-      .replace(/^<h1>(.*?)<\/h1>$/, "$1");
-    menu.write(`${i + 1}. ${menuitem}
+    menu.write(`${i + 1}. ${n.title}
 `);
   });
   menu.question("Which one: (0) ", (a = 0) => {
@@ -150,9 +148,9 @@ const checkSelectedName = name => {
   return true;
 };
 
-const checkSelectedContent = content => {
-  if (!content.startsWith("<h1>")) {
-    throw new Error("This draft does not have a title. A draft content must start with `<h1>`.");
+const checkSelectedTitle = title => {
+  if (typeof title !== "string" || title.length < 8) {
+    throw new Error("This draft does not have a valid title. A draft title must be a long enough string.");
   }
 
   return true;
@@ -172,12 +170,7 @@ const renderSelected = (template, selected, partials) => mustache
 
 const testSelected = async selected => {
   const template = await fs.readFile(selected.src, "utf8");
-  const [title, ...body] = selected.content.split("\n");
-  const rendered = renderSelected(template, {
-    ...selected,
-    body: body.join("\n"),
-    title: title
-  });
+  const rendered = renderSelected(template, selected);
   const [open] = await Promise.all([
     findCommand("open"),
     fs.writeFile(selected.dest, highlight(rendered))
@@ -197,7 +190,7 @@ const main = async () => {
   const selected = await selectDraft(drafts);
   await Promise.all([
     checkSelectedName(selected.name),
-    checkSelectedContent(selected.content)
+    checkSelectedTitle(selected.title)
   ]);
 
   if (argv.contribute) {
