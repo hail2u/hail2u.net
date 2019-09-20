@@ -5,16 +5,10 @@ const runCommand = require("../lib/run-command");
 const findCommand = require("../lib/find-command");
 
 const selectBooksFile = type => {
-  if (type === "comic") {
-    return config.data.comics;
-  }
+  const key = `${type}s`;
 
-  if (type === "novel") {
-    return config.data.novels;
-  }
-
-  if (type === "nonfiction") {
-    return config.data.nonfictions;
+  if (config.data[key]) {
+    return config.data[key];
   }
 
   throw new Error("Book type must be one of comic, novel, and nonfiction.");
