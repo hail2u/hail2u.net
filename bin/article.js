@@ -91,9 +91,12 @@ const isDraft = filename => {
 const getDraft = async filename => {
   const src = path.join(config.src.drafts, filename);
   const content = await fs.readFile(src, "utf8");
-  const [title, ...body] = content.split("\n");
+  const [title, ...rest] = content.split("\n");
+  const body = rest.join("\n")
+    .replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/")
+    .trim();
   return {
-    body: `${body.join("\n").trim()}\n`,
+    body: `${body}\n`,
     name: path.basename(src, path.extname(src)),
     src: src,
     title: decodeHTMLEntities(title.replace(/<.*?>/g, ""))
