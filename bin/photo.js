@@ -13,9 +13,15 @@ const isPhoto = filename => {
   return false;
 };
 
-const pad = number => String(number).padStart(2, "0");
-
-const generateFilename = dt => `${pad(dt.getFullYear())}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}${pad(dt.getHours())}${pad(dt.getMinutes())}${pad(dt.getSeconds())}.jpg`;
+const generateFilename = dt => {
+  const year = String(dt.getFullYear()).padStart(2, "0");
+  const month = String(dt.getMonth() + 1).padStart(2, "0");
+  const date = String(dt.getDate()).padStart(2, "0");
+  const hours = String(dt.getHours()).padStart(2, "0");
+  const minutes = String(dt.getMinutes()).padStart(2, "0");
+  const seconds = String(dt.getSeconds()).padStart(2, "0");
+  return `${year}${month}${date}${hours}${minutes}${seconds}.jpg`;
+};
 
 const main = async () => {
   if (process.argv.length !== 3) {
