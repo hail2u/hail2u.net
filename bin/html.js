@@ -210,7 +210,7 @@ const isLatest = index => {
   return false;
 };
 
-const markItemChanges = (item, index, items) => {
+const markItem = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
   return {
@@ -223,7 +223,7 @@ const markItemChanges = (item, index, items) => {
   };
 };
 
-const markItems = items => Promise.all(items.map(markItemChanges));
+const markItems = items => Promise.all(items.map(markItem));
 
 const mergeData = async (extradataFile, dest, metadata) => {
   const extradata = await readJSONFile(extradataFile);
@@ -323,15 +323,15 @@ const buildHTML = async (metadata, partials, file) => {
   await fs.writeFile(file.dest, minified);
 };
 
+const compareByPublished = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
 const toFilesFormat = article => ({
   dest: convertToPOSIXPath(path.join(config.dest.root, article.link)),
   json: config.data.article,
   src: config.src.article,
   ...article
 });
-
-const compareByPublished = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
