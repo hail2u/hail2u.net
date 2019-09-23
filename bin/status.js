@@ -5,7 +5,7 @@ const findCommand = require("../lib/find-command");
 
 const main = async () => {
   if (process.argv.length !== 3) {
-    throw new Error("Text and only text must be passed.");
+    throw new Error("Status text must be passed. And there should not be any other options.");
   }
 
   const [statuses, git] = await Promise.all([

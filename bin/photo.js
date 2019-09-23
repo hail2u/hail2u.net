@@ -25,13 +25,13 @@ const generateFilename = dt => {
 
 const main = async () => {
   if (process.argv.length !== 3) {
-    throw new Error("Filename and only filename must be passed.");
+    throw new Error("Photo filename must be passed. And there should not be any other options.");
   }
 
   const photo = process.argv.slice(2).shift();
 
   if (!isPhoto(photo)) {
-    throw new Error("JPEG file must be passed.");
+    throw new Error("Photo file must be JPEG.");
   }
 
   const [filename, git] = await Promise.all([

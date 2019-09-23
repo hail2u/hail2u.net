@@ -11,7 +11,7 @@ const selectBooksFile = type => {
     return config.data[key];
   }
 
-  throw new Error("Book type must be one of comic, novel, and nonfiction.");
+  throw new Error("Book type must be one of “comic”, “novel”, and “nonfiction.”");
 };
 
 const main = async () => {
@@ -52,7 +52,7 @@ const main = async () => {
   ]);
 
   if (books.find(book => argv.asin === book.asin)) {
-    throw new Error(`${argv.title} had been added.`);
+    throw new Error(`${argv.title} has already been added.`);
   }
 
   await writeJSONFile(booksFile, [{

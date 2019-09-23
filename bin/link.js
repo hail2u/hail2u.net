@@ -18,11 +18,11 @@ const main = async () => {
   });
 
   if (!argv.title) {
-    throw new Error("Title must be passed.");
+    throw new Error("Webpage title must be passed.");
   }
 
   if (!argv.url) {
-    throw new Error("URL must be passed.");
+    throw new Error("Webpage URL must be passed.");
   }
 
   const [links, git] = await Promise.all([
