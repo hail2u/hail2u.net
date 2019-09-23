@@ -1,5 +1,5 @@
 const config = require("./index.json");
-const { decodeHTMLEntities } = require("../lib/html-entities");
+const { unescapeReferences } = require("../lib/character-reference");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
 const minimist = require("minimist");
@@ -21,7 +21,7 @@ const getDraft = async filename => {
     body: `${body}\n`,
     name: path.basename(src, path.extname(src)),
     src: src,
-    title: decodeHTMLEntities(title.replace(/<.*?>/g, ""))
+    title: unescapeReferences(title.replace(/<.*?>/g, ""))
   };
 };
 

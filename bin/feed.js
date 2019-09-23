@@ -1,5 +1,5 @@
 const config = require("./index.json");
-const { decodeHTMLEntities, encodeHTMLEntities } = require("../lib/html-entities");
+const { escapeCharacters, unescapeReferences } = require("../lib/character-reference");
 const fs = require("fs").promises;
 const getDateDetails = require("../lib/get-date-details");
 const mustache = require("mustache");
@@ -17,7 +17,7 @@ const toAbsoluteURL = url => {
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
 const extendArticle = article => {
-  const description = decodeHTMLEntities(article.body
+  const description = unescapeReferences(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, ""));
@@ -218,7 +218,7 @@ const main = async () => {
   return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
 };
 
-mustache.escape = encodeHTMLEntities;
+mustache.escape = escapeCharacters;
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);

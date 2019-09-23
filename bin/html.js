@@ -1,5 +1,5 @@
 const config = require("./index.json");
-const { decodeHTMLEntities, encodeHTMLEntities } = require("../lib/html-entities");
+const { escapeCharacters, unescapeReferences } = require("../lib/character-reference");
 const fs = require("fs").promises;
 const getDateDetails = require("../lib/get-date-details");
 const highlight = require("../lib/highlight");
@@ -37,7 +37,7 @@ const optsHTMLMinifier = {
 
 const extendArticle = article => {
   const dt = getDateDetails(new Date(article.published));
-  const description = decodeHTMLEntities(article.body
+  const description = unescapeReferences(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
     .replace(/<.*?>/g, ""));
@@ -404,7 +404,7 @@ const main = async () => {
   )));
 };
 
-mustache.escape = encodeHTMLEntities;
+mustache.escape = escapeCharacters;
 main().catch(e => {
   process.exitCode = 1;
   console.trace(e);
