@@ -37,7 +37,9 @@ const optsHTMLMinifier = {
 
 const extendArticle = article => {
   const dt = getDateDetails(new Date(article.published));
-  const body = article.body.replace(/<h2>/g, '<h2 class="subheading">');
+  const body = article.body
+    .replace(/<h2>/g, '<h2 class="subheading">')
+    .replace(/^<aside>/, '<aside class="hang">');
   const description = unescapeReferences(article.body
     .replace(/\r?\n/g, "")
     .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
