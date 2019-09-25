@@ -11,8 +11,8 @@
 <link href=/blog/coding/scss-pitfalls.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.9.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.9.min.js></script>
+<link href=/css/main.9.3.10.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.10.min.js></script>
 <meta content=SassをSCSSで書いていてはまった落とし穴についてのメモ。 itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=SCSSでの落とし穴 itemprop=name>
@@ -27,10 +27,10 @@
 <meta content=@hail2u_ name=twitter:site>
 </head>
 <body>
-<header>
-<nav>
-<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-<ul>
+<header class=header>
+<nav class=navigation>
+<a href=/ class=logo><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul class=pages>
 <li><mark><a href=/blog/ >雑記</a></mark></li>
 <li><a href=/links/ >参照</a></li>
 <li><a href=/statuses/ >近況</a></li>
@@ -41,79 +41,68 @@
 </ul>
 </nav>
 </header>
-<main>
+<main class=content>
 <article>
-<footer>
+<footer class=dateline>
 <p><time datetime=2011-02-18T21:10:35+09:00 itemprop=datePublished>2011年2月18日</time></p>
 </footer>
-<h1>SCSSでの落とし穴</h1>
+<h1 class=headline>SCSSでの落とし穴</h1>
 <div itemprop=articleBody><p>SassをSCSSで書いていてはまった落とし穴についてのメモ。</p>
 <section>
-<h2>プロパティのネスト</h2>
+<h2 class=subheading>プロパティのネスト</h2>
 <pre><code class="hljs language-scss"><span class=hljs-selector-tag>h1</span> {
   <span class=hljs-attribute>font</span> {
     family: <span class=hljs-string>"Gabriola"</span>, sans-serif;
     size: <span class=hljs-number>400%</span>;
   }
-}
-</code></pre>
+}</code></pre>
 <p>とうっかり書いてしまうと、</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-tag>h1</span> <span class=hljs-selector-tag>font</span> {
   <span class=hljs-attribute>family</span>: <span class=hljs-string>"Gabriola"</span>, sans-serif;
-  <span class=hljs-attribute>size</span>: <span class=hljs-number>400%</span>; }
-</code></pre>
+  <span class=hljs-attribute>size</span>: <span class=hljs-number>400%</span>; }</code></pre>
 <p>となる。プロパティのネストを使う時はコロンが必要で、他の部分と記述が違うので注意が必要。</p>
 <pre><code class="hljs language-scss"><span class=hljs-selector-tag>h1</span> {
   <span class=hljs-attribute>font</span>&lt;<span class=hljs-selector-tag>em</span>&gt;:&lt;/em&gt; {
     family: <span class=hljs-string>"Gabriola"</span>, sans-serif;
     size: <span class=hljs-number>400%</span>;
   }
-}
-</code></pre>
+}</code></pre>
 <p>SCSSではこの記述のみがCSSと比較するとかなり特異なので、使わないと決めてしまうのも良さそう。</p>
 </section>
 <section>
-<h2>負の値の計算</h2>
+<h2 class=subheading>負の値の計算</h2>
 <pre><code class="hljs language-scss"><span class=hljs-variable>$gutter</span>: <span class=hljs-number>20px</span>;
 
-<span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> <span class=hljs-number>0</span> <span class=hljs-number>0</span> -<span class=hljs-variable>$gutter</span>;
-</code></pre>
+<span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> <span class=hljs-number>0</span> <span class=hljs-number>0</span> -<span class=hljs-variable>$gutter</span>;</code></pre>
 <p>だと、</p>
-<pre><code class="hljs language-css"><span class=hljs-selector-tag>margin</span>: 0 0 <span class=hljs-selector-tag>-20px</span>;
-</code></pre>
+<pre><code class="hljs language-css"><span class=hljs-selector-tag>margin</span>: 0 0 <span class=hljs-selector-tag>-20px</span>;</code></pre>
 <p>にコンパイルされるので意図したとおりにならない。</p>
-<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> <span class=hljs-number>0</span> <span class=hljs-number>0</span> (- <span class=hljs-variable>$gutter</span>);
-</code></pre>
+<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> <span class=hljs-number>0</span> <span class=hljs-number>0</span> (- <span class=hljs-variable>$gutter</span>);</code></pre>
 <p>などと括弧でくくる。計算式を書く場合は必ず括弧で括ると習慣づけた方が安全そう（必要ない場合でも）。</p>
 </section>
 <section>
-<h2>負の値の計算 #2</h2>
+<h2 class=subheading>負の値の計算 #2</h2>
 <pre><code class="hljs language-scss"><span class=hljs-variable>$column</span>: <span class=hljs-number>60px</span>;
 <span class=hljs-variable>$gutter</span>: <span class=hljs-number>20px</span>;
 
-<span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- <span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> + <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>);
-</code></pre>
+<span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- <span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> + <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>);</code></pre>
 <p>などと、<em>計算結果にマイナス記号を付ける</em>というようなことはできない。</p>
-<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- <span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> - <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>);
-</code></pre>
+<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- <span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> - <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>);</code></pre>
 <p>と普通に書く。計算式の括弧もネスト出来るので、</p>
-<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- (<span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> + <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>));
-</code></pre>
+<pre><code class="hljs language-scss"><span class=hljs-attribute>margin</span>: <span class=hljs-number>0</span> (- (<span class=hljs-variable>$column</span> * <span class=hljs-number>3</span> + <span class=hljs-variable>$gutter</span> * <span class=hljs-number>2</span>));</code></pre>
 <p>と面倒がらずにちゃんと書く方がより良いと思う。</p>
 </section>
 <section>
-<h2>ミックスインにカンマを含む文字列を引数として渡せない</h2>
+<h2 class=subheading>ミックスインにカンマを含む文字列を引数として渡せない</h2>
 <pre><code class="hljs language-scss">@<span class=hljs-keyword>mixin</span> fonts(<span class=hljs-variable>$families</span>) {
   <span class=hljs-attribute>font-family</span>: <span class=hljs-variable>$families</span>;
 }
 
 <span class=hljs-selector-tag>h1</span> {
   @<span class=hljs-keyword>include</span> fonts(<span class=hljs-string>"Lucida Grande"</span>, <span class=hljs-string>"Lucida Sans Unicode"</span>, sans-serif);
-}
-</code></pre>
+}</code></pre>
 <p>だと、カンマが引数の区切りとして解釈されるので、</p>
-<pre>test.scss|18| in `fonts&apos;: Mixin fonts takes 1 argument but 3 were passed.
-</pre>
+<pre>test.scss|18| in `fonts&apos;: Mixin fonts takes 1 argument but 3 were passed.</pre>
 <p>となりコンパイルエラー。エスケープする方法がありそうだけど調べてない。基本的にCSSのプロパティの値としてカンマを使うことはあまり無いので、はまることはあまりなさそう。よくわかっていない時になんでもミックスインにしようとして作った、こういう変で役に立たないミックスインでのみはまる。</p>
 <pre><code class="hljs language-scss"><span class=hljs-variable>$heading</span>: <span class=hljs-string>"Lucida Grande"</span>, <span class=hljs-string>"Lucida Sans Unicode"</span>, <span class=hljs-string>"Lucida Sans"</span>, sans-srif;
 
@@ -123,12 +112,11 @@
 
 <span class=hljs-selector-tag>h1</span> {
   @<span class=hljs-keyword>include</span> fonts(<span class=hljs-variable>$heading</span>);
-}
-</code></pre>
+}</code></pre>
 <p>変数経由なら問題はない。</p>
 </section>
 <section>
-<h2>カスケーディングを考慮したセレクタ順</h2>
+<h2 class=subheading>カスケーディングを考慮したセレクタ順</h2>
 <pre><code class="hljs language-scss"><span class=hljs-selector-id>#nav</span> {
   <span class=hljs-selector-tag>li</span> {
     <span class=hljs-selector-tag>a</span> {
@@ -145,32 +133,28 @@
       }
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>とセレクタのネストを優先させて書くと、</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span> {
   <span class=hljs-attribute>color</span>: blue; }
   <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span><span class=hljs-selector-pseudo>:hover</span> {
     <span class=hljs-attribute>color</span>: green; }
 <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span><span class=hljs-selector-class>.active</span> <span class=hljs-selector-tag>a</span> {
-  <span class=hljs-attribute>color</span>: red; }
-</code></pre>
+  <span class=hljs-attribute>color</span>: red; }</code></pre>
 <p>となるので、<code>#nav li.active a</code>がオンマウスで色が変わらない。<code>a</code>と<code>&amp;.active</code>を入れ替えれば、</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span><span class=hljs-selector-class>.active</span> <span class=hljs-selector-tag>a</span> {
   <span class=hljs-attribute>color</span>: red; }
 <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span> {
   <span class=hljs-attribute>color</span>: blue; }
   <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span><span class=hljs-selector-pseudo>:hover</span> {
-    <span class=hljs-attribute>color</span>: green; }
-</code></pre>
+    <span class=hljs-attribute>color</span>: green; }</code></pre>
 <p>となるので、カスケーディングの規則に従ってちゃんと意図通りになるが、カスケーディングをきちんと理解していないと生成されるCSSがわかりづらい。</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span> {
   <span class=hljs-attribute>color</span>: blue; }
 <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span><span class=hljs-selector-class>.active</span> <span class=hljs-selector-tag>a</span> {
   <span class=hljs-attribute>color</span>: red; }
 <span class=hljs-selector-id>#nav</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span><span class=hljs-selector-pseudo>:hover</span> {
-  <span class=hljs-attribute>color</span>: green; }
-</code></pre>
+  <span class=hljs-attribute>color</span>: green; }</code></pre>
 <p>という比較的直感的なセレクタの順序（普通にCSSを書く時のセレクタの順序）でCSSを生成するためには、</p>
 <pre><code class="hljs language-scss"><span class=hljs-selector-id>#nav</span> {
   <span class=hljs-selector-tag>li</span> {
@@ -190,12 +174,11 @@
       }
     }
   }
-}
-</code></pre>
+}</code></pre>
 <p>と無理やり間に入れるしかないようだ。</p>
 </section>
 <section>
-<h2>追記</h2>
+<h2 class=subheading>追記</h2>
 <p>ミックスインにはカンマを含む引数を<em>絶対に</em>渡せないというわけではない。例えば以下の様なケースでは問題ない。</p>
 <pre><code class="hljs language-scss">@<span class=hljs-keyword>mixin</span> transform(<span class=hljs-variable>$func</span>) {
   -moz-<span class=hljs-attribute>transform</span>: <span class=hljs-variable>$func</span>;
@@ -207,25 +190,23 @@
 
 <span class=hljs-selector-class>.flip-vertical</span> {
   @<span class=hljs-keyword>include</span> transform(matrix(<span class=hljs-number>1</span>, 0, 0 , -1, 0, 0));
-}
-</code></pre>
+}</code></pre>
 <p>カンマを含んでいるが、これは正常にコンパイルされる。</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-class>.flip-vertical</span> {
   <span class=hljs-attribute>-moz-transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0);
   <span class=hljs-attribute>-webkit-transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0);
   <span class=hljs-attribute>-o-transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0);
   <span class=hljs-attribute>-ms-transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0);
-  <span class=hljs-attribute>transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0); }
-</code></pre>
+  <span class=hljs-attribute>transform</span>: <span class=hljs-built_in>matrix</span>(1, 0, 0, -1, 0, 0); }</code></pre>
 <p>さっき知った！関係ないけど、この<code>matrix(1, 0, 0, -1, 0, 0)</code>は対象を上下に反転するもの。180度回転ではない。ショートカット関数は用意されてないので覚えておくと良いかも。CSSも数学できないともうダメっぽい……。せめて行列だけでもちゃんと思い出そう。</p>
 </section></div>
 </article>
 </main>
-<footer>
-<ul>
+<footer class=footer>
+<ul class=footlinks>
 <li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
 <li><a href=https://twitter.com/hail2u_>Twitter</a></li>
 <li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
 </ul>
-<address><a href=/#contact>問い合わせ</a></address>
+<address class=byline><a href=/#contact>問い合わせ</a></address>
 </footer>

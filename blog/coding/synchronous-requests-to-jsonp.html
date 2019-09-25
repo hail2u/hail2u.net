@@ -11,8 +11,8 @@
 <link href=/blog/coding/synchronous-requests-to-jsonp.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.9.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.9.min.js></script>
+<link href=/css/main.9.3.10.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.10.min.js></script>
 <meta content=コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。 itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=JSONPに同期リクエスト itemprop=name>
@@ -27,10 +27,10 @@
 <meta content=@hail2u_ name=twitter:site>
 </head>
 <body>
-<header>
-<nav>
-<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-<ul>
+<header class=header>
+<nav class=navigation>
+<a href=/ class=logo><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul class=pages>
 <li><mark><a href=/blog/ >雑記</a></mark></li>
 <li><a href=/links/ >参照</a></li>
 <li><a href=/statuses/ >近況</a></li>
@@ -41,12 +41,12 @@
 </ul>
 </nav>
 </header>
-<main>
+<main class=content>
 <article>
-<footer>
+<footer class=dateline>
 <p><time datetime=2006-09-25T13:46:13+09:00 itemprop=datePublished>2006年9月25日</time></p>
 </footer>
-<h1>JSONPに同期リクエスト</h1>
+<h1 class=headline>JSONPに同期リクエスト</h1>
 <div itemprop=articleBody><p>コールバック関数を指定する形のJSONPへ<code>for</code>ループなどで複数回リクエストする場合、コールバック関数の実行される順は<code>for</code>ループで回した順と一致するとは限らない（<a href=http://www.opera.com/products/desktop/ >Opera</a>除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。</p>
 <p>同期リクエストするためには、<code>for</code>ループなどでJSONPへのリクエストを一気に処理するのではなく、リクエストをひとつに留めてコールバック関数内で次に進むといった形で実装するが良さそう・・・とアイディアを<a href=http://la.ma.la/blog/ >バソキヤ求めて三千里の人</a>に貰った。</p>
 <p>つまり、</p>
@@ -59,8 +59,7 @@
   <span class=hljs-string>'http://del.icio.us/feeds/json/nagayama'</span>,
   <span class=hljs-string>'http://del.icio.us/feeds/json/typester'</span>,
   <span class=hljs-string>'http://del.icio.us/feeds/json/yoko'</span>
-];
-</code></pre>
+];</code></pre>
 <p>という<a href=http://del.icio.us/ >del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
 <pre><code class="hljs language-js">addScript(<span class=xml><span class=hljs-tag>&lt;<span class=hljs-name>em</span>&gt;</span>urls[0]<span class=hljs-tag>&lt;/<span class=hljs-name>em</span>&gt;</span></span> + <span class=hljs-string>'?callback=diplayPosts'</span>);
 
@@ -82,18 +81,17 @@ function loadNext() {
   if (urls.length &lt;= 1) return;
   urls.shift();
   addScript(&lt;em&gt;urls[0]&lt;/</span>em&gt; + <span class=hljs-string>'?callback=diplayPosts'</span>);
-}
-</code></pre>
+}</code></pre>
 <p>という感じに、コールバック関数(<code>displayPosts()</code>)内で次に進む関数(<code>loadNext()</code>)を呼び出すように<a href=/pub/test/082.html>実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある（ネットワーク状態に依存）し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>
 <p>あえて同期リクエストすることにより、非同期であることからスムースに処理できる（ことが多い）というJSONPの長所を失う上に、処理に時間がかかってしまうという欠点もある。それでもあえて非同期でリクエストしないことによって、得られるものがいくつかあるわけで、場合によってはあえて並行リクエストをしないという選択はアリなのかもしれない。</p>
 <p>少し前に作った指定したdel.icio.usのユーザーのnetworkに登録しているユーザーのブックマークを並べるモノは誰のブックマークやらわからない状態でずらっとブックマークが並べられていたが、同期リクエストに変更することによってユーザー名付きでブックマークを並べられるようになった。</div>
 </article>
 </main>
-<footer>
-<ul>
+<footer class=footer>
+<ul class=footlinks>
 <li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
 <li><a href=https://twitter.com/hail2u_>Twitter</a></li>
 <li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
 </ul>
-<address><a href=/#contact>問い合わせ</a></address>
+<address class=byline><a href=/#contact>問い合わせ</a></address>
 </footer>

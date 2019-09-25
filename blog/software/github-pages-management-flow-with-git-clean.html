@@ -11,8 +11,8 @@
 <link href=/blog/software/github-pages-management-flow-with-git-clean.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.9.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.9.min.js></script>
+<link href=/css/main.9.3.10.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.10.min.js></script>
 <meta content="submodule（やsubtree）を使ったGitHub Pagesの管理フローは良いのだけど、もっと適当な感じでやりたいなと色々試している。要件としては生成に使ってる仕組みやログは非公開にしたいので、rebaseからpush -fのような変更を取り込んで更新する仕組みは使えない、というくらい。最新の実験ではclean -fでステージされてないファイルを削除できることを利用してやってみている。"itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content="git cleanを使ったGitHub Pagesの管理フロー"itemprop=name>
@@ -27,10 +27,10 @@
 <meta content=@hail2u_ name=twitter:site>
 </head>
 <body>
-<header>
-<nav>
-<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-<ul>
+<header class=header>
+<nav class=navigation>
+<a href=/ class=logo><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul class=pages>
 <li><mark><a href=/blog/ >雑記</a></mark></li>
 <li><a href=/links/ >参照</a></li>
 <li><a href=/statuses/ >近況</a></li>
@@ -41,32 +41,28 @@
 </ul>
 </nav>
 </header>
-<main>
+<main class=content>
 <article>
-<footer>
+<footer class=dateline>
 <p><time datetime=2014-07-08T11:38:59+09:00 itemprop=datePublished>2014年7月8日</time></p>
 </footer>
-<h1>git cleanを使ったGitHub Pagesの管理フロー</h1>
+<h1 class=headline>git cleanを使ったGitHub Pagesの管理フロー</h1>
 <div itemprop=articleBody><p>submodule（やsubtree）を使ったGitHub Pagesの管理フローは良いのだけど、もっと適当な感じでやりたいなと色々試している。要件としては生成に使ってる仕組みやログは非公開にしたいので、<code>rebase</code>から<code>push -f</code>のような変更を取り込んで更新する仕組みは使えない、というくらい。最新の実験では<code>clean -f</code>でステージされてないファイルを削除できることを利用してやってみている。</p>
 <p>まずはビルド。<code>master</code>ブランチでビルドして<code>index.html</code>などをバンバンそこに吐いていくような雑なケース。</p>
 <pre><samp>$ <kbd>npm run build</kbd>
 $ <kbd>git add --all</kbd>
-$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd>
-</samp></pre>
+$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd></samp></pre>
 <p>これでGitHub Pagesに必要なファイルが生成され、<code>master</code>ブランチにコミットされた状態になった。</p>
 <pre><samp>$ <kbd>git checkout gh-pages</kbd>
-$ <kbd>git checkout master -- &quot;*&quot;</kbd>
-</samp></pre>
+$ <kbd>git checkout master -- &quot;*&quot;</kbd></samp></pre>
 <p><code>gh-pages</code>ブランチへ切り替えて、<code>master</code>ブランチで変更されたファイルを全部持ってくる。事前に<code>gh-pages</code>ブランチでは手作業で必要なファイルだけを残したり、<code>CNAME</code>や<code>.nojekyll</code>など<code>gh-pages</code>ブランチでのみ必要になるファイルをコミットしたりして構成を整えておく。このまま全部コミットすると構成がグチャグチャになるので、以下のようにして必要な(<code>*.html</code>)のみコミットするように頑張る。</p>
 <pre><samp>$ <kbd>git reset</kbd>
 $ <kbd>git add *.html **/*.html</kbd>
 $ <kbd>git clean -f</kbd>
-$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd>
-</samp></pre>
+$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd></samp></pre>
 <p><code>reset</code>を引数なしで呼んで、全ファイルをステージされていない状態にし、必要なファイルだけステージし直す。その後余ったステージされていないファイルを<code>clean -f</code>で削除するという形。これで<code>master</code>ブランチで変更された<code>*.html</code>だけ<code>gh-pages</code>ブランチにもコミットされた。</p>
 <pre><samp>$ <kbd>git push origin gh-pages</kbd>
-$ <kbd>git checkout master</kbd>
-</samp></pre>
+$ <kbd>git checkout master</kbd></samp></pre>
 <p>最後に<code>gh-pages</code>ブランチだけ<code>push</code>して<code>master</code>ブランチへ戻って完了。</p>
 <hr>
 <p>Gitでは<code>git checkout master -- &lt;paths&gt;...</code>で<code>master</code>ブランチから特定のファイルを持ってこれるのだけど、ここでグロブがうまく使えなくてハマり、こういった強引なやり方になった。多分だけどGit側の制限ではなく、MSYSのエスケープがらみの問題だと思うけど、解決できなかったので分からない。<code>&quot;*&quot;</code>だと全部持ってこれることはわかったので、<code>clean -f</code>を組み合わせて強引にやってみている。今のところうまく動いてる。</p>
@@ -74,11 +70,11 @@ $ <kbd>git checkout master</kbd>
 <p>これ！という管理フローが見つからない。</div>
 </article>
 </main>
-<footer>
-<ul>
+<footer class=footer>
+<ul class=footlinks>
 <li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
 <li><a href=https://twitter.com/hail2u_>Twitter</a></li>
 <li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
 </ul>
-<address><a href=/#contact>問い合わせ</a></address>
+<address class=byline><a href=/#contact>問い合わせ</a></address>
 </footer>

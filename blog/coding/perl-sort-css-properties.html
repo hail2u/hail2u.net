@@ -11,8 +11,8 @@
 <link href=/blog/coding/perl-sort-css-properties.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.9.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.9.min.js></script>
+<link href=/css/main.9.3.10.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.10.min.js></script>
 <meta content="CSSを書く時に「セレクタ内でCSS仕様書でのプロパティの出現順序に従ってソートする」という個人的なルールを守っている。何かコーディングにおいて便利な理由があるからというわけではなく、第三者に説明する時に「仕様書の出現順で書いてます！」とかで済ませられるから。今まではファイル全体を処理するオレオレPerlスクリプトで適当にやっていたのだけど、Vimで選択範囲だけをソートとかやりたくなったので、普通に標準入力を読んで結果を標準出力に吐くように書き直した。ついでにCSS3のプロパティとFirefox（Mozilla）やSafari（WebKit）、Opera（Presto）、Internet Explorer（Trident）の独自拡張などへも対応させたりとか。"itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=CSSのプロパティをソートするPerlスクリプト itemprop=name>
@@ -27,10 +27,10 @@
 <meta content=@hail2u_ name=twitter:site>
 </head>
 <body>
-<header>
-<nav>
-<a href=/ ><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
-<ul>
+<header class=header>
+<nav class=navigation>
+<a href=/ class=logo><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<ul class=pages>
 <li><mark><a href=/blog/ >雑記</a></mark></li>
 <li><a href=/links/ >参照</a></li>
 <li><a href=/statuses/ >近況</a></li>
@@ -41,12 +41,12 @@
 </ul>
 </nav>
 </header>
-<main>
+<main class=content>
 <article>
-<footer>
+<footer class=dateline>
 <p><time datetime=2009-11-14T14:11:51+09:00 itemprop=datePublished>2009年11月14日</time></p>
 </footer>
-<h1>CSSのプロパティをソートするPerlスクリプト</h1>
+<h1 class=headline>CSSのプロパティをソートするPerlスクリプト</h1>
 <div itemprop=articleBody><p>CSSを書く時に「セレクタ内でCSS仕様書でのプロパティの出現順序に従ってソートする」という個人的なルールを守っている。何かコーディングにおいて便利な理由があるからというわけではなく、第三者に説明する時に「仕様書の出現順で書いてます！」とかで済ませられるから。今まではファイル全体を処理するオレオレPerlスクリプトで適当にやっていたのだけど、Vimで選択範囲だけをソートとかやりたくなったので、普通に標準入力を読んで結果を標準出力に吐くように書き直した。ついでにCSS3のプロパティとFirefox（Mozilla）やSafari（WebKit）、Opera（Presto）、Internet Explorer（Trident）の独自拡張などへも対応させたりとか。</p>
 <pre><code class="hljs language-perl"><span class=hljs-comment>#!/usr/bin/perl</span>
 
@@ -573,8 +573,7 @@ $css =~ <span class=hljs-regexp>s/{(.*?)}/"{".sort_properties($1)."}"/imgse</spa
   }
 
   <span class=hljs-keyword>return</span> $order;
-}
-</code></pre>
+}</code></pre>
 <p>安定のCSS2.1のプロパティが優先的に上になる。それに続いてCSS3の草案にあるプロパティが<a href=http://www.w3.org/Style/CSS/current-work#CSS3>CSS Modules</a>の順に並ぶ。各ブラウザの独自拡張でCSS3の草案にそれに対応するものがある場合（<code>border-radius</code>と<code>-moz-border-radius</code>や<code>-webkit-border-radius</code>など）はその対応するものに続けて並べるようにした。それらに続いてプリフィックスのある各ブラウザの独自拡張プロパティ。一番下に来るのはプリフィックスの無い独自拡張プロパティで<code>ime-mode</code>等がこれに当る。</p>
 <p>まとめると「CSS2.1 &gt; CSS3 &gt; 独自拡張 &gt; プリフィックスの無い独自拡張」という順序で並ぶことになり、具体的には以下のように並ぶ。</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-tag>div</span><span class=hljs-selector-id>#header</span> <span class=hljs-selector-tag>ul</span><span class=hljs-selector-id>#navigation</span> <span class=hljs-selector-tag>li</span> <span class=hljs-selector-tag>a</span> {
@@ -596,8 +595,7 @@ $css =~ <span class=hljs-regexp>s/{(.*?)}/"{".sort_properties($1)."}"/imgse</spa
   <span class=hljs-attribute>-moz-margin-start</span>: <span class=hljs-number>6px</span>;
   <span class=hljs-comment>/* Vendor extension (without prefix) */</span>
   <span class=hljs-attribute>ime-mode</span>: auto;
-}
-</code></pre>
+}</code></pre>
 <p>スクリプトではそれぞれを分けて順に<code>push</code>しているので新規追加や修正はそれほど大変でもない（と思う）。</p>
 <p>CSSのプロパティについては以下を参考にした。</p>
 <ul>
@@ -632,38 +630,36 @@ $css =~ <span class=hljs-regexp>s/{(.*?)}/"{".sort_properties($1)."}"/imgse</spa
 <p>「プロパティの位置がおかしい！」とか「プロパティに抜けがある！」とか「プロパティがかぶっている！」とかは<a href=http://hail2u.wufoo.com/forms/feedback/ >報告してくれるとありがたい</a>。</p>
 <hr>
 <p>Vimでこのスクリプトを利用する場合は、パスの通ったところにsortcss.plという名前で保存し、セレクタ全体もしくはファイル全体を選択して、</p>
-<pre>!sortcss.pl
-</pre>
+<pre>!sortcss.pl</pre>
 <p>とすれば良い。セレクタ全体を選択（正確には中括弧の間を中括弧を含めて選択）するにはビジュアル・モードでの<kbd>a}</kbd>を使えば良いので、以下のようなキーバインドとコマンドを用意しておくと便利。</p>
 <pre><code class="hljs language-vim"><span class=hljs-keyword>nmap</span> gso va}:SortCSS<span class=hljs-symbol>&lt;CR&gt;</span>
 <span class=hljs-keyword>vmap</span> gso <span class=hljs-keyword>a</span>}:SortCSS<span class=hljs-symbol>&lt;CR&gt;</span>
 
 <span class=hljs-comment>" Sort CSS properties</span>
 <span class=hljs-comment>" :SortCSS</span>
-command! -<span class=hljs-built_in>range</span>=% SortCSS :<span class=hljs-symbol>&lt;line1&gt;</span>,<span class=hljs-symbol>&lt;line2&gt;</span>!perl -S sortcss.pl
-</code></pre>
+command! -<span class=hljs-built_in>range</span>=% SortCSS :<span class=hljs-symbol>&lt;line1&gt;</span>,<span class=hljs-symbol>&lt;line2&gt;</span>!perl -S sortcss.pl</code></pre>
 <p>これで<kbd>gso</kbd>でソートできる他、<code>:SortCSS</code>でもソートできる（<code>-range=%</code>なので選択していない場合はファイル全体を処理する）。CSSファイル以外ではアクティブにする必要が無いので、<code>$MYVIMRC</code>ではなく<code>$HOME/.vim/ftplugin/css.vim</code>（Windowsなら<code>$HOME\vimfiles\ftplugin\css.vim</code>）とかに書いた方が良い<a href=http://subtech.g.hatena.ne.jp/secondlife/20060831/1157012844>かも</a>。</p>
 <hr>
 <p>プロパティの羅列部分だけを切り出せばCSS用の辞書に早変わり！</p>
 <section>
-<h2>追記@2009-11-16T15:31:03+09:00</h2>
+<h2 class=subheading>追記@2009-11-16T15:31:03+09:00</h2>
 <p><a href=http://blog.livedoor.jp/xaicron/ >xaicronさん</a>に<a href=http://blog.livedoor.jp/xaicron/archives/50913074.html>添削してもらった</a>。なるほどなーということでコピペして更新。</p>
 </section>
 <section>
-<h2>追記@2009-11-16T18:28:19+09:00</h2>
+<h2 class=subheading>追記@2009-11-16T18:28:19+09:00</h2>
 <p>重複していた<code>speak-header</code>の削除（<a href=http://b.hatena.ne.jp/kits/20091116#bookmark-17336010>kitsさんのはてブコメント</a>より）と<code>empty-cells</code>と<code>cursor</code>の位置が逆だったのを修正した。</p>
 </section>
 <section>
-<h2>追記@2009-11-17T23:15:06+09:00</h2>
+<h2 class=subheading>追記@2009-11-17T23:15:06+09:00</h2>
 <p>xaicronさんから<code>defined</code>抜けの修正（<code>margin</code>で場合によってはおかしくなることがあった）とシュワルツ変換を噛ませて高速化したものをフィードバックしてもらったので、手元で加えていた未知のプロパティを最後に回す修正とマージして変数名をちょっと変え更新。<code>warn</code>での未知のプロパティの警告はあったほうが良いのだけど、Vimと一部のシェルの組み合わせでは標準エラー出力もリダイレクトするように（デフォルトでは）なっているのでコメントアウトしておいた。</p>
 </section></div>
 </article>
 </main>
-<footer>
-<ul>
+<footer class=footer>
+<ul class=footlinks>
 <li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
 <li><a href=https://twitter.com/hail2u_>Twitter</a></li>
 <li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
 </ul>
-<address><a href=/#contact>問い合わせ</a></address>
+<address class=byline><a href=/#contact>問い合わせ</a></address>
 </footer>
