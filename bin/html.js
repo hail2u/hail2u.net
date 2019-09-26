@@ -67,8 +67,8 @@ const extendBook = book => {
   };
 };
 
-const readBooks = async file => {
-  const books = await readJSONFile(file);
+const readBooks = async () => {
+  const books = await readJSONFile(config.data.books);
   return books.map(extendBook);
 };
 
@@ -307,14 +307,7 @@ const buildHTML = async (metadata, partials, file) => {
 
   if (data.isHome) {
     data.articles = data.articles.slice(0, 6);
-    data.books = [
-      data.nonfictions[0],
-      data.novels[0],
-      data.comics[0],
-      data.nonfictions[1],
-      data.novels[1],
-      data.comics[1]
-    ];
+    data.books = data.books.slice(0, 6);
     data.documents = data.documents.slice(0, 3);
     data.links = data.links.slice(0, 6);
     data.photos = data.photos.slice(0, 6);
@@ -326,9 +319,6 @@ const buildHTML = async (metadata, partials, file) => {
   const minified = htmlMinifier.minify(highlighted, optsHTMLMinifier);
   await fs.writeFile(file.dest, minified);
 };
-
-const compareByPublished = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const toFilesFormat = article => ({
   dest: convertToPOSIXPath(path.join(config.dest.root, article.link)),
@@ -349,37 +339,26 @@ const main = async () => {
   const [
     metadata,
     articles,
-    comics,
+    books,
     documents,
     links,
-    nonfictions,
-    novels,
     photos,
     statuses,
     partials
   ] = await Promise.all([
     readJSONFile(config.data.metadata),
     readArticles(),
-    readBooks(config.data.comics),
+    readBooks(),
     readDocuments(),
     readLinks(),
-    readBooks(config.data.nonfictions),
-    readBooks(config.data.novels),
     listPhotos(),
     readStatuses(),
     readPartials()
   ]);
   metadata.articles = articles;
-  metadata.books = [
-    ...comics,
-    ...nonfictions,
-    ...novels
-  ].sort(compareByPublished);
-  metadata.comics = comics;
+  metadata.books = books;
   metadata.documents = documents;
   metadata.links = links;
-  metadata.nonfictions = nonfictions;
-  metadata.novels = novels;
   metadata.photos = photos;
   metadata.statuses = statuses;
   metadata.version = version;

@@ -50,8 +50,8 @@ const extendBook = book => {
   };
 };
 
-const readBooks = async file => {
-  const books = await readJSONFile(file);
+const readBooks = async () => {
+  const books = await readJSONFile(config.data.books);
   return books
     .filter(hasPublished)
     .slice(0, 10)
@@ -187,31 +187,25 @@ const main = async () => {
   const [
     metadata,
     articles,
-    comics,
+    books,
     documents,
     links,
-    nonfictions,
-    novels,
     photos,
     statuses
   ] = await Promise.all([
     readJSONFile(config.data.metadata),
     readArticles(),
-    readBooks(config.data.comics),
+    readBooks(),
     readDocuments(),
     readLinks(),
-    readBooks(config.data.nonfictions),
-    readBooks(config.data.novels),
     listPhotos(),
     readStatuses()
   ]);
   metadata.items = [
     ...articles,
-    ...comics,
+    ...books,
     ...documents,
     ...links,
-    ...nonfictions,
-    ...novels,
     ...photos,
     ...statuses
   ].sort(compareByPublished);

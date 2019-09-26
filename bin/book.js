@@ -4,16 +4,6 @@ const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
 const findCommand = require("../lib/find-command");
 
-const selectBooksFile = type => {
-  const key = `${type}s`;
-
-  if (config.data[key]) {
-    return config.data[key];
-  }
-
-  throw new Error("Book type must be one of “comic”, “novel”, and “nonfiction.”");
-};
-
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
     alias: {
@@ -45,9 +35,12 @@ const main = async () => {
     throw new Error("Book type must be passed.");
   }
 
-  const booksFile = selectBooksFile(argv.type);
+  if (!["comic", "novel", "nonfiction"].includes(argv.type)) {
+    throw new Error("Book type must be one of “comic”, “novel”, and “nonfiction.”");
+  }
+
   const [books, git] = await Promise.all([
-    readJSONFile(booksFile),
+    readJSONFile(config.data.books),
     findCommand("git")
   ]);
 
@@ -55,12 +48,13 @@ const main = async () => {
     throw new Error(`${argv.title} has already been added.`);
   }
 
-  await writeJSONFile(booksFile, [{
+  await writeJSONFile(config.data.books, [{
     asin: argv.asin,
     published: Date.now(),
-    title: argv.title
+    title: argv.title,
+    type: argv.type
   }, ...books]);
-  await runCommand(git, ["add", "--", booksFile]);
+  await runCommand(git, ["add", "--", config.data.books]);
   await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
 };
 
