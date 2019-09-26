@@ -1,4 +1,5 @@
 const config = require("./index.json");
+const convertToPOSIXPath = require("../lib/convert-to-posix-path");
 const { escapeCharacters, unescapeReferences } = require("../lib/character-reference");
 const fs = require("fs").promises;
 const getDateDetails = require("../lib/get-date-details");
@@ -8,7 +9,6 @@ const minimist = require("minimist");
 const mustache = require("mustache");
 const path = require("path");
 const { readJSONFile } = require("../lib/json-file");
-const convertToPOSIXPath = require("../lib/convert-to-posix-path");
 const { version } = require("../package.json");
 
 const optsHTMLMinifier = {

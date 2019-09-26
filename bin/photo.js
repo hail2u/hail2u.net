@@ -1,9 +1,9 @@
 const config = require("./index.json");
+const findCommand = require("../lib/find-command");
 const fs = require("fs").promises;
 const path = require("path");
 const runCommand = require("../lib/run-command");
 const sharp = require("sharp");
-const findCommand = require("../lib/find-command");
 
 const isPhoto = filename => {
   if (path.extname(filename).toLowerCase() === ".jpg") {

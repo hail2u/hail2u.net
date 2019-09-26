@@ -1,5 +1,5 @@
 const config = require("./index.json");
-const { unescapeReferences } = require("../lib/character-reference");
+const findCommand = require("../lib/find-command");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
 const minimist = require("minimist");
@@ -8,7 +8,7 @@ const path = require("path");
 const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
-const findCommand = require("../lib/find-command");
+const { unescapeReferences } = require("../lib/character-reference");
 
 const getDraft = async filename => {
   const src = path.join(config.src.drafts, filename);

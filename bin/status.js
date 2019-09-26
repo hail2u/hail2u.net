@@ -1,7 +1,7 @@
 const config = require("./index.json");
+const findCommand = require("../lib/find-command");
 const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
-const findCommand = require("../lib/find-command");
 
 const main = async () => {
   if (process.argv.length !== 3) {

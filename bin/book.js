@@ -1,8 +1,8 @@
 const config = require("./index.json");
+const findCommand = require("../lib/find-command");
 const minimist = require("minimist");
 const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
-const findCommand = require("../lib/find-command");
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
