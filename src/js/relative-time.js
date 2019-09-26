@@ -12,18 +12,18 @@ const unit = {
   day: "日",
   hour: "時間",
   minute: "分",
-  month: "ヶ月",
+  month: "か月",
   now: "たった今",
-  second: "秒",
+  second: " 秒",
   year: "年"
 };
 
-const toRelativeDate = (from, to) => {
-  if (!Number.isInteger(to)) {
+const toRelativeTime = dt => {
+  if (!Number.isInteger(dt)) {
     return;
   }
 
-  let diff = Math.round((from - to) / divisor.second);
+  let diff = Math.round((now - dt) / divisor.second);
 
   if (!Number.isInteger(diff) || diff < 0) {
     return;
@@ -34,39 +34,39 @@ const toRelativeDate = (from, to) => {
   }
 
   if (diff < divisor.minute) {
-    return `${diff}${unit.second}${suffix}`;
+    return `${diff} ${unit.second}${suffix}`;
   }
 
   diff = Math.round(diff / divisor.minute);
 
   if (diff < divisor.hour) {
-    return `${diff}${unit.minute}${suffix}`;
+    return `${diff} ${unit.minute}${suffix}`;
   }
 
   diff = Math.round(diff / divisor.hour);
 
   if (diff < divisor.day) {
-    return `${diff}${unit.hour}${suffix}`;
+    return `${diff} ${unit.hour}${suffix}`;
   }
 
   diff = Math.round(diff / divisor.day);
 
   if (diff < divisor.month) {
-    return `${diff}${unit.day}${suffix}`;
+    return `${diff} ${unit.day}${suffix}`;
   }
 
   diff = Math.round(diff / divisor.month);
 
   if (diff < divisor.year) {
-    return `${diff}${unit.month}${suffix}`;
+    return `${diff} ${unit.month}${suffix}`;
   }
 
-  return `${Math.round(diff / divisor.year)}${unit.year}${suffix}`;
+  // return `${diff} ${unit.year}${suffix}`;
 };
 
-for (const time of document.querySelectorAll("time.js-reldate[datetime]")) {
+for (const time of document.querySelectorAll("time.js-relative-time[datetime]")) {
   const absolute = time.getAttribute("datetime");
-  const relative = toRelativeDate(now, Date.parse(absolute));
+  const relative = toRelativeTime(Date.parse(absolute));
 
   if (relative) {
     time.setAttribute("title", absolute);
