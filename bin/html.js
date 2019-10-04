@@ -297,18 +297,18 @@ const buildHTML = async (metadata, partials, file) => {
   if (file.dest.endsWith("/log.html")) {
     data.canonical = `${data.canonical}log.html`;
   } else {
-    data.otherBooks = markFirstItem(data.books.slice(36));
+    data.otherBooks = markFirstItem(data.books.slice(24));
     data.numOtherBooks = data.otherBooks.length;
-    data.otherPhotos = markFirstItem(data.photos.slice(36));
+    data.otherPhotos = markFirstItem(data.photos.slice(24));
     data.numOtherPhotos = data.otherPhotos.length;
-    data.books = data.books.slice(0, 36);
-    data.photos = data.photos.slice(0, 36);
+    data.books = data.books.slice(0, 24);
+    data.photos = data.photos.slice(0, 24);
   }
 
   if (data.isHome) {
     data.articles = data.articles.slice(0, 6);
     data.books = data.books.slice(0, 6);
-    data.documents = data.documents.slice(0, 3);
+    data.documents = data.documents.slice(0, 6);
     data.links = data.links.slice(0, 6);
     data.photos = data.photos.slice(0, 6);
     data.statuses = data.statuses.slice(0, 1);
