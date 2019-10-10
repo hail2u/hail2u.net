@@ -1,5 +1,4 @@
 const config = require("./index.json");
-const findCommand = require("../lib/find-command");
 const fs = require("fs").promises;
 const highlight = require("../lib/highlight");
 const minimist = require("minimist");
@@ -9,6 +8,7 @@ const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const readline = require("readline");
 const runCommand = require("../lib/run-command");
 const { unescapeReferences } = require("../lib/character-reference");
+const which = require("which");
 
 const getDraft = async filename => {
   const src = path.join(config.src.drafts, filename);
@@ -82,7 +82,7 @@ const checkSelectedName = name => {
 };
 
 const checkSelectedTitle = title => {
-  if (typeof title !== "string" || title.length < 8) {
+  if (typeof title !== "string" || title.length < 4) {
     throw new Error("This draft does not have a valid title. A draft title must be a long enough string.");
   }
 
@@ -149,8 +149,8 @@ const getArticleTotal = cache => ` (${cache.length + 1})`;
 const updateEntry = async file => {
   const cache = await readJSONFile(config.data.articles);
   const [git, node] = await Promise.all([
-    findCommand("git"),
-    findCommand("node"),
+    which("git"),
+    which("node"),
     copyArticleImages(file.body),
     updateCache(cache, file)
   ]);
@@ -173,7 +173,7 @@ const testSelected = async selected => {
     .replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
     .replace(/(?<=\bhref=")\//g, "../dist/");
   const [open] = await Promise.all([
-    findCommand("open"),
+    which("open"),
     fs.writeFile(selected.dest, highlight(rendered))
   ]);
   return runCommand(open, [selected.dest]);

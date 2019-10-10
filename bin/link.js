@@ -1,8 +1,8 @@
 const config = require("./index.json");
-const findCommand = require("../lib/find-command");
 const minimist = require("minimist");
 const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
+const which = require("which");
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
@@ -27,7 +27,7 @@ const main = async () => {
 
   const [links, git] = await Promise.all([
     readJSONFile(config.data.links),
-    findCommand("git")
+    which("git")
   ]);
   await writeJSONFile(config.data.links, [{
     published: Date.now(),

@@ -1,9 +1,9 @@
 const config = require("./index.json");
-const findCommand = require("../lib/find-command");
 const fs = require("fs").promises;
 const path = require("path");
 const runCommand = require("../lib/run-command");
 const sharp = require("sharp");
+const which = require("which");
 
 const isPhoto = ext => {
   if ([".gif", ".jpeg", ".jpg", ".png", ".webp"].includes(ext)) {
@@ -37,7 +37,7 @@ const main = async () => {
 
   const [filename, git] = await Promise.all([
     generateFilename(new Date(), ext),
-    findCommand("git")
+    which("git")
   ]);
   const src = path.join(config.src.photos, filename);
   await sharp(photo)

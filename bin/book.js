@@ -1,8 +1,8 @@
 const config = require("./index.json");
-const findCommand = require("../lib/find-command");
 const minimist = require("minimist");
 const { readJSONFile, writeJSONFile } = require("../lib/json-file");
 const runCommand = require("../lib/run-command");
+const which = require("which");
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
@@ -41,7 +41,7 @@ const main = async () => {
 
   const [books, git] = await Promise.all([
     readJSONFile(config.data.books),
-    findCommand("git")
+    which("git")
   ]);
 
   if (books.find(book => argv.asin === book.asin)) {
