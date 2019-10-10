@@ -11,8 +11,8 @@
 <link href=/blog/webdesign/monospace-font-sizing-incompatibilities.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.10.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.10.min.js></script>
+<link href=/css/main.9.3.11.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.11.min.js></script>
 <meta content="少し前にFixing browsers’ broken monospace font handlingをNice Web Type経由で読んだんだけど、「単純に初期設定が違うだけだろ……%指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。font-size: 100%がうまく動かなかったり、pre要素はともかくcode要素辺りでの実装のずれとか、monospaceだけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。"itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題 itemprop=name>
@@ -29,7 +29,7 @@
 <body>
 <header class=header>
 <nav class=navigation>
-<a href=/ class=logo><svg aria-labelledby=site-logo height=256 role=img viewBox="0 0 152 256"width=152 xmlns=http://www.w3.org/2000/svg><title id=site-logo>Hail2u</title><path d="M38 8c-6 0-12 5-14 10-7 11-9 24-11 36-3 20-3 41-4 61L8 235c0 5 2 10 6 12s8 1 11-2c5-4 7-10 10-16 6-12 13-24 21-35 3-4 6-9 11-11 2-2 5-1 6 1 2 3 1 7 1 11-1 9-2 18-1 28 1 7 3 16 9 21 5 4 12 5 18 4 8-1 14-6 20-12 8-7 14-17 19-26l5-11c1-4-2-8-6-8-3 0-5 3-6 6-6 12-13 24-24 33-4 4-10 7-15 5-5-1-6-6-7-10-2-10-1-21 0-31 1-7-1-15-6-20-4-5-11-6-17-3-8 3-13 10-17 16-10 14-18 29-25 43-1 2-1-1-1-1v-34c14-25 26-51 34-78 6-23 10-47 9-70-1-10-2-21-8-29A19 19 0 0038 8zm1 12c4 0 6 3 7 6 5 9 5 19 5 29 0 31-8 61-19 90l-12 26c0-36 0-73 4-110 1-11 3-21 6-32 2-3 3-7 7-8l2-1z"/></svg></a>
+<a href=/ class=logo>Hail2u</a>
 <ul class=pages>
 <li><mark><a href=/blog/ >雑記</a></mark></li>
 <li><a href=/links/ >参照</a></li>
@@ -43,10 +43,10 @@
 </header>
 <main class=content>
 <article>
+<h1 class=headline>等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</h1>
 <footer class=dateline>
 <p><time datetime=2012-02-19T16:16:45+09:00 itemprop=datePublished>2012年2月19日</time></p>
 </footer>
-<h1 class=headline>等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</h1>
 <div itemprop=articleBody><p>少し前に<a href=http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/ >Fixing browsers’ broken monospace font handling</a>を<a href=http://nicewebtype.com/ >Nice Web Type</a>経由で読んだんだけど、「単純に初期設定が違うだけだろ……<code>%</code>指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。<code>font-size: 100%</code>がうまく動かなかったり、<code>pre</code>要素はともかく<code>code</code>要素辺りでの実装のずれとか、<code>monospace</code>だけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。</p>
 <p>記事で最初に挙げられているコードでも良いのだけど、<a href=http://necolas.github.com/normalize.css/ >normalize.css</a>ではこの問題への対処がちゃんとなされているので、細かいことは余り考えずにnormalize.css使うのが手っ取り早い。記事の最後に挙げられているコードのように、ラテン系の言語に設定されているブラウザーでの挙動（等幅フォントを1段階小さいフォント・サイズにする）に合わせる場合は、normalize.cssのコードも混ぜた上である程度ネストへも対処するように書く必要がある。</p>
 <pre><code class="hljs language-css"><span class=hljs-selector-tag>html</span> {
@@ -75,16 +75,16 @@
 <section>
 <h2 class=subheading>存在する問題</h2>
 <p>問題はだいたい以下の4つに分けることができる。</p>
-<dl>
-<dt>素の<code>pre</code>要素</dt>
-<dd>初期サイズはブラウザー間で殆ど差はないと言って良い。ので、このまま何もいじらないならあまり問題は起きない……わけだが、ユーザー設定と言語設定により結構な差があるのでやはり少しはいじりたい。</dd>
-<dt><code>font-size: 100%</code></dt>
-<dd>地の文とフォント・サイズを合わせる目的で指定するわけだが、Internet Explorer 9とOpera 11でしか期待通りに動かない。どうもFirefox 10やChrome 17、Safari 5ではフォント・ファミリーを指定してやらないと<code>font-size</code>プロパティーによるサイズ指定が有効にならないようだ。</dd>
-<dt><code>font-family: monospace</code></dt>
-<dd>フォント・ファミリーを指定する場合も1つだけではダメで、<code>monospace, serif</code>などもう1つ必要。normalize.cssで<code>serif</code>が使われているのは単にジェネリック・ネームの中で一番短いからだと思う。</dd>
-<dt><code>code</code>要素他</dt>
-<dd><code>code</code>要素など等幅フォントで表示される他のインライン要素でも似たような問題が発生する。こちらは<code>pre</code>要素にネストされることがあるので更に厄介。親での<code>em</code>単位でのフォント・サイズ指定を継承するかどうかという点でIE9/Op11陣営とFx10/Ch17/Sf5陣営の間に壁があり簡単には統一できない。</dd>
-</dl>
+<ul>
+<li>素の<code>pre</code>要素</li>
+<li>初期サイズはブラウザー間で殆ど差はないと言って良い。ので、このまま何もいじらないならあまり問題は起きない……わけだが、ユーザー設定と言語設定により結構な差があるのでやはり少しはいじりたい。</li>
+<li><code>font-size: 100%</code></li>
+<li>地の文とフォント・サイズを合わせる目的で指定するわけだが、Internet Explorer 9とOpera 11でしか期待通りに動かない。どうもFirefox 10やChrome 17、Safari 5ではフォント・ファミリーを指定してやらないと<code>font-size</code>プロパティーによるサイズ指定が有効にならないようだ。</li>
+<li><code>font-family: monospace</code></li>
+<li>フォント・ファミリーを指定する場合も1つだけではダメで、<code>monospace, serif</code>などもう1つ必要。normalize.cssで<code>serif</code>が使われているのは単にジェネリック・ネームの中で一番短いからだと思う。</li>
+<li><code>code</code>要素他</li>
+<li><code>code</code>要素など等幅フォントで表示される他のインライン要素でも似たような問題が発生する。こちらは<code>pre</code>要素にネストされることがあるので更に厄介。親での<code>em</code>単位でのフォント・サイズ指定を継承するかどうかという点でIE9/Op11陣営とFx10/Ch17/Sf5陣営の間に壁があり簡単には統一できない。</li>
+</ul>
 </section>
 <section>
 <h2 class=subheading>解決するための条件</h2>
