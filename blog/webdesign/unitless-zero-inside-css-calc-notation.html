@@ -11,8 +11,8 @@
 <link href=/blog/webdesign/unitless-zero-inside-css-calc-notation.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.11.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.11.min.js></script>
+<link href=/css/main.9.3.12.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.12.min.js></script>
 <meta content="感覚としてcalc(1rem + 1)は明らかにダメそうだとわかるが、なんとなく通りそうに見えるcalc(1rem + 0)もダメになるということをCSSWringへのPRで知った。0ならユニットを省略できることが多いが、calc()内では別のようだ。最初良くわからなかったが、この辺りを定義しているCSS Values and Units Module Level 3仕様でもちゃんとそうなっていた。"itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=calc()内の0 itemprop=name>
@@ -48,7 +48,7 @@
 <p><time datetime=2015-10-24T13:23:52+09:00 itemprop=datePublished>2015年10月24日</time></p>
 </footer>
 <div itemprop=articleBody><p>感覚として<code>calc(1rem + 1)</code>は明らかにダメそうだとわかるが、なんとなく通りそうに見える<code>calc(1rem + 0)</code>もダメになるということを<a href=https://github.com/hail2u/node-csswring/pull/62>CSSWringへのPR</a>で知った。<code>0</code>ならユニットを省略できることが多いが、<code>calc()</code>内では別のようだ。最初良くわからなかったが、この辺りを定義している<a href=http://www.w3.org/TR/css3-values/ >CSS Values and Units Module Level 3仕様</a>でもちゃんとそうなっていた。</p>
-<p>仕様では<code>calc()</code>の内容を処理する時に、<a href=http://www.w3.org/TR/css3-values/#calc-type-checking>右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>（乗算）の場合は両辺のどちらかが数字であることが、<code>/</code>（除算）では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>（加算）と<code>-</code>（減算）では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
+<p>仕様では<code>calc()</code>の内容を処理する時に、<a href=http://www.w3.org/TR/css3-values/#calc-type-checking>右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>(乗算)の場合は両辺のどちらかが数字であることが、<code>/</code>(除算)では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>(加算)と<code>-</code>(減算)では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
 <p>問題の<code>calc(1em + 0)</code>は左辺が<code>&lt;length&gt;</code>で右辺が<code>&lt;integer&gt;</code>となる。そのため両辺の型が一致せず文法違反になる。実際に各ブラウザーでもことごとく無視されるようになる。</p>
 <hr>
 <p>CSSWringではプロパティーの値の中で単位を外せそうな<code>0</code>の長さかパーセンテージを見つけたら問答無用に削除していたため、このバグを作ってしまっていた。PRでは<code>calc()</code>かどうか簡単に探してスキップされるようになっており、これで問題なさそうだったため、ちょっとだけマッチ方法を変えてマージした。そういうわけで<a href=https://github.com/hail2u/node-csswring/releases/tag/v4.1.0>CSSWring v4.1.0</a>では既に修正済みだ。</p>

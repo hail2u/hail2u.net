@@ -11,8 +11,8 @@
 <link href=/blog/coding/create-readability-shorturl-with-js-and-yql.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.11.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.11.min.js></script>
+<link href=/css/main.9.3.12.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.12.min.js></script>
 <meta content="Readabilityにはrdd.meという短縮URLサービスがあり、それを使ってReadability化された読みやすい状態の記事を共有することができます。短縮URLの取得はWeb UIやReadability化したページで行える他、ウィジェットもありますが、APIも用意されているのでWebアプリケーションへの統合にはこちらを使った方が自由度が高いでしょう。YQLを使えばJavaScriptだけでも何とかなります。"itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=JavaScriptとYQLでReadabilityの短縮URLを作る itemprop=name>
@@ -61,14 +61,14 @@
   <span class=hljs-attr>"success"</span>: <span class=hljs-literal>true</span>
 }</code></pre>
 <p>クエリが成功すれば<code>meta.rdd_url</code>から短縮URLを拾うことができます。</p>
-<p>JavaScriptで叩く場合はクロスドメインという壁があるのでYQLで逃げ……られると思いきや、POSTなので素のYQLでは叩けません（できるらしいですけどよく知らないです……）。しかし、Community Tableを有効にすると<a href="http://developer.yahoo.com/yql/console/?q=show%20tables&amp;env=store://datatables.org/alltableswithkeys#h=select%20*%20from%20jsonpost%20where%20url%3D%27http%3A//search.twitter.com/search.json%27%20and%20postdata%3D%22q%3Dtest%22">jsonpost</a>（POSTでJSONが返ってくるサービスに使うテーブル）というまさに必要なものがあるのでこれを使います。</p>
+<p>JavaScriptで叩く場合はクロスドメインという壁があるのでYQLで逃げ……られると思いきや、POSTなので素のYQLでは叩けません(できるらしいですけどよく知らないです……)。しかし、Community Tableを有効にすると<a href="http://developer.yahoo.com/yql/console/?q=show%20tables&amp;env=store://datatables.org/alltableswithkeys#h=select%20*%20from%20jsonpost%20where%20url%3D%27http%3A//search.twitter.com/search.json%27%20and%20postdata%3D%22q%3Dtest%22">jsonpost</a>(POSTでJSONが返ってくるサービスに使うテーブル)というまさに必要なものがあるのでこれを使います。</p>
 <p>Demo: <a href=/pub/test/310.html>JavaScript rdd.me Shortener</a></p>
 <p>YQLに投げるYQL文は以下のような形になります。</p>
 <pre><code class="hljs language-sql"><span class=hljs-keyword>SELECT</span> * <span class=hljs-keyword>FROM</span> jsonpost <span class=hljs-keyword>WHERE</span> <span class=hljs-keyword>url</span>=<span class=hljs-string>'https://readability.com/api/shortener/v1/urls'</span> <span class=hljs-keyword>AND</span> postdata=<span class=hljs-string>'url=http://hail2u.net/documents/diveintohtml5-semantics.html'</span></code></pre>
 <p><code>postdata</code>でリソースに投げる<code>url</code>パラメータをセットして使います。クロスドメインの問題はYQLのJSONPラッパーで解決できるので、<a href=http://jquery.com/ >jQuery</a>などと組み合わせればデモのように数行のJavaScriptでReadabilityの短縮URLが作成可能になります。</p>
 <hr>
-<p>Readabilityのウィジェットはカッコイイと思うんですけど、ちょっと主張が強いというかボタンボタンしすぎてる感じで白背景のクリーンなWebサイト（例えば<a href=http://blog.readability.com/ >Readability Blog</a>など）にしかハマらない気がします。それでAPIを叩いて短縮URLを作ってリンクを叩こうとしました。最初は思わず<a href=http://blosxom.sourceforge.net/ >blosxom</a>のプラグインとして作ったんですが、APIが結構遅いのとやることの割にガッツリ様々なPerlモジュールが必要になるあたりで放棄しました。で、JavaScriptでページのロード後に叩けば良いかなーということでこんな感じになりました。</p>
-<p>JavaScriptでロード後に叩く場合でも結局APIが遅いというのがボトルネックになって、ユーザーが読み始めた後で短縮URLが表示される、もしくは短縮URLが表示される前に読むのをやめてタブを閉じそうというなんともアレな感じです……。キャッシュ作ったりとかちゃんとやらないと実用化するのは厳しそうです。フィードの再構築みたいに記事の公開時だけに短縮URLを作ってキャッシュして、それ以外ではそのキャッシュを読むだけのblosxomプラグインでも書こうかなでも面倒くさいな（←今ここ）みたいな。</div>
+<p>Readabilityのウィジェットはカッコイイと思うんですけど、ちょっと主張が強いというかボタンボタンしすぎてる感じで白背景のクリーンなWebサイト(例えば<a href=http://blog.readability.com/ >Readability Blog</a>など)にしかハマらない気がします。それでAPIを叩いて短縮URLを作ってリンクを叩こうとしました。最初は思わず<a href=http://blosxom.sourceforge.net/ >blosxom</a>のプラグインとして作ったんですが、APIが結構遅いのとやることの割にガッツリ様々なPerlモジュールが必要になるあたりで放棄しました。で、JavaScriptでページのロード後に叩けば良いかなーということでこんな感じになりました。</p>
+<p>JavaScriptでロード後に叩く場合でも結局APIが遅いというのがボトルネックになって、ユーザーが読み始めた後で短縮URLが表示される、もしくは短縮URLが表示される前に読むのをやめてタブを閉じそうというなんともアレな感じです……。キャッシュ作ったりとかちゃんとやらないと実用化するのは厳しそうです。フィードの再構築みたいに記事の公開時だけに短縮URLを作ってキャッシュして、それ以外ではそのキャッシュを読むだけのblosxomプラグインでも書こうかなでも面倒くさいな(←今ここ)みたいな。</div>
 </article>
 </main>
 <footer class=footer>

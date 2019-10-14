@@ -11,8 +11,8 @@
 <link href=/blog/webdesign/fixed-logo-with-to-top-function.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.11.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.11.min.js></script>
+<link href=/css/main.9.3.12.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.12.min.js></script>
 <meta content=ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。 itemprop=description>
 <link href=/apple-touch-icon-precomposed.png itemprop=image>
 <meta content=トップヘモドル機能付きの位置固定なロゴ itemprop=name>
@@ -70,7 +70,7 @@
 <span class=hljs-built_in>window</span>.addEventListener(<span class=hljs-string>'scroll'</span>, toggleLogoAction, <span class=hljs-literal>false</span>);</code></pre>
 <p>スクロール・イベントで<code>window.pageYOffset</code>と<code>globalHeader.offsetTop + siteNavigation.scrollHeight</code>を比べて、前者が大きい場合はナビゲーションが見えないだろうと推測して、トップヘモドル機能をロゴに割り当てるというシンプルなものだ。トップへモドル機能は単純にリンク先を<code>#top</code>に書きかえるだけでも良かったが、URLの分散と履歴の汚染をもたらしてしまうので<code>window.scrollTo(0, 0)</code>を使った。</p>
 <p>実際にはいわゆるdebounceで遅延させて、<a href=/pub/toggle-logo-action.js>イベントを間引いてたりも</a>している。スクロール・イベントで何かする場合にdebounceを使うとカクつくため、間引きつつ定期的に発火できるthrottleを使うことが多い。しかし、こういう目に見える変化をもたらさないものならdebounceの方が効率的だろう。</p>
-<p>また、再読み込み時などにスクロール・イベントなしでナビゲーションが見えない状態になっている場合を考慮して、最初に一回だけ機能の割り当てを試みるようにもした。その後、スクロールごとに<code>addEventListener()</code>を繰り返し行う実装になっており無駄が多いが、同じものは<a href=http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener>複数割り当てられることはない</a>ので、わざわざフラグ管理などをしなくても悪くはない（良くはない）。</p>
+<p>また、再読み込み時などにスクロール・イベントなしでナビゲーションが見えない状態になっている場合を考慮して、最初に一回だけ機能の割り当てを試みるようにもした。その後、スクロールごとに<code>addEventListener()</code>を繰り返し行う実装になっており無駄が多いが、同じものは<a href=http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener>複数割り当てられることはない</a>ので、わざわざフラグ管理などをしなくても悪くはない(良くはない)。</p>
 <p>他にはリンクの<code>href</code>属性の値を<code>#top</code>に書きかえ、ページを遷移するリンクではないことがわかるようにもしておいた。実際には<code>#top</code>に移動するわけではない上、現状のブラウザーの実装だと<code>#</code>以降が見えないこともあるので、完璧な解ではない。とは言っても、少なくともページを遷移するように見えるリンクのままよりは良いだろうし、機能的にはほぼ同等なので及第点と考えた。</p>
 <hr>
 <p>これはイメージとしては最近色々言われることの多いハンバーガー・ボタンによるナビゲーションの展開のごくシンプルな変種というと近い。ページの最上部へ戻らせることではなく、<em>トップにあるナビゲーションを表示させる</em>ことを目的としてる。</p>

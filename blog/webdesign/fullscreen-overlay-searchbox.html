@@ -11,8 +11,8 @@
 <link href=/blog/webdesign/fullscreen-overlay-searchbox.html rel=canonical>
 <link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
 <link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.11.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.11.min.js></script>
+<link href=/css/main.9.3.12.min.css rel=stylesheet>
+<script async defer src=/js/unutm.9.3.12.min.js></script>
 <meta content=増えてきたフルスクリーンでオーバーレイの検索ボックスだが、まだこれといった無難な実装方法はないように見える。今だとvw/vh/vmin/vmax単位を使ってレイアウト、:target擬似クラスを使ってトグルという形にすれば、ほぼCSSで実現できそうだ。 itemprop=description>
 <link href=/img/blog/fullscreen-overlay-searchbox.png itemprop=image>
 <meta content=フルスクリーンでオーバーレイの検索ボックス itemprop=name>
@@ -99,7 +99,7 @@
   <span class=hljs-attribute>height</span>: <span class=hljs-number>100%</span>;
   <span class=hljs-attribute>width</span>: <span class=hljs-number>100%</span>;
 }</code></pre>
-<p>閉じるボタンでは<code>vmin</code>単位を使うことで占有する面積を一定以下に維持し、大きすぎる・小さすぎるがあまりないようにしておいた。<code>font-size</code>でも使えるので、うまく使ってやるときれいに文字（記号）を配置することができる。また、<code>vw</code>や<code>vh</code>ではなく<code>vmin</code>単位を使うことで、縦横のどちらが余っているのかわからない検索フォームの領域とかぶさらないようにもできる。そうすると閉じるボタンがクリックできないというような事故や検索フォームをクリアーするアイコンとかぶったというような事故を避けることができるはずだ。</p>
+<p>閉じるボタンでは<code>vmin</code>単位を使うことで占有する面積を一定以下に維持し、大きすぎる・小さすぎるがあまりないようにしておいた。<code>font-size</code>でも使えるので、うまく使ってやるときれいに文字(記号)を配置することができる。また、<code>vw</code>や<code>vh</code>ではなく<code>vmin</code>単位を使うことで、縦横のどちらが余っているのかわからない検索フォームの領域とかぶさらないようにもできる。そうすると閉じるボタンがクリックできないというような事故や検索フォームをクリアーするアイコンとかぶったというような事故を避けることができるはずだ。</p>
 <p>もうひとつスクロールバーの有無という問題があるので、左上に配置すると簡単になる。スクロールバーの有無をCSSで判定するのは難しく、かといってそのためだけにJavaScriptを使うのももったいない。<code>calc()</code>を使うと何とかなるが、直感的ではない。近年のOSのGUIを考えると、閉じるボタンが右上というのももはや暗黙の了解とは言えなくなってきたので、左上でもわかりやすければ大丈夫だろう。</p>
 <p>アイコン化は簡単にユニコードの<a href=http://en.wikipedia.org/wiki/Dingbat#Unicode>Dingbatsブロック</a>のHeavy Multiplication Xを利用した。うかつに絵文字で良さそうなものを探すと予期せぬカラー化などが起こるので、こういったUIでおとなしめに使う場合はこの辺りの記号から選択すると良い。</p>
 </section>
@@ -127,12 +127,12 @@
 <span class=hljs-selector-id>#searchbox</span><span class=hljs-selector-pseudo>:target</span> {
   <span class=hljs-attribute>display</span>: block;
 }</code></pre>
-<p>トグルの機能はフラグメント識別子と<code>:target</code>擬似クラスの組み合わせで簡単に実装できる。閉じるボタンのリンク先を<code>#top</code>にしてやると、それをクリック（タッチ）することで<code>#search:target</code>を無効にできるため、うまいこと検索ボックスを閉じることができるというわけだ。ここでIDセレクターをちゃんと使うことで、フルスクリーンでオーバーレイにするビジュアル・デザインのためのルール群とトグルのためのルールを切り分けることができる。</p>
+<p>トグルの機能はフラグメント識別子と<code>:target</code>擬似クラスの組み合わせで簡単に実装できる。閉じるボタンのリンク先を<code>#top</code>にしてやると、それをクリック(タッチ)することで<code>#search:target</code>を無効にできるため、うまいこと検索ボックスを閉じることができるというわけだ。ここでIDセレクターをちゃんと使うことで、フルスクリーンでオーバーレイにするビジュアル・デザインのためのルール群とトグルのためのルールを切り分けることができる。</p>
 <p>デモでは検索ボックスを消した後に残るフラグメント識別子を<code>histroy.replaceState()</code>を使って消しているが、これをやめればCSSのみでできるだろう。</p>
 </section>
 <hr>
 <p>フルスクリーンでオーバーレイの検索ボックスは、独立したコンポーネントとしてデザインしやすいのが大きな利点だ。そうデザインできることで、異なるデバイス間でも似た検索体験を提供でき、また違うプロジェクトでも再利用することも比較的容易になる。ここで作ったデモもほぼどこでも使えるように出来たと思う。</p>
-<p>しかし独立したコンポーネントとしてデザインするためには、構造(HTML)として安定した形（独立したセクション）である必要があり、その上で前後の文脈や周辺の要素に依存しないようにCSSを書いていく必要がある。<code>vw</code>や<code>vh</code>、<code>vmin</code>、<code>vmax</code>といった描画領域を基準にした単位は、親要素はもちろん<code>body</code>や<code>html</code>要素のレンダリング状況を迂回してサイズを決定できるので、そういったCSSの書き方に大いに役に立つ。</div>
+<p>しかし独立したコンポーネントとしてデザインするためには、構造(HTML)として安定した形(独立したセクション)である必要があり、その上で前後の文脈や周辺の要素に依存しないようにCSSを書いていく必要がある。<code>vw</code>や<code>vh</code>、<code>vmin</code>、<code>vmax</code>といった描画領域を基準にした単位は、親要素はもちろん<code>body</code>や<code>html</code>要素のレンダリング状況を迂回してサイズを決定できるので、そういったCSSの書き方に大いに役に立つ。</div>
 </article>
 </main>
 <footer class=footer>
