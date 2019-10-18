@@ -6,7 +6,7 @@ const sharp = require("sharp");
 const which = require("which");
 
 const isPhoto = filename => {
-  if (path.extname(filename).toLowerCase() === ".jpg") {
+  if ([".jpeg", ".jpg"].includes(path.extname(filename).toLowerCase())) {
     return true;
   }
 
