@@ -25,12 +25,8 @@ const testContrastRatio = () => {
   };
 
   for (const color of document.querySelectorAll(".test-color li")) {
-    const label = color.firstChild;
     const ratio = parseFloat(getContrast(color).toFixed(3));
-    color.innerHTML = "";
-    color.append(label);
-    color.append(document.createElement("br"));
-    color.append(ratio);
+    color.replaceChild(document.createTextNode(ratio), color.lastChild);
   }
 };
 
