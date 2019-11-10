@@ -82,8 +82,8 @@ const checkSelectedName = name => {
 };
 
 const checkSelectedTitle = title => {
-  if (typeof title !== "string" || title.length < 4) {
-    throw new Error("This draft does not have a valid title. A draft title must be a long enough string.");
+  if (typeof title !== "string") {
+    throw new Error("This draft does not have a valid title. A draft title must be a string.");
   }
 
   return true;
