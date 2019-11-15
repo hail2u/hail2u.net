@@ -18,9 +18,10 @@ const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`
 
 const extendArticle = article => {
   const description = unescapeReferences(article.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, ""));
+    .replace(/<.*?>/g, ""))
+    .trim()
+    .split("\n")
+    .shift();
   return {
     ...article,
     body: article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),

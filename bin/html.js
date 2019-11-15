@@ -41,9 +41,10 @@ const extendArticle = article => {
     .replace(/<h2>/g, '<h2 class="subheading">')
     .replace(/^<aside>/, '<aside class="hang">');
   const description = unescapeReferences(article.body
-    .replace(/\r?\n/g, "")
-    .replace(/^.*?<p.*?>(.*?)<\/p>.*?$/, "$1")
-    .replace(/<.*?>/g, ""));
+    .replace(/<.*?>/g, ""))
+    .trim()
+    .split("\n")
+    .shift();
   return {
     ...article,
     ...dt,
