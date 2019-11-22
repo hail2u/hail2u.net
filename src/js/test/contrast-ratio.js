@@ -7,7 +7,7 @@ const testContrastRatio = () => {
       return sRGB / 12.92;
     }
 
-    return Math.pow((sRGB + 0.055) / 1.055, 2.4);
+    return ((sRGB + 0.055) / 1.055) ** 2.4;
   };
 
   const getRelativeLuminance = ([red, green, blue]) =>
