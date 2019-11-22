@@ -1,7 +1,7 @@
-const config = require("./index.json");
-const { readJSONFile, writeJSONFile } = require("../lib/json-file");
-const runCommand = require("../lib/run-command");
-const which = require("which");
+import config from "./index.js";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import runCommand from "../lib/run-command.js";
+import which from "which";
 
 const main = async () => {
   if (process.argv.length !== 3) {

@@ -1,10 +1,10 @@
-const config = require("./index.json");
-const { escapeCharacters, unescapeReferences } = require("../lib/character-reference");
-const fs = require("fs").promises;
-const getDateDetails = require("../lib/get-date-details");
-const mustache = require("mustache");
-const path = require("path");
-const { readJSONFile } = require("../lib/json-file");
+import config from "./index.js";
+import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
+import { promises as fs } from "fs";
+import getDateDetails from "../lib/get-date-details.js";
+import mustache from "mustache";
+import path from "path";
+import { readJSONFile } from "../lib/json-file.js";
 
 const toAbsoluteURL = url => {
   if (url.startsWith("/")) {

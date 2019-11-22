@@ -1,15 +1,15 @@
-const config = require("./index.json");
-const convertToPOSIXPath = require("../lib/convert-to-posix-path");
-const { escapeCharacters, unescapeReferences } = require("../lib/character-reference");
-const fs = require("fs").promises;
-const getDateDetails = require("../lib/get-date-details");
-const highlight = require("../lib/highlight");
-const htmlMinifier = require("html-minifier");
-const minimist = require("minimist");
-const mustache = require("mustache");
-const path = require("path");
-const { readJSONFile } = require("../lib/json-file");
-const { version } = require("../package.json");
+import config from "./index.js";
+import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
+import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
+import { promises as fs } from "fs";
+import getDateDetails from "../lib/get-date-details.js";
+import highlight from "../lib/highlight.js";
+import htmlMinifier from "html-minifier";
+import minimist from "minimist";
+import mustache from "mustache";
+import path from "path";
+import { readJSONFile } from "../lib/json-file.js";
+import getVersion from "../lib/get-version.js";
 
 const optsHTMLMinifier = {
   collapseBooleanAttributes: true,
@@ -345,7 +345,8 @@ const main = async () => {
     links,
     photos,
     statuses,
-    partials
+    partials,
+    version
   ] = await Promise.all([
     readJSONFile(config.data.metadata),
     readArticles(),
@@ -354,7 +355,8 @@ const main = async () => {
     readLinks(),
     listPhotos(),
     readStatuses(),
-    readPartials()
+    readPartials(),
+    getVersion()
   ]);
   metadata.articles = articles;
   metadata.books = books;

@@ -1,9 +1,9 @@
-const config = require("./index.json");
-const fs = require("fs").promises;
-const path = require("path");
-const runCommand = require("../lib/run-command");
-const sharp = require("sharp");
-const which = require("which");
+import config from "./index.js";
+import { promises as fs } from "fs";
+import path from "path";
+import runCommand from "../lib/run-command.js";
+import sharp from "sharp";
+import which from "which";
 
 const isPhoto = filename => {
   if ([".jpeg", ".jpg"].includes(path.extname(filename).toLowerCase())) {

@@ -1,8 +1,8 @@
-const config = require("./index.json");
-const minimist = require("minimist");
-const { readJSONFile, writeJSONFile } = require("../lib/json-file");
-const runCommand = require("../lib/run-command");
-const which = require("which");
+import config from "./index.js";
+import minimist from "minimist";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import runCommand from "../lib/run-command.js";
+import which from "which";
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {

@@ -1,8 +1,9 @@
-const ClosureCompiler = require("google-closure-compiler").jsCompiler;
-const config = require("./index.json");
-const fs = require("fs").promises;
-const { version } = require("../package.json");
+import googleClosureCompiler from "google-closure-compiler";
+import config from "./index.js";
+import { promises as fs } from "fs";
+import getVersion from "../lib/get-version.js";
 
+const ClosureCompiler = googleClosureCompiler.jsCompiler;
 const compiler = new ClosureCompiler({
   isolationMode: "IIFE",
   languageIn: "ECMASCRIPT_2019",
@@ -19,17 +20,19 @@ const compileJS = jsCode => new Promise((resolve, reject) => {
   });
 });
 
-const versioning = filename => filename.replace(/{{version}}/g, version);
-
 const buildJS = async file => {
   const code = await fs.readFile(file.src, "utf8");
-  const compiled = await compileJS([
-    {
-      sourceMap: null,
-      src: code
-    }
+  const [version, compiled] = await Promise.all([
+    getVersion(),
+    compileJS([
+      {
+        sourceMap: null,
+        src: code
+      }
+    ])
   ]);
-  await fs.writeFile(versioning(file.dest), compiled);
+  const dest = file.dest.replace(/{{version}}/g, version);
+  await fs.writeFile(dest, compiled);
 };
 
 Promise.all(config.files.js.map(buildJS)).catch(e => {

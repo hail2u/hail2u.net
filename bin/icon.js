@@ -1,8 +1,8 @@
-const config = require("./index.json");
-const fs = require("fs").promises;
-const path = require("path");
-const sharp = require("sharp");
-const toIco = require("to-ico");
+import config from "./index.js";
+import { promises as fs } from "fs";
+import path from "path";
+import sharp from "sharp";
+import toIco from "to-ico";
 
 const generatePNG = async file => {
   await sharp(file.src)

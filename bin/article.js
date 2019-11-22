@@ -1,14 +1,14 @@
-const config = require("./index.json");
-const fs = require("fs").promises;
-const highlight = require("../lib/highlight");
-const minimist = require("minimist");
-const mustache = require("mustache");
-const path = require("path");
-const { readJSONFile, writeJSONFile } = require("../lib/json-file");
-const readline = require("readline");
-const runCommand = require("../lib/run-command");
-const { unescapeReferences } = require("../lib/character-reference");
-const which = require("which");
+import config from "./index.js";
+import { promises as fs } from "fs";
+import highlight from "../lib/highlight.js";
+import minimist from "minimist";
+import mustache from "mustache";
+import path from "path";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import readline from "readline";
+import runCommand from "../lib/run-command.js";
+import { unescapeReferences } from "../lib/character-reference.js";
+import which from "which";
 
 const getDraft = async filename => {
   const src = path.join(config.src.drafts, filename);

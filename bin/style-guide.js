@@ -1,5 +1,5 @@
-const config = require("./index.json");
-const fs = require("fs").promises;
+import config from "./index.js";
+import { promises as fs } from "fs";
 
 const main = async () => {
   const html = await fs.readFile(config.src.styleGuide, "utf8");
