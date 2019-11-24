@@ -89,6 +89,16 @@ const checkSelectedTitle = title => {
   return true;
 };
 
+const checkSelectedTitleLength = title => {
+  const bytes = (new TextEncoder().encode(title));
+
+  if (bytes.length < 9) {
+    throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");
+  }
+
+  return true;
+};
+
 const deleteFile = file => fs.unlink(file);
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -191,7 +201,8 @@ const main = async () => {
   const selected = await selectDraft(drafts);
   await Promise.all([
     checkSelectedName(selected.name),
-    checkSelectedTitle(selected.title)
+    checkSelectedTitle(selected.title),
+    checkSelectedTitleLength(selected.title)
   ]);
 
   if (argv.contribute) {
