@@ -27,22 +27,26 @@ const getDraft = async filename => {
 
 const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
-const isDraft = filename => {
-  if (path.extname(filename) === ".html") {
-    return true;
+const isDraft = (isContribute, filename) => {
+  if (isContribute && filename.startsWith("_")) {
+    return false;
   }
 
-  return false;
+  if (path.extname(filename) !== ".html") {
+    return false;
+  }
+
+  return true;
 };
 
-const listDrafts = async () => {
+const listDrafts = async isContribute => {
   const filenames = await fs.readdir(config.src.drafts);
 
   if (filenames.length < 1) {
     throw new Error("There is no draft.");
   }
 
-  return getDrafts(filenames.filter(isDraft));
+  return getDrafts(filenames.filter(isDraft.bind(null, isContribute)));
 };
 
 const selectDraft = drafts => new Promise(resolve => {
@@ -197,7 +201,7 @@ const main = async () => {
     },
     boolean: ["contribute", "test"]
   });
-  const drafts = await listDrafts();
+  const drafts = await listDrafts(argv.contribute);
   const selected = await selectDraft(drafts);
   await Promise.all([
     checkSelectedName(selected.name),
