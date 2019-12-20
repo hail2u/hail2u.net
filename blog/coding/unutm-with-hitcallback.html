@@ -1,95 +1,123 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>hitCallbackを使ったUnUTMの実行 - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。"name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/coding/unutm-with-hitcallback.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。"itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content=hitCallbackを使ったUnUTMの実行 itemprop=name>
-<link href=/blog/coding/unutm-with-hitcallback.html itemprop=url>
-<meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。"property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content=hitCallbackを使ったUnUTMの実行 property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/coding/unutm-with-hitcallback.html property=og:url>
-<meta content=2014-07-19T12:31:08+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
-<article>
-<h1 class=headline>hitCallbackを使ったUnUTMの実行</h1>
-<footer>
-<p class=dateline><time datetime=2014-07-19T12:31:08+09:00 itemprop=datePublished>2014年7月19日</time></p>
-</footer>
-<div itemprop=articleBody><p><a href=https://github.com/hail2u/unutm>UnUTM</a>はGoogle Analyticsなどで使われる<code>utm_*</code>パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスの<code>ga()</code>を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。<code>ga()</code>を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できる<a href=https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#hitCallback><code>hitCallback</code>フィールド</a>を使うのが良さそう。</p>
-<p>普通に書くと以下の様なコードになる。</p>
-<pre><code class="hljs language-javascript">ga(<span class=hljs-string>'create'</span>, <span class=hljs-string>'UA-XXXXXXXX-X'</span>, <span class=hljs-string>'auto'</span>);
-ga(<span class=hljs-string>'send'</span>, <span class=hljs-string>'pageview'</span>, {
-  <span class=hljs-string>'hitCallback'</span>: <span class=hljs-function><span class=hljs-keyword>function</span> () </span>{
-    <span class=hljs-keyword>var</span> l = location;
-    <span class=hljs-keyword>var</span> h = history;
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
 
-    <span class=hljs-keyword>if</span> (!l.search || !h.replaceState) {
-      <span class=hljs-keyword>return</span>;
+    <title>hitCallbackを使ったUnUTMの実行 - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/coding/unutm-with-hitcallback.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="hitCallbackを使ったUnUTMの実行" itemprop="name">
+    <link href="/blog/coding/unutm-with-hitcallback.html" itemprop="url">
+
+    <meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="hitCallbackを使ったUnUTMの実行" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/coding/unutm-with-hitcallback.html" property="og:url">
+    <meta content="2014-07-19T12:31:08+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
+<article>
+  <h1 class="headline">hitCallbackを使ったUnUTMの実行</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2014-07-19T12:31:08+09:00" itemprop="datePublished">2014年7月19日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p><a href="https://github.com/hail2u/unutm">UnUTM</a>はGoogle Analyticsなどで使われる<code>utm_*</code>パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスの<code>ga()</code>を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。<code>ga()</code>を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できる<a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced#hitCallback"><code>hitCallback</code>フィールド</a>を使うのが良さそう。</p>
+
+<p>普通に書くと以下の様なコードになる。</p>
+
+<pre><code class="hljs language-javascript">ga(<span class="hljs-string">'create'</span>, <span class="hljs-string">'UA-XXXXXXXX-X'</span>, <span class="hljs-string">'auto'</span>);
+ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'</span>, {
+  <span class="hljs-string">'hitCallback'</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> l = location;
+    <span class="hljs-keyword">var</span> h = history;
+
+    <span class="hljs-keyword">if</span> (!l.search || !h.replaceState) {
+      <span class="hljs-keyword">return</span>;
     }
 
-    <span class=hljs-keyword>var</span> u = l.pathname +
-      l.search.replace(<span class=hljs-regexp>/[?&amp;]utm_[^&amp;]+/g</span>, <span class=hljs-string>''</span>).replace(<span class=hljs-regexp>/^&amp;/</span>, <span class=hljs-string>'?'</span>) +
+    <span class="hljs-keyword">var</span> u = l.pathname +
+      l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) +
       l.hash;
-    h.replaceState(<span class=hljs-literal>null</span>, <span class=hljs-string>''</span>, u);
+    h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
   }
 });</code></pre>
-<p><code>ga(&apos;send&apos;, &apos;pageview&apos;)</code>にオブジェクトを引数として追加し、そのオブジェクトの<code>hitCallback</code>キーに対して<code>utm_*</code>を消す操作を行う関数を割り当てる。これでトラッカーがデータを送信してから<code>utm_*</code>パラメーターが削除される。</p>
-<hr>
-<p>UnUTMには<code>unutm</code>という関数を追加するだけの<a href=https://github.com/hail2u/unutm/blob/v0.2.0/unutm_ga.js><code>unutm_ga.js</code></a>も追加して、v0.2.0にしておいた。これを使ってGoogle Analyticsのコードを書き換えればきっと機能するだろう。</p>
-<pre><code class="hljs language-html"><span class=hljs-tag>&lt;<span class=hljs-name>script</span> <span class=hljs-attr>src</span>=<span class=hljs-string>"/bower_components/unutm/unutm_ga.js"</span>&gt;</span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>&gt;</span>
-<span class=hljs-tag>&lt;<span class=hljs-name>script</span>&gt;</span><span class=javascript>
-  (<span class=hljs-function><span class=hljs-keyword>function</span>(<span class=hljs-params>i,s,o,g,r,a,m</span>)</span>{i[<span class=hljs-string>'GoogleAnalyticsObject'</span>]=r;i[r]=i[r]||<span class=hljs-function><span class=hljs-keyword>function</span>()</span>{
-  (i[r].q=i[r].q||[]).push(<span class=hljs-built_in>arguments</span>)},i[r].l=<span class=hljs-number>1</span>*<span class=hljs-keyword>new</span> <span class=hljs-built_in>Date</span>();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[<span class=hljs-number>0</span>];a.async=<span class=hljs-number>1</span>;a.src=g;m.parentNode.insertBefore(a,m)
-  })(<span class=hljs-built_in>window</span>,<span class=hljs-built_in>document</span>,<span class=hljs-string>'script'</span>,<span class=hljs-string>'//www.google-analytics.com/analytics.js'</span>,<span class=hljs-string>'ga'</span>);
 
-  ga(<span class=hljs-string>'create'</span>, <span class=hljs-string>'UA-XXXXXXXX-X'</span>, <span class=hljs-string>'auto'</span>);
-  ga(<span class=hljs-string>'send'</span>, <span class=hljs-string>'pageview'</span>, {
-    <span class=hljs-string>'hitCallback'</span>: unutm
+<p><code>ga(&apos;send&apos;, &apos;pageview&apos;)</code>にオブジェクトを引数として追加し、そのオブジェクトの<code>hitCallback</code>キーに対して<code>utm_*</code>を消す操作を行う関数を割り当てる。これでトラッカーがデータを送信してから<code>utm_*</code>パラメーターが削除される。</p>
+
+<hr>
+
+<p>UnUTMには<code>unutm</code>という関数を追加するだけの<a href="https://github.com/hail2u/unutm/blob/v0.2.0/unutm_ga.js"><code>unutm_ga.js</code></a>も追加して、v0.2.0にしておいた。これを使ってGoogle Analyticsのコードを書き換えればきっと機能するだろう。</p>
+
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/bower_components/unutm/unutm_ga.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+  (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i,s,o,g,r,a,m</span>)</span>{i[<span class="hljs-string">'GoogleAnalyticsObject'</span>]=r;i[r]=i[r]||<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+  (i[r].q=i[r].q||[]).push(<span class="hljs-built_in">arguments</span>)},i[r].l=<span class="hljs-number">1</span>*<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[<span class="hljs-number">0</span>];a.async=<span class="hljs-number">1</span>;a.src=g;m.parentNode.insertBefore(a,m)
+  })(<span class="hljs-built_in">window</span>,<span class="hljs-built_in">document</span>,<span class="hljs-string">'script'</span>,<span class="hljs-string">'//www.google-analytics.com/analytics.js'</span>,<span class="hljs-string">'ga'</span>);
+
+  ga(<span class="hljs-string">'create'</span>, <span class="hljs-string">'UA-XXXXXXXX-X'</span>, <span class="hljs-string">'auto'</span>);
+  ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'</span>, {
+    <span class="hljs-string">'hitCallback'</span>: unutm
   });
-</span><span class=hljs-tag>&lt;/<span class=hljs-name>script</span>&gt;</span></code></pre>
-<p>後で他から特定のトラッカーにちゃんとフィールドを追加する方法がわからなかったので、独立したライブラリにはできなかった。正確に言うと、追加自体は問題なくできるけれど、<code>ga('send')</code>が既にある場合はフィールドが追加される前に<code>send</code>されてしまうので、フィールドに設定した値が反映されることはないという感じ。例えば<code>hitCallback</code>の場合は値に設定した関数が発動しない。そのため利用はこのようにAnalyticsのコードを書き換えるという形しかなさそう。</div>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+
+<p>後で他から特定のトラッカーにちゃんとフィールドを追加する方法がわからなかったので、独立したライブラリにはできなかった。正確に言うと、追加自体は問題なくできるけれど、<code>ga('send')</code>が既にある場合はフィールドが追加される前に<code>send</code>されてしまうので、フィールドに設定した値が反映されることはないという感じ。例えば<code>hitCallback</code>の場合は値に設定した関数が発動しない。そのため利用はこのようにAnalyticsのコードを書き換えるという形しかなさそう。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>

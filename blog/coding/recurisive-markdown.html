@@ -1,133 +1,165 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>再帰的にMarkdownを処理 - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content=このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。 name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/coding/recurisive-markdown.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content=このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。 itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content=再帰的にMarkdownを処理 itemprop=name>
-<link href=/blog/coding/recurisive-markdown.html itemprop=url>
-<meta content=このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。 property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content=再帰的にMarkdownを処理 property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/coding/recurisive-markdown.html property=og:url>
-<meta content=2016-04-16T13:56:09+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>再帰的にMarkdownを処理 - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/coding/recurisive-markdown.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="再帰的にMarkdownを処理" itemprop="name">
+    <link href="/blog/coding/recurisive-markdown.html" itemprop="url">
+
+    <meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="再帰的にMarkdownを処理" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/coding/recurisive-markdown.html" property="og:url">
+    <meta content="2016-04-16T13:56:09+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
 <article>
-<h1 class=headline>再帰的にMarkdownを処理</h1>
-<footer>
-<p class=dateline><time datetime=2016-04-16T13:56:09+09:00 itemprop=datePublished>2016年4月16日</time></p>
-</footer>
-<div itemprop=articleBody><p>このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年は<a href=https://github.com/chjj/marked>marked</a>を使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、<code>section</code>や<code>figure</code>要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。</p>
+  <h1 class="headline">再帰的にMarkdownを処理</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2016-04-16T13:56:09+09:00" itemprop="datePublished">2016年4月16日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p>このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年は<a href="https://github.com/chjj/marked">marked</a>を使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、<code>section</code>や<code>figure</code>要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。</p>
+
 <p>例えば<code>figure</code>要素を使って<code>table</code>要素を図としてマークアップしたいとする。その場合、markedでは表の記法が拡張されているので、以下のように書くことになる。</p>
-<pre><code class="hljs language-markdown"><span class=xml><span class=hljs-tag>&lt;<span class=hljs-name>figure</span>&gt;</span></span>
+
+<pre><code class="hljs language-markdown"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span></span>
 |Name|Num|
 |-|-|
 |foo|128|
 |bar|256|
 
-<span class=xml><span class=hljs-tag>&lt;<span class=hljs-name>figcaption</span>&gt;</span></span>表1<span class=xml><span class=hljs-tag>&lt;/<span class=hljs-name>figcaption</span>&gt;</span></span>
-<span class=xml><span class=hljs-tag>&lt;/<span class=hljs-name>figure</span>&gt;</span></span></code></pre>
+<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span></span>表1<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span></span>
+<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></span></code></pre>
+
 <p>このMarkdown文字列をmarkedで処理しても何も起きず、そのまま出てくる。つまり何らかのHTMLタグで括られた間はインライン系の記法しか処理されない。</p>
+
 <hr>
+
 <p>markedには処理をフックする機構が用意されているので、それを使うとうまく処理することできる。こういったHTML文字列の場合、<code>Renderer.html</code>でそういった文字列を処理する関数を指定してやれば良い。</p>
-<pre><code class="hljs language-javascript"><span class=hljs-comment>// node this.js &lt; test.md</span>
-<span class=hljs-keyword>var</span> marked = <span class=hljs-built_in>require</span>(<span class=hljs-string>"marked"</span>);
-<span class=hljs-keyword>var</span> renderer = <span class=hljs-keyword>new</span> marked.Renderer();
 
-<span class=hljs-function><span class=hljs-keyword>function</span> <span class=hljs-title>processHTML</span>(<span class=hljs-params>html</span>) </span>{
-  <span class=hljs-keyword>var</span> attributes;
-  <span class=hljs-keyword>var</span> contents;
-  <span class=hljs-keyword>var</span> tag;
-  <span class=hljs-keyword>var</span> tags = [<span class=hljs-string>"aside"</span>, <span class=hljs-string>"figure"</span>, <span class=hljs-string>"section"</span>];
-  <span class=hljs-keyword>var</span> tokens = html.trim().match(<span class=hljs-regexp>/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-comment">// node this.js &lt; test.md</span>
+<span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">"marked"</span>);
+<span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.Renderer();
 
-  <span class=hljs-keyword>if</span> (!tokens) {
-    <span class=hljs-keyword>return</span> html;
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processHTML</span>(<span class="hljs-params">html</span>) </span>{
+  <span class="hljs-keyword">var</span> attributes;
+  <span class="hljs-keyword">var</span> contents;
+  <span class="hljs-keyword">var</span> tag;
+  <span class="hljs-keyword">var</span> tags = [<span class="hljs-string">"aside"</span>, <span class="hljs-string">"figure"</span>, <span class="hljs-string">"section"</span>];
+  <span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
+
+  <span class="hljs-keyword">if</span> (!tokens) {
+    <span class="hljs-keyword">return</span> html;
   }
 
-  tag = tokens[<span class=hljs-number>1</span>];
+  tag = tokens[<span class="hljs-number">1</span>];
 
-  <span class=hljs-keyword>if</span> (tags.indexOf(tag) === <span class=hljs-number>-1</span>) {
-    <span class=hljs-keyword>return</span> html;
+  <span class="hljs-keyword">if</span> (tags.indexOf(tag) === <span class="hljs-number">-1</span>) {
+    <span class="hljs-keyword">return</span> html;
   }
 
-  attributes = tokens[<span class=hljs-number>2</span>];
-  contents = marked(tokens[<span class=hljs-number>3</span>].replace(<span class=hljs-regexp>/&amp;gt;/g</span>, <span class=hljs-string>"&gt;"</span>), {
-    <span class=hljs-attr>renderer</span>: renderer
+  attributes = tokens[<span class="hljs-number">2</span>];
+  contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">"&gt;"</span>), {
+    <span class="hljs-attr">renderer</span>: renderer
   }).trim();
 
-  <span class=hljs-keyword>return</span> <span class=hljs-string>"&lt;"</span> + tag + attributes + <span class=hljs-string>"&gt;\n"</span> + contents + <span class=hljs-string>"\n&lt;/"</span> + tag + <span class=hljs-string>"&gt;\n"</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;"</span> + tag + attributes + <span class="hljs-string">"&gt;\n"</span> + contents + <span class="hljs-string">"\n&lt;/"</span> + tag + <span class="hljs-string">"&gt;\n"</span>;
 }
 
 renderer.html = processHTML;
-<span class=hljs-built_in>console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class=hljs-string>"utf8"</span>), {
-  <span class=hljs-attr>renderer</span>: renderer
+<span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>), {
+  <span class="hljs-attr">renderer</span>: renderer
 }));</code></pre>
-<p>空白文字を削った一番外側のHTMLタグを拾い、その内容を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
-<p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される(インデントは読みやすいように追加した)。</p>
-<pre><code class="hljs language-html"><span class=hljs-tag>&lt;<span class=hljs-name>figure</span>&gt;</span>
-  <span class=hljs-tag>&lt;<span class=hljs-name>table</span>&gt;</span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>thead</span>&gt;</span>
-      <span class=hljs-tag>&lt;<span class=hljs-name>tr</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>th</span>&gt;</span>Name<span class=hljs-tag>&lt;/<span class=hljs-name>th</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>th</span>&gt;</span>Num<span class=hljs-tag>&lt;/<span class=hljs-name>th</span>&gt;</span>
-      <span class=hljs-tag>&lt;/<span class=hljs-name>tr</span>&gt;</span>
-    <span class=hljs-tag>&lt;/<span class=hljs-name>thead</span>&gt;</span>
-    <span class=hljs-tag>&lt;<span class=hljs-name>tbody</span>&gt;</span>
-      <span class=hljs-tag>&lt;<span class=hljs-name>tr</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>td</span>&gt;</span>foo<span class=hljs-tag>&lt;/<span class=hljs-name>td</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>td</span>&gt;</span>128<span class=hljs-tag>&lt;/<span class=hljs-name>td</span>&gt;</span>
-      <span class=hljs-tag>&lt;/<span class=hljs-name>tr</span>&gt;</span>
-      <span class=hljs-tag>&lt;<span class=hljs-name>tr</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>td</span>&gt;</span>bar<span class=hljs-tag>&lt;/<span class=hljs-name>td</span>&gt;</span>
-        <span class=hljs-tag>&lt;<span class=hljs-name>td</span>&gt;</span>256<span class=hljs-tag>&lt;/<span class=hljs-name>td</span>&gt;</span>
-      <span class=hljs-tag>&lt;/<span class=hljs-name>tr</span>&gt;</span>
-    <span class=hljs-tag>&lt;/<span class=hljs-name>tbody</span>&gt;</span>
-  <span class=hljs-tag>&lt;/<span class=hljs-name>table</span>&gt;</span>
 
-  <span class=hljs-tag>&lt;<span class=hljs-name>figcaption</span>&gt;</span>表1<span class=hljs-tag>&lt;/<span class=hljs-name>figcaption</span>&gt;</span>
-<span class=hljs-tag>&lt;/<span class=hljs-name>figure</span>&gt;</span></code></pre>
+<p>空白文字を削った一番外側のHTMLタグを拾い、その内容を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
+
+<p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される(インデントは読みやすいように追加した)。</p>
+
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">thead</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Name<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Num<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">thead</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tbody</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>foo<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>128<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>bar<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>256<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tbody</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>表1<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></code></pre>
+
 <hr>
-<p>本当はこういったアドホックなプラグイン志向でMarkdownを拡張するのは好きではない。Markdownは拡張性なしの安定志向のもの(それこそオリジナルで良い)を使い、プリプロセッサーで<code>table</code>や<code>dl</code>要素の独自記法を処理して渡す方が良いと考えている。そうしてプリプロセッサーで処理済みのものをデータとして保存しておけば、ほぼあらゆるMarkdown処理系で正常に処理できることが期待できるからだ。</div>
+
+<p>本当はこういったアドホックなプラグイン志向でMarkdownを拡張するのは好きではない。Markdownは拡張性なしの安定志向のもの(それこそオリジナルで良い)を使い、プリプロセッサーで<code>table</code>や<code>dl</code>要素の独自記法を処理して渡す方が良いと考えている。そうしてプリプロセッサーで処理済みのものをデータとして保存しておけば、ほぼあらゆるMarkdown処理系で正常に処理できることが期待できるからだ。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>

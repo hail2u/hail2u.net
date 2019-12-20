@@ -1,97 +1,129 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>PostCSSプラグイン - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。"name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/coding/postcss-plugin.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。"itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content=PostCSSプラグイン itemprop=name>
-<link href=/blog/coding/postcss-plugin.html itemprop=url>
-<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。"property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content=PostCSSプラグイン property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/coding/postcss-plugin.html property=og:url>
-<meta content=2015-06-11T08:05:04+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
-<article>
-<h1 class=headline>PostCSSプラグイン</h1>
-<footer>
-<p class=dateline><time datetime=2015-06-11T08:05:04+09:00 itemprop=datePublished>2015年6月11日</time></p>
-</footer>
-<div itemprop=articleBody><p><a href=https://github.com/postcss/postcss/releases/tag/4.1.0>PostCSS v4.1.0</a>からプラグインAPIが実装され、<code>postcss.plugin()</code>でプラグインを作ることが推奨されるようになった。この<a href=https://github.com/postcss/postcss/blob/master/docs/guidelines/plugin.md>ガイドライン</a>に従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</p>
-<p>仮に<a href=https://github.com/hail2u/node-csswring>CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
-<pre><code class="hljs language-javascript"><span class=hljs-keyword>var</span> fs = <span class=hljs-built_in>require</span>(<span class=hljs-string>"fs"</span>);
-<span class=hljs-keyword>var</span> postcss = <span class=hljs-built_in>require</span>(<span class=hljs-string>"postcss"</span>);
-<span class=hljs-keyword>var</span> csswring = <span class=hljs-built_in>require</span>(<span class=hljs-string>"csswring"</span>);
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
 
-<span class=hljs-keyword>var</span> input = <span class=hljs-string>"main.css"</span>;
-<span class=hljs-keyword>var</span> output = <span class=hljs-string>"main.min.css"</span>;
+    <title>PostCSSプラグイン - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/coding/postcss-plugin.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="PostCSSプラグイン" itemprop="name">
+    <link href="/blog/coding/postcss-plugin.html" itemprop="url">
+
+    <meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="PostCSSプラグイン" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/coding/postcss-plugin.html" property="og:url">
+    <meta content="2015-06-11T08:05:04+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
+<article>
+  <h1 class="headline">PostCSSプラグイン</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2015-06-11T08:05:04+09:00" itemprop="datePublished">2015年6月11日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p><a href="https://github.com/postcss/postcss/releases/tag/4.1.0">PostCSS v4.1.0</a>からプラグインAPIが実装され、<code>postcss.plugin()</code>でプラグインを作ることが推奨されるようになった。この<a href="https://github.com/postcss/postcss/blob/master/docs/guidelines/plugin.md">ガイドライン</a>に従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。</p>
+
+<p>仮に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
+<span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">"postcss"</span>);
+<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">"csswring"</span>);
+
+<span class="hljs-keyword">var</span> input = <span class="hljs-string">"main.css"</span>;
+<span class="hljs-keyword">var</span> output = <span class="hljs-string">"main.min.css"</span>;
 
 postcss([
   csswring()
-]).process(fs.readFileSync(input, <span class=hljs-string>"utf8"</span>), {
-  <span class=hljs-attr>from</span>: input,
-  <span class=hljs-attr>to</span>: output
-}).then(<span class=hljs-function><span class=hljs-keyword>function</span> (<span class=hljs-params>result</span>) </span>{
+]).process(fs.readFileSync(input, <span class="hljs-string">"utf8"</span>), {
+  <span class="hljs-attr">from</span>: input,
+  <span class="hljs-attr">to</span>: output
+}).then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">result</span>) </span>{
   fs.writeFileSync(output, result.css);
 });</code></pre>
+
 <p>PostCSSプラグインなので、このようにPostCSSの使い方をちゃんと知って使わざるをえない。もちろん他のPostCSSプラグインと組み合わせることもあるので、最終的にはこういう利用に落ち着くことはありうる。しかしCSSWringの機能のみを必要とする場合にもこう書かざるをえないのは無駄が多い。Autoprefixerのようにこういった形でコアを書き、別にラッパーを提供するという手もあるが、メンテナンスの手間が倍増することは確実だ。</p>
+
 <p>また必要なPostCSSのバージョンを調べて、手作業で依存を解決しなくてはならないことも欠点になる。CSSWring側の<code>package.json</code>ですでに依存バージョンを明示していることを効果的に利用することができない。</p>
-<pre><code class="hljs language-javascript"><span class=hljs-keyword>var</span> fs = <span class=hljs-built_in>require</span>(<span class=hljs-string>"fs"</span>);
-<span class=hljs-keyword>var</span> csswring = <span class=hljs-built_in>require</span>(<span class=hljs-string>"csswring"</span>);
 
-<span class=hljs-keyword>var</span> input = <span class=hljs-string>"main.css"</span>;
-<span class=hljs-keyword>var</span> output = <span class=hljs-string>"main.min.css"</span>;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
+<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">"csswring"</span>);
 
-<span class=hljs-keyword>var</span> result = csswring.wring(fs.readFileSync(input, <span class=hljs-string>"utf8"</span>), {
-  <span class=hljs-attr>from</span>: input,
-  <span class=hljs-attr>to</span>: output
+<span class="hljs-keyword">var</span> input = <span class="hljs-string">"main.css"</span>;
+<span class="hljs-keyword">var</span> output = <span class="hljs-string">"main.min.css"</span>;
+
+<span class="hljs-keyword">var</span> result = csswring.wring(fs.readFileSync(input, <span class="hljs-string">"utf8"</span>), {
+  <span class="hljs-attr">from</span>: input,
+  <span class="hljs-attr">to</span>: output
 });
 fs.writeFileSync(output, result.css);</code></pre>
+
 <p>CSSWringではこのように標準的なNode.jsモジュールのように利用することができる。Promiseではないことを考慮しても、コードは短くなっている。そもそもとしてPostCSSプラグインとしての使い方を知らなくても、はっきり言うのならPostCSSの存在を知らなくても書けるようになっている。</p>
+
 <p>またこのスクリプトの<code>dependencies</code>からPostCSSが不要にもなる。つまり依存管理をモジュール側に任せることができるわけだ。</p>
+
 <hr>
+
 <p>プラグイン・システムというような方向から見ると、そういうデザインだとも言えるだろう。だがあるNode.jsモジュールを使う時にその依存モジュールの使い方をも知らなくてはならないという見方をするとどうだろうか。そんなことは知らなくてもそれ単体で使えるようになっているべきではないだろうか。</p>
+
 <p>プラグイン・システムのような独自の生態系がいくつかのルール付けによって守られるようになると、同時にそれを内包する生態系(ここではNode.jsとnpm)との間に囲いを築くことにもなる。その囲いが低く感じられるか高く感じられるかはなんとも言えない。深くその独自の生態系について知れば、必要な高さの囲いだと納得できるかもしれないが、万人にそれを求めるのは酷だろう。</p>
-<p>もちろんPostCSSプラグインはまったく悪いものではないし、PostCSSのプロセッサーとしてのみ機能するモジュールを書く場合に最も良い選択であることは確かだろう。ただそれだけではなく、Node.jsモジュールとしても単体で使えるようなインターフェイスも用意しておくことで、もっと使いやすくなるはずだ。</div>
+
+<p>もちろんPostCSSプラグインはまったく悪いものではないし、PostCSSのプロセッサーとしてのみ機能するモジュールを書く場合に最も良い選択であることは確かだろう。ただそれだけではなく、Node.jsモジュールとしても単体で使えるようなインターフェイスも用意しておくことで、もっと使いやすくなるはずだ。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>

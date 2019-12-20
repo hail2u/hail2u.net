@@ -1,85 +1,112 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>git commitするGruntタスク - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content=Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。 name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/coding/grunt-gitcommit.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content=Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。 itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content="git commitするGruntタスク"itemprop=name>
-<link href=/blog/coding/grunt-gitcommit.html itemprop=url>
-<meta content=Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。 property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content="git commitするGruntタスク"property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/coding/grunt-gitcommit.html property=og:url>
-<meta content=2014-01-17T10:30:56+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>git commitするGruntタスク - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/coding/grunt-gitcommit.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="git commitするGruntタスク" itemprop="name">
+    <link href="/blog/coding/grunt-gitcommit.html" itemprop="url">
+
+    <meta content="Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルをaddしてcommitするだけのGruntタスクを書いて使うことにした。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="git commitするGruntタスク" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/coding/grunt-gitcommit.html" property="og:url">
+    <meta content="2014-01-17T10:30:56+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
 <article>
-<h1 class=headline>git commitするGruntタスク</h1>
-<footer>
-<p class=dateline><time datetime=2014-01-17T10:30:56+09:00 itemprop=datePublished>2014年1月17日</time></p>
-</footer>
-<div itemprop=articleBody><p>Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルを<code>add</code>して<code>commit</code>するだけのGruntタスクを書いて使うことにした。</p>
-<p>Download: <a href=/pub/grunt-gitcommit.js>grunt-gitcommit.js</a></p>
+  <h1 class="headline">git commitするGruntタスク</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2014-01-17T10:30:56+09:00" itemprop="datePublished">2014年1月17日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p>Gitを叩くGruntプラグインはいくつかあるけど、Grunt管理外のディレクトリにあるGitリポジトリでも気軽に叩けそうなのがなかった。大体GruntのルートとGitのルートが一致していることが想定されている。それでもGruntのルートが下流ならなんとかなるけど、逆の場合はどうにもならない。しょうがないのでファイルを指定してタスクを走らせたら、指定の作業フォルダへ移動してからそのファイルを<code>add</code>して<code>commit</code>するだけのGruntタスクを書いて使うことにした。</p>
+
+<p>Download: <a href="/pub/grunt-gitcommit.js">grunt-gitcommit.js</a></p>
+
 <p>オプションは<code>cwd</code>と<code>message</code>の2つ。<code>cwd</code>でコミットしたいGitリポジトリのルートを、<code>message</code>でコミット・メッセージのプリフィックスを指定できる。</p>
+
 <pre><code class="hljs language-javascript">gitcommit: {
-  <span class=hljs-attr>options</span>: {
-    <span class=hljs-attr>cwd</span>: <span class=hljs-string>'../../weblog/'</span>,
+  <span class="hljs-attr">options</span>: {
+    <span class="hljs-attr">cwd</span>: <span class="hljs-string">'../../weblog/'</span>,
   },
-  <span class=hljs-attr>publish</span>: {
-    <span class=hljs-attr>options</span>: {
-      <span class=hljs-attr>message</span>: <span class=hljs-string>'Publish'</span>
+  <span class="hljs-attr">publish</span>: {
+    <span class="hljs-attr">options</span>: {
+      <span class="hljs-attr">message</span>: <span class="hljs-string">'Publish'</span>
     },
-    <span class=hljs-attr>src</span>: [grunt.option(<span class=hljs-string>'file'</span>)]
+    <span class="hljs-attr">src</span>: [grunt.option(<span class="hljs-string">'file'</span>)]
   },
-  <span class=hljs-attr>rebuild</span>: {
-    <span class=hljs-attr>options</span>: {
-      <span class=hljs-attr>message</span>: <span class=hljs-string>'Rebuild'</span>
+  <span class="hljs-attr">rebuild</span>: {
+    <span class="hljs-attr">options</span>: {
+      <span class="hljs-attr">message</span>: <span class="hljs-string">'Rebuild'</span>
     },
-    <span class=hljs-attr>src</span>: [grunt.option(<span class=hljs-string>'file'</span>)]
+    <span class="hljs-attr">src</span>: [grunt.option(<span class="hljs-string">'file'</span>)]
   }
 }
 };</code></pre>
-<p><code>--file</code>オプションなどでコミットしたいファイルを指定してタスクを実行すれば良い。オプションの名前はタスク設定の書き方に依存するので何でも良い。この設定例でなんとなく想像がつくように、<a href=https://github.com/hail2u/hail2u.net-weblog>ウェブログの記事のGitリポジトリ</a>を叩くのに使っている。今までGitのフックでGrunt叩いてたけど逆の方が良さそうかな、と<a href=http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/ >Gitを使った静的ウェブサイトのデプロイ</a>を読んで影響されたので。</p>
+
+<p><code>--file</code>オプションなどでコミットしたいファイルを指定してタスクを実行すれば良い。オプションの名前はタスク設定の書き方に依存するので何でも良い。この設定例でなんとなく想像がつくように、<a href="https://github.com/hail2u/hail2u.net-weblog">ウェブログの記事のGitリポジトリ</a>を叩くのに使っている。今までGitのフックでGrunt叩いてたけど逆の方が良さそうかな、と<a href="http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/">Gitを使った静的ウェブサイトのデプロイ</a>を読んで影響されたので。</p>
+
 <pre><samp>$ <kbd>grunt gitcommit:publish --file=/path/to/foo/bar.txt</kbd></samp></pre>
-<p>Nodeの<a href=http://nodejs.org/api/path.html>pathモジュール</a>を使って相対パスに変換するようになっているので、ファイルの指定は絶対パスでも相対パスでも大丈夫。</div>
+
+<p>Nodeの<a href="http://nodejs.org/api/path.html">pathモジュール</a>を使って相対パスに変換するようになっているので、ファイルの指定は絶対パスでも相対パスでも大丈夫。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>

@@ -1,72 +1,98 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>VimのSassでのgfを改善する - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。"name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/software/vim-sass-goto-file.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。"itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content=VimのSassでのgfを改善する itemprop=name>
-<link href=/blog/software/vim-sass-goto-file.html itemprop=url>
-<meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。"property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content=VimのSassでのgfを改善する property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/software/vim-sass-goto-file.html property=og:url>
-<meta content=2014-02-14T11:06:09+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>VimのSassでのgfを改善する - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/software/vim-sass-goto-file.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="VimのSassでのgfを改善する" itemprop="name">
+    <link href="/blog/software/vim-sass-goto-file.html" itemprop="url">
+
+    <meta content="Vimの標準ランタイムに入っているftplugin/sass.vimではincludeexprやsuffixesaddが適切に設定されているので、多くの場合はそのままで快適にgfできる。けれど同じディレクトリにfooというディレクトリと_foo.scssというファイルがある場合、@import &quot;foo&quot;;でgfするとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、_foo.scssを優先させようという試み。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="VimのSassでのgfを改善する" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/software/vim-sass-goto-file.html" property="og:url">
+    <meta content="2014-02-14T11:06:09+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
 <article>
-<h1 class=headline>VimのSassでのgfを改善する</h1>
-<footer>
-<p class=dateline><time datetime=2014-02-14T11:06:09+09:00 itemprop=datePublished>2014年2月14日</time></p>
-</footer>
-<div itemprop=articleBody><p>Vimの標準ランタイムに入っている<code>ftplugin/sass.vim</code>では<code>includeexpr</code>や<code>suffixesadd</code>が適切に設定されているので、多くの場合はそのままで快適に<code>gf</code>できる。けれど同じディレクトリに<code>foo</code>というディレクトリと<code>_foo.scss</code>というファイルがある場合、<code>@import &quot;foo&quot;;</code>で<code>gf</code>するとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、<code>_foo.scss</code>を優先させようという試み。</p>
-<p>Download: <a href=/pub/sass-goto-file.vim>sass-goto-file.vim</a></p>
+  <h1 class="headline">VimのSassでのgfを改善する</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2014-02-14T11:06:09+09:00" itemprop="datePublished">2014年2月14日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p>Vimの標準ランタイムに入っている<code>ftplugin/sass.vim</code>では<code>includeexpr</code>や<code>suffixesadd</code>が適切に設定されているので、多くの場合はそのままで快適に<code>gf</code>できる。けれど同じディレクトリに<code>foo</code>というディレクトリと<code>_foo.scss</code>というファイルがある場合、<code>@import &quot;foo&quot;;</code>で<code>gf</code>するとディレクトリの方が開かれてしまう。それをラッパー関数を書いて、<code>_foo.scss</code>を優先させようという試み。</p>
+
+<p>Download: <a href="/pub/sass-goto-file.vim">sass-goto-file.vim</a></p>
+
 <p>インストールは<code>~/.vimrc</code>にコピペするだけ。以下のような順で開くべきファイルを探している。</p>
+
 <ol>
 <li>普通に<em>ファイル</em>を探す</li>
 <li><code>_</code>を頭に付けて<em>ファイル</em>を探す</li>
 <li>普通に<em>ディレクトリ</em>を探す</li>
 <li>見つからなかったらエラー</li>
 </ol>
+
 <p>タブで開きたい場合は、最後に<code>edit</code>を使って開いているところを<code>tabedit</code>にする。</p>
-<p><code>includeexpr</code>によるファイル探索の強化は、普通に探して見つからなかった場合にのみ発動するという仕様なので、先述のようなディレクトリが先に見つかってしまうケースには対応できない(と思う)。<code>suffixesadd</code>を考慮する<code>findfile()</code>や<code>finddir()</code>関数が組み込みであるので、ラッパー関数を書くのはそんなに難しくない。頭に<code>_</code>を付けるのも<code>includeexpr</code>と同じで良かった。</div>
+
+<p><code>includeexpr</code>によるファイル探索の強化は、普通に探して見つからなかった場合にのみ発動するという仕様なので、先述のようなディレクトリが先に見つかってしまうケースには対応できない(と思う)。<code>suffixesadd</code>を考慮する<code>findfile()</code>や<code>finddir()</code>関数が組み込みであるので、ラッパー関数を書くのはそんなに難しくない。頭に<code>_</code>を付けるのも<code>includeexpr</code>と同じで良かった。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>

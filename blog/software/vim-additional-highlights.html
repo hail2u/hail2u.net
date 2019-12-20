@@ -1,77 +1,100 @@
 <!DOCTYPE html>
-<html itemscope itemtype=http://schema.org/BlogPosting lang=ja>
-<head>
-<meta charset=UTF-8>
-<title>Vimで全角や行末スペースをハイライト - Hail2u</title>
-<meta content="light dark"name=color-scheme>
-<meta content=今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。 name=description>
-<meta content="width=device-width"name=viewport>
-<link href=/blog/feed rel=alternate type=application/rss+xml>
-<link href=https://kyonagashima.com/ rel=author>
-<link href=/blog/software/vim-additional-highlights.html rel=canonical>
-<link href=https://creativecommons.org/licenses/by/4.0/ rel=license>
-<link href="https://www.google.com/search?q=site:hail2u.net"rel=search>
-<link href=/css/main.9.3.17.min.css rel=stylesheet>
-<script async defer src=/js/unutm.9.3.17.min.js></script>
-<meta content=今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。 itemprop=description>
-<link href=/apple-touch-icon-precomposed.png itemprop=image>
-<meta content=Vimで全角や行末スペースをハイライト itemprop=name>
-<link href=/blog/software/vim-additional-highlights.html itemprop=url>
-<meta content=今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。 property=og:description>
-<meta content=https://hail2u.net/apple-touch-icon-precomposed.png property=og:image>
-<meta content=Vimで全角や行末スペースをハイライト property=og:title>
-<meta content=article property=og:type>
-<meta content=https://hail2u.net/blog/software/vim-additional-highlights.html property=og:url>
-<meta content=2012-06-14T06:07:03+09:00 property=article:published_time>
-<meta content=summary name=twitter:card>
-<meta content=@hail2u_ name=twitter:site>
-</head>
-<body>
-<header class=header>
-<nav class=navigation>
-<a href=/ class=logo>Hail2u</a>
-<ul class=pages>
-<li><mark><a href=/blog/ >雑記</a></mark></li>
-<li><a href=/links/ >参照</a></li>
-<li><a href=/statuses/ >近況</a></li>
-<li><a href=/photos/ >写真</a></li>
-<li><a href=/documents/ >特集</a></li>
-<li><a href=/bookshelf/ >書棚</a></li>
-<li><a href="https://www.google.com/search?q=site:hail2u.net">検索</a></li>
-</ul>
-</nav>
-</header>
-<main class=content>
-<article>
-<h1 class=headline>Vimで全角や行末スペースをハイライト</h1>
-<footer>
-<p class=dateline><time datetime=2012-06-14T06:07:03+09:00 itemprop=datePublished>2012年6月14日</time></p>
-</footer>
-<div itemprop=articleBody><p>今まで<code>:match</code>で全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら<code>:2match</code>とかできるけど<code>:3match</code>までしかないから<code>matchadd()</code>使ってねと書いてあった。<code>matchadd()</code>でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。</p>
-<pre><code class="hljs language-vim"><span class=hljs-keyword>scriptencoding</span> utf-<span class=hljs-number>8</span>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
 
-<span class=hljs-comment>" Additional highlights</span>
-<span class=hljs-keyword>augroup</span> AdditionalHighlights
+    <title>Vimで全角や行末スペースをハイライト - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/software/vim-additional-highlights.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.18.min.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.18.min.js"></script>
+
+    <meta content="今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="Vimで全角や行末スペースをハイライト" itemprop="name">
+    <link href="/blog/software/vim-additional-highlights.html" itemprop="url">
+
+    <meta content="今まで:matchで全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら:2matchとかできるけど:3matchまでしかないからmatchadd()使ってねと書いてあった。matchadd()でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="Vimで全角や行末スペースをハイライト" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/software/vim-additional-highlights.html" property="og:url">
+    <meta content="2012-06-14T06:07:03+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
+<article>
+  <h1 class="headline">Vimで全角や行末スペースをハイライト</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2012-06-14T06:07:03+09:00" itemprop="datePublished">2012年6月14日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p>今まで<code>:match</code>で全角スペースのハイライトだけはやってたんだけど、行末のスペースを残したまんまなミスが最近多いのでそれもハイライトしようとした。ヘルプを見たら<code>:2match</code>とかできるけど<code>:3match</code>までしかないから<code>matchadd()</code>使ってねと書いてあった。<code>matchadd()</code>でやりたいことは実現できたんだけど、かなりちゃんとスクリプト書かないとマッチのリストが肥大化しちゃう感じでアレな気がしので、syntaxをふわっと追加する感じで実現することにした。</p>
+
+<pre><code class="hljs language-vim"><span class="hljs-keyword">scriptencoding</span> utf-<span class="hljs-number">8</span>
+
+<span class="hljs-comment">" Additional highlights</span>
+<span class="hljs-keyword">augroup</span> AdditionalHighlights
   autocmd!
 
-  <span class=hljs-comment>" Trailing spaces</span>
-  <span class=hljs-keyword>autocmd</span> ColorScheme * <span class=hljs-keyword>highlight</span> link TrailingSpaces Error
-  <span class=hljs-keyword>autocmd</span> Syntax * <span class=hljs-keyword>syntax</span> <span class=hljs-keyword>match</span> TrailingSpaces containedin=ALL /\s\+$/
+  <span class="hljs-comment">" Trailing spaces</span>
+  <span class="hljs-keyword">autocmd</span> ColorScheme * <span class="hljs-keyword">highlight</span> link TrailingSpaces Error
+  <span class="hljs-keyword">autocmd</span> Syntax * <span class="hljs-keyword">syntax</span> <span class="hljs-keyword">match</span> TrailingSpaces containedin=ALL /\s\+$/
 
-  <span class=hljs-comment>" Zenkaku space</span>
-  <span class=hljs-keyword>autocmd</span> ColorScheme * <span class=hljs-keyword>highlight</span> link ZenkakuSpace Error
-  <span class=hljs-keyword>autocmd</span> Syntax * <span class=hljs-keyword>syntax</span> <span class=hljs-keyword>match</span> ZenkakuSpace containedin=ALL /　/
-<span class=hljs-keyword>augroup</span> END</code></pre>
-<p><code>Error</code>グループに直接ぶち込んでもいいような気もする。</div>
+  <span class="hljs-comment">" Zenkaku space</span>
+  <span class="hljs-keyword">autocmd</span> ColorScheme * <span class="hljs-keyword">highlight</span> link ZenkakuSpace Error
+  <span class="hljs-keyword">autocmd</span> Syntax * <span class="hljs-keyword">syntax</span> <span class="hljs-keyword">match</span> ZenkakuSpace containedin=ALL /　/
+<span class="hljs-keyword">augroup</span> END</code></pre>
+
+<p><code>Error</code>グループに直接ぶち込んでもいいような気もする。</p></div>
 </article>
-</main>
-<footer class=footer>
-<ul class=footlinks>
-<li><a href=https://creativecommons.org/licenses/by/4.0/ >CC/BY</a></li>
-<li><a href=https://twitter.com/hail2u_>Twitter</a></li>
-<li><a href=/blog/feed type=application/rss+xml>RSS</a></li>
-</ul>
-<address class=byline>
-<p><a href=https://kyonagashima.com/ >ながしまきょう</a></p>
-</address>
-</footer>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>
