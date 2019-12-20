@@ -4,6 +4,7 @@ import { promises as fs } from "fs";
 import getVersion from "../lib/get-version.js";
 
 const minifier = new CleanCSS({
+  format: "beautify",
   level: 2,
   returnPromise: true
 });

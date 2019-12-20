@@ -5,6 +5,7 @@ import getVersion from "../lib/get-version.js";
 
 const ClosureCompiler = googleClosureCompiler.jsCompiler;
 const compiler = new ClosureCompiler({
+  formatting: "PRETTY_PRINT",
   isolationMode: "IIFE",
   languageIn: "ECMASCRIPT_2019",
   languageOut: "ECMASCRIPT5_STRICT"
