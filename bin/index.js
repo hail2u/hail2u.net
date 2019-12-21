@@ -20,15 +20,15 @@ export default {
   files: {
     css: [
       {
-        dest: "tmp/documents.min.css",
+        dest: "dist/css/documents.css",
         src: "src/css/documents.css"
       },
       {
-        dest: "tmp/main.{{version}}.min.css",
+        dest: "dist/css/main.{{version}}.css",
         src: "src/css/main.css"
       },
       {
-        dest: "tmp/test.min.css",
+        dest: "dist/css/test.css",
         src: "src/css/test.css"
       }
     ],
@@ -173,15 +173,15 @@ export default {
     ],
     js: [
       {
-        dest: "tmp/append-others.{{version}}.min.js",
+        dest: "dist/js/append-others.{{version}}.js",
         src: "src/js/append-others.js"
       },
       {
-        dest: "tmp/relative-time.{{version}}.min.js",
+        dest: "dist/js/relative-time.{{version}}.js",
         src: "src/js/relative-time.js"
       },
       {
-        dest: "tmp/unutm.{{version}}.min.js",
+        dest: "dist/js/unutm.{{version}}.js",
         src: "src/js/unutm.js"
       }
     ]
