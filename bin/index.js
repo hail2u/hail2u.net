@@ -21,7 +21,7 @@ export default {
     css: [
       {
         dest: "dist/css/documents.css",
-        src: "src/css/documents.css"
+        src: "src/css/baseline.css"
       },
       {
         dest: "dist/css/main.{{version}}.css",
