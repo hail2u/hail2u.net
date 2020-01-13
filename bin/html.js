@@ -190,6 +190,14 @@ const isLatest = index => {
   return false;
 };
 
+const isOldest = (current, next) => {
+  if (!next) {
+    return true;
+  }
+
+  return false;
+};
+
 const markItem = (item, index, items) => {
   const nextItem = items[index + 1];
   const previousItem = items[index - 1];
@@ -199,7 +207,8 @@ const markItem = (item, index, items) => {
     isFirstInYear: isFirstInYear(item, previousItem),
     isLastInMonth: isLastInMonth(item, nextItem),
     isLastInYear: isLastInYear(item, nextItem),
-    isLatest: isLatest(index)
+    isLatest: isLatest(index),
+    isOldest: isOldest(item, nextItem)
   };
 };
 
