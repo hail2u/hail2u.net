@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>月ごとに分割読み込み - Hail2u</title>
+
+    <meta content="light dark" name="color-scheme">
+    <meta content="写真と書棚ページで使っていた、ユーザー操作による過去ログの一気表示を、月ごとに表示していくように変更した。ボタンを押すと前の月が、ボタンを押すとその前の月が、ボタンを押すとさらに前の月が、ボタンを押すともっと前の月が、ボタンを押すともっとその前の月が、と少しづつ進む。最後の月にはボタンはないので、そこまでになる。" name="description">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="https://kyonagashima.com/" rel="author">
+    <link href="/blog/append-others-per-month.html" rel="canonical">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/main.9.3.19.css" rel="stylesheet">
+
+    <script async defer src="/js/unutm.9.3.19.js"></script>
+
+    <meta content="写真と書棚ページで使っていた、ユーザー操作による過去ログの一気表示を、月ごとに表示していくように変更した。ボタンを押すと前の月が、ボタンを押すとその前の月が、ボタンを押すとさらに前の月が、ボタンを押すともっと前の月が、ボタンを押すともっとその前の月が、と少しづつ進む。最後の月にはボタンはないので、そこまでになる。" itemprop="description">
+    <link href="/apple-touch-icon-precomposed.png" itemprop="image">
+    <meta content="月ごとに分割読み込み" itemprop="name">
+    <link href="/blog/append-others-per-month.html" itemprop="url">
+
+    <meta content="写真と書棚ページで使っていた、ユーザー操作による過去ログの一気表示を、月ごとに表示していくように変更した。ボタンを押すと前の月が、ボタンを押すとその前の月が、ボタンを押すとさらに前の月が、ボタンを押すともっと前の月が、ボタンを押すともっとその前の月が、と少しづつ進む。最後の月にはボタンはないので、そこまでになる。" property="og:description">
+    <meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+    <meta content="月ごとに分割読み込み" property="og:title">
+    <meta content="article" property="og:type">
+    <meta content="https://hail2u.net/blog/append-others-per-month.html" property="og:url">
+    <meta content="2020-01-28T13:01:17+09:00" property="article:published_time">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="@hail2u_" name="twitter:site">
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navigation">
+        <a class="logo" href="/">Hail2u</a>
+
+        <ul class="pages">
+          <li><mark><a href="/blog/">雑記</a></mark></li>
+          <li><a href="/links/">参照</a></li>
+          <li><a href="/statuses/">近況</a></li>
+          <li><a href="/photos/">写真</a></li>
+          <li><a href="/documents/">特集</a></li>
+          <li><a href="/bookshelf/">書棚</a></li>
+          <li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </nav>
+
+      
+    </header>
+
+    <main class="content">
+
+<article>
+  <h1 class="headline">月ごとに分割読み込み</h1>
+
+  <footer>
+    <p class="dateline"><time datetime="2020-01-28T13:01:17+09:00" itemprop="datePublished">2020年1月28日</time></p>
+  </footer>
+
+  <div itemprop="articleBody"><p>写真と書棚ページで使っていた、ユーザー操作による過去ログの一気表示を、月ごとに表示していくように変更した。ボタンを押すと前の月が、ボタンを押すとその前の月が、ボタンを押すとさらに前の月が、ボタンを押すともっと前の月が、ボタンを押すともっとその前の月が、と少しづつ進む。最後の月にはボタンはないので、そこまでになる。</p>
+
+<p>スタイル・ガイドでも確認できるが、写真ページでもすでに確認できる。数学的なページングより、知覚的なページングの方が優れている(このウェブサイトでは関係ないが、キャッシュとしても安定度が高い)とも考えているので、そういう点でも改善できたと思う。</p>
+
+<p>これまでは最新の24枚と残りすべてというざっくりとした分割だった。その残りすべてを月ごとに分割し、一度に表示される画像を多くても50枚くらいに抑える。少しだけ辿ってみたい、という場合を想定して、それに最適化した。</p>
+
+<p>引き換えに写真や書影を一気に見れなくなった。画像のためページ内検索をするわけでもなく、それほど必要ないはずなので、今のところはこのまま。<code>template</code>要素に対応していない環境向けに一気に表示するページはあるので、必要そうだったらそれへのリンクを追加しようと思う。</p>
+
+<hr>
+
+<p>実装としてはあまり変化はない。すべての過去ログが仕込まていた<code>template</code>要素を月ごとに作るように変え、その中にサムネイルとボタンを仕込んでおく。ユーザーによりボタンが押されたら、<em>最初の<code>template</code>要素のみ</em>を引っ張り出し、その<code>template</code>要素を削除する。つまり最後まで行くと、すべての<code>template</code>要素がなくなる。</p>
+
+<p>こうすることで<code>template</code>要素に固有の識別子を振ったり、ボタンに読み込むべき識別子を<code>data-*</code>属性で指定したり、などする手間を省いた。コードの簡略化とmustacheへの最適化の間をとって、こういう実装になった。</p>
+</div>
+</article>
+
+    </main>
+
+    <footer class="footer">
+      <ul class="footlinks">
+        <li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+        <li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+        <li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+      </ul>
+
+      <address class="byline">
+        <p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
+      </address>
+    </footer>
+  </body>
+</html>
