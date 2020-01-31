@@ -8,15 +8,13 @@ const main = async () => {
   const argv = minimist(process.argv.slice(2), {
     alias: {
       a: "asin",
-      t: "title",
-      y: "type"
+      t: "title"
     },
     default: {
       asin: "",
-      title: "",
-      type: ""
+      title: ""
     },
-    string: ["asin", "title", "type"]
+    string: ["asin", "title"]
   });
 
   if (!argv.asin) {
@@ -31,14 +29,6 @@ const main = async () => {
     throw new Error("Book title must be passed.");
   }
 
-  if (!argv.type) {
-    throw new Error("Book type must be passed.");
-  }
-
-  if (!["comic", "novel", "nonfiction"].includes(argv.type)) {
-    throw new Error("Book type must be one of “comic”, “novel”, and “nonfiction.”");
-  }
-
   const [books, git] = await Promise.all([
     readJSONFile(config.data.books),
     which("git")
@@ -51,8 +41,7 @@ const main = async () => {
   await writeJSONFile(config.data.books, [{
     asin: argv.asin,
     published: Date.now(),
-    title: argv.title,
-    type: argv.type
+    title: argv.title
   }, ...books]);
   await runCommand(git, ["add", "--", config.data.books]);
   await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
