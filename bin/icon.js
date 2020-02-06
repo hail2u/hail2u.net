@@ -5,8 +5,10 @@ import sharp from "sharp";
 import toIco from "to-ico";
 
 const generatePNG = async file => {
-  await sharp(file.src)
-    .resize(file.width)
+  const metadata = await sharp(file.src).metadata();
+  await sharp(file.src, {
+    density: file.width * metadata.density / metadata.width
+  })
     .toFile(file.dest);
   return file.dest;
 };
