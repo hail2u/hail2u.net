@@ -157,12 +157,12 @@ export default {
       },
       {
         dest: "tmp/favicon-48.png",
-        src: "src/img/icon.svg",
+        src: "src/img/icon-small.svg",
         width: 48
       },
       {
         dest: "tmp/favicon-128.png",
-        src: "src/img/icon.svg",
+        src: "src/img/icon-small.svg",
         width: 128
       },
       {
