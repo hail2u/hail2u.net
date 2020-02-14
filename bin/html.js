@@ -8,6 +8,7 @@ import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
+import sharp from "sharp";
 import getVersion from "../lib/get-version.js";
 
 const extendArticle = article => {
@@ -89,25 +90,33 @@ const getPhotoDatetime = photo => {
   return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
 };
 
-const extendPhoto = photo => {
+const getPhotoDimension = async photo => {
+  const metadata = await sharp(path.join(config.src.photos, photo)).metadata();
+  return [metadata.height, metadata.width];
+};
+
+const extendPhoto = async photo => {
   const published = getPhotoDatetime(photo);
   const dt = getDateDetails(new Date(published));
+  const [height, width] = await getPhotoDimension(photo);
   return {
     ...dt,
     filename: photo,
+    height: height,
     isPhoto: true,
     published: published,
-    url: `/img/photos/${photo}`
+    url: `/img/photos/${photo}`,
+    width: width
   };
 };
 
 const listPhotos = async () => {
   const photos = await fs.readdir(config.src.photos);
-  return photos
+  return Promise.all(photos
     .filter(isPhoto)
     .sort()
     .reverse()
-    .map(extendPhoto);
+    .map(extendPhoto));
 };
 
 const extendStatus = status => {
