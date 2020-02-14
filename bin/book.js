@@ -1,7 +1,11 @@
+import axios from "axios";
 import config from "./index.js";
+import { promises as fs } from "fs";
 import minimist from "minimist";
+import path from "path";
 import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
 import runCommand from "../lib/run-command.js";
+import sharp from "sharp";
 import which from "which";
 
 const main = async () => {
@@ -38,10 +42,19 @@ const main = async () => {
     throw new Error(`${argv.title} has already been added.`);
   }
 
+  const fn = path.join(config.dest.temp, `${argv.asin}.jpg`);
+  const res = await axios.get(`https://images-fe.ssl-images-amazon.com/images/P/${argv.asin}.jpg`, {
+    responseType: "arraybuffer"
+  });
+  await fs.writeFile(fn, res.data);
+  const metadata = await sharp(fn).metadata();
+
   await writeJSONFile(config.data.books, [{
     asin: argv.asin,
+    height: metadata.height,
     published: Date.now(),
-    title: argv.title
+    title: argv.title,
+    width: metadata.width
   }, ...books]);
   await runCommand(git, ["add", "--", config.data.books]);
   await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);

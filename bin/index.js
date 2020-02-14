@@ -15,6 +15,7 @@ export default {
     photos: "dist/img/photos/",
     root: "dist/",
     styleGuide: "dist/style-guide/index.html",
+    temp: "tmp/",
     test: "tmp/__test.html"
   },
   files: {
