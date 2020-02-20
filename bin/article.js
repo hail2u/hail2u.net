@@ -27,8 +27,8 @@ const getDraft = async filename => {
 
 const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
-const isDraft = (isContribute, filename) => {
-  if (isContribute && filename.startsWith("_")) {
+const isDraft = (isTest, filename) => {
+  if (!isTest && filename.startsWith("_")) {
     return false;
   }
 
@@ -39,14 +39,14 @@ const isDraft = (isContribute, filename) => {
   return true;
 };
 
-const listDrafts = async isContribute => {
+const listDrafts = async isTest => {
   const filenames = await fs.readdir(config.src.drafts);
 
   if (filenames.length < 1) {
     throw new Error("There is no draft.");
   }
 
-  return getDrafts(filenames.filter(isDraft.bind(null, isContribute)));
+  return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
 };
 
 const selectDraft = drafts => new Promise(resolve => {
@@ -196,12 +196,11 @@ const testSelected = async selected => {
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
     alias: {
-      c: "contribute",
       t: "test"
     },
-    boolean: ["contribute", "test"]
+    boolean: ["test"]
   });
-  const drafts = await listDrafts(argv.contribute);
+  const drafts = await listDrafts(argv.test);
   const selected = await selectDraft(drafts);
   await Promise.all([
     checkSelectedName(selected.name),
@@ -209,17 +208,17 @@ const main = async () => {
     checkSelectedTitleLength(selected.title)
   ]);
 
-  if (argv.contribute) {
-    return contributeSelected({
+  if (argv.test) {
+    return testSelected({
       ...selected,
-      verb: "Contribute"
+      dest: config.dest.test,
+      src: config.src.test
     });
   }
 
-  return testSelected({
+  return contributeSelected({
     ...selected,
-    dest: config.dest.test,
-    src: config.src.test
+    verb: "Contribute"
   });
 };
 
