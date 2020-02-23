@@ -12,21 +12,23 @@ const main = async () => {
   const argv = minimist(process.argv.slice(2), {
     alias: {
       a: "asin",
+      q: "quote",
       t: "title"
     },
     default: {
       asin: "",
+      quote: "",
       title: ""
     },
-    string: ["asin", "title"]
+    string: ["asin", "quote", "title"]
   });
 
-  if (!argv.asin) {
-    throw new Error("ASIN code must be passed.");
+  if (!argv.asin || !/^[A-Z0-9]{10}$/i.test(argv.asin)) {
+    throw new Error("ASIN code must be passed and must be 10 alphanumeric characters.");
   }
 
-  if (!/^[A-Z0-9]{10}$/i.test(argv.asin)) {
-    throw new Error("ASIN must be 10 alphanumeric characters.");
+  if (!argv.quote) {
+    throw new Error("Book quote must be passed.");
   }
 
   if (!argv.title) {
@@ -53,6 +55,7 @@ const main = async () => {
     asin: argv.asin,
     height: metadata.height,
     published: Date.now(),
+    quote: argv.quote,
     title: argv.title,
     width: metadata.width
   }, ...books]);
