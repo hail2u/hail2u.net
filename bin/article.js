@@ -16,6 +16,8 @@ const getDraft = async filename => {
   const [title, ...rest] = content.split("\n");
   const body = rest.join("\n")
     .replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/")
+    .replace(/^<aside>/, '<aside class="hang">')
+    .replace(/<h2>/g, '<h2 class="subheading">')
     .trim();
   return {
     body: `${body}\n`,
@@ -103,6 +105,19 @@ const checkSelectedTitleLength = title => {
   return true;
 };
 
+const testSelected = async selected => {
+  const template = await fs.readFile(selected.src, "utf8");
+  const rendered = mustache
+    .render(template, selected)
+    .replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
+    .replace(/(?<=\bhref=")\//g, "../dist/");
+  const [open] = await Promise.all([
+    which("open"),
+    fs.writeFile(selected.dest, highlight(rendered))
+  ]);
+  return runCommand(open, [selected.dest]);
+};
+
 const deleteFile = file => fs.unlink(file);
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
@@ -179,19 +194,6 @@ const contributeSelected = selected => Promise.all([
   deleteFile(selected.src),
   updateEntry(selected)
 ]);
-
-const testSelected = async selected => {
-  const template = await fs.readFile(selected.src, "utf8");
-  const rendered = mustache
-    .render(template, selected)
-    .replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
-    .replace(/(?<=\bhref=")\//g, "../dist/");
-  const [open] = await Promise.all([
-    which("open"),
-    fs.writeFile(selected.dest, highlight(rendered))
-  ]);
-  return runCommand(open, [selected.dest]);
-};
 
 const main = async () => {
   const argv = minimist(process.argv.slice(2), {
