@@ -25,16 +25,8 @@ export default {
         src: "src/css/documents.css"
       },
       {
-        dest: "dist/css/huge.{{version}}.css",
-        src: "src/css/huge.css"
-      },
-      {
-        dest: "dist/css/large.{{version}}.css",
-        src: "src/css/large.css"
-      },
-      {
-        dest: "dist/css/default.{{version}}.css",
-        src: "src/css/default.css"
+        dest: "dist/css/main.{{version}}.css",
+        src: "src/css/main.css"
       },
       {
         dest: "dist/css/test.css",
