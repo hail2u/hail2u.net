@@ -24,9 +24,10 @@ const testContrastRatio = () => {
       (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
   };
 
-  for (const color of document.querySelectorAll(".test-color li")) {
+  for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
     const ratio = parseFloat(getContrast(color).toFixed(3));
-    color.replaceChild(document.createTextNode(ratio), color.lastChild);
+    const contrast = color.nextElementSibling;
+    contrast.replaceChild(document.createTextNode(ratio), contrast.lastChild);
   }
 };
 
