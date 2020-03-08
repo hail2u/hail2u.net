@@ -61,7 +61,9 @@ const toRelativeTime = dt => {
     return `${diff} ${unit.month}${suffix}`;
   }
 
-  // return `${diff} ${unit.year}${suffix}`;
+  diff = Math.round(diff / divisor.year);
+
+  return `${diff} ${unit.year}${suffix}`;
 };
 
 for (const time of document.querySelectorAll("time.js-relative-time[datetime]")) {
