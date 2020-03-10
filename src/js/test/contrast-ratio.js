@@ -16,16 +16,19 @@ const testContrastRatio = () => {
     0.0722 * getComponentLuminance(blue);
 
   /* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
-  const getContrast = element => {
-    const style = getComputedStyle(element);
-    const backgroundLuminance = getRelativeLuminance(style.backgroundColor.match(/\d+/g));
-    const foregroundLuminance = getRelativeLuminance(style.color.match(/\d+/g));
+  const getContrast = (foreground, background) => {
+    const backgroundLuminance = getRelativeLuminance(background.match(/\d+/g));
+    const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/g));
     return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05) /
       (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
   };
 
   for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
-    const ratio = parseFloat(getContrast(color).toFixed(3));
+    const style = getComputedStyle(color);
+    const foreground = style.color;
+    const background = style.backgroundColor;
+    const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
+    color.replaceChild(document.createTextNode(background), color.lastChild);
     const contrast = color.nextElementSibling;
     contrast.replaceChild(document.createTextNode(ratio), contrast.lastChild);
   }
