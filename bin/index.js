@@ -178,6 +178,10 @@ export default {
         src: "src/js/append-others.js"
       },
       {
+        dest: "dist/js/back-to-top.{{version}}.js",
+        src: "src/js/back-to-top.js"
+      },
+      {
         dest: "dist/js/relative-time.{{version}}.js",
         src: "src/js/relative-time.js"
       },
