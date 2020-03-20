@@ -384,6 +384,6 @@ const main = async () => {
 
 mustache.escape = escapeCharacters;
 main().catch(e => {
-  process.exitCode = 1;
   console.trace(e);
+  process.exitCode = 1;
 });

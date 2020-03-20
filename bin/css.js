@@ -23,6 +23,6 @@ const buildCSS = async file => {
 };
 
 Promise.all(config.files.css.map(buildCSS)).catch(e => {
-  process.exitCode = 1;
   console.trace(e);
+  process.exitCode = 1;
 });

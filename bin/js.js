@@ -37,6 +37,6 @@ const buildJS = async file => {
 };
 
 Promise.all(config.files.js.map(buildJS)).catch(e => {
-  process.exitCode = 1;
   console.trace(e);
+  process.exitCode = 1;
 });
