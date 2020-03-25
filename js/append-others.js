@@ -1,15 +1,15 @@
 const showNextOthers = event => {
-  const others = document.querySelector(".js-append-others-others");
-  const button = others.content.querySelector("button");
+	const others = document.querySelector(".js-append-others-others");
+	const button = others.content.querySelector("button");
 
-  if (button) {
-    button.addEventListener("click", showNextOthers);
-  }
+	if (button) {
+		button.addEventListener("click", showNextOthers);
+	}
 
-  others.parentNode.appendChild(others.content);
-  others.parentNode.removeChild(others);
-  const self = event.target;
-  self.parentNode.hidden = true;
+	others.parentNode.appendChild(others.content);
+	others.parentNode.removeChild(others);
+	const self = event.target;
+	self.parentNode.hidden = true;
 };
 
 const button = document.querySelector(".js-append-others-button");
