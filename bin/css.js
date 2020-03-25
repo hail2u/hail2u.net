@@ -4,21 +4,21 @@ import { promises as fs } from "fs";
 import getVersion from "../lib/get-version.js";
 
 const minifier = new CleanCSS({
-  format: "beautify",
-  level: 2,
-  returnPromise: true
+	format: "beautify",
+	level: 2,
+	returnPromise: true
 });
 
 const buildCSS = async file => {
-  const [version, minified] = await Promise.all([
-    getVersion(),
-    minifier.minify([file.src])
-  ]);
-  const dest = file.dest.replace(/{{version}}/g, version);
-  await fs.writeFile(dest, minified.styles);
+	const [version, minified] = await Promise.all([
+		getVersion(),
+		minifier.minify([file.src])
+	]);
+	const dest = file.dest.replace(/{{version}}/g, version);
+	await fs.writeFile(dest, minified.styles);
 };
 
 Promise.all(config.files.css.map(buildCSS)).catch(e => {
-  console.trace(e);
-  process.exitCode = 1;
+	console.trace(e);
+	process.exitCode = 1;
 });

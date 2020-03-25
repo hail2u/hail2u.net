@@ -1,499 +1,501 @@
 {
-  "name": "hail2u.net",
-  "version": "9.6.2",
-  "description": "The source files of Hail2u (https://hail2u.net/) website",
-  "homepage": "https://hail2u.net/",
-  "bugs": {
-    "url": "https://github.com/hail2u/hail2u.net/issues"
-  },
-  "license": "UNLICENSED",
-  "author": "Kyo Nagashima <hail2u@gmail.com> (https://kyonagashima.com/)",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hail2u/hail2u.net.git"
-  },
-  "scripts": {
-    "book": "node bin/book.js",
-    "clear": "rm -fr tmp/ && mkdir tmp",
-    "contribute": "node bin/article.js",
-    "css": "cp -ru src/css/. dist/css/ && node bin/css.js && node bin/style-guide.js",
-    "deploy": "cd dist/ && git add --all && git diff --cached --exit-code --quiet || git commit --message=\"Build\" && git push origin gh-pages",
-    "feed": "node bin/feed.js",
-    "html": "node bin/html.js",
-    "img": "cp -ru src/img/. dist/img/ && node bin/img.js",
-    "js": "cp -ru src/js/. dist/js/ && node bin/js.js",
-    "link": "node bin/link.js",
-    "photo": "node bin/photo.js",
-    "start": "serve --listen 8080 dist/",
-    "static": "cp -u src/.nojekyll src/CNAME src/robots.txt dist/ && cp -ru src/documents/. dist/documents/ && cp -ru src/pub/. dist/pub/",
-    "status": "node bin/status.js",
-    "test_css": "stylelint src/css/",
-    "test_draft": "node bin/article.js --test",
-    "test_js": "eslint bin/ lib/ src/js/",
-    "test": "npm run test_css && npm run test_js",
-    "version": "npm run css && npm run js && npm run img && npm run static && npm run html -- --articles && npm run html && npm run feed",
-    "postbook": "npm run deploy && git switch -",
-    "postcontribute": "npm run deploy && git switch -",
-    "postcss": "rm dist/css/test.html",
-    "postjs": "rm dist/js/.eslintrc",
-    "postimg": "cp -u dist/img/favicon.svg dist/",
-    "postlink": "npm run deploy && git switch -",
-    "postphoto": "npm run deploy && git switch -",
-    "poststatic": "rm dist/documents/documents.json dist/documents/index.json dist/documents/index.mustache",
-    "poststatus": "npm run deploy && git switch -",
-    "postversion": "git push origin master --tags && git switch - && git rebase master",
-    "predeploy": "npm run html && npm run feed",
-    "prebook": "git switch master && npm run clear",
-    "precontribute": "git switch master",
-    "precss": "npm run clear",
-    "preimg": "npm run clear",
-    "prejs": "npm run clear",
-    "prelink": "git switch master",
-    "prephoto": "git switch master",
-    "prestatus": "git switch master",
-    "pretest_draft": "npm run clear",
-    "preversion": "git switch upnext && git rebase master && git switch master && git merge --ff-only upnext && npm test"
-  },
-  "devDependencies": {
-    "axios": "^0.19.2",
-    "clean-css": "^4.2.3",
-    "eslint": "^6.8.0",
-    "google-closure-compiler": "^20200224.0.0",
-    "highlight.js": "^9.18.1",
-    "minimist": "^1.2.5",
-    "mustache": "^4.0.0",
-    "serve": "^11.3.0",
-    "sharp": "^0.25.1",
-    "stylelint": "^13.2.1",
-    "to-ico": "^1.1.5",
-    "which": "^2.0.2"
-  },
-  "private": true,
-  "type": "module",
-  "eslintConfig": {
-    "env": {
-      "es6": true,
-      "node": true
-    },
-    "extends": "eslint:recommended",
-    "ignorePatterns": [
-      "**/*.min.js"
-    ],
-    "parserOptions": {
-      "ecmaFeatures": {
-        "globalReturn": true,
-        "impliedStrict": true,
-        "jsx": true
-      },
-      "ecmaVersion": 2019,
-      "sourceType": "module"
-    },
-    "root": true,
-    "rules": {
-      "no-console": [
-        "error",
-        {
-          "allow": [
-            "error",
-            "trace",
-            "warn"
-          ]
-        }
-      ],
-      "no-dupe-else-if": "error",
-      "no-template-curly-in-string": "error",
-      "array-callback-return": "error",
-      "curly": "error",
-      "default-param-last": "error",
-      "dot-notation": "error",
-      "eqeqeq": "error",
-      "no-else-return": "error",
-      "no-extend-native": "error",
-      "no-floating-decimal": "error",
-      "no-implicit-coercion": "error",
-      "no-multi-str": "error",
-      "no-param-reassign": [
-        "error",
-        {
-          "props": true
-        }
-      ],
-      "no-return-await": "error",
-      "no-throw-literal": "error",
-      "no-useless-concat": "error",
-      "no-useless-return": "error",
-      "prefer-promise-reject-errors": "error",
-      "prefer-regex-literals": "error",
-      "radix": "error",
-      "require-await": "error",
-      "no-shadow": "error",
-      "no-use-before-define": "error",
-      "callback-return": "error",
-      "global-require": "error",
-      "no-path-concat": "error",
-      "array-bracket-newline": [
-        "error",
-        "consistent"
-      ],
-      "array-bracket-spacing": "error",
-      "array-element-newline": [
-        "error",
-        "consistent"
-      ],
-      "block-spacing": "error",
-      "brace-style": "error",
-      "camelcase": "error",
-      "comma-dangle": "error",
-      "comma-spacing": "error",
-      "comma-style": "error",
-      "computed-property-spacing": "error",
-      "eol-last": "error",
-      "func-call-spacing": "error",
-      "func-name-matching": "error",
-      "func-names": [
-        "error",
-        "as-needed"
-      ],
-      "func-style": "error",
-      "function-paren-newline": "error",
-      "indent": [
-        "error",
-        2
-      ],
-      "key-spacing": "error",
-      "keyword-spacing": "error",
-      "linebreak-style": "error",
-      "lines-between-class-members": "error",
-      "max-len": [
-        "error",
-        {
-          "code": 80,
-          "ignoreRegExpLiterals": true,
-          "ignoreStrings": true,
-          "ignoreTemplateLiterals": true,
-          "ignoreUrls": true
-        }
-      ],
-      "max-statements-per-line": "error",
-      "new-cap": "error",
-      "new-parens": "error",
-      "newline-per-chained-call": "error",
-      "no-array-constructor": "error",
-      "no-lonely-if": "error",
-      "no-multi-assign": "error",
-      "no-multiple-empty-lines": "error",
-      "no-negated-condition": "error",
-      "no-new-object": "error",
-      "no-plusplus": "error",
-      "no-tabs": "error",
-      "no-ternary": "error",
-      "no-trailing-spaces": "error",
-      "no-underscore-dangle": "error",
-      "no-whitespace-before-property": "error",
-      "object-curly-newline": "error",
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
-      "object-property-newline": "error",
-      "one-var": [
-        "error",
-        "never"
-      ],
-      "operator-assignment": [
-        "error",
-        "never"
-      ],
-      "operator-linebreak": "error",
-      "padded-blocks": [
-        "error",
-        "never"
-      ],
-      "padding-line-between-statements": [
-        "error",
-        {
-          "blankLine": "always",
-          "prev": "block-like",
-          "next": "*"
-        },
-        {
-          "blankLine": "always",
-          "prev": "*",
-          "next": "block-like"
-        }
-      ],
-      "prefer-exponentiation-operator": "error",
-      "prefer-object-spread": "error",
-      "quote-props": [
-        "error",
-        "as-needed"
-      ],
-      "quotes": [
-        "error",
-        "double",
-        {
-          "avoidEscape": true
-        }
-      ],
-      "semi": "error",
-      "semi-spacing": "error",
-      "semi-style": "error",
-      "sort-keys": "error",
-      "space-before-blocks": "error",
-      "space-before-function-paren": "error",
-      "space-in-parens": "error",
-      "space-infix-ops": "error",
-      "space-unary-ops": "error",
-      "switch-colon-spacing": "error",
-      "template-tag-spacing": "error",
-      "unicode-bom": "error",
-      "arrow-body-style": "error",
-      "arrow-parens": [
-        "error",
-        "as-needed"
-      ],
-      "no-var": "error",
-      "prefer-arrow-callback": "error",
-      "prefer-const": "error",
-      "prefer-destructuring": "error",
-      "prefer-rest-params": "error",
-      "prefer-spread": "error",
-      "prefer-template": "error"
-    }
-  },
-  "stylelint": {
-    "ignoreFiles": [
-      "**/*.min.css"
-    ],
-    "rules": {
-      "font-family-no-duplicate-names": true,
-      "font-family-no-missing-generic-family-keyword": true,
-      "function-calc-no-invalid": true,
-      "function-calc-no-unspaced-operator": true,
-      "function-linear-gradient-no-nonstandard-direction": true,
-      "string-no-newline": true,
-      "unit-no-unknown": true,
-      "property-no-unknown": true,
-      "keyframe-declaration-no-important": true,
-      "declaration-block-no-duplicate-properties": [
-        true,
-        {
-          "ignore": [
-            "consecutive-duplicates-with-different-values"
-          ]
-        }
-      ],
-      "declaration-block-no-shorthand-property-overrides": true,
-      "block-no-empty": true,
-      "selector-pseudo-class-no-unknown": true,
-      "selector-pseudo-element-no-unknown": true,
-      "selector-type-no-unknown": [
-        true,
-        {
-          "ignoreTypes": [
-            "discard",
-            "feDropShadow",
-            "hatch",
-            "hatchpath",
-            "mesh",
-            "meshgradient",
-            "meshpatch",
-            "meshrow",
-            "solidcolor",
-            "unknown"
-          ]
-        }
-      ],
-      "media-feature-name-no-unknown": true,
-      "at-rule-no-unknown": [
-        true,
-        {
-          "ignoreAtRules": [
-            "at-root",
-            "debug",
-            "each",
-            "error",
-            "extend",
-            "for",
-            "function",
-            "if",
-            "include",
-            "mixin",
-            "return",
-            "warn",
-            "while"
-          ]
-        }
-      ],
-      "comment-no-empty": true,
-      "no-duplicate-at-import-rules": true,
-      "no-duplicate-selectors": true,
-      "no-empty-source": true,
-      "no-extra-semicolons": true,
-      "no-invalid-double-slash-comments": true,
-      "color-named": "never",
-      "color-no-hex": true,
-      "function-url-no-scheme-relative": true,
-      "number-max-precision": 3,
-      "shorthand-property-no-redundant-values": true,
-      "declaration-block-no-redundant-longhand-properties": true,
-      "declaration-no-important": true,
-      "declaration-block-single-line-max-declarations": 1,
-      "selector-no-qualifying-type": [
-        true,
-        {
-          "ignore": [
-            "attribute",
-            "class"
-          ]
-        }
-      ],
-      "max-nesting-depth": 3,
-      "no-unknown-animations": true,
-      "selector-pseudo-class-case": "lower",
-      "selector-pseudo-element-case": "lower",
-      "selector-pseudo-element-colon-notation": "double",
-      "selector-type-case": "lower",
-      "media-feature-name-case": "lower",
-      "font-family-name-quotes": "always-unless-keyword",
-      "function-comma-newline-after": "always-multi-line",
-      "function-comma-space-after": "always-single-line",
-      "function-comma-space-before": "never",
-      "function-max-empty-lines": 0,
-      "function-name-case": "lower",
-      "function-parentheses-newline-inside": "always-multi-line",
-      "function-parentheses-space-inside": "never-single-line",
-      "function-url-quotes": "always",
-      "function-whitespace-after": "always",
-      "number-leading-zero": "always",
-      "number-no-trailing-zeros": true,
-      "string-quotes": "double",
-      "length-zero-no-unit": null,
-      "unit-case": "lower",
-      "value-keyword-case": [
-        "lower",
-        {
-          "ignoreKeywords": [
-            "currentcolor"
-          ]
-        }
-      ],
-      "value-list-comma-newline-after": "always-multi-line",
-      "value-list-comma-space-after": "always-single-line",
-      "value-list-comma-space-before": "never",
-      "value-list-max-empty-lines": 0,
-      "custom-property-empty-line-before": [
-        "always",
-        {
-          "except": [
-            "after-custom-property",
-            "first-nested"
-          ],
-          "ignore": [
-            "after-comment",
-            "inside-single-line-block"
-          ]
-        }
-      ],
-      "property-case": "lower",
-      "declaration-bang-space-after": "never",
-      "declaration-bang-space-before": "always",
-      "declaration-colon-space-after": "always-single-line",
-      "declaration-colon-space-before": "never",
-      "declaration-empty-line-before": [
-        "always",
-        {
-          "except": [
-            "after-declaration",
-            "first-nested"
-          ],
-          "ignore": [
-            "after-comment",
-            "inside-single-line-block"
-          ]
-        }
-      ],
-      "declaration-block-semicolon-newline-after": "always-multi-line",
-      "declaration-block-semicolon-space-after": "always-single-line",
-      "declaration-block-semicolon-space-before": "never",
-      "declaration-block-trailing-semicolon": "always",
-      "block-closing-brace-empty-line-before": "never",
-      "block-closing-brace-newline-after": "always",
-      "block-closing-brace-newline-before": "always-multi-line",
-      "block-closing-brace-space-before": "always-single-line",
-      "block-opening-brace-newline-after": "always",
-      "block-opening-brace-space-after": "always-single-line",
-      "block-opening-brace-space-before": "always",
-      "selector-attribute-brackets-space-inside": "never",
-      "selector-attribute-operator-space-after": "never",
-      "selector-attribute-operator-space-before": "never",
-      "selector-attribute-quotes": "always",
-      "selector-combinator-space-after": "always",
-      "selector-combinator-space-before": "always",
-      "selector-descendant-combinator-no-non-space": true,
-      "selector-max-empty-lines": 0,
-      "selector-pseudo-class-parentheses-space-inside": "never",
-      "selector-list-comma-newline-after": "always",
-      "selector-list-comma-space-before": "never",
-      "rule-empty-line-before": [
-        "always-multi-line",
-        {
-          "except": [
-            "after-single-line-comment",
-            "first-nested"
-          ]
-        }
-      ],
-      "media-feature-colon-space-after": "always",
-      "media-feature-colon-space-before": "never",
-      "media-feature-name-no-vendor-prefix": true,
-      "media-feature-parentheses-space-inside": "never",
-      "media-feature-range-operator-space-after": "always",
-      "media-feature-range-operator-space-before": "always",
-      "media-query-list-comma-newline-after": "always-multi-line",
-      "media-query-list-comma-space-after": "always-single-line",
-      "media-query-list-comma-space-before": "never",
-      "at-rule-empty-line-before": [
-        "always",
-        {
-          "except": [
-            "blockless-after-same-name-blockless",
-            "first-nested"
-          ],
-          "ignore": [
-            "after-comment"
-          ]
-        }
-      ],
-      "at-rule-name-case": "lower",
-      "at-rule-name-space-after": "always-single-line",
-      "at-rule-semicolon-newline-after": "always",
-      "at-rule-semicolon-space-before": "never",
-      "comment-empty-line-before": [
-        "always",
-        {
-          "except": [
-            "first-nested"
-          ],
-          "ignore": [
-            "stylelint-commands"
-          ]
-        }
-      ],
-      "comment-whitespace-inside": "always",
-      "indentation": [
-        2,
-        {
-          "ignore": [
-            "inside-parens"
-          ]
-        }
-      ],
-      "linebreaks": "unix",
-      "max-empty-lines": 1,
-      "no-eol-whitespace": true,
-      "no-missing-end-of-source-newline": true,
-      "no-empty-first-line": true
-    }
-  }
+	"name": "hail2u.net",
+	"version": "9.6.2",
+	"description": "The source files of Hail2u (https://hail2u.net/) website",
+	"homepage": "https://hail2u.net/",
+	"bugs": {
+		"url": "https://github.com/hail2u/hail2u.net/issues"
+	},
+	"license": "UNLICENSED",
+	"author": "Kyo Nagashima <hail2u@gmail.com> (https://kyonagashima.com/)",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hail2u/hail2u.net.git"
+	},
+	"scripts": {
+		"book": "node bin/book.js",
+		"clear": "rm -fr tmp/ && mkdir tmp",
+		"contribute": "node bin/article.js",
+		"css": "cp -ru src/css/. dist/css/ && node bin/css.js && node bin/style-guide.js",
+		"deploy": "cd dist/ && git add --all && git diff --cached --exit-code --quiet || git commit --message=\"Build\" && git push origin gh-pages",
+		"feed": "node bin/feed.js",
+		"html": "node bin/html.js",
+		"img": "cp -ru src/img/. dist/img/ && node bin/img.js",
+		"js": "cp -ru src/js/. dist/js/ && node bin/js.js",
+		"link": "node bin/link.js",
+		"photo": "node bin/photo.js",
+		"start": "serve --listen 8080 dist/",
+		"static": "cp -u src/.nojekyll src/CNAME src/robots.txt dist/ && cp -ru src/documents/. dist/documents/ && cp -ru src/pub/. dist/pub/",
+		"status": "node bin/status.js",
+		"test_css": "stylelint src/css/",
+		"test_draft": "node bin/article.js --test",
+		"test_js": "eslint bin/ lib/ src/js/",
+		"test": "npm run test_css && npm run test_js",
+		"version": "npm run css && npm run js && npm run img && npm run static && npm run html -- --articles && npm run html && npm run feed",
+		"postbook": "npm run deploy && git switch -",
+		"postcontribute": "npm run deploy && git switch -",
+		"postcss": "rm dist/css/test.html",
+		"postjs": "rm dist/js/.eslintrc",
+		"postimg": "cp -u dist/img/favicon.svg dist/",
+		"postlink": "npm run deploy && git switch -",
+		"postphoto": "npm run deploy && git switch -",
+		"poststatic": "rm dist/documents/documents.json dist/documents/index.json dist/documents/index.mustache",
+		"poststatus": "npm run deploy && git switch -",
+		"postversion": "git push origin master --tags && git switch - && git rebase master",
+		"predeploy": "npm run html && npm run feed",
+		"prebook": "git switch master && npm run clear",
+		"precontribute": "git switch master",
+		"precss": "npm run clear",
+		"preimg": "npm run clear",
+		"prejs": "npm run clear",
+		"prelink": "git switch master",
+		"prephoto": "git switch master",
+		"prestatus": "git switch master",
+		"pretest_draft": "npm run clear",
+		"preversion": "git switch upnext && git rebase master && git switch master && git merge --ff-only upnext && npm test"
+	},
+	"devDependencies": {
+		"axios": "^0.19.2",
+		"clean-css": "^4.2.3",
+		"eslint": "^6.8.0",
+		"google-closure-compiler": "^20200224.0.0",
+		"highlight.js": "^9.18.1",
+		"minimist": "^1.2.5",
+		"mustache": "^4.0.0",
+		"serve": "^11.3.0",
+		"sharp": "^0.25.1",
+		"stylelint": "^13.2.1",
+		"to-ico": "^1.1.5",
+		"which": "^2.0.2"
+	},
+	"private": true,
+	"type": "module",
+	"eslintConfig": {
+		"env": {
+			"es6": true,
+			"node": true
+		},
+		"extends": "eslint:recommended",
+		"ignorePatterns": [
+			"**/*.min.js"
+		],
+		"parserOptions": {
+			"ecmaFeatures": {
+				"globalReturn": true,
+				"impliedStrict": true,
+				"jsx": true
+			},
+			"ecmaVersion": 2019,
+			"sourceType": "module"
+		},
+		"root": true,
+		"rules": {
+			"no-console": [
+				"error",
+				{
+					"allow": [
+						"error",
+						"trace",
+						"warn"
+					]
+				}
+			],
+			"no-dupe-else-if": "error",
+			"no-template-curly-in-string": "error",
+			"array-callback-return": "error",
+			"curly": "error",
+			"default-param-last": "error",
+			"dot-notation": "error",
+			"eqeqeq": "error",
+			"no-else-return": "error",
+			"no-extend-native": "error",
+			"no-floating-decimal": "error",
+			"no-implicit-coercion": "error",
+			"no-multi-str": "error",
+			"no-param-reassign": [
+				"error",
+				{
+					"props": true
+				}
+			],
+			"no-return-await": "error",
+			"no-throw-literal": "error",
+			"no-useless-concat": "error",
+			"no-useless-return": "error",
+			"prefer-promise-reject-errors": "error",
+			"prefer-regex-literals": "error",
+			"radix": "error",
+			"require-await": "error",
+			"no-shadow": "error",
+			"no-use-before-define": "error",
+			"callback-return": "error",
+			"global-require": "error",
+			"no-path-concat": "error",
+			"array-bracket-newline": [
+				"error",
+				"consistent"
+			],
+			"array-bracket-spacing": "error",
+			"array-element-newline": [
+				"error",
+				"consistent"
+			],
+			"block-spacing": "error",
+			"brace-style": "error",
+			"camelcase": "error",
+			"comma-dangle": "error",
+			"comma-spacing": "error",
+			"comma-style": "error",
+			"computed-property-spacing": "error",
+			"eol-last": "error",
+			"func-call-spacing": "error",
+			"func-name-matching": "error",
+			"func-names": [
+				"error",
+				"as-needed"
+			],
+			"func-style": "error",
+			"function-paren-newline": [
+				"error",
+				"multiline"
+			],
+			"indent": [
+				"error",
+				"tab"
+			],
+			"key-spacing": "error",
+			"keyword-spacing": "error",
+			"linebreak-style": "error",
+			"lines-between-class-members": "error",
+			"max-len": [
+				"error",
+				{
+					"code": 80,
+					"ignoreRegExpLiterals": true,
+					"ignoreStrings": true,
+					"ignoreTemplateLiterals": true,
+					"ignoreUrls": true
+				}
+			],
+			"max-statements-per-line": "error",
+			"new-cap": "error",
+			"new-parens": "error",
+			"newline-per-chained-call": "error",
+			"no-array-constructor": "error",
+			"no-lonely-if": "error",
+			"no-multi-assign": "error",
+			"no-multiple-empty-lines": "error",
+			"no-negated-condition": "error",
+			"no-new-object": "error",
+			"no-plusplus": "error",
+			"no-ternary": "error",
+			"no-trailing-spaces": "error",
+			"no-underscore-dangle": "error",
+			"no-whitespace-before-property": "error",
+			"object-curly-newline": "error",
+			"object-curly-spacing": [
+				"error",
+				"always"
+			],
+			"object-property-newline": "error",
+			"one-var": [
+				"error",
+				"never"
+			],
+			"operator-assignment": [
+				"error",
+				"never"
+			],
+			"operator-linebreak": "error",
+			"padded-blocks": [
+				"error",
+				"never"
+			],
+			"padding-line-between-statements": [
+				"error",
+				{
+					"blankLine": "always",
+					"prev": "block-like",
+					"next": "*"
+				},
+				{
+					"blankLine": "always",
+					"prev": "*",
+					"next": "block-like"
+				}
+			],
+			"prefer-exponentiation-operator": "error",
+			"prefer-object-spread": "error",
+			"quote-props": [
+				"error",
+				"as-needed"
+			],
+			"quotes": [
+				"error",
+				"double",
+				{
+					"avoidEscape": true
+				}
+			],
+			"semi": "error",
+			"semi-spacing": "error",
+			"semi-style": "error",
+			"sort-keys": "error",
+			"space-before-blocks": "error",
+			"space-before-function-paren": "error",
+			"space-in-parens": "error",
+			"space-infix-ops": "error",
+			"space-unary-ops": "error",
+			"switch-colon-spacing": "error",
+			"template-tag-spacing": "error",
+			"unicode-bom": "error",
+			"arrow-body-style": "error",
+			"arrow-parens": [
+				"error",
+				"as-needed"
+			],
+			"no-var": "error",
+			"prefer-arrow-callback": "error",
+			"prefer-const": "error",
+			"prefer-destructuring": "error",
+			"prefer-rest-params": "error",
+			"prefer-spread": "error",
+			"prefer-template": "error"
+		}
+	},
+	"stylelint": {
+		"ignoreFiles": [
+			"**/*.min.css"
+		],
+		"rules": {
+			"font-family-no-duplicate-names": true,
+			"font-family-no-missing-generic-family-keyword": true,
+			"function-calc-no-invalid": true,
+			"function-calc-no-unspaced-operator": true,
+			"function-linear-gradient-no-nonstandard-direction": true,
+			"string-no-newline": true,
+			"unit-no-unknown": true,
+			"property-no-unknown": true,
+			"keyframe-declaration-no-important": true,
+			"declaration-block-no-duplicate-properties": [
+				true,
+				{
+					"ignore": [
+						"consecutive-duplicates-with-different-values"
+					]
+				}
+			],
+			"declaration-block-no-shorthand-property-overrides": true,
+			"block-no-empty": true,
+			"selector-pseudo-class-no-unknown": true,
+			"selector-pseudo-element-no-unknown": true,
+			"selector-type-no-unknown": [
+				true,
+				{
+					"ignoreTypes": [
+						"discard",
+						"feDropShadow",
+						"hatch",
+						"hatchpath",
+						"mesh",
+						"meshgradient",
+						"meshpatch",
+						"meshrow",
+						"solidcolor",
+						"unknown"
+					]
+				}
+			],
+			"media-feature-name-no-unknown": true,
+			"at-rule-no-unknown": [
+				true,
+				{
+					"ignoreAtRules": [
+						"at-root",
+						"debug",
+						"each",
+						"error",
+						"extend",
+						"for",
+						"function",
+						"if",
+						"include",
+						"mixin",
+						"return",
+						"warn",
+						"while"
+					]
+				}
+			],
+			"comment-no-empty": true,
+			"no-duplicate-at-import-rules": true,
+			"no-duplicate-selectors": true,
+			"no-empty-source": true,
+			"no-extra-semicolons": true,
+			"no-invalid-double-slash-comments": true,
+			"color-named": "never",
+			"color-no-hex": true,
+			"function-url-no-scheme-relative": true,
+			"number-max-precision": 3,
+			"shorthand-property-no-redundant-values": true,
+			"declaration-block-no-redundant-longhand-properties": true,
+			"declaration-no-important": true,
+			"declaration-block-single-line-max-declarations": 1,
+			"selector-no-qualifying-type": [
+				true,
+				{
+					"ignore": [
+						"attribute",
+						"class"
+					]
+				}
+			],
+			"max-nesting-depth": 3,
+			"no-unknown-animations": true,
+			"selector-pseudo-class-case": "lower",
+			"selector-pseudo-element-case": "lower",
+			"selector-pseudo-element-colon-notation": "double",
+			"selector-type-case": "lower",
+			"media-feature-name-case": "lower",
+			"font-family-name-quotes": "always-unless-keyword",
+			"function-comma-newline-after": "always-multi-line",
+			"function-comma-space-after": "always-single-line",
+			"function-comma-space-before": "never",
+			"function-max-empty-lines": 0,
+			"function-name-case": "lower",
+			"function-parentheses-newline-inside": "always-multi-line",
+			"function-parentheses-space-inside": "never-single-line",
+			"function-url-quotes": "always",
+			"function-whitespace-after": "always",
+			"number-leading-zero": "always",
+			"number-no-trailing-zeros": true,
+			"string-quotes": "double",
+			"length-zero-no-unit": null,
+			"unit-case": "lower",
+			"value-keyword-case": [
+				"lower",
+				{
+					"ignoreKeywords": [
+						"currentcolor"
+					]
+				}
+			],
+			"value-list-comma-newline-after": "always-multi-line",
+			"value-list-comma-space-after": "always-single-line",
+			"value-list-comma-space-before": "never",
+			"value-list-max-empty-lines": 0,
+			"custom-property-empty-line-before": [
+				"always",
+				{
+					"except": [
+						"after-custom-property",
+						"first-nested"
+					],
+					"ignore": [
+						"after-comment",
+						"inside-single-line-block"
+					]
+				}
+			],
+			"property-case": "lower",
+			"declaration-bang-space-after": "never",
+			"declaration-bang-space-before": "always",
+			"declaration-colon-space-after": "always-single-line",
+			"declaration-colon-space-before": "never",
+			"declaration-empty-line-before": [
+				"always",
+				{
+					"except": [
+						"after-declaration",
+						"first-nested"
+					],
+					"ignore": [
+						"after-comment",
+						"inside-single-line-block"
+					]
+				}
+			],
+			"declaration-block-semicolon-newline-after": "always-multi-line",
+			"declaration-block-semicolon-space-after": "always-single-line",
+			"declaration-block-semicolon-space-before": "never",
+			"declaration-block-trailing-semicolon": "always",
+			"block-closing-brace-empty-line-before": "never",
+			"block-closing-brace-newline-after": "always",
+			"block-closing-brace-newline-before": "always-multi-line",
+			"block-closing-brace-space-before": "always-single-line",
+			"block-opening-brace-newline-after": "always",
+			"block-opening-brace-space-after": "always-single-line",
+			"block-opening-brace-space-before": "always",
+			"selector-attribute-brackets-space-inside": "never",
+			"selector-attribute-operator-space-after": "never",
+			"selector-attribute-operator-space-before": "never",
+			"selector-attribute-quotes": "always",
+			"selector-combinator-space-after": "always",
+			"selector-combinator-space-before": "always",
+			"selector-descendant-combinator-no-non-space": true,
+			"selector-max-empty-lines": 0,
+			"selector-pseudo-class-parentheses-space-inside": "never",
+			"selector-list-comma-newline-after": "always",
+			"selector-list-comma-space-before": "never",
+			"rule-empty-line-before": [
+				"always-multi-line",
+				{
+					"except": [
+						"after-single-line-comment",
+						"first-nested"
+					]
+				}
+			],
+			"media-feature-colon-space-after": "always",
+			"media-feature-colon-space-before": "never",
+			"media-feature-name-no-vendor-prefix": true,
+			"media-feature-parentheses-space-inside": "never",
+			"media-feature-range-operator-space-after": "always",
+			"media-feature-range-operator-space-before": "always",
+			"media-query-list-comma-newline-after": "always-multi-line",
+			"media-query-list-comma-space-after": "always-single-line",
+			"media-query-list-comma-space-before": "never",
+			"at-rule-empty-line-before": [
+				"always",
+				{
+					"except": [
+						"blockless-after-same-name-blockless",
+						"first-nested"
+					],
+					"ignore": [
+						"after-comment"
+					]
+				}
+			],
+			"at-rule-name-case": "lower",
+			"at-rule-name-space-after": "always-single-line",
+			"at-rule-semicolon-newline-after": "always",
+			"at-rule-semicolon-space-before": "never",
+			"comment-empty-line-before": [
+				"always",
+				{
+					"except": [
+						"first-nested"
+					],
+					"ignore": [
+						"stylelint-commands"
+					]
+				}
+			],
+			"comment-whitespace-inside": "always",
+			"indentation": [
+				"tab",
+				{
+					"ignore": [
+						"inside-parens"
+					]
+				}
+			],
+			"linebreaks": "unix",
+			"max-empty-lines": 1,
+			"no-eol-whitespace": true,
+			"no-missing-end-of-source-newline": true,
+			"no-empty-first-line": true
+		}
+	}
 }
