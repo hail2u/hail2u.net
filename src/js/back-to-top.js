@@ -1,10 +1,6 @@
 const prettifyURL = () => {
 	if (location.hash === "#top") {
-		history.replaceState(
-			null,
-			"",
-			`${location.pathname}${location.search}`
-		);
+		history.replaceState(null, "", `${location.pathname}${location.search}`);
 	}
 };
 

@@ -91,10 +91,7 @@ const getPhotoDatetime = photo => {
 };
 
 const getPhotoDimension = async photo => {
-	const metadata = await sharp(path.join(
-		config.src.photos,
-		photo
-	)).metadata();
+	const metadata = await sharp(path.join(config.src.photos, photo)).metadata();
 	return [metadata.height, metadata.width];
 };
 
@@ -232,11 +229,10 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	if (extradataFile === config.data.article) {
 		const article = metadata.articles.find(hasSameLink.bind(null, dest));
 		const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
-		const [twitterCard, cover] = findCover(
-			firstImage,
-			metadata.twitterCard,
-			metadata.cover
-		);
+		const [
+			twitterCard,
+			cover
+		] = findCover(firstImage, metadata.twitterCard, metadata.cover);
 		return {
 			...metadata,
 			...extradata,
@@ -371,18 +367,10 @@ const main = async () => {
 
 	if (argv.articles) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
-		return Promise.all(articleFiles.map(buildHTML.bind(
-			null,
-			metadata,
-			partials
-		)));
+		return Promise.all(articleFiles.map(buildHTML.bind(null, metadata, partials)));
 	}
 
-	return Promise.all(config.files.html.map(buildHTML.bind(
-		null,
-		metadata,
-		partials
-	)));
+	return Promise.all(config.files.html.map(buildHTML.bind(null, metadata, partials)));
 };
 
 mustache.escape = escapeCharacters;

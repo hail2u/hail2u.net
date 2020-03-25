@@ -132,10 +132,11 @@ const listArticleImagePaths = html => {
 	return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = imagepath => fs.copyFile(
-	path.join(config.src.articleImages, imagepath),
-	path.join(config.dest.articleImages, imagepath)
-);
+const copyArticleImage = imagepath => {
+	const src = path.join(config.src.articleImages, imagepath);
+	const dest = path.join(config.dest.articleImages, imagepath);
+	fs.copyFile(src, dest);
+};
 
 const copyArticleImages = async html => {
 	const imagePaths = await listArticleImagePaths(html);
@@ -151,16 +152,10 @@ const updateCache = (cache, file) => {
 		published: Date.now(),
 		title: file.title
 	};
-	const sameArticleIndex = cache.findIndex(hasSameLink.bind(
-		null,
-		article.link
-	));
+	const sameArticleIndex = cache.findIndex(hasSameLink.bind(null, article.link));
 
 	if (sameArticleIndex === -1) {
-		return writeJSONFile(
-			config.data.articles,
-			[article, ...cache]
-		);
+		return writeJSONFile(config.data.articles, [article, ...cache]);
 	}
 
 	return writeJSONFile(config.data.articles, [
