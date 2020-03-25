@@ -5,7 +5,11 @@ import getVersion from "../lib/get-version.js";
 
 const minifier = new CleanCSS({
 	format: "beautify",
-	level: 2,
+	level: {
+		2: {
+			mergeMedia: false
+		}
+	},
 	returnPromise: true
 });
 
