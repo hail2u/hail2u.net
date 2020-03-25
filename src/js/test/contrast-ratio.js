@@ -12,15 +12,15 @@ const testContrastRatio = () => {
 
 	const getRelativeLuminance = ([red, green, blue]) =>
 		0.2126 * getComponentLuminance(red) +
-    0.7152 * getComponentLuminance(green) +
-    0.0722 * getComponentLuminance(blue);
+	0.7152 * getComponentLuminance(green) +
+	0.0722 * getComponentLuminance(blue);
 
 	/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
 	const getContrast = (foreground, background) => {
 		const backgroundLuminance = getRelativeLuminance(background.match(/\d+/g));
 		const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/g));
 		return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05) /
-      (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
+	  (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
 	};
 
 	for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
