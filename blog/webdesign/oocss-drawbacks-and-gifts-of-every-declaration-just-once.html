@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -86,11 +86,11 @@
 <p>CSSでは<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity">セレクターの詳細度</a>というものがある。例えば<code>.foo</code>より<code>.bar .foo</code>が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-selector-tag">body</span> <span class="hljs-selector-tag">h1</span> {
-  <span class="hljs-attribute">font-family</span>: serif;
+	<span class="hljs-attribute">font-family</span>: serif;
 }
 
 <span class="hljs-selector-tag">h1</span> {
-  <span class="hljs-attribute">font-family</span>: sans-serif;
+	<span class="hljs-attribute">font-family</span>: sans-serif;
 }</code></pre>
 
 <p>このCSSの場合<a href="/pub/test/606.html"><code>h1</code>は<code>serif</code>で表示されること</a>だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">ルールセット</a>の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。</p>
@@ -106,26 +106,26 @@
 <p>問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-selector-class">.global-header</span> <span class="hljs-selector-class">.nav</span> <span class="hljs-selector-class">.item</span> <span class="hljs-selector-class">.icon</span> {
-  ...
+	...
 }</code></pre>
 
 <p>従ってこのようなクラス名を付けることになる。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-selector-class">.global-header-nav-item-icon</span> {
-  ...
+	...
 }</code></pre>
 
 <p>HTMLは当然のようにこうなる。</p>
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header"</span>&gt;</span>
-  ...
-  <span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item"</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item-icon"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item-title"</span>&gt;</span>Blog<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
-    ...
-  <span class="hljs-tag">&lt;/<span class="hljs-name">nav</span>&gt;</span>
+	...
+	<span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item"</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item-icon"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header-nav-item-title"</span>&gt;</span>Blog<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+		...
+	<span class="hljs-tag">&lt;/<span class="hljs-name">nav</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span></code></pre>
 
 <p>おおっと。</p>
@@ -150,20 +150,20 @@
 <span class="hljs-selector-tag">main</span>,
 <span class="hljs-selector-class">.searchbox</span>,
 <span class="hljs-selector-attr">[role=<span class="hljs-string">"contentinfo"</span>]</span> {
-  <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
 }
 
 <span class="hljs-selector-tag">body</span> &gt; <span class="hljs-selector-tag">header</span>,
 <span class="hljs-selector-attr">[role=<span class="hljs-string">"contentinfo"</span>]</span> {
-  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#333</span>;
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#333</span>;
 }
 
 <span class="hljs-selector-tag">main</span> {
-  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#fff</span>;
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#fff</span>;
 }
 
 <span class="hljs-selector-class">.searchbox</span> {
-  <span class="hljs-attribute">background-color</span>: <span class="hljs-number">#999</span>;
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#999</span>;
 }</code></pre>
 
 <p>EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。</p>

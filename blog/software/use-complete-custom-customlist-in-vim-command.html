@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Vimのコマンドでの引数の補完にカスタム関数を使うというのを撫でてみた。customなら補完候補を改行で連結した文字列を、customlistなら補完候補のlistを返してやる関数を作れば良いだけで、思っていたよりも簡単そう。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -69,16 +69,16 @@
 <p>補完のために適当なファイル（行ごとに補完したい単語が並べたいわゆる辞書ファイル）を用意してやるというありがちなケースでは、<code>readfile()</code>で<code>list</code>が返ってくるので特に簡単だった。例えば各行にメールアドレスが並んでいる<code>$HOME/addressbook.txt</code>というファイルがあるとすると、以下のようなカスタム補完関数で絞り込みつつ補完できるようになる。</p>
 
 <pre><code class="hljs language-vim"><span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">ListMailAddress</span><span class="hljs-params">(A, L, P)</span></span>
-  <span class="hljs-keyword">let</span> addresses = <span class="hljs-built_in">readfile</span>(<span class="hljs-built_in">expand</span>(<span class="hljs-string">'$HOME/addressbook.txt'</span>))
-  <span class="hljs-keyword">let</span> matches = []
+	<span class="hljs-keyword">let</span> addresses = <span class="hljs-built_in">readfile</span>(<span class="hljs-built_in">expand</span>(<span class="hljs-string">'$HOME/addressbook.txt'</span>))
+	<span class="hljs-keyword">let</span> matches = []
 
-  <span class="hljs-keyword">for</span> address in addresses
-    <span class="hljs-keyword">if</span> address =~? <span class="hljs-string">'^'</span> . <span class="hljs-built_in">strpart</span>(<span class="hljs-variable">a:A</span>, <span class="hljs-number">1</span>)
-      <span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, <span class="hljs-built_in">shellescape</span>(address))
-    <span class="hljs-keyword">endif</span>
-  <span class="hljs-keyword">endfor</span>
+	<span class="hljs-keyword">for</span> address in addresses
+		<span class="hljs-keyword">if</span> address =~? <span class="hljs-string">'^'</span> . <span class="hljs-built_in">strpart</span>(<span class="hljs-variable">a:A</span>, <span class="hljs-number">1</span>)
+			<span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, <span class="hljs-built_in">shellescape</span>(address))
+		<span class="hljs-keyword">endif</span>
+	<span class="hljs-keyword">endfor</span>
 
-  <span class="hljs-keyword">return</span> matches
+	<span class="hljs-keyword">return</span> matches
 <span class="hljs-keyword">endfunction</span>
 
 command! -nargs=<span class="hljs-number">1</span> -<span class="hljs-built_in">complete</span>=customlist,ListMailAddress Mail :<span class="hljs-keyword">execute</span> <span class="hljs-string">'! start mailto:'</span> . <span class="hljs-symbol">&lt;args&gt;</span></code></pre>

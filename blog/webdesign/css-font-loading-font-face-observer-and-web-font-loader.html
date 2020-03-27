@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="ウェブ標準であるCSS Font Loadingが気軽に使えるようになるにはまだまだ時間がかかりそうだ。そのポリフィルであるFont Loaderは動作が不安定かつ開発が止まっており信用できない。代替技術としてはポリフィルと同じ開発者が積極的にコミットしているFont Face Observerと、広く使われているWeb Font Loaderがある。同じフォントの読み込みを検知する場合、この三者ではどのようにコードが変わってくるのだろうか。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -74,14 +74,14 @@
 <p>CSS Font Loading仕様はPromiseによる実装で、読み込み待ちはPromiseで解決することになる。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">new</span> FontFace(
-  <span class="hljs-string">'Open Sans'</span>,
-  <span class="hljs-string">'url(/assets/font/open-sans/r.woff)'</span>
+	<span class="hljs-string">'Open Sans'</span>,
+	<span class="hljs-string">'url(/assets/font/open-sans/r.woff)'</span>
 ).load().then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fontface</span>) </span>{
-  <span class="hljs-built_in">document</span>.fonts.add(fontface);
-  <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+	<span class="hljs-built_in">document</span>.fonts.add(fontface);
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
 }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">reason</span>) </span>{
-  <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
-  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
+	<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
 });</code></pre>
 
 <p>気をつけるのはウェブ・フォントのURLを<code>url()</code>でくくる必要があること、そして読み込み成功時に<code>add()</code>することくらいだろう。Promiseなので、読み込み失敗は<code>then()</code>の第二引数に指定した関数で処理すれば良い。</p>
@@ -97,13 +97,13 @@ cssFont.href = <span class="hljs-string">'/assets/css/open-sans.css'</span>;
 cssFont.rel = <span class="hljs-string">'stylesheet'</span>;
 <span class="hljs-built_in">document</span>.head.appendChild(cssFont);
 <span class="hljs-keyword">new</span> FontFaceObserver(
-  <span class="hljs-string">'Open Sans'</span>,
-  {}
+	<span class="hljs-string">'Open Sans'</span>,
+	{}
 ).check().then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-  <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
 }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">reason</span>) </span>{
-  <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
-  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
+	<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
 });</code></pre>
 
 <p>気をつけるのは<code>FontFaceObserver</code>コンストラクターへ渡す第一引数の値と読み込むウェブ・フォントCSSでの<code>font-family</code>の値が一致していることだ。こちらもPromiseのため第二引数に指定した関数で読み込み失敗を処理できる。ただし読み込みする機能自体を持っておらずイベント監視（スクロールイベントで監視しているので軽量）のため、デフォルトの3秒、または<code>check()</code>の第二引数で指定したミリ秒数のタイムアウトでも読み込み失敗になる。</p>
@@ -115,17 +115,17 @@ cssFont.rel = <span class="hljs-string">'stylesheet'</span>;
 <p>使っている人はおなじみだろうがWeb Font LoaderはPromiseによる実装ではない。ウェブ標準とはコードが大きく異る。</p>
 
 <pre><code class="hljs language-javascript">WebFont.load({
-  <span class="hljs-attr">custom</span>: {
-    <span class="hljs-attr">families</span>: [<span class="hljs-string">'Open Sans'</span>],
-    <span class="hljs-attr">urls</span>: [<span class="hljs-string">'/assets/css/open-sans.css'</span>]
-  },
-  <span class="hljs-attr">fontactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
-  },
-  <span class="hljs-attr">fontinactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">family</span>) </span>{
-    <span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Web font "'</span> + family + <span class="hljs-string">'" not loaded.'</span>);
-  }
+	<span class="hljs-attr">custom</span>: {
+		<span class="hljs-attr">families</span>: [<span class="hljs-string">'Open Sans'</span>],
+		<span class="hljs-attr">urls</span>: [<span class="hljs-string">'/assets/css/open-sans.css'</span>]
+	},
+	<span class="hljs-attr">fontactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+	},
+	<span class="hljs-attr">fontinactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">family</span>) </span>{
+		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
+		<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Web font "'</span> + family + <span class="hljs-string">'" not loaded.'</span>);
+	}
 });</code></pre>
 
 <p>このようにライブラリーが用意する<code>WebFont</code>オブジェクトの<code>load()</code>メソッドですべて指定することになる。自前で用意したウェブ・フォントを使いたい場合は<code>custom</code>フィールドで<code>families</code>と<code>urls</code>を指定することで読み込みを行う。Font Face Observerとは違うウェブ・フォントの読み込み機能自体は半分（ウェブ・フォントCSSの読み込みだけ）内蔵されているということだ。読み込みエラーは<code>fontinactive</code>フィールドで指定した関数で処理できる。こちらもタイムアウト（デフォルトでは5秒）でもエラーになる。</p>

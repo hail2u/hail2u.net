@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="開発の止まったConsole2の後継っぽいConsoleZを試している。シェルでずっと作業するわけじゃないのでckw-modで不満はなくて、Console2には乗り換える意味はなさそうだったんだけど、ConsoleZではウィンドウの再利用が行え、他のアプリケーションから新しいタブを開くということが可能になったのでちょっと良い。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -77,33 +77,33 @@
 <p>Vimから簡単に呼べるように設定も書いた。</p>
 
 <pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">'win32'</span>)
-  <span class="hljs-comment">" Reuse existing ConsoleZ instance</span>
-  <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ReuseConsoleZ</span><span class="hljs-params">(...)</span></span>
-    <span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = &amp;<span class="hljs-keyword">shell</span>
+	<span class="hljs-comment">" Reuse existing ConsoleZ instance</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ReuseConsoleZ</span><span class="hljs-params">(...)</span></span>
+		<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = &amp;<span class="hljs-keyword">shell</span>
 
-    <span class="hljs-keyword">if</span> <span class="hljs-variable">a:0</span> != <span class="hljs-number">0</span>
-      <span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = <span class="hljs-variable">a:1</span>
-    <span class="hljs-keyword">endif</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-variable">a:0</span> != <span class="hljs-number">0</span>
+			<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = <span class="hljs-variable">a:1</span>
+		<span class="hljs-keyword">endif</span>
 
-    <span class="hljs-keyword">execute</span> <span class="hljs-string">'silent !start Console.exe -reuse -t '</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">' -d '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%:p:h'</span>)
-  <span class="hljs-keyword">endfunction</span>
+		<span class="hljs-keyword">execute</span> <span class="hljs-string">'silent !start Console.exe -reuse -t '</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">' -d '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%:p:h'</span>)
+	<span class="hljs-keyword">endfunction</span>
 
-  <span class="hljs-comment">" Complete ConsoleZ tab</span>
-  <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ConsoleZTabComplete</span><span class="hljs-params">(A, L, P)</span></span>
-    <span class="hljs-keyword">let</span> commands = [<span class="hljs-string">'cmd'</span>, <span class="hljs-string">'bash'</span>, <span class="hljs-string">'ps'</span>]
-    <span class="hljs-keyword">let</span> matches = []
+	<span class="hljs-comment">" Complete ConsoleZ tab</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ConsoleZTabComplete</span><span class="hljs-params">(A, L, P)</span></span>
+		<span class="hljs-keyword">let</span> commands = [<span class="hljs-string">'cmd'</span>, <span class="hljs-string">'bash'</span>, <span class="hljs-string">'ps'</span>]
+		<span class="hljs-keyword">let</span> matches = []
 
-    <span class="hljs-keyword">for</span> cmd in commands
-      <span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">'^'</span> . <span class="hljs-variable">a:A</span>
-        <span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, cmd)
-      <span class="hljs-keyword">endif</span>
-    <span class="hljs-keyword">endfor</span>
+		<span class="hljs-keyword">for</span> cmd in commands
+			<span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">'^'</span> . <span class="hljs-variable">a:A</span>
+				<span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, cmd)
+			<span class="hljs-keyword">endif</span>
+		<span class="hljs-keyword">endfor</span>
 
-    <span class="hljs-keyword">return</span> matches
-  <span class="hljs-keyword">endfunction</span>
+		<span class="hljs-keyword">return</span> matches
+	<span class="hljs-keyword">endfunction</span>
 
-  <span class="hljs-comment">" ConsoleZ: Open ConsoleZ</span>
-  command! -nargs=* -<span class="hljs-built_in">complete</span>=customlist,<span class="hljs-symbol">&lt;SID&gt;</span>ConsoleZTabComplete ConsoleZ <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>ReuseConsoleZ(<span class="hljs-symbol">&lt;f-args&gt;</span>)
+	<span class="hljs-comment">" ConsoleZ: Open ConsoleZ</span>
+	command! -nargs=* -<span class="hljs-built_in">complete</span>=customlist,<span class="hljs-symbol">&lt;SID&gt;</span>ConsoleZTabComplete ConsoleZ <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>ReuseConsoleZ(<span class="hljs-symbol">&lt;f-args&gt;</span>)
 <span class="hljs-keyword">endif</span></code></pre>
 
 <p>デフォルトはVimのシェル設定から引っ張るようにして、追加でタブ設定を補完できるようにしておき、たまに必要になるPowerShellを起動しやすくしたりとかそんな感じ。あらかじめ<code>-reuse</code>オプションでConsoleZを立ち上げておく必要はある。</p>

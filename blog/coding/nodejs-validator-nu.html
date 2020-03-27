@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -79,25 +79,25 @@
 fd.append(<span class="hljs-string">'out'</span>, <span class="hljs-string">'json'</span>);
 fd.append(<span class="hljs-string">'file'</span>, fs.createReadStream(htmlfile));
 fd.submit(<span class="hljs-string">'http://validator.nu/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, response</span>) </span>{
-  <span class="hljs-keyword">if</span> (error) {
-    <span class="hljs-keyword">throw</span> error;
-  }
+	<span class="hljs-keyword">if</span> (error) {
+		<span class="hljs-keyword">throw</span> error;
+	}
 
-  <span class="hljs-keyword">var</span> chunks = <span class="hljs-string">''</span>;
+	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">''</span>;
 
-  response.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
-    chunks += chunk;
-  });
+	response.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
+		chunks += chunk;
+	});
 
-  response.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-built_in">JSON</span>.parse(chunks).messages.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) </span>{
-      <span class="hljs-keyword">if</span> (message.type === <span class="hljs-string">'error'</span>) {
-        <span class="hljs-keyword">var</span> line = (message.lastLine ? message.lastLine : <span class="hljs-number">0</span>);
-        <span class="hljs-keyword">var</span> column = (message.firstColumn ? message.firstColumn: <span class="hljs-number">0</span>);
-        <span class="hljs-built_in">console</span>.log([htmlfile, line, column, message.message].join(<span class="hljs-string">':'</span>));
-      }
-    });
-  });
+	response.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-built_in">JSON</span>.parse(chunks).messages.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) </span>{
+			<span class="hljs-keyword">if</span> (message.type === <span class="hljs-string">'error'</span>) {
+				<span class="hljs-keyword">var</span> line = (message.lastLine ? message.lastLine : <span class="hljs-number">0</span>);
+				<span class="hljs-keyword">var</span> column = (message.firstColumn ? message.firstColumn: <span class="hljs-number">0</span>);
+				<span class="hljs-built_in">console</span>.log([htmlfile, line, column, message.message].join(<span class="hljs-string">':'</span>));
+			}
+		});
+	});
 });</code></pre>
 
 <p>コマンドラインに渡された最初の引数をHTMLファイルのパスとみなし、その内容を<code>multipart/form-data</code>でバリデーターにPOSTし、返ってきたJSONフォーマットの結果を<a href="http://nodejs.org/">GNUの標準エラーフォーマット</a>に整形して標準出力に吐いている。</p>

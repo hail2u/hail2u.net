@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="このウェブサイトでは、画像や引用をfigure要素でマークアップしている。Markdownで書いているわけだが、もちろんそんな記法はないので、今までは生HTMLを書いていた。しかし、marked v0.4.0でのバグでハマりどうしようもなさそうだったため、markedの拡張機構を使って、なんとなくうまい感じになるようにする必要がでてきてしまった。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -91,25 +91,25 @@
 <p>実装は2つのフェーズに分けて行った。リンク側ではキャプションがあり、かつ内容が画像だったら、<code>figcaption</code>要素でキャプションをマークアップして追加する。段落側では、リンクが張られた画像だけか、それに加えて<code>figcaption</code>要素があるなら、全体を<code>p</code>要素ではなく<code>figure</code>要素でマークアップする。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> markupHyperlink = <span class="hljs-function">(<span class="hljs-params">href, title, content</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!title) {
-    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
-  }
+	<span class="hljs-keyword">if</span> (!title) {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
+	}
 
-  <span class="hljs-keyword">if</span> (!content.startsWith(<span class="hljs-string">"&lt;img "</span>)) {
-    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>" title="<span class="hljs-subst">${title}</span>&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
-  }
+	<span class="hljs-keyword">if</span> (!content.startsWith(<span class="hljs-string">"&lt;img "</span>)) {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>" title="<span class="hljs-subst">${title}</span>&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
+	}
 
-  <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;
 &lt;figcaption&gt;<span class="hljs-subst">${title}</span>&lt;/figcaption&gt;`</span>;
 };
 
 <span class="hljs-keyword">const</span> markupParagaraph = <span class="hljs-function"><span class="hljs-params">content</span> =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!<span class="hljs-regexp">/^&lt;a\b.*?&gt;&lt;img\b.*?&gt;&lt;\/a&gt;(\n&lt;(figcaption)&gt;.*?&lt;\/\1&gt;)?$/</span>.exec(content)) {
-    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;p&gt;<span class="hljs-subst">${content}</span>&lt;/p&gt;
+	<span class="hljs-keyword">if</span> (!<span class="hljs-regexp">/^&lt;a\b.*?&gt;&lt;img\b.*?&gt;&lt;\/a&gt;(\n&lt;(figcaption)&gt;.*?&lt;\/\1&gt;)?$/</span>.exec(content)) {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;p&gt;<span class="hljs-subst">${content}</span>&lt;/p&gt;
 `</span>;
-  }
+	}
 
-  <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
 <span class="hljs-subst">${content}</span>
 &lt;/figure&gt;
 `</span>;
@@ -156,17 +156,17 @@
 <p>実装は引用内の最後の行のみをチェックして行った。EMダッシュで始まっていないなら通常通り出力する。始まっていた場合は最後の行を<code>p</code>要素から<code>figcaption</code>要素へ変換し、さらに<code>figure</code>要素で全体をマークアップする。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> markupQuote = <span class="hljs-function"><span class="hljs-params">content</span> =&gt;</span> {
-  <span class="hljs-keyword">const</span> lines = content.trim().split(<span class="hljs-string">"\n"</span>);
+	<span class="hljs-keyword">const</span> lines = content.trim().split(<span class="hljs-string">"\n"</span>);
 
-  <span class="hljs-keyword">if</span> (!lines[lines.length - <span class="hljs-number">1</span>].startsWith(<span class="hljs-string">"&lt;p&gt;—"</span>)) {
-    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;blockquote&gt;
+	<span class="hljs-keyword">if</span> (!lines[lines.length - <span class="hljs-number">1</span>].startsWith(<span class="hljs-string">"&lt;p&gt;—"</span>)) {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;blockquote&gt;
 <span class="hljs-subst">${lines.join(<span class="hljs-string">"\n"</span>)}</span>
 &lt;/blockquote&gt;
 `</span>;
-  }
+	}
 
-  lines.push(lines.pop().replace(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">"&lt;$1figcaption&gt;"</span>));
-  <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
+	lines.push(lines.pop().replace(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">"&lt;$1figcaption&gt;"</span>));
+	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
 &lt;blockquote&gt;
 <span class="hljs-subst">${lines.join(<span class="hljs-string">"\n"</span>)}</span>
 &lt;/blockquote&gt;

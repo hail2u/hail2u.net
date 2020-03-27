@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="$type-subtype-component-contextというような形でSassの変数を命名していたけど、これにもBEMを使うかという感じになってきた。ただでさえ長いのが、セパレーターで更に長くなるけど、元々そんなに短くないので気にしないことにした。BEMをクラス名で使うような形で単純に利用するケースと、3.3で導入される予定のマップを使って構造化して定義し、複雑に参照するケースを比較して検証している。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -122,24 +122,24 @@
 <h2 class="subheading">マップを使って構造化</h2>
 
 <pre><code class="hljs language-scss"><span class="hljs-variable">$searchbox</span>: (
-  color_bg: <span class="hljs-number">#f9f9f9</span>,
+	color_bg: <span class="hljs-number">#f9f9f9</span>,
 
-  input: (
-    color_fg: black,
-    color_bg: white,
-    color_border: lighten(black, <span class="hljs-number">25%</span>),
-    _focus: (
-      color_border: cyan
-    )
-  ),
+	input: (
+		color_fg: black,
+		color_bg: white,
+		color_border: lighten(black, <span class="hljs-number">25%</span>),
+		_focus: (
+			color_border: cyan
+		)
+	),
 
-  button: (
-    color_fg: white,
-    color_bg: grayscale(mix(cyan, white, <span class="hljs-number">60%</span>)),
-    _hover: (
-      color_bg: cyan
-    )
-  )
+	button: (
+		color_fg: white,
+		color_bg: grayscale(mix(cyan, white, <span class="hljs-number">60%</span>)),
+		_hover: (
+			color_bg: cyan
+		)
+	)
 );</code></pre>
 
 <p>Sass 3.3で導入されることになっているマップを使う場合は、型で大きなマップを作ると巨大な変数になってしまうので、まずブロックをルートに作る。そのキーで変数の型を指定するわけだけど、マップをネストした場合はエレメントとする。モディファイアもマップのネストだけど、キーの先頭に<code>_</code>を付けて区別する。</p>
@@ -147,21 +147,21 @@
 <p>参照は<code>map-get()</code>関数を使う。</p>
 
 <pre><code class="hljs language-scss"><span class="hljs-selector-class">.searchbox</span> {
-  <span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$searchbox</span>, color_bg);
+	<span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$searchbox</span>, color_bg);
 
-  <span class="hljs-selector-tag">input</span> {
-    <span class="hljs-variable">$input</span>: map-get(<span class="hljs-variable">$searchbox</span>, input);
+	<span class="hljs-selector-tag">input</span> {
+		<span class="hljs-variable">$input</span>: map-get(<span class="hljs-variable">$searchbox</span>, input);
 
-      <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid map-get(<span class="hljs-variable">$input</span>, color_border);
+			<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid map-get(<span class="hljs-variable">$input</span>, color_border);
 <span class="hljs-attribute">color</span>: map-get(<span class="hljs-variable">$input</span>, color_fg);
-       <span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$input</span>, color_bg);
+			 <span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$input</span>, color_bg);
 
-       &amp;<span class="hljs-selector-pseudo">:focus</span> {
-         <span class="hljs-variable">$focus</span>: map-get(<span class="hljs-variable">$input</span>, _focus);
+			 &amp;<span class="hljs-selector-pseudo">:focus</span> {
+				 <span class="hljs-variable">$focus</span>: map-get(<span class="hljs-variable">$input</span>, _focus);
 
-         <span class="hljs-attribute">border-color</span>: map-get(<span class="hljs-variable">$focus</span>, color_border);
-       }
-  }
+				 <span class="hljs-attribute">border-color</span>: map-get(<span class="hljs-variable">$focus</span>, color_border);
+			 }
+	}
 }</code></pre>
 
 <p><code>map-get()</code>関数を直接ネストすると読みづらいし、繰り返し書く必要が出てくる。普通にエレメントやモディファイア単位でネストを作ると思うので、そこでローカル変数を作ってやると良い。</p>

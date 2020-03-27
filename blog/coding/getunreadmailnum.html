@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="僕は鶴亀メールを愛用していているのですが、「未読メールがあるかないかしかわからず、総未読メール数は鶴亀メールのウィンドウを開かないとわからない」という不満がありました。ので、マクロを作ってみた。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -74,15 +74,15 @@ $Folder  = $Account + &quot;\\&lt;ルートのフォルダ名&gt;&quot;;
 loaddll &quot;tkinfo.dll&quot;;
 
 if (!dllfunc(&quot;IsTuruKame&quot;)) {
-  endmacro;
+	endmacro;
 }
 
 #i = 0;
 
 while ($Folder != &quot;&quot;) {
-  call GetFolderUnreadMailCount $Folder;
-  #i = #i + ##return;
-  $Folder = dllfuncstr(&quot;GetNextFolder&quot;, $Account, $Folder);
+	call GetFolderUnreadMailCount $Folder;
+	#i = #i + ##return;
+	$Folder = dllfuncstr(&quot;GetNextFolder&quot;, $Account, $Folder);
 }
 
 message str(#i) + &quot;通の未読メールがあります。&quot;;
@@ -90,18 +90,18 @@ message str(#i) + &quot;通の未読メールがあります。&quot;;
 endmacro;
 
 GetFolderUnreadMailCount:
-  #x = strstr($$1, &quot;\\&quot;);
+	#x = strstr($$1, &quot;\\&quot;);
 
-  if (#x &gt;= 0) {
-    $Account = leftstr($$1, #x);
-    $Folder  = midstr($$1, #x + 1, 256);
-  } else {
-    $Account = $$1;
-    $Folder  = &quot;&quot;;
-  }
+	if (#x &gt;= 0) {
+		$Account = leftstr($$1, #x);
+		$Folder  = midstr($$1, #x + 1, 256);
+	} else {
+		$Account = $$1;
+		$Folder  = &quot;&quot;;
+	}
 
-  #n = dllfunc(&quot;GetFolderMailCount&quot;, $Account, $Folder, &quot;unread&quot;);
-  return #n;</pre>
+	#n = dllfunc(&quot;GetFolderMailCount&quot;, $Account, $Folder, &quot;unread&quot;);
+	return #n;</pre>
 <p><code>GetNextFolder</code>をうまく呼ぶことによってループさせながら、<code>GetFolderMailCount</code>の第3引数をunreadにして呼ぶことにより、各フォルダの未読メールを取得し、加算していくという推移になってます。ゆえに遅いです。</p>
 <p><code>GetNextFolder</code>で返ってくる文字列に、アカウント名も含まれることになかなか気づかなくてハマりました。アカウント名とフォルダ名の切り分けのコードは鶴亀マクロヘルプからパクりました。</p>
 <p>このソースではダイアログ・ボックスで表示していますが、僕は<a href="http://homepage1.nifty.com/kazubon/tclocklight/index.html" title="TClock Light">TClock Light</a>のユーザー定義文字列をセットしてやり（tclock.exeを<code>run</code>で呼んでやるということ）、タスクトレイに文字列として表示させて使ってます。マクロ登録→自動起動で、受信が一段落した時のマクロに指定してやれば良し。</p>

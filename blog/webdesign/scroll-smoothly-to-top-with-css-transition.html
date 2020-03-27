@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。" itemprop="description">
 		<link href="/img/blog/scroll-smoothly-to-top-with-css-transition.png" itemprop="image">
@@ -88,13 +88,13 @@
 <p>実装のコードも9行ほどと短く、色々なものに組み込みやすいと思われる。コードも順序良くCSSを割り当てていくだけだ。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"to-top"</span>).addEventListener(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) </span>{
-  <span class="hljs-keyword">var</span> styleBody = <span class="hljs-built_in">document</span>.body.style;
-  styleBody.transition = <span class="hljs-string">"initial"</span>;
-  styleBody.marginTop = <span class="hljs-string">"-"</span> + (<span class="hljs-built_in">window</span>.pageYOffset - <span class="hljs-number">1</span>) + <span class="hljs-string">"px"</span>;
-  <span class="hljs-built_in">window</span>.scrollTo(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-  styleBody.transition = <span class="hljs-string">"margin-top 1s ease-in-out"</span>;
-  styleBody.marginTop = <span class="hljs-string">"0"</span>;
-  evt.preventDefault();
+	<span class="hljs-keyword">var</span> styleBody = <span class="hljs-built_in">document</span>.body.style;
+	styleBody.transition = <span class="hljs-string">"initial"</span>;
+	styleBody.marginTop = <span class="hljs-string">"-"</span> + (<span class="hljs-built_in">window</span>.pageYOffset - <span class="hljs-number">1</span>) + <span class="hljs-string">"px"</span>;
+	<span class="hljs-built_in">window</span>.scrollTo(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+	styleBody.transition = <span class="hljs-string">"margin-top 1s ease-in-out"</span>;
+	styleBody.marginTop = <span class="hljs-string">"0"</span>;
+	evt.preventDefault();
 });</code></pre>
 
 <p>最初に<code>body</code>要素の<code>transition</code>プロパティーを<a href="http://www.w3.org/TR/css3-values/#common-keywords"><code>initial</code></a>に戻すことで、負のマージンを与えた時にアニメーションしないようにすることができる。最初にこうしておかないと、複数回このトップに戻る機能を利用した場合におかしなことになってしまう。<code>initial</code>というキーワードの値はInternet Explorer 11を始めいくつかのブラウザーでまだサポートされていないが、不正な値を仕込んでも目的である<em>アニメーションを潰すこと</em>は可能だ。そのため行儀が良いとは言えないが、このままでも良いだろう。気になる人は<a href="http://www.w3.org/TR/css3-transitions/#transition-shorthand-property">その仕様</a>で決まっている初期値である<code>all 0s ease 0s</code>にすると良い。</p>

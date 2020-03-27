@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="VimLeaveでmksessionを発動させるセッションの自動保存は結構前からやっていたけど、自動復帰はやってなかった（必要な時だけ:sourceしてた）のでちょろっと書いた。ライフ・チェンジング……という程ではなかった。でもまぁそこそこ必要そう。" itemprop="description">
 		<link href="/img/blog/vim-auto-save-and-restore-session.png" itemprop="image">
@@ -69,10 +69,10 @@
 <p><code>VimLeave</code>で<code>mksession</code>を発動させるセッションの自動保存は結構前からやっていたけど、自動復帰はやってなかった（必要な時だけ<code>:source</code>してた）のでちょろっと書いた。ライフ・チェンジング……という程ではなかった。でもまぁそこそこ必要そう。</p>
 
 <pre><code class="hljs language-vim"><span class="hljs-keyword">augroup</span> SessionAutocommands
-  autocmd!
+	autocmd!
 
-  <span class="hljs-keyword">autocmd</span> VimEnter * nested <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>RestoreSessionWithConfirm()
-  <span class="hljs-keyword">autocmd</span> VimLeave * <span class="hljs-keyword">execute</span> <span class="hljs-string">'SaveSession'</span>
+	<span class="hljs-keyword">autocmd</span> VimEnter * nested <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>RestoreSessionWithConfirm()
+	<span class="hljs-keyword">autocmd</span> VimLeave * <span class="hljs-keyword">execute</span> <span class="hljs-string">'SaveSession'</span>
 <span class="hljs-keyword">augroup</span> END
 
 command! RestoreSession :<span class="hljs-keyword">source</span> ~/.<span class="hljs-keyword">vim</span>/.session
@@ -80,11 +80,11 @@ command! SaveSession    :mksession! ~/.<span class="hljs-keyword">vim</span>/.se
 
 <span class="hljs-comment">" Restore session with confirm</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">RestoreSessionWithConfirm</span><span class="hljs-params">()</span></span>
-  <span class="hljs-keyword">let</span> msg = <span class="hljs-string">'Do you want to restore previous session?'</span>
+	<span class="hljs-keyword">let</span> msg = <span class="hljs-string">'Do you want to restore previous session?'</span>
 
-  <span class="hljs-keyword">if</span> !argc() &amp;&amp; <span class="hljs-keyword">confirm</span>(msg, <span class="hljs-string">"&amp;Yes\n&amp;No"</span>, <span class="hljs-number">1</span>, <span class="hljs-string">'Question'</span>) == <span class="hljs-number">1</span>
-    <span class="hljs-keyword">execute</span> <span class="hljs-string">'RestoreSession'</span>
-  <span class="hljs-keyword">endif</span>
+	<span class="hljs-keyword">if</span> !argc() &amp;&amp; <span class="hljs-keyword">confirm</span>(msg, <span class="hljs-string">"&amp;Yes\n&amp;No"</span>, <span class="hljs-number">1</span>, <span class="hljs-string">'Question'</span>) == <span class="hljs-number">1</span>
+		<span class="hljs-keyword">execute</span> <span class="hljs-string">'RestoreSession'</span>
+	<span class="hljs-keyword">endif</span>
 <span class="hljs-keyword">endfunction</span></code></pre>
 
 <p>最初<code>autocmd</code>の<a href="http://vimdoc.sourceforge.net/htmldoc/autocmd.html#autocmd-nested"><code>nested</code>フラグ</a>の存在を知らなくて、セッション復活で開かれたファイルのシンタックス・ハイライトがされないという壁にあたったけどヘルプ読んだらちゃんと書いてありました。<code>autocmd</code>で発動させたコマンドで開かれたりしたバッファーでは<code>BufRead</code>等が発動しないので、自然<code>filetype</code>の設定等それらのイベントに依存する処理が行われないということだった。</p>

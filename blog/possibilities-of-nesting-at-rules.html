@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては@mediaと@supportsが相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -67,29 +67,29 @@
 	<div itemprop="articleBody"><p>At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては<code>@media</code>と<code>@supports</code>が相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">max-width:</span> <span class="hljs-number">30em</span>) {
-  <span class="hljs-selector-class">.foo</span> {
-    <span class="hljs-attribute">position</span>: absolute;
-  }
+	<span class="hljs-selector-class">.foo</span> {
+		<span class="hljs-attribute">position</span>: absolute;
+	}
 
-  <span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">position:</span> sticky) {
-    <span class="hljs-selector-class">.foo</span> {
-      <span class="hljs-attribute">position</span>: sticky;
-    }
-  }
+	<span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">position:</span> sticky) {
+		<span class="hljs-selector-class">.foo</span> {
+			<span class="hljs-attribute">position</span>: sticky;
+		}
+	}
 }</code></pre>
 
 <p>ひとつはこのようにプログレッシブ・エンハンスメントを実装する手段として使うパターンだ。とりあえずA、より優れたBの実装があるならB、というようなCSSになる。普通にCSSを書きつつ、条件付きで分岐させるためフィーチャー・クエリーが子になる（なりうる）。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">display:</span> flex) {
-  <span class="hljs-selector-class">.foo</span> {
-    <span class="hljs-attribute">display</span>: flex;
-  }
+	<span class="hljs-selector-class">.foo</span> {
+		<span class="hljs-attribute">display</span>: flex;
+	}
 
-  <span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">60em</span>) {
-    <span class="hljs-selector-class">.bar</span> {
-      <span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
-    }
-  }
+	<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">60em</span>) {
+		<span class="hljs-selector-class">.bar</span> {
+			<span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
+		}
+	}
 }</code></pre>
 
 <p>もうひとつはこのような、実装があるかによって0か1かになるパターンだ。実装がなかったら何もしない、というCSSになる。おおまかにフィーチャー・クエリーで分岐し、その中で普通のCSSを書いていくため、メディア・クエリーが子になる。</p>
@@ -101,17 +101,17 @@
 <p>後者の<code>@supports</code>内に‘@media`がくるパターンは以下のように書いても等価だ。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">display:</span> flex) {
-  <span class="hljs-selector-class">.foo</span> {
-    <span class="hljs-attribute">display</span>: flex;
-  }
+	<span class="hljs-selector-class">.foo</span> {
+		<span class="hljs-attribute">display</span>: flex;
+	}
 }
 
 <span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">60em</span>) {
-  <span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">display:</span> flex) {
-    <span class="hljs-selector-class">.bar</span> {
-      <span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
-    }
-  }
+	<span class="hljs-keyword">@supports</span> (<span class="hljs-attribute">display:</span> flex) {
+		<span class="hljs-selector-class">.bar</span> {
+			<span class="hljs-attribute">order</span>: <span class="hljs-number">1</span>;
+		}
+	}
 }</code></pre>
 
 <p>つまり分割してネストをひっくり返せる。CSS MQPackerではネスト可能性を考慮して、<code>@media</code>を常にルート直下になるように<a href="https://github.com/hail2u/node-css-mqpacker/pull/52">調整してからまとめる</a>ような実装にしつつある。可能性と効率を優先し、CSSの構造は大きく変えることにした。</p>

@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" itemprop="description">
 		<link href="/img/blog/remove-utm_xxx-for-page-owner.png" itemprop="image">
@@ -76,16 +76,16 @@
 _gaq.push([<span class="hljs-string">'_setAccount'</span>, <span class="hljs-string">'UA-XXXXXX-X'</span>]);
 _gaq.push([<span class="hljs-string">'_trackPageview'</span>]);
 _gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">var</span> h = history, l = location, u;
-  <span class="hljs-keyword">if</span> (!l.search || !h.replaceState) <span class="hljs-keyword">return</span>;
-  u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) + l.hash;
-  h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
+	<span class="hljs-keyword">var</span> h = history, l = location, u;
+	<span class="hljs-keyword">if</span> (!l.search || !h.replaceState) <span class="hljs-keyword">return</span>;
+	u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) + l.hash;
+	h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
 });
 
 (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>); ga.type = <span class="hljs-string">'text/javascript'</span>; ga.async = <span class="hljs-literal">true</span>;
-  ga.src = (<span class="hljs-string">'https:'</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">'https://ssl'</span> : <span class="hljs-string">'http://www'</span>) + <span class="hljs-string">'.google-analytics.com/ga.js'</span>;
-  <span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
+	<span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>); ga.type = <span class="hljs-string">'text/javascript'</span>; ga.async = <span class="hljs-literal">true</span>;
+	ga.src = (<span class="hljs-string">'https:'</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">'https://ssl'</span> : <span class="hljs-string">'http://www'</span>) + <span class="hljs-string">'.google-analytics.com/ga.js'</span>;
+	<span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
 })();</code></pre>
 
 <p>まだちゃんと運用していないけど、複数のutm_xxxがあるケースや他のパラメーターがある場合、更にはハッシュ付きだった場合なども含めた<a href="/pub/test/449.html">簡単なテスト</a>を行った限りでは大丈夫そう。もしかしたらAnalyticsのutm_xxx解析は維持したままURLを綺麗にできるかなと思ったけど、これだとダメな気もする。Analyticsの解析完了で発火するとかだと確実だと思うんだけど、まだ調べてない。</p>

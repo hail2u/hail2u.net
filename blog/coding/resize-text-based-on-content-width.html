@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Webフォント（@font-face）や均等割付（text-align: justify;）、日本語と英語の間のスペース調節（text-autospace）などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまりimg要素にwidth: 100%;を指定した時のようにはCSSではできない（少なくとも思いつかなかった）。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。" itemprop="description">
 		<link href="/img/blog/resize-text-based-on-content-width.png" itemprop="image">
@@ -73,39 +73,39 @@
 <p>フォントレンダリングの関係上、Firefoxの方が綺麗なのでスクリーンショットはFirefoxで撮影した。</p>
 
 <pre><code class="hljs language-js">$(<span class="hljs-built_in">window</span>).load(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">var</span> start = $.now();
+	<span class="hljs-keyword">var</span> start = $.now();
 
-  $(<span class="hljs-string">".line"</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">var</span> target = $(<span class="hljs-keyword">this</span>);
-    <span class="hljs-keyword">var</span> fontSize = <span class="hljs-built_in">parseInt</span>(target.css(<span class="hljs-string">"font-size"</span>), <span class="hljs-number">10</span>);
+	$(<span class="hljs-string">".line"</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">var</span> target = $(<span class="hljs-keyword">this</span>);
+		<span class="hljs-keyword">var</span> fontSize = <span class="hljs-built_in">parseInt</span>(target.css(<span class="hljs-string">"font-size"</span>), <span class="hljs-number">10</span>);
 
-    <span class="hljs-keyword">var</span> temp = $(<span class="hljs-string">"&lt;div/&gt;"</span>).css({
-      <span class="hljs-string">"display"</span>:     <span class="hljs-string">"none"</span>,
-      <span class="hljs-string">"font-family"</span>: target.css(<span class="hljs-string">"font-family"</span>),
-      <span class="hljs-string">"font-size"</span>:   fontSize
-    }).text(target.text()).appendTo(<span class="hljs-string">"body"</span>);
+		<span class="hljs-keyword">var</span> temp = $(<span class="hljs-string">"&lt;div/&gt;"</span>).css({
+			<span class="hljs-string">"display"</span>:     <span class="hljs-string">"none"</span>,
+			<span class="hljs-string">"font-family"</span>: target.css(<span class="hljs-string">"font-family"</span>),
+			<span class="hljs-string">"font-size"</span>:   fontSize
+		}).text(target.text()).appendTo(<span class="hljs-string">"body"</span>);
 
-    <span class="hljs-keyword">var</span> targetWidth = target.width();
-    <span class="hljs-keyword">var</span> tempWidth = temp.width();
+		<span class="hljs-keyword">var</span> targetWidth = target.width();
+		<span class="hljs-keyword">var</span> tempWidth = temp.width();
 
-    <span class="hljs-keyword">while</span> (tempWidth &lt; targetWidth) {
-      fontSize *= (targetWidth / tempWidth);
-      temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
-      tempWidth = temp.width();
-    }
+		<span class="hljs-keyword">while</span> (tempWidth &lt; targetWidth) {
+			fontSize *= (targetWidth / tempWidth);
+			temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+			tempWidth = temp.width();
+		}
 
-    <span class="hljs-keyword">while</span> (tempWidth &gt;= targetWidth) {
-      fontSize--;
-      temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
-      tempWidth = temp.width();
-    }
+		<span class="hljs-keyword">while</span> (tempWidth &gt;= targetWidth) {
+			fontSize--;
+			temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+			tempWidth = temp.width();
+		}
 
-    target.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
-    temp.remove();
-  });
+		target.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+		temp.remove();
+	});
 
-  <span class="hljs-keyword">var</span> time = $.now() - start;
-  $(<span class="hljs-string">"body"</span>).append($(<span class="hljs-string">"&lt;p/&gt;"</span>).text(<span class="hljs-string">"Elapsed Time: "</span> + time));
+	<span class="hljs-keyword">var</span> time = $.now() - start;
+	$(<span class="hljs-string">"body"</span>).append($(<span class="hljs-string">"&lt;p/&gt;"</span>).text(<span class="hljs-string">"Elapsed Time: "</span> + time));
 });</code></pre>
 
 <p>まず非表示の<code>div</code>要素を作成し、そこにテキストとスタイルをコピーすることによって文を複製する。<code>display: none;</code>だとその要素の幅は<code>font-size</code>に応じて変化するので、幅の割合から大まかに当たりをつけてチェックしていき、元の要素の幅を超えたところでフォントサイズを一旦決定している。その後微調整するために1pxづつ下げていき、ちょうど収まるところで決定という仕組み。2passでやらないとうまく収まらなかったり色々不具合が多かった。</p>

@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -69,21 +69,21 @@
 <p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
 
 <pre><code class="hljs language-js">} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selector == <span class="hljs-string">'link[rel="canonical"]'</span>) {
-  <span class="hljs-keyword">var</span> z = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"link"</span>),
-    y,
-    x = z.length,
-    w,
-    v = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"a"</span>);
+	<span class="hljs-keyword">var</span> z = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"link"</span>),
+		y,
+		x = z.length,
+		w,
+		v = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"a"</span>);
 
-  <span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
-    w = z[y];
+	<span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
+		w = z[y];
 
-    <span class="hljs-keyword">if</span> (w.rel === <span class="hljs-string">"canonical"</span>) {
-      v.setAttribute(<span class="hljs-string">"href"</span>, w.href);
-      result = v.cloneNode(<span class="hljs-literal">false</span>);
-      <span class="hljs-keyword">break</span>;
-    }
-  }</code></pre>
+		<span class="hljs-keyword">if</span> (w.rel === <span class="hljs-string">"canonical"</span>) {
+			v.setAttribute(<span class="hljs-string">"href"</span>, w.href);
+			result = v.cloneNode(<span class="hljs-literal">false</span>);
+			<span class="hljs-keyword">break</span>;
+		}
+	}</code></pre>
 
 <p><code>getElementsByTagName()</code>で<code>link</code>要素を全て取得し、<code>rel</code>属性が<code>canonical</code>なものを<code>result</code>にセットするというだけです。変数がはっちゃけているのは気にしない。<code>cloneNode()</code>を使っているのは相対URLで<code>rel="canonical"</code>が書かれていた場合に某ブラウザもどきで絶対URLにならないことへの対策で、元ネタは<a href="http://subtech.g.hatena.ne.jp/secondlife/20090624/1245809935">グループ日記のタイトルを変えすぎる人のエントリ</a>です。<a href="/pub/HatenaStar.js.111107.patch">パッチ</a>もあります。</p>
 
@@ -95,18 +95,18 @@
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="handlebars"><span class="xml">
 Hatena.Star.SiteConfig = {
-  entryNodes: {
-    "article": {
+	entryNodes: {
+		"article": {
 <span class="php"><span class="hljs-meta">&lt;?</span>$path_info like=<span class="hljs-string">"\.html$"</span>&gt;
-      uri:       <span class="hljs-string">"link[rel=\"canonical\"]"</span>,
+			uri:       <span class="hljs-string">"link[rel=\"canonical\"]"</span>,
 &lt;/<span class="hljs-meta">?&gt;</span></span>
 <span class="php"><span class="hljs-meta">&lt;?</span>$path_info unlike=<span class="hljs-string">"\.html$"</span>&gt;
-      uri:       <span class="hljs-string">"h2 a"</span>,
+			uri:       <span class="hljs-string">"h2 a"</span>,
 &lt;/<span class="hljs-meta">?&gt;</span></span>
-      title:     "h2",
-      container: "footer p"
-    }
-  }
+			title:     "h2",
+			container: "footer p"
+		}
+	}
 };
 </span></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 

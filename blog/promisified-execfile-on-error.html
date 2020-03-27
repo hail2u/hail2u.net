@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="child_processモジュールの関数群もutil.promisify()を使ってPromise化できる。しかしexecFile()などは元々のコールバックに3つ引数が渡されることから少し使い方が違ってくる。ここまでは皆が通る道だろう。実はそれだけでなくリジェクトされた時も少し違うことが公式ドキュメントの該当する項の最後に記載されていた。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -77,16 +77,16 @@
 <span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
 
 <span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
-  <span class="hljs-keyword">const</span> { stdout } = <span class="hljs-keyword">await</span> execFile(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
-  <span class="hljs-built_in">console</span>.log(stdout);
+	<span class="hljs-keyword">const</span> { stdout } = <span class="hljs-keyword">await</span> execFile(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
+	<span class="hljs-built_in">console</span>.log(stdout);
 };
 
 getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
-  <span class="hljs-keyword">if</span> (e.stderr) {
-    <span class="hljs-built_in">console</span>.error(e.stderr);
-  }
+	<span class="hljs-keyword">if</span> (e.stderr) {
+		<span class="hljs-built_in">console</span>.error(e.stderr);
+	}
 
-  <span class="hljs-built_in">console</span>.trace(e);
+	<span class="hljs-built_in">console</span>.trace(e);
 });</code></pre>
 
 <p>Promiseの<code>catch()</code>側でやる。これはこれで専用の<code>catch()</code>を書くことになるのがちょっと気になる。大抵の場合は<code>Error</code>オブジェクトがいい感じになっているような気がするので、実はあまり考えなくて良いのかもしれない。</p>
@@ -100,21 +100,21 @@ getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span
 <span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
 
 <span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
-  <span class="hljs-keyword">let</span> stdout;
-  <span class="hljs-keyword">let</span> stderr;
+	<span class="hljs-keyword">let</span> stdout;
+	<span class="hljs-keyword">let</span> stderr;
 
-  <span class="hljs-keyword">try</span> {
-    ({ stdout, stderr }) = <span class="hljs-keyword">await</span> execFileAsync(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
-  } <span class="hljs-keyword">catch</span> (e) {
-    <span class="hljs-built_in">console</span>.error(stderr);
-    <span class="hljs-keyword">throw</span> e;
-  }
+	<span class="hljs-keyword">try</span> {
+		({ stdout, stderr }) = <span class="hljs-keyword">await</span> execFileAsync(<span class="hljs-string">"node"</span>, [<span class="hljs-string">"--version"</span>]);
+	} <span class="hljs-keyword">catch</span> (e) {
+		<span class="hljs-built_in">console</span>.error(stderr);
+		<span class="hljs-keyword">throw</span> e;
+	}
 
-  <span class="hljs-built_in">console</span>.log(stdout);
+	<span class="hljs-built_in">console</span>.log(stdout);
 };
 
 getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
-  <span class="hljs-built_in">console</span>.trace(e);
+	<span class="hljs-built_in">console</span>.trace(e);
 });</code></pre>
 
 <p><code>let</code>を前出ししたり、そのおかげで<code>await</code>で受け取る時に<code>（)</code>で括らなければならない。結局はそれ以前の問題で、これでは<code>catch</code>節で<code>stderr</code>が拾えない。</p></div>

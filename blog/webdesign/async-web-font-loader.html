@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -74,11 +74,11 @@
 <p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
 
 <pre><code class="hljs language-javascript">（<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d, f</span>) </span>{
-  <span class="hljs-keyword">var</span> l = d.createElement(<span class="hljs-string">'link'</span>);
-  l.rel = <span class="hljs-string">'stylesheet'</span>;
-  l.href = f;
-  <span class="hljs-keyword">var</span> s = d.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>];
-  s.parentNode.insertBefore(l, s);
+	<span class="hljs-keyword">var</span> l = d.createElement(<span class="hljs-string">'link'</span>);
+	l.rel = <span class="hljs-string">'stylesheet'</span>;
+	l.href = f;
+	<span class="hljs-keyword">var</span> s = d.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>];
+	s.parentNode.insertBefore(l, s);
 })(<span class="hljs-built_in">document</span>, <span class="hljs-string">'http://example.com/font/foo.css'</span>);</code></pre>
 
 <p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
@@ -90,16 +90,16 @@
 <p>とりあえずWebフォントのURLを<code>link</code>要素として仕込んでおいて、後で<code>rel=&quot;stylesheet&quot;</code>を追加させることにより非同期化する手法。</p>
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">"http://example.com/font/foo.css"</span>
-  <span class="hljs-attr">class</span>=<span class="hljs-string">"async-web-fonts"</span>&gt;</span>
+	<span class="hljs-attr">href</span>=<span class="hljs-string">"http://example.com/font/foo.css"</span>
+	<span class="hljs-attr">class</span>=<span class="hljs-string">"async-web-fonts"</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-  (<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">var</span> webfonts = <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'link.async-web-fonts'</span>);
+	(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">var</span> webfonts = <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'link.async-web-fonts'</span>);
 
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = webfonts.length; i &lt; l; i++) {
-      webfonts[i].rel = <span class="hljs-string">'stylesheet'</span>;
-    }
-  })();
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = webfonts.length; i &lt; l; i++) {
+			webfonts[i].rel = <span class="hljs-string">'stylesheet'</span>;
+		}
+	})();
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 
 <p><code>rel=&quot;stylesheet&quot;</code>がなければ読みに行かないので、これでも非同期になる。複数のWebフォントのURLを参照するようなケースでも拡張しやすい。見た感じのままDOM操作を最小限に抑えられているけど、総合的なパフォーマンスは動的に<code>link</code>要素を突っ込むのとさほど変わらなそう。単体のJavaScriptファイルとして切り出せないのが欠点。</p>

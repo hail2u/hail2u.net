@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" itemprop="description">
 		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
@@ -88,33 +88,33 @@
 <span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.Renderer();
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processHTML</span>(<span class="hljs-params">html</span>) </span>{
-  <span class="hljs-keyword">var</span> attributes;
-  <span class="hljs-keyword">var</span> contents;
-  <span class="hljs-keyword">var</span> tag;
-  <span class="hljs-keyword">var</span> tags = [<span class="hljs-string">"aside"</span>, <span class="hljs-string">"figure"</span>, <span class="hljs-string">"section"</span>];
-  <span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
+	<span class="hljs-keyword">var</span> attributes;
+	<span class="hljs-keyword">var</span> contents;
+	<span class="hljs-keyword">var</span> tag;
+	<span class="hljs-keyword">var</span> tags = [<span class="hljs-string">"aside"</span>, <span class="hljs-string">"figure"</span>, <span class="hljs-string">"section"</span>];
+	<span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
 
-  <span class="hljs-keyword">if</span> (!tokens) {
-    <span class="hljs-keyword">return</span> html;
-  }
+	<span class="hljs-keyword">if</span> (!tokens) {
+		<span class="hljs-keyword">return</span> html;
+	}
 
-  tag = tokens[<span class="hljs-number">1</span>];
+	tag = tokens[<span class="hljs-number">1</span>];
 
-  <span class="hljs-keyword">if</span> (tags.indexOf(tag) === <span class="hljs-number">-1</span>) {
-    <span class="hljs-keyword">return</span> html;
-  }
+	<span class="hljs-keyword">if</span> (tags.indexOf(tag) === <span class="hljs-number">-1</span>) {
+		<span class="hljs-keyword">return</span> html;
+	}
 
-  attributes = tokens[<span class="hljs-number">2</span>];
-  contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">"&gt;"</span>), {
-    <span class="hljs-attr">renderer</span>: renderer
-  }).trim();
+	attributes = tokens[<span class="hljs-number">2</span>];
+	contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">"&gt;"</span>), {
+		<span class="hljs-attr">renderer</span>: renderer
+	}).trim();
 
-  <span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;"</span> + tag + attributes + <span class="hljs-string">"&gt;\n"</span> + contents + <span class="hljs-string">"\n&lt;/"</span> + tag + <span class="hljs-string">"&gt;\n"</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;"</span> + tag + attributes + <span class="hljs-string">"&gt;\n"</span> + contents + <span class="hljs-string">"\n&lt;/"</span> + tag + <span class="hljs-string">"&gt;\n"</span>;
 }
 
 renderer.html = processHTML;
 <span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>), {
-  <span class="hljs-attr">renderer</span>: renderer
+	<span class="hljs-attr">renderer</span>: renderer
 }));</code></pre>
 
 <p>空白文字を削った一番外側のHTMLタグを拾い、その内容を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
@@ -122,26 +122,26 @@ renderer.html = processHTML;
 <p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される（インデントは読みやすいように追加した）。</p>
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">thead</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Name<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Num<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">thead</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">tbody</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>foo<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>128<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>bar<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>256<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">tbody</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">thead</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Name<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Num<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">thead</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">tbody</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>foo<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>128<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>bar<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>256<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">tbody</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
 
-  <span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>表1<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>表1<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></code></pre>
 
 <hr>

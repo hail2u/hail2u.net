@@ -16,10 +16,10 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.6.4.css" rel="stylesheet">
+		<link href="/css/main.9.6.5.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.6.4.js"></script>
-		<script async defer src="/js/back-to-top.9.6.4.js"></script>
+		<script async defer src="/js/unutm.9.6.5.js"></script>
+		<script async defer src="/js/back-to-top.9.6.5.js"></script>
 
 		<meta content="Vimのスニペット系のプラグインとしてJPTemplateを愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、template-vimの補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。" itemprop="description">
 		<link href="/img/blog/jptemplate-wrapper.png" itemprop="image">
@@ -71,19 +71,19 @@
 <pre><code class="hljs language-vim"><span class="hljs-keyword">let</span> <span class="hljs-variable">g:jpTemplateKey</span> = <span class="hljs-string">'&lt;C-S-F12&gt;'</span>
 
 <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">JPTemplateWrapper</span><span class="hljs-params">()</span></span>
-  <span class="hljs-keyword">let</span> templdir_ft = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/'</span>.&amp;ft
-  <span class="hljs-keyword">let</span> templdir_general = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/general'</span>
-  <span class="hljs-keyword">let</span> cword = <span class="hljs-built_in">matchstr</span>(<span class="hljs-built_in">strpart</span>(<span class="hljs-built_in">getline</span>(<span class="hljs-string">'.'</span>), -<span class="hljs-number">1</span>, <span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>)), <span class="hljs-string">'[-0-9a-zA-Z_]*$'</span>)
+	<span class="hljs-keyword">let</span> templdir_ft = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/'</span>.&amp;ft
+	<span class="hljs-keyword">let</span> templdir_general = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/general'</span>
+	<span class="hljs-keyword">let</span> cword = <span class="hljs-built_in">matchstr</span>(<span class="hljs-built_in">strpart</span>(<span class="hljs-built_in">getline</span>(<span class="hljs-string">'.'</span>), -<span class="hljs-number">1</span>, <span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>)), <span class="hljs-string">'[-0-9a-zA-Z_]*$'</span>)
 
-  <span class="hljs-keyword">if</span> <span class="hljs-built_in">filereadable</span>(templdir_ft.<span class="hljs-string">'/'</span>.cword) || <span class="hljs-built_in">filereadable</span>(templdir_general.<span class="hljs-string">'/'</span>.cword)
-    <span class="hljs-keyword">call</span> jp:InsertTemplate()
-  <span class="hljs-keyword">else</span>
-    <span class="hljs-keyword">let</span> templates = <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_ft, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>)
-    <span class="hljs-keyword">let</span> templates += <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_general, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>) 
-    <span class="hljs-keyword">call</span> <span class="hljs-built_in">complete</span>(<span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>) - <span class="hljs-built_in">strlen</span>(cword), <span class="hljs-keyword">map</span>(<span class="hljs-built_in">filter</span>(templates, <span class="hljs-string">'v:val =~ "'</span>.cword.<span class="hljs-string">'"'</span>), <span class="hljs-string">'fnamemodify(v:val, ":t:r")'</span>))
-  <span class="hljs-keyword">endif</span>
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">filereadable</span>(templdir_ft.<span class="hljs-string">'/'</span>.cword) || <span class="hljs-built_in">filereadable</span>(templdir_general.<span class="hljs-string">'/'</span>.cword)
+		<span class="hljs-keyword">call</span> jp:InsertTemplate()
+	<span class="hljs-keyword">else</span>
+		<span class="hljs-keyword">let</span> templates = <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_ft, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>)
+		<span class="hljs-keyword">let</span> templates += <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_general, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>) 
+		<span class="hljs-keyword">call</span> <span class="hljs-built_in">complete</span>(<span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>) - <span class="hljs-built_in">strlen</span>(cword), <span class="hljs-keyword">map</span>(<span class="hljs-built_in">filter</span>(templates, <span class="hljs-string">'v:val =~ "'</span>.cword.<span class="hljs-string">'"'</span>), <span class="hljs-string">'fnamemodify(v:val, ":t:r")'</span>))
+	<span class="hljs-keyword">endif</span>
 
-  <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>
+	<span class="hljs-keyword">return</span> <span class="hljs-string">''</span>
 endfunc
 
 <span class="hljs-keyword">inoremap</span> <span class="hljs-symbol">&lt;C-Tab&gt;</span> <span class="hljs-symbol">&lt;C-R&gt;</span>=<span class="hljs-symbol">&lt;SID&gt;</span>JPTemplateWrapper()<span class="hljs-symbol">&lt;CR&gt;</span></code></pre>
