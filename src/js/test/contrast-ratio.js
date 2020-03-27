@@ -19,8 +19,7 @@ const testContrastRatio = () => {
 	const getContrast = (foreground, background) => {
 		const backgroundLuminance = getRelativeLuminance(background.match(/\d+/g));
 		const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/g));
-		return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05) /
-	  (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
+		return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05) / (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
 	};
 
 	for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
