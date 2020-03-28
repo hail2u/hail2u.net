@@ -1,4 +1,4 @@
-const testContrastRatio = () => {
+window.addEventListener("load", () => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 	const getComponentLuminance = color => {
 		const sRGB = color / 255;
@@ -31,6 +31,4 @@ const testContrastRatio = () => {
 		const contrast = color.nextElementSibling;
 		contrast.replaceChild(document.createTextNode(ratio), contrast.lastChild);
 	}
-};
-
-window.addEventListener("load", testContrastRatio);
+});

@@ -1,4 +1,4 @@
-const testRealtiveTime = () => {
+(() => {
 	const now = Date.now();
 	const container = document.querySelector(".test-relative-time");
 	[
@@ -19,6 +19,4 @@ const testRealtiveTime = () => {
 		li.append(time);
 		container.prepend(li);
 	});
-};
-
-testRealtiveTime();
+})();
