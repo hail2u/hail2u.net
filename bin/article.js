@@ -31,7 +31,7 @@ const getDraft = async filename => {
 const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
 const isDraft = (isTest, filename) => {
-	if (!isTest && filename.startsWith("_")) {
+	if (!isTest && filename.endsWith("_")) {
 		return false;
 	}
 
