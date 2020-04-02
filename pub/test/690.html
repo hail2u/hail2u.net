@@ -11,6 +11,11 @@
 				background-color: rgb(249, 245, 236);
 				color: rgb(31, 28, 20);
 			}
+
+			code {
+				font-family: monospace, serif;
+				font-size: 1em;
+			}
 		</style>
 	</head>
 	<body>
@@ -20,11 +25,13 @@
       <p>このウェブサイトの背景色に4.5以上、文字色に3以上のコントラスト比を持つウェブ・セーフ・カラーをテストするページです。</p>
 		</header>
 		
-<section>
+<section id="test">
+	<h1>#RRGGBB: Ratio vs Background, Ratio vs Foreground</h1>
 	<script>
 		const body = getComputedStyle(document.body);
 		const background = body.backgroundColor;
 		const foreground = body.color;
+		const test = document.getElementById("test");
 
 		/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 		const getComponentLuminance = color => {
@@ -60,12 +67,13 @@
 		for (let r = 0; r < 256; r = r + 51) {
 			for (let g = 0; g < 256; g = g + 51) {
 				for (let b = 0; b < 256; b = b + 51) {
-					const color = `rgb(${r}, ${g}, ${b})`;
-					const vsBackground = getContrast(color, background);
-					const vsForeground = getContrast(color, foreground);
+					const rgb = `rgb(${r}, ${g}, ${b})`;
+					const vsBackground = getContrast(rgb, background).toFixed(3);
+					const vsForeground = getContrast(rgb, foreground).toFixed(3);
+					const hex = `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 
 					if (hasGoodContrast(vsBackground, vsForeground)) {
-						document.write(`<p><span style="color: ${color}; text-decoration: underline">${color}</span>: <code>${vsBackground}</code>, <code>${vsForeground}</code></p>`);
+						test.innerHTML = `${test.innerHTML}<p><code style="color: ${rgb}; text-decoration: underline">${hex}</code>: <code>${vsBackground}</code>, <code>${vsForeground}</code></p>`;
 					}
 				}
 			}
