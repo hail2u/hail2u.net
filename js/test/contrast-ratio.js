@@ -1,4 +1,4 @@
-const testContrastRatio = () => {
+window.addEventListener("load", () => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 	const getComponentLuminance = color => {
 		const sRGB = color / 255;
@@ -27,10 +27,9 @@ const testContrastRatio = () => {
 		const foreground = style.color;
 		const background = style.backgroundColor;
 		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
-		color.replaceChild(document.createTextNode(background), color.lastChild);
-		const contrast = color.nextElementSibling;
+		const code = color.nextElementSibling;
+		code.replaceChild(document.createTextNode(background), code.lastChild);
+		const contrast = code.nextElementSibling;
 		contrast.replaceChild(document.createTextNode(ratio), contrast.lastChild);
 	}
-};
-
-window.addEventListener("load", testContrastRatio);
+});
