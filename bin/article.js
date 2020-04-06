@@ -31,7 +31,7 @@ const getDraft = async filename => {
 const getDrafts = drafts => Promise.all(drafts.map(getDraft));
 
 const isDraft = (isTest, filename) => {
-	if (!isTest && filename.endsWith("_")) {
+	if (!isTest && filename.startsWith("_")) {
 		return false;
 	}
 
@@ -81,7 +81,7 @@ const selectDraft = drafts => new Promise(resolve => {
 });
 
 const checkSelectedName = name => {
-	if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]_?$/.test(name)) {
+	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
 		throw new Error('This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".');
 	}
 
