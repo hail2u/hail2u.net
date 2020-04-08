@@ -4,6 +4,7 @@ export default {
 		articles: "src/blog/articles.json",
 		books: "src/bookshelf/books.json",
 		documents: "src/documents/documents.json",
+		followings: "src/links/followings.json",
 		links: "src/links/links.json",
 		metadata: "src/metadata.json",
 		statuses: "src/statuses/statuses.json"
@@ -118,6 +119,11 @@ export default {
 				dest: "dist/links/index.html",
 				json: "src/links/index.json",
 				src: "src/links/index.mustache"
+			},
+			{
+				dest: "dist/mysubscriptions.opml",
+				json: "src/mysubscriptions.json",
+				src: "src/mysubscriptions.mustache"
 			},
 			{
 				dest: "dist/photos/log.html",
