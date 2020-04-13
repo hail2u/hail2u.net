@@ -1,4 +1,4 @@
-(() => {
+const setupRelativeTime = () => {
 	const now = Date.now();
 	const container = document.querySelector(".test-relative-time");
 	[
@@ -19,4 +19,6 @@
 		li.append(time);
 		container.prepend(li);
 	});
-})();
+};
+
+setupRelativeTime();

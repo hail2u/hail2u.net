@@ -24,12 +24,12 @@ window.addEventListener("load", () => {
 
 	for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
 		const style = getComputedStyle(color);
-		const foreground = style.color;
-		const background = style.backgroundColor;
+		const foreground = style.getPropertyValue("color");
+		const background = style.getPropertyValue("background-color");
 		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
 		const code = color.nextElementSibling;
-		code.replaceChild(document.createTextNode(background), code.lastChild);
+		code.lastChild.replaceWith(background);
 		const contrast = code.nextElementSibling;
-		contrast.replaceChild(document.createTextNode(ratio), contrast.lastChild);
+		contrast.lastChild.replaceWith(ratio);
 	}
 });
