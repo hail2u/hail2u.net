@@ -174,8 +174,8 @@ export default {
 		],
 		js: [
 			{
-				dest: "dist/js/append-others.{{version}}.js",
-				src: "src/js/append-others.js"
+				dest: "dist/js/append-next.{{version}}.js",
+				src: "src/js/append-next.js"
 			},
 			{
 				dest: "dist/js/back-to-top.{{version}}.js",
