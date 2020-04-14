@@ -11,7 +11,7 @@ import { readJSONFile } from "../lib/json-file.js";
 import sharp from "sharp";
 import getVersion from "../lib/get-version.js";
 
-const extendArticle = article => {
+const extendArticle = (article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));
 	const body = article.body
 		.replace(/<h2>/g, '<h2 class="subheading">')
@@ -21,12 +21,28 @@ const extendArticle = article => {
 		.trim()
 		.split("\n")
 		.shift();
+
+	if (i === articles.length - 1) {
+		return {
+			...article,
+			...dt,
+			body: body,
+			description: description,
+			isArticle: true
+		};
+	}
+
+	const { link, title } = articles[i + 1];
 	return {
 		...article,
 		...dt,
 		body: body,
 		description: description,
-		isArticle: true
+		isArticle: true,
+		previous: {
+			link: link,
+			title: title
+		}
 	};
 };
 
