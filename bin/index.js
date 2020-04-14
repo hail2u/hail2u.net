@@ -182,6 +182,10 @@ export default {
 				src: "src/js/back-to-top.js"
 			},
 			{
+				dest: "dist/js/random-link.{{version}}.js",
+				src: "src/js/random-link.js"
+			},
+			{
 				dest: "dist/js/relative-time.{{version}}.js",
 				src: "src/js/relative-time.js"
 			},
