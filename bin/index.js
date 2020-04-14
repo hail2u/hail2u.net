@@ -190,6 +190,10 @@ export default {
 				src: "src/js/relative-time.js"
 			},
 			{
+				dest: "dist/js/site-search.{{version}}.js",
+				src: "src/js/site-search.js"
+			},
+			{
 				dest: "dist/js/unutm.{{version}}.js",
 				src: "src/js/unutm.js"
 			}
