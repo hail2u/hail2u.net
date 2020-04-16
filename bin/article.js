@@ -21,7 +21,7 @@ const getDraft = async filename => {
 		.replace(/<h2>/g, '<h2 class="subheading">')
 		.trim();
 	return {
-		body: `${body}\n`,
+		body: `${body}`,
 		name: path.basename(src, path.extname(src)),
 		src: src,
 		title: unescapeReferences(title.replace(/<.*?>/g, ""))
