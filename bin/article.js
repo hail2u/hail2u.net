@@ -107,19 +107,17 @@ const checkSelectedTitleLength = title => {
 };
 
 const testSelected = async selected => {
-	const template = await fs.readFile(selected.src, "utf8");
+	const template = await fs.readFile(config.src.test, "utf8");
 	const rendered = mustache
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
 		.replace(/(?<=\bhref=")\//g, "../dist/");
 	const [open] = await Promise.all([
 		which("open"),
-		fs.writeFile(selected.dest, highlight(rendered))
+		fs.writeFile(config.dest.test, highlight(rendered))
 	]);
-	return runCommand(open, [selected.dest]);
+	return runCommand(open, [config.dest.test]);
 };
-
-const deleteFile = file => fs.unlink(file);
 
 const toImagePath = str => path.basename(str.split(/"/)[1]);
 
@@ -144,52 +142,30 @@ const copyArticleImages = async html => {
 	return Promise.all(imagePaths.map(copyArticleImage));
 };
 
-const hasSameLink = (link, article) => link === article.link;
-
-const updateCache = (cache, file) => {
-	const article = {
-		body: file.body,
-		link: `/blog/${file.name}.html`,
-		published: Date.now(),
-		title: file.title
-	};
-	const sameArticleIndex = cache.findIndex(hasSameLink.bind(null, article.link));
-
-	if (sameArticleIndex === -1) {
-		return writeJSONFile(config.data.articles, [article, ...cache]);
-	}
-
-	return writeJSONFile(config.data.articles, [
-		...cache.slice(0, sameArticleIndex),
-		{
-			...article,
-			published: cache[sameArticleIndex].published
-		},
-		...cache.slice(sameArticleIndex + 1)
-	]);
-};
-
 const getArticleTotal = cache => ` (${cache.length + 1})`;
 
-const updateEntry = async file => {
+const contributeSelected = async selected => {
+	const articlePath = path.join(config.src.articles, `${selected.name}.html`);
 	const cache = await readJSONFile(config.data.articles);
 	const [git, node] = await Promise.all([
 		which("git"),
 		which("node"),
-		copyArticleImages(file.body),
-		updateCache(cache, file)
+		fs.unlink(selected.src),
+		copyArticleImages(selected.body),
+		fs.writeFile(articlePath, selected.body),
+		writeJSONFile(config.data.articles, [{
+			link: `/blog/${selected.name}.html`,
+			published: Date.now(),
+			title: selected.title
+		}, ...cache])
 	]);
 	await Promise.all([
+		runCommand(git, ["add", "--", articlePath]),
 		runCommand(git, ["add", "--", config.data.articles]),
-		runCommand(node, ["bin/html.js", `--article=${config.dest.articles}${file.name}.html`])
+		runCommand(node, ["bin/html.js", `--article=${config.dest.articles}${selected.name}.html`])
 	]);
-	return runCommand(git, ["commit", `--message=${file.verb} ${file.name}${getArticleTotal(cache)}`]);
+	return runCommand(git, ["commit", `--message=Contribute ${selected.name}${getArticleTotal(cache)}`]);
 };
-
-const contributeSelected = selected => Promise.all([
-	deleteFile(selected.src),
-	updateEntry(selected)
-]);
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
@@ -207,17 +183,10 @@ const main = async () => {
 	]);
 
 	if (argv.test) {
-		return testSelected({
-			...selected,
-			dest: config.dest.test,
-			src: config.src.test
-		});
+		return testSelected(selected);
 	}
 
-	return contributeSelected({
-		...selected,
-		verb: "Contribute"
-	});
+	return contributeSelected(selected);
 };
 
 main().catch(e => {

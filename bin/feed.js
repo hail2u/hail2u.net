@@ -16,15 +16,15 @@ const toAbsoluteURL = url => {
 
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
-const extendArticle = article => {
-	const description = unescapeReferences(article.body
-		.replace(/<.*?>/g, ""))
+const extendArticle = async article => {
+	const body = await fs.readFile(path.join(config.src.root, article.link), "utf8");
+	const description = unescapeReferences(body.replace(/<.*?>/g, ""))
 		.trim()
 		.split("\n")
 		.shift();
 	return {
 		...article,
-		body: article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
+		body: body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
 		description: description,
 		type: "article"
 	};
@@ -32,9 +32,9 @@ const extendArticle = article => {
 
 const readArticles = async () => {
 	const articles = await readJSONFile(config.data.articles);
-	return articles
+	return Promise.all(articles
 		.slice(0, 10)
-		.map(extendArticle);
+		.map(extendArticle));
 };
 
 const hasPublished = book => book.published;

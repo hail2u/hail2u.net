@@ -11,12 +11,10 @@ import { readJSONFile } from "../lib/json-file.js";
 import sharp from "sharp";
 import getVersion from "../lib/get-version.js";
 
-const extendArticle = (article, i, articles) => {
+const extendArticle = async (article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));
-	const body = article.body
-		.replace(/<h2>/g, '<h2 class="subheading">')
-		.replace(/^<aside>/, '<aside class="hang">');
-	const description = unescapeReferences(article.body
+	const body = await fs.readFile(path.join(config.src.root, article.link), "utf8");
+	const description = unescapeReferences(body
 		.replace(/<.*?>/g, ""))
 		.trim()
 		.split("\n")
@@ -48,7 +46,7 @@ const extendArticle = (article, i, articles) => {
 
 const readArticles = async () => {
 	const articles = await readJSONFile(config.data.articles);
-	return articles.map(extendArticle);
+	return Promise.all(articles.map(extendArticle));
 };
 
 const extendBook = book => {
