@@ -49,7 +49,7 @@ const readArticles = async () => {
 	return Promise.all(articles.map(extendArticle));
 };
 
-const extendBook = book => {
+const extendBook = (book) => {
 	const dt = getDateDetails(new Date(book.published));
 	return {
 		...book,
@@ -63,7 +63,7 @@ const readBooks = async () => {
 	return books.map(extendBook);
 };
 
-const extendDocument = document => {
+const extendDocument = (document) => {
 	const dt = getDateDetails(new Date(document.published));
 	return {
 		...document,
@@ -77,7 +77,7 @@ const readDocuments = async () => {
 	return documents.map(extendDocument);
 };
 
-const extendLink = link => {
+const extendLink = (link) => {
 	const dt = getDateDetails(new Date(link.published));
 	return {
 		...link,
@@ -91,7 +91,7 @@ const readLinks = async () => {
 	return links.map(extendLink);
 };
 
-const isPhoto = filename => {
+const isPhoto = (filename) => {
 	if (path.extname(filename) === ".jpg") {
 		return true;
 	}
@@ -99,17 +99,17 @@ const isPhoto = filename => {
 	return false;
 };
 
-const getPhotoDatetime = photo => {
+const getPhotoDatetime = (photo) => {
 	const dt = path.basename(photo, ".jpg").split("");
 	return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
 };
 
-const getPhotoDimension = async photo => {
+const getPhotoDimension = async (photo) => {
 	const metadata = await sharp(path.join(config.src.photos, photo)).metadata();
 	return [metadata.height, metadata.width];
 };
 
-const extendPhoto = async photo => {
+const extendPhoto = async (photo) => {
 	const published = getPhotoDatetime(photo);
 	const dt = getDateDetails(new Date(published));
 	const [height, width] = await getPhotoDimension(photo);
@@ -133,7 +133,7 @@ const listPhotos = async () => {
 		.map(extendPhoto));
 };
 
-const extendStatus = status => {
+const extendStatus = (status) => {
 	const dt = getDateDetails(new Date(status.published));
 	return {
 		...status,
@@ -147,7 +147,7 @@ const readStatuses = async () => {
 	return statuses.map(extendStatus);
 };
 
-const readPartial = async filename => {
+const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
 	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
 	return {
@@ -155,7 +155,7 @@ const readPartial = async filename => {
 	};
 };
 
-const gatherPartials = partials => Object.assign(...partials);
+const gatherPartials = (partials) => Object.assign(...partials);
 
 const readPartials = async () => {
 	const filenames = await fs.readdir(config.src.partial);
@@ -205,7 +205,7 @@ const isLastInYear = (current, next) => {
 	return false;
 };
 
-const isLatest = index => {
+const isLatest = (index) => {
 	if (index === 0) {
 		return true;
 	}
@@ -235,7 +235,7 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const markItems = items => Promise.all(items.map(markItem));
+const markItems = (items) => Promise.all(items.map(markItem));
 
 const mergeData = async (extradataFile, dest, metadata) => {
 	const extradata = await readJSONFile(extradataFile);
@@ -285,7 +285,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	};
 };
 
-const markFirstItem = items => {
+const markFirstItem = (items) => {
 	const firstItem = items.shift();
 	firstItem.isFirstInMonth = true;
 	firstItem.isFirstInYear = true;
@@ -326,7 +326,7 @@ const buildHTML = async (metadata, partials, file) => {
 	await fs.writeFile(file.dest, highlighted);
 };
 
-const toFilesFormat = article => ({
+const toFilesFormat = (article) => ({
 	dest: convertToPOSIXPath(path.join(config.dest.root, article.link)),
 	json: config.data.article,
 	src: config.src.article,
@@ -388,7 +388,7 @@ const main = async () => {
 };
 
 mustache.escape = escapeCharacters;
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

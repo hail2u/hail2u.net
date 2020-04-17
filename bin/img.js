@@ -4,7 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import toIco from "to-ico";
 
-const generatePNG = async file => {
+const generatePNG = async (file) => {
 	const metadata = await sharp(file.src).metadata();
 	await sharp(file.src, {
 		density: file.width * metadata.density / metadata.width
@@ -13,9 +13,9 @@ const generatePNG = async file => {
 	return file.dest;
 };
 
-const isFaviconSource = filepath => path.basename(filepath).startsWith("favicon-");
+const isFaviconSource = (filepath) => path.basename(filepath).startsWith("favicon-");
 
-const readPNG = png => fs.readFile(png, {
+const readPNG = (png) => fs.readFile(png, {
 	encoding: null
 });
 
@@ -26,7 +26,7 @@ const main = async () => {
 	await fs.writeFile(config.dest.favicon, favicon);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

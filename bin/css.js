@@ -13,7 +13,7 @@ const minifier = new CleanCSS({
 	returnPromise: true
 });
 
-const buildCSS = async file => {
+const buildCSS = async (file) => {
 	const [version, minified] = await Promise.all([
 		getVersion(),
 		minifier.minify([file.src])
@@ -22,7 +22,7 @@ const buildCSS = async file => {
 	await fs.writeFile(dest, minified.styles);
 };
 
-Promise.all(config.files.css.map(buildCSS)).catch(e => {
+Promise.all(config.files.css.map(buildCSS)).catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

@@ -38,7 +38,7 @@ const main = async () => {
 	await runCommand(git, ["commit", `--message=Bookmark ${argv.url}`]);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

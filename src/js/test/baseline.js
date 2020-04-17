@@ -1,5 +1,5 @@
 document.querySelector(".js-test-baseline-button").addEventListener("click", () => {
-	const toggleDisabled = element => {
+	const toggleDisabled = (element) => {
 		if (element.hasAttribute("rel")) {
 			element.removeAttribute("rel");
 			return;

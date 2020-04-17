@@ -5,7 +5,7 @@ import runCommand from "../lib/run-command.js";
 import sharp from "sharp";
 import which from "which";
 
-const isPhoto = filename => {
+const isPhoto = (filename) => {
 	if ([".jpeg", ".jpg"].includes(path.extname(filename).toLowerCase())) {
 		return true;
 	}
@@ -13,7 +13,7 @@ const isPhoto = filename => {
 	return false;
 };
 
-const generateFilename = dt => {
+const generateFilename = (dt) => {
 	const year = String(dt.getFullYear()).padStart(2, "0");
 	const month = String(dt.getMonth() + 1).padStart(2, "0");
 	const date = String(dt.getDate()).padStart(2, "0");
@@ -53,7 +53,7 @@ const main = async () => {
 	await runCommand(git, ["commit", `--message=Add ${filename}`]);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

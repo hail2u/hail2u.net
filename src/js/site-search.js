@@ -1,6 +1,6 @@
 const showSiteSearchForm = () => {
 	const template = document.querySelector(".js-site-search");
-	template.content.querySelector(".js-site-search-form").addEventListener("submit", event => {
+	template.content.querySelector(".js-site-search-form").addEventListener("submit", (event) => {
 		const query = event.srcElement.q;
 		query.value = `${query.value} site:hail2u.net`;
 	});

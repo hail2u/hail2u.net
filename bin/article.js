@@ -10,7 +10,7 @@ import runCommand from "../lib/run-command.js";
 import { unescapeReferences } from "../lib/character-reference.js";
 import which from "which";
 
-const getDraft = async filename => {
+const getDraft = async (filename) => {
 	const src = path.join(config.src.drafts, filename);
 	const content = await fs.readFile(src, "utf8");
 	const [title, ...rest] = content.split("\n");
@@ -28,7 +28,7 @@ const getDraft = async filename => {
 	};
 };
 
-const getDrafts = drafts => Promise.all(drafts.map(getDraft));
+const getDrafts = (drafts) => Promise.all(drafts.map(getDraft));
 
 const isDraft = (isTest, filename) => {
 	if (!isTest && filename.startsWith("_")) {
@@ -42,7 +42,7 @@ const isDraft = (isTest, filename) => {
 	return true;
 };
 
-const listDrafts = async isTest => {
+const listDrafts = async (isTest) => {
 	const filenames = await fs.readdir(config.src.drafts);
 
 	if (filenames.length < 1) {
@@ -52,7 +52,7 @@ const listDrafts = async isTest => {
 	return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
 };
 
-const selectDraft = drafts => new Promise(resolve => {
+const selectDraft = (drafts) => new Promise((resolve) => {
 	process.stdin.isTTY = true;
 	process.stdout.isTTY = true;
 	const menu = readline.createInterface({
@@ -80,7 +80,7 @@ const selectDraft = drafts => new Promise(resolve => {
 	});
 });
 
-const checkSelectedName = name => {
+const checkSelectedName = (name) => {
 	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
 		throw new Error('This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".');
 	}
@@ -88,11 +88,11 @@ const checkSelectedName = name => {
 	return true;
 };
 
-const checkSelectedNameConflict = name => fs.access(path.join(config.src.articles, `${name}.html`))
+const checkSelectedNameConflict = (name) => fs.access(path.join(config.src.articles, `${name}.html`))
 	.then(() => {
 		throw new Error("The name of this draft is already used. A draft name must be unique.");
 	})
-	.catch(err => {
+	.catch((err) => {
 		if (err.code === "ENOENT") {
 			return true;
 		}
@@ -100,7 +100,7 @@ const checkSelectedNameConflict = name => fs.access(path.join(config.src.article
 		throw err;
 	});
 
-const checkSelectedTitle = title => {
+const checkSelectedTitle = (title) => {
 	if (typeof title !== "string") {
 		throw new Error("This draft does not have a valid title. A draft title must be a string.");
 	}
@@ -108,7 +108,7 @@ const checkSelectedTitle = title => {
 	return true;
 };
 
-const checkSelectedTitleLength = title => {
+const checkSelectedTitleLength = (title) => {
 	const bytes = (new TextEncoder().encode(title));
 
 	if (bytes.length < 9) {
@@ -118,7 +118,7 @@ const checkSelectedTitleLength = title => {
 	return true;
 };
 
-const testSelected = async selected => {
+const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
 	const rendered = mustache
 		.render(template, selected)
@@ -131,9 +131,9 @@ const testSelected = async selected => {
 	return runCommand(open, [config.dest.test]);
 };
 
-const toImagePath = str => path.basename(str.split(/"/)[1]);
+const toImagePath = (str) => path.basename(str.split(/"/)[1]);
 
-const listArticleImagePaths = html => {
+const listArticleImagePaths = (html) => {
 	const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
 
 	if (!images) {
@@ -143,20 +143,20 @@ const listArticleImagePaths = html => {
 	return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = imagepath => {
+const copyArticleImage = (imagepath) => {
 	const src = path.join(config.src.articleImages, imagepath);
 	const dest = path.join(config.dest.articleImages, imagepath);
 	fs.copyFile(src, dest);
 };
 
-const copyArticleImages = async html => {
+const copyArticleImages = async (html) => {
 	const imagePaths = await listArticleImagePaths(html);
 	return Promise.all(imagePaths.map(copyArticleImage));
 };
 
-const getArticleTotal = cache => ` (${cache.length + 1})`;
+const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
-const contributeSelected = async selected => {
+const contributeSelected = async (selected) => {
 	const articlePath = path.join(config.src.articles, `${selected.name}.html`);
 	const cache = await readJSONFile(config.data.articles);
 	const [git, node] = await Promise.all([
@@ -202,7 +202,7 @@ const main = async () => {
 	return contributeSelected(selected);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

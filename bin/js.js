@@ -11,7 +11,7 @@ const compiler = new ClosureCompiler({
 	languageOut: "ECMASCRIPT5_STRICT"
 });
 
-const compileJS = jsCode => new Promise((resolve, reject) => {
+const compileJS = (jsCode) => new Promise((resolve, reject) => {
 	compiler.run(jsCode, (exitCode, stdOut, stdErr) => {
 		if (exitCode !== 0) {
 			return reject(stdErr);
@@ -21,7 +21,7 @@ const compileJS = jsCode => new Promise((resolve, reject) => {
 	});
 });
 
-const buildJS = async file => {
+const buildJS = async (file) => {
 	const code = await fs.readFile(file.src, "utf8");
 	const [version, compiled] = await Promise.all([
 		getVersion(),
@@ -36,7 +36,7 @@ const buildJS = async file => {
 	await fs.writeFile(dest, compiled);
 };
 
-Promise.all(config.files.js.map(buildJS)).catch(e => {
+Promise.all(config.files.js.map(buildJS)).catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

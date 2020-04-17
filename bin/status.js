@@ -21,7 +21,7 @@ const main = async () => {
 	await runCommand(git, ["commit", "--message=Update status"]);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

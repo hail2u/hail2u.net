@@ -8,7 +8,7 @@ const setupRelativeTime = () => {
 		1000 * 60 * 60 * 3,
 		1000 * 60 * 2,
 		1000 * 1
-	].forEach(diff => {
+	].forEach((diff) => {
 		const time = document.createElement("time");
 		time.classList.add("js-relative-time");
 		const dt = new Date(now - diff);

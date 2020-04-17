@@ -38,7 +38,7 @@ const main = async () => {
 		which("git")
 	]);
 
-	if (books.find(book => argv.asin === book.asin)) {
+	if (books.find((book) => argv.asin === book.asin)) {
 		throw new Error(`${argv.title} has already been added.`);
 	}
 
@@ -60,7 +60,7 @@ const main = async () => {
 	await runCommand(git, ["commit", `--message=Read ${argv.asin}`]);
 };
 
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });

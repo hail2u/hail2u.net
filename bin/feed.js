@@ -6,7 +6,7 @@ import mustache from "mustache";
 import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const toAbsoluteURL = url => {
+const toAbsoluteURL = (url) => {
 	if (url.startsWith("/")) {
 		return `https://hail2u.net${url}`;
 	}
@@ -16,7 +16,7 @@ const toAbsoluteURL = url => {
 
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
-const extendArticle = async article => {
+const extendArticle = async (article) => {
 	const body = await fs.readFile(path.join(config.src.root, article.link), "utf8");
 	const description = unescapeReferences(body.replace(/<.*?>/g, ""))
 		.trim()
@@ -37,9 +37,9 @@ const readArticles = async () => {
 		.map(extendArticle));
 };
 
-const hasPublished = book => book.published;
+const hasPublished = (book) => book.published;
 
-const extendBook = book => {
+const extendBook = (book) => {
 	const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
 	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
 	return {
@@ -59,7 +59,7 @@ const readBooks = async () => {
 		.map(extendBook);
 };
 
-const extendDocument = document => ({
+const extendDocument = (document) => ({
 	...document,
 	type: "document"
 });
@@ -71,7 +71,7 @@ const readDocuments = async () => {
 		.map(extendDocument);
 };
 
-const extendLink = link => ({
+const extendLink = (link) => ({
 	...link,
 	description: link.url,
 	link: link.url,
@@ -85,7 +85,7 @@ const readLinks = async () => {
 		.map(extendLink);
 };
 
-const isPhoto = filename => {
+const isPhoto = (filename) => {
 	if (path.extname(filename) === ".jpg") {
 		return true;
 	}
@@ -93,12 +93,12 @@ const isPhoto = filename => {
 	return false;
 };
 
-const getPhotoDatetime = photo => {
+const getPhotoDatetime = (photo) => {
 	const dt = path.basename(photo, ".jpg").split("");
 	return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
 };
 
-const extendPhoto = photo => {
+const extendPhoto = (photo) => {
 	const link = `/img/photos/${photo}`;
 	const image = toAbsoluteURL(link);
 	return {
@@ -111,7 +111,7 @@ const extendPhoto = photo => {
 	};
 };
 
-const hasValidDate = photo => !Number.isNaN(photo.published);
+const hasValidDate = (photo) => !Number.isNaN(photo.published);
 
 const listPhotos = async () => {
 	const photos = await fs.readdir(config.src.photos);
@@ -124,7 +124,7 @@ const listPhotos = async () => {
 		.filter(hasValidDate);
 };
 
-const extendStatus = status => ({
+const extendStatus = (status) => ({
 	...status,
 	description: status.text,
 	link: `/statuses/#on-${status.published}`,
@@ -154,7 +154,7 @@ const isValidType = (type, item) => {
 	return false;
 };
 
-const extendItem = item => {
+const extendItem = (item) => {
 	const dt = getDateDetails(new Date(item.published));
 	return {
 		...item,
@@ -214,7 +214,7 @@ const main = async () => {
 };
 
 mustache.escape = escapeCharacters;
-main().catch(e => {
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });
