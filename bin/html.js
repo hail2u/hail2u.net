@@ -24,7 +24,7 @@ const extendArticle = async (article, i, articles) => {
 		return {
 			...article,
 			...dt,
-			body: body,
+			body: body.trim(),
 			description: description,
 			isArticle: true
 		};
@@ -34,7 +34,7 @@ const extendArticle = async (article, i, articles) => {
 	return {
 		...article,
 		...dt,
-		body: body,
+		body: body.trim(),
 		description: description,
 		isArticle: true,
 		previous: {
