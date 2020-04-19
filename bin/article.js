@@ -88,6 +88,18 @@ const checkSelectedName = name => {
 	return true;
 };
 
+const checkSelectedNameConflict = name => fs.access(path.join(config.src.articles, `${name}.html`))
+	.then(() => {
+		throw new Error("The name of this draft is already used. A draft name must be unique.");
+	})
+	.catch(err => {
+		if (err.code === "ENOENT") {
+			return true;
+		}
+
+		throw err;
+	});
+
 const checkSelectedTitle = title => {
 	if (typeof title !== "string") {
 		throw new Error("This draft does not have a valid title. A draft title must be a string.");
@@ -178,6 +190,7 @@ const main = async () => {
 	const selected = await selectDraft(drafts);
 	await Promise.all([
 		checkSelectedName(selected.name),
+		checkSelectedNameConflict(selected.name),
 		checkSelectedTitle(selected.title),
 		checkSelectedTitleLength(selected.title)
 	]);
