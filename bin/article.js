@@ -15,11 +15,11 @@ const getDraft = async filename => {
 	const content = await fs.readFile(src, "utf8");
 	const [title, ...rest] = content.split("\n");
 	const body = rest.join("\n")
+		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/")
-		.replace(/^<aside>/, '<aside class="hang">')
+		.replace(/^<aside>/, '<aside class="affiliate">')
 		.replace(/^<figure>/, '<figure class="hero">')
-		.replace(/<h2>/g, '<h2 class="subheading">')
-		.trim();
+		.replace(/<h2>/g, '<h2 class="subheading">');
 	return {
 		body: `${body}`,
 		name: path.basename(src, path.extname(src)),
