@@ -1,6 +1,6 @@
 window.addEventListener("load", () => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
-	const getComponentLuminance = color => {
+	const getComponentLuminance = (color) => {
 		const sRGB = color / 255;
 
 		if (sRGB <= 0.03928) {

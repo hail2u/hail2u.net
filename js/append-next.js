@@ -1,4 +1,4 @@
-const showNext = event => {
+const showNext = (event) => {
 	const template = document.querySelector(".js-append-next");
 	const button = template.content.querySelector("button");
 

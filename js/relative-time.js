@@ -1,4 +1,4 @@
-const toRelativeTime = dt => {
+const toRelativeTime = (dt) => {
 	const divisor = {
 		day: 24,
 		hour: 60,
