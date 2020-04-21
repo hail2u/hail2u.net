@@ -18,8 +18,7 @@ const getDraft = async (filename) => {
 		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/")
 		.replace(/^<aside>/, '<aside class="affiliate">')
-		.replace(/^<figure>/, '<figure class="hero">')
-		.replace(/<h2>/g, '<h2 class="subheading">');
+		.replace(/^<figure>/, '<figure class="hero">');
 	return {
 		body: `${body}`,
 		name: path.basename(src, path.extname(src)),
