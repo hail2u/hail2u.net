@@ -172,8 +172,7 @@ const contributeSelected = async (selected) => {
 		}, ...cache])
 	]);
 	await Promise.all([
-		runCommand(git, ["add", "--", articlePath]),
-		runCommand(git, ["add", "--", config.data.articles]),
+		runCommand(git, ["add", "--", articlePath, config.data.articles]),
 		runCommand(node, ["bin/html.js", `--article=${config.dest.articles}${selected.name}.html`])
 	]);
 	return runCommand(git, ["commit", `--message=Contribute ${selected.name}${getArticleTotal(cache)}`]);
