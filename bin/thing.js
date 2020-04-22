@@ -24,6 +24,8 @@ const addFollowing = async (feed, title, url) => {
 	return commit(config.data.followings, `Follow ${url}`);
 };
 
+const isReadBook = (asin, book) => asin === book.asin;
+
 const addBook = async (asin, title) => {
 	if (!/^[A-Z0-9]{10}$/i.test(asin)) {
 		throw new Error("ASIN must be 10 alphanumeric characters.");
@@ -37,7 +39,7 @@ const addBook = async (asin, title) => {
 		readJSONFile(config.data.books)
 	]);
 
-	if (books.find((book) => asin === book.asin)) {
+	if (books.find(isReadBook.bind(null, asin))) {
 		throw new Error(`${asin} has already been added.`);
 	}
 

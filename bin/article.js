@@ -52,6 +52,8 @@ const listDrafts = async (isTest) => {
 	return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
 };
 
+const toMenuitem = (draft, i) => `${i + 1}. ${draft.title}`;
+
 const selectDraft = (drafts) => new Promise((resolve) => {
 	process.stdin.isTTY = true;
 	process.stdout.isTTY = true;
@@ -59,11 +61,10 @@ const selectDraft = (drafts) => new Promise((resolve) => {
 		input: process.stdin,
 		output: process.stdout
 	});
-	menu.write("0. QUIT\n");
-	drafts.forEach((n, i) => {
-		menu.write(`${i + 1}. ${n.title}
+	const menuitems = drafts.map(toMenuitem).join("\n");
+	menu.write(`0. QUIT
+${menuitems}
 `);
-	});
 	menu.question("Which one: (0) ", (a = 0) => {
 		menu.close();
 		const answer = Number.parseInt(a, 10);
@@ -88,17 +89,24 @@ const checkSelectedName = (name) => {
 	return true;
 };
 
-const checkSelectedNameConflict = (name) => fs.access(path.join(config.src.articles, `${name}.html`))
-	.then(() => {
-		throw new Error("The name of this draft is already used. A draft name must be unique.");
-	})
-	.catch((err) => {
-		if (err.code === "ENOENT") {
-			return true;
-		}
+const handleConflict = () => {
+	throw new Error("The name of this draft is already used. A draft name must be unique.");
+};
 
-		throw err;
-	});
+const handleNotConflict = (e) => {
+	if (e.code === "ENOENT") {
+		return true;
+	}
+
+	throw e;
+};
+
+const checkSelectedNameConflict = (name) => {
+	const filename = path.join(config.src.articles, `${name}.html`);
+	return fs.access(filename)
+		.then(handleConflict)
+		.catch(handleNotConflict);
+};
 
 const checkSelectedTitle = (title) => {
 	if (typeof title !== "string") {
