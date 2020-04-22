@@ -131,7 +131,7 @@ const main = () => {
 			return addPhoto(argv._[0]);
 		}
 
-		return addStatus(file);
+		return addStatus(argv._[0]);
 	}
 
 	throw new Error(`Invalid arguemnts:
