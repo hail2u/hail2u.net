@@ -1,6 +1,6 @@
 import CleanCSS from "clean-css";
 import config from "./index.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import getVersion from "../lib/get-version.js";
 
 const minifier = new CleanCSS({

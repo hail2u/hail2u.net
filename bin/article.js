@@ -1,5 +1,5 @@
 import config from "./index.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import highlight from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";

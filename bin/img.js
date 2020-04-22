@@ -1,5 +1,5 @@
 import config from "./index.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
 import toIco from "to-ico";

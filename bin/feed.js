@@ -1,6 +1,6 @@
 import config from "./index.js";
 import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
 import mustache from "mustache";
 import path from "path";

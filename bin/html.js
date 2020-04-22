@@ -1,7 +1,7 @@
 import config from "./index.js";
 import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
 import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
 import highlight from "../lib/highlight.js";
 import minimist from "minimist";

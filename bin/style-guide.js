@@ -1,5 +1,5 @@
 import config from "./index.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 
 const main = async () => {
 	const html = await fs.readFile(config.src.styleGuide, "utf8");

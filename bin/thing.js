@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "./index.js";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
 import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
