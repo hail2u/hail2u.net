@@ -8,12 +8,6 @@ import runCommand from "../lib/run-command.js";
 import sharp from "sharp";
 import which from "which";
 
-const commit = async (file, message) => {
-	const git = await which("git");
-	await runCommand(git, ["add", "--", file]);
-	await runCommand(git, ["commit", `--message=${message}`]);
-};
-
 const addFollowing = async (feed, title, url) => {
 	const followings = await readJSONFile(config.data.followings);
 	await writeJSONFile(config.data.followings, [{
@@ -21,7 +15,7 @@ const addFollowing = async (feed, title, url) => {
 		title: title,
 		url: url
 	}, ...followings]);
-	return commit(config.data.followings, `Follow ${url}`);
+	return [config.data.followings, `Follow ${url}`];
 };
 
 const isReadBook = (asin, book) => asin === book.asin;
@@ -52,7 +46,7 @@ const addBook = async (asin, title) => {
 		title: title,
 		width: metadata.width
 	}, ...books]);
-	return commit(config.data.books, `Read ${asin}`);
+	return [config.data.books, `Read ${asin}`];
 };
 
 const addLink = async (title, url) => {
@@ -62,7 +56,7 @@ const addLink = async (title, url) => {
 		title: title,
 		url: url
 	}, ...links]);
-	return commit(config.data.links, `Bookmark ${url}`);
+	return [config.data.links, `Bookmark ${url}`];
 };
 
 const addPhoto = async (photo) => {
@@ -85,7 +79,7 @@ const addPhoto = async (photo) => {
 		fs.copyFile(src, dest),
 		fs.unlink(photo)
 	]);
-	return commit(src, `Add ${fn}`);
+	return [src, `Add ${fn}`];
 };
 
 const addStatus = async (status) => {
@@ -94,10 +88,45 @@ const addStatus = async (status) => {
 		published: Date.now(),
 		text: status
 	}, ...statuses]);
-	return commit(config.data.statuses, "Update status");
+	return [config.data.statuses, "Update status"];
 };
 
-const main = () => {
+const addThing = ({ asin, feed, title, url, _: remains }) => {
+	if (feed && title && url) {
+		return addFollowing(feed, title, url);
+	}
+
+	if (asin && title) {
+		return addBook(asin, title);
+	}
+
+	if (title && url) {
+		return addLink(title, url);
+	}
+
+	if (remains.length === 1) {
+		const file = remains[0].toLowerCase();
+
+		if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
+			return addPhoto(remains[0]);
+		}
+
+		return addStatus(remains[0]);
+	}
+
+	throw new Error(`Invalid arguemnts:
+  ${process.argv}
+
+To add:
+  A book:      $ node thing.js --asin <ASIN> --title <TITLE>
+  A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
+	A link:      $ node thins.js --title <TITLE> --url <URL>
+	A photo:     $ node thing.js <FILE>
+	A status:    $ node thing.js <TEXT>
+`);
+};
+
+const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
 			a: "asin",
@@ -113,39 +142,12 @@ const main = () => {
 		},
 		string: ["asin", "feed", "title", "url"]
 	});
-
-	if (argv.feed && argv.title && argv.url) {
-		return addFollowing(argv.feed, argv.title, argv.url);
-	}
-
-	if (argv.asin && argv.title) {
-		return addBook(argv.asin, argv.title);
-	}
-
-	if (argv.title && argv.url) {
-		return addLink(argv.title, argv.url);
-	}
-
-	if (argv._.length === 1) {
-		const file = argv._[0].toLowerCase();
-
-		if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
-			return addPhoto(argv._[0]);
-		}
-
-		return addStatus(argv._[0]);
-	}
-
-	throw new Error(`Invalid arguemnts:
-  ${process.argv}
-
-To add:
-  A book:      $ node thing.js --asin <ASIN> --title <TITLE>
-  A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
-	A link:      $ node thins.js --title <TITLE> --url <URL>
-	A photo:     $ node thing.js <FILE>
-	A status:    $ node thing.js <TEXT>
-`);
+	const [git, [file, message]] = await Promise.all([
+		which("git"),
+		addThing(argv)
+	]);
+	await runCommand(git, ["add", "--", file]);
+	await runCommand(git, ["commit", `--message=${message}`]);
 };
 
 main().catch((e) => {
