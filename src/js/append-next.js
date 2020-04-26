@@ -7,7 +7,7 @@ const showNext = (event) => {
 	}
 
 	template.parentNode.insertBefore(template.content, template);
-	template.remove();
+	template.parentNode.removeChild(template);
 	const self = event.target;
 	self.parentNode.hidden = true;
 };

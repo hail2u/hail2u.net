@@ -5,7 +5,7 @@ const showSiteSearchForm = () => {
 		query.value = `${query.value} site:hail2u.net`;
 	});
 	template.parentNode.insertBefore(template.content, template);
-	template.remove();
+	template.parentNode.removeChild(template);
 	const fallback = document.querySelector(".js-site-search-fallback");
 	fallback.textContent = fallback.dataset.normal;
 };
