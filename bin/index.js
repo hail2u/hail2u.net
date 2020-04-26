@@ -91,9 +91,9 @@ export default {
 		],
 		html: [
 			{
-				dest: "dist/bookshelf/log.html",
-				json: "src/bookshelf/index.json",
-				src: "src/bookshelf/log.mustache"
+				dest: "dist/blog/index.html",
+				json: "src/blog/index.json",
+				src: "src/blog/index.mustache"
 			},
 			{
 				dest: "dist/bookshelf/index.html",
@@ -101,9 +101,14 @@ export default {
 				src: "src/bookshelf/index.mustache"
 			},
 			{
-				dest: "dist/blog/index.html",
-				json: "src/blog/index.json",
-				src: "src/blog/index.mustache"
+				dest: "dist/bookshelf/log.html",
+				json: "src/bookshelf/index.json",
+				src: "src/bookshelf/log.mustache"
+			},
+			{
+				dest: "dist/CNAME",
+				json: "src/index.json",
+				src: "src/cname.mustache"
 			},
 			{
 				dest: "dist/documents/index.html",
@@ -126,14 +131,19 @@ export default {
 				src: "src/mysubscriptions.mustache"
 			},
 			{
+				dest: "dist/photos/index.html",
+				json: "src/photos/index.json",
+				src: "src/photos/index.mustache"
+			},
+			{
 				dest: "dist/photos/log.html",
 				json: "src/photos/index.json",
 				src: "src/photos/log.mustache"
 			},
 			{
-				dest: "dist/photos/index.html",
-				json: "src/photos/index.json",
-				src: "src/photos/index.mustache"
+				dest: "dist/robots.txt",
+				json: "src/index.json",
+				src: "src/robots.mustache"
 			},
 			{
 				dest: "dist/sitemap.xml",
