@@ -1,4 +1,4 @@
-import config from "./index.js";
+import config from "./config.js";
 import fs from "fs/promises";
 
 const main = async () => {

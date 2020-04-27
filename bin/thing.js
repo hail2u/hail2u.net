@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "./index.js";
+import config from "./config.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";

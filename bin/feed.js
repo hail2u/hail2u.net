@@ -1,4 +1,4 @@
-import config from "./index.js";
+import config from "./config.js";
 import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
 import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
