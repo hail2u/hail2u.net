@@ -183,7 +183,7 @@ export default {
 				width: 128
 			},
 			{
-				dest: "dist/apple-touch-icon-precomposed.png",
+				dest: "dist/apple-touch-icon.png",
 				src: "src/img/icon.svg",
 				width: 180
 			}
