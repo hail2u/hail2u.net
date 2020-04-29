@@ -313,7 +313,7 @@ const shuffleArray = (array) => {
 	return shuffled;
 };
 
-const buildHTML = async (metadata, partials, file) => {
+const build = async (metadata, partials, file) => {
 	const [data, template] = await Promise.all([
 		mergeData(file.json, file.dest, metadata),
 		fs.readFile(file.src, "utf8")
@@ -397,7 +397,7 @@ const main = async () => {
 	metadata.version = version;
 
 	if (argv.article) {
-		return buildHTML(metadata, partials, {
+		return build(metadata, partials, {
 			dest: argv.article,
 			json: config.data.article,
 			src: config.src.article
@@ -406,10 +406,10 @@ const main = async () => {
 
 	if (argv.articles) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
-		return Promise.all(articleFiles.map(buildHTML.bind(null, metadata, partials)));
+		return Promise.all(articleFiles.map(build.bind(null, metadata, partials)));
 	}
 
-	return Promise.all(config.files.html.map(buildHTML.bind(null, metadata, partials)));
+	return Promise.all(config.files.txt.map(build.bind(null, metadata, partials)));
 };
 
 mustache.escape = escapeCharacters;

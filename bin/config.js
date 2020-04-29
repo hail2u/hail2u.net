@@ -89,7 +89,65 @@ export default {
 				]
 			}
 		],
-		html: [
+		icon: [
+			{
+				dest: "tmp/favicon-16.png",
+				src: "src/img/icon-small.svg",
+				width: 16
+			},
+			{
+				dest: "tmp/favicon-24.png",
+				src: "src/img/icon-small.svg",
+				width: 24
+			},
+			{
+				dest: "tmp/favicon-32.png",
+				src: "src/img/icon-small.svg",
+				width: 32
+			},
+			{
+				dest: "tmp/favicon-48.png",
+				src: "src/img/icon.svg",
+				width: 48
+			},
+			{
+				dest: "tmp/favicon-128.png",
+				src: "src/img/icon.svg",
+				width: 128
+			},
+			{
+				dest: "dist/apple-touch-icon.png",
+				src: "src/img/icon.svg",
+				width: 180
+			}
+		],
+		js: [
+			{
+				dest: "dist/js/append-next.{{version}}.js",
+				src: "src/js/append-next.js"
+			},
+			{
+				dest: "dist/js/back-to-top.{{version}}.js",
+				src: "src/js/back-to-top.js"
+			},
+			{
+				dest: "dist/js/random-link.{{version}}.js",
+				src: "src/js/random-link.js"
+			},
+			{
+				dest: "dist/js/relative-time.{{version}}.js",
+				src: "src/js/relative-time.js"
+			},
+			{
+				dest: "dist/js/site-search.{{version}}.js",
+				src: "src/js/site-search.js"
+			},
+			{
+				dest: "dist/js/unutm.{{version}}.js",
+				src: "src/js/unutm.js"
+			}
+		],
+		txt: [
 			{
 				dest: "dist/blog/index.html",
 				json: "src/blog/index.json",
@@ -154,64 +212,6 @@ export default {
 				dest: "dist/statuses/index.html",
 				json: "src/statuses/index.json",
 				src: "src/statuses/index.mustache"
-			}
-		],
-		icon: [
-			{
-				dest: "tmp/favicon-16.png",
-				src: "src/img/icon-small.svg",
-				width: 16
-			},
-			{
-				dest: "tmp/favicon-24.png",
-				src: "src/img/icon-small.svg",
-				width: 24
-			},
-			{
-				dest: "tmp/favicon-32.png",
-				src: "src/img/icon-small.svg",
-				width: 32
-			},
-			{
-				dest: "tmp/favicon-48.png",
-				src: "src/img/icon.svg",
-				width: 48
-			},
-			{
-				dest: "tmp/favicon-128.png",
-				src: "src/img/icon.svg",
-				width: 128
-			},
-			{
-				dest: "dist/apple-touch-icon.png",
-				src: "src/img/icon.svg",
-				width: 180
-			}
-		],
-		js: [
-			{
-				dest: "dist/js/append-next.{{version}}.js",
-				src: "src/js/append-next.js"
-			},
-			{
-				dest: "dist/js/back-to-top.{{version}}.js",
-				src: "src/js/back-to-top.js"
-			},
-			{
-				dest: "dist/js/random-link.{{version}}.js",
-				src: "src/js/random-link.js"
-			},
-			{
-				dest: "dist/js/relative-time.{{version}}.js",
-				src: "src/js/relative-time.js"
-			},
-			{
-				dest: "dist/js/site-search.{{version}}.js",
-				src: "src/js/site-search.js"
-			},
-			{
-				dest: "dist/js/unutm.{{version}}.js",
-				src: "src/js/unutm.js"
 			}
 		]
 	},
