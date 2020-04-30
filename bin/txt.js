@@ -255,7 +255,6 @@ const mergeData = async (extradataFile, dest, metadata) => {
 			...article,
 			canonical: article.link,
 			cover: cover,
-			shortTitle: article.title,
 			twitterCard: twitterCard
 		};
 	}

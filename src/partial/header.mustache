@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="{{encoding}}">
 
-		<title>{{^isHome}}{{shortTitle}} - {{/isHome}}{{siteTitle}}</title>
+		<title>{{^isHome}}{{title}} - {{/isHome}}{{siteTitle}}</title>
 
 		<meta content="light dark" name="color-scheme">
 		<meta content="{{description}}" name="description">
@@ -24,17 +24,15 @@
 
 		<meta content="{{description}}" itemprop="description">
 		<link href="{{cover}}" itemprop="image">
-		<meta content="{{#isHome}}{{siteTitle}}{{/isHome}}{{^isHome}}{{shortTitle}}{{/isHome}}" itemprop="name">
+		<meta content="{{#isHome}}{{siteTitle}}{{/isHome}}{{^isHome}}{{title}}{{/isHome}}" itemprop="name">
 		<link href="{{canonical}}" itemprop="url">
 
 		<meta content="{{description}}" property="og:description">
 		<meta content="{{scheme}}://{{domain}}{{cover}}" property="og:image">
-		<meta content="{{#isHome}}{{siteTitle}}{{/isHome}}{{^isHome}}{{shortTitle}}{{/isHome}}" property="og:title">
+		<meta content="{{#isHome}}{{siteTitle}}{{/isHome}}{{^isHome}}{{title}}{{/isHome}}" property="og:title">
 		<meta content="{{ogType}}" property="og:type">
 		<meta content="{{scheme}}://{{domain}}{{canonical}}" property="og:url">
-		{{#isWeblogArticle}}
-			<meta content="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00" property="article:published_time">
-		{{/isWeblogArticle}}
+		{{#isWeblogArticle}}<meta content="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00" property="article:published_time">{{/isWeblogArticle}}
 
 		<meta content="{{twitterCard}}" name="twitter:card">
 		<meta content="@{{twitterUsername}}" name="twitter:site">
@@ -42,11 +40,13 @@
 
 	<body>
 		<header class="header">
-			<nav class="navigation">
-				{{#isHome}}
-					<h1 class="logo">{{siteTitle}}</h1>
-				{{/isHome}}
+			{{#isWeblogArticle}}
+				<p class="metaline"><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00" itemprop="datePublished">{{year}}年{{month}}月{{date}}日</time></p>
+			{{/isWeblogArticle}}
 
+			<h1 class="tagline"{{#tagline}} title="{{{tagline}}}"{{/tagline}}>{{#isHome}}{{siteTitle}}{{/isHome}}{{^isHome}}{{title}}{{/isHome}}</h1>
+
+			<nav class="navigation">
 				{{^isHome}}
 					<div class="logo"><a href="/">{{siteTitle}}</a></div>
 				{{/isHome}}
@@ -61,22 +61,6 @@
 					<li><a href="https://duckduckgo.com/?q=site%3A{{domain}}" aria-label="検索">🔍</a></li>
 				</ul>
 			</nav>
-
-			{{#tagline}}
-				{{#isHome}}
-					<p class="tagline">—{{{tagline}}}</p>
-				{{/isHome}}
-
-				{{^isHome}}
-					<h1 class="tagline" title="{{{tagline}}}">{{shortTitle}}</h1>
-				{{/isHome}}
-			{{/tagline}}
-
-			{{#isWeblogArticle}}
-				<p class="metaline"><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00" itemprop="datePublished">{{year}}年{{month}}月{{date}}日</time></p>
-
-				<h1 class="tagline">{{title}}</h1>
-			{{/isWeblogArticle}}
 		</header>
 
 		<main class="content"{{#isWeblogArticle}} itemprop="articleBody"{{/isWeblogArticle}}>
