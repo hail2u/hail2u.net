@@ -10,28 +10,29 @@
 		<meta content="width=device-width" name="viewport">
 
 		<link href="/blog/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="https://kyonagashima.com/" rel="author">
 		<link href="/blog/coding/grunt-multi-task-running-order.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.8.2.css" rel="stylesheet">
+		<link href="/css/main.9.9.1.css" rel="stylesheet">
 
-		<script async defer src="/js/unutm.9.8.2.js"></script>
-		<script async defer src="/js/back-to-top.9.8.2.js"></script>
+		<script async defer src="/js/unutm.9.9.1.js"></script>
+		<script async defer src="/js/back-to-top.9.9.1.js"></script>
 
 		<meta content="GruntのMultiタスクはまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。" itemprop="description">
-		<link href="/apple-touch-icon-precomposed.png" itemprop="image">
+		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="GruntのMultiタスクの実行順" itemprop="name">
 		<link href="/blog/coding/grunt-multi-task-running-order.html" itemprop="url">
 
 		<meta content="GruntのMultiタスクはまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。" property="og:description">
-		<meta content="https://hail2u.net/apple-touch-icon-precomposed.png" property="og:image">
+		<meta content="https://hail2u.net/apple-touch-icon.png" property="og:image">
 		<meta content="GruntのMultiタスクの実行順" property="og:title">
 		<meta content="article" property="og:type">
 		<meta content="https://hail2u.net/blog/coding/grunt-multi-task-running-order.html" property="og:url">
-			<meta content="2013-08-15T06:22:49+09:00" property="article:published_time">
+		<meta content="2013-08-15T06:22:49+09:00" property="article:published_time">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="@hail2u_" name="twitter:site">
@@ -39,6 +40,10 @@
 
 	<body>
 		<header class="header">
+				<p class="metaline"><time datetime="2013-08-15T06:22:49+09:00" itemprop="datePublished">2013年8月15日</time></p>
+
+			<h1 class="tagline">GruntのMultiタスクの実行順</h1>
+
 			<nav class="navigation">
 					<div class="logo"><a href="/">Hail2u</a></div>
 
@@ -49,21 +54,14 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
+					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net" aria-label="検索">🔍</a></li>
 				</ul>
 			</nav>
-
 		</header>
 
-		<main class="content">
+		<main class="content" itemprop="articleBody">
 
-<article>
-	<header>
-		<p class="metaline"><time datetime="2013-08-15T06:22:49+09:00" itemprop="datePublished">2013年8月15日</time></p>
-
-		<h1 class="headline">GruntのMultiタスクの実行順</h1>
-	</header>
-
-	<div itemprop="articleBody"><p><a href="http://gruntjs.com/creating-tasks#multi-tasks">GruntのMultiタスク</a>はまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。</p>
+<p><a href="http://gruntjs.com/creating-tasks#multi-tasks">GruntのMultiタスク</a>はまとめて実行モードだと書いた順に動くようなので、いちいちターゲット指定しなくても良さそうと勝手に考えていた。一応は本当に書いた順で実行されることが保証されてるのか気になってはいたので、ちゃんとソースを読んでみたところ、どうも保証されないようだ。</p>
 
 <p><a href="https://github.com/gruntjs/grunt/blob/71e631c054cb073dc9d81b911694b4e62eb9dc98/lib/grunt/task.js#L281-L295">GruntのMultiタスクの一括実行</a>は<code>Object.keys</code>で返ってくる配列を<code>forEach()</code>してその中で各ターゲットを実行している。なので実行環境である<a href="http://nodejs.org/">Node.js</a>というか、それで使われているV8がそれらをどう解釈するかに依存していることになる。そして<a href="https://code.google.com/p/v8/issues/detail?id=164">V8では<code>Object.keys</code>で返ってくる配列（や<code>for...in</code>の順番）が勝手にソートされるケース</a>があることもわかった。</p>
 
@@ -109,12 +107,7 @@ Done, without errors.</samp></pre>
 
 <hr>
 
-<p>アルファベット始まりならば経験上は書いた順に実行されてたので、横着して<code>concat</code>をチェインさせるのをターゲットを書く順番でごまかしてたけど止めた。タスクの実行順が重要な場合はMultiタスクの一括実行に期待せず、ひとつひとつターゲットを指定して書くようにしないと危険。</p></div>
-</article>
-
-	<nav class="subnavigation">
-		<p><a href="/blog/internet/for-28-minutes.html">28分間</a></p>
-	</nav>
+<p>アルファベット始まりならば経験上は書いた順に実行されてたので、横着して<code>concat</code>をチェインさせるのをターゲットを書く順番でごまかしてたけど止めた。タスクの実行順が重要な場合はMultiタスクの一括実行に期待せず、ひとつひとつターゲットを指定して書くようにしないと危険。</p>
 
 		</main>
 
@@ -122,13 +115,10 @@ Done, without errors.</samp></pre>
 			<ul class="footlinks">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net" aria-label="検索">🔍</a></li>
 				<li><a href="#top" aria-label="先頭に戻る">🔝</a></li>
 			</ul>
 
-			<address class="byline">
-				<p><a href="https://kyonagashima.com/">ながしまきょう</a></p>
-			</address>
+			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 		</footer>
 	</body>
 </html>
