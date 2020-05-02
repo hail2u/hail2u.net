@@ -14,6 +14,100 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[雑記記事（このページとか）でarticle要素を使わないようにした。他のインデックス・ページでタグラインが入っているところに雑記記事のタイトルが入り、main要素にitemprop=articleBodyを割り当て、その直下に記事本文がくる。]]></description>
+				<link>https://hail2u.net/blog/removing-article-element-from-blog-articles.html</link>
+				<pubDate>Sat, 2 May 2020 09:21:10 +0900</pubDate>
+				<title><![CDATA[雑記記事からarticle要素を削除]]></title>
+
+					<content:encoded><![CDATA[<p>雑記記事（このページとか）で<code>article</code>要素を使わないようにした。他のインデックス・ページでタグラインが入っているところに雑記記事のタイトルが入り、<code>main</code>要素に<code>itemprop=articleBody</code>を割り当て、その直下に記事本文がくる。</p>
+
+<p>多くのブログでは記事ページだと、最重要な見出しがロゴだったりする。そこはやはり記事のタイトルであった方がよいし、あるべきだと思う。それを改善するために<a href="https://hail2u.net/blog/version-nine-point-three-point-two.html">トリッキーな構造</a>にしたけど、これはこれでセクショニング・ルートが見出しなしになってしまう。</p>
+
+<ul>
+	<li><code>body</code>要素
+		<ul>
+			<li><code>header</code>要素
+				<ul>
+					<li>ナビゲーション
+						<ul>
+							<li>ロゴ</li>
+							<li>各ページへのメニュー</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li><code>main</code>要素
+				<ul>
+					<li><code>article</code>要素
+						<ul>
+							<li><code>header</code>要素
+								<ul>
+									<li>記事投稿日時</li>
+									<li>記事タイトル</li>
+								</ul>
+							</li>
+							<li><code>itemprop=articleBody</code>
+								<ul>
+									<li>記事本文</li>
+								</ul>
+							</li>
+							<li>前の記事へのナビゲーション</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li><code>footer</code>要素
+				<ul>
+					<li>雑多なリンク</li>
+					<li>名前</li>
+				</ul>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+<p>そこで記事のタイトルをヘッダーに持っていった。そうなると、今度は<code>article</code>要素が見出しなしになるし、<code>main</code>要素以下にセクションがひとつだけにもなるので、えいやっと消した。</p>
+
+<ul>
+	<li><code>body</code>要素
+		<ul>
+			<li><code>header</code>要素
+				<ul>
+					<li>記事投稿日時</li>
+					<li>記事タイトル</li>
+					<li>ナビゲーション
+						<ul>
+							<li>ロゴ</li>
+							<li>各ページへのメニュー</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li><code>main</code>要素
+				<ul>
+					<li>記事本文</li>
+					<li>前の記事へのナビゲーション</li>
+				</ul>
+			</li>
+			<li><code>footer</code>要素
+				<ul>
+					<li>雑多なリンク</li>
+					<li>名前</li>
+				</ul>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+<p><code>article</code>要素だけでなく、記事タイトルなどをまとめて格納していた<code>header</code>要素や<code>itemprop=articleBody</code>のためだけの<code>div</code>要素もなくなる。ほぼ独立したウェブページとしての構造になって、異様にすっきりとした。<code>body</code>要素以下をどこかの<code>section</code>要素にそのまま持って行ってもほぼ通用する。</p>
+
+<hr>
+
+<p>このあたりの文書アウトラインを考えていたら、<code>header</code>要素の先頭に<code>nav</code>要素があって、その後に<code>h1</code>要素が来ると、仕様で言われる(Untitled Page)とかバリデーターで言われる[body element with no heading]になってしまうことを、突然、思い出した。全ページ共通の問題だった。ここら辺もちゃんと直した（つもり）。見た目の順序はFlexboxに頼っている。</p>
+
+<p>これでv9.9系ということになる。他にはGoogle Closure CompilerからBabelになったりした。別にちょっと書く。またCNAMEファイルやrobots.txtファイルもMustache経由で生成するようにしたりも。ドメインを変える予定はないけど。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[Blogrollのようなものを作るだけだったのに、作業がとりとめなく広がってしまった。一時、こっちじゃない方のドメインで公開したけど、あそこではないような気がしたので、まずは参照ページの一番最後にずらっと置いた。並び順はHTMLが生成されるたびにシャッフルされる。]]></description>
 				<link>https://hail2u.net/blog/adding-followings-to-links.html</link>
 				<pubDate>Wed, 29 Apr 2020 10:59:30 +0900</pubDate>
@@ -171,18 +265,6 @@
 <p>と、思ったらどうもゆっくりやるものらしい。80回というのは、左右の上下がそれぞれ1回で数えるので、上り下りを20セットということみたいだ。どうりで辛いわけだし、すごい頑張っても40くらいなわけだ。</p>
 
 <p>料理のレシピもそうだけど、文字と写真だと誤解する余地が大きい。動画の威力はすごいなと改めて思ったし、撮りだめしてあるきょうの料理ビギナーズでもずっと眺めよう。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[小麦粉がなくなったと思って買ってきたら、ストックがあった。しょうがないので、蒸しパン、ホットケーキ、スコーンと連続で焼き、体重というものを得た。その後スーパーへ行った時に小麦粉の並んでいる棚の前を通ったら、ほとんど売り切れだった。いろいろなものが突然流行るので驚く。事前に購入してあって先見の明があったような、ふんだんに使ってしまってなかったような。]]></description>
-				<link>https://hail2u.net/blog/with-flour-20200411.html</link>
-				<pubDate>Sat, 11 Apr 2020 09:09:21 +0900</pubDate>
-				<title><![CDATA[小麦粉で]]></title>
-
-					<content:encoded><![CDATA[<p>小麦粉がなくなったと思って買ってきたら、ストックがあった。しょうがないので、蒸しパン、ホットケーキ、スコーンと連続で焼き、体重というものを得た。その後スーパーへ行った時に小麦粉の並んでいる棚の前を通ったら、ほとんど売り切れだった。いろいろなものが突然流行るので驚く。事前に購入してあって先見の明があったような、ふんだんに使ってしまってなかったような。</p>
-
-<p>久しぶりのホットケーキは、成功して3cmくらいの厚さに膨らんだ。ゆずジャムとバターを挟んで食べたら、この世のものと思えないおいしさ。これに勝てるのは、トラがギーになるあの話のホットケーキくらいだろう。</p>
-
-<p>豆乳でスコーンを作ったら膨らまないし、まったくさっくりしていないものに仕上がった。ビスケットと乾パンの中間の食感だった。スコーンだと思わなければおいしい。やはり牛乳じゃないと難しいようだ。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
