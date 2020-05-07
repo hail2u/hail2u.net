@@ -5,7 +5,12 @@ import getVersion from "../lib/get-version.js";
 
 const minifier = new CleanCSS({
 	format: "beautify",
-	level: 0,
+	level: {
+		1: {
+			all: false,
+			specialComments: "all"
+		}
+	},
 	returnPromise: true
 });
 
