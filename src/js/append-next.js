@@ -13,5 +13,5 @@ const showNext = (event) => {
 };
 
 showNext({
-	target: document.querySelector(".js-append-next-fallback a")
+	target: document.querySelector(".js-append-next-fallback p")
 });
