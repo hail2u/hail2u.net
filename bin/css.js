@@ -1,26 +1,31 @@
-import CleanCSS from "clean-css";
 import config from "./config.js";
 import fs from "fs/promises";
 import getVersion from "../lib/get-version.js";
+import pcImport from "postcss-import";
+import postcss from "postcss";
+import removeComments from "../lib/postcss/remove-comments.js";
+import stylelint from "stylelint";
 
-const minifier = new CleanCSS({
-	format: "beautify",
-	level: {
-		1: {
-			all: false,
-			specialComments: "all"
-		}
-	},
-	returnPromise: true
-});
+const process = async (file) => {
+	const css = await fs.readFile(file, "utf8");
+	return postcss()
+		.use(pcImport)
+		.use(removeComments)
+		.use(stylelint({
+			fix: true
+		}))
+		.process(css, {
+			from: file
+		});
+};
 
 const buildCSS = async (file) => {
-	const [version, minified] = await Promise.all([
+	const [version, processed] = await Promise.all([
 		getVersion(),
-		minifier.minify([file.src])
+		process(file.src)
 	]);
 	const dest = file.dest.replace(/{{version}}/g, version);
-	await fs.writeFile(dest, minified.styles);
+	await fs.writeFile(dest, processed.css);
 };
 
 Promise.all(config.files.css.map(buildCSS)).catch((e) => {
