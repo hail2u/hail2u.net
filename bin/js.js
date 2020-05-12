@@ -4,14 +4,17 @@ import fs from "fs/promises";
 import getVersion from "../lib/get-version.js";
 
 const buildJS = async (file) => {
-	const [version, compiled] = await Promise.all([
+	const [
+		version,
+		compiled
+	] = await Promise.all([
 		getVersion(),
 		babel.transformFileAsync(file.src, {
-			presets: [
+			"presets": [
 				[
 					"@babel/preset-env",
 					{
-						targets: "defaults"
+						"targets": "defaults"
 					}
 				]
 			]

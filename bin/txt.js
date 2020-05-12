@@ -1,13 +1,13 @@
 import config from "./config.js";
 import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
-import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
+import {escapeCharacters, unescapeReferences} from "../lib/character-reference.js";
 import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
 import highlight from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
-import { readJSONFile } from "../lib/json-file.js";
+import {readJSONFile} from "../lib/json-file.js";
 import sharp from "sharp";
 import getVersion from "../lib/get-version.js";
 
@@ -24,22 +24,22 @@ const extendArticle = async (article, i, articles) => {
 		return {
 			...article,
 			...dt,
-			body: body.trim(),
-			description: description,
-			isArticle: true
+			"body": body.trim(),
+			"description": description,
+			"isArticle": true
 		};
 	}
 
-	const { link, title } = articles[i + 1];
+	const {link, title} = articles[i + 1];
 	return {
 		...article,
 		...dt,
-		body: body.trim(),
-		description: description,
-		isArticle: true,
-		previous: {
-			link: link,
-			title: title
+		"body": body.trim(),
+		"description": description,
+		"isArticle": true,
+		"previous": {
+			"link": link,
+			"title": title
 		}
 	};
 };
@@ -54,7 +54,7 @@ const extendBook = (book) => {
 	return {
 		...book,
 		...dt,
-		isBook: true
+		"isBook": true
 	};
 };
 
@@ -68,7 +68,7 @@ const extendDocument = (document) => {
 	return {
 		...document,
 		...dt,
-		isDocument: true
+		"isDocument": true
 	};
 };
 
@@ -82,7 +82,7 @@ const extendLink = (link) => {
 	return {
 		...link,
 		...dt,
-		isLink: true
+		"isLink": true
 	};
 };
 
@@ -108,21 +108,27 @@ const getPhotoDatetime = (photo) => {
 
 const getPhotoDimension = async (photo) => {
 	const metadata = await sharp(path.join(config.src.photos, photo)).metadata();
-	return [metadata.height, metadata.width];
+	return [
+		metadata.height,
+		metadata.width
+	];
 };
 
 const extendPhoto = async (photo) => {
 	const published = getPhotoDatetime(photo);
 	const dt = getDateDetails(new Date(published));
-	const [height, width] = await getPhotoDimension(photo);
+	const [
+		height,
+		width
+	] = await getPhotoDimension(photo);
 	return {
 		...dt,
-		filename: photo,
-		height: height,
-		isPhoto: true,
-		published: published,
-		url: `/img/photos/${photo}`,
-		width: width
+		"filename": photo,
+		"height": height,
+		"isPhoto": true,
+		"published": published,
+		"url": `/img/photos/${photo}`,
+		"width": width
 	};
 };
 
@@ -140,7 +146,7 @@ const extendStatus = (status) => {
 	return {
 		...status,
 		...dt,
-		isStatus: true
+		"isStatus": true
 	};
 };
 
@@ -169,10 +175,16 @@ const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
 const findCover = (image, defaultTwitterCard, defaultCover) => {
 	if (!image) {
-		return [defaultTwitterCard, defaultCover];
+		return [
+			defaultTwitterCard,
+			defaultCover
+		];
 	}
 
-	return ["summary_large_image", image[1]];
+	return [
+		"summary_large_image",
+		image[1]
+	];
 };
 
 const isFirstInMonth = (current, previous) => {
@@ -228,12 +240,12 @@ const markItem = (item, index, items) => {
 	const previousItem = items[index - 1];
 	return {
 		...item,
-		isFirstInMonth: isFirstInMonth(item, previousItem),
-		isFirstInYear: isFirstInYear(item, previousItem),
-		isLastInMonth: isLastInMonth(item, nextItem),
-		isLastInYear: isLastInYear(item, nextItem),
-		isLatest: isLatest(index),
-		isOldest: isOldest(item, nextItem)
+		"isFirstInMonth": isFirstInMonth(item, previousItem),
+		"isFirstInYear": isFirstInYear(item, previousItem),
+		"isLastInMonth": isLastInMonth(item, nextItem),
+		"isLastInYear": isLastInYear(item, nextItem),
+		"isLatest": isLatest(index),
+		"isOldest": isOldest(item, nextItem)
 	};
 };
 
@@ -253,9 +265,9 @@ const mergeData = async (extradataFile, dest, metadata) => {
 			...metadata,
 			...extradata,
 			...article,
-			canonical: article.link,
-			cover: cover,
-			twitterCard: twitterCard
+			"canonical": article.link,
+			"cover": cover,
+			"twitterCard": twitterCard
 		};
 	}
 
@@ -277,12 +289,12 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	return {
 		...metadata,
 		...extradata,
-		articles: articles,
-		books: books,
-		documents: documents,
-		links: links,
-		photos: photos,
-		statuses: statuses
+		"articles": articles,
+		"books": books,
+		"documents": documents,
+		"links": links,
+		"photos": photos,
+		"statuses": statuses
 	};
 };
 
@@ -299,21 +311,30 @@ const markFirstItem = (items) => {
 const shuffleArray = (array) => {
 	const shuffled = [...array];
 
-	for (let i = array.length - 1; i > 0; i = i - 1) {
+	for (let i = array.length - 1; i > 0; i -= 1) {
 		const j = Math.floor(Math.random() * (i + 1));
 
 		if (i === j) {
 			continue;
 		}
 
-		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+		[
+			shuffled[i],
+			shuffled[j]
+		] = [
+			shuffled[j],
+			shuffled[i]
+		];
 	}
 
 	return shuffled;
 };
 
 const build = async (metadata, partials, file) => {
-	const [data, template] = await Promise.all([
+	const [
+		data,
+		template
+	] = await Promise.all([
 		mergeData(file.json, file.dest, metadata),
 		fs.readFile(file.src, "utf8")
 	]);
@@ -348,20 +369,20 @@ const build = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = (article) => ({
-	dest: convertToPOSIXPath(path.join(config.dest.root, article.link)),
-	json: config.data.article,
-	src: config.src.article,
+	"dest": convertToPOSIXPath(path.join(config.dest.root, article.link)),
+	"json": config.data.article,
+	"src": config.src.article,
 	...article
 });
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		alias: {
-			A: "articles",
-			a: "article"
+		"alias": {
+			"A": "articles",
+			"a": "article"
 		},
-		boolean: ["articles"],
-		string: ["article"]
+		"boolean": ["articles"],
+		"string": ["article"]
 	});
 	const [
 		metadata,
@@ -397,9 +418,9 @@ const main = async () => {
 
 	if (argv.article) {
 		return build(metadata, partials, {
-			dest: argv.article,
-			json: config.data.article,
-			src: config.src.article
+			"dest": argv.article,
+			"json": config.data.article,
+			"src": config.src.article
 		});
 	}
 

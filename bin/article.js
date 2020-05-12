@@ -4,26 +4,29 @@ import highlight from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
-import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import {readJSONFile, writeJSONFile} from "../lib/json-file.js";
 import readline from "readline";
 import runCommand from "../lib/run-command.js";
-import { unescapeReferences } from "../lib/character-reference.js";
+import {unescapeReferences} from "../lib/character-reference.js";
 import which from "which";
 
 const getDraft = async (filename) => {
 	const src = path.join(config.src.drafts, filename);
 	const content = await fs.readFile(src, "utf8");
-	const [title, ...rest] = content.split("\n");
+	const [
+		title,
+		...rest
+	] = content.split("\n");
 	const body = rest.join("\n")
 		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/")
-		.replace(/^<aside>/, '<aside class="affiliate">')
-		.replace(/^<figure>/, '<figure class="hero">');
+		.replace(/^<aside>/, "<aside class=\"affiliate\">")
+		.replace(/^<figure>/, "<figure class=\"hero\">");
 	return {
-		body: `${body}`,
-		name: path.basename(src, path.extname(src)),
-		src: src,
-		title: unescapeReferences(title.replace(/<.*?>/g, ""))
+		"body": `${body}`,
+		"name": path.basename(src, path.extname(src)),
+		"src": src,
+		"title": unescapeReferences(title.replace(/<.*?>/g, ""))
 	};
 };
 
@@ -57,8 +60,8 @@ const selectDraft = (drafts) => new Promise((resolve) => {
 	process.stdin.isTTY = true;
 	process.stdout.isTTY = true;
 	const menu = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout
+		"input": process.stdin,
+		"output": process.stdout
 	});
 	const menuitems = drafts.map(toMenuitem).join("\n");
 	menu.write(`0. QUIT
@@ -82,7 +85,7 @@ ${menuitems}
 
 const checkSelectedName = (name) => {
 	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
-		throw new Error('This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".');
+		throw new Error("This draft does not have a valid name. A draft filename must start and end with \"a-z\" or \"0-9\" and must not contain other than \"-.a-z0-9\".");
 	}
 
 	return true;
@@ -166,31 +169,48 @@ const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 const contributeSelected = async (selected) => {
 	const articlePath = path.join(config.src.articles, `${selected.name}.html`);
 	const cache = await readJSONFile(config.data.articles);
-	const [git, node] = await Promise.all([
+	const [
+		git,
+		node
+	] = await Promise.all([
 		which("git"),
 		which("node"),
 		fs.unlink(selected.src),
 		copyArticleImages(selected.body),
 		fs.writeFile(articlePath, selected.body),
-		writeJSONFile(config.data.articles, [{
-			link: `/blog/${selected.name}.html`,
-			published: Date.now(),
-			title: selected.title
-		}, ...cache])
+		writeJSONFile(config.data.articles, [
+			{
+				"link": `/blog/${selected.name}.html`,
+				"published": Date.now(),
+				"title": selected.title
+			},
+			...cache
+		])
 	]);
 	await Promise.all([
-		runCommand(git, ["add", "--", articlePath, config.data.articles]),
-		runCommand(node, ["bin/txt.js", `--article=${config.dest.articles}${selected.name}.html`])
+		runCommand(git, [
+			"add",
+			"--",
+			articlePath,
+			config.data.articles
+		]),
+		runCommand(node, [
+			"bin/txt.js",
+			`--article=${config.dest.articles}${selected.name}.html`
+		])
 	]);
-	return runCommand(git, ["commit", `--message=Contribute ${selected.name}${getArticleTotal(cache)}`]);
+	return runCommand(git, [
+		"commit",
+		`--message=Contribute ${selected.name}${getArticleTotal(cache)}`
+	]);
 };
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		alias: {
-			t: "test"
+		"alias": {
+			"t": "test"
 		},
-		boolean: ["test"]
+		"boolean": ["test"]
 	});
 	const drafts = await listDrafts(argv.test);
 	const selected = await selectDraft(drafts);

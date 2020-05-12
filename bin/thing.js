@@ -3,19 +3,25 @@ import config from "./config.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
-import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import {readJSONFile, writeJSONFile} from "../lib/json-file.js";
 import runCommand from "../lib/run-command.js";
 import sharp from "sharp";
 import which from "which";
 
 const addFollowing = async (feed, title, url) => {
 	const followings = await readJSONFile(config.data.followings);
-	await writeJSONFile(config.data.followings, [{
-		feed: feed,
-		title: title,
-		url: url
-	}, ...followings]);
-	return [config.data.followings, `Follow ${url}`];
+	await writeJSONFile(config.data.followings, [
+		{
+			"feed": feed,
+			"title": title,
+			"url": url
+		},
+		...followings
+	]);
+	return [
+		config.data.followings,
+		`Follow ${url}`
+	];
 };
 
 const isReadBook = (asin, book) => asin === book.asin;
@@ -26,9 +32,12 @@ const addBook = async (asin, title) => {
 	}
 
 	const fn = path.join(config.dest.temp, `${asin}.jpg`);
-	const [res, books] = await Promise.all([
+	const [
+		res,
+		books
+	] = await Promise.all([
 		axios.get(`https://images-fe.ssl-images-amazon.com/images/P/${asin}.jpg`, {
-			responseType: "arraybuffer"
+			"responseType": "arraybuffer"
 		}),
 		readJSONFile(config.data.books)
 	]);
@@ -39,24 +48,36 @@ const addBook = async (asin, title) => {
 
 	await fs.writeFile(fn, res.data);
 	const metadata = await sharp(fn).metadata();
-	await writeJSONFile(config.data.books, [{
-		asin: asin,
-		height: metadata.height,
-		published: Date.now(),
-		title: title,
-		width: metadata.width
-	}, ...books]);
-	return [config.data.books, `Read ${asin}`];
+	await writeJSONFile(config.data.books, [
+		{
+			"asin": asin,
+			"height": metadata.height,
+			"published": Date.now(),
+			"title": title,
+			"width": metadata.width
+		},
+		...books
+	]);
+	return [
+		config.data.books,
+		`Read ${asin}`
+	];
 };
 
 const addLink = async (title, url) => {
 	const links = await readJSONFile(config.data.links);
-	await writeJSONFile(config.data.links, [{
-		published: Date.now(),
-		title: title,
-		url: url
-	}, ...links]);
-	return [config.data.links, `Bookmark ${url}`];
+	await writeJSONFile(config.data.links, [
+		{
+			"published": Date.now(),
+			"title": title,
+			"url": url
+		},
+		...links
+	]);
+	return [
+		config.data.links,
+		`Bookmark ${url}`
+	];
 };
 
 const addPhoto = async (photo) => {
@@ -71,7 +92,7 @@ const addPhoto = async (photo) => {
 	const src = path.join(config.src.photos, fn);
 	await sharp(photo)
 		.resize({
-			width: 1280
+			"width": 1280
 		})
 		.toFile(src);
 	const dest = path.join(config.dest.photos, fn);
@@ -79,19 +100,28 @@ const addPhoto = async (photo) => {
 		fs.copyFile(src, dest),
 		fs.unlink(photo)
 	]);
-	return [src, `Add ${fn}`];
+	return [
+		src,
+		`Add ${fn}`
+	];
 };
 
 const addStatus = async (status) => {
 	const statuses = await readJSONFile(config.data.statuses, "utf8");
-	await writeJSONFile(config.data.statuses, [{
-		published: Date.now(),
-		text: status
-	}, ...statuses]);
-	return [config.data.statuses, "Update status"];
+	await writeJSONFile(config.data.statuses, [
+		{
+			"published": Date.now(),
+			"text": status
+		},
+		...statuses
+	]);
+	return [
+		config.data.statuses,
+		"Update status"
+	];
 };
 
-const addThing = ({ asin, feed, title, url, _: remains }) => {
+const addThing = ({asin, feed, title, url, "_": remains}) => {
 	if (feed && title && url) {
 		return addFollowing(feed, title, url);
 	}
@@ -128,26 +158,44 @@ To add:
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		alias: {
-			a: "asin",
-			f: "feed",
-			t: "title",
-			u: "url"
+		"alias": {
+			"a": "asin",
+			"f": "feed",
+			"t": "title",
+			"u": "url"
 		},
-		default: {
-			asin: "",
-			feed: "",
-			title: "",
-			url: ""
+		"default": {
+			"asin": "",
+			"feed": "",
+			"title": "",
+			"url": ""
 		},
-		string: ["asin", "feed", "title", "url"]
+		"string": [
+			"asin",
+			"feed",
+			"title",
+			"url"
+		]
 	});
-	const [git, [file, message]] = await Promise.all([
+	const [
+		git,
+		[
+			file,
+			message
+		]
+	] = await Promise.all([
 		which("git"),
 		addThing(argv)
 	]);
-	await runCommand(git, ["add", "--", file]);
-	await runCommand(git, ["commit", `--message=${message}`]);
+	await runCommand(git, [
+		"add",
+		"--",
+		file
+	]);
+	await runCommand(git, [
+		"commit",
+		`--message=${message}`
+	]);
 };
 
 main().catch((e) => {

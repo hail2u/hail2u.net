@@ -12,15 +12,18 @@ const process = async (file) => {
 		.use(pcImport)
 		.use(removeComments)
 		.use(stylelint({
-			fix: true
+			"fix": true
 		}))
 		.process(css, {
-			from: file
+			"from": file
 		});
 };
 
 const buildCSS = async (file) => {
-	const [version, processed] = await Promise.all([
+	const [
+		version,
+		processed
+	] = await Promise.all([
 		getVersion(),
 		process(file.src)
 	]);

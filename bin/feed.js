@@ -1,10 +1,10 @@
 import config from "./config.js";
-import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
+import {escapeCharacters, unescapeReferences} from "../lib/character-reference.js";
 import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
 import mustache from "mustache";
 import path from "path";
-import { readJSONFile } from "../lib/json-file.js";
+import {readJSONFile} from "../lib/json-file.js";
 
 const toAbsoluteURL = (url) => {
 	if (url.startsWith("/")) {
@@ -24,9 +24,9 @@ const extendArticle = async (article) => {
 		.shift();
 	return {
 		...article,
-		body: body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
-		description: description,
-		type: "article"
+		"body": body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
+		"description": description,
+		"type": "article"
 	};
 };
 
@@ -44,10 +44,10 @@ const extendBook = (book) => {
 	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
 	return {
 		...book,
-		body: `<p><a href="${link}"><img alt="${book.title}" src="${image}"></a></p>`,
-		description: book.title,
-		link: link,
-		type: "book"
+		"body": `<p><a href="${link}"><img alt="${book.title}" src="${image}"></a></p>`,
+		"description": book.title,
+		"link": link,
+		"type": "book"
 	};
 };
 
@@ -61,7 +61,7 @@ const readBooks = async () => {
 
 const extendDocument = (document) => ({
 	...document,
-	type: "document"
+	"type": "document"
 });
 
 const readDocuments = async () => {
@@ -73,9 +73,9 @@ const readDocuments = async () => {
 
 const extendLink = (link) => ({
 	...link,
-	description: link.url,
-	link: link.url,
-	type: "link"
+	"description": link.url,
+	"link": link.url,
+	"type": "link"
 });
 
 const readLinks = async () => {
@@ -102,12 +102,12 @@ const extendPhoto = (photo) => {
 	const link = `/img/photos/${photo}`;
 	const image = toAbsoluteURL(link);
 	return {
-		body: `<p><a href="${image}"><img alt="${photo}" src="${image}"></a></p>`,
-		description: photo,
-		link: link,
-		published: getPhotoDatetime(photo),
-		title: photo,
-		type: "photo"
+		"body": `<p><a href="${image}"><img alt="${photo}" src="${image}"></a></p>`,
+		"description": photo,
+		"link": link,
+		"published": getPhotoDatetime(photo),
+		"title": photo,
+		"type": "photo"
 	};
 };
 
@@ -126,10 +126,10 @@ const listPhotos = async () => {
 
 const extendStatus = (status) => ({
 	...status,
-	description: status.text,
-	link: `/statuses/#on-${status.published}`,
-	title: status.text,
-	type: "status"
+	"description": status.text,
+	"link": `/statuses/#on-${status.published}`,
+	"title": status.text,
+	"type": "status"
 });
 
 const readStatuses = async () => {
@@ -159,7 +159,7 @@ const extendItem = (item) => {
 	return {
 		...item,
 		...dt,
-		link: toAbsoluteURL(item.link)
+		"link": toAbsoluteURL(item.link)
 	};
 };
 
@@ -168,7 +168,7 @@ const mergeData = async (extradataFile, metadata, type) => {
 	return {
 		...metadata,
 		...extradata,
-		items: metadata.items
+		"items": metadata.items
 			.filter(isValidType.bind(null, type))
 			.slice(0, 10)
 			.map(extendItem)
@@ -176,7 +176,10 @@ const mergeData = async (extradataFile, metadata, type) => {
 };
 
 const buildFeed = async (metadata, file) => {
-	const [data, template] = await Promise.all([
+	const [
+		data,
+		template
+	] = await Promise.all([
 		mergeData(file.json, metadata, file.type),
 		fs.readFile(file.src, "utf8")
 	]);
