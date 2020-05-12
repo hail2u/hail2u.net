@@ -104,7 +104,7 @@ const addThing = ({ asin, feed, title, url, _: remains }) => {
 		return addLink(title, url);
 	}
 
-	if (remains.length === 1) {
+	if (!asin && !feed && !title && !url && remains.length === 1) {
 		const file = remains[0].toLowerCase();
 
 		if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
@@ -120,9 +120,9 @@ const addThing = ({ asin, feed, title, url, _: remains }) => {
 To add:
   A book:      $ node thing.js --asin <ASIN> --title <TITLE>
   A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
-	A link:      $ node thins.js --title <TITLE> --url <URL>
-	A photo:     $ node thing.js <FILE>
-	A status:    $ node thing.js <TEXT>
+  A link:      $ node thins.js --title <TITLE> --url <URL>
+  A photo:     $ node thing.js <FILE>
+  A status:    $ node thing.js <TEXT>
 `);
 };
 
