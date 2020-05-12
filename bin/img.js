@@ -1,38 +1,27 @@
 import config from "./config.js";
 import fs from "fs/promises";
 import ico from "@fiahfy/ico";
-import path from "path";
 import sharp from "sharp";
 
 const { Ico, IcoImage } = ico;
 
-const generatePNG = async (file) => {
-	await sharp(file.src)
-		.resize(file.width)
-		.toFile(file.dest);
-	return file.dest;
-};
+const generatePNG = async (favicon, file) => {
+	const img = await sharp(file.src)
+		.resize(file.width);
 
-const isFaviconSource = (filepath) => path.basename(filepath).startsWith("favicon-");
+	if (!file.dest) {
+		const png = await img.png().toBuffer();
+		favicon.append(IcoImage.fromPNG(png));
+		return;
+	}
 
-const appendIcon = async (icon, src) => {
-	const png = await fs.readFile(src, {
-		encoding: null
-	});
-	icon.append(IcoImage.fromPNG(png));
-};
-
-const toIco = async (srcs) => {
-	const icon = new Ico();
-	await Promise.all(srcs.map(appendIcon.bind(null, icon)));
-	return icon.data;
+	img.toFile(file.dest);
 };
 
 const main = async () => {
-	const pngs = await Promise.all(config.files.icon.map(generatePNG));
-	const srcs = await Promise.all(pngs.filter(isFaviconSource));
-	const favicon = await toIco(srcs);
-	await fs.writeFile(config.dest.favicon, favicon);
+	const favicon = new Ico();
+	await Promise.all(config.files.icon.map(generatePNG.bind(null, favicon)));
+	await fs.writeFile(config.dest.favicon, favicon.data);
 };
 
 main().catch((e) => {

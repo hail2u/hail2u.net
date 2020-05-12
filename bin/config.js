@@ -91,27 +91,22 @@ export default {
 		],
 		icon: [
 			{
-				dest: "tmp/favicon-16.png",
 				src: "src/img/icon-small.svg",
 				width: 16
 			},
 			{
-				dest: "tmp/favicon-24.png",
 				src: "src/img/icon-small.svg",
 				width: 24
 			},
 			{
-				dest: "tmp/favicon-32.png",
 				src: "src/img/icon-small.svg",
 				width: 32
 			},
 			{
-				dest: "tmp/favicon-48.png",
 				src: "src/img/icon.svg",
 				width: 48
 			},
 			{
-				dest: "tmp/favicon-128.png",
 				src: "src/img/icon.svg",
 				width: 128
 			},
