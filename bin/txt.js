@@ -60,7 +60,7 @@ const extendBook = (book) => {
 
 const readBooks = async () => {
 	const books = await readJSONFile(config.data.books);
-	return books.map(extendBook);
+	return Promise.all(books.map(extendBook));
 };
 
 const extendDocument = (document) => {
@@ -74,7 +74,7 @@ const extendDocument = (document) => {
 
 const readDocuments = async () => {
 	const documents = await readJSONFile(config.data.documents);
-	return documents.map(extendDocument);
+	return Promise.all(documents.map(extendDocument));
 };
 
 const extendLink = (link) => {
@@ -90,15 +90,7 @@ const readFollowings = () => readJSONFile(config.data.followings);
 
 const readLinks = async () => {
 	const links = await readJSONFile(config.data.links);
-	return links.map(extendLink);
-};
-
-const isPhoto = (filename) => {
-	if (path.extname(filename) === ".jpg") {
-		return true;
-	}
-
-	return false;
+	return Promise.all(links.map(extendLink));
 };
 
 const getPhotoDatetime = (photo) => {
@@ -114,7 +106,7 @@ const getPhotoDimension = async (photo) => {
 	];
 };
 
-const extendPhoto = async (photo) => {
+const extendPhoto = async ({photo, title = photo}) => {
 	const published = getPhotoDatetime(photo);
 	const dt = getDateDetails(new Date(published));
 	const [
@@ -123,22 +115,19 @@ const extendPhoto = async (photo) => {
 	] = await getPhotoDimension(photo);
 	return {
 		...dt,
-		"filename": photo,
 		"height": height,
 		"isPhoto": true,
+		"photo": photo,
 		"published": published,
+		"title": title,
 		"url": `/img/photos/${photo}`,
 		"width": width
 	};
 };
 
-const listPhotos = async () => {
-	const photos = await fs.readdir(config.src.photos);
-	return Promise.all(photos
-		.filter(isPhoto)
-		.sort()
-		.reverse()
-		.map(extendPhoto));
+const readPhotos = async () => {
+	const photos = await readJSONFile(config.data.photos);
+	return Promise.all(photos.map(extendPhoto));
 };
 
 const extendStatus = (status) => {
@@ -152,7 +141,7 @@ const extendStatus = (status) => {
 
 const readStatuses = async () => {
 	const statuses = await readJSONFile(config.data.statuses);
-	return statuses.map(extendStatus);
+	return Promise.all(statuses.map(extendStatus));
 };
 
 const readPartial = async (filename) => {
@@ -402,7 +391,7 @@ const main = async () => {
 		readDocuments(),
 		readFollowings(),
 		readLinks(),
-		listPhotos(),
+		readPhotos(),
 		readStatuses(),
 		readPartials(),
 		getVersion()

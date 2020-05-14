@@ -7,6 +7,7 @@ export default {
 		"followings": "src/links/followings.json",
 		"links": "src/links/links.json",
 		"metadata": "src/metadata.json",
+		"photos": "src/photos/photos.json",
 		"statuses": "src/statuses/statuses.json"
 	},
 	"dest": {

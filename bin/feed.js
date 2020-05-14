@@ -85,43 +85,27 @@ const readLinks = async () => {
 		.map(extendLink);
 };
 
-const isPhoto = (filename) => {
-	if (path.extname(filename) === ".jpg") {
-		return true;
-	}
-
-	return false;
-};
-
 const getPhotoDatetime = (photo) => {
 	const dt = path.basename(photo, ".jpg").split("");
 	return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
 };
 
-const extendPhoto = (photo) => {
+const extendPhoto = ({photo, title = photo}) => {
 	const link = `/img/photos/${photo}`;
 	const image = toAbsoluteURL(link);
 	return {
-		"body": `<p><a href="${image}"><img alt="${photo}" src="${image}"></a></p>`,
+		"body": `<p><a href="${image}"><img src="${image}" title="${title}"></a></p>`,
 		"description": photo,
 		"link": link,
 		"published": getPhotoDatetime(photo),
-		"title": photo,
+		"title": title,
 		"type": "photo"
 	};
 };
 
-const hasValidDate = (photo) => !Number.isNaN(photo.published);
-
-const listPhotos = async () => {
-	const photos = await fs.readdir(config.src.photos);
-	return photos
-		.filter(isPhoto)
-		.sort()
-		.reverse()
-		.slice(0, 10)
-		.map(extendPhoto)
-		.filter(hasValidDate);
+const readPhotos = async () => {
+	const photos = await readJSONFile(config.data.photos);
+	return photos.map(extendPhoto);
 };
 
 const extendStatus = (status) => ({
@@ -202,7 +186,7 @@ const main = async () => {
 		readBooks(),
 		readDocuments(),
 		readLinks(),
-		listPhotos(),
+		readPhotos(),
 		readStatuses()
 	]);
 	metadata.items = [

@@ -19,7 +19,7 @@ const addFollowing = async (feed, title, url) => {
 		...followings
 	]);
 	return [
-		config.data.followings,
+		[config.data.followings],
 		`Follow ${url}`
 	];
 };
@@ -59,7 +59,7 @@ const addBook = async (asin, title) => {
 		...books
 	]);
 	return [
-		config.data.books,
+		[config.data.books],
 		`Read ${asin}`
 	];
 };
@@ -75,12 +75,18 @@ const addLink = async (title, url) => {
 		...links
 	]);
 	return [
-		config.data.links,
+		[config.data.links],
 		`Bookmark ${url}`
 	];
 };
 
-const addPhoto = async (photo) => {
+const addPhoto = async (photo, title) => {
+	const ext = path.extname(photo).toLowerCase();
+
+	if (ext !== ".jpg" && ext !== ".jpeg") {
+		throw new Error("Photo must be JPEG.");
+	}
+
 	const dt = new Date();
 	const year = String(dt.getFullYear()).padStart(2, "0");
 	const month = String(dt.getMonth() + 1).padStart(2, "0");
@@ -90,18 +96,31 @@ const addPhoto = async (photo) => {
 	const seconds = String(dt.getSeconds()).padStart(2, "0");
 	const fn = `${year}${month}${date}${hours}${minutes}${seconds}.jpg`;
 	const src = path.join(config.src.photos, fn);
-	await sharp(photo)
-		.resize({
-			"width": 1280
-		})
-		.toFile(src);
+	const [photos] = await Promise.all([
+		readJSONFile(config.data.photos, "utf8"),
+		sharp(photo)
+			.resize({
+				"width": 1280
+			})
+			.toFile(src)
+	]);
 	const dest = path.join(config.dest.photos, fn);
 	await Promise.all([
 		fs.copyFile(src, dest),
-		fs.unlink(photo)
+		fs.unlink(photo),
+		writeJSONFile(config.data.photos, [
+			{
+				"photo": fn,
+				"title": title
+			},
+			...photos
+		])
 	]);
 	return [
-		src,
+		[
+			src,
+			config.data.photos
+		],
 		`Add ${fn}`
 	];
 };
@@ -116,31 +135,29 @@ const addStatus = async (status) => {
 		...statuses
 	]);
 	return [
-		config.data.statuses,
+		[config.data.statuses],
 		"Update status"
 	];
 };
 
-const addThing = ({asin, feed, title, url, "_": remains}) => {
-	if (feed && title && url) {
-		return addFollowing(feed, title, url);
-	}
-
+const addThing = ({asin, feed, photo, title, url, "_": remains}) => {
 	if (asin && title) {
 		return addBook(asin, title);
+	}
+
+	if (feed && title && url) {
+		return addFollowing(feed, title, url);
 	}
 
 	if (title && url) {
 		return addLink(title, url);
 	}
 
-	if (!asin && !feed && !title && !url && remains.length === 1) {
-		const file = remains[0].toLowerCase();
+	if (photo && title) {
+		return addPhoto(photo, title);
+	}
 
-		if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
-			return addPhoto(remains[0]);
-		}
-
+	if (!asin && !feed && !photo && !title && !url && remains.length === 1) {
 		return addStatus(remains[0]);
 	}
 
@@ -151,7 +168,7 @@ To add:
   A book:      $ node thing.js --asin <ASIN> --title <TITLE>
   A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
   A link:      $ node thins.js --title <TITLE> --url <URL>
-  A photo:     $ node thing.js <FILE>
+  A photo:     $ node thing.js --photo <FILE> --title <TITLE>
   A status:    $ node thing.js <TEXT>
 `);
 };
@@ -161,18 +178,21 @@ const main = async () => {
 		"alias": {
 			"a": "asin",
 			"f": "feed",
+			"p": "photo",
 			"t": "title",
 			"u": "url"
 		},
 		"default": {
 			"asin": "",
 			"feed": "",
+			"photo": "",
 			"title": "",
 			"url": ""
 		},
 		"string": [
 			"asin",
 			"feed",
+			"photo",
 			"title",
 			"url"
 		]
@@ -180,7 +200,7 @@ const main = async () => {
 	const [
 		git,
 		[
-			file,
+			files,
 			message
 		]
 	] = await Promise.all([
@@ -190,7 +210,7 @@ const main = async () => {
 	await runCommand(git, [
 		"add",
 		"--",
-		file
+		files.join(" ")
 	]);
 	await runCommand(git, [
 		"commit",
