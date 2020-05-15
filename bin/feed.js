@@ -32,12 +32,9 @@ const extendArticle = async (article) => {
 
 const readArticles = async () => {
 	const articles = await readJSONFile(config.data.articles);
-	return Promise.all(articles
-		.slice(0, 10)
-		.map(extendArticle));
+	const latests = articles.slice(0, 10);
+	return Promise.all(latests.map(extendArticle));
 };
-
-const hasPublished = (book) => book.published;
 
 const extendBook = (book) => {
 	const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
@@ -53,10 +50,8 @@ const extendBook = (book) => {
 
 const readBooks = async () => {
 	const books = await readJSONFile(config.data.books);
-	return books
-		.filter(hasPublished)
-		.slice(0, 10)
-		.map(extendBook);
+	const latests = books.slice(0, 10);
+	return Promise.all(latests.map(extendBook));
 };
 
 const extendDocument = (document) => ({
@@ -66,9 +61,8 @@ const extendDocument = (document) => ({
 
 const readDocuments = async () => {
 	const documents = await readJSONFile(config.data.documents);
-	return documents
-		.slice(0, 10)
-		.map(extendDocument);
+	const latests = documents.slice(0, 10);
+	return Promise.all(latests.map(extendDocument));
 };
 
 const extendLink = (link) => ({
@@ -80,9 +74,8 @@ const extendLink = (link) => ({
 
 const readLinks = async () => {
 	const links = await readJSONFile(config.data.links);
-	return links
-		.slice(0, 10)
-		.map(extendLink);
+	const latests = links.slice(0, 10);
+	return Promise.all(latests.map(extendLink));
 };
 
 const extendPhoto = (photo) => {
@@ -99,7 +92,8 @@ const extendPhoto = (photo) => {
 
 const readPhotos = async () => {
 	const photos = await readJSONFile(config.data.photos);
-	return photos.map(extendPhoto);
+	const latests = photos.slice(0, 10);
+	return Promise.all(latests.map(extendPhoto));
 };
 
 const extendStatus = (status) => ({
@@ -112,13 +106,11 @@ const extendStatus = (status) => ({
 
 const readStatuses = async () => {
 	const statuses = await readJSONFile(config.data.statuses);
-	return statuses
-		.slice(0, 10)
-		.map(extendStatus);
+	const latests = statuses.slice(0, 10);
+	return Promise.all(latests.map(extendStatus));
 };
 
-const compareByPublished = (a, b) =>
-	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const compareByPublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const isValidType = (type, item) => {
 	if (!type) {
