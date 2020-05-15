@@ -1,22 +1,22 @@
 const toRelativeTime = (dt) => {
 	const divisor = {
-		day: 24,
-		hour: 60,
-		minute: 60,
-		month: 30,
-		second: 1000,
-		year: 12
+		"day": 24,
+		"hour": 60,
+		"minute": 60,
+		"month": 30,
+		"second": 1000,
+		"year": 12
 	};
 	const now = performance.timing.navigationStart + performance.now();
 	const suffix = "前";
 	const unit = {
-		day: "日",
-		hour: "時間",
-		minute: "分",
-		month: "か月",
-		now: "たった今",
-		second: " 秒",
-		year: "年"
+		"day": "日",
+		"hour": "時間",
+		"minute": "分",
+		"month": "か月",
+		"now": "たった今",
+		"second": " 秒",
+		"year": "年"
 	};
 
 	if (!Number.isInteger(dt)) {

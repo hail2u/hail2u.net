@@ -10,7 +10,11 @@ window.addEventListener("load", () => {
 		return ((sRGB + 0.055) / 1.055) ** 2.4;
 	};
 
-	const getRelativeLuminance = ([red, green, blue]) =>
+	const getRelativeLuminance = ([
+		red,
+		green,
+		blue
+	]) =>
 		0.2126 * getComponentLuminance(red) +
 	0.7152 * getComponentLuminance(green) +
 	0.0722 * getComponentLuminance(blue);
