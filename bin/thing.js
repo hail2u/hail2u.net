@@ -97,20 +97,14 @@ const addPhoto = async (photo, title) => {
 	const seconds = String(dt.getSeconds()).padStart(2, "0");
 	const fn = `${year}${month}${date}${hours}${minutes}${seconds}.jpg`;
 	const src = path.join(config.src.photos, fn);
-	const [
-		photos,
-		img
-	] = await Promise.all([
+	const [photos] = await Promise.all([
 		readJSONFile(config.data.photos, "utf8"),
-		sharp(photo)
-	]);
-	const [metadata] = await Promise.all([
-		img.metadata(),
-		img.resize({
+		sharp(photo).resize({
 			"width": 1280
 		})
 			.toFile(src)
 	]);
+	const metadata = await sharp(src).metadata();
 	const dest = path.join(config.dest.photos, fn);
 	await Promise.all([
 		fs.copyFile(src, dest),
