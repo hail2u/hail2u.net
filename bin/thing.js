@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./config.js";
+import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
@@ -127,7 +128,7 @@ const addPhoto = async (photo, title) => {
 	]);
 	return [
 		[
-			src,
+			convertToPOSIXPath(src),
 			config.data.photos
 		],
 		`Add ${fn}`
@@ -219,7 +220,7 @@ const main = async () => {
 	await runCommand(git, [
 		"add",
 		"--",
-		files.join(" ")
+		...files
 	]);
 	await runCommand(git, [
 		"commit",
