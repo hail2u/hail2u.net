@@ -96,12 +96,18 @@ const addPhoto = async (photo, title) => {
 	const seconds = String(dt.getSeconds()).padStart(2, "0");
 	const fn = `${year}${month}${date}${hours}${minutes}${seconds}.jpg`;
 	const src = path.join(config.src.photos, fn);
-	const [photos] = await Promise.all([
+	const [
+		photos,
+		img
+	] = await Promise.all([
 		readJSONFile(config.data.photos, "utf8"),
 		sharp(photo)
-			.resize({
-				"width": 1280
-			})
+	]);
+	const [metadata] = await Promise.all([
+		img.metadata(),
+		img.resize({
+			"width": 1280
+		})
 			.toFile(src)
 	]);
 	const dest = path.join(config.dest.photos, fn);
@@ -110,8 +116,11 @@ const addPhoto = async (photo, title) => {
 		fs.unlink(photo),
 		writeJSONFile(config.data.photos, [
 			{
-				"photo": fn,
-				"title": title
+				"height": metadata.height,
+				"link": `/img/photos/${fn}`,
+				"published": Date.now(),
+				"title": title,
+				"width": metadata.width
 			},
 			...photos
 		])

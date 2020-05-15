@@ -44,7 +44,7 @@ const extendBook = (book) => {
 	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
 	return {
 		...book,
-		"body": `<p><a href="${link}"><img alt="${book.title}" src="${image}"></a></p>`,
+		"body": `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
 		"description": book.title,
 		"link": link,
 		"type": "book"
@@ -85,19 +85,13 @@ const readLinks = async () => {
 		.map(extendLink);
 };
 
-const getPhotoDatetime = (photo) => {
-	const dt = path.basename(photo, ".jpg").split("");
-	return Date.parse(`${dt[0]}${dt[1]}${dt[2]}${dt[3]}-${dt[4]}${dt[5]}-${dt[6]}${dt[7]}T${dt[8]}${dt[9]}:${dt[10]}${dt[11]}:${dt[12]}${dt[13]}`);
-};
-
-const extendPhoto = ({photo, title = photo}) => {
-	const link = `/img/photos/${photo}`;
-	const image = toAbsoluteURL(link);
+const extendPhoto = ({link, published, title = link}) => {
+	const url = toAbsoluteURL(link);
 	return {
-		"body": `<p><a href="${image}"><img src="${image}" title="${title}"></a></p>`,
-		"description": photo,
+		"body": `<p><a href="${url}"><img src="${url}" title="${title}"></a></p>`,
+		"description": title,
 		"link": link,
-		"published": getPhotoDatetime(photo),
+		"published": published,
 		"title": title,
 		"type": "photo"
 	};
