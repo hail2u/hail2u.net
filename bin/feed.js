@@ -85,14 +85,14 @@ const readLinks = async () => {
 		.map(extendLink);
 };
 
-const extendPhoto = ({link, published, title = link}) => {
-	const url = toAbsoluteURL(link);
+const extendPhoto = (photo) => {
+	const url = toAbsoluteURL(photo.link);
 	return {
-		"body": `<p><a href="${url}"><img src="${url}" title="${title}"></a></p>`,
-		"description": title,
-		"link": link,
-		"published": published,
-		"title": title,
+		"body": `<p><a href="${url}"><img src="${url}" title="${photo.title}"></a></p>`,
+		"description": photo.title,
+		"link": photo.link,
+		"published": photo.published,
+		"title": photo.title,
 		"type": "photo"
 	};
 };

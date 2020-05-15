@@ -92,15 +92,12 @@ const readLinks = async () => {
 	return Promise.all(links.map(extendLink));
 };
 
-const extendPhoto = ({height, link, published, title = link, width}) => {
-	const dt = getDateDetails(new Date(published));
+const extendPhoto = (photo) => {
+	const dt = getDateDetails(new Date(photo.published));
 	return {
+		...photo,
 		...dt,
-		"height": height,
-		"isPhoto": true,
-		"link": link,
-		"title": title,
-		"width": width
+		"isPhoto": true
 	};
 };
 
