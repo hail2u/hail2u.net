@@ -4,10 +4,15 @@ import highlight from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
-import {readJSONFile, writeJSONFile} from "../lib/json-file.js";
+import {
+	readJSONFile,
+	writeJSONFile
+} from "../lib/json-file.js";
 import readline from "readline";
 import runCommand from "../lib/run-command.js";
-import {unescapeReferences} from "../lib/character-reference.js";
+import {
+	unescapeReferences
+} from "../lib/character-reference.js";
 import which from "which";
 
 const getDraft = async (filename) => {

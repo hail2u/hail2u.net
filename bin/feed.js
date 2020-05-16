@@ -1,10 +1,15 @@
 import config from "./config.js";
-import {escapeCharacters, unescapeReferences} from "../lib/character-reference.js";
+import {
+	escapeCharacters,
+	unescapeReferences
+} from "../lib/character-reference.js";
 import fs from "fs/promises";
 import getDateDetails from "../lib/get-date-details.js";
 import mustache from "mustache";
 import path from "path";
-import {readJSONFile} from "../lib/json-file.js";
+import {
+	readJSONFile
+} from "../lib/json-file.js";
 
 const toAbsoluteURL = (url) => {
 	if (url.startsWith("/")) {

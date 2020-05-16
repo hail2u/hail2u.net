@@ -3,7 +3,10 @@ import fs from "fs/promises";
 import ico from "@fiahfy/ico";
 import sharp from "sharp";
 
-const {Ico, IcoImage} = ico;
+const {
+	Ico,
+	IcoImage
+} = ico;
 
 const generatePNG = async (favicon, file) => {
 	const img = await sharp(file.src)

@@ -4,7 +4,10 @@ import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
-import {readJSONFile, writeJSONFile} from "../lib/json-file.js";
+import {
+	readJSONFile,
+	writeJSONFile
+} from "../lib/json-file.js";
 import runCommand from "../lib/run-command.js";
 import sharp from "sharp";
 import which from "which";
@@ -144,7 +147,14 @@ const addStatus = async (status) => {
 	];
 };
 
-const addThing = ({asin, feed, photo, title, url, "_": remains}) => {
+const addThing = ({
+	asin,
+	feed,
+	photo,
+	title,
+	url,
+	"_": remains
+}) => {
 	if (asin && title) {
 		return addBook(asin, title);
 	}
