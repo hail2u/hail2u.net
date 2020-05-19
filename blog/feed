@@ -14,6 +14,20 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[CSSをインライン化するやつを復活させようと考えていた。前に書いたnode-inliningは、HTMLメールのためだったので、style属性にコピーしていた。また、2年半くらい前の実験では、丸ごとインライン化するだけだった。今回はHTMLファイルごとに必要なCSSのみをインライン化してやろうとしていたけど、結局のところ見送った。]]></description>
+				<link>https://hail2u.net/blog/inline-necessary-css-only.html</link>
+				<pubDate>Tue, 19 May 2020 10:51:50 +0900</pubDate>
+				<title><![CDATA[必要なCSSのみインライン化]]></title>
+
+					<content:encoded><![CDATA[<p>CSSをインライン化するやつを復活させようと考えていた。前に書いた<a href="https://github.com/hail2u/node-inlining">node-inlining</a>は、HTMLメールのためだったので、<code>style</code>属性にコピーしていた。また、<a href="https://hail2u.net/blog/inlining-css-and-javascript.html">2年半くらい前の実験</a>では、丸ごとインライン化するだけだった。今回はHTMLファイルごとに必要なCSSのみをインライン化してやろうとしていたけど、結局のところ見送った。</p>
+
+<p>実装は、postcssの<code>walkRules()</code>でCSSのセレクターをなめ、jsdomから<code>querySelector()</code>を使って、セレクターがマッチしなければ、そのルールを消す、というもの。最終的にはCSSを参照している<code>link</code>要素を<code>style</code>要素で差し替えて終わり。詳しくは<a href="https://gist.github.com/hail2u/e28513bbfd12ff017869a7ae87aefc6c">この実装をCLIツールに落とし込んだもの</a>を参照してほしい。</p>
+
+<p>実装はできたけど、とにかく遅い。jsdomがそれなりに遅いし、このウェブサイトの場合は<code>template</code>要素をはがす必要があってDOMを複製しているのも遅いし、セレクターをなめるのもそこそこ遅い。1ファイルで2秒くらいかかるし、並行実行にも限界があるので、全記事の再構築だと1分以上かかった。必ず残すルールを決めたり、<code>querySelector()</code>で扱うノードを絞ったり、インデックス・ページでは固定したりといった工夫で、ちょっとだけ速くなる。</p>
+
+<p>苦労に見合わないので、インライン化するなら、素直に丸ごとインライン化した方がいい。元のCSSファイルも、今は20KBくらいと、それほど大きくないし、最小限にしても15KBになるかならないかくらいだ。丸ごとインライン化するなら、外部CSSのままでも一長（キャッシュが期待できる）一短（HTMLのレンダリングが遅れる）だ。ふりだしに戻る。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[僕のTwitterは、一昨年の年末にアカウントを削除して、去年の年末にここでの更新を流す媒体として復活させ、4月くらいに（さみしくなって）フォローも再開した。その後、前はあんなにも嫌だった時系列じゃないタイムラインが、それほど嫌じゃなくなったことがわかってきて、なんでだろうと考えていた。]]></description>
 				<link>https://hail2u.net/blog/on-20200517.html</link>
 				<pubDate>Sun, 17 May 2020 09:29:19 +0900</pubDate>
@@ -297,100 +311,6 @@
 
 <p>4月27日の夕方に注文して、5月2日の昼に発送、3日の昼に到着だったので、状況の割には早いと感じた。クール便なので、送料はなかなか高い。僕には新宿へ往復したらほぼ同じくらいなので、気にするほどでもなさそう。</p>
 ]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[雑記記事（このページとか）でarticle要素を使わないようにした。他のインデックス・ページでタグラインが入っているところに雑記記事のタイトルが入り、main要素にitemprop=articleBodyを割り当て、その直下に記事本文がくる。]]></description>
-				<link>https://hail2u.net/blog/removing-article-element-from-blog-articles.html</link>
-				<pubDate>Sat, 2 May 2020 09:21:10 +0900</pubDate>
-				<title><![CDATA[雑記記事からarticle要素を削除]]></title>
-
-					<content:encoded><![CDATA[<p>雑記記事（このページとか）で<code>article</code>要素を使わないようにした。他のインデックス・ページでタグラインが入っているところに雑記記事のタイトルが入り、<code>main</code>要素に<code>itemprop=articleBody</code>を割り当て、その直下に記事本文がくる。</p>
-
-<p>多くのブログでは記事ページだと、最重要な見出しがロゴだったりする。そこはやはり記事のタイトルであった方がよいし、あるべきだと思う。それを改善するために<a href="https://hail2u.net/blog/version-nine-point-three-point-two.html">トリッキーな構造</a>にしたけど、これはこれでセクショニング・ルートが見出しなしになってしまう。</p>
-
-<ul>
-	<li><code>body</code>要素
-		<ul>
-			<li><code>header</code>要素
-				<ul>
-					<li>ナビゲーション
-						<ul>
-							<li>ロゴ</li>
-							<li>各ページへのメニュー</li>
-						</ul>
-					</li>
-				</ul>
-			</li>
-			<li><code>main</code>要素
-				<ul>
-					<li><code>article</code>要素
-						<ul>
-							<li><code>header</code>要素
-								<ul>
-									<li>記事投稿日時</li>
-									<li>記事タイトル</li>
-								</ul>
-							</li>
-							<li><code>itemprop=articleBody</code>
-								<ul>
-									<li>記事本文</li>
-								</ul>
-							</li>
-							<li>前の記事へのナビゲーション</li>
-						</ul>
-					</li>
-				</ul>
-			</li>
-			<li><code>footer</code>要素
-				<ul>
-					<li>雑多なリンク</li>
-					<li>名前</li>
-				</ul>
-			</li>
-		</ul>
-	</li>
-</ul>
-
-<p>そこで記事のタイトルをヘッダーに持っていった。そうなると、今度は<code>article</code>要素が見出しなしになるし、<code>main</code>要素以下にセクションがひとつだけにもなるので、えいやっと消した。</p>
-
-<ul>
-	<li><code>body</code>要素
-		<ul>
-			<li><code>header</code>要素
-				<ul>
-					<li>記事投稿日時</li>
-					<li>記事タイトル</li>
-					<li>ナビゲーション
-						<ul>
-							<li>ロゴ</li>
-							<li>各ページへのメニュー</li>
-						</ul>
-					</li>
-				</ul>
-			</li>
-			<li><code>main</code>要素
-				<ul>
-					<li>記事本文</li>
-					<li>前の記事へのナビゲーション</li>
-				</ul>
-			</li>
-			<li><code>footer</code>要素
-				<ul>
-					<li>雑多なリンク</li>
-					<li>名前</li>
-				</ul>
-			</li>
-		</ul>
-	</li>
-</ul>
-
-<p><code>article</code>要素だけでなく、記事タイトルなどをまとめて格納していた<code>header</code>要素や<code>itemprop=articleBody</code>のためだけの<code>div</code>要素もなくなる。ほぼ独立したウェブページとしての構造になって、異様にすっきりとした。<code>body</code>要素以下をどこかの<code>section</code>要素にそのまま持って行ってもほぼ通用する。</p>
-
-<hr>
-
-<p>このあたりの文書アウトラインを考えていたら、<code>header</code>要素の先頭に<code>nav</code>要素があって、その後に<code>h1</code>要素が来ると、仕様で言われる(Untitled Page)とかバリデーターで言われる[body element with no heading]になってしまうことを、突然、思い出した。全ページ共通の問題だった。ここら辺もちゃんと直した（つもり）。見た目の順序はFlexboxに頼っている。</p>
-
-<p>これでv9.9系ということになる。他にはGoogle Closure CompilerからBabelになったりした。別にちょっと書く。またCNAMEファイルやrobots.txtファイルもMustache経由で生成するようにしたりも。ドメインを変える予定はないけど。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
