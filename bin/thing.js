@@ -1,6 +1,8 @@
 import axios from "axios";
 import config from "./config.js";
-import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
+import {
+	convertToPOSIXPath
+} from "../lib/convert-to-posix-path.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
@@ -8,7 +10,9 @@ import {
 	readJSONFile,
 	writeJSONFile
 } from "../lib/json-file.js";
-import runCommand from "../lib/run-command.js";
+import {
+	runCommand
+} from "../lib/run-command.js";
 import sharp from "sharp";
 import which from "which";
 

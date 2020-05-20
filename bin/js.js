@@ -1,7 +1,9 @@
 import babel from "@babel/core";
 import config from "./config.js";
 import fs from "fs/promises";
-import getVersion from "../lib/get-version.js";
+import {
+	getVersion
+} from "../lib/get-version.js";
 
 const buildJS = async (file) => {
 	const [

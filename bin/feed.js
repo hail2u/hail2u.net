@@ -4,7 +4,9 @@ import {
 	unescapeReferences
 } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import getDateDetails from "../lib/get-date-details.js";
+import {
+	getDateDetails
+} from "../lib/get-date-details.js";
 import mustache from "mustache";
 import path from "path";
 import {

@@ -1,19 +1,27 @@
 import config from "./config.js";
-import convertToPOSIXPath from "../lib/convert-to-posix-path.js";
+import {
+	convertToPOSIXPath
+} from "../lib/convert-to-posix-path.js";
 import {
 	escapeCharacters,
 	unescapeReferences
 } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import getDateDetails from "../lib/get-date-details.js";
-import highlight from "../lib/highlight.js";
+import {
+	getDateDetails
+} from "../lib/get-date-details.js";
+import {
+	getVersion
+} from "../lib/get-version.js";
+import {
+	highlight
+} from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
 import {
 	readJSONFile
 } from "../lib/json-file.js";
-import getVersion from "../lib/get-version.js";
 
 const extendArticle = async (requireBody, article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));

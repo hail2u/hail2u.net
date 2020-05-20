@@ -1,6 +1,8 @@
 import config from "./config.js";
 import fs from "fs/promises";
-import highlight from "../lib/highlight.js";
+import {
+	highlight
+} from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
@@ -9,7 +11,9 @@ import {
 	writeJSONFile
 } from "../lib/json-file.js";
 import readline from "readline";
-import runCommand from "../lib/run-command.js";
+import {
+	runCommand
+} from "../lib/run-command.js";
 import {
 	unescapeReferences
 } from "../lib/character-reference.js";

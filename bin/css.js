@@ -1,9 +1,13 @@
 import config from "./config.js";
 import fs from "fs/promises";
-import getVersion from "../lib/get-version.js";
+import {
+	getVersion
+} from "../lib/get-version.js";
 import pcImport from "postcss-import";
 import postcss from "postcss";
-import removeComments from "../lib/postcss/remove-comments.js";
+import {
+	removeComments
+} from "../lib/postcss/remove-comments.js";
 import stylelint from "stylelint";
 
 const process = async (file) => {
