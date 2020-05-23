@@ -1,8 +1,8 @@
-import axios from "axios";
 import config from "./config.js";
 import {
 	convertToPOSIXPath
 } from "../lib/convert-to-posix-path.js";
+import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
@@ -39,23 +39,25 @@ const addBook = async (asin, title) => {
 		throw new Error("ASIN must be 10 alphanumeric characters.");
 	}
 
-	const fn = path.join(config.dest.temp, `${asin}.jpg`);
-	const [
-		res,
-		books
-	] = await Promise.all([
-		axios.get(`https://images-fe.ssl-images-amazon.com/images/P/${asin}.jpg`, {
-			"responseType": "arraybuffer"
-		}),
-		readJSONFile(config.data.books)
-	]);
+	const books = await readJSONFile(config.data.books);
 
 	if (books.find(isReadBook.bind(null, asin))) {
 		throw new Error(`${asin} has already been added.`);
 	}
 
-	await fs.writeFile(fn, res.data);
-	const metadata = await sharp(fn).metadata();
+	const [
+		saver,
+		res
+	] = await Promise.all([
+		sharp(),
+		fetch(`https://images-fe.ssl-images-amazon.com/images/P/${asin}.jpg`)
+	]);
+	res.body.pipe(saver);
+	const fn = path.join(config.dest.temp, `${asin}.jpg`);
+	const [metadata] = await Promise.all([
+		saver.metadata(),
+		saver.toFile(fn)
+	]);
 	await writeJSONFile(config.data.books, [
 		{
 			"asin": asin,
