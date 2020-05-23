@@ -20,13 +20,13 @@ const toRelativeTime = (dt) => {
 	};
 
 	if (!Number.isInteger(dt)) {
-		return;
+		return false;
 	}
 
 	let diff = Math.round((now - dt) / divisor.second);
 
 	if (!Number.isInteger(diff) || diff < 0) {
-		return;
+		return false;
 	}
 
 	if (diff < divisor.minute / 2) {

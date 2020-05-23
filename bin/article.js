@@ -1,3 +1,7 @@
+import {
+	readJSONFile,
+	writeJSONFile
+} from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
 import {
@@ -6,10 +10,6 @@ import {
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
-import {
-	readJSONFile,
-	writeJSONFile
-} from "../lib/json-file.js";
 import readline from "readline";
 import {
 	runCommand

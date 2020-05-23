@@ -1,11 +1,11 @@
-import config from "./config.js";
-import {
-	convertToPOSIXPath
-} from "../lib/convert-to-posix-path.js";
 import {
 	escapeCharacters,
 	unescapeReferences
 } from "../lib/character-reference.js";
+import config from "./config.js";
+import {
+	convertToPOSIXPath
+} from "../lib/convert-to-posix-path.js";
 import fs from "fs/promises";
 import {
 	getDateDetails

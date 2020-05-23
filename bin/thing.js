@@ -1,3 +1,7 @@
+import {
+	readJSONFile,
+	writeJSONFile
+} from "../lib/json-file.js";
 import config from "./config.js";
 import {
 	convertToPOSIXPath
@@ -6,10 +10,6 @@ import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
-import {
-	readJSONFile,
-	writeJSONFile
-} from "../lib/json-file.js";
 import {
 	runCommand
 } from "../lib/run-command.js";
