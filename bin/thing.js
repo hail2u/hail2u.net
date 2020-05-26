@@ -36,13 +36,13 @@ const isReadBook = (asin, book) => asin === book.asin;
 
 const addBook = async (asin, title) => {
 	if (!/^[A-Z0-9]{10}$/i.test(asin)) {
-		throw new Error("ASIN must be 10 alphanumeric characters.");
+		throw new Error("${asin} is not consisted of 10 alphanumeric characters.");
 	}
 
 	const books = await readJSONFile(config.data.books);
 
 	if (books.find(isReadBook.bind(null, asin))) {
-		throw new Error(`${asin} has already been added.`);
+		throw new Error(`${title} has already been added.`);
 	}
 
 	const [
