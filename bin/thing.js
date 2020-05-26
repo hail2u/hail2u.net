@@ -16,8 +16,15 @@ import {
 import sharp from "sharp";
 import which from "which";
 
+const isFollowed = (url, following) => url === following.url;
+
 const addFollowing = async (feed, title, url) => {
 	const followings = await readJSONFile(config.data.followings);
+
+	if (followings.find(isFollowed.bind(null, url))) {
+		throw new Error(`${title} has already been followed.`);
+	}
+
 	await writeJSONFile(config.data.followings, [
 		{
 			"feed": feed,
