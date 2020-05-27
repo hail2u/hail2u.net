@@ -1,6 +1,6 @@
 import {
-	readJSONFile,
-	writeJSONFile
+	outputJSONFile,
+	readJSONFile
 } from "../lib/json-file.js";
 import config from "./config.js";
 import {
@@ -25,7 +25,7 @@ const addFollowing = async (feed, title, url) => {
 		throw new Error(`${title} has already been followed.`);
 	}
 
-	await writeJSONFile(config.data.followings, [
+	await outputJSONFile(config.data.followings, [
 		{
 			"feed": feed,
 			"title": title,
@@ -65,7 +65,7 @@ const addBook = async (asin, title) => {
 		saver.metadata(),
 		saver.toFile(fn)
 	]);
-	await writeJSONFile(config.data.books, [
+	await outputJSONFile(config.data.books, [
 		{
 			"asin": asin,
 			"height": metadata.height,
@@ -83,7 +83,7 @@ const addBook = async (asin, title) => {
 
 const addLink = async (title, url) => {
 	const links = await readJSONFile(config.data.links);
-	await writeJSONFile(config.data.links, [
+	await outputJSONFile(config.data.links, [
 		{
 			"published": Date.now(),
 			"title": title,
@@ -112,14 +112,17 @@ const addPhoto = async (photo, ext) => {
 		sharp(photo).resize({
 			"width": 1280
 		})
-			.toFile(src)
+			.toFile(src),
+		fs.mkdir(config.dest.photos, {
+			"recursive": true
+		})
 	]);
 	const metadata = await sharp(src).metadata();
 	const dest = path.join(config.dest.photos, fn);
 	await Promise.all([
 		fs.copyFile(src, dest),
 		fs.unlink(photo),
-		writeJSONFile(config.data.photos, [
+		outputJSONFile(config.data.photos, [
 			{
 				"height": metadata.height,
 				"link": `/img/photos/${fn}`,
@@ -141,7 +144,7 @@ const addPhoto = async (photo, ext) => {
 
 const addStatus = async (status) => {
 	const statuses = await readJSONFile(config.data.statuses, "utf8");
-	await writeJSONFile(config.data.statuses, [
+	await outputJSONFile(config.data.statuses, [
 		{
 			"published": Date.now(),
 			"text": status

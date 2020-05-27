@@ -1,9 +1,11 @@
 import babel from "@babel/core";
 import config from "./config.js";
-import fs from "fs/promises";
 import {
 	getVersion
 } from "../lib/get-version.js";
+import {
+	outputFile
+} from "../lib/output-file.js";
 
 const buildJS = async (file) => {
 	const [
@@ -23,7 +25,7 @@ const buildJS = async (file) => {
 		})
 	]);
 	const dest = file.dest.replace(/{{version}}/g, version);
-	await fs.writeFile(dest, `(function(){${compiled.code}})();`);
+	await outputFile(dest, `(function(){${compiled.code}})();`);
 };
 
 Promise.all(config.files.js.map(buildJS)).catch((e) => {

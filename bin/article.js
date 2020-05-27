@@ -1,6 +1,6 @@
 import {
-	readJSONFile,
-	writeJSONFile
+	outputJSONFile,
+	readJSONFile
 } from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
@@ -9,6 +9,9 @@ import {
 } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
+import {
+	outputFile
+} from "../lib/output-file.js";
 import path from "path";
 import readline from "readline";
 import {
@@ -143,7 +146,7 @@ const testSelected = async (selected) => {
 		.replace(/(?<=\bhref=")\//g, "../dist/");
 	const [open] = await Promise.all([
 		which("open"),
-		fs.writeFile(config.dest.test, highlight(rendered))
+		outputFile(config.dest.test, highlight(rendered))
 	]);
 	return runCommand(open, [config.dest.test]);
 };
@@ -160,9 +163,12 @@ const listArticleImagePaths = (html) => {
 	return Promise.all(images.map(toImagePath));
 };
 
-const copyArticleImage = (imagepath) => {
+const copyArticleImage = async (imagepath) => {
 	const src = path.join(config.src.articleImages, imagepath);
 	const dest = path.join(config.dest.articleImages, imagepath);
+	await fs.mkdir(config.dest.articleImages, {
+		"recursive": true
+	})
 	fs.copyFile(src, dest);
 };
 
@@ -184,8 +190,8 @@ const contributeSelected = async (selected) => {
 		which("node"),
 		fs.unlink(selected.src),
 		copyArticleImages(selected.body),
-		fs.writeFile(articlePath, selected.body),
-		writeJSONFile(config.data.articles, [
+		outputFile(articlePath, selected.body),
+		outputJSONFile(config.data.articles, [
 			{
 				"link": `/blog/${selected.name}.html`,
 				"published": Date.now(),
