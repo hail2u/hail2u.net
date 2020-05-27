@@ -324,7 +324,7 @@ const build = async (metadata, partials, file) => {
 		data,
 		template
 	] = await Promise.all([
-		mergeData(file.json, file.dest, metadata),
+		mergeData(file.data, file.dest, metadata),
 		fs.readFile(file.src, "utf8")
 	]);
 
@@ -358,8 +358,8 @@ const build = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = (article) => ({
+	"data": config.data.article,
 	"dest": convertToPOSIXPath(path.join(config.dest.root, article.link)),
-	"json": config.data.article,
 	"src": config.src.article,
 	...article
 });
@@ -411,8 +411,8 @@ const main = async () => {
 
 	if (argv.article) {
 		return build(metadata, partials, {
+			"data": config.data.article,
 			"dest": argv.article,
-			"json": config.data.article,
 			"src": config.src.article
 		});
 	}

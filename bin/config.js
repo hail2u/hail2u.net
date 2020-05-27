@@ -129,68 +129,68 @@ export default {
 		],
 		"txt": [
 			{
+				"data": "src/blog/index.json",
 				"dest": "dist/blog/index.html",
-				"json": "src/blog/index.json",
 				"src": "src/blog/index.mustache"
 			},
 			{
+				"data": "src/bookshelf/index.json",
 				"dest": "dist/bookshelf/index.html",
-				"json": "src/bookshelf/index.json",
 				"src": "src/bookshelf/index.mustache"
 			},
 			{
+				"data": "src/bookshelf/index.json",
 				"dest": "dist/bookshelf/log.html",
-				"json": "src/bookshelf/index.json",
 				"src": "src/bookshelf/log.mustache"
 			},
 			{
+				"data": "src/index.json",
 				"dest": "dist/CNAME",
-				"json": "src/index.json",
 				"src": "src/cname.mustache"
 			},
 			{
+				"data": "src/documents/index.json",
 				"dest": "dist/documents/index.html",
-				"json": "src/documents/index.json",
 				"src": "src/documents/index.mustache"
 			},
 			{
+				"data": "src/index.json",
 				"dest": "dist/index.html",
-				"json": "src/index.json",
 				"src": "src/index.mustache"
 			},
 			{
+				"data": "src/links/index.json",
 				"dest": "dist/links/index.html",
-				"json": "src/links/index.json",
 				"src": "src/links/index.mustache"
 			},
 			{
+				"data": "src/mysubscriptions.json",
 				"dest": "dist/mysubscriptions.opml",
-				"json": "src/mysubscriptions.json",
 				"src": "src/mysubscriptions.mustache"
 			},
 			{
+				"data": "src/photos/index.json",
 				"dest": "dist/photos/index.html",
-				"json": "src/photos/index.json",
 				"src": "src/photos/index.mustache"
 			},
 			{
+				"data": "src/photos/index.json",
 				"dest": "dist/photos/log.html",
-				"json": "src/photos/index.json",
 				"src": "src/photos/log.mustache"
 			},
 			{
+				"data": "src/index.json",
 				"dest": "dist/robots.txt",
-				"json": "src/index.json",
 				"src": "src/robots.mustache"
 			},
 			{
+				"data": "src/sitemap.json",
 				"dest": "dist/sitemap.xml",
-				"json": "src/sitemap.json",
 				"src": "src/sitemap.mustache"
 			},
 			{
+				"data": "src/statuses/index.json",
 				"dest": "dist/statuses/index.html",
-				"json": "src/statuses/index.json",
 				"src": "src/statuses/index.mustache"
 			}
 		]
