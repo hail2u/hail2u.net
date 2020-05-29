@@ -4,7 +4,8 @@ const setRandomLink = () => {
 	const href = link.getAttribute("href");
 	const template = document.querySelector(".js-random-link");
 	template.content.querySelector("a").setAttribute("href", href);
-	template.parentNode.insertBefore(template.content, template);
+	const fallback = document.querySelector(".js-random-link-fallback");
+	template.parentNode.replaceChild(template.content, fallback);
 	template.parentNode.removeChild(template);
 };
 

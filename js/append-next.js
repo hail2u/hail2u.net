@@ -1,4 +1,6 @@
-const showNext = (event) => {
+const showNext = ({
+	target
+}) => {
 	const template = document.querySelector(".js-append-next");
 	const button = template.content.querySelector("button");
 
@@ -8,8 +10,7 @@ const showNext = (event) => {
 
 	template.parentNode.insertBefore(template.content, template);
 	template.parentNode.removeChild(template);
-	const self = event.target;
-	self.parentNode.hidden = true;
+	target.parentNode.hidden = true;
 };
 
 showNext({
