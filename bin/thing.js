@@ -90,13 +90,7 @@ const addLink = async (title, url) => {
 	];
 };
 
-const addPhoto = async (photo, title) => {
-	const ext = path.extname(photo).toLowerCase();
-
-	if (ext !== ".jpg" && ext !== ".jpeg") {
-		throw new Error("Photo must be JPEG.");
-	}
-
+const addPhoto = async (photo, ext) => {
 	const dt = new Date();
 	const year = String(dt.getFullYear()).padStart(2, "0");
 	const month = String(dt.getMonth() + 1).padStart(2, "0");
@@ -123,7 +117,7 @@ const addPhoto = async (photo, title) => {
 				"height": metadata.height,
 				"link": `/img/photos/${fn}`,
 				"published": Date.now(),
-				"title": title,
+				"title": path.basename(photo, ext),
 				"width": metadata.width
 			},
 			...photos
@@ -156,7 +150,6 @@ const addStatus = async (status) => {
 const addThing = ({
 	asin,
 	feed,
-	photo,
 	title,
 	url,
 	"_": remains
@@ -173,11 +166,13 @@ const addThing = ({
 		return addLink(title, url);
 	}
 
-	if (photo && title) {
-		return addPhoto(photo, title);
-	}
+	if (!asin && !feed && !title && !url && remains.length === 1) {
+		const ext = path.extname(remains[0]).toLowerCase();
 
-	if (!asin && !feed && !photo && !title && !url && remains.length === 1) {
+		if (ext === ".jpg" || ext === ".jpeg") {
+			return addPhoto(remains[0], ext);
+		}
+
 		return addStatus(remains[0]);
 	}
 
@@ -188,7 +183,7 @@ To add:
   A book:      $ node thing.js --asin <ASIN> --title <TITLE>
   A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
   A link:      $ node thins.js --title <TITLE> --url <URL>
-  A photo:     $ node thing.js --photo <FILE> --title <TITLE>
+  A photo:     $ node thing.js <FILE>
   A status:    $ node thing.js <TEXT>
 `);
 };
