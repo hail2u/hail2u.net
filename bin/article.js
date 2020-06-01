@@ -20,7 +20,6 @@ import {
 import {
 	unescapeReferences
 } from "../lib/character-reference.js";
-import which from "which";
 
 const getDraft = async (filename) => {
 	const src = path.join(config.src.drafts, filename);
@@ -144,11 +143,8 @@ const testSelected = async (selected) => {
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
 		.replace(/(?<=\bhref=")\//g, "../dist/");
-	const [open] = await Promise.all([
-		which("open"),
-		outputFile(config.dest.test, highlight(rendered))
-	]);
-	return runCommand(open, [config.dest.test]);
+	await outputFile(config.dest.test, highlight(rendered));
+	return runCommand("open", [config.dest.test]);
 };
 
 const toImagePath = (str) => path.basename(str.split(/"/)[1]);
@@ -182,12 +178,7 @@ const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 const contributeSelected = async (selected) => {
 	const articlePath = path.join(config.src.articles, `${selected.name}.html`);
 	const cache = await readJSONFile(config.data.articles);
-	const [
-		git,
-		node
-	] = await Promise.all([
-		which("git"),
-		which("node"),
+	await Promise.all([
 		fs.unlink(selected.src),
 		copyArticleImages(selected.body),
 		outputFile(articlePath, selected.body),
@@ -201,18 +192,18 @@ const contributeSelected = async (selected) => {
 		])
 	]);
 	await Promise.all([
-		runCommand(git, [
+		runCommand("git", [
 			"add",
 			"--",
 			articlePath,
 			config.data.articles
 		]),
-		runCommand(node, [
+		runCommand("node", [
 			"bin/txt.js",
 			`--article=${config.dest.articles}${selected.name}.html`
 		])
 	]);
-	return runCommand(git, [
+	return runCommand("git", [
 		"commit",
 		`--message=Contribute ${selected.name}${getArticleTotal(cache)}`
 	]);

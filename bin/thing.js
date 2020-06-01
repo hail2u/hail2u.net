@@ -14,7 +14,6 @@ import {
 	runCommand
 } from "../lib/run-command.js";
 import sharp from "sharp";
-import which from "which";
 
 const isFollowed = (url, following) => url === following.url;
 
@@ -223,21 +222,15 @@ const main = async () => {
 		]
 	});
 	const [
-		git,
-		[
-			files,
-			message
-		]
-	] = await Promise.all([
-		which("git"),
-		addThing(argv)
-	]);
-	await runCommand(git, [
+		files,
+		message
+	] = await addThing(argv);
+	await runCommand("git", [
 		"add",
 		"--",
 		...files
 	]);
-	await runCommand(git, [
+	await runCommand("git", [
 		"commit",
 		`--message=${message}`
 	]);
