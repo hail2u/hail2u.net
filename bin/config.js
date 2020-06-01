@@ -109,22 +109,6 @@ export default {
 			{
 				"dest": "dist/js/append-next.{{version}}.js",
 				"src": "src/js/append-next.js"
-			},
-			{
-				"dest": "dist/js/random-link.{{version}}.js",
-				"src": "src/js/random-link.js"
-			},
-			{
-				"dest": "dist/js/relative-time.{{version}}.js",
-				"src": "src/js/relative-time.js"
-			},
-			{
-				"dest": "dist/js/site-search.{{version}}.js",
-				"src": "src/js/site-search.js"
-			},
-			{
-				"dest": "dist/js/unutm.{{version}}.js",
-				"src": "src/js/unutm.js"
 			}
 		],
 		"txt": [
