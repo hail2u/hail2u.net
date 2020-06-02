@@ -3,9 +3,6 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "./config.js";
-import {
-	convertToPOSIXPath
-} from "../lib/convert-to-posix-path.js";
 import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
@@ -134,7 +131,7 @@ const addPhoto = async (photo, ext) => {
 	]);
 	return [
 		[
-			convertToPOSIXPath(src),
+			src,
 			config.data.photos
 		],
 		`Add ${fn}`

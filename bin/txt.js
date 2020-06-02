@@ -3,9 +3,6 @@ import {
 	unescapeReferences
 } from "../lib/character-reference.js";
 import config from "./config.js";
-import {
-	convertToPOSIXPath
-} from "../lib/convert-to-posix-path.js";
 import fs from "fs/promises";
 import {
 	getDateDetails
@@ -362,7 +359,7 @@ const build = async (metadata, partials, file) => {
 
 const toFilesFormat = (article) => ({
 	"data": config.data.article,
-	"dest": convertToPOSIXPath(path.join(config.dest.root, article.link)),
+	"dest": path.join(config.dest.root, article.link),
 	"src": config.src.article,
 	...article
 });
