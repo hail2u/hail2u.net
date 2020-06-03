@@ -17,7 +17,7 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.11.css" rel="stylesheet">
+		<link href="/css/main.9.9.12.css" rel="stylesheet">
 
 		<meta content="vim-css3-syntaxとvim-lessを両方入れている環境で、LESSの引数付きミックスイン内がハイライトされなくなってしまうバグを直した（つもり）。コンフリクトかと思ったら普通にバグだった……。でも他にもこのあたりの絡みで不具合があって、多分vim-less側でも対処しないと完全には直らないと思う。まぁとにかく一部は直せたので、両方使っている人は更新してみてください。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
@@ -37,7 +37,9 @@
 
 	<body>
 		<header class="header">
-			<div class="navigation">
+			<nav class="navigation">
+				<p class="logo"><a href="/">Hail2u</a></p>
+
 				<ul class="pages">
 					<li><a href="/documents/">特集</a></li>
 					<li><a href="/blog/" aria-current="page">雑記</a></li>
@@ -47,18 +49,22 @@
 					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
+			</nav>
 
-					<p class="logo"><a href="/">Hail2u</a></p>
-			</div>
-
-				<p class="metaline"><time datetime="2012-02-20T12:58:58+09:00" itemprop="datePublished">2012年2月20日</time></p>
-
-			<h1 class="tagline">vim-css3-syntaxがvim-lessのハイライトを壊してしまう</h1>
 		</header>
 
-		<main id="content" class="content" itemprop="articleBody">
+		<main class="content">
 
-<p><a href="https://github.com/hail2u/vim-css3-syntax">vim-css3-syntax</a>と<a href="https://github.com/groenewege/vim-less">vim-less</a>を両方入れている環境で、<a href="https://github.com/hail2u/vim-css3-syntax/issues/5">LESSの引数付きミックスイン内がハイライトされなくなってしまうバグ</a>を直した（つもり）。コンフリクトかと思ったら普通にバグだった……。でも他にもこのあたりの絡みで不具合があって、多分vim-less側でも対処しないと完全には直らないと思う。まぁとにかく一部は直せたので、両方使っている人は更新してみてください。</p>
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2012-02-20T12:58:58+09:00" itemprop="datePublished">2012年2月20日</time></p>
+
+		<h1 class="tagline">vim-css3-syntaxがvim-lessのハイライトを壊してしまう</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p><a href="https://github.com/hail2u/vim-css3-syntax">vim-css3-syntax</a>と<a href="https://github.com/groenewege/vim-less">vim-less</a>を両方入れている環境で、<a href="https://github.com/hail2u/vim-css3-syntax/issues/5">LESSの引数付きミックスイン内がハイライトされなくなってしまうバグ</a>を直した（つもり）。コンフリクトかと思ったら普通にバグだった……。でも他にもこのあたりの絡みで不具合があって、多分vim-less側でも対処しないと完全には直らないと思う。まぁとにかく一部は直せたので、両方使っている人は更新してみてください。</p>
 
 <p>vim-css3-syntaxの<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Querires</a>のハイライトを担う部分で追加定義している<code>cssMediaType</code>グループで<code>contained</code>を引数として指定していなかったため、<a href="http://lesscss.org/">LESS</a>のミックスインの引数を括るのに使う括弧（<code>（)</code>）がMedia Queriesの<code>（min-width: 480px)</code>などの括弧とみなされてしまっていた。その結果、その括弧に続く<code>{}</code>で括られたブロックがLESSのルールセットではなく<code>@media</code>のブロックになってしまい、直下のCSSプロパティーなどがうまくハイライトされなくなった（<code>cssMediaBlock</code>グループの<code>contains</code>にはCSSプロパティー等をハイライトするための<code>css.*Prop</code>や<code>lessDefinition</code>グループ等が含まれてないので）ということの模様。</p>
 
@@ -71,6 +77,8 @@ syn clear cssMediaBlock
 syn region cssMediaBlock contained transparent matchgroup=cssBraces start=<span class="hljs-string">'{'</span> end=<span class="hljs-string">'}'</span> contains=TOP</code></pre>
 
 <p>ただ完璧ではなくて、例えばMedia Queriesのクエリ式での変数（prerelease版でサポートされている奴）なんかがキレイにハイライトされない。単なるハイライトグループへの追加とかでは無理そうな気がするので、対応するにはちゃんとSCSS向けに<code>css3-mediaqueries.vim</code>を書き直す必要がありそう。</p>
+	</div>
+</article>
 
 	<nav class="subnavigation">
 		<p><a href="/blog/webdesign/monospace-font-sizing-incompatibilities.html">等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</a></p>
@@ -83,7 +91,7 @@ syn region cssMediaBlock contained transparent matchgroup=cssBraces start=<span 
 
 			<ul class="footlinks">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-				<li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>
 		</footer>
 	</body>

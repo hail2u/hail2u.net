@@ -17,7 +17,7 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.11.css" rel="stylesheet">
+		<link href="/css/main.9.9.12.css" rel="stylesheet">
 
 		<meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
@@ -37,7 +37,9 @@
 
 	<body>
 		<header class="header">
-			<div class="navigation">
+			<nav class="navigation">
+				<p class="logo"><a href="/">Hail2u</a></p>
+
 				<ul class="pages">
 					<li><a href="/documents/">特集</a></li>
 					<li><a href="/blog/" aria-current="page">雑記</a></li>
@@ -47,18 +49,22 @@
 					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
+			</nav>
 
-					<p class="logo"><a href="/">Hail2u</a></p>
-			</div>
-
-				<p class="metaline"><time datetime="2015-01-25T18:54:05+09:00" itemprop="datePublished">2015年1月25日</time></p>
-
-			<h1 class="tagline">child_process.spawnSync()のoptions引数</h1>
 		</header>
 
-		<main id="content" class="content" itemprop="articleBody">
+		<main class="content">
 
-<p><a href="https://iojs.org/api/child_process.html#child_process_child_process_spawnsync_command_args_options"><code>child_process.spawnSync()</code></a>で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。<a href="https://github.com/iojs/io.js/issues/576">イシュー</a>立てたらすぐ<a href="https://github.com/iojs/io.js/pull/579">修正</a>された。どうやら内部で<code>options</code>を上書きしてしまっていただけらしい。</p>
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2015-01-25T18:54:05+09:00" itemprop="datePublished">2015年1月25日</time></p>
+
+		<h1 class="tagline">child_process.spawnSync()のoptions引数</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p><a href="https://iojs.org/api/child_process.html#child_process_child_process_spawnsync_command_args_options"><code>child_process.spawnSync()</code></a>で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。<a href="https://github.com/iojs/io.js/issues/576">イシュー</a>立てたらすぐ<a href="https://github.com/iojs/io.js/pull/579">修正</a>された。どうやら内部で<code>options</code>を上書きしてしまっていただけらしい。</p>
 
 <p>io.js v1.0.3上では以下のようなコードで再現できる。</p>
 
@@ -94,6 +100,8 @@ TypeError: Incorrect value for stdio stream: { type: &apos;fd&apos;, fd: { type:
 		at Function.Module.runMain (module.js:487:10)</pre>
 
 <p>io.jsではすぐ直りそう（Node.jsではstableに来る頃には直っていることだろう）だが、それまでは<code>options</code>はいちいち書いた方が無難だろう。具体的には<code>JSON.parse(JSON.stringify(opts))</code>とオブジェクトをクローンするテクニックを利用して指定するのが安定して良さそうだ。</p>
+	</div>
+</article>
 
 	<nav class="subnavigation">
 		<p><a href="/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html">CloudFlareにおけるメール・ソリューションとしてのMailgun</a></p>
@@ -106,7 +114,7 @@ TypeError: Incorrect value for stdio stream: { type: &apos;fd&apos;, fd: { type:
 
 			<ul class="footlinks">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-				<li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>
 		</footer>
 	</body>

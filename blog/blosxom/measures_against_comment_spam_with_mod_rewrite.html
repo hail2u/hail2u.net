@@ -17,7 +17,7 @@
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.11.css" rel="stylesheet">
+		<link href="/css/main.9.9.12.css" rel="stylesheet">
 
 		<meta content="blosxomでのスパム対策は自分で考えたものも含め、いくつか紹介してきたわけですが、どれもwritebackプラグインに対策コードを追加という形を取っているので、blosxom本体が呼ばれまくるというのは避けられないものです。現に、ここ4日ほどランダムプロクシ経由で爆撃（1000近い）受け、ちょっと精神的によろしくない感じでした（全部撃墜できたので、さほど気にすることはないとは思うのですが）。そこで思い出したのが、mod_rewriteによるスパム対策です。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
@@ -37,7 +37,9 @@
 
 	<body>
 		<header class="header">
-			<div class="navigation">
+			<nav class="navigation">
+				<p class="logo"><a href="/">Hail2u</a></p>
+
 				<ul class="pages">
 					<li><a href="/documents/">特集</a></li>
 					<li><a href="/blog/" aria-current="page">雑記</a></li>
@@ -47,18 +49,22 @@
 					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
+			</nav>
 
-					<p class="logo"><a href="/">Hail2u</a></p>
-			</div>
-
-				<p class="metaline"><time datetime="2004-09-16T20:28:20+09:00" itemprop="datePublished">2004年9月16日</time></p>
-
-			<h1 class="tagline">mod_rewriteでスパム対策</h1>
 		</header>
 
-		<main id="content" class="content" itemprop="articleBody">
+		<main class="content">
 
-<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>でのスパム対策は自分で考えたものも含め、いくつか紹介してきたわけですが、どれも<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writebackプラグイン</a>に対策コードを追加という形を取っているので、blosxom本体が呼ばれまくるというのは避けられないものです。現に、ここ4日ほどランダムプロクシ経由で爆撃（1000近い）受け、ちょっと精神的によろしくない感じでした（全部撃墜できたので、さほど気にすることはないとは思うのですが）。そこで思い出したのが、mod_rewriteによるスパム対策です。</p>
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2004-09-16T20:28:20+09:00" itemprop="datePublished">2004年9月16日</time></p>
+
+		<h1 class="tagline">mod_rewriteでスパム対策</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>でのスパム対策は自分で考えたものも含め、いくつか紹介してきたわけですが、どれも<a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writebackプラグイン</a>に対策コードを追加という形を取っているので、blosxom本体が呼ばれまくるというのは避けられないものです。現に、ここ4日ほどランダムプロクシ経由で爆撃（1000近い）受け、ちょっと精神的によろしくない感じでした（全部撃墜できたので、さほど気にすることはないとは思うのですが）。そこで思い出したのが、mod_rewriteによるスパム対策です。</p>
 <p>スパム対策をいろいろ探し回っていた時に見つけた、<a href="http://www.unix-girl.com/blog/" title="kasia in a nutshell">kasia in a nutshell</a>の<a href="http://www.unix-girl.com/blog/archives/001444.html" title="kasia in a nutshell: Comment spam and mod_rewrite">Comment spam and mod_rewrite</a>というエントリが元ネタです。これは<a href="http://www.movabletype.org/" title="Movable Type Publishing Platform">Movable Type</a>での話ですが、仕組み自体はさほど変わらない（特定のURLにPOSTするだけ）ので、自分の環境に合わせて書き直してみたり。</p>
 <pre>RewriteCond %{REQUEST_METHOD} POST
 RewriteCond %{REQUEST_URI} \.writeback$
@@ -72,6 +78,8 @@ RewriteRule (.*) - [F,L]</pre>
 </ul>
 <p>ということになります。で、全てにマッチしたら403を返してやると。</p>
 <p>結局はリファラのチェックに過ぎないので、リファラを詐称されたら防げないですが、経験上はそこまで頑張ったスパムはあまり無いと思うので、結構コレで潰せそうです。この場合はblosxom本体は呼ばれないので、CGIによる負荷が下がることになります（mod_rewriteによる負荷は当然上がりますが）。</p>
+	</div>
+</article>
 
 	<nav class="subnavigation">
 		<p><a href="/blog/rss/unable_to_access_rss.html">RSSにアクセス不能</a></p>
@@ -84,7 +92,7 @@ RewriteRule (.*) - [F,L]</pre>
 
 			<ul class="footlinks">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
-				<li><a href="/blog/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>
 		</footer>
 	</body>
