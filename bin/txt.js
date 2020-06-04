@@ -297,28 +297,6 @@ const markFirstItem = (items) => {
 	];
 };
 
-const shuffleArray = (array) => {
-	const shuffled = [...array];
-
-	for (let i = array.length - 1; i > 0; i -= 1) {
-		const j = Math.floor(Math.random() * (i + 1));
-
-		if (i === j) {
-			continue;
-		}
-
-		[
-			shuffled[i],
-			shuffled[j]
-		] = [
-			shuffled[j],
-			shuffled[i]
-		];
-	}
-
-	return shuffled;
-};
-
 const build = async (metadata, partials, file) => {
 	const [
 		data,
@@ -346,10 +324,6 @@ const build = async (metadata, partials, file) => {
 		data.links = data.links.slice(0, 6);
 		data.photos = data.photos.slice(0, 12);
 		data.statuses = data.statuses.slice(0, 1);
-	}
-
-	if (data.isLinks) {
-		data.followings = shuffleArray(data.followings);
 	}
 
 	const rendered = mustache.render(template, data, partials);
