@@ -4,9 +4,6 @@ import {
 } from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
-import {
-	highlight
-} from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import {
@@ -143,7 +140,7 @@ const testSelected = async (selected) => {
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
 		.replace(/(?<=\bhref=")\//g, "../dist/");
-	await outputFile(config.dest.test, highlight(rendered));
+	await outputFile(config.dest.test, rendered);
 	return runCommand("open", [config.dest.test]);
 };
 
