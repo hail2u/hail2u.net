@@ -27,8 +27,8 @@ export default {
 				"src": "src/css/documents.css"
 			},
 			{
-				"dest": "dist/css/main.{{version}}.css",
-				"src": "src/css/main.css"
+				"dest": "dist/css/index.{{version}}.css",
+				"src": "src/css/index.css"
 			},
 			{
 				"dest": "dist/css/test.css",
