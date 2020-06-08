@@ -120,7 +120,7 @@ const readStatuses = async () => {
 	return Promise.all(latests.map(extendStatus));
 };
 
-const compareByPublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const isValidType = (type, item) => {
 	if (!type) {
@@ -192,7 +192,7 @@ const main = async () => {
 		...links,
 		...photos,
 		...statuses
-	].sort(compareByPublished);
+	].sort(comparePublished);
 	return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
 };
 
