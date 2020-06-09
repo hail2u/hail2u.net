@@ -31,9 +31,8 @@ window.addEventListener("load", () => {
 		const foreground = style.getPropertyValue("color");
 		const background = style.getPropertyValue("background-color");
 		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
-		const code = color.nextElementSibling;
-		code.lastChild.replaceWith(background);
-		const contrast = code.nextElementSibling;
+		color.lastChild.replaceWith(background);
+		const contrast = color.nextElementSibling;
 		contrast.lastChild.replaceWith(ratio);
 	}
 });
