@@ -15,13 +15,13 @@
 		<link href="/blog/coding/set_data_to_clipboard_from_bookmarklet.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Bookmarkletからクリップボードに文字列をコピー" itemprop="name">
+		<link href="/blog/coding/view_sorce_in_firefox.html" rel="prev">
 		<link href="/blog/coding/set_data_to_clipboard_from_bookmarklet.html" itemprop="url">
 
 		<meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-07-04T00:08:01+09:00" itemprop="datePublished">2004年7月4日</time></p>
 
-		<h1 class="tagline">Bookmarkletからクリップボードに文字列をコピー</h1>
+		<h1 class="screamer">Bookmarkletからクリップボードに文字列をコピー</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -79,17 +78,17 @@
 [HKEY_CLASSES_ROOT\set-data-to-clipboard\shell\open\command]
 @=&quot;wscript.exe C:\\Scripts\\SetDataToClipBoard.js \&quot;%1\&quot;&quot;</pre>
 <p>SetDataToClipBoard.jsはこんな感じ。</p>
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> oArgs = WScript.Arguments
-<span class="hljs-keyword">var</span> s = oArgs(<span class="hljs-number">0</span>);
-s = s.replace(<span class="hljs-regexp">/^set-data-to-clipboard:\/\//</span>, <span class="hljs-string">""</span>);
-s = s.replace(<span class="hljs-regexp">/\/$/</span>, <span class="hljs-string">""</span>);
+<pre><code class="language-js">var oArgs = WScript.Arguments
+var s = oArgs(0);
+s = s.replace(/^set-data-to-clipboard:\/\//, &quot;&quot;);
+s = s.replace(/\/$/, &quot;&quot;);
 
-<span class="hljs-keyword">var</span> oIe = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"InternetExplorer.Application"</span>);
-oIe.Navigate(<span class="hljs-string">"about:blank"</span>);
+var oIe = new ActiveXObject(&quot;InternetExplorer.Application&quot;);
+oIe.Navigate(&quot;about:blank&quot;);
 
-<span class="hljs-keyword">while</span> (oIe.Busy) WScript.Sleep(<span class="hljs-number">100</span>);
+while (oIe.Busy) WScript.Sleep(100);
 
-oIe.Document.parentWindow.clipboardData.setData(<span class="hljs-string">"text"</span>, <span class="hljs-built_in">unescape</span>(s));
+oIe.Document.parentWindow.clipboardData.setData(&quot;text&quot;, unescape(s));
 oIe.Quit();</code></pre>
 <p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。</p>
 <p>あとはテキトウにBookmarkletを作成してみましょう。例えば閲覧中のページのタイトルとリンクをコピーするBookmarkletだと、Locationには、</p>
@@ -109,15 +108,15 @@ oIe.Quit();</code></pre>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/view_sorce_in_firefox.html">Firefoxのソースの表示を任意のエディタで</a></p>
+		<p><a href="/blog/coding/view_sorce_in_firefox.html" rel="prev">Firefoxのソースの表示を任意のエディタで</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

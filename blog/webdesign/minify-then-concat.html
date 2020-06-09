@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/minify-then-concat.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="MinifyしてからConcat" itemprop="name">
+		<link href="/blog/software/convert-svg-to-png-with-inkscape-cli.html" rel="prev">
 		<link href="/blog/webdesign/minify-then-concat.html" itemprop="url">
 
 		<meta content="配布されているライブラリーを最小ツールに通すと、ライセンスあたりの扱いで面倒なことになる。またCSSの場合は壊れる可能性を否定できないことは意識しなければならない。ということで重い腰を上げて、最小化してから連結するような工夫をソース・マップを維持することを前提にこのウェブサイトで実験し始めた。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-12-13T07:13:34+09:00" itemprop="datePublished">2014年12月13日</time></p>
 
-		<h1 class="tagline">MinifyしてからConcat</h1>
+		<h1 class="screamer">MinifyしてからConcat</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -84,94 +83,94 @@
 
 <p>これを踏まえて、Bowerでインストールした<code>lib-a.min.js</code>と<code>lib-b.min.js</code>、そして自分で書いた<code>foo.js</code>と<code>bar.js</code>を最小化してから連結し、最終的に<code>main.min.js</code>を作るとする。タスクの設定は以下のようになることだろう。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) </span>{
+<pre><code class="language-javascript">module.exports = function (grunt) {
 	grunt.initConfig({
-		<span class="hljs-attr">clean</span>: {
-			<span class="hljs-comment">// `tmp/`ディレクトリーを掃除するタスク</span>
-			<span class="hljs-attr">main</span>: {
-				<span class="hljs-attr">src</span>: [<span class="hljs-string">'tmp/**/*'</span>]
+		clean: {
+			// `tmp/`ディレクトリーを掃除するタスク
+			main: {
+				src: ['tmp/**/*']
 			}
 		},
 
-		<span class="hljs-attr">concat</span>: {
-			<span class="hljs-comment">// 最小化済みのファイルをソース・マップ付きで連結するタスク</span>
-			<span class="hljs-attr">js</span>: {
-				<span class="hljs-attr">options</span>: {
-					<span class="hljs-attr">seperator</span>: <span class="hljs-string">';'</span>,
-					<span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span>,
-					<span class="hljs-attr">sourceMapStyle</span>: <span class="hljs-string">'link'</span>
+		concat: {
+			// 最小化済みのファイルをソース・マップ付きで連結するタスク
+			js: {
+				options: {
+					seperator: &apos;;&apos;,
+					sourceMap: true,
+					sourceMapStyle: &apos;link&apos;
 				},
 
-				<span class="hljs-attr">files</span>: {
-					<span class="hljs-string">'tmp/main.min.js'</span>: [
-						<span class="hljs-string">'tmp/lib-a.min.js'</span>,
-						<span class="hljs-string">'tmp/lib-b.min.js'</span>,
-						<span class="hljs-string">'tmp/foo.min.js'</span>,
-						<span class="hljs-string">'tmp/bar.min.js'</span>
+				files: {
+					&apos;tmp/main.min.js&apos;: [
+						&apos;tmp/lib-a.min.js&apos;,
+						&apos;tmp/lib-b.min.js&apos;,
+						&apos;tmp/foo.min.js&apos;,
+						&apos;tmp/bar.min.js&apos;
 					]
 				}
 			}
 		},
 
-		<span class="hljs-attr">copy</span>: {
-			<span class="hljs-comment">// プロダクション向けに公開ディレクトリーへコピーするタスク</span>
-			<span class="hljs-attr">js</span>: {
-				<span class="hljs-attr">cwd</span>: <span class="hljs-string">'tmp/'</span>,
-				<span class="hljs-attr">dest</span>: <span class="hljs-string">'build/js/'</span>,
-				<span class="hljs-attr">expand</span>: <span class="hljs-literal">true</span>,
-				<span class="hljs-attr">src</span>: [
-					<span class="hljs-string">'**/*.js'</span>,
-					<span class="hljs-string">'**/*.js.map'</span>
+		copy: {
+			// プロダクション向けに公開ディレクトリーへコピーするタスク
+			js: {
+				cwd: &apos;tmp/&apos;,
+				dest: &apos;build/js/&apos;,
+				expand: true,
+				src: [
+					&apos;**/*.js&apos;,
+					&apos;**/*.js.map&apos;
 				]
 			},
 
-			<span class="hljs-comment">// 一時ディレクトリーへ必要なファイルをコピーするタスク</span>
-			<span class="hljs-comment">// 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも</span>
-			<span class="hljs-attr">prejs</span>: {
-				<span class="hljs-attr">files</span>: {
-					<span class="hljs-string">'tmp/bar.js'</span>: <span class="hljs-string">'src/js/bar.js'</span>,
-					<span class="hljs-string">'tmp/foo.js'</span>: <span class="hljs-string">'src/js/foo.js'</span>,
-					<span class="hljs-string">'tmp/lib-a.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.js'</span>,
-					<span class="hljs-string">'tmp/lib-a.min.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.min.js'</span>,
-					<span class="hljs-string">'tmp/lib-a.min.js.map'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-a.min.js.map'</span>,
-					<span class="hljs-string">'tmp/lib-b.js'</span>: <span class="hljs-string">'bower_component/lib-a/dist/lib-b.js'</span>,
-					<span class="hljs-string">'tmp/lib-b.min.js'</span>: <span class="hljs-string">'bower_component/lib-b/dist/lib-b.min.js'</span>,
-					<span class="hljs-string">'tmp/lib-b.min.js.map'</span>: <span class="hljs-string">'bower_component/lib-b/dist/lib-b.min.js.map'</span>
+			// 一時ディレクトリーへ必要なファイルをコピーするタスク
+			// 最小化済みのライブラリーは元ファイルとソース・マップ・ファイルも
+			prejs: {
+				files: {
+					&apos;tmp/bar.js&apos;: &apos;src/js/bar.js&apos;,
+					&apos;tmp/foo.js&apos;: &apos;src/js/foo.js&apos;,
+					&apos;tmp/lib-a.js&apos;: &apos;bower_component/lib-a/dist/lib-a.js&apos;,
+					&apos;tmp/lib-a.min.js&apos;: &apos;bower_component/lib-a/dist/lib-a.min.js&apos;,
+					&apos;tmp/lib-a.min.js.map&apos;: &apos;bower_component/lib-a/dist/lib-a.min.js.map&apos;,
+					&apos;tmp/lib-b.js&apos;: &apos;bower_component/lib-a/dist/lib-b.js&apos;,
+					&apos;tmp/lib-b.min.js&apos;: &apos;bower_component/lib-b/dist/lib-b.min.js&apos;,
+					&apos;tmp/lib-b.min.js.map&apos;: &apos;bower_component/lib-b/dist/lib-b.min.js.map&apos;
 				}
 			}
 		},
 
-		<span class="hljs-attr">uglify</span>: {
-			<span class="hljs-attr">options</span>: {
-				<span class="hljs-attr">preserveComments</span>: <span class="hljs-string">'some'</span>,
-				<span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span>
+		uglify: {
+			options: {
+				preserveComments: &apos;some&apos;,
+				sourceMap: true
 			},
 
-			<span class="hljs-comment">// まだ最小化されていないファイルをソース・マップ付きで最小化するタスク</span>
-			<span class="hljs-attr">main</span>: {
-				<span class="hljs-attr">cwd</span>: <span class="hljs-string">'tmp/'</span>,
-				<span class="hljs-attr">dest</span>: <span class="hljs-string">'tmp/'</span>,
-				<span class="hljs-attr">expand</span>: <span class="hljs-literal">true</span>,
-				<span class="hljs-attr">ext</span>: <span class="hljs-string">'.min.js'</span>,
-				<span class="hljs-attr">src</span>: [
-					<span class="hljs-string">'**/*.js'</span>,
-					<span class="hljs-string">'!**/*.min.js'</span>
+			// まだ最小化されていないファイルをソース・マップ付きで最小化するタスク
+			main: {
+				cwd: &apos;tmp/&apos;,
+				dest: &apos;tmp/&apos;,
+				expand: true,
+				ext: &apos;.min.js&apos;,
+				src: [
+					&apos;**/*.js&apos;,
+					&apos;!**/*.min.js&apos;
 				]
 			}
 		}
 	});
 
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-clean'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-copy'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-concat'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-uglify'</span>);
+	grunt.loadNpmTasks(&apos;grunt-contrib-clean&apos;);
+	grunt.loadNpmTasks(&apos;grunt-contrib-copy&apos;);
+	grunt.loadNpmTasks(&apos;grunt-contrib-concat&apos;);
+	grunt.loadNpmTasks(&apos;grunt-contrib-uglify&apos;);
 
-	grunt.registerTask(<span class="hljs-string">'build:js'</span>, [
-		<span class="hljs-string">'clean'</span>,
-		<span class="hljs-string">'copy:prejs'</span>,
-		<span class="hljs-string">'uglify'</span>,
-		<span class="hljs-string">'concat:js'</span>,
-		<span class="hljs-string">'copy:js'</span>
+	grunt.registerTask(&apos;build:js&apos;, [
+		&apos;clean&apos;,
+		&apos;copy:prejs&apos;,
+		&apos;uglify&apos;,
+		&apos;concat:js&apos;,
+		&apos;copy:js&apos;
 	]);
 };</code></pre>
 
@@ -207,15 +206,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/convert-svg-to-png-with-inkscape-cli.html">InkscapeのCLIを利用してSVGからPNGへ変換</a></p>
+		<p><a href="/blog/software/convert-svg-to-png-with-inkscape-cli.html" rel="prev">InkscapeのCLIを利用してSVGからPNGへ変換</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/promise-waterfall.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="async離れが完了したが、気づくとPromiseでasync-waterfall的なものを何度も書いていた。Promise.resolve()で始めたり、そうでなかったり。名前付き関数を受け取るだけのthen()を何度も書き、読みにくいなとなったり。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Promiseでwaterfall" itemprop="name">
+		<link href="/blog/sizing-and-positioning-svg-icon.html" rel="prev">
 		<link href="/blog/promise-waterfall.html" itemprop="url">
 
 		<meta content="async離れが完了したが、気づくとPromiseでasync-waterfall的なものを何度も書いていた。Promise.resolve()で始めたり、そうでなかったり。名前付き関数を受け取るだけのthen()を何度も書き、読みにくいなとなったり。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2017-04-14T10:58:40+09:00" itemprop="datePublished">2017年4月14日</time></p>
 
-		<h1 class="tagline">Promiseでwaterfall</h1>
+		<h1 class="screamer">Promiseでwaterfall</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,23 +67,23 @@
 
 <p>とりあえず、<code>Array#reduce()</code>を使って配列と初期変数を渡すと順に実行していくものを書いた。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-comment">// waterfall([funcA, funcB, funcC], foo)</span>
-<span class="hljs-comment">//   .then((r) =&gt; {</span>
-<span class="hljs-comment">//     console.log(r);</span>
-<span class="hljs-comment">//   })</span>
-<span class="hljs-comment">//   .catch((e) =&gt; {</span>
-<span class="hljs-comment">//     console.error(e.stack);</span>
-<span class="hljs-comment">//   });</span>
-<span class="hljs-meta">"use strict"</span>;
+<pre><code class="language-javascript">// waterfall([funcA, funcB, funcC], foo)
+//   .then((r) =&gt; {
+//     console.log(r);
+//   })
+//   .catch((e) =&gt; {
+//     console.error(e.stack);
+//   });
+&quot;use strict&quot;;
 
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function">(<span class="hljs-params">tasks, initialValue</span>) =&gt;</span> {
-	<span class="hljs-keyword">if</span> (!initialValue) {
-		initialValue = <span class="hljs-literal">null</span>;
+module.exports = (tasks, initialValue) =&gt; {
+	if (!initialValue) {
+		initialValue = null;
 	}
 
-	<span class="hljs-keyword">return</span> tasks.reduce(<span class="hljs-function">(<span class="hljs-params">p, t</span>) =&gt;</span> {
-		<span class="hljs-keyword">return</span> p.then(t);
-	}, <span class="hljs-built_in">Promise</span>.resolve(initialValue));
+	return tasks.reduce((p, t) =&gt; {
+		return p.then(t);
+	}, Promise.resolve(initialValue));
 };</code></pre>
 
 <p>多少読みやすくはなるが、<code>then()</code>を書かないで済むくらいしかメリットがない。途中で止められないな（常に<code>then()</code>なので）とかも考えると普通に書いた方が良さそうだ。</p>
@@ -96,15 +95,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/sizing-and-positioning-svg-icon.html">SVGアイコンのサイズと位置</a></p>
+		<p><a href="/blog/sizing-and-positioning-svg-icon.html" rel="prev">SVGアイコンのサイズと位置</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

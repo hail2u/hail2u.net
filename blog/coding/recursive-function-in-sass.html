@@ -15,13 +15,13 @@
 		<link href="/blog/coding/recursive-function-in-sass.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Sassでの関数の再帰呼び出し" itemprop="name">
+		<link href="/blog/blog/encounter.html" rel="prev">
 		<link href="/blog/coding/recursive-function-in-sass.html" itemprop="url">
 
 		<meta content="ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-12-05T01:19:17+09:00" itemprop="datePublished">2014年12月5日</time></p>
 
-		<h1 class="tagline">Sassでの関数の再帰呼び出し</h1>
+		<h1 class="screamer">Sassでの関数の再帰呼び出し</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,21 +67,21 @@
 
 <p>以下のようなテスト・コードを書き、<code>$max</code>を書きかえて限界を探った。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-variable">$initial</span>: <span class="hljs-number">0</span>;
-<span class="hljs-variable">$max</span>: <span class="hljs-number">302</span>;
+<pre><code class="language-scss">$initial: 0;
+$max: 302;
 
-<span class="hljs-keyword">@function</span> loop(<span class="hljs-variable">$i</span>) {
-	<span class="hljs-variable">$i</span>: <span class="hljs-variable">$i</span> + <span class="hljs-number">1</span>;
+@function loop($i) {
+	$i: $i + 1;
 
-	<span class="hljs-keyword">@if</span> (<span class="hljs-variable">$i</span> &lt; <span class="hljs-variable">$max</span>) {
-		<span class="hljs-keyword">@return</span> loop(<span class="hljs-variable">$i</span>);
-	} <span class="hljs-keyword">@else</span> {
-		<span class="hljs-keyword">@return</span> <span class="hljs-variable">$i</span>;
+	@if ($i &lt; $max) {
+		@return loop($i);
+	} @else {
+		@return $i;
 	}
 }
 
-<span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">z-index</span>: loop(<span class="hljs-variable">$initial</span>);
+.test {
+	z-index: loop($initial);
 }</code></pre>
 
 <p>コンパイラーが落ちず、出力されるCSSで<code>z-index</code>プロパティーの値が<code>$initial + $max</code>と等しくなれば良い。手元の環境（Sass v3.4.9)では302までは問題なく通り、303にするとstack level too deep (SystemStackError)で落ちた。</p>
@@ -92,15 +91,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/blog/encounter.html">ゆるやかな出会い</a></p>
+		<p><a href="/blog/blog/encounter.html" rel="prev">ゆるやかな出会い</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

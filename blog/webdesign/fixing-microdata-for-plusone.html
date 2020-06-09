@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/fixing-microdata-for-plusone.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Google +1ボタンはMicrodataを読んでくれるんだけど、HTMLありきでメタデータの注釈をつけてあとはお任せでなんとなかなるわけではない。例えばBlogとBlogPostingを組み合わせた形でMicrodataによる注釈を行って、それを一覧ページとpermalinkで使いまわすと+1ボタンからは両者の区別がつかなくなる。そりゃそうか。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="+1向けにMicrodataの修正" itemprop="name">
+		<link href="/blog/misc/hail2u_.html" rel="prev">
 		<link href="/blog/webdesign/fixing-microdata-for-plusone.html" itemprop="url">
 
 		<meta content="Google +1ボタンはMicrodataを読んでくれるんだけど、HTMLありきでメタデータの注釈をつけてあとはお任せでなんとなかなるわけではない。例えばBlogとBlogPostingを組み合わせた形でMicrodataによる注釈を行って、それを一覧ページとpermalinkで使いまわすと+1ボタンからは両者の区別がつかなくなる。そりゃそうか。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2012-06-07T01:12:42+09:00" itemprop="datePublished">2012年6月7日</time></p>
 
-		<h1 class="tagline">+1向けにMicrodataの修正</h1>
+		<h1 class="screamer">+1向けにMicrodataの修正</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -70,18 +69,18 @@
 
 <p>マークアップする段階で<code>itemprop="description"</code>とか<code>img</code>要素に<code>itemprop="image"</code>とかは面倒すぎるので、<a href="http://blosxom.sourceforge.net/">Blosxom</a>側で</p>
 
-<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">story</span> </span>{
-	<span class="hljs-keyword">my</span>($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+<pre><code class="language-perl">sub story {
+	my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
 
-	$$body_ref =~ <span class="hljs-regexp">s/&lt;p&gt;/&lt;p itemprop="description"&gt;/</span>;
-	$has_image = <span class="hljs-number">0</span>;
+	$$body_ref =~ s/&lt;p&gt;/&lt;p itemprop="description"&gt;/;
+	$has_image = 0;
 
-	<span class="hljs-keyword">if</span> ($$body_ref =~ <span class="hljs-keyword">m</span>!&lt;img!) {
-		$has_image = <span class="hljs-number">1</span>;
-		$$body_ref =~ <span class="hljs-regexp">s/&lt;img (.*?)&gt;/&lt;img $1 itemprop="image"&gt;/</span>;
+	if ($$body_ref =~ m!&lt;img!) {
+		$has_image = 1;
+		$$body_ref =~ s/&lt;img (.*?)&gt;/&lt;img $1 itemprop="image"&gt;/;
 	}
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }</code></pre>
 
 <p>とかして最初の段落を<code>description</code>にしたり、画像のあるエントリーの場合は<code>image</code>を割り当てるようにした。単独のプラグイン化する程ではなかったので、いろんな機能をとりあえずぶち込んでる便利プラグインに混ぜてる。こんなの作って誤魔化すことが多いのでflavourがロジックだらけの魔窟でひどい。</p>
@@ -91,15 +90,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/misc/hail2u_.html">@hail2u_</a></p>
+		<p><a href="/blog/misc/hail2u_.html" rel="prev">@hail2u_</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

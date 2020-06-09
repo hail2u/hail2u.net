@@ -15,13 +15,13 @@
 		<link href="/blog/coding/perl-convert-to-data-uri.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。@cho45が書いたのを見て重い腰が上がった。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Data URIに変換するPerlスクリプト" itemprop="name">
+		<link href="/blog/webdesign/sass-identity.html" rel="prev">
 		<link href="/blog/coding/perl-convert-to-data-uri.html" itemprop="url">
 
 		<meta content="Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。@cho45が書いたのを見て重い腰が上がった。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,54 +47,53 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2012-03-19T16:10:54+09:00" itemprop="datePublished">2012年3月19日</time></p>
 
-		<h1 class="tagline">Data URIに変換するPerlスクリプト</h1>
+		<h1 class="screamer">Data URIに変換するPerlスクリプト</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。<a href="https://github.com/cho45/dotfiles/blob/master/bin/data-scheme">@cho45が書いたの</a>を見て重い腰が上がった。</p>
 
-<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/bin/env perl</span>
+<pre><code class="language-perl">#!/usr/bin/env perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> warnings;
+use strict;
+use warnings;
 
-<span class="hljs-keyword">use</span> MIME::Base64;
-<span class="hljs-keyword">use</span> MIME::Types;
-<span class="hljs-keyword">use</span> Path::Extended <span class="hljs-string">qw(file)</span>;
+use MIME::Base64;
+use MIME::Types;
+use Path::Extended qw(file);
 
-<span class="hljs-keyword">my</span> $mt = MIME::Types-&gt;new();
-<span class="hljs-keyword">my</span> @r;
+my $mt = MIME::Types-&gt;new();
+my @r;
 
-<span class="hljs-keyword">foreach</span> (@ARGV) {
-	<span class="hljs-keyword">my</span> $f = file($_);
-	<span class="hljs-keyword">my</span> $t = $mt-&gt;mimeTypeOf($file-&gt;stringify);
-	<span class="hljs-keyword">push</span>(@r, <span class="hljs-string">'data:'</span> . ($t ? $t : <span class="hljs-string">'text/plain'</span>) . <span class="hljs-string">';base64,'</span> . encode_base64(<span class="hljs-keyword">scalar</span>($f-&gt;slurp(<span class="hljs-string">binmode =&gt;</span> <span class="hljs-number">1</span>)), <span class="hljs-string">''</span>));
+foreach (@ARGV) {
+	my $f = file($_);
+	my $t = $mt-&gt;mimeTypeOf($file-&gt;stringify);
+	push(@r, 'data:' . ($t ? $t : 'text/plain') . ';base64,' . encode_base64(scalar($f-&gt;slurp(binmode =&gt; 1)), ''));
 }
 
-<span class="hljs-keyword">print</span> <span class="hljs-keyword">join</span>(<span class="hljs-string">"\n"</span>, @r);
+print join("\n", @r);
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 
 <p><a href="https://metacpan.org/module/URI">URI</a>モジュールでの<code>new('data:')</code>だとBase64でエンコードするかどうかよしなにしてくれちゃうので、普通に<a href="https://metacpan.org/module/MIME::Base64">MIME::Base64</a>を使った。メディアタイプ判別のモジュールはいくつか試したけど、未知の時に例外吐いて死ぬ奴とか常に配列で返す奴とか色々アレなのが多くて、未知の場合は空で返ってくる<a href="https://metacpan.org/module/MIME::Types">MIME::Types</a>が結局一番ましな感じだった。</p>
 
 <p>右クリックから使う場合は、</p>
 
-<pre><code class="hljs language-bat">@<span class="hljs-built_in">echo</span> off
+<pre><code class="language-bat">@echo off
 
-perl -S <span class="hljs-built_in">convert</span>-to-data-uri.pl %* | clip</code></pre>
+perl -S convert-to-data-uri.pl %* | clip</code></pre>
 
 <p>というようなバッチファイルを送るに置いておくとクリップボードに即コピーとかできる。</p>
 
@@ -109,15 +108,15 @@ perl -S <span class="hljs-built_in">convert</span>-to-data-uri.pl %* | clip</cod
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/sass-identity.html">Sassの存在意義</a></p>
+		<p><a href="/blog/webdesign/sass-identity.html" rel="prev">Sassの存在意義</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

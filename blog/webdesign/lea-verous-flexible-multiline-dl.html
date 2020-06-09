@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/lea-verous-flexible-multiline-dl.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Lea Verouの編み出したフレキシブルな複数行定義リストは目からウロコだった。このテクニックを知るまではfloatを使うと長い時（コンテンツ幅に収まらない時）に途中で改行とかうまくできないけどまぁしょうがないか……みたいな感じで我慢していた。LF(やCR)を擬似要素経由で挿入してwhite-space: preで改行させてしまうというのは頭良い。ただ複数のdd要素を持つケースにはうまく対応できないのでちょっと変えて使い始めた。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Lea Verouのフレシキブルな複数行定義リスト" itemprop="name">
+		<link href="/blog/software/ckw-and-cd.html" rel="prev">
 		<link href="/blog/webdesign/lea-verous-flexible-multiline-dl.html" itemprop="url">
 
 		<meta content="Lea Verouの編み出したフレキシブルな複数行定義リストは目からウロコだった。このテクニックを知るまではfloatを使うと長い時（コンテンツ幅に収まらない時）に途中で改行とかうまくできないけどまぁしょうがないか……みたいな感じで我慢していた。LF(やCR)を擬似要素経由で挿入してwhite-space: preで改行させてしまうというのは頭良い。ただ複数のdd要素を持つケースにはうまく対応できないのでちょっと変えて使い始めた。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2012-05-25T08:06:31+09:00" itemprop="datePublished">2012年5月25日</time></p>
 
-		<h1 class="tagline">Lea Verouのフレシキブルな複数行定義リスト</h1>
+		<h1 class="screamer">Lea Verouのフレシキブルな複数行定義リスト</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,32 +67,32 @@
 
 <p>このテクニックはつまり<code>dt</code>要素とそれとセットになった<code>dd</code>要素を一行に並べるというもの。表的なものならばそれは単にマークアップが間違っているので<code>table</code>要素でマークアップし直した方が適切だけど、<code>dl</code>要素のが適切なケースも多くあるのでこのテクニックが生かされる場面は多い。</p>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-tag">dt</span>,
-<span class="hljs-selector-tag">dd</span> {
-	<span class="hljs-attribute">display</span>: inline;
+<pre><code class="language-css">dt,
+dd {
+	display: inline;
 }
 
-<span class="hljs-selector-tag">dd</span> + <span class="hljs-selector-tag">dt</span><span class="hljs-selector-pseudo">:before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"\000a"</span>;
-	<span class="hljs-attribute">white-space</span>: pre;
+dd + dt:before {
+	content: "\000a";
+	white-space: pre;
 }</code></pre>
 
 <p>Lea Verouのオリジナルは<em><code>dd</code>要素の後</em>に改行を追加するけど、変更したやつでは<em><code>dt</code>要素の前</em>に追加するようにした。それだけでは最初の<code>dt</code>要素の前に空行ができるので、隣接セレクターで<code>dd</code>要素の次に来る<code>dt</code>要素に絞る。</p>
 
 <p><code>:first-child</code>擬似クラスを使っても書ける。</p>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-tag">dt</span>,
-<span class="hljs-selector-tag">dd</span> {
-	<span class="hljs-attribute">display</span>: inline;
+<pre><code class="language-css">dt,
+dd {
+	display: inline;
 }
 
-<span class="hljs-selector-tag">dt</span><span class="hljs-selector-pseudo">:before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"\000a"</span>;
-	<span class="hljs-attribute">white-space</span>: pre;
+dt:before {
+	content: "\000a";
+	white-space: pre;
 }
 
-<span class="hljs-selector-tag">dt</span><span class="hljs-selector-pseudo">:first-child</span><span class="hljs-selector-pseudo">:before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">""</span>;
+dt:first-child:before {
+	content: "";
 }</code></pre>
 
 <p>こっちの方が直感的な気もする。けどセレクターの節約が身についてきたので隣接セレクターを使うことにした。隣接セレクターも<code>:first-child</code>擬似クラスもInternet Explorer 7以降での対応だし、そもそも<code>:before</code>擬似要素が8以降なので互換性という点ではあまり変わらない。</p>
@@ -107,15 +106,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/ckw-and-cd.html">ckwとカレントディレクトリ</a></p>
+		<p><a href="/blog/software/ckw-and-cd.html" rel="prev">ckwとカレントディレクトリ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

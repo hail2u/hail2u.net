@@ -15,13 +15,13 @@
 		<link href="/blog/coding/load-mustache-partials-from-file.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="何かしらテンプレート使う時は、実行にはHandlebars.jsを使いつつ、mustacheの仕様に沿った形のみで書くみたいな感じで大体やってる。前に書いたHandlebars.jsのincludeヘルパーだけ便利だったのでちょっと使ったりしてたけど、パーシャルを使って書き直すことにした。パーシャルそのままなのでネストでき、他の実行環境でもだいたいそのままで動く反面、相対パスで見に行くみたいなことは出来なくなった。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="mustacheのパーシャルをファイルから読み込む" itemprop="name">
+		<link href="/blog/webdesign/designer-news-unsubscribe-link.html" rel="prev">
 		<link href="/blog/coding/load-mustache-partials-from-file.html" itemprop="url">
 
 		<meta content="何かしらテンプレート使う時は、実行にはHandlebars.jsを使いつつ、mustacheの仕様に沿った形のみで書くみたいな感じで大体やってる。前に書いたHandlebars.jsのincludeヘルパーだけ便利だったのでちょっと使ったりしてたけど、パーシャルを使って書き直すことにした。パーシャルそのままなのでネストでき、他の実行環境でもだいたいそのままで動く反面、相対パスで見に行くみたいなことは出来なくなった。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-02-12T08:57:01+09:00" itemprop="datePublished">2014年2月12日</time></p>
 
-		<h1 class="tagline">mustacheのパーシャルをファイルから読み込む</h1>
+		<h1 class="screamer">mustacheのパーシャルをファイルから読み込む</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,54 +67,54 @@
 
 <p>特定のパスにまとめたパーシャル（<code>*.partial.mustache</code>）を読み込み、オブジェクトに拡張子を抜いたファイル名をキーにして、その内容を値に格納していくだけ。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_loadSharedPartials</span>(<span class="hljs-params">dir</span>) </span>{
-	<span class="hljs-keyword">var</span> partials = {};
+<pre><code class="language-javascript">function _loadSharedPartials(dir) {
+	var partials = {};
 
-	<span class="hljs-keyword">var</span> files = fs.readDirSync(dir);
+	var files = fs.readDirSync(dir);
 
-	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = files.length; i &lt; l; i++) {
-		<span class="hljs-keyword">var</span> file = files[i];
+	for (var i = 0, l = files.length; i &lt; l; i++) {
+		var file = files[i];
 
-		<span class="hljs-keyword">if</span> (file.match(<span class="hljs-regexp">/\.partial\.mustache$/</span>)) {
-			<span class="hljs-keyword">var</span> name = path.basename(file, <span class="hljs-string">'.partial.mustache'</span>);
+		if (file.match(/\.partial\.mustache$/)) {
+			var name = path.basename(file, &apos;.partial.mustache&apos;);
 			partials[name] = fs.readFileSync(path.join(dir, file), {
-				<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span>
+				encoding: &apos;utf8&apos;
 			});
 		}
 	}
 
-	<span class="hljs-keyword">return</span> partials;
+	return partials;
 }</code></pre>
 
 <p>Handlebars.jsで使う場合は以下のようにテンプレートの実行関数の第2引数のオブジェクトの子で指定する。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'handlebars'</span>);
+<pre><code class="language-javascript">var hbs = require(&apos;handlebars&apos;);
 
-<span class="hljs-keyword">var</span> render = hbs.compile(template);
-<span class="hljs-keyword">var</span> rendered = render(data, {
-	<span class="hljs-attr">partials</span>: _loadSharedPartials(<span class="hljs-string">'./'</span>)
+var render = hbs.compile(template);
+var rendered = render(data, {
+	partials: _loadSharedPartials(&apos;./&apos;)
 });</code></pre>
 
 <p><a href="https://github.com/janl/mustache.js">mustache.js</a>では<code>render()</code>の第3引数に<em>直接</em>指定する。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> mustache = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mustache'</span>);
+<pre><code class="language-javascript">var mustache = require(&apos;mustache&apos;);
 
-<span class="hljs-keyword">var</span> rendered = mustache.render(template, data, _loadSharedPartials(<span class="hljs-string">'./'</span>));</code></pre>
+var rendered = mustache.render(template, data, _loadSharedPartials(&apos;./&apos;));</code></pre>
 
 <p>SSIのインクルードとはちょっと違う挙動になるけど、mustache的には素直な実装なので、Handlebars.jsの柔軟さを利用して変なことするよりもこうやった方が良さそう。</p>
 	</div>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/designer-news-unsubscribe-link.html">Designer Newsの購読解除リンク</a></p>
+		<p><a href="/blog/webdesign/designer-news-unsubscribe-link.html" rel="prev">Designer Newsの購読解除リンク</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

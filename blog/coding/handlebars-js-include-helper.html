@@ -15,13 +15,13 @@
 		<link href="/blog/coding/handlebars-js-include-helper.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Handlebars.jsのincludeヘルパー" itemprop="name">
+		<link href="/blog/coding/shallow-and-deep.html" rel="prev">
 		<link href="/blog/coding/handlebars-js-include-helper.html" itemprop="url">
 
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2013-08-07T16:05:43+09:00" itemprop="datePublished">2013年8月7日</time></p>
 
-		<h1 class="tagline">Handlebars.jsのincludeヘルパー</h1>
+		<h1 class="screamer">Handlebars.jsのincludeヘルパー</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,36 +67,36 @@
 
 <p>色々遠回りしたけど、結局はテンプレート・ファイルを読んでコンパイル→レンダーする関数を作ってそれをヘルパー関数にすれば良いだけだった。Handlebars.jsがカシコイのでコンテキストとかは自動的に良しなにしてくれる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
-<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'handlebars'</span>);
+<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
+var hbs = require(&apos;handlebars&apos;);
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyTemplate</span>(<span class="hljs-params">file, data</span>) </span>{
-	<span class="hljs-keyword">var</span> tmpl = hbs.compile(fs.readFileSync(file, <span class="hljs-string">'UTF-8'</span>));
+function applyTemplate(file, data) {
+	var tmpl = hbs.compile(fs.readFileSync(file, &apos;UTF-8&apos;));
 
-	<span class="hljs-keyword">return</span> tmpl(data);
+	return tmpl(data);
 }
 
-hbs.registerHelper(<span class="hljs-string">'include'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) </span>{
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.SafeString(applyTemplate(file, <span class="hljs-keyword">this</span>));
+hbs.registerHelper(&apos;include&apos;, function (file, options) {
+	return new hbs.SafeString(applyTemplate(file, this));
 });
 
-<span class="hljs-built_in">console</span>.log(applyTemplate(<span class="hljs-string">'./template.hbs'</span>, {
-	<span class="hljs-string">"he"</span>: {
-		<span class="hljs-string">"name"</span>: <span class="hljs-string">"John"</span>
+console.log(applyTemplate(&apos;./template.hbs&apos;, {
+	&quot;he&quot;: {
+		&quot;name&quot;: &quot;John&quot;
 	},
-	<span class="hljs-string">"she"</span>: {
-		<span class="hljs-string">"name"</span>: <span class="hljs-string">"Jane"</span>
+	&quot;she&quot;: {
+		&quot;name&quot;: &quot;Jane&quot;
 	}
 }));</code></pre>
 
 <p>使うテンプレート・ファイルは、<code>template.hbs</code></p>
 
-<pre><code class="hljs language-handlebars"><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="xml">His name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="xml">
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="xml">His girlfriend name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span></code></pre>
+<pre><code class="language-handlebars">{{#he}}His name is {{include &quot;./include.hbs&quot;}}{{/he}}
+{{#she}}His girlfriend name is {{include &quot;./include.hbs&quot;}}{{/she}}</code></pre>
 
 <p>と、<code>include.hbs</code></p>
 
-<pre><code class="hljs language-handlebars"><span class="hljs-template-variable">{{name}}</span></code></pre>
+<pre><code class="language-handlebars">{{name}}</code></pre>
 
 <p>の2つ。実行すると結果はこうなる。</p>
 
@@ -116,15 +115,15 @@ His girlfriend name is Jane</samp></pre>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/shallow-and-deep.html">浅深</a></p>
+		<p><a href="/blog/coding/shallow-and-deep.html" rel="prev">浅深</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

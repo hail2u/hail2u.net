@@ -15,13 +15,13 @@
 		<link href="/blog/coding/jsonscriptrequest.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="JSONScriptRequest" itemprop="name">
+		<link href="/blog/coding/labs-hail2u-net-amazon-asamashi.html" rel="prev">
 		<link href="/blog/coding/jsonscriptrequest.html" itemprop="url">
 
 		<meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2006-08-04T17:26:20+09:00" itemprop="datePublished">2006年8月4日</time></p>
 
-		<h1 class="tagline">JSONScriptRequest</h1>
+		<h1 class="screamer">JSONScriptRequest</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,35 +67,35 @@
 
 <p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
 
-<pre><code class="hljs language-js">callback({
-	<span class="hljs-attr">foo</span>:    <span class="hljs-string">'This is foo.'</span>,
-	<span class="hljs-attr">bar</span>:    <span class="hljs-string">'This is bar.'</span>,
-	<span class="hljs-attr">foobar</span>: <span class="hljs-string">'This is foobar.'</span>
+<pre><code class="language-js">callback({
+	foo:    &apos;This is foo.&apos;,
+	bar:    &apos;This is bar.&apos;,
+	foobar: &apos;This is foobar.&apos;
 });</code></pre>
 
 <p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"jsr_class.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript">
-<span class="hljs-keyword">var</span> oJsr = <span class="hljs-keyword">new</span> JSONscriptRequest(<span class="hljs-string">'http://example.com/json/data.json?dummy=1'</span>);
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var oJsr = new JSONscriptRequest(&apos;http://example.com/json/data.json?dummy=1&apos;);
 oJsr.buildScriptTag();
 oJsr.addScriptTag();
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">callback</span>(<span class="hljs-params">data</span>) </span>{
+function callback(data) {
 	alert(data.foo);
 	alert(data.bar);
 	alert(data.foobar);
 	oJsr.removeScriptTag();
 }
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
 <p>HTML(やJavaScript)ファイル側でcallback関数を定義しておく必要もある（<a href="/pub/test/054.html" title="JSONScriptRequest Test">サンプル</a>）。</p>
 
@@ -109,15 +108,15 @@ oJsr.addScriptTag();
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/labs-hail2u-net-amazon-asamashi.html">labs.hail2u.net - amazon - asamashi</a></p>
+		<p><a href="/blog/coding/labs-hail2u-net-amazon-asamashi.html" rel="prev">labs.hail2u.net - amazon - asamashi</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

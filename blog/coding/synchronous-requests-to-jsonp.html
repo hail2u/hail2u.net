@@ -15,13 +15,13 @@
 		<link href="/blog/coding/synchronous-requests-to-jsonp.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="JSONPに同期リクエスト" itemprop="name">
+		<link href="/blog/coding/list-of-inbound-links.html" rel="prev">
 		<link href="/blog/coding/synchronous-requests-to-jsonp.html" itemprop="url">
 
 		<meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2006-09-25T13:46:13+09:00" itemprop="datePublished">2006年9月25日</time></p>
 
-		<h1 class="tagline">JSONPに同期リクエスト</h1>
+		<h1 class="screamer">JSONPに同期リクエスト</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -70,39 +69,39 @@
 
 <p>つまり、</p>
 
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> urls = [
-	<span class="hljs-string">'http://del.icio.us/feeds/json/cho45'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/drawnboy'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/gorou'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/hail2u'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/miyagawa'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/nagayama'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/typester'</span>,
-	<span class="hljs-string">'http://del.icio.us/feeds/json/yoko'</span>
+<pre><code class="language-js">var urls = [
+	&apos;http://del.icio.us/feeds/json/cho45&apos;,
+	&apos;http://del.icio.us/feeds/json/drawnboy&apos;,
+	&apos;http://del.icio.us/feeds/json/gorou&apos;,
+	&apos;http://del.icio.us/feeds/json/hail2u&apos;,
+	&apos;http://del.icio.us/feeds/json/miyagawa&apos;,
+	&apos;http://del.icio.us/feeds/json/nagayama&apos;,
+	&apos;http://del.icio.us/feeds/json/typester&apos;,
+	&apos;http://del.icio.us/feeds/json/yoko&apos;
 ];</code></pre>
 
 <p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
 
-<pre><code class="hljs language-js">addScript(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">'?callback=diplayPosts'</span>);
+<pre><code class="language-js">addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addScript</span>(<span class="hljs-params">url</span>) </span>{
-	<span class="hljs-keyword">var</span> script = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>);
-	script.setAttribute(<span class="hljs-string">'type'</span>, <span class="hljs-string">'text/javascript'</span>);
-	script.setAttribute(<span class="hljs-string">'src'</span>, url);
-	script.setAttribute(<span class="hljs-string">'charset'</span>, <span class="hljs-string">'UTF-8'</span>);
-	<span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'head'</span>).item(<span class="hljs-number">0</span>).appendChild(script);
+function addScript(url) {
+	var script = document.createElement(&apos;script&apos;);
+	script.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
+	script.setAttribute(&apos;src&apos;, url);
+	script.setAttribute(&apos;charset&apos;, &apos;UTF-8&apos;);
+	document.getElementsByTagName(&apos;head&apos;).item(0).appendChild(script);
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diplayPosts</span>(<span class="hljs-params">posts</span>) </span>{
-	<span class="hljs-comment">// JSONフィードに含まれるブックマークのJSONデータに対する処理色々</span>
+function diplayPosts(posts) {
+	// JSONフィードに含まれるブックマークのJSONデータに対する処理色々
 
-	&lt;em&gt;loadNext()&lt;/em&gt;;
+	<em>loadNext()</em>;
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadNext</span>(<span class="hljs-params"></span>) </span>{
-	<span class="hljs-keyword">if</span> (urls.length &lt;= <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>;
+function loadNext() {
+	if (urls.length &lt;= 1) return;
 	urls.shift();
-	addScript(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">'?callback=diplayPosts'</span>);
+	addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
 }</code></pre>
 
 <p>という感じに、コールバック関数（<code>displayPosts()</code>）内で次に進む関数（<code>loadNext()</code>）を呼び出すように<a href="/pub/test/082.html">実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある（ネットワーク状態に依存）し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>
@@ -114,15 +113,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/list-of-inbound-links.html">インバウンド・リンクのリスト</a></p>
+		<p><a href="/blog/coding/list-of-inbound-links.html" rel="prev">インバウンド・リンクのリスト</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

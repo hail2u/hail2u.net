@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/svg-background-image-bug-on-webkit.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="SVGはそのリサイズ（スケーリング）においてブラウザ間で差異やバグがあります。有名なのはviewBoxがないことによるIE9やWebKitでのバグでしょうか。それでもimg要素等でSVGを使う場合はSVG側でwidthとheightそしてviewBox属性を指定し、CSSなどでリサイズすれば大体問題ありません。なので背景画像で使う場合もbackground-sizeプロパティーを使えば……と思いきや、なかなかの落とし穴がありました。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="WebKitでのSVGを背景画像にすると起こるバグ" itemprop="name">
+		<link href="/blog/webdesign/style-guide.html" rel="prev">
 		<link href="/blog/webdesign/svg-background-image-bug-on-webkit.html" itemprop="url">
 
 		<meta content="SVGはそのリサイズ（スケーリング）においてブラウザ間で差異やバグがあります。有名なのはviewBoxがないことによるIE9やWebKitでのバグでしょうか。それでもimg要素等でSVGを使う場合はSVG側でwidthとheightそしてviewBox属性を指定し、CSSなどでリサイズすれば大体問題ありません。なので背景画像で使う場合もbackground-sizeプロパティーを使えば……と思いきや、なかなかの落とし穴がありました。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2011-12-09T06:06:11+09:00" itemprop="datePublished">2011年12月9日</time></p>
 
-		<h1 class="tagline">WebKitでのSVGを背景画像にすると起こるバグ</h1>
+		<h1 class="screamer">WebKitでのSVGを背景画像にすると起こるバグ</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -73,8 +72,8 @@
 <section>
 <h2><code>background-size</code>プロパティー</h2>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-class">.arrow</span> {
-	<span class="hljs-attribute">background-size</span>: <span class="hljs-number">100%</span> <span class="hljs-number">100%</span>;
+<pre><code class="language-css">.arrow {
+	background-size: 100% 100%;
 }</code></pre>
 
 <p>まずは背景画像のサイズを指定する<code>background-size</code>プロパティーを使用してみました。するとどうやらSVGをラスタライズしてからリサイズするようで、デモを見ればわかるようにぼやけます。ここでは<code>%</code>を使っていますが、<code>px</code>指定でのリサイズでも同じくぼやけます。</p>
@@ -85,10 +84,10 @@
 <section>
 <h2>SVGの<code>width</code>と<code>height</code>属性で<code>100%</code></h2>
 
-<pre><code class="hljs language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
-	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 64 64"</span>
+<pre><code class="language-xml">&lt;svg
+	viewBox="0 0 64 64"
  
- &gt;</span></code></pre>
+ &gt;</code></pre>
 
 <p>CSSでのリサイズはラスタライズされてからになってしまうということだと思うので、今度はSVGのルート要素の<code>width</code>と<code>height</code>属性で<code>100%</code>を指定してリサイズさせてみました。今度はうまくいった……と思ったんですが、同じSVG画像を更に使用した場合に片一方のリサイズ結果に引きずられてしまうという現象が起こりました。デモのように左の<code>64px</code>へのリサイズ結果が<code>128px</code>へのリサイズへ影響してしまうということです。場合によっては<code>128px</code>の方が成功して、<code>64px</code>の方が失敗するなどひどく挙動不審です。</p>
 </section>
@@ -96,16 +95,16 @@
 <section>
 <h2><code>::before</code>擬似要素で！</h2>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-class">.arrow</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">256px</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">256px</span>;
+<pre><code class="language-css">.arrow {
+	width: 256px;
+	height: 256px;
 }
 
-<span class="hljs-selector-class">.arrow</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">display</span>: block;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">"arrow.svg"</span>);
+.arrow::before {
+	display: block;
+	width: 100%;
+	height: 100%;
+	content: url("arrow.svg");
 }</code></pre>
 
 <p>結局のところ背景画像で使う以上どうにもならなそうな気がしたので、目先を変えて<code>::before</code>擬似要素の<code>content</code>プロパティーでSVGを指定するという方法を試したところすんなりうまく行きました。WebKit以外でも問題ありません。</p>
@@ -115,20 +114,20 @@
 
 <p>というわけでこのサイトの<a href="https://github.com/hail2u/hail2u.net-styles/commit/0c7bcf6a8514d4711edbc3bd804c2d99aaba1d96">ページング・ナビゲーションをSVGにしました</a>。デモ・ページにも載っていますが矢印は以下のような単純なものです。</p>
 
-<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"left-arrow"</span>
-	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 64 64"</span>
-	<span class="hljs-attr">version</span>=<span class="hljs-string">"1.1"</span>
-	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2000/svg"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">g</span> <span class="hljs-attr">transform</span>=<span class="hljs-string">"translate(32), rotate(-45, 32, 32)"</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">g</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">"none"</span>
-			<span class="hljs-attr">stroke</span>=<span class="hljs-string">"#fff"</span>
-			<span class="hljs-attr">stroke-width</span>=<span class="hljs-string">"8"</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">"0"</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">"24"</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">"4"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">"0"</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">"24"</span>/&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">g</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">g</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span></code></pre>
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;svg id="left-arrow"
+	viewBox="0 0 64 64"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"&gt;
+	&lt;g transform="translate(32), rotate(-45, 32, 32)"&gt;
+		&lt;g fill="none"
+			stroke="#fff"
+			stroke-width="8"&gt;
+			&lt;line x1="0" y1="4" x2="24" y2="4"/&gt;
+			&lt;line x1="4" y1="0" x2="4" y2="24"/&gt;
+		&lt;/g&gt;
+	&lt;/g&gt;
+&lt;/svg&gt;</code></pre>
 
 <p>パスで書く必要もなさそうだったので、適当に線を組み合わせてカギ型にし、それを<code>transform</code>属性で移動（<code>translate</code>）と回転（<code>rotate</code>）を使ってシンプルなページング向けの矢印を作りました。</p>
 
@@ -141,15 +140,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/style-guide.html">Style Guideを作った</a></p>
+		<p><a href="/blog/webdesign/style-guide.html" rel="prev">Style Guideを作った</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/coding/air_2.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Amazonの画像置換 #2" itemprop="name">
+		<link href="/blog/coding/gen_nmnl.html" rel="prev">
 		<link href="/blog/coding/air_2.html" itemprop="url">
 
 		<meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,31 +47,30 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-05-30T05:53:01+09:00" itemprop="datePublished">2004年5月30日</time></p>
 
-		<h1 class="tagline">Amazonの画像置換 #2</h1>
+		<h1 class="screamer">Amazonの画像置換 #2</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>以前書いた<a href="/blog/coding/air.html" title="hail2u.net - Weblog - Amazonの画像置換">Amazonの画像置換</a>というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。</p>
 <p>とりあえずコード（把握しやすいように改行つけてますが、実際には一行でガッと解た方が良いと思います）。</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://images-fe.ssl-images-amazon.com/images/P/XXXXXXXXXX.jpg"</span>
- <span class="hljs-attr">onload</span>=<span class="hljs-string">"if (this.width=='1' &amp;&amp; this.src.match(/\.01\./)) {
-	 this.src='/images/music-no-image.png';
- } else if (this.width=='1') {
-	 this.src=this.src.replace('.09.','.01.');
- }"</span> /&gt;</span></code></pre>
+<pre><code class="language-html">&lt;img src=&quot;https://images-fe.ssl-images-amazon.com/images/P/XXXXXXXXXX.jpg&quot;
+ onload=&quot;if (this.width==&apos;1&apos; &amp;&amp; this.src.match(/\.01\./)) {
+	 this.src=&apos;/images/music-no-image.png&apos;;
+ } else if (this.width==&apos;1&apos;) {
+	 this.src=this.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
+ }&quot; /&gt;</code></pre>
 <p><code>img</code>の<code>src</code>にまず09で類推した画像のURLを入れます。もし、この画像のURLが幅1pxの画像を返した場合は、01で類推される画像のURLに置き換わります（<code>else if</code>の方）。すると<code>onload</code>イベントが再び起きます。もし、01で類推される画像のURLも幅1pxの画像を返した場合は、画像が無いよ画像（ここでは/images/no-image.png)に置き換わるというわけ。</p>
 <p>うむ。完璧？</p>
 <section>
@@ -91,15 +90,15 @@
 <section>
 <h2>追記</h2>
 <p>以下のようなコードを書いた外部JavaScriptファイルを読み込んでおけば、もっとすっきりとしたHTMLになるかも（ちゃんとは試してないですので多分）。</p>
-<pre><code class="hljs language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">replaceImage</span>(<span class="hljs-params">img</span>) </span>{
-	<span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">'1'</span> &amp;&amp; img.src.match(<span class="hljs-regexp">/\.01\./</span>)) {
-		img.src = <span class="hljs-string">'/images/music-no-image.png'</span>;
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">'1'</span>) {
-		img.src = img.src.replace(<span class="hljs-string">'.09.'</span>,<span class="hljs-string">'.01.'</span>);
+<pre><code class="language-js">function replaceImage(img) {
+	if (img.width == &apos;1&apos; &amp;&amp; img.src.match(/\.01\./)) {
+		img.src = &apos;/images/music-no-image.png&apos;;
+	} else if (img.width == &apos;1&apos;) {
+		img.src = img.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
 	}
 }</code></pre>
 <p><code>img</code>要素は以下のように記述することになります。</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://images-fe.ssl-images-amazon.com/images/P/XXXXXXXXXX.jpg"</span> <span class="hljs-attr">onload</span>=<span class="hljs-string">"replaceImage(this)"</span> /&gt;</span></code></pre>
+<pre><code class="language-html">&lt;img src=&quot;https://images-fe.ssl-images-amazon.com/images/P/XXXXXXXXXX.jpg&quot; onload=&quot;replaceImage(this)&quot; /&gt;</code></pre>
 <p>すっきり。</p>
 <p>追記ばっか。</p>
 </section>
@@ -107,15 +106,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/gen_nmnl.html">gen_nmnl</a></p>
+		<p><a href="/blog/coding/gen_nmnl.html" rel="prev">gen_nmnl</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

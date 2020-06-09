@@ -15,13 +15,13 @@
 		<link href="/blog/coding/air_3.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="AWSをガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと（今さら）気づいた。ので、画像置換のためのチェック方法にはContent-Typeを利用する方法もあるわけ。てかAmazon Hacksに載ってるらしいです（持ってない）。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Amazonの画像置換 #3" itemprop="name">
+		<link href="/blog/coding/acl_1.html" rel="prev">
 		<link href="/blog/coding/air_3.html" itemprop="url">
 
 		<meta content="AWSをガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと（今さら）気づいた。ので、画像置換のためのチェック方法にはContent-Typeを利用する方法もあるわけ。てかAmazon Hacksに載ってるらしいです（持ってない）。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,46 +47,45 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-09-28T21:00:11+09:00" itemprop="datePublished">2004年9月28日</time></p>
 
-		<h1 class="tagline">Amazonの画像置換 #3</h1>
+		<h1 class="screamer">Amazonの画像置換 #3</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p><a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>をガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと（今さら）気づいた。ので、画像置換のためのチェック方法には<code>Content-Type</code>を利用する方法もあるわけ。てか<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873111811/hail2unet-22" title="Amazon.co.jp： 本: Amazon Hacks 世界最大のショッピングサイト完全活用テクニック100選">Amazon Hacks</a>に載ってるらしいです（持ってない）。</p>
 <p><code>Content-Type</code>がimage/jpegな場合はちゃんと画像がある（はず）なので、チェックするためのコードはこんなシンプルなものでOKなはず。</p>
-<pre><code class="hljs language-perl"><span class="hljs-keyword">use</span> LWP::Simple;
+<pre><code class="language-perl">use LWP::Simple;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_image</span> </span>{
-	<span class="hljs-keyword">my</span> $url = <span class="hljs-keyword">shift</span>;
+sub check_image {
+	my $url = shift;
 
-	<span class="hljs-keyword">my</span> $header = head($url);
+	my $header = head($url);
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> $header-&gt;content_type eq <span class="hljs-string">"image/jpeg"</span>;
-	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	return 1 if $header-&gt;content_type eq &quot;image/jpeg&quot;;
+	return 0;
 }</code></pre>
 <p>とか書いたけど、ちゃんとした画像がimage/gifだったりすることもあるかもなぁ。いまいち一貫性に欠けるところがあるので信用できない（偉そう）。</p>
 <p><code>Content-Length</code>でチェックする場合はこんなコード。</p>
-<pre><code class="hljs language-perl"><span class="hljs-keyword">use</span> LWP::Simple;
+<pre><code class="language-perl">use LWP::Simple;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_image</span> </span>{
-	<span class="hljs-keyword">my</span> $url = <span class="hljs-keyword">shift</span>;
+sub check_image {
+	my $url = shift;
 
-	<span class="hljs-keyword">my</span> $header = head($url);
+	my $header = head($url);
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> $header-&gt;content_length &gt; <span class="hljs-number">807</span>;
-	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	return 1 if $header-&gt;content_length &gt; 807;
+	return 0;
 }</code></pre>
 <p>どっちにしても、失敗する時は失敗する気がする。しかも結構頻繁に。</p>
 <p>そもそもAWSがきちんとしたURLを返さないのが悪い。とか、いつも思うわけで。</p>
@@ -95,15 +94,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/acl_1.html">Amazon Check List</a></p>
+		<p><a href="/blog/coding/acl_1.html" rel="prev">Amazon Check List</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

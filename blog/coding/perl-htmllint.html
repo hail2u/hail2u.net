@@ -15,13 +15,13 @@
 		<link href="/blog/coding/perl-htmllint.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="HTML LintにはAPIが用意されているのでVimからいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。WebService::Validator::HTML::W3Cも使ってMarkup Validation Serviceにまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="HTML LintのAPIを叩くPerlスクリプト" itemprop="name">
+		<link href="/blog/software/rewrite-tidyrc.html" rel="prev">
 		<link href="/blog/coding/perl-htmllint.html" itemprop="url">
 
 		<meta content="HTML LintにはAPIが用意されているのでVimからいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。WebService::Validator::HTML::W3Cも使ってMarkup Validation Serviceにまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,65 +47,64 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2011-10-29T17:32:56+09:00" itemprop="datePublished">2011年10月29日</time></p>
 
-		<h1 class="tagline">HTML LintのAPIを叩くPerlスクリプト</h1>
+		<h1 class="screamer">HTML LintのAPIを叩くPerlスクリプト</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p><a href="http://lint.brihten.com/html/">HTML Lint</a>にはAPIが用意されているので<a href="http://www.vim.org/">Vim</a>からいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。<a href="http://search.cpan.org/perldoc?WebService::Validator::HTML::W3C">WebService::Validator::HTML::W3C</a>も使って<a href="http://validator.w3.org/">Markup Validation Service</a>にまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。</p>
 
-<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/bin/env perl</span>
+<pre><code class="language-perl">#!/usr/bin/env perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> warnings;
+use strict;
+use warnings;
 
-<span class="hljs-keyword">use</span> JSON;
-<span class="hljs-keyword">use</span> LWP::UserAgent;
+use JSON;
+use LWP::UserAgent;
 
-<span class="hljs-keyword">my</span> $file = <span class="hljs-keyword">shift</span>;
+my $file = shift;
 
-<span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new();
-<span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">"http://lint.brihten.com/html/lint/"</span>,
-	<span class="hljs-string">Content_type =&gt;</span> <span class="hljs-string">"form-data"</span>, 
-	<span class="hljs-string">Content      =&gt;</span> [
-		<span class="hljs-string">filesource           =&gt;</span> [$file],
-		<span class="hljs-string">tags_closeoptional   =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_lowercase       =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_closeempty      =&gt;</span> <span class="hljs-number">0</span>,
-		<span class="hljs-string">attrs_quoted         =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">attrs_lowercase      =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">attrs_simplebooleans =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_whitespace      =&gt;</span> <span class="hljs-number">0</span>,
-		<span class="hljs-string">response_format      =&gt;</span> <span class="hljs-string">"json"</span>
+my $ua = LWP::UserAgent-&gt;new();
+my $res = $ua-&gt;post("http://lint.brihten.com/html/lint/",
+	Content_type =&gt; "form-data", 
+	Content      =&gt; [
+		filesource           =&gt; [$file],
+		tags_closeoptional   =&gt; 1,
+		tags_lowercase       =&gt; 1,
+		tags_closeempty      =&gt; 0,
+		attrs_quoted         =&gt; 1,
+		attrs_lowercase      =&gt; 1,
+		attrs_simplebooleans =&gt; 1,
+		tags_whitespace      =&gt; 0,
+		response_format      =&gt; "json"
 	]
 );
 
-<span class="hljs-keyword">if</span> ($res-&gt;is_success) {
-	<span class="hljs-keyword">my</span> $result = from_json($res-&gt;decoded_content);
-	<span class="hljs-keyword">my</span> $errors = $result-&gt;{mistakes};
+if ($res-&gt;is_success) {
+	my $result = from_json($res-&gt;decoded_content);
+	my $errors = $result-&gt;{mistakes};
 
-	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">scalar</span>(@$errors) &gt; <span class="hljs-number">0</span>) {
-		<span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $e (@$errors) {
-			<span class="hljs-keyword">print</span> <span class="hljs-keyword">join</span>(<span class="hljs-string">":"</span>, $file, $e-&gt;{line}, $e-&gt;{message}), <span class="hljs-string">"\n"</span>;
+	if (scalar(@$errors) &gt; 0) {
+		foreach my $e (@$errors) {
+			print join(":", $file, $e-&gt;{line}, $e-&gt;{message}), "\n";
 		}
 	}
-} <span class="hljs-keyword">else</span> {
-	<span class="hljs-keyword">die</span> $res-&gt;status_line;
+} else {
+	die $res-&gt;status_line;
 }
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 
 <p>空要素を閉じてない場合の警告をオフっている以外はデフォルトです。</p>
 
@@ -114,15 +113,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/rewrite-tidyrc.html">~/.tidyrcを書き直した</a></p>
+		<p><a href="/blog/software/rewrite-tidyrc.html" rel="prev">~/.tidyrcを書き直した</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

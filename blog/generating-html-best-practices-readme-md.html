@@ -15,13 +15,13 @@
 		<link href="/blog/generating-html-best-practices-readme-md.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="HTML Best PracticesのREADME*.mdを生成する仕組み" itemprop="name">
+		<link href="/blog/on-20200504.html" rel="prev">
 		<link href="/blog/generating-html-best-practices-readme-md.html" itemprop="url">
 
 		<meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2020-05-05T09:59:32+09:00" itemprop="datePublished">2020年5月5日</time></p>
 
-		<h1 class="tagline">HTML Best PracticesのREADME*.mdを生成する仕組み</h1>
+		<h1 class="screamer">HTML Best PracticesのREADME*.mdを生成する仕組み</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -106,23 +105,23 @@
 
 <p>目次は、自分で考えたIDにジャンプするよう、リスト記法で並べる。本文では、見出しの末尾に空の<code>span</code>要素を追加し、それに考えたIDを振る（ここのIDはMarkdownレンダラーで処理されないので、Mustacheでエスケープされるように<code>{{...}}</code>で書く）。目次と本文で2回、同じセクションを回す。</p>
 
-<pre><code class="hljs language-mustache"><span class="hljs-template-tag">{{#<span class="hljs-name">sections</span>}}</span><span class="xml">
-- [</span><span class="hljs-template-variable">{{{title}}}</span><span class="xml">](#</span><span class="hljs-template-variable">{{{id}}}</span><span class="xml">)
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">practices</span>}}</span><span class="xml">
-    - [</span><span class="hljs-template-variable">{{{title}}}</span><span class="xml">](#</span><span class="hljs-template-variable">{{{id}}}</span><span class="xml">)
-</span><span class="hljs-template-tag">{{/<span class="hljs-name">practices</span>}}</span><span class="xml">
-</span><span class="hljs-template-tag">{{/<span class="hljs-name">sections</span>}}</span><span class="xml">
+<pre><code class="language-mustache">{{#sections}}
+- [{{{title}}}](#{{{id}}})
+{{#practices}}
+    - [{{{title}}}](#{{{id}}})
+{{/practices}}
+{{/sections}}
 
 
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">sections</span>}}</span><span class="xml">
-## </span><span class="hljs-template-variable">{{{title}}}</span><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+{{#sections}}
+## {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
 
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">practices</span>}}</span><span class="xml">
-### </span><span class="hljs-template-variable">{{{title}}}</span><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+{{#practices}}
+### {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
 
-</span><span class="hljs-template-variable">{{{body}}}</span><span class="xml">
-</span><span class="hljs-template-tag">{{/<span class="hljs-name">practices</span>}}</span><span class="xml">
-</span><span class="hljs-template-tag">{{/<span class="hljs-name">sections</span>}}</span></code></pre>
+{{{body}}}
+{{/practices}}
+{{/sections}}</code></pre>
 
 <p>IDを振った要素で見出しを括ってしまってもいいけど、それだとMarkdownとして読みづらくなるので、空要素にした。HTMLにすることを前提とした、こういったMarkdownはよくないと思うものの、GitHubのためならエンヤコラという感じだ。同時に、GitHubの見出しIDに依存しない（共存できる）ので、どこでHTMLにされても多分機能するという利点もある。</p>
 
@@ -135,15 +134,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/on-20200504.html">パンのお取り寄せ</a></p>
+		<p><a href="/blog/on-20200504.html" rel="prev">パンのお取り寄せ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

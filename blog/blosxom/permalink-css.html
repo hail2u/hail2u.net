@@ -15,13 +15,13 @@
 		<link href="/blog/blosxom/permalink-css.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="パーマリンクに特別なCSSを追加" itemprop="name">
+		<link href="/blog/internet/chugoku-np-subscription.html" rel="prev">
 		<link href="/blog/blosxom/permalink-css.html" itemprop="url">
 
 		<meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-04-01T02:39:12+09:00" itemprop="datePublished">2014年4月1日</time></p>
 
-		<h1 class="tagline">パーマリンクに特別なCSSを追加</h1>
+		<h1 class="screamer">パーマリンクに特別なCSSを追加</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,19 +67,19 @@
 
 <p>記事ファイルでは特別なCSSを使うかどうかのフラグのみ書く。</p>
 
-<pre><code class="hljs language-markdown">パーマリンクに特別なCSSを追加
-meta-special<span class="hljs-emphasis">_css: 1
+<pre><code class="language-markdown">パーマリンクに特別なCSSを追加
+meta-special_css: 1
 
-<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span></span>...<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span></span></code></pre>
+&lt;p&gt;...&lt;/p&gt;</code></pre>
 
 <p>フレーバーでは以下のようにして、<code>$meta::special_css</code>を使った分岐を利用する。CSSファイルのパスは記事ファイル名を利用することでユニークさを保証できる。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">?$meta::special_css</span> <span class="hljs-attr">eq</span>=<span class="hljs-string">"1"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/styles$path/$fn.css"</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">?</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">?$meta::special_css</span> <span class="hljs-attr">ne</span>=<span class="hljs-string">"1"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/styles/style.css"</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">?</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;?$meta::special_css eq=&quot;1&quot;&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;/styles$path/$fn.css&quot;&gt;
+&lt;/?&gt;
+&lt;?$meta::special_css ne=&quot;1&quot;&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;/styles/style.css&quot;&gt;
+&lt;/?&gt;</code></pre>
 
 <p>まだ採用はしてない。</p>
 
@@ -88,29 +87,29 @@ meta-special<span class="hljs-emphasis">_css: 1
 
 <p>常に記事ファイル名を利用したCSSファイルのパスを参照するようにしておいて、mod_rewriteでそのパスが見つからなかった場合にデフォルトのCSSにフォールバックさせる方がもっと手っ取り早い感じする。普通にURL書き換えしちゃうとキャッシュが効かなくなるけど、302での外部リダイレクトにすれば良さそう。</p>
 
-<pre><code class="hljs language-apache"><span class="hljs-section">&lt;IfModule mod_rewrite.c&gt;</span>
-	<span class="hljs-attribute"><span class="hljs-nomarkup">RewriteEngine</span></span> <span class="hljs-literal">On</span>
+<pre><code class="language-apache">&lt;IfModule mod_rewrite.c&gt;
+	RewriteEngine On
 
-	<span class="hljs-attribute">RewriteBase</span> /styles/
+	RewriteBase /styles/
 
-	<span class="hljs-attribute"><span class="hljs-nomarkup">RewriteCond</span></span> <span class="hljs-variable">%{REQUEST_FILENAME}</span> !-f
-	<span class="hljs-attribute"><span class="hljs-nomarkup">RewriteRule</span></span> ^(.*)$ style.css<span class="hljs-meta"> [L,R=302]</span>
-<span class="hljs-section">&lt;/IfModule&gt;</span></code></pre>
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^(.*)$ style.css [L,R=302]
+&lt;/IfModule&gt;</code></pre>
 
 <p>こういう実装だとBlosxomに依存しないので、CSSファイルのパスをユニークにする仕組みさえ用意できれば、様々なCMSで実現できる。</p>
 	</div>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/internet/chugoku-np-subscription.html">中国新聞のデジタルコース</a></p>
+		<p><a href="/blog/internet/chugoku-np-subscription.html" rel="prev">中国新聞のデジタルコース</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

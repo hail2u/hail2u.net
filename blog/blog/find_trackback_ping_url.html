@@ -15,13 +15,13 @@
 		<link href="/blog/blog/find_trackback_ping_url.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="miyagawaさんのエントリを見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、innerHTMLとかじゃなくて、ドキュメントのノードを全てチェックし、nodeTypeが8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Find TrackBack ping URL" itemprop="name">
+		<link href="/blog/media/eddie.html" rel="prev">
 		<link href="/blog/blog/find_trackback_ping_url.html" itemprop="url">
 
 		<meta content="miyagawaさんのエントリを見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、innerHTMLとかじゃなくて、ドキュメントのノードを全てチェックし、nodeTypeが8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,45 +47,44 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-07-03T00:16:34+09:00" itemprop="datePublished">2004年7月3日</time></p>
 
-		<h1 class="tagline">Find TrackBack ping URL</h1>
+		<h1 class="screamer">Find TrackBack ping URL</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p><a href="http://blog.bulknews.net/mt/archives/001078.html" title="blog.bulknews.net: Trackback Discovery Bookmarklet">miyagawaさんのエントリ</a>を見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、<code>innerHTML</code>とかじゃなくて、ドキュメントのノードを全てチェックし、<code>nodeType</code>が8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。</p>
 <p>JavaScriptのコードはこんな感じになっています。</p>
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> tburl;
-<span class="hljs-keyword">var</span> comments = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>();
+<pre><code class="language-js">var tburl;
+var comments = new Array();
 getComment();
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; comments.length; i++) {
-	<span class="hljs-keyword">if</span> (comments[i].match(<span class="hljs-regexp">/trackback:ping="([^"]+)"/</span>)) {
-		tburl = <span class="hljs-built_in">RegExp</span>.$<span class="hljs-number">1</span>;
-		<span class="hljs-keyword">break</span>;
+for (var i = 0; i &lt; comments.length; i++) {
+	if (comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)) {
+		tburl = RegExp.$1;
+		break;
 	}
 }
 
-prompt(<span class="hljs-string">'TrackBack ping URL'</span>, tburl);
+prompt(&apos;TrackBack ping URL&apos;, tburl);
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getComment</span>(<span class="hljs-params">elm</span>) </span>{
-	<span class="hljs-keyword">if</span> (!elm) elm = <span class="hljs-built_in">document</span>.documentElement;
+function getComment(elm) {
+	if (!elm) elm = document.documentElement;
 
-	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; elm.childNodes.length; i++) {
-		<span class="hljs-keyword">if</span> (elm.childNodes[i].nodeType == <span class="hljs-number">8</span>) {
+	for (var i = 0; i &lt; elm.childNodes.length; i++) {
+		if (elm.childNodes[i].nodeType == 8) {
 			comments[comments.length] = elm.childNodes[i].data;
-		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (elm.childNodes[i].nodeType == <span class="hljs-number">1</span>) {
+		} else if (elm.childNodes[i].nodeType == 1) {
 			getComment(elm.childNodes[i]);
 		}
 	}
@@ -98,15 +97,15 @@ prompt(<span class="hljs-string">'TrackBack ping URL'</span>, tburl);
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/media/eddie.html">Eddie</a></p>
+		<p><a href="/blog/media/eddie.html" rel="prev">Eddie</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

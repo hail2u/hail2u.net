@@ -15,13 +15,13 @@
 		<link href="/blog/coding/come-into-eslint.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="よろしくESLint" itemprop="name">
+		<link href="/blog/internet/failswatch.html" rel="prev">
 		<link href="/blog/coding/come-into-eslint.html" itemprop="url">
 
 		<meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2015-02-24T05:14:53+09:00" itemprop="datePublished">2015年2月24日</time></p>
 
-		<h1 class="tagline">よろしくESLint</h1>
+		<h1 class="screamer">よろしくESLint</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -71,10 +70,10 @@
 
 <p>外部設定ファイルとしては<code>.eslinrc</code>の他にも<code>package.json</code>に混ぜ込むこともできる。フィールド名は<code>eslintConfig</code>で、それ以下は同じ。</p>
 
-<pre><code class="hljs language-json">{
-	<span class="hljs-attr">"eslintConfig"</span>: {
-		<span class="hljs-attr">"env"</span>: {
-			<span class="hljs-attr">"node"</span>: <span class="hljs-literal">true</span>
+<pre><code class="language-json">{
+	&quot;eslintConfig&quot;: {
+		&quot;env&quot;: {
+			&quot;node&quot;: true
 		}
 	}
 }</code></pre>
@@ -87,7 +86,7 @@
 
 <p>複数の連続した空白が検出できる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> a =  <span class="hljs-number">1</span>;</code></pre>
+<pre><code class="language-javascript">var a =  1;</code></pre>
 
 <p>これで警告出るのはかなり助かる。ソロエルノスキーさんには厳しそう。</p>
 </section>
@@ -119,11 +118,11 @@
 
 <p>JSHintで一重引用符を強制されて以降、そっちを使っていたが、ESlintではデフォルトは二重引用符になっていた。書き直すのがとても面倒な気がするので、<code>~/.eslintrc</code>で以下のようにして一重引用符をデフォルトにしてしまった。</p>
 
-<pre><code class="hljs language-json">{
-	<span class="hljs-attr">"rules"</span>: {
-		<span class="hljs-attr">"quotes"</span>: [
-			<span class="hljs-number">1</span>,
-			<span class="hljs-string">"single"</span>
+<pre><code class="language-json">{
+	&quot;rules&quot;: {
+		&quot;quotes&quot;: [
+			1,
+			&quot;single&quot;
 		]
 	}
 }</code></pre>
@@ -140,7 +139,7 @@
 
 <p>アンダースコアで始まるまたは終わる変数やプロパティーへアクセスするだけで怒られる。ライブラリー側で使っていることもあるので、そういったファイルでのみ無効にするのが良さそう。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);</code></pre>
+<pre><code class="language-javascript">var _ = require(&apos;underscore&apos;);</code></pre>
 
 <p>だけは特別視されてて、現実的。</p>
 </section>
@@ -150,10 +149,10 @@
 
 <p>Node.js(つまり<code>&quot;node&quot;: true</code>）で<code>process.exit()</code>を使ってプログラムを終了しようとしていると怒られる。とりあえずは以下のようにして逃げるのも可能だが、完全に悪手っぽい。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> exit = process.exit;
+<pre><code class="language-javascript">var exit = process.exit;
 
-<span class="hljs-keyword">if</span> (process.argv[<span class="hljs-number">3</span>] === <span class="hljs-string">'--version'</span>) {
-	<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Foo v0.1.0'</span>);
+if (process.argv[3] === &apos;--version&apos;) {
+	console.log(&apos;Foo v0.1.0&apos;);
 	exit();
 }</code></pre>
 
@@ -185,15 +184,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/internet/failswatch.html">Failswatch</a></p>
+		<p><a href="/blog/internet/failswatch.html" rel="prev">Failswatch</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/monospace-font-sizing-incompatibilities.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="少し前にFixing browsers’ broken monospace font handlingをNice Web Type経由で読んだんだけど、「単純に初期設定が違うだけだろ……%指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。font-size: 100%がうまく動かなかったり、pre要素はともかくcode要素辺りでの実装のずれとか、monospaceだけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題" itemprop="name">
+		<link href="/blog/webdesign/translation-of-learn-you-a-flexbox.html" rel="prev">
 		<link href="/blog/webdesign/monospace-font-sizing-incompatibilities.html" itemprop="url">
 
 		<meta content="少し前にFixing browsers’ broken monospace font handlingをNice Web Type経由で読んだんだけど、「単純に初期設定が違うだけだろ……%指定すれば大丈夫じゃね？」とか高をくくってたら大間違いだった。font-size: 100%がうまく動かなかったり、pre要素はともかくcode要素辺りでの実装のずれとか、monospaceだけだとWebKitでおかしくなるバグとかも絡んできてかなりの魔窟のようだ。この記事では触れられていないけど、言語設定によって等幅フォントの初期サイズが違うこともあるので更なるカオス。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2012-02-19T16:16:45+09:00" itemprop="datePublished">2012年2月19日</time></p>
 
-		<h1 class="tagline">等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</h1>
+		<h1 class="screamer">等幅フォントが使われる要素の扱いがブラウザー間でまちまちな問題</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,27 +67,27 @@
 
 <p>記事で最初に挙げられているコードでも良いのだけど、<a href="http://necolas.github.com/normalize.css/">normalize.css</a>ではこの問題への対処がちゃんとなされているので、細かいことは余り考えずにnormalize.css使うのが手っ取り早い。記事の最後に挙げられているコードのように、ラテン系の言語に設定されているブラウザーでの挙動（等幅フォントを1段階小さいフォント・サイズにする）に合わせる場合は、normalize.cssのコードも混ぜた上である程度ネストへも対処するように書く必要がある。</p>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-tag">html</span> {
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">100%</span>;
+<pre><code class="language-css">html {
+	font-size: 100%;
 }
 
-<span class="hljs-selector-tag">pre</span>,
-<span class="hljs-selector-tag">code</span>,
-<span class="hljs-selector-tag">var</span>,
-<span class="hljs-selector-tag">samp</span>,
-<span class="hljs-selector-tag">kbd</span>,
-<span class="hljs-selector-tag">tt</span> {
-	<span class="hljs-attribute">font-family</span>: monospace, serif;
-	<span class="hljs-attribute">_font-family</span>: <span class="hljs-string">'courier new'</span>, monospace;
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.8125em</span>;
+pre,
+code,
+var,
+samp,
+kbd,
+tt {
+	font-family: monospace, serif;
+	_font-family: 'courier new', monospace;
+	font-size: 0.8125em;
 }
 
-<span class="hljs-selector-tag">pre</span> <span class="hljs-selector-tag">code</span>,
-<span class="hljs-selector-tag">pre</span> <span class="hljs-selector-tag">var</span>,
-<span class="hljs-selector-tag">pre</span> <span class="hljs-selector-tag">samp</span>,
-<span class="hljs-selector-tag">pre</span> <span class="hljs-selector-tag">kbd</span>,
-<span class="hljs-selector-tag">pre</span> <span class="hljs-selector-tag">tt</span> {
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">100%</span>;
+pre code,
+pre var,
+pre samp,
+pre kbd,
+pre tt {
+	font-size: 100%;
 }</code></pre>
 
 <p><code>rem</code>単位さえ使えれば……という感じだ。と、対処を書いた所でどういう問題があって、どうすれば解決でき、なぜ今まであまり表面化しなかったのかということをちょっと書く。</p>
@@ -142,15 +141,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/translation-of-learn-you-a-flexbox.html">Learn You a Flexbox for Great Good!を訳した</a></p>
+		<p><a href="/blog/webdesign/translation-of-learn-you-a-flexbox.html" rel="prev">Learn You a Flexbox for Great Good!を訳した</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/coding/sass-encode-color-function.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Sassで色をURLエンコードする関数" itemprop="name">
+		<link href="/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html" rel="prev">
 		<link href="/blog/coding/sass-encode-color-function.html" itemprop="url">
 
 		<meta content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2013-07-29T09:20:21+09:00" itemprop="datePublished">2013年7月29日</time></p>
 
-		<h1 class="tagline">Sassで色をURLエンコードする関数</h1>
+		<h1 class="screamer">Sassで色をURLエンコードする関数</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,22 +67,22 @@
 
 <p>以下はSass 3.3.0.alpha.218 (Bleeding Edge)での話なので、3.3の正式リリースでは動く保証はない。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-comment">// encode-color() - Encode color by percent encoding</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">// @param {color} $color Color that you want to encode</span>
-<span class="hljs-comment">// @return {string}</span>
-<span class="hljs-keyword">@function</span> encode-color(<span class="hljs-variable">$color</span>) {
-	<span class="hljs-variable">$str_color</span>: <span class="hljs-string">""</span> + <span class="hljs-variable">$color</span>;
+<pre><code class="language-scss">// encode-color() - Encode color by percent encoding
+//
+// @param {color} $color Color that you want to encode
+// @return {string}
+@function encode-color($color) {
+	$str_color: "" + $color;
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">"#"</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">"%23"</span> + str-slice(<span class="hljs-variable">$str_color</span>, <span class="hljs-number">2</span>);
+	@if (str-index($str_color, "#") == 1) {
+		$str_color: "%23" + str-slice($str_color, 2);
 	}
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">"rgba"</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">"rgba("</span> + red(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + green(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + blue(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + alpha(<span class="hljs-variable">$color</span>) + <span class="hljs-string">")"</span>;
+	@if (str-index($str_color, "rgba") == 1) {
+		$str_color: "rgba(" + red($color) + "%2C" + green($color) + "%2C" + blue($color) + "%2C" + alpha($color) + ")";
 	}
 
-	<span class="hljs-keyword">@return</span> <span class="hljs-variable">$str_color</span>;
+	@return $str_color;
 }</code></pre>
 
 <p><code>str-index()</code>や<code>str-slice()</code>関数は文字列専用で色を投げるとエラーになるので、まずは色に空文字を連結することによって型をキャストすることろから。今までは型キャストが必要なケースはほとんど無かったけど、これからは使う機会増えそう。</p>
@@ -94,11 +93,11 @@
 
 <p>これらにマッチしなかった場合は色キーワードなのでそのまま返す。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(#336699)}"</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(rgb(51, 102, 153))}"</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(rgba(51, 102, 153, 0.2))}"</span>; <span class="hljs-comment">// rgba(51%2C102%2C153%2C0.2)</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(beige)}"</span>; <span class="hljs-comment">// beige</span>
+<pre><code class="language-scss">.test {
+	content: "#{encode-color(#336699)}"; // %23369
+	content: "#{encode-color(rgb(51, 102, 153))}"; // %23369
+	content: "#{encode-color(rgba(51, 102, 153, 0.2))}"; // rgba(51%2C102%2C153%2C0.2)
+	content: "#{encode-color(beige)}"; // beige
 }</code></pre>
 
 <p>このテストはうまくいったのでこれでだいたい大丈夫そう。</p>
@@ -110,15 +109,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html">URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する</a></p>
+		<p><a href="/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html" rel="prev">URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

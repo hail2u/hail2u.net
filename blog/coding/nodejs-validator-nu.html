@@ -15,13 +15,13 @@
 		<link href="/blog/coding/nodejs-validator-nu.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Node.jsでValidator.Nuを叩く" itemprop="name">
+		<link href="/blog/coding/nodejs-https-get.html" rel="prev">
 		<link href="/blog/coding/nodejs-validator-nu.html" itemprop="url">
 
 		<meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2012-07-31T02:19:51+09:00" itemprop="datePublished">2012年7月31日</time></p>
 
-		<h1 class="tagline">Node.jsでValidator.Nuを叩く</h1>
+		<h1 class="screamer">Node.jsでValidator.Nuを叩く</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,33 +67,33 @@
 
 <p>form-dataモジュールは<a href="http://www.w3.org/TR/XMLHttpRequest2/">XMLHTTPRequest Level 2</a>の<a href="http://www.w3.org/TR/XMLHttpRequest2/#interface-formdata">FormDataインターフェイス</a>に似たものを提供するNode.jsモジュール。<code>append()</code>でパラメーターを追加していき、<code>submit()</code>で指定したURLにPOSTすることができる。Validator.nuは<code>application/x-www-form-urlencoded</code>に対応しておらず、Query Stringモジュールとかでポンと叩くことはできないため、このform-dataモジュールや<a href="https://github.com/coolaj86/abstract-http-request">ahr2モジュール</a>などが（面倒くさいので）必要。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
+<pre><code class="language-js">#!/usr/bin/env node
 
-<span class="hljs-keyword">var</span> FormData = <span class="hljs-built_in">require</span>(<span class="hljs-string">'form-data'</span>);
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+var FormData = require('form-data');
+var fs = require('fs');
 
-<span class="hljs-keyword">var</span> htmlfile = process.argv.slice(<span class="hljs-number">2</span>)[<span class="hljs-number">0</span>];
+var htmlfile = process.argv.slice(2)[0];
 
-<span class="hljs-keyword">var</span> fd = <span class="hljs-keyword">new</span> FormData();
-fd.append(<span class="hljs-string">'out'</span>, <span class="hljs-string">'json'</span>);
-fd.append(<span class="hljs-string">'file'</span>, fs.createReadStream(htmlfile));
-fd.submit(<span class="hljs-string">'http://validator.nu/'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, response</span>) </span>{
-	<span class="hljs-keyword">if</span> (error) {
-		<span class="hljs-keyword">throw</span> error;
+var fd = new FormData();
+fd.append('out', 'json');
+fd.append('file', fs.createReadStream(htmlfile));
+fd.submit('http://validator.nu/', function (error, response) {
+	if (error) {
+		throw error;
 	}
 
-	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">''</span>;
+	var chunks = '';
 
-	response.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
+	response.on('data', function (chunk) {
 		chunks += chunk;
 	});
 
-	response.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		<span class="hljs-built_in">JSON</span>.parse(chunks).messages.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) </span>{
-			<span class="hljs-keyword">if</span> (message.type === <span class="hljs-string">'error'</span>) {
-				<span class="hljs-keyword">var</span> line = (message.lastLine ? message.lastLine : <span class="hljs-number">0</span>);
-				<span class="hljs-keyword">var</span> column = (message.firstColumn ? message.firstColumn: <span class="hljs-number">0</span>);
-				<span class="hljs-built_in">console</span>.log([htmlfile, line, column, message.message].join(<span class="hljs-string">':'</span>));
+	response.on('end', function () {
+		JSON.parse(chunks).messages.forEach(function (message) {
+			if (message.type === 'error') {
+				var line = (message.lastLine ? message.lastLine : 0);
+				var column = (message.firstColumn ? message.firstColumn: 0);
+				console.log([htmlfile, line, column, message.message].join(':'));
 			}
 		});
 	});
@@ -107,15 +106,15 @@ fd.submit(<span class="hljs-string">'http://validator.nu/'</span>, <span class="
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/nodejs-https-get.html">Node.jsのhttps.get()</a></p>
+		<p><a href="/blog/coding/nodejs-https-get.html" rel="prev">Node.jsのhttps.get()</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

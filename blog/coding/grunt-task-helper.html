@@ -15,13 +15,13 @@
 		<link href="/blog/coding/grunt-task-helper.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="grunt-task-helperが良さそう" itemprop="name">
+		<link href="/blog/media/hollow-icons.html" rel="prev">
 		<link href="/blog/coding/grunt-task-helper.html" itemprop="url">
 
 		<meta content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2013-08-26T10:40:13+09:00" itemprop="datePublished">2013年8月26日</time></p>
 
-		<h1 class="tagline">grunt-task-helperが良さそう</h1>
+		<h1 class="screamer">grunt-task-helperが良さそう</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,49 +67,49 @@
 
 <p><a href="https://npmjs.org/package/grunt-contrib-concat">grunt-contrib-concat</a>を使っているとして、そのタスク設定が以下のようになっているとする。</p>
 
-<pre><code class="hljs language-javascript">concat: {
-	<span class="hljs-attr">options</span>: {
-		<span class="hljs-attr">seperator</span>: <span class="hljs-string">';'</span>
+<pre><code class="language-javascript">concat: {
+	options: {
+		seperator: &apos;;&apos;
 	},
-	<span class="hljs-attr">prettify</span>: {
-		<span class="hljs-attr">src</span>: [
-			<span class="hljs-string">'scripts/prettify/prettify.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-config.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-css.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-scss.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-vim.js'</span>,
-			<span class="hljs-string">'scripts/prettify/prettify-loader.js'</span>
+	prettify: {
+		src: [
+			&apos;scripts/prettify/prettify.js&apos;,
+			&apos;scripts/prettify/lang-config.js&apos;,
+			&apos;scripts/prettify/lang-css.js&apos;,
+			&apos;scripts/prettify/lang-scss.js&apos;,
+			&apos;scripts/prettify/lang-vim.js&apos;,
+			&apos;scripts/prettify/prettify-loader.js&apos;
 		],
-		<span class="hljs-attr">dest</span>: <span class="hljs-string">'scripts/prettify.js'</span>
+		dest: &apos;scripts/prettify.js&apos;
 	}
 }</code></pre>
 
 <p>この場合は順番が重要なのでグロブでまとめて拾っていない以外は普通なマルチタスク設定。これをgrunt-task-helperを挟むように書きかえるとこうなる。</p>
 
-<pre><code class="hljs language-javascript">concat: {
-	<span class="hljs-attr">options</span>: {
-		<span class="hljs-attr">seperator</span>: <span class="hljs-string">';'</span>
+<pre><code class="language-javascript">concat: {
+	options: {
+		seperator: &apos;;&apos;
 	},
-	<span class="hljs-attr">prettify</span>: {
-		<span class="hljs-attr">files</span>: <span class="hljs-string">'&lt;%= taskHelper.prettify.options.filesArray %&gt;'</span>
+	prettify: {
+		files: &apos;&lt;%= taskHelper.prettify.options.filesArray %&gt;&apos;
 	}
 },
 
-<span class="hljs-attr">taskHelper</span>: {
-	<span class="hljs-attr">prettify</span>: {
-		<span class="hljs-attr">options</span>: {
-			<span class="hljs-attr">handlerByFile</span>: <span class="hljs-string">'newFile'</span>,
-			<span class="hljs-attr">filesArray</span>: []
+taskHelper: {
+	prettify: {
+		options: {
+			handlerByFile: &apos;newFile&apos;,
+			filesArray: []
 		},
-		<span class="hljs-attr">src</span>: [
-			<span class="hljs-string">'scripts/prettify/prettify.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-config.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-css.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-scss.js'</span>,
-			<span class="hljs-string">'scripts/prettify/lang-vim.js'</span>,
-			<span class="hljs-string">'scripts/prettify/loader.js'</span>
+		src: [
+			&apos;scripts/prettify/prettify.js&apos;,
+			&apos;scripts/prettify/lang-config.js&apos;,
+			&apos;scripts/prettify/lang-css.js&apos;,
+			&apos;scripts/prettify/lang-scss.js&apos;,
+			&apos;scripts/prettify/lang-vim.js&apos;,
+			&apos;scripts/prettify/loader.js&apos;
 		],
-		<span class="hljs-attr">dest</span>: <span class="hljs-string">'scripts/prettify.js'</span>
+		dest: &apos;scripts/prettify.js&apos;
 	}
 }</code></pre>
 
@@ -125,15 +124,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/media/hollow-icons.html">空白の多いアイコン</a></p>
+		<p><a href="/blog/media/hollow-icons.html" rel="prev">空白の多いアイコン</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

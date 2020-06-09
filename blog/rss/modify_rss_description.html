@@ -15,13 +15,13 @@
 		<link href="/blog/rss/modify_rss_description.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="RSSファイルの各itemdescriptionとcontent:encodedが、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、descriptionは最初の段落のみ、content:encodedはこれまで通りエントリの内容のフルコピーというようにしました。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="RSSファイルのdescriptionを調節" itemprop="name">
+		<link href="/blog/rss/bloglines_notfier.html" rel="prev">
 		<link href="/blog/rss/modify_rss_description.html" itemprop="url">
 
 		<meta content="RSSファイルの各itemdescriptionとcontent:encodedが、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、descriptionは最初の段落のみ、content:encodedはこれまで通りエントリの内容のフルコピーというようにしました。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,35 +47,34 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2003-10-13T06:40:57+09:00" itemprop="datePublished">2003年10月13日</time></p>
 
-		<h1 class="tagline">RSSファイルのdescriptionを調節</h1>
+		<h1 class="screamer">RSSファイルのdescriptionを調節</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>RSSファイルの各<code>item</code><code>description</code>と<code>content:encoded</code>が、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、<code>description</code>は最初の段落のみ、<code>content:encoded</code>はこれまで通りエントリの内容のフルコピーというようにしました。</p>
 <p>最近のRSSリーダーは<code>content:encoded</code>優先というものが多いと思うので、あんまり問題ない（今までどおりとも言う）んじゃないかと思ってます。RSSファイルのサイズがかなり減るという利点も。</p>
 <p>実装は単純明快に、</p>
-<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">make_excerpt</span> </span>{
-	<span class="hljs-keyword">my</span> $out = $_[<span class="hljs-number">0</span>];
+<pre><code class="language-perl">sub make_excerpt {
+	my $out = $_[0];
 
-	$out =~ <span class="hljs-keyword">s</span>!\x0D\x0A|\x0D|\x0A!!g;
-	$out =~ <span class="hljs-keyword">s</span>!^(.*?)&lt;<span class="hljs-regexp">/p&gt;.*$!$1!g;
+	$out =~ s!\x0D\x0A|\x0D|\x0A!!g;
+	$out =~ s!^(.*?)&lt;/p&gt;.*$!$1!g;
 	$out =~ s!&lt;.*?&gt;!!g;
 
 	return $out;
-}</span></code></pre>
+}</code></pre>
 <p>最初の<code>p</code>要素の閉じタグまで抜き出すとしました。substrでうまく切る方法を思いつかなかったので、こんな実装になったのは秘密です。utf8モジュールないしなぁ、ここ。かといって、要約生成するためにJcodeモジュールで一旦EUC-JPに変換して処理するとかもなんか手間がかかるわりに報われないかなと。ざっと自分のエントリを眺めたところ、大体はタイトルと最初の段落で概要はつかめそうだったので、これで良い事にします。</p>
 <p>うちで配っているRSS関連スクリプトは、軒並みcontent:encoded非対応だったりするわけですが。そろそろ対応しようかなとか思うんですが、HTML出力限定という作りになっていないので、なかなか対応しづらいんですよね。</p>
 <p>もし、<code>description</code>がエントリ内容のフルコピーであるRSSファイルがどうしても必要という場合は、別のflavour作って対応しますので、ヨコセとコメントで要求してください。</p>
@@ -83,15 +82,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/rss/bloglines_notfier.html">Bloglines Notifier</a></p>
+		<p><a href="/blog/rss/bloglines_notfier.html" rel="prev">Bloglines Notifier</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

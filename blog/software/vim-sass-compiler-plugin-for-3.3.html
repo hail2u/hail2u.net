@@ -15,13 +15,13 @@
 		<link href="/blog/software/vim-sass-compiler-plugin-for-3.3.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Sass 3.3でコンパイラーの出すエラー・メッセージがちょっと変わる（った）。Vimプラグインの構文チェッカーで最も有名と思われるSyntasticでは既に反映されているので、これ使っている人は最新版にするだけで良い。僕みたいに使ってない人は書きかえる必要がある。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Sass 3.3向けVimコンパイラー・プラグイン" itemprop="name">
+		<link href="/blog/misc/three-parts.html" rel="prev">
 		<link href="/blog/software/vim-sass-compiler-plugin-for-3.3.html" itemprop="url">
 
 		<meta content="Sass 3.3でコンパイラーの出すエラー・メッセージがちょっと変わる（った）。Vimプラグインの構文チェッカーで最も有名と思われるSyntasticでは既に反映されているので、これ使っている人は最新版にするだけで良い。僕みたいに使ってない人は書きかえる必要がある。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2013-08-21T10:58:39+09:00" itemprop="datePublished">2013年8月21日</time></p>
 
-		<h1 class="tagline">Sass 3.3向けVimコンパイラー・プラグイン</h1>
+		<h1 class="screamer">Sass 3.3向けVimコンパイラー・プラグイン</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -73,42 +72,42 @@ test.scss:2:in `test&apos;: Undefined variable: &quot;$foo&quot;. (Sass::SyntaxE
 
 <p><code>test.scss</code>の<code>test</code>というミックスインでエラーがあるとこうなる（<code>--trace</code>オプション付きの場合）。少なくともこれに対応してやらないとエラーの取りこぼしが起き、エラーがあるのにQuickFixウィンドウに何も出ないとか起きる。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">"current_compiler"</span>)
-	<span class="hljs-keyword">finish</span>
-<span class="hljs-keyword">endif</span>
-<span class="hljs-keyword">let</span> current_compiler = <span class="hljs-string">"sass_scss"</span>
+<pre><code class="language-vim">if exists(&quot;current_compiler&quot;)
+	finish
+endif
+let current_compiler = &quot;sass_scss&quot;
 
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">":CompilerSet"</span>) != <span class="hljs-number">2</span>
-	<span class="hljs-keyword">command</span> -nargs=* CompilerSet <span class="hljs-keyword">setlocal</span> <span class="hljs-symbol">&lt;args&gt;</span>
-<span class="hljs-keyword">endif</span>
+if exists(&quot;:CompilerSet&quot;) != 2
+	command -nargs=* CompilerSet setlocal &lt;args&gt;
+endif
 
-<span class="hljs-keyword">let</span> <span class="hljs-variable">s:cpo_save</span> = &amp;cpo
-<span class="hljs-keyword">set</span> cpo&amp;<span class="hljs-keyword">vim</span>
+let s:cpo_save = &amp;cpo
+set cpo&amp;vim
 
 CompilerSet makeprg=scss\ --check\ --trace\ %
 
 CompilerSet errorformat=
-			\%<span class="hljs-keyword">f</span>:%<span class="hljs-variable">l:</span>\ %<span class="hljs-keyword">m</span>,
-			\%<span class="hljs-keyword">f</span>:%<span class="hljs-variable">l:in</span>\ %.%#:\ %<span class="hljs-keyword">m</span>,
+			\%f:%l:\ %m,
+			\%f:%l:in\ %.%#:\ %m,
 			\%-G%.%#
 
-<span class="hljs-keyword">let</span> &amp;cpo = <span class="hljs-variable">s:cpo_save</span>
-<span class="hljs-keyword">unlet</span> <span class="hljs-variable">s:cpo_save</span></code></pre>
+let &amp;cpo = s:cpo_save
+unlet s:cpo_save</code></pre>
 
 <p>SassのCLIアプリケーションは<code>--trace</code>オプションを付けてるとVimの<code>errorformat</code>を書きやすくなる。自前でSassのコンパイラー・プラグインを用意する場合は付けるの前提で書くとすごく楽。</p>
 	</div>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/misc/three-parts.html">3つのパーツ</a></p>
+		<p><a href="/blog/misc/three-parts.html" rel="prev">3つのパーツ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

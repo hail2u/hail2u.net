@@ -1,6 +1,7 @@
 (function(){"use strict";
 
-var showNext = function showNext(event) {
+var showNext = function showNext(_ref) {
+  var target = _ref.target;
   var template = document.querySelector(".js-append-next");
   var button = template.content.querySelector("button");
 
@@ -10,10 +11,9 @@ var showNext = function showNext(event) {
 
   template.parentNode.insertBefore(template.content, template);
   template.parentNode.removeChild(template);
-  var self = event.target;
-  self.parentNode.hidden = true;
+  target.parentNode.hidden = true;
 };
 
 showNext({
-  target: document.querySelector(".js-append-next-fallback a")
+  "target": document.querySelector(".js-append-next-fallback p")
 });})();

@@ -15,13 +15,13 @@
 		<link href="/blog/blosxom/excerpt.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容はforeshortenedとあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="excerpt plugin" itemprop="name">
+		<link href="/blog/sports/grudge.html" rel="prev">
 		<link href="/blog/blosxom/excerpt.html" itemprop="url">
 
 		<meta content="諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容はforeshortenedとあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,56 +47,55 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-03-10T11:41:02+09:00" itemprop="datePublished">2004年3月10日</time></p>
 
-		<h1 class="tagline">excerpt plugin</h1>
+		<h1 class="screamer">excerpt plugin</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容は<a href="http://www.blosxom.com/plugins/text/foreshortened.htm" title="blosxom :: the zen of blogging :: plugins/text/foreshortened.txt">foreshortened</a>とあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。</p>
-<pre><code class="hljs language-perl"><span class="hljs-comment"># Blosxom Plugin: excerpt</span>
-<span class="hljs-comment"># Author(s): Kyo Nagashima &lt;k-n&amp;#64;muc.biglobe.ne.jp&gt;</span>
-<span class="hljs-comment"># Version: 1.0</span>
-<span class="hljs-comment"># Blosxom Home/Docs/Licensing: http://www.blosxom.com/</span>
+<pre><code class="language-perl"># Blosxom Plugin: excerpt
+# Author(s): Kyo Nagashima &lt;k-n&#64;muc.biglobe.ne.jp&gt;
+# Version: 1.0
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
 
-<span class="hljs-keyword">package</span> excerpt;
+package excerpt;
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> vars <span class="hljs-string">qw($body)</span>;
+use strict;
+use vars qw($body);
 
-<span class="hljs-comment"># --- Configurable variables -----------</span>
+# --- Configurable variables -----------
 
-<span class="hljs-comment"># --- Plug-in package variables --------</span>
+# --- Plug-in package variables --------
 
-<span class="hljs-comment"># --------------------------------------</span>
+# --------------------------------------
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+sub start {
+	return 1;
 }
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">story</span> </span>{
-	<span class="hljs-keyword">my</span>($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+sub story {
+	my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
 
 	$body = $$body_ref;
-	$body =~ <span class="hljs-keyword">s</span>!\x0D|\x0A!!g;
-	$body =~ <span class="hljs-keyword">s</span>!^&lt;p&gt;(.*?)&lt;<span class="hljs-regexp">/p&gt;.*$!$1!;
+	$body =~ s!\x0D|\x0A!!g;
+	$body =~ s!^&lt;p&gt;(.*?)&lt;/p&gt;.*$!$1!;
 	$body =~ s!&lt;.*?&gt;!!g;
 
 	return 1;
 }
 
-1;</span></code></pre>
+1;</code></pre>
 <p>というような感じで、最初の<code>p</code>要素の内容を切り出し、タグを削除という単純明快、ぶっちゃけこのblog専用の手抜きなもの。</p>
 <p>事情というのは、rssフレーバーを<a href="http://blogs.law.harvard.edu/tech/rss" title="RSS 2.0 Specification">RSS 2.0</a>、rdfフレーバーを<a href="http://web.resource.org/rss/1.0/spec" title="RDF Site Summary (RSS) 1.0">RSS 1.0</a>に変更した事情です。特に何かセマンティックな理由（どんな理由だ）があるわけではなく、気分の問題。RSS 2.0に非対応というRSSリーダーはあんまり聞かないので、多くの人には関係の無いことだと思いますが、もしかすると一部のRSSリーダーで読めなくなっちゃったとかあるかもしれません。ゴメンナサイと謝っておきます。</p>
 <p>ということで、現在このblogのフィードは以下の4種類です。</p>
@@ -111,15 +110,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/sports/grudge.html">イコン</a></p>
+		<p><a href="/blog/sports/grudge.html" rel="prev">イコン</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

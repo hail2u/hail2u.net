@@ -15,13 +15,13 @@
 		<link href="/blog/coding/arbitrarycounter.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Hacker News経由でArbitraryCounterというのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="ArbitraryCounter" itemprop="name">
+		<link href="/blog/rss/why-i-dont-want-to-use-digg-reader-or-aol-reader.html" rel="prev">
 		<link href="/blog/coding/arbitrarycounter.html" itemprop="url">
 
 		<meta content="Hacker News経由でArbitraryCounterというのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2013-07-25T09:10:24+09:00" itemprop="datePublished">2013年7月25日</time></p>
 
-		<h1 class="tagline">ArbitraryCounter</h1>
+		<h1 class="screamer">ArbitraryCounter</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -85,28 +84,28 @@
 
 <p>カウントアップ（ダウン）には<code>POST</code>が必須。素のYQLでは出来ないけど、以下の様な簡単なOpen Data Tablesを書いてやればいける。</p>
 
-<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">table</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://query.yahooapis.com/v1/schema/table.xsd"</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">meta</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">sampleQuery</span>&gt;</span>&lt;![CDATA[
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;table xmlns="http://query.yahooapis.com/v1/schema/table.xsd"&gt;
+&lt;meta&gt;
+&lt;sampleQuery&gt;&lt;![CDATA[
 	select * from {table} where url="http://arbitrarycounter.com/vb/fruit/apples+"
-]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">sampleQuery</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">meta</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">bindings</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">select</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">urls</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">url</span>&gt;</span>{url}<span class="hljs-tag">&lt;/<span class="hljs-name">url</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">urls</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">inputs</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">key</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"url"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"xs:string"</span> <span class="hljs-attr">required</span>=<span class="hljs-string">"true"</span> <span class="hljs-attr">paramType</span>=<span class="hljs-string">"variable"</span>/&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">inputs</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">execute</span>&gt;</span>&lt;![CDATA[
+]]&gt;&lt;/sampleQuery&gt;
+&lt;/meta&gt;
+&lt;bindings&gt;
+&lt;select&gt;
+&lt;urls&gt;
+&lt;url&gt;{url}&lt;/url&gt;
+&lt;/urls&gt;
+&lt;inputs&gt;
+&lt;key id="url" type="xs:string" required="true" paramType="variable"/&gt;
+&lt;/inputs&gt;
+&lt;execute&gt;&lt;![CDATA[
 	var data = y.rest(url).accept('*').contentType('application/x-www-form-urlencoded').post().response;
 	response.object = y.xparseJson(data);
-]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">execute</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">bindings</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span></code></pre>
+]]&gt;&lt;/execute&gt;
+&lt;/select&gt;
+&lt;/bindings&gt;
+&lt;/table&gt;</code></pre>
 
 <p>最後に<code>y.xparseJson()</code>するのを忘れずに。このXMLファイルをどこかにアップロードするとYQLでPOSTを処理できるようになる。</p>
 
@@ -125,15 +124,15 @@ select * from post where url="http://arbitrarycounter.com/vb/fruit/apples+"</a><
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/rss/why-i-dont-want-to-use-digg-reader-or-aol-reader.html">Digg ReaderとAOL Readerにはがっかりだ</a></p>
+		<p><a href="/blog/rss/why-i-dont-want-to-use-digg-reader-or-aol-reader.html" rel="prev">Digg ReaderとAOL Readerにはがっかりだ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

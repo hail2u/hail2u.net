@@ -15,13 +15,13 @@
 		<link href="/blog/coding/jquery-highlight-search-terms-plugin.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う（そこまで考えてるなら実装しろ）。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="jQueryプラグイン: Highlight Search Terms" itemprop="name">
+		<link href="/blog/coding/highlight-search-terms.html" rel="prev">
 		<link href="/blog/coding/jquery-highlight-search-terms-plugin.html" itemprop="url">
 
 		<meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う（そこまで考えてるなら実装しろ）。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2009-06-04T11:26:19+09:00" itemprop="datePublished">2009年6月4日</time></p>
 
-		<h1 class="tagline">jQueryプラグイン: Highlight Search Terms</h1>
+		<h1 class="screamer">jQueryプラグイン: Highlight Search Terms</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,19 +67,19 @@
 
 <p>使い方は多くのjQueryプラグインと同じで、</p>
 
-<pre><code class="hljs language-js">$(<span class="hljs-string">"body"</span>).highlightSearchTerms();</code></pre>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms();</code></pre>
 
 <p>と検索語のハイライトを行いたい要素からつなげて使う。プラグイン側でインライン・スタイルを付加したりはしないので、デフォルトの<code>em.highlight</code>に対してスタイル指定をあらかじめしておく必要がある。</p>
 
 <p><code>highlightSearchTerms()</code>にはオプションとして、</p>
 
-<pre><code class="hljs language-js">
-$(<span class="hljs-string">"body"</span>).highlightSearchTerms({
-	<span class="hljs-attr">className</span>: <span class="hljs-string">"search-keyword"</span>,
-	<span class="hljs-attr">referrerPatterns</span>: [
-		<span class="hljs-string">"^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$"</span>
+<pre><code class="language-js">
+$(&quot;body&quot;).highlightSearchTerms({
+	className: &quot;search-keyword&quot;,
+	referrerPatterns: [
+		&quot;^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$&quot;
 	],
-	<span class="hljs-attr">unsafeChars</span>: <span class="hljs-string">"[!-*,-/:-@[-`{-~]"</span>
+	unsafeChars: &quot;[!-*,-/:-@[-`{-~]&quot;
 });</code></pre>
 
 <p>このように指定することができる。</p>
@@ -89,9 +88,9 @@ $(<span class="hljs-string">"body"</span>).highlightSearchTerms({
 
 <p><code>referrerPatters</code>はリファラを評価する正規表現のパターン。配列なので複数指定可能。デフォルトでGoogle(comとco.jp)・Yahoo!(comとco.jp)・Bingの計5つが設定されており、オプションで指定されたものとマージされる。オプションで指定したものが先に評価され、マッチした時点で評価のループを抜けるので、デフォルトのパターンよりも優先されることになる（上書きではないが、近い挙動になる）。例えば自分のサイト内検索のリファラを拾うようにするためには、</p>
 
-<pre><code class="hljs language-js">$(<span class="hljs-string">"body"</span>).highlightSearchTerms({
-	<span class="hljs-attr">referrerPatterns</span>: [
-		<span class="hljs-string">"^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$"</span>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+	referrerPatterns: [
+		&quot;^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$&quot;
 	]
 });</code></pre>
 
@@ -101,8 +100,8 @@ $(<span class="hljs-string">"body"</span>).highlightSearchTerms({
 
 <p>また、デバッグ用に<code>referrer</code>というオプションがある。</p>
 
-<pre><code class="hljs language-js">$(<span class="hljs-string">"body"</span>).highlightSearchTerms({
-	<span class="hljs-attr">referrer</span>: <span class="hljs-string">"http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet"</span>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+	referrer: &quot;http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet&quot;
 });</code></pre>
 
 <p>とすることによって<code>document.referrer</code>の代わりに<code>referrer</code>で指定されたURL(URLじゃなくても通っちゃうけど）が検索語の取り出し元になる。なので、色々なリファラを想定して試すことができる。</p>
@@ -111,7 +110,7 @@ $(<span class="hljs-string">"body"</span>).highlightSearchTerms({
 
 <p>内容のコードはあまり変わっていない。変えたところは<code>$(&quot;*&quot;).not(&quot;iframe&quot;)</code>というような感じで書いていた部分を<code>find()</code>と<code>:not()</code>セレクタを使うようにしたことくらい。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-keyword">this</span>.find(<span class="hljs-string">":not(iframe)"</span>).contents().each();</code></pre>
+<pre><code class="language-js">this.find(&quot;:not(iframe)&quot;).contents().each();</code></pre>
 
 <p>という感じになっている。jQueryのここらへんの柔軟性はすごくて、XPathなんか目じゃないね（おおげさ）。</p>
 
@@ -120,15 +119,15 @@ $(<span class="hljs-string">"body"</span>).highlightSearchTerms({
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/coding/highlight-search-terms.html">検索語の強調</a></p>
+		<p><a href="/blog/coding/highlight-search-terms.html" rel="prev">検索語の強調</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/scroll-down-smoothly-with-css-transition.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="少し前のCSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事では、CSS Transitionを使ってスムーズにスクロールさせるためにbody要素のmargin-topプロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。" itemprop="description">
 		<link href="/img/blog/scroll-down-smoothly-with-css-transition.png" itemprop="image">
 		<meta content="下方向にもCSS Transitionでスムーズにスクロール" itemprop="name">
+		<link href="/blog/misc/the-end-svg.html" rel="prev">
 		<link href="/blog/webdesign/scroll-down-smoothly-with-css-transition.html" itemprop="url">
 
 		<meta content="少し前のCSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事では、CSS Transitionを使ってスムーズにスクロールさせるためにbody要素のmargin-topプロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2015-05-18T06:55:05+09:00" itemprop="datePublished">2015年5月18日</time></p>
 
-		<h1 class="tagline">下方向にもCSS Transitionでスムーズにスクロール</h1>
+		<h1 class="screamer">下方向にもCSS Transitionでスムーズにスクロール</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -74,21 +73,21 @@
 
 <p>デモではJump to Bottomというボタンを押すとページの最下部までスクロールするようになっている。スムーズなことがわかりやすいように長めのアニメーションにしておいた。今回のものは任意の要素の位置へにもスクロールすることが可能だ。Jump to Middleというボタンでは中程までスクロールしてピタッと止まる。また上方向にも対応させた。Back to Topというボタンではページの先頭にスムーズにスクロールしながら戻ることができる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">scrollToElm</span>(<span class="hljs-params">to</span>) </span>{
-	<span class="hljs-keyword">var</span> root = <span class="hljs-built_in">document</span>.documentElement;
-	<span class="hljs-keyword">var</span> styleRoot = root.style;
-	<span class="hljs-keyword">var</span> doScroll = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		styleRoot.transition = styleRoot.transform = <span class="hljs-string">'initial'</span>;
-		<span class="hljs-built_in">window</span>.scrollTo(<span class="hljs-number">0</span>, to.offsetTop);
-		root.removeEventListener(<span class="hljs-string">'transitionend'</span>, doScroll, <span class="hljs-literal">false</span>);
+<pre><code class="language-javascript">function scrollToElm(to) {
+	var root = document.documentElement;
+	var styleRoot = root.style;
+	var doScroll = function () {
+		styleRoot.transition = styleRoot.transform = &apos;initial&apos;;
+		window.scrollTo(0, to.offsetTop);
+		root.removeEventListener(&apos;transitionend&apos;, doScroll, false);
 	};
-	<span class="hljs-keyword">var</span> scrollDistance = <span class="hljs-built_in">window</span>.pageYOffset - <span class="hljs-built_in">Math</span>.min(
+	var scrollDistance = window.pageYOffset - Math.min(
 		to.offsetTop,
-		root.scrollHeight - <span class="hljs-built_in">window</span>.innerHeight
+		root.scrollHeight - window.innerHeight
 	);
-	root.addEventListener(<span class="hljs-string">'transitionend'</span>, doScroll, <span class="hljs-literal">false</span>);
-	styleRoot.transition = <span class="hljs-string">'transform 1s ease-in-out'</span>;
-	styleRoot.transform = <span class="hljs-string">'translate3d(0, '</span> + scrollDistance + <span class="hljs-string">'px, 0)'</span>;
+	root.addEventListener(&apos;transitionend&apos;, doScroll, false);
+	styleRoot.transition = &apos;transform 1s ease-in-out&apos;;
+	styleRoot.transform = &apos;translate3d(0, &apos; + scrollDistance + &apos;px, 0)&apos;;
 }</code></pre>
 
 <p>少しややこしくなったが、それでも16行程度で実装することができる。上下へスクロールさせる場合、後処理が重要になるので<code>transitionend</code>イベントを使うことが必須になる（使わなくても不可能ではない）。</p>
@@ -118,15 +117,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/misc/the-end-svg.html">The End (SVG)</a></p>
+		<p><a href="/blog/misc/the-end-svg.html" rel="prev">The End (SVG)</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

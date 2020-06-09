@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/fixed-logo-with-to-top-function.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="トップヘモドル機能付きの位置固定なロゴ" itemprop="name">
+		<link href="/blog/software/git-config-fetch-prune.html" rel="prev">
 		<link href="/blog/webdesign/fixed-logo-with-to-top-function.html" itemprop="url">
 
 		<meta content="ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,45 +47,44 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-09-04T08:32:27+09:00" itemprop="datePublished">2014年9月4日</time></p>
 
-		<h1 class="tagline">トップヘモドル機能付きの位置固定なロゴ</h1>
+		<h1 class="screamer">トップヘモドル機能付きの位置固定なロゴ</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> globalHeader = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'.global-header'</span>);
-<span class="hljs-keyword">var</span> logo = globalHeader.querySelector(<span class="hljs-string">'.logo'</span>);
-<span class="hljs-keyword">var</span> siteNavigation = globalHeader.querySelector(<span class="hljs-string">'.site-navigation'</span>);
+<pre><code class="language-javascript">var globalHeader = document.querySelector(&apos;.global-header&apos;);
+var logo = globalHeader.querySelector(&apos;.logo&apos;);
+var siteNavigation = globalHeader.querySelector(&apos;.site-navigation&apos;);
 
-<span class="hljs-keyword">var</span> scrollToTop = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) </span>{
-	<span class="hljs-built_in">window</span>.scrollTo(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+var scrollToTop = function (evt) {
+	window.scrollTo(0, 0);
 	evt.preventDefault();
 };
 
-<span class="hljs-keyword">var</span> toggleLogoAction = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) </span>{
-	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">window</span>.pageYOffset &gt; globalHeader.offsetTop + siteNavigation.scrollHeight) {
-		logo.addEventListener(<span class="hljs-string">'click'</span>, scrollToTop, <span class="hljs-literal">false</span>);
+var toggleLogoAction = function (evt) {
+	if (window.pageYOffset &gt; globalHeader.offsetTop + siteNavigation.scrollHeight) {
+		logo.addEventListener(&apos;click&apos;, scrollToTop, false);
 
-		<span class="hljs-keyword">return</span>;
+		return;
 	}
 
-	logo.removeEventListener(<span class="hljs-string">'click'</span>, scrollToTop, <span class="hljs-literal">false</span>);
+	logo.removeEventListener(&apos;click&apos;, scrollToTop, false);
 };
 
-<span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'scroll'</span>, toggleLogoAction, <span class="hljs-literal">false</span>);</code></pre>
+window.addEventListener(&apos;scroll&apos;, toggleLogoAction, false);</code></pre>
 
 <p>スクロール・イベントで<code>window.pageYOffset</code>と<code>globalHeader.offsetTop + siteNavigation.scrollHeight</code>を比べて、前者が大きい場合はナビゲーションが見えないだろうと推測して、トップヘモドル機能をロゴに割り当てるというシンプルなものだ。トップへモドル機能は単純にリンク先を<code>#top</code>に書きかえるだけでも良かったが、URLの分散と履歴の汚染をもたらしてしまうので<code>window.scrollTo(0, 0)</code>を使った。</p>
 
@@ -108,15 +107,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/git-config-fetch-prune.html">Gitのfetch/pullサブコマンドで--pruneオプションをデフォルトにする</a></p>
+		<p><a href="/blog/software/git-config-fetch-prune.html" rel="prev">Gitのfetch/pullサブコマンドで--pruneオプションをデフォルトにする</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

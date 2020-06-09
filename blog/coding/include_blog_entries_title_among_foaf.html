@@ -15,13 +15,13 @@
 		<link href="/blog/coding/include_blog_entries_title_among_foaf.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="なんとなく気が向いたので、XSLを利用して、FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込む" itemprop="name">
+		<link href="/blog/software/firefox_userchrome_css_tricks.html" rel="prev">
 		<link href="/blog/coding/include_blog_entries_title_among_foaf.html" itemprop="url">
 
 		<meta content="なんとなく気が向いたので、XSLを利用して、FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,37 +47,36 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-07-12T03:32:24+09:00" itemprop="datePublished">2004年7月12日</time></p>
 
-		<h1 class="tagline">FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込む</h1>
+		<h1 class="screamer">FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込む</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p>なんとなく気が向いたので、XSLを利用して、FOAF<ins>をブラウザで表示する時</ins>にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。</p>
 <p>他のXMLファイルの要素を参照するには、<code>document</code>関数に続けて、ルートから要素を辿ってやれば良いという話に気づいた後は簡単でした。当該処理は、foaf.xslではこんな感じになっています。</p>
-<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:for-each</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"document('../blog/index.rdf')/rdf:RDF/rss:item"</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">a</span>&gt;</span>
-				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:attribute</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"href"</span>&gt;</span>
-					<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"rss:link"</span>/&gt;</span>
-				<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:attribute</span>&gt;</span>
-				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"rss:title"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:for-each</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></code></pre>
+<pre><code class="language-xsl">&lt;ul&gt;
+	&lt;xsl:for-each select=&quot;document(&apos;../blog/index.rdf&apos;)/rdf:RDF/rss:item&quot;&gt;
+		&lt;li&gt;
+			&lt;a&gt;
+				&lt;xsl:attribute name=&quot;href&quot;&gt;
+					&lt;xsl:value-of select=&quot;rss:link&quot;/&gt;
+				&lt;/xsl:attribute&gt;
+				&lt;xsl:value-of select=&quot;rss:title&quot;/&gt;
+			&lt;/a&gt;
+		&lt;/li&gt;
+	&lt;/xsl:for-each&gt;
+&lt;/ul&gt;</code></pre>
 <p>foaf.xslにはRSSのnamespaceも追加する必要があります。</p>
 <p>FOAFはSNSの切り札になるかと思ったら、実装しないSNSばっかりなので再び忘れかけられているような感じ？いや、知らんけど。<a href="http://mixi.jp/" title="ソーシャル・ネットワーキングサイト [mixi(ミクシィ）]">mixi</a>なんかは実装されている機能のほとんどがFOAFで表現できそうなので、バックアップとかそういう用途をメインとして、FOAFで設定のインポート・エクスポートを実装してくれたりすれば面白いんじゃないかなとか。それならmixiに参加していない人もつながれるし。そして、mixiに参加していない人が<code>knows</code>にあるFOAFファイルをインポートしたら、未参加の方に招待状を一斉送信とか。ダメですか？</p>
 <p>てかmixiにいます！友達6人しかいねー。いや、決して友達にしてくださいとかそういう訳では・・・ありますが。blosxomとかななみちゃんコミュニティ辺りから探してくれると見つかりやすいかも。ニックネームはkyoです（まんま）。写真さっさとアップしようか・・・。ハーヴェイ・カイテルのようなので、ストーキングされたりしたら怖いなとか思ってアップロードしてなかったんですが。</p>
@@ -86,15 +85,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/firefox_userchrome_css_tricks.html">FirefoxのuserChrome.cssネタ</a></p>
+		<p><a href="/blog/software/firefox_userchrome_css_tricks.html" rel="prev">FirefoxのuserChrome.cssネタ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

@@ -15,13 +15,13 @@
 		<link href="/blog/software/xml-rpc_on_popfile.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="POPFileの0.22.0よりサポートされているはずのXML-RPCによるAPIですが、これを設定で有効にすると起動に失敗してしまいます。少し調べてみたところ、どうやらWindows版のインストーラーではScalar::Utilというモジュールがインストールされないことに原因があるようです。CPANからダウンロードしてlibフォルダに置いてみたらきちんと動作しました。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="XML-RPC on POPFile" itemprop="name">
+		<link href="/blog/rss/kinja.html" rel="prev">
 		<link href="/blog/software/xml-rpc_on_popfile.html" itemprop="url">
 
 		<meta content="POPFileの0.22.0よりサポートされているはずのXML-RPCによるAPIですが、これを設定で有効にすると起動に失敗してしまいます。少し調べてみたところ、どうやらWindows版のインストーラーではScalar::Utilというモジュールがインストールされないことに原因があるようです。CPANからダウンロードしてlibフォルダに置いてみたらきちんと動作しました。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,47 +47,46 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2004-10-07T15:11:32+09:00" itemprop="datePublished">2004年10月7日</time></p>
 
-		<h1 class="tagline">XML-RPC on POPFile</h1>
+		<h1 class="screamer">XML-RPC on POPFile</h1>
 	</header>
 
 	<div itemprop="articleBody">
 		<p><a href="http://popfile.sourceforge.net/">POPFile</a>の0.22.0よりサポートされているはずの<a href="http://popfile.sourceforge.net/cgi-bin/wiki.pl?POPFileModules/XmlRpc">XML-RPCによるAPI</a>ですが、これを設定で有効にすると起動に失敗してしまいます。少し調べてみたところ、どうやらWindows版のインストーラーでは<a href="http://search.cpan.org/search?module=Scalar::Util">Scalar::Util</a>というモジュールがインストールされないことに原因があるようです。CPANからダウンロードしてlibフォルダに置いてみたらきちんと動作しました。</p>
 <p>ドキュメントを読む限りではXML-RPC APIをメーラーから叩いて、微妙に使いづらいHTMLインターフェイスを利用せずに大概のことができるはずな感じじゃないかなぁとか。とりあえず鶴亀マクロは作る。</p>
 <p>まぁとりあえず適当に書いた実験スクリプトは動いた。</p>
-<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
+<pre><code class="language-perl">#!/usr/local/bin/perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> XMLRPC::Lite;
+use strict;
+use XMLRPC::Lite;
 
-<span class="hljs-keyword">my</span> $proxy = <span class="hljs-string">"http://localhost:8081/RPC2"</span>;
+my $proxy = &quot;http://localhost:8081/RPC2&quot;;
 
-<span class="hljs-keyword">my</span> $sk = XMLRPC::Lite-&gt;proxy($proxy)
-	-&gt;call(<span class="hljs-string">'POPFile/API.get_session_key'</span>, <span class="hljs-string">'admin'</span>, <span class="hljs-string">''</span>)
+my $sk = XMLRPC::Lite-&gt;proxy($proxy)
+	-&gt;call(&apos;POPFile/API.get_session_key&apos;, &apos;admin&apos;, &apos;&apos;)
 	-&gt;result;
 
-<span class="hljs-keyword">my</span> $buckets = XMLRPC::Lite-&gt;proxy($proxy)
-	-&gt;call(<span class="hljs-string">'POPFile/API.get_buckets'</span>, $sk)
+my $buckets = XMLRPC::Lite-&gt;proxy($proxy)
+	-&gt;call(&apos;POPFile/API.get_buckets&apos;, $sk)
 	-&gt;result;
 
-<span class="hljs-keyword">print</span> <span class="hljs-string">"$_\n"</span> <span class="hljs-keyword">foreach</span> (@$buckets);
+print &quot;$_\n&quot; foreach (@$buckets);
 
 XMLRPC::Lite-&gt;proxy($proxy)
-	-&gt;call(<span class="hljs-string">'POPFile/API.release_session_key'</span>, $sk);
+	-&gt;call(&apos;POPFile/API.release_session_key&apos;, $sk);
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 <p>XML-RPC APIは上記のようにPOPFile自体の操作もできるのですが、任意のテキスト・ファイルを渡してスパムかどうかチェックできるので、なんか遊べそうな気がします。<a href="http://www.raelity.org/Blagg.html">blagg</a>などと組み合わせてスパム・フィルタ付きのRSSアグリゲーターとかですかね。</p>
 <section>
 <h2>追記@2004/10/07</h2>
@@ -98,15 +97,15 @@ XMLRPC::Lite-&gt;proxy($proxy)
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/rss/kinja.html">Kinja</a></p>
+		<p><a href="/blog/rss/kinja.html" rel="prev">Kinja</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

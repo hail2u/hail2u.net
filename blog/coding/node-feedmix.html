@@ -15,13 +15,13 @@
 		<link href="/blog/coding/node-feedmix.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="xml2jsを使って複数のRSS 2.0をマージするパッケージ、FeedMixを作った。手元で結構前から使っていたGruntタスクをNode.jsパッケージにして、それを叩くだけのGruntタスクを同梱するという形にした。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="node-feedmix" itemprop="name">
+		<link href="/blog/webdesign/index-markup-and-permalink-markup.html" rel="prev">
 		<link href="/blog/coding/node-feedmix.html" itemprop="url">
 
 		<meta content="xml2jsを使って複数のRSS 2.0をマージするパッケージ、FeedMixを作った。手元で結構前から使っていたGruntタスクをNode.jsパッケージにして、それを叩くだけのGruntタスクを同梱するという形にした。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2015-03-02T06:26:59+09:00" itemprop="datePublished">2015年3月2日</time></p>
 
-		<h1 class="tagline">node-feedmix</h1>
+		<h1 class="screamer">node-feedmix</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,23 +67,23 @@
 
 <p>混ぜたいRSSファイルを配列として<code>merge()</code>の引数に指定する。XMLファイルではない場合はxml2jsが、RSSファイルではなさそうな場合はFeedMixがそれぞれ例外を吐いて落ちる。落ちる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> feedmix = <span class="hljs-built_in">require</span>(<span class="hljs-string">'feedmix'</span>);
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<pre><code class="language-javascript">var feedmix = require(&apos;feedmix&apos;);
+var fs = require(&apos;fs&apos;);
 
-<span class="hljs-keyword">var</span> a = f.readFileSync(<span class="hljs-string">'a.rss'</span>, <span class="hljs-string">'utf8'</span>);
-<span class="hljs-keyword">var</span> b = f.readFileSync(<span class="hljs-string">'b.rss'</span>, <span class="hljs-string">'utf8'</span>);
-<span class="hljs-keyword">var</span> c = f.readFileSync(<span class="hljs-string">'c.rss'</span>, <span class="hljs-string">'utf8'</span>);
-<span class="hljs-keyword">var</span> m = feedmix.merge([a, b, c], {
-	<span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>
+var a = f.readFileSync(&apos;a.rss&apos;, &apos;utf8&apos;);
+var b = f.readFileSync(&apos;b.rss&apos;, &apos;utf8&apos;);
+var c = f.readFileSync(&apos;c.rss&apos;, &apos;utf8&apos;);
+var m = feedmix.merge([a, b, c], {
+	trim: true
 });</code></pre>
 
 <p>これで<code>m</code>の内容が<code>b.rss</code>と<code>c.rss</code>のすべての<code>item</code>要素を<code>a.rss</code>へ混ぜ込んだJavaScriptオブジェクトになる。<code>item</code>は<code>pubDate</code>要素の値を使ってソートされるが、切り詰められたりはしない。<code>channel</code>要素は<code>a.rss</code>のものが採用されるが、<code>lastBuildDate</code>要素の値のみ最初の<code>item</code>要素の<code>pubDate</code>要素の値がコピーされ書き換えられる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-built_in">console</span>.log(feedmix.stringify(m, {
-	<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-attr">xmldec</span>: {
-		<span class="hljs-attr">encoding</span>: <span class="hljs-string">'UTF-8'</span>,
-		<span class="hljs-attr">version</span>: <span class="hljs-string">'1.0'</span>
+<pre><code class="language-javascript">console.log(feedmix.stringify(m, {
+	cdata: true,
+	xmldec: {
+		encoding: &apos;UTF-8&apos;,
+		version: &apos;1.0&apos;
 	}
 }));</code></pre>
 
@@ -96,26 +95,26 @@
 
 <p>同梱されているGruntタスクも凝ってはいない。</p>
 
-<pre><code class="hljs language-javascript">feedmix: {
-	<span class="hljs-attr">main</span>: {
-		<span class="hljs-attr">options</span>: {
-			<span class="hljs-attr">builder</span>: {
-				<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>,
-				<span class="hljs-attr">xmldec</span>: {
-					<span class="hljs-attr">encoding</span>: <span class="hljs-string">'UTF-8'</span>,
-					<span class="hljs-attr">version</span>: <span class="hljs-string">'1.0'</span>
+<pre><code class="language-javascript">feedmix: {
+	main: {
+		options: {
+			builder: {
+				cdata: true,
+				xmldec: {
+					encoding: &apos;UTF-8&apos;,
+					version: &apos;1.0&apos;
 				}
 			},
 
-			<span class="hljs-attr">parser</span>: {
-				<span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>
+			parser: {
+				trim: true
 			}
 		},
 
-		<span class="hljs-attr">dest</span>: <span class="hljs-string">'build/feed'</span>,
-		<span class="hljs-attr">src</span>: [
-			<span class="hljs-string">'src/feed/index.rss'</span>,
-			<span class="hljs-string">'build/blog/feed'</span>
+		dest: &apos;build/feed&apos;,
+		src: [
+			&apos;src/feed/index.rss&apos;,
+			&apos;build/blog/feed&apos;
 		]
 	}
 }</code></pre>
@@ -129,15 +128,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/index-markup-and-permalink-markup.html">indexのマークアップとpermalinkのマークアップ</a></p>
+		<p><a href="/blog/webdesign/index-markup-and-permalink-markup.html" rel="prev">indexのマークアップとpermalinkのマークアップ</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

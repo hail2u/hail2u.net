@@ -15,13 +15,13 @@
 		<link href="/blog/software/install-git-for-windows-v2.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Git v2系のWindows版がGit for Windowsの方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Git for Windows v2.x.xのインストール" itemprop="name">
+		<link href="/blog/webdesign/infield-top-aligned-label-pattern.html" rel="prev">
 		<link href="/blog/software/install-git-for-windows-v2.html" itemprop="url">
 
 		<meta content="Git v2系のWindows版がGit for Windowsの方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2015-05-06T00:39:28+09:00" itemprop="datePublished">2015年5月6日</time></p>
 
-		<h1 class="tagline">Git for Windows v2.x.xのインストール</h1>
+		<h1 class="screamer">Git for Windows v2.x.xのインストール</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -71,7 +70,7 @@
 
 <p>このGit for Windowsでは、デフォルトで<em>無理やり</em><code>~/.bashrc</code>を読みに行くことがなくなった。<code>~/.bash_profile</code>は読みに行くので、<code>~/.bash_profile</code>から<code>~/.bashrc</code>を読みに行くように、つまり普通にBashを設定してやれば良い。</p>
 
-<pre><code class="hljs language-bash"><span class="hljs-keyword">if</span> [ -f ~/.bashrc ]; <span class="hljs-keyword">then</span> . ~/.bashrc; <span class="hljs-keyword">fi</span></code></pre>
+<pre><code class="language-bash">if [ -f ~/.bashrc ]; then . ~/.bashrc; fi</code></pre>
 
 <p>これだけ書いた<code>~/.bash_profile</code>を作成するのが良い。<a href="https://github.com/git-for-windows/git/issues/86">あまり関係ないイシュー</a>ではそのうち<code>~/.bash_profile</code>がなかったら作成するようにするというような事を言っているので、これについてはそのうち直りそうだ。</p>
 </section>
@@ -101,17 +100,17 @@
 
 <p>Vimなど他のプログラムから気軽に呼び出したい場合、両者にパスが通っていることが必要になることもあるので、うまいことパスを通す方法を模索する必要がある。僕は<code>~/.vim/vimrc</code>の先頭で無理やり<code>$PATH</code>を最適化してお茶を濁した。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">'win32'</span>)
-	<span class="hljs-keyword">let</span> $PATH = <span class="hljs-keyword">substitute</span>($PATH, <span class="hljs-string">'\\'</span>, <span class="hljs-string">'/'</span>, <span class="hljs-string">'g'</span>);
+<pre><code class="language-vim">if has(&apos;win32&apos;)
+	let $PATH = substitute($PATH, &apos;\\&apos;, &apos;/&apos;, &apos;g&apos;);
 
-	<span class="hljs-keyword">if</span> $PATH !~? <span class="hljs-string">'\(^\|;\)C:/git/usr/bin\(;\|$\)'</span>
-		<span class="hljs-keyword">let</span> $PATH = <span class="hljs-string">'C:/git/usr/bin;'</span> . $PATH
-	<span class="hljs-keyword">endif</span>
+	if $PATH !~? &apos;\(^\|;\)C:/git/usr/bin\(;\|$\)&apos;
+		let $PATH = &apos;C:/git/usr/bin;&apos; . $PATH
+	endif
 
-	<span class="hljs-keyword">if</span> $PATH !~? <span class="hljs-string">'\(^\|;\)C:/git/mingw64/bin\(;\|$\)'</span>
-		<span class="hljs-keyword">let</span> $PATH = <span class="hljs-string">'C:/git/mingw64/bin;'</span> . $PATH
-	<span class="hljs-keyword">endif</span>
-<span class="hljs-keyword">endif</span></code></pre>
+	if $PATH !~? &apos;\(^\|;\)C:/git/mingw64/bin\(;\|$\)&apos;
+		let $PATH = &apos;C:/git/mingw64/bin;&apos; . $PATH
+	endif
+endif</code></pre>
 </section>
 
 <hr>
@@ -121,15 +120,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/infield-top-aligned-label-pattern.html">Infield Top Aligned Labelパターン</a></p>
+		<p><a href="/blog/webdesign/infield-top-aligned-label-pattern.html" rel="prev">Infield Top Aligned Labelパターン</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

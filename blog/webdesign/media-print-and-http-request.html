@@ -15,13 +15,13 @@
 		<link href="/blog/webdesign/media-print-and-http-request.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="スクリーン向けスタイルシートと印刷向けスタイルシートを分けるように戻そうかと考えてた。過去ログ検索すると何度か切り替えてることがわかる。最近印刷向けとかに注意を向けてなかったので忘れてたけど、media=printとしてもHTTPリクエストは常に書いたところで走る。ので、別ファイルにするとHTTPリクエストがほぼ無駄な形で増えてしまう。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="media=printとHTTPリクエスト" itemprop="name">
+		<link href="/blog/software/fragmentions.html" rel="prev">
 		<link href="/blog/webdesign/media-print-and-http-request.html" itemprop="url">
 
 		<meta content="スクリーン向けスタイルシートと印刷向けスタイルシートを分けるように戻そうかと考えてた。過去ログ検索すると何度か切り替えてることがわかる。最近印刷向けとかに注意を向けてなかったので忘れてたけど、media=printとしてもHTTPリクエストは常に書いたところで走る。ので、別ファイルにするとHTTPリクエストがほぼ無駄な形で増えてしまう。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-04-21T08:50:58+09:00" itemprop="datePublished">2014年4月21日</time></p>
 
-		<h1 class="tagline">media=printとHTTPリクエスト</h1>
+		<h1 class="screamer">media=printとHTTPリクエスト</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,12 +67,12 @@
 
 <p>HTTPリクエストを無駄に増やさず印刷向けスタイルシートを別にするには、印刷前にJavaScriptでスタイルシート読んでやれば良さそう。スタイルシートの読み込みを待ってから<code>print()</code>するボタンを用意するみたいのなら簡単そうだけど、印刷はブラウザーの機能を使ってもらいたい。となると<a href="http://www.w3.org/TR/html5/webappapis.html#printing"><code>beforeprint</code>イベント</a>を使うのが王道のようだ。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"print-css"</span> <span class="hljs-attr">media</span>=<span class="hljs-string">"only print"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/css/print.css"</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-	<span class="hljs-built_in">window</span>.addEventListner(<span class="hljs-string">'beforeprint'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'print-css'</span>).rel = <span class="hljs-string">'stylesheet'</span>;
+<pre><code class="language-html">&lt;link id=&quot;print-css&quot; media=&quot;only print&quot; href=&quot;/css/print.css&quot;&gt;
+&lt;script&gt;
+	window.addEventListner(&apos;beforeprint&apos;, function () {
+		document.getElementById(&apos;print-css&apos;).rel = &apos;stylesheet&apos;;
 	});
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+&lt;/script&gt;</code></pre>
 
 <p>Internet Explorer 11では<a href="/pub/550.html">期待通り</a>動いた。しかしFirefox 28では印刷向けスタイルシートのリクエストは走るもののスタイルは反映されない。また<code>beforeprint</code>にはChrome 34とSafari 7が対応してないので、これらではこのやり方ではどうにもならない。</p>
 
@@ -82,15 +81,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/fragmentions.html">Fragmentions</a></p>
+		<p><a href="/blog/software/fragmentions.html" rel="prev">Fragmentions</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

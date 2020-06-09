@@ -15,13 +15,13 @@
 		<link href="/blog/software/consolez.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="開発の止まったConsole2の後継っぽいConsoleZを試している。シェルでずっと作業するわけじゃないのでckw-modで不満はなくて、Console2には乗り換える意味はなさそうだったんだけど、ConsoleZではウィンドウの再利用が行え、他のアプリケーションから新しいタブを開くということが可能になったのでちょっと良い。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="ConsoleZ" itemprop="name">
+		<link href="/blog/webdesign/drawic-220.html" rel="prev">
 		<link href="/blog/software/consolez.html" itemprop="url">
 
 		<meta content="開発の止まったConsole2の後継っぽいConsoleZを試している。シェルでずっと作業するわけじゃないのでckw-modで不満はなくて、Console2には乗り換える意味はなさそうだったんだけど、ConsoleZではウィンドウの再利用が行え、他のアプリケーションから新しいタブを開くということが可能になったのでちょっと良い。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-04-29T09:51:52+09:00" itemprop="datePublished">2014年4月29日</time></p>
 
-		<h1 class="tagline">ConsoleZ</h1>
+		<h1 class="screamer">ConsoleZ</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -76,35 +75,35 @@
 
 <p>Vimから簡単に呼べるように設定も書いた。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">'win32'</span>)
-	<span class="hljs-comment">" Reuse existing ConsoleZ instance</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ReuseConsoleZ</span><span class="hljs-params">(...)</span></span>
-		<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = &amp;<span class="hljs-keyword">shell</span>
+<pre><code class="language-vim">if has(&apos;win32&apos;)
+	&quot; Reuse existing ConsoleZ instance
+	function! s:ReuseConsoleZ(...)
+		let tab = &amp;shell
 
-		<span class="hljs-keyword">if</span> <span class="hljs-variable">a:0</span> != <span class="hljs-number">0</span>
-			<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = <span class="hljs-variable">a:1</span>
-		<span class="hljs-keyword">endif</span>
+		if a:0 != 0
+			let tab = a:1
+		endif
 
-		<span class="hljs-keyword">execute</span> <span class="hljs-string">'silent !start Console.exe -reuse -t '</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">' -d '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%:p:h'</span>)
-	<span class="hljs-keyword">endfunction</span>
+		execute &apos;silent !start Console.exe -reuse -t &apos; . tab .&apos; -d &apos; . expand(&apos;%:p:h&apos;)
+	endfunction
 
-	<span class="hljs-comment">" Complete ConsoleZ tab</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ConsoleZTabComplete</span><span class="hljs-params">(A, L, P)</span></span>
-		<span class="hljs-keyword">let</span> commands = [<span class="hljs-string">'cmd'</span>, <span class="hljs-string">'bash'</span>, <span class="hljs-string">'ps'</span>]
-		<span class="hljs-keyword">let</span> matches = []
+	&quot; Complete ConsoleZ tab
+	function! s:ConsoleZTabComplete(A, L, P)
+		let commands = [&apos;cmd&apos;, &apos;bash&apos;, &apos;ps&apos;]
+		let matches = []
 
-		<span class="hljs-keyword">for</span> cmd in commands
-			<span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">'^'</span> . <span class="hljs-variable">a:A</span>
-				<span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, cmd)
-			<span class="hljs-keyword">endif</span>
-		<span class="hljs-keyword">endfor</span>
+		for cmd in commands
+			if cmd =~? &apos;^&apos; . a:A
+				call add(matches, cmd)
+			endif
+		endfor
 
-		<span class="hljs-keyword">return</span> matches
-	<span class="hljs-keyword">endfunction</span>
+		return matches
+	endfunction
 
-	<span class="hljs-comment">" ConsoleZ: Open ConsoleZ</span>
-	command! -nargs=* -<span class="hljs-built_in">complete</span>=customlist,<span class="hljs-symbol">&lt;SID&gt;</span>ConsoleZTabComplete ConsoleZ <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>ReuseConsoleZ(<span class="hljs-symbol">&lt;f-args&gt;</span>)
-<span class="hljs-keyword">endif</span></code></pre>
+	&quot; ConsoleZ: Open ConsoleZ
+	command! -nargs=* -complete=customlist,&lt;SID&gt;ConsoleZTabComplete ConsoleZ call &lt;SID&gt;ReuseConsoleZ(&lt;f-args&gt;)
+endif</code></pre>
 
 <p>デフォルトはVimのシェル設定から引っ張るようにして、追加でタブ設定を補完できるようにしておき、たまに必要になるPowerShellを起動しやすくしたりとかそんな感じ。あらかじめ<code>-reuse</code>オプションでConsoleZを立ち上げておく必要はある。</p>
 
@@ -115,15 +114,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/drawic-220.html">Drawic v2.2.0</a></p>
+		<p><a href="/blog/webdesign/drawic-220.html" rel="prev">Drawic v2.2.0</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

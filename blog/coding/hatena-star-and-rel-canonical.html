@@ -15,13 +15,13 @@
 		<link href="/blog/coding/hatena-star-and-rel-canonical.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="はてなスターでrel=&quot;canonical&quot;を見るように" itemprop="name">
+		<link href="/blog/webdesign/svg-feed-icon.html" rel="prev">
 		<link href="/blog/coding/hatena-star-and-rel-canonical.html" itemprop="url">
 
 		<meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2011-11-07T11:34:03+09:00" itemprop="datePublished">2011年11月7日</time></p>
 
-		<h1 class="tagline">はてなスターでrel=&quot;canonical&quot;を見るように</h1>
+		<h1 class="screamer">はてなスターでrel=&quot;canonical&quot;を見るように</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,20 +67,20 @@
 
 <p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
 
-<pre><code class="hljs language-js">} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selector == <span class="hljs-string">'link[rel="canonical"]'</span>) {
-	<span class="hljs-keyword">var</span> z = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"link"</span>),
+<pre><code class="language-js">} else if (selector == 'link[rel="canonical"]') {
+	var z = document.getElementsByTagName("link"),
 		y,
 		x = z.length,
 		w,
-		v = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"a"</span>);
+		v = document.createElement("a");
 
-	<span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
+	for (y = 0; y &lt; x; y++) {
 		w = z[y];
 
-		<span class="hljs-keyword">if</span> (w.rel === <span class="hljs-string">"canonical"</span>) {
-			v.setAttribute(<span class="hljs-string">"href"</span>, w.href);
-			result = v.cloneNode(<span class="hljs-literal">false</span>);
-			<span class="hljs-keyword">break</span>;
+		if (w.rel === "canonical") {
+			v.setAttribute("href", w.href);
+			result = v.cloneNode(false);
+			break;
 		}
 	}</code></pre>
 
@@ -93,37 +92,37 @@
 
 <p>このブログのように、Blosxomで一覧ページとpermalinkで対象とするURLを切り替える場合は<a href="http://blosxom.sourceforge.net/plugins/interpolate/interpolate_fancy.htm">interpolcate_fancy</a>を使って以下のようにすれば良いでしょう。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript">
+<pre><code class="language-html">&lt;script type="text/javascript"&gt;
 Hatena.Star.SiteConfig = {
-	<span class="hljs-attr">entryNodes</span>: {
-		<span class="hljs-string">"article"</span>: {
-&lt;?$path_info like=<span class="hljs-string">"\.html$"</span>&gt;
-			uri:       <span class="hljs-string">"link[rel=\"canonical\"]"</span>,
+	entryNodes: {
+		"article": {
+&lt;?$path_info like="\.html$"&gt;
+			uri:       "link[rel=\"canonical\"]",
 &lt;/?&gt;
-&lt;?$path_info unlike=<span class="hljs-string">"\.html$"</span>&gt;
-			uri:       <span class="hljs-string">"h2 a"</span>,
+&lt;?$path_info unlike="\.html$"&gt;
+			uri:       "h2 a",
 &lt;/?&gt;
-			title:     <span class="hljs-string">"h2"</span>,
-			<span class="hljs-attr">container</span>: <span class="hljs-string">"footer p"</span>
+			title:     "h2",
+			container: "footer p"
 		}
 	}
 };
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+&lt;/script&gt;</code></pre>
 
 <p>これでスター通知でニヤニヤする日々が帰ってきますね！</p>
 	</div>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/svg-feed-icon.html">SVGのフィード・アイコン</a></p>
+		<p><a href="/blog/webdesign/svg-feed-icon.html" rel="prev">SVGのフィード・アイコン</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

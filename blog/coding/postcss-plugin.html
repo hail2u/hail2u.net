@@ -15,13 +15,13 @@
 		<link href="/blog/coding/postcss-plugin.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="PostCSSプラグイン" itemprop="name">
+		<link href="/blog/webdesign/easy-loading-marker-for-infinite-scroll.html" rel="prev">
 		<link href="/blog/coding/postcss-plugin.html" itemprop="url">
 
 		<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2015-06-11T08:05:04+09:00" itemprop="datePublished">2015年6月11日</time></p>
 
-		<h1 class="tagline">PostCSSプラグイン</h1>
+		<h1 class="screamer">PostCSSプラグイン</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,19 +67,19 @@
 
 <p>仮に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
-<span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">"postcss"</span>);
-<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">"csswring"</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+var postcss = require(&quot;postcss&quot;);
+var csswring = require(&quot;csswring&quot;);
 
-<span class="hljs-keyword">var</span> input = <span class="hljs-string">"main.css"</span>;
-<span class="hljs-keyword">var</span> output = <span class="hljs-string">"main.min.css"</span>;
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
 
 postcss([
 	csswring()
-]).process(fs.readFileSync(input, <span class="hljs-string">"utf8"</span>), {
-	<span class="hljs-attr">from</span>: input,
-	<span class="hljs-attr">to</span>: output
-}).then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">result</span>) </span>{
+]).process(fs.readFileSync(input, &quot;utf8&quot;), {
+	from: input,
+	to: output
+}).then(function (result) {
 	fs.writeFileSync(output, result.css);
 });</code></pre>
 
@@ -88,15 +87,15 @@ postcss([
 
 <p>また必要なPostCSSのバージョンを調べて、手作業で依存を解決しなくてはならないことも欠点になる。CSSWring側の<code>package.json</code>ですでに依存バージョンを明示していることを効果的に利用することができない。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
-<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">"csswring"</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+var csswring = require(&quot;csswring&quot;);
 
-<span class="hljs-keyword">var</span> input = <span class="hljs-string">"main.css"</span>;
-<span class="hljs-keyword">var</span> output = <span class="hljs-string">"main.min.css"</span>;
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
 
-<span class="hljs-keyword">var</span> result = csswring.wring(fs.readFileSync(input, <span class="hljs-string">"utf8"</span>), {
-	<span class="hljs-attr">from</span>: input,
-	<span class="hljs-attr">to</span>: output
+var result = csswring.wring(fs.readFileSync(input, &quot;utf8&quot;), {
+	from: input,
+	to: output
 });
 fs.writeFileSync(output, result.css);</code></pre>
 
@@ -115,15 +114,15 @@ fs.writeFileSync(output, result.css);</code></pre>
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/easy-loading-marker-for-infinite-scroll.html">無限スクロール向け雑なローディング画像</a></p>
+		<p><a href="/blog/webdesign/easy-loading-marker-for-infinite-scroll.html" rel="prev">無限スクロール向け雑なローディング画像</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

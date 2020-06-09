@@ -15,13 +15,13 @@
 		<link href="/blog/software/support-slash-started-relative-url-in-vim-gf.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="Vimではファイル名らしき箇所でgfを押すと、見つけることができればそのファイルを開いてくれる。この機能はとても便利なのだが、HTMLファイルにスラッシュで始まる相対URLでCSSファイルやJavaScriptファイルのURLを書いた場合は、そこでgfを押してもうまく開くことができない。これを解決するためにvimでHTMLとかを編集するときに絶対パスのファイルを開くで公開されているプラグインをちょっと使っていたのだけど、どうやらpathオプションとincludeexprオプションを設定することでも対応できるようだ。Vimすげー。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる" itemprop="name">
+		<link href="/blog/webdesign/pure-css-speech-bubble.html" rel="prev">
 		<link href="/blog/software/support-slash-started-relative-url-in-vim-gf.html" itemprop="url">
 
 		<meta content="Vimではファイル名らしき箇所でgfを押すと、見つけることができればそのファイルを開いてくれる。この機能はとても便利なのだが、HTMLファイルにスラッシュで始まる相対URLでCSSファイルやJavaScriptファイルのURLを書いた場合は、そこでgfを押してもうまく開くことができない。これを解決するためにvimでHTMLとかを編集するときに絶対パスのファイルを開くで公開されているプラグインをちょっと使っていたのだけど、どうやらpathオプションとincludeexprオプションを設定することでも対応できるようだ。Vimすげー。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2009-11-07T04:02:30+09:00" itemprop="datePublished">2009年11月7日</time></p>
 
-		<h1 class="tagline">Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる</h1>
+		<h1 class="screamer">Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,8 +67,8 @@
 
 <p>とりあえず設定から。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> path+=W:/www/test,W:/www/hail2u.net,W:/www/blosxom.info
-<span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> includeexpr=<span class="hljs-keyword">substitute</span>(<span class="hljs-variable">v:fname</span>,<span class="hljs-string">'^\\/'</span>,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>)</code></pre>
+<pre><code class="language-vim">autocmd FileType html :setlocal path+=W:/www/test,W:/www/hail2u.net,W:/www/blosxom.info
+autocmd FileType html :setlocal includeexpr=substitute(v:fname,&apos;^\\/&apos;,&apos;&apos;,&apos;&apos;)</code></pre>
 
 <p><code>W:/www/test</code>等のパスはカンマ区切りで自分の環境に合わせて必要なだけカンマで区切って書く。追加するパスはサイトのトップページのあるディレクトリ（フォルダ）のパス。ややこしく言うならウェブサイトのドキュメント・ルートに対応するローカル（またはリモート）のファイルシステム上のパス。</p>
 
@@ -77,7 +76,7 @@
 
 <p>デフォルトでは以下のように書くと<code>gf</code>で開くことができない。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/scripts/twitter/speech-bubble.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/twitter/speech-bubble.js&quot;&gt;&lt;/script&gt;</code></pre>
 
 <p>ファイルシステム上のルートとドキュメント・ルートが一致しないため<em>/scripts/twitter/speech-bubble.js</em>の上で<kbd>gf</kbd>を押しても「ファイルがありません」と怒られるだけ。<code>:help gf</code>によると<kbd>gf</kbd>は以下のようにしてファイルを探しているようだ。</p>
 
@@ -95,7 +94,7 @@
 
 <p>上位ディレクトリの参照は<a href="http://vimdoc.sourceforge.net/htmldoc/editing.html#file-searching">セミコロンを使えばできる</a>ということを教えてもらった。なので<code>path</code>オプションの設定は、</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> path+=;/</code></pre>
+<pre><code class="language-vim">autocmd FileType html :setlocal path+=;/</code></pre>
 
 <p>というシンプルなものでもいける。こっちの方が誤爆も無さそうだし良さそう。</p>
 </section>
@@ -103,15 +102,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/webdesign/pure-css-speech-bubble.html">Pure CSSな吹き出し</a></p>
+		<p><a href="/blog/webdesign/pure-css-speech-bubble.html" rel="prev">Pure CSSな吹き出し</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>

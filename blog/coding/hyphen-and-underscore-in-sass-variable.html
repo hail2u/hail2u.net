@@ -15,13 +15,13 @@
 		<link href="/blog/coding/hyphen-and-underscore-in-sass-variable.html" rel="canonical">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-		<link href="/css/main.9.9.12.css" rel="stylesheet">
+		<link href="/css/index.9.10.0.css" rel="stylesheet">
 
 		<meta content="SassでBEMを利用して変数名を付けようとして、今までハイフンのみでどうにかしていた変数名を書き換えていた時に気づいたんだけど、Sassの変数名ではハイフン（-）とアンダースコア（_）が同一視される。バグだと思ってIssue立てたら、3.0.0でSCSS記法を追加した時に入れた仕様だという返事だった。" itemprop="description">
 		<link href="/apple-touch-icon.png" itemprop="image">
 		<meta content="Sassの変数名での-と_" itemprop="name">
+		<link href="/blog/software/vim-sass-goto-file.html" rel="prev">
 		<link href="/blog/coding/hyphen-and-underscore-in-sass-variable.html" itemprop="url">
 
 		<meta content="SassでBEMを利用して変数名を付けようとして、今までハイフンのみでどうにかしていた変数名を書き換えていた時に気づいたんだけど、Sassの変数名ではハイフン（-）とアンダースコア（_）が同一視される。バグだと思ってIssue立てたら、3.0.0でSCSS記法を追加した時に入れた仕様だという返事だった。" property="og:description">
@@ -36,7 +36,7 @@
 	</head>
 
 	<body>
-		<header class="header">
+		<header>
 			<nav class="navigation">
 				<p class="logo"><a href="/">Hail2u</a></p>
 
@@ -47,20 +47,19 @@
 					<li><a href="/statuses/">近況</a></li>
 					<li><a href="/photos/">写真</a></li>
 					<li><a href="/bookshelf/">書棚</a></li>
-					<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
 			</nav>
 
 		</header>
 
-		<main class="content">
+		<main>
 
 
 <article>
 	<header>
 		<p class="metaline"><time datetime="2014-02-15T09:36:01+09:00" itemprop="datePublished">2014年2月15日</time></p>
 
-		<h1 class="tagline">Sassの変数名での-と_</h1>
+		<h1 class="screamer">Sassの変数名での-と_</h1>
 	</header>
 
 	<div itemprop="articleBody">
@@ -68,51 +67,51 @@
 
 <p><code>-</code>と<code>_</code>が同一視されるということはどういうことかというと、以下の変数はすべて同じとみなされるということで、すべての変数の値は最後に定義した変数の値になる。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-variable">$foo--bar</span>: <span class="hljs-string">"foo--bar"</span>;
-<span class="hljs-variable">$foo-_bar</span>: <span class="hljs-string">"foo-_bar"</span>;
-<span class="hljs-variable">$foo_-bar</span>: <span class="hljs-string">"foo_-bar"</span>;
-<span class="hljs-variable">$foo__bar</span>: <span class="hljs-string">"foo__bar"</span>;
+<pre><code class="language-scss">$foo--bar: &quot;foo--bar&quot;;
+$foo-_bar: &quot;foo-_bar&quot;;
+$foo_-bar: &quot;foo_-bar&quot;;
+$foo__bar: &quot;foo__bar&quot;;
 
-<span class="hljs-selector-class">.test-foo--bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-variable">$foo--bar</span>;
+.test-foo--bar {
+	content: $foo--bar;
 }
 
-<span class="hljs-selector-class">.test-foo-_bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-variable">$foo-_bar</span>;
+.test-foo-_bar {
+	content: $foo-_bar;
 }
 
-<span class="hljs-selector-class">.test-foo_-bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-variable">$foo_-bar</span>;
+.test-foo_-bar {
+	content: $foo_-bar;
 }
 
-<span class="hljs-selector-class">.test-foo__bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-variable">$foo__bar</span>;
+.test-foo__bar {
+	content: $foo__bar;
 }</code></pre>
 
 <p>コンパイルすると以下のように全て<code>&quot;foo__bar&quot;</code>になる。</p>
 
-<pre><code class="hljs language-css"><span class="hljs-selector-class">.test-foo--bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"foo__bar"</span>; }
+<pre><code class="language-css">.test-foo--bar {
+	content: &quot;foo__bar&quot;; }
 
-<span class="hljs-selector-class">.test-foo-_bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"foo__bar"</span>; }
+.test-foo-_bar {
+	content: &quot;foo__bar&quot;; }
 
-<span class="hljs-selector-class">.test-foo_-bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"foo__bar"</span>; }
+.test-foo_-bar {
+	content: &quot;foo__bar&quot;; }
 
-<span class="hljs-selector-class">.test-foo__bar</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"foo__bar"</span>; }</code></pre>
+.test-foo__bar {
+	content: &quot;foo__bar&quot;; }</code></pre>
 
 <p>またエラーや警告も出ないので、間違えて参照してもエラーに気付くのは難しい。例えばBEMのモディファイアの区切りを<code>--</code>にしていたとして、参照する時に間違えて<code>__</code>で参照しても運良くコンパイルされる。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-variable">$menu__item</span>: <span class="hljs-number">#69c</span>;
-<span class="hljs-variable">$menu__item--current</span>: <span class="hljs-number">#369</span>;
+<pre><code class="language-scss">$menu__item: #69c;
+$menu__item--current: #369;
 
-<span class="hljs-selector-class">.menu__item</span> {
-	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$menu__item</span>;
+.menu__item {
+	color: $menu__item;
 
-	&amp;<span class="hljs-selector-class">.current</span> {
-		<span class="hljs-attribute">color</span>: <span class="hljs-variable">$menu__item__current</span>;
+	&amp;.current {
+		color: $menu__item__current;
 	}
 }</code></pre>
 
@@ -121,15 +120,15 @@
 </article>
 
 	<nav class="subnavigation">
-		<p><a href="/blog/software/vim-sass-goto-file.html">VimのSassでのgfを改善する</a></p>
+		<p><a href="/blog/software/vim-sass-goto-file.html" rel="prev">VimのSassでのgfを改善する</a></p>
 	</nav>
 
 		</main>
 
-		<footer class="footer navigation">
+		<footer class="navigation">
 			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
 
-			<ul class="footlinks">
+			<ul class="pages">
 				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
 				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
 			</ul>
