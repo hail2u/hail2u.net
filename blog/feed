@@ -14,6 +14,53 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。]]></description>
+				<link>https://hail2u.net/blog/github-packages-and-npmrc.html</link>
+				<pubDate>Tue, 16 Jun 2020 11:31:37 +0900</pubDate>
+				<title><![CDATA[GitHub Packagesと.npmrcファイル]]></title>
+
+					<content:encoded><![CDATA[<p>興味があったので<a href="https://github.co.jp/features/packages">GitHub Packages</a>を試してみている。node-css-mqpackerを復活させて、<a href="https://github.com/hail2u/node-css-mqpacker/packages">公開するところ</a>まではできた。ヘルプの通りでうまくいったが、<code>.npmrc</code>ファイルで気になるところがあったので、メモを残しておく。</p>
+
+<h2>公開時</h2>
+
+<p>オーナーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package">公開する場合</a>、<code>.npmrc</code>ファイルを編集して<code>registry</code>を編集しろとなっている。もちろんこれで公開できる（できた）けれど、npmの<code>audit</code>コマンドが動かなくなってしまった。</p>
+
+<pre><samp>$ <kbd>npm audit</kbd>
+npm ERR! code ENOAUDIT
+npm ERR! audit Your configured registry (https://npm.pkg.github.com/hail2u) does not support audit requests.
+npm ERR! audit The server said: 404 page not found
+npm ERR! audit</samp></pre>
+
+<p>それはそうかというエラーだが、これは困る。後述のスコープで絞る方法で設定しても良いようだが、ヘルプに併記されている<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package-using-publishconfig-in-the-packagejson-file"><code>package.json</code>ファイルで<code>publishConfig</code>フィールドを使う方法</a>でもうまくいく。</p>
+
+<pre><code class="language-json">{
+	"name": "@hail2u/css-mqpacker",
+	"version": "8.0.1",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/hail2u/node-css-mqpacker.git"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
+	}
+}
+</code></pre>
+
+<p><code>.npmrc</code>ファイルを編集する場合と違い、<code>registry</code>フィールドの値にはオーナー名まで含めなくていい。こちらは「公開設定」というそのものズバリのフィールドで設定することになるので、わかりやすいと感じた。他に<code>.npmrc</code>ファイルを使う必要がない場合に、ファイルが増えないという点でもやりやすい。</p>
+
+<h2>インストール時</h2>
+
+<p>ユーザーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package">インストールする場合</a>も、<code>.npmrc</code>ファイルを編集して<code>registry</code>を設定しろとなっている。しかし、これだと影響範囲が大きすぎるような気がする。npmの<code>audit</code>コマンドが動かないのも同じだ。</p>
+
+<pre><code class="language-ini">@hail2u:registry=https://npm.pkg.github.com/</code></pre>
+
+<p>このようにスコープで絞って設定してやっても大丈夫だった。これならプリフィックスで<code>@hail2u</code>を持つ依存パッケージのみがGitHub Packagesを見に行くだろう。</p>
+
+<hr>
+
+<p>ローカルの<code>.npmrc</code>ファイルを使ったことがなかったので、基本的な知識がなく混乱した。registryを変更する場合は「とりあえずスコープをつける」などと覚えるだけも良いのかもしれない。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[防腐剤まみれのグレープフルーツを食べている。地元のスーパーで、果物の品ぞろえが回復しない。いつまでもリンゴが売っていたり、イチゴも売っていたりする。安定しているのはグレープフルーツ、オレンジ、キウイやパイナップルなどの輸入ものばかりだ。ようやくスイカは出てきたが、スイカはあまり好きじゃない。メロンもあるけど、安くなっても高い。早くナシやモモを食べたい。]]></description>
 				<link>https://hail2u.net/blog/on-20200614.html</link>
 				<pubDate>Sun, 14 Jun 2020 13:09:51 +0900</pubDate>
@@ -155,20 +202,6 @@ body {
 <p>仕様でも触れられている通り、<a href="https://www.w3.org/TR/css-values-4/#funcdef-clamp"><code>clamp(MIN, VAL, MAX)</code>は<code>max(MIN, min(VAL, MAX))</code>と等価</a>だ。つまり、こういう入れ子が出てきたら初めて、<code>clamp()</code>関数に書き換えられる。</p>
 
 <p>また、これらの関数を使うと、多くのメディア・クエリーを書き換えられる。メディア・クエリーでの値の上書きは、段階的な上昇（または下降）で、最も大きい（小さい）値を最大（小）値とした<code>clamp()</code>関数に書き換えられそうに見える。しかし、実際には、その多くが<code>min()</code>か<code>max()</code>関数の入れ子でしか書き換えられない。<code>min-width</code>なら<code>min()</code>関数で、<code>max-width</code>なら<code>max()</code>関数で書き換える、こう覚えることにした。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[あまり大きな変更はないが、そこそこたまってきたので、vim-css3-syntaxのv1.7.1をリリースした。新しく追加された仕様は、CSS Box Model Module Level 4とCSS Box Sizing Module Level 4の二つだ。間違えたので、すでにパッチ・バージョンが出ている。]]></description>
-				<link>https://hail2u.net/blog/vim-css3-syntax-v1.7.1.html</link>
-				<pubDate>Thu, 28 May 2020 12:19:15 +0900</pubDate>
-				<title><![CDATA[vim-css3-syntax v1.7.1]]></title>
-
-					<content:encoded><![CDATA[<p>あまり大きな変更はないが、そこそこたまってきたので、<a href="https://github.com/hail2u/vim-css3-syntax">vim-css3-syntax</a>のv1.7.1をリリースした。新しく追加された仕様は、<a href="https://www.w3.org/TR/css-box-4/">CSS Box Model Module Level 4</a>と<a href="https://www.w3.org/TR/css-sizing-4/">CSS Box Sizing Module Level 4</a>の二つだ。間違えたので、すでにパッチ・バージョンが出ている。</p>
-
-<p>CSS Box Model Module Level 4で、<code>margin-trim</code>プロパティーというものが追加された。Gridの<code>gap</code>プロパティーのように、間だけに余白を取れるようになる。親要素で指定し、子要素に適用される。使用例はいくつか思いつくが、中でも折り返すFlexboxで役に立つのではないかと思う。実装はまだない。</p>
-
-<p>CSS Box Sizing Module Level 4では待望の<code>aspect-ratio</code>プロパティーが定義された。スラッシュ区切りでブロックの縦横比を指定できる。画像や画像を含むブロックではもちろんだが、FlexboxやGridで謎の幅や高さになる面倒が良しなに解消でき、とても役に立つはずだ。</p>
-
-<p>また、ついに妥協して、非公式仕様などをまとめておく<a href="https://github.com/hail2u/vim-css3-syntax/blob/master/after/syntax/css/unofficials.vim">unofficials.vim</a>を追加した。<code>env()</code>関数をどうしても構文強調したかったからだ。怪しい実装があるだけで、標準仕様になくても、気軽に追加していくつもりだが、そういう方面にはあまりアンテナを張っていないので、欲しいものがあったら追加してPRを送ってほしい。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>

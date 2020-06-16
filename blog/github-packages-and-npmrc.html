@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>GitHub Packagesと.npmrcファイル - Hail2u</title>
+
+		<meta content="light dark" name="color-scheme">
+		<meta content="興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。" name="description">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/blog/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="https://kyonagashima.com/" rel="author">
+		<link href="/blog/github-packages-and-npmrc.html" rel="canonical">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+
+		<link href="/css/index.9.10.1.css" rel="stylesheet">
+
+		<meta content="興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。" itemprop="description">
+		<link href="/apple-touch-icon.png" itemprop="image">
+		<meta content="GitHub Packagesと.npmrcファイル" itemprop="name">
+		<link href="/blog/on-20200614.html" rel="prev">
+		<link href="/blog/github-packages-and-npmrc.html" itemprop="url">
+
+		<meta content="興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。" property="og:description">
+		<meta content="https://hail2u.net/apple-touch-icon.png" property="og:image">
+		<meta content="GitHub Packagesと.npmrcファイル" property="og:title">
+		<meta content="article" property="og:type">
+		<meta content="https://hail2u.net/blog/github-packages-and-npmrc.html" property="og:url">
+		<meta content="2020-06-16T11:31:37+09:00" property="article:published_time">
+
+		<meta content="summary" name="twitter:card">
+		<meta content="@hail2u_" name="twitter:site">
+	</head>
+
+	<body>
+		<header>
+			<nav class="navigation">
+				<p class="logo"><a href="/">Hail2u</a></p>
+
+				<ul class="pages">
+					<li><a href="/documents/">特集</a></li>
+					<li><a href="/blog/" aria-current="page">雑記</a></li>
+					<li><a href="/links/">参照</a></li>
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/photos/">写真</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
+				</ul>
+			</nav>
+
+		</header>
+
+		<main>
+
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2020-06-16T11:31:37+09:00" itemprop="datePublished">2020年6月16日</time></p>
+
+		<h1 class="headline">GitHub Packagesと.npmrcファイル</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p>興味があったので<a href="https://github.co.jp/features/packages">GitHub Packages</a>を試してみている。node-css-mqpackerを復活させて、<a href="https://github.com/hail2u/node-css-mqpacker/packages">公開するところ</a>まではできた。ヘルプの通りでうまくいったが、<code>.npmrc</code>ファイルで気になるところがあったので、メモを残しておく。</p>
+
+<h2>公開時</h2>
+
+<p>オーナーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package">公開する場合</a>、<code>.npmrc</code>ファイルを編集して<code>registry</code>を編集しろとなっている。もちろんこれで公開できる（できた）けれど、npmの<code>audit</code>コマンドが動かなくなってしまった。</p>
+
+<pre><samp>$ <kbd>npm audit</kbd>
+npm ERR! code ENOAUDIT
+npm ERR! audit Your configured registry (https://npm.pkg.github.com/hail2u) does not support audit requests.
+npm ERR! audit The server said: 404 page not found
+npm ERR! audit</samp></pre>
+
+<p>それはそうかというエラーだが、これは困る。後述のスコープで絞る方法で設定しても良いようだが、ヘルプに併記されている<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package-using-publishconfig-in-the-packagejson-file"><code>package.json</code>ファイルで<code>publishConfig</code>フィールドを使う方法</a>でもうまくいく。</p>
+
+<pre><code class="language-json">{
+	"name": "@hail2u/css-mqpacker",
+	"version": "8.0.1",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/hail2u/node-css-mqpacker.git"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
+	}
+}
+</code></pre>
+
+<p><code>.npmrc</code>ファイルを編集する場合と違い、<code>registry</code>フィールドの値にはオーナー名まで含めなくていい。こちらは「公開設定」というそのものズバリのフィールドで設定することになるので、わかりやすいと感じた。他に<code>.npmrc</code>ファイルを使う必要がない場合に、ファイルが増えないという点でもやりやすい。</p>
+
+<h2>インストール時</h2>
+
+<p>ユーザーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package">インストールする場合</a>も、<code>.npmrc</code>ファイルを編集して<code>registry</code>を設定しろとなっている。しかし、これだと影響範囲が大きすぎるような気がする。npmの<code>audit</code>コマンドが動かないのも同じだ。</p>
+
+<pre><code class="language-ini">@hail2u:registry=https://npm.pkg.github.com/</code></pre>
+
+<p>このようにスコープで絞って設定してやっても大丈夫だった。これならプリフィックスで<code>@hail2u</code>を持つ依存パッケージのみがGitHub Packagesを見に行くだろう。</p>
+
+<hr>
+
+<p>ローカルの<code>.npmrc</code>ファイルを使ったことがなかったので、基本的な知識がなく混乱した。registryを変更する場合は「とりあえずスコープをつける」などと覚えるだけも良いのかもしれない。</p>
+	</div>
+</article>
+
+	<nav class="subnavigation">
+		<p><a href="/blog/on-20200614.html" rel="prev">イワシのみりん干し</a></p>
+	</nav>
+
+		</main>
+
+		<footer class="navigation">
+			<address class="byline"><a href="https://kyonagashima.com/">ながしまきょう</a></address>
+
+			<ul class="pages">
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC/BY</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">Feed</a></li>
+			</ul>
+		</footer>
+	</body>
+</html>
