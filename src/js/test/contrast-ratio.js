@@ -1,4 +1,4 @@
-window.addEventListener("load", () => {
+const testContrastRatio = () => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 	const getComponentLuminance = (color) => {
 		const sRGB = color / 255;
@@ -16,8 +16,8 @@ window.addEventListener("load", () => {
 		blue
 	]) =>
 		0.2126 * getComponentLuminance(red) +
-	0.7152 * getComponentLuminance(green) +
-	0.0722 * getComponentLuminance(blue);
+			0.7152 * getComponentLuminance(green) +
+			0.0722 * getComponentLuminance(blue);
 
 	/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
 	const getContrast = (foreground, background) => {
@@ -35,4 +35,6 @@ window.addEventListener("load", () => {
 		const contrast = color.nextElementSibling;
 		contrast.lastChild.replaceWith(ratio);
 	}
-});
+};
+
+window.addEventListener("load", testContrastRatio);
