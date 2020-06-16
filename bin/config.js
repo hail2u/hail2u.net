@@ -31,6 +31,10 @@ export default {
 				"src": "src/css/index.css"
 			},
 			{
+				"dest": "dist/css/print.{{version}}.css",
+				"src": "src/css/print.css"
+			},
+			{
 				"dest": "dist/css/test.css",
 				"src": "src/css/test.css"
 			}
