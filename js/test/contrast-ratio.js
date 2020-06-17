@@ -1,4 +1,4 @@
-window.addEventListener("load", () => {
+const testContrastRatio = () => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 	const getComponentLuminance = (color) => {
 		const sRGB = color / 255;
@@ -14,10 +14,9 @@ window.addEventListener("load", () => {
 		red,
 		green,
 		blue
-	]) =>
-		0.2126 * getComponentLuminance(red) +
-	0.7152 * getComponentLuminance(green) +
-	0.0722 * getComponentLuminance(blue);
+	]) => 0.2126 * getComponentLuminance(red) +
+		0.7152 * getComponentLuminance(green) +
+		0.0722 * getComponentLuminance(blue);
 
 	/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
 	const getContrast = (foreground, background) => {
@@ -31,8 +30,10 @@ window.addEventListener("load", () => {
 		const foreground = style.getPropertyValue("color");
 		const background = style.getPropertyValue("background-color");
 		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
-		color.lastChild.replaceWith(background);
+		color.lastChild.textContent = background;
 		const contrast = color.nextElementSibling;
-		contrast.lastChild.replaceWith(ratio);
+		contrast.lastChild.textContent = ratio;
 	}
-});
+};
+
+window.addEventListener("load", testContrastRatio);
