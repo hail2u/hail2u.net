@@ -84,15 +84,15 @@ export default {
 		],
 		"icon": [
 			{
-				"src": "src/img/icon-small.svg",
+				"src": "src/img/icon.svg",
 				"width": 16
 			},
 			{
-				"src": "src/img/icon-small.svg",
+				"src": "src/img/icon.svg",
 				"width": 24
 			},
 			{
-				"src": "src/img/icon-small.svg",
+				"src": "src/img/icon.svg",
 				"width": 32
 			},
 			{
