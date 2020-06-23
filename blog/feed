@@ -14,6 +14,51 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[使われるプロパティーや式の書き方によって、clamp()関数の最小値が最大値を上回ってしまう場合がある。そのように競合した場合は、必ず最小値が勝つ。min-widthとmax-widthプロパティーが競合した場合と似た挙動になる。]]></description>
+				<link>https://hail2u.net/blog/conflict-between-min-and-max-in-clamp-function.html</link>
+				<pubDate>Tue, 23 Jun 2020 09:40:21 +0900</pubDate>
+				<title><![CDATA[clamp()関数における最小値と最大値の競合]]></title>
+
+					<content:encoded><![CDATA[<p>使われるプロパティーや式の書き方によって、<code>clamp()</code>関数の最小値が最大値を上回ってしまう場合がある。そのように競合した場合は、必ず最小値が勝つ。<code>min-width</code>と<code>max-width</code>プロパティーが競合した場合と似た挙動になる。</p>
+
+<p>この挙動について、<a href="https://www.w3.org/TR/css-values-4/#calc-notation">CSS Values and Units Module Level 4仕様の安定版（20190131）では微妙な表現</a>になっている。<code>clamp(MIN, VAL, MAX)</code>が<code>max(MIN, min(VAL, MAX))</code>と等価だとしか書いていない。最終的に<code>max(MIN, MAX)</code>が評価されるということにはなるので、最小値が優先されそうだと理解できるだろう。</p>
+
+<p><a href="https://drafts.csswg.org/css-values-4/">編集版仕様</a>では、<q>favoring the min calculation if it conflicts with the max</q>（最小計算値が最大計算値と競合した場合は最小計算値を支持する）と、明確に書かれるようになった。いずれにしても最小値が優先される。</p>
+
+<hr>
+
+<p>ともあれ<a href="https://hail2u.net/pub/test/694.html">競合する例</a>（デスクトップ・ブラウザーのみで動作する）を考えてみよう。これは、画像の幅を<code>40rem</code>にしたいが、最小でも<code>500px</code>は確保しつつ、はみ出さないように最大で<code>100%</code>に制限したいとするものだ。競合する簡単な例を他にうまく思いつかなかった。</p>
+
+<pre><code class="language-css">.test {
+	width: clamp(
+		500px,
+		40rem,
+		100%
+	);
+}
+</code></pre>
+
+<p>描画領域の幅がおよそ530px以上の場合は、<code>40rem</code>か最大値が選択される。また、フォント・サイズを下げ、<code>40rem</code>が<code>500px</code>を下回った場合は、最小値が選択される。ここまでは要件通りの挙動だが、描画領域の幅がおよそ500px以下の場合、最小値が優先されてはみ出してしまうことがわかる。はみ出したくないという要件が、最小値を優先する仕様によって満たせていない。</p>
+
+<p>最大値を優先したい場合は、<code>min()</code>関数を入れ子にする。最小値が優先される挙動を変更したいので、最小値で入れ子にしなければならない。</p>
+
+<pre><code class="language-css">.test {
+	width: clamp(
+		min(
+			500px,
+			100%
+		),
+		40rem,
+		100%
+	);
+}
+</code></pre>
+
+<hr>
+
+<p>最大値がうまく反映されない場合は、この挙動を疑ってみるといいかもしれない。<code>clamp()</code>の性質上、<code>min-width</code>と<code>max-width</code>プロパティーの競合より発生しやすいので、遭遇する可能性はそれなりにあると思う。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[VSCodeの配色テーマでSolarized Lightを使っていると、このウェブサイトがグレーに見えてしまうので、最近はLight+を使っている。Windows TerminalではまだSolarized Lightを使っていたが、同じにしたくなったので、Light+（とDark+）を地道に移植したものを使うようにした。]]></description>
 				<link>https://hail2u.net/blog/vscode-color-scheme-for-windows-terminal.html</link>
 				<pubDate>Sat, 20 Jun 2020 09:51:55 +0900</pubDate>
@@ -202,18 +247,6 @@ body {
 <p>他に、UTMパラメーターを削除するものや、ランダムな記事に飛ぶものが消えている。特に軽くはならない。</p>
 
 <p>写真や書棚ページで使っている、残りを表示するスクリプトだけ残した。写真ページは、そのHTMLファイルのサイズが増えてきたが、まだ300KB弱なので大丈夫だろう。1MBを超えたらページを分割をして、スクリプトなしにしたい。10年後くらいに超えると思う。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[やはり5月は金遣いが荒かった。食べ物や酒で、いつもの月より倍近くかかってしまった。体重はともかく、体脂肪率が少し増えてしまった。毎日歩く日々に戻らないと、なかなか難しそうだ。]]></description>
-				<link>https://hail2u.net/blog/on-20200531.html</link>
-				<pubDate>Sun, 31 May 2020 19:39:16 +0900</pubDate>
-				<title><![CDATA[サバのみりん干し]]></title>
-
-					<content:encoded><![CDATA[<p>やはり5月は金遣いが荒かった。食べ物や酒で、いつもの月より倍近くかかってしまった。体重はともかく、体脂肪率が少し増えてしまった。毎日歩く日々に戻らないと、なかなか難しそうだ。</p>
-
-<p>そろそろ髪を切りに行きたい。先週くらいに限界に近づいたが、自粛要請が解除される前後は混みそうだと思い、先延ばししている。スヌーズ。</p>
-
-<p>図書館が再開するようで何よりだ。座席を撤廃して、長居させないようにするらしい。昔の本屋みたいに、長く立ち読みをしているとハタキでパタパタやられたりしたら面白い。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
