@@ -159,18 +159,17 @@ const readPartials = async () => {
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
-const findCover = (image, defaultTwitterCard, defaultCover) => {
+const findCover = (html) => {
+	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(html);
+
 	if (!image) {
-		return [
-			defaultTwitterCard,
-			defaultCover
-		];
+		return {};
 	}
 
-	return [
-		"summary_large_image",
-		image[1]
-	];
+	return {
+		"cover": image[1],
+		"twitterCard": "summary_large_image"
+	};
 };
 
 const isFirstInMonth = (current, previous) => {
@@ -242,18 +241,13 @@ const mergeData = async (extradataFile, dest, metadata) => {
 
 	if (extradataFile === config.data.article) {
 		const article = metadata.articles.find(hasSameLink.bind(null, dest));
-		const firstImage = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(article.body);
-		const [
-			twitterCard,
-			cover
-		] = findCover(firstImage, metadata.twitterCard, metadata.cover);
+		const cover = findCover(article.body);
 		return {
 			...metadata,
 			...extradata,
 			...article,
-			"canonical": article.link,
-			"cover": cover,
-			"twitterCard": twitterCard
+			...cover,
+			"canonical": article.link
 		};
 	}
 
