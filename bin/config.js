@@ -117,6 +117,10 @@ export default {
 			{
 				"dest": "dist/js/back-to-top.{{version}}.js",
 				"src": "src/js/back-to-top.js"
+			},
+			{
+				"dest": "dist/js/seconds-to-hue.{{version}}.js",
+				"src": "src/js/seconds-to-hue.js"
 			}
 		],
 		"txt": [
