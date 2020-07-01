@@ -14,6 +14,45 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑（105度）と紫（285度）が見やすいと思う。]]></description>
+				<link>https://hail2u.net/blog/mozoushi.html</link>
+				<pubDate>Wed, 1 Jul 2020 09:39:09 +0900</pubDate>
+				<title><![CDATA[模造紙風の背景色]]></title>
+
+					<content:encoded><![CDATA[<p>ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑（105度）と紫（285度）が見やすいと思う。</p>
+
+<p>当初はDay of the Yearで変わるようにしようと考えていた。しかし、これでは変化に乏しいし、DotYを計算するのが面倒（うるう年とか）だし、360におさまらないのをどうなじませるか考えるのも面倒だったので、秒数を使うことにした。</p>
+
+<pre><code class="language-javascript">const seconds = Math.floor((new Date()).getSeconds() / 10);
+const hue = seconds * 60 - 15;</code></pre>
+
+<p>秒数をそのまま使い、色のバリエーションは60種類にしても良かったが、ハイパーリンクのコントラスト要件が満たされるかどうかを確認するのが大変で、6種類に絞った。つまり秒数を10で割った商に60を掛け、60刻みで0から300まで作り、それを色相に設定する。60の倍数だときれいな色になりやすいので、15度だけ反時計回りに回して、若干ずらした。</p>
+
+<pre><code class="language-javascript">const lightness = [&quot;49%&quot;, &quot;34%&quot;, &quot;33%&quot;, &quot;33%&quot;, &quot;52%&quot;, &quot;50%&quot;];</code></pre>
+
+<p>彩度は50%で固定し、明度は使われる場所で使い分ける。前バージョンのカラー・パレットと同じく、背景色なら95%、文字色なら10%にしている。ハイパーリンクの色は、背景色と文字色の両方とコントラスト比を確保したいので、手作業で適切な明度を探し、色相に応じて選択できるようにした。</p>
+
+<pre><code class="language-javascript">document.documentElement.style = `--hue:${hue};--lightness:${lightness[seconds]}`;</code></pre>
+
+<p>最後に生成した色相と明度をカスタム・プロパティーで仕込むだけだ。ここではルート要素の<code>style</code>属性に仕込んだが、<code>style</code>要素を作ってもいい。</p>
+
+<pre><code class="language-css">:root {
+	--hue: -15;
+	--lightness: 49%;
+
+	--color-primary: hsl(var(--hue) 50% 10%);
+	--color-secondary: hsl(var(--hue) 50% var(--lightness));
+	--color-background: hsl(var(--hue) 50% 95%);
+	--color-surface: hsl(var(--hue) 50% 92%);
+}</code></pre>
+
+<p><code>hsl()</code>関数の中でもカスタム・プロパティーが使えるので、CSSはこのように書ける。ちょうど4色まで減らしていたところだったので、調整することもなくちょっと書き換えるだけで済んだ。</p>
+
+<hr>
+
+<p>テーマ・カラー的なものがなくなってしまった。その一方で、無個性なようでいて主張が強い色とも言える。ダーク・モードへの反発で、軽やかな色構成に魅かれており、こういうものも作ってみたかった。スクロールと共に変化しても面白そうだが、コストが高いのでやめておく。<code>onscroll100vh</code>などという組み込みイベントができたら、実装したい。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[墓参りに行けた。雨が降らなそうだったので、前日に電車を予約して行ってきた。チケットレス割引のキャンペーンをまたやっていたので、片道720円だ。家を出る時にはまんまと雨が降っていたが、そのあとは順調だった。盆地は暑い。]]></description>
 				<link>https://hail2u.net/blog/kofu-20200624.html</link>
 				<pubDate>Sat, 27 Jun 2020 09:16:29 +0900</pubDate>
@@ -246,18 +285,6 @@ body {
 <p>1月か2月くらいにプラスチックごみの輸出が止まって、リサイクル業者が受け入れを停止したという報道が気になっている。海外のリサイクル業者に渡して終わりで、実際にはリサイクルされていない、そういう主張もよく聞く。陰謀論めいた雰囲気も感じるが、素直にリサイクル業者を信じることもできない。</p>
 
 <p>本やドキュメンタリー、講演などを参照すると、様々な対立する意見がある。僕にはまだ、ごみというレベルで減らすという選択くらいしか、はっきりとした方針が持てない。買い物に使っている一澤帆布のトートバッグが壊れるまでには、もっとはっきりとした方針が持てるよう、学ぶ機会は逃さないようにしたい。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[このウェブサイトの文章が、最近のChromeでは、よくわからないタイミングで折り返しされるようになった。どのバージョンからかは正確に記憶していないが、Chrome 80前後からのようだ。そこじゃないところで折り返される現象で、2つ目のツイートの画像だと、1段落目の1行目や、2段落目の4行目、3段落目の3行目あたりで発生している。]]></description>
-				<link>https://hail2u.net/blog/text-wrapping-on-chrome-version-around-80.html</link>
-				<pubDate>Wed, 3 Jun 2020 13:21:36 +0900</pubDate>
-				<title><![CDATA[Chrome 80前後での折り返し]]></title>
-
-					<content:encoded><![CDATA[<p>このウェブサイトの文章が、最近のChromeでは、よくわからないタイミングで折り返しされるようになった。どのバージョンからかは正確に記憶していないが、Chrome 80前後からのようだ。<a href="https://twitter.com/hail2u_/status/1266574447281967105">そこじゃないところで折り返される現象</a>で、2つ目のツイートの画像だと、1段落目の1行目や、2段落目の4行目、3段落目の3行目あたりで発生している。</p>
-
-<p>コンテナーの幅を<code>1px</code>ずつ変えてみたりして確認すると、よくわからないタイミングで折り返されることが確認できる。<code>rem</code>単位で発生するとツイートしてしまったが、<code>px</code>単位でも起こる。回避手段はなさそうだが、致命的な現象ではないので、改善されるのを待つしかないだろう。</p>
-
-<p>そういえばChrome 80前後で、<code>text-align: justify</code>がきれいに揃えられるようになった。もしかしたらそのあたりでリグレッションが発生したのかもしれない。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
