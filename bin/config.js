@@ -119,8 +119,12 @@ export default {
 				"src": "src/js/back-to-top.js"
 			},
 			{
-				"dest": "dist/js/seconds-to-hue.{{version}}.js",
-				"src": "src/js/seconds-to-hue.js"
+				"dest": "dist/js/update-hue.{{version}}.js",
+				"src": "src/js/update-hue.js"
+			},
+			{
+				"dest": "dist/js/update-hue-on-scroll.{{version}}.js",
+				"src": "src/js/update-hue-on-scroll.js"
 			}
 		],
 		"txt": [
