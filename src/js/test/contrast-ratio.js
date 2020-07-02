@@ -1,4 +1,4 @@
-const testContrastRatio = () => {
+((window) => {
 	/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
 	const getComponentLuminance = (color) => {
 		const sRGB = color / 255;
@@ -22,18 +22,23 @@ const testContrastRatio = () => {
 	const getContrast = (foreground, background) => {
 		const backgroundLuminance = getRelativeLuminance(background.match(/\d+/g));
 		const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/g));
-		return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05) / (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
+		const lighter = Math.max(backgroundLuminance, foregroundLuminance);
+		const darker = Math.min(backgroundLuminance, foregroundLuminance);
+		return (lighter + 0.05) / (darker + 0.05);
 	};
 
-	for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
-		const style = getComputedStyle(color);
-		const foreground = style.getPropertyValue("color");
-		const background = style.getPropertyValue("background-color");
-		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
-		color.lastChild.textContent = background;
-		const contrast = color.nextElementSibling;
-		contrast.lastChild.textContent = ratio;
-	}
-};
+	const update = () => {
+		for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
+			const style = getComputedStyle(color);
+			const foreground = style.getPropertyValue("color");
+			const background = style.getPropertyValue("background-color");
+			const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
+			color.lastChild.textContent = background;
+			const contrast = color.nextElementSibling;
+			contrast.lastChild.textContent = ratio;
+		}
+	};
 
-window.addEventListener("load", testContrastRatio);
+	update();
+	window.testContrastRatio = update;
+})(window);

@@ -1,13 +1,19 @@
-/* global updateHue */
-
 const updateHueOnScroll = () => {
-	const observe = (observer, element) => {
-		observer.observe(element);
+	const updateOnHide = (entries) => {
+		if (entries[0].isIntersecting) {
+			return;
+		}
+
+		/* global updateHue */
+		updateHue();
 	};
 
-	const observer = new IntersectionObserver(updateHue);
-	document.querySelectorAll("hr, pre, blockquote, ol, ul, figure, table")
-		.forEach(observe.bind(null, observer));
+	const elements = document.querySelectorAll("hr, pre, blockquote, :not(li) > ol, :not(li) ul, figure, table, h2 + .metaline");
+	const observer = new IntersectionObserver(updateOnHide);
+
+	for (const element of elements) {
+		observer.observe(element);
+	}
 };
 
-window.addEventListener("DOMContentLoaded", updateHueOnScroll);
+updateHueOnScroll();
