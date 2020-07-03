@@ -119,6 +119,14 @@ export default {
 				"src": "src/js/back-to-top.js"
 			},
 			{
+				"dest": "dist/js/change-color-mode.{{version}}.js",
+				"src": "src/js/change-color-mode.js"
+			},
+			{
+				"dest": "dist/js/change-color-mode-on-check.{{version}}.js",
+				"src": "src/js/change-color-mode-on-check.js"
+			},
+			{
 				"dest": "dist/js/change-hue.{{version}}.js",
 				"src": "src/js/change-hue.js"
 			},
