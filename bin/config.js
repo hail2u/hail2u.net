@@ -119,12 +119,12 @@ export default {
 				"src": "src/js/back-to-top.js"
 			},
 			{
-				"dest": "dist/js/update-hue.{{version}}.js",
-				"src": "src/js/update-hue.js"
+				"dest": "dist/js/change-hue.{{version}}.js",
+				"src": "src/js/change-hue.js"
 			},
 			{
-				"dest": "dist/js/update-hue-on-scroll.{{version}}.js",
-				"src": "src/js/update-hue-on-scroll.js"
+				"dest": "dist/js/change-hue-on-scroll.{{version}}.js",
+				"src": "src/js/change-hue-on-scroll.js"
 			}
 		],
 		"txt": [

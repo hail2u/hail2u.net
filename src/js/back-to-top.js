@@ -1,7 +1,9 @@
-const backToTop = () => {
-	if (location.hash === "#top") {
-		history.replaceState(null, "", `${location.pathname}${location.search}`);
-	}
-};
+(() => {
+	const remove = () => {
+		if (location.hash === "#top") {
+			history.replaceState(null, "", `${location.pathname}${location.search}`);
+		}
+	};
 
-window.addEventListener("hashchange", backToTop);
+	window.addEventListener("hashchange", remove);
+})();

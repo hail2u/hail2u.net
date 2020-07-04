@@ -1,8 +1,12 @@
-((window) => {
-	const lightnessVariation = ["49%", "34%", "33%", "33%", "52%", "50%"];
+(() => {
 	const rootStyle = document.documentElement.style;
+	const lightnessVariation = ["49%", "34%", "32%", "32%", "52%", "50%"];
 
-	const update = () => {
+	const change = (entries) => {
+		if (entries[0].isIntersecting) {
+			return;
+		}
+
 		const roll = Math.floor(Math.random() * 6);
 		const hue = roll * 60 - 15;
 		rootStyle.setProperty("--hue", hue);
@@ -14,6 +18,8 @@
 		}
 	};
 
-	update();
-	window.updateHue = update;
-})(window);
+	window.changeHue = change;
+	change([{
+		isIntersecting: false
+	}]);
+})();
