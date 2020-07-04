@@ -9,8 +9,7 @@
 		return mode;
 	};
 
-	const change = (event) => {
-		const mode = event.srcElement.value;
+	const change = (mode) => {
 		localStorage.setItem("color-mode", mode);
 		const rootClass = document.documentElement.classList;
 
@@ -31,9 +30,5 @@
 	};
 
 	window.changeColorMode = change;
-	change({
-		srcElement: {
-			value: get()
-		}
-	});
+	change(get());
 })();
