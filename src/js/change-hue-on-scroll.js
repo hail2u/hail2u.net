@@ -1,8 +1,23 @@
 (() => {
+	let previous = 0;
+
+	const change = (entries) => {
+		const [{
+			time: now
+		}] = entries;
+
+		if (entries[0].isIntersecting || now < previous + 1000) {
+			return;
+		}
+
+		previous = now;
+		/* global changeHue */
+		changeHue();
+	};
+
 	const init = () => {
 		const elements = document.querySelectorAll("hr, pre, blockquote, :not(li) > ol, :not(li) ul, figure, table, h2 + .metaline");
-		/* global changeHue */
-		const observer = new IntersectionObserver(changeHue);
+		const observer = new IntersectionObserver(change);
 
 		for (const element of elements) {
 			observer.observe(element);

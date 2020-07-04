@@ -2,11 +2,7 @@
 	const rootStyle = document.documentElement.style;
 	const lightnessVariation = ["49%", "34%", "32%", "32%", "52%", "50%"];
 
-	const change = (entries) => {
-		if (entries[0].isIntersecting) {
-			return;
-		}
-
+	const change = () => {
 		const roll = Math.floor(Math.random() * 6);
 		const hue = roll * 60 - 15;
 		rootStyle.setProperty("--hue", hue);
@@ -19,7 +15,5 @@
 	};
 
 	window.changeHue = change;
-	change([{
-		isIntersecting: false
-	}]);
+	change();
 })();
