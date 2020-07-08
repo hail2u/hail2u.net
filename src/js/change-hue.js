@@ -1,4 +1,8 @@
 (() => {
+	if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		return;
+	}
+
 	const rootStyle = document.documentElement.style;
 	const lightnessVariation = ["49%", "34%", "32%", "32%", "52%", "50%"];
 

@@ -1,4 +1,8 @@
 (() => {
+	if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		return;
+	}
+
 	let previous = 0;
 
 	const change = (entries) => {
