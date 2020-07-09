@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>スクロールで色相を変化 - Hail2u</title>
+
+		<meta content="light dark" name="color-scheme">
+		<meta content="秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。" name="description">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="mailto:hail2u@gmail.com" rel="author">
+		<link href="/blog/changing-hue-on-scroll.html" rel="canonical">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+		<link href="/css/index.9.11.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.11.0.css" media="only print" rel="stylesheet">
+
+		<script async defer src="/js/back-to-top.9.11.0.js"></script>
+		<script src="/js/update-hue.9.11.0.js"></script>
+		<script defer src="/js/update-hue-on-scroll.9.11.0.js"></script>
+
+		<meta content="秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。" itemprop="description">
+		<link href="/img/blog/changing-hue-on-scroll.gif" itemprop="image">
+		<meta content="スクロールで色相を変化" itemprop="name">
+		<link href="/blog/on-20200706.html" rel="prev">
+		<link href="/blog/changing-hue-on-scroll.html" itemprop="url">
+
+		<meta content="秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。" property="og:description">
+		<meta content="https://hail2u.net/img/blog/changing-hue-on-scroll.gif" property="og:image">
+		<meta content="スクロールで色相を変化" property="og:title">
+		<meta content="article" property="og:type">
+		<meta content="https://hail2u.net/blog/changing-hue-on-scroll.html" property="og:url">
+		<meta content="2020-07-09T14:12:43+09:00" property="article:published_time">
+
+		<meta content="summary_large_image" name="twitter:card">
+		<meta content="@hail2u_" name="twitter:site">
+	</head>
+
+	<body>
+		<header>
+			<nav>
+					<p class="logo"><a href="/">Hail2u</a></p>
+
+				<ul class="pages">
+					<li><a href="/blog/" aria-current="page">雑記</a></li>
+					<li><a href="/links/">参照</a></li>
+					<li><a href="/documents/">特集</a></li>
+					<li><a href="/photos/">写真</a></li>
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
+				</ul>
+			</nav>
+
+		</header>
+
+		<main>
+
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2020-07-09T14:12:43+09:00" itemprop="datePublished">2020年7月9日</time></p>
+
+		<h1>スクロールで色相を変化</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<figure><a href="/img/blog/changing-hue-on-scroll.gif"><img alt="6種類の色相でのプレビューを並べてみたもの" height="900" src="/img/blog/changing-hue-on-scroll.gif" width="1600"></a></figure>
+
+<p>秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。<a href="/blog/">雑記ページ</a>や<a href="/style-guide/">スタイル・ガイド</a>で、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。</p>
+
+<p>スクロールに応じて変えるので、素直にやるなら<code>onscroll</code>イベントを使うところだが、間引いても重いことがあるだろうし、Intersection Observerを利用した。トリガーをどうしようかと悩んだが、<code>p</code>要素ほど出てこず、たまに出てくる要素を<em>すべて</em>観察させると、どのページでもいい感じになった。</p>
+
+<ul>
+	<li><code>hr</code>要素</li>
+	<li><code>pre</code>要素</li>
+	<li><code>blockquote</code>要素</li>
+	<li><code>li</code>要素直下ではない<code>ol</code>要素</li>
+	<li><code>li</code>要素直下ではない<code>ul</code>要素</li>
+	<li><code>figure</code>要素</li>
+	<li><code>table</code>要素</li>
+	<li><code>h2 + .metaline</code></li>
+</ul>
+
+<p>対象はこれらの要素だ。見出しやセクショニング要素でも良さそうだが、それだと雑記記事であまり変わらなくなってしまうので、これら挿入される何かを対象にした。つまり、このリストが画面外に消えると、色相が変わる。<code>ol</code>と<code>ul</code>要素はネストを考慮したセレクターになっている。また最後の<code>h2 + .metaline</code>は、トップページや特集ページのため、特別に追加した。</p>
+
+<pre><code class="language-javascript">const updateHueOnScroll = () => {
+	const updateOnHide = (entries) => {
+		if (entries[0].isIntersecting) {
+			return;
+		}
+
+		/* global updateHue */
+		updateHue();
+	};
+
+	const elements = document.querySelectorAll("hr, pre, blockquote, :not(li) > ol, :not(li) > ul, figure, table, h2 + .metaline");
+	const observer = new IntersectionObserver(updateOnHide);
+
+	for (const element of elements) {
+		observer.observe(element);
+	}
+};</code></pre>
+
+<p>色々観察している関係上、<code>entries</code>が複数あることが多いが、全部に反応する必要はないので最初だけを見ている。また、消えた時に色を変えるよう、<code>isIntersecting</code>が<code>false</code>の時に色相を変更している。消えた時にすると、スクロールしすぎて戻るというありがちな行動パターンと、うまくなじむんじゃないかと考えた。</p>
+
+<p><code>updateHue()</code>は<a href="/blog/mozoushi.html">模造紙風の背景色</a>のコードを、少しだけ手直しし、秒数ではなくランダムにした。<code>style</code>属性にカスタム・プロパティーで色相（と明度）が仕込まれるところは同じだ。そのため、背景色他への反映はCSSがやってくれるので、呼ぶだけで済む。</p>
+
+<p>あとは観察対象へ登録するだけだ。<code>observe()</code>はNodeListを受け取れないので、<code>for..of</code>でばらまいた。<code>forEach()</code>を欲しがっていた割には、<code>for...of</code>を好んで使うようになってしまった。<code>break</code>したい。</p>
+	</div>
+</article>
+
+	<nav>
+		<p class="prev"><a href="/blog/on-20200706.html" rel="prev">アジの開き</a></p>
+	</nav>
+
+		</main>
+
+		<footer>
+			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
+				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
+				<li><a href="/#about">案内</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">許諾</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+			</ul>
+
+			<ul class="pages">
+				<li><address><a href="mailto:hail2u@gmail.com">ながしまきょう</a></address></li>
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+				<li><a href="https://github.com/hail2u">GitHub</a></li>
+			</ul>
+		</footer>
+	</body>
+</html>

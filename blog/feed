@@ -14,6 +14,55 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。]]></description>
+				<link>https://hail2u.net/blog/changing-hue-on-scroll.html</link>
+				<pubDate>Thu, 9 Jul 2020 14:12:43 +0900</pubDate>
+				<title><![CDATA[スクロールで色相を変化]]></title>
+
+					<content:encoded><![CDATA[<figure><a href="https://hail2u.net/img/blog/changing-hue-on-scroll.gif"><img alt="6種類の色相でのプレビューを並べてみたもの" height="900" src="https://hail2u.net/img/blog/changing-hue-on-scroll.gif" width="1600"></a></figure>
+
+<p>秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。<a href="https://hail2u.net/blog/">雑記ページ</a>や<a href="https://hail2u.net/style-guide/">スタイル・ガイド</a>で、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。</p>
+
+<p>スクロールに応じて変えるので、素直にやるなら<code>onscroll</code>イベントを使うところだが、間引いても重いことがあるだろうし、Intersection Observerを利用した。トリガーをどうしようかと悩んだが、<code>p</code>要素ほど出てこず、たまに出てくる要素を<em>すべて</em>観察させると、どのページでもいい感じになった。</p>
+
+<ul>
+	<li><code>hr</code>要素</li>
+	<li><code>pre</code>要素</li>
+	<li><code>blockquote</code>要素</li>
+	<li><code>li</code>要素直下ではない<code>ol</code>要素</li>
+	<li><code>li</code>要素直下ではない<code>ul</code>要素</li>
+	<li><code>figure</code>要素</li>
+	<li><code>table</code>要素</li>
+	<li><code>h2 + .metaline</code></li>
+</ul>
+
+<p>対象はこれらの要素だ。見出しやセクショニング要素でも良さそうだが、それだと雑記記事であまり変わらなくなってしまうので、これら挿入される何かを対象にした。つまり、このリストが画面外に消えると、色相が変わる。<code>ol</code>と<code>ul</code>要素はネストを考慮したセレクターになっている。また最後の<code>h2 + .metaline</code>は、トップページや特集ページのため、特別に追加した。</p>
+
+<pre><code class="language-javascript">const updateHueOnScroll = () => {
+	const updateOnHide = (entries) => {
+		if (entries[0].isIntersecting) {
+			return;
+		}
+
+		/* global updateHue */
+		updateHue();
+	};
+
+	const elements = document.querySelectorAll("hr, pre, blockquote, :not(li) > ol, :not(li) > ul, figure, table, h2 + .metaline");
+	const observer = new IntersectionObserver(updateOnHide);
+
+	for (const element of elements) {
+		observer.observe(element);
+	}
+};</code></pre>
+
+<p>色々観察している関係上、<code>entries</code>が複数あることが多いが、全部に反応する必要はないので最初だけを見ている。また、消えた時に色を変えるよう、<code>isIntersecting</code>が<code>false</code>の時に色相を変更している。消えた時にすると、スクロールしすぎて戻るというありがちな行動パターンと、うまくなじむんじゃないかと考えた。</p>
+
+<p><code>updateHue()</code>は<a href="https://hail2u.net/blog/mozoushi.html">模造紙風の背景色</a>のコードを、少しだけ手直しし、秒数ではなくランダムにした。<code>style</code>属性にカスタム・プロパティーで色相（と明度）が仕込まれるところは同じだ。そのため、背景色他への反映はCSSがやってくれるので、呼ぶだけで済む。</p>
+
+<p>あとは観察対象へ登録するだけだ。<code>observe()</code>はNodeListを受け取れないので、<code>for..of</code>でばらまいた。<code>forEach()</code>を欲しがっていた割には、<code>for...of</code>を好んで使うようになってしまった。<code>break</code>したい。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[体温を毎日測るようになってしばらくになる。結果は36.3から36.8度くらいで、ずっと安定している。あまり意味がないような気もしているが、心の平穏には少し役立つ。]]></description>
 				<link>https://hail2u.net/blog/on-20200706.html</link>
 				<pubDate>Mon, 6 Jul 2020 09:05:30 +0900</pubDate>
@@ -271,18 +320,6 @@ body {
 <p>今のところ、あずさとかいじはガラガラみたいだ。前日に確認しても8割以上が空席だった。互い違いに予約させるとか、そういうことはないらしい。飛行機と違って、席を回転させて向かい合わせる需要があるからだろうか。金が許すなら、前後左右すべての席を予約してしまいたい。</p>
 
 <p>梅雨が明けると、盆地の夏なので、なるべく行きたくない。秋に延ばすと、草むしりが大変そうで、これまた延ばしたくない。ルバイヤートと七賢を心の支えにして、行くしかなさそうだ。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[昨日は朝一で散髪に行った。2か月半ぶりくらいだったのと、暑くなってきたのとで、すっきりした。また坊主には踏み切れなかった。このままだと辞世の句で「坊主にしてみたかった」と詠む羽目になってしまう。]]></description>
-				<link>https://hail2u.net/blog/on-20200606.html</link>
-				<pubDate>Sat, 6 Jun 2020 14:44:48 +0900</pubDate>
-				<title><![CDATA[キンメダイの煮付け]]></title>
-
-					<content:encoded><![CDATA[<p>昨日は朝一で散髪に行った。2か月半ぶりくらいだったのと、暑くなってきたのとで、すっきりした。また坊主には踏み切れなかった。このままだと辞世の句で「坊主にしてみたかった」と詠む羽目になってしまう。</p>
-
-<p>カワイスギクライシスを買うかどうか迷っている。連載で読むとすごい面白いが、単行本だと胃にもたれそうな気がする。</p>
-
-<p>ローソンに行く用事があったので、冷凍食品や総菜の新パッケージを眺めていた。時間がゆっくり流れるパッケージという感想だ。つまりナチュラル・ローソン（まだあるのかな？）なら、うまく機能するんじゃないかと思う。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
