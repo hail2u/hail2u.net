@@ -81,7 +81,7 @@ const addLink = async (comment, title, url) => {
 	const links = await readJSONFile(config.data.links);
 	await outputJSONFile(config.data.links, [
 		{
-			"description": comment,
+			"comment": comment,
 			"published": Date.now(),
 			"title": title,
 			"url": url

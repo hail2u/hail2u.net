@@ -99,6 +99,7 @@ const readDocuments = async () => {
 
 const extendLink = (link) => {
 	const dt = getDateDetails(new Date(link.published));
+
 	return {
 		...link,
 		...dt,

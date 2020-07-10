@@ -76,8 +76,10 @@ const readDocuments = async () => {
 };
 
 const extendLink = (link) => {
-	if (!link.description) {
+	if (!link.comment) {
 		link.description = link.url;
+	} else {
+		link.description = link.comment;
 	}
 
 	return {
