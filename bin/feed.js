@@ -75,12 +75,17 @@ const readDocuments = async () => {
 	return Promise.all(latests.map(extendDocument));
 };
 
-const extendLink = (link) => ({
-	...link,
-	"description": link.url,
-	"link": link.url,
-	"type": "link"
-});
+const extendLink = (link) => {
+	if (!link.description) {
+		link.description = link.url;
+	}
+
+	return {
+		...link,
+		"link": link.url,
+		"type": "link"
+	};
+};
 
 const readLinks = async () => {
 	const links = await readJSONFile(config.data.links);

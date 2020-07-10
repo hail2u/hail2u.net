@@ -77,10 +77,11 @@ const addBook = async (asin, title) => {
 	];
 };
 
-const addLink = async (title, url) => {
+const addLink = async (comment, title, url) => {
 	const links = await readJSONFile(config.data.links);
 	await outputJSONFile(config.data.links, [
 		{
+			"description": comment,
 			"published": Date.now(),
 			"title": title,
 			"url": url
@@ -155,6 +156,7 @@ const addStatus = async (status) => {
 
 const addThing = ({
 	asin,
+	comment,
 	feed,
 	title,
 	url,
@@ -168,11 +170,11 @@ const addThing = ({
 		return addFollowing(feed, title, url);
 	}
 
-	if (title && url) {
-		return addLink(title, url);
+	if (comment && title && url) {
+		return addLink(comment, title, url);
 	}
 
-	if (!asin && !feed && !title && !url && remains.length === 1) {
+	if (!asin && !comment && !feed && !title && !url && remains.length === 1) {
 		const ext = path.extname(remains[0]).toLowerCase();
 
 		if (ext === ".jpg" || ext === ".jpeg") {
@@ -188,7 +190,7 @@ const addThing = ({
 To add:
   A book:      $ node thing.js --asin <ASIN> --title <TITLE>
   A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
-  A link:      $ node thins.js --title <TITLE> --url <URL>
+  A link:      $ node thins.js --comment <COMMENT> --title <TITLE> --url <URL>
   A photo:     $ node thing.js <FILE>
   A status:    $ node thing.js <TEXT>
 `);
@@ -198,6 +200,7 @@ const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
 		"alias": {
 			"a": "asin",
+			"c": "comment",
 			"f": "feed",
 			"p": "photo",
 			"t": "title",
@@ -205,6 +208,7 @@ const main = async () => {
 		},
 		"default": {
 			"asin": "",
+			"comment": "",
 			"feed": "",
 			"photo": "",
 			"title": "",
@@ -212,6 +216,7 @@ const main = async () => {
 		},
 		"string": [
 			"asin",
+			"comment",
 			"feed",
 			"photo",
 			"title",
