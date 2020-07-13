@@ -10038,33 +10038,35 @@
 			const select = () => data[Math.floor(Math.random() * data.length)];
 
 			const generate = (type, format, count) => {
-				console.log(type, format, count);
 				let result = [];
 
 				for (var i = 0; i < count; i++) {
-					if (type === "li") {
-						result.push(select());
-						continue;
-					}
-
-					const count = Math.floor(Math.random() * 5 + 3);
-					const p = [];
+					const count = Math.floor(Math.random() * 6 + 3);
+					let p = [];
 
 					for (var j = 0; j < count; j++) {
 						p.push(select());
 					}
 
+					if (type === "li") {
+						if (format === "html") {
+							p = p.map((li) => `<li>${li}</li>`);
+							p.unshift("<ul>");
+							p.push("</ul>");
+						} else {
+							p = p.map((li) => `- ${li}`);
+						}
+
+						result = result.concat(p.join("\n"));
+						continue;
+					}
+
+					if (format === "html" && type === "p") {
+						result.unshift("<p>");
+						result.push("</p>");
+					}
+
 					result.push(p.join(""));
-				}
-
-				if (format === "html" && type === "li") {
-					result = result.map((li) => `<li>${li}</li>`);
-					result.unshift("<ul>");
-					result.push("</ul>");
-				}
-
-				if (format === "html" && type === "p") {
-					result = result.map((p) => `<p>${p}</p>`);
 				}
 
 				if (format === "txt") {
@@ -10072,13 +10074,7 @@
 					result.push("</pre>");
 				}
 
-				let delimiter = "\n";
-
-				if (type === "p") {
-					delimiter = "\n\n";
-				}
-
-				return result.join(delimiter);
+				return result.join("\n\n");
 			};
 
 			document.getElementById("generate").addEventListener("click", () => {
