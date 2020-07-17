@@ -102,7 +102,7 @@ const addPhoto = async (photo, ext) => {
 	const hours = String(dt.getHours()).padStart(2, "0");
 	const minutes = String(dt.getMinutes()).padStart(2, "0");
 	const seconds = String(dt.getSeconds()).padStart(2, "0");
-	const fn = `${year}${month}${date}${hours}${minutes}${seconds}.jpg`;
+	const fn = `${year}${month}${date}${hours}${minutes}${seconds}${ext}`;
 	const src = path.join(config.src.photos, fn);
 	const [photos] = await Promise.all([
 		readJSONFile(config.data.photos, "utf8"),
@@ -177,7 +177,7 @@ const addThing = ({
 	if (!asin && !comment && !feed && !title && !url && remains.length === 1) {
 		const ext = path.extname(remains[0]).toLowerCase();
 
-		if (ext === ".jpg" || ext === ".jpeg") {
+		if (ext === ".jpg" || ext === ".jpeg" || ext === ".png") {
 			return addPhoto(remains[0], ext);
 		}
 
