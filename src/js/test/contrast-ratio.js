@@ -39,6 +39,5 @@
 		}
 	};
 
-	window.testContrastRatio = update;
 	window.addEventListener("load", update);
 })();

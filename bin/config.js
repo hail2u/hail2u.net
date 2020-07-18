@@ -113,14 +113,6 @@ export default {
 			{
 				"dest": "dist/js/append-next.{{version}}.js",
 				"src": "src/js/append-next.js"
-			},
-			{
-				"dest": "dist/js/change-color-mode.{{version}}.js",
-				"src": "src/js/change-color-mode.js"
-			},
-			{
-				"dest": "dist/js/change-color-mode-on-check.{{version}}.js",
-				"src": "src/js/change-color-mode-on-check.js"
 			}
 		],
 		"txt": [
