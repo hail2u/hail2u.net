@@ -14,6 +14,24 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[オンマウスでボタンのコントラストを上げるために色を増やすのは嫌だなと考えていたが、filterプロパティーが簡単そうだ。色モードの変更にもそのままで機能する。ボタンの背景色が白や黒でない限り、汎用的に使える。]]></description>
+				<link>https://hail2u.net/blog/increasing-button-contrast-on-hover.html</link>
+				<pubDate>Sun, 19 Jul 2020 14:59:54 +0900</pubDate>
+				<title><![CDATA[オンマウス、ボタン、コントラスト]]></title>
+
+					<content:encoded><![CDATA[<p>オンマウスでボタンのコントラストを上げるために色を増やすのは嫌だなと考えていたが、<code>filter</code>プロパティーが簡単そうだ。色モードの変更にもそのままで機能する。ボタンの背景色が白や黒でない限り、汎用的に使える。</p>
+
+<pre><code class="language-css">button:hover {
+	filter: contrast(1.5);
+}</code></pre>
+
+<p>ボタンをオンマウスでどう変化すべき（または変化させないべき）かというのは意見が一致しない。セケンではハイライトを当てる実装が多い。僕は、それだと白背景の場合に目立たなくなるので否定的だ。</p>
+
+<p>ボタンを操作する時に指をのせるという行為のメタファーと考えると、指の影で暗くなるのが自然にも思える。しかし、そのままボタンを暗くし、ボタンの文字も暗くしてしまうと、操作しづらくなってしまうだろう。</p>
+
+<p>ボタンに指をのせることで、そこに目の焦点が合い、相対的に強調されるというのが、実情に近い。それを考えるとコントラストを上げることを主眼にして、変化させるのが良いはずだ。その実装として<code>filter</code>プロパティーで<code>contrast()</code>関数を使うことは理にかなっている。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[Windows 10では「アプリ モード（App mode）」、Android 10では「ダークモード（Dark Theme）」、macOS 10.15やiOS 13では「外観モード（Appearance）」と、それぞれ呼ばれている色モードを尊重しつつ、ユーザーの好みで明るくも暗くもできるようにした。どう実装すると効率的かを考えたかっただけなので、次期マイナーバージョンでは消える。]]></description>
 				<link>https://hail2u.net/blog/changing-color-mode.html</link>
 				<pubDate>Wed, 15 Jul 2020 16:30:00 +0900</pubDate>
@@ -338,53 +356,6 @@ const hue = seconds * 60 - 15;</code></pre>
 <p>Light+テーマを使用中に、コマンド パレットから「開発者: 現在の設定から配色テーマを作成する（Developer: Generate Color Theme From Current Settings）」を実行すると、JSONファイルが生成され、タブに開かれる。その中で<code>terminal.</code>で始まるキーがターミナルで使われている配色なので、これらをWindows Terminalのカラースキーム向けに書き換えればいい。</p>
 
 <p>書き換えは、<code>terminal.ansi</code>を削除して、<code>Bright</code>を小文字に変換し、<code>magenta</code>を<code>purple</code>に置換する。また、<code>background</code>が存在しないので、<code>panel.background</code>をコピーするか、カラー・ピッカーか何かで拾う必要があった。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。]]></description>
-				<link>https://hail2u.net/blog/github-packages-and-npmrc.html</link>
-				<pubDate>Tue, 16 Jun 2020 11:31:37 +0900</pubDate>
-				<title><![CDATA[GitHub Packagesと.npmrcファイル]]></title>
-
-					<content:encoded><![CDATA[<p>興味があったので<a href="https://github.co.jp/features/packages">GitHub Packages</a>を試してみている。node-css-mqpackerを復活させて、<a href="https://github.com/hail2u/node-css-mqpacker/packages">公開するところ</a>まではできた。ヘルプの通りでうまくいったが、<code>.npmrc</code>ファイルで気になるところがあったので、メモを残しておく。</p>
-
-<h2>公開時</h2>
-
-<p>オーナーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package">公開する場合</a>、<code>.npmrc</code>ファイルを編集して<code>registry</code>を編集しろとなっている。もちろんこれで公開できる（できた）けれど、npmの<code>audit</code>コマンドが動かなくなってしまった。</p>
-
-<pre><samp>$ <kbd>npm audit</kbd>
-npm ERR! code ENOAUDIT
-npm ERR! audit Your configured registry (https://npm.pkg.github.com/hail2u) does not support audit requests.
-npm ERR! audit The server said: 404 page not found
-npm ERR! audit</samp></pre>
-
-<p>それはそうかというエラーだが、これは困る。後述のスコープで絞る方法で設定しても良いようだが、ヘルプに併記されている<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package-using-publishconfig-in-the-packagejson-file"><code>package.json</code>ファイルで<code>publishConfig</code>フィールドを使う方法</a>でもうまくいく。</p>
-
-<pre><code class="language-json">{
-	"name": "@hail2u/css-mqpacker",
-	"version": "8.0.1",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/hail2u/node-css-mqpacker.git"
-	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com/"
-	}
-}
-</code></pre>
-
-<p><code>.npmrc</code>ファイルを編集する場合と違い、<code>registry</code>フィールドの値にはオーナー名まで含めなくていい。こちらは「公開設定」というそのものズバリのフィールドで設定することになるので、わかりやすいと感じた。他に<code>.npmrc</code>ファイルを使う必要がない場合に、ファイルが増えないという点でもやりやすい。</p>
-
-<h2>インストール時</h2>
-
-<p>ユーザーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package">インストールする場合</a>も、<code>.npmrc</code>ファイルを編集して<code>registry</code>を設定しろとなっている。しかし、これだと影響範囲が大きすぎるような気がする。npmの<code>audit</code>コマンドが動かないのも同じだ。</p>
-
-<pre><code class="language-ini">@hail2u:registry=https://npm.pkg.github.com/</code></pre>
-
-<p>このようにスコープで絞って設定してやっても大丈夫だった。これならプリフィックスで<code>@hail2u</code>を持つ依存パッケージのみがGitHub Packagesを見に行くだろう。</p>
-
-<hr>
-
-<p>ローカルの<code>.npmrc</code>ファイルを使ったことがなかったので、基本的な知識がなく混乱した。registryを変更する場合は「とりあえずスコープをつける」などと覚えるだけも良いのかもしれない。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
