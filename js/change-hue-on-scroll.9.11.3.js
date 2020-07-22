@@ -25,7 +25,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     var _entries = _slicedToArray(entries, 1),
         now = _entries[0].time;
 
-    if (entries[0].isIntersecting || now < previous + 1000) {
+    if (entries[0].isIntersecting || now < previous + 2000) {
       return;
     }
 

@@ -10,7 +10,7 @@
 			time: now
 		}] = entries;
 
-		if (entries[0].isIntersecting || now < previous + 1000) {
+		if (entries[0].isIntersecting || now < previous + 2000) {
 			return;
 		}
 
