@@ -14,16 +14,7 @@
 		target.parentNode.hidden = true;
 	};
 
-	const init = () => {
-		append({
-			"target": document.querySelector(".js-append-next-fallback p")
-		});
-	};
-
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", init);
-		return;
-	}
-
-	init();
+	append({
+		"target": document.querySelector(".js-append-next-fallback p")
+	});
 })();
