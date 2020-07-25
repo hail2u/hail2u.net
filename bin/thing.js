@@ -175,7 +175,7 @@ const addThing = ({
 	}
 
 	if (!asin && !comment && !feed && !title && !url && remains.length === 1) {
-		const ext = path.extname(remains[0]).toLowerCase();
+		const ext = path.extname(remains[0]).toLocaleLowerCase('en-US');
 
 		if (ext === ".jpg" || ext === ".jpeg" || ext === ".png") {
 			return addPhoto(remains[0], ext);
