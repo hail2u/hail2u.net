@@ -14,6 +14,22 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[スクロールで色相が変わる機能がちょっと変わった。連続で変わらないよう、2000ミリ秒待つようにした。発火時間はentries[0].timeで取得できるので、低コストで待てる。同じコードで、再読み込みした時や戻った時にスクロールが起きて色相が変わるのも抑制できた。このtimeについては、その基準がtime originとしてHigh Resolution Time Level 2仕様で定義されている。]]></description>
+				<link>https://hail2u.net/blog/throttling-change-hue.html</link>
+				<pubDate>Mon, 27 Jul 2020 09:31:21 +0900</pubDate>
+				<title><![CDATA[色相を変えるスクリプトの間引き]]></title>
+
+					<content:encoded><![CDATA[<p>スクロールで色相が変わる機能がちょっと変わった。連続で変わらないよう、2000ミリ秒待つようにした。発火時間は<code>entries[0].time</code>で取得できるので、低コストで待てる。同じコードで、再読み込みした時や戻った時にスクロールが起きて色相が変わるのも抑制できた。この<code>time</code>については、その基準が<a href="https://www.w3.org/TR/hr-time-2/#sec-time-origin">time origin</a>としてHigh Resolution Time Level 2仕様で定義されている。</p>
+
+<p>具体的に基準はページを読み込もうとした時（など）になる。Intersection Observerでは、コールバック関数の引数に<code>time</code>として要素の出入り時間を設定してくれる。ストップウォッチのラップ機能が近いかもしれない。ページを開いている間はずっと動き、タブを裏側にしても動き続ける。ブラウザーを開いたまま、パソコンやスマフォをスリープしても動き続ける。</p>
+
+<p><code>onscroll</code>の代わりにIntersectin Observerを使う場合、この<code>time</code>、<code>isInterseting</code>、<code>insersectionRatio</code>の3つの引数でほぼ書けることがわかってきた。やることがはっきりした引数なので、コールバック関数内で色々せずに済むのもパフォーマンスにおいて有利に働く。他の引数を使うようなコードになった場合は、ルートや監視対象の工夫を先に考えた方がいい。</p>
+
+<hr>
+
+<p>色相を変えるスクリプトでは、<code>prefers-reduced-motion</code>を見て、アニメーションを抑えている場合は変えないようにもした。色を変えることがモーションかどうかは微妙なところだが、目への負担を減らす機能と考えると、止めるべきだと思う。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[Edgeをフルスクリーンで常用してみているけど、タブやアドレスバーにアクセスできるし、同様のFirefoxの実装と違ってコンテンツが動かなくて使いやすいものの、Chromeの没入感もフルスクリーンらしくていいし、どういうのが正解なんだろう]]></description>
 				<link>https://hail2u.net/statuses/#on-1595767572980</link>
 				<pubDate>Sun, 26 Jul 2020 21:46:12 +0900</pubDate>
@@ -77,13 +93,6 @@
 				<link>https://hail2u.net/statuses/#on-1595648655859</link>
 				<pubDate>Sat, 25 Jul 2020 12:44:15 +0900</pubDate>
 				<title><![CDATA[開発者サービスからなんか変な通知が来てびっくりしたけど、通知をオンにした通知だったっぽい]]></title>
-
-			</item>
-			<item>
-				<description><![CDATA[toUpperCase()はUnicode Default Case Conversionのアルゴリズムを使うが、toLowerCase()は独自アルゴリズムを使うため、toUpperCase()の方が安全な可能性が高い。]]></description>
-				<link>https://tc39.es/ecma262/#sec-string.prototype.touppercase</link>
-				<pubDate>Sat, 25 Jul 2020 09:29:11 +0900</pubDate>
-				<title><![CDATA[21.1.3.28 String.prototype.toUpperCase()]]></title>
 
 			</item>
 	</channel>
