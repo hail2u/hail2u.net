@@ -347,6 +347,17 @@ const toFilesFormat = (article) => ({
 	...article
 });
 
+const toChunks = (num, previous, current, index) => {
+	const remainder = index % num;
+
+	if (!previous[remainder]) {
+		previous.push([]);
+	}
+
+	previous[remainder].push(current);
+	return previous;
+};
+
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
 		"alias": {
@@ -402,7 +413,11 @@ const main = async () => {
 
 	if (argv.articles) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
-		return Promise.all(articleFiles.map(build.bind(null, metadata, partials)));
+		const articleChunks = articleFiles.reduce(toChunks.bind(null, 4), []);
+
+		for (const articleChunk of articleChunks) {
+			await Promise.all(articleChunk.map(build.bind(null, metadata, partials)));
+		}
 	}
 
 	return Promise.all(config.files.txt.map(build.bind(null, metadata, partials)));
