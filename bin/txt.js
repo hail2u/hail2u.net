@@ -10,6 +10,9 @@ import {
 import {
 	getVersion
 } from "../lib/get-version.js";
+import {
+	highlight
+} from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import {
@@ -337,7 +340,8 @@ const build = async (metadata, partials, file) => {
 	}
 
 	const rendered = mustache.render(template, data, partials);
-	await outputFile(file.dest, rendered);
+	const highlighted = highlight(rendered);
+	await outputFile(file.dest, highlighted);
 };
 
 const toFilesFormat = (article) => ({
