@@ -39,12 +39,5 @@
 		}
 	};
 
-	window.testContrastRatio = update;
-
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", update);
-		return;
-	}
-
-	update();
+	window.addEventListener("load", update);
 })();

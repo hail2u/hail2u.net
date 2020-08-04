@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/cdata-section-in-xml2js-v0.4.5.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに（小さなRSSが）吐ける。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに（小さなRSSが）吐ける。" itemprop="description">
 		
@@ -74,16 +67,16 @@
 
 <p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
 
-<pre><code class="language-javascript">var xml2js = require(&apos;xml2js&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>);
 
-var builder = new xml2js.Builder({
-	cdata: true
+<span class="hljs-keyword">var</span> builder = <span class="hljs-keyword">new</span> xml2js.Builder({
+	<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>
 });
-var obj = {
-	foo: &apos;Foo&apos;,
-	bar: &apos;Bar&apos;
+<span class="hljs-keyword">var</span> obj = {
+	<span class="hljs-attr">foo</span>: <span class="hljs-string">'Foo'</span>,
+	<span class="hljs-attr">bar</span>: <span class="hljs-string">'Bar'</span>
 };
-var xml = builder.buildObject(obj);</code></pre>
+<span class="hljs-keyword">var</span> xml = builder.buildObject(obj);</code></pre>
 
 <p>このようにグローバルでの設定しかないため、CDATAで書くか書かないかの二択になる。この要素ではCDATAを、この要素では文字参照で、などとはできないのが少し残念だ。</p>
 
@@ -91,22 +84,22 @@ var xml = builder.buildObject(obj);</code></pre>
 
 <p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
 
-<pre><code class="language-javascript">var xml2js = require(&apos;xml2js&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>);
 
-console.log(new xml2js.Builder({
-	cdata: true
+<span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> xml2js.Builder({
+	<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>
 }).buildObject({
-	&apos;foo&apos;: {
-		&apos;bar&apos;: &apos;baz &amp; qux&apos;
+	<span class="hljs-string">'foo'</span>: {
+		<span class="hljs-string">'bar'</span>: <span class="hljs-string">'baz &amp; qux'</span>
 	}
 }));</code></pre>
 
 <p>これで<code>bar</code>要素の内容がCDATAセクションになってくれれば良いが、なってくれない。</p>
 
-<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
-&lt;foo&gt;
-	&lt;bar&gt;baz &amp;amp; qux&lt;/bar&gt;
-&lt;/foo&gt;</code></pre>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">foo</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">bar</span>&gt;</span>baz <span class="hljs-symbol">&amp;amp;</span> qux<span class="hljs-tag">&lt;/<span class="hljs-name">bar</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">foo</span>&gt;</span></code></pre>
 
 <p>イシューは立てておいたので早めに直って欲しい。手元では<a href="https://pub.hail2u.net/xml2js.js.diff">パッチ</a>を（しかもJavaScriptファイルの方に）当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p>
 	</div>
@@ -126,20 +119,13 @@ console.log(new xml2js.Builder({
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

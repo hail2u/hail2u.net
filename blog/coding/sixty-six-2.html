@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/sixty-six-2.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Amazon E-Commerce Service 4.0は「&quot;」や「&apos;」をそのまま返してくれる（XML的にはまぁOKなんだけど）ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Amazon E-Commerce Service 4.0は「&quot;」や「&apos;」をそのまま返してくれる（XML的にはまぁOKなんだけど）ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。" itemprop="description">
 		
@@ -72,29 +65,29 @@
 	<div itemprop="articleBody">
 		<p><a href="https://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>は「&quot;」や「&apos;」をそのまま返してくれる（XML的にはまぁOKなんだけど）ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。</p>
 <p>「&apos;」のエスケープは、<code>translate()</code>では出来ないので、</p>
-<pre><code class="language-xsl">&lt;xsl:template name=&quot;replace&quot;&gt;
-	&lt;xsl:param name=&quot;str&quot;/&gt;
-	&lt;xsl:param name=&quot;from&quot;&gt;&amp;#39;&lt;/xsl:param&gt;
-	&lt;xsl:param name=&quot;to&quot;&gt;\&amp;#39;&lt;/xsl:param&gt;
-	&lt;xsl:choose&gt;
-		&lt;xsl:when test=&quot;contains($str, $from)&quot;&gt;
-			&lt;xsl:value-of select=&quot;substring-before($str, $from)&quot;/&gt;
-			&lt;xsl:value-of select=&quot;$to&quot;/&gt;
-			&lt;xsl:call-template name=&quot;replace&quot;&gt;
-				&lt;xsl:with-param name=&quot;str&quot; select=&quot;substring-after($str, $from)&quot;/&gt;
-			&lt;/xsl:call-template&gt;
-		&lt;/xsl:when&gt;
-		&lt;xsl:otherwise&gt;
-			&lt;xsl:value-of select=&quot;$str&quot;/&gt;
-		&lt;/xsl:otherwise&gt;
-	&lt;/xsl:choose&gt;
-&lt;/xsl:template&gt;</code></pre>
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span>/&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"from"</span>&gt;</span><span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"to"</span>&gt;</span>\<span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:choose</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:when</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"contains($str, $from)"</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"substring-before($str, $from)"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"$to"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"substring-after($str, $from)"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:call-template</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:when</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:otherwise</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"$str"</span>/&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:otherwise</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:choose</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:template</span>&gt;</span></code></pre>
 <p>こんな形の文字列の置換として実装することになります。SIXTY-SIXのケースでは「&apos;」を「\&apos;」にエスケープするだけなので、<code>xsl:param</code>でデフォルトとしてそれらを指定しておき、呼び出しが書きやすいようにしました。呼び出しは、</p>
-<pre><code class="language-xsl">&lt;xsl:call-template name=&quot;replace&quot;&gt;
-	&lt;xsl:with-param name=&quot;str&quot;&gt;
-		&lt;xsl:value-of select=&quot;aws:ItemAttributes/aws:Title&quot;/&gt;
-	&lt;/xsl:with-param&gt;
-&lt;/xsl:call-template&gt;</code></pre>
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"aws:ItemAttributes/aws:Title"</span>/&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:with-param</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:call-template</span>&gt;</span></code></pre>
 <p>てな具合。</p>
 <p>これでAmazonのXSLTサービスがXMLまんまを返すとかいう寝ぼけたことをしない限り、正常に処理できるようになったような気がする。</p>
 	</div>
@@ -114,20 +107,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

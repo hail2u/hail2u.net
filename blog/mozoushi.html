@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/mozoushi.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑（105度）と紫（285度）が見やすいと思う。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑（105度）と紫（285度）が見やすいと思う。" itemprop="description">
 		<link href="/img/blog/mozoushi.png" itemprop="image">
@@ -76,27 +69,27 @@
 
 <p>当初はDay of the Yearで変わるようにしようと考えていた。しかし、これでは変化に乏しいし、DotYを計算するのが面倒（うるう年とか）だし、360におさまらないのをどうなじませるか考えるのも面倒だったので、秒数を使うことにした。</p>
 
-<pre><code class="language-javascript">const seconds = Math.floor((new Date()).getSeconds() / 10);
-const hue = seconds * 60 - 15;</code></pre>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> seconds = <span class="hljs-built_in">Math</span>.floor((<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()).getSeconds() / <span class="hljs-number">10</span>);
+<span class="hljs-keyword">const</span> hue = seconds * <span class="hljs-number">60</span> - <span class="hljs-number">15</span>;</code></pre>
 
 <p>秒数をそのまま使い、色のバリエーションは60種類にしても良かったが、ハイパーリンクのコントラスト要件が満たされるかどうかを確認するのが大変で、6種類に絞った。つまり秒数を10で割った商に60を掛け、60刻みで0から300まで作り、それを色相に設定する。60の倍数だときれいな色になりやすいので、15度だけ反時計回りに回して、若干ずらした。</p>
 
-<pre><code class="language-javascript">const lightness = [&quot;49%&quot;, &quot;34%&quot;, &quot;33%&quot;, &quot;33%&quot;, &quot;52%&quot;, &quot;50%&quot;];</code></pre>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> lightness = [<span class="hljs-string">"49%"</span>, <span class="hljs-string">"34%"</span>, <span class="hljs-string">"33%"</span>, <span class="hljs-string">"33%"</span>, <span class="hljs-string">"52%"</span>, <span class="hljs-string">"50%"</span>];</code></pre>
 
 <p>彩度は50%で固定し、明度は使われる場所で使い分ける。前バージョンのカラー・パレットと同じく、背景色なら95%、文字色なら10%にしている。ハイパーリンクの色は、背景色と文字色の両方とコントラスト比を確保したいので、手作業で適切な明度を探し、色相に応じて選択できるようにした。</p>
 
-<pre><code class="language-javascript">document.documentElement.style = `--hue:${hue};--lightness:${lightness[seconds]}`;</code></pre>
+<pre><code class="hljs language-javascript"><span class="hljs-built_in">document</span>.documentElement.style = <span class="hljs-string">`--hue:<span class="hljs-subst">${hue}</span>;--lightness:<span class="hljs-subst">${lightness[seconds]}</span>`</span>;</code></pre>
 
 <p>最後に生成した色相と明度をカスタム・プロパティーで仕込むだけだ。ここではルート要素の<code>style</code>属性に仕込んだが、<code>style</code>要素を作ってもいい。</p>
 
-<pre><code class="language-css">:root {
-	--hue: -15;
-	--lightness: 49%;
+<pre><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+	<span class="hljs-attribute">--hue</span>: -<span class="hljs-number">15</span>;
+	<span class="hljs-attribute">--lightness</span>: <span class="hljs-number">49%</span>;
 
-	--color-primary: hsl(var(--hue) 50% 10%);
-	--color-secondary: hsl(var(--hue) 50% var(--lightness));
-	--color-background: hsl(var(--hue) 50% 95%);
-	--color-surface: hsl(var(--hue) 50% 92%);
+	<span class="hljs-attribute">--color-primary</span>: <span class="hljs-built_in">hsl</span>(var(--hue) <span class="hljs-number">50%</span> <span class="hljs-number">10%</span>);
+	<span class="hljs-attribute">--color-secondary</span>: <span class="hljs-built_in">hsl</span>(var(--hue) <span class="hljs-number">50%</span> <span class="hljs-built_in">var</span>(--lightness));
+	<span class="hljs-attribute">--color-background</span>: <span class="hljs-built_in">hsl</span>(var(--hue) <span class="hljs-number">50%</span> <span class="hljs-number">95%</span>);
+	<span class="hljs-attribute">--color-surface</span>: <span class="hljs-built_in">hsl</span>(var(--hue) <span class="hljs-number">50%</span> <span class="hljs-number">92%</span>);
 }</code></pre>
 
 <p><code>hsl()</code>関数の中でもカスタム・プロパティーが使えるので、CSSはこのように書ける。ちょうど4色まで減らしていたところだったので、調整することもなくちょっと書き換えるだけで済んだ。</p>
@@ -121,20 +114,13 @@ const hue = seconds * 60 - 15;</code></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

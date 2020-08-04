@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/webdesign/expand-pre-with-calc-and-vw.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" itemprop="description">
 		<link href="/img/blog/expand-pre-with-calc-and-vw.png" itemprop="image">
@@ -78,30 +71,30 @@
 
 <p><code>pre</code>要素の左右が<code>#f0f</code>の矩形で埋められている。Chrome 35、Firefox 30、そしてInternet Explorer 11で確認できる。Mobile Safari 7ではうまく動かない（多分<code>vw</code>単位の問題のような気がする）。わかりやすいように左右に追加する擬似要素の背景の色を変えておいたけど、同じ色にすればあたかも<code>pre</code>要素が飛び出すように見えるはず。</p>
 
-<pre><code class="language-css">.test {
-	margin-right: auto;
-	margin-left: auto;
-	position: relative;
-	width: 480px;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.test</span> {
+	<span class="hljs-attribute">margin-right</span>: auto;
+	<span class="hljs-attribute">margin-left</span>: auto;
+	<span class="hljs-attribute">position</span>: relative;
+	<span class="hljs-attribute">width</span>: <span class="hljs-number">480px</span>;
 }
 
-.test:before,
-.test:after {
-	display: block;
-	position: absolute;
-	top: 0;
-	width: calc((100vw - 100%) / 2);
-	height: 100%;
-	content: &quot;&quot;;
-	background-color: #f0f;
+<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:before</span>,
+<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:after</span> {
+	<span class="hljs-attribute">display</span>: block;
+	<span class="hljs-attribute">position</span>: absolute;
+	<span class="hljs-attribute">top</span>: <span class="hljs-number">0</span>;
+	<span class="hljs-attribute">width</span>: <span class="hljs-built_in">calc</span>((<span class="hljs-number">100vw</span> - <span class="hljs-number">100%</span>) / <span class="hljs-number">2</span>);
+	<span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+	<span class="hljs-attribute">content</span>: <span class="hljs-string">""</span>;
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f0f</span>;
 }
 
-.test:before {
-	right: 100%;
+<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:before</span> {
+	<span class="hljs-attribute">right</span>: <span class="hljs-number">100%</span>;
 }
 
-.test:after {
-	left: 100%;
+<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:after</span> {
+	<span class="hljs-attribute">left</span>: <span class="hljs-number">100%</span>;
 }</code></pre>
 
 <p><code>vw</code>単位は<code>1vw</code>でビューポートの幅の<em>1/100</em>なので、<code>100vw</code>がビューポートの幅になる。<code>calc()</code>では<code>%</code>も使え、<code>width</code>プロパティーで<code>calc(100%)</code>とすると<em>その要素の幅</em>になる。つまり<code>calc(100vw - 100%)</code>で<em>ビューポート幅からその要素の幅を引いた余り</em>を計算できることになる。デモでは<code>pre</code>要素は真ん中寄せなので単純にこれを半分にし、左右に追加する擬似要素の幅にすれば良い。高さは<code>100%</code>で自動的に揃うので計算不要。</p>
@@ -120,8 +113,8 @@
 
 <p>ただしInternet Explorer 11以降では<code>-ms-overflow-style</code>独自プロパティーでオーバーレイのスクロールバーに変更できるのでなんとか解決できる。</p>
 
-<pre><code class="language-css">html {
-	-ms-overflow-style: -ms-autohiding-scrollbar;
+<pre><code class="hljs language-css"><span class="hljs-selector-tag">html</span> {
+	<span class="hljs-attribute">-ms-overflow-style</span>: -ms-autohiding-scrollbar;
 }</code></pre>
 
 <p><code>overflow-style</code>プロパティー自体は一時期いくつかの標準仕様に存在したんだけど、今は<code>overflow</code>プロパティーへ統合された。元々<code>overflow</code>した時の内容物の扱われ方を定義するプロパティーだったようなので、スクロールバーの表示形式の変更に使うのは間違ってたりとかすることもあるので、独自プロパティーであることに目をつぶったとしても使わない方が良さそう。</p>
@@ -142,20 +135,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

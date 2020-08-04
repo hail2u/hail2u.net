@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/associate_this_with_image.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" itemprop="description">
 		
@@ -73,28 +66,28 @@
 		<p>Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していた<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtでは<code>event.src</code>とかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースの<code>img</code>要素を全部調べ、<code>src</code>属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。</p>
 <p>Amazonの個別商品ページには画像があればかならず正しいURLで画像へのリンクが張られている（と思う）ので、<code>document.images</code>で拾うことができる<code>img</code>要素でループを回してやり、正規表現でMZZZZZZZが含まれているかどうかチェックするというわけ。</p>
 <p>JavaScriptのコードは以下のような構造になってます。</p>
-<pre><code class="language-js">var aid  = &apos;hail2unet-22&apos;;
-var t    = document.title;
-var u    = document.location.href;
-var i    = u.indexOf(&apos;ASIN&apos;);
-var asin = u.substring(i+5,i+15);
-u        = &apos;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;
-var img;
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> aid  = <span class="hljs-string">'hail2unet-22'</span>;
+<span class="hljs-keyword">var</span> t    = <span class="hljs-built_in">document</span>.title;
+<span class="hljs-keyword">var</span> u    = <span class="hljs-built_in">document</span>.location.href;
+<span class="hljs-keyword">var</span> i    = u.indexOf(<span class="hljs-string">'ASIN'</span>);
+<span class="hljs-keyword">var</span> asin = u.substring(i+<span class="hljs-number">5</span>,i+<span class="hljs-number">15</span>);
+u        = <span class="hljs-string">'https://www.amazon.co.jp/exec/obidos/ASIN/'</span>+asin+<span class="hljs-string">'/'</span>+aid;
+<span class="hljs-keyword">var</span> img;
 
-for (i=0; i &lt; document.images.length; i++) {
-	if (document.images[i].src.match(/MZZZZZZZ/)) {
-		img = document.images[i].src;
-		break;
+<span class="hljs-keyword">for</span> (i=<span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">document</span>.images.length; i++) {
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">document</span>.images[i].src.match(<span class="hljs-regexp">/MZZZZZZZ/</span>)) {
+		img = <span class="hljs-built_in">document</span>.images[i].src;
+		<span class="hljs-keyword">break</span>;
 	}
 }
 
-prompt(&apos;Associate This (with image)!&apos;,
-	&apos;&lt;a href=&quot;&apos; + u + &apos;&quot; title=&quot;&apos; + t + &apos;&quot;&gt;&lt;img src=&quot;&apos; + img + &apos;&quot; alt=&quot;&apos; + t +
-	&apos;&quot; /&gt;&lt;/a&gt;&apos;);</code></pre>
+prompt(<span class="hljs-string">'Associate This (with image)!'</span>,
+	<span class="hljs-string">'&lt;a href="'</span> + u + <span class="hljs-string">'" title="'</span> + t + <span class="hljs-string">'"&gt;&lt;img src="'</span> + img + <span class="hljs-string">'" alt="'</span> + t +
+	<span class="hljs-string">'" /&gt;&lt;/a&gt;'</span>);</code></pre>
 <p>Bookmarkletはこちら。</p>
 <p>Bookmarklet: <em><a href="javascript:var aid=&apos;hail2unet-22&apos;;var t=document.title;var u=document.location.href;var i=u.indexOf(&apos;ASIN&apos;);var asin=u.substring(i+5,i+15); u=&apos;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;var img;for(i=0;i&lt;document.images.length;i++){if(document.images[i].src.match(/MZZZZZZZ/)){img=document.images[i].src;break;}}prompt(&apos;Associate This (with image)!&apos;, &apos;&lt;a href=&quot;&apos;+u+&apos;&quot; title=&quot;&apos;+t+&apos;&quot;&gt;&lt;img src=&quot;&apos;+img+&apos;&quot; alt=&quot;&apos;+t+&apos;&quot; /&gt;&lt;/a&gt;&apos;);" title="Associate This (with image)!">Associate This (with image)!</a></em></p>
 <p>使い方は、上記リンクをBookmarks Toolbarにドラッグ・アンド・ドロップし、Amazonの個別商品ページを開いた状態でそれをクリックするだけ！すると、</p>
-<pre><code class="language-html">&lt;a href=&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22&quot; title=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot;&gt;&lt;img src=&quot;https://images-fe.ssl-images-amazon.com/images/P/B00028G7J8.jpg&quot; alt=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot; /&gt;&lt;/a&gt;</code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22"</span> <span class="hljs-attr">title</span>=<span class="hljs-string">"Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)"</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://images-fe.ssl-images-amazon.com/images/P/B00028G7J8.jpg"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)"</span> /&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
 <p>というコードがプロンプトで出てきます。hail2unet-22となっているアソシエイトIDは自分のアソシエイトIDに書き換えましょう。</p>
 <p>コピーするのメンドイ（なんてズボラな・・・）。</p>
 <section>
@@ -118,20 +111,13 @@ prompt(&apos;Associate This (with image)!&apos;,
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

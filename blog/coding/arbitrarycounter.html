@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/arbitrarycounter.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Hacker News経由でArbitraryCounterというのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Hacker News経由でArbitraryCounterというのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。" itemprop="description">
 		
@@ -91,28 +84,28 @@
 
 <p>カウントアップ（ダウン）には<code>POST</code>が必須。素のYQLでは出来ないけど、以下の様な簡単なOpen Data Tablesを書いてやればいける。</p>
 
-<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;table xmlns="http://query.yahooapis.com/v1/schema/table.xsd"&gt;
-&lt;meta&gt;
-&lt;sampleQuery&gt;&lt;![CDATA[
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">table</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://query.yahooapis.com/v1/schema/table.xsd"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">meta</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">sampleQuery</span>&gt;</span>&lt;![CDATA[
 	select * from {table} where url="http://arbitrarycounter.com/vb/fruit/apples+"
-]]&gt;&lt;/sampleQuery&gt;
-&lt;/meta&gt;
-&lt;bindings&gt;
-&lt;select&gt;
-&lt;urls&gt;
-&lt;url&gt;{url}&lt;/url&gt;
-&lt;/urls&gt;
-&lt;inputs&gt;
-&lt;key id="url" type="xs:string" required="true" paramType="variable"/&gt;
-&lt;/inputs&gt;
-&lt;execute&gt;&lt;![CDATA[
+]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">sampleQuery</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">meta</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">bindings</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">select</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">urls</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">url</span>&gt;</span>{url}<span class="hljs-tag">&lt;/<span class="hljs-name">url</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">urls</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">inputs</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">key</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"url"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"xs:string"</span> <span class="hljs-attr">required</span>=<span class="hljs-string">"true"</span> <span class="hljs-attr">paramType</span>=<span class="hljs-string">"variable"</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">inputs</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">execute</span>&gt;</span>&lt;![CDATA[
 	var data = y.rest(url).accept('*').contentType('application/x-www-form-urlencoded').post().response;
 	response.object = y.xparseJson(data);
-]]&gt;&lt;/execute&gt;
-&lt;/select&gt;
-&lt;/bindings&gt;
-&lt;/table&gt;</code></pre>
+]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">execute</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">bindings</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span></code></pre>
 
 <p>最後に<code>y.xparseJson()</code>するのを忘れずに。このXMLファイルをどこかにアップロードするとYQLでPOSTを処理できるようになる。</p>
 
@@ -144,20 +137,13 @@ select * from post where url="http://arbitrarycounter.com/vb/fruit/apples+"</a><
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/handlebars-js-include-helper.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" itemprop="description">
 		
@@ -74,36 +67,36 @@
 
 <p>色々遠回りしたけど、結局はテンプレート・ファイルを読んでコンパイル→レンダーする関数を作ってそれをヘルパー関数にすれば良いだけだった。Handlebars.jsがカシコイのでコンテキストとかは自動的に良しなにしてくれる。</p>
 
-<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
-var hbs = require(&apos;handlebars&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'handlebars'</span>);
 
-function applyTemplate(file, data) {
-	var tmpl = hbs.compile(fs.readFileSync(file, &apos;UTF-8&apos;));
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyTemplate</span>(<span class="hljs-params">file, data</span>) </span>{
+	<span class="hljs-keyword">var</span> tmpl = hbs.compile(fs.readFileSync(file, <span class="hljs-string">'UTF-8'</span>));
 
-	return tmpl(data);
+	<span class="hljs-keyword">return</span> tmpl(data);
 }
 
-hbs.registerHelper(&apos;include&apos;, function (file, options) {
-	return new hbs.SafeString(applyTemplate(file, this));
+hbs.registerHelper(<span class="hljs-string">'include'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.SafeString(applyTemplate(file, <span class="hljs-keyword">this</span>));
 });
 
-console.log(applyTemplate(&apos;./template.hbs&apos;, {
-	&quot;he&quot;: {
-		&quot;name&quot;: &quot;John&quot;
+<span class="hljs-built_in">console</span>.log(applyTemplate(<span class="hljs-string">'./template.hbs'</span>, {
+	<span class="hljs-string">"he"</span>: {
+		<span class="hljs-string">"name"</span>: <span class="hljs-string">"John"</span>
 	},
-	&quot;she&quot;: {
-		&quot;name&quot;: &quot;Jane&quot;
+	<span class="hljs-string">"she"</span>: {
+		<span class="hljs-string">"name"</span>: <span class="hljs-string">"Jane"</span>
 	}
 }));</code></pre>
 
 <p>使うテンプレート・ファイルは、<code>template.hbs</code></p>
 
-<pre><code class="language-handlebars">{{#he}}His name is {{include &quot;./include.hbs&quot;}}{{/he}}
-{{#she}}His girlfriend name is {{include &quot;./include.hbs&quot;}}{{/she}}</code></pre>
+<pre><code class="hljs language-handlebars"><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="xml">His name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="xml">His girlfriend name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span></code></pre>
 
 <p>と、<code>include.hbs</code></p>
 
-<pre><code class="language-handlebars">{{name}}</code></pre>
+<pre><code class="hljs language-handlebars"><span class="hljs-template-variable">{{name}}</span></code></pre>
 
 <p>の2つ。実行すると結果はこうなる。</p>
 
@@ -135,20 +128,13 @@ His girlfriend name is Jane</samp></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

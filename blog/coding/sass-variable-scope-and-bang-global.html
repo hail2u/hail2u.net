@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/sass-variable-scope-and-bang-global.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。" itemprop="description">
 		
@@ -74,28 +67,28 @@
 
 <p>Sassではローカル・コンテキストでグローバル変数を上書きでき、そのスコープを抜けてもそのままになる。</p>
 
-<pre><code class="language-scss">$color: #f00;
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color</span>: <span class="hljs-number">#f00</span>;
 
-.test-local {
-	$color: #0f0;
-	color: $color; // #0f0
+<span class="hljs-selector-class">.test-local</span> {
+	<span class="hljs-variable">$color</span>: <span class="hljs-number">#0f0</span>;
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #0f0</span>
 }
 
-.test-global {
-	color: $color; // #0f0
+<span class="hljs-selector-class">.test-global</span> {
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #0f0</span>
 }</code></pre>
 
 <p>対してLESSでは上書きされない。</p>
 
-<pre><code class="language-less">@color: #f00;
+<pre><code class="hljs language-less"><span class="hljs-variable">@color:</span> <span class="hljs-number">#f00</span>;
 
-.test-local {
-	@color: #0f0;
-	color: @var; // #0f0
+<span class="hljs-selector-class">.test-local</span> {
+	<span class="hljs-variable">@color:</span> <span class="hljs-number">#0f0</span>;
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">@var</span>; <span class="hljs-comment">// #0f0</span>
 }
 
-.test-global {
-	color: @color; // #f00 yay!
+<span class="hljs-selector-class">.test-global</span> {
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">@color</span>; <span class="hljs-comment">// #f00 yay!</span>
 }</code></pre>
 
 <p>Sass 3.3では<a href="https://github.com/nex3/sass/blob/bd8d8db2eb2ec57b1ef851816a95ef23e68abbe9/doc-src/SASS_CHANGELOG.md#backwards-incompatibilities----must-read#">グローバル変数をローカル・コンテキストで変更しようとした時に警告（Backwards Incompatibilitiesの12個目の項目を参照）</a>が出るようになった。具体的には以下のような警告メッセージをSassコンパイラが吐く。</p>
@@ -109,28 +102,28 @@ Note that this will be incompatible with Sass 3.2.</samp></pre>
 
 <p>この警告を出さないようにするには<code>!global</code>フラグを使う。</p>
 
-<pre><code class="language-scss">$color: #f00;
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color</span>: <span class="hljs-number">#f00</span>;
 
-.test-local {
-	$color: #0f0 !global;
-	color: $color; // #0f0
+<span class="hljs-selector-class">.test-local</span> {
+	<span class="hljs-variable">$color</span>: <span class="hljs-number">#0f0</span> !global;
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #0f0</span>
 }
 
-.test-global {
-	color: $color; // #0f0
+<span class="hljs-selector-class">.test-global</span> {
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #0f0</span>
 }</code></pre>
 
 <p>警告が出るのみで、そのメッセージの通り実際にはまだ挙動は変わらない。しかし、将来的にはローカル変数を新しく作成する（this wil create a new local variable)と書かれているので、挙動はLESSと同じになるのだろう。</p>
 
-<pre><code class="language-scss">$color: #f00;
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color</span>: <span class="hljs-number">#f00</span>;
 
-.test-local {
-	$color: #0f0;
-	color: $color; // #0f0
+<span class="hljs-selector-class">.test-local</span> {
+	<span class="hljs-variable">$color</span>: <span class="hljs-number">#0f0</span>;
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #0f0</span>
 }
 
-.test-global {
-	color: $color; // #f00 gotcha!
+<span class="hljs-selector-class">.test-global</span> {
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color</span>; <span class="hljs-comment">// #f00 gotcha!</span>
 }</code></pre>
 
 <p>つまり<code>!global</code>フラグを使うことにより<em>今までの挙動を維持したまま警告は出なくなるが、それは一時しのぎに過ぎない</em>ということだ。そこそこ大きな互換性のない変更なので、その「一時」はかなり長い間ではありそうだが。元々ローカル・コンテキストでグローバル変数を上書きするのは、そのルールセットの順番を変えるだけで破綻するようなあまり行儀の良い書き方ではないので、なるべくなら仕様の変更を見据えて書き直した方が良いだろう。</p>
@@ -157,20 +150,13 @@ Note that this will be incompatible with Sass 3.2.</samp></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

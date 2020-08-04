@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/include_blog_entries_title_among_foaf.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="なんとなく気が向いたので、XSLを利用して、FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="なんとなく気が向いたので、XSLを利用して、FOAFをブラウザで表示する時にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。" itemprop="description">
 		
@@ -72,18 +65,18 @@
 	<div itemprop="articleBody">
 		<p>なんとなく気が向いたので、XSLを利用して、FOAF<ins>をブラウザで表示する時</ins>にblogのエントリのタイトル一覧を埋め込んでみる。IE6やFirefoxではうまい具合に表示されました。RSS 1.0のファイル名が決め打ちなのがイタダケナイ。</p>
 <p>他のXMLファイルの要素を参照するには、<code>document</code>関数に続けて、ルートから要素を辿ってやれば良いという話に気づいた後は簡単でした。当該処理は、foaf.xslではこんな感じになっています。</p>
-<pre><code class="language-xsl">&lt;ul&gt;
-	&lt;xsl:for-each select=&quot;document(&apos;../blog/index.rdf&apos;)/rdf:RDF/rss:item&quot;&gt;
-		&lt;li&gt;
-			&lt;a&gt;
-				&lt;xsl:attribute name=&quot;href&quot;&gt;
-					&lt;xsl:value-of select=&quot;rss:link&quot;/&gt;
-				&lt;/xsl:attribute&gt;
-				&lt;xsl:value-of select=&quot;rss:title&quot;/&gt;
-			&lt;/a&gt;
-		&lt;/li&gt;
-	&lt;/xsl:for-each&gt;
-&lt;/ul&gt;</code></pre>
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:for-each</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"document('../blog/index.rdf')/rdf:RDF/rss:item"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">a</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:attribute</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"href"</span>&gt;</span>
+					<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"rss:link"</span>/&gt;</span>
+				<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:attribute</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"rss:title"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:for-each</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></code></pre>
 <p>foaf.xslにはRSSのnamespaceも追加する必要があります。</p>
 <p>FOAFはSNSの切り札になるかと思ったら、実装しないSNSばっかりなので再び忘れかけられているような感じ？いや、知らんけど。<a href="http://mixi.jp/" title="ソーシャル・ネットワーキングサイト [mixi(ミクシィ）]">mixi</a>なんかは実装されている機能のほとんどがFOAFで表現できそうなので、バックアップとかそういう用途をメインとして、FOAFで設定のインポート・エクスポートを実装してくれたりすれば面白いんじゃないかなとか。それならmixiに参加していない人もつながれるし。そして、mixiに参加していない人が<code>knows</code>にあるFOAFファイルをインポートしたら、未参加の方に招待状を一斉送信とか。ダメですか？</p>
 <p>てかmixiにいます！友達6人しかいねー。いや、決して友達にしてくださいとかそういう訳では・・・ありますが。blosxomとかななみちゃんコミュニティ辺りから探してくれると見つかりやすいかも。ニックネームはkyoです（まんま）。写真さっさとアップしようか・・・。ハーヴェイ・カイテルのようなので、ストーキングされたりしたら怖いなとか思ってアップロードしてなかったんですが。</p>
@@ -105,20 +98,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

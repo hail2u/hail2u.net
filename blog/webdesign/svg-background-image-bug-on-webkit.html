@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/webdesign/svg-background-image-bug-on-webkit.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="SVGはそのリサイズ（スケーリング）においてブラウザ間で差異やバグがあります。有名なのはviewBoxがないことによるIE9やWebKitでのバグでしょうか。それでもimg要素等でSVGを使う場合はSVG側でwidthとheightそしてviewBox属性を指定し、CSSなどでリサイズすれば大体問題ありません。なので背景画像で使う場合もbackground-sizeプロパティーを使えば……と思いきや、なかなかの落とし穴がありました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="SVGはそのリサイズ（スケーリング）においてブラウザ間で差異やバグがあります。有名なのはviewBoxがないことによるIE9やWebKitでのバグでしょうか。それでもimg要素等でSVGを使う場合はSVG側でwidthとheightそしてviewBox属性を指定し、CSSなどでリサイズすれば大体問題ありません。なので背景画像で使う場合もbackground-sizeプロパティーを使えば……と思いきや、なかなかの落とし穴がありました。" itemprop="description">
 		
@@ -79,8 +72,8 @@
 <section>
 <h2><code>background-size</code>プロパティー</h2>
 
-<pre><code class="language-css">.arrow {
-	background-size: 100% 100%;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.arrow</span> {
+	<span class="hljs-attribute">background-size</span>: <span class="hljs-number">100%</span> <span class="hljs-number">100%</span>;
 }</code></pre>
 
 <p>まずは背景画像のサイズを指定する<code>background-size</code>プロパティーを使用してみました。するとどうやらSVGをラスタライズしてからリサイズするようで、デモを見ればわかるようにぼやけます。ここでは<code>%</code>を使っていますが、<code>px</code>指定でのリサイズでも同じくぼやけます。</p>
@@ -91,10 +84,10 @@
 <section>
 <h2>SVGの<code>width</code>と<code>height</code>属性で<code>100%</code></h2>
 
-<pre><code class="language-xml">&lt;svg
-	viewBox="0 0 64 64"
+<pre><code class="hljs language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 64 64"</span>
 
- &gt;</code></pre>
+ &gt;</span></code></pre>
 
 <p>CSSでのリサイズはラスタライズされてからになってしまうということだと思うので、今度はSVGのルート要素の<code>width</code>と<code>height</code>属性で<code>100%</code>を指定してリサイズさせてみました。今度はうまくいった……と思ったんですが、同じSVG画像を更に使用した場合に片一方のリサイズ結果に引きずられてしまうという現象が起こりました。デモのように左の<code>64px</code>へのリサイズ結果が<code>128px</code>へのリサイズへ影響してしまうということです。場合によっては<code>128px</code>の方が成功して、<code>64px</code>の方が失敗するなどひどく挙動不審です。</p>
 </section>
@@ -102,16 +95,16 @@
 <section>
 <h2><code>::before</code>擬似要素で！</h2>
 
-<pre><code class="language-css">.arrow {
-	width: 256px;
-	height: 256px;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.arrow</span> {
+	<span class="hljs-attribute">width</span>: <span class="hljs-number">256px</span>;
+	<span class="hljs-attribute">height</span>: <span class="hljs-number">256px</span>;
 }
 
-.arrow::before {
-	display: block;
-	width: 100%;
-	height: 100%;
-	content: url("arrow.svg");
+<span class="hljs-selector-class">.arrow</span><span class="hljs-selector-pseudo">::before</span> {
+	<span class="hljs-attribute">display</span>: block;
+	<span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+	<span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">"arrow.svg"</span>);
 }</code></pre>
 
 <p>結局のところ背景画像で使う以上どうにもならなそうな気がしたので、目先を変えて<code>::before</code>擬似要素の<code>content</code>プロパティーでSVGを指定するという方法を試したところすんなりうまく行きました。WebKit以外でも問題ありません。</p>
@@ -121,20 +114,20 @@
 
 <p>というわけでこのサイトの<a href="https://github.com/hail2u/hail2u.net-styles/commit/0c7bcf6a8514d4711edbc3bd804c2d99aaba1d96">ページング・ナビゲーションをSVGにしました</a>。デモ・ページにも載っていますが矢印は以下のような単純なものです。</p>
 
-<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;svg id="left-arrow"
-	viewBox="0 0 64 64"
-	version="1.1"
-	xmlns="http://www.w3.org/2000/svg"&gt;
-	&lt;g transform="translate(32), rotate(-45, 32, 32)"&gt;
-		&lt;g fill="none"
-			stroke="#fff"
-			stroke-width="8"&gt;
-			&lt;line x1="0" y1="4" x2="24" y2="4"/&gt;
-			&lt;line x1="4" y1="0" x2="4" y2="24"/&gt;
-		&lt;/g&gt;
-	&lt;/g&gt;
-&lt;/svg&gt;</code></pre>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"left-arrow"</span>
+	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 64 64"</span>
+	<span class="hljs-attr">version</span>=<span class="hljs-string">"1.1"</span>
+	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2000/svg"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">g</span> <span class="hljs-attr">transform</span>=<span class="hljs-string">"translate(32), rotate(-45, 32, 32)"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">g</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">"none"</span>
+			<span class="hljs-attr">stroke</span>=<span class="hljs-string">"#fff"</span>
+			<span class="hljs-attr">stroke-width</span>=<span class="hljs-string">"8"</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">"0"</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">"24"</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">"4"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">"0"</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">"4"</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">"24"</span>/&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">g</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">g</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span></code></pre>
 
 <p>パスで書く必要もなさそうだったので、適当に線を組み合わせてカギ型にし、それを<code>transform</code>属性で移動（<code>translate</code>）と回転（<code>rotate</code>）を使ってシンプルなページング向けの矢印を作りました。</p>
 
@@ -160,20 +153,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

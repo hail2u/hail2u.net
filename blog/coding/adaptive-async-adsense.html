@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/adaptive-async-adsense.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Google Adsenseの広告コードでAsync版のBETAテストが始まった。広告表示時にページの読み込みをブロックしないというのが売りでそれ以上でもそれ以下でもなく、コードもそんなにスッキリするわけではないし、空要素さん……みたいな感じだけど、現行のものよりはこっちの方が良い。ということでこれを利用する場合に広告サイズの切り替えはどうするのが良いのか考えてるメモ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Google Adsenseの広告コードでAsync版のBETAテストが始まった。広告表示時にページの読み込みをブロックしないというのが売りでそれ以上でもそれ以下でもなく、コードもそんなにスッキリするわけではないし、空要素さん……みたいな感じだけど、現行のものよりはこっちの方が良い。ということでこれを利用する場合に広告サイズの切り替えはどうするのが良いのか考えてるメモ。" itemprop="description">
 		
@@ -74,28 +67,28 @@
 
 <p>コピペするコードはHTMLの<code>style</code>属性で広告のサイズを、<code>data-*</code>属性で広告スロットとかを指定してあり、そのまま再利用するのは難しい感じ。<code>document.write()</code>でも使えば話は別だけどそれはさすがにためらう。<code>innerHTML</code>でなら広告のコンテナーである<code>ins</code>要素の部分はほぼコピペでいけるけど、マークアップ増やす必要があるのでアレ。</p>
 
-<pre><code class="language-html">&lt;ins class="adsbygoogle"
-	id="adsense-main"
-	style="display:inline-block;width:300px;height:250px"
-	data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
-	data-ad-slot="xxxxxxxxxx"&gt;&lt;/ins&gt;
-&lt;script&gt;
-	(adsbygoogle = window.adsbygoogle || []).push({});
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">ins</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"adsbygoogle"</span>
+	<span class="hljs-attr">id</span>=<span class="hljs-string">"adsense-main"</span>
+	<span class="hljs-attr">style</span>=<span class="hljs-string">"display:inline-block;width:300px;height:250px"</span>
+	<span class="hljs-attr">data-ad-client</span>=<span class="hljs-string">"ca-pub-xxxxxxxxxxxxxxxx"</span>
+	<span class="hljs-attr">data-ad-slot</span>=<span class="hljs-string">"xxxxxxxxxx"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ins</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
+	(adsbygoogle = <span class="hljs-built_in">window</span>.adsbygoogle || []).push({});
 
-	(function (d) {
-		if (d.body.dataset) {
-			var p = d.getElementById('adsense-main');
-			var w = p.parentNode.clientWidth;
+	(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d</span>) </span>{
+		<span class="hljs-keyword">if</span> (d.body.dataset) {
+			<span class="hljs-keyword">var</span> p = d.getElementById(<span class="hljs-string">'adsense-main'</span>);
+			<span class="hljs-keyword">var</span> w = p.parentNode.clientWidth;
 
-			if (w &gt;= 728) {
-				p.style.width = '728px';
-				p.style.height = '90px';
-				p.dataset.adSlot = 'xxxxxxxxxx';
+			<span class="hljs-keyword">if</span> (w &gt;= <span class="hljs-number">728</span>) {
+				p.style.width = <span class="hljs-string">'728px'</span>;
+				p.style.height = <span class="hljs-string">'90px'</span>;
+				p.dataset.adSlot = <span class="hljs-string">'xxxxxxxxxx'</span>;
 			}
 		}
-	}(document));
-&lt;/script&gt;
-&lt;script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;</code></pre>
+	}(<span class="hljs-built_in">document</span>));
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">async</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 
 <ul>
 <li>なるべくデフォルトとする広告コードをいじらずにIDを振るだけに留める</li>
@@ -129,20 +122,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

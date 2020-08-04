@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/internet/designate_related_url_on_hatena_bookmark.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="みんな大好きなはてなブックマークには、関連URLという機能があります。が、現状では気が向いた人が人力で入力するという感じみたいです。これをブックマークされる側で指定できたら幸せなんじゃないかなとか。そうなれば、ある英語のサービスについての紹介とかいうエントリを書いた時にはそのサービスのURLとか、ある英語のページの翻訳を書いた場合は元のページのURLとかをブックマークのページに表示でき、ブックマークを漁って行動する人にはちょっと便利だったりしそうとか。ある本の感想を書いた時にアサマシURLを仕込んだりとかも出来そう（むしろこれがメイン）！" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="みんな大好きなはてなブックマークには、関連URLという機能があります。が、現状では気が向いた人が人力で入力するという感じみたいです。これをブックマークされる側で指定できたら幸せなんじゃないかなとか。そうなれば、ある英語のサービスについての紹介とかいうエントリを書いた時にはそのサービスのURLとか、ある英語のページの翻訳を書いた場合は元のページのURLとかをブックマークのページに表示でき、ブックマークを漁って行動する人にはちょっと便利だったりしそうとか。ある本の感想を書いた時にアサマシURLを仕込んだりとかも出来そう（むしろこれがメイン）！" itemprop="description">
 		
@@ -76,7 +69,7 @@
 <section>
 <h2>リンクに<code>rel=&quot;related&quot;</code></h2>
 <p>僕がまず初めに思いついた方法は<code>a</code>要素に<code>rel=&quot;related&quot;</code>と、「このリンクは関連したURLを参照しているよ」という意味付けをしてやる方法。例えば、<a href="/blog/internet/dodgeit.html" title="hail2u.net - Weblog - dodgeit">dodgeitというエントリ</a>では、<a href="http://www.dodgeit.com/" title="dodgeit - free. receive-only. email. no set up. rss.">dodgeit</a>というWeb上のサービスについて書いています。このエントリではもちろんdodgeitのサイトへのリンクを書いているので、そのリンクに<code>rel=&quot;related&quot;</code>を追加してやるということになります。具体的には、dodgeitのサイトへのリンクを、</p>
-<pre><code class="language-html">&lt;a rel=&quot;related&quot; href=&quot;http://www.dodgeit.com/&quot;&gt;dodgeit&lt;/a&gt;</code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"related"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"http://www.dodgeit.com/"</span>&gt;</span>dodgeit<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
 <p>と書くということです。はてなブックマーク側は<code>rel=&quot;related&quot;</code>を含むリンクを抜き出してやって関連URLとして登録してやるだけで、特に実装が難しいということは無いと思います。ブックマークされる側も多少タイプするだけなので簡単。</p>
 <p>実際には<a href="http://www.gmpg.org/xmdp/" title="XMDP - XHTML Meta Data Profiles">Xhtml Meta Data Profiles</a>などで<code>related</code>が意味するものを定義したプロファイルへの参照を<code>head</code>要素の<code>profile</code>属性を使って書くべきだったりとかいろいろありますが、まーそれはそれ（適当すぎ）として比較的手軽なアプローチなんじゃないかなと。</p>
 <p><code>link</code>要素に<code>rel=&quot;related&quot;</code>でももちろん構わないわけなんですが、そうなると多くの場合は結構凝った事をしないと実装できない気がするので、<code>a</code>要素に仕込む方が良さそう。</p>
@@ -84,12 +77,12 @@
 <section>
 <h2>RDFで！！！</h2>
 <p>次にIRCで<a href="http://antipop.gs/" title="antipop.gs">Windows大好きな人</a>とこの話をちょっと振ってみたら、「RDFでなうせまんてぃっく！」とか言われました（かなり捏造）。数十分、あーでもないこーでもないとやり取りした後、<a href="http://dublincore.org/documents/dces/" title="Dublin Core Metadata Element Set, Version 1.1: Reference Description">Dublin Core</a>の<code>relation</code>要素を利用した書き方が良さそうという結論になりました。具体的には上記と同じくdodgeitというエントリを例にとると、</p>
-<pre><code class="language-html">&lt;rdf:RDF xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
-	xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;&gt;
-		&lt;rdf:Description rdf:about=&quot;http://hail2u.net/blog/internet/dodgeit.html&quot;&gt;
-		&lt;dc:relation rdf:resource=&quot;http://www.dodgeit.com/&quot;/&gt;
-	&lt;/rdf:Description&gt;
-&lt;/rdf:RDF&gt;</code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">rdf:RDF</span> <span class="hljs-attr">xmlns:rdf</span>=<span class="hljs-string">"http://www.w3.org/1999/02/22-rdf-syntax-ns#"</span>
+	<span class="hljs-attr">xmlns:dc</span>=<span class="hljs-string">"http://purl.org/dc/elements/1.1/"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">rdf:Description</span> <span class="hljs-attr">rdf:about</span>=<span class="hljs-string">"http://hail2u.net/blog/internet/dodgeit.html"</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">dc:relation</span> <span class="hljs-attr">rdf:resource</span>=<span class="hljs-string">"http://www.dodgeit.com/"</span>/&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">rdf:Description</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">rdf:RDF</span>&gt;</span></code></pre>
 <p>こんな感じでしょうか（定かではない）。RDFを使った場合は、TrackBack Auto-discoveryやAccount Auto-discoveryなどと併せて記述することが出来、まさにページのメタ・データになり得ます（多分ね）。</p>
 <p>こちらの方ははてなブックマーク側の実装はともかく、ブックマークされる側はツールによる対応が必須だったりしそうでなかなか敷居が高いかも。blosxomでの実装を考えてみようとしたんですが、頭が痛くなったのでやめました。</p>
 </section>
@@ -97,7 +90,7 @@
 <p>いろいろな意味で前者の方が楽です。後者はそれならちゃんとそのページのメタ・データをきちんと定義すればいいんじゃないの云々とかいう感じ。世のしがらみとか考えると、どうもお手軽な前者をプッシュしたい感じ。</p>
 <p>実際には、ブックマークのページからのトラフィックが減る可能性があったりとかマイナスな面がなきにしもあらずなので、関連URLを指定したいと思う人がいるかどうかは謎です（大抵の場合はリンクを張っているわけだし）。</p>
 <p>以上の話とはあまり関係ないんですが、はてなブックマークのタグ（やキーワード）もブックマークされる側で制御（この場合は推薦に限定した方が良さそう）できたりすると面白いかも。こっちの場合は、<code>meta</code>要素を使って、</p>
-<pre><code class="language-html">&lt;meta name=&quot;keyword&quot; content=&quot;foo, bar, buzz&quot; /&gt;</code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"keyword"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"foo, bar, buzz"</span> /&gt;</span></code></pre>
 <p>とかで良さげ。これは既に実装されてたりはしそう。わかんないけど。</p>
 	</div>
 </article>
@@ -116,20 +109,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/internet/process_alt_ad_for_adsense_by_aws_2.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="AdSenseの代替広告をAWSでの続き。このエントリの追記で、ページ自体のランダム化はできたのですが、これでは各ページの最初のアイテムしか出てこないので、どうにかしてランダムの順位のアイテムを出そうといろいろいじってました。XSLファイル内ではどうにかできそうもないので、各順位を取り出すXSLファイルを10用意し（1ページに付き10アイテムなので）、AdSenseのJavaScriptコードの方でランダムにそれを呼んでやるという手段になりました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="AdSenseの代替広告をAWSでの続き。このエントリの追記で、ページ自体のランダム化はできたのですが、これでは各ページの最初のアイテムしか出てこないので、どうにかしてランダムの順位のアイテムを出そうといろいろいじってました。XSLファイル内ではどうにかできそうもないので、各順位を取り出すXSLファイルを10用意し（1ページに付き10アイテムなので）、AdSenseのJavaScriptコードの方でランダムにそれを呼んでやるという手段になりました。" itemprop="description">
 		
@@ -72,23 +65,23 @@
 	<div itemprop="articleBody">
 		<p><a href="/blog/internet/process_alt_ad_for_adsense_by_aws.html" title="hail2u.net - Weblog - AdSenseの代替広告をAWSで">AdSenseの代替広告をAWSで</a>の続き。このエントリの追記で、ページ自体のランダム化はできたのですが、これでは各ページの最初のアイテムしか出てこないので、どうにかしてランダムの順位のアイテムを出そうといろいろいじってました。XSLファイル内ではどうにかできそうもないので、各順位を取り出すXSLファイルを10用意し（1ページに付き10アイテムなので）、<a href="https://www.google.com/adsense/" title="Google AdSense">AdSense</a>のJavaScriptコードの方でランダムにそれを呼んでやるという手段になりました。</p>
 <p>まずは1.xsl～10.xslというXSLファイルを作ります。内容は特に凝ったものではなく、4.xslなら、</p>
-<pre><code class="language-xsl">&lt;xsl:for-each select=&quot;ProductInfo/Details&quot;&gt;
-	&lt;xsl:if test=&quot;position() = 4&quot;&gt;
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:for-each</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"ProductInfo/Details"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:if</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"position() = 4"</span>&gt;</span>
 		...
-	&lt;/xsl:if&gt;
-&lt;/xsl:for-each&gt;</code></pre>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:if</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:for-each</span>&gt;</span></code></pre>
 <p>というように4番目の<code>Details</code>のみから出力してるだけ。他はAWSのXSL変換サービスでAdSenseライクに整形するためのXSLとほとんど同じ。</p>
 <p>そしてAdSenseのJavaScriptコードの方で、1.xsl～10.xslのXSLファイルをランダムに呼んでやると。</p>
-<pre><code class="language-js">var google_alternate_ad_url = &quot;http://xml.amazon.co.jp/onca/xml3&quot;;
-google_alternate_ad_url += &quot;?t=hail2unet-22&quot;;
-google_alternate_ad_url += &quot;&amp;dev-t=XXXXXXXXXXXXXX&quot;;
-google_alternate_ad_url += &quot;&amp;mode=music-jp&quot;;
-google_alternate_ad_url += &quot;&amp;type=lite&quot;;
-google_alternate_ad_url += &quot;&amp;f=http%3A%2F%2Fhail2u.net%2Fstyles%2Faws%2F&quot;;
-google_alternate_ad_url += Math.ceil(Math.random() * 10) + &quot;.xsl&quot;;
-google_alternate_ad_url += &quot;&amp;page=&quot; + Math.ceil(Math.random() * 5);
-google_alternate_ad_url += &quot;&amp;locale=jp&quot;;
-google_alternate_ad_url += &quot;&amp;BrowseNodeSearch=564624&quot;;</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> google_alternate_ad_url = <span class="hljs-string">"http://xml.amazon.co.jp/onca/xml3"</span>;
+google_alternate_ad_url += <span class="hljs-string">"?t=hail2unet-22"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;dev-t=XXXXXXXXXXXXXX"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;mode=music-jp"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;type=lite"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;f=http%3A%2F%2Fhail2u.net%2Fstyles%2Faws%2F"</span>;
+google_alternate_ad_url += <span class="hljs-built_in">Math</span>.ceil(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">10</span>) + <span class="hljs-string">".xsl"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;page="</span> + <span class="hljs-built_in">Math</span>.ceil(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">5</span>);
+google_alternate_ad_url += <span class="hljs-string">"&amp;locale=jp"</span>;
+google_alternate_ad_url += <span class="hljs-string">"&amp;BrowseNodeSearch=564624"</span>;</code></pre>
 <p>これで<a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=tg/browse/-/564624/" title="Amazon.co.jp：ミュージック / 輸入盤">輸入盤ストア</a>のベストセラー50位までのアイテムからランダムに拾えます（多分）。</p>
 <p>てか、クリック数はそこそこなんだけど、まったく売れないすね。ま、公共広告がダサいのでこんなもの作っているだけなんですが。</p>
 	</div>
@@ -108,20 +101,13 @@ google_alternate_ad_url += &quot;&amp;BrowseNodeSearch=564624&quot;;</code></pre
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

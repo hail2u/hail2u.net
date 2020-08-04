@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/webdesign/color-management-in-sass.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Sassでは色を変数として定義でき、また様々な関数でそれを操作することが可能になっている。そのため色を論理的に管理することが可能になっているが、これといった手法が確立されているわけではない。このウェブサイトでは少しややこしい形で管理するようにしている。どういう目的でこういう複雑な構造になっているのかを簡単に書いておきたい。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Sassでは色を変数として定義でき、また様々な関数でそれを操作することが可能になっている。そのため色を論理的に管理することが可能になっているが、これといった手法が確立されているわけではない。このウェブサイトでは少しややこしい形で管理するようにしている。どういう目的でこういう複雑な構造になっているのかを簡単に書いておきたい。" itemprop="description">
 		
@@ -77,16 +70,16 @@
 
 <p>基本色、つまりテーマカラーであったり、本文の背景色や文字色といった見た目のイメージを決定する色は、色コードを直接指定して定義する必要がある。これはほぼ間違いなくみんな同じように書いているだろう。</p>
 
-<pre><code class="language-scss">$color-dark: rgb(60, 51, 48);
-$color-light: rgb(252, 249, 240);
-$color-accent: rgb(17, 136, 187);</code></pre>
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color-dark</span>: rgb(<span class="hljs-number">60</span>, <span class="hljs-number">51</span>, <span class="hljs-number">48</span>);
+<span class="hljs-variable">$color-light</span>: rgb(<span class="hljs-number">252</span>, <span class="hljs-number">249</span>, <span class="hljs-number">240</span>);
+<span class="hljs-variable">$color-accent</span>: rgb(<span class="hljs-number">17</span>, <span class="hljs-number">136</span>, <span class="hljs-number">187</span>);</code></pre>
 
 <p>これらは背景色であったり文字色、そしてリンクの文字色として使っているが、まずは<em>その色がどのようなタイプの色か</em>を直接表した変数名で定義している。ここで変数名の実際に利用されるコンテキストにおけるセマンティクスを重視しないのは、色を大きく変更した時にそのまま機能しないからだ。</p>
 
 <p>これらの色は後々混ぜたり、明るくしたり、暗くしたり、と様々な変形を加える事になるわけだが、そういった変形はその色（特に明度）に依存することが多い。例えば以下のように基本色とその変形を定義したとしよう。</p>
 
-<pre><code class="language-scss">$color-bg: rgb(238, 238, 238);
-$color-bg_quote: darken($color-bg, 10%);</code></pre>
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color-bg</span>: rgb(<span class="hljs-number">238</span>, <span class="hljs-number">238</span>, <span class="hljs-number">238</span>);
+<span class="hljs-variable">$color-bg_quote</span>: darken(<span class="hljs-variable">$color-bg</span>, <span class="hljs-number">10%</span>);</code></pre>
 
 <p>引用ブロックの背景色を少し暗くするというものだ。この時点ではもちろん機能するが、仮に<code>$color-bg</code>をもっと暗い色にした場合、引用ブロックの背景色は意図したような違いを得ることはできなくなるだろう。元々を明るい色や暗い色と定義しておくと、このような問題は起きにくい。</p>
 </section>
@@ -98,20 +91,20 @@ $color-bg_quote: darken($color-bg, 10%);</code></pre>
 
 <p>例えば先程の引用ブロックの背景色の例を考えてみよう。</p>
 
-<pre><code class="language-scss">$color-light: rgb(238, 238, 238);
-$color-bg_quote: darken($color-light, 10%);</code></pre>
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color-light</span>: rgb(<span class="hljs-number">238</span>, <span class="hljs-number">238</span>, <span class="hljs-number">238</span>);
+<span class="hljs-variable">$color-bg_quote</span>: darken(<span class="hljs-variable">$color-light</span>, <span class="hljs-number">10%</span>);</code></pre>
 
 <p>単純に基本色を使うとこうなるだろう。<code>$color-light</code>の調節に連動して引用ブロックの背景色も変化する。しかしこれでは再利用性に欠ける。この10%暗くした色を引用ブロック以外でも使うことはあるだろうが、その変数名を考えると使いづらいものになる。あらかじめバリエーションを定義しておき、それを参照するような形にすると再利用性が向上する。</p>
 
-<pre><code class="language-scss">$color-light: rgb(238, 238, 238);
-$color-tint--light: darken($color-light, 10%);
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color-light</span>: rgb(<span class="hljs-number">238</span>, <span class="hljs-number">238</span>, <span class="hljs-number">238</span>);
+<span class="hljs-variable">$color-tint--light</span>: darken(<span class="hljs-variable">$color-light</span>, <span class="hljs-number">10%</span>);
 
-blockquote {
-	background-color: $color-tint--light;
+<span class="hljs-selector-tag">blockquote</span> {
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$color-tint--light</span>;
 }
 
-.foo {
-	background-color: $color-tint--light;
+<span class="hljs-selector-class">.foo</span> {
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$color-tint--light</span>;
 }</code></pre>
 
 <p>別の方向から見ると<code>blockquote</code>や<code>.foo</code>の色を扱うプロパティーで、基本色を変形させる関数などを直接使わないようにするということだ。こうすることによって関数を読み解くことなく色を把握することが可能になり、その色は全体の見た目の中でどのような振る舞いをする色なのかを表現することが出来る。後者の色の振る舞いに関しては、上記例のようにBEMを流用した強力な命名規則も合わせて必要になってくる。</p>
@@ -122,34 +115,34 @@ blockquote {
 
 <p>基本色とそのバリエーションはセマンティクス（CSSを適用する文書におけるそれ）を無視した形で定義してきた。それらの変数の参照は簡単なものだが、Sassではウィジェットごとに分割して開発を行うことが多いので、色の管理が散らばってしまうことにもなる。色の管理を単独のファイルに集約させるためにはセマンティクスを重視した変数名を更に作ってやる必要があるだろう。</p>
 
-<pre><code class="language-scss">$color-light: rgb(238, 238, 238);
-$color-accent: rgb(17, 136, 187);
+<pre><code class="hljs language-scss"><span class="hljs-variable">$color-light</span>: rgb(<span class="hljs-number">238</span>, <span class="hljs-number">238</span>, <span class="hljs-number">238</span>);
+<span class="hljs-variable">$color-accent</span>: rgb(<span class="hljs-number">17</span>, <span class="hljs-number">136</span>, <span class="hljs-number">187</span>);
 
-$color-tint--light: darken($color-light, 10%);
+<span class="hljs-variable">$color-tint--light</span>: darken(<span class="hljs-variable">$color-light</span>, <span class="hljs-number">10%</span>);
 
-$color-fg_link: $color-accent;
-$color-fg_link--hover: $color-light;
-$color-bg_link--hover: $color-accent;
-$color-bg_blockquote: $color-tint--light;
-$color-bg_foo: $color-tint--light;</code></pre>
+<span class="hljs-variable">$color-fg_link</span>: <span class="hljs-variable">$color-accent</span>;
+<span class="hljs-variable">$color-fg_link--hover</span>: <span class="hljs-variable">$color-light</span>;
+<span class="hljs-variable">$color-bg_link--hover</span>: <span class="hljs-variable">$color-accent</span>;
+<span class="hljs-variable">$color-bg_blockquote</span>: <span class="hljs-variable">$color-tint--light</span>;
+<span class="hljs-variable">$color-bg_foo</span>: <span class="hljs-variable">$color-tint--light</span>;</code></pre>
 
 <p>以降で基本色とそのバリエーションを使うことがないように、利用される要素やクラス名を流用した変数名で再定義するという形になる。ここではBEMを使って定義したが、明確なルールがあるならなんでも良い。</p>
 
-<pre><code class="language-scss">a {
-	color: $color-fg_link;
+<pre><code class="hljs language-scss"><span class="hljs-selector-tag">a</span> {
+	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color-fg_link</span>;
 
-	&amp;:hover {
-		color: $color-fg_link--hover;
-		background-color: $color-bg_link--hover;
+	&amp;<span class="hljs-selector-pseudo">:hover</span> {
+		<span class="hljs-attribute">color</span>: <span class="hljs-variable">$color-fg_link--hover</span>;
+		<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$color-bg_link--hover</span>;
 	}
 }
 
-blockquote {
-	background-color: $color-bg_blockquote;
+<span class="hljs-selector-tag">blockquote</span> {
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$color-bg_blockquote</span>;
 }
 
-.foo {
-	background-color: $color-bg_foo;
+<span class="hljs-selector-class">.foo</span> {
+	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$color-bg_foo</span>;
 }</code></pre>
 
 <p>実際にはこれらのルールはそれぞれのSCSSファイルで書かれることになるが、このように明確な命名規則に基づいた変数を参照するように書くだけで良い。明確なルール付けに基づいた変数名なので、これらのルールセットを書く時には色の定義はおろかその存在や実際にどのような色なのかを考える必要はまったくない。ルールセットが完成したら改めて色定義を行っているSCSSファイルに色定義を追加する、というように色の管理を一元化することが可能になるわけだ。</p>
@@ -177,20 +170,13 @@ blockquote {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

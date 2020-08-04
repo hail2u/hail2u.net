@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/json2xml-in-javascript.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="多くのウェブサービスで提供されるJSONデータは改行もインデントもなく読みづらい。PipesとかPipesとかPipesとか。Big SkyではGUIツールを作っていたけど、単にデータの構造を把握したいだけとかならXMLに変換してブラウザで見るのでも良いと思う。今まではその変換を適当なPerlスクリプトでやってたが、JavaScriptだけで出来そうな気がしたのでとりあえず作ってみた。そこそこ使えそう。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="多くのウェブサービスで提供されるJSONデータは改行もインデントもなく読みづらい。PipesとかPipesとかPipesとか。Big SkyではGUIツールを作っていたけど、単にデータの構造を把握したいだけとかならXMLに変換してブラウザで見るのでも良いと思う。今まではその変換を適当なPerlスクリプトでやってたが、JavaScriptだけで出来そうな気がしたのでとりあえず作ってみた。そこそこ使えそう。" itemprop="description">
 		
@@ -74,30 +67,30 @@
 
 <p>コアになるコードは20行ほどの再帰的に呼ばれる関数だけ。</p>
 
-<pre><code class="language-js">function JSONtoXML (obj, depth) {
-	var result = &quot;&quot;, indent = &quot;&quot;;
+<pre><code class="hljs language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">JSONtoXML</span> (<span class="hljs-params">obj, depth</span>) </span>{
+	<span class="hljs-keyword">var</span> result = <span class="hljs-string">""</span>, indent = <span class="hljs-string">""</span>;
 
-	for (var i = 0; i &lt; depth; i++) {
-		indent += &quot;  &quot;;
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; depth; i++) {
+		indent += <span class="hljs-string">"  "</span>;
 	}
 
-	for (var key in obj) {
-		var name = key;
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> obj) {
+		<span class="hljs-keyword">var</span> name = key;
 
-		if (key.match(/^\d+$/)) name = &quot;item&quot;;
+		<span class="hljs-keyword">if</span> (key.match(<span class="hljs-regexp">/^\d+$/</span>)) name = <span class="hljs-string">"item"</span>;
 
-		if (typeof(obj[key]) == &quot;object&quot;) {
-			result += indent + &quot;&lt;&quot; + name + &quot;&gt;\n&quot;;
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span>(obj[key]) == <span class="hljs-string">"object"</span>) {
+			result += indent + <span class="hljs-string">"&lt;"</span> + name + <span class="hljs-string">"&gt;\n"</span>;
 			depth++;
 			result += JSONtoXML(obj[key], depth);
 			depth--;
-			result += indent + &quot;&lt;/&quot; + name + &quot;&gt;\n&quot;;
-		} else {
-			result += indent + &quot;&lt;&quot; + name + &quot;&gt;&quot; + encodeEntities(obj[key]) + &quot;&lt;/&quot; + name + &quot;&gt;\n&quot;;
+			result += indent + <span class="hljs-string">"&lt;/"</span> + name + <span class="hljs-string">"&gt;\n"</span>;
+		} <span class="hljs-keyword">else</span> {
+			result += indent + <span class="hljs-string">"&lt;"</span> + name + <span class="hljs-string">"&gt;"</span> + encodeEntities(obj[key]) + <span class="hljs-string">"&lt;/"</span> + name + <span class="hljs-string">"&gt;\n"</span>;
 		}
 	}
 
-	return result;
+	<span class="hljs-keyword">return</span> result;
 }</code></pre>
 
 <p>結果をインデントしないならもっと短くなる（インデントは趣味）。JSONデータ内に配列がある場合は<code>item</code>という要素にして並べるので、<code>item</code>という文字列のキーを持つJSONとかではきっとややこしいことになる（arrayとかに変えたほうが良さそうだ）。上記URLのではこの返り値をダミーの<code>root</code>という要素でくくって、XML宣言を付け出力を作っている。ダミーの要素を追加する理由は、いきなり配列で始まるJSONデータでおかしなことになることへの対策。</p>
@@ -126,20 +119,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

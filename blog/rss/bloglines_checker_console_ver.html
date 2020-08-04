@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/rss/bloglines_checker_console_ver.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Bloglinesの未読記事数を得る方法をずいぶん前に発見したのですが、Windows版のNotifierの使い勝手が良いので、特にこれを利用して何かをやろうとは思わなかったんですよね。なんとなく気が向いたので、方法の公開と共に簡単なPerlスクリプトを組んでみました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Bloglinesの未読記事数を得る方法をずいぶん前に発見したのですが、Windows版のNotifierの使い勝手が良いので、特にこれを利用して何かをやろうとは思わなかったんですよね。なんとなく気が向いたので、方法の公開と共に簡単なPerlスクリプトを組んでみました。" itemprop="description">
 		
@@ -76,43 +69,43 @@
 <p>http://www.bloglines.com/update?user=&lt;登録したメール・アドレス&gt;</p>
 </blockquote>
 <p>というURLにアクセスするだけです。これで<samp>|17||</samp>などという一行が返ってくるので、これを適当にパースするだけ。</p>
-<pre><code class="language-perl">#!/usr/local/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
 
-use strict;
+<span class="hljs-keyword">use</span> strict;
 
-use LWP::Simple;
+<span class="hljs-keyword">use</span> LWP::Simple;
 
-my $email = shift;
-my $url = &quot;http://www.bloglines.com/update?user=$email&quot;;
+<span class="hljs-keyword">my</span> $email = <span class="hljs-keyword">shift</span>;
+<span class="hljs-keyword">my</span> $url = <span class="hljs-string">"http://www.bloglines.com/update?user=$email"</span>;
 
-if (is_success(mirror($url, &apos;cache.dat&apos;))) {
-	open (FH, &quot;&lt; cache.dat&quot;) or die &quot;Failed to open cache file.\n\n&quot;;
-	my $content = &lt;FH&gt;;
-	close(FH);
-	chomp($content);
+<span class="hljs-keyword">if</span> (is_success(mirror($url, <span class="hljs-string">'cache.dat'</span>))) {
+	<span class="hljs-keyword">open</span> (FH, <span class="hljs-string">"&lt; cache.dat"</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span> <span class="hljs-string">"Failed to open cache file.\n\n"</span>;
+	<span class="hljs-keyword">my</span> $content = &lt;FH&gt;;
+	<span class="hljs-keyword">close</span>(FH);
+	<span class="hljs-keyword">chomp</span>($content);
 
-	if ($content =~ m!^\|(.*?)\|(.*?)\|$!) {
-		my $count = $1;
+	<span class="hljs-keyword">if</span> ($content =~ <span class="hljs-keyword">m</span>!^\|(.*?)\|(.*?)\|$!) {
+		<span class="hljs-keyword">my</span> $count = $1;
 
-		if ($count &gt; 1) {
-			print &quot;You have $1 new items.\n\n&quot;;
+		<span class="hljs-keyword">if</span> ($count &gt; <span class="hljs-number">1</span>) {
+			<span class="hljs-keyword">print</span> <span class="hljs-string">"You have $1 new items.\n\n"</span>;
 		}
-		elsif ($count == 1) {
-			print &quot;You have 1 new item.\n\n&quot;;
+		<span class="hljs-keyword">elsif</span> ($count == <span class="hljs-number">1</span>) {
+			<span class="hljs-keyword">print</span> <span class="hljs-string">"You have 1 new item.\n\n"</span>;
 		}
-		else {
-			print &quot;You don&apos;t have new items.\n\n&quot;;
+		<span class="hljs-keyword">else</span> {
+			<span class="hljs-keyword">print</span> <span class="hljs-string">"You don't have new items.\n\n"</span>;
 		}
 	}
-	else {
-		print &quot;Failed to parse cache file.\n\n&quot;;
+	<span class="hljs-keyword">else</span> {
+		<span class="hljs-keyword">print</span> <span class="hljs-string">"Failed to parse cache file.\n\n"</span>;
 	}
 }
-else {
-	print &quot;Failed to mirror $url.\n\n&quot;;
+<span class="hljs-keyword">else</span> {
+	<span class="hljs-keyword">print</span> <span class="hljs-string">"Failed to mirror $url.\n\n"</span>;
 }
 
-exit;</code></pre>
+<span class="hljs-keyword">exit</span>;</code></pre>
 <p>簡単なPerlスクリプトはこんな感じ。新着記事があると標準出力に<samp>You have 17 new items.</samp>などと出力します。</p>
 <p>今はもう<a href="http://www.bloglines.com/notifier" title="Bloglines | New Entries">Web VersionのNotifier</a>でも新着記事数がチェックできるのであんまり意味は無いのですけど、Notifierアプリケーションの無いUnix系OSの場合は役に立つ知識かもしれません。いや別に「誰か作れよ」とか言っているわけではありません。</p>
 	</div>
@@ -132,20 +125,13 @@ exit;</code></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

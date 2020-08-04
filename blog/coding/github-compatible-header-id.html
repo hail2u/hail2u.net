@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/github-compatible-header-id.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="gfmtoc(mdtocから名前を変えた）を作っている時にGitHub flavored Markdown(本当はHTML Pipeline）互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="gfmtoc(mdtocから名前を変えた）を作っている時にGitHub flavored Markdown(本当はHTML Pipeline）互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" itemprop="description">
 		
@@ -83,24 +76,24 @@
 
 <p>つまりこれらを連結した正規表現パターンを作れば良い。まともにやったら日が暮れるので、Node.jsでは<a href="https://www.npmjs.com/package/unicode-7.0.0">unicode-7.0.0</a>と<a href="https://www.npmjs.com/package/regenerate">regenerate</a>の両パッケージを使って生成してやる。</p>
 
-<pre><code class="language-javascript">var regenerate = require(&apos;regenerate&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> regenerate = <span class="hljs-built_in">require</span>(<span class="hljs-string">'regenerate'</span>);
 
-var word = regenerate().add(
-	require(&apos;unicode-7.0.0/properties/Any/code-points&apos;)
+<span class="hljs-keyword">var</span> word = regenerate().add(
+	<span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/properties/Any/code-points'</span>)
 ).remove(
-	require(&apos;unicode-7.0.0/categories/L/code-points&apos;)
+	<span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/L/code-points'</span>)
 ).remove(
-	require(&apos;unicode-7.0.0/categories/M/code-points&apos;)
+	<span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/M/code-points'</span>)
 ).remove(
-	require(&apos;unicode-7.0.0/categories/N/code-points&apos;)
+	<span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/N/code-points'</span>)
 ).remove(
-	require(&apos;unicode-7.0.0/categories/Pc/code-points&apos;)
+	<span class="hljs-built_in">require</span>(<span class="hljs-string">'unicode-7.0.0/categories/Pc/code-points'</span>)
 ).remove(
-	&apos;-&apos;,
-	&apos; &apos;
+	<span class="hljs-string">'-'</span>,
+	<span class="hljs-string">' '</span>
 );
 
-console.log(word.toString());</code></pre>
+<span class="hljs-built_in">console</span>.log(word.toString());</code></pre>
 
 <p>ここでは否定形が欲しいので、Anyプロパティーを<code>add()</code>してから上記カテゴリーを<code>remove()</code>していく。最終的には特別視される<code>-</code>と<code> </code>もここでついでに削除しておく。gfmtocでは<a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js">生成結果をファイルに保存したもの</a>をライブラリとして使っている。普通はそのまま書けば良い（毎回動的に生成させるととても遅いことには注意が必要）。あとはHTML Pipelineがやっていることをなぞるのみだ。</p>
 
@@ -113,26 +106,26 @@ console.log(word.toString());</code></pre>
 
 <p>HTML Pipelineではこのような<a href="https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb">生成手順</a>になっているようだ。</p>
 
-<pre><code class="language-javascript">var h = {};
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> h = {};
 
-function genID(s, h) {
-	var u = &apos;&apos;;
-	var word = /.../g;
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">genID</span>(<span class="hljs-params">s, h</span>) </span>{
+	<span class="hljs-keyword">var</span> u = <span class="hljs-string">''</span>;
+	<span class="hljs-keyword">var</span> word = <span class="hljs-regexp">/.../g</span>;
 	s = s.toLowerCase();
-	s = s.replace(word, &apos;&apos;);
-	s = s.replace(/ /g, &apos;-&apos;);
+	s = s.replace(word, <span class="hljs-string">''</span>);
+	s = s.replace(<span class="hljs-regexp">/ /g</span>, <span class="hljs-string">'-'</span>);
 
-	if (h[s] &gt; 0) {
-		u = &apos;-&apos; + h[s];
+	<span class="hljs-keyword">if</span> (h[s] &gt; <span class="hljs-number">0</span>) {
+		u = <span class="hljs-string">'-'</span> + h[s];
 	}
 
-	if (!h[s]) {
-		h[s] = 0;
+	<span class="hljs-keyword">if</span> (!h[s]) {
+		h[s] = <span class="hljs-number">0</span>;
 	}
 
-	h[s] += 1;
+	h[s] += <span class="hljs-number">1</span>;
 
-	return s + u;
+	<span class="hljs-keyword">return</span> s + u;
 }</code></pre>
 
 <p>確認した限りではうまくいっているようだ。<code>id</code>属性の値として使う場合はこのままで問題ないが、<code>href</code>属性の値として使う場合は<code>encodeURIComponent()</code>でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。</p>
@@ -153,20 +146,13 @@ function genID(s, h) {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

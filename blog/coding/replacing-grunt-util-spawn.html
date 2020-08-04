@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/replacing-grunt-util-spawn.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Gruntのタスクで実行ファイルなど別プロセスを立ちあげたい場合、通常はうまくラップされたgrunt.util.spawn()を使う。今のところ非推奨というわけではないが、最近の感じだと別パッケージを利用すれば簡単にリプレースできるものはなるべくリプレースした方が良い。例えばgrunt.file.write()はfs-extraパッケージが良い。grunt.util.spawn()はというとio.jsかNode.jsのUnstableが入っている環境ならばspawnSync()とwhich.sync()を組み合わせてリプレースすると良さそうだ。" itemprop="description">
 		
@@ -74,17 +67,17 @@
 
 <p>別プロセスを立ち上げる辺りはだいたい以下のような形になっていることと思う。</p>
 
-<pre><code class="language-javascript">var done = this.async();
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> done = <span class="hljs-keyword">this</span>.async();
 
 grunt.util.spawn({
-	cmd: &apos;foo&apos;,
-	args: [&apos;--bar&apos;],
-	opts: {
-		stdio: &apos;inherit&apos;
+	<span class="hljs-attr">cmd</span>: <span class="hljs-string">'foo'</span>,
+	<span class="hljs-attr">args</span>: [<span class="hljs-string">'--bar'</span>],
+	<span class="hljs-attr">opts</span>: {
+		<span class="hljs-attr">stdio</span>: <span class="hljs-string">'inherit'</span>
 	}
-}, function (error, result, code) {
-	if (error) {
-		return done(error);
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, result, code</span>) </span>{
+	<span class="hljs-keyword">if</span> (error) {
+		<span class="hljs-keyword">return</span> done(error);
 	}
 
 	done();
@@ -92,13 +85,13 @@ grunt.util.spawn({
 
 <p>ストレートに書き換えると、以下のようになるだろう。</p>
 
-<pre><code class="language-javascript">var spawn = require(&apos;child_process&apos;).spawnSync;
-var which = require(&apos;which&apos;).sync;
-var child = spawn(which(&apos;foo&apos;), [&apos;--bar&apos;], {
-	stdio: &apos;inherit&apos;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawnSync;
+<span class="hljs-keyword">var</span> which = <span class="hljs-built_in">require</span>(<span class="hljs-string">'which'</span>).sync;
+<span class="hljs-keyword">var</span> child = spawn(which(<span class="hljs-string">'foo'</span>), [<span class="hljs-string">'--bar'</span>], {
+	<span class="hljs-attr">stdio</span>: <span class="hljs-string">'inherit'</span>
 });
 
-if (child.error) {
+<span class="hljs-keyword">if</span> (child.error) {
 	grunt.fail.warn(child.error);
 }</code></pre>
 
@@ -108,8 +101,8 @@ if (child.error) {
 
 <p>別プロセスに何かをしてもらうだけのタスクの場合はこれで良いが、標準出力を受け取って……という場合は<code>stdout</code>プロパティーを拾ってやれば良い。ただしデフォルトではBufferオブジェクトなので、<code>child_process.spawnSync()</code>の第三引数であるオプションで<code>encoding</code>を指定してやりStringオブジェクトになるようにして、後に受け取るのが簡単だろう。</p>
 
-<pre><code class="language-javascript">var child = spawn(which(&apos;foo&apos;), [&apos;--bar&apos;], {
-	encoding: &apos;utf8&apos;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> child = spawn(which(<span class="hljs-string">'foo'</span>), [<span class="hljs-string">'--bar'</span>], {
+	<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span>
 });</code></pre>
 
 <p>エラーチェックはもうちょっと厳密な必要がありそうだ。そうしないとゾンビプロセスが残ったり、タスクがうまく終了しなくなる可能性がある。でもまだ<code>child_process.spawnSync()</code>の知見がなくてよくわからない。</p>
@@ -136,20 +129,13 @@ if (child.error) {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

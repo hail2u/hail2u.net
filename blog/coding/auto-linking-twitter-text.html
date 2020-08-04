@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/auto-linking-twitter-text.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Twitterではツイートの表示にいくつか規制がある。例えばTwitterの鳥さんを表示しなければならないとかユーザーのプロフィールへのリンクでは#!/のアレはダメだったりとかかなり細かい。ということでユーザー名やURL、ハッシュタグにまとめてリンクを張るJavaScriptをjQueryで普通に書いてみた。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Twitterではツイートの表示にいくつか規制がある。例えばTwitterの鳥さんを表示しなければならないとかユーザーのプロフィールへのリンクでは#!/のアレはダメだったりとかかなり細かい。ということでユーザー名やURL、ハッシュタグにまとめてリンクを張るJavaScriptをjQueryで普通に書いてみた。" itemprop="description">
 		
@@ -74,43 +67,43 @@
 
 <p>まず正規表現の定義。</p>
 
-<pre><code class="language-js">var url     = &quot;https?://\\S+&quot;;
-var mention = &quot;@[0-9a-zA-Z_]{1,15}&quot;;
-var hashtag = &quot;#[0-9a-zA-Z]+&quot;;
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> url     = <span class="hljs-string">"https?://\\S+"</span>;
+<span class="hljs-keyword">var</span> mention = <span class="hljs-string">"@[0-9a-zA-Z_]{1,15}"</span>;
+<span class="hljs-keyword">var</span> hashtag = <span class="hljs-string">"#[0-9a-zA-Z]+"</span>;
 
-var re_url     = new RegExp(&quot;^&quot; + url);
-var re_mention = new RegExp(&quot;^&quot; + mention);
-var re_hashtag = new RegExp(&quot;^&quot; + hashtag);
+<span class="hljs-keyword">var</span> re_url     = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"^"</span> + url);
+<span class="hljs-keyword">var</span> re_mention = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"^"</span> + mention);
+<span class="hljs-keyword">var</span> re_hashtag = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"^"</span> + hashtag);
 
-var re_token = new RegExp(&quot;(&quot; + url + &quot;|&quot; + mention + &quot;|&quot; + hashtag + &quot;)&quot;, &quot;g&quot;);</code></pre>
+<span class="hljs-keyword">var</span> re_token = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"("</span> + url + <span class="hljs-string">"|"</span> + mention + <span class="hljs-string">"|"</span> + hashtag + <span class="hljs-string">")"</span>, <span class="hljs-string">"g"</span>);</code></pre>
 
 <p>テキストで定義して連結する。URLを優先した。</p>
 
-<pre><code class="language-js">var tokens = input.split(re_token);</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> tokens = input.split(re_token);</code></pre>
 
 <p>入力（=ツイート）を分割。</p>
 
-<pre><code class="language-js">for (var i = 0, l = tokens.length; i &lt; l; i++) {
-	var token = tokens[i];
+<pre><code class="hljs language-js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = tokens.length; i &lt; l; i++) {
+	<span class="hljs-keyword">var</span> token = tokens[i];
 
-	if (re_url.test(token)) {
-		console.log(&quot;URL: &quot; + token);
-		output.append($(&quot;&lt;a/&gt;&quot;, {
-			href: token
+	<span class="hljs-keyword">if</span> (re_url.test(token)) {
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"URL: "</span> + token);
+		output.append($(<span class="hljs-string">"&lt;a/&gt;"</span>, {
+			<span class="hljs-attr">href</span>: token
 		}).append(token));
-	} else if (re_mention.test(token)) {
-		console.log(&quot;Mention: &quot; + token);
-		output.append($(&quot;&lt;a/&gt;&quot;, {
-			href: &quot;http://twitter.com/&quot; + encodeURIComponent(token.replace(/^@/, &quot;&quot;))
+	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_mention.test(token)) {
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Mention: "</span> + token);
+		output.append($(<span class="hljs-string">"&lt;a/&gt;"</span>, {
+			<span class="hljs-attr">href</span>: <span class="hljs-string">"http://twitter.com/"</span> + <span class="hljs-built_in">encodeURIComponent</span>(token.replace(<span class="hljs-regexp">/^@/</span>, <span class="hljs-string">""</span>))
 		}).append(token));
-	} else if (re_hashtag.test(token)) {
-		console.log(&quot;Hashtag: &quot; + token);
-		output.append($(&quot;&lt;a/&gt;&quot;, {
-			href: &quot;http://twitter.com/search?q=&quot; + encodeURIComponent(token)
+	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_hashtag.test(token)) {
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Hashtag: "</span> + token);
+		output.append($(<span class="hljs-string">"&lt;a/&gt;"</span>, {
+			<span class="hljs-attr">href</span>: <span class="hljs-string">"http://twitter.com/search?q="</span> + <span class="hljs-built_in">encodeURIComponent</span>(token)
 		}).append(token));
-	} else {
-		console.log(&quot;Plain: &quot; + token);
-		output.append(token.replace(/[\r\n]/g, &quot;&lt;br&gt;&quot;));
+	} <span class="hljs-keyword">else</span> {
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Plain: "</span> + token);
+		output.append(token.replace(<span class="hljs-regexp">/[\r\n]/g</span>, <span class="hljs-string">"&lt;br&gt;"</span>));
 	}
 }</code></pre>
 
@@ -134,20 +127,13 @@ var re_token = new RegExp(&quot;(&quot; + url + &quot;|&quot; + mention + &quot;
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

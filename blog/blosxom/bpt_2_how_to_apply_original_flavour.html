@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blosxom/bpt_2_how_to_apply_original_flavour.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="blosxomの出力に、プラグインで生成した何か（大抵の場合はHTMLとか）を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの（単なるリストとか）を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、HTML::Templateなりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="blosxomの出力に、プラグインで生成した何か（大抵の場合はHTMLとか）を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの（単なるリストとか）を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、HTML::Templateなりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。" itemprop="description">
 		
@@ -77,23 +70,23 @@
 </blockquote>
 <p>とあるように、プラグインで<code>template</code>サブルーチンを利用するという事が意味するのは、デフォルトのテンプレートを差し替えるということです（よくわからない説明になってますけど、察してください）。</p>
 <p>blosxomの<code>template</code>サブルーチンは、</p>
-<pre><code class="language-perl">my $tmpl = &amp;$blosxom::template($path, $chunk, $flavour);</code></pre>
+<pre><code class="hljs language-perl"><span class="hljs-keyword">my</span> $tmpl = &amp;$blosxom::template($path, $chunk, $flavour);</code></pre>
 <p>という形で呼び、<code>$tmpl</code>には、<code>$datadir/$path/$chunk.$flavour</code>というファイルの内容がそのまま格納されます。<code>$path</code>は<code>$blosxom::path_info</code>などをそのまま渡してやり、<code>$chunk</code>はプラグイン名などを利用、<code>$flavour</code>は<code>$blosxom::flavour</code>をそのまま渡すと、blosxomの挙動を真似することが出来、わかりやすく（ユーサーにもデベロッパーにも）ます。実際のコードを書いてみると、</p>
-<pre><code class="language-perl">package foo;
+<pre><code class="hljs language-perl"><span class="hljs-keyword">package</span> foo;
 
-use strict;
-use vars qw($bar);
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> vars <span class="hljs-string">qw($bar)</span>;
 
-my $hoge = &apos;hogehoge&apos;;
+<span class="hljs-keyword">my</span> $hoge = <span class="hljs-string">'hogehoge'</span>;
 
-sub start {
-	$bar = &amp;$blosxom::template($blosxom::path_info, &apos;foo&apos;, $blosxom::flavour);
-	$bar =~ s/\$foo::hoge/$hoge/ge;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+	$bar = &amp;$blosxom::template($blosxom::path_info, <span class="hljs-string">'foo'</span>, $blosxom::flavour);
+	$bar =~ <span class="hljs-regexp">s/\$foo::hoge/$hoge/ge</span>;
 
-	return 1;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }
 
-1;</code></pre>
+<span class="hljs-number">1</span>;</code></pre>
 <p>という感じになります。これでhead.htmlなどで<code>$foo::bar</code>と書いておくと、その場所にfoo.htmlというflavourの内容が入ることになります。blosxomの<code>template</code>サブルーチンは、blosxomの<code>interpolate</code>サブルーチンが呼ばれないので、独自flavour内のblosxomスタイルの変数は自前で処理してやる必要があります（10行目）。</p>
 <p>より実践的なコードは、<a href="http://www.blosxom.com/plugins/input/writeback.htm">writeback</a>の<code>story</code>サブルーチンや、僕の作成した<a href="/archives/blugins.html#back_and_forth">back_and_forth</a>の<code>head</code>サブルーチンあたりで見ることが出来ます。</p>
 <p>blosxomの<code>template</code>サブルーチンを利用した独自flavourを利用するようにプラグインを作成すると、ユーザーに優しいプラグインになると思います。一方で説明が面倒になることも否定はしないですが。</p>
@@ -114,20 +107,13 @@ sub start {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

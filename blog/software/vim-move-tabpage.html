@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/software/vim-move-tabpage.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Vimでバッファーごとにタブページを開くみたいなヌルい使い方をしているみなさんこん○○は。タブページを適当に開きまくるとたまに整理してやらないとごちゃごちゃになるので、簡単に位置を変えられないかなーとタブページのヘルプをちゃんと読んだら:tabmoveというまんまなコマンドでできることがわかった。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Vimでバッファーごとにタブページを開くみたいなヌルい使い方をしているみなさんこん○○は。タブページを適当に開きまくるとたまに整理してやらないとごちゃごちゃになるので、簡単に位置を変えられないかなーとタブページのヘルプをちゃんと読んだら:tabmoveというまんまなコマンドでできることがわかった。" itemprop="description">
 		
@@ -74,29 +67,29 @@
 
 <p>ただ<code>:tabmove</code>は引数として正の整数しか受け取れないので、<code>-1</code>で左に動かすとかそういう相対的な移動はできない。<code>1</code>で1つ右に、<code>-1</code>で1つ左にループして動かせるようなラッパー関数を書いて使うことにした。</p>
 
-<pre><code class="language-vim">" Move tabpage
-function! s:MoveTabpage(num)
-	if type(a:num) != type(0)
-		return
-	endif
+<pre><code class="hljs language-vim"><span class="hljs-comment">" Move tabpage</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">MoveTabpage</span><span class="hljs-params">(num)</span></span>
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(<span class="hljs-variable">a:num</span>) != <span class="hljs-built_in">type</span>(<span class="hljs-number">0</span>)
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-keyword">endif</span>
 
-	let pos = tabpagenr() - 1 + a:num
-	let tabcount = tabpagenr("$")
+	<span class="hljs-keyword">let</span> pos = <span class="hljs-built_in">tabpagenr</span>() - <span class="hljs-number">1</span> + <span class="hljs-variable">a:num</span>
+	<span class="hljs-keyword">let</span> tabcount = <span class="hljs-built_in">tabpagenr</span>(<span class="hljs-string">"$"</span>)
 
-	if pos &lt; 0
-		let pos = tabcount - 1
-	elseif pos &gt;= tabcount 
-		let pos = 0
-	endif
+	<span class="hljs-keyword">if</span> pos &lt; <span class="hljs-number">0</span>
+		<span class="hljs-keyword">let</span> pos = tabcount - <span class="hljs-number">1</span>
+	<span class="hljs-keyword">elseif</span> pos &gt;= tabcount 
+		<span class="hljs-keyword">let</span> pos = <span class="hljs-number">0</span>
+	<span class="hljs-keyword">endif</span>
 
-	execute "tabmove " . pos
-endfunction
+	<span class="hljs-keyword">execute</span> <span class="hljs-string">"tabmove "</span> . pos
+<span class="hljs-keyword">endfunction</span>
 
-" TabMove: Move tabpage with reltive number
-command! -nargs=1 TabMove :call &lt;SID&gt;MoveTabpage(&lt;f-args&gt;)
+<span class="hljs-comment">" TabMove: Move tabpage with reltive number</span>
+command! -nargs=<span class="hljs-number">1</span> TabMove :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>MoveTabpage(<span class="hljs-symbol">&lt;f-args&gt;</span>)
 
-nnoremap &lt;C-S-Right&gt; :call &lt;SID&gt;MoveTabpage(1)&lt;Return&gt;
-nnoremap &lt;C-S-Left&gt;  :call &lt;SID&gt;MoveTabpage(-1)&lt;Return&gt;</code></pre>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-S-Right&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>MoveTabpage(<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Return&gt;</span>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-S-Left&gt;</span>  :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>MoveTabpage(-<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Return&gt;</span></code></pre>
 
 <p>そんなに使うわけではないけど悪くはなさそう。</p>
 	</div>
@@ -116,20 +109,13 @@ nnoremap &lt;C-S-Left&gt;  :call &lt;SID&gt;MoveTabpage(-1)&lt;Return&gt;</code>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

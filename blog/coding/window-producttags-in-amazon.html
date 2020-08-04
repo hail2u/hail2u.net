@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/window-producttags-in-amazon.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Amazon.co.jp（Amazon.comでも）の商品個別ページのDOMにはwindow.productTagsというオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名（CDとかならアーティスト名）など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Amazon.co.jp（Amazon.comでも）の商品個別ページのDOMにはwindow.productTagsというオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名（CDとかならアーティスト名）など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。" itemprop="description">
 		
@@ -74,20 +67,20 @@
 
 <p><code>window.productTags</code>オブジェクトは商品個別ページにあるタグをつける機能のために用意されているものみたい。<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873112028/hail2unet-22">Perlクックブック〈VOLUME1〉</a>のページを例に<code>window.productTags</code>オブジェクトを探してみると、</p>
 
-<pre><code class="language-js">productTags: {
-	asin: &quot;4873112028&quot;,
-	image: &quot;http://ec2.images-amazon.com/images/I/51FHW5B8GQL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU09_.jpg&quot;,
-	title: &quot;Perl\u30AF\u30C3\u30AF\u30D6\u30C3\u30AF\u3008VOLUME1\u3009&quot;,
-	authors: [
-		&quot;\u30C8\u30E0 \u30AF\u30EA\u30B9\u30C1\u30E3\u30F3\u30BB\u30F3&quot;,
-		&quot;\u30CD\u30A4\u30B6\u30F3 \u30C8\u30FC\u30AD\u30F3\u30C8\u30F3&quot;,
-		&quot;Tom Christiansen&quot;,
-		&quot;Nathan Torkington&quot;,
-		&quot;Shibuya Perl Mongers&quot;,
-		&quot;\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u30B7\u30B9\u30C6\u30E0&quot;
+<pre><code class="hljs language-js">productTags: {
+	<span class="hljs-attr">asin</span>: <span class="hljs-string">"4873112028"</span>,
+	<span class="hljs-attr">image</span>: <span class="hljs-string">"http://ec2.images-amazon.com/images/I/51FHW5B8GQL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU09_.jpg"</span>,
+	<span class="hljs-attr">title</span>: <span class="hljs-string">"Perl\u30AF\u30C3\u30AF\u30D6\u30C3\u30AF\u3008VOLUME1\u3009"</span>,
+	<span class="hljs-attr">authors</span>: [
+		<span class="hljs-string">"\u30C8\u30E0 \u30AF\u30EA\u30B9\u30C1\u30E3\u30F3\u30BB\u30F3"</span>,
+		<span class="hljs-string">"\u30CD\u30A4\u30B6\u30F3 \u30C8\u30FC\u30AD\u30F3\u30C8\u30F3"</span>,
+		<span class="hljs-string">"Tom Christiansen"</span>,
+		<span class="hljs-string">"Nathan Torkington"</span>,
+		<span class="hljs-string">"Shibuya Perl Mongers"</span>,
+		<span class="hljs-string">"\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u30B7\u30B9\u30C6\u30E0"</span>
 	],
-	appID: &quot;retail&quot;,
-	// 以下、タグをつける機能に関するプロパティが色々
+	<span class="hljs-attr">appID</span>: <span class="hljs-string">"retail"</span>,
+	<span class="hljs-comment">// 以下、タグをつける機能に関するプロパティが色々</span>
 }</code></pre>
 
 <p>こんな感じになっている。<code>productTags.authors</code>もジャンルによってプロパティ名が違うとかそういうことは無く（空の配列だったりすることはあるけど）、どこでも同じように値を取り出すことが出来る。試しに画像つきのアソシエイト・リンクを生成するブックマークレットを作ってみた。</p>
@@ -98,7 +91,7 @@
 
 <p>画像のサイズは基本的に長辺が75pxにリサイズされているものを参照している（_SL75_)が、なか見！検索のマークやおすすめマークと混ぜられたりしてると83pxとかそれ以上の時もあるので、適当に正規表現で削除してやると良さそう。</p>
 
-<pre><code class="language-js">productTags.image.replace(/_SL75_.*\.jpg$/, &quot;_SL75_.jpg&quot;);</code></pre>
+<pre><code class="hljs language-js">productTags.image.replace(<span class="hljs-regexp">/_SL75_.*\.jpg$/</span>, <span class="hljs-string">"_SL75_.jpg"</span>);</code></pre>
 
 <p>こんなんで多分いける。ついでに画像を大きくしたかったりする場合は<code>_SL120_.jpg</code>で置換してやるとかで。</p>
 	</div>
@@ -118,20 +111,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

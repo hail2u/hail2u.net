@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blog/blog_hacks_79.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="もう第二刷！な、ぶろがーのますとあいてむBlog HacksのHack #79ではPerlでBloglinesの新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在はMozilla Extensionとして動作するものやKDE上で動作するものが公開されています。ので、通常はこちらを使った方が良いと思います。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="もう第二刷！な、ぶろがーのますとあいてむBlog HacksのHack #79ではPerlでBloglinesの新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在はMozilla Extensionとして動作するものやKDE上で動作するものが公開されています。ので、通常はこちらを使った方が良いと思います。" itemprop="description">
 		<link href="/img/blog/bloglines_and_tclockl.png" itemprop="image">
@@ -75,21 +68,21 @@
 <p>Windowsだと、簡単なスクリプトが動かせたりする<a href="http://www.samurize.com/modules/news/" title="Samurize.com - News">Samurize</a>や<a href="http://www.coolmon.org/" title="CoolMon - system stats on your desktop">CoolMon</a>、<a href="http://kapsules.shellscape.org/" title="Kapsules">Kapsules</a>などでBloglinesのNotifierを作ることができるでしょう（使ってないので僕は作りませんけど）。また、TClock Lightのユーザー定義文字列を引数でセットできる機能を利用して、WSHで新着記事数を取得して<a href="http://homepage1.nifty.com/kazubon/tclocklight/index.html" title="TClock Light">TClock Light</a>に渡し、タスクトレイに表示するなんてことも可能です。</p>
 <figure><a href="/img/blog/bloglines_and_tclockl.png"><img alt="TClock Lightを利用してBloglinesの新着記事数をタスクトレイに表示" height="24" src="/img/blog/bloglines_and_tclockl.png" width="260"></a></figure>
 <p>これを実現するためには以下のようなVBScriptファイルでOK。</p>
-<pre><code class="language-vbs">sMail = &quot;&lt;登録したメールアドレス&gt;&quot;
-sTClock = &quot;C:\Program Files\TClock Light\tclock.exe&quot;
+<pre><code class="hljs language-vbs">sMail = <span class="hljs-string">"&lt;登録したメールアドレス&gt;"</span>
+sTClock = <span class="hljs-string">"C:\Program Files\TClock Light\tclock.exe"</span>
 
-Set oXmlHttp  = CreateObject(&quot;Msxml2.XMLHTTP.3.0&quot;)
-Set oWshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+<span class="hljs-keyword">Set</span> oXmlHttp  = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">"Msxml2.XMLHTTP.3.0"</span>)
+<span class="hljs-keyword">Set</span> oWshShell = WScript.<span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">"WScript.Shell"</span>)
 
-sTClock = Chr(34) &amp; sTClock &amp; Chr(34)
+sTClock = <span class="hljs-built_in">Chr</span>(<span class="hljs-number">34</span>) &amp; sTClock &amp; <span class="hljs-built_in">Chr</span>(<span class="hljs-number">34</span>)
 
-oXmlHttp.open &quot;GET&quot;, &quot;http://www.bloglines.com/update?user=&quot; &amp; sMail, False
+oXmlHttp.open <span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://www.bloglines.com/update?user="</span> &amp; sMail, <span class="hljs-literal">False</span>
 oXmlHttp.send
 sRes = oXmlHttp.responseText
 
-aRes = Split(sStr, &quot;|&quot;, -1, 0)
+aRes = <span class="hljs-built_in">Split</span>(sStr, <span class="hljs-string">"|"</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>)
 
-oWshShell.Run sTClock &amp; &quot; /ustr9 &quot; &amp; aRes(1)</code></pre>
+oWshShell.Run sTClock &amp; <span class="hljs-string">" /ustr9 "</span> &amp; aRes(<span class="hljs-number">1</span>)</code></pre>
 <p>あとはTClock Lightの書式設定に<code>USTR9</code>と書いてやればこのVBScriptを実行するたびにタスクトレイの表示が更新されます。定期的にこのVBScriptを実行したい場合は、同じくTClock Lightのアラーム設定で適度な間隔を指定してやれば良いです。さらにはTClock Lightのマウス操作設定で、タスクトレイのダブルクリックをファイルを開くにしてやり、ファイルに、</p>
 <pre>http://www.bloglines.com/myblogs</pre>
 <p>を指定すると、タスクトレイのダブルクリックからMy Blogsが開けて完璧！</p>
@@ -111,20 +104,13 @@ oWshShell.Run sTClock &amp; &quot; /ustr9 &quot; &amp; aRes(1)</code></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

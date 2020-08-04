@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/recurisive-markdown.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" itemprop="description">
 		
@@ -74,14 +67,14 @@
 
 <p>例えば<code>figure</code>要素を使って<code>table</code>要素を図としてマークアップしたいとする。その場合、markedでは表の記法が拡張されているので、以下のように書くことになる。</p>
 
-<pre><code class="language-markdown">&lt;figure&gt;
+<pre><code class="hljs language-markdown"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span></span>
 |Name|Num|
 |-|-|
 |foo|128|
 |bar|256|
 
-&lt;figcaption&gt;表1&lt;/figcaption&gt;
-&lt;/figure&gt;</code></pre>
+<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span></span>表1<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span></span>
+<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></span></code></pre>
 
 <p>このMarkdown文字列をmarkedで処理しても何も起きず、そのまま出てくる。つまり何らかのHTMLタグで括られた間はインライン系の記法しか処理されない。</p>
 
@@ -89,66 +82,66 @@
 
 <p>markedには処理をフックする機構が用意されているので、それを使うとうまく処理することできる。こういったHTML文字列の場合、<code>Renderer.html</code>でそういった文字列を処理する関数を指定してやれば良い。</p>
 
-<pre><code class="language-javascript">// node this.js &lt; test.md
-var marked = require(&quot;marked&quot;);
-var renderer = new marked.Renderer();
+<pre><code class="hljs language-javascript"><span class="hljs-comment">// node this.js &lt; test.md</span>
+<span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">"marked"</span>);
+<span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.Renderer();
 
-function processHTML(html) {
-	var attributes;
-	var contents;
-	var tag;
-	var tags = [&quot;aside&quot;, &quot;figure&quot;, &quot;section&quot;];
-	var tokens = html.trim().match(/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/);
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processHTML</span>(<span class="hljs-params">html</span>) </span>{
+	<span class="hljs-keyword">var</span> attributes;
+	<span class="hljs-keyword">var</span> contents;
+	<span class="hljs-keyword">var</span> tag;
+	<span class="hljs-keyword">var</span> tags = [<span class="hljs-string">"aside"</span>, <span class="hljs-string">"figure"</span>, <span class="hljs-string">"section"</span>];
+	<span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
 
-	if (!tokens) {
-		return html;
+	<span class="hljs-keyword">if</span> (!tokens) {
+		<span class="hljs-keyword">return</span> html;
 	}
 
-	tag = tokens[1];
+	tag = tokens[<span class="hljs-number">1</span>];
 
-	if (tags.indexOf(tag) === -1) {
-		return html;
+	<span class="hljs-keyword">if</span> (tags.indexOf(tag) === <span class="hljs-number">-1</span>) {
+		<span class="hljs-keyword">return</span> html;
 	}
 
-	attributes = tokens[2];
-	contents = marked(tokens[3].replace(/&amp;gt;/g, &quot;&gt;&quot;), {
-		renderer: renderer
+	attributes = tokens[<span class="hljs-number">2</span>];
+	contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">"&gt;"</span>), {
+		<span class="hljs-attr">renderer</span>: renderer
 	}).trim();
 
-	return &quot;&lt;&quot; + tag + attributes + &quot;&gt;\n&quot; + contents + &quot;\n&lt;/&quot; + tag + &quot;&gt;\n&quot;;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;"</span> + tag + attributes + <span class="hljs-string">"&gt;\n"</span> + contents + <span class="hljs-string">"\n&lt;/"</span> + tag + <span class="hljs-string">"&gt;\n"</span>;
 }
 
 renderer.html = processHTML;
-console.log(marked(fs.readFileSync(process.stdin.fd, &quot;utf8&quot;), {
-	renderer: renderer
+<span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>), {
+	<span class="hljs-attr">renderer</span>: renderer
 }));</code></pre>
 
 <p>空白文字を削った一番外側のHTMLタグを拾い、その内容を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
 
 <p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される（インデントは読みやすいように追加した）。</p>
 
-<pre><code class="language-html">&lt;figure&gt;
-	&lt;table&gt;
-		&lt;thead&gt;
-			&lt;tr&gt;
-				&lt;th&gt;Name&lt;/th&gt;
-				&lt;th&gt;Num&lt;/th&gt;
-			&lt;/tr&gt;
-		&lt;/thead&gt;
-		&lt;tbody&gt;
-			&lt;tr&gt;
-				&lt;td&gt;foo&lt;/td&gt;
-				&lt;td&gt;128&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-				&lt;td&gt;bar&lt;/td&gt;
-				&lt;td&gt;256&lt;/td&gt;
-			&lt;/tr&gt;
-		&lt;/tbody&gt;
-	&lt;/table&gt;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">thead</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Name<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">th</span>&gt;</span>Num<span class="hljs-tag">&lt;/<span class="hljs-name">th</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">thead</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">tbody</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>foo<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>128<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>bar<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>256<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+			<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+		<span class="hljs-tag">&lt;/<span class="hljs-name">tbody</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
 
-	&lt;figcaption&gt;表1&lt;/figcaption&gt;
-&lt;/figure&gt;</code></pre>
+	<span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>表1<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></code></pre>
 
 <hr>
 
@@ -170,20 +163,13 @@ console.log(marked(fs.readFileSync(process.stdin.fd, &quot;utf8&quot;), {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

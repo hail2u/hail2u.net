@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/software/replace-ms-pgothic-with-arial-plus-meiryo-in-chrome.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="最近のブラウザではWebフォントの利用を可能にする@font-faceをサポートしており、使われているサイトもよく見かけるようになった。@font-faceはWebフォントの利用に限らず、ローカルのフォントの再定義にも使えるので、ユーザースタイルシートで利用すればＭＳ Ｐゴシックをメイリオに置換することが出来る（Chromeでも）。これに留まらず@font-faceデスクリプターのunicode-rangeプロパティを利用すれば、英数字はArialで日本語部分はメイリオで置換するなどというわがままなことが出来る。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="最近のブラウザではWebフォントの利用を可能にする@font-faceをサポートしており、使われているサイトもよく見かけるようになった。@font-faceはWebフォントの利用に限らず、ローカルのフォントの再定義にも使えるので、ユーザースタイルシートで利用すればＭＳ Ｐゴシックをメイリオに置換することが出来る（Chromeでも）。これに留まらず@font-faceデスクリプターのunicode-rangeプロパティを利用すれば、英数字はArialで日本語部分はメイリオで置換するなどというわがままなことが出来る。" itemprop="description">
 		
@@ -74,34 +67,34 @@
 
 <p><code>unicode-range</code>プロパティはグリフのコードを範囲指定することによって<code>src</code>プロパティで指定されているフォントのどの部分を利用するかを決定するもの。つまりArialから英数字（<a href="http://unicode.org/charts/PDF/U0000.pdf">PDF: Basic Latinと呼ばれる範囲</a>）を取ってきてＭＳ Ｐゴシックを置換する場合はGoogle Chromeのユーザースタイルシートで以下のようにする。</p>
 
-<pre><code class="language-css">@font-face {
-	font-family: &quot;ＭＳ Ｐゴシック&quot;;
-	src: local(&quot;Arial&quot;);
-	<em>unicode-range: U+0000-007F;</em>
+<pre><code class="hljs language-css"><span class="hljs-keyword">@font-face</span> {
+	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">"ＭＳ Ｐゴシック"</span>;
+	<span class="hljs-attribute">src</span>: <span class="hljs-built_in">local</span>(<span class="hljs-string">"Arial"</span>);
+	&lt;em&gt;<span class="hljs-attribute">unicode-range</span>: U+<span class="hljs-number">0000</span>-<span class="hljs-number">007</span>F;&lt;/em&gt;
 }</code></pre>
 
 <p>ユーザースタイルシートは<a href="http://www.chromium.org/user-experience/user-data-directory">ユーザー・データ・ディレクトリ</a>のUser StyleSheetsディレクトリ（フォルダ）にあるCustom.cssというファイルで、そのファイルにコピペするだけでＭＳ Ｐゴシックの英数字部分がArialに置き換わる（ブラウザの再起動も不要）。更に残りの部分をメイリオに置換するなら同じ<code>font-family</code>名で定義を追加する。</p>
 
-<pre><code class="language-css">@font-face {
-	font-family: &quot;ＭＳ Ｐゴシック&quot;;
-	src: local(&quot;メイリオ&quot;), local(&quot;ＭＳ Ｐゴシック&quot;);
-	<em>unicode-range: U+0080-FFFF;</em>
+<pre><code class="hljs language-css"><span class="hljs-keyword">@font-face</span> {
+	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">"ＭＳ Ｐゴシック"</span>;
+	<span class="hljs-attribute">src</span>: <span class="hljs-built_in">local</span>(<span class="hljs-string">"メイリオ"</span>), <span class="hljs-built_in">local</span>(<span class="hljs-string">"ＭＳ Ｐゴシック"</span>);
+	&lt;em&gt;<span class="hljs-attribute">unicode-range</span>: U+<span class="hljs-number">0080</span>-FFFF;&lt;/em&gt;
 }</code></pre>
 
 <p>今度は<code>unicode-range</code>で先程のU+007Fまでを外して範囲指定する。これでＭＳ Ｐゴシックが英数字部分がArial、それ以外がメイリオに置換されるようになる。<code>@font-face</code>の順序を逆にすれば、メイリオの方の<code>unicode-range</code>は指定する必要がない（多分）。</p>
 
 <p>他に実用性のある組み合わせがあまり思いつかないが、強いて挙げるならMS UI GothicをSegoe UIとMeiryo UIを混ぜたもので置換するとかだろうか。</p>
 
-<pre><code class="language-css">@font-face {
-	font-family: &quot;MS UI Gothic&quot;;
-	src: local(&quot;Segoe UI&quot;);
-	unicode-range: U+0000-007F;
+<pre><code class="hljs language-css"><span class="hljs-keyword">@font-face</span> {
+	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">"MS UI Gothic"</span>;
+	<span class="hljs-attribute">src</span>: <span class="hljs-built_in">local</span>(<span class="hljs-string">"Segoe UI"</span>);
+	<span class="hljs-attribute">unicode-range</span>: U+<span class="hljs-number">0000</span>-<span class="hljs-number">007</span>F;
 }
 
-@font-face {
-	font-family: &quot;MS UI Gothic&quot;;
-	src: local(&quot;Meiryo UI&quot;), local(&quot;MS UI Gothic&quot;);
-	unicode-range: U+0080-FFFF;
+<span class="hljs-keyword">@font-face</span> {
+	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">"MS UI Gothic"</span>;
+	<span class="hljs-attribute">src</span>: <span class="hljs-built_in">local</span>(<span class="hljs-string">"Meiryo UI"</span>), <span class="hljs-built_in">local</span>(<span class="hljs-string">"MS UI Gothic"</span>);
+	<span class="hljs-attribute">unicode-range</span>: U+<span class="hljs-number">0080</span>-FFFF;
 }</code></pre>
 
 <p>等幅フォントの場合はフォントによってグリフの幅が違うため、縦が揃わなくなることが多く、混ぜないほうが無難だと思う。また、等幅フォント同士組み合わせなくてはならないというルールなどもないので、Consolas+メイリオなども普通に作れるが、あんまり意味ない。</p>
@@ -146,20 +139,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

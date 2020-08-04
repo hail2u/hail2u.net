@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/software/cycle-foo-bar-buz-in-vim.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の（&lt;C-x&gt;だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の（&lt;C-x&gt;だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。" itemprop="description">
 		
@@ -72,39 +65,39 @@
 	<div itemprop="articleBody">
 		<p>メタ構文変数とか呼ばれてるらしい<code>foo</code>とか<code>bar</code>とかのアレがまったく覚えられない。のでVimに<a href="http://en.wikipedia.org/wiki/Metasyntactic_variable#English">一般的なメタ構文変数のリスト</a>を覚えさせておいて、<code>foo</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>bar</code>に、<code>bar</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>buz</code>に、と順に次の（<kbd>&lt;C-x&gt;</kbd>だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。</p>
 
-<pre><code class="language-vim">&quot; Cycle metasyntactic variables
-function! s:CycleMetasyntacticVariables(num)
-	if type(a:num) != type(0)
-		return
-	endif
+<pre><code class="hljs language-vim"><span class="hljs-comment">" Cycle metasyntactic variables</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CycleMetasyntacticVariables</span><span class="hljs-params">(num)</span></span>
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(<span class="hljs-variable">a:num</span>) != <span class="hljs-built_in">type</span>(<span class="hljs-number">0</span>)
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-keyword">endif</span>
 
-	let vars = [&apos;foo&apos;, &apos;bar&apos;, &apos;baz&apos;, &apos;qux&apos;, &apos;quux&apos;, &apos;corge&apos;, &apos;grault&apos;, &apos;garply&apos;, &apos;waldo&apos;, &apos;fred&apos;, &apos;plugh&apos;, &apos;xyzzy&apos;, &apos;thud&apos;]
-	let i = index(vars, expand(&apos;&lt;cword&gt;&apos;))
+	<span class="hljs-keyword">let</span> vars = [<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>, <span class="hljs-string">'baz'</span>, <span class="hljs-string">'qux'</span>, <span class="hljs-string">'quux'</span>, <span class="hljs-string">'corge'</span>, <span class="hljs-string">'grault'</span>, <span class="hljs-string">'garply'</span>, <span class="hljs-string">'waldo'</span>, <span class="hljs-string">'fred'</span>, <span class="hljs-string">'plugh'</span>, <span class="hljs-string">'xyzzy'</span>, <span class="hljs-string">'thud'</span>]
+	<span class="hljs-keyword">let</span> i = <span class="hljs-built_in">index</span>(vars, <span class="hljs-built_in">expand</span>(<span class="hljs-string">'&lt;cword&gt;'</span>))
 
-	if (i == -1)
-		if (a:num &gt; 0)
-			execute &quot;normal! \&lt;C-a&gt;&quot;
-		else
-			execute &quot;normal! \&lt;C-x&gt;&quot;
-		endif
+	<span class="hljs-keyword">if</span> (i == -<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">if</span> (<span class="hljs-variable">a:num</span> &gt; <span class="hljs-number">0</span>)
+			<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-a&gt;"</span>
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-x&gt;"</span>
+		<span class="hljs-keyword">endif</span>
 
-		return
-	endif
+		<span class="hljs-keyword">return</span>
+	<span class="hljs-keyword">endif</span>
 
-	let i += a:num
+	<span class="hljs-keyword">let</span> i += <span class="hljs-variable">a:num</span>
 
-	if (i == -1)
-		let i = len(vars) - 1
-	elseif (i == len(vars))
-		let i = 0
-	endif
+	<span class="hljs-keyword">if</span> (i == -<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">let</span> i = <span class="hljs-built_in">len</span>(vars) - <span class="hljs-number">1</span>
+	<span class="hljs-keyword">elseif</span> (i == <span class="hljs-built_in">len</span>(vars))
+		<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>
+	<span class="hljs-keyword">endif</span>
 
-	let @w = vars[i]
-	execute &quot;normal! viw\&quot;wp&quot;
-endfunction
+	<span class="hljs-keyword">let</span> @w = vars[i]
+	<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! viw\"wp"</span>
+<span class="hljs-keyword">endfunction</span>
 
-nnoremap &lt;C-a&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(1)&lt;Enter&gt;
-nnoremap &lt;C-x&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(-1)&lt;Enter&gt;</code></pre>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-a&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CycleMetasyntacticVariables(<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Enter&gt;</span>
+<span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-x&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CycleMetasyntacticVariables(-<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Enter&gt;</span></code></pre>
 
 <p>レジスターを使ってることに注意。<kbd>&lt;C-a&gt;</kbd>と<kbd>&lt;C-x&gt;</kbd>にマッピングする前提で書いたので、数字の上とかだとデフォルトと同じようにインクリメント・デクリメントする。あんまり行儀よくない気もするのでフォールバックさせるのやめて、<kbd>&lt;Leader&gt;a</kbd>とかにマッピングさせるように書いた方が良さそう……な気もするけど、自分で使う分には良いか。</p>
 	</div>
@@ -124,20 +117,13 @@ nnoremap &lt;C-x&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(-1)&lt;Enter&g
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

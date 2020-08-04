@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/postcss-plugin-to-longhand.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Edge 17にあるカスタム・プロパティーとショートハンド・プロパティーでのバグが、パッチ・レベルでは直りそうもない。つまり、そう簡単には世界から消えてくれないことが確定してしまったため、しばらく（最低1年半くらい）の間ロングハンド・プロパティーで書かなくてはならない。しかし、そう書き直されたCSSを見ていると、とにかく悲しいので、to-longhandというPostCSSプラグインを書いて誤魔化すことにした。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Edge 17にあるカスタム・プロパティーとショートハンド・プロパティーでのバグが、パッチ・レベルでは直りそうもない。つまり、そう簡単には世界から消えてくれないことが確定してしまったため、しばらく（最低1年半くらい）の間ロングハンド・プロパティーで書かなくてはならない。しかし、そう書き直されたCSSを見ていると、とにかく悲しいので、to-longhandというPostCSSプラグインを書いて誤魔化すことにした。" itemprop="description">
 		
@@ -80,26 +73,26 @@
 
 <p>ヒマがあったら順不同に対応できるように書き直したい、と考えていたが、どうやら無理そうだ。どのような値が指定されているのかざっと調べれば良いと単純にとらえていたが、問題になるのはカスタム・プロパティーなので、ランタイム、すなわちブラウザーでレンダリングされるまで値がどのようなものか確定しない。</p>
 
-<pre><code class="language-css">:root {
-	--foo: double;
-	--bar: 3px;
+<pre><code class="hljs language-css"><span class="hljs-selector-pseudo">:root</span> {
+	<span class="hljs-attribute">--foo</span>: double;
+	<span class="hljs-attribute">--bar</span>: <span class="hljs-number">3px</span>;
 }
 
-.test {
-	border: var(--foo) var(--bar);
+<span class="hljs-selector-class">.test</span> {
+	<span class="hljs-attribute">border</span>: <span class="hljs-built_in">var</span>(--foo) <span class="hljs-built_in">var</span>(--bar);
 }</code></pre>
 
 <p>恣意的なコードを出すと、こういう<code>border</code>プロパティーがありうる。<code>--foo</code>を辿ると<code>double</code>、同じように<code>--bar</code>を辿ると<code>3px</code>なので、このプロパティーからは以下のようなロングハンド・プロパティー群が生成できるだろう。</p>
 
-<pre><code class="language-css">.test {
-	border-style: var(--foo);
-	border-width: var(--bar);
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.test</span> {
+	<span class="hljs-attribute">border-style</span>: <span class="hljs-built_in">var</span>(--foo);
+	<span class="hljs-attribute">border-width</span>: <span class="hljs-built_in">var</span>(--bar);
 }</code></pre>
 
 <p>一見、これで良さそうだが、カスタム・プロパティーなので、その値がいつも同じタイプであるとは限らない。別のルールセット内で上書き定義されることもあるからだ。</p>
 
-<pre><code class="language-css">.test2 {
-	--foo: #f0f;
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.test2</span> {
+	<span class="hljs-attribute">--foo</span>: <span class="hljs-number">#f0f</span>;
 }</code></pre>
 
 <p>トリッキーに書くなら、このようにして色とスタイルを同時に変更できる。この場合、生成した<code>border-style</code>プロパティーで色を指定することになってしまうので、無視される。</p>
@@ -126,20 +119,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

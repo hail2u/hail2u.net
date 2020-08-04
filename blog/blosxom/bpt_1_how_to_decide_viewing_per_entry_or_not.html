@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blosxom/bpt_1_how_to_decide_viewing_per_entry_or_not.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="blosxomのプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、one_year_agoなんかがそうですね。その判定はどうやるのかということですよ。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="blosxomのプラグインを作成する時に、エントリごとのページを閲覧している場合のみに動かしたいと考えることは良くあると思います。僕の作った物の中では、one_year_agoなんかがそうですね。その判定はどうやるのかということですよ。" itemprop="description">
 		
@@ -74,12 +67,12 @@
 <p>プラグインの挙動にもよりますが、大抵の場合は<code>start</code>サブルーチンで、<code>$blosxom::path_info</code>をチェックすることによって判定することになると思います。<code>$blosxom::path_info</code>にはエントリごとのページを閲覧している場合、</p>
 <pre>foo/bar.html</pre>
 <p>というようなものになるので、</p>
-<pre><code class="language-perl">sub start {
-	if ($blosxom::path_info !~ /\./) {
-		return 0;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+	<span class="hljs-keyword">if</span> ($blosxom::path_info !~ <span class="hljs-regexp">/\./</span>) {
+		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 	}
 
-	return 1;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }</code></pre>
 <p>一番単純に考えると、こんな感じでしょう。<code>$blosxom::path_info</code>にピリオド（.)が含まれるかどうかをチェックしており、含まれなかった場合は0を返し、プラグインを停止させています。コレは単純明快で良いのですが、場合によっては不具合があります。具体的な例を挙げると、「.を含むディレクトリでカテゴリを掘っている場合」です。例えば、</p>
 <pre>$datadir/programming/ms.net</pre>
@@ -88,12 +81,12 @@
 <p>などとなり、一見してエントリごとのページを閲覧している場合と判別できません。この判定には<code>.$blosxom::flavour</code>で終わるかどうかというチェックが必要になります。</p>
 <p>また、<code>$blosxom::path_info</code>は<code>$ENV{PATH_INFO}</code>をちょっと加工したものなので、この両者は似て非なるものです。その違いはindex.htmlなどは含まれないことや最初と最後のスラッシュ（/)が削除されることなどで、そのあたりのチェックは無用だったりします。</p>
 <p>以上を踏まえると、エントリごとのページを閲覧している場合かどうかを判定するコードは、</p>
-<pre><code class="language-perl">sub start {
-	if ($blosxom::path_info !~ /\.$blosxom::flavour$/) {
-		return 0;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+	<span class="hljs-keyword">if</span> ($blosxom::path_info !~ <span class="hljs-regexp">/\.$blosxom::flavour$/</span>) {
+		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 	}
 
-	return 1;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }</code></pre>
 <p>となると思います。これでも万能ではなく、いろいろ考えるとメンドウなので、最初に書いたコードでも良いかも知れません。</p>
 <p>おもむろに連載物になりそうなものを始めてみる。BPTは「blosxom plugin tips」の頭字語。「#1」とか付けたので、引っ込みがつかなさそうな気がするけど、流れが速いので書かなければバレナイ気がする。経験則100%で書いているので、ツッコミは大歓迎です。</p>
@@ -114,20 +107,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

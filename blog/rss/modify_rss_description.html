@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/rss/modify_rss_description.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="RSSファイルの各itemdescriptionとcontent:encodedが、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、descriptionは最初の段落のみ、content:encodedはこれまで通りエントリの内容のフルコピーというようにしました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="RSSファイルの各itemdescriptionとcontent:encodedが、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、descriptionは最初の段落のみ、content:encodedはこれまで通りエントリの内容のフルコピーというようにしました。" itemprop="description">
 		
@@ -73,15 +66,15 @@
 		<p>RSSファイルの各<code>item</code><code>description</code>と<code>content:encoded</code>が、両方ともエントリの内容そのまんまというのはどうも無駄な感じが否めないので、<code>description</code>は最初の段落のみ、<code>content:encoded</code>はこれまで通りエントリの内容のフルコピーというようにしました。</p>
 <p>最近のRSSリーダーは<code>content:encoded</code>優先というものが多いと思うので、あんまり問題ない（今までどおりとも言う）んじゃないかと思ってます。RSSファイルのサイズがかなり減るという利点も。</p>
 <p>実装は単純明快に、</p>
-<pre><code class="language-perl">sub make_excerpt {
-	my $out = $_[0];
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">make_excerpt</span> </span>{
+	<span class="hljs-keyword">my</span> $out = $_[<span class="hljs-number">0</span>];
 
-	$out =~ s!\x0D\x0A|\x0D|\x0A!!g;
-	$out =~ s!^(.*?)&lt;/p&gt;.*$!$1!g;
+	$out =~ <span class="hljs-keyword">s</span>!\x0D\x0A|\x0D|\x0A!!g;
+	$out =~ <span class="hljs-keyword">s</span>!^(.*?)&lt;<span class="hljs-regexp">/p&gt;.*$!$1!g;
 	$out =~ s!&lt;.*?&gt;!!g;
 
 	return $out;
-}</code></pre>
+}</span></code></pre>
 <p>最初の<code>p</code>要素の閉じタグまで抜き出すとしました。substrでうまく切る方法を思いつかなかったので、こんな実装になったのは秘密です。utf8モジュールないしなぁ、ここ。かといって、要約生成するためにJcodeモジュールで一旦EUC-JPに変換して処理するとかもなんか手間がかかるわりに報われないかなと。ざっと自分のエントリを眺めたところ、大体はタイトルと最初の段落で概要はつかめそうだったので、これで良い事にします。</p>
 <p>うちで配っているRSS関連スクリプトは、軒並みcontent:encoded非対応だったりするわけですが。そろそろ対応しようかなとか思うんですが、HTML出力限定という作りになっていないので、なかなか対応しづらいんですよね。</p>
 <p>もし、<code>description</code>がエントリ内容のフルコピーであるRSSファイルがどうしても必要という場合は、別のflavour作って対応しますので、ヨコセとコメントで要求してください。</p>
@@ -102,20 +95,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

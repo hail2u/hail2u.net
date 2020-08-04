@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/software/dont-exit-vim-when-closing-last-tab.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Firefoxでいうところのbrowser.tabs.closeWindowWithLastTab=falseとか、タブ付きエディタによくある最後のタブを閉じても終了せずに新規ファイルを編集するタブが開かれる機能がVimにもずっと欲しかった（特にgVim)。なるべく閉じないように使うことにしていたが、よく:wqaとか勢いで打ってしまい悲しいことに。そろそろどうにかしようと色々調べて、:cabbrevコマンドで:qとかを書き換えてやれば良さそうということがわかった。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Firefoxでいうところのbrowser.tabs.closeWindowWithLastTab=falseとか、タブ付きエディタによくある最後のタブを閉じても終了せずに新規ファイルを編集するタブが開かれる機能がVimにもずっと欲しかった（特にgVim)。なるべく閉じないように使うことにしていたが、よく:wqaとか勢いで打ってしまい悲しいことに。そろそろどうにかしようと色々調べて、:cabbrevコマンドで:qとかを書き換えてやれば良さそうということがわかった。" itemprop="description">
 		
@@ -76,11 +69,11 @@
 
 <p>現在のウィンドウを新規ファイルを編集する状態にするには<code>:enew</code>で良いので、<code>:qa</code>や<code>:wqa</code>の場合は<code>:tabonly</code>と<code>:only</code>に続けて実行してやれば良い。<code>:q</code>や<code>:wq</code>の場合はウィンドウの数やタブページの数を調べて、最後の1つだった時だけ<code>:enew</code>にすり替えてやれば良い。ウィンドウの数を取得するには、ウィンドウ番号を取得する<code>winnr()</code>に<code>$</code>という引数を渡す。そうすると最後のウィンドウ番号、つまりウィンドウの数が取得できる。<code>tabpagenr()</code>も同じ。</p>
 
-<pre><code class="language-vim">&quot; Don&apos;t exit vim when closing last tab with :q and :wq, :qa, :wqa
-cabbrev q   &lt;C-r&gt;=(getcmdtype() == &apos;:&apos; &amp;&amp; getcmdpos() == 1 &amp;&amp; tabpagenr(&apos;$&apos;) == 1 &amp;&amp; winnr(&apos;$&apos;) == 1 ? &apos;enew&apos; : &apos;q&apos;)&lt;CR&gt;
-cabbrev wq  &lt;C-r&gt;=(getcmdtype() == &apos;:&apos; &amp;&amp; getcmdpos() == 1 &amp;&amp; tabpagenr(&apos;$&apos;) == 1 &amp;&amp; winnr(&apos;$&apos;) == 1 ? &apos;w\|enew&apos; : &apos;wq&apos;)&lt;CR&gt;
-cabbrev qa  &lt;C-r&gt;=(getcmdtype() == &apos;:&apos; &amp;&amp; getcmdpos() == 1 ? &apos;tabonly\|only\|enew&apos; : &apos;qa&apos;)&lt;CR&gt;
-cabbrev wqa &lt;C-r&gt;=(getcmdtype() == &apos;:&apos; &amp;&amp; getcmdpos() == 1 ? &apos;wa\|tabonly\|only\|enew&apos; : &apos;wqa&apos;)&lt;CR&gt;</code></pre>
+<pre><code class="hljs language-vim"><span class="hljs-comment">" Don't exit vim when closing last tab with :q and :wq, :qa, :wqa</span>
+<span class="hljs-keyword">cabbrev</span> q   <span class="hljs-symbol">&lt;C-r&gt;</span>=(<span class="hljs-built_in">getcmdtype</span>() == <span class="hljs-string">':'</span> &amp;&amp; <span class="hljs-built_in">getcmdpos</span>() == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">tabpagenr</span>(<span class="hljs-string">'$'</span>) == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">winnr</span>(<span class="hljs-string">'$'</span>) == <span class="hljs-number">1</span> ? <span class="hljs-string">'enew'</span> : <span class="hljs-string">'q'</span>)<span class="hljs-symbol">&lt;CR&gt;</span>
+<span class="hljs-keyword">cabbrev</span> <span class="hljs-keyword">wq</span>  <span class="hljs-symbol">&lt;C-r&gt;</span>=(<span class="hljs-built_in">getcmdtype</span>() == <span class="hljs-string">':'</span> &amp;&amp; <span class="hljs-built_in">getcmdpos</span>() == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">tabpagenr</span>(<span class="hljs-string">'$'</span>) == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">winnr</span>(<span class="hljs-string">'$'</span>) == <span class="hljs-number">1</span> ? <span class="hljs-string">'w\|enew'</span> : <span class="hljs-string">'wq'</span>)<span class="hljs-symbol">&lt;CR&gt;</span>
+<span class="hljs-keyword">cabbrev</span> <span class="hljs-keyword">qa</span>  <span class="hljs-symbol">&lt;C-r&gt;</span>=(<span class="hljs-built_in">getcmdtype</span>() == <span class="hljs-string">':'</span> &amp;&amp; <span class="hljs-built_in">getcmdpos</span>() == <span class="hljs-number">1</span> ? <span class="hljs-string">'tabonly\|only\|enew'</span> : <span class="hljs-string">'qa'</span>)<span class="hljs-symbol">&lt;CR&gt;</span>
+<span class="hljs-keyword">cabbrev</span> <span class="hljs-keyword">wqa</span> <span class="hljs-symbol">&lt;C-r&gt;</span>=(<span class="hljs-built_in">getcmdtype</span>() == <span class="hljs-string">':'</span> &amp;&amp; <span class="hljs-built_in">getcmdpos</span>() == <span class="hljs-number">1</span> ? <span class="hljs-string">'wa\|tabonly\|only\|enew'</span> : <span class="hljs-string">'wqa'</span>)<span class="hljs-symbol">&lt;CR&gt;</span></code></pre>
 
 <p>これだと<code>:qa!</code>とかが使えなくなるので、ちゃんと<code>!</code>を解釈できる関数を作ってやらないとならない……けど面倒なので。他にも副作用が多そうだ。</p>
 
@@ -102,20 +95,13 @@ cabbrev wqa &lt;C-r&gt;=(getcmdtype() == &apos;:&apos; &amp;&amp; getcmdpos() ==
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

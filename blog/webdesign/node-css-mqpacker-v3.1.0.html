@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/webdesign/node-css-mqpacker-v3.1.0.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="min-widthを使ったクエリーのみをソートするオプションを追加し、CSS MQPacker v3.1.0をリリースした。sortオプションを有効にすると、まとめられたクエリーのうちmin-widthが使われるクエリーのみソートされる。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="min-widthを使ったクエリーのみをソートするオプションを追加し、CSS MQPacker v3.1.0をリリースした。sortオプションを有効にすると、まとめられたクエリーのうちmin-widthが使われるクエリーのみソートされる。" itemprop="description">
 		
@@ -74,33 +67,33 @@
 
 <p>オプションの切り替えに対応するため、新たに引数を渡してインスタンスを作成できるようになった。今までの使われ方を壊さないように実装したので、今までのコードはそのまま動く。</p>
 
-<pre><code class="language-javascript">var mqpacker = require(&apos;css-mqpacker&apos;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> mqpacker = <span class="hljs-built_in">require</span>(<span class="hljs-string">'css-mqpacker'</span>);
 
-var result = mqpacker({
-	sort: true
+<span class="hljs-keyword">var</span> result = mqpacker({
+	<span class="hljs-attr">sort</span>: <span class="hljs-literal">true</span>
 }).pack(css);
-console.log(result.css);</code></pre>
+<span class="hljs-built_in">console</span>.log(result.css);</code></pre>
 
 <p>ソート機能を有効にするには<code>sort</code>オプションを<code>true</code>にしてインスタンスを作成してやる。PostCSSのプロセッサー（プラグイン）として使う場合も同じだ。PostCSSのオプションに混ぜ込むことも可能だが、将来的な安全は保証されていないので推奨しない。なおデフォルトでは無効のため、明示的に有効にしてやる必要がある。</p>
 
-<pre><code class="language-css">@media (min-width: 2em) {}
-@media print {}
-@media (min-width: 48px) {}
-@media (min-width: 16px) {}
-.foo {}
-@media (min-width: 48px) {}
-@media (max-width: 8px) {}
-@media (min-width: 2em) {}
-@media (min-width: 16px) {}</code></pre>
+<pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">2em</span>) {}
+<span class="hljs-keyword">@media</span> print {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">48px</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">16px</span>) {}
+<span class="hljs-selector-class">.foo</span> {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">48px</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">max-width:</span> <span class="hljs-number">8px</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">2em</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">16px</span>) {}</code></pre>
 
 <p>例えばこのように<code>min-width</code>クエリーが散在し、それらが複数の単位を用いている上、他の種類のクエリーも混ざっているようなケースを処理してみよう。ありそうもないように思えるが、CSSプリプロセッサーで<code>@media</code>ルールをネストして書いていると似たような構成にはなりうるはずだ。</p>
 
-<pre><code class="language-css">.foo {}                     /* .foo {} */
-@media (min-width: 16px) {} /* @media (min-width: 2em) {} */
-@media (min-width: 2em) {}  /* @media print {} */
-@media (min-width: 48px) {} /* @media (min-width: 48px) {} */
-@media print {}             /* @media (min-width: 16px) {} */
-@media (max-width: 8px) {}  /* @media (max-width: 8px) {} */</code></pre>
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.foo</span> {}                     <span class="hljs-comment">/* .foo {} */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">16px</span>) {} <span class="hljs-comment">/* @media (min-width: 2em) {} */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">2em</span>) {}  <span class="hljs-comment">/* @media print {} */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">48px</span>) {} <span class="hljs-comment">/* @media (min-width: 48px) {} */</span>
+<span class="hljs-keyword">@media</span> print {}             <span class="hljs-comment">/* @media (min-width: 16px) {} */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">max-width:</span> <span class="hljs-number">8px</span>) {}  <span class="hljs-comment">/* @media (max-width: 8px) {} */</span></code></pre>
 
 <p><code>sort</code>オプションを有効にして処理すると、このように同じメディア・クエリーがまとめられ、後ろに回された上で、<code>min-width</code>クエリーのみがソートされる。わかりやすいように<code>sort</code>オプションを指定しない場合の順序もコメントで併記しておいた。</p>
 
@@ -112,9 +105,9 @@ console.log(result.css);</code></pre>
 
 <p><code>sort</code>オプションには直接関数も指定することができる。こちらを使うと自由にソートすることができる。</p>
 
-<pre><code class="language-javascript">var result = mqpacker({
-	sort: function (a, b) {
-		return a.localeCompare(b);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> result = mqpacker({
+	<span class="hljs-attr">sort</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) </span>{
+		<span class="hljs-keyword">return</span> a.localeCompare(b);
 	}
 }).pack(css);</code></pre>
 
@@ -122,11 +115,11 @@ console.log(result.css);</code></pre>
 
 <p>作成した関数は、<em>完全な</em>クエリーの配列に対する<code>Array#sort</code>へと渡される。例えばテストにある<a href="https://github.com/hail2u/node-css-mqpacker/blob/9c40f0a3bc613a86153a2ce719929c46cc4898ec/test/fixtures/sort_ignore-print-queries.css"><code>sort_ignore-print-queries.css</code></a>だと以下のような配列になる。</p>
 
-<pre><code class="language-javascript">[
-	&quot;(min-width: 2em)&quot;,
-	&quot;print and (min-width: 1em)&quot;,
-	&quot;print, (min-width: 3em)&quot;,
-	&quot;(min-width: 1em)&quot;
+<pre><code class="hljs language-javascript">[
+	<span class="hljs-string">"(min-width: 2em)"</span>,
+	<span class="hljs-string">"print and (min-width: 1em)"</span>,
+	<span class="hljs-string">"print, (min-width: 3em)"</span>,
+	<span class="hljs-string">"(min-width: 1em)"</span>
 ]</code></pre>
 
 <p>これをちゃんと処理しなければならないので、カンマ区切りの処理や<code>and</code>区切りの処理も自前で用意する必要がある。<code>min-width</code>だけでもかなり大変だったので、かなり苦労することと思う。そこそこちゃんとパースした結果を渡すというのも悪くはないと考えていたが、どちらかというとPostCSSというかAST側でやって欲しい機能なので、ツール側で持ってしまうのはやめておいた。</p>
@@ -139,11 +132,11 @@ console.log(result.css);</code></pre>
 
 <p>このウェブサイトでも同梱しているGruntプラグインのテストがてら稼働させ始めた。メディア・クエリーを抜き出すと以下のような順序で最後に追加されている。</p>
 
-<pre><code class="language-css">@media (min-width: 352px) {}
-@media (min-width: 39.118rem) {}
-@media (min-width: 53.487rem) {}
-@media not screen {}
-@media print {}</code></pre>
+<pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">352px</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">39.118rem</span>) {}
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">min-width:</span> <span class="hljs-number">53.487rem</span>) {}
+<span class="hljs-keyword">@media</span> <span class="hljs-keyword">not</span> screen {}
+<span class="hljs-keyword">@media</span> print {}</code></pre>
 
 <p>ちゃんと動いていそうだ。</p>
 	</div>
@@ -163,20 +156,13 @@ console.log(result.css);</code></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

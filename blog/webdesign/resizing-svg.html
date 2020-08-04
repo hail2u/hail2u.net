@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/webdesign/resizing-svg.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさのrect要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさのrect要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。" itemprop="description">
 		<link href="/img/blog/svg-edge-on-resizing.png" itemprop="image">
@@ -74,20 +67,20 @@
 
 <p>端のぼやけはChrome 34で起こりやすく、Firefox 29ではあまり起こらない。Internet Explorer 11では<code>px</code>単位でのリサイズなら起こらないかも。SVGのリサイズは実装側のパフォーマンス重視かアウトプット重視かで大きく変わってくるので、端のぼやけが起こらないようになることは期待できない。</p>
 
-<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;svg
-	xmlns=&quot;http://www.w3.org/2000/svg&quot;
-	version=&quot;1.1&quot;
-	width=&quot;1024&quot;
-	height=&quot;1024&quot;
-	viewBox=&quot;0 0 1024 1024&quot;&gt;
-	&lt;rect
-		x=&quot;0&quot;
-		y=&quot;0&quot;
-		width=&quot;1024&quot;
-		height=&quot;1024&quot;
-		style=&quot;fill:#333333&quot;/&gt;
-&lt;/svg&gt;</code></pre>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2000/svg"</span>
+	<span class="hljs-attr">version</span>=<span class="hljs-string">"1.1"</span>
+	<span class="hljs-attr">width</span>=<span class="hljs-string">"1024"</span>
+	<span class="hljs-attr">height</span>=<span class="hljs-string">"1024"</span>
+	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 1024 1024"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+		<span class="hljs-attr">x</span>=<span class="hljs-string">"0"</span>
+		<span class="hljs-attr">y</span>=<span class="hljs-string">"0"</span>
+		<span class="hljs-attr">width</span>=<span class="hljs-string">"1024"</span>
+		<span class="hljs-attr">height</span>=<span class="hljs-string">"1024"</span>
+		<span class="hljs-attr">style</span>=<span class="hljs-string">"fill:#333333"</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span></code></pre>
 
 <p>縦横1024のキャンバスいっぱいいっぱいの矩形を描こうとするとこうなる。このままだとリサイズした時に端がぼやける。</p>
 
@@ -95,20 +88,20 @@
 
 <p>下のように最適化するにはキャンバスからはみ出すように矩形を描いてやる。</p>
 
-<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;svg
-	xmlns=&quot;http://www.w3.org/2000/svg&quot;
-	version=&quot;1.1&quot;
-	width=&quot;1024&quot;
-	height=&quot;1024&quot;
-	viewBox=&quot;0 0 1024 1024&quot;&gt;
-	&lt;rect
-		x=&quot;-128&quot;
-		y=&quot;-128&quot;
-		width=&quot;1536&quot;
-		height=&quot;1536&quot;
-		style=&quot;fill:#333333&quot;/&gt;
-&lt;/svg&gt;</code></pre>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2000/svg"</span>
+	<span class="hljs-attr">version</span>=<span class="hljs-string">"1.1"</span>
+	<span class="hljs-attr">width</span>=<span class="hljs-string">"1024"</span>
+	<span class="hljs-attr">height</span>=<span class="hljs-string">"1024"</span>
+	<span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 1024 1024"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+		<span class="hljs-attr">x</span>=<span class="hljs-string">"-128"</span>
+		<span class="hljs-attr">y</span>=<span class="hljs-string">"-128"</span>
+		<span class="hljs-attr">width</span>=<span class="hljs-string">"1536"</span>
+		<span class="hljs-attr">height</span>=<span class="hljs-string">"1536"</span>
+		<span class="hljs-attr">style</span>=<span class="hljs-string">"fill:#333333"</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span></code></pre>
 
 <p>縦横に128ずつはみ出すように矩形を描くだけ。SVGではキャンバスが基本透明で、その背景を塗るためにはこのように矩形を作成してやったりする必要があるため、そこそこの頻度でこういったきれいにリサイズされるテクニックは必要になる。</p>
 	</div>
@@ -128,20 +121,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

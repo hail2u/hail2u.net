@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/synchronous-requests-to-jsonp.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" itemprop="description">
 		
@@ -76,39 +69,39 @@
 
 <p>つまり、</p>
 
-<pre><code class="language-js">var urls = [
-	&apos;http://del.icio.us/feeds/json/cho45&apos;,
-	&apos;http://del.icio.us/feeds/json/drawnboy&apos;,
-	&apos;http://del.icio.us/feeds/json/gorou&apos;,
-	&apos;http://del.icio.us/feeds/json/hail2u&apos;,
-	&apos;http://del.icio.us/feeds/json/miyagawa&apos;,
-	&apos;http://del.icio.us/feeds/json/nagayama&apos;,
-	&apos;http://del.icio.us/feeds/json/typester&apos;,
-	&apos;http://del.icio.us/feeds/json/yoko&apos;
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> urls = [
+	<span class="hljs-string">'http://del.icio.us/feeds/json/cho45'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/drawnboy'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/gorou'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/hail2u'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/miyagawa'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/nagayama'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/typester'</span>,
+	<span class="hljs-string">'http://del.icio.us/feeds/json/yoko'</span>
 ];</code></pre>
 
 <p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
 
-<pre><code class="language-js">addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
+<pre><code class="hljs language-js">addScript(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">'?callback=diplayPosts'</span>);
 
-function addScript(url) {
-	var script = document.createElement(&apos;script&apos;);
-	script.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
-	script.setAttribute(&apos;src&apos;, url);
-	script.setAttribute(&apos;charset&apos;, &apos;UTF-8&apos;);
-	document.getElementsByTagName(&apos;head&apos;).item(0).appendChild(script);
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addScript</span>(<span class="hljs-params">url</span>) </span>{
+	<span class="hljs-keyword">var</span> script = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>);
+	script.setAttribute(<span class="hljs-string">'type'</span>, <span class="hljs-string">'text/javascript'</span>);
+	script.setAttribute(<span class="hljs-string">'src'</span>, url);
+	script.setAttribute(<span class="hljs-string">'charset'</span>, <span class="hljs-string">'UTF-8'</span>);
+	<span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'head'</span>).item(<span class="hljs-number">0</span>).appendChild(script);
 }
 
-function diplayPosts(posts) {
-	// JSONフィードに含まれるブックマークのJSONデータに対する処理色々
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">diplayPosts</span>(<span class="hljs-params">posts</span>) </span>{
+	<span class="hljs-comment">// JSONフィードに含まれるブックマークのJSONデータに対する処理色々</span>
 
-	<em>loadNext()</em>;
+	&lt;em&gt;loadNext()&lt;/em&gt;;
 }
 
-function loadNext() {
-	if (urls.length &lt;= 1) return;
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadNext</span>(<span class="hljs-params"></span>) </span>{
+	<span class="hljs-keyword">if</span> (urls.length &lt;= <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>;
 	urls.shift();
-	addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
+	addScript(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">'?callback=diplayPosts'</span>);
 }</code></pre>
 
 <p>という感じに、コールバック関数（<code>displayPosts()</code>）内で次に進む関数（<code>loadNext()</code>）を呼び出すように<a href="https://pub.hail2u.net/test/082.html">実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある（ネットワーク状態に依存）し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>
@@ -133,20 +126,13 @@ function loadNext() {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

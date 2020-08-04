@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blosxom/googlebot_plugin.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="V. W. MarshallのIn Which the Fly Invites the Spider Into His Parlorと言うエントリにinspireされて（inspireとはパクったのを誤魔化したい時に使う言葉です）、Googlebotが自分が設置したblosxomのどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="V. W. MarshallのIn Which the Fly Invites the Spider Into His Parlorと言うエントリにinspireされて（inspireとはパクったのを誤魔化したい時に使う言葉です）、Googlebotが自分が設置したblosxomのどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。" itemprop="description">
 		
@@ -72,47 +65,47 @@
 	<div itemprop="articleBody">
 		<p><a href="http://www.vwmarshall.net/" title="V. W. Marshall">V. W. Marshall</a>の<a href="http://www.vwmarshall.net/archives/000998.php" title="V. W. Marshall: In Which the Fly Invites the Spider Into His Parlor">In Which the Fly Invites the Spider Into His Parlor</a>と言うエントリにinspireされて（inspireとはパクったのを誤魔化したい時に使う言葉です）、<a href="http://www.google.com/bot.html" title="Googlebot">Googlebot</a>が自分が設置した<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。</p>
 <p>以下、コード。</p>
-<pre><code class="language-perl"># Blosxom Plugin: googlebot
-# Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;
-# Version: 1.0
-# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+<pre><code class="hljs language-perl"><span class="hljs-comment"># Blosxom Plugin: googlebot</span>
+<span class="hljs-comment"># Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;</span>
+<span class="hljs-comment"># Version: 1.0</span>
+<span class="hljs-comment"># Blosxom Home/Docs/Licensing: http://www.blosxom.com/</span>
 
-package googlebot;
+<span class="hljs-keyword">package</span> googlebot;
 
-use strict;
+<span class="hljs-keyword">use</span> strict;
 
-# --- Configurable variables -----------
+<span class="hljs-comment"># --- Configurable variables -----------</span>
 
-my $sendmail = &apos;/usr/sbin/sendmail&apos;;
-my $from     = &apos;googlebot@example.com&apos;;
-my $to       = &apos;john.doe@example.com&apos;;
-my $subject  = &apos;Welcome Googlebot.&apos;;
+<span class="hljs-keyword">my</span> $sendmail = <span class="hljs-string">'/usr/sbin/sendmail'</span>;
+<span class="hljs-keyword">my</span> $from     = <span class="hljs-string">'googlebot@example.com'</span>;
+<span class="hljs-keyword">my</span> $to       = <span class="hljs-string">'john.doe@example.com'</span>;
+<span class="hljs-keyword">my</span> $subject  = <span class="hljs-string">'Welcome Googlebot.'</span>;
 
-# --- Plug-in package variables --------
+<span class="hljs-comment"># --- Plug-in package variables --------</span>
 
-# --------------------------------------
+<span class="hljs-comment"># --------------------------------------</span>
 
-sub start {
-	if (
-		$ENV{&apos;HTTP_USER_AGENT&apos;} =~ /Googlebot/ and
-		open(MAIL, &quot;| $sendmail -t&quot;)
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+	<span class="hljs-keyword">if</span> (
+		$ENV{<span class="hljs-string">'HTTP_USER_AGENT'</span>} =~ <span class="hljs-regexp">/Googlebot/</span> <span class="hljs-keyword">and</span>
+		<span class="hljs-keyword">open</span>(MAIL, <span class="hljs-string">"| $sendmail -t"</span>)
 	) {
-		print MAIL &lt;&lt;&quot;_MAIL_&quot;;
+		<span class="hljs-keyword">print</span> MAIL &lt;&lt;<span class="hljs-string">"_MAIL_"</span>;
 From: $from
 To: $to
 Subject: $subject
-Content-Type: text/plain; charset=ISO-2022-JP
+Content-Type: text/plain; charset=ISO-<span class="hljs-number">2022</span>-JP
 
-Googlebot tries to index the following page:
-http://example.com$ENV{&apos;REQUEST_URI&apos;}
-_MAIL_
-		close(MAIL);
+Googlebot tries to <span class="hljs-keyword">index</span> the following page:
+http:<span class="hljs-regexp">//example</span>.com$ENV{<span class="hljs-string">'REQUEST_URI'</span>}
+_MAIL<span class="hljs-number">_</span>
+		<span class="hljs-keyword">close</span>(MAIL);
 	}
 
-	return 0;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
 
-1;</code></pre>
+<span class="hljs-number">1</span>;</code></pre>
 <p>てか、使ってないので動くかどうかは知りませんけど。</p>
 <p>なんて奴だ。</p>
 <p>inspire元のエントリにもあるように、いろいろな検索エンジンのロボットをトラッキングすると面白いかもしれないですね。</p>
@@ -133,20 +126,13 @@ _MAIL_
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

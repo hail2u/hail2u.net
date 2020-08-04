@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/generating-html-best-practices-readme-md.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" itemprop="description">
 		
@@ -112,23 +105,23 @@
 
 <p>目次は、自分で考えたIDにジャンプするよう、リスト記法で並べる。本文では、見出しの末尾に空の<code>span</code>要素を追加し、それに考えたIDを振る（ここのIDはMarkdownレンダラーで処理されないので、Mustacheでエスケープされるように<code>{{...}}</code>で書く）。目次と本文で2回、同じセクションを回す。</p>
 
-<pre><code class="language-mustache">{{#sections}}
-- [{{{title}}}](#{{{id}}})
-{{#practices}}
-    - [{{{title}}}](#{{{id}}})
-{{/practices}}
-{{/sections}}
+<pre><code class="hljs language-mustache"><span class="hljs-template-tag">{{#<span class="hljs-name">sections</span>}}</span><span class="xml">
+- [</span><span class="hljs-template-variable">{{{title}}}</span><span class="xml">](#</span><span class="hljs-template-variable">{{{id}}}</span><span class="xml">)
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">practices</span>}}</span><span class="xml">
+    - [</span><span class="hljs-template-variable">{{{title}}}</span><span class="xml">](#</span><span class="hljs-template-variable">{{{id}}}</span><span class="xml">)
+</span><span class="hljs-template-tag">{{/<span class="hljs-name">practices</span>}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{/<span class="hljs-name">sections</span>}}</span><span class="xml">
 
 
-{{#sections}}
-## {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">sections</span>}}</span><span class="xml">
+## </span><span class="hljs-template-variable">{{{title}}}</span><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-{{#practices}}
-### {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">practices</span>}}</span><span class="xml">
+### </span><span class="hljs-template-variable">{{{title}}}</span><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{id}}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-{{{body}}}
-{{/practices}}
-{{/sections}}</code></pre>
+</span><span class="hljs-template-variable">{{{body}}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{/<span class="hljs-name">practices</span>}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{/<span class="hljs-name">sections</span>}}</span></code></pre>
 
 <p>IDを振った要素で見出しを括ってしまってもいいけど、それだとMarkdownとして読みづらくなるので、空要素にした。HTMLにすることを前提とした、こういったMarkdownはよくないと思うものの、GitHubのためならエンヤコラという感じだ。同時に、GitHubの見出しIDに依存しない（共存できる）ので、どこでHTMLにされても多分機能するという利点もある。</p>
 
@@ -154,20 +147,13 @@
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

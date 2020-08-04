@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/coding/shuffle-array-in-javascript.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。" itemprop="description">
 		
@@ -74,10 +67,10 @@
 
 <p>最初に書いたコードは、</p>
 
-<pre><code class="language-js">var a = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> a = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>);
 a.sort(
-	function (a, b) {
-		return Math.ceil(Math.random() * 3) - 2;
+	<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">a, b</span>) </span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.ceil(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-number">3</span>) - <span class="hljs-number">2</span>;
 	}
 );</code></pre>
 
@@ -89,30 +82,30 @@ a.sort(
 
 <p>Perlクックブックのレシピ4.18 配列の要素をランダムに並べ替えるでは、</p>
 
-<pre><code class="language-perl">sub fisher_yates_shuffle {
-	my $array = shift;
-	my $i;
-	for ($i = @$array; --$i; ) {
-		my $j = int rand ($i+1);
-		next if $i == $j;
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">fisher_yates_shuffle</span> </span>{
+	<span class="hljs-keyword">my</span> $array = <span class="hljs-keyword">shift</span>;
+	<span class="hljs-keyword">my</span> $i;
+	<span class="hljs-keyword">for</span> ($i = @$array; --$i; ) {
+		<span class="hljs-keyword">my</span> $j = <span class="hljs-keyword">int</span> <span class="hljs-keyword">rand</span> ($i+<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">next</span> <span class="hljs-keyword">if</span> $i == $j;
 		@$array[$i,$j] = @$array[$j,$i];
 	}
 }</code></pre>
 
 <p>という風になっている。拙い理解でJavaScriptに移植すると、</p>
 
-<pre><code class="language-js">function shuffle(list) {
-	var i = list.length;
+<pre><code class="hljs language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">shuffle</span>(<span class="hljs-params">list</span>) </span>{
+	<span class="hljs-keyword">var</span> i = list.length;
 
-	while (--i) {
-		var j = Math.floor(Math.random() * (i + 1));
-		if (i == j) continue;
-		var k = list[i];
+	<span class="hljs-keyword">while</span> (--i) {
+		<span class="hljs-keyword">var</span> j = <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random() * (i + <span class="hljs-number">1</span>));
+		<span class="hljs-keyword">if</span> (i == j) <span class="hljs-keyword">continue</span>;
+		<span class="hljs-keyword">var</span> k = list[i];
 		list[i] = list[j];
 		list[j] = k;
 	}
 
-	return list;
+	<span class="hljs-keyword">return</span> list;
 }</code></pre>
 
 <p>となる（と思う）。<a href="https://pub.hail2u.net/test/065.html">サンプル・ページ</a>を作成して試したところ、ちゃんとシャッフルされているようだ。並べ替えるというよりも、入れ替えるという形。</p>
@@ -150,20 +143,13 @@ a.sort(
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/software/node-inlining.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="HTMLからlink要素で参照しているCSSの内容をstyle属性に全部展開するNode.jsパッケージ、node-inliningを書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="HTMLからlink要素で参照しているCSSの内容をstyle属性に全部展開するNode.jsパッケージ、node-inliningを書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。" itemprop="description">
 		
@@ -81,9 +74,9 @@ $ <kbd>inlining input.html &gt;output.html</kbd></samp></pre>
 
 <p>Node.jsパッケージとしての利用は少しややこしくなる。</p>
 
-<pre><code class="language-javascript">var inlining = require(&quot;inlining&quot;);
-inlining(fs.readFileSync(&quot;input.html&quot;, &quot;utf8&quot;), function (result) {
-	console.log(result);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> inlining = <span class="hljs-built_in">require</span>(<span class="hljs-string">"inlining"</span>);
+inlining(fs.readFileSync(<span class="hljs-string">"input.html"</span>, <span class="hljs-string">"utf8"</span>), <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">result</span>) </span>{
+	<span class="hljs-built_in">console</span>.log(result);
 });</code></pre>
 
 <p>引数は以下の3つになる。</p>
@@ -132,17 +125,17 @@ inlining(fs.readFileSync(&quot;input.html&quot;, &quot;utf8&quot;), function (re
 
 <p>最後に完全なHTMLソースを手に入れることに少し苦労した。<code>window.document.documentElement.innerHTML</code>だと<code>html</code>要素が除外され、<code>window.document.documentElement.outerHTML</code>だとDOCTYPEが拾えない。<code>window.document.doctype</code>を使って連結するのは少しややこしすぎる。どうやら専用の非標準APIが用意されているようで、それを使うとうまく手に入れられた。</p>
 
-<pre><code class="language-javascript">var jsdom = require(&quot;jsdom&quot;);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> jsdom = <span class="hljs-built_in">require</span>(<span class="hljs-string">"jsdom"</span>);
 
 jsdom.env(
-	&quot;&lt;!DOCTYPE html&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&quot;,
-	function (errors, window) {
-		console.log(window.document.documentElement.innerHTML);
-		// &lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;
-		console.log(window.document.documentElement.outerHTML);
-		// &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-		console.log(jsdom.serializeDocument(window.document));
-		// &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+	<span class="hljs-string">"&lt;!DOCTYPE html&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;"</span>,
+	<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">errors, window</span>) </span>{
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">window</span>.document.documentElement.innerHTML);
+		<span class="hljs-comment">// &lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;</span>
+		<span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">window</span>.document.documentElement.outerHTML);
+		<span class="hljs-comment">// &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</span>
+		<span class="hljs-built_in">console</span>.log(jsdom.serializeDocument(<span class="hljs-built_in">window</span>.document));
+		<span class="hljs-comment">// &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</span>
 	}
 );</code></pre>
 
@@ -168,20 +161,13 @@ jsdom.env(
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/rss/bloglines_web_services.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="遂に来ました。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="遂に来ました。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。" itemprop="description">
 		
@@ -82,24 +75,24 @@
 <section>
 <h2>追記</h2>
 <p>とりあえずSync APIの<a href="http://www.bloglines.com/services/api/listsubs">listsubs</a>を叩くPerlスクリプトを書いてみた。</p>
-<pre><code class="language-perl">#!/usr/local/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
 
-use strict;
+<span class="hljs-keyword">use</span> strict;
 
-my $uname = &apos;メールアドレス&apos;;
-my $pass  = &apos;パスワード&apos;;
+<span class="hljs-keyword">my</span> $uname = <span class="hljs-string">'メールアドレス'</span>;
+<span class="hljs-keyword">my</span> $pass  = <span class="hljs-string">'パスワード'</span>;
 
-my $loc   = &apos;rpc.bloglines.com:80&apos;;
-my $realm = &apos;Bloglines RPC&apos;;
+<span class="hljs-keyword">my</span> $loc   = <span class="hljs-string">'rpc.bloglines.com:80'</span>;
+<span class="hljs-keyword">my</span> $realm = <span class="hljs-string">'Bloglines RPC'</span>;
 
-use LWP::UserAgent;
+<span class="hljs-keyword">use</span> LWP::UserAgent;
 
-my $ua = LWP::UserAgent-&gt;new();
+<span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new();
 $ua-&gt;credentials($loc, $realm, $uname, $pass);
 
-print $ua-&gt;get(&quot;http://rpc.bloglines.com/listsubs&quot;)-&gt;as_string;
+<span class="hljs-keyword">print</span> $ua-&gt;get(<span class="hljs-string">"http://rpc.bloglines.com/listsubs"</span>)-&gt;as_string;
 
-exit;</code></pre>
+<span class="hljs-keyword">exit</span>;</code></pre>
 <p>遅！仕様的にキャッシュできない（未読状態が少しでも変わると内容が変わってしまう）ので辛いかも。</p>
 <p>本筋とは関係ないですけど、<a href="http://www.mozilla.org/products/firefox/">Firefox</a>のPassword Managerでrealmを調べることができました（まぁ間違ったのを送った場合はレスポンスヘッダに正しいrealmが書かれているんですけどね）。Siteカラムの（）で括られている部分。</p>
 </section>
@@ -123,18 +116,18 @@ End If
 
 WScript.Quit</pre>
 <p>続いてJScriptのコード。</p>
-<pre><code class="language-js">var xmlHttp = new ActiveXObject(&quot;Msxml2.XMLHTTP.3.0&quot;);
-var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> xmlHttp = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Msxml2.XMLHTTP.3.0"</span>);
+<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Msxml2.DOMDocument.3.0"</span>);
 
-xmlHttp.open(&quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, false, &quot;メールアドレス&quot;, &quot;パスワード&quot;);
+xmlHttp.open(<span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://rpc.bloglines.com/listsubs"</span>, <span class="hljs-literal">false</span>, <span class="hljs-string">"メールアドレス"</span>, <span class="hljs-string">"パスワード"</span>);
 xmlHttp.send();
 
-xmlDoc.async = false;
+xmlDoc.async = <span class="hljs-literal">false</span>;
 xmlDoc.loadXML(xmlHttp.responseText);
 
-if (xmlDoc.parseError.errorCode != 0) {
-	WScript.Echo(&quot;You have error &quot; + xmlDoc.parseError.reason);
-} else {
+<span class="hljs-keyword">if</span> (xmlDoc.parseError.errorCode != <span class="hljs-number">0</span>) {
+	WScript.Echo(<span class="hljs-string">"You have error "</span> + xmlDoc.parseError.reason);
+} <span class="hljs-keyword">else</span> {
 	WScript.Echo(xmlDoc.xml);
 }
 
@@ -158,20 +151,13 @@ WScript.Quit();</code></pre>
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

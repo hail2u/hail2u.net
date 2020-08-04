@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/rss/rss_which_has_a_few_error.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする（XML::RSSも含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする（XML::RSSも含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" itemprop="description">
 		
@@ -72,18 +65,18 @@
 	<div itemprop="articleBody">
 		<p><a href="http://mylog.ishinao.net/">ishinao.net/mylog</a>の<a href="http://mylog.ishinao.net/id/1174">微妙にinvalidなRSSを手軽にvalidにする方法</a>で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSを<a href="http://search.cpan.org/search?module=XML::Parser">XML::Parser</a>を利用してゴニョゴニョする（<a href="http://search.cpan.org/search?module=XML::RSS">XML::RSS</a>も含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。</p>
 <p>僕はこんなコードで、この両方の問題をまとめて回避しています。</p>
-<pre><code class="language-perl">#!/usr/local/bin/perl
+<pre><code class="hljs language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
 
-use strict;
-use Jcode;
-use LWP::Simple;
-use XML::RSS;
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> Jcode;
+<span class="hljs-keyword">use</span> LWP::Simple;
+<span class="hljs-keyword">use</span> XML::RSS;
 
-my $res = LWP::Simple::get(&apos;http://example.com/path/to/rss&apos;);
-my $content = Jcode-&gt;new($res)-&gt;utf8;
-$content =~ s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/;
-my $rss = new XML::RSS;
-eval { $rss-&gt;parse($content); };
+<span class="hljs-keyword">my</span> $res = LWP::Simple::get(<span class="hljs-string">'http://example.com/path/to/rss'</span>);
+<span class="hljs-keyword">my</span> $content = Jcode-&gt;new($res)-&gt;utf8;
+$content =~ <span class="hljs-regexp">s/&lt;\?xml.*?\?&gt;/&lt;\?xml version="1.0" encoding="UTF-8"\?&gt;/</span>;
+<span class="hljs-keyword">my</span> $rss = new XML::RSS;
+<span class="hljs-keyword">eval</span> { $rss-&gt;parse($content); };
 ...</code></pre>
 <ol>
 <li>ファイルごとUTF-8にコンバート</li>
@@ -109,20 +102,13 @@ eval { $rss-&gt;parse($content); };
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

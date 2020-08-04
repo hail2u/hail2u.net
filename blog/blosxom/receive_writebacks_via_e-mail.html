@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blosxom/receive_writebacks_via_e-mail.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="そういや付けました。結構前に。writeback notifyというプラグインがあったんですけど、配布サイト消えてたり。なので、sendmailで適当に組んでみました。writeback最後の方に以下を追加。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="そういや付けました。結構前に。writeback notifyというプラグインがあったんですけど、配布サイト消えてたり。なので、sendmailで適当に組んでみました。writeback最後の方に以下を追加。" itemprop="description">
 		
@@ -71,11 +64,11 @@
 
 	<div itemprop="articleBody">
 		<p>そういや付けました。結構前に。writeback notifyというプラグインがあったんですけど、配布サイト消えてたり。なので、sendmailで適当に組んでみました。writeback最後の方に以下を追加。</p>
-<pre><code class="language-perl">sub notify {
-	my $body = $_[0];
+<pre><code class="hljs language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">notify</span> </span>{
+	<span class="hljs-keyword">my</span> $body = $_[<span class="hljs-number">0</span>];
 
-	if (open(MAIL, &quot;| /usr/lib/sendmail -t&quot;)) {
-		print MAIL &lt;&lt;&quot;_MAIL_&quot;;
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">open</span>(MAIL, <span class="hljs-string">"| /usr/lib/sendmail -t"</span>)) {
+		<span class="hljs-keyword">print</span> MAIL &lt;&lt;<span class="hljs-string">"_MAIL_"</span>;
 From:writeback\@blosxom.com
 To:kyo\@hail2u.net
 Subject:hail2u.net - Weblog - Comment/TrackBack
@@ -83,35 +76,35 @@ Content-Type:text/plain
 X-Mailer:blosxom writeback plugin
 
 $body
-_MAIL_
-		close(MAIL);
+_MAIL<span class="hljs-number">_</span>
+		<span class="hljs-keyword">close</span>(MAIL);
 	}
 }</code></pre>
 <p>これは、引数に渡された文字列をsendmailで送るサブルーチンです。さらに、128行目あたりのパラメータからファイルに書き込むところを、</p>
-<pre><code class="language-perl">foreach (@fields) {
-	my $p = param($_);
-	$p =~ s/\x0D\x0A|\x0D|\x0A/\t/gm;
-	$p =~ s/^\t*(.*?)\t*$/$1/gm;
-	$p =~ s/&lt;.*?&gt;//gm;
-	$p =~ s/&amp;/&amp;amp;/gm;
-	$p =~ s/&lt;/&amp;lt;/gm;
-	$p =~ s/&gt;/&amp;gt;/gm;
-	$p =~ s/&quot;/&amp;quot;/gm;
+<pre><code class="hljs language-perl"><span class="hljs-keyword">foreach</span> (@fields) {
+	<span class="hljs-keyword">my</span> $p = param($_);
+	$p =~ <span class="hljs-regexp">s/\x0D\x0A|\x0D|\x0A/\t/gm</span>;
+	$p =~ <span class="hljs-regexp">s/^\t*(.*?)\t*$/$1/gm</span>;
+	$p =~ <span class="hljs-regexp">s/&lt;.*?&gt;//gm</span>;
+	$p =~ <span class="hljs-regexp">s/&amp;/&amp;amp;/gm</span>;
+	$p =~ <span class="hljs-regexp">s/&lt;/&amp;lt;/gm</span>;
+	$p =~ <span class="hljs-regexp">s/&gt;/&amp;gt;/gm</span>;
+	$p =~ <span class="hljs-regexp">s/"/&amp;quot;/gm</span>;
 
-	if ($_ eq &apos;comment&apos; || $_ eq &apos;excerpt&apos;) {
-		$p =~ s/(ftp:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; ftp&lt;\/a&gt;/g;
-		$p =~ s/(h?ttp:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; http&lt;\/a&gt;/g;
-		$p =~ s/(h?ttps:\/\/[!-~]+\.[!-~]+)/&lt;a href=&quot;$1&quot; title=&quot;$1&quot;&gt;&amp;#187; https&lt;\/a&gt;/g;
-		$p =~ s/(^|[^\x81-\x9f])([!-~]+\@[!-~]+\.[!-~]+)/$1&lt;a href=&quot;mailto:$2&quot; title=&quot;$2&quot;&gt;&amp;#187; mailto&lt;\/a&gt;/g;
+	<span class="hljs-keyword">if</span> ($_ eq <span class="hljs-string">'comment'</span> || $_ eq <span class="hljs-string">'excerpt'</span>) {
+		$p =~ <span class="hljs-regexp">s/(ftp:\/\/[!-~]+\.[!-~]+)/&lt;a href="$1" title="$1"&gt;&amp;#187; ftp&lt;\/a&gt;/g</span>;
+		$p =~ <span class="hljs-regexp">s/(h?ttp:\/\/[!-~]+\.[!-~]+)/&lt;a href="$1" title="$1"&gt;&amp;#187; http&lt;\/a&gt;/g</span>;
+		$p =~ <span class="hljs-regexp">s/(h?ttps:\/\/[!-~]+\.[!-~]+)/&lt;a href="$1" title="$1"&gt;&amp;#187; https&lt;\/a&gt;/g</span>;
+		$p =~ <span class="hljs-regexp">s/(^|[^\x81-\x9f])([!-~]+\@[!-~]+\.[!-~]+)/$1&lt;a href="mailto:$2" title="$2"&gt;&amp;#187; mailto&lt;\/a&gt;/g</span>;
 	}
 
-	$p =~ s/\t/&lt;br \/&gt;/g;
-	$temp .= &quot;$_:$p\n&quot;;
+	$p =~ <span class="hljs-regexp">s/\t/&lt;br \/&gt;/g</span>;
+	$temp .= <span class="hljs-string">"$_:$p\n"</span>;
 }
-$temp .= &quot;-----\n&quot;;
-print $fh $temp;
-$fh-&gt;close();
-$temp = &quot;$blosxom::url$path/$fn.html\n-----\n$temp&quot;; # *1
+$temp .= <span class="hljs-string">"-----\n"</span>;
+<span class="hljs-keyword">print</span> $fh $temp;
+$fh-&gt;<span class="hljs-keyword">close</span>();
+$temp = <span class="hljs-string">"$blosxom::url$path/$fn.html\n-----\n$temp"</span>; <span class="hljs-comment"># *1</span>
 &amp;notify($temp);</code></pre>
 <p>こんな風に書き換えます。タグ削除とか自動リンクとかそんなものも追加されてますが、根幹は元々各パラメータの値を順に書き加えているのを、一旦<code>$temp</code>に追加していく様にして、最後に書き込みしてます。その上で、<code>$temp</code>の先頭（後尾でも良いのですけど）ににそのエントリのParmanent linkを付け加え（*1のところ）、<code>notify</code>サブルーチンに渡してます。</p>
 <p>わかりにく。</p>
@@ -132,20 +125,13 @@ $temp = &quot;$blosxom::url$path/$fn.html\n-----\n$temp&quot;; # *1
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>

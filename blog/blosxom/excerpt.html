@@ -9,21 +9,14 @@
 		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
 		<link href="mailto:hail2u@gmail.com" rel="author">
 		<link href="/blog/blosxom/excerpt.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
 		<meta content="諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容はforeshortenedとあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。" name="description">
 		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
 		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
 		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.11.5.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
-		<link href="/css/print.9.11.5.css" media="only print" rel="stylesheet">
-
-		<script async defer src="/js/change-color-mode-on-check.9.11.5.js"></script>
-		<script async defer src="/js/change-hue-on-scroll.9.11.5.js"></script>
-
-		<script src="/js/change-color-mode.9.11.5.js"></script>
-		<script src="/js/change-hue.9.11.5.js"></script>
+		<link href="/css/index.9.12.0.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.0.css" media="only print" rel="stylesheet">
 
 		<meta content="諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容はforeshortenedとあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。" itemprop="description">
 		
@@ -71,38 +64,38 @@
 
 	<div itemprop="articleBody">
 		<p>諸事情により、概要らしきものを無理やり作ってみるexcerptプラグインを一週間前くらいに作りました。内容は<a href="http://www.blosxom.com/plugins/text/foreshortened.htm" title="blosxom :: the zen of blogging :: plugins/text/foreshortened.txt">foreshortened</a>とあんまり変わらないです。元々rss10プラグインに似たような機能を付けてはいたのですが、いくつかのプラグインやフレーバーから扱う都合上、切り分けてみたり。</p>
-<pre><code class="language-perl"># Blosxom Plugin: excerpt
-# Author(s): Kyo Nagashima &lt;k-n&#64;muc.biglobe.ne.jp&gt;
-# Version: 1.0
-# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+<pre><code class="hljs language-perl"><span class="hljs-comment"># Blosxom Plugin: excerpt</span>
+<span class="hljs-comment"># Author(s): Kyo Nagashima &lt;k-n&amp;#64;muc.biglobe.ne.jp&gt;</span>
+<span class="hljs-comment"># Version: 1.0</span>
+<span class="hljs-comment"># Blosxom Home/Docs/Licensing: http://www.blosxom.com/</span>
 
-package excerpt;
+<span class="hljs-keyword">package</span> excerpt;
 
-use strict;
-use vars qw($body);
+<span class="hljs-keyword">use</span> strict;
+<span class="hljs-keyword">use</span> vars <span class="hljs-string">qw($body)</span>;
 
-# --- Configurable variables -----------
+<span class="hljs-comment"># --- Configurable variables -----------</span>
 
-# --- Plug-in package variables --------
+<span class="hljs-comment"># --- Plug-in package variables --------</span>
 
-# --------------------------------------
+<span class="hljs-comment"># --------------------------------------</span>
 
-sub start {
-	return 1;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
 }
 
-sub story {
-	my($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
+<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">story</span> </span>{
+	<span class="hljs-keyword">my</span>($pkg, $path, $fn, $story_ref, $title_ref, $body_ref) = @_;
 
 	$body = $$body_ref;
-	$body =~ s!\x0D|\x0A!!g;
-	$body =~ s!^&lt;p&gt;(.*?)&lt;/p&gt;.*$!$1!;
+	$body =~ <span class="hljs-keyword">s</span>!\x0D|\x0A!!g;
+	$body =~ <span class="hljs-keyword">s</span>!^&lt;p&gt;(.*?)&lt;<span class="hljs-regexp">/p&gt;.*$!$1!;
 	$body =~ s!&lt;.*?&gt;!!g;
 
 	return 1;
 }
 
-1;</code></pre>
+1;</span></code></pre>
 <p>というような感じで、最初の<code>p</code>要素の内容を切り出し、タグを削除という単純明快、ぶっちゃけこのblog専用の手抜きなもの。</p>
 <p>事情というのは、rssフレーバーを<a href="http://blogs.law.harvard.edu/tech/rss" title="RSS 2.0 Specification">RSS 2.0</a>、rdfフレーバーを<a href="http://web.resource.org/rss/1.0/spec" title="RDF Site Summary (RSS) 1.0">RSS 1.0</a>に変更した事情です。特に何かセマンティックな理由（どんな理由だ）があるわけではなく、気分の問題。RSS 2.0に非対応というRSSリーダーはあんまり聞かないので、多くの人には関係の無いことだと思いますが、もしかすると一部のRSSリーダーで読めなくなっちゃったとかあるかもしれません。ゴメンナサイと謝っておきます。</p>
 <p>ということで、現在このblogのフィードは以下の4種類です。</p>
@@ -130,20 +123,13 @@ sub story {
 			</ul>
 
 			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/style-guide/">スタイル・ガイド</a></li>
 				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li aria-hidden="true">⸱</li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages">
-				<li><a href="#top"><span aria-hidden="true">⬆</span>先頭に戻る</a></li>
-				<li><a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></li>
-				<li>色モード:
-					<label for="color-mode-light"><input id="color-mode-light" class="js-color-mode" name="color-mode" type="radio" value="light">ライト</label>
-					<label for="color-mode-dark"><input id="color-mode-dark" class="js-color-mode" name="color-mode" type="radio" value="dark">ダーク</label>
-					<label for="color-mode-auto"><input id="color-mode-auto" class="js-color-mode" checked name="color-mode" type="radio" value="auto">自動</label>
-				</li>
 			</ul>
 		</footer>
 	</body>
