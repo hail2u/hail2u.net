@@ -100,25 +100,6 @@ const checkSelectedName = (name) => {
 	return true;
 };
 
-const handleConflict = () => {
-	throw new Error("The name of this draft is already used. A draft name must be unique.");
-};
-
-const handleNotConflict = (e) => {
-	if (e.code === "ENOENT") {
-		return true;
-	}
-
-	throw e;
-};
-
-const checkSelectedNameConflict = (name) => {
-	const filename = path.join(config.src.articles, `${name}.html`);
-	return fs.access(filename)
-		.then(handleConflict)
-		.catch(handleNotConflict);
-};
-
 const checkSelectedTitle = (title) => {
 	if (typeof title !== "string") {
 		throw new Error("This draft does not have a valid title. A draft title must be a string.");
@@ -176,14 +157,13 @@ const copyArticleImages = async (html) => {
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
 const contributeSelected = async (selected) => {
-	const articlePath = path.join(config.src.articles, `${selected.name}.html`);
 	const cache = await readJSONFile(config.data.articles);
 	await Promise.all([
 		fs.unlink(selected.src),
 		copyArticleImages(selected.body),
-		outputFile(articlePath, selected.body),
 		outputJSONFile(config.data.articles, [
 			{
+				"body": selected.body,
 				"link": `/blog/${selected.name}.html`,
 				"published": Date.now(),
 				"title": selected.title
@@ -195,7 +175,6 @@ const contributeSelected = async (selected) => {
 		runCommand("git", [
 			"add",
 			"--",
-			articlePath,
 			config.data.articles
 		]),
 		runCommand("node", [
@@ -220,7 +199,6 @@ const main = async () => {
 	const selected = await selectDraft(drafts);
 	await Promise.all([
 		checkSelectedName(selected.name),
-		checkSelectedNameConflict(selected.name),
 		checkSelectedTitle(selected.title),
 		checkSelectedTitleLength(selected.title)
 	]);

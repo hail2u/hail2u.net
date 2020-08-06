@@ -11,7 +11,6 @@ import mustache from "mustache";
 import {
 	outputFile
 } from "../lib/output-file.js";
-import path from "path";
 import {
 	readJSONFile
 } from "../lib/json-file.js";
@@ -26,15 +25,14 @@ const toAbsoluteURL = (url) => {
 
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
-const extendArticle = async (article) => {
-	const body = await fs.readFile(path.join(config.src.root, article.link), "utf8");
-	const description = unescapeReferences(body.replace(/<.*?>/g, ""))
+const extendArticle = (article) => {
+	const description = unescapeReferences(article.body.replace(/<.*?>/g, ""))
 		.trim()
 		.split("\n")
 		.shift();
 	return {
 		...article,
-		"body": body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
+		"body": article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
 		"description": description,
 		"type": "article"
 	};

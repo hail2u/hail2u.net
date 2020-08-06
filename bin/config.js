@@ -191,7 +191,6 @@ export default {
 	"src": {
 		"article": "src/blog/article.mustache",
 		"articleImages": "src/img/blog/",
-		"articles": "src/blog/",
 		"drafts": "src/drafts/",
 		"partial": "src/partial/",
 		"photos": "src/img/photos/",

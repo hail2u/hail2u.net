@@ -23,19 +23,9 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 
-const extendArticle = async (requireBody, article, i, articles) => {
+const extendArticle = (article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));
-
-	if (!requireBody || (typeof requireBody === "string" && !requireBody.endsWith(article.link))) {
-		return {
-			...article,
-			...dt,
-			"isArticle": true
-		};
-	}
-
-	const body = await fs.readFile(path.join(config.src.root, article.link), "utf8");
-	const description = unescapeReferences(body.replace(/<.*?>/g, ""))
+	const description = unescapeReferences(article.body.replace(/<.*?>/g, ""))
 		.trim()
 		.split("\n")
 		.shift();
@@ -44,7 +34,7 @@ const extendArticle = async (requireBody, article, i, articles) => {
 		return {
 			...article,
 			...dt,
-			"body": body.trim(),
+			"body": article.body.trim(),
 			"description": description,
 			"isArticle": true
 		};
@@ -57,7 +47,7 @@ const extendArticle = async (requireBody, article, i, articles) => {
 	return {
 		...article,
 		...dt,
-		"body": body.trim(),
+		"body": article.body.trim(),
 		"description": description,
 		"isArticle": true,
 		"previous": {
@@ -67,9 +57,9 @@ const extendArticle = async (requireBody, article, i, articles) => {
 	};
 };
 
-const readArticles = async (requireBody) => {
+const readArticles = async () => {
 	const articles = await readJSONFile(config.data.articles);
-	return Promise.all(articles.map(extendArticle.bind(null, requireBody)));
+	return Promise.all(articles.map(extendArticle));
 };
 
 const extendBook = (book) => {
@@ -388,7 +378,7 @@ const main = async () => {
 		version
 	] = await Promise.all([
 		readJSONFile(config.data.metadata),
-		readArticles(argv.articles || argv.article),
+		readArticles(),
 		readBooks(),
 		readDocuments(),
 		readFollowings(),
