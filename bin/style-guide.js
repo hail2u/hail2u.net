@@ -5,9 +5,12 @@ import {
 } from "../lib/output-file.js";
 
 const main = async () => {
-	const reURLAttr = /\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g;
 	const html = await fs.readFile(config.src.styleGuide, "utf8");
-	await outputFile(config.dest.styleGuide, html.replace(reURLAttr, "$1=\"$3\""));
+	const optimized = html.replace(
+		/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,
+		"$1=\"$3\""
+	);
+	await outputFile(config.dest.styleGuide, optimized);
 };
 
 main().catch((e) => {

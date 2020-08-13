@@ -12,29 +12,6 @@ import {
 } from "../lib/run-command.js";
 import sharp from "sharp";
 
-const isFollowed = (url, following) => url === following.url;
-
-const addFollowing = async (feed, title, url) => {
-	const followings = await readJSONFile(config.data.followings);
-
-	if (followings.find(isFollowed.bind(null, url))) {
-		throw new Error(`${title} has already been followed.`);
-	}
-
-	await outputJSONFile(config.data.followings, [
-		{
-			"feed": feed,
-			"title": title,
-			"url": url
-		},
-		...followings
-	]);
-	return [
-		[config.data.followings],
-		`Follow ${url}`
-	];
-};
-
 const isReadBook = (asin, book) => asin === book.asin;
 
 const addBook = async (asin, title) => {
@@ -72,8 +49,31 @@ const addBook = async (asin, title) => {
 		...books
 	]);
 	return [
-		[config.data.books],
-		`Read ${asin}`
+		`Read ${asin}`,
+		config.data.books
+	];
+};
+
+const isFollowed = (url, following) => url === following.url;
+
+const addFollowing = async (feed, title, url) => {
+	const followings = await readJSONFile(config.data.followings);
+
+	if (followings.find(isFollowed.bind(null, url))) {
+		throw new Error(`${title} has already been followed.`);
+	}
+
+	await outputJSONFile(config.data.followings, [
+		{
+			"feed": feed,
+			"title": title,
+			"url": url
+		},
+		...followings
+	]);
+	return [
+		`Follow ${url}`,
+		config.data.followings
 	];
 };
 
@@ -89,8 +89,8 @@ const addLink = async (comment, title, url) => {
 		...links
 	]);
 	return [
-		[config.data.links],
-		`Bookmark ${url}`
+		`Bookmark ${url}`,
+		config.data.links
 	];
 };
 
@@ -131,11 +131,9 @@ const addPhoto = async (photo, ext) => {
 		])
 	]);
 	return [
-		[
-			src,
-			config.data.photos
-		],
-		`Add ${fn}`
+		`Add ${fn}`,
+		src,
+		config.data.photos
 	];
 };
 
@@ -149,8 +147,8 @@ const addStatus = async (status) => {
 		...statuses
 	]);
 	return [
-		[config.data.statuses],
-		"Update status"
+		"Update status",
+		config.data.statuses
 	];
 };
 
@@ -202,7 +200,6 @@ const main = async () => {
 			"a": "asin",
 			"c": "comment",
 			"f": "feed",
-			"p": "photo",
 			"t": "title",
 			"u": "url"
 		},
@@ -210,7 +207,6 @@ const main = async () => {
 			"asin": "",
 			"comment": "",
 			"feed": "",
-			"photo": "",
 			"title": "",
 			"url": ""
 		},
@@ -218,14 +214,13 @@ const main = async () => {
 			"asin",
 			"comment",
 			"feed",
-			"photo",
 			"title",
 			"url"
 		]
 	});
 	const [
-		files,
-		message
+		message,
+		...files
 	] = await addThing(argv);
 	await runCommand("git", [
 		"add",

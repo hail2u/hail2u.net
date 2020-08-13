@@ -25,7 +25,9 @@ const buildJS = async (file) => {
 		})
 	]);
 	const dest = file.dest.replace(/{{version}}/g, version);
-	await outputFile(dest, `(function(){${compiled.code}})();`);
+	await outputFile(dest, `(function () {
+${compiled.code.trim()}
+})();`);
 };
 
 Promise.all(config.files.js.map(buildJS)).catch((e) => {
