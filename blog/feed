@@ -14,6 +14,70 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。]]></description>
+				<link>https://hail2u.net/blog/limiting-concurrency.html</link>
+				<pubDate>Thu, 27 Aug 2020 10:46:59 +0900</pubDate>
+				<title><![CDATA[並行実行数の制限]]></title>
+
+					<content:encoded><![CDATA[<p>Windows 10上のNode.jsだと、<code>Promise.all()</code>で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。</p>
+
+<p>並行実行数を固定するコードを書くと確実だが、スパッと書けなかった。ならば1024を超えない程度に配列を分割するだけでもいいかと、目先を変えた。今回は、このウェブサイトのHTML生成スクリプトでどうするかという話だ。まだ3268記事なので、4つに（800強ずつに）分割すれば大丈夫だろう。5で割る必要が出てくるのは、月に10記事でもあと7年以上かかる。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const chunks = longArray.reduce((previous, current, index) => {
+	previous[index % previous.length].push(current);
+	return previous;
+}, [[], [], [], []]);
+
+for (const chunk of chunks) {
+	await Promise.all(chunks.map(doSomething));
+}</code></pre>
+
+<p>配列を分割して配列の配列にしたかったので、<code>Array#reduce()</code>を使って書いた。5年後に5分割するよう書き換えるなら、初期配列を書き換える。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const chunkCount = 4;
+const chunkLength = Math.floor(longArray.length / chunkCount);
+
+for (let i = 0; i < chunkCount; i++) {
+	await Promise.all(
+		longArray
+			.slice(chunkLength * i, chunkLength * (i + 1))
+			.map(doSomething)
+	);
+}</code></pre>
+
+<p>普通に<code>Array#slice()</code>で書いた方が、ループが1回で済むので速そうだ。ここまで書いて、ようやく並行実行数を固定するコードがスパッと書けることがわかった。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const limit = 32;
+let i = 0;
+
+while (i > longArray.length) {
+	const to = i + limit;
+	await Promise.all(
+		longArray
+			.slice(i, to)
+			.map(doSomething)
+	);
+	i = to;
+}</code></pre>
+
+<p><code>Array#splice()</code>で破壊しながら実行すると、もっと短くなりそうだ。うろ覚えだが、後ろから削っていくと速かったはずだ。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+
+while (longArray.length > 0) {
+	await Promise.all(
+		longArray
+			.splice(-32)
+			.map(doSomething)
+	);
+}</code></pre>
+
+<p>まずはこれでやっていくことにした。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[集中して、いくつかプロダクト・デザイナーの本を読んでいた。あまり得るところがない。エッセイとして仕上げられたものが多く、どうしても経験則にかたより、デザイン哲学みたいなようで、特に根拠がないフワッとした主張の文章に終わりがち（主張には根拠があるが、そこまで書けない）だ。第三者による評論を読んだ方がいいと思うが、プロダクト・デザイナー、しかも日本のとなるとなかなかない。]]></description>
 				<link>https://hail2u.net/blog/on-20200821.html</link>
 				<pubDate>Fri, 21 Aug 2020 12:19:42 +0900</pubDate>
@@ -176,24 +240,6 @@
 <hr>
 
 <p><a href="https://ja.wikipedia.org/wiki/%E5%AF%8C%E5%B6%BD%E4%B8%89%E5%8D%81%E5%85%AD%E6%99%AF#/media/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB:The_Great_Wave_off_Kanagawa.jpg">神奈川沖浪裏</a>は一番有名なだけあって、画像がしゃっきりしており、きれいに印刷できそうな気がする。そのうちやってみたい。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[オンマウスでボタンのコントラストを上げるために色を増やすのは嫌だなと考えていたが、filterプロパティーが簡単そうだ。色モードの変更にもそのままで機能する。ボタンの背景色が白や黒でない限り、汎用的に使える。]]></description>
-				<link>https://hail2u.net/blog/increasing-button-contrast-on-hover.html</link>
-				<pubDate>Sun, 19 Jul 2020 14:59:54 +0900</pubDate>
-				<title><![CDATA[オンマウス、ボタン、コントラスト]]></title>
-
-					<content:encoded><![CDATA[<p>オンマウスでボタンのコントラストを上げるために色を増やすのは嫌だなと考えていたが、<code>filter</code>プロパティーが簡単そうだ。色モードの変更にもそのままで機能する。ボタンの背景色が白や黒でない限り、汎用的に使える。</p>
-
-<pre><code class="language-css">button:hover {
-	filter: contrast(1.5);
-}</code></pre>
-
-<p>ボタンをオンマウスでどう変化すべき（または変化させないべき）かというのは意見が一致しない。セケンではハイライトを当てる実装が多い。僕は、それだと白背景の場合に目立たなくなるので否定的だ。</p>
-
-<p>ボタンを操作する時に指をのせるという行為のメタファーと考えると、指の影で暗くなるのが自然にも思える。しかし、そのままボタンを暗くし、ボタンの文字も暗くしてしまうと、操作しづらくなってしまうだろう。</p>
-
-<p>ボタンに指をのせることで、そこに目の焦点が合い、相対的に強調されるというのが、実情に近い。それを考えるとコントラストを上げることを主眼にして、変化させるのが良いはずだ。その実装として<code>filter</code>プロパティーで<code>contrast()</code>関数を使うことは理にかなっている。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>

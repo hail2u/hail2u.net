@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>並行実行数の制限 - Hail2u</title>
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="mailto:hail2u@gmail.com" rel="author">
+		<link href="/blog/limiting-concurrency.html" rel="canonical">
+		<meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" name="description">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<link href="/blog/on-20200821.html" rel="prev">
+		<link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/css/index.9.12.2.css" media="only screen and (-webkit-min-device-pixel-ratio: 1), only screen and (min-resolution: 1dppx)" rel="stylesheet">
+		<link href="/css/print.9.12.2.css" media="only print" rel="stylesheet">
+
+		<meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" itemprop="description">
+		
+		<meta content="並行実行数の制限" itemprop="name">
+		<link href="/blog/limiting-concurrency.html" itemprop="url">
+
+		<meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" property="og:description">
+		
+		<meta content="並行実行数の制限" property="og:title">
+		<meta content="article" property="og:type">
+		<meta content="https://hail2u.net/blog/limiting-concurrency.html" property="og:url">
+		<meta content="2020-08-27T10:46:59+09:00" property="article:published_time">
+
+		<meta content="summary" name="twitter:card">
+		<meta content="@hail2u_" name="twitter:site">
+	</head>
+
+	<body>
+		<header>
+			<nav>
+					<p class="logo"><a href="/">Hail2u</a></p>
+
+				<ul class="pages">
+					<li><a href="/blog/" aria-current="page">雑記</a></li>
+					<li><a href="/links/">参照</a></li>
+					<li><a href="/documents/">特集</a></li>
+					<li><a href="/photos/">写真</a></li>
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
+				</ul>
+			</nav>
+
+		</header>
+
+		<main>
+
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2020-08-27T10:46:59+09:00" itemprop="datePublished">2020年8月27日</time></p>
+
+		<h1>並行実行数の制限</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p>Windows 10上のNode.jsだと、<code>Promise.all()</code>で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。</p>
+
+<p>並行実行数を固定するコードを書くと確実だが、スパッと書けなかった。ならば1024を超えない程度に配列を分割するだけでもいいかと、目先を変えた。今回は、このウェブサイトのHTML生成スクリプトでどうするかという話だ。まだ3268記事なので、4つに（800強ずつに）分割すれば大丈夫だろう。5で割る必要が出てくるのは、月に10記事でもあと7年以上かかる。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<span class="hljs-keyword">const</span> chunks = longArray.reduce(<span class="hljs-function">(<span class="hljs-params">previous, current, index</span>) =&gt;</span> {
+	previous[index % previous.length].push(current);
+	<span class="hljs-keyword">return</span> previous;
+}, [[], [], [], []]);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> chunks) {
+	<span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(chunks.map(doSomething));
+}</code></pre>
+
+<p>配列を分割して配列の配列にしたかったので、<code>Array#reduce()</code>を使って書いた。5年後に5分割するよう書き換えるなら、初期配列を書き換える。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<span class="hljs-keyword">const</span> chunkCount = <span class="hljs-number">4</span>;
+<span class="hljs-keyword">const</span> chunkLength = <span class="hljs-built_in">Math</span>.floor(longArray.length / chunkCount);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; chunkCount; i++) {
+	<span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
+		longArray
+			.slice(chunkLength * i, chunkLength * (i + <span class="hljs-number">1</span>))
+			.map(doSomething)
+	);
+}</code></pre>
+
+<p>普通に<code>Array#slice()</code>で書いた方が、ループが1回で済むので速そうだ。ここまで書いて、ようやく並行実行数を固定するコードがスパッと書けることがわかった。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<span class="hljs-keyword">const</span> limit = <span class="hljs-number">32</span>;
+<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">while</span> (i &gt; longArray.length) {
+	<span class="hljs-keyword">const</span> to = i + limit;
+	<span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
+		longArray
+			.slice(i, to)
+			.map(doSomething)
+	);
+	i = to;
+}</code></pre>
+
+<p><code>Array#splice()</code>で破壊しながら実行すると、もっと短くなりそうだ。うろ覚えだが、後ろから削っていくと速かったはずだ。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+
+<span class="hljs-keyword">while</span> (longArray.length &gt; <span class="hljs-number">0</span>) {
+	<span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
+		longArray
+			.splice(<span class="hljs-number">-32</span>)
+			.map(doSomething)
+	);
+}</code></pre>
+
+<p>まずはこれでやっていくことにした。</p>
+	</div>
+</article>
+
+	<nav>
+		<p class="prev"><a href="/blog/on-20200821.html" rel="prev">プロダクト・デザイナーの本</a></p>
+	</nav>
+
+		</main>
+
+		<footer>
+			<ul class="pages">
+				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+				<li><a href="https://github.com/hail2u">GitHub</a></li>
+			</ul>
+
+			<ul class="pages">
+				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/style-guide/">スタイル・ガイド</a></li>
+				<li><a href="https://github.com/hail2u/hail2u.net">ソース・コード</a></li>
+				<li aria-hidden="true">⸱</li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+			</ul>
+		</footer>
+	</body>
+</html>
