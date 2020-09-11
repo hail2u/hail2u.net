@@ -76,20 +76,6 @@ const readBooks = async () => {
 	return Promise.all(books.map(extendBook));
 };
 
-const extendDocument = (document) => {
-	const dt = getDateDetails(new Date(document.published));
-	return {
-		...document,
-		...dt,
-		"isDocument": true
-	};
-};
-
-const readDocuments = async () => {
-	const documents = await readJSONFile(config.data.documents);
-	return Promise.all(documents.map(extendDocument));
-};
-
 const extendLink = (link) => {
 	const dt = getDateDetails(new Date(link.published));
 
@@ -252,13 +238,11 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	const [
 		articles,
 		books,
-		documents,
 		links,
 		statuses
 	] = await Promise.all([
 		metadata.articles,
 		metadata.books,
-		metadata.documents,
 		metadata.links,
 		metadata.statuses
 	].map(markItems));
@@ -267,7 +251,6 @@ const mergeData = async (extradataFile, dest, metadata) => {
 		...extradata,
 		"articles": articles,
 		"books": books,
-		"documents": documents,
 		"links": links,
 		"statuses": statuses
 	};
@@ -303,7 +286,6 @@ const build = async (metadata, partials, file) => {
 	if (data.isHome) {
 		data.articles = data.articles.slice(0, 5);
 		data.books = data.books.slice(0, 3);
-		data.documents = data.documents.slice(0, 1);
 		data.links = data.links.slice(0, 5);
 		data.statuses = data.statuses.slice(0, 1);
 	}
@@ -337,7 +319,6 @@ const main = async () => {
 		metadata,
 		articles,
 		books,
-		documents,
 		followings,
 		links,
 		statuses,
@@ -347,7 +328,6 @@ const main = async () => {
 		readJSONFile(config.data.metadata),
 		readArticles(),
 		readBooks(),
-		readDocuments(),
 		readFollowings(),
 		readLinks(),
 		readStatuses(),
@@ -356,7 +336,6 @@ const main = async () => {
 	]);
 	metadata.articles = articles;
 	metadata.books = books;
-	metadata.documents = documents;
 	metadata.followings = followings;
 	metadata.links = links;
 	metadata.statuses = statuses;
