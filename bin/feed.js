@@ -86,24 +86,6 @@ const readLinks = async () => {
 	return Promise.all(latests.map(extendLink));
 };
 
-const extendPhoto = (photo) => {
-	const url = toAbsoluteURL(photo.link);
-	return {
-		"body": `<p><a href="${url}"><img src="${url}" title="${photo.title}"></a></p>`,
-		"description": photo.title,
-		"link": photo.link,
-		"published": photo.published,
-		"title": photo.title,
-		"type": "photo"
-	};
-};
-
-const readPhotos = async () => {
-	const photos = await readJSONFile(config.data.photos);
-	const latests = photos.slice(0, 10);
-	return Promise.all(latests.map(extendPhoto));
-};
-
 const extendStatus = (status) => ({
 	...status,
 	"description": status.text,
@@ -172,7 +154,6 @@ const main = async () => {
 		books,
 		documents,
 		links,
-		photos,
 		statuses
 	] = await Promise.all([
 		readJSONFile(config.data.metadata),
@@ -180,7 +161,6 @@ const main = async () => {
 		readBooks(),
 		readDocuments(),
 		readLinks(),
-		readPhotos(),
 		readStatuses()
 	]);
 	metadata.items = [
@@ -188,7 +168,6 @@ const main = async () => {
 		...books,
 		...documents,
 		...links,
-		...photos,
 		...statuses
 	].sort(comparePublished);
 	return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));

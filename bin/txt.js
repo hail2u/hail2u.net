@@ -107,20 +107,6 @@ const readLinks = async () => {
 	return Promise.all(links.map(extendLink));
 };
 
-const extendPhoto = (photo) => {
-	const dt = getDateDetails(new Date(photo.published));
-	return {
-		...photo,
-		...dt,
-		"isPhoto": true
-	};
-};
-
-const readPhotos = async () => {
-	const photos = await readJSONFile(config.data.photos);
-	return Promise.all(photos.map(extendPhoto));
-};
-
 const extendStatus = (status) => {
 	const dt = getDateDetails(new Date(status.published));
 	return {
@@ -268,14 +254,12 @@ const mergeData = async (extradataFile, dest, metadata) => {
 		books,
 		documents,
 		links,
-		photos,
 		statuses
 	] = await Promise.all([
 		metadata.articles,
 		metadata.books,
 		metadata.documents,
 		metadata.links,
-		metadata.photos,
 		metadata.statuses
 	].map(markItems));
 	return {
@@ -285,7 +269,6 @@ const mergeData = async (extradataFile, dest, metadata) => {
 		"books": books,
 		"documents": documents,
 		"links": links,
-		"photos": photos,
 		"statuses": statuses
 	};
 };
@@ -314,10 +297,7 @@ const build = async (metadata, partials, file) => {
 	} else {
 		data.otherBooks = markFirstItem(data.books.slice(24));
 		data.numOtherBooks = data.otherBooks.length;
-		data.otherPhotos = markFirstItem(data.photos.slice(24));
-		data.numOtherPhotos = data.otherPhotos.length;
 		data.books = data.books.slice(0, 24);
-		data.photos = data.photos.slice(0, 24);
 	}
 
 	if (data.isHome) {
@@ -325,7 +305,6 @@ const build = async (metadata, partials, file) => {
 		data.books = data.books.slice(0, 3);
 		data.documents = data.documents.slice(0, 1);
 		data.links = data.links.slice(0, 5);
-		data.photos = data.photos.slice(0, 3);
 		data.statuses = data.statuses.slice(0, 1);
 	}
 
@@ -361,7 +340,6 @@ const main = async () => {
 		documents,
 		followings,
 		links,
-		photos,
 		statuses,
 		partials,
 		version
@@ -372,7 +350,6 @@ const main = async () => {
 		readDocuments(),
 		readFollowings(),
 		readLinks(),
-		readPhotos(),
 		readStatuses(),
 		readPartials(),
 		getVersion()
@@ -382,7 +359,6 @@ const main = async () => {
 	metadata.documents = documents;
 	metadata.followings = followings;
 	metadata.links = links;
-	metadata.photos = photos;
 	metadata.statuses = statuses;
 	metadata.version = version;
 

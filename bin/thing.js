@@ -4,7 +4,6 @@ import {
 } from "../lib/json-file.js";
 import config from "./config.js";
 import fetch from "node-fetch";
-import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
 import {
@@ -94,49 +93,6 @@ const addLink = async (comment, title, url) => {
 	];
 };
 
-const addPhoto = async (photo, ext) => {
-	const dt = new Date();
-	const year = String(dt.getFullYear()).padStart(2, "0");
-	const month = String(dt.getMonth() + 1).padStart(2, "0");
-	const date = String(dt.getDate()).padStart(2, "0");
-	const hours = String(dt.getHours()).padStart(2, "0");
-	const minutes = String(dt.getMinutes()).padStart(2, "0");
-	const seconds = String(dt.getSeconds()).padStart(2, "0");
-	const fn = `${year}${month}${date}${hours}${minutes}${seconds}${ext}`;
-	const src = path.join(config.src.photos, fn);
-	const [photos] = await Promise.all([
-		readJSONFile(config.data.photos, "utf8"),
-		sharp(photo).resize({
-			"width": 1280
-		})
-			.toFile(src),
-		fs.mkdir(config.dest.photos, {
-			"recursive": true
-		})
-	]);
-	const metadata = await sharp(src).metadata();
-	const dest = path.join(config.dest.photos, fn);
-	await Promise.all([
-		fs.copyFile(src, dest),
-		fs.unlink(photo),
-		outputJSONFile(config.data.photos, [
-			{
-				"height": metadata.height,
-				"link": `/img/photos/${fn}`,
-				"published": Date.now(),
-				"title": path.basename(photo, ext),
-				"width": metadata.width
-			},
-			...photos
-		])
-	]);
-	return [
-		`Add ${fn}`,
-		src,
-		config.data.photos
-	];
-};
-
 const addStatus = async (status) => {
 	const statuses = await readJSONFile(config.data.statuses, "utf8");
 	await outputJSONFile(config.data.statuses, [
@@ -173,12 +129,6 @@ const addThing = ({
 	}
 
 	if (!asin && !comment && !feed && !title && !url && remains.length === 1) {
-		const ext = path.extname(remains[0]).toLocaleLowerCase('en-US');
-
-		if (ext === ".jpg" || ext === ".jpeg" || ext === ".png") {
-			return addPhoto(remains[0], ext);
-		}
-
 		return addStatus(remains[0]);
 	}
 
@@ -189,7 +139,6 @@ To add:
   A book:      $ node thing.js --asin <ASIN> --title <TITLE>
   A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
   A link:      $ node thins.js --comment <COMMENT> --title <TITLE> --url <URL>
-  A photo:     $ node thing.js <FILE>
   A status:    $ node thing.js <TEXT>
 `);
 };

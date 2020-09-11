@@ -7,14 +7,12 @@ export default {
 		"followings": "src/links/followings.json",
 		"links": "src/links/links.json",
 		"metadata": "src/metadata.json",
-		"photos": "src/photos/photos.json",
 		"statuses": "src/statuses/statuses.json"
 	},
 	"dest": {
 		"articleImages": "dist/img/blog/",
 		"articles": "dist/blog/",
 		"favicon": "dist/favicon.ico",
-		"photos": "dist/img/photos/",
 		"root": "dist/",
 		"styleGuide": "dist/style-guide/index.html",
 		"temp": "tmp/",
@@ -68,12 +66,6 @@ export default {
 				"json": "src/links/index.json",
 				"src": "src/feed.mustache",
 				"type": ["link"]
-			},
-			{
-				"dest": "dist/photos/feed",
-				"json": "src/photos/index.json",
-				"src": "src/feed.mustache",
-				"type": ["photo"]
 			},
 			{
 				"dest": "dist/statuses/feed",
@@ -162,16 +154,6 @@ export default {
 				"src": "src/mysubscriptions.mustache"
 			},
 			{
-				"data": "src/photos/index.json",
-				"dest": "dist/photos/index.html",
-				"src": "src/photos/index.mustache"
-			},
-			{
-				"data": "src/photos/index.json",
-				"dest": "dist/photos/log.html",
-				"src": "src/photos/log.mustache"
-			},
-			{
 				"data": "src/index.json",
 				"dest": "dist/robots.txt",
 				"src": "src/robots.mustache"
@@ -193,7 +175,6 @@ export default {
 		"articleImages": "src/img/blog/",
 		"drafts": "src/drafts/",
 		"partial": "src/partial/",
-		"photos": "src/img/photos/",
 		"root": "src/",
 		"styleGuide": "src/css/test.html",
 		"test": "src/blog/test.mustache"
