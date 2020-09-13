@@ -55,6 +55,28 @@ const addBook = async (asin, title) => {
 
 const isFollowed = (url, following) => url === following.url;
 
+const shuffleArray = (array) => {
+	const shuffled = [...array];
+
+	for (let i = array.length - 1; i > 0; i -= 1) {
+		const j = Math.floor(Math.random() * (i + 1));
+
+		if (i === j) {
+			continue;
+		}
+
+		[
+			shuffled[i],
+			shuffled[j]
+		] = [
+			shuffled[j],
+			shuffled[i]
+		];
+	}
+
+	return shuffled;
+};
+
 const addFollowing = async (feed, title, url) => {
 	const followings = await readJSONFile(config.data.followings);
 
@@ -68,7 +90,7 @@ const addFollowing = async (feed, title, url) => {
 			"title": title,
 			"url": url
 		},
-		...followings
+		...shuffleArray(followings)
 	]);
 	return [
 		`Follow ${url}`,
