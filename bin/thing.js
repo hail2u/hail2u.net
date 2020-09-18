@@ -37,6 +37,11 @@ const addBook = async (asin, title) => {
 		saver.metadata(),
 		saver.toFile(fn)
 	]);
+
+	if (metadata.height === 1 && metadata.width === 1) {
+		throw new Error(`${title} does not have a cover image.`);
+	}
+
 	await outputJSONFile(config.data.books, [
 		{
 			"asin": asin,
