@@ -32,7 +32,7 @@ const getDraft = async (filename) => {
 		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/");
 	return {
-		"body": `${body}`,
+		"body": body,
 		"name": path.basename(src, path.extname(src)),
 		"src": src,
 		"title": unescapeReferences(title.replace(/<.*?>/g, ""))
@@ -91,32 +91,6 @@ ${menuitems}
 		return resolve(drafts[answer - 1]);
 	});
 });
-
-const checkSelectedName = (name) => {
-	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(name)) {
-		throw new Error("This draft does not have a valid name. A draft filename must start and end with \"a-z\" or \"0-9\" and must not contain other than \"-.a-z0-9\".");
-	}
-
-	return true;
-};
-
-const checkSelectedTitle = (title) => {
-	if (typeof title !== "string") {
-		throw new Error("This draft does not have a valid title. A draft title must be a string.");
-	}
-
-	return true;
-};
-
-const checkSelectedTitleLength = (title) => {
-	const bytes = (new TextEncoder().encode(title));
-
-	if (bytes.length < 9) {
-		throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");
-	}
-
-	return true;
-};
 
 const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
@@ -197,11 +171,20 @@ const main = async () => {
 	});
 	const drafts = await listDrafts(argv.test);
 	const selected = await selectDraft(drafts);
-	await Promise.all([
-		checkSelectedName(selected.name),
-		checkSelectedTitle(selected.title),
-		checkSelectedTitleLength(selected.title)
-	]);
+
+	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
+		throw new Error("This draft does not have a valid name. A draft filename must start and end with \"a-z\" or \"0-9\" and must not contain other than \"-.a-z0-9\".");
+	}
+
+	if (typeof selected.title !== "string") {
+		throw new Error("This draft does not have a valid title. A draft title must be a string.");
+	}
+
+	const bytes = (new TextEncoder().encode(selected.title));
+
+	if (bytes.length < 9) {
+		throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");
+	}
 
 	if (argv.test) {
 		return testSelected(selected);
