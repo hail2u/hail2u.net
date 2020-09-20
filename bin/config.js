@@ -127,11 +127,6 @@ export default {
 				"src": "src/index.mustache"
 			},
 			{
-				"data": "src/links/blogroll.json",
-				"dest": "dist/links/blogroll.html",
-				"src": "src/links/blogroll.mustache"
-			},
-			{
 				"data": "src/links/index.json",
 				"dest": "dist/links/index.html",
 				"src": "src/links/index.mustache"
