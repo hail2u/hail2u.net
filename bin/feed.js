@@ -34,7 +34,8 @@ const extendArticle = (article) => {
 		...article,
 		"body": article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
 		"description": description,
-		"type": "article"
+		"type": "article",
+		"ifttt": article.title
 	};
 };
 
@@ -52,7 +53,8 @@ const extendBook = (book) => {
 		"body": `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
 		"description": book.title,
 		"link": link,
-		"type": "book"
+		"type": "book",
+		"ifttt": book.title
 	};
 };
 
@@ -66,7 +68,8 @@ const extendLink = (link) => ({
 	...link,
 	"description": link.comment,
 	"link": link.url,
-	"type": "link"
+	"type": "link",
+	"ifttt": link.comment
 });
 
 const readLinks = async () => {
@@ -80,7 +83,8 @@ const extendStatus = (status) => ({
 	"description": status.text,
 	"link": `/statuses/#on-${status.published}`,
 	"title": status.text,
-	"type": "status"
+	"type": "status",
+	"ifttt": status.text
 });
 
 const readStatuses = async () => {

@@ -38,21 +38,26 @@ export default {
 		],
 		"feed": [
 			{
-				"dest": "dist/bookshelf/feed",
-				"json": "src/bookshelf/index.json",
-				"src": "src/feed.mustache",
-				"type": ["book"]
-			},
-			{
 				"dest": "dist/blog/feed",
 				"json": "src/blog/index.json",
 				"src": "src/feed.mustache",
 				"type": ["article"]
 			},
 			{
+				"dest": "dist/bookshelf/feed",
+				"json": "src/bookshelf/index.json",
+				"src": "src/feed.mustache",
+				"type": ["book"]
+			},
+			{
 				"dest": "dist/feed",
 				"json": "src/index.json",
 				"src": "src/feed.mustache"
+			},
+			{
+				"dest": "dist/ifttt.xml",
+				"json": "src/index.json",
+				"src": "src/ifttt.mustache"
 			},
 			{
 				"dest": "dist/links/feed",
