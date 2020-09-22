@@ -35,7 +35,7 @@ const extendArticle = (article) => {
 		"body": article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
 		"description": description,
 		"type": "article",
-		"ifttt": `${article.title} ${article.link}`
+		"ifttt": `${article.title} ${toAbsoluteURL(article.link)}`
 	};
 };
 
