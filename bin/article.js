@@ -63,7 +63,7 @@ const listDrafts = async (isTest) => {
 	return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
 };
 
-const toMenuitem = (draft, i) => `${i + 1}. ${draft.title}`;
+const toMenuitem = (draft, i) => `${i + 1}. ${draft.title} (${draft.name})`;
 
 const selectDraft = (drafts) => new Promise((resolve) => {
 	process.stdin.isTTY = true;
