@@ -76,18 +76,7 @@ const readBooks = async () => {
 	return Promise.all(books.map(extendBook));
 };
 
-const readFollowings = async () => {
-	const followings = await readJSONFile(config.data.followings);
-	const last = followings.pop();
-
-	return [
-		...followings,
-		{
-			...last,
-			"isLast": true
-		}
-	];
-};
+const readFollowings = () => readJSONFile(config.data.followings);
 
 const extendLink = (link) => {
 	const dt = getDateDetails(new Date(link.published));
