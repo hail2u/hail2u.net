@@ -65,32 +65,38 @@ const listDrafts = async (isTest) => {
 
 const toMenuitem = (draft, i) => `${i + 1}. ${draft.title} (${draft.name})`;
 
-const selectDraft = (drafts) => new Promise((resolve) => {
-	process.stdin.isTTY = true;
-	process.stdout.isTTY = true;
-	const menu = readline.createInterface({
-		"input": process.stdin,
-		"output": process.stdout
-	});
-	const menuitems = drafts.map(toMenuitem).join("\n");
-	menu.write(`0. QUIT
+const selectDraft = (drafts) => {
+	if (drafts.length === 1) {
+		return drafts[0];
+	}
+
+	return new Promise((resolve) => {
+		process.stdin.isTTY = true;
+		process.stdout.isTTY = true;
+		const menu = readline.createInterface({
+			"input": process.stdin,
+			"output": process.stdout
+		});
+		const menuitems = drafts.map(toMenuitem).join("\n");
+		menu.write(`0. QUIT
 ${menuitems}
 `);
-	menu.question("Which one: (0) ", (a = 0) => {
-		menu.close();
-		const answer = Number.parseInt(a, 10);
+		menu.question("Which one: (0) ", (a = 0) => {
+			menu.close();
+			const answer = Number.parseInt(a, 10);
 
-		if (!Number.isInteger(answer) || answer > drafts.length) {
-			throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
-		}
+			if (!Number.isInteger(answer) || answer > drafts.length) {
+				throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
+			}
 
-		if (answer === 0) {
-			throw new Error("Aborted by user.");
-		}
+			if (answer === 0) {
+				throw new Error("Aborted by user.");
+			}
 
-		return resolve(drafts[answer - 1]);
+			return resolve(drafts[answer - 1]);
+		});
 	});
-});
+};
 
 const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
