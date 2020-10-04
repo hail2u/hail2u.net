@@ -11,8 +11,11 @@ const {
 } = ico;
 
 const generatePNG = async (favicon, file) => {
-	const img = await sharp(file.src)
-		.resize(file.width);
+	const metadata = await sharp(file.src).metadata();
+	const img = await sharp(file.src, {
+		density: file.width * metadata.density / metadata.width
+	});
+	await img.resize(file.width);
 
 	if (!file.dest) {
 		const png = await img.png().toBuffer();
