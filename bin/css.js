@@ -12,6 +12,9 @@ import {
 	removeComments
 } from "../lib/postcss/remove-comments.js";
 import stylelint from "stylelint";
+import {
+	wrapWithSupports
+} from "../lib/postcss/wrap-with-supports.js";
 
 const process = async (file) => {
 	const css = await fs.readFile(file, "utf8");
@@ -21,6 +24,7 @@ const process = async (file) => {
 		.use(stylelint({
 			"fix": true
 		}))
+		.use(wrapWithSupports)
 		.process(css, {
 			"from": file
 		});
