@@ -102,36 +102,9 @@ const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
 	const rendered = mustache
 		.render(template, selected)
-		.replace(/(?<=\b(href|src)=")\/img\//g, "../src/img/")
-		.replace(/(?<=\bhref=")\//g, "../dist/");
+		.replace(/(?<=\b(href|src)=")\//g, "../dist/");
 	await outputFile(config.dest.test, highlight(rendered));
 	return runCommand("open", [config.dest.test]);
-};
-
-const toImagePath = (str) => path.basename(str.split(/"/)[1]);
-
-const listArticleImagePaths = (html) => {
-	const images = html.match(/\bsrc="\/img\/blog\/.*?"/g);
-
-	if (!images) {
-		return [];
-	}
-
-	return Promise.all(images.map(toImagePath));
-};
-
-const copyArticleImage = async (imagepath) => {
-	const src = path.join(config.src.articleImages, imagepath);
-	const dest = path.join(config.dest.articleImages, imagepath);
-	await fs.mkdir(config.dest.articleImages, {
-		"recursive": true
-	})
-	fs.copyFile(src, dest);
-};
-
-const copyArticleImages = async (html) => {
-	const imagePaths = await listArticleImagePaths(html);
-	return Promise.all(imagePaths.map(copyArticleImage));
 };
 
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
@@ -140,7 +113,6 @@ const contributeSelected = async (selected) => {
 	const cache = await readJSONFile(config.data.articles);
 	await Promise.all([
 		fs.unlink(selected.src),
-		copyArticleImages(selected.body),
 		outputJSONFile(config.data.articles, [
 			{
 				"body": selected.body,
