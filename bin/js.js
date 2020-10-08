@@ -1,11 +1,10 @@
 import babel from "@babel/core";
 import config from "./config.js";
+import fs from "fs/promises";
 import {
 	getVersion
 } from "../lib/get-version.js";
-import {
-	outputFile
-} from "../lib/output-file.js";
+import path from "path";
 
 const buildJS = async (file) => {
 	const [
@@ -25,9 +24,13 @@ const buildJS = async (file) => {
 		})
 	]);
 	const dest = file.dest.replace(/{{version}}/g, version);
-	await outputFile(dest, `(function () {
+	const wrapped = `(function () {
 ${compiled.code.trim()}
-})();`);
+})();`;
+	await fs.mkdir(path.dirname(dest), {
+		recursive: true
+	});
+	await fs.writeFile(dest, wrapped);
 };
 
 Promise.all(config.files.js.map(buildJS)).catch((e) => {

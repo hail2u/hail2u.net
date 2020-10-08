@@ -15,9 +15,6 @@ import {
 } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
-import {
-	outputFile
-} from "../lib/output-file.js";
 import path from "path";
 import {
 	readJSONFile
@@ -292,7 +289,10 @@ const build = async (metadata, partials, file) => {
 
 	const rendered = mustache.render(template, data, partials);
 	const highlighted = highlight(rendered);
-	await outputFile(file.dest, highlighted);
+	await fs.mkdir(path.dirname(file.dest), {
+		recursive: true
+	});
+	await fs.writeFile(file.dest, highlighted);
 };
 
 const toFilesFormat = (article) => ({

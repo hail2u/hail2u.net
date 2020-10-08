@@ -1,6 +1,6 @@
 import {
-	outputJSONFile,
-	readJSONFile
+	readJSONFile,
+	writeJSONFile,
 } from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
@@ -9,9 +9,6 @@ import {
 } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
-import {
-	outputFile
-} from "../lib/output-file.js";
 import path from "path";
 import readline from "readline";
 import {
@@ -103,17 +100,26 @@ const testSelected = async (selected) => {
 	const rendered = mustache
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\//g, "../dist/");
-	await outputFile(config.dest.test, highlight(rendered));
+	const highlighted = highlight(rendered);
+	await fs.mkdir(path.dirname(config.dest.test), {
+		recursive: true
+	});
+	await fs.writeFile(config.dest.test, highlighted);
 	return runCommand("open", [config.dest.test]);
 };
 
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
 const contributeSelected = async (selected) => {
-	const cache = await readJSONFile(config.data.articles);
+	const cache = await Promise.all([
+		readJSONFile(config.data.articles),
+		await fs.mkdir(path.dirname(config.data.articles), {
+			recursive: true
+		})
+	]);
 	await Promise.all([
 		fs.unlink(selected.src),
-		outputJSONFile(config.data.articles, [
+		writeJSONFile(config.data.articles, [
 			{
 				"body": selected.body,
 				"link": `/blog/${selected.name}.html`,

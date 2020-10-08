@@ -1,9 +1,10 @@
 import {
-	outputJSONFile,
-	readJSONFile
+	readJSONFile,
+	writeJSONFile
 } from "../lib/json-file.js";
 import config from "./config.js";
 import fetch from "node-fetch";
+import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
 import {
@@ -42,19 +43,19 @@ const addBook = async (asin, title) => {
 		throw new Error(`${title} does not have a cover image.`);
 	}
 
-	await outputJSONFile(config.data.books, [
-		{
-			"asin": asin,
-			"height": metadata.height,
-			"published": Date.now(),
-			"title": title,
-			"width": metadata.width
-		},
-		...books
-	]);
 	return [
-		`Read ${asin}`,
-		config.data.books
+		config.data.books,
+		[
+			{
+				"asin": asin,
+				"height": metadata.height,
+				"published": Date.now(),
+				"title": title,
+				"width": metadata.width
+			},
+			...books
+		],
+		`Read ${asin}`
 	];
 };
 
@@ -89,49 +90,49 @@ const addFollowing = async (feed, title, url) => {
 		throw new Error(`${title} has already been followed.`);
 	}
 
-	await outputJSONFile(config.data.followings, [
-		{
-			"feed": feed,
-			"title": title,
-			"url": url
-		},
-		...shuffleArray(followings)
-	]);
 	return [
-		`Follow ${url}`,
-		config.data.followings
+		config.data.followings,
+		[
+			{
+				"feed": feed,
+				"title": title,
+				"url": url
+			},
+			...shuffleArray(followings)
+		],
+		`Follow ${url}`
 	];
 };
 
 const addLink = async (comment, title, url) => {
 	const links = await readJSONFile(config.data.links);
-	await outputJSONFile(config.data.links, [
-		{
-			"comment": comment,
-			"published": Date.now(),
-			"title": title,
-			"url": url
-		},
-		...links
-	]);
 	return [
-		`Bookmark ${url}`,
-		config.data.links
+		config.data.links,
+		[
+			{
+				"comment": comment,
+				"published": Date.now(),
+				"title": title,
+				"url": url
+			},
+			...links
+		],
+		`Bookmark ${url}`
 	];
 };
 
 const addStatus = async (status) => {
 	const statuses = await readJSONFile(config.data.statuses, "utf8");
-	await outputJSONFile(config.data.statuses, [
-		{
-			"published": Date.now(),
-			"text": status
-		},
-		...statuses
-	]);
 	return [
-		"Update status",
-		config.data.statuses
+		config.data.statuses,
+		[
+			{
+				"published": Date.now(),
+				"text": status
+			},
+			...statuses
+		],
+		"Update status"
 	];
 };
 
@@ -195,13 +196,18 @@ const main = async () => {
 		]
 	});
 	const [
-		message,
-		...files
+		file,
+		data,
+		message
 	] = await addThing(argv);
+	await fs.mkdir(path.dirname(file), {
+		recursive: true
+	});
+	await writeJSONFile(file, data);
 	await runCommand("git", [
 		"add",
 		"--",
-		...files
+		file
 	]);
 	await runCommand("git", [
 		"commit",

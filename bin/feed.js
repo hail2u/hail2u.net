@@ -8,9 +8,7 @@ import {
 	getDateDetails
 } from "../lib/get-date-details.js";
 import mustache from "mustache";
-import {
-	outputFile
-} from "../lib/output-file.js";
+import path from "path";
 import {
 	readJSONFile
 } from "../lib/json-file.js";
@@ -137,7 +135,10 @@ const buildFeed = async (metadata, file) => {
 		fs.readFile(file.src, "utf8")
 	]);
 	const rendered = mustache.render(template, data);
-	await outputFile(file.dest, rendered);
+	await fs.mkdir(path.dirname(file.dest), {
+		recursive: true
+	});
+	await fs.writeFile(file.dest, rendered);
 };
 
 const main = async () => {

@@ -3,9 +3,7 @@ import fs from "fs/promises";
 import {
 	getVersion
 } from "../lib/get-version.js";
-import {
-	outputFile
-} from "../lib/output-file.js";
+import path from "path";
 import pcImport from "postcss-import";
 import postcss from "postcss";
 import {
@@ -39,7 +37,10 @@ const buildCSS = async (file) => {
 		process(file.src)
 	]);
 	const dest = file.dest.replace(/{{version}}/g, version);
-	await outputFile(dest, processed.css);
+	await fs.mkdir(path.dirname(dest), {
+		recursive: true
+	});
+	await fs.writeFile(dest, processed.css);
 };
 
 Promise.all(config.files.css.map(buildCSS)).catch((e) => {
