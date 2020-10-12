@@ -111,7 +111,7 @@ const testSelected = async (selected) => {
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
 const contributeSelected = async (selected) => {
-	const cache = await Promise.all([
+	const [cache] = await Promise.all([
 		readJSONFile(config.data.articles),
 		await fs.mkdir(path.dirname(config.data.articles), {
 			recursive: true
