@@ -62,6 +62,17 @@ const readBooks = async () => {
 	return Promise.all(latests.map(extendBook));
 };
 
+const extendDocument = (document) => ({
+	...document,
+	"type": "document"
+});
+
+const readDocuments = async () => {
+	const documents = await readJSONFile(config.data.documents);
+	const latests = documents.slice(0, 10);
+	return Promise.all(latests.map(extendDocument));
+};
+
 const extendLink = (link) => ({
 	...link,
 	"description": link.comment,
@@ -146,18 +157,21 @@ const main = async () => {
 		metadata,
 		articles,
 		books,
+		documents,
 		links,
 		statuses
 	] = await Promise.all([
 		readJSONFile(config.data.metadata),
 		readArticles(),
 		readBooks(),
+		readDocuments(),
 		readLinks(),
 		readStatuses()
 	]);
 	metadata.items = [
 		...articles,
 		...books,
+		...documents,
 		...links,
 		...statuses
 	].sort(comparePublished);

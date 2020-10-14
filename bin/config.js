@@ -3,6 +3,7 @@ export default {
 		"article": "src/blog/article.json",
 		"articles": "src/blog/articles.json",
 		"books": "src/bookshelf/books.json",
+		"documents": "src/documents/documents.json",
 		"followings": "src/links/followings.json",
 		"links": "src/links/links.json",
 		"metadata": "src/metadata.json",
@@ -48,6 +49,12 @@ export default {
 				"json": "src/bookshelf/index.json",
 				"src": "src/feed.mustache",
 				"type": ["book"]
+			},
+			{
+				"dest": "dist/documents/feed",
+				"json": "src/documents/index.json",
+				"src": "src/feed.mustache",
+				"type": ["document"]
 			},
 			{
 				"dest": "dist/feed",
@@ -125,6 +132,11 @@ export default {
 				"data": "src/index.json",
 				"dest": "dist/CNAME",
 				"src": "src/cname.mustache"
+			},
+			{
+				"data": "src/documents/index.json",
+				"dest": "dist/documents/index.html",
+				"src": "src/documents/index.mustache"
 			},
 			{
 				"data": "src/index.json",
