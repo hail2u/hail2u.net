@@ -3,61 +3,12 @@ import {
 	writeJSONFile
 } from "../lib/json-file.js";
 import config from "./config.js";
-import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
 import {
 	runCommand
 } from "../lib/run-command.js";
-import sharp from "sharp";
-
-const isReadBook = (asin, book) => asin === book.asin;
-
-const addBook = async (asin, title) => {
-	if (!/^[A-Z0-9]{10}$/i.test(asin)) {
-		throw new Error("${asin} is not consisted of 10 alphanumeric characters.");
-	}
-
-	const books = await readJSONFile(config.data.books);
-
-	if (books.find(isReadBook.bind(null, asin))) {
-		throw new Error(`${title} has already been added.`);
-	}
-
-	const [
-		saver,
-		res
-	] = await Promise.all([
-		sharp(),
-		fetch(`https://images-fe.ssl-images-amazon.com/images/P/${asin}.jpg`)
-	]);
-	res.body.pipe(saver);
-	const fn = path.join(config.dest.temp, `${asin}.jpg`);
-	const [metadata] = await Promise.all([
-		saver.metadata(),
-		saver.toFile(fn)
-	]);
-
-	if (metadata.height === 1 && metadata.width === 1) {
-		throw new Error(`${title} does not have a cover image.`);
-	}
-
-	return [
-		config.data.books,
-		[
-			{
-				"asin": asin,
-				"height": metadata.height,
-				"published": Date.now(),
-				"title": title,
-				"width": metadata.width
-			},
-			...books
-		],
-		`Read ${asin}`
-	];
-};
 
 const isFollowed = (url, following) => url === following.url;
 
@@ -121,33 +72,12 @@ const addLink = async (comment, title, url) => {
 	];
 };
 
-const addStatus = async (status) => {
-	const statuses = await readJSONFile(config.data.statuses, "utf8");
-	return [
-		config.data.statuses,
-		[
-			{
-				"published": Date.now(),
-				"text": status
-			},
-			...statuses
-		],
-		"Update status"
-	];
-};
-
 const addThing = ({
-	asin,
 	comment,
 	feed,
 	title,
-	url,
-	"_": remains
+	url
 }) => {
-	if (asin && title) {
-		return addBook(asin, title);
-	}
-
 	if (feed && title && url) {
 		return addFollowing(feed, title, url);
 	}
@@ -156,39 +86,24 @@ const addThing = ({
 		return addLink(comment, title, url);
 	}
 
-	if (!asin && !comment && !feed && !title && !url && remains.length === 1) {
-		return addStatus(remains[0]);
-	}
-
-	throw new Error(`Invalid arguemnts:
-  ${process.argv}
-
-To add:
-  A book:      $ node thing.js --asin <ASIN> --title <TITLE>
-  A following: $ node thing.js --feed <URL> --title <TITLE> --url <URL>
-  A link:      $ node thins.js --comment <COMMENT> --title <TITLE> --url <URL>
-  A status:    $ node thing.js <TEXT>
-`);
+	throw new Error("--title, --url, and --coment or --feed are required.");
 };
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
 		"alias": {
-			"a": "asin",
 			"c": "comment",
 			"f": "feed",
 			"t": "title",
 			"u": "url"
 		},
 		"default": {
-			"asin": "",
 			"comment": "",
 			"feed": "",
 			"title": "",
 			"url": ""
 		},
 		"string": [
-			"asin",
 			"comment",
 			"feed",
 			"title",
