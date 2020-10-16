@@ -30,8 +30,8 @@ const main = async () => {
 		"_": remains
 	} = minimist(process.argv.slice(2));
 
-	if (remains.length > 1) {
-		throw new Error(`1 argumet is required.`);
+	if (remains.length !== 1) {
+		throw new Error(`Only 1 argumet is required.`);
 	}
 
 	const [
