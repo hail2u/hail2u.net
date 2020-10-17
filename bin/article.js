@@ -118,7 +118,7 @@ const contributeSelected = async (selected) => {
 		})
 	]);
 	await Promise.all([
-		fs.unlink(selected.src),
+		fs.rm(selected.src),
 		writeJSONFile(config.data.articles, [
 			{
 				"body": selected.body,
