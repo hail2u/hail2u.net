@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>ゆるキャラ一覧</title>
+
+
+    <style>
+      ul li {
+        margin: 0;
+        display: inline-block;
+        width: 96px;
+        height: 128px;
+      }
+
+      ul li a img {
+        width: 96px;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="./283.js"></script>
+    <script>
+      $(function () {
+        var statement = "select * from html where url='http://www.yurugp.jp/' and xpath='//select[@id=\"select\"]/option'",
+          ul = $("<ul/>"),
+          v;
+
+        $.queryYQL(statement, function(d) {
+          $.each(d.query.results.option, function (i, d) {
+            if (i === 0) {
+              return true;
+            }
+
+            v = d.value;
+            $("<li/>").append(
+              $("<a/>").attr({
+                "href": "http://www.yurugp.jp/yuruchar.php?id=" + v
+              }).append(
+                $("<img/>").attr({
+                  "alt": this.title,
+                  "src": "http://www.yurugp.jp/images/upload/" + v + "_PC.jpg"
+                })
+              )
+            ).appendTo(ul);
+          });
+        });
+
+        ul.appendTo("body");
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>ゆるキャラ一覧</h1>
+    </header>
+  </body>
+</html>

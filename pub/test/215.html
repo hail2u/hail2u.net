@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Blothumbnail</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:bold">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css">
+    <style>
+      html {
+        background-color: transparent;
+      }
+
+      body {
+        color: rgb(0, 0, 0);
+        background-color: rgb(135, 206, 250);
+        background-image: url("http://hail2u.github.com/different.png");
+        font-family: "Yanone Kaffeesatz", sans-serif;
+        font-weight: bold;
+        text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 {
+        margin: 32px 0;
+        font-size: 96px;
+        text-align: center;
+      }
+
+      ul {
+        margin: 0 auto;
+        width: 960px;
+        overflow: hidden;
+      }
+
+      ul li {
+        margin: 32px;
+        float: left;
+      }
+
+      ul li a img {
+        vertical-align: bottom;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
+      }
+
+      address {
+        margin: 32px 0;
+        font-size: 32px;
+        text-align: center;
+      }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="./215.js"></script>
+    <script>
+      $(function () {
+        var statement = "select * from html where url='http://blosxom.info/UserList' and xpath='//div[@id=\"contents\"]/ul/li/a'";
+
+        var t = $("#thumbnail");
+
+        if (t === undefined) return false;
+
+        t.empty().append($("<p/>").append($("<em/>").append("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026")));
+        $.queryYQL(statement, function (d) {
+          if (d) {
+            var ul = $("<ul/>");
+
+            $.each(shuffle(d.query.results.a), function () {
+              var li = $("<li/>").append($("<a/>", {
+                "href":  this.href,
+                "title": this.content
+              }).append($("<img/>", {
+                "src": "http://capture.heartrails.com/256x144?" + this.href,
+                "alt": this.content
+              }))).appendTo(ul);
+            });
+
+            t.empty().append(ul);
+          }
+        });
+      });
+
+      function shuffle (list) {
+        var i = list.length;
+
+        while (--i) {
+          var j = Math.floor(Math.random() * (i + 1));
+          if (i == j) continue;
+          var k = list[i];
+          list[i] = list[j];
+          list[j] = k;
+        }
+
+        return list;
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Blothumbnail</h1>
+    </header>
+
+    <section id="thumbnail">
+      <p><a href="http://blosxom.info/UserList">UserList</a>に登録されているサイトのサムネイルが並びます。</p>
+    </section>
+
+    <footer>
+      <address>&copy; 2011 Kyo Nagashima</address>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,129 @@
+# Blosxom Plugin: last_modified
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2004-09-04
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+# このプラグインの60%は、
+# モジュール版PHPで「If-Modified-Since」に対応する
+# http://www.arielworks.net/articles/2004/0125a/
+# からパクリ、
+# 残り35%は、
+# Blosxom Plugin: lastmodified
+# http://www.cobblers.net/files/lastmodified
+# からパクリますた。
+# 5%くらい書いた気がする。
+
+# 名前変えたいところ
+package last_modified;
+
+use strict;
+
+# --- Configurable variables -----------
+
+# writebackのデータディレクトリ
+my $wb_dir = "$blosxom::plugin_state_dir/writeback";
+
+# writebackのデータファイルの拡張子
+my $wb_ext = "wb";
+
+# writebackのflavour・・・というわけではない罠なので気をつけてください（w
+my $wb_flv = "writeback";
+
+# --- Plug-in package variables --------
+
+my $mtime;
+
+# --------------------------------------
+
+# ちと無駄っぽい感じだけど、どうせ本体で使ってるしね
+use CGI qw(:standard);
+use File::stat;
+# パースルーチンと書けないよ
+use HTTP::Date;
+
+sub start {
+  # paging対策
+  # パラメータがあったら0返すとかでも良さげ
+  # それならfindとかにも対応できる
+  return 0 if param('page');
+  # $default_flavour以外は動的でいいよ、マンドクセ
+  return 0 if $blosxom::flavour ne $blosxom::default_flavour;
+  # 年月日ごと閲覧対応とかシラネ
+  return 0 if $blosxom::path_info_yr;
+
+  return 1;
+}
+
+sub filter {
+  my($pkg, $files_ref, $others_ref) = @_;
+
+  my(@files, @mtimes);
+  # パスチェック用 from paging
+  my $currentpath = "$blosxom::datadir/$blosxom::path_info";
+  $currentpath =~ s/\.$blosxom::flavour$//;
+
+  # $files_refを走査して、対象エントリをリストアップ
+  foreach (keys %$files_ref) {
+    push @files, $_ if /^$currentpath/;
+  }
+
+  # 時間順でソート
+  @files = sort { $files_ref->{$b} <=> $files_ref->{$a} } @files;
+  # $num_entriesで切り出し
+  @files = splice @files, 0, $blosxom::num_entries;
+
+  # @filesを走査
+  foreach my $file (@files) {
+    # エントリファイルのmtimeゲットズサー
+    push @mtimes, stat($file)->mtime if -f $file;
+    # エントリファイルのpathからwritebackのデータファイルのpathに投げやり変換
+    $file =~ s/^$blosxom::datadir/$wb_dir/;
+    $file =~ s/$blosxom::file_extension$/$wb_ext/;
+    # writebackのデータファイルのmtimeゲットズサー
+    push @mtimes, stat($file)->mtime if -f $file;
+  }
+
+  # mtimeでソート
+  @mtimes = sort { $b <=> $a } @mtimes;
+  # 一番新しい日付けをゲット
+  $mtime  = $mtimes[0];
+
+  return 1;
+}
+
+sub skip {
+  # If-Modified-Sinceヘッダがあり、
+  # コメント投稿後であるところのwritebackなflavourで無い場合
+  # 後者のチェックは環境依存、ミンナ(･∀･)ガンバレ
+  if ($ENV{'HTTP_IF_MODIFIED_SINCE'} and $ENV{'HTTP_REFERER'} !~ /\.$wb_flv$/) {
+    # ブラウザの送信したIf-Modified-Sinceを取得
+    my $since = $ENV{'HTTP_IF_MODIFIED_SINCE'};
+    # "Fri, 03 Sep 2004 19:54:17 GMT; length=55438"てなのに対応
+    # IEトラップ
+    # 最初の";"以降を削除してるけどコレで良いのかは知らない
+    $since =~ s/;.*$//;
+    # unixtimeに
+    $since = str2time($since);
+
+    # 比(ﾟДﾟ 三 ﾟДﾟ)較
+    if ($since >= $mtime) {
+      # ショボーン(AA略
+      $blosxom::header = {
+        -status => '304 Not Modified'
+      };
+      # この時点では空なんだけど一応
+      $blosxom::output = '';
+
+      # 1を返すとinterpolate/head/sort/date/story/foot/lastをスキップします
+      return 1;
+    }
+  }
+
+  # Las-Modified送ってやらないとIf-Modified-Sinceを送ってくれない
+  # 送ってくれる奴もあるらしいけど
+  $blosxom::header->{-Last_modified} = time2str($mtime);
+
+  return 0;
+}
+
+1;

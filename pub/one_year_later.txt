@@ -1,0 +1,81 @@
+# Blosxom Plugin: one_year_later
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2004-07-26
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package one_year_later;
+
+use strict;
+use vars qw($list);
+
+# --- Configurable variables -----------
+
+my $prefix = <<"_HTML_";
+<div class="story">
+<h3>One year later...</h3>
+_HTML_
+
+my $postfix = <<"_HTML_";
+</div>
+_HTML_
+
+# --- Plug-in package variables --------
+
+my %entries;
+
+# --------------------------------------
+
+use HTTP::Date;
+use FileHandle;
+
+my $fh = new FileHandle;
+
+sub start {
+  return 0 unless $blosxom::path_info =~ /\./;
+
+  return 1;
+}
+
+sub filter {
+  my ($pkg, $files_ref) = @_;
+
+  %entries = %$files_ref;
+
+  return 1;
+}
+
+sub date {
+  my ($pkg, $path, $date_ref, $mtime, $dw, $mo, $mo_num, $da, $ti, $yr) = @_;
+
+  $yr = $yr - 1;
+  my $from = str2time("$dw, $da $mo $yr 00:00:00 +0900");
+  my $to   = str2time("$dw, $da $mo $yr 23:59:59 +0900");
+
+  foreach my $file (keys %entries) {
+    if ($entries{$file} >= $from and $entries{$file} <= $to) {
+      my($url, $title) = &getinfo($file);
+      $list .= qq!<li><a href="$url" title="$title">$title</a></li>\n!;
+    }
+  }
+
+  chomp($list = "$prefix<ul>\n$list</ul>\n$postfix") if ($list);
+
+  return 1;
+}
+
+sub getinfo {
+  my $file = shift;
+
+  my($path, $fn) = $file =~ m!^$blosxom::datadir/(?:(.*)/)?(.*)\.$blosxom::file_extension!;
+  my $url = "$blosxom::url/$path/$fn.$blosxom::flavour";
+  my $title = '';
+
+  if (-f $file && $fh->open("< $file")) {
+    chomp($title = <$fh>);
+    $fh->close;
+  }
+
+  return($url, $title);
+}
+
+1;

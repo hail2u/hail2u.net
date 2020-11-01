@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>はてなブックマークのインクルード</title>
+
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("jquery", "1.3.2");
+</script>
+<script type="text/javascript">
+
+$(function () {
+  var t = $("#hatena-bookmark-comments");
+  t.empty();
+  $("<h3/>").text("Comments").appendTo(t);
+  $.getJSON("http://b.hatena.ne.jp/entry/json/?callback=?", {
+    url: "http://hail2u.net/documents/diveintohtml5-semantics.html"
+  }, function (d) {
+    if (d !== null) {
+      $("<p/>").text("このエントリは " + d.count + " 人からブックマークされています。").appendTo(t);
+
+      $("<p/>").addClass("add-comment-button").append($("<a/>").attr({
+        href: "http://b.hatena.ne.jp/add?url=" + d.url
+      }).text("はてなブックマークでコメントする")).appendTo(t);
+
+      $.each(d.bookmarks, function () {
+        if (this.comment !== "") {
+          var c = $("<div/>").addClass("comment");
+
+          $("<p/>").addClass("date").text(this.timestamp).appendTo(c);
+
+          $("<h4/>").addClass("user").attr({
+            style: "background-image:url(\"http://www.hatena.ne.jp/users/" +
+                   this.user.slice(0, 2) +
+                   "/" +
+                   this.user +
+                   "/profile_s.gif\");"
+          }).append($("<a/>").attr({
+            href: "http://b.hatena.ne.jp/" + this.user
+          }).text(this.user)).appendTo(c);
+
+          $("<p/>").addClass("body").text(this.comment).appendTo(c);
+
+          c.appendTo(t);
+        }
+      });
+    } else {
+      $("<p/>").text("このエントリはまだ誰からもブックマークされていないようです。").appendTo(t);
+
+      $("<p/>").addClass("add-comment-button").append($("<a/>").attr({
+        href: "http://b.hatena.ne.jp/add?url=" + d.url
+      }).text("はてなブックマークでコメントする")).appendTo(t);
+    }
+  });
+});
+</script>
+
+<style type="text/css">
+body {
+  font-family: "Lucida Grande", "Lucida Sans", sans-serif;
+  font-size: 13px;
+}
+
+div#contents {
+  margin: 0 322px 0 48px;
+}
+
+div#contents div#hatena-bookmark-comments p.add-comment-button {
+}
+
+div#contents div#hatena-bookmark-comments p.add-comment-button a {
+  margin: 0 auto;
+  display: block;
+  width: 50%;
+  height: 3em;
+  line-height: 3em;
+  color: #393630;
+  background-color: #c9c6c0;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+}
+
+div#contents div#hatena-bookmark-comments p.add-comment-button a:hover {
+  color: #f9f6f0;
+  background-color: #66aa11;
+}
+
+div#contents div#hatena-bookmark-comments div.comment {
+  margin: 0;
+  padding: 1.5em 0;
+  border-top: 1px dotted #c9c6c0;
+}
+
+div#contents div#hatena-bookmark-comments div.comment h4.user {
+  margin: 0 0 0.5em 0;
+  padding-left: 24px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  font-size: 100%;
+  font-weight: normal;
+}
+
+div#contents div#hatena-bookmark-comments div.comment p.date {
+  margin: 0;
+  float: right;
+}
+
+div#contents div#hatena-bookmark-comments div.comment p.body {
+  margin: 0.5em 0 0 0;
+  clear: both;
+}
+</style>
+</head>
+<body>
+<h1>はてなブックマークのインクルード</h1>
+
+<div id="contents">
+<div class="story" id="hatena-bookmark-comments">
+<h4>Comments</h4>
+<p>JavaScriptが有効な場合云々</p>
+</div>
+</div>
+</body>
+</html>

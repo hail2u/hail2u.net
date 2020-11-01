@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Scribble your tweet #2</title>
+    <style type="text/css">
+      @font-face {
+        font-family: 'Sakura Alphabet';
+        src: url('159a.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: 'Sakura Hiragana';
+        src: url('159h.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      #twitter {
+        margin: 96px 48px;
+        padding: 36px;
+        position: relative;
+        width: 360px;
+        color: rgb(57, 54, 48);
+        background-color: rgb(237, 234, 228);
+        font-family: "Sakura Alphabet", sans-serif;
+        font-weight: bold;
+        font-size: 36px;
+        -moz-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        -webkit-box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+        word-wrap: break-word;
+        -moz-transform: rotate(-7deg);
+        -webkit-transform: rotate(-7deg);
+        transform: rotate(-7deg);
+        -moz-transform-origin: left top;
+        -webkit-transform-origin: left top;
+        transform-origin: left top;
+      }
+
+      #twitter h1 {
+        margin: 0;
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        width: auto;
+        height: 48px;
+        line-height: 48px;
+        font-size: 36px;
+        -webkit-transform: rotate(3deg);
+        -moz-transform: rotate(3deg);
+      }
+
+      #twitter h1 a {
+        padding: 0 24px;
+        border: 1px solid rgb(234, 230, 224);
+        display: block;
+        position: relative;
+        left: -50%;
+        color: inherit;
+        background-color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+      }
+
+      #twitter p {
+        margin: 0;
+        font-size: 36px;
+      }
+
+      #twitter p .hiragana {
+        font-family: "Sakura Hiragana", sans-serif;
+        font-weight: normal;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+$(function () {
+  var kanatable = {
+    "あ" : "3",
+    "い" : "e",
+    "う" : "4",
+    "え" : "5",
+    "お" : "6",
+    "か" : "t",
+    "き" : "g",
+    "く" : "h",
+    "け" : ":",
+    "こ" : "b",
+    "さ" : "x",
+    "し" : "d",
+    "す" : "r",
+    "せ" : "p",
+    "そ" : "c",
+    "た" : "q",
+    "ち" : "a",
+    "つ" : "z",
+    "て" : "w",
+    "と" : "s",
+    "な" : "u",
+    "に" : "i",
+    "ぬ" : "1",
+    "ね" : ",",
+    "の" : "k",
+    "は" : "f",
+    "ひ" : "v",
+    "ふ" : "2",
+    "へ" : "^",
+    "ほ" : "-",
+    "ま" : "j",
+    "み" : "n",
+    "む" : "]",
+    "め" : "/",
+    "も" : "m",
+    "や" : "7",
+    "ゆ" : "8",
+    "よ" : "9",
+    "ら" : "o",
+    "り" : "l",
+    "る" : ".",
+    "れ" : ";",
+    "ろ" : "_",
+    "わ" : "0",
+    "を" : "6",
+    "ん" : "y",
+    "が" : "t@",
+    "ぎ" : "g@",
+    "ぐ" : "h@",
+    "げ" : ":@",
+    "ご" : "b@",
+    "ざ" : "x@",
+    "じ" : "d@",
+    "ず" : "r@",
+    "ぜ" : "p@",
+    "ぞ" : "c@",
+    "だ" : "q@",
+    "ぢ" : "a@",
+    "づ" : "z@",
+    "で" : "w@",
+    "ど" : "s@",
+    "ば" : "f@",
+    "び" : "v@",
+    "ぶ" : "2@",
+    "べ" : "^@",
+    "ぼ" : "-@",
+    "ぱ" : "f[",
+    "ぴ" : "v[",
+    "ぷ" : "2[",
+    "ぺ" : "^[",
+    "ぽ" : "-[",
+    "ぁ" : "#",
+    "ぃ" : "E",
+    "ぅ" : "$",
+    "ぇ" : "%",
+    "ぉ" : "&",
+    "っ" : "Z",
+    "ゃ" : "'",
+    "ゅ" : "(",
+    "ょ" : ")",
+    "ー" : "\\"
+  };
+  var user = "hell2u";
+  var t = $("#twitter").empty().append($("<p/>").append("Loading..."));
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from json where url='http://twitter.com/users/" + user + ".json'",
+    format: "json"
+  }, function (d1) {
+    if (d1.query.results) {
+      var status = d1.query.results.json.status.text;
+      t.empty();
+      $("<h1/>").append($("<a/>").attr({
+        href: "http://twitter.com/#!/" + user
+      }).append("@" + user)).appendTo(t);
+      $("<p/>").attr({
+        id:"status"
+      }).append(status).appendTo(t);
+
+      $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+        q:      "SELECT * FROM yahoojp.jlp.furigana.furigana WHERE appid='fvFniIOxg65wd_4u77dXLQUPXkLcmKb7pKjGg77IBP49oWE.TzSNdpc-' and sentence='" + status + "'",
+        format: "json",
+        env:    "store://datatables.org/alltableswithkeys"
+      }, function (d2) {
+        if (d2.query.results) {
+          var s = "";
+          $.each(d2.query.results.Result.WordList.Word, function () {
+            if (this.Furigana) {
+              s += "<span class=\"hiragana\">";
+              $.each(this.Furigana.split(""), function () {
+                s += kanatable[this];
+              });
+              s += "</span>"
+            } else {
+              s += this.Surface;
+            }
+          });
+          $("#status").empty().append(s);
+        }
+      });
+    }
+  });
+});
+    </script>
+  </head>
+  <body>
+    <h1>Scribble your tweet #2</h1>
+    <section id="twitter"></section>
+  </body>
+</html>

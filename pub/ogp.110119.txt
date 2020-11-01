@@ -1,0 +1,67 @@
+# Blosxom Plugin: ogp
+# Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 2011/01/19 19:40:50
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package ogp;
+
+use strict;
+
+# --- Configurable variables -----------
+
+# Default metadata
+my $title       = "$blosxom::blog_title";
+my $type        = 'blog';
+my $url         = "$blosxom::url";
+my $image_url   = "http://example.com/path/to/logo.png";
+my $description = $blosxom::blog_description;
+my $site_name   = "$blosxom::blog_title";
+
+# Output as XHTML?
+my $as_xhtml = 0;
+
+# --- Plug-in package variables --------
+
+my $placeholder = '{{{ogp_metadata}}}';
+my $xhtml = $as_xhtml ? ' /' : '';
+my $individual = 0;
+
+# --------------------------------------
+
+sub start {
+  $individual = 1 if $blosxom::path_info =~ /\.\Q$blosxom::flavour\E$/;
+
+  return 1;
+}
+
+sub story {
+  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  if ($individual) {
+    ($title = $$title_ref) =~ s/&lt;.*?&gt;//g;
+    $type = 'article';
+    $url = "$blosxom::url$path/$filename.$blosxom::default_flavour";
+    $description = $$body_ref;
+    $description =~ tr!\x0D\x0A!!d;
+    $description =~ s!&lt;.*?&gt;!!g;
+  }
+
+  return 1;
+}
+
+sub foot {
+  my $metadata = &lt;&lt;"METADATA";
+&lt;meta property="og:title" content="$title"$xhtml&gt;
+&lt;meta property="og:type" content="$type"$xhtml&gt;
+&lt;meta property="og:url" content="$url"$xhtml&gt;
+&lt;meta property="og:image" content="$image_url"$xhtml&gt;
+&lt;meta property="og:description" content="$description"$xhtml&gt;
+&lt;meta property="og:site_name" content="$site_name"$xhtml&gt;
+METADATA
+
+  $blosxom::output =~ s/$placeholder/$metadata/m;
+
+  return 1;
+}
+
+1;

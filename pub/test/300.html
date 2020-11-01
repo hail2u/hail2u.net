@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>New Homepage Mockup (multicol version)</title>
+
+
+
+
+  </head>
+
+  <body>
+    <header>
+      <h1>New Homepage Mockup (multicol version)</h1>
+    </header>
+
+    <section id="news">
+      <p>placeholder</p>
+    </section>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+/*!
+ * weblog-entries.js
+ *
+ * Copyright (c) 2009 Kyo Nagashima <kyo@hail2u.net>
+ * This library licensed under MIT license:
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+/*global jQuery, $ */
+
+$(function () {
+  "use strict";
+
+  var t = $("#news");
+
+  if (t === undefined) {
+    return false;
+  }
+
+  t.empty().append(
+    $("<p/>").append(
+      $("<em/>").append("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026")
+    )
+  );
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from rss where url='http://feeds.feedburner.com/hail2u/blog'",
+    format: "json"
+  }, function (data) {
+    t.empty().addClass("news");
+
+    if (data.query.results && data.query.results.item) {
+      var subNews = $("<section/>").addClass("sub-news");
+
+      $.each(data.query.results.item, function (i, item) {
+        if (i === 0) {
+          $("<h2/>").append(
+            $("<a/>").attr({
+              href: item.link
+            }).append(item.title)
+          ).appendTo(t);
+          $("<p/>").append(item.description).appendTo(t);
+          $("<nav/>").addClass("seemore").append(
+            $("<p/>").append(
+              $("<a/>").attr({
+                href: item.link
+              }).append("Read full entry")
+            )
+          ).appendTo(t);
+          $("<hr/>").appendTo(t);
+        } else {
+          $("<section/>").append(
+            $("<h3/>").append(
+              $("<a/>").attr({
+                href: item.link
+              }).append(item.title)
+            )
+          ).append(
+            $("<p/>").append(item.description)
+          ).appendTo(subNews);
+        }
+
+        subNews.appendTo(t);
+      });
+    } else {
+      $("<p/>").append("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002").appendTo(t);
+    }
+  });
+
+  return true;
+});
+    </script>
+    <style>
+      .sub-news {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        -o-column-count: 3;
+        -ms-column-count: 3;
+        column-count: 3;
+        -moz-column-gap: 16px;
+        -webkit-column-gap: 16px;
+        -o-column-gap: 16px;
+        -ms-column-gap: 16px;
+        column-gap: 16px;
+        font-size: 75%;
+      }
+
+      .sub-news section h3 {
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .sub-news section p {
+        margin: 16px 0 32px 0;
+        height: 84px;
+        display: block;
+        overflow: hidden;
+      }
+    </style>
+  </body>
+</html>

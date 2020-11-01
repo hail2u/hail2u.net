@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>On-Demand JavaScript Test</title>
+
+<style type="text/css">
+body {
+  font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
+  font-size: 80%;
+}
+
+div.bookmarks {
+  width: 30%;
+  float: left;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 1.5;
+  list-style-type: square;
+}
+
+ul li {
+  margin: 0 1.5em;
+  padding: 0;
+  white-space: nowrap;
+}
+</style>
+
+<script type="text/javascript" src="/scripts/prototype.js"></script>
+<script type="text/javascript" src="063_odj.js"></script>
+
+</head>
+
+<body>
+
+<h1>On-Demand JavaScript Test</h1>
+
+<div id="results"></div>
+
+<script type="text/javascript">
+var users = ['hail2u', 'gorou', 'miyagawa'];
+
+users.each(function (user) {
+  var odj = new onDemandJavaScript();
+  odj.request('http://del.icio.us/feeds/json/' + user, diplayPosts, 'callback');
+});
+
+function diplayPosts(posts) {
+  var div = document.createElement('div')
+  div.className = 'bookmarks';
+
+  var ul = document.createElement('ul')
+
+  for (var i = 0; i < posts.length; i++) {
+    var post = posts[i];
+    var li = document.createElement('li')
+    var a = document.createElement('a')
+    a.setAttribute('href', post.u)
+    a.appendChild(document.createTextNode(post.d))
+    li.appendChild(a)
+    ul.appendChild(li)
+  }
+
+  div.appendChild(ul);
+
+  $('results').appendChild(div);
+}
+</script>
+
+</body>
+
+</html>

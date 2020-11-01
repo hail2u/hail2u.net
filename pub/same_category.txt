@@ -1,0 +1,85 @@
+# Blosxom Plugin: same_category
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2004-07-16
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package same_category;
+
+use strict;
+use vars qw($list);
+
+# --- Configurable variables -----------
+
+# number to display
+my $num = 5;
+
+# prefix
+my $prefix = <<"_EOD_";
+<div class="story">
+<h3>Recent entries from same category</h3>
+_EOD_
+
+# postfix
+my $postfix = <<"_EOD_";
+</div>
+_EOD_
+
+# --- Plug-in package variables --------
+
+my $curr_path;
+
+# --------------------------------------
+
+use FileHandle;
+
+sub start {
+  return 0 unless $blosxom::path_info =~ /\./;
+
+  $curr_path = $blosxom::path_info;
+  $curr_path =~ s!/.*?$!!;
+  $curr_path = "$blosxom::datadir/$curr_path";
+
+  return 1;
+}
+
+sub filter {
+  my($pkg, $files_ref) = @_;
+
+  $list .= qq!$prefix<ul>\n!;
+  (my $path = $blosxom::path_info) =~ s/\..*?$//;
+  my $i = 0;
+
+  foreach my $file (sort {
+    $files_ref->{$b} <=> $files_ref->{$a}
+  } keys %$files_ref) {
+    next if $file =~ /$path/;
+    next if $file !~ /$curr_path/;
+    last if $i > $num;
+    my($url, $title) = &getinfo($file);
+    $list .= qq!<li><a href="$url" title="$title">$title</a></li>\n!;
+    $i++;
+  }
+
+  $list .= qq!</ul>\n$postfix!;
+  chomp $list;
+
+  return 1;
+}
+
+sub getinfo {
+  my $file = shift;
+
+  my($path, $fn) = $file =~ m!^$blosxom::datadir/(?:(.*)/)?(.*)\.$blosxom::file_extension!;
+  my $url = "$blosxom::url/$path/$fn.$blosxom::flavour";
+  my $fh = new FileHandle;
+  my $title = '';
+
+  if (-f $file && $fh->open("< $file")) {
+    chomp($title = <$fh>);
+    $fh->close;
+  }
+
+  return($url, $title);
+}
+
+1;

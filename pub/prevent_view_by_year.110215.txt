@@ -1,0 +1,31 @@
+# Blosxom Plugin: prevent_view_by_year
+# Author(s): Kyo Nagashima <kyo@hail2u.net>
+# Version: 2011-02-15
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package prevent_view_by_year;
+
+use strict;
+
+# --- Configurable variables -----------
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  if ($blosxom::path_info_yr && !$blosxom::path_info_mo) {
+    return 1;
+  }
+
+  return 0;
+}
+
+sub skip {
+  $blosxom::header->{-status} = '403 Forbidden';
+  $blosxom::output = '403 Forbidden';
+
+  return 1;
+}
+
+1;

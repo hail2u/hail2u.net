@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var fs = require('fs');
+var htmlhint = require('htmlhint').HTMLHint;
+var path = require('path');
+
+var ruleset = {
+  'tagname-lowercase': true,
+  'attr-lowercase': true,
+  'attr-value-double-quotes': true,
+  'attr-no-duplication': true,
+  'doctype-first': true,
+  'tag-pair': true,
+  'tag-self-close': false,
+  'spec-char-escape': true,
+  'id-unique': true,
+  'src-not-empty': true,
+  'head-script-disabled': false,
+  'img-alt-require': false,
+  'doctype-html5': true,
+  'id-class-value': false,
+  'style-disabled': true,
+  'space-tab-mixed-disabled': false,
+  'id-class-ad-disabled': false,
+  'href-abs-or-rel': false,
+  'attr-unsafe-chars': false,
+  'csslint': false,
+  'jshint': false
+};
+
+var file = process.argv[2];
+var html = fs.readFileSync(file, 'utf-8');
+var messages = htmlhint.verify(html, ruleset);
+messages.forEach(function (message) {
+  file = path.relative(process.cwd(), file);
+  console.log([file, message.line, message.col, message.message].join(':'));
+});
+process.exit(messages.length);

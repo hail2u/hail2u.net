@@ -1,0 +1,56 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+# Configration variables -----------------------------------------------
+
+# Your Technorati API key
+my $apikey = '<API Key>';
+
+# Your blog URL
+my $url = '<URL>';
+
+# Maximum number of items
+my $maxnum = 10;
+
+# Unsafe characters
+my $unsafe = '<&>\'"';
+
+# Output file path and name
+my $output = './cosmos.js';
+
+# ----------------------------------------------------------------------
+
+use HTML::Entities qw(encode_entities);
+use LWP::Simple;
+use URI::Escape qw(uri_escape);
+
+$url = uri_escape($url);
+$url = "http://api.technorati.com/cosmos?type=weblog&key=$apikey&url=" . $url;
+
+if(my $xml = get($url)) {
+	my @match = $xml =~ m!<item>.*?</item>!gs;
+	my $js = qq!document.writeln('<ul>');\n!;
+
+	foreach (splice(@match, 0, $maxnum)) {
+		my $blogname = encode_entities($1, $unsafe) if (m!<name>(.*?)</name>!s);
+		my $blogurl  = encode_entities($1, $unsafe) if (m!<url>(.*?)</url>!s);
+		my $inblogs  = $1 if (m!<inboundblogs>(.*?)</inboundblogs>!s);
+		my $inlinks  = $1 if (m!<inboundlinks>(.*?)</inboundlinks>!s);
+		$js .= qq!document.writeln('<li><a href="$blogurl" title="$blogname ($inblogs Inbound Blogs, $inlinks Inbound Links)">$blogname</a></li>');\n!;
+	}
+
+	$js .= qq!document.writeln('</ul>');\n!;
+	$js .= qq!document.write('<p>Powered by <a href="http://www.technorati.com/" title="Technorati: Web Services for bloggers.">Technorati</a>.</p>');\n!;
+
+	if (open(FH, "> $output")) {
+		print FH $js;
+		close(FH);
+	} else {
+		die "Error: Failed to output to $output\n\n";
+	}
+} else {
+	die "Error: Failed to connect to http://api.technorati.com/\n\n";
+}
+
+exit;

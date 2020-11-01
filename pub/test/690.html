@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<meta content="width=device-width" name="viewport">
+
+		<title>Good Contrast Web Safe Colors</title>
+
+		<style>
+			body {
+				background-color: hsl(45, 50%, 95%);
+				color: hsl(45, 20%, 10%);
+			}
+
+			code {
+				font-family: monospace, serif;
+				font-size: 1.5em;
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Good Contrast Web Safe Colors</h1>
+
+			<p>このウェブサイトの背景色に4.5以上、文字色に3以上のコントラスト比を持つウェブ・セーフ・カラーを一覧するページです。</p>
+		</header>
+
+		<section id="test">
+			<h1>#RRGGBB: Ratio vs Background, Ratio vs Foreground</h1>
+
+			<script>
+				const body = getComputedStyle(document.body);
+				const background = body.backgroundColor;
+				const foreground = body.color;
+				const colors = new DocumentFragment();
+
+				/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
+				const getComponentLuminance = color => {
+					const sRGB = color / 255;
+
+					if (sRGB <= 0.03928) {
+						return sRGB / 12.92;
+					}
+
+					return ((sRGB + 0.055) / 1.055) ** 2.4;
+				};
+
+				const getRelativeLuminance = ([red, green, blue]) =>
+					0.2126 * getComponentLuminance(red) +
+				0.7152 * getComponentLuminance(green) +
+				0.0722 * getComponentLuminance(blue);
+
+				/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
+				const getContrast = (colorA, colorB) => {
+					const luminanceA = getRelativeLuminance(colorA.match(/\d+/g));
+					const luminanceB = getRelativeLuminance(colorB.match(/\d+/g));
+					return (Math.max(luminanceA, luminanceB) + 0.05) / (Math.min(luminanceA, luminanceB) + 0.05);
+				};
+
+				const hasGoodContrast = (vsBackground, vsForeground) => {
+					if (vsBackground >= 4.5 && vsForeground >= 3) {
+						return true;
+					}
+
+					return false;
+				};
+
+				for (let r = 0; r < 256; r = r + 51) {
+					for (let g = 0; g < 256; g = g + 51) {
+						for (let b = 0; b < 256; b = b + 51) {
+							const rgb = `rgb(${r}, ${g}, ${b})`;
+							const vsBackground = getContrast(rgb, background).toFixed(3);
+							const vsForeground = getContrast(rgb, foreground).toFixed(3);
+							const hex = `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+
+							if (hasGoodContrast(vsBackground, vsForeground)) {
+								const p = document.createElement("p");
+								const color = document.createElement("code");
+								color.style = `color: ${rgb}; text-decoration: underline`;
+								color.append(hex);
+								p.append(color);
+								p.append(": ");
+								const background = document.createElement("code");
+								background.append(vsBackground);
+								p.append(background);
+								p.append(", ");
+								const foreground = document.createElement("code");
+								foreground.append(vsForeground);
+								p.append(foreground);
+								colors.append(p);
+							}
+						}
+					}
+				}
+
+				document.getElementById("test").append(colors);
+			</script>
+		</section>
+	</body>
+</html>

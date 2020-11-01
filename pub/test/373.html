@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Reactions on Hatena Bookmark</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Reactions on Hatena Bookmark</h1>
+    </header>
+
+    <div id="reactions"></div>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+$(function () {
+  var t = $("#reactions").empty(),
+    li = function (url, txt) {
+      return $("<li/>").append(
+        $("<a/>").attr({
+          href: url
+        }).text(txt)
+      );
+    };
+
+  $.getJSON("http://b.hatena.ne.jp/entry/json/?callback=?", {
+    url: "http://hail2u.net/documents/diveintohtml5-semantics.html"
+  }, function (d) {
+    if (d !== null) {
+      var ul = $("<ul/>");
+
+      li("http://b.hatena.ne.jp/add?url=" + d.url, "B!").appendTo(ul);
+
+      $.each(d.bookmarks, function (i, b) {
+        if (i > 9) {
+          return false;
+        }
+
+        li("http://b.hatena.ne.jp/" + b.user, b.user).appendTo(ul);
+      });
+
+      li("http://b.hatena.ne.jp/entry/" + d.url, "...").appendTo(ul);
+
+      ul.appendTo(t);
+    }
+  });
+});
+</script>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+
+    <title>Lightbox with Clean Markup</title>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Lightbox with Clean Markup</h1>
+
+      <p>リンクを張ってあるリンクのみなんとなくlightbox的なUIで表示するデモ。<code>z-index</code>プロパティーの値が要調整になるため、ライブラリーとして作ることは難しそう。</p>
+    </header>
+
+    <section>
+      <h1>Landscape Image</h1>
+
+      <figure>
+        <a href="http://lorempixel.com/480/270/"><img height="270" src="http://lorempixel.com/480/270/" width="480"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Portrait Image</h1>
+
+      <figure>
+        <a href="http://lorempixel.com/360/640/"><img height="640" src="http://lorempixel.com/360/640/" width="360"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Large Landscape Image</h1>
+
+      <figure>
+        <a href="http://lorempixel.com/2560/1440/"><img height="1440" src="http://lorempixel.com/2560/1440/" width="2560"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Large Portrait Image</h1>
+
+      <figure>
+        <a href="http://lorempixel.com/1080/1920/"><img height="1920" src="http://lorempixel.com/1080/1920/" width="1080"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>Link Different Image</h1>
+
+      <figure>
+        <a href="http://lorempixel.com/960/540/"><img height="90" src="http://lorempixel.com/160/90/" width="160"></a>
+      </figure>
+    </section>
+
+    <section>
+      <h1>動作環境</h1>
+
+      <ul>
+        <li><code>Element.querySelectorAll()</code>のサポート</li>
+        <li>属性セレクター及び<code>^=</code>のサポート</li>
+        <li><code>Function.prototype.bind()</code>のサポート</li>
+        <li><code>vw</code>と<code>vh</code>単位のサポート</li>
+      </ul>
+    </section>
+
+    <script>
+      (function () {
+        var images = document.querySelectorAll('section img[src^="http://lorempixel.com/"]');
+        var image;
+        var parent;
+
+        for (var i = 0, l = images.length; i < l; i++) {
+          image = images[i];
+          parent = image.parentNode;
+
+          if (parent.tagName === 'A' && /^http:\/\/lorempixel\.com\//.test(parent.getAttribute('href'))) {
+            parent.addEventListener('click', function (image, evt) {
+              if (evt.which !== 1) {
+                return;
+              }
+
+              evt.preventDefault();
+
+              if (this.style.cssText && image.style.cssText) {
+                if (image._src) {
+                  image.src = image._src;
+                  delete image._src;
+                }
+
+                this.style.cssText = '';
+                image.style.cssText = '';
+
+                return;
+              }
+
+              if (this.href !== image.src) {
+                image._src = image.src;
+                image.src = this.href;
+              }
+
+              this.style.backgroundColor = '#333';
+              this.style.cursor = 'zoom-out';
+              this.style.height = '100vh';
+              this.style.left = '0';
+              this.style.position = 'fixed';
+              this.style.top = '0';
+              this.style.width = '100vw';
+              this.style.zIndex = '1';
+              image.style.bottom = '0';
+              image.style.height = 'auto';
+              image.style.left = '0';
+              image.style.margin = 'auto';
+              image.style.maxHeight = '96%';
+              image.style.maxWidth = '96%';
+              image.style.position = 'absolute';
+              image.style.right = '0';
+              image.style.top = '0';
+              image.style.width = 'auto';
+            }.bind(parent, image), false);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,178 @@
+#posX = x;
+#posY = y;
+$srBuf = searchbuffer;
+#srOpt = searchoption;
+
+disabledraw;
+escape;
+
+moveto 0, 0;
+
+replaceallfast "&",  "&amp;";
+replaceallfast "\"", "&quot;";
+replaceallfast "<",  "&lt;";
+replaceallfast ">",  "&gt;";
+replaceallfast "'", "&#39;";
+
+replaceallfast "C\\*\\f.*?\\f\\*", "<code>\\1</code>", regular;
+replaceallfast "S\\*\\f.*?\\f\\*", "<samp>\\1</samp>", regular;
+replaceallfast "K\\*\\f.*?\\f\\*", "<kbd>\\1</kbd>", regular;
+replaceallfast "V\\*\\f.*?\\f\\*", "<var>\\1</var>", regular;
+replaceallfast "L\\*\\f.*?\\f\\*", "<a href=\"\" title=\"\">\\1</a>", regular;
+
+movetolineno 1, 2;
+#slNo = lineno;
+gofileend;
+#elNo = lineno;
+#clNo = #slNo;
+
+while (#clNo < #elNo) {
+	movetolineno 1, #clNo;
+
+	if (code == 0x2A) {
+		right;
+
+		if (code == 0x2A) {
+			right;
+
+			if (code == 0x2A) {
+				backspace;
+				backspace;
+				delete;
+				insert "<h6>";
+				golineend2;
+				insert "</h6>";
+			} else {
+				backspace;
+				backspace;
+				insert "<h5>";
+				golineend2;
+				insert "</h5>";
+			}
+		} else {
+			backspace;
+			insert "<h4>";
+			golineend2;
+			insert "</h4>";
+		}
+	} else if (code == 0x23) {
+		delete;
+		insert "<div class=\"image\"><img src=\"/blog/images/";
+		searchdown "\\t", regular;
+		delete;
+		insert "\" alt=\"";
+		searchdown "\\t", regular;
+		delete;
+		insert "\" width=\"";
+		searchdown "\\t", regular;
+		delete;
+		insert "\" height=\"";
+		golineend2;
+		insert "\" /></div>";
+	} else if (code == 0x09) {
+		delete;
+		insert "<blockquote cite=\"\">\n<p>";
+		#elNo = #elNo + 1;
+		golineend2;
+		insert "</p>\n</blockquote>";
+		#elNo = #elNo + 1;
+	} else if (code == 0x2D) {
+		delete;
+		insert "<ul>\n<li>";
+		#elNo = #elNo + 1;
+
+		UlMarkUp:
+			golineend2;
+			insert "</li>";
+			golinetop2;
+			movetolineno 1, lineno + 1;
+
+			if (code == 0x2D) {
+				delete;
+				insert "<li>";
+				goto UlMarkUp;
+			} else {
+				insert "</ul>\n";
+				#elNo = #elNo + 1;
+				golinetop2;
+				up;
+			}
+	} else if (code == 0x2B) {
+		delete;
+		insert "<ol>\n<li>";
+		#elNo = #elNo + 1;
+
+		OlMarkUp:
+			golineend2;
+			insert "</li>";
+			golinetop2;
+			movetolineno 1, lineno + 1;
+
+			if (code == 0x2B) {
+				delete;
+				insert "<li>";
+				goto OlMarkUp;
+			} else {
+				insert "</ol>\n";
+				#elNo = #elNo + 1;
+				golinetop2;
+				up;
+			}
+	} else if (code == 0x3A) {
+		delete;
+		insert "<dl>\n<dt>";
+		#elNo = #elNo + 1;
+
+		DlMarkUp:
+			searchdown2 ":";
+			delete;
+			insert "</dt>\n<dd>";
+			#elNo = #elNo + 1;
+			golineend2;
+			insert "</dd>";
+			golinetop2;
+			movetolineno 1, lineno + 1;
+
+			if (code == 0x3A) {
+				delete;
+				insert "<dt>";
+				goto DlMarkUp;
+			} else {
+				insert "</dl>\n";
+				#elNo = #elNo + 1;
+				golinetop2;
+				up;
+			}
+	} else if (code == 0x20) {
+		delete;
+		insert "<pre>\n<code>";
+		#elNo = #elNo + 1;
+
+		PreMarkUp:
+			golinetop2;
+			movetolineno 1, lineno + 1;
+
+			if (code == 0x20) {
+				delete;
+				goto PreMarkUp;
+			} else {
+				backspace;
+				insert "</code>\n</pre>\n";
+				#elNo = #elNo + 1;
+				golinetop2;
+				up;
+			}
+	} else {
+		insert "<p>";
+		golineend2;
+		insert "</p>";
+	}
+
+	#clNo = lineno + 1;
+}
+
+moveto #posX, #posY;
+setsearch $srBuf, #srOpt;
+enabledraw;
+
+endmacro;

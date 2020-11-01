@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>サイト内検索</title>
+
+
+
+<script type="text/javascript">
+/**
+ * Copyright (c) 2006 Kyo Nagashima <kyo@hail2u.net>
+ * This library licensed under MIT license:
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+var appid = 'hail2u-net';
+
+function doSearch() {
+  document.getElementById('results').innerHTML = '<p>検索中です。しばらくお待ちください。</p>';
+  var script = document.createElement('script');
+  script.setAttribute('type', 'text/javascript');
+  script.setAttribute('src', [
+    'http://api.search.yahoo.com/WebSearchService/V1/webSearch',
+    '?appid=', encodeURIComponent(appid),
+    '&query=', encodeURIComponent(document.getElementById('q').value),
+    '&site=',  encodeURIComponent(document.getElementById('d').value),
+    '&results=10',
+    '&format=html',
+    '&language=ja',
+    '&output=json',
+    '&callback=handleWebResults'
+  ].join(''));
+  script.setAttribute('charset', 'UTF-8');
+
+  document.body.appendChild(script);
+}
+
+function handleWebResults(response) {
+  var results = document.getElementById('results');
+  var q = document.getElementById('q').value;
+  var d = document.getElementById('d').value;
+  var buf = [
+    '<h2><em>',
+    escapeHTML(d),
+    '</em> から <em>',
+    escapeHTML(q),
+    '</em> を検索しました</h2>'
+  ];
+
+  if (response.Error) {
+    buf.push([
+      '<p>処理中にエラーが発生しました: <em>',
+      r.Error.Message,
+      '</em></p><hr />'
+    ].join(''));
+    results.innerHTML = buf.join('');
+    return;
+  }
+
+  var ResultSet = response.ResultSet;
+
+  if (ResultSet.totalResultsReturned === 0) {
+    buf.push([
+      '<p>該当するページが見つかりませんでした。</p><hr />'
+    ].join(''));
+    results.innerHTML = buf.join('');
+    return;
+  }
+
+  buf.push([
+    '<p><em>',
+    ResultSet.totalResultsAvailable,
+    '</em> 件見つかりました。</p><hr />'
+  ].join(''));
+
+  for (var i = 0; i < ResultSet.Result.length; i++) {
+    var item = ResultSet.Result[i];
+    buf.push([
+      '<h3><a href="',
+      item.Url,
+      '">',
+      item.Title,
+      '</a></h3><p>',
+      item.Summary,
+      '</p><p>',
+      item.DisplayUrl,
+      '</p><hr />'
+    ].join(''));
+  }
+
+  results.innerHTML = buf.join('');
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>サイト内検索</h1>
+
+<form onsubmit="doSearch(); return false;">
+  <p>
+    <input type="text" name="q" size="32" value="jsonp" id="q" />
+    <input type="text" name="d" size="32" value="hail2u.net" id="d" />
+    <input type="submit" value="検索" />
+  </p>
+</form>
+
+<div id ="results">
+  <p><a href="http://developer.yahoo.com/search/web/">Yahoo! Search Web Services</a>を利用したPure JavaScriptなサイト内検索スクリプトです。</p>
+</div>
+
+<address>Powered by <a href="http://developer.yahoo.com/search/web/">Yahoo! Search Web Services</a>.</address>
+
+</body>
+
+</html>

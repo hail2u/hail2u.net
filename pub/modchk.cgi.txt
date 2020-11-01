@@ -1,0 +1,80 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+use CGI qw(:standard);
+use HTML::Entities;
+
+my $module = param('module');
+
+print header(
+	-type    => "text/html",
+	-charset => "ISO-8859-1",
+);
+
+print <<"_HTML_";
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>Module Checker</title>
+<style type="text/css">
+body {
+	font-family:Verdana, sans-serif;
+	font-size:small;
+}
+
+form, input {
+	font-family:Verdana, sans-serif;
+}
+
+pre {
+	font-family:'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+<h1>Module Checker</h1>
+<form method="get" action="./modchk.cgi">
+<div>
+<label for="module">Module:</label>
+<input type="text" name="module" size="24" value="$module" id="module" />
+<input type="submit" value="Check" />
+</div>
+</form>
+_HTML_
+
+if ($module) {
+	$module =~ s!::!/!g;
+
+	eval {
+		require "$module.pm";
+	};
+
+	$module =~ s!/!::!g;
+
+	if ($@) {
+		print qq!<p>Failed to load &quot;$module&quot;.</p>\n!;
+	} else {
+		my $ver = $module->VERSION;
+		print qq!<p>Succeed to load &quot;$module v$ver&quot;.</p>\n!;
+
+		if (open(FH, "perldoc $module |")) {
+			print qq!<pre>!;
+			print encode_entities($_, '<>&"') foreach <FH>;
+			print qq!</pre>\n!;
+			close(FH);
+		}
+	}
+} else {
+	print qq!<p>Input module name and submit.</p>\n!;
+}
+
+print <<"_HTML_";
+</body>
+</html>
+_HTML_
+
+exit;

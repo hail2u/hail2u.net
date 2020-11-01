@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Better Smart Keywords</title>
+    <style type="text/css">
+      * {
+        font-family: "Lucida Grande", "Segoe UI", "Meiryo UI", sans-serif;
+
+      }
+
+      form {
+        margin: -21px 0 0 -240px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 480px;
+        height: 42px;
+
+      }
+
+      #q {
+        margin: 0;
+        padding: 3px;
+        border: 3px solid #cccccc;
+        width: 468px;
+        height: 30px;
+        font-size: 24px;
+        -moz-border-radius: 9px;
+
+      }
+
+      #q:focus {
+        border-color: #336699;
+
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Better Smart Keywords</h1>
+    <form method="GET" action="http://www.google.com/search">
+      <p><input type="text" name="q" size="32" id="q"></p>
+    </form>
+    <script type="text/javascript">
+      var re = /^\?(.*) (.*?)$/;
+      var keywords = {
+        "g":       "http://www.google.com/search?q=",
+        "a":       "http://www.amazon.co.jp/gp/search?index=blended&amp;tag=hail2unet-22&amp;__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&amp;field-keywords=",
+        "perldoc": "http://perldoc.perl.org/search.html?q=",
+        "mdc":     "http://www.google.com/search?q=site:developer.mozilla.org+"
+      };
+
+      if (decodeURIComponent(location.search).match(re)) {
+        redirct(RegExp.$1, RegExp.$2);
+      }
+
+      document.forms[0].addEventListener("submit", function (evt) {
+        var s = "?" + document.getElementById("q").value;
+        var k = "g";
+
+        if (s.match(re)) {
+          s = RegExp.$1;
+          k = RegExp.$2;
+        }
+
+        redirect(s, k);
+        evt.preventDefault();
+        evt.stopPropagation();
+      }, false);
+      document.getElementById("q").focus();
+
+      function redirect (q, k) {
+        if (keywords[k]) {
+          location.href = keywords[k] + encodeURIComponent(q);
+        }
+      }
+    </script>
+  </body>
+</html>

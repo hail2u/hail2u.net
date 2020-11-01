@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>iOS Home screen icon effect with CSS</title>
+    <style type="text/css">
+      #friends {
+        padding: 8px;
+        position: relative;
+        width: 304px;
+        height: 464px;
+        z-index: -10;
+      }
+
+      .ios {
+        margin: 16px 10px 16px 9px;
+        display: inline-block;
+        width: 57px;
+        height: 57px;
+        overflow: hidden;
+        background-image: -moz-radial-gradient(
+          center -60px,
+          rgba(255, 255, 255, 1)   57px,
+          rgba(255, 255, 255, 0.3) 87px,
+          rgba(255, 255, 255, 0)   89px
+        );
+        background-image: -webkit-radial-gradient(
+          center -60px,
+          rgba(255, 255, 255, 1)   57px,
+          rgba(255, 255, 255, 0.3) 87px,
+          rgba(255, 255, 255, 0)   89px
+        );
+        background-image: radial-gradient(
+          center -60px,
+          rgba(255, 255, 255, 1)   57px,
+          rgba(255, 255, 255, 0.3) 87px,
+          rgba(255, 255, 255, 0)   89px
+        );
+        -moz-border-radius: 9px;
+        -webkit-border-radius: 9px;
+        border-radius: 9px;
+        -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 1);
+        -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.7);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.7);
+      }
+
+      .ios img {
+        position: relative;
+        z-index: -1;
+        width: 57px;
+        height: 57px;
+        -moz-border-radius: 9px;
+        -webkit-border-radius: 9px;
+        border-radius: 9px;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        var t = $("#friends").empty();
+        $("<p/>").append($("<em/>").append("データを取得中……")).appendTo(t);
+
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+          q:      "select * from json where url='http://api.twitter.com/1/statuses/friends.json?screen_name=twitter'",
+          format: "json"
+        }, function (data) {
+          t.empty();
+
+          if (data.query.results && data.query.results.json.json) {
+            $.each(data.query.results.json.json, function (i, friend) {
+              if (i >= 20) return false;
+              $("<div/>").addClass("ios").append($("<img/>").attr({src: friend.profile_image_url})).appendTo(t);
+            });
+          } else {
+            $("<p/>").append("データを取得できませんでした。").appendTo(t);
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>iOS Home screen icon effect with CSS</h1>
+    <div id="friends">Friends</div>
+  </body>
+</html>
