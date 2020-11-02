@@ -5,9 +5,6 @@ import {
 import config from "./config.js";
 import fs from "fs/promises";
 import {
-	getDateDetails
-} from "../lib/get-date-details.js";
-import {
 	getVersion
 } from "../lib/get-version.js";
 import {
@@ -19,6 +16,29 @@ import path from "path";
 import {
 	readJSONFile
 } from "../lib/json-file.js";
+
+const getDateDetails = (dt) => {
+	const date = dt.getDate();
+	const hour = dt.getHours();
+	const minute = dt.getMinutes();
+	const month = dt.getMonth() + 1;
+	const second = dt.getSeconds();
+	const year = dt.getFullYear();
+	return {
+		"date": date,
+		"hour": hour,
+		"minute": minute,
+		"month": month,
+		"second": second,
+		"strDate": String(date).padStart(2, "0"),
+		"strHour": String(hour).padStart(2, "0"),
+		"strMinute": String(minute).padStart(2, "0"),
+		"strMonth": String(month).padStart(2, "0"),
+		"strSecond": String(second).padStart(2, "0"),
+		"strYear": String(year),
+		"year": year
+	};
+};
 
 const extendArticle = (article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));

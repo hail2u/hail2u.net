@@ -4,9 +4,6 @@ import {
 } from "../lib/character-reference.js";
 import config from "./config.js";
 import fs from "fs/promises";
-import {
-	getDateDetails
-} from "../lib/get-date-details.js";
 import mustache from "mustache";
 import path from "path";
 import {
@@ -116,11 +113,54 @@ const isValidType = (type, item) => {
 	return false;
 };
 
+const dowNames = [
+	"Sun",
+	"Mon",
+	"Tue",
+	"Wed",
+	"Thu",
+	"Fri",
+	"Sat"
+];
+
+const monthNames = [
+	"Jan",
+	"Feb",
+	"Mar",
+	"Apr",
+	"May",
+	"Jun",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Oct",
+	"Nov",
+	"Dec"
+];
+
+const extendDate = (dt) => [
+	dt.getDate(),
+	dowNames[dt.getDay()],
+	String(dt.getHours()).padStart(2, "0"),
+	String(dt.getMinutes()).padStart(2, "0"),
+	monthNames[dt.getMonth()],
+	String(dt.getSeconds()).padStart(2, "0"),
+	String(dt.getFullYear())
+];
+
 const extendItem = (item) => {
-	const dt = getDateDetails(new Date(item.published));
+	const [
+		date,
+		dow,
+		hour,
+		minute,
+		month,
+		second,
+		year
+	] = extendDate(new Date(item.published));
 	return {
 		...item,
-		...dt,
+		"pubDate": `${dow}, ${date} ${month} ${year} ${hour}:${minute}:${second} +0900`,
 		"link": toAbsoluteURL(item.link)
 	};
 };
