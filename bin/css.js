@@ -6,13 +6,29 @@ import {
 import path from "path";
 import pcImport from "postcss-import";
 import postcss from "postcss";
-import {
-	removeComments
-} from "../lib/postcss/remove-comments.js";
 import stylelint from "stylelint";
-import {
-	wrapWithSupports
-} from "../lib/postcss/wrap-with-supports.js";
+
+const removeComment = (comment) => {
+	if (comment.text.startsWith("!")) {
+		return;
+	}
+
+	comment.remove();
+};
+
+const removeComments = (root) => {
+	root.walkComments(removeComment);
+};
+
+const addNode = (supports, node) => {
+	supports.first.append(node);
+};
+
+const wrapWithSupports = (root) => {
+	const supports = postcss.parse("@supports (--custom-property: true) {}");
+	root.each(addNode.bind(null, supports));
+	root.append(supports);
+};
 
 const process = async (file) => {
 	const css = await fs.readFile(file, "utf8");
