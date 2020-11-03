@@ -149,7 +149,7 @@ export default {
 				"src": "src/links/index.mustache"
 			},
 			{
-				"data": "src/mysubscriptions.json",
+				"data": "src/index.json",
 				"dest": "dist/mysubscriptions.opml",
 				"src": "src/mysubscriptions.mustache"
 			},
@@ -159,7 +159,7 @@ export default {
 				"src": "src/robots.mustache"
 			},
 			{
-				"data": "src/sitemap.json",
+				"data": "src/index.json",
 				"dest": "dist/sitemap.xml",
 				"src": "src/sitemap.mustache"
 			},
