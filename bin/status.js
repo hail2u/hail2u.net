@@ -34,11 +34,12 @@ const main = async () => {
 		throw new Error(`Only 1 argumet is required.`);
 	}
 
+	const [status] = remains;
 	const [
 		file,
 		data,
 		message
-	] = await addStatus(remains);
+	] = await addStatus(status);
 	await fs.mkdir(path.dirname(file), {
 		recursive: true
 	});
