@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/?as_sitesearch=hail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.14.9.css" rel="stylesheet">
-		<link href="/css/print.9.14.9.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.14.10.css" rel="stylesheet">
+		<link href="/css/print.9.14.10.css" media="only print" rel="stylesheet">
 
 		<meta content="JavaScriptだけでAmazonのProduct Advertising APIへのリクエストの署名認証を実装するのはできないことはないが、秘密キーを隠すというのは無理がある。公式フォーラムでのAmazon側の解答ではプロクシならOKですよみたいな感じなので、プロクシCGIを作り、Asamashi09で利用しているPipeをそれ経由にしてやることにした。" itemprop="description">
 		
@@ -37,37 +37,32 @@
 
 	<body>
 		<header>
+
 			<nav>
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
-					<li aria-hidden="true">⸱</li>
 					<li><a href="https://www.google.com/?as_sitesearch=hail2u.net">ウェブサイト内の検索</a></li>
 				</ul>
 			</nav>
 
+					<p class="metaline"><time datetime="2009-07-09T03:35:41+09:00" itemprop="datePublished">2009年7月9日</time></p>
+
+				<h1>Asamashi09 #3</h1>
 		</header>
 
-		<main>
+		<main itemprop="articleBody">
 
+<p>JavaScriptだけでAmazonのProduct Advertising APIへのリクエストの署名認証を実装するのはできないことはないが、秘密キーを隠すというのは無理がある。<a href="http://developer.amazonwebservices.com/connect/message.jspa?messageID=132577#132577">公式フォーラムでのAmazon側の解答</a>ではプロクシならOKですよみたいな感じなので、プロクシCGIを作り、<a href="http://hail2u.github.io/asamashi09/">Asamashi09</a>で利用しているPipeをそれ経由にしてやることにした。</p>
 
-<article>
-	<header>
-		<p class="metaline"><time datetime="2009-07-09T03:35:41+09:00" itemprop="datePublished">2009年7月9日</time></p>
+<p>プロクシCGIは<a href="http://github.com/tdtds/amazon-auth-proxy">ただただしさんのamazon-auth-proxy</a>をPerlでCGIモジュールを使って<a href="/amazon-authentication-proxy.pl.txt">書き直したもの</a>を使っている。このCGIスクリプトに署名認証導入前のリクエストをそのまま投げてやれば良い。<code>AWSAccessKeyId</code>は僕のアクセスキーIDに変更して署名を作成するので、特に変更する必要はない。</p>
 
-		<h1>Asamashi09 #3</h1>
-	</header>
+<p>なお<a href="http://www.xrea.com/">XREA</a>のインストールされているPerlが5.6系なサーバーでは<a href="http://search.cpan.org/dist/URI/">URIモジュール</a>が1.30と古く<code>uri_escape_utf8()</code>が無かったり、<a href="http://search.cpan.org/dist/Digest-SHA/">Digest::SHAモジュール</a>がインストールされてなかったりするので、少し手を加えてやる必要がある。<code>uri_escape_utf8()</code>の実装はURIモジュールからコピーして来れば良い。Digest::SHAモジュールの代わりは、<a href="http://search.cpan.org/dist/Digest-SHA-PurePerl/">Digest::SHA::PurePerlモジュール</a>をライブラリ・パスに置いてやるのが手っ取り早い。<a href="/amazon-authentication-proxy-xrea.pl.txt">Perl 5.6系なXREAサーバーで動作するもの</a>も公開しておく。</p>
 
-	<div itemprop="articleBody">
-		<p>JavaScriptだけでAmazonのProduct Advertising APIへのリクエストの署名認証を実装するのはできないことはないが、秘密キーを隠すというのは無理がある。<a href="http://developer.amazonwebservices.com/connect/message.jspa?messageID=132577#132577">公式フォーラムでのAmazon側の解答</a>ではプロクシならOKですよみたいな感じなので、プロクシCGIを作り、<a href="http://hail2u.github.io/asamashi09/">Asamashi09</a>で利用しているPipeをそれ経由にしてやることにした。</p>
-
-<p>プロクシCGIは<a href="http://github.com/tdtds/amazon-auth-proxy">ただただしさんのamazon-auth-proxy</a>をPerlでCGIモジュールを使って<a href="https://pub.hail2u.net/amazon-authentication-proxy.pl.txt">書き直したもの</a>を使っている。このCGIスクリプトに署名認証導入前のリクエストをそのまま投げてやれば良い。<code>AWSAccessKeyId</code>は僕のアクセスキーIDに変更して署名を作成するので、特に変更する必要はない。</p>
-
-<p>なお<a href="http://www.xrea.com/">XREA</a>のインストールされているPerlが5.6系なサーバーでは<a href="http://search.cpan.org/dist/URI/">URIモジュール</a>が1.30と古く<code>uri_escape_utf8()</code>が無かったり、<a href="http://search.cpan.org/dist/Digest-SHA/">Digest::SHAモジュール</a>がインストールされてなかったりするので、少し手を加えてやる必要がある。<code>uri_escape_utf8()</code>の実装はURIモジュールからコピーして来れば良い。Digest::SHAモジュールの代わりは、<a href="http://search.cpan.org/dist/Digest-SHA-PurePerl/">Digest::SHA::PurePerlモジュール</a>をライブラリ・パスに置いてやるのが手っ取り早い。<a href="https://pub.hail2u.net/amazon-authentication-proxy-xrea.pl.txt">Perl 5.6系なXREAサーバーで動作するもの</a>も公開しておく。</p>
-
-<p>また、ただただしさんのamazon-auth-proxyもRuby 1.8.7以上が必要（多分）で1.8.5なXREAサーバーでは<code>Object#tap</code>と<code>Symbol#to_proc(open( uri, &amp;:read ))</code>のところでエラーになる（Ruby知らないのでググって調べただけ）ので、適当に書き換えてやる必要がある（参考: <a href="https://pub.hail2u.net/amazon-auth-proxy.rb.txt">今までの人生でRubyのコードを100行くらいしか書いたことがない人が動作するように書き換えたもの</a>）。</p>
+<p>また、ただただしさんのamazon-auth-proxyもRuby 1.8.7以上が必要（多分）で1.8.5なXREAサーバーでは<code>Object#tap</code>と<code>Symbol#to_proc(open( uri, &amp;:read ))</code>のところでエラーになる（Ruby知らないのでググって調べただけ）ので、適当に書き換えてやる必要がある（参考: <a href="/amazon-auth-proxy.rb.txt">今までの人生でRubyのコードを100行くらいしか書いたことがない人が動作するように書き換えたもの</a>）。</p>
 
 <p>署名認証については公式フォーラムでAmazon側が</p>
 
@@ -80,32 +75,30 @@
 <p>中継プロクシによる署名認証の実装はユーザーに手間をかけさせずに対応できるのだけど、第三者に利用されまくるという問題がある。署名認証は「送信されたリクエストが誰によって送られたものかを確認するためのプロセス」であるということなので、第三者に利用されまくると意味をなさなくなってしまうんじゃないかなぁ。</p>
 
 <p>署名認証はなかったことになりましたというアナウンスを心待ちにしている。誰でも使えるプロクシ実装はやっぱダメでしたとかいうアナウンスが出そうで怖い。</p>
-	</div>
-</article>
 
 	<nav>
-		<p class="prev"><a href="/blog/software/pngcrush.html" rel="prev">pngcrushでPNGファイルから不必要と思われるメタデータを削除</a></p>
+		<p class="metaline">前の記事:</p>
+
+		<h2><a href="/blog/software/pngcrush.html" rel="prev">pngcrushでPNGファイルから不必要と思われるメタデータを削除</a></h2>
 	</nav>
 
 		</main>
 
 		<footer>
-			<ul class="pages">
+			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
-				<li aria-hidden="true">⸱</li>
-				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
-			<ul class="pages">
+			<ul class="pages oneline">
 				<li><a href="/statuses/">近況</a></li>
 				<li><a href="/bookshelf/">書棚</a></li>
-				<li aria-hidden="true">⸱</li>
-				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
 				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 
-			<ul class="pages">
+			<ul class="pages oneline">
 				<li><a href="#top"><span aria-hidden="true">↑</span>先頭に戻る</a></li>
 			</ul>
 		</footer>
