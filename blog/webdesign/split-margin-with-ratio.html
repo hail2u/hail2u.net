@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/?as_sitesearch=hail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.14.11.css" rel="stylesheet">
-		<link href="/css/print.9.14.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.14.12.css" rel="stylesheet">
+		<link href="/css/print.9.14.12.css" media="only print" rel="stylesheet">
 
 		<meta content="余白を特定の比率で分割したいなとちょっと考えていた。つまりmargin-leftとmargin-rightプロパティーの計算済みの値が3:2とかの比率で自動調節されるように、ということ。そのようなことをTwitterでちょっと書いたら、@o_tiがcalc()を使う方法を考えてくれた。" itemprop="description">
 		<link href="/img/blog/split-margin-with-ratio.png" itemprop="image">
@@ -58,17 +58,20 @@
 
 <p>余白を特定の比率で分割したいなとちょっと考えていた。つまり<code>margin-left</code>と<code>margin-right</code>プロパティーの計算済みの値が3:2とかの比率で自動調節されるように、ということ。そのようなことをTwitterでちょっと書いたら、<a href="https://twitter.com/o_ti/status/487922228835516416">@o_tiが<code>calc()</code>を使う方法</a>を考えてくれた。</p>
 
-<p>Demo: <a href="/test/580.html">Split margins 1 to 3</a></p>
+<p>Demo: <a href="/pub/test/580.html">Split margins 1 to 3</a></p>
 
 <p>最初のデモの幅は<code>320px</code>、二つ目のデモの幅は<code>480px</code>になっている。<code>margin-left</code>プロパティーで<code>calc()</code>を使い、<code>100%</code>から要素の幅を引いた残りを4で割っている。<code>margin-right</code>プロパティーは<code>auto</code>で自動調節すれば良い。</p>
 
 <pre><code class="hljs language-css"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">margin-right</span>: auto;
-	<span class="hljs-attribute">margin-left</span>: <span class="hljs-built_in">calc</span>((<span class="hljs-number">100%</span> -<span class="hljs-number">320px</span>) / <span class="hljs-number">4</span>);
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">320px</span>;
+  <span class="hljs-attribute">margin-right</span>: auto;
+  <span class="hljs-attribute">margin-left</span>: <span class="hljs-built_in">calc</span>((<span class="hljs-number">100%</span> -<span class="hljs-number">320px</span>) / <span class="hljs-number">4</span>);
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">320px</span>;
 }</code></pre>
 
-<figure><a href="/img/blog/split-margin-with-ratio.png"><img alt="320pxの要素では260pxと780px、480pxの要素では220pxと660px、と1:3で余白が分割されている" height="240" src="/img/blog/split-margin-with-ratio.png" width="640"></a></figure>
+<figure>
+<a href="/img/blog/split-margin-with-ratio.png"><img alt="320pxの要素では260pxと780px、480pxの要素では220pxと660px、と1:3で余白が分割されている" height="240" src="/img/blog/split-margin-with-ratio.png" width="640"></a>
+<figcaption>Inspect <code>margin-left: calc((100% - width) / 3)</code></figcaption>
+</figure>
 
 <p>開発者ツールを使って検証すると、それぞれの要素でちゃんと1:3になっていることが確認できる。残念ながら<code>calc()</code>でその要素の幅を参照するような仕組みはない（CSS Variables待ちだろうか）ので、それぞれで<code>calc()</code>を書かないとならないけど、やりたいことはこれで出来た。</p>
 
@@ -78,14 +81,14 @@
 
 <hr>
 
-<p><code>calc()</code>の中で<code>calc()</code>みたいなことしたいとかできなかったっけとかできないな……とか混乱した。落ち着いて考えた感じ、<code>calc()</code>内に<code>calc()</code>は書けないけど、<code>calc()</code>内の<code>（...)</code>は事実上<code>calc()</code>と同等なので、<code>calc()</code>内で<code>calc()</code>出来ると言って良さそう。</p>
+<p><code>calc()</code>の中で<code>calc()</code>みたいなことしたいとかできなかったっけとかできないな……とか混乱した。落ち着いて考えた感じ、<code>calc()</code>内に<code>calc()</code>は書けないけど、<code>calc()</code>内の<code>(...)</code>は事実上<code>calc()</code>と同等なので、<code>calc()</code>内で<code>calc()</code>出来ると言って良さそう。</p>
 
 <pre>&lt;calc()&gt; = calc( &lt;calc-sum&gt; )
 &lt;calc-sum&gt; = &lt;calc-product&gt; [ [ &apos;+&apos; | &apos;-&apos; ] &lt;calc-product&gt; ]*
 &lt;calc-product&gt; = &lt;calc-value&gt; [ &apos;*&apos; &lt;calc-value&gt; | &apos;/&apos; &lt;number&gt; ]*
 &lt;calc-value&gt; = &lt;number&gt; | &lt;dimension&gt; | &lt;percentage&gt; | ( &lt;calc-sum&gt; )</pre>
 
-<p><a href="http://dev.w3.org/csswg/css-values/">2014/06/22付けの開発版のCSS Values and Units Modules Level 3仕様</a>ではこのように<code>calc()</code>の計算が<code>（)</code>でネストできることが、その文法の解説で明示されている。</p>
+<p><a href="http://dev.w3.org/csswg/css-values/">2014/06/22付けの開発版のCSS Values and Units Modules Level 3仕様</a>ではこのように<code>calc()</code>の計算が<code>()</code>でネストできることが、その文法の解説で明示されている。</p>
 
 	<nav>
 		<p class="metaline">前の記事:</p>
