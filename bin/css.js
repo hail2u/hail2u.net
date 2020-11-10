@@ -59,7 +59,20 @@ const buildCSS = async (file) => {
 	await fs.writeFile(dest, processed.css);
 };
 
-Promise.all(config.files.css.map(buildCSS)).catch((e) => {
+const main = async () => {
+	await Promise.all(config.files.css.map(buildCSS));
+	const html = await fs.readFile(config.src.styleGuide, "utf8");
+	const optimized = html.replace(
+		/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,
+		"$1=\"$3\""
+	);
+	await fs.mkdir(path.dirname(config.dest.styleGuide), {
+		recursive: true
+	});
+	await fs.writeFile(config.dest.styleGuide, optimized);
+};
+
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });
