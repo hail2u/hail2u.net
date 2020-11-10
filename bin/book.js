@@ -30,7 +30,7 @@ const addBook = async (asin, title) => {
 		res
 	] = await Promise.all([
 		sharp(),
-		fetch(`https://images-fe.ssl-images-amazon.com/images/P/${asin}.jpg`)
+		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`)
 	]);
 	res.body.pipe(saver);
 	const fn = path.join(config.dest.temp, `${asin}.jpg`);

@@ -41,7 +41,7 @@ const readArticles = async () => {
 };
 
 const extendBook = (book) => {
-	const image = `https://images-fe.ssl-images-amazon.com/images/P/${book.asin}.jpg`;
+	const image = `https://m.media-amazon.com/images/P/${book.asin}.jpg`;
 	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
 	return {
 		...book,
