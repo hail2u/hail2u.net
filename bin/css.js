@@ -61,10 +61,15 @@ const main = async () => {
 	const version = await getVersion();
 	await Promise.all(config.files.css.map(buildCSS.bind(null, version)));
 	const html = await fs.readFile(config.src.styleGuide, "utf8");
-	const optimized = html.replace(
-		/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,
-		"$1=\"$3\""
-	);
+	const optimized = html
+		.replace(
+			/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,
+			"$1=\"$3\""
+		)
+		.replace(
+			/<!-- version -->/g,
+			` v${version}`
+		);
 	await fs.mkdir(path.dirname(config.dest.styleGuide), {
 		recursive: true
 	});
