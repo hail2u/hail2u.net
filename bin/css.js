@@ -44,23 +44,22 @@ const process = async (file) => {
 		});
 };
 
-const buildCSS = async (file) => {
+const buildCSS = async (version, file) => {
+	const dest = file.dest.replace(/{{version}}/g, version);
 	const [
-		version,
 		processed
 	] = await Promise.all([
-		getVersion(),
-		process(file.src)
+		process(file.src),
+		fs.mkdir(path.dirname(dest), {
+			recursive: true
+		})
 	]);
-	const dest = file.dest.replace(/{{version}}/g, version);
-	await fs.mkdir(path.dirname(dest), {
-		recursive: true
-	});
 	await fs.writeFile(dest, processed.css);
 };
 
 const main = async () => {
-	await Promise.all(config.files.css.map(buildCSS));
+	const version = await getVersion();
+	await Promise.all(config.files.css.map(buildCSS.bind(null, version)));
 	const html = await fs.readFile(config.src.styleGuide, "utf8");
 	const optimized = html.replace(
 		/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,

@@ -6,12 +6,11 @@ import {
 } from "../lib/get-version.js";
 import path from "path";
 
-const buildJS = async (file) => {
+const buildJS = async (version, file) => {
+	const dest = file.dest.replace(/{{version}}/g, version);
 	const [
-		version,
 		compiled
 	] = await Promise.all([
-		getVersion(),
 		babel.transformFileAsync(file.src, {
 			"presets": [
 				[
@@ -21,19 +20,23 @@ const buildJS = async (file) => {
 					}
 				]
 			]
+		}),
+		fs.mkdir(path.dirname(dest), {
+			recursive: true
 		})
 	]);
-	const dest = file.dest.replace(/{{version}}/g, version);
 	const wrapped = `(function () {
 ${compiled.code.trim()}
 })();`;
-	await fs.mkdir(path.dirname(dest), {
-		recursive: true
-	});
 	await fs.writeFile(dest, wrapped);
 };
 
-Promise.all(config.files.js.map(buildJS)).catch((e) => {
+const main = async () => {
+	const version = await getVersion();
+	await Promise.all(config.files.js.map(buildJS.bind(null, version)));
+};
+
+main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
 });
