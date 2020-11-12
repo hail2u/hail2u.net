@@ -150,11 +150,6 @@ export default {
 			},
 			{
 				"data": "src/index.json",
-				"dest": "dist/robots.txt",
-				"src": "src/robots.mustache"
-			},
-			{
-				"data": "src/index.json",
 				"dest": "dist/sitemap.xml",
 				"src": "src/sitemap.mustache"
 			},
