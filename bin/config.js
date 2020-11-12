@@ -129,11 +129,6 @@ export default {
 				"src": "src/bookshelf/log.mustache"
 			},
 			{
-				"data": "src/index.json",
-				"dest": "dist/CNAME",
-				"src": "src/cname.mustache"
-			},
-			{
 				"data": "src/documents/index.json",
 				"dest": "dist/documents/index.html",
 				"src": "src/documents/index.mustache"
