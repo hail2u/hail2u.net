@@ -402,7 +402,7 @@ const main = async () => {
 		}
 	}
 
-	return Promise.all(config.files.txt.map(build.bind(null, metadata, partials)));
+	return Promise.all(config.files.html.map(build.bind(null, metadata, partials)));
 };
 
 mustache.escape = escapeCharacters;

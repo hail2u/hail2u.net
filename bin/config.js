@@ -79,40 +79,7 @@ export default {
 				"type": ["status"]
 			}
 		],
-		"icon": [
-			{
-				"src": "src/img/icon.svg",
-				"width": 16
-			},
-			{
-				"src": "src/img/icon.svg",
-				"width": 24
-			},
-			{
-				"src": "src/img/icon.svg",
-				"width": 32
-			},
-			{
-				"src": "src/img/icon.svg",
-				"width": 48
-			},
-			{
-				"src": "src/img/icon.svg",
-				"width": 128
-			},
-			{
-				"dest": "dist/apple-touch-icon.png",
-				"src": "src/img/icon.svg",
-				"width": 180
-			}
-		],
-		"js": [
-			{
-				"dest": "dist/js/append-next.{{version}}.js",
-				"src": "src/js/append-next.js"
-			}
-		],
-		"txt": [
+		"html": [
 			{
 				"data": "src/blog/index.json",
 				"dest": "dist/blog/index.html",
@@ -157,6 +124,39 @@ export default {
 				"data": "src/statuses/index.json",
 				"dest": "dist/statuses/index.html",
 				"src": "src/statuses/index.mustache"
+			}
+		],
+		"icon": [
+			{
+				"src": "src/img/icon.svg",
+				"width": 16
+			},
+			{
+				"src": "src/img/icon.svg",
+				"width": 24
+			},
+			{
+				"src": "src/img/icon.svg",
+				"width": 32
+			},
+			{
+				"src": "src/img/icon.svg",
+				"width": 48
+			},
+			{
+				"src": "src/img/icon.svg",
+				"width": 128
+			},
+			{
+				"dest": "dist/apple-touch-icon.png",
+				"src": "src/img/icon.svg",
+				"width": 180
+			}
+		],
+		"js": [
+			{
+				"dest": "dist/js/append-next.{{version}}.js",
+				"src": "src/js/append-next.js"
 			}
 		]
 	},

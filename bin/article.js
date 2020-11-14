@@ -136,7 +136,7 @@ const contributeSelected = async (selected) => {
 			config.data.articles
 		]),
 		runCommand("node", [
-			"bin/txt.js",
+			"bin/html.js",
 			`--article=${config.dest.articles}${selected.name}.html`
 		])
 	]);
