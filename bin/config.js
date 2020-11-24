@@ -111,12 +111,12 @@ export default {
 				"src": "src/links/index.mustache"
 			},
 			{
-				"data": "src/index.json",
+				"data": "src/mysubscriptions.json",
 				"dest": "dist/mysubscriptions.opml",
 				"src": "src/mysubscriptions.mustache"
 			},
 			{
-				"data": "src/index.json",
+				"data": "src/sitemap.json",
 				"dest": "dist/sitemap.xml",
 				"src": "src/sitemap.mustache"
 			},
