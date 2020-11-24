@@ -45,7 +45,7 @@ const process = async (file) => {
 };
 
 const buildCSS = async (version, file) => {
-	const dest = file.dest.replace(/{{version}}/g, version);
+	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
 	const [
 		processed
 	] = await Promise.all([
@@ -63,11 +63,11 @@ const main = async () => {
 	const html = await fs.readFile(config.src.styleGuide, "utf8");
 	const optimized = html
 		.replace(
-			/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/g,
+			/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/gu,
 			"$1=\"$3\""
 		)
 		.replace(
-			/<!-- version -->/g,
+			/<!-- version -->/gu,
 			` v${version}`
 		);
 	await fs.mkdir(path.dirname(config.dest.styleGuide), {

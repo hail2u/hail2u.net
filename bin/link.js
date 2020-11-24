@@ -45,9 +45,9 @@ const addFollowing = async (feed, title, url) => {
 		config.data.followings,
 		[
 			{
-				"feed": feed,
-				"title": title,
-				"url": url
+				feed,
+				title,
+				url
 			},
 			...shuffleArray(followings)
 		],
@@ -61,10 +61,10 @@ const addLink = async (comment, title, url) => {
 		config.data.links,
 		[
 			{
-				"comment": comment,
+				comment,
 				"published": Date.now(),
-				"title": title,
-				"url": url
+				title,
+				url
 			},
 			...links
 		],

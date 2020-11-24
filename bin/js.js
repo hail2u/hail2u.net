@@ -7,7 +7,7 @@ import {
 import path from "path";
 
 const buildJS = async (version, file) => {
-	const dest = file.dest.replace(/{{version}}/g, version);
+	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
 	const [
 		compiled
 	] = await Promise.all([

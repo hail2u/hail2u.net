@@ -21,14 +21,14 @@ const toAbsoluteURL = (url) => {
 const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
 
 const extendArticle = (article) => {
-	const description = unescapeReferences(article.body.replace(/<.*?>/g, ""))
+	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
 	return {
 		...article,
-		"body": article.body.replace(/(href|src)="(\/.*?)"/g, toAbsoluteURLAll),
-		"description": description,
+		"body": article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll),
+		description,
 		"type": "article",
 		"ifttt": `${article.title} ${toAbsoluteURL(article.link)}`
 	};
@@ -47,7 +47,7 @@ const extendBook = (book) => {
 		...book,
 		"body": `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
 		"description": book.title,
-		"link": link,
+		link,
 		"type": "book",
 		"ifttt": `${book.title} ${link}`
 	};

@@ -27,12 +27,12 @@ const getDraft = async (filename) => {
 	] = content.split("\n");
 	const body = rest.join("\n")
 		.trim()
-		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//g, "/");
+		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//gu, "/");
 	return {
-		"body": body,
+		body,
 		"name": path.basename(src, path.extname(src)),
-		"src": src,
-		"title": unescapeReferences(title.replace(/<.*?>/g, ""))
+		src,
+		"title": unescapeReferences(title.replace(/<.*?>/gu, ""))
 	};
 };
 
@@ -99,7 +99,7 @@ const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
 	const rendered = mustache
 		.render(template, selected)
-		.replace(/(?<=\b(href|src)=")\//g, "../dist/");
+		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
 	const highlighted = highlight(rendered);
 	await fs.mkdir(path.dirname(config.dest.test), {
 		recursive: true
@@ -156,7 +156,7 @@ const main = async () => {
 	const drafts = await listDrafts(argv.test);
 	const selected = await selectDraft(drafts);
 
-	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/.test(selected.name)) {
+	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(selected.name)) {
 		throw new Error("This draft does not have a valid name. A draft filename must start and end with \"a-z\" or \"0-9\" and must not contain other than \"-.a-z0-9\".");
 	}
 
@@ -164,7 +164,7 @@ const main = async () => {
 		throw new Error("This draft does not have a valid title. A draft title must be a string.");
 	}
 
-	const bytes = (new TextEncoder().encode(selected.title));
+	const bytes = new TextEncoder().encode(selected.title);
 
 	if (bytes.length < 9) {
 		throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");

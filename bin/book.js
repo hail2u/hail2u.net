@@ -15,8 +15,8 @@ import sharp from "sharp";
 const isReadBook = (asin, book) => asin === book.asin;
 
 const addBook = async (asin, title) => {
-	if (!/^[A-Z0-9]{10}$/i.test(asin)) {
-		throw new Error("${asin} is not consisted of 10 alphanumeric characters.");
+	if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
+		throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 	}
 
 	const books = await readJSONFile(config.data.books);
@@ -47,10 +47,10 @@ const addBook = async (asin, title) => {
 		config.data.books,
 		[
 			{
-				"asin": asin,
+				asin,
 				"height": metadata.height,
 				"published": Date.now(),
-				"title": title,
+				title,
 				"width": metadata.width
 			},
 			...books

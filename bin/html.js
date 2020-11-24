@@ -25,24 +25,24 @@ const getDateDetails = (dt) => {
 	const second = dt.getSeconds();
 	const year = dt.getFullYear();
 	return {
-		"date": date,
-		"hour": hour,
-		"minute": minute,
-		"month": month,
-		"second": second,
+		date,
+		hour,
+		minute,
+		month,
+		second,
 		"strDate": String(date).padStart(2, "0"),
 		"strHour": String(hour).padStart(2, "0"),
 		"strMinute": String(minute).padStart(2, "0"),
 		"strMonth": String(month).padStart(2, "0"),
 		"strSecond": String(second).padStart(2, "0"),
 		"strYear": String(year),
-		"year": year
+		year
 	};
 };
 
 const extendArticle = (article, i, articles) => {
 	const dt = getDateDetails(new Date(article.published));
-	const description = unescapeReferences(article.body.replace(/<.*?>/g, ""))
+	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
@@ -52,7 +52,7 @@ const extendArticle = (article, i, articles) => {
 			...article,
 			...dt,
 			"body": article.body.trim(),
-			"description": description,
+			description,
 			"isArticle": true
 		};
 	}
@@ -65,11 +65,11 @@ const extendArticle = (article, i, articles) => {
 		...article,
 		...dt,
 		"body": article.body.trim(),
-		"description": description,
+		description,
 		"isArticle": true,
 		"previous": {
-			"link": link,
-			"title": title
+			link,
+			title
 		}
 	};
 };
@@ -157,7 +157,7 @@ const readPartials = async () => {
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
 const findCover = (html) => {
-	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/.exec(html);
+	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
 
 	if (!image) {
 		return {};
@@ -282,11 +282,11 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	return {
 		...metadata,
 		...extradata,
-		"articles": articles,
-		"books": books,
-		"documents": documents,
-		"links": links,
-		"statuses": statuses
+		articles,
+		books,
+		documents,
+		links,
+		statuses
 	};
 };
 
@@ -394,6 +394,7 @@ const main = async () => {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
+			/* eslint-disable-next-line no-await-in-loop */
 			await Promise.all(
 				articleFiles
 					.splice(-32)
