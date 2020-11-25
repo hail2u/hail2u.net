@@ -1,14 +1,12 @@
 import {
 	escapeCharacters,
-	unescapeReferences
+	unescapeReferences,
 } from "../lib/character-reference.js";
 import config from "./config.js";
 import fs from "fs/promises";
 import mustache from "mustache";
 import path from "path";
-import {
-	readJSONFile
-} from "../lib/json-file.js";
+import { readJSONFile } from "../lib/json-file.js";
 
 const toAbsoluteURL = (url) => {
 	if (url.startsWith("/")) {
@@ -18,7 +16,8 @@ const toAbsoluteURL = (url) => {
 	return url;
 };
 
-const toAbsoluteURLAll = (match, attr, url) => `${attr}="${toAbsoluteURL(url)}"`;
+const toAbsoluteURLAll = (match, attr, url) =>
+	`${attr}="${toAbsoluteURL(url)}"`;
 
 const extendArticle = (article) => {
 	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
@@ -27,10 +26,10 @@ const extendArticle = (article) => {
 		.shift();
 	return {
 		...article,
-		"body": article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll),
+		body: article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll),
 		description,
-		"type": "article",
-		"ifttt": `${article.title} ${toAbsoluteURL(article.link)}`
+		type: "article",
+		ifttt: `${article.title} ${toAbsoluteURL(article.link)}`,
 	};
 };
 
@@ -45,11 +44,11 @@ const extendBook = (book) => {
 	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
 	return {
 		...book,
-		"body": `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
-		"description": book.title,
+		body: `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
+		description: book.title,
 		link,
-		"type": "book",
-		"ifttt": `${book.title} ${link}`
+		type: "book",
+		ifttt: `${book.title} ${link}`,
 	};
 };
 
@@ -61,7 +60,7 @@ const readBooks = async () => {
 
 const extendDocument = (document) => ({
 	...document,
-	"type": "document"
+	type: "document",
 });
 
 const readDocuments = async () => {
@@ -72,10 +71,10 @@ const readDocuments = async () => {
 
 const extendLink = (link) => ({
 	...link,
-	"description": link.comment,
-	"link": link.url,
-	"type": "link",
-	"ifttt": `${link.comment} ${link.url}`
+	description: link.comment,
+	link: link.url,
+	type: "link",
+	ifttt: `${link.comment} ${link.url}`,
 });
 
 const readLinks = async () => {
@@ -86,11 +85,11 @@ const readLinks = async () => {
 
 const extendStatus = (status) => ({
 	...status,
-	"description": status.text,
-	"link": `/statuses/#on-${status.published}`,
-	"title": status.text,
-	"type": "status",
-	"ifttt": status.text
+	description: status.text,
+	link: `/statuses/#on-${status.published}`,
+	title: status.text,
+	type: "status",
+	ifttt: status.text,
 });
 
 const readStatuses = async () => {
@@ -99,7 +98,8 @@ const readStatuses = async () => {
 	return Promise.all(latests.map(extendStatus));
 };
 
-const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const comparePublished = (a, b) =>
+	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const isValidType = (type, item) => {
 	if (!type) {
@@ -113,15 +113,7 @@ const isValidType = (type, item) => {
 	return false;
 };
 
-const dowNames = [
-	"Sun",
-	"Mon",
-	"Tue",
-	"Wed",
-	"Thu",
-	"Fri",
-	"Sat"
-];
+const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const monthNames = [
 	"Jan",
@@ -135,7 +127,7 @@ const monthNames = [
 	"Sep",
 	"Oct",
 	"Nov",
-	"Dec"
+	"Dec",
 ];
 
 const extendDate = (dt) => [
@@ -145,23 +137,17 @@ const extendDate = (dt) => [
 	String(dt.getMinutes()).padStart(2, "0"),
 	monthNames[dt.getMonth()],
 	String(dt.getSeconds()).padStart(2, "0"),
-	String(dt.getFullYear())
+	String(dt.getFullYear()),
 ];
 
 const extendItem = (item) => {
-	const [
-		date,
-		dow,
-		hour,
-		minute,
-		month,
-		second,
-		year
-	] = extendDate(new Date(item.published));
+	const [date, dow, hour, minute, month, second, year] = extendDate(
+		new Date(item.published)
+	);
 	return {
 		...item,
-		"pubDate": `${dow}, ${date} ${month} ${year} ${hour}:${minute}:${second} +0900`,
-		"link": toAbsoluteURL(item.link)
+		pubDate: `${dow}, ${date} ${month} ${year} ${hour}:${minute}:${second} +0900`,
+		link: toAbsoluteURL(item.link),
 	};
 };
 
@@ -170,24 +156,21 @@ const mergeData = async (extradataFile, metadata, type) => {
 	return {
 		...metadata,
 		...extradata,
-		"items": metadata.items
+		items: metadata.items
 			.filter(isValidType.bind(null, type))
 			.slice(0, 10)
-			.map(extendItem)
+			.map(extendItem),
 	};
 };
 
 const buildFeed = async (metadata, file) => {
-	const [
-		data,
-		template
-	] = await Promise.all([
+	const [data, template] = await Promise.all([
 		mergeData(file.json, metadata, file.type),
-		fs.readFile(file.src, "utf8")
+		fs.readFile(file.src, "utf8"),
 	]);
 	const rendered = mustache.render(template, data);
 	await fs.mkdir(path.dirname(file.dest), {
-		recursive: true
+		recursive: true,
 	});
 	await fs.writeFile(file.dest, rendered);
 };
@@ -199,21 +182,21 @@ const main = async () => {
 		books,
 		documents,
 		links,
-		statuses
+		statuses,
 	] = await Promise.all([
 		readJSONFile(config.data.metadata),
 		readArticles(),
 		readBooks(),
 		readDocuments(),
 		readLinks(),
-		readStatuses()
+		readStatuses(),
 	]);
 	metadata.items = [
 		...articles,
 		...books,
 		...documents,
 		...links,
-		...statuses
+		...statuses,
 	].sort(comparePublished);
 	return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
 };

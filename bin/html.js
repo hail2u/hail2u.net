@@ -1,21 +1,15 @@
 import {
 	escapeCharacters,
-	unescapeReferences
+	unescapeReferences,
 } from "../lib/character-reference.js";
 import config from "./config.js";
 import fs from "fs/promises";
-import {
-	getVersion
-} from "../lib/get-version.js";
-import {
-	highlight
-} from "../lib/highlight.js";
+import { getVersion } from "../lib/get-version.js";
+import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
-import {
-	readJSONFile
-} from "../lib/json-file.js";
+import { readJSONFile } from "../lib/json-file.js";
 
 const getDateDetails = (dt) => {
 	const date = dt.getDate();
@@ -30,13 +24,13 @@ const getDateDetails = (dt) => {
 		minute,
 		month,
 		second,
-		"strDate": String(date).padStart(2, "0"),
-		"strHour": String(hour).padStart(2, "0"),
-		"strMinute": String(minute).padStart(2, "0"),
-		"strMonth": String(month).padStart(2, "0"),
-		"strSecond": String(second).padStart(2, "0"),
-		"strYear": String(year),
-		year
+		strDate: String(date).padStart(2, "0"),
+		strHour: String(hour).padStart(2, "0"),
+		strMinute: String(minute).padStart(2, "0"),
+		strMonth: String(month).padStart(2, "0"),
+		strSecond: String(second).padStart(2, "0"),
+		strYear: String(year),
+		year,
 	};
 };
 
@@ -51,26 +45,23 @@ const extendArticle = (article, i, articles) => {
 		return {
 			...article,
 			...dt,
-			"body": article.body.trim(),
+			body: article.body.trim(),
 			description,
-			"isArticle": true
+			isArticle: true,
 		};
 	}
 
-	const {
-		link,
-		title
-	} = articles[i + 1];
+	const { link, title } = articles[i + 1];
 	return {
 		...article,
 		...dt,
-		"body": article.body.trim(),
+		body: article.body.trim(),
 		description,
-		"isArticle": true,
-		"previous": {
+		isArticle: true,
+		previous: {
 			link,
-			title
-		}
+			title,
+		},
 	};
 };
 
@@ -84,7 +75,7 @@ const extendBook = (book) => {
 	return {
 		...book,
 		...dt,
-		"isBook": true
+		isBook: true,
 	};
 };
 
@@ -100,7 +91,7 @@ const extendDocument = (document) => {
 	return {
 		...document,
 		...dt,
-		"isDocument": true
+		isDocument: true,
 	};
 };
 
@@ -115,7 +106,7 @@ const extendLink = (link) => {
 	return {
 		...link,
 		...dt,
-		"isLink": true
+		isLink: true,
 	};
 };
 
@@ -129,7 +120,7 @@ const extendStatus = (status) => {
 	return {
 		...status,
 		...dt,
-		"isStatus": true
+		isStatus: true,
 	};
 };
 
@@ -140,9 +131,12 @@ const readStatuses = async () => {
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
+	const content = await fs.readFile(
+		path.join(config.src.partial, filename),
+		"utf8"
+	);
 	return {
-		[name]: content
+		[name]: content,
 	};
 };
 
@@ -164,8 +158,8 @@ const findCover = (html) => {
 	}
 
 	return {
-		"cover": image[1],
-		"twitterCard": "summary_large_image"
+		cover: image[1],
+		twitterCard: "summary_large_image",
 	};
 };
 
@@ -238,14 +232,14 @@ const markItem = (item, index, items) => {
 	const previousItem = items[index - 1];
 	return {
 		...item,
-		"isFirstInDate": isFirstInDate(item, previousItem),
-		"isFirstInMonth": isFirstInMonth(item, previousItem),
-		"isFirstInYear": isFirstInYear(item, previousItem),
-		"isLastInDate": isLastInDate(item, nextItem),
-		"isLastInMonth": isLastInMonth(item, nextItem),
-		"isLastInYear": isLastInYear(item, nextItem),
-		"isLatest": isLatest(index),
-		"isOldest": isOldest(item, nextItem)
+		isFirstInDate: isFirstInDate(item, previousItem),
+		isFirstInMonth: isFirstInMonth(item, previousItem),
+		isFirstInYear: isFirstInYear(item, previousItem),
+		isLastInDate: isLastInDate(item, nextItem),
+		isLastInMonth: isLastInMonth(item, nextItem),
+		isLastInYear: isLastInYear(item, nextItem),
+		isLatest: isLatest(index),
+		isOldest: isOldest(item, nextItem),
 	};
 };
 
@@ -262,23 +256,19 @@ const mergeData = async (extradataFile, dest, metadata) => {
 			...extradata,
 			...article,
 			...cover,
-			"canonical": article.link
+			canonical: article.link,
 		};
 	}
 
-	const [
-		articles,
-		books,
-		documents,
-		links,
-		statuses
-	] = await Promise.all([
-		metadata.articles,
-		metadata.books,
-		metadata.documents,
-		metadata.links,
-		metadata.statuses
-	].map(markItems));
+	const [articles, books, documents, links, statuses] = await Promise.all(
+		[
+			metadata.articles,
+			metadata.books,
+			metadata.documents,
+			metadata.links,
+			metadata.statuses,
+		].map(markItems)
+	);
 	return {
 		...metadata,
 		...extradata,
@@ -286,7 +276,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
 		books,
 		documents,
 		links,
-		statuses
+		statuses,
 	};
 };
 
@@ -294,19 +284,13 @@ const markFirstItem = (items) => {
 	const firstItem = items.shift();
 	firstItem.isFirstInMonth = true;
 	firstItem.isFirstInYear = true;
-	return [
-		firstItem,
-		...items
-	];
+	return [firstItem, ...items];
 };
 
 const build = async (metadata, partials, file) => {
-	const [
-		data,
-		template
-	] = await Promise.all([
+	const [data, template] = await Promise.all([
 		mergeData(file.data, file.dest, metadata),
-		fs.readFile(file.src, "utf8")
+		fs.readFile(file.src, "utf8"),
 	]);
 
 	if (file.dest.endsWith("/log.html")) {
@@ -328,30 +312,30 @@ const build = async (metadata, partials, file) => {
 	const rendered = mustache.render(template, data, partials);
 	const highlighted = highlight(rendered);
 	await fs.mkdir(path.dirname(file.dest), {
-		recursive: true
+		recursive: true,
 	});
 	await fs.writeFile(file.dest, highlighted);
 };
 
 const toFilesFormat = (article) => ({
-	"data": config.data.article,
-	"dest": path.join(config.dest.root, article.link),
-	"src": config.src.article,
-	...article
+	data: config.data.article,
+	dest: path.join(config.dest.root, article.link),
+	src: config.src.article,
+	...article,
 });
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		"alias": {
-			"A": "articles",
-			"a": "article"
+		alias: {
+			A: "articles",
+			a: "article",
 		},
-		"boolean": ["articles"],
-		"default": {
-			"article": "",
-			"articles": false
+		boolean: ["articles"],
+		default: {
+			article: "",
+			articles: false,
 		},
-		"string": ["article"]
+		string: ["article"],
 	});
 	const [
 		metadata,
@@ -362,7 +346,7 @@ const main = async () => {
 		links,
 		statuses,
 		partials,
-		version
+		version,
 	] = await Promise.all([
 		readJSONFile(config.data.metadata),
 		readArticles(),
@@ -372,7 +356,7 @@ const main = async () => {
 		readLinks(),
 		readStatuses(),
 		readPartials(),
-		getVersion()
+		getVersion(),
 	]);
 	metadata.articles = articles;
 	metadata.books = books;
@@ -384,9 +368,9 @@ const main = async () => {
 
 	if (argv.article) {
 		return build(metadata, partials, {
-			"data": config.data.article,
-			"dest": argv.article,
-			"src": config.src.article
+			data: config.data.article,
+			dest: argv.article,
+			src: config.src.article,
 		});
 	}
 
@@ -396,14 +380,14 @@ const main = async () => {
 		while (articleFiles.length > 0) {
 			/* eslint-disable-next-line no-await-in-loop */
 			await Promise.all(
-				articleFiles
-					.splice(-32)
-					.map(build.bind(null, metadata, partials))
+				articleFiles.splice(-32).map(build.bind(null, metadata, partials))
 			);
 		}
 	}
 
-	return Promise.all(config.files.html.map(build.bind(null, metadata, partials)));
+	return Promise.all(
+		config.files.html.map(build.bind(null, metadata, partials))
+	);
 };
 
 mustache.escape = escapeCharacters;

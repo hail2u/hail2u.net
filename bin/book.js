@@ -1,15 +1,10 @@
-import {
-	readJSONFile,
-	writeJSONFile
-} from "../lib/json-file.js";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
 import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
-import {
-	runCommand
-} from "../lib/run-command.js";
+import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
 
 const isReadBook = (asin, book) => asin === book.asin;
@@ -25,19 +20,13 @@ const addBook = async (asin, title) => {
 		throw new Error(`${title} has already been added.`);
 	}
 
-	const [
-		saver,
-		res
-	] = await Promise.all([
+	const [saver, res] = await Promise.all([
 		sharp(),
-		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`)
+		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`),
 	]);
 	res.body.pipe(saver);
 	const fn = path.join(config.dest.temp, `${asin}.jpg`);
-	const [metadata] = await Promise.all([
-		saver.metadata(),
-		saver.toFile(fn)
-	]);
+	const [metadata] = await Promise.all([saver.metadata(), saver.toFile(fn)]);
 
 	if (metadata.height === 1 && metadata.width === 1) {
 		throw new Error(`${title} does not have a cover image.`);
@@ -48,58 +37,41 @@ const addBook = async (asin, title) => {
 		[
 			{
 				asin,
-				"height": metadata.height,
-				"published": Date.now(),
+				height: metadata.height,
+				published: Date.now(),
 				title,
-				"width": metadata.width
+				width: metadata.width,
 			},
-			...books
+			...books,
 		],
-		`Read ${asin}`
+		`Read ${asin}`,
 	];
 };
 
 const main = async () => {
-	const {
-		asin,
-		title
-	} = minimist(process.argv.slice(2), {
-		"alias": {
-			"a": "asin",
-			"t": "title"
+	const { asin, title } = minimist(process.argv.slice(2), {
+		alias: {
+			a: "asin",
+			t: "title",
 		},
-		"default": {
-			"asin": "",
-			"title": ""
+		default: {
+			asin: "",
+			title: "",
 		},
-		"string": [
-			"asin",
-			"title"
-		]
+		string: ["asin", "title"],
 	});
 
 	if (!asin || !title) {
 		throw new Error("--asin and --title are required.");
 	}
 
-	const [
-		file,
-		data,
-		message
-	] = await addBook(asin, title);
+	const [file, data, message] = await addBook(asin, title);
 	await fs.mkdir(path.dirname(file), {
-		recursive: true
+		recursive: true,
 	});
 	await writeJSONFile(file, data);
-	await runCommand("git", [
-		"add",
-		"--",
-		file
-	]);
-	await runCommand("git", [
-		"commit",
-		`--message=${message}`
-	]);
+	await runCommand("git", ["add", "--", file]);
+	await runCommand("git", ["commit", `--message=${message}`]);
 };
 
 main().catch((e) => {

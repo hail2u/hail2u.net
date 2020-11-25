@@ -1,38 +1,27 @@
-import {
-	readJSONFile,
-	writeJSONFile,
-} from "../lib/json-file.js";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
-import {
-	highlight
-} from "../lib/highlight.js";
+import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import path from "path";
 import readline from "readline";
-import {
-	runCommand
-} from "../lib/run-command.js";
-import {
-	unescapeReferences
-} from "../lib/character-reference.js";
+import { runCommand } from "../lib/run-command.js";
+import { unescapeReferences } from "../lib/character-reference.js";
 
 const getDraft = async (filename) => {
 	const src = path.join(config.src.drafts, filename);
 	const content = await fs.readFile(src, "utf8");
-	const [
-		title,
-		...rest
-	] = content.split("\n");
-	const body = rest.join("\n")
+	const [title, ...rest] = content.split("\n");
+	const body = rest
+		.join("\n")
 		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//gu, "/");
 	return {
 		body,
-		"name": path.basename(src, path.extname(src)),
+		name: path.basename(src, path.extname(src)),
 		src,
-		"title": unescapeReferences(title.replace(/<.*?>/gu, ""))
+		title: unescapeReferences(title.replace(/<.*?>/gu, "")),
 	};
 };
 
@@ -71,8 +60,8 @@ const selectDraft = (drafts) => {
 		process.stdin.isTTY = true;
 		process.stdout.isTTY = true;
 		const menu = readline.createInterface({
-			"input": process.stdin,
-			"output": process.stdout
+			input: process.stdin,
+			output: process.stdout,
 		});
 		const menuitems = drafts.map(toMenuitem).join("\n");
 		menu.write(`0. QUIT
@@ -83,7 +72,9 @@ ${menuitems}
 			const answer = Number.parseInt(a, 10);
 
 			if (!Number.isInteger(answer) || answer > drafts.length) {
-				throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
+				throw new Error(
+					`You must enter a number between 0 and ${drafts.length}.`
+				);
 			}
 
 			if (answer === 0) {
@@ -102,7 +93,7 @@ const testSelected = async (selected) => {
 		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
 	const highlighted = highlight(rendered);
 	await fs.mkdir(path.dirname(config.dest.test), {
-		recursive: true
+		recursive: true,
 	});
 	await fs.writeFile(config.dest.test, highlighted);
 	return runCommand("open", [config.dest.test]);
@@ -114,60 +105,62 @@ const contributeSelected = async (selected) => {
 	const [cache] = await Promise.all([
 		readJSONFile(config.data.articles),
 		await fs.mkdir(path.dirname(config.data.articles), {
-			recursive: true
-		})
+			recursive: true,
+		}),
 	]);
 	await Promise.all([
 		fs.rm(selected.src),
 		writeJSONFile(config.data.articles, [
 			{
-				"body": selected.body,
-				"link": `/blog/${selected.name}.html`,
-				"published": Date.now(),
-				"title": selected.title
+				body: selected.body,
+				link: `/blog/${selected.name}.html`,
+				published: Date.now(),
+				title: selected.title,
 			},
-			...cache
-		])
+			...cache,
+		]),
 	]);
 	await Promise.all([
-		runCommand("git", [
-			"add",
-			"--",
-			config.data.articles
-		]),
+		runCommand("git", ["add", "--", config.data.articles]),
 		runCommand("node", [
 			"bin/html.js",
-			`--article=${config.dest.articles}${selected.name}.html`
-		])
+			`--article=${config.dest.articles}${selected.name}.html`,
+		]),
 	]);
 	return runCommand("git", [
 		"commit",
-		`--message=Contribute ${selected.name}${getArticleTotal(cache)}`
+		`--message=Contribute ${selected.name}${getArticleTotal(cache)}`,
 	]);
 };
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		"alias": {
-			"t": "test"
+		alias: {
+			t: "test",
 		},
-		"boolean": ["test"]
+		boolean: ["test"],
 	});
 	const drafts = await listDrafts(argv.test);
 	const selected = await selectDraft(drafts);
 
 	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(selected.name)) {
-		throw new Error("This draft does not have a valid name. A draft filename must start and end with \"a-z\" or \"0-9\" and must not contain other than \"-.a-z0-9\".");
+		throw new Error(
+			'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
+		);
 	}
 
 	if (typeof selected.title !== "string") {
-		throw new Error("This draft does not have a valid title. A draft title must be a string.");
+		throw new Error(
+			"This draft does not have a valid title. A draft title must be a string."
+		);
 	}
 
 	const bytes = new TextEncoder().encode(selected.title);
 
 	if (bytes.length < 9) {
-		throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");
+		throw new Error(
+			"This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese)."
+		);
 	}
 
 	if (argv.test) {

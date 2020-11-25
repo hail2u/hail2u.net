@@ -1,14 +1,9 @@
-import {
-	readJSONFile,
-	writeJSONFile
-} from "../lib/json-file.js";
+import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
 import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
-import {
-	runCommand
-} from "../lib/run-command.js";
+import { runCommand } from "../lib/run-command.js";
 
 const isFollowed = (url, following) => url === following.url;
 
@@ -22,13 +17,7 @@ const shuffleArray = (array) => {
 			continue;
 		}
 
-		[
-			shuffled[i],
-			shuffled[j]
-		] = [
-			shuffled[j],
-			shuffled[i]
-		];
+		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
 	}
 
 	return shuffled;
@@ -47,11 +36,11 @@ const addFollowing = async (feed, title, url) => {
 			{
 				feed,
 				title,
-				url
+				url,
 			},
-			...shuffleArray(followings)
+			...shuffleArray(followings),
 		],
-		`Follow ${url}`
+		`Follow ${url}`,
 	];
 };
 
@@ -62,22 +51,17 @@ const addLink = async (comment, title, url) => {
 		[
 			{
 				comment,
-				"published": Date.now(),
+				published: Date.now(),
 				title,
-				url
+				url,
 			},
-			...links
+			...links,
 		],
-		`Bookmark ${url}`
+		`Bookmark ${url}`,
 	];
 };
 
-const addThing = ({
-	comment,
-	feed,
-	title,
-	url
-}) => {
+const addThing = ({ comment, feed, title, url }) => {
 	if (feed && title && url) {
 		return addFollowing(feed, title, url);
 	}
@@ -91,43 +75,27 @@ const addThing = ({
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
-		"alias": {
-			"c": "comment",
-			"f": "feed",
-			"t": "title",
-			"u": "url"
+		alias: {
+			c: "comment",
+			f: "feed",
+			t: "title",
+			u: "url",
 		},
-		"default": {
-			"comment": "",
-			"feed": "",
-			"title": "",
-			"url": ""
+		default: {
+			comment: "",
+			feed: "",
+			title: "",
+			url: "",
 		},
-		"string": [
-			"comment",
-			"feed",
-			"title",
-			"url"
-		]
+		string: ["comment", "feed", "title", "url"],
 	});
-	const [
-		file,
-		data,
-		message
-	] = await addThing(argv);
+	const [file, data, message] = await addThing(argv);
 	await fs.mkdir(path.dirname(file), {
-		recursive: true
+		recursive: true,
 	});
 	await writeJSONFile(file, data);
-	await runCommand("git", [
-		"add",
-		"--",
-		file
-	]);
-	await runCommand("git", [
-		"commit",
-		`--message=${message}`
-	]);
+	await runCommand("git", ["add", "--", file]);
+	await runCommand("git", ["commit", `--message=${message}`]);
 };
 
 main().catch((e) => {
