@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="いくつかAmazonの画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、event.srcElementでimg要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -63,31 +65,31 @@
 <p>いくつか<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、<code>event.srcElement</code>で<code>img</code>要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。</p>
 <p>てなわけで画像付きのAmazonアソシエイトリンクを作成するMenuExtのコードを書いてみる。</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">defer</span>&gt;</span><span class="javascript">
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">defer</span>&gt;</span><span class="javascript">
 &lt;!--
-	<span class="hljs-keyword">var</span> aid = <span class="hljs-string">'hail2unet-22'</span>;
+	<span class="hljs-keyword">var</span> aid = <span class="hljs-string">&#x27;hail2unet-22&#x27;</span>;
 
 	<span class="hljs-keyword">var</span> pWin = external.menuArguments;
 
-	<span class="hljs-keyword">if</span> (pWin.event.srcElement.tagName == <span class="hljs-string">'IMG'</span>) {
+	<span class="hljs-keyword">if</span> (pWin.event.srcElement.tagName == <span class="hljs-string">&#x27;IMG&#x27;</span>) {
 		<span class="hljs-keyword">var</span> uri = pWin.location.href;
-		<span class="hljs-keyword">var</span> i = uri.indexOf(<span class="hljs-string">'ASIN'</span>);
+		<span class="hljs-keyword">var</span> i = uri.indexOf(<span class="hljs-string">&#x27;ASIN&#x27;</span>);
 		<span class="hljs-keyword">var</span> asin = uri.substring(i + <span class="hljs-number">5</span>, i + <span class="hljs-number">15</span>);
-		<span class="hljs-keyword">var</span> uri = <span class="hljs-string">"https://www.amazon.co.jp/exec/obidos/ASIN/"</span> + asin + <span class="hljs-string">"/"</span> + aid;
+		<span class="hljs-keyword">var</span> uri = <span class="hljs-string">&quot;https://www.amazon.co.jp/exec/obidos/ASIN/&quot;</span> + asin + <span class="hljs-string">&quot;/&quot;</span> + aid;
 		<span class="hljs-keyword">var</span> imguri = <span class="hljs-keyword">new</span> <span class="hljs-built_in">String</span>(pWin.event.srcElement.src);
 		<span class="hljs-keyword">var</span> title = pWin.document.title;
-		pWin.clipboardData.setData(<span class="hljs-string">"text"</span>, <span class="hljs-string">"&lt;a href=\""</span> + uri + <span class="hljs-string">"\" title=\""</span> +
-			title + <span class="hljs-string">"\"&gt;&lt;img src=\""</span> + imguri + <span class="hljs-string">"\" alt=\""</span> + title + <span class="hljs-string">"\" /&gt;&lt;/a&gt;"</span>);
+		pWin.clipboardData.setData(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;&lt;a href=\&quot;&quot;</span> + uri + <span class="hljs-string">&quot;\&quot; title=\&quot;&quot;</span> +
+			title + <span class="hljs-string">&quot;\&quot;&gt;&lt;img src=\&quot;&quot;</span> + imguri + <span class="hljs-string">&quot;\&quot; alt=\&quot;&quot;</span> + title + <span class="hljs-string">&quot;\&quot; /&gt;&lt;/a&gt;&quot;</span>);
 	}
 <span class="hljs-comment">//--&gt;</span>
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
 <p>これを適当なフォルダに保存して、<a href="http://www.uryusoft.com/software/IEMenuExt/" title="IE MenuExt">IE MenuExt</a>で「Associate this!」などというタイトルで登録するだけ。登録時には忘れずに、表示方法のところで画像上にチェックを入れておきましょう。</p>
 <p>で、Amazonの各商品のページの*画像上で*右クリックし、Associate this!を選択すると、</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22"</span>
-	<span class="hljs-attr">title</span>=<span class="hljs-string">"Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://m.media-amazon.com/images/P/B00021LRWM.jpg"</span>
-		<span class="hljs-attr">alt</span>=<span class="hljs-string">"Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]"</span> /&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22&quot;</span>
+	<span class="hljs-attr">title</span>=<span class="hljs-string">&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/B00021LRWM.jpg&quot;</span>
+		<span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
 <p>というようなコードがクリップボードにコピーされます（見やすいように改行を入れていますが、実際には一行で）。</p>
 <p>お、なかなか良いかも。</p>
@@ -104,20 +106,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

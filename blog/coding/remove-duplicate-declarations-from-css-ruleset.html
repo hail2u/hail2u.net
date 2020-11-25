@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="CSSWringに同じルールセット内で重複する定義（プロパティーとその値のセット）をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -65,11 +67,11 @@
 <p><a href="https://github.com/ai/postcss">PostCSS</a>でCSSをパースすると、各定義は以下のような構造になる（一部省略）。</p>
 
 <pre><code class="hljs language-javascript">{
-	<span class="hljs-attr">type</span>: <span class="hljs-string">'decl'</span>,
-	<span class="hljs-attr">before</span>: <span class="hljs-string">'\n	'</span>,
-	<span class="hljs-attr">prop</span>: <span class="hljs-string">'color'</span>,
-	<span class="hljs-attr">between</span>: <span class="hljs-string">': '</span>,
-	<span class="hljs-attr">value</span>: <span class="hljs-string">'white'</span>
+	<span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;decl&#x27;</span>,
+	<span class="hljs-attr">before</span>: <span class="hljs-string">&#x27;\n	&#x27;</span>,
+	<span class="hljs-attr">prop</span>: <span class="hljs-string">&#x27;color&#x27;</span>,
+	<span class="hljs-attr">between</span>: <span class="hljs-string">&#x27;: &#x27;</span>,
+	<span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;white&#x27;</span>
 }</code></pre>
 
 <p><code>type</code>に定義であることが明記されていて、<code>prop</code>でプロパティー名、<code>value</code>で値が拾える。また<code>before</code>にプロパティー名の前にある文字列、<code>between</code>にプロパティーと値の間の文字列が入ってる。</p>
@@ -78,11 +80,11 @@
 
 <p>PostCSSでは全定義をなめるイテレータ（<code>eachDecl()</code>）もあるけど、この場合はルールセット単位で作業するべきなので<code>eachRule()</code>の方で行う。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'postcss'</span>);
-<span class="hljs-keyword">var</span> css = fs.readFileSync(<span class="hljs-string">'test.css'</span>, <span class="hljs-string">'utf-8'</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;postcss&#x27;</span>);
+<span class="hljs-keyword">var</span> css = fs.readFileSync(<span class="hljs-string">&#x27;test.css&#x27;</span>, <span class="hljs-string">&#x27;utf-8&#x27;</span>);
 <span class="hljs-keyword">var</span> root = postcss.parse(css);
 root.eachRule(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">rule</span>) </span>{
-	<span class="hljs-keyword">var</span> d = <span class="hljs-string">''</span>;
+	<span class="hljs-keyword">var</span> d = <span class="hljs-string">&#x27;&#x27;</span>;
 	<span class="hljs-keyword">var</span> decls = {};
 	rule.each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">decl, index</span>) </span>{
 		d = decl.prop + decl.value;
@@ -111,20 +113,14 @@ root.eachRule(<span class="hljs-function"><span class="hljs-keyword">function</s
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

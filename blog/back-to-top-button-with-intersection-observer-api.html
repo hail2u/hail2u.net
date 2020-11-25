@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと10行に満たないJavaScriptで実装できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。" itemprop="description">
 		<link href="/img/blog/back-to-top-button-with-intersection-observer-api.gif" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -72,13 +74,13 @@
 <p>HTMLでは<code>body</code>要素直下の最後にでも<code>button</code>要素を置いておく。最後の方に置くのは重なり順のため。位置はCSSで行うので、あまり考える必要はない。イベントの発生までラグがあるかもしれないので、デフォルトで<code>hidden</code>属性は追加しておく。</p>
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"global-header"</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header&quot;</span>&gt;</span>
 		...
 	<span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span>
 
 	...
 
-	<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"to-top"</span> <span class="hljs-attr">hidden</span>&gt;</span>↑ Back to Top<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;to-top&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span>↑ Back to Top<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span></code></pre>
 </section>
 
@@ -101,13 +103,13 @@
 
 <p><code>IntersectionObserver</code>オブジェクトを作る時に渡すコールバック関数で、表示の切り替えを行う。引数から監視するグローバル・ヘッダーの位置情報が手に入るので、そのうちの見えるか見えないかだけを真偽値で返してくれる<code>isIntersecting</code>プロパティーを利用する。ボタンの<code>hidden</code>属性へコピーするだけで、グローバル・ヘッダーとボタンのどちらかのみが表示されるようになるはず。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> toTop = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"to-top"</span>);
-toTop.addEventListener(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> toTop = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;to-top&quot;</span>);
+toTop.addEventListener(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 	<span class="hljs-built_in">window</span>.scrollTo(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
 });
 (<span class="hljs-keyword">new</span> IntersectionObserver(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">entries</span>) </span>{
 	toTop.hidden = entries[<span class="hljs-number">0</span>].isIntersecting;
-})).observe(<span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">".global-header"</span>));</code></pre>
+})).observe(<span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;.global-header&quot;</span>));</code></pre>
 </section>
 
 <hr>
@@ -130,20 +132,14 @@ toTop.addEventListener(<span class="hljs-string">"click"</span>, <span class="hl
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の（&lt;C-x&gt;だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -62,20 +64,20 @@
 
 <p>メタ構文変数とか呼ばれてるらしい<code>foo</code>とか<code>bar</code>とかのアレがまったく覚えられない。のでVimに<a href="http://en.wikipedia.org/wiki/Metasyntactic_variable#English">一般的なメタ構文変数のリスト</a>を覚えさせておいて、<code>foo</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>bar</code>に、<code>bar</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>buz</code>に、と順に次の（<kbd>&lt;C-x&gt;</kbd>だと前の）を選択してくれるように関数とマッピングを書いて使うことにした。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-comment">" Cycle metasyntactic variables</span>
+<pre><code class="hljs language-vim"><span class="hljs-comment">&quot; Cycle metasyntactic variables</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CycleMetasyntacticVariables</span><span class="hljs-params">(num)</span></span>
 	<span class="hljs-keyword">if</span> <span class="hljs-built_in">type</span>(<span class="hljs-variable">a:num</span>) != <span class="hljs-built_in">type</span>(<span class="hljs-number">0</span>)
 		<span class="hljs-keyword">return</span>
 	<span class="hljs-keyword">endif</span>
 
-	<span class="hljs-keyword">let</span> vars = [<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>, <span class="hljs-string">'baz'</span>, <span class="hljs-string">'qux'</span>, <span class="hljs-string">'quux'</span>, <span class="hljs-string">'corge'</span>, <span class="hljs-string">'grault'</span>, <span class="hljs-string">'garply'</span>, <span class="hljs-string">'waldo'</span>, <span class="hljs-string">'fred'</span>, <span class="hljs-string">'plugh'</span>, <span class="hljs-string">'xyzzy'</span>, <span class="hljs-string">'thud'</span>]
-	<span class="hljs-keyword">let</span> i = <span class="hljs-built_in">index</span>(vars, <span class="hljs-built_in">expand</span>(<span class="hljs-string">'&lt;cword&gt;'</span>))
+	<span class="hljs-keyword">let</span> vars = [<span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-string">&#x27;baz&#x27;</span>, <span class="hljs-string">&#x27;qux&#x27;</span>, <span class="hljs-string">&#x27;quux&#x27;</span>, <span class="hljs-string">&#x27;corge&#x27;</span>, <span class="hljs-string">&#x27;grault&#x27;</span>, <span class="hljs-string">&#x27;garply&#x27;</span>, <span class="hljs-string">&#x27;waldo&#x27;</span>, <span class="hljs-string">&#x27;fred&#x27;</span>, <span class="hljs-string">&#x27;plugh&#x27;</span>, <span class="hljs-string">&#x27;xyzzy&#x27;</span>, <span class="hljs-string">&#x27;thud&#x27;</span>]
+	<span class="hljs-keyword">let</span> i = <span class="hljs-built_in">index</span>(vars, <span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;&lt;cword&gt;&#x27;</span>))
 
 	<span class="hljs-keyword">if</span> (i == -<span class="hljs-number">1</span>)
 		<span class="hljs-keyword">if</span> (<span class="hljs-variable">a:num</span> &gt; <span class="hljs-number">0</span>)
-			<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-a&gt;"</span>
+			<span class="hljs-keyword">execute</span> <span class="hljs-string">&quot;normal! \&lt;C-a&gt;&quot;</span>
 		<span class="hljs-keyword">else</span>
-			<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! \&lt;C-x&gt;"</span>
+			<span class="hljs-keyword">execute</span> <span class="hljs-string">&quot;normal! \&lt;C-x&gt;&quot;</span>
 		<span class="hljs-keyword">endif</span>
 
 		<span class="hljs-keyword">return</span>
@@ -90,7 +92,7 @@
 	<span class="hljs-keyword">endif</span>
 
 	<span class="hljs-keyword">let</span> @w = vars[i]
-	<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! viw\"wp"</span>
+	<span class="hljs-keyword">execute</span> <span class="hljs-string">&quot;normal! viw\&quot;wp&quot;</span>
 <span class="hljs-keyword">endfunction</span>
 
 <span class="hljs-keyword">nnoremap</span> <span class="hljs-symbol">&lt;C-a&gt;</span> :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>CycleMetasyntacticVariables(<span class="hljs-number">1</span>)<span class="hljs-symbol">&lt;Enter&gt;</span>
@@ -108,20 +110,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

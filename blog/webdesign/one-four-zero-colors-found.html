@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="140 Colors FoundというCSSで使える色キーワードをランダムにちょっとかっこよく表示するツールを作った。CSS Color Keywordsのアレンジ。実用性はまったくない。本当にない。" itemprop="description">
 		<link href="/img/blog/peru-found.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -73,17 +75,17 @@
 
 <p>色キーワードから<code>rgb(R, G, B)</code>か<code>#RRGGBB</code>に変換するために、その色キーワードを指定した要素の計算済みスタイルを拾おうとした。どんな色のフォーマットでも計算済みスタイルでは統一されている記憶があった（Operaは<code>#RRGGBB</code>で返ってきてしまうけど）ので利用したが、あえなく失敗。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-built_in">document</span>.body.style.backgroundColor = <span class="hljs-string">"Red"</span>;
-<span class="hljs-keyword">var</span> c = <span class="hljs-built_in">window</span>.getComputedStyle(<span class="hljs-built_in">document</span>.body, <span class="hljs-literal">null</span>).getPropertyValue(<span class="hljs-string">"background-color"</span>);
+<pre><code class="hljs language-js"><span class="hljs-built_in">document</span>.body.style.backgroundColor = <span class="hljs-string">&quot;Red&quot;</span>;
+<span class="hljs-keyword">var</span> c = <span class="hljs-built_in">window</span>.getComputedStyle(<span class="hljs-built_in">document</span>.body, <span class="hljs-literal">null</span>).getPropertyValue(<span class="hljs-string">&quot;background-color&quot;</span>);
 <span class="hljs-comment">// rgba(0, 0, 0, 0) or transparent</span></code></pre>
 
 <p>このコード自体にはあまり問題はない。<code>rgba(0, 0, 0, 0)</code>等が返ってきてしまう理由は<code>body</code>要素のスタイルに<code>transition</code>プロパティがあったことで、色を変更した直後だとアニメーション中なため正確な値が拾えなかった。当たり前ですよねー。<code>transition</code>プロパティがなければ意図した通りに変換される。</p>
 
 <p><code>transition</code>が原因なので、そういった余計なスタイルが付かないダミーの要素を作ってそこから拾えばいいんじゃないかとやってみたら、今度は一部ブラウザで空文字列が返された。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> span = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"span"</span>);
-span.style.backgroundColor = <span class="hljs-string">"Red"</span>;
-<span class="hljs-keyword">var</span> c = <span class="hljs-built_in">window</span>.getComputedStyle(span, <span class="hljs-literal">null</span>).getPropertyValue(<span class="hljs-string">"background-color"</span>);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> span = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&quot;span&quot;</span>);
+span.style.backgroundColor = <span class="hljs-string">&quot;Red&quot;</span>;
+<span class="hljs-keyword">var</span> c = <span class="hljs-built_in">window</span>.getComputedStyle(span, <span class="hljs-literal">null</span>).getPropertyValue(<span class="hljs-string">&quot;background-color&quot;</span>);
 <span class="hljs-comment">// Chrome, Safari and Opera: empty string</span>
 <span class="hljs-comment">// Internet Explorer and Firefox: rgb(255, 0, 0)</span></code></pre>
 
@@ -106,20 +108,14 @@ span.style.backgroundColor = <span class="hljs-string">"Red"</span>;
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

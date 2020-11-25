@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="blosxomのパワフルなプラグインのひとつに、configプラグインという、グローバルな設定（$blog_titleとか）を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、設定の説明がMLのアーカイブにしかないことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,25 +66,25 @@
 <p>どうにかこうにか、</p>
 <pre><code class="hljs language-perl"><span class="hljs-keyword">package</span> blosxom;
 
-$blog_title = <span class="hljs-string">'FooBarBlosxom'</span>;
+$blog_title = <span class="hljs-string">&#x27;FooBarBlosxom&#x27;</span>;
 
 <span class="hljs-number">1</span>;</code></pre>
 <p>とか書いて、configとかconfig.htmlとかいうファイル名でファイルを作ってやれば良いということまでは理解できました。</p>
 <p>しかし、動きません。</p>
 <p>まず第一の原因は、どうやら<code>head</code>サブルーチンで設定ファイルを読んでいることにあるようです。プラグインを読み込む順番によっては、うまく読んでくれないことがあるかもしれないとか。これに対しての解は<code>head</code>サブルーチンから<code>filter</code>サブルーチンに変更してやるか、configプラグインを最初に読み込むように00configなどと名前を変更してやるだけです。</p>
 <p>次の原因は、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>との兼ね合いっぽいです。blosxomはエントリのファイルをリストアップする際に、エントリ・ファイルとみなす拡張子以外のファイルを<code>%others</code>というハッシュに格納するので、configプラグインの設定ファイルはこちらに格納されることになります。また、configプラグインでは、その<code>%others</code>に格納されているかどうかで、設定ファイルの存在を確認しています。通常はこれで問題ないのですが、entries_indexでは、この<code>%others</code>をまるごと吹っ飛ばしているっぽいので、configプラグインで設定ファイルの存在を検知できていないような。なので、その部分をちょっと書き換えてやる必要があるかもないかも。本格的な対策はentries_indexを書き換えるべきなんでしょうけど、あれのコードはかなりトリッキーで僕にはちょっと正確に読めないです。configプラグインの</p>
-<pre><code class="hljs language-perl">$blosxom::others{<span class="hljs-string">"$blosxom::datadir$path/config.$blosxom::flavour"</span>}
-	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">"$blosxom::datadir$path/config.$blosxom::flavour"</span> }
+<pre><code class="hljs language-perl">$blosxom::others{<span class="hljs-string">&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;</span>}
+	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;</span> }
 	<span class="hljs-keyword">and</span> ( $@ ? <span class="hljs-keyword">warn</span> $@ : <span class="hljs-keyword">last</span> );
-$blosxom::others{<span class="hljs-string">"$blosxom::datadir$path/config"</span>}
-	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">"$blosxom::datadir$path/config"</span> }
+$blosxom::others{<span class="hljs-string">&quot;$blosxom::datadir$path/config&quot;</span>}
+	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">&quot;$blosxom::datadir$path/config&quot;</span> }
 	<span class="hljs-keyword">and</span> ( $@ ? <span class="hljs-keyword">warn</span> $@ : <span class="hljs-keyword">last</span> );</code></pre>
 <p>となっている部分を、</p>
 <pre><code class="hljs language-perl">-e $blosxom::datadir$path/config.$blosxom::flavour
-	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">"$blosxom::datadir$path/config.$blosxom::flavour"</span> }
+	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;</span> }
 	<span class="hljs-keyword">and</span> ( $@ ? <span class="hljs-keyword">warn</span> $@ : <span class="hljs-keyword">last</span> );
 -e $blosxom::datadir$path/config
-	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">"$blosxom::datadir$path/config"</span> }
+	<span class="hljs-keyword">and</span> <span class="hljs-keyword">eval</span> { <span class="hljs-keyword">require</span> <span class="hljs-string">&quot;$blosxom::datadir$path/config&quot;</span> }
 	<span class="hljs-keyword">and</span> ( $@ ? <span class="hljs-keyword">warn</span> $@ : <span class="hljs-keyword">last</span> );</code></pre>
 <p>と、ファイルテスト演算子で存在確認するようにしたらちゃんと動作するようになりました。適当過ぎな改造ですので、あまり参考にしないほうが良いです。ていうか、正確に挙動をつかめてないですしね。</p>
 <p>ちなみに、entries_indexを大幅に拡張した<a href="http://www.blosxom.com/plugins/indexing/entries_cache.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_cache.txt">entries_cache</a>の方では、<code>%others</code>をきちんと扱っているようなので、そのままでうまく動くような気がします。entries_indexはパフォーマンス的にも機能的にもちょっと落ちるので、entries_cacheが使える環境の場合はこちらを使った方が良いような気も。</p>
@@ -98,20 +100,14 @@ $blosxom::others{<span class="hljs-string">"$blosxom::datadir$path/config"</span
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

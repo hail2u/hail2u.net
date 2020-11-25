@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="HTML5時代に向いていそうな（S)CSSの書き方を模索しています。SCSSで書くのでモジュール式に色々分割した方が良さそうだな……とか色々試してますが、なかなかこれ！というものに辿りつけません……。ということで、ここ最近の書き方をメモがてら晒してみる試みです。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -69,18 +71,18 @@
 
 <p>style.cssになるSCSSファイルではCSSは書かないようにします。ただし例外としてCSS文法での<code>@import</code>ルールはその必要性からここに書きます。Webフォントなんかで使いますね。それ以外はSCSSの<code>@import</code>でモジュール化した各種SCSSファイルを読み込んでいきます。</p>
 
-<pre><code class="hljs language-scss"><span class="hljs-keyword">@import</span> url(<span class="hljs-string">"http://fonts.googleapis.com/css?family=Pacifico"</span>);
+<pre><code class="hljs language-scss"><span class="hljs-keyword">@import</span> url(<span class="hljs-string">&quot;http://fonts.googleapis.com/css?family=Pacifico&quot;</span>);
 
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"vars"</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;vars&quot;</span>;
 
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"reset"</span>;
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"clearfix"</span>;
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"vendor-extension"</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;reset&quot;</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;clearfix&quot;</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;vendor-extension&quot;</span>;
 
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"basics"</span>;
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"layout"</span>;
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"widget"</span>;
-<span class="hljs-keyword">@import</span> <span class="hljs-string">"print"</span>;</code></pre>
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;basics&quot;</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;layout&quot;</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;widget&quot;</span>;
+<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;print&quot;</span>;</code></pre>
 </section>
 
 <section>
@@ -89,8 +91,8 @@
 <p>以降のSCSSファイルで使用するグローバル変数を定義するSCSSファイルです。これにもCSSは書きません。フォントファミリのショートカットや基本となる幾つかの色、グリッド定義などはここに書いて再利用しやすくします。対してブログパーツ的なもののスタイル指定等で必要になる変数はここで定義する必要が無いので、混乱を避けるためにここには書きません。</p>
 
 <pre><code class="hljs language-scss"><span class="hljs-comment">// Font</span>
-<span class="hljs-variable">$sans-serif</span>: <span class="hljs-string">"Lucida Grande"</span>, <span class="hljs-string">"Lucida Sans Unicode"</span>, sans-serif;
-<span class="hljs-variable">$monospace</span>:  <span class="hljs-string">"Monaco"</span>, <span class="hljs-string">"Andale Mono"</span>, monospace;
+<span class="hljs-variable">$sans-serif</span>: <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif;
+<span class="hljs-variable">$monospace</span>:  <span class="hljs-string">&quot;Monaco&quot;</span>, <span class="hljs-string">&quot;Andale Mono&quot;</span>, monospace;
 
 <span class="hljs-comment">// Color</span>
 <span class="hljs-variable">$dark</span>:   rgb(<span class="hljs-number">115</span>, <span class="hljs-number">143</span>, <span class="hljs-number">153</span>);
@@ -134,7 +136,7 @@
 	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.75</span>;
 	<span class="hljs-attribute">color</span>: <span class="hljs-variable">$fg</span>;
 	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$bg</span>;
-	<span class="hljs-attribute">background-image</span>: url(<span class="hljs-string">"../images/bg-body.png"</span>);
+	<span class="hljs-attribute">background-image</span>: url(<span class="hljs-string">&quot;../images/bg-body.png&quot;</span>);
 	<span class="hljs-attribute">font-family</span>: <span class="hljs-variable">$sans-serif</span>;
 }
 
@@ -233,20 +235,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

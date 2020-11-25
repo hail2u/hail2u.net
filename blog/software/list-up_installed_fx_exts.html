@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Firefoxにインストール済みのExtensionは、もちろんExtension Managerで確認できるわけですが、なんかの拍子にプロファイル作り直しの刑を受けてしまうと当然Extensionも入れ直しなわけです。この作業は、新たなExtensionを導入する作業と違ってかったるいだけの作業だったりするわけで。てなわけでその作業の手間を少し楽にするためにインストール済みのExtensionの情報が書かれているExtension.rdfを（かなり適当に）パースして、Extensionの名前とバージョン、配布サイトのURLをリスト・アップするスクリプトを書いてみました。・・・WSH with JScriptで。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -67,14 +69,14 @@
 <span class="hljs-keyword">var</span> oArgs = WScript.Arguments;
 <span class="hljs-keyword">var</span> fFxExtsRdf = oArgs(<span class="hljs-number">0</span>);
 
-<span class="hljs-keyword">var</span> oFileSys = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Scripting.FileSystemObject"</span>);
+<span class="hljs-keyword">var</span> oFileSys = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">&quot;Scripting.FileSystemObject&quot;</span>);
 
 <span class="hljs-keyword">if</span> (!oFileSys.FileExists(fFxExtsRdf)) {
-	WScript.Echo(fFxExtsRdf + <span class="hljs-string">"\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。"</span>);
+	WScript.Echo(fFxExtsRdf + <span class="hljs-string">&quot;\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。&quot;</span>);
 	WScript.Quit();
 }
 
-<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">"Msxml2.DOMDocument.3.0"</span>);
+<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">&quot;Msxml2.DOMDocument.3.0&quot;</span>);
 
 xmlDoc.async = <span class="hljs-literal">false</span>;
 xmlDoc.load(fFxExtsRdf);
@@ -84,23 +86,23 @@ xmlDoc.load(fFxExtsRdf);
 	WScript.Quit();
 }
 
-<span class="hljs-keyword">var</span> descriptionNodes = xmlDoc.getElementsByTagName(<span class="hljs-string">"RDF:Description"</span>);
-<span class="hljs-keyword">var</span> sExtsList = <span class="hljs-string">""</span>;
+<span class="hljs-keyword">var</span> descriptionNodes = xmlDoc.getElementsByTagName(<span class="hljs-string">&quot;RDF:Description&quot;</span>);
+<span class="hljs-keyword">var</span> sExtsList = <span class="hljs-string">&quot;&quot;</span>;
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; descriptionNodes.length; i++) {
 	<span class="hljs-keyword">var</span> description   = descriptionNodes.item(i);
-	<span class="hljs-keyword">var</span> emName        = description.getAttribute(<span class="hljs-string">"em:name"</span>);
-	<span class="hljs-keyword">var</span> emVersion     = description.getAttribute(<span class="hljs-string">"em:version"</span>);
-	<span class="hljs-keyword">var</span> emHomepageUrl = description.getAttribute(<span class="hljs-string">"em:homepageURL"</span>);
+	<span class="hljs-keyword">var</span> emName        = description.getAttribute(<span class="hljs-string">&quot;em:name&quot;</span>);
+	<span class="hljs-keyword">var</span> emVersion     = description.getAttribute(<span class="hljs-string">&quot;em:version&quot;</span>);
+	<span class="hljs-keyword">var</span> emHomepageUrl = description.getAttribute(<span class="hljs-string">&quot;em:homepageURL&quot;</span>);
 
 	<span class="hljs-keyword">if</span> (emName &amp;&amp; emVersion &amp;&amp; emHomepageUrl) {
-		sExtsList += emName + <span class="hljs-string">" version "</span> + emVersion + <span class="hljs-string">"\n"</span> + emHomepageUrl + <span class="hljs-string">"\n"</span>;
-		sExtsList += <span class="hljs-string">"----------------------------------------\n"</span>;
+		sExtsList += emName + <span class="hljs-string">&quot; version &quot;</span> + emVersion + <span class="hljs-string">&quot;\n&quot;</span> + emHomepageUrl + <span class="hljs-string">&quot;\n&quot;</span>;
+		sExtsList += <span class="hljs-string">&quot;----------------------------------------\n&quot;</span>;
 	}
 }
 
 <span class="hljs-keyword">if</span> (sExtsList) {
-	sExtsList = <span class="hljs-string">"Firefox installed Extensions\n========================================\n"</span> + sExtsList;
+	sExtsList = <span class="hljs-string">&quot;Firefox installed Extensions\n========================================\n&quot;</span> + sExtsList;
 	WScript.Echo(sExtsList);
 }
 
@@ -157,20 +159,14 @@ http://tecwizards.de/mozilla/
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="もう第二刷！な、ぶろがーのますとあいてむBlog HacksのHack #79ではPerlでBloglinesの新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在はMozilla Extensionとして動作するものやKDE上で動作するものが公開されています。ので、通常はこちらを使った方が良いと思います。" itemprop="description">
 		<link href="/img/blog/bloglines_and_tclockl.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -67,21 +69,21 @@
 <a href="/img/blog/bloglines_and_tclockl.png"><img alt="TClock Lightを利用してBloglinesの新着記事数をタスクトレイに表示" height="24" src="/img/blog/bloglines_and_tclockl.png" width="260"></a>
 </figure>
 <p>これを実現するためには以下のようなVBScriptファイルでOK。</p>
-<pre><code class="hljs language-vbs">sMail = <span class="hljs-string">"&lt;登録したメールアドレス&gt;"</span>
-sTClock = <span class="hljs-string">"C:\Program Files\TClock Light\tclock.exe"</span>
+<pre><code class="hljs language-vbs">sMail = <span class="hljs-string">&quot;&lt;登録したメールアドレス&gt;&quot;</span>
+sTClock = <span class="hljs-string">&quot;C:\Program Files\TClock Light\tclock.exe&quot;</span>
 
-<span class="hljs-keyword">Set</span> oXmlHttp  = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">"Msxml2.XMLHTTP.3.0"</span>)
-<span class="hljs-keyword">Set</span> oWshShell = WScript.<span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">"WScript.Shell"</span>)
+<span class="hljs-keyword">Set</span> oXmlHttp  = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;Msxml2.XMLHTTP.3.0&quot;</span>)
+<span class="hljs-keyword">Set</span> oWshShell = WScript.<span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;WScript.Shell&quot;</span>)
 
 sTClock = <span class="hljs-built_in">Chr</span>(<span class="hljs-number">34</span>) &amp; sTClock &amp; <span class="hljs-built_in">Chr</span>(<span class="hljs-number">34</span>)
 
-oXmlHttp.open <span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://www.bloglines.com/update?user="</span> &amp; sMail, <span class="hljs-literal">False</span>
+oXmlHttp.open <span class="hljs-string">&quot;GET&quot;</span>, <span class="hljs-string">&quot;http://www.bloglines.com/update?user=&quot;</span> &amp; sMail, <span class="hljs-literal">False</span>
 oXmlHttp.send
 sRes = oXmlHttp.responseText
 
-aRes = <span class="hljs-built_in">Split</span>(sStr, <span class="hljs-string">"|"</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>)
+aRes = <span class="hljs-built_in">Split</span>(sStr, <span class="hljs-string">&quot;|&quot;</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>)
 
-oWshShell.Run sTClock &amp; <span class="hljs-string">" /ustr9 "</span> &amp; aRes(<span class="hljs-number">1</span>)</code></pre>
+oWshShell.Run sTClock &amp; <span class="hljs-string">&quot; /ustr9 &quot;</span> &amp; aRes(<span class="hljs-number">1</span>)</code></pre>
 <p>あとはTClock Lightの書式設定に<code>USTR9</code>と書いてやればこのVBScriptを実行するたびにタスクトレイの表示が更新されます。定期的にこのVBScriptを実行したい場合は、同じくTClock Lightのアラーム設定で適度な間隔を指定してやれば良いです。さらにはTClock Lightのマウス操作設定で、タスクトレイのダブルクリックをファイルを開くにしてやり、ファイルに、</p>
 <pre>http://www.bloglines.com/myblogs</pre>
 <p>を指定すると、タスクトレイのダブルクリックからMy Blogsが開けて完璧！</p>
@@ -97,20 +99,14 @@ oWshShell.Run sTClock &amp; <span class="hljs-string">" /ustr9 "</span> &amp; aR
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

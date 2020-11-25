@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Amazon.co.jp（Amazon.comでも）の商品個別ページのDOMにはwindow.productTagsというオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名（CDとかならアーティスト名）など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -65,18 +67,18 @@
 <p><code>window.productTags</code>オブジェクトは商品個別ページにあるタグをつける機能のために用意されているものみたい。<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873112028/hail2unet-22">Perlクックブック〈VOLUME1〉</a>のページを例に<code>window.productTags</code>オブジェクトを探してみると、</p>
 
 <pre><code class="hljs language-js">productTags: {
-	<span class="hljs-attr">asin</span>: <span class="hljs-string">"4873112028"</span>,
-	<span class="hljs-attr">image</span>: <span class="hljs-string">"http://ec2.images-amazon.com/images/I/51FHW5B8GQL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU09_.jpg"</span>,
-	<span class="hljs-attr">title</span>: <span class="hljs-string">"Perl\u30AF\u30C3\u30AF\u30D6\u30C3\u30AF\u3008VOLUME1\u3009"</span>,
+	<span class="hljs-attr">asin</span>: <span class="hljs-string">&quot;4873112028&quot;</span>,
+	<span class="hljs-attr">image</span>: <span class="hljs-string">&quot;http://ec2.images-amazon.com/images/I/51FHW5B8GQL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU09_.jpg&quot;</span>,
+	<span class="hljs-attr">title</span>: <span class="hljs-string">&quot;Perl\u30AF\u30C3\u30AF\u30D6\u30C3\u30AF\u3008VOLUME1\u3009&quot;</span>,
 	<span class="hljs-attr">authors</span>: [
-		<span class="hljs-string">"\u30C8\u30E0 \u30AF\u30EA\u30B9\u30C1\u30E3\u30F3\u30BB\u30F3"</span>,
-		<span class="hljs-string">"\u30CD\u30A4\u30B6\u30F3 \u30C8\u30FC\u30AD\u30F3\u30C8\u30F3"</span>,
-		<span class="hljs-string">"Tom Christiansen"</span>,
-		<span class="hljs-string">"Nathan Torkington"</span>,
-		<span class="hljs-string">"Shibuya Perl Mongers"</span>,
-		<span class="hljs-string">"\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u30B7\u30B9\u30C6\u30E0"</span>
+		<span class="hljs-string">&quot;\u30C8\u30E0 \u30AF\u30EA\u30B9\u30C1\u30E3\u30F3\u30BB\u30F3&quot;</span>,
+		<span class="hljs-string">&quot;\u30CD\u30A4\u30B6\u30F3 \u30C8\u30FC\u30AD\u30F3\u30C8\u30F3&quot;</span>,
+		<span class="hljs-string">&quot;Tom Christiansen&quot;</span>,
+		<span class="hljs-string">&quot;Nathan Torkington&quot;</span>,
+		<span class="hljs-string">&quot;Shibuya Perl Mongers&quot;</span>,
+		<span class="hljs-string">&quot;\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u30B7\u30B9\u30C6\u30E0&quot;</span>
 	],
-	<span class="hljs-attr">appID</span>: <span class="hljs-string">"retail"</span>,
+	<span class="hljs-attr">appID</span>: <span class="hljs-string">&quot;retail&quot;</span>,
 	<span class="hljs-comment">// 以下、タグをつける機能に関するプロパティが色々</span>
 }</code></pre>
 
@@ -88,7 +90,7 @@
 
 <p>画像のサイズは基本的に長辺が75pxにリサイズされているものを参照している（_SL75_)が、なか見！検索のマークやおすすめマークと混ぜられたりしてると83pxとかそれ以上の時もあるので、適当に正規表現で削除してやると良さそう。</p>
 
-<pre><code class="hljs language-js">productTags.image.replace(<span class="hljs-regexp">/_SL75_.*\.jpg$/</span>, <span class="hljs-string">"_SL75_.jpg"</span>);</code></pre>
+<pre><code class="hljs language-js">productTags.image.replace(<span class="hljs-regexp">/_SL75_.*\.jpg$/</span>, <span class="hljs-string">&quot;_SL75_.jpg&quot;</span>);</code></pre>
 
 <p>こんなんで多分いける。ついでに画像を大きくしたかったりする場合は<code>_SL120_.jpg</code>で置換してやるとかで。</p>
 
@@ -102,20 +104,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

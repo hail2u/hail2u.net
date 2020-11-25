@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,36 +66,36 @@
 
 <p>色々遠回りしたけど、結局はテンプレート・ファイルを読んでコンパイル→レンダーする関数を作ってそれをヘルパー関数にすれば良いだけだった。Handlebars.jsがカシコイのでコンテキストとかは自動的に良しなにしてくれる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
-<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'handlebars'</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;handlebars&#x27;</span>);
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyTemplate</span>(<span class="hljs-params">file, data</span>) </span>{
-	<span class="hljs-keyword">var</span> tmpl = hbs.compile(fs.readFileSync(file, <span class="hljs-string">'UTF-8'</span>));
+	<span class="hljs-keyword">var</span> tmpl = hbs.compile(fs.readFileSync(file, <span class="hljs-string">&#x27;UTF-8&#x27;</span>));
 
 	<span class="hljs-keyword">return</span> tmpl(data);
 }
 
-hbs.registerHelper(<span class="hljs-string">'include'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) </span>{
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.SafeString(applyTemplate(file, <span class="hljs-keyword">this</span>));
+hbs.registerHelper(<span class="hljs-string">&#x27;include&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.SafeString(applyTemplate(file, <span class="hljs-built_in">this</span>));
 });
 
-<span class="hljs-built_in">console</span>.log(applyTemplate(<span class="hljs-string">'./template.hbs'</span>, {
-	<span class="hljs-string">"he"</span>: {
-		<span class="hljs-string">"name"</span>: <span class="hljs-string">"John"</span>
+<span class="hljs-built_in">console</span>.log(applyTemplate(<span class="hljs-string">&#x27;./template.hbs&#x27;</span>, {
+	<span class="hljs-string">&quot;he&quot;</span>: {
+		<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;John&quot;</span>
 	},
-	<span class="hljs-string">"she"</span>: {
-		<span class="hljs-string">"name"</span>: <span class="hljs-string">"Jane"</span>
+	<span class="hljs-string">&quot;she&quot;</span>: {
+		<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Jane&quot;</span>
 	}
 }));</code></pre>
 
 <p>使うテンプレート・ファイルは、<code>template.hbs</code></p>
 
-<pre><code class="hljs language-handlebars"><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="xml">His name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="xml">
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="xml">His girlfriend name is </span><span class="hljs-template-variable">{{include "./include.hbs"}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span></code></pre>
+<pre><code class="hljs language-handlebars"><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="xml">His name is </span><span class="hljs-template-variable">{{<span class="hljs-name">include</span> <span class="hljs-string">&quot;./include.hbs&quot;</span>}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="xml">
+</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="xml">His girlfriend name is </span><span class="hljs-template-variable">{{<span class="hljs-name">include</span> <span class="hljs-string">&quot;./include.hbs&quot;</span>}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span></code></pre>
 
 <p>と、<code>include.hbs</code></p>
 
-<pre><code class="hljs language-handlebars"><span class="hljs-template-variable">{{name}}</span></code></pre>
+<pre><code class="hljs language-handlebars"><span class="hljs-template-variable">{{<span class="hljs-name">name</span>}}</span></code></pre>
 
 <p>の2つ。実行すると結果はこうなる。</p>
 
@@ -119,20 +121,14 @@ His girlfriend name is Jane</samp></pre>
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

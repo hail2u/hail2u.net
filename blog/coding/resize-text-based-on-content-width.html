@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Webフォント（@font-face）や均等割付（text-align: justify;）、日本語と英語の間のスペース調節（text-autospace）などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまりimg要素にwidth: 100%;を指定した時のようにはCSSではできない（少なくとも思いつかなかった）。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。" itemprop="description">
 		<link href="/img/blog/resize-text-based-on-content-width.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -73,37 +75,37 @@
 <pre><code class="hljs language-js">$(<span class="hljs-built_in">window</span>).load(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 	<span class="hljs-keyword">var</span> start = $.now();
 
-	$(<span class="hljs-string">".line"</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		<span class="hljs-keyword">var</span> target = $(<span class="hljs-keyword">this</span>);
-		<span class="hljs-keyword">var</span> fontSize = <span class="hljs-built_in">parseInt</span>(target.css(<span class="hljs-string">"font-size"</span>), <span class="hljs-number">10</span>);
+	$(<span class="hljs-string">&quot;.line&quot;</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">var</span> target = $(<span class="hljs-built_in">this</span>);
+		<span class="hljs-keyword">var</span> fontSize = <span class="hljs-built_in">parseInt</span>(target.css(<span class="hljs-string">&quot;font-size&quot;</span>), <span class="hljs-number">10</span>);
 
-		<span class="hljs-keyword">var</span> temp = $(<span class="hljs-string">"&lt;div/&gt;"</span>).css({
-			<span class="hljs-string">"display"</span>:     <span class="hljs-string">"none"</span>,
-			<span class="hljs-string">"font-family"</span>: target.css(<span class="hljs-string">"font-family"</span>),
-			<span class="hljs-string">"font-size"</span>:   fontSize
-		}).text(target.text()).appendTo(<span class="hljs-string">"body"</span>);
+		<span class="hljs-keyword">var</span> temp = $(<span class="hljs-string">&quot;&lt;div/&gt;&quot;</span>).css({
+			<span class="hljs-string">&quot;display&quot;</span>:     <span class="hljs-string">&quot;none&quot;</span>,
+			<span class="hljs-string">&quot;font-family&quot;</span>: target.css(<span class="hljs-string">&quot;font-family&quot;</span>),
+			<span class="hljs-string">&quot;font-size&quot;</span>:   fontSize
+		}).text(target.text()).appendTo(<span class="hljs-string">&quot;body&quot;</span>);
 
 		<span class="hljs-keyword">var</span> targetWidth = target.width();
 		<span class="hljs-keyword">var</span> tempWidth = temp.width();
 
 		<span class="hljs-keyword">while</span> (tempWidth &lt; targetWidth) {
 			fontSize *= (targetWidth / tempWidth);
-			temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+			temp.css(<span class="hljs-string">&quot;font-size&quot;</span>, fontSize + <span class="hljs-string">&quot;px&quot;</span>);
 			tempWidth = temp.width();
 		}
 
 		<span class="hljs-keyword">while</span> (tempWidth &gt;= targetWidth) {
 			fontSize--;
-			temp.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+			temp.css(<span class="hljs-string">&quot;font-size&quot;</span>, fontSize + <span class="hljs-string">&quot;px&quot;</span>);
 			tempWidth = temp.width();
 		}
 
-		target.css(<span class="hljs-string">"font-size"</span>, fontSize + <span class="hljs-string">"px"</span>);
+		target.css(<span class="hljs-string">&quot;font-size&quot;</span>, fontSize + <span class="hljs-string">&quot;px&quot;</span>);
 		temp.remove();
 	});
 
 	<span class="hljs-keyword">var</span> time = $.now() - start;
-	$(<span class="hljs-string">"body"</span>).append($(<span class="hljs-string">"&lt;p/&gt;"</span>).text(<span class="hljs-string">"Elapsed Time: "</span> + time));
+	$(<span class="hljs-string">&quot;body&quot;</span>).append($(<span class="hljs-string">&quot;&lt;p/&gt;&quot;</span>).text(<span class="hljs-string">&quot;Elapsed Time: &quot;</span> + time));
 });</code></pre>
 
 <p>まず非表示の<code>div</code>要素を作成し、そこにテキストとスタイルをコピーすることによって文を複製する。<code>display: none;</code>だとその要素の幅は<code>font-size</code>に応じて変化するので、幅の割合から大まかに当たりをつけてチェックしていき、元の要素の幅を超えたところでフォントサイズを一旦決定している。その後微調整するために1pxずつ下げていき、ちょうど収まるところで決定という仕組み。2passでやらないとうまく収まらなかったり色々不具合が多かった。</p>
@@ -128,20 +130,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

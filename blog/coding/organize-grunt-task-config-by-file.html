@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -76,36 +78,36 @@
 
 <p><code>grunt.file.expand()</code>を使って<code>.grunt/config/*.json</code>をグロブし、それぞれのファイル名をキーにして、ファイルの内容を値にして設定を組み立てていく。最後に<code>grunt.initConfig()</code>して読み込む。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-string">'use strcit'</span>;
+<pre><code class="hljs language-javascript"><span class="hljs-string">&#x27;use strcit&#x27;</span>;
 
-<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);
 
 <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) </span>{
 	<span class="hljs-keyword">var</span> config = {
-		<span class="hljs-attr">pkg</span>: grunt.file.readJSON(<span class="hljs-string">'package.json'</span>)
+		<span class="hljs-attr">pkg</span>: grunt.file.readJSON(<span class="hljs-string">&#x27;package.json&#x27;</span>)
 	};
 
-	grunt.file.expand(<span class="hljs-string">'.grunt/config/*.json'</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
-		config[path.basename(file, <span class="hljs-string">'.json'</span>)] = grunt.file.readJSON(file);
+	grunt.file.expand(<span class="hljs-string">&#x27;.grunt/config/*.json&#x27;</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
+		config[path.basename(file, <span class="hljs-string">&#x27;.json&#x27;</span>)] = grunt.file.readJSON(file);
 	});
 
 	grunt.initConfig(config);
 
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-clean'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-copy'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-cssmin'</span>);
-	grunt.loadNpmTasks(<span class="hljs-string">'grunt-contrib-uglify'</span>);
+	grunt.loadNpmTasks(<span class="hljs-string">&#x27;grunt-contrib-clean&#x27;</span>);
+	grunt.loadNpmTasks(<span class="hljs-string">&#x27;grunt-contrib-copy&#x27;</span>);
+	grunt.loadNpmTasks(<span class="hljs-string">&#x27;grunt-contrib-cssmin&#x27;</span>);
+	grunt.loadNpmTasks(<span class="hljs-string">&#x27;grunt-contrib-uglify&#x27;</span>);
 
-	grunt.registerTask(<span class="hljs-string">'rebuild:css'</span>, [
-		<span class="hljs-string">'clean:css'</span>,
-		<span class="hljs-string">'copy:css'</span>,
-		<span class="hljs-string">'cssmin'</span>
+	grunt.registerTask(<span class="hljs-string">&#x27;rebuild:css&#x27;</span>, [
+		<span class="hljs-string">&#x27;clean:css&#x27;</span>,
+		<span class="hljs-string">&#x27;copy:css&#x27;</span>,
+		<span class="hljs-string">&#x27;cssmin&#x27;</span>
 	]);
 
-	grunt.registerTask(<span class="hljs-string">'rebuild:js'</span>, [
-		<span class="hljs-string">'clean:js'</span>,
-		<span class="hljs-string">'copy:js'</span>,
-		<span class="hljs-string">'uglify'</span>
+	grunt.registerTask(<span class="hljs-string">&#x27;rebuild:js&#x27;</span>, [
+		<span class="hljs-string">&#x27;clean:js&#x27;</span>,
+		<span class="hljs-string">&#x27;copy:js&#x27;</span>,
+		<span class="hljs-string">&#x27;uglify&#x27;</span>
 	]);
 };</code></pre>
 
@@ -122,18 +124,18 @@
 <p>例えば<code>.grunt/config/uglify.json</code>は以下のようになる。</p>
 
 <pre><code class="hljs language-javascript">{
-	<span class="hljs-string">"options"</span>: {
-		<span class="hljs-string">"beautify"</span>: {
-			<span class="hljs-string">"ascii_only"</span>: <span class="hljs-literal">true</span>
+	<span class="hljs-string">&quot;options&quot;</span>: {
+		<span class="hljs-string">&quot;beautify&quot;</span>: {
+			<span class="hljs-string">&quot;ascii_only&quot;</span>: <span class="hljs-literal">true</span>
 		},
-		<span class="hljs-string">"preserveComments"</span>: <span class="hljs-string">"some"</span>
+		<span class="hljs-string">&quot;preserveComments&quot;</span>: <span class="hljs-string">&quot;some&quot;</span>
 	},
-	<span class="hljs-string">"main"</span>: {
-		<span class="hljs-string">"expand"</span>: <span class="hljs-literal">true</span>,
-		<span class="hljs-string">"cwd"</span>: <span class="hljs-string">".grunt/tmp/"</span>,
-		<span class="hljs-string">"src"</span>: [<span class="hljs-string">"*.js"</span>],
-		<span class="hljs-string">"dest"</span>: <span class="hljs-string">"scripts/"</span>,
-		<span class="hljs-string">"ext"</span>: <span class="hljs-string">".min.js"</span>
+	<span class="hljs-string">&quot;main&quot;</span>: {
+		<span class="hljs-string">&quot;expand&quot;</span>: <span class="hljs-literal">true</span>,
+		<span class="hljs-string">&quot;cwd&quot;</span>: <span class="hljs-string">&quot;.grunt/tmp/&quot;</span>,
+		<span class="hljs-string">&quot;src&quot;</span>: [<span class="hljs-string">&quot;*.js&quot;</span>],
+		<span class="hljs-string">&quot;dest&quot;</span>: <span class="hljs-string">&quot;scripts/&quot;</span>,
+		<span class="hljs-string">&quot;ext&quot;</span>: <span class="hljs-string">&quot;.min.js&quot;</span>
 	}
 }</code></pre>
 
@@ -162,20 +164,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

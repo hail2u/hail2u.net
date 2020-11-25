@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="融合っていうのは、「あいうえお」と「うえおかき」を混ぜて足して「あいうえおかき」にするケースのこと。後者の先頭の「うえお」を前者へ融かし合わせるので融合と言ったけど、それで良いのかよくわからない。ちゃんとしたアルゴリズムありそうだけど、見つけることができなかったので、後方から検索していくみたいな感じで書いた。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,7 +66,7 @@
 
 <pre><code class="hljs language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fuse</span>(<span class="hljs-params">a, b</span>) </span>{
 	<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>;
-	<span class="hljs-keyword">var</span> s = <span class="hljs-string">''</span>;
+	<span class="hljs-keyword">var</span> s = <span class="hljs-string">&#x27;&#x27;</span>;
 	<span class="hljs-keyword">var</span> j = <span class="hljs-number">0</span>;
 
 	<span class="hljs-keyword">for</span> (i = b.length; i &gt; <span class="hljs-number">0</span>; i--) {
@@ -79,11 +81,11 @@
 	<span class="hljs-keyword">return</span> a + b.substring(i);
 }
 
-<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'abcde + efg   ='</span>, fuse(<span class="hljs-string">'abcde'</span>, <span class="hljs-string">'efg'</span>));
-<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'abcde + cdefg ='</span>, fuse(<span class="hljs-string">'abcde'</span>, <span class="hljs-string">'cdefg'</span>));
-<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'abcde + fg    ='</span>, fuse(<span class="hljs-string">'abcde'</span>, <span class="hljs-string">'fg'</span>));
-<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'abcde + abcde ='</span>, fuse(<span class="hljs-string">'abcde'</span>, <span class="hljs-string">'abcde'</span>));
-<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'abcde + bcd   ='</span>, fuse(<span class="hljs-string">'abcde'</span>, <span class="hljs-string">'bcd'</span>));</code></pre>
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;abcde + efg   =&#x27;</span>, fuse(<span class="hljs-string">&#x27;abcde&#x27;</span>, <span class="hljs-string">&#x27;efg&#x27;</span>));
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;abcde + cdefg =&#x27;</span>, fuse(<span class="hljs-string">&#x27;abcde&#x27;</span>, <span class="hljs-string">&#x27;cdefg&#x27;</span>));
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;abcde + fg    =&#x27;</span>, fuse(<span class="hljs-string">&#x27;abcde&#x27;</span>, <span class="hljs-string">&#x27;fg&#x27;</span>));
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;abcde + abcde =&#x27;</span>, fuse(<span class="hljs-string">&#x27;abcde&#x27;</span>, <span class="hljs-string">&#x27;abcde&#x27;</span>));
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;abcde + bcd   =&#x27;</span>, fuse(<span class="hljs-string">&#x27;abcde&#x27;</span>, <span class="hljs-string">&#x27;bcd&#x27;</span>));</code></pre>
 
 <p>文字列<code>b</code>を一文字ずつ減らしながら文字列<code>a</code>の後ろから検索していく。正規表現だとコストが高そうだったので<code>lastIndexOf()</code>でやってる。このままだと途中に出てきてもOKになってしまうので、インデックスに検索した文字列の長さを足して文字列<code>a</code>の長さになるかどうかをチェックすることで、文字列<code>a</code>の最後に出てきているかどうかもちゃんと確認する。減らしながら探しているので、見つかったらそこで終了すれば良い。最後のインデックスを使って文字列<code>b</code>を切り詰め連結すれば融合した文字列が作り出せる。</p>
 
@@ -106,20 +108,14 @@ abcde + bcd   = abcdebcd</samp></pre>
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

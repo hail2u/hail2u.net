@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="ウェブ標準であるCSS Font Loadingが気軽に使えるようになるにはまだまだ時間がかかりそうだ。そのポリフィルであるFont Loaderは動作が不安定かつ開発が止まっており信用できない。代替技術としてはポリフィルと同じ開発者が積極的にコミットしているFont Face Observerと、広く使われているWeb Font Loaderがある。同じフォントの読み込みを検知する場合、この三者ではどのようにコードが変わってくるのだろうか。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -70,13 +72,13 @@
 <p>CSS Font Loading仕様はPromiseによる実装で、読み込み待ちはPromiseで解決することになる。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">new</span> FontFace(
-	<span class="hljs-string">'Open Sans'</span>,
-	<span class="hljs-string">'url(/assets/font/open-sans/r.woff)'</span>
+	<span class="hljs-string">&#x27;Open Sans&#x27;</span>,
+	<span class="hljs-string">&#x27;url(/assets/font/open-sans/r.woff)&#x27;</span>
 ).load().then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fontface</span>) </span>{
 	<span class="hljs-built_in">document</span>.fonts.add(fontface);
-	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; loaded&#x27;</span>;
 }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">reason</span>) </span>{
-	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; failed&#x27;</span>;
 	<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
 });</code></pre>
 
@@ -88,17 +90,17 @@
 
 <p>Font Face Observerはウェブ標準と同じくPromiseによる実装のためウェブ標準と置換えがしやすい……と思いきや、ウェブ・フォントを読み込む機能自体は持っていない。そのためウェブ・フォントCSSを自前で読み込み、そのウェブ・フォントが利用可能になったかどうかをもって読み込み完了が決定される。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> cssFont = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'link'</span>);
-cssFont.href = <span class="hljs-string">'/assets/css/open-sans.css'</span>;
-cssFont.rel = <span class="hljs-string">'stylesheet'</span>;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> cssFont = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&#x27;link&#x27;</span>);
+cssFont.href = <span class="hljs-string">&#x27;/assets/css/open-sans.css&#x27;</span>;
+cssFont.rel = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
 <span class="hljs-built_in">document</span>.head.appendChild(cssFont);
 <span class="hljs-keyword">new</span> FontFaceObserver(
-	<span class="hljs-string">'Open Sans'</span>,
+	<span class="hljs-string">&#x27;Open Sans&#x27;</span>,
 	{}
 ).check().then(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; loaded&#x27;</span>;
 }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">reason</span>) </span>{
-	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
+	<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; failed&#x27;</span>;
 	<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(reason);
 });</code></pre>
 
@@ -112,15 +114,15 @@ cssFont.rel = <span class="hljs-string">'stylesheet'</span>;
 
 <pre><code class="hljs language-javascript">WebFont.load({
 	<span class="hljs-attr">custom</span>: {
-		<span class="hljs-attr">families</span>: [<span class="hljs-string">'Open Sans'</span>],
-		<span class="hljs-attr">urls</span>: [<span class="hljs-string">'/assets/css/open-sans.css'</span>]
+		<span class="hljs-attr">families</span>: [<span class="hljs-string">&#x27;Open Sans&#x27;</span>],
+		<span class="hljs-attr">urls</span>: [<span class="hljs-string">&#x27;/assets/css/open-sans.css&#x27;</span>]
 	},
 	<span class="hljs-attr">fontactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' loaded'</span>;
+		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; loaded&#x27;</span>;
 	},
 	<span class="hljs-attr">fontinactive</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">family</span>) </span>{
-		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">' failed'</span>;
-		<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Web font "'</span> + family + <span class="hljs-string">'" not loaded.'</span>);
+		<span class="hljs-built_in">document</span>.body.className += <span class="hljs-string">&#x27; failed&#x27;</span>;
+		<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&#x27;Web font &quot;&#x27;</span> + family + <span class="hljs-string">&#x27;&quot; not loaded.&#x27;</span>);
 	}
 });</code></pre>
 
@@ -145,20 +147,14 @@ cssFont.rel = <span class="hljs-string">'stylesheet'</span>;
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

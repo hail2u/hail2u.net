@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -68,7 +70,7 @@
 <p>tidy.vimが用意されているので、<a href="http://tidy.sourceforge.net/">HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。</p>
 
 <pre><code class="hljs language-vim"><span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">compiler</span> tidy
-<span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \<span class="hljs-string">"%\"</span></code></pre>
+<span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \<span class="hljs-string">&quot;%\&quot;</span></code></pre>
 
 <p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</p>
 </section>
@@ -116,17 +118,17 @@
 
 <span class="hljs-keyword">use</span> HTML::Entities;
 
-<span class="hljs-keyword">print</span> encode_entities(<span class="hljs-keyword">join</span>(<span class="hljs-string">''</span>, &lt;STDIN&gt;), <span class="hljs-string">'&amp;&lt;&gt;"\''</span>);</code></pre>
+<span class="hljs-keyword">print</span> encode_entities(<span class="hljs-keyword">join</span>(<span class="hljs-string">&#x27;&#x27;</span>, &lt;STDIN&gt;), <span class="hljs-string">&#x27;&amp;&lt;&gt;&quot;\&#x27;&#x27;</span>);</code></pre>
 
 <p>その上でコマンドを作成。</p>
 
-<pre><code class="hljs language-vim">command! -<span class="hljs-built_in">range</span> EncodeEntities :<span class="hljs-string">'&lt;,'</span>&gt;!perl -S encode-entities.pl</code></pre>
+<pre><code class="hljs language-vim">command! -<span class="hljs-built_in">range</span> EncodeEntities :<span class="hljs-string">&#x27;&lt;,&#x27;</span>&gt;!perl -S encode-entities.pl</code></pre>
 </section>
 
 <section>
 <h2>W3CDTFで日付と時刻の挿入</h2>
 
-<pre><code class="hljs language-vim">command! InsertDateTime :<span class="hljs-keyword">execute</span> <span class="hljs-string">"normal! i"</span>.<span class="hljs-built_in">strftime</span>(<span class="hljs-string">"%Y-%m-%dT%H:%M:%S+09:00"</span>)</code></pre>
+<pre><code class="hljs language-vim">command! InsertDateTime :<span class="hljs-keyword">execute</span> <span class="hljs-string">&quot;normal! i&quot;</span>.<span class="hljs-built_in">strftime</span>(<span class="hljs-string">&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;</span>)</code></pre>
 
 <p>必要な人は少ないだろうけど。</p>
 </section>
@@ -147,13 +149,13 @@
 <p><a href="http://www.javascriptlint.com/">JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code>（Windowsでは<code>$HOME/vimfiles/compiler</code>）以下に作成する。</p>
 
 <pre><code class="hljs language-vim">
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">"current_compiler"</span>)
+<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;current_compiler&quot;</span>)
 	<span class="hljs-keyword">finish</span>
 <span class="hljs-keyword">endif</span>
 
-<span class="hljs-keyword">let</span> current_compiler = <span class="hljs-string">"javascriptlint"</span>
+<span class="hljs-keyword">let</span> current_compiler = <span class="hljs-string">&quot;javascriptlint&quot;</span>
 
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">":CompilerSet"</span>) != <span class="hljs-number">2</span>
+<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;:CompilerSet&quot;</span>) != <span class="hljs-number">2</span>
 	<span class="hljs-keyword">command</span> -nargs=* CompilerSet <span class="hljs-keyword">setlocal</span> <span class="hljs-symbol">&lt;args&gt;</span>
 <span class="hljs-keyword">endif</span>
 
@@ -192,16 +194,16 @@ CompilerSet errorformat=%<span class="hljs-keyword">f</span>(%<span class="hljs-
 <pre><code class="hljs language-js">$(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 	<span class="hljs-keyword">var</span> num = <span class="hljs-number">32</span>;
 
-	$(<span class="hljs-string">"#monthly_archives &gt; li"</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">i, li</span>) </span>{
+	$(<span class="hljs-string">&quot;#monthly_archives &gt; li&quot;</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">i, li</span>) </span>{
 		<span class="hljs-keyword">if</span> (i === num) {
-			$(li).before($(<span class="hljs-string">"&lt;li/&gt;"</span>).append($(<span class="hljs-string">"&lt;a/&gt;"</span>).attr({
-				<span class="hljs-attr">href</span>: <span class="hljs-string">"#archives-by-month"</span>
-			}).append(<span class="hljs-string">"» more"</span>).click(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-				$(<span class="hljs-keyword">this</span>).hide();
-				$(<span class="hljs-string">"#monthly_archives .folded"</span>).show();
-			}))).addClass(<span class="hljs-string">"folded"</span>).hide();
+			$(li).before($(<span class="hljs-string">&quot;&lt;li/&gt;&quot;</span>).append($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>).attr({
+				<span class="hljs-attr">href</span>: <span class="hljs-string">&quot;#archives-by-month&quot;</span>
+			}).append(<span class="hljs-string">&quot;» more&quot;</span>).click(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+				$(<span class="hljs-built_in">this</span>).hide();
+				$(<span class="hljs-string">&quot;#monthly_archives .folded&quot;</span>).show();
+			}))).addClass(<span class="hljs-string">&quot;folded&quot;</span>).hide();
 		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (i &gt; num) {
-			$(li).addClass(<span class="hljs-string">"folded"</span>).hide();
+			$(li).addClass(<span class="hljs-string">&quot;folded&quot;</span>).hide();
 		}
 	});
 });</code></pre>
@@ -252,20 +254,14 @@ CompilerSet errorformat=%<span class="hljs-keyword">f</span>(%<span class="hljs-
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

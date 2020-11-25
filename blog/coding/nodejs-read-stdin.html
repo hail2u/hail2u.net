@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="/dev/stdinとかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今はprocess.stdin.fdのsizeを調べてそのサイズでBufferオブジェクトを作り、fs.readSync()で読み込むのが良いみたいだ。本当なのかな？" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,20 +66,20 @@
 
 <pre><code class="hljs language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
 
 <span class="hljs-keyword">var</span> fd = process.stdin.fd;
 <span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
 <span class="hljs-keyword">var</span> buffer = <span class="hljs-keyword">new</span> Buffer(length);
 <span class="hljs-keyword">var</span> bytesRead = fs.readSync(fd, buffer, <span class="hljs-number">0</span>, length, <span class="hljs-number">0</span>);
-<span class="hljs-keyword">var</span> input = buffer.toString(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, bytesRead);
+<span class="hljs-keyword">var</span> input = buffer.toString(<span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-number">0</span>, bytesRead);
 <span class="hljs-built_in">console</span>.log(input);</code></pre>
 
 <p><code>fs.readSync()</code>はその第二引数がBufferオブジェクトじゃない場合はレガシーなモードになるので、Bufferオブジェクトを経由しなくて良かったりもする。</p>
 
 <pre><code class="hljs language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
 
 <span class="hljs-keyword">var</span> fd = process.stdin.fd;
 <span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
@@ -90,9 +92,9 @@
 <h2>追記</h2>
 <p>Node.js v5以降では<code>fs.*File()</code>の第一引数でファイル識別子が利用できるようになった。そのためもはやこのような冗長な記述をする必要はなく、以下のような形で一気に読むことができる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
 
-<span class="hljs-keyword">var</span> input = fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>);</code></pre>
+<span class="hljs-keyword">var</span> input = fs.readFileSync(process.stdin.fd, <span class="hljs-string">&quot;utf8&quot;</span>);</code></pre>
 
 <p>標準入力のファイル識別子は<code>process.stdin.fd</code>で参照できるので、それを第一引数で指定するだけだ。</p>
 </section>
@@ -107,20 +109,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

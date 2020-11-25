@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Node.jsでRSSを処理するの何がいいのかなーと色々試していた。その中で一番考えなくて済みそうなのがxml2jsだった。XMLをparseString()に渡すと、コールバックの引数にオブジェクトに変換して渡してくれる。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,19 +66,19 @@
 
 <p>このウェブサイトのフィードをパースして標準出力に吐くならこんな感じで簡単。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
-<span class="hljs-keyword">var</span> parseXML = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>).parseString;
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);
+<span class="hljs-keyword">var</span> parseXML = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xml2js&#x27;</span>).parseString;
 
-http.get(<span class="hljs-string">'http://hail2u.net/feed'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
-	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">''</span>;
+http.get(<span class="hljs-string">&#x27;http://hail2u.net/feed&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
+	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">&#x27;&#x27;</span>;
 
-	res.setEncoding = <span class="hljs-string">'UTF-8'</span>;
+	res.setEncoding = <span class="hljs-string">&#x27;UTF-8&#x27;</span>;
 
-	res.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
+	res.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
 		chunks += chunk;
 	});
 
-	res.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 		parseXML(chunks, {
 			<span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>,
 			<span class="hljs-attr">explicitArray</span>: <span class="hljs-literal">false</span>
@@ -86,7 +88,7 @@ http.get(<span class="hljs-string">'http://hail2u.net/feed'</span>, <span class=
 			}
 
 			data.rss.channel.item.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val, index, array</span>) </span>{
-				<span class="hljs-built_in">console</span>.log(val.title + <span class="hljs-string">': '</span> + val.link);
+				<span class="hljs-built_in">console</span>.log(val.title + <span class="hljs-string">&#x27;: &#x27;</span> + val.link);
 			});
 		});
 	});
@@ -110,20 +112,14 @@ http.get(<span class="hljs-string">'http://hail2u.net/feed'</span>, <span class=
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

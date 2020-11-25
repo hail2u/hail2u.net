@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="本家MLの方で、flavour無しpermalinkを実現するパッチが投稿されたんですが、これはちょっと微妙かなと。まぁ確かに実現できているといえば実現できているのですが、うまいこと$default_flavourを利用してくれはしないような感じなので、別の方法をとにかく考えてみようかと。前に考えた時はうまく思いつかなかったんですが、今日は数分で思いついたりした。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -65,13 +67,13 @@
 <p>なので、改造すべき部分は、<code>PATH_INFO</code>環境変数から<code>$path_info</code>を生成する一連の処理のうちの一部分（112行目から118行目あたり）。</p>
 <pre><code class="hljs language-perl"><span class="hljs-keyword">if</span> ( $path_info[$#path_info] =~ <span class="hljs-regexp">/(.+)\.(.+)$/</span> ) {
 	$flavour = $2;
-	$1 <span class="hljs-keyword">ne</span> <span class="hljs-string">'index'</span> <span class="hljs-keyword">and</span> $path_info .= <span class="hljs-string">"/$1.$2"</span>;
+	$1 <span class="hljs-keyword">ne</span> <span class="hljs-string">&#x27;index&#x27;</span> <span class="hljs-keyword">and</span> $path_info .= <span class="hljs-string">&quot;/$1.$2&quot;</span>;
 	<span class="hljs-keyword">pop</span> @path_info;
-} <span class="hljs-keyword">elsif</span> (!-d <span class="hljs-string">"$datadir$path_info"</span>) {
-	$path_info .= <span class="hljs-string">".$default_flavour"</span>;
-	$flavour = param(<span class="hljs-string">'flav'</span>) || $default_flavour;
+} <span class="hljs-keyword">elsif</span> (!-d <span class="hljs-string">&quot;$datadir$path_info&quot;</span>) {
+	$path_info .= <span class="hljs-string">&quot;.$default_flavour&quot;</span>;
+	$flavour = param(<span class="hljs-string">&#x27;flav&#x27;</span>) || $default_flavour;
 } <span class="hljs-keyword">else</span> {
-	$flavour = param(<span class="hljs-string">'flav'</span>) || $default_flavour;
+	$flavour = param(<span class="hljs-string">&#x27;flav&#x27;</span>) || $default_flavour;
 }</code></pre>
 <p>以上のように、<code>elsif</code>のブロックを追加するだけでうまくいきました。<code>!-d</code>でディレクトリの存在チェックをしているのは、カテゴリ単位での閲覧の場合かどうかを判別するためです。</p>
 <p>というわけで<a href="/blog/blosxom/permalink_without_flavour" title="hail2u.net - Weblog - flavour無しpermalink">flavour無しpermalink</a>が機能するようになりました。ビジターへの利便性は皆無に等しいけど、自己満足度は高い。Cool URI！</p>
@@ -91,20 +93,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

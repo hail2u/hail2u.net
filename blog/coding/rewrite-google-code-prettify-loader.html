@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="単にDOMContentLoadedでGoogle Code PrettifyのprettyPrint()を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのためにpre要素にprettyprintというクラスを指定しないように方針変更したので、それに合わせてcode[class*=language-]な要素を探してその親がpreだったらprettyprintを追加し、その後でprettyPrint()を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。Rainbow移行への布石。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -68,10 +70,10 @@
 
 <p>サポートしている言語かそうでないかはごく簡単にチェック。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> languages = [<span class="hljs-string">"bsh"</span>, <span class="hljs-string">"c"</span>, <span class="hljs-string">"cc"</span>, <span class="hljs-string">"cpp"</span>, <span class="hljs-string">"cs"</span>, <span class="hljs-string">"csh"</span>, <span class="hljs-string">"cyc"</span>, <span class="hljs-string">"cv"</span>, <span class="hljs-string">"htm"</span>,
-	<span class="hljs-string">"html"</span>, <span class="hljs-string">"java"</span>, <span class="hljs-string">"js"</span>, <span class="hljs-string">"m"</span>, <span class="hljs-string">"mxml"</span>, <span class="hljs-string">"perl"</span>, <span class="hljs-string">"pl"</span>, <span class="hljs-string">"pm"</span>, <span class="hljs-string">"py"</span>, <span class="hljs-string">"rb"</span>, <span class="hljs-string">"sh"</span>,
-	<span class="hljs-string">"xhtml"</span>, <span class="hljs-string">"xml"</span>, <span class="hljs-string">"xsl"</span>, <span class="hljs-string">"css"</span>, <span class="hljs-string">"scss"</span>, <span class="hljs-string">"vim"</span>],
-	reLanguage = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"\\blanguage-("</span> + languages.join(<span class="hljs-string">"|"</span>) + <span class="hljs-string">")\\b"</span>);</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> languages = [<span class="hljs-string">&quot;bsh&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;cc&quot;</span>, <span class="hljs-string">&quot;cpp&quot;</span>, <span class="hljs-string">&quot;cs&quot;</span>, <span class="hljs-string">&quot;csh&quot;</span>, <span class="hljs-string">&quot;cyc&quot;</span>, <span class="hljs-string">&quot;cv&quot;</span>, <span class="hljs-string">&quot;htm&quot;</span>,
+	<span class="hljs-string">&quot;html&quot;</span>, <span class="hljs-string">&quot;java&quot;</span>, <span class="hljs-string">&quot;js&quot;</span>, <span class="hljs-string">&quot;m&quot;</span>, <span class="hljs-string">&quot;mxml&quot;</span>, <span class="hljs-string">&quot;perl&quot;</span>, <span class="hljs-string">&quot;pl&quot;</span>, <span class="hljs-string">&quot;pm&quot;</span>, <span class="hljs-string">&quot;py&quot;</span>, <span class="hljs-string">&quot;rb&quot;</span>, <span class="hljs-string">&quot;sh&quot;</span>,
+	<span class="hljs-string">&quot;xhtml&quot;</span>, <span class="hljs-string">&quot;xml&quot;</span>, <span class="hljs-string">&quot;xsl&quot;</span>, <span class="hljs-string">&quot;css&quot;</span>, <span class="hljs-string">&quot;scss&quot;</span>, <span class="hljs-string">&quot;vim&quot;</span>],
+	reLanguage = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">&quot;\\blanguage-(&quot;</span> + languages.join(<span class="hljs-string">&quot;|&quot;</span>) + <span class="hljs-string">&quot;)\\b&quot;</span>);</code></pre>
 
 <p>追加しづらそう……。Google Code Prettifyの<code>langHandlerRegistry</code>を参照するか<code>langHandlerForExtension()</code>パクった方が良さそう。むしろ頑張ってハイライトしようとするフォールバックの部分なくしちゃえばいいのかなー。</p>
 
@@ -91,20 +93,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

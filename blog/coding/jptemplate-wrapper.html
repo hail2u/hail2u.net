@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Vimのスニペット系のプラグインとしてJPTemplateを愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、template-vimの補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。" itemprop="description">
 		<link href="/img/blog/jptemplate-wrapper.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -66,22 +68,22 @@
 
 <p><a href="http://www.vim.org/">Vim</a>のスニペット系のプラグインとして<a href="http://www.lunar-linux.org/~jannis/jptemplate/">JPTemplate</a>を愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、<a href="https://github.com/mattn/template-vim">template-vim</a>の補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">let</span> <span class="hljs-variable">g:jpTemplateKey</span> = <span class="hljs-string">'&lt;C-S-F12&gt;'</span>
+<pre><code class="hljs language-vim"><span class="hljs-keyword">let</span> <span class="hljs-variable">g:jpTemplateKey</span> = <span class="hljs-string">&#x27;&lt;C-S-F12&gt;&#x27;</span>
 
 <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">JPTemplateWrapper</span><span class="hljs-params">()</span></span>
-	<span class="hljs-keyword">let</span> templdir_ft = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/'</span>.&amp;ft
-	<span class="hljs-keyword">let</span> templdir_general = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">'/general'</span>
-	<span class="hljs-keyword">let</span> cword = <span class="hljs-built_in">matchstr</span>(<span class="hljs-built_in">strpart</span>(<span class="hljs-built_in">getline</span>(<span class="hljs-string">'.'</span>), -<span class="hljs-number">1</span>, <span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>)), <span class="hljs-string">'[-0-9a-zA-Z_]*$'</span>)
+	<span class="hljs-keyword">let</span> templdir_ft = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">&#x27;/&#x27;</span>.&amp;ft
+	<span class="hljs-keyword">let</span> templdir_general = <span class="hljs-variable">g:jpTemplateDir</span>.<span class="hljs-string">&#x27;/general&#x27;</span>
+	<span class="hljs-keyword">let</span> cword = <span class="hljs-built_in">matchstr</span>(<span class="hljs-built_in">strpart</span>(<span class="hljs-built_in">getline</span>(<span class="hljs-string">&#x27;.&#x27;</span>), -<span class="hljs-number">1</span>, <span class="hljs-keyword">col</span>(<span class="hljs-string">&#x27;.&#x27;</span>)), <span class="hljs-string">&#x27;[-0-9a-zA-Z_]*$&#x27;</span>)
 
-	<span class="hljs-keyword">if</span> <span class="hljs-built_in">filereadable</span>(templdir_ft.<span class="hljs-string">'/'</span>.cword) || <span class="hljs-built_in">filereadable</span>(templdir_general.<span class="hljs-string">'/'</span>.cword)
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">filereadable</span>(templdir_ft.<span class="hljs-string">&#x27;/&#x27;</span>.cword) || <span class="hljs-built_in">filereadable</span>(templdir_general.<span class="hljs-string">&#x27;/&#x27;</span>.cword)
 		<span class="hljs-keyword">call</span> jp:InsertTemplate()
 	<span class="hljs-keyword">else</span>
-		<span class="hljs-keyword">let</span> templates = <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_ft, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>)
-		<span class="hljs-keyword">let</span> templates += <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_general, <span class="hljs-string">'*'</span>), <span class="hljs-string">"\n"</span>)
-		<span class="hljs-keyword">call</span> <span class="hljs-built_in">complete</span>(<span class="hljs-keyword">col</span>(<span class="hljs-string">'.'</span>) - <span class="hljs-built_in">strlen</span>(cword), <span class="hljs-keyword">map</span>(<span class="hljs-built_in">filter</span>(templates, <span class="hljs-string">'v:val =~ "'</span>.cword.<span class="hljs-string">'"'</span>), <span class="hljs-string">'fnamemodify(v:val, ":t:r")'</span>))
+		<span class="hljs-keyword">let</span> templates = <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_ft, <span class="hljs-string">&#x27;*&#x27;</span>), <span class="hljs-string">&quot;\n&quot;</span>)
+		<span class="hljs-keyword">let</span> templates += <span class="hljs-keyword">split</span>(<span class="hljs-built_in">globpath</span>(templdir_general, <span class="hljs-string">&#x27;*&#x27;</span>), <span class="hljs-string">&quot;\n&quot;</span>)
+		<span class="hljs-keyword">call</span> <span class="hljs-built_in">complete</span>(<span class="hljs-keyword">col</span>(<span class="hljs-string">&#x27;.&#x27;</span>) - <span class="hljs-built_in">strlen</span>(cword), <span class="hljs-keyword">map</span>(<span class="hljs-built_in">filter</span>(templates, <span class="hljs-string">&#x27;v:val =~ &quot;&#x27;</span>.cword.<span class="hljs-string">&#x27;&quot;&#x27;</span>), <span class="hljs-string">&#x27;fnamemodify(v:val, &quot;:t:r&quot;)&#x27;</span>))
 	<span class="hljs-keyword">endif</span>
 
-	<span class="hljs-keyword">return</span> <span class="hljs-string">''</span>
+	<span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>
 endfunc
 
 <span class="hljs-keyword">inoremap</span> <span class="hljs-symbol">&lt;C-Tab&gt;</span> <span class="hljs-symbol">&lt;C-R&gt;</span>=<span class="hljs-symbol">&lt;SID&gt;</span>JPTemplateWrapper()<span class="hljs-symbol">&lt;CR&gt;</span></code></pre>
@@ -100,20 +102,14 @@ endfunc
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

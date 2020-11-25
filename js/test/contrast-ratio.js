@@ -20,8 +20,8 @@
 
 	/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
 	const getContrast = (foreground, background) => {
-		const backgroundLuminance = getRelativeLuminance(background.match(/\d+/g));
-		const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/g));
+		const backgroundLuminance = getRelativeLuminance(background.match(/\d+/gu));
+		const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/gu));
 		const lighter = Math.max(backgroundLuminance, foregroundLuminance);
 		const darker = Math.min(backgroundLuminance, foregroundLuminance);
 		return (lighter + 0.05) / (darker + 0.05);

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="NDO::WeblogのnaoyaさんがMonday Module ひとり - HTML::LinkExtorというエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -80,20 +82,20 @@
 
 <span class="hljs-comment"># 引数を取得してURLエンコード</span>
 <span class="hljs-keyword">my</span> $query = <span class="hljs-keyword">shift</span>;
-$query =~ <span class="hljs-keyword">s</span>!([^a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9_</span>.-])!<span class="hljs-keyword">uc</span> <span class="hljs-keyword">sprintf</span> <span class="hljs-string">"%%%02x"</span>, <span class="hljs-keyword">ord</span>($1)!eg;
+$query =~ <span class="hljs-keyword">s</span>!([^a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9_</span>.-])!<span class="hljs-keyword">uc</span> <span class="hljs-keyword">sprintf</span> <span class="hljs-string">&quot;%%%02x&quot;</span>, <span class="hljs-keyword">ord</span>($1)!eg;
 
 <span class="hljs-comment"># 検索</span>
-<span class="hljs-keyword">my</span> $content = LWP::Simple::get(<span class="hljs-string">"http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query"</span>);
+<span class="hljs-keyword">my</span> $content = LWP::Simple::get(<span class="hljs-string">&quot;http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query&quot;</span>);
 
 <span class="hljs-comment"># HTMLソースから検索結果の一覧のところまでを削除</span>
 $content =~ <span class="hljs-keyword">s</span>!^.*?Sort items by!!is;
 
 <span class="hljs-comment"># リンク抽出</span>
 <span class="hljs-keyword">my</span> @urls;
-<span class="hljs-keyword">my</span> $p = HTML::LinkExtor-&gt;new(\&amp;callback, <span class="hljs-string">"http://www.towerrecords.com/music/"</span>);
+<span class="hljs-keyword">my</span> $p = HTML::LinkExtor-&gt;new(\&amp;callback, <span class="hljs-string">&quot;http://www.towerrecords.com/music/&quot;</span>);
 <span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">callback</span> </span>{
 	<span class="hljs-keyword">my</span>($tag, %links) = @_;
-	<span class="hljs-keyword">if</span> ($tag eq <span class="hljs-string">"a"</span>) {
+	<span class="hljs-keyword">if</span> ($tag eq <span class="hljs-string">&quot;a&quot;</span>) {
 		<span class="hljs-keyword">push</span>(@urls, <span class="hljs-keyword">values</span> %links);
 	}
 }
@@ -132,8 +134,8 @@ $p-&gt;parse($content);
 }
 
 <span class="hljs-comment"># Windows Media Playlistを出力（再生できるからこれで良さげ）</span>
-<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">"_WPL_"</span>;
-&lt;?wpl version=<span class="hljs-string">"1.0"</span>?&gt;
+<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">&quot;_WPL_&quot;</span>;
+&lt;?wpl version=<span class="hljs-string">&quot;1.0&quot;</span>?&gt;
 &lt;smil&gt;
 	&lt;body&gt;
 		&lt;seq&gt;
@@ -141,10 +143,10 @@ _WPL<span class="hljs-number">_</span>
 
 <span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $wm (@wms) {
 	$wm =~ <span class="hljs-keyword">s</span>!&amp;!&amp;amp;!;
-	<span class="hljs-keyword">print</span> <span class="hljs-keyword">qq</span>!      &lt;media src=<span class="hljs-string">"$wm"</span>/&gt;\n!;
+	<span class="hljs-keyword">print</span> <span class="hljs-keyword">qq</span>!      &lt;media src=<span class="hljs-string">&quot;$wm&quot;</span>/&gt;\n!;
 }
 
-<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">"_WPL_"</span>;
+<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">&quot;_WPL_&quot;</span>;
 		&lt;<span class="hljs-regexp">/seq&gt;
 	&lt;/body</span>&gt;
 &lt;<span class="hljs-regexp">/smil&gt;
@@ -152,11 +154,11 @@ _WPL_
 
 exit;</span></code></pre>
 <p>標準出力に出てくるファイルはこんな感じ。</p>
-<pre><code class="hljs language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">?wpl</span> <span class="hljs-attr">version</span>=<span class="hljs-string">"1.0"</span>?&gt;</span>
+<pre><code class="hljs language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">?wpl</span> <span class="hljs-attr">version</span>=<span class="hljs-string">&quot;1.0&quot;</span>?&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">smil</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">seq</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">media</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729<span class="hljs-symbol">&amp;amp;</span>urlid=b67557aff4096b9abd"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">media</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729<span class="hljs-symbol">&amp;amp;</span>urlid=b67557aff4096b9abd&quot;</span>/&gt;</span>
 		<span class="hljs-tag">&lt;/<span class="hljs-name">seq</span>&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">smil</span>&gt;</span></code></pre>
@@ -174,20 +176,14 @@ exit;</span></code></pre>
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

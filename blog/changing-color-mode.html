@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Windows 10では「アプリ モード（App mode）」、Android 10では「ダークモード（Dark Theme）」、macOS 10.15やiOS 13では「外観モード（Appearance）」と、それぞれ呼ばれている色モードを尊重しつつ、ユーザーの好みで明るくも暗くもできるようにした。どう実装すると効率的かを考えたかっただけなので、次期マイナーバージョンでは消える。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -99,23 +101,23 @@
 <p>色の反転はカスタム・プロパティーで、ユーザーによる強制はクラス名で、それぞれCSSで管理する。いろいろなウェブサイトで解説されているように、パレットを定義しておいて参照するだけにしておくと簡単だ。最初の2つのルールセットが自動の時に使われるもので、あとの2つがユーザーが設定した時に使われる。詳細度がうまく機能するので、これらルールセットはほぼ順不同だが、この順序が書きやすいだろう。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> changeColorMode = <span class="hljs-function">(<span class="hljs-params">mode</span>) =&gt;</span> {
-	localStorage.setItem(<span class="hljs-string">"color-mode"</span>, mode);
+	<span class="hljs-built_in">localStorage</span>.setItem(<span class="hljs-string">&quot;color-mode&quot;</span>, mode);
 	<span class="hljs-keyword">const</span> rootClass = <span class="hljs-built_in">document</span>.documentElement.classList;
 
-	<span class="hljs-keyword">if</span> (mode === <span class="hljs-string">"dark"</span>) {
-		rootClass.add(<span class="hljs-string">"js-color-mode-dark"</span>);
-		rootClass.remove(<span class="hljs-string">"js-color-mode-light"</span>);
+	<span class="hljs-keyword">if</span> (mode === <span class="hljs-string">&quot;dark&quot;</span>) {
+		rootClass.add(<span class="hljs-string">&quot;js-color-mode-dark&quot;</span>);
+		rootClass.remove(<span class="hljs-string">&quot;js-color-mode-light&quot;</span>);
 		<span class="hljs-keyword">return</span>;
 	}
 
-	<span class="hljs-keyword">if</span> (mode === <span class="hljs-string">"light"</span>) {
-		rootClass.add(<span class="hljs-string">"js-color-mode-light"</span>);
-		rootClass.remove(<span class="hljs-string">"js-color-mode-dark"</span>);
+	<span class="hljs-keyword">if</span> (mode === <span class="hljs-string">&quot;light&quot;</span>) {
+		rootClass.add(<span class="hljs-string">&quot;js-color-mode-light&quot;</span>);
+		rootClass.remove(<span class="hljs-string">&quot;js-color-mode-dark&quot;</span>);
 		<span class="hljs-keyword">return</span>;
 	}
 
-	rootClass.remove(<span class="hljs-string">"js-color-mode-dark"</span>, <span class="hljs-string">"js-color-mode-light"</span>);
-	localStorage.removeItem(<span class="hljs-string">"color-mode"</span>);
+	rootClass.remove(<span class="hljs-string">&quot;js-color-mode-dark&quot;</span>, <span class="hljs-string">&quot;js-color-mode-light&quot;</span>);
+	<span class="hljs-built_in">localStorage</span>.removeItem(<span class="hljs-string">&quot;color-mode&quot;</span>);
 };</code></pre>
 
 <p>ユーザー設定の保存はローカル・ストレージにした。「自動」に戻すと削除する。復元する時は<code>html</code>要素にクラス名を振っている。そのまま保存できるカスタム・データ属性の方が書きやすいが、スタイル目的なのでクラス名を振るのが正しいと思う。ややこしいことは、ややこしいことができる仕組みの中で、できるだけやるべきだ。</p>
@@ -126,10 +128,10 @@
 	changeColorMode(event.srcElement.value);
 };
 
-<span class="hljs-keyword">const</span> elements = <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">".js-color-mode"</span>);
+<span class="hljs-keyword">const</span> elements = <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">&quot;.js-color-mode&quot;</span>);
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> element <span class="hljs-keyword">of</span> elements) {
-	element.addEventListener(<span class="hljs-string">"change"</span>, onchange);
+	element.addEventListener(<span class="hljs-string">&quot;change&quot;</span>, onchange);
 }</code></pre>
 
 <p>あとはラジオ・ボタンの切り替えで色モードを変えるコードを呼ぶだけだ。<code>value</code>属性をよしなにしておけば数行で片付く。</p>
@@ -148,20 +150,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

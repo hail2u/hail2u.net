@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -80,14 +82,14 @@
 <p>markedには処理をフックする機構が用意されているので、それを使うとうまく処理することできる。こういったHTML文字列の場合、<code>Renderer.html</code>でそういった文字列を処理する関数を指定してやれば良い。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-comment">// node this.js &lt; test.md</span>
-<span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">"marked"</span>);
+<span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;marked&quot;</span>);
 <span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.Renderer();
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processHTML</span>(<span class="hljs-params">html</span>) </span>{
 	<span class="hljs-keyword">var</span> attributes;
 	<span class="hljs-keyword">var</span> contents;
 	<span class="hljs-keyword">var</span> tag;
-	<span class="hljs-keyword">var</span> tags = [<span class="hljs-string">"aside"</span>, <span class="hljs-string">"figure"</span>, <span class="hljs-string">"section"</span>];
+	<span class="hljs-keyword">var</span> tags = [<span class="hljs-string">&quot;aside&quot;</span>, <span class="hljs-string">&quot;figure&quot;</span>, <span class="hljs-string">&quot;section&quot;</span>];
 	<span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
 
 	<span class="hljs-keyword">if</span> (!tokens) {
@@ -101,15 +103,15 @@
 	}
 
 	attributes = tokens[<span class="hljs-number">2</span>];
-	contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">"&gt;"</span>), {
+	contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">&quot;&gt;&quot;</span>), {
 		<span class="hljs-attr">renderer</span>: renderer
 	}).trim();
 
-	<span class="hljs-keyword">return</span> <span class="hljs-string">"&lt;"</span> + tag + attributes + <span class="hljs-string">"&gt;\n"</span> + contents + <span class="hljs-string">"\n&lt;/"</span> + tag + <span class="hljs-string">"&gt;\n"</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&lt;&quot;</span> + tag + attributes + <span class="hljs-string">&quot;&gt;\n&quot;</span> + contents + <span class="hljs-string">&quot;\n&lt;/&quot;</span> + tag + <span class="hljs-string">&quot;&gt;\n&quot;</span>;
 }
 
 renderer.html = processHTML;
-<span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">"utf8"</span>), {
+<span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">&quot;utf8&quot;</span>), {
 	<span class="hljs-attr">renderer</span>: renderer
 }));</code></pre>
 
@@ -154,20 +156,14 @@ renderer.html = processHTML;
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

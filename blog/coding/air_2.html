@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -62,12 +64,12 @@
 
 <p>以前書いた<a href="/blog/coding/air.html" title="hail2u.net - Weblog - Amazonの画像置換">Amazonの画像置換</a>というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。</p>
 <p>とりあえずコード（把握しやすいように改行つけてますが、実際には一行でガッと解た方が良いと思います）。</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg"</span>
- <span class="hljs-attr">onload</span>=<span class="hljs-string">"if (this.width=='1' &amp;&amp; this.src.match(/\.01\./)) {
-	 this.src='/images/music-no-image.png';
- } else if (this.width=='1') {
-	 this.src=this.src.replace('.09.','.01.');
- }"</span> /&gt;</span></code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;</span>
+ <span class="hljs-attr">onload</span>=<span class="hljs-string">&quot;if (this.width==&#x27;1&#x27; &amp;&amp; this.src.match(/\.01\./)) {
+	 this.src=&#x27;/images/music-no-image.png&#x27;;
+ } else if (this.width==&#x27;1&#x27;) {
+	 this.src=this.src.replace(&#x27;.09.&#x27;,&#x27;.01.&#x27;);
+ }&quot;</span> /&gt;</span></code></pre>
 <p><code>img</code>の<code>src</code>にまず09で類推した画像のURLを入れます。もし、この画像のURLが幅1pxの画像を返した場合は、01で類推される画像のURLに置き換わります（<code>else if</code>の方）。すると<code>onload</code>イベントが再び起きます。もし、01で類推される画像のURLも幅1pxの画像を返した場合は、画像が無いよ画像（ここでは/images/no-image.png)に置き換わるというわけ。</p>
 <p>うむ。完璧？</p>
 <section>
@@ -88,14 +90,14 @@
 <h2>追記</h2>
 <p>以下のようなコードを書いた外部JavaScriptファイルを読み込んでおけば、もっとすっきりとしたHTMLになるかも（ちゃんとは試してないですので多分）。</p>
 <pre><code class="hljs language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">replaceImage</span>(<span class="hljs-params">img</span>) </span>{
-	<span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">'1'</span> &amp;&amp; img.src.match(<span class="hljs-regexp">/\.01\./</span>)) {
-		img.src = <span class="hljs-string">'/images/music-no-image.png'</span>;
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">'1'</span>) {
-		img.src = img.src.replace(<span class="hljs-string">'.09.'</span>,<span class="hljs-string">'.01.'</span>);
+	<span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">&#x27;1&#x27;</span> &amp;&amp; img.src.match(<span class="hljs-regexp">/\.01\./</span>)) {
+		img.src = <span class="hljs-string">&#x27;/images/music-no-image.png&#x27;</span>;
+	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (img.width == <span class="hljs-string">&#x27;1&#x27;</span>) {
+		img.src = img.src.replace(<span class="hljs-string">&#x27;.09.&#x27;</span>,<span class="hljs-string">&#x27;.01.&#x27;</span>);
 	}
 }</code></pre>
 <p><code>img</code>要素は以下のように記述することになります。</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg"</span> <span class="hljs-attr">onload</span>=<span class="hljs-string">"replaceImage(this)"</span> /&gt;</span></code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;</span> <span class="hljs-attr">onload</span>=<span class="hljs-string">&quot;replaceImage(this)&quot;</span> /&gt;</span></code></pre>
 <p>すっきり。</p>
 <p>追記ばっか。</p>
 </section>
@@ -110,20 +112,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

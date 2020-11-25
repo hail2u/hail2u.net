@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="CSSを書く時に「セレクタ内でCSS仕様書でのプロパティの出現順序に従ってソートする」という個人的なルールを守っている。何かコーディングにおいて便利な理由があるからというわけではなく、第三者に説明する時に「仕様書の出現順で書いてます！」とかで済ませられるから。今まではファイル全体を処理するオレオレPerlスクリプトで適当にやっていたのだけど、Vimで選択範囲だけをソートとかやりたくなったので、普通に標準入力を読んで結果を標準出力に吐くように書き直した。ついでにCSS3のプロパティとFirefox(Mozilla)やSafari(WebKit)、Opera(Presto)、Internet Explorer(Trident)の独自拡張などへも対応させたりとか。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -548,8 +550,8 @@ text-rendering
 	<span class="hljs-keyword">map</span> { $_ =&gt; $i++ } @property_order;
 };
 
-<span class="hljs-keyword">my</span> $css = <span class="hljs-keyword">join</span> <span class="hljs-string">""</span>, &lt;STDIN&gt;;
-$css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</span>;
+<span class="hljs-keyword">my</span> $css = <span class="hljs-keyword">join</span> <span class="hljs-string">&quot;&quot;</span>, &lt;STDIN&gt;;
+$css =~ <span class="hljs-regexp">s/{(.*?)}/&quot;{&quot;.sort_properties($1).&quot;}&quot;/imgse</span>;
 
 <span class="hljs-keyword">print</span> $css;
 
@@ -561,7 +563,7 @@ $css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</s
 	<span class="hljs-comment"># my %temp;</span>
 	<span class="hljs-comment"># my @sorted_rules = sort {</span>
 	<span class="hljs-comment">#   ($temp{$a} ||= check_order($a)) &lt;=&gt; ($temp{$b} ||= check_order($b))</span>
-	<span class="hljs-comment"># } split "\n", $rules;</span>
+	<span class="hljs-comment"># } split &quot;\n&quot;, $rules;</span>
 
 	<span class="hljs-comment"># Schwartzian Transform</span>
 	<span class="hljs-comment"># See also: http://gist.github.com/236860</span>
@@ -569,9 +571,9 @@ $css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</s
 		= <span class="hljs-keyword">map</span>  { $_-&gt;[<span class="hljs-number">0</span>] }
 			<span class="hljs-keyword">sort</span> { $a-&gt;[<span class="hljs-number">1</span>] &lt;=&gt; $b-&gt;[<span class="hljs-number">1</span>] }
 			<span class="hljs-keyword">map</span>  { [ $_, check_order($_) ] }
-			<span class="hljs-keyword">split</span> <span class="hljs-string">"\n"</span>, $rules;
+			<span class="hljs-keyword">split</span> <span class="hljs-string">&quot;\n&quot;</span>, $rules;
 
-	<span class="hljs-keyword">return</span> <span class="hljs-string">"\n"</span> . <span class="hljs-keyword">join</span>(<span class="hljs-string">"\n"</span>, @sorted_rules) . <span class="hljs-string">"\n"</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;\n&quot;</span> . <span class="hljs-keyword">join</span>(<span class="hljs-string">&quot;\n&quot;</span>, @sorted_rules) . <span class="hljs-string">&quot;\n&quot;</span>;
 }
 
 <span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_order</span> </span>{
@@ -583,7 +585,7 @@ $css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</s
 			$order = $property{$1};
 		}
 	<span class="hljs-comment"># } else {</span>
-	<span class="hljs-comment">#   warn "Unknown property: $1";</span>
+	<span class="hljs-comment">#   warn &quot;Unknown property: $1&quot;;</span>
 	}
 
 	<span class="hljs-keyword">return</span> $order;
@@ -602,7 +604,7 @@ $css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</s
 	<span class="hljs-attribute">height</span>: <span class="hljs-number">24px</span>;
 	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">24px</span>;
 	<span class="hljs-attribute">color</span>: <span class="hljs-number">#c9c6c0</span>;
-	<span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">"../images/bg-navigation.png"</span>);
+	<span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">&quot;../images/bg-navigation.png&quot;</span>);
 	<span class="hljs-attribute">background-repeat</span>: repeat-x;
 	<span class="hljs-comment">/* CSS3 */</span>
 	<span class="hljs-attribute">border-radius</span>: <span class="hljs-number">3px</span>;
@@ -661,8 +663,8 @@ $css =~ <span class="hljs-regexp">s/{(.*?)}/"{".sort_properties($1)."}"/imgse</s
 <pre><code class="hljs language-vim"><span class="hljs-keyword">nmap</span> gso va}:SortCSS<span class="hljs-symbol">&lt;CR&gt;</span>
 <span class="hljs-keyword">vmap</span> gso <span class="hljs-keyword">a</span>}:SortCSS<span class="hljs-symbol">&lt;CR&gt;</span>
 
-<span class="hljs-comment">" Sort CSS properties</span>
-<span class="hljs-comment">" :SortCSS</span>
+<span class="hljs-comment">&quot; Sort CSS properties</span>
+<span class="hljs-comment">&quot; :SortCSS</span>
 command! -<span class="hljs-built_in">range</span>=% SortCSS :<span class="hljs-symbol">&lt;line1&gt;</span>,<span class="hljs-symbol">&lt;line2&gt;</span>!perl -S sortcss.pl</code></pre>
 
 <p>これで<kbd>gso</kbd>でソートできる他、<code>:SortCSS</code>でもソートできる（<code>-range=%</code>なので選択していない場合はファイル全体を処理する）。CSSファイル以外ではアクティブにする必要が無いので、<code>$MYVIMRC</code>ではなく<code>$HOME/.vim/ftplugin/css.vim</code>（Windowsなら<code>$HOME\vimfiles\ftplugin\css.vim</code>）とかに書いた方が良い<a href="http://subtech.g.hatena.ne.jp/secondlife/20060831/1157012844">かも</a>。</p>
@@ -699,20 +701,14 @@ command! -<span class="hljs-built_in">range</span>=% SortCSS :<span class="hljs-
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

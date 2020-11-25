@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="PubSubHubbub Working Draftのv0.4が出た。某氏のブックマーク→MLを流し読んでPublisher側では何か作業する必要はないように読んでしまったけど、どうもatom:linkの代わりにLink HTTPヘッダーを使って購読先を探せるようにするようにということのようだ。JSONや画像を筆頭にあらゆるもののPub/Subもサポートするようにするためみたい。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -68,10 +70,10 @@
 
 <p>HTTPレスポンスにおいてMUSTとなっており、従来の<code>atom:link</code>は後方互換性のためという扱い。値は固定のはずなのでApache HTTP Serverでは<a href="http://httpd.apache.org/docs/2.4/en/mod/mod_headers.html">mod_headers</a>を使うだけで良さそう。</p>
 
-<pre><code class="hljs language-apache"><span class="hljs-section">&lt;FilesMatch <span class="hljs-string">"^feed$"</span>&gt;</span>
-	<span class="hljs-attribute">ForceType</span> <span class="hljs-string">"application/rss+xml"</span>
-	<span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">"&lt;http://hail2u.net/feed&gt;; rel=\"self\""</span>
-	<span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">"&lt;https://pubsubhubbub.appspot.com/&gt;; rel=\"hub\""</span>
+<pre><code class="hljs language-apache"><span class="hljs-section">&lt;FilesMatch <span class="hljs-string">&quot;^feed$&quot;</span>&gt;</span>
+	<span class="hljs-attribute">ForceType</span> <span class="hljs-string">&quot;application/rss+xml&quot;</span>
+	<span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">&quot;&lt;http://hail2u.net/feed&gt;; rel=\&quot;self\&quot;&quot;</span>
+	<span class="hljs-attribute"><span class="hljs-nomarkup">Header</span></span> append Link <span class="hljs-string">&quot;&lt;https://pubsubhubbub.appspot.com/&gt;; rel=\&quot;hub\&quot;&quot;</span>
 <span class="hljs-section">&lt;/FilesMatch&gt;</span></code></pre>
 
 <p>1行で無理やり書いたりせずに、<code>Header append</code>を使ってやると安全でキレイに書ける。<code>rel=hub</code>の追加も後ろに並べて追加するだけ。もちろんSubscriber側の対応には時間がかかると思うので従来の<code>atom:link</code>を使ったものも続けてサポートするべき。</p>
@@ -86,20 +88,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

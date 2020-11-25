@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -69,14 +71,14 @@
 <span class="hljs-comment">// @param {color} $color Color that you want to encode</span>
 <span class="hljs-comment">// @return {string}</span>
 <span class="hljs-keyword">@function</span> encode-color(<span class="hljs-variable">$color</span>) {
-	<span class="hljs-variable">$str_color</span>: <span class="hljs-string">""</span> + <span class="hljs-variable">$color</span>;
+	<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;&quot;</span> + <span class="hljs-variable">$color</span>;
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">"#"</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">"%23"</span> + str-slice(<span class="hljs-variable">$str_color</span>, <span class="hljs-number">2</span>);
+	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">&quot;#&quot;</span>) == <span class="hljs-number">1</span>) {
+		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;%23&quot;</span> + str-slice(<span class="hljs-variable">$str_color</span>, <span class="hljs-number">2</span>);
 	}
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">"rgba"</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">"rgba("</span> + red(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + green(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + blue(<span class="hljs-variable">$color</span>) + <span class="hljs-string">"%2C"</span> + alpha(<span class="hljs-variable">$color</span>) + <span class="hljs-string">")"</span>;
+	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">&quot;rgba&quot;</span>) == <span class="hljs-number">1</span>) {
+		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;rgba(&quot;</span> + red(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + green(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + blue(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + alpha(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;)&quot;</span>;
 	}
 
 	<span class="hljs-keyword">@return</span> <span class="hljs-variable">$str_color</span>;
@@ -91,10 +93,10 @@
 <p>これらにマッチしなかった場合は色キーワードなのでそのまま返す。</p>
 
 <pre><code class="hljs language-scss"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(#336699)}"</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(rgb(51, 102, 153))}"</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(rgba(51, 102, 153, 0.2))}"</span>; <span class="hljs-comment">// rgba(51%2C102%2C153%2C0.2)</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">"#{encode-color(beige)}"</span>; <span class="hljs-comment">// beige</span>
+	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(#336699)}&quot;</span>; <span class="hljs-comment">// %23369</span>
+	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(rgb(51, 102, 153))}&quot;</span>; <span class="hljs-comment">// %23369</span>
+	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(rgba(51, 102, 153, 0.2))}&quot;</span>; <span class="hljs-comment">// rgba(51%2C102%2C153%2C0.2)</span>
+	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(beige)}&quot;</span>; <span class="hljs-comment">// beige</span>
 }</code></pre>
 
 <p>このテストはうまくいったのでこれでだいたい大丈夫そう。</p>
@@ -113,20 +115,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

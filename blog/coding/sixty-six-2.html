@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Amazon E-Commerce Service 4.0は「&quot;」や「&apos;」をそのまま返してくれる（XML的にはまぁOKなんだけど）ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -62,27 +64,27 @@
 
 <p><a href="https://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>は「&quot;」や「&apos;」をそのまま返してくれる（XML的にはまぁOKなんだけど）ので、場合によってはそれらを適切に扱ってやらないとまずかったりします。PerlなりRubyなりでやる場合は大して面倒でもなんでもないのですが、XSLTでどうにかしようとするとなかなか厄介。厄介なのでSIXTY-SIXではこの仕様に由来するバグを放置していたわけですが、どうにかできそうだということを理解したので、ItemSearchをJSONで整形するXSLスタイルシートを修正してみました。</p>
 <p>「&apos;」のエスケープは、<code>translate()</code>では出来ないので、</p>
-<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span>/&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"from"</span>&gt;</span><span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"to"</span>&gt;</span>\<span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;replace&quot;</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;str&quot;</span>/&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;from&quot;</span>&gt;</span><span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;to&quot;</span>&gt;</span>\<span class="hljs-symbol">&amp;#39;</span><span class="hljs-tag">&lt;/<span class="hljs-name">xsl:param</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:choose</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:when</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"contains($str, $from)"</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"substring-before($str, $from)"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"$to"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
-				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"substring-after($str, $from)"</span>/&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:when</span> <span class="hljs-attr">test</span>=<span class="hljs-string">&quot;contains($str, $from)&quot;</span>&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">&quot;substring-before($str, $from)&quot;</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">&quot;$to&quot;</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;replace&quot;</span>&gt;</span>
+				<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;str&quot;</span> <span class="hljs-attr">select</span>=<span class="hljs-string">&quot;substring-after($str, $from)&quot;</span>/&gt;</span>
 			<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:call-template</span>&gt;</span>
 		<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:when</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:otherwise</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"$str"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">&quot;$str&quot;</span>/&gt;</span>
 		<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:otherwise</span>&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:choose</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">xsl:template</span>&gt;</span></code></pre>
 <p>こんな形の文字列の置換として実装することになります。SIXTY-SIXのケースでは「&apos;」を「\&apos;」にエスケープするだけなので、<code>xsl:param</code>でデフォルトとしてそれらを指定しておき、呼び出しが書きやすいようにしました。呼び出しは、</p>
-<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"replace"</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"str"</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"aws:ItemAttributes/aws:Title"</span>/&gt;</span>
+<pre><code class="hljs language-xsl"><span class="hljs-tag">&lt;<span class="hljs-name">xsl:call-template</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;replace&quot;</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">xsl:with-param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;str&quot;</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">xsl:value-of</span> <span class="hljs-attr">select</span>=<span class="hljs-string">&quot;aws:ItemAttributes/aws:Title&quot;</span>/&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">xsl:with-param</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">xsl:call-template</span>&gt;</span></code></pre>
 <p>てな具合。</p>
@@ -98,20 +100,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

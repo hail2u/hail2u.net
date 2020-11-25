@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに（小さなRSSが）吐ける。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,14 +66,14 @@
 
 <p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xml2js&#x27;</span>);
 
 <span class="hljs-keyword">var</span> builder = <span class="hljs-keyword">new</span> xml2js.Builder({
 	<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>
 });
 <span class="hljs-keyword">var</span> obj = {
-	<span class="hljs-attr">foo</span>: <span class="hljs-string">'Foo'</span>,
-	<span class="hljs-attr">bar</span>: <span class="hljs-string">'Bar'</span>
+	<span class="hljs-attr">foo</span>: <span class="hljs-string">&#x27;Foo&#x27;</span>,
+	<span class="hljs-attr">bar</span>: <span class="hljs-string">&#x27;Bar&#x27;</span>
 };
 <span class="hljs-keyword">var</span> xml = builder.buildObject(obj);</code></pre>
 
@@ -81,19 +83,19 @@
 
 <p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">'xml2js'</span>);
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">var</span> xml2js = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xml2js&#x27;</span>);
 
 <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> xml2js.Builder({
 	<span class="hljs-attr">cdata</span>: <span class="hljs-literal">true</span>
 }).buildObject({
-	<span class="hljs-string">'foo'</span>: {
-		<span class="hljs-string">'bar'</span>: <span class="hljs-string">'baz &amp; qux'</span>
+	<span class="hljs-string">&#x27;foo&#x27;</span>: {
+		<span class="hljs-string">&#x27;bar&#x27;</span>: <span class="hljs-string">&#x27;baz &amp; qux&#x27;</span>
 	}
 }));</code></pre>
 
 <p>これで<code>bar</code>要素の内容がCDATAセクションになってくれれば良いが、なってくれない。</p>
 
-<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;</span>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">foo</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">bar</span>&gt;</span>baz <span class="hljs-symbol">&amp;amp;</span> qux<span class="hljs-tag">&lt;/<span class="hljs-name">bar</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">foo</span>&gt;</span></code></pre>
@@ -110,20 +112,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

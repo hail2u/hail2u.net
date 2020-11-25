@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="僕はVimを使うまでは秀丸エディタを長いこと使用していました。両者の間に設定の項目数やキーバインドに割り当てられる機能に大きな差があるとも思わなかったので、使い始めた当初は「そんな言うほど高機能でもないよなー」とか思っていました。しかし色々なプラグインを試したり、様々な設定を.vimrcに書いているうちに、Vim(やEmacs）がその他エディタと決定的に違うのは設定の豊富さではなく、設定の自由さがもたらすアプローチの多様性なのではないかと考えるようになりました。というわけでそういう設定の自由さを最初に実感した話をVim Advent Calendar 2011の6日目のエントリーとして書かせてもらいます。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -66,11 +68,11 @@
 
 <p>昨今のWebサイトではCMSなどを利用することが多く、共通のHTMLコードはテンプレートとして作成されます。その場合そのテンプレートの利用されるパスが様々な場所や階層になりうるので、例えばJavaScriptファイルのインクルードを行う場合、以下のようにスラッシュで始まる相対URLを利用することが多いでしょう。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/js/foo.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/js/foo.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 
 <p>しかしこのようなURLを利用していると何かと便利な<a href="http://vim-jp.org/vimdoc-ja/editing.html#gf"><code>gf</code></a>でカーソル下のファイル（この場合は<code>foo.js</code>）を（多くの場合）開くことが出来ません。ローカル（やリモート）のファイルシステム上のパス構成をURL構成とマッチするように整えてやれば開くことができるようになりますが、それは面倒でしょう。それを解決するのが以下の一行です。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">autocmd</span> FileType html <span class="hljs-keyword">setlocal</span> includeexpr=<span class="hljs-keyword">substitute</span>(<span class="hljs-variable">v:fname</span>,<span class="hljs-string">'^\\/'</span>,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>) | <span class="hljs-keyword">setlocal</span> path+=;/</code></pre>
+<pre><code class="hljs language-vim"><span class="hljs-keyword">autocmd</span> FileType html <span class="hljs-keyword">setlocal</span> includeexpr=<span class="hljs-keyword">substitute</span>(<span class="hljs-variable">v:fname</span>,<span class="hljs-string">&#x27;^\\/&#x27;</span>,<span class="hljs-string">&#x27;&#x27;</span>,<span class="hljs-string">&#x27;&#x27;</span>) | <span class="hljs-keyword">setlocal</span> path+=;/</code></pre>
 
 <p>こう~/.vimrcに書いておくだけで<code>gf</code>で開くことができるようになります。<code>includeexpr</code>でファイル名の先頭のスラッシュを削り、<code>path</code>に<code>;/</code>を追加して上流を探すようにすることにより、大体うまく開くことが可能になるわけです。<code>path</code>によって<code>gf</code>や<code>:find</code>などでファイルを探すパスを細かく設定できます。値の<code>;/</code>については、</p>
 
@@ -102,20 +104,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

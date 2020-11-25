@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Hacker News経由でArbitraryCounterというのを知った。カウントをアップまたはダウンするだけというニッチなAPIを提供するだけのもの。データは48時間しか保たないので本当に開発者向けなんだろうけど、いいね！ボタンっぽいものを作るという形で遊んだら楽しかった。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -81,11 +83,11 @@
 
 <p>カウントアップ（ダウン）には<code>POST</code>が必須。素のYQLでは出来ないけど、以下の様な簡単なOpen Data Tablesを書いてやればいける。</p>
 
-<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">table</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://query.yahooapis.com/v1/schema/table.xsd"</span>&gt;</span>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">table</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://query.yahooapis.com/v1/schema/table.xsd&quot;</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">meta</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">sampleQuery</span>&gt;</span>&lt;![CDATA[
-	select * from {table} where url="http://arbitrarycounter.com/vb/fruit/apples+"
+	select * from {table} where url=&quot;http://arbitrarycounter.com/vb/fruit/apples+&quot;
 ]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">sampleQuery</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">meta</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">bindings</span>&gt;</span>
@@ -94,10 +96,10 @@
 <span class="hljs-tag">&lt;<span class="hljs-name">url</span>&gt;</span>{url}<span class="hljs-tag">&lt;/<span class="hljs-name">url</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">urls</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">inputs</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">key</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"url"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"xs:string"</span> <span class="hljs-attr">required</span>=<span class="hljs-string">"true"</span> <span class="hljs-attr">paramType</span>=<span class="hljs-string">"variable"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">key</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;url&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;xs:string&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">paramType</span>=<span class="hljs-string">&quot;variable&quot;</span>/&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">inputs</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">execute</span>&gt;</span>&lt;![CDATA[
-	var data = y.rest(url).accept('*').contentType('application/x-www-form-urlencoded').post().response;
+	var data = y.rest(url).accept(&#x27;*&#x27;).contentType(&#x27;application/x-www-form-urlencoded&#x27;).post().response;
 	response.object = y.xparseJson(data);
 ]]&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">execute</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
@@ -128,20 +130,14 @@ select * from post where url="http://arbitrarycounter.com/vb/fruit/apples+"</a><
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -77,8 +79,8 @@
 <span class="hljs-keyword">use</span> LWP::UserAgent;
 
 <span class="hljs-keyword">my</span> @params = (
-	<span class="hljs-string">"output_info"</span>,   <span class="hljs-string">"compiled_code"</span>,
-	<span class="hljs-string">"output_format"</span>, <span class="hljs-string">"json"</span>,
+	<span class="hljs-string">&quot;output_info&quot;</span>,   <span class="hljs-string">&quot;compiled_code&quot;</span>,
+	<span class="hljs-string">&quot;output_format&quot;</span>, <span class="hljs-string">&quot;json&quot;</span>,
 );
 
 &amp;main;
@@ -86,7 +88,7 @@
 
 <span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">main</span> </span>{
 	<span class="hljs-keyword">my</span> @code = &lt;STDIN&gt;;
-	<span class="hljs-keyword">push</span> @params, <span class="hljs-string">"js_code"</span>, <span class="hljs-keyword">join</span>(<span class="hljs-string">""</span>, @code);
+	<span class="hljs-keyword">push</span> @params, <span class="hljs-string">&quot;js_code&quot;</span>, <span class="hljs-keyword">join</span>(<span class="hljs-string">&quot;&quot;</span>, @code);
 	<span class="hljs-keyword">my</span> $idx = <span class="hljs-number">0</span>;
 	<span class="hljs-keyword">my</span> $found_metadata = <span class="hljs-number">0</span>;
 
@@ -112,19 +114,19 @@
 
 <span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">compile</span> </span>{
 	<span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new;
-	<span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">"http://closure-compiler.appspot.com/compile"</span>, \@_);
+	<span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">&quot;http://closure-compiler.appspot.com/compile&quot;</span>, \@_);
 
 	<span class="hljs-keyword">if</span> ($res-&gt;is_success) {
 		<span class="hljs-keyword">my</span> $c = from_json($res-&gt;decoded_content);
 
-		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">defined</span> $c-&gt;{<span class="hljs-string">"serverErrors"</span>}) {
-			<span class="hljs-keyword">foreach</span> (@{$c-&gt;{<span class="hljs-string">"serverErrors"</span>}}) {
-				<span class="hljs-keyword">warn</span> <span class="hljs-string">"Error("</span> . $_-&gt;{<span class="hljs-string">"code"</span>} . <span class="hljs-string">"): "</span> . $_-&gt;{<span class="hljs-string">"error"</span>};
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">defined</span> $c-&gt;{<span class="hljs-string">&quot;serverErrors&quot;</span>}) {
+			<span class="hljs-keyword">foreach</span> (@{$c-&gt;{<span class="hljs-string">&quot;serverErrors&quot;</span>}}) {
+				<span class="hljs-keyword">warn</span> <span class="hljs-string">&quot;Error(&quot;</span> . $_-&gt;{<span class="hljs-string">&quot;code&quot;</span>} . <span class="hljs-string">&quot;): &quot;</span> . $_-&gt;{<span class="hljs-string">&quot;error&quot;</span>};
 			}
 
-			<span class="hljs-keyword">die</span> <span class="hljs-string">"Failed to compile"</span>;
+			<span class="hljs-keyword">die</span> <span class="hljs-string">&quot;Failed to compile&quot;</span>;
 		} <span class="hljs-keyword">else</span> {
-			<span class="hljs-keyword">print</span> $c-&gt;{<span class="hljs-string">"compiledCode"</span>};
+			<span class="hljs-keyword">print</span> $c-&gt;{<span class="hljs-string">&quot;compiledCode&quot;</span>};
 		}
 	} <span class="hljs-keyword">else</span> {
 		<span class="hljs-keyword">die</span> $res-&gt;status_line;
@@ -143,8 +145,8 @@
 <span class="hljs-comment">// ==/ClosureCompiler==</span>
  
 $(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-	<span class="hljs-keyword">var</span> who = <span class="hljs-string">"Google Closure Compiler Service"</span>;
-	alert(<span class="hljs-string">"Hello "</span> + who + <span class="hljs-string">"!"</span>);
+	<span class="hljs-keyword">var</span> who = <span class="hljs-string">&quot;Google Closure Compiler Service&quot;</span>;
+	alert(<span class="hljs-string">&quot;Hello &quot;</span> + who + <span class="hljs-string">&quot;!&quot;</span>);
 });</code></pre>
 
 <p>細かい設定は<a href="http://code.google.com/intl/ja/closure/compiler/docs/api-ref.html">APIリファレンス</a>を参照。<code>code_url</code>はいくつでも指定できる。<code>compilation_level</code>はデフォルトで<code>SIMPLE_OPTIMIZATIONS</code>に設定されているので省略可能。パラメータは丸投げなのでリファレンスに載っていない適当なパラメータなども設定できてしまうが、実害はないと思う。結果がJSONで返ってくるとみなしてパースしているので、<code>output_format</code>は指定しない方が良い。また警告やエラーの出力にはまったく対応していないので<code>output_info</code>や<code>warning_level</code>を指定しても無意味。</p>
@@ -163,17 +165,17 @@ $(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span 
 
 <p>Vimから簡単に使えるように<code>$MYVIMRC</code>には以下のように書いた。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-comment">" Compile JavaScript file with Google Closure Compiler Service</span>
-<span class="hljs-comment">" :GCCS [&lt;path&gt;]</span>
-command! -nargs=? -<span class="hljs-built_in">complete</span>=<span class="hljs-keyword">file</span> GCCS :<span class="hljs-keyword">call</span> <span class="hljs-variable">s:CompileScript</span>(<span class="hljs-string">'&lt;args&gt;'</span>)
+<pre><code class="hljs language-vim"><span class="hljs-comment">&quot; Compile JavaScript file with Google Closure Compiler Service</span>
+<span class="hljs-comment">&quot; :GCCS [&lt;path&gt;]</span>
+command! -nargs=? -<span class="hljs-built_in">complete</span>=<span class="hljs-keyword">file</span> GCCS :<span class="hljs-keyword">call</span> <span class="hljs-variable">s:CompileScript</span>(<span class="hljs-string">&#x27;&lt;args&gt;&#x27;</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">CompileScript</span><span class="hljs-params">(file)</span></span>
-	<span class="hljs-keyword">if</span> <span class="hljs-variable">a:file</span> == <span class="hljs-string">''</span>
+	<span class="hljs-keyword">if</span> <span class="hljs-variable">a:file</span> == <span class="hljs-string">&#x27;&#x27;</span>
 		<span class="hljs-keyword">silent</span> <span class="hljs-keyword">normal</span> ggVG
-		<span class="hljs-string">'&lt;,'</span>&gt;!perl -S gccs.pl
+		<span class="hljs-string">&#x27;&lt;,&#x27;</span>&gt;!perl -S gccs.pl
 		<span class="hljs-keyword">silent</span> <span class="hljs-keyword">normal</span> V
 	<span class="hljs-keyword">else</span>
-		<span class="hljs-keyword">execute</span> <span class="hljs-string">'!perl -S gccs.pl &lt; '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%'</span>) . <span class="hljs-string">' &gt; '</span> . <span class="hljs-variable">a:file</span>
+		<span class="hljs-keyword">execute</span> <span class="hljs-string">&#x27;!perl -S gccs.pl &lt; &#x27;</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%&#x27;</span>) . <span class="hljs-string">&#x27; &gt; &#x27;</span> . <span class="hljs-variable">a:file</span>
 	<span class="hljs-keyword">endif</span>
 <span class="hljs-keyword">endfunction</span></code></pre>
 
@@ -189,20 +191,14 @@ command! -nargs=? -<span class="hljs-built_in">complete</span>=<span class="hljs
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

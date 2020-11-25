@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="Firefox 3のオプション設定ダイアログやダウンロード・ダイアログなどに存在するfilefield要素。nsIFilePickerなどと組み合わせてファイルやフォルダを指定するために使うもののようだけど、MDCに書いてないので使い方が全然わからなかった。けどソースをgrepして探して読んでみたら、ファイルやフォルダの指定に特化したものだったのでそんなに難しくなかった。ということで使い方のメモ。" itemprop="description">
 		<link href="/img/blog/filefield-test-preview1.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,33 +66,33 @@
 
 <p>よくある使い方であろうダイアログでアプリケーションを指定するようなケースでは、</p>
 
-<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version="1.0"?&gt;</span>
-<span class="hljs-meta">&lt;?xml-stylesheet href="chrome://global/skin/"?&gt;</span>
-<span class="hljs-meta">&lt;?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?&gt;</span>
-<span class="hljs-meta">&lt;?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">dialog</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"filefield-test"</span>
-	<span class="hljs-attr">title</span>=<span class="hljs-string">"filefield Test"</span>
-	<span class="hljs-attr">buttons</span>=<span class="hljs-string">"accept, cancel"</span>
-	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"</span>&gt;</span>
+<pre><code class="hljs language-xml"><span class="hljs-meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="hljs-meta">&lt;?xml-stylesheet href=&quot;chrome://global/skin/&quot;?&gt;</span>
+<span class="hljs-meta">&lt;?xml-stylesheet href=&quot;chrome://mozapps/content/preferences/preferences.css&quot;?&gt;</span>
+<span class="hljs-meta">&lt;?xml-stylesheet href=&quot;chrome://browser/skin/preferences/preferences.css&quot;?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">dialog</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;filefield-test&quot;</span>
+	<span class="hljs-attr">title</span>=<span class="hljs-string">&quot;filefield Test&quot;</span>
+	<span class="hljs-attr">buttons</span>=<span class="hljs-string">&quot;accept, cancel&quot;</span>
+	<span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul&quot;</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
 	&lt;![CDATA[
 		<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">browseApp</span> (<span class="hljs-params"></span>) </span>{
 			<span class="hljs-keyword">var</span> nsIFilePicker = Components.interfaces.nsIFilePicker;
-			<span class="hljs-keyword">var</span> filePicker = Components.classes[<span class="hljs-string">"@mozilla.org/filepicker;1"</span>].createInstance(nsIFilePicker);
-			filePicker.init(<span class="hljs-built_in">window</span>, <span class="hljs-string">"Select a Application"</span>, nsIFilePicker.modeOpen);
+			<span class="hljs-keyword">var</span> filePicker = Components.classes[<span class="hljs-string">&quot;@mozilla.org/filepicker;1&quot;</span>].createInstance(nsIFilePicker);
+			filePicker.init(<span class="hljs-built_in">window</span>, <span class="hljs-string">&quot;Select a Application&quot;</span>, nsIFilePicker.modeOpen);
 			filePicker.appendFilters(nsIFilePicker.filterApps);
 
 			<span class="hljs-keyword">if</span> (filePicker.show() === nsIFilePicker.returnOK) {
-				<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"app-path"</span>).file = filePicker.file;
+				<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;app-path&quot;</span>).file = filePicker.file;
 			}
 		}
 	]]&gt;
 	</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 	<span class="hljs-tag">&lt;<span class="hljs-name">vbox</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">hbox</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">control</span>=<span class="hljs-string">"app-path"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"Application:"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">filefield</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"app-path"</span> <span class="hljs-attr">flex</span>=<span class="hljs-string">"1"</span>/&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">label</span>=<span class="hljs-string">"Browse..."</span> <span class="hljs-attr">oncommand</span>=<span class="hljs-string">"browseApp();"</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">control</span>=<span class="hljs-string">&quot;app-path&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;Application:&quot;</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">filefield</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app-path&quot;</span> <span class="hljs-attr">flex</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span>
+			<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">label</span>=<span class="hljs-string">&quot;Browse...&quot;</span> <span class="hljs-attr">oncommand</span>=<span class="hljs-string">&quot;browseApp();&quot;</span>/&gt;</span>
 		<span class="hljs-tag">&lt;/<span class="hljs-name">hbox</span>&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">vbox</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">dialog</span>&gt;</span></code></pre>
@@ -123,20 +125,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="UnUTMはGoogle Analyticsなどで使われるutm_*パラメーターを削除するものなので、当然それらを利用した解析機能は失われることになる。一応ユニバーサル・アナリティクスのga()を使って呼ぶことにより、うまくすればトラッキング出来るんじゃないかと考え、そうしていたが、どうもダメそうだ。ga()を直接使う代わりにトラッカーによるデータ送信後に発動する関数を指定できるhitCallbackフィールドを使うのが良さそう。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,9 +66,9 @@
 
 <p>普通に書くと以下の様なコードになる。</p>
 
-<pre><code class="hljs language-javascript">ga(<span class="hljs-string">'create'</span>, <span class="hljs-string">'UA-XXXXXXXX-X'</span>, <span class="hljs-string">'auto'</span>);
-ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'</span>, {
-	<span class="hljs-string">'hitCallback'</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<pre><code class="hljs language-javascript">ga(<span class="hljs-string">&#x27;create&#x27;</span>, <span class="hljs-string">&#x27;UA-XXXXXXXX-X&#x27;</span>, <span class="hljs-string">&#x27;auto&#x27;</span>);
+ga(<span class="hljs-string">&#x27;send&#x27;</span>, <span class="hljs-string">&#x27;pageview&#x27;</span>, {
+	<span class="hljs-string">&#x27;hitCallback&#x27;</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">var</span> l = location;
 		<span class="hljs-keyword">var</span> h = history;
 
@@ -75,9 +77,9 @@ ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'
 		}
 
 		<span class="hljs-keyword">var</span> u = l.pathname +
-			l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) +
+			l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">&#x27;?&#x27;</span>) +
 			l.hash;
-		h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
+		h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;&#x27;</span>, u);
 	}
 });</code></pre>
 
@@ -87,16 +89,16 @@ ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'
 
 <p>UnUTMには<code>unutm</code>という関数を追加するだけの<a href="https://github.com/hail2u/unutm/blob/v0.2.0/unutm_ga.js"><code>unutm_ga.js</code></a>も追加して、v0.2.0にしておいた。これを使ってGoogle Analyticsのコードを書き換えればきっと機能するだろう。</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/bower_components/unutm/unutm_ga.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/bower_components/unutm/unutm_ga.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-	(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i,s,o,g,r,a,m</span>)</span>{i[<span class="hljs-string">'GoogleAnalyticsObject'</span>]=r;i[r]=i[r]||<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+	(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i,s,o,g,r,a,m</span>)</span>{i[<span class="hljs-string">&#x27;GoogleAnalyticsObject&#x27;</span>]=r;i[r]=i[r]||<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
 	(i[r].q=i[r].q||[]).push(<span class="hljs-built_in">arguments</span>)},i[r].l=<span class="hljs-number">1</span>*<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();a=s.createElement(o),
 	m=s.getElementsByTagName(o)[<span class="hljs-number">0</span>];a.async=<span class="hljs-number">1</span>;a.src=g;m.parentNode.insertBefore(a,m)
-	})(<span class="hljs-built_in">window</span>,<span class="hljs-built_in">document</span>,<span class="hljs-string">'script'</span>,<span class="hljs-string">'//www.google-analytics.com/analytics.js'</span>,<span class="hljs-string">'ga'</span>);
+	})(<span class="hljs-built_in">window</span>,<span class="hljs-built_in">document</span>,<span class="hljs-string">&#x27;script&#x27;</span>,<span class="hljs-string">&#x27;//www.google-analytics.com/analytics.js&#x27;</span>,<span class="hljs-string">&#x27;ga&#x27;</span>);
 
-	ga(<span class="hljs-string">'create'</span>, <span class="hljs-string">'UA-XXXXXXXX-X'</span>, <span class="hljs-string">'auto'</span>);
-	ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'</span>, {
-		<span class="hljs-string">'hitCallback'</span>: unutm
+	ga(<span class="hljs-string">&#x27;create&#x27;</span>, <span class="hljs-string">&#x27;UA-XXXXXXXX-X&#x27;</span>, <span class="hljs-string">&#x27;auto&#x27;</span>);
+	ga(<span class="hljs-string">&#x27;send&#x27;</span>, <span class="hljs-string">&#x27;pageview&#x27;</span>, {
+		<span class="hljs-string">&#x27;hitCallback&#x27;</span>: unutm
 	});
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 
@@ -112,20 +114,14 @@ ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'pageview'
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

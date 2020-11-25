@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="開発の止まったConsole2の後継っぽいConsoleZを試している。シェルでずっと作業するわけじゃないのでckw-modで不満はなくて、Console2には乗り換える意味はなさそうだったんだけど、ConsoleZではウィンドウの再利用が行え、他のアプリケーションから新しいタブを開くということが可能になったのでちょっと良い。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -72,8 +74,8 @@
 
 <p>Vimから簡単に呼べるように設定も書いた。</p>
 
-<pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">'win32'</span>)
-	<span class="hljs-comment">" Reuse existing ConsoleZ instance</span>
+<pre><code class="hljs language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">&#x27;win32&#x27;</span>)
+	<span class="hljs-comment">&quot; Reuse existing ConsoleZ instance</span>
 	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ReuseConsoleZ</span><span class="hljs-params">(...)</span></span>
 		<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = &amp;<span class="hljs-keyword">shell</span>
 
@@ -81,16 +83,16 @@
 			<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = <span class="hljs-variable">a:1</span>
 		<span class="hljs-keyword">endif</span>
 
-		<span class="hljs-keyword">execute</span> <span class="hljs-string">'silent !start Console.exe -reuse -t '</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">' -d '</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">'%:p:h'</span>)
+		<span class="hljs-keyword">execute</span> <span class="hljs-string">&#x27;silent !start Console.exe -reuse -t &#x27;</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">&#x27; -d &#x27;</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:h&#x27;</span>)
 	<span class="hljs-keyword">endfunction</span>
 
-	<span class="hljs-comment">" Complete ConsoleZ tab</span>
+	<span class="hljs-comment">&quot; Complete ConsoleZ tab</span>
 	<span class="hljs-function"><span class="hljs-keyword">function</span>! <span class="hljs-title">s</span>:<span class="hljs-title">ConsoleZTabComplete</span><span class="hljs-params">(A, L, P)</span></span>
-		<span class="hljs-keyword">let</span> commands = [<span class="hljs-string">'cmd'</span>, <span class="hljs-string">'bash'</span>, <span class="hljs-string">'ps'</span>]
+		<span class="hljs-keyword">let</span> commands = [<span class="hljs-string">&#x27;cmd&#x27;</span>, <span class="hljs-string">&#x27;bash&#x27;</span>, <span class="hljs-string">&#x27;ps&#x27;</span>]
 		<span class="hljs-keyword">let</span> matches = []
 
 		<span class="hljs-keyword">for</span> cmd in commands
-			<span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">'^'</span> . <span class="hljs-variable">a:A</span>
+			<span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">&#x27;^&#x27;</span> . <span class="hljs-variable">a:A</span>
 				<span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, cmd)
 			<span class="hljs-keyword">endif</span>
 		<span class="hljs-keyword">endfor</span>
@@ -98,7 +100,7 @@
 		<span class="hljs-keyword">return</span> matches
 	<span class="hljs-keyword">endfunction</span>
 
-	<span class="hljs-comment">" ConsoleZ: Open ConsoleZ</span>
+	<span class="hljs-comment">&quot; ConsoleZ: Open ConsoleZ</span>
 	command! -nargs=* -<span class="hljs-built_in">complete</span>=customlist,<span class="hljs-symbol">&lt;SID&gt;</span>ConsoleZTabComplete ConsoleZ <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>ReuseConsoleZ(<span class="hljs-symbol">&lt;f-args&gt;</span>)
 <span class="hljs-keyword">endif</span></code></pre>
 
@@ -118,20 +120,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

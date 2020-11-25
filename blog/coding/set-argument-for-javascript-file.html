@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="前回のエントリで触れたscript要素のsrc属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元はscript.aculo.usで、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる（った）。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -64,15 +66,15 @@
 
 <p>asamashi.jsでは以下のようなコードで引数に指定したASINコードを取得している。</p>
 
-<pre><code class="hljs language-js">$A(<span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"script"</span>)).findAll(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">s</span>) </span>{
+<pre><code class="hljs language-js">$A(<span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;script&quot;</span>)).findAll(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">s</span>) </span>{
 	<span class="hljs-keyword">return</span> (s.src &amp;&amp; s.src.match(<span class="hljs-regexp">/asamashi\.js(\#.*)?$/</span>))
 }).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">s</span>) </span>{
-	asin = s.src.replace(<span class="hljs-regexp">/http:\/\/hail2u\.net\/pub\/test\/056_asamashi\.js\#/</span>, <span class="hljs-string">''</span>);
+	asin = s.src.replace(<span class="hljs-regexp">/http:\/\/hail2u\.net\/pub\/test\/056_asamashi\.js\#/</span>, <span class="hljs-string">&#x27;&#x27;</span>);
 });</code></pre>
 
 <p><code>$A()</code>や<code>findAll()</code>など<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>を利用したコードなので短くまとまっている。</p>
 
-<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> ss1 = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"script"</span>);
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> ss1 = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;script&quot;</span>);
 <span class="hljs-keyword">var</span> ss2 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>();
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; ss1.length; i++) {
@@ -82,31 +84,31 @@
 
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; ss2.length; i++) {
 	<span class="hljs-keyword">var</span> s = ss2[i];
-	asin = s.src.replace(<span class="hljs-regexp">/http:\/\/labs\.hail2u\.net\/amazon\/asamashi\/asamashi\.js\#/</span>, <span class="hljs-string">''</span>);
+	asin = s.src.replace(<span class="hljs-regexp">/http:\/\/labs\.hail2u\.net\/amazon\/asamashi\/asamashi\.js\#/</span>, <span class="hljs-string">&#x27;&#x27;</span>);
 }</code></pre>
 
 <p>普通に書くとこんな感じ（あんまりチェックしてないので多分）。つまり<code>script</code>要素を列挙して、<code>src</code>属性をチェック。自分自身への参照でかつ引数があれば配列に格納し、正規表現の置換で引数をゲットというわけ。</p>
 
 <p>実際には、</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript">
-	<span class="hljs-keyword">var</span> asin = <span class="hljs-string">"4844322222"</span>;
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="javascript">
+	<span class="hljs-keyword">var</span> asin = <span class="hljs-string">&quot;4844322222&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"asamashi.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"asamashi-4844322222"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;asamashi.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;asamashi-4844322222&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
 
 <p>などという形（<a href="http://www.google.com/adsense/" title="Google AdSense">Google AdSense</a>なんかみたいなスタイル）で良いことが多い（と思う）。そのためこういった引数を与えるというテクニックは使う場所が限られそう。もちろんscript.aculo.usのような動的ロードの仕組みなどはその限られた場所のひとつで、大いに力を発揮するだろう。前回のエントリでやったような仕組みを汎用的にし、第三者に積極的に利用してもらう場合にも良いアプローチだと思う。上記のようなコードよりも、</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>
-	<span class="hljs-attr">src</span>=<span class="hljs-string">"http://hail2u.net/pub/test/056_asamashi.js#4844322222"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"asamashi-4844322222"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>
+	<span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://hail2u.net/pub/test/056_asamashi.js#4844322222&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;asamashi-4844322222&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
 
 <p>の方がすっきりしてて気持ちが良いし、利用する第三者に優しいと思うので。コーダー的なメリット（アプリケーションにおいて引数を渡すことができるというメリット）よりも、ユーザー的なメリット（JavaScriptファイルの呼び出しが簡略化できたりするメリット）という面でポイントが高いテクニックかなとかいう印象。</p>
 
 <p>例えばGoogle AdSenseが、</p>
 
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>
-	<span class="hljs-attr">src</span>=<span class="hljs-string">"http://pagead2.googlesyndication.com/pagead/show_ads.js#pub-8712792805045949:Seaside"</span>&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>
+	<span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://pagead2.googlesyndication.com/pagead/show_ads.js#pub-8712792805045949:Seaside&quot;</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 
 <p>という感じだったとしたらすっきりしてて良くない？みたいな。</p>
@@ -121,20 +123,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

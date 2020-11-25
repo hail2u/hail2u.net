@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" itemprop="description">
 		<link href="/img/blog/remove-utm_xxx-for-page-owner.png" itemprop="image">
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -69,19 +71,19 @@
 <p>正規化する関数を発火させるタイミングの制御には色々アプローチがあると思うけど、素で書くといろいろ面倒そうなので<a href="http://www.google.com/analytics/">Google Analytics</a>のコードに混ぜることにした。</p>
 
 <pre><code class="hljs language-js"><span class="hljs-keyword">var</span> _gaq = _gaq || [];
-_gaq.push([<span class="hljs-string">'_setAccount'</span>, <span class="hljs-string">'UA-XXXXXX-X'</span>]);
-_gaq.push([<span class="hljs-string">'_trackPageview'</span>]);
+_gaq.push([<span class="hljs-string">&#x27;_setAccount&#x27;</span>, <span class="hljs-string">&#x27;UA-XXXXXX-X&#x27;</span>]);
+_gaq.push([<span class="hljs-string">&#x27;_trackPageview&#x27;</span>]);
 _gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
 	<span class="hljs-keyword">var</span> h = history, l = location, u;
 	<span class="hljs-keyword">if</span> (!l.search || !h.replaceState) <span class="hljs-keyword">return</span>;
-	u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">'?'</span>) + l.hash;
-	h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">''</span>, u);
+	u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">&#x27;?&#x27;</span>) + l.hash;
+	h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;&#x27;</span>, u);
 });
 
 (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-	<span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'script'</span>); ga.type = <span class="hljs-string">'text/javascript'</span>; ga.async = <span class="hljs-literal">true</span>;
-	ga.src = (<span class="hljs-string">'https:'</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">'https://ssl'</span> : <span class="hljs-string">'http://www'</span>) + <span class="hljs-string">'.google-analytics.com/ga.js'</span>;
-	<span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'script'</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
+	<span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&#x27;script&#x27;</span>); ga.type = <span class="hljs-string">&#x27;text/javascript&#x27;</span>; ga.async = <span class="hljs-literal">true</span>;
+	ga.src = (<span class="hljs-string">&#x27;https:&#x27;</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">&#x27;https://ssl&#x27;</span> : <span class="hljs-string">&#x27;http://www&#x27;</span>) + <span class="hljs-string">&#x27;.google-analytics.com/ga.js&#x27;</span>;
+	<span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&#x27;script&#x27;</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
 })();</code></pre>
 
 <p>まだちゃんと運用していないけど、複数のutm_xxxがあるケースや他のパラメーターがある場合、更にはハッシュ付きだった場合なども含めた<a href="/test/449.html">簡単なテスト</a>を行った限りでは大丈夫そう。もしかしたらAnalyticsのutm_xxx解析は維持したままURLを綺麗にできるかなと思ったけど、これだとダメな気もする。Analyticsの解析完了で発火するとかだと確実だと思うんだけど、まだ調べてない。</p>
@@ -102,20 +104,14 @@ _gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>

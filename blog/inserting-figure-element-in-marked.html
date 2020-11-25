@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.15.2.css" rel="stylesheet">
-		<link href="/css/print.9.15.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.15.3.css" rel="stylesheet">
+		<link href="/css/print.9.15.3.css" media="only print" rel="stylesheet">
 
 		<meta content="このウェブサイトでは、画像や引用をfigure要素でマークアップしている。Markdownで書いているわけだが、もちろんそんな記法はないので、今までは生HTMLを書いていた。しかし、marked v0.4.0でのバグでハマりどうしようもなさそうだったため、markedの拡張機構を使って、なんとなくうまい感じになるようにする必要がでてきてしまった。" itemprop="description">
 		
@@ -42,12 +42,14 @@
 					<p class="logo"><a href="/">Hail2u</a></p>
 
 				<ul class="pages">
-					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
 					<li><a href="/links/">気になったウェブページ</a></li>
 				</ul>
 
 				<ul class="pages oneline">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
 					<li><a href="/#about">案内</a></li>
 					<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
 				</ul>
@@ -69,33 +71,33 @@
 
 <p>想定するパターンはキャプションのあるなしの2つだ。キャプションの記述には、Markdownのいくつかの記法にある<code>title</code>属性を流用するようにした（使ったことがない）。画像記法のそれだと実装が面倒くさかったため、リンクを張ることを前提に、ハイパーリンク記法のそれを利用する。</p>
 
-<pre><code class="hljs language-markdown">[<span class="hljs-string">![alt</span>](<span class="hljs-link">src</span>)](<span class="hljs-link">href "caption"</span>)
+<pre><code class="hljs language-markdown">[<span class="hljs-string">![alt</span>](<span class="hljs-link">src</span>)](<span class="hljs-link">href &quot;caption&quot;</span>)
 
 [<span class="hljs-string">![alt</span>](<span class="hljs-link">src</span>)](<span class="hljs-link">href</span>)</code></pre>
 
 <p>このMarkdownから以下のHTMLを生成したい。</p>
 
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"href"</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"alt"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"src"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;href&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;alt&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;src&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>caption<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"href"</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"alt"</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"src"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;href&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;alt&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;src&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></code></pre>
 
 <p>実装は2つのフェーズに分けて行った。リンク側ではキャプションがあり、かつ内容が画像だったら、<code>figcaption</code>要素でキャプションをマークアップして追加する。段落側では、リンクが張られた画像だけか、それに加えて<code>figcaption</code>要素があるなら、全体を<code>p</code>要素ではなく<code>figure</code>要素でマークアップする。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> markupHyperlink = <span class="hljs-function">(<span class="hljs-params">href, title, content</span>) =&gt;</span> {
 	<span class="hljs-keyword">if</span> (!title) {
-		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href=&quot;<span class="hljs-subst">${href}</span>&quot;&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
 	}
 
-	<span class="hljs-keyword">if</span> (!content.startsWith(<span class="hljs-string">"&lt;img "</span>)) {
-		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>" title="<span class="hljs-subst">${title}</span>&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
+	<span class="hljs-keyword">if</span> (!content.startsWith(<span class="hljs-string">&quot;&lt;img &quot;</span>)) {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href=&quot;<span class="hljs-subst">${href}</span>&quot; title=&quot;<span class="hljs-subst">${title}</span>&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
 	}
 
-	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href="<span class="hljs-subst">${href}</span>"&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href=&quot;<span class="hljs-subst">${href}</span>&quot;&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;
 &lt;figcaption&gt;<span class="hljs-subst">${title}</span>&lt;/figcaption&gt;`</span>;
 };
 
@@ -135,14 +137,14 @@
 <span class="hljs-tag">&lt;<span class="hljs-name">blockquote</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is a quote.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">blockquote</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>— <span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"href"</span>&gt;</span>text<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>— <span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;href&quot;</span>&gt;</span>text<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">blockquote</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is a quote.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">blockquote</span>&gt;</span>
 
-<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>— <span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"href"</span>&gt;</span>text<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>— <span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;href&quot;</span>&gt;</span>text<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">blockquote</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is a quote.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
@@ -152,19 +154,19 @@
 <p>実装は引用内の最後の行のみをチェックして行った。EMダッシュで始まっていないなら通常通り出力する。始まっていた場合は最後の行を<code>p</code>要素から<code>figcaption</code>要素へ変換し、さらに<code>figure</code>要素で全体をマークアップする。</p>
 
 <pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> markupQuote = <span class="hljs-function"><span class="hljs-params">content</span> =&gt;</span> {
-	<span class="hljs-keyword">const</span> lines = content.trim().split(<span class="hljs-string">"\n"</span>);
+	<span class="hljs-keyword">const</span> lines = content.trim().split(<span class="hljs-string">&quot;\n&quot;</span>);
 
-	<span class="hljs-keyword">if</span> (!lines[lines.length - <span class="hljs-number">1</span>].startsWith(<span class="hljs-string">"&lt;p&gt;—"</span>)) {
+	<span class="hljs-keyword">if</span> (!lines[lines.length - <span class="hljs-number">1</span>].startsWith(<span class="hljs-string">&quot;&lt;p&gt;—&quot;</span>)) {
 		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;blockquote&gt;
-<span class="hljs-subst">${lines.join(<span class="hljs-string">"\n"</span>)}</span>
+<span class="hljs-subst">${lines.join(<span class="hljs-string">&quot;\n&quot;</span>)}</span>
 &lt;/blockquote&gt;
 `</span>;
 	}
 
-	lines.push(lines.pop().replace(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">"&lt;$1figcaption&gt;"</span>));
+	lines.push(lines.pop().replace(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">&quot;&lt;$1figcaption&gt;&quot;</span>));
 	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
 &lt;blockquote&gt;
-<span class="hljs-subst">${lines.join(<span class="hljs-string">"\n"</span>)}</span>
+<span class="hljs-subst">${lines.join(<span class="hljs-string">&quot;\n&quot;</span>)}</span>
 &lt;/blockquote&gt;
 &lt;/figure&gt;
 `</span>;
@@ -187,20 +189,14 @@
 
 		<footer>
 			<ul class="pages oneline">
-				<li><a href="/statuses/">近況</a></li>
-				<li><a href="/bookshelf/">書棚</a></li>
-				<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
-				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
-			</ul>
-
-			<ul class="pages oneline">
 				<li class="byline"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
 				<li class="sep"><a href="https://twitter.com/hail2u_">Twitter</a></li>
 				<li><a href="https://github.com/hail2u">GitHub</a></li>
 			</ul>
 
 			<ul class="pages oneline">
-				<li><a href="#top"><span aria-hidden="true">↑ </span>先頭に戻る</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li class="sep"><a href="/feed" type="application/rss+xml">RSS</a></li>
 			</ul>
 		</footer>
 	</body>
