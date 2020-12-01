@@ -10,11 +10,8 @@
 		return ((sRGB + 0.055) / 1.055) ** 2.4;
 	};
 
-	const getRelativeLuminance = ([
-		red,
-		green,
-		blue
-	]) => 0.2126 * getComponentLuminance(red) +
+	const getRelativeLuminance = ([red, green, blue]) =>
+		0.2126 * getComponentLuminance(red) +
 		0.7152 * getComponentLuminance(green) +
 		0.0722 * getComponentLuminance(blue);
 
@@ -28,7 +25,9 @@
 	};
 
 	const update = () => {
-		for (const color of document.querySelectorAll(".test-color tbody td:first-child")) {
+		for (const color of document.querySelectorAll(
+			".test-color tbody td:first-child"
+		)) {
 			const style = getComputedStyle(color);
 			const foreground = style.getPropertyValue("color");
 			const background = style.getPropertyValue("background-color");

@@ -4,5 +4,7 @@
 		document.body.classList.toggle("js-test-element");
 	};
 
-	document.querySelector(".js-test-column-and-element-button").addEventListener("click", toggle);
+	document
+		.querySelector(".js-test-column-and-element-button")
+		.addEventListener("click", toggle);
 })();

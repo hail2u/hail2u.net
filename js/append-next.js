@@ -1,7 +1,5 @@
 (() => {
-	const append = ({
-		target
-	}) => {
+	const append = ({ target }) => {
 		const template = document.querySelector(".js-append-next");
 		const button = template.content.querySelector("button");
 
@@ -15,6 +13,6 @@
 	};
 
 	append({
-		"target": document.querySelector(".js-append-next-fallback p")
+		target: document.querySelector(".js-append-next-fallback p"),
 	});
 })();
