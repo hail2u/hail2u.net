@@ -245,15 +245,15 @@ const markItem = (item, index, items) => {
 
 const markItems = (items) => Promise.all(items.map(markItem));
 
-const mergeData = async (extradataFile, dest, metadata) => {
-	const extradata = await readJSONFile(extradataFile);
+const mergeData = async (file, metadata) => {
+	const overrides = await readJSONFile(file.metadata);
 
-	if (extradataFile === config.data.article) {
-		const article = metadata.articles.find(hasSameLink.bind(null, dest));
+	if (file.metadata === config.metadata.article) {
+		const article = metadata.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
 			...metadata,
-			...extradata,
+			...overrides,
 			...article,
 			...cover,
 			canonical: article.link,
@@ -271,7 +271,7 @@ const mergeData = async (extradataFile, dest, metadata) => {
 	);
 	return {
 		...metadata,
-		...extradata,
+		...overrides,
 		articles,
 		books,
 		documents,
@@ -289,7 +289,7 @@ const markFirstItem = (items) => {
 
 const build = async (metadata, partials, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file.data, file.dest, metadata),
+		mergeData(file, metadata),
 		fs.readFile(file.src, "utf8"),
 	]);
 
@@ -318,8 +318,8 @@ const build = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = (article) => ({
-	data: config.data.article,
 	dest: path.join(config.dest.root, article.link),
+	metadata: config.metadata.article,
 	src: config.src.article,
 	...article,
 });
@@ -348,7 +348,7 @@ const main = async () => {
 		partials,
 		version,
 	] = await Promise.all([
-		readJSONFile(config.data.metadata),
+		readJSONFile(config.metadata.root),
 		readArticles(),
 		readBooks(),
 		readDocuments(),
@@ -368,8 +368,8 @@ const main = async () => {
 
 	if (argv.article) {
 		return build(metadata, partials, {
-			data: config.data.article,
 			dest: argv.article,
+			metadata: config.metadata.article,
 			src: config.src.article,
 		});
 	}

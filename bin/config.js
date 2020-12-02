@@ -1,12 +1,10 @@
 export default {
 	data: {
-		article: "src/blog/article.json",
 		articles: "src/blog/articles.json",
 		books: "src/bookshelf/books.json",
 		documents: "src/documents/documents.json",
 		followings: "src/links/followings.json",
 		links: "src/links/links.json",
-		metadata: "src/metadata.json",
 		statuses: "src/statuses/statuses.json",
 	},
 	dest: {
@@ -40,89 +38,89 @@ export default {
 		feed: [
 			{
 				dest: "dist/blog/feed",
-				json: "src/blog/index.json",
+				metadata: "src/blog/index.json",
 				src: "src/feed.mustache",
 				type: ["article"],
 			},
 			{
 				dest: "dist/bookshelf/feed",
-				json: "src/bookshelf/index.json",
+				metadata: "src/bookshelf/index.json",
 				src: "src/feed.mustache",
 				type: ["book"],
 			},
 			{
 				dest: "dist/documents/feed",
-				json: "src/documents/index.json",
+				metadata: "src/documents/index.json",
 				src: "src/feed.mustache",
 				type: ["document"],
 			},
 			{
 				dest: "dist/feed",
-				json: "src/index.json",
+				metadata: "src/index.json",
 				src: "src/feed.mustache",
 			},
 			{
 				dest: "dist/ifttt.xml",
-				json: "src/index.json",
+				metadata: "src/index.json",
 				src: "src/ifttt.mustache",
 			},
 			{
 				dest: "dist/links/feed",
-				json: "src/links/index.json",
+				metadata: "src/links/index.json",
 				src: "src/feed.mustache",
 				type: ["link"],
 			},
 			{
 				dest: "dist/statuses/feed",
-				json: "src/statuses/index.json",
+				metadata: "src/statuses/index.json",
 				src: "src/feed.mustache",
 				type: ["status"],
 			},
 		],
 		html: [
 			{
-				data: "src/blog/index.json",
 				dest: "dist/blog/index.html",
+				metadata: "src/blog/index.json",
 				src: "src/blog/index.mustache",
 			},
 			{
-				data: "src/bookshelf/index.json",
 				dest: "dist/bookshelf/index.html",
+				metadata: "src/bookshelf/index.json",
 				src: "src/bookshelf/index.mustache",
 			},
 			{
-				data: "src/bookshelf/index.json",
 				dest: "dist/bookshelf/log.html",
+				metadata: "src/bookshelf/index.json",
 				src: "src/bookshelf/log.mustache",
 			},
 			{
-				data: "src/documents/index.json",
 				dest: "dist/documents/index.html",
+				metadata: "src/documents/index.json",
 				src: "src/documents/index.mustache",
 			},
 			{
-				data: "src/index.json",
 				dest: "dist/index.html",
+				metadata: "src/index.json",
 				src: "src/index.mustache",
 			},
 			{
-				data: "src/links/index.json",
 				dest: "dist/links/index.html",
+				metadata: "src/links/index.json",
 				src: "src/links/index.mustache",
 			},
 			{
-				data: "src/mysubscriptions.json",
 				dest: "dist/mysubscriptions.opml",
+				metadata: "src/mysubscriptions.json",
 				src: "src/mysubscriptions.mustache",
 			},
 			{
-				data: "src/sitemap.json",
 				dest: "dist/sitemap.xml",
+				metadata: "src/sitemap.json",
 				src: "src/sitemap.mustache",
 			},
 			{
-				data: "src/statuses/index.json",
 				dest: "dist/statuses/index.html",
+				metadata: "src/statuses/index.json",
 				src: "src/statuses/index.mustache",
 			},
 		],
@@ -159,6 +157,10 @@ export default {
 				src: "src/js/append-next.js",
 			},
 		],
+	},
+	metadata: {
+		article: "src/blog/article.json",
+		root: "src/metadata.json",
 	},
 	src: {
 		article: "src/blog/article.mustache",

@@ -151,13 +151,13 @@ const extendItem = (item) => {
 	};
 };
 
-const mergeData = async (extradataFile, metadata, type) => {
-	const extradata = await readJSONFile(extradataFile);
+const mergeData = async (file, metadata) => {
+	const overrides = await readJSONFile(file.metadata);
 	return {
 		...metadata,
-		...extradata,
+		...overrides,
 		items: metadata.items
-			.filter(isValidType.bind(null, type))
+			.filter(isValidType.bind(null, file.type))
 			.slice(0, 10)
 			.map(extendItem),
 	};
@@ -165,7 +165,7 @@ const mergeData = async (extradataFile, metadata, type) => {
 
 const buildFeed = async (metadata, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file.json, metadata, file.type),
+		mergeData(file, metadata),
 		fs.readFile(file.src, "utf8"),
 	]);
 	const rendered = mustache.render(template, data);
@@ -184,7 +184,7 @@ const main = async () => {
 		links,
 		statuses,
 	] = await Promise.all([
-		readJSONFile(config.data.metadata),
+		readJSONFile(config.metadata.root),
 		readArticles(),
 		readBooks(),
 		readDocuments(),
