@@ -19,10 +19,6 @@ export default {
 	files: {
 		css: [
 			{
-				dest: "dist/css/documents.css",
-				src: "src/css/documents.css",
-			},
-			{
 				dest: "dist/css/index.{{version}}.css",
 				src: "src/css/index.css",
 			},
