@@ -12,6 +12,7 @@ export default {
 		articles: "dist/blog/",
 		favicon: "dist/favicon.ico",
 		root: "dist/",
+		sitemap: "dist/sitemap.xml",
 		styleGuide: "dist/style-guide/index.html",
 		temp: "tmp/",
 		test: "tmp/__test.html",

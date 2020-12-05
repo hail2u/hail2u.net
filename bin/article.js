@@ -8,6 +8,7 @@ import path from "path";
 import readline from "readline";
 import { runCommand } from "../lib/run-command.js";
 import { unescapeReferences } from "../lib/character-reference.js";
+import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (filename) => {
 	const src = path.join(config.src.drafts, filename);
@@ -86,6 +87,46 @@ ${menuitems}
 	});
 };
 
+const checkName = (name) => {
+	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(name)) {
+		throw new Error(
+			'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
+		);
+	}
+};
+
+const checkTitleLength = (title) => {
+	const bytes = new TextEncoder().encode(title);
+
+	if (bytes.length < 9) {
+		throw new Error(
+			"This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese)."
+		);
+	}
+};
+
+const checkTitleType = (title) => {
+	if (typeof title !== "string") {
+		throw new Error(
+			"This draft does not have a valid title. A draft title must be a string."
+		);
+	}
+};
+
+const formatMessage = (file, message) =>
+	`${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
+
+const validateBody = async (body, src) => {
+	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
+
+	if (messages.length > 0) {
+		const errors = messages.map(formatMessage.bind(null, src));
+		process.stderr.write(errors.join("\n"));
+		process.stderr.write("\n\n");
+		throw new Error(`${errors.length} error(s) in ${src}`);
+	}
+};
+
 const testSelected = async (selected) => {
 	const template = await fs.readFile(config.src.test, "utf8");
 	const rendered = mustache
@@ -142,26 +183,12 @@ const main = async () => {
 	});
 	const drafts = await listDrafts(argv.test);
 	const selected = await selectDraft(drafts);
-
-	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(selected.name)) {
-		throw new Error(
-			'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
-		);
-	}
-
-	if (typeof selected.title !== "string") {
-		throw new Error(
-			"This draft does not have a valid title. A draft title must be a string."
-		);
-	}
-
-	const bytes = new TextEncoder().encode(selected.title);
-
-	if (bytes.length < 9) {
-		throw new Error(
-			"This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese)."
-		);
-	}
+	await Promise.all([
+		checkName(selected.name),
+		checkTitleLength(selected.title),
+		checkTitleType(selected.title),
+		validateBody(selected.body, selected.src),
+	]);
 
 	if (argv.test) {
 		return testSelected(selected);
