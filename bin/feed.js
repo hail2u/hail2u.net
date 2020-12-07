@@ -130,23 +130,21 @@ const monthNames = [
 	"Dec",
 ];
 
-const extendDate = (dt) => [
-	dt.getDate(),
-	dowNames[dt.getDay()],
-	String(dt.getHours()).padStart(2, "0"),
-	String(dt.getMinutes()).padStart(2, "0"),
-	monthNames[dt.getMonth()],
-	String(dt.getSeconds()).padStart(2, "0"),
-	String(dt.getFullYear()),
-];
+const getDateDetails = (dt) => ({
+	date: dt.getDate(),
+	dow: dowNames[dt.getDay()],
+	hour: String(dt.getHours()).padStart(2, "0"),
+	minute: String(dt.getMinutes()).padStart(2, "0"),
+	month: monthNames[dt.getMonth()],
+	second: String(dt.getSeconds()).padStart(2, "0"),
+	year: String(dt.getFullYear()),
+});
 
 const extendItem = (item) => {
-	const [date, dow, hour, minute, month, second, year] = extendDate(
-		new Date(item.published)
-	);
+	const dt = getDateDetails(new Date(item.published));
 	return {
 		...item,
-		pubDate: `${dow}, ${date} ${month} ${year} ${hour}:${minute}:${second} +0900`,
+		...dt,
 		link: toAbsoluteURL(item.link),
 	};
 };
