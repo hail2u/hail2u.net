@@ -4,24 +4,9 @@ import fs from "fs/promises";
 import minimist from "minimist";
 import path from "path";
 import { runCommand } from "../lib/run-command.js";
+import { shuffleArray } from "../lib/shuffle-array.js";
 
 const isFollowed = (url, following) => url === following.url;
-
-const shuffleArray = (array) => {
-	const shuffled = [...array];
-
-	for (let i = array.length - 1; i > 0; i -= 1) {
-		const j = Math.floor(Math.random() * (i + 1));
-
-		if (i === j) {
-			continue;
-		}
-
-		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-	}
-
-	return shuffled;
-};
 
 const addFollowing = async (feed, title, url) => {
 	const followings = await readJSONFile(config.data.followings);
