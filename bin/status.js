@@ -1,8 +1,6 @@
-import { readJSONFile, writeJSONFile } from "../lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
-import fs from "fs/promises";
 import minimist from "minimist";
-import path from "path";
 import { runCommand } from "../lib/run-command.js";
 
 const addStatus = async (status) => {
@@ -29,10 +27,7 @@ const main = async () => {
 
 	const [status] = remains;
 	const [file, data, message] = await addStatus(status);
-	await fs.mkdir(path.dirname(file), {
-		recursive: true,
-	});
-	await writeJSONFile(file, data);
+	await outputJSONFile(file, data);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=${message}`]);
 };

@@ -1,7 +1,7 @@
 import config from "./config.js";
 import fs from "fs/promises";
 import { getVersion } from "../lib/get-version.js";
-import path from "path";
+import { outputFile } from "../lib/output-file.js";
 import pcImport from "postcss-import";
 import postcss from "postcss";
 
@@ -40,13 +40,8 @@ const process = async (file) => {
 
 const buildCSS = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
-	const [processed] = await Promise.all([
-		process(file.src),
-		fs.mkdir(path.dirname(dest), {
-			recursive: true,
-		}),
-	]);
-	await fs.writeFile(dest, processed.css);
+	const processed = await process(file.src);
+	await outputFile(dest, processed.css);
 };
 
 const main = async () => {
@@ -56,10 +51,7 @@ const main = async () => {
 	const optimized = html
 		.replace(/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/gu, '$1="$3"')
 		.replace(/<!-- version -->/gu, ` v${version}`);
-	await fs.mkdir(path.dirname(config.dest.styleGuide), {
-		recursive: true,
-	});
-	await fs.writeFile(config.dest.styleGuide, optimized);
+	await outputFile(config.dest.styleGuide, optimized);
 };
 
 main().catch((e) => {

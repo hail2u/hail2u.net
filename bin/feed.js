@@ -5,7 +5,7 @@ import {
 import config from "./config.js";
 import fs from "fs/promises";
 import mustache from "mustache";
-import path from "path";
+import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
 const toAbsoluteURL = (url) => {
@@ -169,10 +169,7 @@ const buildFeed = async (metadata, file) => {
 		fs.readFile(file.src, "utf8"),
 	]);
 	const rendered = mustache.render(template, data);
-	await fs.mkdir(path.dirname(file.dest), {
-		recursive: true,
-	});
-	await fs.writeFile(file.dest, rendered);
+	await outputFile(file.dest, rendered);
 };
 
 const main = async () => {
