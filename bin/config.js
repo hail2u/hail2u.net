@@ -1,11 +1,11 @@
 export default {
 	data: {
-		articles: "src/blog/articles.json",
-		books: "src/bookshelf/books.json",
-		documents: "src/documents/documents.json",
-		followings: "src/links/followings.json",
-		links: "src/links/links.json",
-		statuses: "src/statuses/statuses.json",
+		articles: "data/articles.json",
+		books: "data/books.json",
+		documents: "data/documents.json",
+		followings: "data/followings.json",
+		links: "data/links.json",
+		statuses: "data/statuses.json",
 	},
 	dest: {
 		articleImages: "dist/img/blog/",
