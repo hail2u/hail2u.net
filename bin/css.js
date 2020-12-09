@@ -17,25 +17,11 @@ const removeComments = (root) => {
 	root.walkComments(removeComment);
 };
 
-const addNode = (supports, node) => {
-	supports.first.append(node);
-};
-
-const wrapWithSupports = (root) => {
-	const supports = postcss.parse("@supports (--custom-property: true) {}");
-	root.each(addNode.bind(null, supports));
-	root.append(supports);
-};
-
 const process = async (file) => {
 	const css = await fs.readFile(file, "utf8");
-	return postcss()
-		.use(pcImport)
-		.use(removeComments)
-		.use(wrapWithSupports)
-		.process(css, {
-			from: file,
-		});
+	return postcss().use(pcImport).use(removeComments).process(css, {
+		from: file,
+	});
 };
 
 const buildCSS = async (version, file) => {
