@@ -15,7 +15,7 @@ export default {
 		sitemap: "dist/sitemap.xml",
 		styleGuide: "dist/style-guide/index.html",
 		temp: "tmp/",
-		test: "tmp/__test.html",
+		testArticle: "tmp/__test.html",
 	},
 	files: {
 		css: [
@@ -166,6 +166,6 @@ export default {
 		partial: "src/partial/",
 		root: "src/",
 		styleGuide: "src/css/test.html",
-		test: "src/blog/test.mustache",
+		testArticle: "src/blog/test.mustache",
 	},
 };

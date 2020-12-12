@@ -129,13 +129,13 @@ const validateBody = async (body, src) => {
 };
 
 const testSelected = async (selected) => {
-	const template = await fs.readFile(config.src.test, "utf8");
+	const template = await fs.readFile(config.src.testArticle, "utf8");
 	const rendered = mustache
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
 	const highlighted = highlight(rendered);
-	await outputFile(config.dest.test, highlighted);
-	return runCommand("open", [config.dest.test]);
+	await outputFile(config.dest.testArticle, highlighted);
+	return runCommand("open", [config.dest.testArticle]);
 };
 
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
