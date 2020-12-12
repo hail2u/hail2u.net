@@ -1,5 +1,6 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
+import { createTempDir } from "../lib/create-temp-dir.js";
 import fetch from "node-fetch";
 import minimist from "minimist";
 import path from "path";
@@ -19,12 +20,13 @@ const addBook = async (asin, title) => {
 		throw new Error(`${title} has already been added.`);
 	}
 
-	const [saver, res] = await Promise.all([
-		sharp(),
+	const [res, saver, tmpdir] = await Promise.all([
 		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`),
+		sharp(),
+		createTempDir(),
 	]);
 	res.body.pipe(saver);
-	const fn = path.join(config.dest.temp, `${asin}.jpg`);
+	const fn = path.join(tmpdir, `${asin}.jpg`);
 	const [metadata] = await Promise.all([saver.metadata(), saver.toFile(fn)]);
 
 	if (metadata.height === 1 && metadata.width === 1) {

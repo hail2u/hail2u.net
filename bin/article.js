@@ -1,5 +1,6 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
+import { createTempDir } from "../lib/create-temp-dir.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
@@ -129,13 +130,17 @@ const validateBody = async (body, src) => {
 };
 
 const testSelected = async (selected) => {
-	const template = await fs.readFile(config.src.testArticle, "utf8");
+	const [template, tmpdir] = await Promise.all([
+		fs.readFile(config.src.testArticle, "utf8"),
+		createTempDir(),
+	]);
+	const test = path.join(tmpdir, "test.html");
 	const rendered = mustache
 		.render(template, selected)
 		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
 	const highlighted = highlight(rendered);
-	await outputFile(config.dest.testArticle, highlighted);
-	return runCommand("open", [config.dest.testArticle]);
+	await outputFile(test, highlighted);
+	return runCommand("open", [test]);
 };
 
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;

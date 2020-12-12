@@ -14,8 +14,6 @@ export default {
 		root: "dist/",
 		sitemap: "dist/sitemap.xml",
 		styleGuide: "dist/style-guide/index.html",
-		temp: "tmp/",
-		testArticle: "tmp/__test.html",
 	},
 	files: {
 		css: [
