@@ -13,7 +13,7 @@ import { unescapeReferences } from "../lib/character-reference.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (filename) => {
-	const src = path.join(config.src.drafts, filename);
+	const src = path.join(config.src.draft, filename);
 	const content = await fs.readFile(src, "utf8");
 	const [title, ...rest] = content.split("\n");
 	const body = rest
@@ -43,7 +43,7 @@ const isDraft = (isTest, filename) => {
 };
 
 const listDrafts = async (isTest) => {
-	const filenames = await fs.readdir(config.src.drafts);
+	const filenames = await fs.readdir(config.src.draft);
 
 	if (filenames.length < 1) {
 		throw new Error("There is no draft.");
@@ -161,7 +161,7 @@ const contributeSelected = async (selected) => {
 		runCommand("git", ["add", "--", config.data.articles]),
 		runCommand("node", [
 			"bin/html.js",
-			`--article=${config.dest.articles}${selected.name}.html`,
+			`--article=${config.dest.article}${selected.name}.html`,
 		]),
 	]);
 	return runCommand("git", [

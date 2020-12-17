@@ -8,8 +8,7 @@ export default {
 		statuses: "data/statuses.json",
 	},
 	dest: {
-		articleImages: "dist/img/blog/",
-		articles: "dist/blog/",
+		article: "dist/blog/",
 		favicon: "dist/favicon.ico",
 		root: "dist/",
 		sitemap: "dist/sitemap.xml",
@@ -159,8 +158,7 @@ export default {
 	},
 	src: {
 		article: "src/blog/article.mustache",
-		articleImages: "src/img/blog/",
-		drafts: "src/drafts/",
+		draft: "src/drafts/",
 		partial: "src/partial/",
 		root: "src/",
 		styleGuide: "src/css/test.html",
