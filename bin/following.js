@@ -2,41 +2,48 @@ import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
+import { shuffleArray } from "../lib/shuffle-array.js";
 
-const addLink = async ({ comment, title, url }) => {
-	const links = await readJSONFile(config.data.links);
+const isFollowed = (url, following) => url === following.url;
+
+const addFollowing = async ({ feed, title, url }) => {
+	const followings = await readJSONFile(config.data.followings);
+
+	if (followings.find(isFollowed.bind(null, url))) {
+		throw new Error(`${title} has already been followed.`);
+	}
+
 	return [
-		config.data.links,
+		config.data.followings,
 		[
 			{
-				comment,
-				published: Date.now(),
+				feed,
 				title,
 				url,
 			},
-			...links,
+			...shuffleArray(followings),
 		],
-		`Bookmark ${url}`,
+		`Follow ${url}`,
 	];
 };
 
 const main = async () => {
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
-			c: "comment",
+			f: "feed",
 			t: "title",
 			u: "url",
 		},
 		default: {
-			comment: "",
+			feed: "",
 			title: "",
 			url: "",
 		},
-		string: ["comment", "title", "url"],
+		string: ["feed", "title", "url"],
 	});
 
-	if (!argv.comment) {
-		throw new Error("--comment is required.");
+	if (!argv.feed) {
+		throw new Error("--feed is required.");
 	}
 
 	if (!argv.title) {
@@ -47,7 +54,7 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const [file, data, message] = await addLink(argv);
+	const [file, data, message] = await addFollowing(argv);
 	await outputJSONFile(file, data);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=${message}`]);
