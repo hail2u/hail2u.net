@@ -8,35 +8,38 @@ import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
-const toAbsoluteURL = (url) => {
-	if (url.startsWith("/")) {
-		return `https://hail2u.net${url}`;
+const toAbsoluteURL = (prefix, url) => {
+	if (!url.startsWith("/")) {
+		return url;
 	}
 
-	return url;
+	return `${prefix}${url}`;
 };
 
-const toAbsoluteURLAll = (match, attr, url) =>
-	`${attr}="${toAbsoluteURL(url)}"`;
+const toAbsoluteURLAll = (prefix, match, attr, url) =>
+	`${attr}="${toAbsoluteURL(prefix, url)}"`;
 
-const extendArticle = (article) => {
+const extendArticle = (prefix, article) => {
 	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
 	return {
 		...article,
-		body: article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll),
+		body: article.body.replace(
+			/(href|src)="(\/.*?)"/gu,
+			toAbsoluteURLAll.bind(null, prefix)
+		),
 		description,
 		type: "article",
-		ifttt: `${article.title} ${toAbsoluteURL(article.link)}`,
+		ifttt: `${article.title} ${toAbsoluteURL(prefix, article.link)}`,
 	};
 };
 
-const readArticles = async () => {
+const readArticles = async (prefix) => {
 	const articles = await readJSONFile(config.paths.data.articles);
 	const latests = articles.slice(0, 10);
-	return Promise.all(latests.map(extendArticle));
+	return Promise.all(latests.map(extendArticle.bind(null, prefix)));
 };
 
 const extendBook = (book) => {
@@ -140,12 +143,12 @@ const getDateDetails = (dt) => ({
 	year: String(dt.getFullYear()),
 });
 
-const extendItem = (item) => {
+const extendItem = (prefix, item) => {
 	const dt = getDateDetails(new Date(item.published));
 	return {
 		...item,
 		...dt,
-		link: toAbsoluteURL(item.link),
+		link: toAbsoluteURL(prefix, item.link),
 	};
 };
 
@@ -157,7 +160,7 @@ const mergeData = async (file, metadata) => {
 		items: metadata.items
 			.filter(isValidType.bind(null, file.type))
 			.slice(0, 10)
-			.map(extendItem),
+			.map(extendItem.bind(null, `${metadata.scheme}://${metadata.domain}`)),
 	};
 };
 
@@ -171,16 +174,9 @@ const buildFeed = async (metadata, file) => {
 };
 
 const main = async () => {
-	const [
-		metadata,
-		articles,
-		books,
-		documents,
-		links,
-		statuses,
-	] = await Promise.all([
-		readJSONFile(config.paths.metadata.root),
-		readArticles(),
+	const metadata = await readJSONFile(config.paths.metadata.root);
+	const [articles, books, documents, links, statuses] = await Promise.all([
+		readArticles(`${metadata.scheme}://${metadata.domain}`),
 		readBooks(),
 		readDocuments(),
 		readLinks(),
