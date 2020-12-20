@@ -1,12 +1,12 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
-import config from "./config.js";
+import config from "../.config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 
 const addStatus = async (status) => {
-	const statuses = await readJSONFile(config.data.statuses, "utf8");
+	const statuses = await readJSONFile(config.paths.data.statuses, "utf8");
 	return [
-		config.data.statuses,
+		config.paths.data.statuses,
 		[
 			{
 				published: Date.now(),

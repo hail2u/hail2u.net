@@ -2,7 +2,7 @@ import {
 	escapeCharacters,
 	unescapeReferences,
 } from "../lib/character-reference.js";
-import config from "./config.js";
+import config from "../.config.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
@@ -66,7 +66,7 @@ const extendArticle = (article, i, articles) => {
 };
 
 const readArticles = async () => {
-	const articles = await readJSONFile(config.data.articles);
+	const articles = await readJSONFile(config.paths.data.articles);
 	return Promise.all(articles.map(extendArticle));
 };
 
@@ -80,11 +80,11 @@ const extendBook = (book) => {
 };
 
 const readBooks = async () => {
-	const books = await readJSONFile(config.data.books);
+	const books = await readJSONFile(config.paths.data.books);
 	return Promise.all(books.map(extendBook));
 };
 
-const readFollowings = () => readJSONFile(config.data.followings);
+const readFollowings = () => readJSONFile(config.paths.data.followings);
 
 const extendDocument = (document) => {
 	const dt = getDateDetails(new Date(document.published));
@@ -96,7 +96,7 @@ const extendDocument = (document) => {
 };
 
 const readDocuments = async () => {
-	const documents = await readJSONFile(config.data.documents);
+	const documents = await readJSONFile(config.paths.data.documents);
 	return Promise.all(documents.map(extendDocument));
 };
 
@@ -111,7 +111,7 @@ const extendLink = (link) => {
 };
 
 const readLinks = async () => {
-	const links = await readJSONFile(config.data.links);
+	const links = await readJSONFile(config.paths.data.links);
 	return Promise.all(links.map(extendLink));
 };
 
@@ -125,14 +125,14 @@ const extendStatus = (status) => {
 };
 
 const readStatuses = async () => {
-	const statuses = await readJSONFile(config.data.statuses);
+	const statuses = await readJSONFile(config.paths.data.statuses);
 	return Promise.all(statuses.map(extendStatus));
 };
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
 	const content = await fs.readFile(
-		path.join(config.src.partial, filename),
+		path.join(config.paths.src.partial, filename),
 		"utf8"
 	);
 	return {
@@ -143,7 +143,7 @@ const readPartial = async (filename) => {
 const gatherPartials = (partials) => Object.assign(...partials);
 
 const readPartials = async () => {
-	const filenames = await fs.readdir(config.src.partial);
+	const filenames = await fs.readdir(config.paths.src.partial);
 	const partials = await Promise.all(filenames.map(readPartial));
 	return gatherPartials(partials);
 };
@@ -248,7 +248,7 @@ const markItems = (items) => Promise.all(items.map(markItem));
 const mergeData = async (file, metadata) => {
 	const overrides = await readJSONFile(file.metadata);
 
-	if (file.metadata === config.metadata.article) {
+	if (file.metadata === config.paths.metadata.article) {
 		const article = metadata.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
@@ -313,9 +313,9 @@ const build = async (metadata, partials, file) => {
 };
 
 const toFilesFormat = (article) => ({
-	dest: path.join(config.dest.root, article.link),
-	metadata: config.metadata.article,
-	src: config.src.article,
+	dest: path.join(config.paths.dest.root, article.link),
+	metadata: config.paths.metadata.article,
+	src: config.paths.src.article,
 	...article,
 });
 
@@ -332,7 +332,7 @@ const main = async () => {
 		partials,
 		pkg,
 	] = await Promise.all([
-		readJSONFile(config.metadata.root),
+		readJSONFile(config.paths.metadata.root),
 		readArticles(),
 		readBooks(),
 		readDocuments(),
@@ -365,8 +365,8 @@ const main = async () => {
 	if (argv.article) {
 		return build(metadata, partials, {
 			dest: argv.article,
-			metadata: config.metadata.article,
-			src: config.src.article,
+			metadata: config.paths.metadata.article,
+			src: config.paths.src.article,
 		});
 	}
 

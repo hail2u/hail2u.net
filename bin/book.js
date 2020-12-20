@@ -1,5 +1,5 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
-import config from "./config.js";
+import config from "../.config.js";
 import fetch from "node-fetch";
 import fs from "fs/promises";
 import minimist from "minimist";
@@ -15,7 +15,7 @@ const addBook = async (asin, title) => {
 		throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 	}
 
-	const books = await readJSONFile(config.data.books);
+	const books = await readJSONFile(config.paths.data.books);
 
 	if (books.find(isReadBook.bind(null, asin))) {
 		throw new Error(`${title} has already been added.`);
@@ -40,7 +40,7 @@ const addBook = async (asin, title) => {
 	}
 
 	return [
-		config.data.books,
+		config.paths.data.books,
 		[
 			{
 				asin,

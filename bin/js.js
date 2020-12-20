@@ -1,5 +1,5 @@
 import babel from "@babel/core";
-import config from "./config.js";
+import config from "../.config.js";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 

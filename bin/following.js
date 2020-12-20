@@ -1,5 +1,5 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
-import config from "./config.js";
+import config from "../.config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
@@ -7,14 +7,14 @@ import { shuffleArray } from "../lib/shuffle-array.js";
 const isFollowed = (url, following) => url === following.url;
 
 const addFollowing = async ({ feed, title, url }) => {
-	const followings = await readJSONFile(config.data.followings);
+	const followings = await readJSONFile(config.paths.data.followings);
 
 	if (followings.find(isFollowed.bind(null, url))) {
 		throw new Error(`${title} has already been followed.`);
 	}
 
 	return [
-		config.data.followings,
+		config.paths.data.followings,
 		[
 			{
 				feed,

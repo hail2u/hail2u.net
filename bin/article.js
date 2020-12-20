@@ -1,5 +1,5 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
-import config from "./config.js";
+import config from "../.config.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
@@ -13,7 +13,7 @@ import { unescapeReferences } from "../lib/character-reference.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (filename) => {
-	const src = path.join(config.src.draft, filename);
+	const src = path.join(config.paths.src.draft, filename);
 	const content = await fs.readFile(src, "utf8");
 	const [title, ...rest] = content.split("\n");
 	const body = rest
@@ -43,7 +43,7 @@ const isDraft = (isTest, filename) => {
 };
 
 const listDrafts = async (isTest) => {
-	const filenames = await fs.readdir(config.src.draft);
+	const filenames = await fs.readdir(config.paths.src.draft);
 
 	if (filenames.length < 1) {
 		throw new Error("There is no draft.");
@@ -136,7 +136,7 @@ const testSelected = async (selected) => {
 		readJSONFile(json),
 	]);
 	const [template, tmpdir] = await Promise.all([
-		fs.readFile(config.src.testArticle, "utf8"),
+		fs.readFile(config.paths.src.testArticle, "utf8"),
 		fs.mkdtemp(path.join(tmproot, path.sep, `${pkg.name}-`)),
 	]);
 	const test = path.join(tmpdir, "test.html");
@@ -151,11 +151,15 @@ const testSelected = async (selected) => {
 const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
 const contributeSelected = async (selected) => {
-	const cache = await readJSONFile(config.data.articles);
-	await outputJSONFile(config.data.articles, [
+	const cache = await readJSONFile(config.paths.data.articles);
+	await outputJSONFile(config.paths.data.articles, [
 		{
 			body: selected.body,
-			link: `/blog/${selected.name}.html`,
+			link: path.posix.join(
+				"/",
+				path.relative(config.paths.dest.root, config.paths.dest.article),
+				`${selected.name}.html`
+			),
 			published: Date.now(),
 			title: selected.title,
 		},
@@ -163,10 +167,10 @@ const contributeSelected = async (selected) => {
 	]);
 	await fs.rm(selected.src);
 	await Promise.all([
-		runCommand("git", ["add", "--", config.data.articles]),
+		runCommand("git", ["add", "--", config.paths.data.articles]),
 		runCommand("node", [
 			"bin/html.js",
-			`--article=${config.dest.article}${selected.name}.html`,
+			`--article=${config.paths.dest.article}${selected.name}.html`,
 		]),
 	]);
 	return runCommand("git", [

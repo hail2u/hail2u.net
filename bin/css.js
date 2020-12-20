@@ -1,4 +1,4 @@
-import config from "./config.js";
+import config from "../.config.js";
 import fs from "fs/promises";
 import { outputFile } from "../lib/output-file.js";
 import pcImport from "postcss-import";
@@ -34,11 +34,11 @@ const main = async () => {
 	const json = new URL("../package.json", import.meta.url);
 	const pkg = await readJSONFile(json);
 	await Promise.all(config.files.css.map(buildCSS.bind(null, pkg.version)));
-	const html = await fs.readFile(config.src.styleGuide, "utf8");
+	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
 	const optimized = html
 		.replace(/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/gu, '$1="$3"')
 		.replace(/<!-- version -->/gu, ` v${pkg.version}`);
-	await outputFile(config.dest.styleGuide, optimized);
+	await outputFile(config.paths.dest.styleGuide, optimized);
 };
 
 main().catch((e) => {

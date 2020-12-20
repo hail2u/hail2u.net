@@ -1,4 +1,4 @@
-import config from "./config.js";
+import config from "../.config.js";
 import fs from "fs/promises";
 import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
@@ -19,22 +19,22 @@ const isEmpty = (element) => element.length !== 0;
 
 const main = async () => {
 	const [metadata, sitemap] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		fs.readFile(config.dest.sitemap, "utf8"),
+		readJSONFile(config.paths.metadata.root),
+		fs.readFile(config.paths.dest.sitemap, "utf8"),
 	]);
 	const prefix = `${metadata.scheme}://${metadata.domain}/`;
 	const reArticle = RegExp(`<loc>${prefix}(blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
 		Array.from(
 			sitemap.matchAll(reArticle),
-			pickPath.bind(null, config.dest.root)
+			pickPath.bind(null, config.paths.dest.root)
 		)
 	).slice(0, 10);
 	const reDocuments = RegExp(`<loc>${prefix}(documents/.*?[^/])</loc>`, "gu");
 	const documents = shuffleArray(
 		Array.from(
 			sitemap.matchAll(reDocuments),
-			pickPath.bind(null, config.dest.root)
+			pickPath.bind(null, config.paths.dest.root)
 		)
 	).slice(0, 1);
 	const results = await Promise.all(

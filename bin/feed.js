@@ -2,7 +2,7 @@ import {
 	escapeCharacters,
 	unescapeReferences,
 } from "../lib/character-reference.js";
-import config from "./config.js";
+import config from "../.config.js";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
@@ -34,7 +34,7 @@ const extendArticle = (article) => {
 };
 
 const readArticles = async () => {
-	const articles = await readJSONFile(config.data.articles);
+	const articles = await readJSONFile(config.paths.data.articles);
 	const latests = articles.slice(0, 10);
 	return Promise.all(latests.map(extendArticle));
 };
@@ -53,7 +53,7 @@ const extendBook = (book) => {
 };
 
 const readBooks = async () => {
-	const books = await readJSONFile(config.data.books);
+	const books = await readJSONFile(config.paths.data.books);
 	const latests = books.slice(0, 10);
 	return Promise.all(latests.map(extendBook));
 };
@@ -64,7 +64,7 @@ const extendDocument = (document) => ({
 });
 
 const readDocuments = async () => {
-	const documents = await readJSONFile(config.data.documents);
+	const documents = await readJSONFile(config.paths.data.documents);
 	const latests = documents.slice(0, 10);
 	return Promise.all(latests.map(extendDocument));
 };
@@ -78,7 +78,7 @@ const extendLink = (link) => ({
 });
 
 const readLinks = async () => {
-	const links = await readJSONFile(config.data.links);
+	const links = await readJSONFile(config.paths.data.links);
 	const latests = links.slice(0, 10);
 	return Promise.all(latests.map(extendLink));
 };
@@ -93,7 +93,7 @@ const extendStatus = (status) => ({
 });
 
 const readStatuses = async () => {
-	const statuses = await readJSONFile(config.data.statuses);
+	const statuses = await readJSONFile(config.paths.data.statuses);
 	const latests = statuses.slice(0, 10);
 	return Promise.all(latests.map(extendStatus));
 };
@@ -179,7 +179,7 @@ const main = async () => {
 		links,
 		statuses,
 	] = await Promise.all([
-		readJSONFile(config.metadata.root),
+		readJSONFile(config.paths.metadata.root),
 		readArticles(),
 		readBooks(),
 		readDocuments(),

@@ -1,4 +1,4 @@
-import config from "./config.js";
+import config from "../.config.js";
 import ico from "@fiahfy/ico";
 import { outputFile } from "../lib/output-file.js";
 import sharp from "sharp";
@@ -24,7 +24,7 @@ const generatePNG = async (favicon, file) => {
 const main = async () => {
 	const favicon = new Ico();
 	await Promise.all(config.files.icon.map(generatePNG.bind(null, favicon)));
-	await outputFile(config.dest.favicon, favicon.data);
+	await outputFile(config.paths.dest.favicon, favicon.data);
 };
 
 main().catch((e) => {

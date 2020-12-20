@@ -1,19 +1,4 @@
 export default {
-	data: {
-		articles: "data/articles.json",
-		books: "data/books.json",
-		documents: "data/documents.json",
-		followings: "data/followings.json",
-		links: "data/links.json",
-		statuses: "data/statuses.json",
-	},
-	dest: {
-		article: "dist/blog/",
-		favicon: "dist/favicon.ico",
-		root: "dist/",
-		sitemap: "dist/sitemap.xml",
-		styleGuide: "dist/style-guide/index.html",
-	},
 	files: {
 		css: [
 			{
@@ -152,16 +137,33 @@ export default {
 			},
 		],
 	},
-	metadata: {
-		article: "src/blog/article.json",
-		root: "src/metadata.json",
-	},
-	src: {
-		article: "src/blog/article.mustache",
-		draft: "src/drafts/",
-		partial: "src/partial/",
-		root: "src/",
-		styleGuide: "src/css/test.html",
-		testArticle: "src/blog/test.mustache",
+	paths: {
+		data: {
+			articles: "data/articles.json",
+			books: "data/books.json",
+			documents: "data/documents.json",
+			followings: "data/followings.json",
+			links: "data/links.json",
+			statuses: "data/statuses.json",
+		},
+		dest: {
+			article: "dist/blog/",
+			favicon: "dist/favicon.ico",
+			root: "dist/",
+			sitemap: "dist/sitemap.xml",
+			styleGuide: "dist/style-guide/index.html",
+		},
+		metadata: {
+			article: "src/blog/article.json",
+			root: "src/metadata.json",
+		},
+		src: {
+			article: "src/blog/article.mustache",
+			draft: "src/drafts/",
+			partial: "src/partial/",
+			root: "src/",
+			styleGuide: "src/css/test.html",
+			testArticle: "src/blog/test.mustache",
+		},
 	},
 };

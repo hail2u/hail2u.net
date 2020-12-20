@@ -1,12 +1,12 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
-import config from "./config.js";
+import config from "../.config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 
 const addLink = async ({ comment, title, url }) => {
-	const links = await readJSONFile(config.data.links);
+	const links = await readJSONFile(config.paths.data.links);
 	return [
-		config.data.links,
+		config.paths.data.links,
 		[
 			{
 				comment,
