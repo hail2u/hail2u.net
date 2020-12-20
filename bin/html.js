@@ -4,7 +4,6 @@ import {
 } from "../lib/character-reference.js";
 import config from "./config.js";
 import fs from "fs/promises";
-import { getVersion } from "../lib/get-version.js";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
@@ -321,6 +320,35 @@ const toFilesFormat = (article) => ({
 });
 
 const main = async () => {
+	const json = new URL("../package.json", import.meta.url);
+	const [
+		metadata,
+		articles,
+		books,
+		documents,
+		followings,
+		links,
+		statuses,
+		partials,
+		pkg,
+	] = await Promise.all([
+		readJSONFile(config.metadata.root),
+		readArticles(),
+		readBooks(),
+		readDocuments(),
+		readFollowings(),
+		readLinks(),
+		readStatuses(),
+		readPartials(),
+		readJSONFile(json),
+	]);
+	metadata.articles = articles;
+	metadata.books = books;
+	metadata.documents = documents;
+	metadata.followings = followings;
+	metadata.links = links;
+	metadata.statuses = statuses;
+	metadata.version = pkg.version;
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
 			A: "articles",
@@ -333,34 +361,6 @@ const main = async () => {
 		},
 		string: ["article"],
 	});
-	const [
-		metadata,
-		articles,
-		books,
-		documents,
-		followings,
-		links,
-		statuses,
-		partials,
-		version,
-	] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		readArticles(),
-		readBooks(),
-		readDocuments(),
-		readFollowings(),
-		readLinks(),
-		readStatuses(),
-		readPartials(),
-		getVersion(),
-	]);
-	metadata.articles = articles;
-	metadata.books = books;
-	metadata.documents = documents;
-	metadata.followings = followings;
-	metadata.links = links;
-	metadata.statuses = statuses;
-	metadata.version = version;
 
 	if (argv.article) {
 		return build(metadata, partials, {

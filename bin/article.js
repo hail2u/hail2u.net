@@ -1,10 +1,10 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "./config.js";
-import { createTempDir } from "../lib/create-temp-dir.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
+import os from "os";
 import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import readline from "readline";
@@ -130,9 +130,14 @@ const validateBody = async (body, src) => {
 };
 
 const testSelected = async (selected) => {
+	const json = new URL("../package.json", import.meta.url);
+	const [tmproot, pkg] = await Promise.all([
+		fs.realpath(os.tmpdir()),
+		readJSONFile(json),
+	]);
 	const [template, tmpdir] = await Promise.all([
 		fs.readFile(config.src.testArticle, "utf8"),
-		createTempDir(),
+		fs.mkdtemp(path.join(tmproot, path.sep, `${pkg.name}-`)),
 	]);
 	const test = path.join(tmpdir, "test.html");
 	const rendered = mustache

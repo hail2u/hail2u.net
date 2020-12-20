@@ -1,7 +1,7 @@
 import babel from "@babel/core";
 import config from "./config.js";
-import { getVersion } from "../lib/get-version.js";
 import { outputFile } from "../lib/output-file.js";
+import { readJSONFile } from "../lib/json-file.js";
 
 const buildJS = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
@@ -22,8 +22,9 @@ ${compiled.code.trim()}
 };
 
 const main = async () => {
-	const version = await getVersion();
-	await Promise.all(config.files.js.map(buildJS.bind(null, version)));
+	const json = new URL("../package.json", import.meta.url);
+	const pkg = await readJSONFile(json);
+	await Promise.all(config.files.js.map(buildJS.bind(null, pkg.version)));
 };
 
 main().catch((e) => {
