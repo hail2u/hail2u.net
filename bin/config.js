@@ -84,7 +84,7 @@ export default {
 			},
 			{
 				dest: "dist/bookshelf/log.html",
-				metadata: "src/bookshelf/index.json",
+				metadata: "src/bookshelf/log.json",
 				src: "src/bookshelf/log.mustache",
 			},
 			{

@@ -294,9 +294,7 @@ const build = async (metadata, partials, file) => {
 		fs.readFile(file.src, "utf8"),
 	]);
 
-	if (file.dest.endsWith("/log.html")) {
-		data.canonical = `${data.canonical}log.html`;
-	} else {
+	if (!data.isLog) {
 		data.otherBooks = markFirstItem(data.books.slice(24));
 		data.numOtherBooks = data.otherBooks.length;
 		data.books = data.books.slice(0, 24);
