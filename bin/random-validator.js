@@ -4,7 +4,15 @@ import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const pickPath = (root, match) => `${root}${match[1]}`;
+const pickPath = (root, [, path]) => {
+	if (path.endsWith("/")) {
+		return `${root}${path}index.html`;
+	}
+
+	return `${root}${path}`;
+};
+
+const isNotStyleGuide = (styleGuide, file) => file !== styleGuide;
 
 const formatMessage = (file, message) =>
 	`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
@@ -23,6 +31,11 @@ const main = async () => {
 		fs.readFile(config.paths.dest.sitemap, "utf8"),
 	]);
 	const prefix = `${metadata.scheme}://${metadata.domain}/`;
+	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
+	const indexes = Array.from(
+		sitemap.matchAll(reIndex),
+		pickPath.bind(null, config.paths.dest.root)
+	).filter(isNotStyleGuide.bind(null, config.paths.dest.styleGuide));
 	const reArticle = RegExp(`<loc>${prefix}(blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
 		Array.from(
@@ -30,25 +43,7 @@ const main = async () => {
 			pickPath.bind(null, config.paths.dest.root)
 		)
 	).slice(0, 10);
-	const reDocuments = RegExp(`<loc>${prefix}(documents/.*?[^/])</loc>`, "gu");
-	const documents = shuffleArray(
-		Array.from(
-			sitemap.matchAll(reDocuments),
-			pickPath.bind(null, config.paths.dest.root)
-		)
-	).slice(0, 1);
-	const results = await Promise.all(
-		[
-			"dist/index.html",
-			"dist/blog/index.html",
-			"dist/bookshelf/index.html",
-			"dist/documents/index.html",
-			"dist/links/index.html",
-			"dist/statuses/index.html",
-			...documents,
-			...articles,
-		].map(validate)
-	);
+	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();
 	const errorFiles = results.filter(isEmpty);
 
