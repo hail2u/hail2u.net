@@ -1,4 +1,4 @@
-(() => {
+const unutm = () => {
 	if (location.search) {
 		const search = location.search
 			.replace(/[?&]utm_[^&]+/gu, "")
@@ -9,4 +9,6 @@
 			`${location.pathname}${search}${location.hash}`
 		);
 	}
-})();
+};
+
+unutm();
