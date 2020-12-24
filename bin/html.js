@@ -320,7 +320,7 @@ const toFilesFormat = (article) => ({
 });
 
 const main = async () => {
-	const json = new URL("../package.json", import.meta.url);
+	const file = new URL("../package.json", import.meta.url);
 	const [
 		metadata,
 		articles,
@@ -340,7 +340,7 @@ const main = async () => {
 		readLinks(),
 		readStatuses(),
 		readPartials(),
-		readJSONFile(json),
+		readJSONFile(file),
 	]);
 	metadata.articles = articles;
 	metadata.books = books;

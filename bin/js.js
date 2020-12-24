@@ -22,8 +22,8 @@ ${compiled.code.trim()}
 };
 
 const main = async () => {
-	const json = new URL("../package.json", import.meta.url);
-	const pkg = await readJSONFile(json);
+	const file = new URL("../package.json", import.meta.url);
+	const pkg = await readJSONFile(file);
 	await Promise.all(config.files.js.map(buildJS.bind(null, pkg.version)));
 };
 

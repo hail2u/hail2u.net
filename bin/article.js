@@ -130,10 +130,10 @@ const validateBody = async (body, src) => {
 };
 
 const testSelected = async (selected) => {
-	const json = new URL("../package.json", import.meta.url);
+	const file = new URL("../package.json", import.meta.url);
 	const [tmproot, pkg] = await Promise.all([
 		fs.realpath(os.tmpdir()),
-		readJSONFile(json),
+		readJSONFile(file),
 	]);
 	const [template, tmpdir] = await Promise.all([
 		fs.readFile(config.paths.src.testArticle, "utf8"),

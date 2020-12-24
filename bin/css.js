@@ -31,8 +31,8 @@ const buildCSS = async (version, file) => {
 };
 
 const main = async () => {
-	const json = new URL("../package.json", import.meta.url);
-	const pkg = await readJSONFile(json);
+	const file = new URL("../package.json", import.meta.url);
+	const pkg = await readJSONFile(file);
 	await Promise.all(config.files.css.map(buildCSS.bind(null, pkg.version)));
 	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
 	const optimized = html

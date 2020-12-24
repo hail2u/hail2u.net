@@ -21,10 +21,10 @@ const addBook = async (asin, title) => {
 		throw new Error(`${title} has already been added.`);
 	}
 
-	const json = new URL("../package.json", import.meta.url);
+	const file = new URL("../package.json", import.meta.url);
 	const [tmproot, pkg] = await Promise.all([
 		fs.realpath(os.tmpdir()),
-		readJSONFile(json),
+		readJSONFile(file),
 	]);
 	const [res, saver, tmpdir] = await Promise.all([
 		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`),
