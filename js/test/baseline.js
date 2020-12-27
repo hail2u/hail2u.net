@@ -7,10 +7,10 @@ const toggleRel = (element) => {
 	element.setAttribute("rel", "stylesheet");
 };
 
-const toggleBaseline = () => {
+const testBaseline = () => {
 	document.querySelectorAll(".js-test-baseline").forEach(toggleRel);
 };
 
 document
 	.querySelector(".js-test-baseline-button")
-	.addEventListener("click", toggleBaseline);
+	.addEventListener("click", testBaseline);

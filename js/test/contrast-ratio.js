@@ -20,21 +20,21 @@ const getContrast = (foreground, background) => {
 	const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/gu));
 	const lighter = Math.max(backgroundLuminance, foregroundLuminance);
 	const darker = Math.min(backgroundLuminance, foregroundLuminance);
-	return (lighter + 0.05) / (darker + 0.05);
+	return parseFloat((lighter + 0.05) / (darker + 0.05)).toFixed(3);
 };
 
-const updateContrastValues = () => {
+const testContrast = () => {
 	for (const color of document.querySelectorAll(
 		".test-color tbody td:first-child"
 	)) {
 		const style = getComputedStyle(color);
 		const foreground = style.getPropertyValue("color");
 		const background = style.getPropertyValue("background-color");
-		const ratio = parseFloat(getContrast(foreground, background).toFixed(3));
+		const ratio = getContrast(foreground, background);
 		color.lastChild.textContent = background;
 		const contrast = color.nextElementSibling;
 		contrast.lastChild.textContent = ratio;
 	}
 };
 
-window.addEventListener("load", updateContrastValues);
+window.addEventListener("load", testContrast);
