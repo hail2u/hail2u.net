@@ -300,10 +300,10 @@ const build = async (metadata, partials, file) => {
 	}
 
 	if (data.isHome) {
-		data.articles = data.articles.slice(0, 5);
+		data.articles = data.articles.slice(0, 9);
 		data.books = data.books.slice(0, 3);
 		data.documents = data.documents.slice(0, 1);
-		data.links = data.links.slice(0, 5);
+		data.links = data.links.slice(0, 6);
 		data.statuses = data.statuses.slice(0, 1);
 	}
 
