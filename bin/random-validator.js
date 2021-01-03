@@ -20,6 +20,13 @@ const formatMessage = (file, message) =>
 const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
 	const messages = await validateHTML(html);
+
+	if (typeof messages === "string") {
+		process.stdout.write(`${file}:1:1: ${messages}
+`);
+		return [];
+	}
+
 	return messages.map(formatMessage.bind(null, file));
 };
 
@@ -42,7 +49,7 @@ const main = async () => {
 			sitemap.matchAll(reArticle),
 			pickPath.bind(null, config.paths.dest.root)
 		)
-	).slice(0, 10);
+	).slice(0, 5);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();
 	const errorFiles = results.filter(isEmpty);
