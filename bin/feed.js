@@ -31,8 +31,8 @@ const extendArticle = (prefix, article) => {
 			toAbsoluteURLAll.bind(null, prefix)
 		),
 		description,
-		type: "article",
 		ifttt: `${article.title} ${toAbsoluteURL(prefix, article.link)}`,
+		type: "article",
 	};
 };
 
@@ -49,9 +49,9 @@ const extendBook = (book) => {
 		...book,
 		body: `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
 		description: book.title,
+		ifttt: `${book.title} ${link}`,
 		link,
 		type: "book",
-		ifttt: `${book.title} ${link}`,
 	};
 };
 
@@ -61,23 +61,24 @@ const readBooks = async () => {
 	return Promise.all(latests.map(extendBook));
 };
 
-const extendDocument = (document) => ({
+const extendDocument = (prefix, document) => ({
 	...document,
+	ifttt: `${document.title} ${toAbsoluteURL(prefix, document.link)}`,
 	type: "document",
 });
 
-const readDocuments = async () => {
+const readDocuments = async (prefix) => {
 	const documents = await readJSONFile(config.paths.data.documents);
 	const latests = documents.slice(0, 10);
-	return Promise.all(latests.map(extendDocument));
+	return Promise.all(latests.map(extendDocument.bind(null, prefix)));
 };
 
 const extendLink = (link) => ({
 	...link,
 	description: link.comment,
+	ifttt: `${link.comment} ${link.url}`,
 	link: link.url,
 	type: "link",
-	ifttt: `${link.comment} ${link.url}`,
 });
 
 const readLinks = async () => {
@@ -89,10 +90,10 @@ const readLinks = async () => {
 const extendStatus = (status) => ({
 	...status,
 	description: status.text,
+	ifttt: status.text,
 	link: `/statuses/#on-${status.published}`,
 	title: status.text,
 	type: "status",
-	ifttt: status.text,
 });
 
 const readStatuses = async () => {
@@ -175,10 +176,11 @@ const buildFeed = async (metadata, file) => {
 
 const main = async () => {
 	const metadata = await readJSONFile(config.paths.metadata.root);
+	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const [articles, books, documents, links, statuses] = await Promise.all([
-		readArticles(`${metadata.scheme}://${metadata.domain}`),
+		readArticles(prefix),
 		readBooks(),
-		readDocuments(),
+		readDocuments(prefix),
 		readLinks(),
 		readStatuses(),
 	]);
