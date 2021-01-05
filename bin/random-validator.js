@@ -1,15 +1,16 @@
 import config from "../.config.js";
 import fs from "fs/promises";
+import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const pickPath = (root, [, path]) => {
-	if (path.endsWith("/")) {
-		return `${root}${path}index.html`;
+const pickPath = (root, [, relative]) => {
+	if (relative.endsWith("/")) {
+		return path.join(root, relative, "index.html");
 	}
 
-	return `${root}${path}`;
+	return path.join(root, relative);
 };
 
 const isNotStyleGuide = (styleGuide, file) => file !== styleGuide;
@@ -37,13 +38,13 @@ const main = async () => {
 		readJSONFile(config.paths.metadata.root),
 		fs.readFile(config.paths.dest.sitemap, "utf8"),
 	]);
-	const prefix = `${metadata.scheme}://${metadata.domain}/`;
+	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
 	const indexes = Array.from(
 		sitemap.matchAll(reIndex),
 		pickPath.bind(null, config.paths.dest.root)
 	).filter(isNotStyleGuide.bind(null, config.paths.dest.styleGuide));
-	const reArticle = RegExp(`<loc>${prefix}(blog/.*?[^/])</loc>`, "gu");
+	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
 		Array.from(
 			sitemap.matchAll(reArticle),
