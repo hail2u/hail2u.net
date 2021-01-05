@@ -121,6 +121,12 @@ const formatMessage = (file, message) =>
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
+	if (typeof messages === "string") {
+		process.stdout.write(`${src}:1:1: ${messages}
+`);
+		return;
+	}
+
 	if (messages.length > 0) {
 		const errors = messages.map(formatMessage.bind(null, src));
 		process.stderr.write(errors.join("\n"));
