@@ -1,39 +1,31 @@
 import config from "../.config.js";
 import fs from "fs/promises";
 import { outputFile } from "../lib/output-file.js";
-import pcImport from "postcss-import";
-import postcss from "postcss";
+import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const removeComment = (comment) => {
-	if (comment.text.startsWith("!")) {
-		return;
+const inline = (from, line) => {
+	if (!line.startsWith("@import")) {
+		return line;
 	}
 
-	comment.remove();
+	const [, url] = line.split('"');
+	const abs = path.resolve(path.dirname(from), url);
+	return fs.readFile(abs, "utf8");
 };
 
-const removeComments = (root) => {
-	root.walkComments(removeComment);
-};
-
-const compile = async (file) => {
-	const css = await fs.readFile(file, "utf8");
-	return postcss().use(pcImport).use(removeComments).process(css, {
-		from: file,
-	});
-};
-
-const buildCSS = async (version, file) => {
+const build = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
-	const compiled = await compile(file.src);
-	await outputFile(dest, compiled.css);
+	const css = await fs.readFile(file.src, "utf8");
+	const lines = css.split("\n");
+	const inlined = await Promise.all(lines.map(inline.bind(null, file.src)));
+	await outputFile(dest, inlined.join("\n"));
 };
 
 const main = async () => {
 	const file = new URL("../package.json", import.meta.url);
 	const pkg = await readJSONFile(file);
-	await Promise.all(config.files.css.map(buildCSS.bind(null, pkg.version)));
+	await Promise.all(config.files.css.map(build.bind(null, pkg.version)));
 	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
 	const optimized = html
 		.replace(/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/gu, '$1="$3"')
