@@ -84,8 +84,6 @@ const readBooks = async () => {
 	return Promise.all(books.map(extendBook));
 };
 
-const readFollowings = () => readJSONFile(config.paths.data.followings);
-
 const extendDocument = (document) => {
 	const dt = getDateDetails(new Date(document.published));
 	return {
@@ -128,6 +126,8 @@ const readStatuses = async () => {
 	const statuses = await readJSONFile(config.paths.data.statuses);
 	return Promise.all(statuses.map(extendStatus));
 };
+
+const readSubscriptions = () => readJSONFile(config.paths.data.subscriptions);
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
@@ -326,9 +326,9 @@ const main = async () => {
 		articles,
 		books,
 		documents,
-		followings,
 		links,
 		statuses,
+		subscriptions,
 		partials,
 		pkg,
 	] = await Promise.all([
@@ -336,16 +336,16 @@ const main = async () => {
 		readArticles(),
 		readBooks(),
 		readDocuments(),
-		readFollowings(),
 		readLinks(),
 		readStatuses(),
+		readSubscriptions(),
 		readPartials(),
 		readJSONFile(file),
 	]);
 	metadata.articles = articles;
 	metadata.books = books;
 	metadata.documents = documents;
-	metadata.followings = followings;
+	metadata.subscriptions = subscriptions;
 	metadata.links = links;
 	metadata.statuses = statuses;
 	metadata.version = pkg.version;

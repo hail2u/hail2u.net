@@ -142,9 +142,9 @@ export default {
 			articles: "data/articles.json",
 			books: "data/books.json",
 			documents: "data/documents.json",
-			followings: "data/followings.json",
 			links: "data/links.json",
 			statuses: "data/statuses.json",
+			subscriptions: "data/subscriptions.json",
 		},
 		dest: {
 			article: "dist/blog/",

@@ -4,26 +4,26 @@ import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 
-const isFollowed = (url, following) => url === following.url;
+const isSubscribed = (url, subscription) => url === subscription.url;
 
-const addFollowing = async ({ feed, title, url }) => {
-	const followings = await readJSONFile(config.paths.data.followings);
+const addSubscription = async ({ feed, title, url }) => {
+	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
 
-	if (followings.find(isFollowed.bind(null, url))) {
-		throw new Error(`${title} has already been followed.`);
+	if (subscriptions.find(isSubscribed.bind(null, url))) {
+		throw new Error(`${title} has already been subscribed.`);
 	}
 
 	return [
-		config.paths.data.followings,
+		config.paths.data.subscriptions,
 		[
 			{
 				feed,
 				title,
 				url,
 			},
-			...shuffleArray(followings),
+			...shuffleArray(subscriptions),
 		],
-		`Follow ${url}`,
+		`Subscribe ${url}`,
 	];
 };
 
@@ -54,7 +54,7 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const [file, data, message] = await addFollowing(argv);
+	const [file, data, message] = await addSubscription(argv);
 	await outputJSONFile(file, data);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=${message}`]);
