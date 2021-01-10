@@ -24,7 +24,7 @@ const compile = async (file) => {
 	});
 };
 
-const buildCSS = async (version, file) => {
+const build = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
 	const compiled = await compile(file.src);
 	await outputFile(dest, compiled.css);
@@ -33,12 +33,7 @@ const buildCSS = async (version, file) => {
 const main = async () => {
 	const file = new URL("../package.json", import.meta.url);
 	const pkg = await readJSONFile(file);
-	await Promise.all(config.files.css.map(buildCSS.bind(null, pkg.version)));
-	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
-	const optimized = html
-		.replace(/\b(href|src)="(\.\.|https:\/\/hail2u\.net)(\/.*?)"/gu, '$1="$3"')
-		.replace(/<!-- version -->/gu, ` v${pkg.version}`);
-	await outputFile(config.paths.dest.styleGuide, optimized);
+	await Promise.all(config.files.css.map(build.bind(null, pkg.version)));
 };
 
 main().catch((e) => {
