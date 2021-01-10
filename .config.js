@@ -93,11 +93,6 @@ export default {
 				src: "src/mysubscriptions.mustache",
 			},
 			{
-				dest: "dist/sitemap.xml",
-				metadata: "src/sitemap.json",
-				src: "src/sitemap.mustache",
-			},
-			{
 				dest: "dist/statuses/index.html",
 				metadata: "src/statuses/index.json",
 				src: "src/statuses/index.mustache",
@@ -162,6 +157,7 @@ export default {
 			draft: "src/drafts/",
 			partial: "src/partial/",
 			root: "src/",
+			sitemap: "dist/sitemap.xml",
 			styleGuide: "src/css/test.html",
 			testArticle: "src/blog/test.mustache",
 		},
