@@ -280,11 +280,24 @@ const mergeData = async (file, metadata) => {
 	};
 };
 
+const markFirstItem = (items) => {
+	const firstItem = items.shift();
+	firstItem.isFirstInMonth = true;
+	firstItem.isFirstInYear = true;
+	return [firstItem, ...items];
+};
+
 const build = async (metadata, partials, file) => {
 	const [data, template] = await Promise.all([
 		mergeData(file, metadata),
 		fs.readFile(file.src, "utf8"),
 	]);
+
+	if (!data.isLog) {
+		data.otherBooks = markFirstItem(data.books.slice(24));
+		data.numOtherBooks = data.otherBooks.length;
+		data.books = data.books.slice(0, 24);
+	}
 
 	if (data.isHome) {
 		data.articles = data.articles.slice(0, 9);
