@@ -3,7 +3,7 @@ import config from "../.config.js";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
-const buildJS = async (version, file) => {
+const build = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
 	const compiled = await babel.transformFileAsync(file.src, {
 		presets: [
@@ -24,7 +24,7 @@ ${compiled.code.trim()}
 const main = async () => {
 	const file = new URL("../package.json", import.meta.url);
 	const pkg = await readJSONFile(file);
-	await Promise.all(config.files.js.map(buildJS.bind(null, pkg.version)));
+	await Promise.all(config.files.js.map(build.bind(null, pkg.version)));
 };
 
 main().catch((e) => {

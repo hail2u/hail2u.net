@@ -165,7 +165,7 @@ const mergeData = async (file, metadata) => {
 	};
 };
 
-const buildFeed = async (metadata, file) => {
+const build = async (metadata, file) => {
 	const [data, template] = await Promise.all([
 		mergeData(file, metadata),
 		fs.readFile(file.src, "utf8"),
@@ -191,7 +191,7 @@ const main = async () => {
 		...links,
 		...statuses,
 	].sort(comparePublished);
-	return Promise.all(config.files.feed.map(buildFeed.bind(null, metadata)));
+	return Promise.all(config.files.feed.map(build.bind(null, metadata)));
 };
 
 mustache.escape = escapeCharacters;

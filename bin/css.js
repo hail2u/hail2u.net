@@ -17,16 +17,15 @@ const removeComments = (root) => {
 	root.walkComments(removeComment);
 };
 
-const compile = async (file) => {
-	const css = await fs.readFile(file, "utf8");
-	return postcss().use(pcImport).use(removeComments).process(css, {
-		from: file,
-	});
-};
-
 const build = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
-	const compiled = await compile(file.src);
+	const css = await fs.readFile(file.src, "utf8");
+	const compiled = await postcss()
+		.use(pcImport)
+		.use(removeComments)
+		.process(css, {
+			from: file.src,
+		});
 	await outputFile(dest, compiled.css);
 };
 
