@@ -345,9 +345,9 @@ const main = async () => {
 	metadata.articles = articles;
 	metadata.books = books;
 	metadata.documents = documents;
-	metadata.subscriptions = subscriptions;
 	metadata.links = links;
 	metadata.statuses = statuses;
+	metadata.subscriptions = subscriptions;
 	metadata.version = pkg.version;
 	const argv = minimist(process.argv.slice(2), {
 		alias: {

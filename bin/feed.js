@@ -102,20 +102,10 @@ const readStatuses = async () => {
 	return Promise.all(latests.map(extendStatus));
 };
 
+const pickItems = (metadata, type) => metadata[type];
+
 const comparePublished = (a, b) =>
 	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
-const isValidType = (type, item) => {
-	if (!type) {
-		return true;
-	}
-
-	if (type.includes(item.type)) {
-		return true;
-	}
-
-	return false;
-};
 
 const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -158,8 +148,10 @@ const mergeData = async (file, metadata) => {
 	return {
 		...metadata,
 		...overrides,
-		items: metadata.items
-			.filter(isValidType.bind(null, file.type))
+		items: file.type
+			.map(pickItems.bind(null, metadata))
+			.flat()
+			.sort(comparePublished)
 			.slice(0, 10)
 			.map(extendItem.bind(null, `${metadata.scheme}://${metadata.domain}`)),
 	};
@@ -184,13 +176,11 @@ const main = async () => {
 		readLinks(),
 		readStatuses(),
 	]);
-	metadata.items = [
-		...articles,
-		...books,
-		...documents,
-		...links,
-		...statuses,
-	].sort(comparePublished);
+	metadata.articles = articles;
+	metadata.books = books;
+	metadata.documents = documents;
+	metadata.links = links;
+	metadata.statuses = statuses;
 	return Promise.all(config.files.feed.map(build.bind(null, metadata)));
 };
 
