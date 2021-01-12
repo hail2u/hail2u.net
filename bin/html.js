@@ -379,7 +379,7 @@ const main = async () => {
 		while (articleFiles.length > 0) {
 			/* eslint-disable-next-line no-await-in-loop */
 			await Promise.all(
-				articleFiles.splice(-32).map(build.bind(null, data, partials))
+				articleFiles.splice(-1024).map(build.bind(null, data, partials))
 			);
 		}
 	}
