@@ -155,7 +155,7 @@ export default {
 			draft: "src/drafts/",
 			partial: "src/partial/",
 			root: "src/",
-			sitemap: "dist/sitemap.xml",
+			sitemap: "src/sitemap.mustache",
 			styleGuide: "src/css/test.html",
 			mysubscriptions: "src/mysubscriptions.mustache",
 			testArticle: "src/blog/test.mustache",
