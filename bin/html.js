@@ -287,13 +287,13 @@ const markFirstItem = (items) => {
 	return [firstItem, ...items];
 };
 
-const build = async (metadata, partials, file) => {
+const build = async (basicData, partials, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file, metadata),
+		mergeData(file, basicData),
 		fs.readFile(file.src, "utf8"),
 	]);
 
-	if (!data.isLog) {
+	if (data.books && !data.isLog) {
 		data.otherBooks = markFirstItem(data.books.slice(24));
 		data.numOtherBooks = data.otherBooks.length;
 		data.books = data.books.slice(0, 24);
@@ -342,13 +342,6 @@ const main = async () => {
 		readPartials(),
 		readJSONFile(file),
 	]);
-	metadata.articles = articles;
-	metadata.books = books;
-	metadata.documents = documents;
-	metadata.links = links;
-	metadata.statuses = statuses;
-	metadata.subscriptions = subscriptions;
-	metadata.version = pkg.version;
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
 			A: "articles",
@@ -361,9 +354,19 @@ const main = async () => {
 		},
 		string: ["article"],
 	});
+	const data = {
+		...metadata,
+		articles,
+		books,
+		documents,
+		links,
+		statuses,
+		subscriptions,
+		version: pkg.version,
+	};
 
 	if (argv.article) {
-		return build(metadata, partials, {
+		return build(data, partials, {
 			dest: argv.article,
 			metadata: config.paths.metadata.article,
 			src: config.paths.src.article,
@@ -376,14 +379,12 @@ const main = async () => {
 		while (articleFiles.length > 0) {
 			/* eslint-disable-next-line no-await-in-loop */
 			await Promise.all(
-				articleFiles.splice(-32).map(build.bind(null, metadata, partials))
+				articleFiles.splice(-32).map(build.bind(null, data, partials))
 			);
 		}
 	}
 
-	return Promise.all(
-		config.files.html.map(build.bind(null, metadata, partials))
-	);
+	return Promise.all(config.files.html.map(build.bind(null, data, partials)));
 };
 
 mustache.escape = escapeCharacters;

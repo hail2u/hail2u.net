@@ -12,9 +12,11 @@ const main = async () => {
 		readJSONFile(config.paths.data.documents),
 		fs.readFile(config.paths.src.sitemap, "utf8"),
 	]);
-	data.articles = articles;
-	data.documents = documents;
-	const rendered = mustache.render(template, data);
+	const rendered = mustache.render(template, {
+		...data,
+		articles,
+		documents,
+	});
 	await outputFile(config.paths.dest.sitemap, rendered);
 };
 

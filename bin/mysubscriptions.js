@@ -11,8 +11,10 @@ const main = async () => {
 		readJSONFile(config.paths.data.subscriptions),
 		fs.readFile(config.paths.src.mysubscriptions, "utf8"),
 	]);
-	data.subscriptions = subscriptions;
-	const rendered = mustache.render(template, data);
+	const rendered = mustache.render(template, {
+		...data,
+		subscriptions,
+	});
 	await outputFile(config.paths.dest.mysubscriptions, rendered);
 };
 

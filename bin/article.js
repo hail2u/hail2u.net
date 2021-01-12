@@ -98,7 +98,8 @@ const checkName = (name) => {
 };
 
 const checkTitleLength = (title) => {
-	const bytes = new TextEncoder().encode(title);
+	const textEncoder = new TextEncoder();
+	const bytes = textEncoder.encode(title);
 
 	if (bytes.length < 9) {
 		throw new Error(

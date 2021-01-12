@@ -157,9 +157,9 @@ const mergeData = async (file, metadata) => {
 	};
 };
 
-const build = async (metadata, file) => {
+const build = async (basicData, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file, metadata),
+		mergeData(file, basicData),
 		fs.readFile(file.src, "utf8"),
 	]);
 	const rendered = mustache.render(template, data);
@@ -176,12 +176,18 @@ const main = async () => {
 		readLinks(),
 		readStatuses(),
 	]);
-	metadata.articles = articles;
-	metadata.books = books;
-	metadata.documents = documents;
-	metadata.links = links;
-	metadata.statuses = statuses;
-	return Promise.all(config.files.feed.map(build.bind(null, metadata)));
+	return Promise.all(
+		config.files.feed.map(
+			build.bind(null, {
+				...metadata,
+				articles,
+				books,
+				documents,
+				links,
+				statuses,
+			})
+		)
+	);
 };
 
 mustache.escape = escapeCharacters;
