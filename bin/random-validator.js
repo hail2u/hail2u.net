@@ -28,7 +28,8 @@ const validate = async (file) => {
 		return [];
 	}
 
-	return messages.map(formatMessage.bind(null, file));
+	const formatMessageB = formatMessage.bind(null, file);
+	return messages.map(formatMessageB);
 };
 
 const isEmpty = (element) => element.length !== 0;
@@ -40,16 +41,17 @@ const main = async () => {
 	]);
 	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const indexes = Array.from(
-		sitemap.matchAll(reIndex),
-		pickPath.bind(null, config.paths.dest.root)
-	).filter(isNotStyleGuide.bind(null, config.paths.dest.styleGuide));
+	const pickPathB = pickPath.bind(null, config.paths.dest.root);
+	const isNotStyleGuideB = isNotStyleGuide.bind(
+		null,
+		config.paths.dest.styleGuide
+	);
+	const indexes = Array.from(sitemap.matchAll(reIndex), pickPathB).filter(
+		isNotStyleGuideB
+	);
 	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
-		Array.from(
-			sitemap.matchAll(reArticle),
-			pickPath.bind(null, config.paths.dest.root)
-		)
+		Array.from(sitemap.matchAll(reArticle), pickPathB)
 	).slice(0, 5);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();

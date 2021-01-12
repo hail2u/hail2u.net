@@ -8,8 +8,9 @@ const isSubscribed = (url, subscription) => url === subscription.url;
 
 const addSubscription = async ({ feed, title, url }) => {
 	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
+	const isSubscribedB = isSubscribed.bind(null, url);
 
-	if (subscriptions.find(isSubscribed.bind(null, url))) {
+	if (subscriptions.find(isSubscribedB)) {
 		throw new Error(`${title} has already been subscribed.`);
 	}
 

@@ -23,7 +23,8 @@ const generatePNG = async (favicon, file) => {
 
 const main = async () => {
 	const favicon = new Ico();
-	await Promise.all(config.files.icon.map(generatePNG.bind(null, favicon)));
+	const generatePNGB = generatePNG.bind(null, favicon);
+	await Promise.all(config.files.icon.map(generatePNGB));
 	await outputFile(config.paths.dest.favicon, favicon.data);
 };
 

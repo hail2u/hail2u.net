@@ -13,8 +13,9 @@ const addBook = async (asin, title) => {
 	}
 
 	const books = await readJSONFile(config.paths.data.books);
+	const isReadBookB = isReadBook.bind(null, asin);
 
-	if (books.find(isReadBook.bind(null, asin))) {
+	if (books.find(isReadBookB)) {
 		throw new Error(`${title} has already been added.`);
 	}
 
