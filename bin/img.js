@@ -7,10 +7,10 @@ const { Ico, IcoImage } = ico;
 
 const generatePNG = async (favicon, file) => {
 	const metadata = await sharp(file.src).metadata();
-	const img = await sharp(file.src, {
+	const img = sharp(file.src, {
 		density: (file.width * metadata.density) / metadata.width,
 	});
-	await img.resize(file.width);
+	img.resize(file.width);
 
 	if (!file.dest) {
 		const png = await img.png().toBuffer();
@@ -18,7 +18,7 @@ const generatePNG = async (favicon, file) => {
 		return;
 	}
 
-	img.toFile(file.dest);
+	await img.toFile(file.dest);
 };
 
 const main = async () => {
