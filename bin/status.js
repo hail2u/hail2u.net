@@ -19,13 +19,12 @@ const addStatus = async (status) => {
 };
 
 const main = async () => {
-	const { _: remains } = minimist(process.argv.slice(2));
+	const { _: [status] } = minimist(process.argv.slice(2));
 
-	if (remains.length !== 1) {
+	if (!status) {
 		throw new Error(`Only 1 argumet is required.`);
 	}
 
-	const [status] = remains;
 	const [file, data, message] = await addStatus(status);
 	await outputJSONFile(file, data);
 	await runCommand("git", ["add", "--", file]);

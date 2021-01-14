@@ -189,13 +189,13 @@ const contributeSelected = async (selected) => {
 };
 
 const main = async () => {
-	const argv = minimist(process.argv.slice(2), {
+	const { test: isTest } = minimist(process.argv.slice(2), {
 		alias: {
 			t: "test",
 		},
 		boolean: ["test"],
 	});
-	const drafts = await listDrafts(argv.test);
+	const drafts = await listDrafts(isTest);
 	const selected = await selectDraft(drafts);
 	await Promise.all([
 		checkName(selected.name),
@@ -204,7 +204,7 @@ const main = async () => {
 		validateBody(selected.body, selected.src),
 	]);
 
-	if (argv.test) {
+	if (isTest) {
 		return testSelected(selected);
 	}
 

@@ -6,7 +6,7 @@ import { shuffleArray } from "../lib/shuffle-array.js";
 
 const isSubscribed = (url, subscription) => url === subscription.url;
 
-const addSubscription = async ({ feed, title, url }) => {
+const addSubscription = async (feed, title, url) => {
 	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
 	const isSubscribedB = isSubscribed.bind(null, url);
 
@@ -29,7 +29,7 @@ const addSubscription = async ({ feed, title, url }) => {
 };
 
 const main = async () => {
-	const argv = minimist(process.argv.slice(2), {
+	const { feed, title, url } = minimist(process.argv.slice(2), {
 		alias: {
 			f: "feed",
 			t: "title",
@@ -43,19 +43,19 @@ const main = async () => {
 		string: ["feed", "title", "url"],
 	});
 
-	if (!argv.feed) {
+	if (!feed) {
 		throw new Error("--feed is required.");
 	}
 
-	if (!argv.title) {
+	if (!title) {
 		throw new Error("--title is required.");
 	}
 
-	if (!argv.url) {
+	if (!url) {
 		throw new Error("--url is required.");
 	}
 
-	const [file, data, message] = await addSubscription(argv);
+	const [file, data, message] = await addSubscription(feed, title, url);
 	await outputJSONFile(file, data);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=${message}`]);
