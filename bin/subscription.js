@@ -6,28 +6,6 @@ import { shuffleArray } from "../lib/shuffle-array.js";
 
 const isSubscribed = (url, subscription) => url === subscription.url;
 
-const addSubscription = async (feed, title, url) => {
-	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
-	const isSubscribedB = isSubscribed.bind(null, url);
-
-	if (subscriptions.find(isSubscribedB)) {
-		throw new Error(`${title} has already been subscribed.`);
-	}
-
-	return [
-		config.paths.data.subscriptions,
-		[
-			{
-				feed,
-				title,
-				url,
-			},
-			...shuffleArray(subscriptions),
-		],
-		`Subscribe ${url}`,
-	];
-};
-
 const main = async () => {
 	const { feed, title, url } = minimist(process.argv.slice(2), {
 		alias: {
@@ -55,10 +33,24 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const [file, data, message] = await addSubscription(feed, title, url);
-	await outputJSONFile(file, data);
+	const file = config.paths.data.subscriptions;
+	const subscriptions = await readJSONFile(file);
+	const isSubscribedB = isSubscribed.bind(null, url);
+
+	if (subscriptions.find(isSubscribedB)) {
+		throw new Error(`${title} has already been subscribed.`);
+	}
+
+	await outputJSONFile(file, [
+		{
+			feed,
+			title,
+			url,
+		},
+		...shuffleArray(subscriptions),
+	]);
 	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=${message}`]);
+	await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
 };
 
 main().catch((e) => {

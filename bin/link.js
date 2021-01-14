@@ -3,23 +3,6 @@ import config from "../.config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 
-const addLink = async (comment, title, url) => {
-	const links = await readJSONFile(config.paths.data.links);
-	return [
-		config.paths.data.links,
-		[
-			{
-				comment,
-				published: Date.now(),
-				title,
-				url,
-			},
-			...links,
-		],
-		`Bookmark ${url}`,
-	];
-};
-
 const main = async () => {
 	const { comment, title, url } = minimist(process.argv.slice(2), {
 		alias: {
@@ -47,10 +30,19 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const [file, data, message] = await addLink(comment, title, url);
-	await outputJSONFile(file, data);
+	const file = config.paths.data.links;
+	const links = await readJSONFile(file);
+	await outputJSONFile(file, [
+		{
+			comment,
+			published: Date.now(),
+			title,
+			url,
+		},
+		...links,
+	]);
 	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=${message}`]);
+	await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
 };
 
 main().catch((e) => {

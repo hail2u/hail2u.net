@@ -3,32 +3,26 @@ import config from "../.config.js";
 import minimist from "minimist";
 import { runCommand } from "../lib/run-command.js";
 
-const addStatus = async (status) => {
-	const statuses = await readJSONFile(config.paths.data.statuses, "utf8");
-	return [
-		config.paths.data.statuses,
-		[
-			{
-				published: Date.now(),
-				text: status,
-			},
-			...statuses,
-		],
-		"Update status",
-	];
-};
-
 const main = async () => {
-	const { _: [status] } = minimist(process.argv.slice(2));
+	const {
+		_: [status],
+	} = minimist(process.argv.slice(2));
 
 	if (!status) {
 		throw new Error(`Only 1 argumet is required.`);
 	}
 
-	const [file, data, message] = await addStatus(status);
-	await outputJSONFile(file, data);
+	const file = config.paths.data.statuses;
+	const statuses = await readJSONFile(file);
+	await outputJSONFile(file, [
+		{
+			published: Date.now(),
+			text: status,
+		},
+		...statuses,
+	]);
 	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=${message}`]);
+	await runCommand("git", ["commit", `--message=Update status`]);
 };
 
 main().catch((e) => {

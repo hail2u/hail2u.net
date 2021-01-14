@@ -7,12 +7,33 @@ import sharp from "sharp";
 
 const isReadBook = (asin, book) => asin === book.asin;
 
-const addBook = async (asin, title) => {
+const main = async () => {
+	const { asin, title } = minimist(process.argv.slice(2), {
+		alias: {
+			a: "asin",
+			t: "title",
+		},
+		default: {
+			asin: "",
+			title: "",
+		},
+		string: ["asin", "title"],
+	});
+
+	if (!asin) {
+		throw new Error("--asin is required.");
+	}
+
+	if (!title) {
+		throw new Error("--title is required.");
+	}
+
 	if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
 		throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 	}
 
-	const books = await readJSONFile(config.paths.data.books);
+	const file = config.paths.data.books;
+	const books = await readJSONFile(file);
 	const isReadBookB = isReadBook.bind(null, asin);
 
 	if (books.find(isReadBookB)) {
@@ -30,43 +51,18 @@ const addBook = async (asin, title) => {
 		throw new Error(`${title} does not have a cover image.`);
 	}
 
-	return [
-		config.paths.data.books,
-		[
-			{
-				asin,
-				height: metadata.height,
-				published: Date.now(),
-				title,
-				width: metadata.width,
-			},
-			...books,
-		],
-		`Read ${asin}`,
-	];
-};
-
-const main = async () => {
-	const { asin, title } = minimist(process.argv.slice(2), {
-		alias: {
-			a: "asin",
-			t: "title",
+	await outputJSONFile(file, [
+		{
+			asin,
+			height: metadata.height,
+			published: Date.now(),
+			title,
+			width: metadata.width,
 		},
-		default: {
-			asin: "",
-			title: "",
-		},
-		string: ["asin", "title"],
-	});
-
-	if (!asin || !title) {
-		throw new Error("--asin and --title are required.");
-	}
-
-	const [file, data, message] = await addBook(asin, title);
-	await outputJSONFile(file, data);
+		...books,
+	]);
 	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=${message}`]);
+	await runCommand("git", ["commit", `--message=Read ${asin}`]);
 };
 
 main().catch((e) => {
