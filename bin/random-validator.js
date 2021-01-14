@@ -5,7 +5,7 @@ import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const pickPath = (root, [, relative]) => {
+const rewritePath = (root, [, relative]) => {
 	if (relative.endsWith("/")) {
 		return path.join(root, relative, "index.html");
 	}
@@ -41,17 +41,17 @@ const main = async () => {
 	]);
 	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const pickPathB = pickPath.bind(null, config.paths.dest.root);
+	const rewritePathB = rewritePath.bind(null, config.paths.dest.root);
 	const isNotStyleGuideB = isNotStyleGuide.bind(
 		null,
 		config.paths.dest.styleGuide
 	);
-	const indexes = Array.from(sitemap.matchAll(reIndex), pickPathB).filter(
+	const indexes = Array.from(sitemap.matchAll(reIndex), rewritePathB).filter(
 		isNotStyleGuideB
 	);
 	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
-		Array.from(sitemap.matchAll(reArticle), pickPathB)
+		Array.from(sitemap.matchAll(reArticle), rewritePathB)
 	).slice(0, 5);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();
