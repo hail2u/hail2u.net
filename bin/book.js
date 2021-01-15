@@ -7,6 +7,10 @@ import sharp from "sharp";
 
 const isReadBook = (asin, book) => asin === book.asin;
 
+const abortFetch = (abortController) => {
+	abortController.abort();
+};
+
 const main = async () => {
 	const { asin, title } = minimist(process.argv.slice(2), {
 		alias: {
@@ -40,29 +44,39 @@ const main = async () => {
 		throw new Error(`${title} has already been added.`);
 	}
 
-	const [res, saver] = await Promise.all([
-		fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`),
-		sharp(),
-	]);
-	res.body.pipe(saver);
-	const metadata = await saver.metadata();
+	const abortController = new AbortController();
+	const abortFetchB = abortFetch.bind(null, abortController);
+	const abortID = setTimeout(abortFetchB, 3000);
 
-	if (metadata.height === 1 && metadata.width === 1) {
-		throw new Error(`${title} does not have a cover image.`);
+	try {
+		const [res, saver] = await Promise.all([
+			fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`, {
+				signal: abortController.signal,
+			}),
+			sharp(),
+		]);
+		res.body.pipe(saver);
+		const metadata = await saver.metadata();
+
+		if (metadata.height === 1 && metadata.width === 1) {
+			throw new Error(`${title} does not have a cover image.`);
+		}
+
+		await outputJSONFile(file, [
+			{
+				asin,
+				height: metadata.height,
+				published: Date.now(),
+				title,
+				width: metadata.width,
+			},
+			...books,
+		]);
+		await runCommand("git", ["add", "--", file]);
+		await runCommand("git", ["commit", `--message=Read ${asin}`]);
+	} finally {
+		clearTimeout(abortID);
 	}
-
-	await outputJSONFile(file, [
-		{
-			asin,
-			height: metadata.height,
-			published: Date.now(),
-			title,
-			width: metadata.width,
-		},
-		...books,
-	]);
-	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=Read ${asin}`]);
 };
 
 main().catch((e) => {
