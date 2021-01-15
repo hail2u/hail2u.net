@@ -1,9 +1,7 @@
+import { Ico, IcoImage } from "@fiahfy/ico";
 import config from "../.config.js";
-import ico from "@fiahfy/ico";
 import { outputFile } from "../lib/output-file.js";
 import sharp from "sharp";
-
-const { Ico, IcoImage } = ico;
 
 const generatePNG = async (favicon, file) => {
 	const metadata = await sharp(file.src).metadata();

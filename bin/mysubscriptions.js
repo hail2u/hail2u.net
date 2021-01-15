@@ -11,14 +11,20 @@ const main = async () => {
 		readJSONFile(config.paths.data.subscriptions),
 		fs.readFile(config.paths.src.mysubscriptions, "utf8"),
 	]);
-	const rendered = mustache.render(template, {
-		...data,
-		subscriptions,
-	});
+	const rendered = mustache.render(
+		template,
+		{
+			...data,
+			subscriptions,
+		},
+		null,
+		{
+			escape: escapeCharacters,
+		}
+	);
 	await outputFile(config.paths.dest.mysubscriptions, rendered);
 };
 
-mustache.escape = escapeCharacters;
 main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;

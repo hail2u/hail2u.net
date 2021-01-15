@@ -308,7 +308,9 @@ const build = async (basicData, partials, file) => {
 		data.statuses = data.statuses.slice(0, 1);
 	}
 
-	const rendered = mustache.render(template, data, partials);
+	const rendered = mustache.render(template, data, partials, {
+		escape: escapeCharacters,
+	});
 	const highlighted = highlight(rendered);
 	await outputFile(file.dest, highlighted);
 };
@@ -388,7 +390,6 @@ const main = async () => {
 	return Promise.all(config.files.html.map(buildB));
 };
 
-mustache.escape = escapeCharacters;
 main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;

@@ -1,3 +1,7 @@
+import {
+	escapeCharacters,
+	unescapeReferences,
+} from "../lib/character-reference.js";
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fs from "fs/promises";
@@ -9,7 +13,6 @@ import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import readline from "readline";
 import { runCommand } from "../lib/run-command.js";
-import { unescapeReferences } from "../lib/character-reference.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (filename) => {
@@ -150,7 +153,9 @@ const testSelected = async (selected) => {
 	]);
 	const test = path.join(tmpdir, "test.html");
 	const rendered = mustache
-		.render(template, selected)
+		.render(template, selected, null, {
+			escape: escapeCharacters,
+		})
 		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
 	const highlighted = highlight(rendered);
 	await outputFile(test, highlighted);

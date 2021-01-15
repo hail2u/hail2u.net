@@ -167,7 +167,9 @@ const build = async (basicData, file) => {
 		mergeData(file, basicData),
 		fs.readFile(file.src, "utf8"),
 	]);
-	const rendered = mustache.render(template, data);
+	const rendered = mustache.render(template, data, null, {
+		escape: escapeCharacters,
+	});
 	await outputFile(file.dest, rendered);
 };
 
@@ -192,7 +194,6 @@ const main = async () => {
 	return Promise.all(config.files.feed.map(buildB));
 };
 
-mustache.escape = escapeCharacters;
 main().catch((e) => {
 	console.trace(e);
 	process.exitCode = 1;
