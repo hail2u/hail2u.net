@@ -52,7 +52,7 @@ const main = async () => {
 	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
 		Array.from(sitemap.matchAll(reArticle), rewritePathB)
-	).slice(0, 5);
+	).slice(0, 6);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();
 	const errorFiles = results.filter(isEmpty);
