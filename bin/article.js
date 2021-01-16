@@ -151,12 +151,13 @@ const testSelected = async (selected) => {
 		fs.readFile(config.paths.src.testArticle, "utf8"),
 		fs.mkdtemp(path.join(tmproot, path.sep, `${pkg.name}-`)),
 	]);
+	const root = path.relative(tmpdir, config.paths.dest.root);
 	const test = path.join(tmpdir, "test.html");
 	const rendered = mustache
 		.render(template, selected, null, {
 			escape: escapeCharacters,
 		})
-		.replace(/(?<=\b(href|src)=")\//gu, "../dist/");
+		.replace(/(?<=\b(href|src)=")\//gu, `${root}/`);
 	const highlighted = highlight(rendered);
 	await outputFile(test, highlighted);
 	return runCommand("open", [test]);
