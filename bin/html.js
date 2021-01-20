@@ -34,34 +34,18 @@ const getDateDetails = (dt) => {
 	};
 };
 
-const extendArticle = (article, i, articles) => {
+const extendArticle = (article) => {
 	const dt = getDateDetails(new Date(article.published));
 	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
-
-	if (i === articles.length - 1) {
-		return {
-			...article,
-			...dt,
-			body: article.body.trim(),
-			description,
-			isArticle: true,
-		};
-	}
-
-	const { link, title } = articles[i + 1];
 	return {
 		...article,
 		...dt,
 		body: article.body.trim(),
 		description,
 		isArticle: true,
-		previous: {
-			link,
-			title,
-		},
 	};
 };
 
