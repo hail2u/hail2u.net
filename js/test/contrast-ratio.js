@@ -24,14 +24,13 @@ const getContrast = (foreground, background) => {
 };
 
 const testContrast = () => {
-	for (const color of document.querySelectorAll(
-		".test-color tbody td:first-child"
-	)) {
+	const colors = document.querySelectorAll(".test-color tbody td:first-child");
+
+	for (const color of colors) {
 		const style = getComputedStyle(color);
 		const foreground = style.getPropertyValue("color");
 		const background = style.getPropertyValue("background-color");
 		const ratio = getContrast(foreground, background);
-		color.lastChild.textContent = background;
 		const contrast = color.nextElementSibling;
 		contrast.lastChild.textContent = ratio;
 	}
