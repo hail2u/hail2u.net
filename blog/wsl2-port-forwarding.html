@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>WSL2のためのポート・フォワーディング — Hail2u</title>
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="https://kyonagashima.com/" rel="author">
+		<link href="https://hail2u.net/blog/wsl2-port-forwarding.html" rel="canonical">
+		<meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" name="description">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/css/index.9.17.14.css" rel="stylesheet">
+		<link href="/css/print.9.17.14.css" media="only print" rel="stylesheet">
+
+		<meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" itemprop="description">
+		<link href="/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png" itemprop="image">
+		<meta content="WSL2のためのポート・フォワーディング" itemprop="name">
+		<link href="/blog/wsl2-port-forwarding.html" itemprop="url">
+
+		<meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" property="og:description">
+		<meta content="https://hail2u.net/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png" property="og:image">
+		<meta content="WSL2のためのポート・フォワーディング" property="og:title">
+		<meta content="article" property="og:type">
+		<meta content="https://hail2u.net/blog/wsl2-port-forwarding.html" property="og:url">
+		<meta content="2021-01-23T12:38:09+09:00" property="article:published_time">
+
+		<meta content="summary_large_image" name="twitter:card">
+		<meta content="@hail2u_" name="twitter:site">
+	</head>
+
+	<body>
+		<header class="page-header">
+			<nav>
+				<p class="logo"><a href="/">Hail2u</a></p>
+
+				<details class="menu">
+					<summary>メニュー</summary>
+
+					<ul>
+						<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+						<li><a href="/documents/">選りすぐりの文書</a></li>
+						<li><a href="/links/">気になったウェブページ</a></li>
+					</ul>
+
+					<ul class="oneline">
+						<li><a href="/statuses/">近況</a></li>
+						<li><a href="/bookshelf/">書棚</a></li>
+						<li class="sep"><a href="/#about">案内</a></li>
+						<li class="sep"><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+						<li class="sep"><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+						<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+						<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+					</ul>
+				</details>
+			</nav>
+		</header>
+
+		<main class="page-content">
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2021-01-23T12:38:09+09:00" itemprop="datePublished">2021年1月23日</time></p>
+
+		<h1>WSL2のためのポート・フォワーディング</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p>WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレス<em>だけ</em>がわかるので、これと<a href="https://docs.microsoft.com/ja-jp/windows-server/networking/technologies/netsh/netsh-interface-portproxy">netsh interface portproxyコマンド</a>を使って、バッチファイルを書く。</p>
+
+<pre><code class="hljs language-bat">@<span class="hljs-built_in">echo</span> off
+
+<span class="hljs-keyword">for</span> /f &quot;tokens=* usebackq&quot; <span class="hljs-variable">%%F</span> <span class="hljs-keyword">in</span> (`wsl --distribution Ubuntu --exec hostname --all-ip-addresses`) <span class="hljs-keyword">do</span> <span class="hljs-built_in">set</span> IP=<span class="hljs-variable">%%F</span>
+netsh interface portproxy add v4tov4 listenport=<span class="hljs-number">8080</span> connectaddress=<span class="hljs-variable">%IP%</span></code></pre>
+
+<p>このバッチファイルを管理者権限で実行すると設定される。WSL2をホストしているコンピューターのローカル・ネットワークでのIPアドレスが192.168.11.11とすると、他のコンピューターから192.168.11.11:8080へのアクセスが、Ubuntu仮想マシン上で動いている（8080で待機している）ウェブサーバーに届く。</p>
+
+<p>Windows 10では、Windows Defenderファイアウォールという別の問題もきっとある。初回アクセス時に聞かれるんじゃないかと思う。</p>
+
+<hr>
+
+<p>netsh interface portproxyコマンドのaddやremoveは要管理者権限なので、バッチファイルの実行にもちょっとだけ工夫が必要になる。まともにやるとするなら、バッチファイルを右クリックして「管理者として実行」を選択する。僕は<a href="https://www.nirsoft.net/utils/nircmd.html">nircmd</a>のelavateサブコマンドを使ってWindows Terminalから実行しているが、まったくおすすめはしない。</p>
+
+<figure>
+	<a href="/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png"><img alt="" height="1190" src="/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png" width="1568"></a>
+
+	<figcaption>スタート・メニューからportforwarding.batを探した結果</figcaption>
+</figure>
+
+<p>スタート・メニューの検索機能を利用するのが安全だと思う。バッチファイルを検索パスの通ったところに置いておくと、スタート・メニューからファイル名で検索できるようになる。スタート・メニューの検索結果では、スクリーンショットのように「管理者として実行」が出てくる。<kbd>→↓</kbd>とキーを押せばキーボードだけで選択でき、そこそこ手軽に実行できる。</p>
+	</div>
+</article>
+
+		</main>
+
+		<footer class="page-footer">
+			<p class="metaline">このウェブサイトは、<a href="https://kyonagashima.com/">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、公開、更新しています。更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。<a href="/blog/feed">雑多な記録だけのRSS</a>もあります。</p>
+		</footer>
+	</body>
+</html>
