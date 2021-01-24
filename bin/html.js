@@ -111,7 +111,17 @@ const readStatuses = async () => {
 	return Promise.all(statuses.map(extendStatus));
 };
 
-const readSubscriptions = () => readJSONFile(config.paths.data.subscriptions);
+const readSubscriptions = async () => {
+	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
+	const lastItem = subscriptions.pop();
+	return [
+		...subscriptions,
+		{
+			...lastItem,
+			isLast: true,
+		},
+	];
+};
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
@@ -195,22 +205,6 @@ const isLastInYear = (current, next) => {
 	return false;
 };
 
-const isLatest = (index) => {
-	if (index === 0) {
-		return true;
-	}
-
-	return false;
-};
-
-const isOldest = (current, next) => {
-	if (!next) {
-		return true;
-	}
-
-	return false;
-};
-
 const markItem = (item, index, items) => {
 	const nextItem = items[index + 1];
 	const previousItem = items[index - 1];
@@ -222,8 +216,6 @@ const markItem = (item, index, items) => {
 		isLastInDate: isLastInDate(item, nextItem),
 		isLastInMonth: isLastInMonth(item, nextItem),
 		isLastInYear: isLastInYear(item, nextItem),
-		isLatest: isLatest(index),
-		isOldest: isOldest(item, nextItem),
 	};
 };
 
