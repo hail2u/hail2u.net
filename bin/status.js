@@ -23,6 +23,8 @@ const main = async () => {
 	]);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Update status`]);
+	const text = encodeURIComponent(`${status}`);
+	await runCommand("open", [`twitter://post?text=${text}`]);
 };
 
 main().catch((e) => {

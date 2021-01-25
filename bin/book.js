@@ -74,6 +74,9 @@ const main = async () => {
 		]);
 		await runCommand("git", ["add", "--", file]);
 		await runCommand("git", ["commit", `--message=Read ${asin}`]);
+		const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
+		const text = encodeURIComponent(`${title} ${url}`);
+		await runCommand("open", [`twitter://post?text=${text}`]);
 	} finally {
 		clearTimeout(abortID);
 	}

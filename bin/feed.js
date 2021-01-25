@@ -29,7 +29,6 @@ const extendArticle = (prefix, article) => {
 		...article,
 		body: article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLB),
 		description,
-		ifttt: `${article.title} ${toAbsoluteURL(prefix, article.link)}`,
 		type: "article",
 	};
 };
@@ -48,7 +47,6 @@ const extendBook = (book) => {
 		...book,
 		body: `<p><a href="${link}"><img src="${image}" title="${book.title}"></a></p>`,
 		description: book.title,
-		ifttt: `${book.title} ${link}`,
 		link,
 		type: "book",
 	};
@@ -62,7 +60,6 @@ const readBooks = async () => {
 
 const extendDocument = (prefix, document) => ({
 	...document,
-	ifttt: `${document.title} ${toAbsoluteURL(prefix, document.link)}`,
 	type: "document",
 });
 
@@ -76,7 +73,6 @@ const readDocuments = async (prefix) => {
 const extendLink = (link) => ({
 	...link,
 	description: link.comment,
-	ifttt: `${link.comment} ${link.url}`,
 	link: link.url,
 	type: "link",
 });
@@ -90,7 +86,6 @@ const readLinks = async () => {
 const extendStatus = (status) => ({
 	...status,
 	description: status.text,
-	ifttt: status.text,
 	link: `/statuses/#on-${status.published}`,
 	title: status.text,
 	type: "status",

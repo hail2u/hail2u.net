@@ -160,21 +160,20 @@ const testSelected = async (selected) => {
 		.replace(/(?<=\b(href|src)=")\//gu, `${root}/`);
 	const highlighted = highlight(rendered);
 	await outputFile(test, highlighted);
-	return runCommand("open", [test]);
+	await runCommand("open", [test]);
 };
-
-const getArticleTotal = (cache) => ` (${cache.length + 1})`;
 
 const contributeSelected = async (selected) => {
 	const cache = await readJSONFile(config.paths.data.articles);
+	const link = path.posix.join(
+		"/",
+		path.relative(config.paths.dest.root, config.paths.dest.article),
+		`${selected.name}.html`
+	);
 	await outputJSONFile(config.paths.data.articles, [
 		{
 			body: selected.body,
-			link: path.posix.join(
-				"/",
-				path.relative(config.paths.dest.root, config.paths.dest.article),
-				`${selected.name}.html`
-			),
+			link,
 			published: Date.now(),
 			title: selected.title,
 		},
@@ -188,10 +187,15 @@ const contributeSelected = async (selected) => {
 			`--article=${config.paths.dest.article}${selected.name}.html`,
 		]),
 	]);
-	return runCommand("git", [
+	const th = cache.length + 1;
+	await runCommand("git", [
 		"commit",
-		`--message=Contribute ${selected.name}${getArticleTotal(cache)}`,
+		`--message=Contribute ${selected.name} (${th})`,
 	]);
+	const { domain, scheme } = await readJSONFile(config.paths.metadata.root);
+	const url = `${scheme}://${domain}${link}`;
+	const text = encodeURIComponent(`${selected.title} ${url}`);
+	await runCommand("open", [`twitter://post?text=${text}`]);
 };
 
 const main = async () => {

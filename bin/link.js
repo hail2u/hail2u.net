@@ -43,6 +43,8 @@ const main = async () => {
 	]);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
+	const text = encodeURIComponent(`${comment} ${url}`);
+	await runCommand("open", [`twitter://post?text=${text}`]);
 };
 
 main().catch((e) => {

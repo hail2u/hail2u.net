@@ -40,12 +40,6 @@ export default {
 				type: ["articles", "books", "documents", "links", "statuses"],
 			},
 			{
-				dest: "dist/ifttt.xml",
-				metadata: "src/index.json",
-				src: "src/ifttt.mustache",
-				type: ["articles", "books", "documents", "links", "statuses"],
-			},
-			{
 				dest: "dist/links/feed",
 				metadata: "src/links/index.json",
 				src: "src/feed.mustache",
