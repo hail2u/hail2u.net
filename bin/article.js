@@ -215,10 +215,11 @@ const main = async () => {
 	]);
 
 	if (isTest) {
-		return testSelected(selected);
+		await testSelected(selected);
+		return;
 	}
 
-	return contributeSelected(selected);
+	await contributeSelected(selected);
 };
 
 main().catch((e) => {
