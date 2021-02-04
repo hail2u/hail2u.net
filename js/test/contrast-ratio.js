@@ -1,38 +1,104 @@
-/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
-const getComponentLuminance = (color) => {
-	const sRGB = color / 255;
+// https://github.com/Myndex/SAPC-APCA#the-plain-english-steps-are
 
-	if (sRGB <= 0.03928) {
-		return sRGB / 12.92;
+const selectColor = (classes, background, foreground) => {
+	if (classes.contains("bg")) {
+		return background;
 	}
 
-	return ((sRGB + 0.055) / 1.055) ** 2.4;
+	return foreground;
 };
 
-const getRelativeLuminance = ([red, green, blue]) =>
-	0.2126 * getComponentLuminance(red) +
-	0.7152 * getComponentLuminance(green) +
-	0.0722 * getComponentLuminance(blue);
+const linearize = (val) => (val / 255.0) ** 2.4;
 
-/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
-const getContrast = (foreground, background) => {
-	const backgroundLuminance = getRelativeLuminance(background.match(/\d+/gu));
-	const foregroundLuminance = getRelativeLuminance(foreground.match(/\d+/gu));
-	const lighter = Math.max(backgroundLuminance, foregroundLuminance);
-	const darker = Math.min(backgroundLuminance, foregroundLuminance);
-	return parseFloat((lighter + 0.05) / (darker + 0.05)).toFixed(3);
+const clampLuminance = (luminance) => {
+	const blkThrs = 0.03;
+	const blkClmp = 1.45;
+
+	if (luminance > blkThrs) {
+		return luminance;
+	}
+
+	return Math.abs(blkThrs - luminance) ** blkClmp + luminance;
 };
+
+const getLuminance = (color) => {
+	const [red, green, blue] = color.match(/\d+/gu);
+	const y =
+		0.2126729 * linearize(red) +
+		0.7151522 * linearize(green) +
+		0.072175 * linearize(blue);
+	return clampLuminance(y);
+};
+
+const getContrast = (background, foreground) => {
+	const deltaYmin = 0.0005;
+	const scale = 1.25;
+
+	const backgroundLuminance = getLuminance(background);
+	const foregroundLuminance = getLuminance(foreground);
+
+	if (Math.abs(backgroundLuminance - foregroundLuminance) < deltaYmin) {
+		return 0.0;
+	}
+
+	if (backgroundLuminance > foregroundLuminance) {
+		return (backgroundLuminance ** 0.55 - foregroundLuminance ** 0.58) * scale;
+	}
+
+	if (backgroundLuminance < foregroundLuminance) {
+		return (backgroundLuminance ** 0.62 - foregroundLuminance ** 0.57) * scale;
+	}
+
+	return 0.0;
+};
+
+const scaleContrast = (contrast) => {
+	const loClip = 0.001;
+	const loConThresh = 0.078;
+	const loConFactor = 1 / loConThresh;
+	const loConOffset = 0.06;
+
+	const absContrast = Math.abs(contrast);
+
+	if (absContrast < loClip) {
+		return 0.0;
+	}
+
+	if (absContrast <= loConThresh) {
+		return contrast - contrast * loConFactor * loConOffset;
+	}
+
+	if (contrast > loConThresh) {
+		return contrast - loConOffset;
+	}
+
+	if (contrast < -loConThresh) {
+		return contrast + loConOffset;
+	}
+
+	return 0.0;
+};
+
+const toPercentage = (float) => (float * 100).toFixed(3);
 
 const testContrast = () => {
-	const colors = document.querySelectorAll(".test-color tbody td:first-child");
+	const queryColorCell = ".test-color > tbody > tr > td:first-child";
+	const colorCells = document.querySelectorAll(queryColorCell);
 
-	for (const color of colors) {
-		const style = getComputedStyle(color);
-		const foreground = style.getPropertyValue("color");
+	for (const colorCell of colorCells) {
+		const style = getComputedStyle(colorCell);
 		const background = style.getPropertyValue("background-color");
-		const ratio = getContrast(foreground, background);
-		const contrast = color.nextElementSibling;
-		contrast.lastChild.textContent = ratio;
+		const foreground = style.getPropertyValue("color");
+		colorCell.lastChild.textContent = selectColor(
+			colorCell.classList,
+			background,
+			foreground
+		);
+		const contrastCell = colorCell.nextElementSibling;
+		const contrast = getContrast(background, foreground);
+		const scaled = scaleContrast(contrast);
+		const percentage = toPercentage(scaled);
+		contrastCell.lastChild.textContent = `${percentage}%`;
 	}
 };
 
