@@ -14,6 +14,38 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[ついにGoogleが、検索結果ページで暗い背景を試し始めたようなので、ふたたび真っ黒の背景色でダーク・モードを仕込んでおいた。切り替え機能は次のバージョンで再導入される。他に、色を1つ減らしたり、ページ・ヘッダーなどでも未読リンクが判別できるようにしたり、構文強調のカラー・スキームを脱Solarizedしたりした。色関係で変更が多い。]]></description>
+				<link>https://hail2u.net/blog/on-20210206.html</link>
+				<pubDate>Sat, 6 Feb 2021 08:56:24 +0900</pubDate>
+				<title><![CDATA[色（v9.18.0）]]></title>
+
+					<content:encoded><![CDATA[<p>ついにGoogleが、検索結果ページで暗い背景を試し始めたようなので、ふたたび真っ黒の背景色でダーク・モードを仕込んでおいた。切り替え機能は次のバージョンで再導入される。他に、色を1つ減らしたり、ページ・ヘッダーなどでも未読リンクが判別できるようにしたり、構文強調のカラー・スキームを脱Solarizedしたりした。色関係で変更が多い。</p>
+
+<p>新しいコントラストのスコア化アルゴリズム（Advanced Perceptual Contrast Algorithm: APCA）がちらほら話題になっている。うまく機能しているように見えるし、今までのコントラスト比計算における問題点が改善されているように感じる。まずは<a href="https://github.com/Myndex/SAPC-APCA#apca-math-new-098d12e-constants">この新しいアルゴリズムの実装の解説</a>（英語の解説と、LaTeXの数式、JavaScriptの実装で微妙に食い違いがあった）を読みながら<a href="https://gist.github.com/hail2u/a1fb620d4826c5b476180ee6285618a5">コード</a>に落とし、<a href="https://hail2u.net/style-guide/#color">スタイル・ガイドの色彩</a>などで、コントラスト・スコアを確認するために使い始めた。ついでに、2色のコントラスト・スコアを簡単にチェックできる、<a href="https://hail2u.net/pub/test/702.html">APCA Contrast Calculator</a>というページも作った。</p>
+
+<section>
+	<h2>APCAについてのメモ</h2>
+
+	<p>SAPC（S-Luv Advanced Perceptual Contrast）がコントラストそのもので、APCAがそれを元に重み付けし、スコア化（以前はパーセンテージだった）するアルゴリズムのようだ。SAPCについてはあまり考えなくていいだろう。</p>
+
+	<ul>
+		<li>LaTeX数式を元に、英語の解説や、JavaScriptライブラリーが作られている</li>
+		<li>明度を計算する仕組みそのものはあまり変わっていない</li>
+		<li>前景色と背景色を扱い分けるので、前景色と背景色を入れ替えるとコントラストが変わる</li>
+		<li>コントラストに対し重みづけをし、知覚的な印象に近づける</li>
+		<li>まだ色覚多様性は考慮されていない</li>
+		<li>比率やパーセンテージではなく、スコア化する</li>
+		<li>|80|が7:1、|60|が4.5:1、|40|が3:1に相当するように結果はスコア化される</li>
+	</ul>
+
+	<p>知覚的なコントラストのため、色覚多様性での差異が激しくなるのではないか、という疑問は解決しなかった。コントラストを算出するための色空間モデルのレベルで、元々考慮しているというようにも読めるため、あまり気にする必要はないかもしれない。素直にWCAG 2.1のコントラスト・アルゴリズムも併用するべきだろう。</p>
+</section>
+
+<hr>
+
+<p>他には、ハンバーガー・ボタンがなくなった。そのためマイナー番号が上がっている。ハンバーガー・ボタンは気に入ってはいたものの、やはりこのようなウェブサイトでわざわざボタンを押させるのはよくない。<code>details</code>要素での作り方はだいたいわかったので、またどこかで使いたい。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[腕時計の電池が切れ（てい）た。およそ2年で切れたようで、やや早めくらいだろう。なんとなく新しい腕時計を買おうかと、いろいろ見てみたものの、腕時計にそれほど依存していないし、他にSwatchもあるので、欲しくてたまらないというほどにはならなかった。結局、近所で電池を交換した。]]></description>
 				<link>https://hail2u.net/blog/on-20210201.html</link>
 				<pubDate>Mon, 1 Feb 2021 08:59:29 +0900</pubDate>
@@ -325,27 +357,6 @@ netsh interface portproxy add v4tov4 listenport=8080 connectaddress=%IP%</code><
 <p>もうちょっと詰めるべきところがありそうだ。CSSが面倒くさくなりそうな予感があり、こういう構造（ロゴを<code>summary</code>要素に含める形）にしたが、結局は面倒な実装になってしまった。やはりロゴに続けて<code>details</code>要素にした方が無難だろうか。横長の広い領域が操作可能になっていて、どこでもメニューが出てくる状態は、操作しやすくて気に入っていおり、なかなか悩ましい。</p>
 
 <p><code>summary</code>要素に<code>a</code>要素を置いても、問題なく<em>両者が</em>操作可能であることなど、柔軟な使い方ができることがわかり、収穫はあったので、もっと様々な利用例を考えて試してみたい。今まで<code>button</code>要素でやっていた、ボタンを押してすぐ下にコンテンツが追加されるような仕組みは、半分くらいは置き換えられそうだ。ページングで分けるフォームなども、<code>details</code>要素のネストでやっても面白そうだ。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[npmが仕込んでくれる環境変数のNPM_PACKAGE_VERSIONなどを参照するために、CSSファイルをコンパイルするスクリプトなどがちゃんとした実行ファイルになるよう、手元で書き直していた。ES modulesで書くようにしてからrequire(&quot;../package.json&quot;)などが使えなくなったため、無理やりpackage.jsonを読んでいたのが気になったからだ。でも結局はimport.meta.urlを使って、package.jsonを読むよう、さらに書き直した。]]></description>
-				<link>https://hail2u.net/blog/hello-import-meta-url.html</link>
-				<pubDate>Sun, 27 Dec 2020 09:14:22 +0900</pubDate>
-				<title><![CDATA[import.meta.urlの利用]]></title>
-
-					<content:encoded><![CDATA[<p>npmが仕込んでくれる環境変数のNPM_PACKAGE_VERSIONなどを参照するために、CSSファイルをコンパイルするスクリプトなどがちゃんとした実行ファイルになるよう、手元で書き直していた。ES modulesで書くようにしてから<code>require("../package.json")</code>などが使えなくなったため、無理やりpackage.jsonを読んでいたのが気になったからだ。でも結局は<a href="https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_import_meta_url"><code>import.meta.url</code></a>を使って、package.jsonを読むよう、さらに書き直した。</p>
-
-<pre><code class="language-javascript">import fs from &quot;fs/promises&quot;;
-
-const file = new URL(&quot;../package.json&quot;, import.meta.url);
-const json = await fs.readFile(file, &quot;utf8&quot;);
-const pkg = JSON.parse(json);
-console.log(`${pkg.name} v${pkg.version}`);</code></pre>
-
-<p>すでにフラグ付きで実行すればimportでJSONファイルを読める。このフラグがなくなるまでのつなぎと考えると、この方が書き直しやすそうという目算だ。環境変数を参照するやり方と違って、npm経由で実行しなくてもいいので、雑に動作を確認しやすいという利点もある。また、パーミッションのことを忘れられ、環境耐性が高いかもしれない。</p>
-
-<hr>
-
-<p>こういうのも考えてくれるBabelの逆、みたいなものが欲しい。昔のやり方で書いていたら、今風に修正してくれるようなものだ。配列や文字列の新しいメソッドに書き換えてくれたりするとありがたい。<code>startsWith()</code>あたりにはさすがに慣れてきたが、<code>matchAll()</code>はまだ使い損ねる。ありそうなので探してみよう。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
