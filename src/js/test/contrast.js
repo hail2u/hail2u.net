@@ -1,16 +1,7 @@
 // https://github.com/Myndex/SAPC-APCA#the-plain-english-steps-are
+const testContrastLinearizeColorComponent = (val) => (val / 255.0) ** 2.4;
 
-const selectColor = (classes, background, foreground) => {
-	if (classes.contains("bg")) {
-		return background;
-	}
-
-	return foreground;
-};
-
-const linearize = (val) => (val / 255.0) ** 2.4;
-
-const clampLuminance = (luminance) => {
+const testContrastClampLuminance = (luminance) => {
 	const blkThrs = 0.03;
 	const blkClmp = 1.45;
 
@@ -21,21 +12,21 @@ const clampLuminance = (luminance) => {
 	return Math.abs(blkThrs - luminance) ** blkClmp + luminance;
 };
 
-const getLuminance = (color) => {
+const testContrastGetLuminance = (color) => {
 	const [red, green, blue] = color.match(/\d+/gu);
-	const y =
-		0.2126729 * linearize(red) +
-		0.7151522 * linearize(green) +
-		0.072175 * linearize(blue);
-	return clampLuminance(y);
+	const luminance =
+		0.2126729 * testContrastLinearizeColorComponent(red) +
+		0.7151522 * testContrastLinearizeColorComponent(green) +
+		0.072175 * testContrastLinearizeColorComponent(blue);
+	return testContrastClampLuminance(luminance);
 };
 
-const getContrast = (background, foreground) => {
+const testContrastGetPerceptualContrast = (
+	backgroundLuminance,
+	foregroundLuminance
+) => {
 	const deltaYmin = 0.0005;
 	const scale = 1.25;
-
-	const backgroundLuminance = getLuminance(background);
-	const foregroundLuminance = getLuminance(foreground);
 
 	if (Math.abs(backgroundLuminance - foregroundLuminance) < deltaYmin) {
 		return 0.0;
@@ -52,7 +43,7 @@ const getContrast = (background, foreground) => {
 	return 0.0;
 };
 
-const scaleContrast = (contrast) => {
+const testContrastScaleContrast = (contrast) => {
 	const loClip = 0.001;
 	const loConThresh = 0.078;
 	const loConFactor = 1 / loConThresh;
@@ -72,14 +63,25 @@ const scaleContrast = (contrast) => {
 		return contrast - loConOffset;
 	}
 
-	if (contrast < -loConThresh) {
+	if (contrast < 0 - loConThresh) {
 		return contrast + loConOffset;
 	}
 
 	return 0.0;
 };
 
-const toPercentage = (float) => (float * 100).toFixed(3);
+const testContrastToScore = (float) => (float * 100).toFixed(3);
+
+const testContrastGetScore = (background, foreground) => {
+	const backgroundLuminance = testContrastGetLuminance(background);
+	const foregroundLuminance = testContrastGetLuminance(foreground);
+	const contrast = testContrastGetPerceptualContrast(
+		backgroundLuminance,
+		foregroundLuminance
+	);
+	const scaled = testContrastScaleContrast(contrast);
+	return testContrastToScore(scaled);
+};
 
 const testContrast = () => {
 	const queryColorCell = ".test-color > tbody > tr > td:first-child";
@@ -89,16 +91,17 @@ const testContrast = () => {
 		const style = getComputedStyle(colorCell);
 		const background = style.getPropertyValue("background-color");
 		const foreground = style.getPropertyValue("color");
-		colorCell.lastChild.textContent = selectColor(
-			colorCell.classList,
-			background,
-			foreground
-		);
+		colorCell.lastChild.textContent = background;
 		const contrastCell = colorCell.nextElementSibling;
-		const contrast = getContrast(background, foreground);
-		const scaled = scaleContrast(contrast);
-		const percentage = toPercentage(scaled);
-		contrastCell.lastChild.textContent = `${percentage}%`;
+
+		if (colorCell.classList.contains("js-test-color-flip")) {
+			const score = testContrastGetScore(foreground, background);
+			contrastCell.lastChild.textContent = `${score}`;
+			continue;
+		}
+
+		const score = testContrastGetScore(background, foreground);
+		contrastCell.lastChild.textContent = `${score}`;
 	}
 };
 
