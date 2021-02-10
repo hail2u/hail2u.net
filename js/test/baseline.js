@@ -1,4 +1,4 @@
-const toggleRel = (element) => {
+const testBaselineToggleRel = (element) => {
 	if (element.hasAttribute("rel")) {
 		element.removeAttribute("rel");
 		return;
@@ -8,7 +8,7 @@ const toggleRel = (element) => {
 };
 
 const testBaseline = () => {
-	document.querySelectorAll(".js-test-baseline").forEach(toggleRel);
+	document.querySelectorAll(".js-test-baseline").forEach(testBaselineToggleRel);
 };
 
 document
