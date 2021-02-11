@@ -88,6 +88,11 @@ export default {
 				metadata: "src/statuses/index.json",
 				src: "src/statuses/index.mustache",
 			},
+			{
+				dest: "dist/subscriptions/index.html",
+				metadata: "src/subscriptions/index.json",
+				src: "src/subscriptions/index.mustache",
+			},
 		],
 		icon: [
 			{
