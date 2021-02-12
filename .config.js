@@ -54,6 +54,11 @@ export default {
 		],
 		html: [
 			{
+				dest: "dist/about/index.html",
+				metadata: "src/about/index.json",
+				src: "src/about/index.mustache",
+			},
+			{
 				dest: "dist/blog/index.html",
 				metadata: "src/blog/index.json",
 				src: "src/blog/index.mustache",
