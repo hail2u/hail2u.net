@@ -41,14 +41,15 @@ const main = async () => {
 		throw new Error(`${title} has already been subscribed.`);
 	}
 
-	await outputJSONFile(file, [
+	const shuffled = shuffleArray([
 		{
 			feed,
 			title,
 			url,
 		},
-		...shuffleArray(subscriptions),
+		...subscriptions,
 	]);
+	await outputJSONFile(file, shuffled);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
 };
