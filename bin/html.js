@@ -271,9 +271,9 @@ const build = async (basicData, partials, file) => {
 	]);
 
 	if (data.books && !data.isLog) {
-		data.otherBooks = markFirstItem(data.books.slice(24));
+		data.otherBooks = markFirstItem(data.books.slice(9));
 		data.numOtherBooks = data.otherBooks.length;
-		data.books = data.books.slice(0, 24);
+		data.books = data.books.slice(0, 9);
 	}
 
 	if (data.isHome) {
