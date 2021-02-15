@@ -1,7 +1,7 @@
 // https://github.com/Myndex/SAPC-APCA#the-plain-english-steps-are
-const testContrastLinearizeColorComponent = (val) => (val / 255.0) ** 2.4;
+const testContrast_linearizeColorComponent = (val) => (val / 255.0) ** 2.4;
 
-const testContrastClampLuminance = (luminance) => {
+const testContrast_clampLuminance = (luminance) => {
 	const blkThrs = 0.03;
 	const blkClmp = 1.45;
 
@@ -12,16 +12,16 @@ const testContrastClampLuminance = (luminance) => {
 	return Math.abs(blkThrs - luminance) ** blkClmp + luminance;
 };
 
-const testContrastGetLuminance = (color) => {
+const testContrast_getLuminance = (color) => {
 	const [red, green, blue] = color.match(/\d+/gu);
 	const luminance =
-		0.2126729 * testContrastLinearizeColorComponent(red) +
-		0.7151522 * testContrastLinearizeColorComponent(green) +
-		0.072175 * testContrastLinearizeColorComponent(blue);
-	return testContrastClampLuminance(luminance);
+		0.2126729 * testContrast_linearizeColorComponent(red) +
+		0.7151522 * testContrast_linearizeColorComponent(green) +
+		0.072175 * testContrast_linearizeColorComponent(blue);
+	return testContrast_clampLuminance(luminance);
 };
 
-const testContrastGetPerceptualContrast = (
+const testContrast_getPerceptualContrast = (
 	backgroundLuminance,
 	foregroundLuminance
 ) => {
@@ -43,7 +43,7 @@ const testContrastGetPerceptualContrast = (
 	return 0.0;
 };
 
-const testContrastScaleContrast = (contrast) => {
+const testContrast_scaleContrast = (contrast) => {
 	const loClip = 0.001;
 	const loConThresh = 0.078;
 	const loConFactor = 1 / loConThresh;
@@ -70,17 +70,17 @@ const testContrastScaleContrast = (contrast) => {
 	return 0.0;
 };
 
-const testContrastToScore = (float) => (float * 100).toFixed(3);
+const testContrast_toScore = (float) => (float * 100).toFixed(3);
 
-const testContrastGetScore = (background, foreground) => {
-	const backgroundLuminance = testContrastGetLuminance(background);
-	const foregroundLuminance = testContrastGetLuminance(foreground);
-	const contrast = testContrastGetPerceptualContrast(
+const testContrast_getScore = (background, foreground) => {
+	const backgroundLuminance = testContrast_getLuminance(background);
+	const foregroundLuminance = testContrast_getLuminance(foreground);
+	const contrast = testContrast_getPerceptualContrast(
 		backgroundLuminance,
 		foregroundLuminance
 	);
-	const scaled = testContrastScaleContrast(contrast);
-	return testContrastToScore(scaled);
+	const scaled = testContrast_scaleContrast(contrast);
+	return testContrast_toScore(scaled);
 };
 
 const testContrast = () => {
@@ -95,12 +95,12 @@ const testContrast = () => {
 		const contrastCell = colorCell.nextElementSibling;
 
 		if (colorCell.classList.contains("js-test-color-flip")) {
-			const score = testContrastGetScore(foreground, background);
+			const score = testContrast_getScore(foreground, background);
 			contrastCell.lastChild.textContent = `${score}`;
 			continue;
 		}
 
-		const score = testContrastGetScore(background, foreground);
+		const score = testContrast_getScore(background, foreground);
 		contrastCell.lastChild.textContent = `${score}`;
 	}
 };

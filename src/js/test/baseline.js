@@ -1,14 +1,16 @@
-const testBaselineToggleRel = (element) => {
-	if (element.hasAttribute("rel")) {
-		element.removeAttribute("rel");
+const testBaseline_toggleRel = (link) => {
+	if (link.hasAttribute("rel")) {
+		link.removeAttribute("rel");
 		return;
 	}
 
-	element.setAttribute("rel", "stylesheet");
+	link.setAttribute("rel", "stylesheet");
 };
 
 const testBaseline = () => {
-	document.querySelectorAll(".js-test-baseline").forEach(testBaselineToggleRel);
+	document
+		.querySelectorAll(".js-test-baseline")
+		.forEach(testBaseline_toggleRel);
 };
 
 document
