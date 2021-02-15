@@ -14,6 +14,66 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくるスクロールバーが明るいままなので、かなり浮いてしまう。meta要素でcolor-schemeを適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く（明るく）できる。]]></description>
+				<link>https://hail2u.net/blog/meta-name-color-scheme.html</link>
+				<pubDate>Mon, 15 Feb 2021 10:36:25 +0900</pubDate>
+				<title><![CDATA[meta要素のcolor-schemeについて]]></title>
+
+					<content:encoded><![CDATA[<figure class="hero">
+	<a href="https://hail2u.net/img/blog/meta-name-color-scheme.png"><img alt="WindowsのEdgeが、ユーザーのダーク・モード設定に適応して、チェックボックスや、メーター、入力ボックス、セレクト・ボックス、ボタン、そしてスクロールバーの色を暗くしてくれている" height="1440" src="https://hail2u.net/img/blog/meta-name-color-scheme.png" width="2560"></a>
+</figure>
+
+<p>ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくる<em>スクロールバー</em>が明るいままなので、かなり浮いてしまう。meta要素で<a href="https://html.spec.whatwg.org/multipage/semantics.html#meta-color-scheme">color-scheme</a>を適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く（明るく）できる。</p>
+
+<p>書き方は特に難しくない。ダーク・モードへ適応しようと、prefers-color-schemeメディア・クエリーを使って、明るい背景と暗い背景を切り替えるなら、以下のようにHTMLファイルのhead要素以下に書けばいい。viewportと似たようなものだ。</p>
+
+<pre><code class="language-html">&lt;meta
+	name=&quot;color-scheme&quot;
+	content=&quot;light dark&quot;&gt;</code></pre>
+
+<p>lightとdarkの順序は、逆でも意味は変わらない。これだけでユーザーのOSやブラウザーでのダーク・モード設定にしたがって、フォーム関連要素やスクロールバーの色が切り替わってくれる。具体的にどのように切り替わるかは、<a href="https://webkit.org/blog/8840/dark-mode-support-in-webkit/">Safariでの紹介</a>を参照するといいだろう。ChromeやEdgeでも、同じようになじみやすい色合いに変わってくれる。</p>
+
+<section>
+	<h2>CSSに書くか、HTMLに書くか</h2>
+
+	<p>Safariでの紹介では、CSSで<a href="https://www.w3.org/TR/css-color-adjust-1/#color-scheme-prop">color-schemeプロパティー</a>を使っている。こうした場合、CSSをパースするまで外観モードに従うべきかはっきりしないため、読み込み時にちらつく可能性がないこともない。そうなった場合、ユーザーへ大きな不利益を与えるので、HTMLにmeta要素で書いた方が無難だろう。</p>
+
+	<p>また、HTMLに書くと、何らかの理由でCSSが読み込めなかった場合にも利点がある。そういった場合にも、ユーザーのダーク・モード設定にしたがって、背景色が白または黒に適応してくれるからだ。この挙動には議論の余地があるが、ユーザーの環境の尊重という観点では、HTMLに書く方に軍配が上がるだろう。</p>
+
+	<p>一方で、CSSに書く利点もある。prefers-color-schemeメディア・クエリーなどと共に、すべてCSSに閉じ込められるからだ。ツールなどでCSSをインライン化する場合などには、ちらつく危険性や読み込み失敗の可能性がほぼなくなるので、CSSに書いてもいいかもしれない。</p>
+</section>
+
+<section>
+	<h2>常に書くべきか</h2>
+
+	<p>ダーク・モードへ適応せず、明るい背景のウェブページなら、このmeta要素を書く必要はない。今まで通り、明るいもので構わないからだ。後方互換性のため、ブラウザーは既定で明るいものを使うままになっている。</p>
+
+	<p>逆に、暗い背景のみのウェブページを作っているなら、content属性の値をdarkのみにするといい。こうすると、ユーザーの外観モード設定を無視して<em>常に</em>暗いものを使うようになる。今までは扱いが難しかったスクロールバー、特に上述したテキストエリアでのスクロールバーがうまくなじむようになり、ユーザー体験の向上に貢献するだろう。</p>
+</section>
+
+<section>
+	<h2>Firefoxについて</h2>
+
+	<p>2021年2月15日現在の最新版であるFirefox 85では、<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#browser_compatibility">このmeta要素でのcolor-scheme</a>や<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme#browser_compatibility">CSSのcolor-schemeプロパティー</a>はサポートされていない。しかし、ウェブページの背景色に基づいて自動で切り替わるようになっており、記述の有無は関係ない。Firefoxだけでのみ挙動が違うということもないはずなので、あまり気にする必要はないだろう。</p>
+
+	<p>ただし、CSSの書き方によっては、暗い背景なのに明るいものが使われてしまうことがある。確認は忘れないようにしたい。このウェブサイトでは<a href="https://github.com/hail2u/hail2u.net/commit/aab8fd8dcb234a20e099d371f91d0772c6d71007">最近直した</a>。Firefox 64以降では<a href="https://drafts.csswg.org/css-scrollbars-1/#scrollbar-color">scrollbar-colorプロパティー</a>が実装されているので、確実を期すなら、こちらも利用した方がいいかもしれない。</p>
+</section>
+
+<hr>
+
+<p>まとめると以下のようになる。</p>
+
+<ul>
+	<li>ダーク・モードへ適応するなら<code>&lt;meta name=&quot;color-scheme&quot; content=&quot;light dark&quot;&gt;</code></li>
+	<li>meta要素で書く方が無難</li>
+	<li>明るい背景だけなら不要</li>
+	<li>暗い背景だけなら<code>&lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot;&gt;</code>に</li>
+	<li>Firefoxはダイジョウブ</li>
+</ul>
+
+<p>このmeta要素でcolor-schemeの実装は、Safari 12が最初で、後にChrome 81やEdge 81でサポートされた。ChromeとEdgeでのサポートからは、すでに半年以上になる。ダーク・モードの広まりに若干遅れたため、記述していないウェブページはかなり多い。些細なことと思わずに、ぜひ記述してほしい。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[Twitterへのミラーを半手動で行うようにした。といっても難しいことはせず、Twitter URIスキームのURLを開き、関連付けに基づいてインストール済みのTwitterアプリを開くだけだ。うまくいっているようだ。あるものは使っていきたい。]]></description>
 				<link>https://hail2u.net/blog/with-twitter-uri-scheme.html</link>
 				<pubDate>Fri, 12 Feb 2021 08:23:52 +0900</pubDate>
@@ -323,20 +383,6 @@ netsh interface portproxy add v4tov4 listenport=8080 connectaddress=%IP%</code><
 <p>他の候補は、前に少し欲しかった<a href="https://shop.lemnos.jp/shopdetail/000000000302/ct8/page2/recommend/">札幌駅の時計</a>、<a href="https://www.seiko-clock.co.jp/product-personal/wall_clock/office/kx623w.html">UDフォントの時計</a>、<a href="https://www.seiko-clock.co.jp/product-personal/wall_clock/standard/kx301h.html">枠がない時計</a>だった。</p>
 
 <p>札幌駅の時計は好きだけど、遠くから鋭角に見ると不安で、秒針がないのも気になったのでやめた。やっぱり欲しいな……となったら、置き時計版の方でも買おうと思う。UDフォントのものは実物も見れて、かなり気に入ったものの、単二電池というのが嫌だった。家で他に単二電池を使うものがないので、予備の効率が悪い。枠がないものはすっきりとして全体的にはよかったが、針の形が微妙な気がする。家族も嫌がった。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[ハンバーガー・ボタンでウェブサイトのナビゲーションを展開させると、いわゆる「メニュー」としての性格が強くなる。ならば、アプリケーションのメニューのように、あらゆるコンテンツへのアクセス手段が含まれるという暗黙の了解があるのではないか？　そうだとするとメール・アドレス、ライセンス、RSS、ソーシャル・メディアへのリンクも含まれていた方がいいかもしれない。]]></description>
-				<link>https://hail2u.net/blog/navigation-contents-20210107.html</link>
-				<pubDate>Thu, 7 Jan 2021 08:30:36 +0900</pubDate>
-				<title><![CDATA[ナビゲーションの中身]]></title>
-
-					<content:encoded><![CDATA[<p>ハンバーガー・ボタンでウェブサイトのナビゲーションを展開させると、いわゆる「メニュー」としての性格が強くなる。ならば、アプリケーションのメニューのように、<em>あらゆるコンテンツへのアクセス手段が含まれる</em>という暗黙の了解があるのではないか？　そうだとするとメール・アドレス、ライセンス、RSS、ソーシャル・メディアへのリンクも含まれていた方がいいかもしれない。</p>
-
-<p>そう考え、手元ではページ・フッターの中身をコピーして配置してみたが、想像以上にうまくおさめるのが難しい。項目の性格によって分類したものを、余白で更に分割すると、かなり縦に長くなる。広い画面では横に分割して並べればいいが、狭い画面でうまくおさめられない。縦並びにこだわっているとなおさらだ。</p>
-
-<p>巷の全部入りのナビゲーションはうまくおさまっているものも散見される。それらの共通点としては全体を覆う、すなわち<em>オーバーレイのもの</em>であることだった。全体を覆うように作ると、メイン・コンテンツとの兼ね合いや、余白の制約などから解放される。その結果、自由に配置できるのだろう。</p>
-
-<p>インラインで展開するように作ったのが裏目に出た形だ。項目を整理したり、ラベルを調節し、うまくおさまるように祈るしかない。そのうちに実装される。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
