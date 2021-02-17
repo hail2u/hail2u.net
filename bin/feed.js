@@ -24,10 +24,12 @@ const extendArticle = (prefix, article) => {
 		.trim()
 		.split("\n")
 		.shift();
-	const toAbsoluteURLB = toAbsoluteURLAll.bind(null, prefix);
 	return {
 		...article,
-		body: article.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLB),
+		body: article.body.replace(
+			/(href|src)="(\/.*?)"/gu,
+			toAbsoluteURLAll.bind(null, prefix)
+		),
 		description,
 		type: "article",
 	};
@@ -36,8 +38,7 @@ const extendArticle = (prefix, article) => {
 const readArticles = async (prefix) => {
 	const articles = await readJSONFile(config.paths.data.articles);
 	const latests = articles.slice(0, 10);
-	const extendArticleB = extendArticle.bind(null, prefix);
-	return Promise.all(latests.map(extendArticleB));
+	return Promise.all(latests.map(extendArticle.bind(null, prefix)));
 };
 
 const extendBook = (book) => {
@@ -66,8 +67,7 @@ const extendDocument = (prefix, document) => ({
 const readDocuments = async (prefix) => {
 	const documents = await readJSONFile(config.paths.data.documents);
 	const latests = documents.slice(0, 10);
-	const extendDocumentB = extendDocument.bind(null, prefix);
-	return Promise.all(latests.map(extendDocumentB));
+	return Promise.all(latests.map(extendDocument.bind(null, prefix)));
 };
 
 const extendLink = (link) => ({
@@ -140,20 +140,15 @@ const extendItem = (prefix, item) => {
 
 const mergeData = async (file, metadata) => {
 	const overrides = await readJSONFile(file.metadata);
-	const pickItemsB = pickItems.bind(null, metadata);
-	const extendItemB = extendItem.bind(
-		null,
-		`${metadata.scheme}://${metadata.domain}`
-	);
 	return {
 		...metadata,
 		...overrides,
 		items: file.type
-			.map(pickItemsB)
+			.map(pickItems.bind(null, metadata))
 			.flat()
 			.sort(comparePublished)
 			.slice(0, 10)
-			.map(extendItemB),
+			.map(extendItem.bind(null, `${metadata.scheme}://${metadata.domain}`)),
 	};
 };
 
@@ -178,15 +173,18 @@ const main = async () => {
 		readLinks(),
 		readStatuses(),
 	]);
-	const buildB = build.bind(null, {
-		...metadata,
-		articles,
-		books,
-		documents,
-		links,
-		statuses,
-	});
-	return Promise.all(config.files.feed.map(buildB));
+	return Promise.all(
+		config.files.feed.map(
+			build.bind(null, {
+				...metadata,
+				articles,
+				books,
+				documents,
+				links,
+				statuses,
+			})
+		)
+	);
 };
 
 main().catch((e) => {

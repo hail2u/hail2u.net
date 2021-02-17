@@ -225,8 +225,7 @@ const mergeData = async (file, metadata) => {
 	const overrides = await readJSONFile(file.metadata);
 
 	if (file.metadata === config.paths.metadata.article) {
-		const hasSameLinkB = hasSameLink.bind(null, file.dest);
-		const article = metadata.articles.find(hasSameLinkB);
+		const article = metadata.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
 			...metadata,
@@ -352,18 +351,18 @@ const main = async () => {
 		});
 	}
 
-	const buildB = build.bind(null, data, partials);
-
 	if (argv.articles) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
 			/* eslint-disable-next-line no-await-in-loop */
-			await Promise.all(articleFiles.splice(-1024).map(buildB));
+			await Promise.all(
+				articleFiles.splice(-1024).map(build.bind(null, data, partials))
+			);
 		}
 	}
 
-	return Promise.all(config.files.html.map(buildB));
+	return Promise.all(config.files.html.map(build.bind(null, data, partials)));
 };
 
 main().catch((e) => {

@@ -5,15 +5,15 @@ import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const rewritePath = (root, [, relative]) => {
+const rewritePath = ([, relative]) => {
 	if (relative.endsWith("/")) {
-		return path.join(root, relative, "index.html");
+		return path.join(config.paths.dest.root, relative, "index.html");
 	}
 
-	return path.join(root, relative);
+	return path.join(config.paths.dest.root, relative);
 };
 
-const isNotStyleGuide = (styleGuide, file) => file !== styleGuide;
+const isNotStyleGuide = (file) => file !== config.paths.dest.styleGuide;
 
 const formatMessage = (file, message) =>
 	`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
@@ -28,8 +28,7 @@ const validate = async (file) => {
 		return [];
 	}
 
-	const formatMessageB = formatMessage.bind(null, file);
-	return messages.map(formatMessageB);
+	return messages.map(formatMessage.bind(null, file));
 };
 
 const isEmpty = (element) => element.length !== 0;
@@ -41,17 +40,12 @@ const main = async () => {
 	]);
 	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const rewritePathB = rewritePath.bind(null, config.paths.dest.root);
-	const isNotStyleGuideB = isNotStyleGuide.bind(
-		null,
-		config.paths.dest.styleGuide
-	);
-	const indexes = Array.from(sitemap.matchAll(reIndex), rewritePathB).filter(
-		isNotStyleGuideB
+	const indexes = Array.from(sitemap.matchAll(reIndex), rewritePath).filter(
+		isNotStyleGuide
 	);
 	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
-		Array.from(sitemap.matchAll(reArticle), rewritePathB)
+		Array.from(sitemap.matchAll(reArticle), rewritePath)
 	).slice(0, 3);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();

@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 const isReadBook = (asin, book) => asin === book.asin;
 
-const abortFetch = (abortController) => {
+const cancelFetch = (abortController) => {
 	abortController.abort();
 };
 
@@ -38,15 +38,13 @@ const main = async () => {
 
 	const file = config.paths.data.books;
 	const books = await readJSONFile(file);
-	const isReadBookB = isReadBook.bind(null, asin);
 
-	if (books.find(isReadBookB)) {
+	if (books.find(isReadBook.bind(null, asin))) {
 		throw new Error(`${title} has already been added.`);
 	}
 
 	const abortController = new AbortController();
-	const abortFetchB = abortFetch.bind(null, abortController);
-	const abortID = setTimeout(abortFetchB, 3000);
+	const abortID = setTimeout(cancelFetch.bind(null, abortController), 5000);
 
 	try {
 		const [res, saver] = await Promise.all([

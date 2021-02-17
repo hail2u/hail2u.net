@@ -35,9 +35,8 @@ const main = async () => {
 
 	const file = config.paths.data.subscriptions;
 	const subscriptions = await readJSONFile(file);
-	const isSubscribedB = isSubscribed.bind(null, url);
 
-	if (subscriptions.find(isSubscribedB)) {
+	if (subscriptions.find(isSubscribed.bind(null, url))) {
 		throw new Error(`${title} has already been subscribed.`);
 	}
 

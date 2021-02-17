@@ -52,8 +52,7 @@ const listDrafts = async (isTest) => {
 		throw new Error("There is no draft.");
 	}
 
-	const isDraftB = isDraft.bind(null, isTest);
-	return getDrafts(filenames.filter(isDraftB));
+	return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
 };
 
 const toMenuitem = (draft, i) => `${i + 1}. ${draft.title} (${draft.name})`;
@@ -133,8 +132,7 @@ const validateBody = async (body, src) => {
 	}
 
 	if (messages.length > 0) {
-		const formatMessageB = formatMessage.bind(null, src);
-		const errors = messages.map(formatMessageB);
+		const errors = messages.map(formatMessage.bind(null, src));
 		process.stderr.write(errors.join("\n"));
 		process.stderr.write("\n\n");
 		throw new Error(`${errors.length} error(s) in ${src}`);
