@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja" itemscope itemtype="http://schema.org/BlogPosting">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの — Hail2u</title>
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="https://kyonagashima.com/" rel="author">
+		<link href="https://hail2u.net/blog/window-local-storage-for-a-local-file.html" rel="canonical">
+		<meta content="light dark" name="color-scheme">
+		<meta content="window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。" name="description">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/css/index.9.18.8.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.18.8.css" media="only print" rel="stylesheet">
+
+		<script async defer src="/js/back-to-top.9.18.8.js"></script>
+
+		<meta content="window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。" itemprop="description">
+		
+		<meta content="ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの" itemprop="name">
+		<link href="/blog/window-local-storage-for-a-local-file.html" itemprop="url">
+
+		<meta content="window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。" property="og:description">
+		
+		<meta content="ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの" property="og:title">
+		<meta content="article" property="og:type">
+		<meta content="https://hail2u.net/blog/window-local-storage-for-a-local-file.html" property="og:url">
+		<meta content="2021-02-20T08:19:17+09:00" property="article:published_time">
+
+		<meta content="summary" name="twitter:card">
+		<meta content="@hail2u_" name="twitter:site">
+	</head>
+
+	<body>
+		<header class="page-header">
+			<nav>
+				<p class="logo"><a href="/">Hail2u</a></p>
+
+				<ul class="pages">
+					<li><a href="/blog/" aria-current="page">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+				</ul>
+
+				<ul class="pages">
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">書棚</a></li>
+					<li><a href="/subscriptions/">ブログロール</a></li>
+					<li class="sep"><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+					<li><a href="https://github.com/sponsors/hail2u">後援</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main class="page-content">
+
+<article>
+	<header>
+		<p class="metaline"><time datetime="2021-02-20T08:19:17+09:00" itemprop="datePublished">2021年2月20日</time></p>
+
+		<h1>ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの</h1>
+	</header>
+
+	<div itemprop="articleBody">
+		<p><code>window.localStorage</code>が実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったん<code>delete window.localStorage</code>してから、らしきものを作ってやるとうまくいく。</p>
+
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">try</span> {
+	<span class="hljs-keyword">const</span> test = <span class="hljs-string">&quot;__test__&quot;</span>;
+	<span class="hljs-built_in">localStorage</span>.setItem(test, test);
+	<span class="hljs-built_in">localStorage</span>.removeItem(test);
+} <span class="hljs-keyword">catch</span> (e) {
+	<span class="hljs-keyword">delete</span> <span class="hljs-built_in">window</span>.localStorage;
+	<span class="hljs-built_in">window</span>.localStorage = {
+		<span class="hljs-attr">_data</span>: {},
+
+		<span class="hljs-function"><span class="hljs-title">clear</span>(<span class="hljs-params"></span>)</span> {
+			<span class="hljs-keyword">return</span> (<span class="hljs-built_in">this</span>._data = {});
+		},
+
+		<span class="hljs-function"><span class="hljs-title">getItem</span>(<span class="hljs-params">key</span>)</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>._data[key];
+		},
+
+		<span class="hljs-function"><span class="hljs-title">removeItem</span>(<span class="hljs-params">key</span>)</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">delete</span> <span class="hljs-built_in">this</span>._data[key];
+		},
+
+		<span class="hljs-function"><span class="hljs-title">setItem</span>(<span class="hljs-params">key, value</span>)</span> {
+			<span class="hljs-keyword">return</span> (<span class="hljs-built_in">this</span>._data[key] = <span class="hljs-built_in">String</span>(value));
+		}
+	};
+}</code></pre>
+
+<p><code>window.localStorage</code>の存在確認にも<a href="https://gist.github.com/paulirish/5558557">いろいろある</a>ので、このようなコードが必要になった。動かすだけは動かせるものの、保存されるわけではないので、完全には動作確認できないが、ダーク・モードの切り替え程度に使うだけなら十分だと思う。クッキーを代わりに使ったりなどするくらいなら、素直にローカル・サーバーを立てて確認するべきだろう。</p>
+	</div>
+</article>
+
+		</main>
+
+		<footer class="page-footer">
+			<p class="metaline">このウェブサイトは、<a href="https://kyonagashima.com/">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+
+			<p class="metaline"><a href="#top"><span aria-hidden="true">⇑</span> 先頭へ戻る</a></p>
+		</footer>
+	</body>
+</html>

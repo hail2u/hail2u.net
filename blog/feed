@@ -14,6 +14,43 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。]]></description>
+				<link>https://hail2u.net/blog/window-local-storage-for-a-local-file.html</link>
+				<pubDate>Sat, 20 Feb 2021 08:19:17 +0900</pubDate>
+				<title><![CDATA[ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの]]></title>
+
+					<content:encoded><![CDATA[<p><code>window.localStorage</code>が実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったん<code>delete window.localStorage</code>してから、らしきものを作ってやるとうまくいく。</p>
+
+<pre><code class="language-javascript">try {
+	const test = &quot;__test__&quot;;
+	localStorage.setItem(test, test);
+	localStorage.removeItem(test);
+} catch (e) {
+	delete window.localStorage;
+	window.localStorage = {
+		_data: {},
+
+		clear() {
+			return (this._data = {});
+		},
+
+		getItem(key) {
+			return this._data[key];
+		},
+
+		removeItem(key) {
+			return delete this._data[key];
+		},
+
+		setItem(key, value) {
+			return (this._data[key] = String(value));
+		}
+	};
+}</code></pre>
+
+<p><code>window.localStorage</code>の存在確認にも<a href="https://gist.github.com/paulirish/5558557">いろいろある</a>ので、このようなコードが必要になった。動かすだけは動かせるものの、保存されるわけではないので、完全には動作確認できないが、ダーク・モードの切り替え程度に使うだけなら十分だと思う。クッキーを代わりに使ったりなどするくらいなら、素直にローカル・サーバーを立てて確認するべきだろう。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくるスクロールバーが明るいままなので、かなり浮いてしまう。meta要素でcolor-schemeを適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く（明るく）できる。]]></description>
 				<link>https://hail2u.net/blog/meta-name-color-scheme.html</link>
 				<pubDate>Mon, 15 Feb 2021 10:36:25 +0900</pubDate>
@@ -359,30 +396,6 @@ netsh interface portproxy add v4tov4 listenport=8080 connectaddress=%IP%</code><
 <p>出来上がるのは6枚切りの食パンで3枚分くらいだ。モチモチでおいしかった。冷めてもおいしい。その日のうちに食べきったので、数日置いたらどうなるかはわからない。</p>
 
 <p>手軽なので、週一くらいで焼きたくなる。次は予熱不要の魚焼きグリルでやってみよう。ついに強力粉を数キロ入りで買うようになってしまうかもしれない。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[かなり長い間使っていた掛け時計が、電池を変えても1日に30分くらい遅れるようになった。しばらく掛け時計なしで生活してみたが、掛かっていたところをつい見てしまうので、改めてスマフォなどを見る羽目になり、とても面倒くさい。2ヶ月くらい我慢すれば慣れそうだが、それほどのことでもないので、買うことにした。カチカチしないのと、数字が1から12まであることを条件にして、セイコーのKX249Bにした。ヨドバシカメラで4760円だった。]]></description>
-				<link>https://hail2u.net/blog/seiko-kx249b.html</link>
-				<pubDate>Mon, 11 Jan 2021 09:13:45 +0900</pubDate>
-				<title><![CDATA[セイコーの安い掛け時計（KX249B）]]></title>
-
-					<content:encoded><![CDATA[<aside class="affiliate">
-	<figure>
-		<a href="https://www.amazon.co.jp/exec/obidos/ASIN/B07KWXMQHX/hail2unet-22"><img alt="セイコークロック 掛け時計 天然色木地 直径30×4.7cm 電波 アナログ 木枠 KX249B" height="500" src="https://m.media-amazon.com/images/P/B07KWXMQHX.jpg" width="500"></a>
-	</figure>
-</aside>
-
-<p>かなり長い間使っていた掛け時計が、電池を変えても1日に30分くらい遅れるようになった。しばらく掛け時計なしで生活してみたが、掛かっていたところをつい見てしまうので、改めてスマフォなどを見る羽目になり、とても面倒くさい。2ヶ月くらい我慢すれば慣れそうだが、それほどのことでもないので、買うことにした。カチカチしないのと、数字が1から12まであることを条件にして、<a href="https://www.amazon.co.jp/exec/obidos/ASIN/B07KWXMQHX/hail2unet-22">セイコーのKX249B</a>にした。ヨドバシカメラで4760円だった。</p>
-
-<p>木枠の色もハズレではなさそうで、きれいな色だった。文字もUDフォントではないものの、サンセリフだし、見慣れているし、読みやすい。6のところにある穴はそこそこ目立つ。風防がガラスなのが難点だが、木枠のねじ止めを外して分解すれば外せそうに見えるので、気になったら外せばいいかと考えている。横から基盤部分が少し見えてしまうが、壁と並行に設置できるので、ピタっとおさまり満足だ。</p>
-
-<p>音がしない時計は最高だ。音がしないので、暗くなると秒針が止まる機能は余計な気がする。電波修正機能は、設置したい場所でうまく動いたので、問題ないだろう。12時00分から、10時50分くらいに合わせようと、一生懸命進めているところはかわいかった。手動でも調節できるようなので、夏にうまく動かなくなったらそっちでやろうと思う。</p>
-
-<hr>
-
-<p>他の候補は、前に少し欲しかった<a href="https://shop.lemnos.jp/shopdetail/000000000302/ct8/page2/recommend/">札幌駅の時計</a>、<a href="https://www.seiko-clock.co.jp/product-personal/wall_clock/office/kx623w.html">UDフォントの時計</a>、<a href="https://www.seiko-clock.co.jp/product-personal/wall_clock/standard/kx301h.html">枠がない時計</a>だった。</p>
-
-<p>札幌駅の時計は好きだけど、遠くから鋭角に見ると不安で、秒針がないのも気になったのでやめた。やっぱり欲しいな……となったら、置き時計版の方でも買おうと思う。UDフォントのものは実物も見れて、かなり気に入ったものの、単二電池というのが嫌だった。家で他に単二電池を使うものがないので、予備の効率が悪い。枠がないものはすっきりとして全体的にはよかったが、針の形が微妙な気がする。家族も嫌がった。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
