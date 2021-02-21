@@ -140,6 +140,10 @@ export default {
 				dest: "dist/js/back-to-top.{{version}}.js",
 				src: "src/js/back-to-top.js",
 			},
+			{
+				dest: "dist/js/unutm.{{version}}.js",
+				src: "src/js/unutm.js",
+			},
 		],
 	},
 	paths: {
