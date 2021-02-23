@@ -298,6 +298,18 @@ const toFilesFormat = (article) => ({
 });
 
 const main = async () => {
+	const { all, article } = minimist(process.argv.slice(2), {
+		alias: {
+			A: "all",
+			a: "article",
+		},
+		boolean: ["all"],
+		default: {
+			all: false,
+			article: "",
+		},
+		string: ["article"],
+	});
 	const file = new URL("../package.json", import.meta.url);
 	const [
 		metadata,
@@ -320,18 +332,6 @@ const main = async () => {
 		readPartials(),
 		readJSONFile(file),
 	]);
-	const argv = minimist(process.argv.slice(2), {
-		alias: {
-			A: "all",
-			a: "article",
-		},
-		boolean: ["all"],
-		default: {
-			all: false,
-			article: "",
-		},
-		string: ["article"],
-	});
 	const data = {
 		...metadata,
 		articles,
@@ -343,15 +343,16 @@ const main = async () => {
 		version: pkg.version,
 	};
 
-	if (argv.article) {
-		return build(data, partials, {
-			dest: argv.article,
+	if (article) {
+		await build(data, partials, {
+			dest: article,
 			metadata: config.paths.metadata.article,
 			src: config.paths.src.article,
 		});
+		return;
 	}
 
-	if (argv.all) {
+	if (all) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
@@ -362,7 +363,7 @@ const main = async () => {
 		}
 	}
 
-	return Promise.all(config.files.html.map(build.bind(null, data, partials)));
+	await Promise.all(config.files.html.map(build.bind(null, data, partials)));
 };
 
 main().catch((e) => {
