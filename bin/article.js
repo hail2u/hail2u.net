@@ -1,15 +1,14 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fs from "fs/promises";
+import minimist from "minimist";
 import path from "path";
-import readline from "readline";
 import { runCommand } from "../lib/run-command.js";
 import { unescapeReferences } from "../lib/character-reference.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const getDraft = async (filename) => {
-	const src = path.join(config.paths.src.draft, filename);
-	const content = await fs.readFile(src, "utf8");
+const getArticle = async (file) => {
+	const content = await fs.readFile(file, "utf8");
 	const [title, ...rest] = content.split("\n");
 	const body = rest
 		.join("\n")
@@ -17,71 +16,10 @@ const getDraft = async (filename) => {
 		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//gu, "/");
 	return {
 		body,
-		name: path.basename(src, path.extname(src)),
-		src,
+		name: path.basename(file, path.extname(file)),
+		src: file,
 		title: unescapeReferences(title.replace(/<.*?>/gu, "")),
 	};
-};
-
-const getDrafts = (drafts) => Promise.all(drafts.map(getDraft));
-
-const isDraft = (filename) => {
-	if (filename.startsWith("_")) {
-		return false;
-	}
-
-	if (path.extname(filename) !== ".html") {
-		return false;
-	}
-
-	return true;
-};
-
-const listDrafts = async () => {
-	const filenames = await fs.readdir(config.paths.src.draft);
-
-	if (filenames.length < 1) {
-		throw new Error("There is no draft.");
-	}
-
-	return getDrafts(filenames.filter(isDraft));
-};
-
-const toMenuitem = (draft, i) => `${i + 1}. ${draft.title} (${draft.name})`;
-
-const selectDraft = (drafts) => {
-	if (drafts.length === 1) {
-		return drafts[0];
-	}
-
-	return new Promise((resolve) => {
-		process.stdin.isTTY = true;
-		process.stdout.isTTY = true;
-		const menu = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout,
-		});
-		const menuitems = drafts.map(toMenuitem).join("\n");
-		menu.write(`0. QUIT
-${menuitems}
-`);
-		menu.question("Which one: (0) ", (a = 0) => {
-			menu.close();
-			const answer = Number.parseInt(a, 10);
-
-			if (!Number.isInteger(answer) || answer > drafts.length) {
-				throw new Error(
-					`You must enter a number between 0 and ${drafts.length}.`
-				);
-			}
-
-			if (answer === 0) {
-				throw new Error("Aborted by user.");
-			}
-
-			return resolve(drafts[answer - 1]);
-		});
-	});
 };
 
 const checkName = (name) => {
@@ -131,51 +69,54 @@ const validateBody = async (body, src) => {
 	}
 };
 
-const contributeSelected = async (selected) => {
-	const cache = await readJSONFile(config.paths.data.articles);
+const main = async () => {
+	const {
+		_: [file],
+	} = minimist(process.argv.slice(2));
+
+	if (!file) {
+		throw new Error(`Only 1 argument is required.`);
+	}
+
+	const article = await getArticle(file);
+	await Promise.all([
+		checkName(article.name),
+		checkTitleLength(article.title),
+		checkTitleType(article.title),
+		validateBody(article.body, article.src),
+	]);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
-		`${selected.name}.html`
+		`${article.name}.html`
 	);
+	const cache = await readJSONFile(config.paths.data.articles);
 	await outputJSONFile(config.paths.data.articles, [
 		{
-			body: selected.body,
+			body: article.body,
 			link,
 			published: Date.now(),
-			title: selected.title,
+			title: article.title,
 		},
 		...cache,
 	]);
-	await fs.rm(selected.src);
+	await fs.rm(article.src);
 	await Promise.all([
 		runCommand("git", ["add", "--", config.paths.data.articles]),
 		runCommand("node", [
 			"bin/html.js",
-			`--article=${config.paths.dest.article}${selected.name}.html`,
+			`--article=${config.paths.dest.article}${article.name}.html`,
 		]),
 	]);
 	const th = cache.length + 1;
 	await runCommand("git", [
 		"commit",
-		`--message=Contribute ${selected.name} (${th})`,
+		`--message=Contribute ${article.name} (${th})`,
 	]);
 	const { domain, scheme } = await readJSONFile(config.paths.metadata.root);
 	const url = `${scheme}://${domain}${link}`;
-	const text = encodeURIComponent(`${selected.title} ${url}`);
+	const text = encodeURIComponent(`${article.title} ${url}`);
 	await runCommand("open", [`twitter://post?text=${text}`]);
-};
-
-const main = async () => {
-	const drafts = await listDrafts();
-	const selected = await selectDraft(drafts);
-	await Promise.all([
-		checkName(selected.name),
-		checkTitleLength(selected.title),
-		checkTitleType(selected.title),
-		validateBody(selected.body, selected.src),
-	]);
-	await contributeSelected(selected);
 };
 
 main().catch((e) => {
