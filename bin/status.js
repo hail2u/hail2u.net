@@ -9,7 +9,7 @@ const main = async () => {
 	} = minimist(process.argv.slice(2));
 
 	if (!status) {
-		throw new Error(`Only 1 argumet is required.`);
+		throw new Error(`Only 1 argument is required.`);
 	}
 
 	const file = config.paths.data.statuses;
