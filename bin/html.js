@@ -322,13 +322,13 @@ const main = async () => {
 	]);
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
-			A: "articles",
+			A: "all",
 			a: "article",
 		},
-		boolean: ["articles"],
+		boolean: ["all"],
 		default: {
+			all: false,
 			article: "",
-			articles: false,
 		},
 		string: ["article"],
 	});
@@ -351,7 +351,7 @@ const main = async () => {
 		});
 	}
 
-	if (argv.articles) {
+	if (argv.all) {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
