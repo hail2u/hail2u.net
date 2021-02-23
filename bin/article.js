@@ -1,18 +1,10 @@
-import {
-	escapeCharacters,
-	unescapeReferences,
-} from "../lib/character-reference.js";
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fs from "fs/promises";
-import { highlight } from "../lib/highlight.js";
-import minimist from "minimist";
-import mustache from "mustache";
-import os from "os";
-import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import readline from "readline";
 import { runCommand } from "../lib/run-command.js";
+import { unescapeReferences } from "../lib/character-reference.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (filename) => {
@@ -33,8 +25,8 @@ const getDraft = async (filename) => {
 
 const getDrafts = (drafts) => Promise.all(drafts.map(getDraft));
 
-const isDraft = (isTest, filename) => {
-	if (!isTest && filename.startsWith("_")) {
+const isDraft = (filename) => {
+	if (filename.startsWith("_")) {
 		return false;
 	}
 
@@ -45,14 +37,14 @@ const isDraft = (isTest, filename) => {
 	return true;
 };
 
-const listDrafts = async (isTest) => {
+const listDrafts = async () => {
 	const filenames = await fs.readdir(config.paths.src.draft);
 
 	if (filenames.length < 1) {
 		throw new Error("There is no draft.");
 	}
 
-	return getDrafts(filenames.filter(isDraft.bind(null, isTest)));
+	return getDrafts(filenames.filter(isDraft));
 };
 
 const toMenuitem = (draft, i) => `${i + 1}. ${draft.title} (${draft.name})`;
@@ -139,28 +131,6 @@ const validateBody = async (body, src) => {
 	}
 };
 
-const testSelected = async (selected) => {
-	const file = new URL("../package.json", import.meta.url);
-	const [tmproot, pkg] = await Promise.all([
-		fs.realpath(os.tmpdir()),
-		readJSONFile(file),
-	]);
-	const [template, tmpdir] = await Promise.all([
-		fs.readFile(config.paths.src.testArticle, "utf8"),
-		fs.mkdtemp(path.join(tmproot, path.sep, `${pkg.name}-`)),
-	]);
-	const root = path.relative(tmpdir, config.paths.dest.root);
-	const test = path.join(tmpdir, "test.html");
-	const rendered = mustache
-		.render(template, selected, null, {
-			escape: escapeCharacters,
-		})
-		.replace(/(?<=\b(href|src)=")\//gu, `${root}/`);
-	const highlighted = highlight(rendered);
-	await outputFile(test, highlighted);
-	await runCommand("open", [test]);
-};
-
 const contributeSelected = async (selected) => {
 	const cache = await readJSONFile(config.paths.data.articles);
 	const link = path.posix.join(
@@ -197,13 +167,7 @@ const contributeSelected = async (selected) => {
 };
 
 const main = async () => {
-	const { test: isTest } = minimist(process.argv.slice(2), {
-		alias: {
-			t: "test",
-		},
-		boolean: ["test"],
-	});
-	const drafts = await listDrafts(isTest);
+	const drafts = await listDrafts();
 	const selected = await selectDraft(drafts);
 	await Promise.all([
 		checkName(selected.name),
@@ -211,12 +175,6 @@ const main = async () => {
 		checkTitleType(selected.title),
 		validateBody(selected.body, selected.src),
 	]);
-
-	if (isTest) {
-		await testSelected(selected);
-		return;
-	}
-
 	await contributeSelected(selected);
 };
 
