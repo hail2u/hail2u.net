@@ -101,13 +101,7 @@ const main = async () => {
 		...cache,
 	]);
 	await fs.rm(article.src);
-	await Promise.all([
-		runCommand("git", ["add", "--", config.paths.data.articles]),
-		runCommand("node", [
-			"bin/html.js",
-			`--article=${config.paths.dest.article}${article.name}.html`,
-		]),
-	]);
+	await runCommand("git", ["add", "--", config.paths.data.articles]);
 	const th = cache.length + 1;
 	await runCommand("git", [
 		"commit",

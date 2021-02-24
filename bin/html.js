@@ -298,17 +298,16 @@ const toFilesFormat = (article) => ({
 });
 
 const main = async () => {
-	const { all, article } = minimist(process.argv.slice(2), {
+	const { all, one } = minimist(process.argv.slice(2), {
 		alias: {
-			A: "all",
-			a: "article",
+			a: "all",
+			o: "one",
 		},
-		boolean: ["all"],
+		boolean: ["all", "one"],
 		default: {
 			all: false,
-			article: "",
+			one: false,
 		},
-		string: ["article"],
 	});
 	const file = new URL("../package.json", import.meta.url);
 	const [
@@ -343,13 +342,9 @@ const main = async () => {
 		version: pkg.version,
 	};
 
-	if (article) {
-		await build(data, partials, {
-			dest: article,
-			metadata: config.paths.metadata.article,
-			src: config.paths.src.article,
-		});
-		return;
+	if (one && !all) {
+		const article = toFilesFormat(articles[0]);
+		await build(data, partials, article);
 	}
 
 	if (all) {
