@@ -23,7 +23,7 @@ const getArticle = async (file) => {
 };
 
 const checkName = (name) => {
-	if (!/^_?[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(name)) {
+	if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(name)) {
 		throw new Error(
 			'This draft does not have a valid name. A draft filename must start and end with "a-z" or "0-9" and must not contain other than "-.a-z0-9".'
 		);
