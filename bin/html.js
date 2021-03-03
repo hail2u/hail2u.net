@@ -224,7 +224,7 @@ const markItems = (items) => Promise.all(items.map(markItem));
 const mergeData = async (file, metadata) => {
 	const overrides = await readJSONFile(file.metadata);
 
-	if (file.metadata === config.paths.metadata.article) {
+	if (overrides.isWeblogArticle) {
 		const article = metadata.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
