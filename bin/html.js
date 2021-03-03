@@ -269,7 +269,7 @@ const build = async (basicData, partials, file) => {
 		fs.readFile(file.src, "utf8"),
 	]);
 
-	if (data.books && !data.isLog) {
+	if (data.isBookshelf && !data.isLog) {
 		data.otherBooks = markFirstItem(data.books.slice(9));
 		data.numOtherBooks = data.otherBooks.length;
 		data.books = data.books.slice(0, 9);
