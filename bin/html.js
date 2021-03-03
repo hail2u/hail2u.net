@@ -49,114 +49,6 @@ const extendArticle = (article) => {
 	};
 };
 
-const readArticles = async () => {
-	const articles = await readJSONFile(config.paths.data.articles);
-	return Promise.all(articles.map(extendArticle));
-};
-
-const extendBook = (book) => {
-	const dt = getDateDetails(new Date(book.published));
-	return {
-		...book,
-		...dt,
-		isBook: true,
-	};
-};
-
-const readBooks = async () => {
-	const books = await readJSONFile(config.paths.data.books);
-	return Promise.all(books.map(extendBook));
-};
-
-const extendDocument = (document) => {
-	const dt = getDateDetails(new Date(document.published));
-	return {
-		...document,
-		...dt,
-		isDocument: true,
-	};
-};
-
-const readDocuments = async () => {
-	const documents = await readJSONFile(config.paths.data.documents);
-	return Promise.all(documents.map(extendDocument));
-};
-
-const extendLink = (link) => {
-	const dt = getDateDetails(new Date(link.published));
-
-	return {
-		...link,
-		...dt,
-		isLink: true,
-	};
-};
-
-const readLinks = async () => {
-	const links = await readJSONFile(config.paths.data.links);
-	return Promise.all(links.map(extendLink));
-};
-
-const extendStatus = (status) => {
-	const dt = getDateDetails(new Date(status.published));
-	return {
-		...status,
-		...dt,
-		isStatus: true,
-	};
-};
-
-const readStatuses = async () => {
-	const statuses = await readJSONFile(config.paths.data.statuses);
-	return Promise.all(statuses.map(extendStatus));
-};
-
-const readSubscriptions = async () => {
-	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
-	const lastItem = subscriptions.pop();
-	return [
-		...subscriptions,
-		{
-			...lastItem,
-			isLast: true,
-		},
-	];
-};
-
-const readPartial = async (filename) => {
-	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(
-		path.join(config.paths.src.partial, filename),
-		"utf8"
-	);
-	return {
-		[name]: content,
-	};
-};
-
-const gatherPartials = (partials) => Object.assign(...partials);
-
-const readPartials = async () => {
-	const filenames = await fs.readdir(config.paths.src.partial);
-	const partials = await Promise.all(filenames.map(readPartial));
-	return gatherPartials(partials);
-};
-
-const hasSameLink = (dest, article) => dest.endsWith(article.link);
-
-const findCover = (html) => {
-	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
-
-	if (!image) {
-		return {};
-	}
-
-	return {
-		cover: image[1],
-		twitterCard: "summary_large_image",
-	};
-};
-
 const isFirstInDate = (current, previous) => {
 	if (!previous || current.date !== previous.date) {
 		return true;
@@ -219,7 +111,113 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const markItems = (items) => Promise.all(items.map(markItem));
+const readArticles = async () => {
+	const articles = await readJSONFile(config.paths.data.articles);
+	return Promise.all(articles.map(extendArticle).map(markItem));
+};
+
+const extendBook = (book) => {
+	const dt = getDateDetails(new Date(book.published));
+	return {
+		...book,
+		...dt,
+		isBook: true,
+	};
+};
+
+const readBooks = async () => {
+	const books = await readJSONFile(config.paths.data.books);
+	return Promise.all(books.map(extendBook).map(markItem));
+};
+
+const extendDocument = (document) => {
+	const dt = getDateDetails(new Date(document.published));
+	return {
+		...document,
+		...dt,
+		isDocument: true,
+	};
+};
+
+const readDocuments = async () => {
+	const documents = await readJSONFile(config.paths.data.documents);
+	return Promise.all(documents.map(extendDocument).map(markItem));
+};
+
+const extendLink = (link) => {
+	const dt = getDateDetails(new Date(link.published));
+
+	return {
+		...link,
+		...dt,
+		isLink: true,
+	};
+};
+
+const readLinks = async () => {
+	const links = await readJSONFile(config.paths.data.links);
+	return Promise.all(links.map(extendLink).map(markItem));
+};
+
+const extendStatus = (status) => {
+	const dt = getDateDetails(new Date(status.published));
+	return {
+		...status,
+		...dt,
+		isStatus: true,
+	};
+};
+
+const readStatuses = async () => {
+	const statuses = await readJSONFile(config.paths.data.statuses);
+	return Promise.all(statuses.map(extendStatus).map(markItem));
+};
+
+const readSubscriptions = async () => {
+	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
+	const lastItem = subscriptions.pop();
+	return [
+		...subscriptions,
+		{
+			...lastItem,
+			isLast: true,
+		},
+	];
+};
+
+const readPartial = async (filename) => {
+	const name = path.basename(filename, ".mustache");
+	const content = await fs.readFile(
+		path.join(config.paths.src.partial, filename),
+		"utf8"
+	);
+	return {
+		[name]: content,
+	};
+};
+
+const gatherPartials = (partials) => Object.assign(...partials);
+
+const readPartials = async () => {
+	const filenames = await fs.readdir(config.paths.src.partial);
+	const partials = await Promise.all(filenames.map(readPartial));
+	return gatherPartials(partials);
+};
+
+const hasSameLink = (dest, article) => dest.endsWith(article.link);
+
+const findCover = (html) => {
+	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
+
+	if (!image) {
+		return {};
+	}
+
+	return {
+		cover: image[1],
+		twitterCard: "summary_large_image",
+	};
+};
 
 const mergeData = async (file, metadata) => {
 	const overrides = await readJSONFile(file.metadata);
@@ -236,23 +234,9 @@ const mergeData = async (file, metadata) => {
 		};
 	}
 
-	const [articles, books, documents, links, statuses] = await Promise.all(
-		[
-			metadata.articles,
-			metadata.books,
-			metadata.documents,
-			metadata.links,
-			metadata.statuses,
-		].map(markItems)
-	);
 	return {
 		...metadata,
 		...overrides,
-		articles,
-		books,
-		documents,
-		links,
-		statuses,
 	};
 };
 
@@ -270,7 +254,8 @@ const build = async (basicData, partials, file) => {
 	]);
 
 	if (data.isBookshelf && !data.isLog) {
-		data.otherBooks = markFirstItem(data.books.slice(9));
+		data.otherBooks = data.books.slice(9);
+		data.otherBooks = markFirstItem(data.otherBooks);
 		data.numOtherBooks = data.otherBooks.length;
 		data.books = data.books.slice(0, 9);
 	}
