@@ -2,6 +2,7 @@ import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fs from "fs/promises";
 import minimist from "minimist";
+import { openTwitter } from "../lib/open-twitter.js";
 import path from "path";
 import { runCommand } from "../lib/run-command.js";
 import { unescapeReferences } from "../lib/character-reference.js";
@@ -109,8 +110,7 @@ const main = async () => {
 	]);
 	const { domain, scheme } = await readJSONFile(config.paths.metadata.root);
 	const url = `${scheme}://${domain}${link}`;
-	const text = encodeURIComponent(`${article.title} ${url}`);
-	await runCommand("open", [`twitter://post?text=${text}`]);
+	await openTwitter(`${article.title} ${url}`);
 };
 
 main().catch((e) => {

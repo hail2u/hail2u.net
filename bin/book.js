@@ -2,6 +2,7 @@ import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fetch from "node-fetch";
 import minimist from "minimist";
+import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
 
@@ -73,8 +74,7 @@ const main = async () => {
 		await runCommand("git", ["add", "--", file]);
 		await runCommand("git", ["commit", `--message=Read ${asin}`]);
 		const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
-		const text = encodeURIComponent(`${title} ${url}`);
-		await runCommand("open", [`twitter://post?text=${text}`]);
+		await openTwitter(`${title} ${url}`);
 	} catch (e) {
 		throw new Error(`Amazon image server does not respond in 5s.`);
 	} finally {

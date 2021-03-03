@@ -1,6 +1,7 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import minimist from "minimist";
+import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
@@ -23,8 +24,7 @@ const main = async () => {
 	]);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Update status`]);
-	const text = encodeURIComponent(status);
-	await runCommand("open", [`twitter://post?text=${text}`]);
+	await openTwitter(status);
 };
 
 main().catch((e) => {

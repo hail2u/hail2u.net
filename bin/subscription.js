@@ -1,6 +1,7 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import minimist from "minimist";
+import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 
@@ -51,8 +52,7 @@ const main = async () => {
 	await outputJSONFile(file, shuffled);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
-	const text = encodeURIComponent(`「${title}」を購読開始 ${url}`);
-	await runCommand("open", [`twitter://post?text=${text}`]);
+	await openTwitter(`${title} ${url}`);
 };
 
 main().catch((e) => {

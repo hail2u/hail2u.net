@@ -1,6 +1,7 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import minimist from "minimist";
+import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
@@ -43,8 +44,7 @@ const main = async () => {
 	]);
 	await runCommand("git", ["add", "--", file]);
 	await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
-	const text = encodeURIComponent(`${comment} ${url}`);
-	await runCommand("open", [`twitter://post?text=${text}`]);
+	await openTwitter(`${comment} ${url}`);
 };
 
 main().catch((e) => {
