@@ -319,7 +319,7 @@ const main = async () => {
 		statuses,
 		subscriptions,
 		partials,
-		pkg,
+		{ version },
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		readArticles(),
@@ -339,7 +339,7 @@ const main = async () => {
 		links,
 		statuses,
 		subscriptions,
-		version: pkg.version,
+		version,
 	};
 
 	if (latest) {
