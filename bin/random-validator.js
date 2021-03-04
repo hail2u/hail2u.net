@@ -34,18 +34,18 @@ const validate = async (file) => {
 const isEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-	const [metadata, sitemap] = await Promise.all([
+	const [{ domain, scheme }, sitemap] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		fs.readFile(config.paths.dest.sitemap, "utf8"),
 	]);
-	const prefix = `${metadata.scheme}://${metadata.domain}`;
-	const reIndex = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const indexes = Array.from(sitemap.matchAll(reIndex), rewritePath).filter(
+	const prefix = `${scheme}://${domain}`;
+	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
+	const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath).filter(
 		isNotStyleGuide
 	);
-	const reArticle = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
+	const articleRe = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = shuffleArray(
-		Array.from(sitemap.matchAll(reArticle), rewritePath)
+		Array.from(sitemap.matchAll(articleRe), rewritePath)
 	).slice(0, 3);
 	const results = await Promise.all([...indexes, ...articles].map(validate));
 	const errors = results.flat();
