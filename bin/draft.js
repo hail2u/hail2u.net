@@ -66,11 +66,12 @@ const main = async () => {
 	}
 
 	const draft = await getDraft(file);
-	await validateBody(draft.body, file);
-	const [template, dir] = await Promise.all([
-		fs.readFile(config.paths.src.testArticle, "utf8"),
+	const [dir, template] = await Promise.all([
 		makeTempDir(),
+		fs.readFile(config.paths.src.testArticle, "utf8"),
+		validateBody(draft.body, file),
 	]);
+	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
 		.render(template, draft, null, {
@@ -78,7 +79,6 @@ const main = async () => {
 		})
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
 	const highlighted = highlight(rendered);
-	const test = path.join(dir, "test.html");
 	await outputFile(test, highlighted);
 	await runCommand("open", [test]);
 };

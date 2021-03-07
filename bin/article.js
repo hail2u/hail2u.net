@@ -79,38 +79,41 @@ const main = async () => {
 		throw new Error(`A file path must be passed.`);
 	}
 
-	const article = await getArticle(file);
+	const [{ body, name, src, title }, cache] = await Promise.all([
+		getArticle(file),
+		readJSONFile(config.paths.data.articles),
+	]);
 	await Promise.all([
-		checkName(article.name),
-		checkTitleLength(article.title),
-		checkTitleType(article.title),
-		validateBody(article.body, article.src),
+		checkName(name),
+		checkTitleLength(title),
+		checkTitleType(title),
+		validateBody(body, src),
 	]);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
-		`${article.name}.html`
+		`${name}.html`
 	);
-	const cache = await readJSONFile(config.paths.data.articles);
 	await outputJSONFile(config.paths.data.articles, [
 		{
-			body: article.body,
+			body,
 			link,
 			published: Date.now(),
-			title: article.title,
+			title,
 		},
 		...cache,
 	]);
-	await fs.rm(article.src);
-	await runCommand("git", ["add", "--", config.paths.data.articles]);
-	const th = cache.length + 1;
-	await runCommand("git", [
-		"commit",
-		`--message=Contribute ${article.name} (${th})`,
+	await Promise.all([
+		fs.rm(src),
+		runCommand("git", ["add", "--", config.paths.data.articles]),
 	]);
-	const { domain, scheme } = await readJSONFile(config.paths.metadata.root);
+	const th = cache.length + 1;
+	const [{ domain, scheme }] = await Promise.all([
+		readJSONFile(config.paths.metadata.root),
+		runCommand("git", ["commit", `--message=Contribute ${name} (${th})`]),
+	]);
 	const url = `${scheme}://${domain}${link}`;
-	await openTwitter(`${article.title} ${url}`);
+	await openTwitter(`${title} ${url}`);
 };
 
 main().catch((e) => {
