@@ -62,7 +62,7 @@ const main = async () => {
 	} = minimist(process.argv.slice(2));
 
 	if (!file) {
-		throw new Error(`Only 1 argument is required.`);
+		throw new Error(`A file path must be passed.`);
 	}
 
 	const draft = await getDraft(file);
