@@ -141,6 +141,10 @@ export default {
 				src: "src/js/back-to-top.js",
 			},
 			{
+				dest: "dist/js/heading-anchors.{{version}}.js",
+				src: "src/js/heading-anchors.js",
+			},
+			{
 				dest: "dist/js/unutm.{{version}}.js",
 				src: "src/js/unutm.js",
 			},
