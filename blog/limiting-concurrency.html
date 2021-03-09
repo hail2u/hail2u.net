@@ -16,11 +16,11 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.19.2.css" media="only screen" rel="stylesheet">
-		<link href="/css/print.9.19.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.19.3.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.19.3.css" media="only print" rel="stylesheet">
 
-		<script async defer src="/js/back-to-top.9.19.2.js"></script>
-		<script async defer src="/js/unutm.9.19.2.js"></script>
+		<script async defer src="/js/back-to-top.9.19.3.js"></script>
+		<script async defer src="/js/unutm.9.19.3.js"></script>
 
 		<meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" itemprop="description">
 		
@@ -66,7 +66,7 @@
 
 <p>並行実行数を固定するコードを書くと確実だが、スパッと書けなかった。ならば1024を超えない程度に配列を分割するだけでもいいかと、目先を変えた。今回は、このウェブサイトのHTML生成スクリプトでどうするかという話だ。まだ3268記事なので、4つに（800強ずつに）分割すれば大丈夫だろう。5で割る必要が出てくるのは、月に10記事でもあと7年以上かかる。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
 <span class="hljs-keyword">const</span> chunks = longArray.reduce(<span class="hljs-function">(<span class="hljs-params">previous, current, index</span>) =&gt;</span> {
 	previous[index % previous.length].push(current);
 	<span class="hljs-keyword">return</span> previous;
@@ -78,7 +78,7 @@
 
 <p>配列を分割して配列の配列にしたかったので、<code>Array#reduce()</code>を使って書いた。5年後に5分割するよう書き換えるなら、初期配列を書き換える。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
 <span class="hljs-keyword">const</span> chunkCount = <span class="hljs-number">4</span>;
 <span class="hljs-keyword">const</span> chunkLength = <span class="hljs-built_in">Math</span>.floor(longArray.length / chunkCount);
 
@@ -92,7 +92,7 @@
 
 <p>普通に<code>Array#slice()</code>で書いた方が、ループが1回で済むので速そうだ。ここまで書いて、ようやく並行実行数を固定するコードがスパッと書けることがわかった。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
 <span class="hljs-keyword">const</span> limit = <span class="hljs-number">32</span>;
 <span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
 
@@ -108,7 +108,7 @@
 
 <p><code>Array#splice()</code>で破壊しながら実行すると、もっと短くなりそうだ。うろ覚えだが、後ろから削っていくと速かったはずだ。</p>
 
-<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
 
 <span class="hljs-keyword">while</span> (longArray.length &gt; <span class="hljs-number">0</span>) {
 	<span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
@@ -120,6 +120,8 @@
 
 <p>まずはこれでやっていくことにした。</p>
 				</div>
+
+				<script async defer src="/js/heading-anchors.9.19.3.js"></script>
 			</article>
 		</main>
 

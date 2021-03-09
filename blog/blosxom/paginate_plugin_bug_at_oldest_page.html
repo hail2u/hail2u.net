@@ -16,11 +16,11 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.19.2.css" media="only screen" rel="stylesheet">
-		<link href="/css/print.9.19.2.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.19.3.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.19.3.css" media="only print" rel="stylesheet">
 
-		<script async defer src="/js/back-to-top.9.19.2.js"></script>
-		<script async defer src="/js/unutm.9.19.2.js"></script>
+		<script async defer src="/js/back-to-top.9.19.3.js"></script>
+		<script async defer src="/js/unutm.9.19.3.js"></script>
 
 		<meta content="総エントリー数が、一度に表示するエントリー数で割り切れる場合、最古のページが妙なことになるような。空ページが出力されないですか？" itemprop="description">
 		
@@ -63,26 +63,28 @@
 
 				<div itemprop="articleBody">
 					<p>総エントリー数が、一度に表示するエントリー数で割り切れる場合、最古のページが妙なことになるような。空ページが出力されないですか？</p>
-<pre><code class="hljs language-perl">$pages = ($num_files / $blosxom::num_entries) + <span class="hljs-number">1</span>;</code></pre>
+<pre><code class="highlight language-perl">$pages = ($num_files / $blosxom::num_entries) + <span class="hljs-number">1</span>;</code></pre>
 <p>サブルーチン<code>filter</code>のあたりかな。1足すとかじゃなくて、切り上げにすれば良いのか。</p>
-<pre><code class="hljs language-perl">$pages = $num_files / $blosxom::num_entries;
+<pre><code class="highlight language-perl">$pages = $num_files / $blosxom::num_entries;
 $pages = <span class="hljs-keyword">int</span>($pages + <span class="hljs-number">1</span>) <span class="hljs-keyword">unless</span> $pages == <span class="hljs-keyword">int</span>($pages);</code></pre>
 <p>と、変えてみる。</p>
 <p>てか、最古のページで空エントリが出力されてる。エントリ無いのにstory出力しようとしてるっぽいですね。</p>
-<pre><code class="hljs language-perl"><span class="hljs-keyword">return</span> @sorted[$skip .. $num_files - <span class="hljs-number">1</span>];</code></pre>
+<pre><code class="highlight language-perl"><span class="hljs-keyword">return</span> @sorted[$skip .. $num_files - <span class="hljs-number">1</span>];</code></pre>
 <p>サブルーチン<code>sort</code>のところをこう変えればいいみたい。配列の添え字は個数 - 1までなのでということあたりのお話かな。</p>
 <p>とか、最古のページあたりをチェックしてたら、サブルーチン<code>head</code>のところもバグらしきものを・・・。次へのリンクを生成する<code>if</code>ステートメントが、</p>
-<pre><code class="hljs language-perl"><span class="hljs-keyword">if</span> (($page + <span class="hljs-number">1</span>) &lt; $pages) {
+<pre><code class="highlight language-perl"><span class="hljs-keyword">if</span> (($page + <span class="hljs-number">1</span>) &lt; $pages) {
 ...
 }</code></pre>
 <p>と、なってるのですが、これだと最古のページの1つ手前で、次へのリンクが生成されなかったです。</p>
-<pre><code class="hljs language-perl">
+<pre><code class="highlight language-perl">
 <span class="hljs-keyword">if</span> (($page + <span class="hljs-number">1</span>) &lt;= $pages) {
 ...
 }</code></pre>
 <p>こうだろ。どうよ！</p>
 <p>正直、挙動を大幅に変えてたりするので、paginateでは問題ないのかもしれないですね（弱。</p>
 				</div>
+
+				<script async defer src="/js/heading-anchors.9.19.3.js"></script>
 			</article>
 		</main>
 
