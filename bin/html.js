@@ -4,35 +4,13 @@ import {
 } from "../lib/character-reference.js";
 import config from "../.config.js";
 import fs from "fs/promises";
+import { getDateDetails } from "../lib/get-date-details.js";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
-
-const getDateDetails = (dt) => {
-	const date = dt.getDate();
-	const hour = dt.getHours();
-	const minute = dt.getMinutes();
-	const month = dt.getMonth() + 1;
-	const second = dt.getSeconds();
-	const year = dt.getFullYear();
-	return {
-		date,
-		hour,
-		minute,
-		month,
-		second,
-		strDate: String(date).padStart(2, "0"),
-		strHour: String(hour).padStart(2, "0"),
-		strMinute: String(minute).padStart(2, "0"),
-		strMonth: String(month).padStart(2, "0"),
-		strSecond: String(second).padStart(2, "0"),
-		strYear: String(year),
-		year,
-	};
-};
 
 const extendArticle = (article) => {
 	const dt = getDateDetails(new Date(article.published));

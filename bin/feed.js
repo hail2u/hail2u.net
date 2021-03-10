@@ -4,6 +4,7 @@ import {
 } from "../lib/character-reference.js";
 import config from "../.config.js";
 import fs from "fs/promises";
+import { getDateDetails } from "../lib/get-date-details.js";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
@@ -82,33 +83,6 @@ const pickItems = (metadata, type) => metadata[type];
 
 const comparePublished = (a, b) =>
 	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
-const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-const monthNames = [
-	"Jan",
-	"Feb",
-	"Mar",
-	"Apr",
-	"May",
-	"Jun",
-	"Jul",
-	"Aug",
-	"Sep",
-	"Oct",
-	"Nov",
-	"Dec",
-];
-
-const getDateDetails = (dt) => ({
-	date: dt.getDate(),
-	dow: dowNames[dt.getDay()],
-	hour: String(dt.getHours()).padStart(2, "0"),
-	minute: String(dt.getMinutes()).padStart(2, "0"),
-	month: monthNames[dt.getMonth()],
-	second: String(dt.getSeconds()).padStart(2, "0"),
-	year: String(dt.getFullYear()),
-});
 
 const toAbsoluteURL = (prefix, url) => {
 	if (!url.startsWith("/")) {
