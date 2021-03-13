@@ -6,10 +6,10 @@ import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
 	const {
-		_: [status],
+		_: [text],
 	} = minimist(process.argv.slice(2));
 
-	if (!status) {
+	if (!text) {
 		throw new Error(`Only 1 argument is required.`);
 	}
 
@@ -18,13 +18,17 @@ const main = async () => {
 	await outputJSONFile(file, [
 		{
 			published: Date.now(),
-			text: status,
+			text,
 		},
 		...statuses,
 	]);
 	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=Update status`]);
-	await openTwitter(status);
+	await runCommand("git", [
+		"commit",
+		"--message=Update status",
+		`--message=${text}`,
+	]);
+	await openTwitter(text);
 };
 
 main().catch((e) => {

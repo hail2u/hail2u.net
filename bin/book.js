@@ -48,14 +48,14 @@ const main = async () => {
 	const abortID = setTimeout(cancelFetch.bind(null, abortController), 5000);
 
 	try {
-		const [res, saver] = await Promise.all([
+		const [res, img] = await Promise.all([
 			fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`, {
 				signal: abortController.signal,
 			}),
 			sharp(),
 		]);
-		res.body.pipe(saver);
-		const metadata = await saver.metadata();
+		res.body.pipe(img);
+		const metadata = await img.metadata();
 
 		if (metadata.height === 1 && metadata.width === 1) {
 			throw new Error(`${title} does not have a cover image.`);
