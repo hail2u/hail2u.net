@@ -5,18 +5,18 @@ import sharp from "sharp";
 
 const generatePNG = async (favicon, file) => {
 	const metadata = await sharp(file.src).metadata();
-	const img = sharp(file.src, {
+	const icon = sharp(file.src, {
 		density: (file.width * metadata.density) / metadata.width,
 	});
-	img.resize(file.width);
+	icon.resize(file.width);
 
 	if (!file.dest) {
-		const png = await img.png().toBuffer();
+		const png = await icon.png().toBuffer();
 		favicon.append(IcoImage.fromPNG(png));
 		return;
 	}
 
-	await img.toFile(file.dest);
+	await icon.toFile(file.dest);
 };
 
 const main = async () => {
