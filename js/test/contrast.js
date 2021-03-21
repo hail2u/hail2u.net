@@ -84,7 +84,7 @@ const testContrast_getScore = (background, foreground) => {
 };
 
 const testContrast = () => {
-	const queryColorCell = ".test-color > tbody > tr > td:first-child";
+	const queryColorCell = ".test-color > tbody > tr > td:nth-child(2)";
 	const colorCells = document.querySelectorAll(queryColorCell);
 
 	for (const colorCell of colorCells) {
