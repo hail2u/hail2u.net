@@ -11,6 +11,18 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[コーディング規約で!importantを禁止されているプロジェクトで、それらしきものを実現しようと考えている。最終的に:not(#not) :not(#not) pというセレクターをひねり出した。ウェブページでは、ブラウザーがhtmlとbody要素を補完するので、すべてのp要素に必ずマッチする。そして、詳細度が2,0,1と、かなり高くなるため、ルールセットが!importantにかなり近い強さになる。]]></description>
+				<link>https://hail2u.net/blog/not-not-not-not-p.html</link>
+				<pubDate>Mon, 22 Mar 2021 08:22:37 +0900</pubDate>
+				<title><![CDATA[:not(#not) :not(#not) p]]></title>
+
+					<content:encoded><![CDATA[<p>コーディング規約で<code>!important</code>を禁止されているプロジェクトで、それらしきものを実現しようと考えている。最終的に<code>:not(#not) :not(#not) p</code>というセレクターをひねり出した。ウェブページでは、ブラウザーが<code>html</code>と<code>body</code>要素を補完するので、すべての<code>p</code>要素に必ずマッチする。そして、詳細度が<code>2,0,1</code>と、かなり高くなるため、ルールセットが<code>!important</code>にかなり近い強さになる。</p>
+
+<p><code>:not(#not)</code>はいくつでも書ける。しかし、補完される2つの要素分以外は、HTMLのツリー構造に依存するので、注意が必要だ。セレクターのため、ブロック（ルールセット）が明示的に分かれ、追加と削除が明確な分、<code>!important</code>よりも作業しやすい。<code>:not()</code>疑似クラスの基本サポートはかなり古い（10年以上）ため、そういう点でも問題はない。</p>
+
+<p>何かおかしいところを直すために一時的に使い、根本的に解決出来たら消す用途に使おうと思っている。ほとんどの人が見たことがないので、かなり書きづらい。こっそり書いたが、まだ見つかっていない。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[楽しいので、週一くらいでフォカッチャを焼いている。粉をいろいろ変えているが、「フォカッチャ向け」と書いてあった粉がおいしい。信じることは大切だ。]]></description>
 				<link>https://hail2u.net/blog/on-20210317.html</link>
 				<pubDate>Wed, 17 Mar 2021 07:12:56 +0900</pubDate>
@@ -244,36 +256,6 @@
 <hr>
 
 <p>あとはうまいことスクリプトを<a href="https://github.com/hail2u/hail2u.net/blob/e1ca9607c27d5b864d7ff300275d7d9f580c20ad/bin/status.js#L26-L27">組んでやるだけ</a>でいい。今のところ、デスクトップからしか更新するつもりがないので、これでやっていけるかもしれない。問題なく動いているので、3ヶ月くらいは様子を見てからIFTTTレシピを消すつもりだ。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[利用しているフォントの「0」のグリフ幅によって変わるch単位は、実装されて久しい。これを、font-sizeプロパティーでcalc()やclamp()など計算するCSS関数を通して使うと、Chrome 88やEdge 88で想定より大きくなってしまうバグがあるようだ。Firefox 85やSafari 14では問題なく、またwidthプロパティーなどでなら発生しない。]]></description>
-				<link>https://hail2u.net/blog/font-size-calc-2ch-in-chrome-88-or-edge-88.html</link>
-				<pubDate>Tue, 9 Feb 2021 08:39:46 +0900</pubDate>
-				<title><![CDATA[Chrome 88やEdge 88でのfont-size: calc(2ch)]]></title>
-
-					<content:encoded><![CDATA[<p>利用しているフォントの「0」のグリフ幅によって変わる<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位</a>は、実装されて久しい。これを、<code>font-size</code>プロパティーで<code>calc()</code>や<code>clamp()</code>など計算するCSS関数を通して使うと、<a href="https://hail2u.net/pub/test/703.html">Chrome 88やEdge 88で想定より大きくなってしまうバグ</a>があるようだ。Firefox 85やSafari 14では問題なく、また<code>width</code>プロパティーなどでなら発生しない。</p>
-
-<pre><code class="language-css">.test .raw {
-	font-size: 2ch;
-}
-
-.test .calc {
-	font-size: calc(2ch);
-}</code></pre>
-
-<p>このようなコードで再現する。同じ大きさ（16px前後）になるはずだが、Chrome 88やEdge 88で<code>.calc</code>の方が倍の大きさになってしまう。例えばNoto Sans CJK JPだと、17.76pxのはずが35.52pxになった。</p>
-
-<p>2度計算してしまっているような気がするが、<code>3ch</code>にしても倍なので、そういうわけでもないようだ。単に<code>1ch</code>が倍に解釈されてしまうように見える。とにかく挙動不審だ。解決策もなさそうで、使わないようにするしかない。フォントによって変わるサイズを利用する時は頭に入れておくべきだろう。<code>ex</code>単位でも発生する（<code>cap</code>や<code>lh</code>単位は実装がない）。</p>
-
-<hr>
-
-<p>このウェブサイトのカラム幅を<code>ch</code>単位で指定しようとしたら、まんまと遭遇した。<code>html</code>要素の文字サイズを描画領域幅とカラム幅の差から計算していたので、ぴったりとこのような使い方になっていた。変わったことをしている自覚はあったので、すぐに気づけた。カスタム・プロパティーで定義、それを使って計算、というような書き方だと、どこでどのような単位を使っているか忘れてしまうので、遭遇しやすいかもしれない。</p>
-
-<section>
-	<h2>追記</h2>
-
-	<p>このバグはどうもWindows 10でスケーリングを200%にすると起こるようだ。100%にすると起こらず、150%にすると1.5倍になった。高解像度なWindows 10のパソコンはそこそこ存在すると思うので、気をつける必要があるし、エミュレーター（スケーリングが100%のまま）などでは気づけない可能性も高いので、より注意が必要かもしれない。</p>
-</section>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
