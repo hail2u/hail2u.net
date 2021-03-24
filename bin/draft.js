@@ -20,7 +20,7 @@ const getDraft = async (file) => {
 	const body = rest
 		.join("\n")
 		.trim()
-		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//gu, "/");
+		.replace(/(?<=\b(href|src)=")\.\.\/dist\//gu, "/");
 	return {
 		body,
 		title: unescapeReferences(title.replace(/<.*?>/gu, "")),
