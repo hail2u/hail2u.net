@@ -17,7 +17,7 @@ const main = async () => {
 	const file = config.paths.data.statuses;
 	const statuses = await readJSONFile(file);
 	const published = Date.now();
-	const dt = getDateDetails(new Date(published));
+	const dt = getDateDetails(published);
 	await outputJSONFile(file, [
 		{
 			description: text,

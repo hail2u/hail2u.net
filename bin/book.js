@@ -71,7 +71,7 @@ const main = async () => {
 		const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
 		const body = `<p><a href="${link}">${description}</a></p>`;
 		const published = Date.now();
-		const dt = getDateDetails(new Date(published));
+		const dt = getDateDetails(published);
 		await outputJSONFile(file, [
 			{
 				body,

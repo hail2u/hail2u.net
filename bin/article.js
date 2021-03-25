@@ -100,7 +100,7 @@ const main = async () => {
 		`${name}.html`
 	);
 	const published = Date.now();
-	const dt = getDateDetails(new Date(published));
+	const dt = getDateDetails(published);
 	await outputJSONFile(config.paths.data.articles, [
 		{
 			body,
