@@ -137,10 +137,6 @@ export default {
 				src: "src/js/append-next.js",
 			},
 			{
-				dest: "dist/js/back-to-top.{{version}}.js",
-				src: "src/js/back-to-top.js",
-			},
-			{
 				dest: "dist/js/heading-anchors.{{version}}.js",
 				src: "src/js/heading-anchors.js",
 			},
