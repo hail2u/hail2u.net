@@ -56,6 +56,11 @@ const main = async () => {
 			}),
 			sharp(),
 		]);
+
+		if (res.status !== 200) {
+			throw new Error(`${res.status} ${res.statusText}`);
+		}
+
 		res.body.pipe(img);
 		const metadata = await img.metadata();
 
