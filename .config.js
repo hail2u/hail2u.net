@@ -136,10 +136,6 @@ export default {
 				dest: "dist/js/append-next.{{version}}.js",
 				src: "src/js/append-next.js",
 			},
-			{
-				dest: "dist/js/unutm.{{version}}.js",
-				src: "src/js/unutm.js",
-			},
 		],
 	},
 	paths: {
