@@ -8,7 +8,7 @@ import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
 
-const isReadBook = (asin, book) => asin === book.asin;
+const isReadBook = (title, book) => title === book.title;
 
 const cancelFetch = (abortController) => {
 	abortController.abort();
@@ -42,7 +42,7 @@ const main = async () => {
 	const file = config.paths.data.books;
 	const books = await readJSONFile(file);
 
-	if (books.find(isReadBook.bind(null, asin))) {
+	if (books.find(isReadBook.bind(null, title))) {
 		throw new Error(`${title} has already been added.`);
 	}
 
@@ -63,19 +63,15 @@ const main = async () => {
 			throw new Error(`${title} does not have a cover image.`);
 		}
 
-		const description = `<img height="${
-			metadata.height
-		}" src="https://m.media-amazon.com/images/P/${asin}.jpg" title="${escapeCharacters(
-			title
-		)}" width="${metadata.width}">`;
 		const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
-		const body = `<p><a href="${link}">${description}</a></p>`;
+		const titleEscaped = escapeCharacters(title);
+		const body = `<a href="${link}"><img height="${metadata.height}" src="https://m.media-amazon.com/images/P/${asin}.jpg" title="${titleEscaped}" width="${metadata.width}"></a>`;
 		const published = Date.now();
 		const dt = getDateDetails(published);
 		await outputJSONFile(file, [
 			{
 				body,
-				description,
+				description: title,
 				link,
 				published,
 				...dt,
