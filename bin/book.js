@@ -85,6 +85,10 @@ const main = async () => {
 		const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
 		await openTwitter(`${title} ${url}`);
 	} catch (e) {
+		if (e) {
+			throw e;
+		}
+
 		throw new Error(`Amazon image server does not respond in 5s.`);
 	} finally {
 		clearTimeout(abortID);
