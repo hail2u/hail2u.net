@@ -1,82 +1,13 @@
-import {
-	escapeCharacters,
-	unescapeReferences,
-} from "../lib/character-reference.js";
 import config from "../.config.js";
+import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import { getDateDetails } from "../lib/get-date-details.js";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
-const extendArticle = (article) => ({
-	...article,
-	description: unescapeReferences(article.body.replace(/<.*?>/gu, ""))
-		.trim()
-		.split("\n")
-		.shift(),
-	type: "article",
-});
-
-const readArticles = async () => {
-	const articles = await readJSONFile(config.paths.data.articles);
-	const latests = articles.slice(0, 10);
-	return Promise.all(latests.map(extendArticle));
-};
-
-const extendBook = (book) => {
-	const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${book.asin}/hail2unet-22`;
-	return {
-		...book,
-		body: `<p><a href="${link}"><img src="https://m.media-amazon.com/images/P/${book.asin}.jpg" title="${book.title}"></a></p>`,
-		description: book.title,
-		link,
-		type: "book",
-	};
-};
-
-const readBooks = async () => {
-	const books = await readJSONFile(config.paths.data.books);
-	const latests = books.slice(0, 10);
-	return Promise.all(latests.map(extendBook));
-};
-
-const extendDocument = (document) => ({
-	...document,
-	type: "document",
-});
-
-const readDocuments = async () => {
-	const documents = await readJSONFile(config.paths.data.documents);
-	const latests = documents.slice(0, 10);
-	return Promise.all(latests.map(extendDocument));
-};
-
-const extendLink = (link) => ({
-	...link,
-	description: link.comment,
-	link: link.url,
-	type: "link",
-});
-
-const readLinks = async () => {
-	const links = await readJSONFile(config.paths.data.links);
-	const latests = links.slice(0, 10);
-	return Promise.all(latests.map(extendLink));
-};
-
-const extendStatus = (status) => ({
-	...status,
-	description: status.text,
-	link: `/statuses/#on-${status.published}`,
-	title: status.text,
-	type: "status",
-});
-
-const readStatuses = async () => {
-	const statuses = await readJSONFile(config.paths.data.statuses);
-	const latests = statuses.slice(0, 10);
-	return Promise.all(latests.map(extendStatus));
+const readLatestItems = async (file) => {
+	const items = await readJSONFile(file);
+	return items.slice(0, 10);
 };
 
 const pickItems = (metadata, type) => metadata[type];
@@ -96,14 +27,12 @@ const toAbsoluteURLAll = (prefix, match, attr, url) =>
 	`${attr}="${toAbsoluteURL(prefix, url)}"`;
 
 const extendItem = (prefix, item) => {
-	const dt = getDateDetails(new Date(item.published));
 	const link = toAbsoluteURL(prefix, item.link);
 
 	if (item.body) {
 		const urlRe = /(href|src)="(\/.*?)"/gu;
 		return {
 			...item,
-			...dt,
 			body: item.body.replace(urlRe, toAbsoluteURLAll.bind(null, prefix)),
 			link,
 		};
@@ -111,7 +40,6 @@ const extendItem = (prefix, item) => {
 
 	return {
 		...item,
-		...dt,
 		link,
 	};
 };
@@ -145,11 +73,11 @@ const build = async (basicData, file) => {
 const main = async () => {
 	const metadata = await readJSONFile(config.paths.metadata.root);
 	const [articles, books, documents, links, statuses] = await Promise.all([
-		readArticles(),
-		readBooks(),
-		readDocuments(),
-		readLinks(),
-		readStatuses(),
+		readLatestItems(config.paths.data.articles),
+		readLatestItems(config.paths.data.books),
+		readLatestItems(config.paths.data.documents),
+		readLatestItems(config.paths.data.links),
+		readLatestItems(config.paths.data.statuses),
 	]);
 	return Promise.all(
 		config.files.feed.map(

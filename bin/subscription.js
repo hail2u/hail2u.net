@@ -44,8 +44,8 @@ const main = async () => {
 	const shuffled = shuffleArray([
 		{
 			feed,
+			link: url,
 			title,
-			url,
 		},
 		...subscriptions,
 	]);

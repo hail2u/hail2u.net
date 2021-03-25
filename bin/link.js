@@ -1,5 +1,6 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
+import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
@@ -33,12 +34,16 @@ const main = async () => {
 
 	const file = config.paths.data.links;
 	const links = await readJSONFile(file);
+	const published = Date.now();
+	const dt = getDateDetails(new Date(published));
 	await outputJSONFile(file, [
 		{
-			comment,
-			published: Date.now(),
+			description: comment,
+			link: url,
+			published,
+			...dt,
 			title,
-			url,
+			type: "link",
 		},
 		...links,
 	]);

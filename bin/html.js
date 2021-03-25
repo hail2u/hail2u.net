@@ -1,31 +1,12 @@
-import {
-	escapeCharacters,
-	unescapeReferences,
-} from "../lib/character-reference.js";
 import config from "../.config.js";
+import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import { getDateDetails } from "../lib/get-date-details.js";
 import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
-
-const extendArticle = (article) => {
-	const dt = getDateDetails(new Date(article.published));
-	const description = unescapeReferences(article.body.replace(/<.*?>/gu, ""))
-		.trim()
-		.split("\n")
-		.shift();
-	return {
-		...article,
-		...dt,
-		body: article.body.trim(),
-		description,
-		isArticle: true,
-	};
-};
 
 const isFirstInDate = (current, previous) => {
 	if (!previous || current.date !== previous.date) {
@@ -89,66 +70,9 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const readArticles = async () => {
-	const articles = await readJSONFile(config.paths.data.articles);
-	return Promise.all(articles.map(extendArticle).map(markItem));
-};
-
-const extendBook = (book) => {
-	const dt = getDateDetails(new Date(book.published));
-	return {
-		...book,
-		...dt,
-		isBook: true,
-	};
-};
-
-const readBooks = async () => {
-	const books = await readJSONFile(config.paths.data.books);
-	return Promise.all(books.map(extendBook).map(markItem));
-};
-
-const extendDocument = (document) => {
-	const dt = getDateDetails(new Date(document.published));
-	return {
-		...document,
-		...dt,
-		isDocument: true,
-	};
-};
-
-const readDocuments = async () => {
-	const documents = await readJSONFile(config.paths.data.documents);
-	return Promise.all(documents.map(extendDocument).map(markItem));
-};
-
-const extendLink = (link) => {
-	const dt = getDateDetails(new Date(link.published));
-
-	return {
-		...link,
-		...dt,
-		isLink: true,
-	};
-};
-
-const readLinks = async () => {
-	const links = await readJSONFile(config.paths.data.links);
-	return Promise.all(links.map(extendLink).map(markItem));
-};
-
-const extendStatus = (status) => {
-	const dt = getDateDetails(new Date(status.published));
-	return {
-		...status,
-		...dt,
-		isStatus: true,
-	};
-};
-
-const readStatuses = async () => {
-	const statuses = await readJSONFile(config.paths.data.statuses);
-	return Promise.all(statuses.map(extendStatus).map(markItem));
+const readItems = async (file) => {
+	const items = await readJSONFile(file);
+	return Promise.all(items.map(markItem));
 };
 
 const readSubscriptions = async () => {
@@ -285,11 +209,11 @@ const main = async () => {
 		{ version },
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
-		readArticles(),
-		readBooks(),
-		readDocuments(),
-		readLinks(),
-		readStatuses(),
+		readItems(config.paths.data.articles),
+		readItems(config.paths.data.books),
+		readItems(config.paths.data.documents),
+		readItems(config.paths.data.links),
+		readItems(config.paths.data.statuses),
 		readSubscriptions(),
 		readPartials(),
 		readJSONFile(file),

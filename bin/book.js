@@ -1,6 +1,8 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
+import { escapeCharacters } from "../lib/character-reference.js";
 import fetch from "node-fetch";
+import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
@@ -61,13 +63,24 @@ const main = async () => {
 			throw new Error(`${title} does not have a cover image.`);
 		}
 
+		const description = `<img height="${
+			metadata.height
+		}" src="https://m.media-amazon.com/images/P/${asin}.jpg" title="${escapeCharacters(
+			title
+		)}" width="${metadata.width}">`;
+		const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
+		const body = `<p><a href="${link}">${description}</a></p>`;
+		const published = Date.now();
+		const dt = getDateDetails(new Date(published));
 		await outputJSONFile(file, [
 			{
-				asin,
-				height: metadata.height,
-				published: Date.now(),
+				body,
+				description,
+				link,
+				published,
+				...dt,
 				title,
-				width: metadata.width,
+				type: "book",
 			},
 			...books,
 		]);

@@ -1,6 +1,7 @@
 import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../.config.js";
 import fs from "fs/promises";
+import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
 import path from "path";
@@ -89,17 +90,26 @@ const main = async () => {
 		checkTitleType(title),
 		validateBody(body, src),
 	]);
+	const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
+		.trim()
+		.split("\n")
+		.shift();
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
 		`${name}.html`
 	);
+	const published = Date.now();
+	const dt = getDateDetails(new Date(published));
 	await outputJSONFile(config.paths.data.articles, [
 		{
 			body,
+			description,
 			link,
-			published: Date.now(),
+			published,
+			...dt,
 			title,
+			type: "article",
 		},
 		...cache,
 	]);
