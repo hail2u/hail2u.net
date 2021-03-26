@@ -15,7 +15,7 @@ const getArticle = async (file) => {
 	const body = rest
 		.join("\n")
 		.trim()
-		.replace(/(?<=\b(href|src)=")\.\.(\/\.\.\/dist)?\//gu, "/");
+		.replace(/(?<=\b(href|src)=")\.\.\/dist\//gu, "/");
 	return {
 		body,
 		name: path.basename(file, path.extname(file)),
