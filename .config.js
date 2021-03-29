@@ -89,6 +89,16 @@ export default {
 				src: "src/links/index.mustache",
 			},
 			{
+				dest: "dist/mysubscriptions.opml",
+				metadata: "src/metadata.json",
+				src: "src/mysubscriptions.mustache",
+			},
+			{
+				dest: "dist/sitemap.xml",
+				metadata: "src/metadata.json",
+				src: "src/sitemap.mustache",
+			},
+			{
 				dest: "dist/statuses/index.html",
 				metadata: "src/statuses/index.json",
 				src: "src/statuses/index.mustache",
@@ -153,7 +163,6 @@ export default {
 			root: "dist/",
 			sitemap: "dist/sitemap.xml",
 			styleGuide: "dist/style-guide/index.html",
-			mysubscriptions: "dist/mysubscriptions.opml",
 		},
 		metadata: {
 			article: "src/blog/article.json",
@@ -164,9 +173,7 @@ export default {
 			draft: "src/drafts/",
 			partial: "src/partial/",
 			root: "src/",
-			sitemap: "src/sitemap.mustache",
 			styleGuide: "src/css/test.html",
-			mysubscriptions: "src/mysubscriptions.mustache",
 			testArticle: "src/blog/test.mustache",
 		},
 	},
