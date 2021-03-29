@@ -75,18 +75,6 @@ const readItems = async (file) => {
 	return Promise.all(items.map(markItem));
 };
 
-const readSubscriptions = async () => {
-	const subscriptions = await readJSONFile(config.paths.data.subscriptions);
-	const lastItem = subscriptions.pop();
-	return [
-		...subscriptions,
-		{
-			...lastItem,
-			isLast: true,
-		},
-	];
-};
-
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
 	const content = await fs.readFile(
@@ -98,12 +86,10 @@ const readPartial = async (filename) => {
 	};
 };
 
-const gatherPartials = (partials) => Object.assign(...partials);
-
 const readPartials = async () => {
 	const filenames = await fs.readdir(config.paths.src.partial);
 	const partials = await Promise.all(filenames.map(readPartial));
-	return gatherPartials(partials);
+	return Object.assign(...partials);
 };
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
@@ -121,14 +107,14 @@ const findCover = (html) => {
 	};
 };
 
-const mergeData = async (file, metadata) => {
+const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
 
 	if (overrides.isWeblogArticle) {
-		const article = metadata.articles.find(hasSameLink.bind(null, file.dest));
+		const article = data.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
-			...metadata,
+			...data,
 			...overrides,
 			...article,
 			...cover,
@@ -137,21 +123,22 @@ const mergeData = async (file, metadata) => {
 	}
 
 	return {
-		...metadata,
+		...data,
 		...overrides,
 	};
 };
 
 const markFirstItem = (items) => {
 	const firstItem = items.shift();
+	firstItem.isFirstInDate = true;
 	firstItem.isFirstInMonth = true;
 	firstItem.isFirstInYear = true;
 	return [firstItem, ...items];
 };
 
-const build = async (basicData, partials, file) => {
+const build = async (basic, partials, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file, basicData),
+		mergeData(file, basic),
 		fs.readFile(file.src, "utf8"),
 	]);
 
@@ -214,7 +201,7 @@ const main = async () => {
 		readItems(config.paths.data.documents),
 		readItems(config.paths.data.links),
 		readItems(config.paths.data.statuses),
-		readSubscriptions(),
+		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
 		readJSONFile(file),
 	]);

@@ -10,7 +10,7 @@ const readLatestItems = async (file) => {
 	return items.slice(0, 10);
 };
 
-const pickItems = (metadata, type) => metadata[type];
+const pickItems = (basicData, type) => basicData[type];
 
 const comparePublished = (a, b) =>
 	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
@@ -23,8 +23,10 @@ const toAbsoluteURL = (prefix, url) => {
 	return `${prefix}${url}`;
 };
 
-const toAbsoluteURLAll = (prefix, match, attr, url) =>
-	`${attr}="${toAbsoluteURL(prefix, url)}"`;
+const toAbsoluteURLAll = (prefix, match, attr, url) => {
+	const absoluteURL = toAbsoluteURL(prefix, url);
+	return `${attr}="${absoluteURL}"`;
+};
 
 const extendItem = (prefix, item) => {
 	const link = toAbsoluteURL(prefix, item.link);
@@ -44,14 +46,14 @@ const extendItem = (prefix, item) => {
 	};
 };
 
-const mergeData = async (file, metadata) => {
+const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
-	const prefix = `${metadata.scheme}://${metadata.domain}`;
+	const prefix = `${data.scheme}://${data.domain}`;
 	return {
-		...metadata,
+		...data,
 		...overrides,
 		items: file.type
-			.map(pickItems.bind(null, metadata))
+			.map(pickItems.bind(null, data))
 			.flat()
 			.sort(comparePublished)
 			.slice(0, 10)
@@ -59,9 +61,9 @@ const mergeData = async (file, metadata) => {
 	};
 };
 
-const build = async (basicData, file) => {
+const build = async (basic, file) => {
 	const [data, template] = await Promise.all([
-		mergeData(file, basicData),
+		mergeData(file, basic),
 		fs.readFile(file.src, "utf8"),
 	]);
 	const rendered = mustache.render(template, data, null, {
