@@ -69,11 +69,6 @@ export default {
 				src: "src/bookshelf/index.mustache",
 			},
 			{
-				dest: "dist/bookshelf/log.html",
-				metadata: "src/bookshelf/log.json",
-				src: "src/bookshelf/log.mustache",
-			},
-			{
 				dest: "dist/documents/index.html",
 				metadata: "src/documents/index.json",
 				src: "src/documents/index.mustache",
@@ -139,12 +134,6 @@ export default {
 				dest: "dist/apple-touch-icon.png",
 				src: "src/img/icon.svg",
 				width: 180,
-			},
-		],
-		js: [
-			{
-				dest: "dist/js/append-next.{{version}}.js",
-				src: "src/js/append-next.js",
 			},
 		],
 	},
