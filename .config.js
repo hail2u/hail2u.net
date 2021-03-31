@@ -99,11 +99,6 @@ export default {
 				src: "src/statuses/index.mustache",
 			},
 			{
-				dest: "dist/statuses/log.txt",
-				metadata: "src/statuses/log.json",
-				src: "src/statuses/log.mustache",
-			},
-			{
 				dest: "dist/subscriptions/index.html",
 				metadata: "src/subscriptions/index.json",
 				src: "src/subscriptions/index.mustache",
