@@ -1,32 +1,44 @@
 import config from "../.config.js";
 import fs from "fs/promises";
 import { outputFile } from "../lib/output-file.js";
-import pcImport from "postcss-import";
-import postcss from "postcss";
+import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const removeComment = (comment) => {
-	if (comment.text.startsWith("!")) {
-		return;
+const removeCommentLine = (line) => {
+	const trimmed = line.trim();
+
+	if (!trimmed.startsWith("/*") || !trimmed.endsWith("*/")) {
+		return line;
 	}
 
-	comment.remove();
+	if (trimmed.startsWith("/*!")) {
+		return line;
+	}
+
+	return "";
 };
 
-const removeComments = (root) => {
-	root.walkComments(removeComment);
+const inline = async (src, line) => {
+	if (!line.startsWith("@import")) {
+		return line;
+	}
+
+	const root = path.dirname(src);
+	const openQuote = line.indexOf('"');
+	const closeQuote = line.lastIndexOf('"');
+	const filename = line.substring(openQuote + 1, closeQuote);
+	const file = path.resolve(root, filename);
+	const css = await fs.readFile(file, "utf8");
+	return css.split("\n").map(removeCommentLine).join("\n");
 };
 
 const build = async (version, file) => {
 	const dest = file.dest.replace(/\{\{version\}\}/gu, version);
 	const css = await fs.readFile(file.src, "utf8");
-	const compiled = await postcss()
-		.use(pcImport)
-		.use(removeComments)
-		.process(css, {
-			from: file.src,
-		});
-	await outputFile(dest, compiled.css);
+	const lines = css.split("\n");
+	const inlined = await Promise.all(lines.map(inline.bind(null, file.src)));
+	const removed = await Promise.all(inlined.map(removeCommentLine));
+	await outputFile(dest, removed.join("\n"));
 };
 
 const main = async () => {
