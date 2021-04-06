@@ -11,6 +11,19 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。ch単位の仕様では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。実装もそうなっているようだった。]]></description>
+				<link>https://hail2u.net/blog/ch-unit-size-and-japanese-webpage-with-latin-font.html</link>
+				<pubDate>Wed, 7 Apr 2021 07:33:44 +0900</pubDate>
+				<title><![CDATA[ch単位の大きさと、欧文フォントを指定した日本語ウェブページ]]></title>
+				<content:encoded><![CDATA[<p>ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位の仕様</a>では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。<a href="https://hail2u.net/pub/test/707.html">実装もそうなっているよう</a>だった。</p>
+
+<p>それはそうだろう、という話に聞こえる。しかし、例えば0のないフォントが先頭にあった場合、フォールバックとしての<code>0.5em</code>が使われるのかどうか、という話になる。具体的には、Emoji用にサブセットしたフォントや、ロゴ用にサブセットしたフォント、<a href="https://yakuhanjp.qranoko.jp/">約物用にサブセットしたフォント</a>など、「0」のグリフがないフォントを使う時、どうなるのだろうかという疑問だった。結論としては、「『0』のグリフを実際にレンダリングした幅」であることを確認しただけに終わった。フォールバックの<code>0.5em</code>が使われる状況は縦書きの時だけと考えてよさそうだ。</p>
+
+<p>これを踏まえると、日本語のウェブサイトで欧文フォントを指定した場合、幅が思ったような大きさ、例えば<code>60ch</code>でカタカナ30文字分前後にはならないことが理解できる。欧文フォントには間違いなく「0」のグリフがあるので、その幅で<code>ch</code>単位の大きさは決まり、カタカナはその欧文フォントではないフォントで決まるからだ。例えば、ヒラギノやメイリオではかなり幅が違うため、欧文フォントがその前で指定されている場合、同じ<code>60ch</code>でも、おさまる文字数が変わってしまう。<code>ch</code>単位は、フォントによるおさまりの違いを吸収するものであるはずなので、これではあまり意味がない。</p>
+
+<p>つまり、欧文のみではないウェブサイト独特の挙動になるが、欧文フォントの指定と<code>ch</code>単位の組み合わせは避けるべきと思われる。おさまる文字数を考慮しない幅でいいなら、<code>ch</code>単位を使う意味はまったくない。<code>(r)em</code>や、<code>px</code>、<code>vw</code>単位などを使うべきだろう。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[データの持ち方を変えたりしていた。今までは各ページを生成する時にtimestampから細かい日時の情報を作っていたが、静的に持つようにした。読み終えた本のカバー画像も、ASINと高さと幅を保持していたが、HTMLとして持つようにしてしまった。他はキー名を、RSSに都合がいいようにそろえたりしている。生成するスクリプトやテンプレートがすっきりしただけでなく、全記事の再生成にかかる時間が0.3秒くらい速くなった。]]></description>
 				<link>https://hail2u.net/blog/on-20210405.html</link>
 				<pubDate>Fri, 2 Apr 2021 08:02:28 +0900</pubDate>
@@ -195,42 +208,6 @@
 <p>しかし、嫌いなヌルヌルするやつが、めっちゃヌルヌルするやつに強化されていた。めっちゃヌルヌルするやつは、剃ったひげが着きやすく、また落ちづらくなってもいる。念入りに掃除しないとならなそうだったので、ちょっと使った後に、すぐ外した。プログライドよりもがっちりとはめ込まれていたので、外しにくい。外しても、特に使い心地に差はないようだった。</p>
 
 <p>スキンガードの良さは特に感じなかったが、悪いところもあまりない。しばらく、少なくとも半年くらい使うと、2枚刃による肌への優しさを実感できるかもしれないので、替え刃4個入りを買ってしばらく使ってみる。あまり実感できなかったら、その後は、フュージョンと、プログライド、スキンガードで、一番安いものを買うことにする。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。]]></description>
-				<link>https://hail2u.net/blog/window-local-storage-for-a-local-file.html</link>
-				<pubDate>Sat, 20 Feb 2021 08:19:17 +0900</pubDate>
-				<title><![CDATA[ローカル・ファイルでwindow.localStorageが動かないので、簡単なテスト用にどうにかするもの]]></title>
-				<content:encoded><![CDATA[<p><code>window.localStorage</code>が実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったん<code>delete window.localStorage</code>してから、らしきものを作ってやるとうまくいく。</p>
-
-<pre><code class="language-javascript">try {
-	const test = &quot;__test__&quot;;
-	localStorage.setItem(test, test);
-	localStorage.removeItem(test);
-} catch (e) {
-	delete window.localStorage;
-	window.localStorage = {
-		_data: {},
-
-		clear() {
-			return (this._data = {});
-		},
-
-		getItem(key) {
-			return this._data[key];
-		},
-
-		removeItem(key) {
-			return delete this._data[key];
-		},
-
-		setItem(key, value) {
-			return (this._data[key] = String(value));
-		}
-	};
-}</code></pre>
-
-<p><code>window.localStorage</code>の存在確認にも<a href="https://gist.github.com/paulirish/5558557">いろいろある</a>ので、このようなコードが必要になった。動かすだけは動かせるものの、保存されるわけではないので、完全には動作確認できないが、ダーク・モードの切り替え程度に使うだけなら十分だと思う。クッキーを代わりに使ったりなどするくらいなら、素直にローカル・サーバーを立てて確認するべきだろう。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
