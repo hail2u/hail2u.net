@@ -5,7 +5,10 @@ import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
-const rewritePath = ([, relative]) => {
+const rewritePath = ([
+		,
+		relative
+	]) => {
 	if (relative.endsWith("/")) {
 		return path.join(config.paths.dest.root, relative, "index.html");
 	}
@@ -22,7 +25,7 @@ const formatMessage = (file, messages, message) => {
 
 	return [
 		...messages,
-		`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`,
+		`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`
 	];
 };
 
@@ -50,9 +53,15 @@ const validate = async (file) => {
 const isNotEmpty = (result) => result.length !== 0;
 
 const main = async () => {
-	const [{ domain, scheme }, sitemap] = await Promise.all([
+	const [
+		{
+			domain,
+			scheme
+		},
+		sitemap
+	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
-		fs.readFile(config.paths.dest.sitemap, "utf8"),
+		fs.readFile(config.paths.dest.sitemap, "utf8")
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
@@ -63,16 +72,17 @@ const main = async () => {
 	const articles = shuffleArray(
 		Array.from(sitemap.matchAll(articleRe), rewritePath)
 	).slice(0, 3);
-	const results = await Promise.all([...indexes, ...articles].map(validate));
+	const results = await Promise.all([
+		...indexes,
+		...articles
+	].map(validate));
 	const errors = results.flat();
 	const errorFiles = results.filter(isNotEmpty);
 
 	if (errors.length > 0) {
 		process.stderr.write(errors.join("\n"));
 		process.stderr.write("\n\n");
-		throw new Error(
-			`${errors.length} error(s) in ${errorFiles.length} file(s)`
-		);
+		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
 	}
 };
 

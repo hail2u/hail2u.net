@@ -8,18 +8,22 @@ import { shuffleArray } from "../lib/shuffle-array.js";
 const isSubscribed = (url, subscription) => url === subscription.url;
 
 const main = async () => {
-	const { feed, title, url } = minimist(process.argv.slice(2), {
+	const {
+		feed,
+		title,
+		url
+	} = minimist(process.argv.slice(2), {
 		alias: {
 			f: "feed",
 			t: "title",
-			u: "url",
+			u: "url"
 		},
 		default: {
 			feed: "",
 			title: "",
-			url: "",
+			url: ""
 		},
-		string: ["feed", "title", "url"],
+		string: ["feed", "title", "url"]
 	});
 
 	if (!feed) {
@@ -45,13 +49,20 @@ const main = async () => {
 		{
 			feed,
 			link: url,
-			title,
+			title
 		},
-		...subscriptions,
+		...subscriptions
 	]);
 	await outputJSONFile(file, shuffled);
-	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
+	await runCommand("git", [
+		"add",
+		"--",
+		file
+	]);
+	await runCommand("git", [
+		"commit",
+		`--message=Subscribe ${url}`
+	]);
 	await openTwitter(`「${title}」を購読開始 ${url}`);
 };
 

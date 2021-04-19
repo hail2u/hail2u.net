@@ -6,7 +6,7 @@ import sharp from "sharp";
 const generatePNG = async (favicon, file) => {
 	const metadata = await sharp(file.src).metadata();
 	const img = sharp(file.src, {
-		density: (file.width * metadata.density) / metadata.width,
+		density: (file.width * metadata.density) / metadata.width
 	});
 	img.resize(file.width);
 

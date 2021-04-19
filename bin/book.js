@@ -15,16 +15,22 @@ const cancelFetch = (abortController) => {
 };
 
 const main = async () => {
-	const { asin, title } = minimist(process.argv.slice(2), {
+	const {
+		asin,
+		title
+	} = minimist(process.argv.slice(2), {
 		alias: {
 			a: "asin",
-			t: "title",
+			t: "title"
 		},
 		default: {
 			asin: "",
-			title: "",
+			title: ""
 		},
-		string: ["asin", "title"],
+		string: [
+			"asin",
+			"title"
+		]
 	});
 
 	if (!asin) {
@@ -50,11 +56,14 @@ const main = async () => {
 	const abortID = setTimeout(cancelFetch.bind(null, abortController), 5000);
 
 	try {
-		const [res, img] = await Promise.all([
+		const [
+			res,
+			img
+		] = await Promise.all([
 			fetch(`https://m.media-amazon.com/images/P/${asin}.jpg`, {
-				signal: abortController.signal,
+				signal: abortController.signal
 			}),
-			sharp(),
+			sharp()
 		]);
 
 		if (res.status !== 200) {
@@ -81,12 +90,19 @@ const main = async () => {
 				published,
 				...dt,
 				title,
-				type: "book",
+				type: "book"
 			},
-			...books,
+			...books
 		]);
-		await runCommand("git", ["add", "--", file]);
-		await runCommand("git", ["commit", `--message=Read ${asin}`]);
+		await runCommand("git", [
+			"add",
+			"--",
+			file
+		]);
+		await runCommand("git", [
+			"commit",
+			`--message=Read ${asin}`
+		]);
 		const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
 		await openTwitter(`${title} ${url}`);
 	} catch (e) {

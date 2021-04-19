@@ -66,7 +66,7 @@ const markItem = (item, index, items) => {
 		isFirstInYear: isFirstInYear(item, previousItem),
 		isLastInDate: isLastInDate(item, nextItem),
 		isLastInMonth: isLastInMonth(item, nextItem),
-		isLastInYear: isLastInYear(item, nextItem),
+		isLastInYear: isLastInYear(item, nextItem)
 	};
 };
 
@@ -77,12 +77,9 @@ const readItems = async (file) => {
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(
-		path.join(config.paths.src.partial, filename),
-		"utf8"
-	);
+	const content = await fs.readFile(path.join(config.paths.src.partial, filename), "utf8");
 	return {
-		[name]: content,
+		[name]: content
 	};
 };
 
@@ -103,7 +100,7 @@ const findCover = (html) => {
 
 	return {
 		cover: image[1],
-		twitterCard: "summary_large_image",
+		twitterCard: "summary_large_image"
 	};
 };
 
@@ -118,13 +115,13 @@ const mergeData = async (file, data) => {
 			...overrides,
 			...article,
 			...cover,
-			canonical: article.link,
+			canonical: article.link
 		};
 	}
 
 	return {
 		...data,
-		...overrides,
+		...overrides
 	};
 };
 
@@ -133,13 +130,19 @@ const markFirstItem = (items) => {
 	firstItem.isFirstInDate = true;
 	firstItem.isFirstInMonth = true;
 	firstItem.isFirstInYear = true;
-	return [firstItem, ...items];
+	return [
+		firstItem,
+		...items
+	];
 };
 
 const build = async (basic, partials, file) => {
-	const [data, template] = await Promise.all([
+	const [
+		data,
+		template
+	] = await Promise.all([
 		mergeData(file, basic),
-		fs.readFile(file.src, "utf8"),
+		fs.readFile(file.src, "utf8")
 	]);
 
 	if (data.isBookshelf && !data.isLog) {
@@ -158,7 +161,7 @@ const build = async (basic, partials, file) => {
 	}
 
 	const rendered = mustache.render(template, data, partials, {
-		escape: escapeCharacters,
+		escape: escapeCharacters
 	});
 	const highlighted = highlight(rendered);
 	await outputFile(file.dest, highlighted);
@@ -168,20 +171,26 @@ const toFilesFormat = (article) => ({
 	dest: path.join(config.paths.dest.root, article.link),
 	metadata: config.paths.metadata.article,
 	src: config.paths.src.article,
-	...article,
+	...article
 });
 
 const main = async () => {
-	const { all, latest } = minimist(process.argv.slice(2), {
+	const {
+		all,
+		latest
+	} = minimist(process.argv.slice(2), {
 		alias: {
 			a: "all",
-			l: "latest",
+			l: "latest"
 		},
-		boolean: ["all", "latest"],
+		boolean: [
+			"all",
+			"latest"
+		],
 		default: {
 			all: false,
-			latest: false,
-		},
+			latest: false
+		}
 	});
 	const file = new URL("../package.json", import.meta.url);
 	const [
@@ -193,7 +202,9 @@ const main = async () => {
 		statuses,
 		subscriptions,
 		partials,
-		{ version },
+		{
+			version
+		}
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		readItems(config.paths.data.articles),
@@ -203,7 +214,7 @@ const main = async () => {
 		readItems(config.paths.data.statuses),
 		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
-		readJSONFile(file),
+		readJSONFile(file)
 	]);
 	const data = {
 		...metadata,
@@ -213,7 +224,7 @@ const main = async () => {
 		links,
 		statuses,
 		subscriptions,
-		version,
+		version
 	};
 
 	if (latest) {

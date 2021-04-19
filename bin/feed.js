@@ -12,8 +12,7 @@ const readLatestItems = async (file) => {
 
 const pickItems = (basicData, type) => basicData[type];
 
-const comparePublished = (a, b) =>
-	Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const toAbsoluteURL = (prefix, url) => {
 	if (!url.startsWith("/")) {
@@ -36,13 +35,13 @@ const extendItem = (prefix, item) => {
 		return {
 			...item,
 			body: item.body.replace(urlRe, toAbsoluteURLAll.bind(null, prefix)),
-			link,
+			link
 		};
 	}
 
 	return {
 		...item,
-		link,
+		link
 	};
 };
 
@@ -57,29 +56,38 @@ const mergeData = async (file, data) => {
 			.flat()
 			.sort(comparePublished)
 			.slice(0, 10)
-			.map(extendItem.bind(null, prefix)),
+			.map(extendItem.bind(null, prefix))
 	};
 };
 
 const build = async (basic, file) => {
-	const [data, template] = await Promise.all([
+	const [
+		data,
+		template
+	] = await Promise.all([
 		mergeData(file, basic),
-		fs.readFile(file.src, "utf8"),
+		fs.readFile(file.src, "utf8")
 	]);
 	const rendered = mustache.render(template, data, null, {
-		escape: escapeCharacters,
+		escape: escapeCharacters
 	});
 	await outputFile(file.dest, rendered);
 };
 
 const main = async () => {
 	const metadata = await readJSONFile(config.paths.metadata.root);
-	const [articles, books, documents, links, statuses] = await Promise.all([
+	const [
+		articles,
+		books,
+		documents,
+		links,
+		statuses
+	] = await Promise.all([
 		readLatestItems(config.paths.data.articles),
 		readLatestItems(config.paths.data.books),
 		readLatestItems(config.paths.data.documents),
 		readLatestItems(config.paths.data.links),
-		readLatestItems(config.paths.data.statuses),
+		readLatestItems(config.paths.data.statuses)
 	]);
 	return Promise.all(
 		config.files.feed.map(
@@ -89,7 +97,7 @@ const main = async () => {
 				books,
 				documents,
 				links,
-				statuses,
+				statuses
 			})
 		)
 	);

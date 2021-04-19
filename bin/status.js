@@ -7,7 +7,7 @@ import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
 	const {
-		_: [text],
+		_: [text]
 	} = minimist(process.argv.slice(2));
 
 	if (!text) {
@@ -25,15 +25,19 @@ const main = async () => {
 			published,
 			...dt,
 			title: text,
-			type: "status",
+			type: "status"
 		},
-		...statuses,
+		...statuses
 	]);
-	await runCommand("git", ["add", "--", file]);
+	await runCommand("git", [
+		"add",
+		"--",
+		file
+	]);
 	await runCommand("git", [
 		"commit",
 		"--message=Update status",
-		`--message=${text}`,
+		`--message=${text}`
 	]);
 	await openTwitter(text);
 };

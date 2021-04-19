@@ -1,7 +1,4 @@
-import {
-	escapeCharacters,
-	unescapeReferences,
-} from "../lib/character-reference.js";
+import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
 import config from "../.config.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";
@@ -16,19 +13,21 @@ import { validateHTML } from "../lib/validate-html.js";
 
 const getDraft = async (file) => {
 	const content = await fs.readFile(file, "utf8");
-	const [title, ...rest] = content.split("\n");
+	const [
+		title,
+		...rest
+	] = content.split("\n");
 	const body = rest
 		.join("\n")
 		.trim()
 		.replace(/(?<=\b(href|src)=")\.\.\/dist\//gu, "/");
 	return {
 		body,
-		title: unescapeReferences(title.replace(/<.*?>/gu, "")),
+		title: unescapeReferences(title.replace(/<.*?>/gu, ""))
 	};
 };
 
-const formatMessage = (file, message) =>
-	`${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
+const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
 
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
@@ -49,16 +48,19 @@ const validateBody = async (body, src) => {
 
 const makeTempDir = async () => {
 	const file = new URL("../package.json", import.meta.url);
-	const [osTemp, pkg] = await Promise.all([
+	const [
+		osTemp,
+		pkg
+	] = await Promise.all([
 		fs.realpath(os.tmpdir()),
-		readJSONFile(file),
+		readJSONFile(file)
 	]);
 	return fs.mkdtemp(path.join(osTemp, path.sep, `${pkg.name}-`));
 };
 
 const main = async () => {
 	const {
-		_: [file],
+		_: [file]
 	} = minimist(process.argv.slice(2));
 
 	if (!file) {
@@ -66,16 +68,19 @@ const main = async () => {
 	}
 
 	const draft = await getDraft(file);
-	const [dir, template] = await Promise.all([
+	const [
+		dir,
+		template
+	] = await Promise.all([
 		makeTempDir(),
 		fs.readFile(config.paths.src.testArticle, "utf8"),
-		validateBody(draft.body, file),
+		validateBody(draft.body, file)
 	]);
 	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
 		.render(template, draft, null, {
-			escape: escapeCharacters,
+			escape: escapeCharacters
 		})
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
 	const highlighted = highlight(rendered);

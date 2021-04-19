@@ -13,7 +13,10 @@ const toAbsolutePath = (m, attr, prefix, path) => {
 
 const main = async () => {
 	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
-	const { domain, scheme } = await readJSONFile(config.paths.metadata.root);
+	const {
+		domain,
+		scheme
+	} = await readJSONFile(config.paths.metadata.root);
 	const urlRe = new RegExp(
 		`\\b(href|src)="(\\.\\.|${scheme}://${domain})(/.*?)"`,
 		"gu"

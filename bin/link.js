@@ -6,18 +6,26 @@ import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
-	const { comment, title, url } = minimist(process.argv.slice(2), {
+	const {
+		comment,
+		title,
+		url
+	} = minimist(process.argv.slice(2), {
 		alias: {
 			c: "comment",
 			t: "title",
-			u: "url",
+			u: "url"
 		},
 		default: {
 			comment: "",
 			title: "",
-			url: "",
+			url: ""
 		},
-		string: ["comment", "title", "url"],
+		string: [
+			"comment",
+			"title",
+			"url"
+		]
 	});
 
 	if (!comment) {
@@ -43,12 +51,19 @@ const main = async () => {
 			published,
 			...dt,
 			title,
-			type: "link",
+			type: "link"
 		},
-		...links,
+		...links
 	]);
-	await runCommand("git", ["add", "--", file]);
-	await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
+	await runCommand("git", [
+		"add",
+		"--",
+		file
+	]);
+	await runCommand("git", [
+		"commit",
+		`--message=Bookmark ${url}`
+	]);
 	await openTwitter(`${comment} ${url}`);
 };
 
