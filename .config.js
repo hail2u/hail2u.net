@@ -104,7 +104,7 @@ export default {
 				src: "src/subscriptions/index.mustache",
 			},
 		],
-		icon: [
+		img: [
 			{
 				src: "src/img/icon.svg",
 				width: 16,
