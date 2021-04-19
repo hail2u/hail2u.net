@@ -11,6 +11,77 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。]]></description>
+				<link>https://hail2u.net/blog/grid-area-in-style.html</link>
+				<pubDate>Tue, 20 Apr 2021 07:29:09 +0900</pubDate>
+				<title><![CDATA[style属性にgrid-areaプロパティー]]></title>
+				<content:encoded><![CDATA[<p><code>grid-template-area</code>プロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、<code>grid-area</code>プロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。</p>
+
+<p>例えば以下のようなリストがあり、そのレイアウトにグリッドを使うとする。グローバル・ヘッダーのナビゲーションを想定している。例なので<code>a</code>要素は省略した。</p>
+
+<pre><code class="language-html">&lt;ul class="nav"&gt;
+	&lt;li class=&quot;news&quot;&gt;News&lt;/li&gt;
+	&lt;li class=&quot;feature&quot;&gt;Feature&lt;/li&gt;
+	&lt;li class=&quot;column&quot;&gt;Column&lt;/li&gt;
+	&lt;li class=&quot;store&quot;&gt;Store&lt;/li&gt;
+	&lt;li class=&quot;search&quot;&gt;Search&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>このHTMLに対して、CSSファイルで、レイアウトを書き、各項目に識別子を付ける。例えば、3列2行にして、2行目の真ん中を空項目で埋めることにしたい。恣意的だが、空項目の部分にロゴが食い込むようなグローバル・ヘッダーを想像しておいてほしい。</p>
+
+<pre><code class="language-css">.nav {
+	grid-template-areas:
+		&quot;a b c&quot;
+		&quot;d . e&quot;;
+}
+
+.news {
+	grid-area: a;
+}
+
+.feature {
+	grid-area: b;
+}
+
+.column {
+	grid-area: c;
+}
+
+.store {
+	grid-area: d;
+}
+
+.search {
+	grid-area: e;
+}</code></pre>
+
+<p>この名前付けが冗長で、かつ<em>定義より利用が前に</em>来てしまうので、落ち着かない。逆順に書くと、親要素へのルールセットよりも、子要素のルールセットが前に来てしまい、同じく落ち着かない。HTML側でこう書いておきたい。</p>
+
+<pre><code class="language-html">&lt;ul class="nav"&gt;
+	&lt;li style=&quot;grid-area: news&quot;&gt;News&lt;/li&gt;
+	&lt;li style=&quot;grid-area: feature&quot;&gt;Feature&lt;/li&gt;
+	&lt;li style=&quot;grid-area: column&quot;&gt;Column&lt;/li&gt;
+	&lt;li style=&quot;grid-area: store&quot;&gt;Store&lt;/li&gt;
+	&lt;li style=&quot;grid-area: search&quot;&gt;Search&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>クラスの代わりにこうしておくと、CSS側では、<code>.nav</code>へのスタイルのみでよくなる。CSSでクラス名が使いたい場合は、HTML側にクラス名も重ねて書いてもいい。CSS側で属性セレクターを使って<code>[style*="column"]</code>と書いてもいいだろう。</p>
+
+<pre><code class="language-css">.nav {
+	grid-template-areas:
+		&quot;news  feature column&quot;
+		&quot;store ....... search&quot;;
+}</code></pre>
+
+<p>あたかも<em><code>grid-template-areas</code>プロパティーでクラス名を直接使えるように</em>書ける。また、定義済みを参照しているだけなので、とても落ち着く。HTML側は、テンプレート・システムによって生成されるので、コストが下がり、ミスタイプも減る。このように、特化型で、構造や内容物に強く依存する場合なら、<code>style</code>属性に書いてしまってもいい気がしている。</p>
+
+<hr>
+
+<p>こういった<code>grid-template-areas</code>プロパティーで識別子だけを使う、固定的なグリッド・レイアウトは、グローバル・ヘッダーやグローバル・フッターで出番がある。項目の数やラベルが安定しているので、決め打ちで割り当てても問題は起きにくい。描画領域幅に合わせてレイアウトを変える場合も、<code>grid-template-areas</code>プロパティーを上書きするだけと、細かいグリッドを定義しておいて、複雑に組み合わせるようなことをせずに済む。</p>
+
+<p>そんなわけで、現在のページ・ヘッダーは、識別子を使ったグリッド・レイアウトになっている。試行錯誤した過程で、このウェブサイトでいろいろ試していた。左寄せではないが、おさまりがいいので、しばらく使うかもしれない。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[つい最近になって、近所の大型商業施設に、非常時以外にも自由に使える階段があることを知った。隅の方にこっそりあった。三角のらせん階段で、なかなかいい。階段が好きなので、ちょくちょく上ったり下りたりしているが、他に誰も使っていない。]]></description>
 				<link>https://hail2u.net/blog/on-20210417.html</link>
 				<pubDate>Sat, 17 Apr 2021 07:59:26 +0900</pubDate>
@@ -212,35 +283,6 @@ a {
 <hr>
 
 <p>写真を投げたいだけの記事を、どう書くか考えている。他の記事では、3段落は書くことにしているが、写真の場合は1段落にでもよさそうだ。<code>alt</code>属性だけでもいいくらいだが、そういうわけにもいかない。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[本文へ飛ぶ（Skip to Main Content）を追加した。ナビゲーションの項目が長いので、飛ばせるなら飛ばせた方が、イライラさせずにすむかもしれない。また、ヒーロー画像コンポーネントがなくなった。大きな画像に食傷気味だ。他にもいろいろ変わった。]]></description>
-				<link>https://hail2u.net/blog/skip-to-main-content-v9.19.0.html</link>
-				<pubDate>Wed, 3 Mar 2021 08:51:12 +0900</pubDate>
-				<title><![CDATA[本文へ飛ぶ（v9.19.0）]]></title>
-				<content:encoded><![CDATA[<p>本文へ飛ぶ（Skip to Main Content）を追加した。ナビゲーションの項目が長いので、飛ばせるなら飛ばせた方が、イライラさせずにすむかもしれない。また、ヒーロー画像コンポーネントがなくなった。大きな画像に食傷気味だ。他にもいろいろ変わった。</p>
-
-<section>
-	<h2>メイン・カラムの幅が<code>65ch</code>に</h2>
-
-	<p><code>65ch</code>はテキトウな数字ではなく、Noto Sans CJK JPのひらがなで、1行が36文字になるようにした。最初は40文字にしてみたが、ちょっと広すぎで、36文字に落ち着いた。これでメイリオだと1行の文字数が少なくなってしまうようなことがなくなる。</p>
-</section>
-
-<section>
-	<h2>はっきりとした矩形を持つ要素の余白を広く</h2>
-
-	<p>具体的に「はっきりとした矩形」とは、画像に使う<code>figure</code>要素や、<code>table</code>要素、そして<code>pre</code>要素だ。いわゆるHalf-Leadingがないので、段落と並べると詰まり気味になるからだ。<a href="https://www.w3.org/TR/css-inline-3/#leading-trim"><code>leading-trim</code>プロパティー</a>を待ってはいられないが、いずれ来るだろうことはわかっており、以前のように計算するのもバカバカしくなったので、大きめにするという雑な対応をしている。</p>
-</section>
-
-<section>
-	<h2>ページ・ヘッダーが一行に</h2>
-
-	<p>ページ・ヘッダーの項目を整理して、ページ・フッターに移した勢いで、1行にしてしまった。やりすぎたような気がする。これはこれでおさまりがいいが、やはり縦に積んだ方が項目を把握しやすい。</p>
-</section>
-
-<hr>
-
-<p>他だとダーク・モードでの背景色が完全な黒ではなくなった。Android 12のDP1で<a href="https://9to5google.com/2021/02/19/android-12-dp1-dark-theme-on-pixel-is-no-longer-amoled-black/">ダーク・テーマの背景色が完全な黒ではなくなったこと</a>を意識している。バッテリー消費でのメリットはアプリに任せ、長くても数分の滞在で終わるウェブサイトでは、もうちょっと自由にやっていい雰囲気になってくれそうだ。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>

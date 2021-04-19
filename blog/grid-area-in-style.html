@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>style属性にgrid-areaプロパティー — Hail2u</title>
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="mailto:hail2u@gmail.com" rel="author">
+		<link href="https://hail2u.net/blog/grid-area-in-style.html" rel="canonical">
+		<meta content="light dark" name="color-scheme">
+		<meta content="grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。" name="description">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy">
+		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/css/print.9.20.8.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.20.8.css" media="only screen" rel="stylesheet">
+
+		<meta content="summary" name="twitter:card">
+		<meta content="grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。" property="twitter:description">
+		
+		<meta content="@hail2u_" name="twitter:site">
+		<meta content="style属性にgrid-areaプロパティー" property="twitter:title">
+	</head>
+
+	<body>
+		<header>
+			<nav>
+				<ul class="pages">
+					<li><a href="/">Hail2u</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/documents/">選りすぐりの文書</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/statuses/">近況</a></li>
+					<li><a href="/bookshelf/">本棚</a></li>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main>
+			<article>
+				<header>
+					<p><time datetime="2021-04-20T07:29:09+09:00">2021年4月20日</time></p>
+
+					<h1>style属性にgrid-areaプロパティー</h1>
+				</header>
+
+				<p><code>grid-template-area</code>プロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、<code>grid-area</code>プロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。</p>
+
+<p>例えば以下のようなリストがあり、そのレイアウトにグリッドを使うとする。グローバル・ヘッダーのナビゲーションを想定している。例なので<code>a</code>要素は省略した。</p>
+
+<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;nav&quot;</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;news&quot;</span>&gt;</span>News<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;feature&quot;</span>&gt;</span>Feature<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;column&quot;</span>&gt;</span>Column<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;store&quot;</span>&gt;</span>Store<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;search&quot;</span>&gt;</span>Search<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></code></pre>
+
+<p>このHTMLに対して、CSSファイルで、レイアウトを書き、各項目に識別子を付ける。例えば、3列2行にして、2行目の真ん中を空項目で埋めることにしたい。恣意的だが、空項目の部分にロゴが食い込むようなグローバル・ヘッダーを想像しておいてほしい。</p>
+
+<pre><code class="highlight language-css"><span class="hljs-selector-class">.nav</span> {
+	<span class="hljs-attribute">grid-template-areas</span>:
+		<span class="hljs-string">&quot;a b c&quot;</span>
+		<span class="hljs-string">&quot;d . e&quot;</span>;
+}
+
+<span class="hljs-selector-class">.news</span> {
+	<span class="hljs-attribute">grid-area</span>: a;
+}
+
+<span class="hljs-selector-class">.feature</span> {
+	<span class="hljs-attribute">grid-area</span>: b;
+}
+
+<span class="hljs-selector-class">.column</span> {
+	<span class="hljs-attribute">grid-area</span>: c;
+}
+
+<span class="hljs-selector-class">.store</span> {
+	<span class="hljs-attribute">grid-area</span>: d;
+}
+
+<span class="hljs-selector-class">.search</span> {
+	<span class="hljs-attribute">grid-area</span>: e;
+}</code></pre>
+
+<p>この名前付けが冗長で、かつ<em>定義より利用が前に</em>来てしまうので、落ち着かない。逆順に書くと、親要素へのルールセットよりも、子要素のルールセットが前に来てしまい、同じく落ち着かない。HTML側でこう書いておきたい。</p>
+
+<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;nav&quot;</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;grid-area: news&quot;</span>&gt;</span>News<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;grid-area: feature&quot;</span>&gt;</span>Feature<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;grid-area: column&quot;</span>&gt;</span>Column<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;grid-area: store&quot;</span>&gt;</span>Store<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;grid-area: search&quot;</span>&gt;</span>Search<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></code></pre>
+
+<p>クラスの代わりにこうしておくと、CSS側では、<code>.nav</code>へのスタイルのみでよくなる。CSSでクラス名が使いたい場合は、HTML側にクラス名も重ねて書いてもいい。CSS側で属性セレクターを使って<code>[style*="column"]</code>と書いてもいいだろう。</p>
+
+<pre><code class="highlight language-css"><span class="hljs-selector-class">.nav</span> {
+	<span class="hljs-attribute">grid-template-areas</span>:
+		<span class="hljs-string">&quot;news  feature column&quot;</span>
+		<span class="hljs-string">&quot;store ....... search&quot;</span>;
+}</code></pre>
+
+<p>あたかも<em><code>grid-template-areas</code>プロパティーでクラス名を直接使えるように</em>書ける。また、定義済みを参照しているだけなので、とても落ち着く。HTML側は、テンプレート・システムによって生成されるので、コストが下がり、ミスタイプも減る。このように、特化型で、構造や内容物に強く依存する場合なら、<code>style</code>属性に書いてしまってもいい気がしている。</p>
+
+<hr>
+
+<p>こういった<code>grid-template-areas</code>プロパティーで識別子だけを使う、固定的なグリッド・レイアウトは、グローバル・ヘッダーやグローバル・フッターで出番がある。項目の数やラベルが安定しているので、決め打ちで割り当てても問題は起きにくい。描画領域幅に合わせてレイアウトを変える場合も、<code>grid-template-areas</code>プロパティーを上書きするだけと、細かいグリッドを定義しておいて、複雑に組み合わせるようなことをせずに済む。</p>
+
+<p>そんなわけで、現在のページ・ヘッダーは、識別子を使ったグリッド・レイアウトになっている。試行錯誤した過程で、このウェブサイトでいろいろ試していた。左寄せではないが、おさまりがいいので、しばらく使うかもしれない。</p>
+			</article>
+		</main>
+
+		<footer>
+			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトが気に入ったなら、ぜひ<a href="https://github.com/sponsors/hail2u">後援すること</a>も考えてください。もし、このウェブサイトが気に入ったら、ぜひ<a href="https://github.com/sponsors/hail2u">後援すること</a>も考えてください。</p>
+
+			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+		</footer>
+	</body>
+</html>
