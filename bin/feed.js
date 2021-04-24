@@ -75,14 +75,15 @@ const build = async (basic, file) => {
 };
 
 const main = async () => {
-	const metadata = await readJSONFile(config.paths.metadata.root);
 	const [
+		metadata,
 		articles,
 		books,
 		documents,
 		links,
 		statuses
 	] = await Promise.all([
+		readJSONFile(config.paths.metadata.root),
 		readLatestItems(config.paths.data.articles),
 		readLatestItems(config.paths.data.books),
 		readLatestItems(config.paths.data.documents),
