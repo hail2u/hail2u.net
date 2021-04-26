@@ -18,16 +18,8 @@ const rewritePath = ([
 
 const isNotStyleGuide = (file) => file !== config.paths.dest.styleGuide;
 
-const formatMessage = (file, messages, message) => {
-	if (message.message.includes("“Permissions-Policy”")) {
-		return messages;
-	}
-
-	return [
-		...messages,
-		`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`
-	];
-};
+const formatMessage = (file, message) =>
+	`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
 
 const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
@@ -39,18 +31,10 @@ const validate = async (file) => {
 		return [];
 	}
 
-	const formatted = messages.reduce(formatMessage.bind(null, file), []);
-
-	if (formatted.length === 0) {
-		process.stdout.write(`${file}:1:1: Some errors, but ignored.
-`);
-		return [];
-	}
-
-	return formatted;
+	return messages.map(formatMessage.bind(null, file));
 };
 
-const isNotEmpty = (result) => result.length !== 0;
+const isEmpty = (element) => element.length !== 0;
 
 const main = async () => {
 	const [
@@ -77,9 +61,9 @@ const main = async () => {
 		...articles
 	].map(validate));
 	const errors = results.flat();
-	const errorFiles = results.filter(isNotEmpty);
+	const errorFiles = results.filter(isEmpty);
 
-	if (errors.length > 0) {
+	if (errors.length > 1) {
 		process.stderr.write(errors.join("\n"));
 		process.stderr.write("\n\n");
 		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
