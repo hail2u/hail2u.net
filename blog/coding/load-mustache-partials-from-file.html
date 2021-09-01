@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="何かしらテンプレート使う時は、実行にはHandlebars.jsを使いつつ、mustacheの仕様に沿った形のみで書くみたいな感じで大体やってる。前に書いたHandlebars.jsのincludeヘルパーだけ便利だったのでちょっと使ったりしてたけど、パーシャルを使って書き直すことにした。パーシャルそのままなのでネストでき、他の実行環境でもだいたいそのままで動く反面、相対パスで見に行くみたいなことは出来なくなった。" property="twitter:description">
@@ -62,17 +62,17 @@
 
 <p>特定のパスにまとめたパーシャル（<code>*.partial.mustache</code>）を読み込み、オブジェクトに拡張子を抜いたファイル名をキーにして、その内容を値に格納していくだけ。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_loadSharedPartials</span>(<span class="hljs-params">dir</span>) </span>{
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">_loadSharedPartials</span>(<span class="hljs-params">dir</span>) {
 	<span class="hljs-keyword">var</span> partials = {};
 
-	<span class="hljs-keyword">var</span> files = fs.readDirSync(dir);
+	<span class="hljs-keyword">var</span> files = fs.<span class="hljs-title function_">readDirSync</span>(dir);
 
-	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = files.length; i &lt; l; i++) {
+	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = files.<span class="hljs-property">length</span>; i &lt; l; i++) {
 		<span class="hljs-keyword">var</span> file = files[i];
 
-		<span class="hljs-keyword">if</span> (file.match(<span class="hljs-regexp">/\.partial\.mustache$/</span>)) {
-			<span class="hljs-keyword">var</span> name = path.basename(file, <span class="hljs-string">&#x27;.partial.mustache&#x27;</span>);
-			partials[name] = fs.readFileSync(path.join(dir, file), {
+		<span class="hljs-keyword">if</span> (file.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/\.partial\.mustache$/</span>)) {
+			<span class="hljs-keyword">var</span> name = path.<span class="hljs-title function_">basename</span>(file, <span class="hljs-string">&#x27;.partial.mustache&#x27;</span>);
+			partials[name] = fs.<span class="hljs-title function_">readFileSync</span>(path.<span class="hljs-title function_">join</span>(dir, file), {
 				<span class="hljs-attr">encoding</span>: <span class="hljs-string">&#x27;utf8&#x27;</span>
 			});
 		}
@@ -85,25 +85,33 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;handlebars&#x27;</span>);
 
-<span class="hljs-keyword">var</span> render = hbs.compile(template);
-<span class="hljs-keyword">var</span> rendered = render(data, {
-	<span class="hljs-attr">partials</span>: _loadSharedPartials(<span class="hljs-string">&#x27;./&#x27;</span>)
+<span class="hljs-keyword">var</span> render = hbs.<span class="hljs-title function_">compile</span>(template);
+<span class="hljs-keyword">var</span> rendered = <span class="hljs-title function_">render</span>(data, {
+	<span class="hljs-attr">partials</span>: <span class="hljs-title function_">_loadSharedPartials</span>(<span class="hljs-string">&#x27;./&#x27;</span>)
 });</code></pre>
 
 <p><a href="https://github.com/janl/mustache.js">mustache.js</a>では<code>render()</code>の第3引数に<em>直接</em>指定する。</p>
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> mustache = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mustache&#x27;</span>);
 
-<span class="hljs-keyword">var</span> rendered = mustache.render(template, data, _loadSharedPartials(<span class="hljs-string">&#x27;./&#x27;</span>));</code></pre>
+<span class="hljs-keyword">var</span> rendered = mustache.<span class="hljs-title function_">render</span>(template, data, <span class="hljs-title function_">_loadSharedPartials</span>(<span class="hljs-string">&#x27;./&#x27;</span>));</code></pre>
 
 <p>SSIのインクルードとはちょっと違う挙動になるけど、mustache的には素直な実装なので、Handlebars.jsの柔軟さを利用して変なことするよりもこうやった方が良さそう。</p>
 			</article>
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

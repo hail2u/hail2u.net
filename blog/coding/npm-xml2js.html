@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Node.jsでRSSを処理するの何がいいのかなーと色々試していた。その中で一番考えなくて済みそうなのがxml2jsだった。XMLをparseString()に渡すと、コールバックの引数にオブジェクトに変換して渡してくれる。" property="twitter:description">
@@ -63,28 +63,28 @@
 <p>このウェブサイトのフィードをパースして標準出力に吐くならこんな感じで簡単。</p>
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);
-<span class="hljs-keyword">var</span> parseXML = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xml2js&#x27;</span>).parseString;
+<span class="hljs-keyword">var</span> parseXML = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xml2js&#x27;</span>).<span class="hljs-property">parseString</span>;
 
-http.get(<span class="hljs-string">&#x27;http://hail2u.net/feed&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{
+http.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;http://hail2u.net/feed&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) {
 	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">&#x27;&#x27;</span>;
 
-	res.setEncoding = <span class="hljs-string">&#x27;UTF-8&#x27;</span>;
+	res.<span class="hljs-property">setEncoding</span> = <span class="hljs-string">&#x27;UTF-8&#x27;</span>;
 
-	res.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) </span>{
+	res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) {
 		chunks += chunk;
 	});
 
-	res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		parseXML(chunks, {
+	res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+		<span class="hljs-title function_">parseXML</span>(chunks, {
 			<span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span>,
 			<span class="hljs-attr">explicitArray</span>: <span class="hljs-literal">false</span>
-		}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) </span>{
+		}, <span class="hljs-keyword">function</span> (<span class="hljs-params">err, data</span>) {
 			<span class="hljs-keyword">if</span> (err) {
 				<span class="hljs-keyword">throw</span> err;
 			}
 
-			data.rss.channel.item.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val, index, array</span>) </span>{
-				<span class="hljs-built_in">console</span>.log(val.title + <span class="hljs-string">&#x27;: &#x27;</span> + val.link);
+			data.<span class="hljs-property">rss</span>.<span class="hljs-property">channel</span>.<span class="hljs-property">item</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">val, index, array</span>) {
+				<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(val.<span class="hljs-property">title</span> + <span class="hljs-string">&#x27;: &#x27;</span> + val.<span class="hljs-property">link</span>);
 			});
 		});
 	});
@@ -101,9 +101,17 @@ http.get(<span class="hljs-string">&#x27;http://hail2u.net/feed&#x27;</span>, <s
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

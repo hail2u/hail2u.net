@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="このウェブサイトでは、画像や引用をfigure要素でマークアップしている。Markdownで書いているわけだが、もちろんそんな記法はないので、今までは生HTMLを書いていた。しかし、marked v0.4.0でのバグでハマりどうしようもなさそうだったため、markedの拡張機構を使って、なんとなくうまい感じになるようにする必要がでてきてしまった。" property="twitter:description">
@@ -84,12 +84,12 @@
 
 <p>実装は2つのフェーズに分けて行った。リンク側ではキャプションがあり、かつ内容が画像だったら、<code>figcaption</code>要素でキャプションをマークアップして追加する。段落側では、リンクが張られた画像だけか、それに加えて<code>figcaption</code>要素があるなら、全体を<code>p</code>要素ではなく<code>figure</code>要素でマークアップする。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> markupHyperlink = <span class="hljs-function">(<span class="hljs-params">href, title, content</span>) =&gt;</span> {
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">markupHyperlink</span> = (<span class="hljs-params">href, title, content</span>) =&gt; {
 	<span class="hljs-keyword">if</span> (!title) {
 		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href=&quot;<span class="hljs-subst">${href}</span>&quot;&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
 	}
 
-	<span class="hljs-keyword">if</span> (!content.startsWith(<span class="hljs-string">&quot;&lt;img &quot;</span>)) {
+	<span class="hljs-keyword">if</span> (!content.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;&lt;img &quot;</span>)) {
 		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;a href=&quot;<span class="hljs-subst">${href}</span>&quot; title=&quot;<span class="hljs-subst">${title}</span>&gt;<span class="hljs-subst">${content}</span>&lt;/a&gt;`</span>;
 	}
 
@@ -97,8 +97,8 @@
 &lt;figcaption&gt;<span class="hljs-subst">${title}</span>&lt;/figcaption&gt;`</span>;
 };
 
-<span class="hljs-keyword">const</span> markupParagaraph = <span class="hljs-function"><span class="hljs-params">content</span> =&gt;</span> {
-	<span class="hljs-keyword">if</span> (!<span class="hljs-regexp">/^&lt;a\b.*?&gt;&lt;img\b.*?&gt;&lt;\/a&gt;(\n&lt;(figcaption)&gt;.*?&lt;\/\1&gt;)?$/</span>.exec(content)) {
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">markupParagaraph</span> = content =&gt; {
+	<span class="hljs-keyword">if</span> (!<span class="hljs-regexp">/^&lt;a\b.*?&gt;&lt;img\b.*?&gt;&lt;\/a&gt;(\n&lt;(figcaption)&gt;.*?&lt;\/\1&gt;)?$/</span>.<span class="hljs-title function_">exec</span>(content)) {
 		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;p&gt;<span class="hljs-subst">${content}</span>&lt;/p&gt;
 `</span>;
 	}
@@ -117,11 +117,11 @@
 
 <pre><code class="highlight language-markdown"><span class="hljs-quote">&gt; This is a quote.</span>
 <span class="hljs-quote">&gt;
-&gt; — <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span></span>[<span class="hljs-string">text</span>](<span class="hljs-link">href</span>)<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span></span></span>
+&gt; — <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span></span>[<span class="hljs-string">text</span>](<span class="hljs-link">href</span>)<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span></span></span>
 
 <span class="hljs-quote">&gt; This is a quote.</span>
 
-— <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span></span>[<span class="hljs-string">text</span>](<span class="hljs-link">href</span>)<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span></span>
+— <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">cite</span>&gt;</span></span>[<span class="hljs-string">text</span>](<span class="hljs-link">href</span>)<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">cite</span>&gt;</span></span>
 
 <span class="hljs-quote">&gt; This is a quote.</span>
 <span class="hljs-quote">&gt;
@@ -149,17 +149,17 @@
 
 <p>実装は引用内の最後の行のみをチェックして行った。EMダッシュで始まっていないなら通常通り出力する。始まっていた場合は最後の行を<code>p</code>要素から<code>figcaption</code>要素へ変換し、さらに<code>figure</code>要素で全体をマークアップする。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> markupQuote = <span class="hljs-function"><span class="hljs-params">content</span> =&gt;</span> {
-	<span class="hljs-keyword">const</span> lines = content.trim().split(<span class="hljs-string">&quot;\n&quot;</span>);
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">markupQuote</span> = content =&gt; {
+	<span class="hljs-keyword">const</span> lines = content.<span class="hljs-title function_">trim</span>().<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;\n&quot;</span>);
 
-	<span class="hljs-keyword">if</span> (!lines[lines.length - <span class="hljs-number">1</span>].startsWith(<span class="hljs-string">&quot;&lt;p&gt;—&quot;</span>)) {
+	<span class="hljs-keyword">if</span> (!lines[lines.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>].<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;&lt;p&gt;—&quot;</span>)) {
 		<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;blockquote&gt;
 <span class="hljs-subst">${lines.join(<span class="hljs-string">&quot;\n&quot;</span>)}</span>
 &lt;/blockquote&gt;
 `</span>;
 	}
 
-	lines.push(lines.pop().replace(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">&quot;&lt;$1figcaption&gt;&quot;</span>));
+	lines.<span class="hljs-title function_">push</span>(lines.<span class="hljs-title function_">pop</span>().<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&lt;(\/)?p&gt;/g</span>, <span class="hljs-string">&quot;&lt;$1figcaption&gt;&quot;</span>));
 	<span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;figure&gt;
 &lt;blockquote&gt;
 <span class="hljs-subst">${lines.join(<span class="hljs-string">&quot;\n&quot;</span>)}</span>
@@ -178,9 +178,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

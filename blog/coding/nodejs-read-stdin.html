@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="/dev/stdinとかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今はprocess.stdin.fdのsizeを調べてそのサイズでBufferオブジェクトを作り、fs.readSync()で読み込むのが良いみたいだ。本当なのかな？" property="twitter:description">
@@ -64,12 +64,12 @@
 
 <span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
 
-<span class="hljs-keyword">var</span> fd = process.stdin.fd;
-<span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
-<span class="hljs-keyword">var</span> buffer = <span class="hljs-keyword">new</span> Buffer(length);
-<span class="hljs-keyword">var</span> bytesRead = fs.readSync(fd, buffer, <span class="hljs-number">0</span>, length, <span class="hljs-number">0</span>);
-<span class="hljs-keyword">var</span> input = buffer.toString(<span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-number">0</span>, bytesRead);
-<span class="hljs-built_in">console</span>.log(input);</code></pre>
+<span class="hljs-keyword">var</span> fd = process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>;
+<span class="hljs-keyword">var</span> length = fs.<span class="hljs-title function_">fstatSync</span>(fd).<span class="hljs-property">size</span>;
+<span class="hljs-keyword">var</span> buffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Buffer</span>(length);
+<span class="hljs-keyword">var</span> bytesRead = fs.<span class="hljs-title function_">readSync</span>(fd, buffer, <span class="hljs-number">0</span>, length, <span class="hljs-number">0</span>);
+<span class="hljs-keyword">var</span> input = buffer.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-number">0</span>, bytesRead);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(input);</code></pre>
 
 <p><code>fs.readSync()</code>はその第二引数がBufferオブジェクトじゃない場合はレガシーなモードになるので、Bufferオブジェクトを経由しなくて良かったりもする。</p>
 
@@ -77,10 +77,10 @@
 
 <span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
 
-<span class="hljs-keyword">var</span> fd = process.stdin.fd;
-<span class="hljs-keyword">var</span> length = fs.fstatSync(fd).size;
-<span class="hljs-keyword">var</span> input = fs.readSync(fd, length)[<span class="hljs-number">0</span>];
-<span class="hljs-built_in">console</span>.log(input);</code></pre>
+<span class="hljs-keyword">var</span> fd = process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>;
+<span class="hljs-keyword">var</span> length = fs.<span class="hljs-title function_">fstatSync</span>(fd).<span class="hljs-property">size</span>;
+<span class="hljs-keyword">var</span> input = fs.<span class="hljs-title function_">readSync</span>(fd, length)[<span class="hljs-number">0</span>];
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(input);</code></pre>
 
 <p>レガシーなモードでは返り値は<code>[string, bytesRead]</code>という配列になってるので、最初の要素だけを抜き出せば良い。短い。でもv0.8.4のドキュメントではこのことについて<a href="http://nodejs.org/docs/v0.8.4/api/fs.html#fs_fs_readsync_fd_buffer_offset_length_position">もう書かれていない</a>ので使わない方が良さそう。</p>
 
@@ -90,7 +90,7 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
 
-<span class="hljs-keyword">var</span> input = fs.readFileSync(process.stdin.fd, <span class="hljs-string">&quot;utf8&quot;</span>);</code></pre>
+<span class="hljs-keyword">var</span> input = fs.<span class="hljs-title function_">readFileSync</span>(process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>, <span class="hljs-string">&quot;utf8&quot;</span>);</code></pre>
 
 <p>標準入力のファイル識別子は<code>process.stdin.fd</code>で参照できるので、それを第一引数で指定するだけだ。</p>
 </section>
@@ -98,9 +98,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

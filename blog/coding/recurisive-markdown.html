@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており（宗教上の理由でCommonMark系は使うことができない）、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" property="twitter:description">
@@ -62,14 +62,14 @@
 
 <p>例えば<code>figure</code>要素を使って<code>table</code>要素を図としてマークアップしたいとする。その場合、markedでは表の記法が拡張されているので、以下のように書くことになる。</p>
 
-<pre><code class="highlight language-markdown"><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span></span>
+<pre><code class="highlight language-markdown"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span></span>
 |Name|Num|
 |-|-|
 |foo|128|
 |bar|256|
 
-<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span></span>表1<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span></span>
-<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></span></code></pre>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span></span>表1<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span></span>
+<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></span></code></pre>
 
 <p>このMarkdown文字列をmarkedで処理しても何も起きず、そのまま出てくる。つまり何らかのHTMLタグで括られた間はインライン系の記法しか処理されない。</p>
 
@@ -79,14 +79,14 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-comment">// node this.js &lt; test.md</span>
 <span class="hljs-keyword">var</span> marked = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;marked&quot;</span>);
-<span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.Renderer();
+<span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> marked.<span class="hljs-title class_">Renderer</span>();
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processHTML</span>(<span class="hljs-params">html</span>) </span>{
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">processHTML</span>(<span class="hljs-params">html</span>) {
 	<span class="hljs-keyword">var</span> attributes;
 	<span class="hljs-keyword">var</span> contents;
 	<span class="hljs-keyword">var</span> tag;
 	<span class="hljs-keyword">var</span> tags = [<span class="hljs-string">&quot;aside&quot;</span>, <span class="hljs-string">&quot;figure&quot;</span>, <span class="hljs-string">&quot;section&quot;</span>];
-	<span class="hljs-keyword">var</span> tokens = html.trim().match(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
+	<span class="hljs-keyword">var</span> tokens = html.<span class="hljs-title function_">trim</span>().<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/</span>);
 
 	<span class="hljs-keyword">if</span> (!tokens) {
 		<span class="hljs-keyword">return</span> html;
@@ -94,20 +94,20 @@
 
 	tag = tokens[<span class="hljs-number">1</span>];
 
-	<span class="hljs-keyword">if</span> (tags.indexOf(tag) === -<span class="hljs-number">1</span>) {
+	<span class="hljs-keyword">if</span> (tags.<span class="hljs-title function_">indexOf</span>(tag) === -<span class="hljs-number">1</span>) {
 		<span class="hljs-keyword">return</span> html;
 	}
 
 	attributes = tokens[<span class="hljs-number">2</span>];
-	contents = marked(tokens[<span class="hljs-number">3</span>].replace(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">&quot;&gt;&quot;</span>), {
+	contents = <span class="hljs-title function_">marked</span>(tokens[<span class="hljs-number">3</span>].<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&amp;gt;/g</span>, <span class="hljs-string">&quot;&gt;&quot;</span>), {
 		<span class="hljs-attr">renderer</span>: renderer
-	}).trim();
+	}).<span class="hljs-title function_">trim</span>();
 
 	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&lt;&quot;</span> + tag + attributes + <span class="hljs-string">&quot;&gt;\n&quot;</span> + contents + <span class="hljs-string">&quot;\n&lt;/&quot;</span> + tag + <span class="hljs-string">&quot;&gt;\n&quot;</span>;
 }
 
-renderer.html = processHTML;
-<span class="hljs-built_in">console</span>.log(marked(fs.readFileSync(process.stdin.fd, <span class="hljs-string">&quot;utf8&quot;</span>), {
+renderer.<span class="hljs-property">html</span> = processHTML;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">marked</span>(fs.<span class="hljs-title function_">readFileSync</span>(process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>, <span class="hljs-string">&quot;utf8&quot;</span>), {
 	<span class="hljs-attr">renderer</span>: renderer
 }));</code></pre>
 
@@ -145,9 +145,17 @@ renderer.html = processHTML;
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

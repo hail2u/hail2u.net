@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="child_processモジュールの関数群もutil.promisify()を使ってPromise化できる。しかしexecFile()などは元々のコールバックに3つ引数が渡されることから少し使い方が違ってくる。ここまでは皆が通る道だろう。実はそれだけでなくリジェクトされた時も少し違うことが公式ドキュメントの該当する項の最後に記載されていた。" property="twitter:description">
@@ -68,19 +68,19 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;util&quot;</span>);
 <span class="hljs-keyword">const</span> { execFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;child_process&quot;</span>);
-<span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
+<span class="hljs-keyword">const</span> execFileAsync = util.<span class="hljs-title function_">promisify</span>(execFile);
 
 <span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
-	<span class="hljs-keyword">const</span> { stdout } = <span class="hljs-keyword">await</span> execFile(<span class="hljs-string">&quot;node&quot;</span>, [<span class="hljs-string">&quot;--version&quot;</span>]);
-	<span class="hljs-built_in">console</span>.log(stdout);
+	<span class="hljs-keyword">const</span> { stdout } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">execFile</span>(<span class="hljs-string">&quot;node&quot;</span>, [<span class="hljs-string">&quot;--version&quot;</span>]);
+	<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(stdout);
 };
 
-getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
-	<span class="hljs-keyword">if</span> (e.stderr) {
-		<span class="hljs-built_in">console</span>.error(e.stderr);
+<span class="hljs-title function_">getVersion</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+	<span class="hljs-keyword">if</span> (e.<span class="hljs-property">stderr</span>) {
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(e.<span class="hljs-property">stderr</span>);
 	}
 
-	<span class="hljs-built_in">console</span>.trace(e);
+	<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">trace</span>(e);
 });</code></pre>
 
 <p>Promiseの<code>catch()</code>側でやる。これはこれで専用の<code>catch()</code>を書くことになるのがちょっと気になる。大抵の場合は<code>Error</code>オブジェクトがいい感じになっているような気がするので、実はあまり考えなくて良いのかもしれない。</p>
@@ -91,24 +91,24 @@ getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;util&quot;</span>);
 <span class="hljs-keyword">const</span> { execFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;child_process&quot;</span>);
-<span class="hljs-keyword">const</span> execFileAsync = util.promisify(execFile);
+<span class="hljs-keyword">const</span> execFileAsync = util.<span class="hljs-title function_">promisify</span>(execFile);
 
 <span class="hljs-keyword">const</span> getVersion = <span class="hljs-keyword">async</span> () =&gt; {
 	<span class="hljs-keyword">let</span> stdout;
 	<span class="hljs-keyword">let</span> stderr;
 
 	<span class="hljs-keyword">try</span> {
-		({ stdout, stderr }) = <span class="hljs-keyword">await</span> execFileAsync(<span class="hljs-string">&quot;node&quot;</span>, [<span class="hljs-string">&quot;--version&quot;</span>]);
+		({ stdout, stderr }) = <span class="hljs-keyword">await</span> <span class="hljs-title function_">execFileAsync</span>(<span class="hljs-string">&quot;node&quot;</span>, [<span class="hljs-string">&quot;--version&quot;</span>]);
 	} <span class="hljs-keyword">catch</span> (e) {
-		<span class="hljs-built_in">console</span>.error(stderr);
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(stderr);
 		<span class="hljs-keyword">throw</span> e;
 	}
 
-	<span class="hljs-built_in">console</span>.log(stdout);
+	<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(stdout);
 };
 
-getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
-	<span class="hljs-built_in">console</span>.trace(e);
+<span class="hljs-title function_">getVersion</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+	<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">trace</span>(e);
 });</code></pre>
 
 <p><code>let</code>を前出ししたり、そのおかげで<code>await</code>で受け取る時に<code>（)</code>で括らなければならない。結局はそれ以前の問題で、これでは<code>catch</code>節で<code>stderr</code>が拾えない。</p>
@@ -116,9 +116,17 @@ getVersion().catch(<span class="hljs-function"><span class="hljs-params">e</span
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Twitterではツイートの表示にいくつか規制がある。例えばTwitterの鳥さんを表示しなければならないとかユーザーのプロフィールへのリンクでは#!/のアレはダメだったりとかかなり細かい。ということでユーザー名やURL、ハッシュタグにまとめてリンクを張るJavaScriptをjQueryで普通に書いてみた。" property="twitter:description">
@@ -66,39 +66,39 @@
 <span class="hljs-keyword">var</span> mention = <span class="hljs-string">&quot;@[0-9a-zA-Z_]{1,15}&quot;</span>;
 <span class="hljs-keyword">var</span> hashtag = <span class="hljs-string">&quot;#[0-9a-zA-Z]+&quot;</span>;
 
-<span class="hljs-keyword">var</span> re_url     = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + url);
-<span class="hljs-keyword">var</span> re_mention = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + mention);
-<span class="hljs-keyword">var</span> re_hashtag = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + hashtag);
+<span class="hljs-keyword">var</span> re_url     = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + url);
+<span class="hljs-keyword">var</span> re_mention = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + mention);
+<span class="hljs-keyword">var</span> re_hashtag = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">&quot;^&quot;</span> + hashtag);
 
-<span class="hljs-keyword">var</span> re_token = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">&quot;(&quot;</span> + url + <span class="hljs-string">&quot;|&quot;</span> + mention + <span class="hljs-string">&quot;|&quot;</span> + hashtag + <span class="hljs-string">&quot;)&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>);</code></pre>
+<span class="hljs-keyword">var</span> re_token = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-string">&quot;(&quot;</span> + url + <span class="hljs-string">&quot;|&quot;</span> + mention + <span class="hljs-string">&quot;|&quot;</span> + hashtag + <span class="hljs-string">&quot;)&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>);</code></pre>
 
 <p>テキストで定義して連結する。URLを優先した。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> tokens = input.split(re_token);</code></pre>
+<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> tokens = input.<span class="hljs-title function_">split</span>(re_token);</code></pre>
 
 <p>入力（=ツイート）を分割。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = tokens.length; i &lt; l; i++) {
+<pre><code class="highlight language-js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = tokens.<span class="hljs-property">length</span>; i &lt; l; i++) {
 	<span class="hljs-keyword">var</span> token = tokens[i];
 
-	<span class="hljs-keyword">if</span> (re_url.test(token)) {
-		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;URL: &quot;</span> + token);
-		output.append($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
+	<span class="hljs-keyword">if</span> (re_url.<span class="hljs-title function_">test</span>(token)) {
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;URL: &quot;</span> + token);
+		output.<span class="hljs-title function_">append</span>($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
 			<span class="hljs-attr">href</span>: token
-		}).append(token));
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_mention.test(token)) {
-		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Mention: &quot;</span> + token);
-		output.append($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
-			<span class="hljs-attr">href</span>: <span class="hljs-string">&quot;http://twitter.com/&quot;</span> + <span class="hljs-built_in">encodeURIComponent</span>(token.replace(<span class="hljs-regexp">/^@/</span>, <span class="hljs-string">&quot;&quot;</span>))
-		}).append(token));
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_hashtag.test(token)) {
-		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Hashtag: &quot;</span> + token);
-		output.append($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
+		}).<span class="hljs-title function_">append</span>(token));
+	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_mention.<span class="hljs-title function_">test</span>(token)) {
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Mention: &quot;</span> + token);
+		output.<span class="hljs-title function_">append</span>($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
+			<span class="hljs-attr">href</span>: <span class="hljs-string">&quot;http://twitter.com/&quot;</span> + <span class="hljs-built_in">encodeURIComponent</span>(token.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^@/</span>, <span class="hljs-string">&quot;&quot;</span>))
+		}).<span class="hljs-title function_">append</span>(token));
+	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (re_hashtag.<span class="hljs-title function_">test</span>(token)) {
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hashtag: &quot;</span> + token);
+		output.<span class="hljs-title function_">append</span>($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>, {
 			<span class="hljs-attr">href</span>: <span class="hljs-string">&quot;http://twitter.com/search?q=&quot;</span> + <span class="hljs-built_in">encodeURIComponent</span>(token)
-		}).append(token));
+		}).<span class="hljs-title function_">append</span>(token));
 	} <span class="hljs-keyword">else</span> {
-		<span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Plain: &quot;</span> + token);
-		output.append(token.replace(<span class="hljs-regexp">/[\r\n]/g</span>, <span class="hljs-string">&quot;&lt;br&gt;&quot;</span>));
+		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Plain: &quot;</span> + token);
+		output.<span class="hljs-title function_">append</span>(token.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[\r\n]/g</span>, <span class="hljs-string">&quot;&lt;br&gt;&quot;</span>));
 	}
 }</code></pre>
 
@@ -109,9 +109,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

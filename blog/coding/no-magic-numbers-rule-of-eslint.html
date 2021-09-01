@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。" property="twitter:description">
@@ -60,20 +60,20 @@
 
 				<p>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でも<a href="http://eslint.org/docs/rules/no-magic-numbers">no-magic-numbers</a>にとりわけ怒られた。怒られたコードをメモしておく。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
-<span class="hljs-keyword">var</span> m = d.getMonth() + <span class="hljs-number">1</span>;</code></pre>
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>();
+<span class="hljs-keyword">var</span> m = d.<span class="hljs-title function_">getMonth</span>() + <span class="hljs-number">1</span>;</code></pre>
 
 <p>月を数字で取得しようとすると怒られる。</p>
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> a = [<span class="hljs-string">&quot;foo&quot;</span>, <span class="hljs-string">&quot;bar&quot;</span>, <span class="hljs-string">&quot;baz&quot;</span>, <span class="hljs-string">&quot;qux&quot;</span>];
 <span class="hljs-keyword">var</span> firstElement = a[<span class="hljs-number">0</span>];
-<span class="hljs-keyword">var</span> lastElement = a[a.length - <span class="hljs-number">1</span>];</code></pre>
+<span class="hljs-keyword">var</span> lastElement = a[a.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>];</code></pre>
 
 <p>最初と最後の要素を参照しようとすると怒られる。<code>Array#shift()</code>や<code>Array#pop()</code>で済むものは置き換えても良いが、若干コストがかかりそうだ。</p>
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> s = <span class="hljs-string">&quot;foobarbazqux&quot;</span>;
 
-<span class="hljs-keyword">if</span> (s.indexOf(<span class="hljs-string">&quot;foo&quot;</span>) === <span class="hljs-number">0</span>) {
+<span class="hljs-keyword">if</span> (s.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot;foo&quot;</span>) === <span class="hljs-number">0</span>) {
 	...
 }</code></pre>
 
@@ -81,14 +81,14 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> s = <span class="hljs-string">&quot;foobarbazqux&quot;</span>;
 
-<span class="hljs-keyword">if</span> (s.startsWith(foo)) {
-	s = s.substr(foo - <span class="hljs-number">1</span>);
+<span class="hljs-keyword">if</span> (s.<span class="hljs-title function_">startsWith</span>(foo)) {
+	s = s.<span class="hljs-title function_">substr</span>(foo - <span class="hljs-number">1</span>);
 }</code></pre>
 
 <p>特定の文字列で始まっていたら削除しようとすると怒られる。素直に正規表現を使うのが良いだろう。</p>
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> minimist = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;minimist&quot;</span>);
-<span class="hljs-keyword">var</span> argv = minimist(process.argv.slice(<span class="hljs-number">2</span>));</code></pre>
+<span class="hljs-keyword">var</span> argv = <span class="hljs-title function_">minimist</span>(process.<span class="hljs-property">argv</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">2</span>));</code></pre>
 
 <p><a href="https://github.com/substack/minimist">minimist</a>で処理するためにNode.jsの実行ファイルとスクリプトのパスを捨てようとすると怒られる。えっ、これどうしよう……。</p>
 
@@ -96,32 +96,40 @@
 
 <p>つまり配列へのテキトウなアクセスで怒られるということだ。配列の長さと添え字のずれを矯正する<code>1</code>と<code>0</code>が問題と言いかえることもできるだろう。代替手段はあるものはあるが、ないものはかなり苦しい対応になる。</p>
 
-<pre><code class="highlight language-json">{
-	<span class="hljs-attr">&quot;rules&quot;</span>: {
-		<span class="hljs-attr">&quot;no-magic-numbers&quot;</span>: [
-			<span class="hljs-string">&quot;error&quot;</span>,
-			{
-				<span class="hljs-attr">&quot;ignores&quot;</span>: [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>]
-			}
-		]
-	}
-}</code></pre>
+<pre><code class="highlight language-json"><span class="hljs-punctuation">{</span>
+	<span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+		<span class="hljs-attr">&quot;no-magic-numbers&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+			<span class="hljs-string">&quot;error&quot;</span><span class="hljs-punctuation">,</span>
+			<span class="hljs-punctuation">{</span>
+				<span class="hljs-attr">&quot;ignores&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span><span class="hljs-punctuation">]</span>
+			<span class="hljs-punctuation">}</span>
+		<span class="hljs-punctuation">]</span>
+	<span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre>
 
 <p>有効にするなら<code>0</code>と<code>1</code>を無視する、このような設定が良いかもしれない。</p>
 
 <hr>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
-<span class="hljs-keyword">var</span> m = [<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-string">&quot;10&quot;</span>, <span class="hljs-string">&quot;11&quot;</span>, <span class="hljs-string">&quot;12&quot;</span>][d.getMonth()];</code></pre>
+<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>();
+<span class="hljs-keyword">var</span> m = [<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;2&quot;</span>, <span class="hljs-string">&quot;3&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>, <span class="hljs-string">&quot;5&quot;</span>, <span class="hljs-string">&quot;6&quot;</span>, <span class="hljs-string">&quot;7&quot;</span>, <span class="hljs-string">&quot;8&quot;</span>, <span class="hljs-string">&quot;9&quot;</span>, <span class="hljs-string">&quot;10&quot;</span>, <span class="hljs-string">&quot;11&quot;</span>, <span class="hljs-string">&quot;12&quot;</span>][d.<span class="hljs-title function_">getMonth</span>()];</code></pre>
 
 <p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p>
 			</article>
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

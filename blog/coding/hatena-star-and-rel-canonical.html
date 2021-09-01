@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" property="twitter:description">
@@ -63,18 +63,18 @@
 <p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
 
 <pre><code class="highlight language-js">} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selector == <span class="hljs-string">&#x27;link[rel=&quot;canonical&quot;]&#x27;</span>) {
-	<span class="hljs-keyword">var</span> z = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;link&quot;</span>),
+	<span class="hljs-keyword">var</span> z = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&quot;link&quot;</span>),
 		y,
-		x = z.length,
+		x = z.<span class="hljs-property">length</span>,
 		w,
-		v = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&quot;a&quot;</span>);
+		v = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;a&quot;</span>);
 
 	<span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
 		w = z[y];
 
-		<span class="hljs-keyword">if</span> (w.rel === <span class="hljs-string">&quot;canonical&quot;</span>) {
-			v.setAttribute(<span class="hljs-string">&quot;href&quot;</span>, w.href);
-			result = v.cloneNode(<span class="hljs-literal">false</span>);
+		<span class="hljs-keyword">if</span> (w.<span class="hljs-property">rel</span> === <span class="hljs-string">&quot;canonical&quot;</span>) {
+			v.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&quot;href&quot;</span>, w.<span class="hljs-property">href</span>);
+			result = v.<span class="hljs-title function_">cloneNode</span>(<span class="hljs-literal">false</span>);
 			<span class="hljs-keyword">break</span>;
 		}
 	}</code></pre>
@@ -87,17 +87,17 @@
 
 <p>このブログのように、Blosxomで一覧ページとpermalinkで対象とするURLを切り替える場合は<a href="http://blosxom.sourceforge.net/plugins/interpolate/interpolate_fancy.htm">interpolcate_fancy</a>を使って以下のようにすれば良いでしょう。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="javascript">
-Hatena.Star.SiteConfig = {
+<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="language-javascript">
+<span class="hljs-title class_">Hatena</span>.<span class="hljs-property">Star</span>.<span class="hljs-property">SiteConfig</span> = {
 	<span class="hljs-attr">entryNodes</span>: {
 		<span class="hljs-string">&quot;article&quot;</span>: {
 &lt;?$path_info like=<span class="hljs-string">&quot;\.html$&quot;</span>&gt;
-			uri:       <span class="hljs-string">&quot;link[rel=\&quot;canonical\&quot;]&quot;</span>,
+			<span class="hljs-attr">uri</span>:       <span class="hljs-string">&quot;link[rel=\&quot;canonical\&quot;]&quot;</span>,
 &lt;/?&gt;
 &lt;?$path_info unlike=<span class="hljs-string">&quot;\.html$&quot;</span>&gt;
-			uri:       <span class="hljs-string">&quot;h2 a&quot;</span>,
+			<span class="hljs-attr">uri</span>:       <span class="hljs-string">&quot;h2 a&quot;</span>,
 &lt;/?&gt;
-			title:     <span class="hljs-string">&quot;h2&quot;</span>,
+			<span class="hljs-attr">title</span>:     <span class="hljs-string">&quot;h2&quot;</span>,
 			<span class="hljs-attr">container</span>: <span class="hljs-string">&quot;footer p&quot;</span>
 		}
 	}
@@ -109,9 +109,17 @@ Hatena.Star.SiteConfig = {
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

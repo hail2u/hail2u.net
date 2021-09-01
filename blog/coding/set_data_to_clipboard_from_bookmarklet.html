@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" property="twitter:description">
@@ -73,18 +73,18 @@
 [HKEY_CLASSES_ROOT\set-data-to-clipboard\shell\open\command]
 @=&quot;wscript.exe C:\\Scripts\\SetDataToClipBoard.js \&quot;%1\&quot;&quot;</pre>
 <p>SetDataToClipBoard.jsはこんな感じ。</p>
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> oArgs = WScript.Arguments
-<span class="hljs-keyword">var</span> s = oArgs(<span class="hljs-number">0</span>);
-s = s.replace(<span class="hljs-regexp">/^set-data-to-clipboard:\/\//</span>, <span class="hljs-string">&quot;&quot;</span>);
-s = s.replace(<span class="hljs-regexp">/\/$/</span>, <span class="hljs-string">&quot;&quot;</span>);
+<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> oArgs = WScript.<span class="hljs-property">Arguments</span>
+<span class="hljs-keyword">var</span> s = <span class="hljs-title function_">oArgs</span>(<span class="hljs-number">0</span>);
+s = s.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^set-data-to-clipboard:\/\//</span>, <span class="hljs-string">&quot;&quot;</span>);
+s = s.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\/$/</span>, <span class="hljs-string">&quot;&quot;</span>);
 
-<span class="hljs-keyword">var</span> oIe = <span class="hljs-keyword">new</span> ActiveXObject(<span class="hljs-string">&quot;InternetExplorer.Application&quot;</span>);
-oIe.Navigate(<span class="hljs-string">&quot;about:blank&quot;</span>);
+<span class="hljs-keyword">var</span> oIe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Active</span>XObject(<span class="hljs-string">&quot;InternetExplorer.Application&quot;</span>);
+oIe.<span class="hljs-title class_">Navigate</span>(<span class="hljs-string">&quot;about:blank&quot;</span>);
 
-<span class="hljs-keyword">while</span> (oIe.Busy) WScript.Sleep(<span class="hljs-number">100</span>);
+<span class="hljs-keyword">while</span> (oIe.<span class="hljs-property">Busy</span>) WScript.<span class="hljs-title class_">Sleep</span>(<span class="hljs-number">100</span>);
 
-oIe.Document.parentWindow.clipboardData.setData(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-built_in">unescape</span>(s));
-oIe.Quit();</code></pre>
+oIe.<span class="hljs-property">Document</span>.<span class="hljs-property">parentWindow</span>.<span class="hljs-property">clipboardData</span>.<span class="hljs-title function_">setData</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-built_in">unescape</span>(s));
+oIe.<span class="hljs-title class_">Quit</span>();</code></pre>
 <p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。</p>
 <p>あとはテキトウにBookmarkletを作成してみましょう。例えば閲覧中のページのタイトルとリンクをコピーするBookmarkletだと、Locationには、</p>
 <pre>javascript:document.location.href=&apos;set-data-to-clipboard://&apos;+escape(document.title+&apos;\n&apos;+document.location.href+&apos;\n&apos;)+&apos;/&apos;;</pre>
@@ -103,9 +103,17 @@ oIe.Quit();</code></pre>
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

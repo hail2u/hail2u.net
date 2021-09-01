@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" property="twitter:description">
@@ -67,7 +67,7 @@
 	<span class="hljs-keyword">my</span> $p = HTML::LinkExtor-&gt;new(\&amp;callback);
 	<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">callback</span> </span>{
 		<span class="hljs-keyword">my</span>($tag, %attr) = @_;
-		<span class="hljs-keyword">if</span> ($tag eq <span class="hljs-string">&#x27;a&#x27;</span> <span class="hljs-keyword">and</span> ($attr{<span class="hljs-string">&#x27;href&#x27;</span>} =~ <span class="hljs-keyword">m</span>!^http:<span class="hljs-regexp">//</span>!)) {
+		<span class="hljs-keyword">if</span> ($tag eq <span class="hljs-string">&#x27;a&#x27;</span> <span class="hljs-keyword">and</span> ($attr{<span class="hljs-string">&#x27;href&#x27;</span>} =~ m!^http:<span class="hljs-regexp">//</span>!)) {
 			<span class="hljs-keyword">push</span>(@urls, $attr{<span class="hljs-string">&#x27;href&#x27;</span>});
 		}
 	}
@@ -90,24 +90,24 @@
 	<span class="hljs-keyword">if</span> ($res-&gt;is_success) {
 		<span class="hljs-keyword">my</span> $content = $res-&gt;content;
 		$url =~ <span class="hljs-regexp">s/#.*$//</span>;
-		<span class="hljs-keyword">while</span> ($content =~ <span class="hljs-keyword">m</span>!(&lt;rdf:RDF.*?&lt;<span class="hljs-regexp">/rdf:RDF&gt;)!sg) {
-			my $rdf = $1;
-			my($perm_url) = $rdf =~ m!dc:identifier=&quot;([^&quot;]+)&quot;!;
-			if ($perm_url eq $url) {
-				if ($rdf =~ m!trackback:ping=&quot;([^&quot;]+)&quot;!) {
+		<span class="hljs-keyword">while</span> ($content =~ m!(&lt;rdf:RDF.*?&lt;/rdf:RDF&gt;)!sg) {
+			<span class="hljs-keyword">my</span> $rdf = $1;
+			<span class="hljs-keyword">my</span>($perm_url) = $rdf =~ <span class="hljs-regexp">m!dc:identifier=&quot;([^&quot;]+)&quot;!</span>;
+			<span class="hljs-keyword">if</span> ($perm_url eq $url) {
+				<span class="hljs-keyword">if</span> ($rdf =~ <span class="hljs-regexp">m!trackback:ping=&quot;([^&quot;]+)&quot;!</span>) {
 					$url = $1;
-					$flag = 1;
+					$flag = <span class="hljs-number">1</span>;
 				}
-				elsif ($rdf =~ m!about=&quot;([^&quot;]+)&quot;!) {
+				<span class="hljs-keyword">elsif</span> ($rdf =~ <span class="hljs-regexp">m!about=&quot;([^&quot;]+)&quot;!</span>) {
 					$url = $1;
-					$flag = 1;
+					$flag = <span class="hljs-number">1</span>;
 				}
 			}
 		}
 	}
 
-	return($url, $flag);
-}</span></code></pre>
+	<span class="hljs-keyword">return</span>($url, $flag);
+}</code></pre>
 <p>ネスト深すぎですよ。</p>
 <p>とりあえず、自動的にTrackBack Pingを送るスクリプトはほとんど完成したので、実験をどうやってやろうかと考え中。自分のblogのエントリでやるべきだな（当たり前）。</p>
 <p>うげ。<a href="http://search.cpan.org/search?module=Net::TrackBack" title="search.cpan.org: Net::TrackBack - A modularized implementation of core TrackBack 1x functionality.">Net::TrackBack</a>モジュールにTrackBack ping URL auto discoveryの機能あったよ！2番目のコードは考える必要なかった・・・。</p>
@@ -115,9 +115,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

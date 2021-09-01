@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" property="twitter:description">
@@ -67,13 +67,13 @@
 
 <p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
 
-<pre><code class="highlight language-javascript">（<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">d, f</span>) </span>{
-	<span class="hljs-keyword">var</span> l = d.createElement(<span class="hljs-string">&#x27;link&#x27;</span>);
-	l.rel = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
-	l.href = f;
-	<span class="hljs-keyword">var</span> s = d.getElementsByTagName(<span class="hljs-string">&#x27;script&#x27;</span>)[<span class="hljs-number">0</span>];
-	s.parentNode.insertBefore(l, s);
-})(<span class="hljs-built_in">document</span>, <span class="hljs-string">&#x27;http://example.com/font/foo.css&#x27;</span>);</code></pre>
+<pre><code class="highlight language-javascript">（<span class="hljs-keyword">function</span> (<span class="hljs-params">d, f</span>) {
+	<span class="hljs-keyword">var</span> l = d.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;link&#x27;</span>);
+	l.<span class="hljs-property">rel</span> = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
+	l.<span class="hljs-property">href</span> = f;
+	<span class="hljs-keyword">var</span> s = d.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&#x27;script&#x27;</span>)[<span class="hljs-number">0</span>];
+	s.<span class="hljs-property">parentNode</span>.<span class="hljs-title function_">insertBefore</span>(l, s);
+})(<span class="hljs-variable language_">document</span>, <span class="hljs-string">&#x27;http://example.com/font/foo.css&#x27;</span>);</code></pre>
 
 <p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
 </section>
@@ -86,12 +86,12 @@
 <pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span>
 	<span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.com/font/foo.css&quot;</span>
 	<span class="hljs-attr">class</span>=<span class="hljs-string">&quot;async-web-fonts&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">
-	(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-		<span class="hljs-keyword">var</span> webfonts = <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">&#x27;link.async-web-fonts&#x27;</span>);
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
+	(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+		<span class="hljs-keyword">var</span> webfonts = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;link.async-web-fonts&#x27;</span>);
 
-		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = webfonts.length; i &lt; l; i++) {
-			webfonts[i].rel = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = webfonts.<span class="hljs-property">length</span>; i &lt; l; i++) {
+			webfonts[i].<span class="hljs-property">rel</span> = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
 		}
 	})();
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
@@ -108,9 +108,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

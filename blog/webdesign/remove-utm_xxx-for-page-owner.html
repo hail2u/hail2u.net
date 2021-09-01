@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" property="twitter:description">
@@ -67,19 +67,19 @@
 <p>正規化する関数を発火させるタイミングの制御には色々アプローチがあると思うけど、素で書くといろいろ面倒そうなので<a href="http://www.google.com/analytics/">Google Analytics</a>のコードに混ぜることにした。</p>
 
 <pre><code class="highlight language-js"><span class="hljs-keyword">var</span> _gaq = _gaq || [];
-_gaq.push([<span class="hljs-string">&#x27;_setAccount&#x27;</span>, <span class="hljs-string">&#x27;UA-XXXXXX-X&#x27;</span>]);
-_gaq.push([<span class="hljs-string">&#x27;_trackPageview&#x27;</span>]);
-_gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+_gaq.<span class="hljs-title function_">push</span>([<span class="hljs-string">&#x27;_setAccount&#x27;</span>, <span class="hljs-string">&#x27;UA-XXXXXX-X&#x27;</span>]);
+_gaq.<span class="hljs-title function_">push</span>([<span class="hljs-string">&#x27;_trackPageview&#x27;</span>]);
+_gaq.<span class="hljs-title function_">push</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
 	<span class="hljs-keyword">var</span> h = history, l = location, u;
-	<span class="hljs-keyword">if</span> (!l.search || !h.replaceState) <span class="hljs-keyword">return</span>;
-	u = l.pathname + l.search.replace(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">&#x27;?&#x27;</span>) + l.hash;
-	h.replaceState(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;&#x27;</span>, u);
+	<span class="hljs-keyword">if</span> (!l.<span class="hljs-property">search</span> || !h.<span class="hljs-property">replaceState</span>) <span class="hljs-keyword">return</span>;
+	u = l.<span class="hljs-property">pathname</span> + l.<span class="hljs-property">search</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[?&amp;]utm_[^&amp;]+/g</span>, <span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/^&amp;/</span>, <span class="hljs-string">&#x27;?&#x27;</span>) + l.<span class="hljs-property">hash</span>;
+	h.<span class="hljs-title function_">replaceState</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">&#x27;&#x27;</span>, u);
 });
 
-(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-	<span class="hljs-keyword">var</span> ga = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&#x27;script&#x27;</span>); ga.type = <span class="hljs-string">&#x27;text/javascript&#x27;</span>; ga.async = <span class="hljs-literal">true</span>;
-	ga.src = (<span class="hljs-string">&#x27;https:&#x27;</span> == <span class="hljs-built_in">document</span>.location.protocol ? <span class="hljs-string">&#x27;https://ssl&#x27;</span> : <span class="hljs-string">&#x27;http://www&#x27;</span>) + <span class="hljs-string">&#x27;.google-analytics.com/ga.js&#x27;</span>;
-	<span class="hljs-keyword">var</span> s = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&#x27;script&#x27;</span>)[<span class="hljs-number">0</span>]; s.parentNode.insertBefore(ga, s);
+(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+	<span class="hljs-keyword">var</span> ga = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;script&#x27;</span>); ga.<span class="hljs-property">type</span> = <span class="hljs-string">&#x27;text/javascript&#x27;</span>; ga.<span class="hljs-property">async</span> = <span class="hljs-literal">true</span>;
+	ga.<span class="hljs-property">src</span> = (<span class="hljs-string">&#x27;https:&#x27;</span> == <span class="hljs-variable language_">document</span>.<span class="hljs-property">location</span>.<span class="hljs-property">protocol</span> ? <span class="hljs-string">&#x27;https://ssl&#x27;</span> : <span class="hljs-string">&#x27;http://www&#x27;</span>) + <span class="hljs-string">&#x27;.google-analytics.com/ga.js&#x27;</span>;
+	<span class="hljs-keyword">var</span> s = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&#x27;script&#x27;</span>)[<span class="hljs-number">0</span>]; s.<span class="hljs-property">parentNode</span>.<span class="hljs-title function_">insertBefore</span>(ga, s);
 })();</code></pre>
 
 <p>まだちゃんと運用していないけど、複数のutm_xxxがあるケースや他のパラメーターがある場合、更にはハッシュ付きだった場合なども含めた<a href="/test/449.html">簡単なテスト</a>を行った限りでは大丈夫そう。もしかしたらAnalyticsのutm_xxx解析は維持したままURLを綺麗にできるかなと思ったけど、これだとダメな気もする。Analyticsの解析完了で発火するとかだと確実だと思うんだけど、まだ調べてない。</p>
@@ -93,9 +93,17 @@ _gaq.push(<span class="hljs-function"><span class="hljs-keyword">function</span>
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

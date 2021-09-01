@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="gfmtoc(mdtocから名前を変えた）を作っている時にGitHub flavored Markdown(本当はHTML Pipeline）互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" property="twitter:description">
@@ -73,22 +73,22 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> regenerate = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;regenerate&#x27;</span>);
 
-<span class="hljs-keyword">var</span> word = regenerate().add(
+<span class="hljs-keyword">var</span> word = <span class="hljs-title function_">regenerate</span>().<span class="hljs-title function_">add</span>(
 	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;unicode-7.0.0/properties/Any/code-points&#x27;</span>)
-).remove(
+).<span class="hljs-title function_">remove</span>(
 	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;unicode-7.0.0/categories/L/code-points&#x27;</span>)
-).remove(
+).<span class="hljs-title function_">remove</span>(
 	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;unicode-7.0.0/categories/M/code-points&#x27;</span>)
-).remove(
+).<span class="hljs-title function_">remove</span>(
 	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;unicode-7.0.0/categories/N/code-points&#x27;</span>)
-).remove(
+).<span class="hljs-title function_">remove</span>(
 	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;unicode-7.0.0/categories/Pc/code-points&#x27;</span>)
-).remove(
+).<span class="hljs-title function_">remove</span>(
 	<span class="hljs-string">&#x27;-&#x27;</span>,
 	<span class="hljs-string">&#x27; &#x27;</span>
 );
 
-<span class="hljs-built_in">console</span>.log(word.toString());</code></pre>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(word.<span class="hljs-title function_">toString</span>());</code></pre>
 
 <p>ここでは否定形が欲しいので、Anyプロパティーを<code>add()</code>してから上記カテゴリーを<code>remove()</code>していく。最終的には特別視される<code>-</code>と<code> </code>もここでついでに削除しておく。gfmtocでは<a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js">生成結果をファイルに保存したもの</a>をライブラリとして使っている。普通はそのまま書けば良い（毎回動的に生成させるととても遅いことには注意が必要）。あとはHTML Pipelineがやっていることをなぞるのみだ。</p>
 
@@ -103,12 +103,12 @@
 
 <pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> h = {};
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">genID</span>(<span class="hljs-params">s, h</span>) </span>{
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">genID</span>(<span class="hljs-params">s, h</span>) {
 	<span class="hljs-keyword">var</span> u = <span class="hljs-string">&#x27;&#x27;</span>;
 	<span class="hljs-keyword">var</span> word = <span class="hljs-regexp">/.../g</span>;
-	s = s.toLowerCase();
-	s = s.replace(word, <span class="hljs-string">&#x27;&#x27;</span>);
-	s = s.replace(<span class="hljs-regexp">/ /g</span>, <span class="hljs-string">&#x27;-&#x27;</span>);
+	s = s.<span class="hljs-title function_">toLowerCase</span>();
+	s = s.<span class="hljs-title function_">replace</span>(word, <span class="hljs-string">&#x27;&#x27;</span>);
+	s = s.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/ /g</span>, <span class="hljs-string">&#x27;-&#x27;</span>);
 
 	<span class="hljs-keyword">if</span> (h[s] &gt; <span class="hljs-number">0</span>) {
 		u = <span class="hljs-string">&#x27;-&#x27;</span> + h[s];
@@ -128,9 +128,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

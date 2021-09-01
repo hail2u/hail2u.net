@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="いくつかAmazonの画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、event.srcElementでimg要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。" property="twitter:description">
@@ -61,20 +61,20 @@
 				<p>いくつか<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、<code>event.srcElement</code>で<code>img</code>要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。</p>
 <p>てなわけで画像付きのAmazonアソシエイトリンクを作成するMenuExtのコードを書いてみる。</p>
 <pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">defer</span>&gt;</span><span class="javascript">
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">defer</span>&gt;</span><span class="language-javascript">
 &lt;!--
 	<span class="hljs-keyword">var</span> aid = <span class="hljs-string">&#x27;hail2unet-22&#x27;</span>;
 
-	<span class="hljs-keyword">var</span> pWin = external.menuArguments;
+	<span class="hljs-keyword">var</span> pWin = external.<span class="hljs-property">menuArguments</span>;
 
-	<span class="hljs-keyword">if</span> (pWin.event.srcElement.tagName == <span class="hljs-string">&#x27;IMG&#x27;</span>) {
-		<span class="hljs-keyword">var</span> uri = pWin.location.href;
-		<span class="hljs-keyword">var</span> i = uri.indexOf(<span class="hljs-string">&#x27;ASIN&#x27;</span>);
-		<span class="hljs-keyword">var</span> asin = uri.substring(i + <span class="hljs-number">5</span>, i + <span class="hljs-number">15</span>);
+	<span class="hljs-keyword">if</span> (pWin.<span class="hljs-property">event</span>.<span class="hljs-property">srcElement</span>.<span class="hljs-property">tagName</span> == <span class="hljs-string">&#x27;IMG&#x27;</span>) {
+		<span class="hljs-keyword">var</span> uri = pWin.<span class="hljs-property">location</span>.<span class="hljs-property">href</span>;
+		<span class="hljs-keyword">var</span> i = uri.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;ASIN&#x27;</span>);
+		<span class="hljs-keyword">var</span> asin = uri.<span class="hljs-title function_">substring</span>(i + <span class="hljs-number">5</span>, i + <span class="hljs-number">15</span>);
 		<span class="hljs-keyword">var</span> uri = <span class="hljs-string">&quot;https://www.amazon.co.jp/exec/obidos/ASIN/&quot;</span> + asin + <span class="hljs-string">&quot;/&quot;</span> + aid;
-		<span class="hljs-keyword">var</span> imguri = <span class="hljs-keyword">new</span> <span class="hljs-built_in">String</span>(pWin.event.srcElement.src);
-		<span class="hljs-keyword">var</span> title = pWin.document.title;
-		pWin.clipboardData.setData(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;&lt;a href=\&quot;&quot;</span> + uri + <span class="hljs-string">&quot;\&quot; title=\&quot;&quot;</span> +
+		<span class="hljs-keyword">var</span> imguri = <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(pWin.<span class="hljs-property">event</span>.<span class="hljs-property">srcElement</span>.<span class="hljs-property">src</span>);
+		<span class="hljs-keyword">var</span> title = pWin.<span class="hljs-property">document</span>.<span class="hljs-property">title</span>;
+		pWin.<span class="hljs-property">clipboardData</span>.<span class="hljs-title function_">setData</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;&lt;a href=\&quot;&quot;</span> + uri + <span class="hljs-string">&quot;\&quot; title=\&quot;&quot;</span> +
 			title + <span class="hljs-string">&quot;\&quot;&gt;&lt;img src=\&quot;&quot;</span> + imguri + <span class="hljs-string">&quot;\&quot; alt=\&quot;&quot;</span> + title + <span class="hljs-string">&quot;\&quot; /&gt;&lt;/a&gt;&quot;</span>);
 	}
 <span class="hljs-comment">//--&gt;</span>
@@ -95,9 +95,17 @@
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>

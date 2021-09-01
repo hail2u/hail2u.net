@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.21.0.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.21.0.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.1.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.1.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="writebackの投稿されたコメントのマークアップをpでうまくどうにかするようにしてみました。うまいこと動いてる模様。" property="twitter:description">
@@ -60,7 +60,7 @@
 
 				<p><a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writeback</a>の投稿されたコメントのマークアップを<code>p</code>でうまくどうにかするようにしてみました。うまいこと動いてる模様。</p>
 <p>実装的には単純で、予め改行をタブ文字（<code>\t</code>）に変換しておき、</p>
-<pre><code class="highlight language-perl">$str =~ <span class="hljs-keyword">s</span>!\t{<span class="hljs-number">2</span>,}!&lt;<span class="hljs-regexp">/p&gt;&lt;p&gt;!g;
+<pre><code class="highlight language-perl">$str =~ s!\t{<span class="hljs-number">2</span>,}!&lt;<span class="hljs-regexp">/p&gt;&lt;p&gt;!g;
 $str =~ s!\t!&lt;br /</span>&gt;!g;
 $str = <span class="hljs-string">&quot;&lt;p&gt;$str&lt;/p&gt;&quot;</span>;</code></pre>
 <p>というコードで。2個以上の連続した改行を<code>&lt;/p&gt;&lt;p&gt;</code>に変換→残った改行を<code>&lt;br /&gt;</code>に変換→全体を<code>&lt;/p&gt;</code>と<code>&lt;p&gt;</code>要素で括るということですね。</p>
@@ -82,7 +82,7 @@ writebackの新しいマークアップ機能のテストの終わり。</pre>
 <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>writebackの新しいマークアップ機能のテストの終わり。<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></code></pre>
 <p>となります（データファイル上では改行は消えます）。</p>
 <p>同時にテンプレにベタ書きしていた<code>p</code>要素を取っ払いました。そのため、今までのコメントを変換する必要がある（<code>p</code>要素で括られていないので）のですが、grepして置換するのすらメンドウなので、</p>
-<pre><code class="highlight language-perl">$param{<span class="hljs-string">&#x27;comment&#x27;</span>} = <span class="hljs-string">&quot;&lt;p&gt;&quot;</span> . $param{<span class="hljs-string">&#x27;comment&#x27;</span>} . <span class="hljs-string">&quot;&lt;/p&gt;&quot;</span> <span class="hljs-keyword">if</span> $param{<span class="hljs-string">&#x27;comment&#x27;</span>} !~ <span class="hljs-keyword">m</span>!^&lt;p&gt;.+&lt;<span class="hljs-regexp">/p&gt;$!;</span></code></pre>
+<pre><code class="highlight language-perl">$param{<span class="hljs-string">&#x27;comment&#x27;</span>} = <span class="hljs-string">&quot;&lt;p&gt;&quot;</span> . $param{<span class="hljs-string">&#x27;comment&#x27;</span>} . <span class="hljs-string">&quot;&lt;/p&gt;&quot;</span> <span class="hljs-keyword">if</span> $param{<span class="hljs-string">&#x27;comment&#x27;</span>} !~ m!^&lt;p&gt;.+&lt;/p&gt;$!;</code></pre>
 <p>という<code>p</code>要素で括られていなかったら括るというコードで逃げました。ヒマな時にちゃんと変換して、このコードは外すようにしよう。</p>
 <p><a href="/archives/bsk.html" title="hail2u.net - Archives - blosxom starter kit">blosxom starter kit</a>にも導入したいところだけど、どうだろうな。互換性が失われるのが難。利点もコレといってないしなぁ。</p>
 <section>
@@ -93,9 +93,17 @@ writebackの新しいマークアップ機能のテストの終わり。</pre>
 		</main>
 
 		<footer>
-			<p>このウェブサイトは、<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下、アクセシビリティーに配慮し、プライバシーを尊重した上で、公開、更新しています。もし、このウェブサイトの文書や公開しているオープンソース・プロジェクトが気に入ったなら、<a href="https://github.com/sponsors/hail2u">後援してくれると</a>うれしいです。</p>
-
-			<p>更新情報は、<a href="/feed" type="application/rss+xml">RSS</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます（僕も<a href="/subscriptions/">いろいろなウェブサイトを購読</a>しています）。<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>もあります。</p>
+			<ul class="pages">
+				<li class="sep"><a href="mailto:hail2u@gmail.com">ながしまきょう</a></li>
+				<li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a></li>
+				<li><a href="/feed" type="application/rss+xml">RSS</a></li>
+				<li><a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a></li>
+				
+				
+				
+				
+				<li><a href="https://twitter.com/hail2u_">Twitter</a></li>
+			</ul>
 		</footer>
 	</body>
 </html>
