@@ -36,8 +36,6 @@ const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
 	if (typeof messages === "string") {
-		process.stdout.write(`${src}:1:1: ${messages}
-`);
 		return;
 	}
 

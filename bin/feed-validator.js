@@ -10,8 +10,6 @@ const validate = async (file) => {
 	const messages = await validateFeed(feed);
 
 	if (typeof messages === "string") {
-		process.stdout.write(`${file.dest}:1:1: ${messages}
-`);
 		return [];
 	}
 

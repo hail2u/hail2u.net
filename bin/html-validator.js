@@ -26,8 +26,6 @@ const validate = async (file) => {
 	const messages = await validateHTML(html);
 
 	if (typeof messages === "string") {
-		process.stdout.write(`${file}:1:1: ${messages}
-`);
 		return [];
 	}
 
