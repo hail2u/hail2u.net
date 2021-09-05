@@ -89,7 +89,7 @@ const main = async () => {
 	} = minimist(process.argv.slice(2));
 
 	if (!file) {
-		throw new Error(`A file path must be passed.`);
+		throw new Error("A file path must be passed.");
 	}
 
 	const [

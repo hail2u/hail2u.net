@@ -14,7 +14,7 @@ const main = async () => {
 	} = minimist(process.argv.slice(2));
 
 	if (!text) {
-		throw new Error(`Only 1 argument is required.`);
+		throw new Error("Only 1 argument is required.");
 	}
 
 	const file = config.paths.data.statuses;

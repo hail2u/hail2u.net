@@ -114,7 +114,7 @@ const main = async () => {
 			throw e;
 		}
 
-		throw new Error(`Amazon image server does not respond in 5s.`);
+		throw new Error("Amazon image server does not respond in 5s.");
 	} finally {
 		clearTimeout(abortID);
 	}
