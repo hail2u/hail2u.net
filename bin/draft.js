@@ -43,8 +43,8 @@ const validateBody = async (body, src) => {
 
 	if (messages.length > 0) {
 		const errors = messages.map(formatMessage.bind(null, src));
-		process.stderr.write(errors.join("\n"));
-		process.stderr.write("\n\n");
+		process.stdout.write(errors.join("\n"));
+		process.stdout.write("\n\n");
 		throw new Error(`${errors.length} error(s) in ${src}`);
 	}
 };

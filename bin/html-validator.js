@@ -63,8 +63,8 @@ const main = async () => {
 	const errors = results.flat();
 
 	if (errors.length > 0) {
-		process.stderr.write(errors.join("\n"));
-		process.stderr.write("\n\n");
+		process.stdout.write(errors.join("\n"));
+		process.stdout.write("\n\n");
 		const errorFiles = results.filter(isEmpty);
 		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
 	}
