@@ -1,4 +1,7 @@
-import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
+import {
+	outputJSONFile,
+	readJSONFile
+} from "../lib/json-file.js";
 import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";

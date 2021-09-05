@@ -1,4 +1,7 @@
-import { escapeCharacters, unescapeReferences } from "../lib/character-reference.js";
+import {
+	escapeCharacters,
+	unescapeReferences
+} from "../lib/character-reference.js";
 import config from "../.config.js";
 import fs from "fs/promises";
 import { highlight } from "../lib/highlight.js";

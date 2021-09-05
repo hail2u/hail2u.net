@@ -1,4 +1,7 @@
-import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
+import {
+	outputJSONFile,
+	readJSONFile
+} from "../lib/json-file.js";
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fetch from "node-fetch";

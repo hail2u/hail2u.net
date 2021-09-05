@@ -23,11 +23,11 @@ const isEmpty = (element) => element.length !== 0;
 const main = async () => {
 	const results = await Promise.all(config.files.feed.map(validate));
 	const errors = results.flat();
-	const errorFiles = results.filter(isEmpty);
 
 	if (errors.length > 0) {
 		process.stderr.write(errors.join("\n"));
 		process.stderr.write("\n\n");
+		const errorFiles = results.filter(isEmpty);
 		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
 	}
 };
