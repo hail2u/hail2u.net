@@ -70,7 +70,7 @@ const main = async () => {
 			sharp()
 		]);
 
-		if (res.status !== 200) {
+		if (!res.ok) {
 			throw new Error(`${res.status} ${res.statusText}`);
 		}
 
