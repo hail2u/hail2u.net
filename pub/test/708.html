@@ -21,7 +21,7 @@
 		</header>
 
 		<main>
-			<p><label for="fg">前景色: </label><input id="fg" type="color" value="#0568e1"></p>
+			<p><label for="fg">前景色: </label><input id="fg" type="color" value="hsl(213deg, 96%, 42%)"></p>
 			<p><button id="calc">算出</button></p>
 			<ul id="output"></ul>
 		</main>
@@ -118,8 +118,14 @@
 						.getPropertyValue("background-color")
 						.match(/\d+/gu);
 					const contrast = getContrast(background, foreground);
-					const scaled = scaleContrast(contrast);
-					li.append(scaled * 100);
+					const scaled = scaleContrast(contrast) * 100;
+
+					if (Math.abs(scaled) < 60) {
+						li.append(`${String(hue).padStart(3)}deg: ${scaled}`);
+						continue;
+					}
+
+					output.removeChild(li);
 				}
 			};
 
