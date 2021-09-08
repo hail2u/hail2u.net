@@ -9,6 +9,7 @@ const cancelFetch = (abortController) => {
 
 const parseXML = (xml) => {
 	const json = fastXMLParser.parse(xml, {
+		"arrayMode": /^error$/iu,
 		"ignoreNameSpace": true
 	});
 	return json.Envelope.Body.feedvalidationresponse.errors;
@@ -36,16 +37,11 @@ const validateFeed = async (feed) => {
 		const json = await res.text().then(parseXML);
 		const errorcount = parseInt(json.errorcount, 10);
 
-		switch (errorcount) {
-			case 0:
-				return null;
-
-			case 1:
-				return [json.errorlist.error];
-
-			default:
-				return json.errorlist.error;
+		if (errorcount === 0) {
+			return null;
 		}
+
+		return json.errorlist.error;
 	} catch (e) {
 		if (e.type === "aborted") {
 			return "Skipped. W3C Feed Validator does not respond in 10s.";
