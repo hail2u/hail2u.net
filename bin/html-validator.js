@@ -25,7 +25,13 @@ const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
 	const messages = await validateHTML(html);
 
+	if (!messages) {
+		return [];
+	}
+
 	if (typeof messages === "string") {
+		process.stdout.write(`${file}:1:1: ${messages}
+`);
 		return [];
 	}
 

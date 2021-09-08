@@ -38,7 +38,7 @@ const validateFeed = async (feed) => {
 
 		switch (errorcount) {
 			case 0:
-				return "No errors.";
+				return null;
 
 			case 1:
 				return [json.errorlist.error];
@@ -64,7 +64,13 @@ const validate = async (file) => {
 	const feed = await fs.readFile(file.dest, "utf8");
 	const messages = await validateFeed(feed);
 
+	if (!messages) {
+		return [];
+	}
+
 	if (typeof messages === "string") {
+		process.stdout.write(`${file.dest}:1:1: ${messages}
+`);
 		return [];
 	}
 

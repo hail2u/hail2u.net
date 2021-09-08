@@ -35,7 +35,13 @@ const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${mess
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
+	if (!messages) {
+		return;
+	}
+
 	if (typeof messages === "string") {
+		process.stdout.write(`${src}:1:1: ${messages}
+`);
 		return;
 	}
 
