@@ -16,7 +16,7 @@ const validate = async (file) => {
 	return messages.map(formatMessage.bind(null, file.dest));
 };
 
-const isEmpty = (element) => element.length !== 0;
+const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
 	const results = await Promise.all(config.files.feed.map(validate));
@@ -25,7 +25,7 @@ const main = async () => {
 	if (errors.length > 0) {
 		process.stdout.write(errors.join("\n"));
 		process.stdout.write("\n\n");
-		const errorFiles = results.filter(isEmpty);
+		const errorFiles = results.filter(isNotEmpty);
 		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
 	}
 };
