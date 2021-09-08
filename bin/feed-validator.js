@@ -56,8 +56,9 @@ const validateFeed = async (feed) => {
 const formatMessage = (file, message) =>
 	`${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
 
-const validate = async (file) => {
-	const feed = await fs.readFile(file.dest, "utf8");
+const validate = async (feedFile) => {
+	const file = feedFile.dest;
+	const feed = await fs.readFile(file, "utf8");
 	const messages = await validateFeed(feed);
 
 	if (!messages) {
@@ -65,12 +66,12 @@ const validate = async (file) => {
 	}
 
 	if (typeof messages === "string") {
-		process.stdout.write(`${file.dest}:1:1: ${messages}
+		process.stdout.write(`${file}:1:1: ${messages}
 `);
 		return [];
 	}
 
-	return messages.map(formatMessage.bind(null, file.dest));
+	return messages.map(formatMessage.bind(null, file));
 };
 
 const isNotEmpty = (element) => element.length !== 0;
