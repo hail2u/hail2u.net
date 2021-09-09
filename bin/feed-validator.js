@@ -34,7 +34,8 @@ const validateFeed = async (feed) => {
 			return `Skipped. ${res.status} ${res.statusText}.`;
 		}
 
-		const json = await res.text().then(parseXML);
+		const xml = await res.text();
+		const json = await parseXML(xml);
 		const errorcount = parseInt(json.errorcount, 10);
 
 		if (errorcount === 0) {
