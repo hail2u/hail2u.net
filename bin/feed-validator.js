@@ -16,16 +16,16 @@ const parseXML = (xml) => {
 };
 
 const validateFeed = async (feed) => {
-	const encoded = encodeURIComponent(feed);
+	const body = new URLSearchParams();
+	body.append("manual", 1);
+	body.append("output", "soap12");
+	body.append("rawdata", feed);
 	const abortController = new AbortController();
 	const abortID = setTimeout(cancelFetch.bind(null, abortController), 10000);
 
 	try {
 		const res = await fetch("https://validator.w3.org/feed/check.cgi", {
-			body: `manual=1&output=soap12&rawdata=${encoded}`,
-			headers: {
-				"Content-type": "application/x-www-form-urlencoded"
-			},
+			body,
 			method: "POST",
 			signal: abortController.signal
 		});
