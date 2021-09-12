@@ -57,8 +57,9 @@ const validateFeed = async (feed) => {
 const formatMessage = (file, message) =>
 	`${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
 
-const validate = async (feedFile) => {
-	const file = feedFile.dest;
+const validate = async ({
+	dest: file
+}) => {
 	const feed = await fs.readFile(file, "utf8");
 	const messages = await validateFeed(feed);
 
