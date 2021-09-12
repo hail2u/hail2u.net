@@ -13,6 +13,40 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[v9.21.0で背景色の色相がコロコロ変わるようにしていたが、戻した。一部の色相でコントラストが落ちるためだ。コントラストは60（APCAで計算した値で、WCAG 2.1の4.5:1相当）くらい確保できるが、一部の色相で57くらいまで落ちる。機械的にどうにかできるが、大変そうだった。]]></description>
+				<guid>https://hail2u.net/blog/stopping-random-background-color-hue.html</guid>
+				<link>https://hail2u.net/blog/stopping-random-background-color-hue.html</link>
+				<pubDate>Sun, 12 Sep 2021 16:32:18 +0900</pubDate>
+				<title><![CDATA[背景色の色相をコロコロ変えると]]></title>
+				<content:encoded><![CDATA[<p>v9.21.0で背景色の色相がコロコロ変わるようにしていたが、戻した。一部の色相でコントラストが落ちるためだ。コントラストは60（APCAで計算した値で、WCAG 2.1の4.5:1相当）くらい確保できるが、一部の色相で57くらいまで落ちる。機械的にどうにかできるが、大変そうだった。</p>
+
+<p>何か別のものがないといけない。多分<a href="https://www.w3.org/TR/css-color-5/#colorcontrast">color-contrast()関数</a>が必要になるだろう。具体的には、彩度や明度を前後3%ずつずらしたもので比較する関数を作る。</p>
+
+<pre><code class="language-css">:root {
+	--hue: 48;
+	--color-on-ground: hsl(0 0% 15%);
+	--color-background: color-contrast(
+		var(--color-on-background) vs
+			hsl(var(--hue) 51% 93%),
+			hsl(var(--hue) 51% 90%),
+			hsl(var(--hue) 51% 87%),
+			hsl(var(--hue) 48% 93%),
+			hsl(var(--hue) 48% 90%),
+			hsl(var(--hue) 48% 87%),
+			hsl(var(--hue) 45% 93%),
+			hsl(var(--hue) 45% 90%),
+			hsl(var(--hue) 45% 87%)
+		to AA
+	);
+}</code></pre>
+
+<p>こうすると、最もコントラスト比が4.5に近い色が選択される。これでコントラストの問題を低コストで機械的に解消できるだろう。パフォーマンスの点で懸念があるが、面倒で実装のあるSafari 15 TPで試しておらず、どうなるかわからない。</p>
+
+<hr>
+
+<p><code>color-contrast</code>関数は、<code>accent-color</code>プロパティーで利用するといいのかもしれない。ユーザー指定の色（が<code>initial</code>で参照できれば、それ）よりコントラストが出る場合にのみ、独自の色に差し替えるというようなことができる（かもしれない）。<code>accent-color</code>プロパティーについては、<em>コントラストではなく色で判断するためにユーザーが指定している可能性</em>が否定できないので、あまり積極的に使いたくないが、使いたい気持ちもわかる。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[冬にベランダを交換した。柱や柵はダーク・ブラウンで落ち着いた色だが、床だけが白い。雨の後は汚れが目立つし、夏になったらまぶしいことがわかったので、IKEAのフロア・デッキを敷き詰めた。そこそこぴっちり敷き詰められたので、今のところは満足している。]]></description>
 				<guid>https://hail2u.net/blog/ikea-runnen-floor-decking.html</guid>
 				<link>https://hail2u.net/blog/ikea-runnen-floor-decking.html</link>
@@ -197,78 +231,6 @@
 <p>その近くに、2棟の駅ビルが建てられている。両方とも小田急だが、片方はオフィス賃貸用で、もう片方はジムや、クリニック、保育園などが入るらしい。すでにその横に完成している小田急のタワーマンションの住人用なのか、ほぼ直結の橋なども作られている。</p>
 
 <p>駅の反対側に前からある商業施設群も、小田急がすべて持っている。完全に小田急の町になってきた。相鉄が駅舎の建て直しをしているが、ここでは駅ナカくらいしかやる予定はないみたいだ。一年後に完成する予定らしいが、どうなることやら。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。]]></description>
-				<guid>https://hail2u.net/blog/grid-area-in-style.html</guid>
-				<link>https://hail2u.net/blog/grid-area-in-style.html</link>
-				<pubDate>Tue, 20 Apr 2021 07:29:09 +0900</pubDate>
-				<title><![CDATA[style属性にgrid-areaプロパティー]]></title>
-				<content:encoded><![CDATA[<p><code>grid-template-area</code>プロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、<code>grid-area</code>プロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。</p>
-
-<p>例えば以下のようなリストがあり、そのレイアウトにグリッドを使うとする。グローバル・ヘッダーのナビゲーションを想定している。例なので<code>a</code>要素は省略した。</p>
-
-<pre><code class="language-html">&lt;ul class="nav"&gt;
-	&lt;li class=&quot;news&quot;&gt;News&lt;/li&gt;
-	&lt;li class=&quot;feature&quot;&gt;Feature&lt;/li&gt;
-	&lt;li class=&quot;column&quot;&gt;Column&lt;/li&gt;
-	&lt;li class=&quot;store&quot;&gt;Store&lt;/li&gt;
-	&lt;li class=&quot;search&quot;&gt;Search&lt;/li&gt;
-&lt;/ul&gt;</code></pre>
-
-<p>このHTMLに対して、CSSファイルで、レイアウトを書き、各項目に識別子を付ける。例えば、3列2行にして、2行目の真ん中を空項目で埋めることにしたい。恣意的だが、空項目の部分にロゴが食い込むようなグローバル・ヘッダーを想像しておいてほしい。</p>
-
-<pre><code class="language-css">.nav {
-	grid-template-areas:
-		&quot;a b c&quot;
-		&quot;d . e&quot;;
-}
-
-.news {
-	grid-area: a;
-}
-
-.feature {
-	grid-area: b;
-}
-
-.column {
-	grid-area: c;
-}
-
-.store {
-	grid-area: d;
-}
-
-.search {
-	grid-area: e;
-}</code></pre>
-
-<p>この名前付けが冗長で、かつ<em>定義より利用が前に</em>来てしまうので、落ち着かない。逆順に書くと、親要素へのルールセットよりも、子要素のルールセットが前に来てしまい、同じく落ち着かない。HTML側でこう書いておきたい。</p>
-
-<pre><code class="language-html">&lt;ul class="nav"&gt;
-	&lt;li style=&quot;grid-area: news&quot;&gt;News&lt;/li&gt;
-	&lt;li style=&quot;grid-area: feature&quot;&gt;Feature&lt;/li&gt;
-	&lt;li style=&quot;grid-area: column&quot;&gt;Column&lt;/li&gt;
-	&lt;li style=&quot;grid-area: store&quot;&gt;Store&lt;/li&gt;
-	&lt;li style=&quot;grid-area: search&quot;&gt;Search&lt;/li&gt;
-&lt;/ul&gt;</code></pre>
-
-<p>クラスの代わりにこうしておくと、CSS側では、<code>.nav</code>へのスタイルのみでよくなる。CSSでクラス名が使いたい場合は、HTML側にクラス名も重ねて書いてもいい。CSS側で属性セレクターを使って<code>[style*="column"]</code>と書いてもいいだろう。</p>
-
-<pre><code class="language-css">.nav {
-	grid-template-areas:
-		&quot;news  feature column&quot;
-		&quot;store ....... search&quot;;
-}</code></pre>
-
-<p>あたかも<em><code>grid-template-areas</code>プロパティーでクラス名を直接使えるように</em>書ける。また、定義済みを参照しているだけなので、とても落ち着く。HTML側は、テンプレート・システムによって生成されるので、コストが下がり、ミスタイプも減る。このように、特化型で、構造や内容物に強く依存する場合なら、<code>style</code>属性に書いてしまってもいい気がしている。</p>
-
-<hr>
-
-<p>こういった<code>grid-template-areas</code>プロパティーで識別子だけを使う、固定的なグリッド・レイアウトは、グローバル・ヘッダーやグローバル・フッターで出番がある。項目の数やラベルが安定しているので、決め打ちで割り当てても問題は起きにくい。描画領域幅に合わせてレイアウトを変える場合も、<code>grid-template-areas</code>プロパティーを上書きするだけと、細かいグリッドを定義しておいて、複雑に組み合わせるようなことをせずに済む。</p>
-
-<p>そんなわけで、現在のページ・ヘッダーは、識別子を使ったグリッド・レイアウトになっている。試行錯誤した過程で、このウェブサイトでいろいろ試していた。左寄せではないが、おさまりがいいので、しばらく使うかもしれない。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
