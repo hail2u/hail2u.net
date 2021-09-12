@@ -64,7 +64,8 @@ const checkTitleType = (title) => {
 	}
 };
 
-const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
+const formatMessage = (file, message) =>
+	`${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
 
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
