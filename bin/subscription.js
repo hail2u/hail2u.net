@@ -26,7 +26,11 @@ const main = async () => {
 			title: "",
 			url: ""
 		},
-		string: ["feed", "title", "url"]
+		string: [
+			"feed",
+			"title",
+			"url"
+		]
 	});
 
 	if (!feed) {

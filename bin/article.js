@@ -88,9 +88,7 @@ const validateBody = async (body, src) => {
 };
 
 const main = async () => {
-	const {
-		_: [file]
-	} = minimist(process.argv.slice(2));
+	const { _: [ file ] } = minimist(process.argv.slice(2));
 
 	if (!file) {
 		throw new Error("A file path must be passed.");

@@ -68,9 +68,7 @@ const build = async (basic, file) => {
 		mergeData(file, basic),
 		fs.readFile(file.src, "utf8")
 	]);
-	const rendered = mustache.render(template, data, null, {
-		escape: escapeCharacters
-	});
+	const rendered = mustache.render(template, data, null, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
 };
 

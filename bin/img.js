@@ -3,9 +3,8 @@ import sharp from "sharp";
 
 const generatePNG = async (file) => {
 	const metadata = await sharp(file.src).metadata();
-	const img = sharp(file.src, {
-		density: (file.width * metadata.density) / metadata.width
-	});
+	const density = (file.width * metadata.density) / metadata.width;
+	const img = sharp(file.src, { density });
 	img.resize(file.width);
 	await img.toFile(file.dest);
 };

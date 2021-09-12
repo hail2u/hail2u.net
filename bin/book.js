@@ -64,9 +64,7 @@ const main = async () => {
 			res,
 			img
 		] = await Promise.all([
-			fetch(cover, {
-				signal: abortController.signal
-			}),
+			fetch(cover, { signal: abortController.signal }),
 			sharp()
 		]);
 

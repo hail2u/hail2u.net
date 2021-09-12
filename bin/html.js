@@ -78,9 +78,7 @@ const readItems = async (file) => {
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
 	const content = await fs.readFile(path.join(config.paths.src.partial, filename), "utf8");
-	return {
-		[name]: content
-	};
+	return { [ name ]: content };
 };
 
 const readPartials = async () => {
@@ -202,9 +200,7 @@ const main = async () => {
 		statuses,
 		subscriptions,
 		partials,
-		{
-			version
-		}
+		{ version }
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		readItems(config.paths.data.articles),

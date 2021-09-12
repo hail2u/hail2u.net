@@ -9,9 +9,7 @@ import { openTwitter } from "../lib/open-twitter.js";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
-	const {
-		_: [text]
-	} = minimist(process.argv.slice(2));
+	const { _: [ text ] } = minimist(process.argv.slice(2));
 
 	if (!text) {
 		throw new Error("Only 1 argument is required.");

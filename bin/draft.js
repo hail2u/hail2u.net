@@ -66,9 +66,7 @@ const makeTempDir = async () => {
 };
 
 const main = async () => {
-	const {
-		_: [file]
-	} = minimist(process.argv.slice(2));
+	const { _: [ file ] } = minimist(process.argv.slice(2));
 
 	if (!file) {
 		throw new Error("A file path must be passed.");
@@ -86,13 +84,11 @@ const main = async () => {
 	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
-		.render(template, draft, null, {
-			escape: escapeCharacters
-		})
+		.render(template, draft, null, { escape: escapeCharacters })
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
 	const highlighted = highlight(rendered);
 	await outputFile(test, highlighted);
-	await runCommand("open", [test]);
+	await runCommand("open", [ test ]);
 };
 
 main().catch((e) => {

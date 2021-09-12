@@ -14,7 +14,11 @@ const testContrast_clampLuminance = (luminance) => {
 };
 
 const testContrast_getLuminance = (color) => {
-	const [red, green, blue] = color.match(/\d+/gu);
+	const [
+		red,
+		green,
+		blue
+	] = color.match(/\d+/gu);
 	const luminance =
 		0.2126729 * testContrast_linearizeColorComponent(red) +
 		0.7151522 * testContrast_linearizeColorComponent(green) +
