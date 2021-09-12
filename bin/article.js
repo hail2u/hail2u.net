@@ -156,8 +156,7 @@ const main = async () => {
 			`--message=Contribute ${name} (${th})`
 		])
 	]);
-	const url = `${scheme}://${domain}${link}`;
-	await openTwitter(`${title} ${url}`);
+	await openTwitter(`${title} ${scheme}://${domain}${link}`);
 };
 
 main().catch((e) => {
