@@ -13,6 +13,34 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[フィードを検証するようにした。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、W3C Feed ValidatorのAPIを利用した。]]></description>
+				<guid>https://hail2u.net/blog/validating-feeds-on-versioning.html</guid>
+				<link>https://hail2u.net/blog/validating-feeds-on-versioning.html</link>
+				<pubDate>Sun, 19 Sep 2021 06:51:49 +0900</pubDate>
+				<title><![CDATA[バージョン更新時におけるフィードの検証]]></title>
+				<content:encoded><![CDATA[<p><a href="https://github.com/hail2u/hail2u.net/blob/95bc9267a2b4ab65c3b6e8003a8597fae7ffd032/bin/feed-validator.js">フィードを検証するように</a>した。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、<a href="https://validator.w3.org/feed/docs/soap.html">W3C Feed ValidatorのAPI</a>を利用した。</p>
+
+<p>APIはSOAPとなっているが、<code>output</code>パラメーターを<code>soap12</code>にし、普通にウェブ・フォームとして（<code>x-www-form-urlencoded</code>で）POSTするとXMLで返ってくるというもののようだ。node-soapパッケージなどを使う必要はない。</p>
+
+<p>node-fetchパッケージを使う場合は、<code>&</code>でつなげた文字列を<code>body</code>オプションに指定するのではなく、<code>URLSearchParams</code>オブジェクトを使う。Fetch標準では、<code>body</code>オプションの値が<code>URLSearchParams</code>だった場合、<a href="https://fetch.spec.whatwg.org/#bodyinit-unions"><code>Content-Type</code>ヘッダーを設定すると規定</a>されているので、<code>headers</code>オプションを指定しなくて済む。もちろんnode-fetchパッケージでも実装されている。</p>
+
+<pre><code class="language-javascript">const body = new URLSearchParams();
+body.append(&quot;manual&quot;, 1);
+body.append(&quot;output&quot;, &quot;soap12&quot;);
+const feed = await fs.readFile("feed.xml", "utf8");
+body.append(&quot;rawdata&quot;, feed);
+const res = await fetch(&quot;https://validator.w3.org/feed/check.cgi&quot;, {
+	body,
+	method: &quot;POST&quot;
+});</code></pre>
+
+<p>よくFetchと共に使うFormDataオブジェクトの書き方と合わせるために<code>append()</code>を使っている。普通にオブジェクトを渡して<code>URLSearchParams</code>オブジェクトを作成した方がすっきりする。あとは<code>fetch()</code>するだけなので、<code>body</code>という名前で<code>URLSearchParams</code>オブジェクトを作っておくと、ちょっと短く書ける。</p>
+
+<p>返ってきたXMLを扱いやすくするには、xml2jsonパッケージではなく、xml2jsパッケージでもなく、<a href="https://github.com/NaturalIntelligence/fast-xml-parser">fast-xml-parserパッケージ</a>が（現在は）いいようだ。速いし、メンテされている。</p>
+
+<p><code>parse()</code>メソッドでは、それほど厳密に扱う必要もないので、<code>ignoreNameSpace</code>オプションを有効にして、名前空間を削除すると、すらすらとドット表記法で参照できる。また<code>arrayMode</code>に<code>/^(error|warning|info)$/</code>としておくと、エラー等のみ常に配列として処理できるようになる。そうでない場合はエラーが一つだけの場合に配列に変換するか、<code>[errors].flat().map()</code>というような謎のコードを書く必要が出てくる。便利機能はちゃんと使った方がいい。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[v9.21.0で背景色の色相がコロコロ変わるようにしていたが、戻した。一部の色相でコントラストが落ちるためだ。コントラストは60（APCAで計算した値で、WCAG 2.1の4.5:1相当）くらい確保できるが、一部の色相で57くらいまで落ちる。機械的にどうにかできるが、大変そうだった。]]></description>
 				<guid>https://hail2u.net/blog/stopping-random-background-color-hue.html</guid>
 				<link>https://hail2u.net/blog/stopping-random-background-color-hue.html</link>
@@ -215,22 +243,6 @@
 <p>革はシボが粗く、ちょっと安っぽい。値段を考えると、あきらめはつく。柔らかいというか、ふにゃふにゃなので、靴ずれはしなそうだ。吐き口にクッションも入っているので、履き心地はいい。アウト・ソールは固めだが、ミッド・ソールは柔らかいので、かなり歩きやすい。</p>
 
 <p>スウッシュがなかったり、ソールの側面がツライチだったり、いろいろすっきりしている。しかし、革の安っぽさによって、<a href="https://store.yoaktokyo.com/items/3356058">高級</a>な<a href="https://highbridge-store.com/item/amb/HAMB9838ARCSOL-BLKWHT-39/">スニーカー</a>達の偽物感が少しあるので、靴ひもを白に変えて、普通っぽくしたい。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[近所にロマンスカーミュージアムが開業した。電車にはそれほど興味はないが、ロゴには興味がある。ロゴは、ロマンスカーの色を使いつつ、頭文字のRを横に寝かせただけのものだと思っていた。しかし、よく見ると、手前側にくる三角の左下が少し丸くなっており、ロマンスカーっぽい形も取り込んでいるようだった。]]></description>
-				<guid>https://hail2u.net/blog/on-20210423.html</guid>
-				<link>https://hail2u.net/blog/on-20210423.html</link>
-				<pubDate>Fri, 23 Apr 2021 11:20:20 +0900</pubDate>
-				<title><![CDATA[小田急の町]]></title>
-				<content:encoded><![CDATA[<figure class="hero">
-	<a href="https://hail2u.net/img/blog/on-20210423.png"><img alt="ロマンスカーミュージアムのロゴは、朱色とオレンジ色でかたどられたRが横になっている。" height="1440" src="https://hail2u.net/img/blog/on-20210423.png" width="2560"></a>
-</figure>
-
-<p>近所に<a href="https://www.odakyu.jp/romancecarmuseum/">ロマンスカーミュージアム</a>が開業した。電車にはそれほど興味はないが、ロゴには興味がある。ロゴは、ロマンスカーの色を使いつつ、頭文字のRを横に寝かせただけのものだと思っていた。しかし、よく見ると、手前側にくる三角の左下が少し丸くなっており、ロマンスカーっぽい形も取り込んでいるようだった。</p>
-
-<p>その近くに、2棟の駅ビルが建てられている。両方とも小田急だが、片方はオフィス賃貸用で、もう片方はジムや、クリニック、保育園などが入るらしい。すでにその横に完成している小田急のタワーマンションの住人用なのか、ほぼ直結の橋なども作られている。</p>
-
-<p>駅の反対側に前からある商業施設群も、小田急がすべて持っている。完全に小田急の町になってきた。相鉄が駅舎の建て直しをしているが、ここでは駅ナカくらいしかやる予定はないみたいだ。一年後に完成する予定らしいが、どうなることやら。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
