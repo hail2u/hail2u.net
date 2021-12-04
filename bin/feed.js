@@ -103,6 +103,7 @@ const main = async () => {
 };
 
 main().catch((e) => {
+	/* eslint-disable-next-line no-console */
 	console.trace(e);
 	process.exitCode = 1;
 });
