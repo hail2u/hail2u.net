@@ -157,9 +157,7 @@ const build = async (basic, partials, file) => {
 		data.statuses = data.statuses.slice(0, 1);
 	}
 
-	const rendered = mustache.render(template, data, partials, {
-		escape: escapeCharacters
-	});
+	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
 };
 

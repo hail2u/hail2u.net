@@ -18,8 +18,7 @@ const rewritePath = ([
 
 const isNotStyleGuide = (file) => file !== config.paths.dest.styleGuide;
 
-const formatMessage = (file, message) =>
-	`${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
+const formatMessage = (file, message) => `${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
 
 const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
@@ -53,16 +52,13 @@ const main = async () => {
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath).filter(
-		isNotStyleGuide
-	);
+	const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath).filter(isNotStyleGuide);
 	const articleRe = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
-	const articles = shuffleArray(
-		Array.from(sitemap.matchAll(articleRe), rewritePath)
-	).slice(0, 3);
+	const articles = Array.from(sitemap.matchAll(articleRe), rewritePath);
+	const picked = shuffleArray(articles).slice(0, 3);
 	const results = await Promise.all([
 		...indexes,
-		...articles
+		...picked
 	].map(validate));
 	const errors = results.flat();
 
