@@ -4,7 +4,6 @@ import {
 } from "../lib/character-reference.js";
 import config from "../.config.js";
 import fs from "fs/promises";
-import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import os from "os";
@@ -85,10 +84,11 @@ const main = async () => {
 	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
-		.render(template, draft, null, { escape: escapeCharacters })
+		.render(template, draft, null, {
+			escape: escapeCharacters
+		})
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
-	const highlighted = highlight(rendered);
-	await outputFile(test, highlighted);
+	await outputFile(test, rendered);
 	await runCommand("open", [ test ]);
 };
 

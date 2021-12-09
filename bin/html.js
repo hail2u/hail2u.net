@@ -1,7 +1,6 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import { highlight } from "../lib/highlight.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
@@ -161,8 +160,7 @@ const build = async (basic, partials, file) => {
 	const rendered = mustache.render(template, data, partials, {
 		escape: escapeCharacters
 	});
-	const highlighted = highlight(rendered);
-	await outputFile(file.dest, highlighted);
+	await outputFile(file.dest, rendered);
 };
 
 const toFilesFormat = (article) => ({
