@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめSassのミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。" property="twitter:description">
@@ -36,30 +37,30 @@
 
 				<p>ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめ<a href="http://sass-lang.com/">Sass</a>のミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$safe-for-content</span>: <span class="hljs-number">4.5em</span>;
-<span class="hljs-variable">$safe-for-full</span>: <span class="hljs-number">66em</span>;
+<pre><code class="language-scss">$safe-for-content: 4.5em;
+$safe-for-full: 66em;
 
-<span class="hljs-keyword">@mixin</span> adjust-font-size(<span class="hljs-variable">$sizes</span>) {
-	<span class="hljs-keyword">@each</span> <span class="hljs-variable">$size</span> in <span class="hljs-variable">$sizes</span> {
-		<span class="hljs-variable">$ratio</span>: <span class="hljs-variable">$size</span> / <span class="hljs-number">16px</span>;
-		<span class="hljs-variable">$feature</span>: min-width;
-		<span class="hljs-variable">$value</span>: <span class="hljs-variable">$safe-for-full</span> * <span class="hljs-variable">$ratio</span> * <span class="hljs-variable">$ratio</span>;
+@mixin adjust-font-size($sizes) {
+	@each $size in $sizes {
+		$ratio: $size / 16px;
+		$feature: min-width;
+		$value: $safe-for-full * $ratio * $ratio;
 
-		<span class="hljs-keyword">@if</span> (<span class="hljs-variable">$ratio</span> &lt; <span class="hljs-number">1</span>) {
-			<span class="hljs-variable">$feature</span>: max-width;
-			<span class="hljs-variable">$value</span>: <span class="hljs-variable">$safe-for-content</span> * <span class="hljs-variable">$ratio</span> * <span class="hljs-variable">$ratio</span>;
+		@if ($ratio &lt; 1) {
+			$feature: max-width;
+			$value: $safe-for-content * $ratio * $ratio;
 		}
 
-		<span class="hljs-keyword">@media</span> screen <span class="hljs-keyword">and</span> (<span class="hljs-variable">$feature</span>: <span class="hljs-variable">$value</span>) {
-			<span class="hljs-attribute">font-size</span>: percentage(<span class="hljs-variable">$ratio</span>);
+		@media screen and ($feature: $value) {
+			font-size: percentage($ratio);
 		}
 	}
 }
 
-<span class="hljs-selector-tag">html</span> {
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">100%</span>;
+html {
+	font-size: 100%;
 
-	<span class="hljs-keyword">@include</span> adjust-font-size((<span class="hljs-number">14px</span>, <span class="hljs-number">18px</span>, <span class="hljs-number">21px</span>, <span class="hljs-number">24px</span>, <span class="hljs-number">27px</span>, <span class="hljs-number">30px</span>));
+	@include adjust-font-size((14px, 18px, 21px, 24px, 27px, 30px));
 }</code></pre>
 
 <p>引数で使うフォントサイズを<code>px</code>単位でリスト指定し、ミックスイン側で<code>16px</code>からの比率（<code>px</code>を<code>px</code>で割るとユニットレスにちゃんとなる）を基準に切り替えていく<code>@media</code>ルールを吐くというもの。ミックスインの引数でリストを使いたい場合は括弧を使ってまとめる。リストにしておくとミックスインでは<code>@each</code>ルールでサクッと参照できるので繰り返し処理に強く、覚えておくとベンダー拡なんとかとかなんとか張プリフィックスとかフォールバック処理を書く時とかに便利だったりする。</p>

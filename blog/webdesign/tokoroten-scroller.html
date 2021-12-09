@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Facebookに買われたという話で知ったLightboxという写真共有サービスのLive Streamの見せ方が良いなと思ったのでCSS Transitionsを使ったもどきっぽいのを作った。Pure CSSではない。良い名前思い浮かばなかった。" property="twitter:description">
@@ -38,31 +39,31 @@
 
 <p>つまりはどんどん画像を押し出していくのをディレイとアニメーションを組み合わせて見せるというもので、ディレイをJavaScriptで、アニメーションをCSSで実装した。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> container = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;scroller&quot;</span>);
+<pre><code class="language-js">var container = document.getElementById("scroller");
 
-<span class="hljs-variable language_">window</span>.<span class="hljs-built_in">setInterval</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-	<span class="hljs-keyword">var</span> img = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;img&quot;</span>),
-		li = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;li&quot;</span>);
+window.setInterval(function () {
+	var img = document.createElement("img"),
+		li = document.createElement("li");
 
-	img.<span class="hljs-property">src</span> = <span class="hljs-string">&quot;http://lorempixel.com/120/160/&quot;</span>;
-	img.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;load&quot;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-		<span class="hljs-variable language_">this</span>.<span class="hljs-property">className</span> = <span class="hljs-string">&quot;loaded&quot;</span>;
+	img.src = "http://lorempixel.com/120/160/";
+	img.addEventListener("load", function () {
+		this.className = "loaded";
 	});
 
-	li.<span class="hljs-title function_">appendChild</span>(img);
+	li.appendChild(img);
 
-	container.<span class="hljs-title function_">insertBefore</span>(li, container.<span class="hljs-property">firstChild</span>);
-}, <span class="hljs-number">3000</span>);</code></pre>
+	container.insertBefore(li, container.firstChild);
+}, 3000);</code></pre>
 
 <p>ディレイは普通に<code>window.setInterval()</code>で3秒ごとに画像を先頭に追加していく。後にアニメーションのトリガーに使うために画像に読み込み完了で<code>loaded</code>というクラス名を振る処理も付けておく。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#scroller</span> <span class="hljs-selector-tag">img</span> {
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">0px</span>;
+<pre><code class="language-css">#scroller img {
+	height: 0px;
 }
 
-<span class="hljs-selector-id">#scroller</span> <span class="hljs-selector-class">.loaded</span> {
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">160px</span>;
-	<span class="hljs-attribute">transition</span>: height <span class="hljs-number">0.2s</span> ease;
+#scroller .loaded {
+	height: 160px;
+	transition: height 0.2s ease;
 }</code></pre>
 
 <p><code>img</code>をデフォルトで<code>height: 0px</code>にしておき、画像の読み込み完了時に付くクラス名<code>.loaded</code>で高さを戻す。その時に同時にCSS Transitionsを使うことによってアニメーションさせる。Firefox 12でCSS Transitionsが動いてないのはよくわからない。能動的なアクションしかトリガーにできないとかなんか制限ありそう。</p>

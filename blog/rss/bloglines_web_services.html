@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="遂に来ました。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。" property="twitter:description">
@@ -46,24 +47,24 @@
 <section>
 <h2>追記</h2>
 <p>とりあえずSync APIの<a href="http://www.bloglines.com/services/api/listsubs">listsubs</a>を叩くPerlスクリプトを書いてみた。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
+<pre><code class="language-perl">#!/usr/local/bin/perl
 
-<span class="hljs-keyword">use</span> strict;
+use strict;
 
-<span class="hljs-keyword">my</span> $uname = <span class="hljs-string">&#x27;メールアドレス&#x27;</span>;
-<span class="hljs-keyword">my</span> $pass  = <span class="hljs-string">&#x27;パスワード&#x27;</span>;
+my $uname = &apos;メールアドレス&apos;;
+my $pass  = &apos;パスワード&apos;;
 
-<span class="hljs-keyword">my</span> $loc   = <span class="hljs-string">&#x27;rpc.bloglines.com:80&#x27;</span>;
-<span class="hljs-keyword">my</span> $realm = <span class="hljs-string">&#x27;Bloglines RPC&#x27;</span>;
+my $loc   = &apos;rpc.bloglines.com:80&apos;;
+my $realm = &apos;Bloglines RPC&apos;;
 
-<span class="hljs-keyword">use</span> LWP::UserAgent;
+use LWP::UserAgent;
 
-<span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new();
+my $ua = LWP::UserAgent-&gt;new();
 $ua-&gt;credentials($loc, $realm, $uname, $pass);
 
-<span class="hljs-keyword">print</span> $ua-&gt;get(<span class="hljs-string">&quot;http://rpc.bloglines.com/listsubs&quot;</span>)-&gt;as_string;
+print $ua-&gt;get(&quot;http://rpc.bloglines.com/listsubs&quot;)-&gt;as_string;
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 <p>遅！仕様的にキャッシュできない（未読状態が少しでも変わると内容が変わってしまう）ので辛いかも。</p>
 <p>本筋とは関係ないですけど、<a href="http://www.mozilla.org/products/firefox/">Firefox</a>のPassword Managerでrealmを調べることができました（まぁ間違ったのを送った場合はレスポンスヘッダに正しいrealmが書かれているんですけどね）。Siteカラムの（）で括られている部分。</p>
 </section>
@@ -87,22 +88,22 @@ End If
 
 WScript.Quit</pre>
 <p>続いてJScriptのコード。</p>
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> xmlHttp = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Active</span>XObject(<span class="hljs-string">&quot;Msxml2.XMLHTTP.3.0&quot;</span>);
-<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Active</span>XObject(<span class="hljs-string">&quot;Msxml2.DOMDocument.3.0&quot;</span>);
+<pre><code class="language-js">var xmlHttp = new ActiveXObject(&quot;Msxml2.XMLHTTP.3.0&quot;);
+var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
 
-xmlHttp.<span class="hljs-title function_">open</span>(<span class="hljs-string">&quot;GET&quot;</span>, <span class="hljs-string">&quot;http://rpc.bloglines.com/listsubs&quot;</span>, <span class="hljs-literal">false</span>, <span class="hljs-string">&quot;メールアドレス&quot;</span>, <span class="hljs-string">&quot;パスワード&quot;</span>);
-xmlHttp.<span class="hljs-title function_">send</span>();
+xmlHttp.open(&quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, false, &quot;メールアドレス&quot;, &quot;パスワード&quot;);
+xmlHttp.send();
 
-xmlDoc.<span class="hljs-property">async</span> = <span class="hljs-literal">false</span>;
-xmlDoc.<span class="hljs-title function_">loadXML</span>(xmlHttp.<span class="hljs-property">responseText</span>);
+xmlDoc.async = false;
+xmlDoc.loadXML(xmlHttp.responseText);
 
-<span class="hljs-keyword">if</span> (xmlDoc.<span class="hljs-property">parseError</span>.<span class="hljs-property">errorCode</span> != <span class="hljs-number">0</span>) {
-	WScript.<span class="hljs-title class_">Echo</span>(<span class="hljs-string">&quot;You have error &quot;</span> + xmlDoc.<span class="hljs-property">parseError</span>.<span class="hljs-property">reason</span>);
-} <span class="hljs-keyword">else</span> {
-	WScript.<span class="hljs-title class_">Echo</span>(xmlDoc.<span class="hljs-property">xml</span>);
+if (xmlDoc.parseError.errorCode != 0) {
+	WScript.Echo(&quot;You have error &quot; + xmlDoc.parseError.reason);
+} else {
+	WScript.Echo(xmlDoc.xml);
 }
 
-WScript.<span class="hljs-title class_">Quit</span>();</code></pre>
+WScript.Quit();</code></pre>
 <p>うむ、良い感じ。これをベースにして、未読をすべて取得して単一のHTMLファイルに吐くアプリケーション作るかな。DelphiでGUI用意しても良いのだけど、表示の仕組みを作るのがメンドイ。</p>
 </section>
 			</article>

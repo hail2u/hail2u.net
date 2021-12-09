@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" property="twitter:description">
@@ -36,12 +37,12 @@
 
 				<p>以前書いた<a href="/blog/coding/air.html" title="hail2u.net - Weblog - Amazonの画像置換">Amazonの画像置換</a>というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました（てか、無限ループします）。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。</p>
 <p>とりあえずコード（把握しやすいように改行つけてますが、実際には一行でガッと解た方が良いと思います）。</p>
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;</span>
- <span class="hljs-attr">onload</span>=<span class="hljs-string">&quot;if (this.width==&#x27;1&#x27; &amp;&amp; this.src.match(/\.01\./)) {
-	 this.src=&#x27;/images/music-no-image.png&#x27;;
- } else if (this.width==&#x27;1&#x27;) {
-	 this.src=this.src.replace(&#x27;.09.&#x27;,&#x27;.01.&#x27;);
- }&quot;</span> /&gt;</span></code></pre>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;
+ onload=&quot;if (this.width==&apos;1&apos; &amp;&amp; this.src.match(/\.01\./)) {
+	 this.src=&apos;/images/music-no-image.png&apos;;
+ } else if (this.width==&apos;1&apos;) {
+	 this.src=this.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
+ }&quot; /&gt;</code></pre>
 <p><code>img</code>の<code>src</code>にまず09で類推した画像のURLを入れます。もし、この画像のURLが幅1pxの画像を返した場合は、01で類推される画像のURLに置き換わります（<code>else if</code>の方）。すると<code>onload</code>イベントが再び起きます。もし、01で類推される画像のURLも幅1pxの画像を返した場合は、画像が無いよ画像（ここでは/images/no-image.png)に置き換わるというわけ。</p>
 <p>うむ。完璧？</p>
 <section>
@@ -61,15 +62,15 @@
 <section>
 <h2>追記</h2>
 <p>以下のようなコードを書いた外部JavaScriptファイルを読み込んでおけば、もっとすっきりとしたHTMLになるかも（ちゃんとは試してないですので多分）。</p>
-<pre><code class="highlight language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">replaceImage</span>(<span class="hljs-params">img</span>) {
-	<span class="hljs-keyword">if</span> (img.<span class="hljs-property">width</span> == <span class="hljs-string">&#x27;1&#x27;</span> &amp;&amp; img.<span class="hljs-property">src</span>.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/\.01\./</span>)) {
-		img.<span class="hljs-property">src</span> = <span class="hljs-string">&#x27;/images/music-no-image.png&#x27;</span>;
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (img.<span class="hljs-property">width</span> == <span class="hljs-string">&#x27;1&#x27;</span>) {
-		img.<span class="hljs-property">src</span> = img.<span class="hljs-property">src</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-string">&#x27;.09.&#x27;</span>,<span class="hljs-string">&#x27;.01.&#x27;</span>);
+<pre><code class="language-js">function replaceImage(img) {
+	if (img.width == &apos;1&apos; &amp;&amp; img.src.match(/\.01\./)) {
+		img.src = &apos;/images/music-no-image.png&apos;;
+	} else if (img.width == &apos;1&apos;) {
+		img.src = img.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
 	}
 }</code></pre>
 <p><code>img</code>要素は以下のように記述することになります。</p>
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;</span> <span class="hljs-attr">onload</span>=<span class="hljs-string">&quot;replaceImage(this)&quot;</span> /&gt;</span></code></pre>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot; onload=&quot;replaceImage(this)&quot; /&gt;</code></pre>
 <p>すっきり。</p>
 <p>追記ばっか。</p>
 </section>

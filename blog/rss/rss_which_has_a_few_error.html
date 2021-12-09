@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする（XML::RSSも含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" property="twitter:description">
@@ -36,18 +37,18 @@
 
 				<p><a href="http://mylog.ishinao.net/">ishinao.net/mylog</a>の<a href="http://mylog.ishinao.net/id/1174">微妙にinvalidなRSSを手軽にvalidにする方法</a>で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSを<a href="http://search.cpan.org/search?module=XML::Parser">XML::Parser</a>を利用してゴニョゴニョする（<a href="http://search.cpan.org/search?module=XML::RSS">XML::RSS</a>も含む）場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。</p>
 <p>僕はこんなコードで、この両方の問題をまとめて回避しています。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
+<pre><code class="language-perl">#!/usr/local/bin/perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> Jcode;
-<span class="hljs-keyword">use</span> LWP::Simple;
-<span class="hljs-keyword">use</span> XML::RSS;
+use strict;
+use Jcode;
+use LWP::Simple;
+use XML::RSS;
 
-<span class="hljs-keyword">my</span> $res = LWP::Simple::get(<span class="hljs-string">&#x27;http://example.com/path/to/rss&#x27;</span>);
-<span class="hljs-keyword">my</span> $content = Jcode-&gt;new($res)-&gt;utf8;
-$content =~ <span class="hljs-regexp">s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/</span>;
-<span class="hljs-keyword">my</span> $rss = new XML::RSS;
-<span class="hljs-keyword">eval</span> { $rss-&gt;parse($content); };
+my $res = LWP::Simple::get(&apos;http://example.com/path/to/rss&apos;);
+my $content = Jcode-&gt;new($res)-&gt;utf8;
+$content =~ s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/;
+my $rss = new XML::RSS;
+eval { $rss-&gt;parse($content); };
 ...</code></pre>
 <ol>
 <li>ファイルごとUTF-8にコンバート</li>

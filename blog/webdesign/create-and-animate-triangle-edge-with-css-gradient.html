@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="擬似要素とborderプロパティーを組み合わせてCSSで三角形を作る方法はかなり市民権を得ているように思う。ちょくちょく見かけるようになった。しかしこのテクニックには欠点がいくつかある。例えばbox-shadowがうまくつかないこととか。それ以外にもWebKitでCSS Transitionによるアニメーションが起こらないという欠点もある。それを回避するために三角を作る新たな方法を発明したという話。" property="twitter:description">
@@ -44,38 +45,38 @@
 
 <p>縦方向にアニメーションさせたいので、うまいこと縦に繰り返しになるように三角を作ろうと頑張って考えると、以下のようなコードになる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">background-image</span>:
+<pre><code class="language-css">.test a {
+	background-image:
 		...
-		<span class="hljs-built_in">linear-gradient</span>(top, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">0</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>)  <span class="hljs-number">3px</span>, white  <span class="hljs-number">3px</span>, white <span class="hljs-number">29px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">29px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">32px</span>),
-		<span class="hljs-built_in">linear-gradient</span>(top, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">0</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>)  <span class="hljs-number">4px</span>, white  <span class="hljs-number">4px</span>, white <span class="hljs-number">28px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">28px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">32px</span>),
-		<span class="hljs-built_in">linear-gradient</span>(top, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">0</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>)  <span class="hljs-number">6px</span>, white  <span class="hljs-number">6px</span>, white <span class="hljs-number">26px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">26px</span>, <span class="hljs-built_in">rgb</span>(<span class="hljs-number">221</span>, <span class="hljs-number">50</span>, <span class="hljs-number">47</span>) <span class="hljs-number">32px</span>),
-		...
-	;
-	<span class="hljs-attribute">background-position</span>:
-		...
-		 <span class="hljs-number">3px</span> <span class="hljs-number">0</span>,
-		 <span class="hljs-number">4px</span> <span class="hljs-number">0</span>,
-		 <span class="hljs-number">5px</span> <span class="hljs-number">0</span>,
+		linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  3px, white  3px, white 29px, rgb(221, 50, 47) 29px, rgb(221, 50, 47) 32px),
+		linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  4px, white  4px, white 28px, rgb(221, 50, 47) 28px, rgb(221, 50, 47) 32px),
+		linear-gradient(top, rgb(221, 50, 47) 0, rgb(221, 50, 47)  6px, white  6px, white 26px, rgb(221, 50, 47) 26px, rgb(221, 50, 47) 32px),
 		...
 	;
-	<span class="hljs-attribute">background-repeat</span>: repeat-y;
-	<span class="hljs-attribute">background-size</span>: <span class="hljs-number">1px</span> <span class="hljs-number">32px</span>;
+	background-position:
+		...
+		 3px 0,
+		 4px 0,
+		 5px 0,
+		...
+	;
+	background-repeat: repeat-y;
+	background-size: 1px 32px;
 }</code></pre>
 
 <p>それぞれのCSSグラデーションは<em>背景色で塗り白に戻しもう一度背景色で塗る</em>というもの。その白い部分を徐々に少なくしていくようにたくさん作り、それを<code>bakcground-position</code>プロパティーで<code>1px</code>ずつずらして並べていく。すると徐々に白い部分が先細りになるわけなので三角形になる。大切なのは<code>background-position</code>と<code>background-size</code>プロパティーで、この2つのプロパティーでそれぞれのグラデーションが重ならないようにしながら縦方向は繰り返しになるように調節する。デモのケースでは16のCSSグラデーションで三角を完成させた。三角の向きを逆にする場合はグラデーションの並びをひっくり返せば良い。向きを90度変更したい場合はグラデーションのキーワードを<code>left</code>から<code>top</code>に変更するだけ（多分）。</p>
 
 <p>アニメーションは背景を動かすことになるので、<code>background-position</code>プロパティーをいじる。あとは<code>transition-duration</code>プロパティーで等でアニメーションを調節するだけ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-pseudo">:hover</span> {
-	<span class="hljs-attribute">background-position</span>:
+<pre><code class="language-css">.test a:hover {
+	background-position:
 		...
-		 <span class="hljs-number">3px</span> -<span class="hljs-number">320px</span>,
-		 <span class="hljs-number">4px</span> -<span class="hljs-number">320px</span>,
-		 <span class="hljs-number">5px</span> -<span class="hljs-number">320px</span>,
+		 3px -320px,
+		 4px -320px,
+		 5px -320px,
 		...
 	;
-	<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
+	transition-duration: 1s;
 }</code></pre>
 
 <p>これでデモのようなしゅるしゅる動く奴が完成。</p>

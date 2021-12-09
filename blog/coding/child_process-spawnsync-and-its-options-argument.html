@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" property="twitter:description">
@@ -38,16 +39,16 @@
 
 <p>io.js v1.0.3上では以下のようなコードで再現できる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> spawnSync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;child_process&#x27;</span>).<span class="hljs-property">spawnSync</span>;
+<pre><code class="language-javascript">var spawnSync = require(&apos;child_process&apos;).spawnSync;
 
-<span class="hljs-keyword">var</span> ls;
-<span class="hljs-keyword">var</span> opts = {
-	<span class="hljs-attr">stdio</span>: <span class="hljs-string">&#x27;inherit&#x27;</span>
+var ls;
+var opts = {
+	stdio: &apos;inherit&apos;
 };
 
-ls = <span class="hljs-title function_">spawnSync</span>(<span class="hljs-string">&#x27;ls&#x27;</span>, [], opts);
-ls = <span class="hljs-title function_">spawnSync</span>(<span class="hljs-string">&#x27;ls&#x27;</span>, [], opts);
-ls = <span class="hljs-title function_">spawnSync</span>(<span class="hljs-string">&#x27;ls&#x27;</span>, [], opts);</code></pre>
+ls = spawnSync(&apos;ls&apos;, [], opts);
+ls = spawnSync(&apos;ls&apos;, [], opts);
+ls = spawnSync(&apos;ls&apos;, [], opts);</code></pre>
 
 <p>実行すると3回目の`spawnSync()`で例外を吐いて落ちる。</p>
 

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="というかClosure Compiler ServiceのREST APIを叩くスクリプト。Validator.nuと違ってapplication/x-www-form-urlencodedに対応してるのでQuery Stringモジュールで良く、コア・モジュールだけでいける。けどローカル・ファイルへの対応を加える時にコールバック地獄に堕ちそうなので、asyncモジュールでガッとまとめてやるようにした。" property="twitter:description">
@@ -38,124 +39,124 @@
 
 <p>まず元になるJavaScriptファイルへのコメントに書かれた<code>@compilation_level</code>などを解釈してオブジェクトにキーを追加していく。<code>@code_url</code>と独自に追加したローカルのJavaScriptファイルのパスを指定する<code>@code_path</code>だけを特別視し、JavaScriptファイルをURLやローカルのパスから読み込む。URLもこちらで読み込んでるのはClosure Compiler Service側のキャッシュが結構強く、問題が起きることがあるため。最後にQuery Stringモジュールでパラメーターに組み立ててPOSTするだけ。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
+<pre><code class="language-js">#!/usr/bin/env node
 
-<span class="hljs-keyword">var</span> <span class="hljs-keyword">async</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;async&#x27;</span>);
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
-<span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);
-<span class="hljs-keyword">var</span> https = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;https&#x27;</span>);
-<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);
-<span class="hljs-keyword">var</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;url&#x27;</span>);
+var async = require('async');
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var path = require('path');
+var url = require('url');
 
-<span class="hljs-keyword">var</span> jsfile = process.<span class="hljs-property">argv</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">2</span>)[<span class="hljs-number">0</span>];
-<span class="hljs-keyword">var</span> js = fs.<span class="hljs-title function_">readFileSync</span>(jsfile, <span class="hljs-string">&#x27;utf8&#x27;</span>).<span class="hljs-title function_">split</span>(<span class="hljs-regexp">/\n/</span>);
-<span class="hljs-keyword">var</span> found = <span class="hljs-literal">false</span>;
-<span class="hljs-keyword">var</span> matches = [];
-<span class="hljs-keyword">var</span> loadJSFiles = [];
-<span class="hljs-keyword">var</span> options = {
-	<span class="hljs-string">&#x27;output_info&#x27;</span>: <span class="hljs-string">&#x27;compiled_code&#x27;</span>,
-	<span class="hljs-string">&#x27;output_format&#x27;</span>: <span class="hljs-string">&#x27;json&#x27;</span>
+var jsfile = process.argv.slice(2)[0];
+var js = fs.readFileSync(jsfile, 'utf8').split(/\n/);
+var found = false;
+var matches = [];
+var loadJSFiles = [];
+var options = {
+	'output_info': 'compiled_code',
+	'output_format': 'json'
 };
-<span class="hljs-keyword">var</span> jscode = [];
+var jscode = [];
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, l = js.<span class="hljs-property">length</span>; i &lt; l; i++) {
-	<span class="hljs-keyword">var</span> line = js[i];
+for (var i = 0, l = js.length; i &lt; l; i++) {
+	var line = js[i];
 
-	<span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^\/\/ ==ClosureCompiler==$/</span>.<span class="hljs-title function_">test</span>(line)) {
-		found = <span class="hljs-literal">true</span>;
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^\/\/ ==\/ClosureCompiler==$/</span>.<span class="hljs-title function_">test</span>(line)) {
-		found = <span class="hljs-literal">false</span>;
-	} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (found &amp;&amp; (matches = <span class="hljs-regexp">/^\/\/ @(\S+)\s*(.*)$/</span>.<span class="hljs-title function_">exec</span>(line))) {
-		<span class="hljs-keyword">var</span> param = matches[<span class="hljs-number">1</span>];
-		<span class="hljs-keyword">var</span> value = matches[<span class="hljs-number">2</span>];
+	if (/^\/\/ ==ClosureCompiler==$/.test(line)) {
+		found = true;
+	} else if (/^\/\/ ==\/ClosureCompiler==$/.test(line)) {
+		found = false;
+	} else if (found &amp;&amp; (matches = /^\/\/ @(\S+)\s*(.*)$/.exec(line))) {
+		var param = matches[1];
+		var value = matches[2];
 
-		<span class="hljs-keyword">if</span> (param === <span class="hljs-string">&#x27;code_path&#x27;</span>) {
-			loadJSFiles.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">loadFromPath</span>(value));
-		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (param === <span class="hljs-string">&#x27;code_url&#x27;</span>) {
-			loadJSFiles.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">loadFromURL</span>(url.<span class="hljs-title function_">parse</span>(value)));
-		} <span class="hljs-keyword">else</span> {
+		if (param === 'code_path') {
+			loadJSFiles.push(loadFromPath(value));
+		} else if (param === 'code_url') {
+			loadJSFiles.push(loadFromURL(url.parse(value)));
+		} else {
 			options[param] = value;
 		}
-	} <span class="hljs-keyword">else</span> {
-		jscode.<span class="hljs-title function_">push</span>(line);
+	} else {
+		jscode.push(line);
 	}
 }
 
-<span class="hljs-keyword">async</span>.<span class="hljs-title function_">parallel</span>(loadJSFiles, <span class="hljs-keyword">function</span> (<span class="hljs-params">error, results</span>) {
-	<span class="hljs-keyword">if</span> (error) {
-		<span class="hljs-keyword">throw</span> error;
+async.parallel(loadJSFiles, function (error, results) {
+	if (error) {
+		throw error;
 	}
 
-	<span class="hljs-keyword">var</span> querystring = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;querystring&#x27;</span>);
+	var querystring = require('querystring');
 
-	results.<span class="hljs-title function_">push</span>(jscode.<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;\n&#x27;</span>));
-	options.<span class="hljs-property">js_code</span> = results;
-	<span class="hljs-keyword">var</span> data = querystring.<span class="hljs-title function_">stringify</span>(options);
+	results.push(jscode.join('\n'));
+	options.js_code = results;
+	var data = querystring.stringify(options);
 
-	<span class="hljs-keyword">var</span> request = http.<span class="hljs-title function_">request</span>({
-		<span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;closure-compiler.appspot.com&#x27;</span>,
-		<span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;/compile&#x27;</span>,
-		<span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
-		<span class="hljs-attr">headers</span>: {
-			<span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/x-www-form-urlencoded&#x27;</span>
+	var request = http.request({
+		host: 'closure-compiler.appspot.com',
+		path: '/compile',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
 		}
-	}, <span class="hljs-keyword">function</span> (<span class="hljs-params">response</span>) {
-		<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">&#x27;&#x27;</span>;
+	}, function (response) {
+		var chunks = '';
 
-		response.<span class="hljs-property">setEncoding</span> = <span class="hljs-string">&#x27;UTF-8&#x27;</span>;
+		response.setEncoding = 'UTF-8';
 
-		response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) {
+		response.on('data', function (chunk) {
 			chunks += chunk;
 		});
 
-		response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-			<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(chunks).<span class="hljs-property">compiledCode</span>);
+		response.on('end', function () {
+			console.log(JSON.parse(chunks).compiledCode);
 		});
 	});
 
-	request.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) {
-		<span class="hljs-keyword">throw</span> error;
+	request.on('error', function (error) {
+		throw error;
 	});
 
-	request.<span class="hljs-title function_">write</span>(data);
-	request.<span class="hljs-title function_">end</span>();
+	request.write(data);
+	request.end();
 });
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">loadFromPath</span>(<span class="hljs-params">jspath</span>) {
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">callback</span>) {
-		fs.<span class="hljs-title function_">readFile</span>(path.<span class="hljs-title function_">resolve</span>(path.<span class="hljs-title function_">dirname</span>(jsfile), jspath), <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error, data</span>) {
-			<span class="hljs-keyword">if</span> (error) {
-				<span class="hljs-keyword">throw</span> error;
+function loadFromPath(jspath) {
+	return function (callback) {
+		fs.readFile(path.resolve(path.dirname(jsfile), jspath), 'utf8', function (error, data) {
+			if (error) {
+				throw error;
 			}
 
-			<span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, data);
+			callback(null, data);
 		});
 	};
 }
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">loadFromURL</span>(<span class="hljs-params">jsurl</span>) {
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">callback</span>) {
-		<span class="hljs-keyword">if</span> (jsurl.<span class="hljs-property">protocol</span> === <span class="hljs-string">&#x27;https:&#x27;</span>) {
-			https.<span class="hljs-title function_">get</span>(jsurl, gatherResponse).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) {
-				<span class="hljs-keyword">throw</span> error;
+function loadFromURL(jsurl) {
+	return function (callback) {
+		if (jsurl.protocol === 'https:') {
+			https.get(jsurl, gatherResponse).on('error', function (error) {
+				throw error;
 			});
-		} <span class="hljs-keyword">else</span> {
-			http.<span class="hljs-title function_">get</span>(jsurl, gatherResponse).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) {
-				<span class="hljs-keyword">throw</span> error;
+		} else {
+			http.get(jsurl, gatherResponse).on('error', function (error) {
+				throw error;
 			});
 		}
 
-		<span class="hljs-keyword">function</span> <span class="hljs-title function_">gatherResponse</span>(<span class="hljs-params">response</span>) {
-			<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">&#x27;&#x27;</span>;
+		function gatherResponse(response) {
+			var chunks = '';
 
-			response.<span class="hljs-property">setEncoding</span> = <span class="hljs-string">&#x27;UTF-8&#x27;</span>;
+			response.setEncoding = 'UTF-8';
 
-			response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) {
+			response.on('data', function (chunk) {
 				chunks += chunk;
 			});
 
-			response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-				<span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, chunks);
+			response.on('end', function () {
+				callback(null, chunks);
 			});
 		}
 	};
@@ -168,13 +169,13 @@
 
 <p>Closure Comiler Serviceでは<code>js_code</code>というパラメーターでJavaScriptのコードを渡す。これは複数渡すことができるので、Query Stringモジュールの仕様に従い配列にしてやると良い。ここで適当に<code>;</code>で連結したりしてしまうと残すコメントの位置がおかしくなったりと、コンパイル結果がアレになるので注意が必要。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> querystring = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;querystring&#x27;</span>);
+<pre><code class="language-js">var querystring = require('querystring');
 
-querystring.<span class="hljs-title function_">stringify</span>({
-		<span class="hljs-string">&#x27;js_code&#x27;</span>: [
-		<span class="hljs-string">&#x27;var foo;&#x27;</span>,
-		<span class="hljs-string">&#x27;var bar;&#x27;</span>,
-		<span class="hljs-string">&#x27;var buz;&#x27;</span>
+querystring.stringify({
+		'js_code': [
+		'var foo;',
+		'var bar;',
+		'var buz;'
 		]
 		})</code></pre>
 

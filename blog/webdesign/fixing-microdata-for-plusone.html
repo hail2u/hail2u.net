@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Google +1ボタンはMicrodataを読んでくれるんだけど、HTMLありきでメタデータの注釈をつけてあとはお任せでなんとなかなるわけではない。例えばBlogとBlogPostingを組み合わせた形でMicrodataによる注釈を行って、それを一覧ページとpermalinkで使いまわすと+1ボタンからは両者の区別がつかなくなる。そりゃそうか。" property="twitter:description">
@@ -40,18 +41,18 @@
 
 <p>マークアップする段階で<code>itemprop="description"</code>とか<code>img</code>要素に<code>itemprop="image"</code>とかは面倒すぎるので、<a href="http://blosxom.sourceforge.net/">Blosxom</a>側で</p>
 
-<pre><code class="highlight language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">story</span> </span>{
-	<span class="hljs-keyword">my</span>($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+<pre><code class="language-perl">sub story {
+	my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
 
-	$$body_ref =~ <span class="hljs-regexp">s/&lt;p&gt;/&lt;p itemprop=&quot;description&quot;&gt;/</span>;
-	$has_image = <span class="hljs-number">0</span>;
+	$$body_ref =~ s/&lt;p&gt;/&lt;p itemprop="description"&gt;/;
+	$has_image = 0;
 
-	<span class="hljs-keyword">if</span> ($$body_ref =~ <span class="hljs-regexp">m!&lt;img!</span>) {
-		$has_image = <span class="hljs-number">1</span>;
-		$$body_ref =~ <span class="hljs-regexp">s/&lt;img (.*?)&gt;/&lt;img $1 itemprop=&quot;image&quot;&gt;/</span>;
+	if ($$body_ref =~ m!&lt;img!) {
+		$has_image = 1;
+		$$body_ref =~ s/&lt;img (.*?)&gt;/&lt;img $1 itemprop="image"&gt;/;
 	}
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }</code></pre>
 
 <p>とかして最初の段落を<code>description</code>にしたり、画像のあるエントリーの場合は<code>image</code>を割り当てるようにした。単独のプラグイン化する程ではなかったので、いろんな機能をとりあえずぶち込んでる便利プラグインに混ぜてる。こんなの作って誤魔化すことが多いのでflavourがロジックだらけの魔窟でひどい。</p>

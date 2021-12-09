@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Google Adsenseの広告コードでAsync版のBETAテストが始まった。広告表示時にページの読み込みをブロックしないというのが売りでそれ以上でもそれ以下でもなく、コードもそんなにスッキリするわけではないし、空要素さん……みたいな感じだけど、現行のものよりはこっちの方が良い。ということでこれを利用する場合に広告サイズの切り替えはどうするのが良いのか考えてるメモ。" property="twitter:description">
@@ -38,28 +39,28 @@
 
 <p>コピペするコードはHTMLの<code>style</code>属性で広告のサイズを、<code>data-*</code>属性で広告スロットとかを指定してあり、そのまま再利用するのは難しい感じ。<code>document.write()</code>でも使えば話は別だけどそれはさすがにためらう。<code>innerHTML</code>でなら広告のコンテナーである<code>ins</code>要素の部分はほぼコピペでいけるけど、マークアップ増やす必要があるのでアレ。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">ins</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;adsbygoogle&quot;</span>
-	<span class="hljs-attr">id</span>=<span class="hljs-string">&quot;adsense-main&quot;</span>
-	<span class="hljs-attr">style</span>=<span class="hljs-string">&quot;display:inline-block;width:300px;height:250px&quot;</span>
-	<span class="hljs-attr">data-ad-client</span>=<span class="hljs-string">&quot;ca-pub-xxxxxxxxxxxxxxxx&quot;</span>
-	<span class="hljs-attr">data-ad-slot</span>=<span class="hljs-string">&quot;xxxxxxxxxx&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ins</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
-	(adsbygoogle = <span class="hljs-variable language_">window</span>.<span class="hljs-property">adsbygoogle</span> || []).<span class="hljs-title function_">push</span>({});
+<pre><code class="language-html">&lt;ins class="adsbygoogle"
+	id="adsense-main"
+	style="display:inline-block;width:300px;height:250px"
+	data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+	data-ad-slot="xxxxxxxxxx"&gt;&lt;/ins&gt;
+&lt;script&gt;
+	(adsbygoogle = window.adsbygoogle || []).push({});
 
-	(<span class="hljs-keyword">function</span> (<span class="hljs-params">d</span>) {
-		<span class="hljs-keyword">if</span> (d.<span class="hljs-property">body</span>.<span class="hljs-property">dataset</span>) {
-			<span class="hljs-keyword">var</span> p = d.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;adsense-main&#x27;</span>);
-			<span class="hljs-keyword">var</span> w = p.<span class="hljs-property">parentNode</span>.<span class="hljs-property">clientWidth</span>;
+	(function (d) {
+		if (d.body.dataset) {
+			var p = d.getElementById('adsense-main');
+			var w = p.parentNode.clientWidth;
 
-			<span class="hljs-keyword">if</span> (w &gt;= <span class="hljs-number">728</span>) {
-				p.<span class="hljs-property">style</span>.<span class="hljs-property">width</span> = <span class="hljs-string">&#x27;728px&#x27;</span>;
-				p.<span class="hljs-property">style</span>.<span class="hljs-property">height</span> = <span class="hljs-string">&#x27;90px&#x27;</span>;
-				p.<span class="hljs-property">dataset</span>.<span class="hljs-property">adSlot</span> = <span class="hljs-string">&#x27;xxxxxxxxxx&#x27;</span>;
+			if (w &gt;= 728) {
+				p.style.width = '728px';
+				p.style.height = '90px';
+				p.dataset.adSlot = 'xxxxxxxxxx';
 			}
 		}
-	}(<span class="hljs-variable language_">document</span>));
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">async</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+	}(document));
+&lt;/script&gt;
+&lt;script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"&gt;&lt;/script&gt;</code></pre>
 
 <ul>
 <li>なるべくデフォルトとする広告コードをいじらずにIDを振るだけに留める</li>

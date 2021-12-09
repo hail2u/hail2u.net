@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="段落の区切りに使うhr要素をちょっと凝ったデザインにするという話は以前書きました。似たような話はCSS-Tricksでも最近取り上げられていますね。しかしこれらはhr要素でのテクニックです。では、例えばsection要素の最後にこういったちょっと凝った感じの区切り線をつけるにはどうすれば良いのでしょうか？" property="twitter:description">
@@ -46,52 +47,52 @@
 
 <p><code>hr</code>要素の場合は結構簡単なものです。</p>
 
-<pre><code class="highlight language-css">hr {
-	<span class="hljs-attribute">border</span>: none;
-	<span class="hljs-attribute">border-top</span>: <span class="hljs-number">1px</span> dotted <span class="hljs-number">#666</span>;
-	<span class="hljs-attribute">position</span>: relative;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">0</span>;
+<pre><code class="language-css">hr {
+	border: none;
+	border-top: 1px dotted #666;
+	position: relative;
+	height: 0;
 }
 
-hr<span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">margin-left</span>: -<span class="hljs-number">32px</span>;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">top</span>: -<span class="hljs-number">24px</span>;
-	<span class="hljs-attribute">left</span>: <span class="hljs-number">50%</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">64px</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;\00a7&quot;</span>;
-	<span class="hljs-attribute">color</span>: <span class="hljs-number">#999</span>;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#fff</span>;
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Georgia&quot;</span>, serif;
-	<span class="hljs-attribute">font-style</span>: italic;
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">text-align</span>: center;
+hr::before {
+	margin-left: -32px;
+	position: absolute;
+	top: -24px;
+	left: 50%;
+	width: 64px;
+	height: 48px;
+	line-height: 48px;
+	content: "\00a7";
+	color: #999;
+	background-color: #fff;
+	font-family: "Georgia", serif;
+	font-style: italic;
+	font-size: 48px;
+	text-align: center;
 }</code></pre>
 
 <p>このようにまず<code>hr</code>要素を罫線のみにし（ここでは点線にしました）、<code>::before</code>擬似要素でセクション記号を挟むということです。セクション記号の位置揃えは<code>relative</code>した中での<code>absolute</code>でやります。上に<em>フォントサイズの半分</em>ずらし、左には50%分移動させ、更に<code>margin-left</code>で<em>余白を含めた幅の半分</em>戻すことによって中央揃えします。幅に余裕を持たせて背景をコンテンツの背景と合わせることによって、罫線とセクション記号の間に少し余白をとったりもすると良いでしょう。色は好みですが、コントラストが強いと主張がすごいので控えめにするとすっきりすると思います。<code>border-bottom</code>や<code>text-shadow</code>プロパティーを駆使することによって、このエントリの最初に載せた画像のような<a href="/test/317.html">少し凹んだデザインも可能です</a>。</p>
 
 <p><code>section</code>要素の最後につける場合は少し工夫が必要です。区切り線を置くためにパディングを確保したり、罫線を横幅いっぱいにしないようにするために複数の擬似要素を使ったりですね。コードの多くは<code>hr</code>要素へのスタイルと変わらない部分も多いので、違う部分のみ抜粋します。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">section</span> {
-	<span class="hljs-attribute">padding-bottom</span>: <span class="hljs-number">96px</span>;
-	<span class="hljs-attribute">position</span>: relative;
+<pre><code class="language-css">section {
+	padding-bottom: 96px;
+	position: relative;
 }
 
-<span class="hljs-selector-tag">section</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">border-top</span>: <span class="hljs-number">1px</span> dotted <span class="hljs-number">#666</span>;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">bottom</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">left</span>: <span class="hljs-number">25%</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">50%</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
+section::before {
+	border-top: 1px dotted #666;
+	position: absolute;
+	bottom: 0;
+	left: 25%;
+	width: 50%;
+	height: 48px;
+	line-height: 48px;
+	content: "";
 }
 
-<span class="hljs-selector-tag">section</span><span class="hljs-selector-pseudo">::after</span> {
-	<span class="hljs-attribute">bottom</span>: <span class="hljs-number">24px</span>;
+section::after {
+	bottom: 24px;
 }</code></pre>
 
 <p><code>section</code>要素ではこの区切り線を配置するためのスペースを<code>padding-bottom</code>を使って確保します。確保するサイズは要調整ですが、だいたい<code>::before</code>擬似要素の高さの1.5～2倍が適当そうです。そして<code>::before</code>擬似要素で罫線を作ります。これの高さは好みで、周囲のコンテンツと余裕を持たせたいなら大きめにするという感じです。幅で区切り線のサイズを決めますが、あまり考えずに<code>left</code>でセンタリングされるようにするにはそれぞれ<code>%</code>を使って指定するのが良いでしょう。<code>px</code>単位で幅を決めたい場合は、手作業で調節するか<code>left: 50%</code>から<code>margin-left</code>で半分戻すというテクニックを使えば大丈夫だと思います。最後のセクション記号の配置に使う<code>::after</code>擬似要素のコードは<code>hr</code>要素でのコードとほぼ同じです。違うのは<code>top</code>の代わりに<code>bottom</code>を使って<code>section</code>要素の下端を基準に配置している点のみです。</p>

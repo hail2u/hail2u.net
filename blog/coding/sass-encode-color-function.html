@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Sass 3.3で導入される予定のものではなんといっても--sourcemapオプションが注目。でももちろんそれだけじゃなくて、文字列から文字列を探すstr-index()関数とか文字列から一部切り出すstr-slice()関数などといった文字列関係の関数の充実もある。これらの新文字列関数を利用すると、以下で取り上げる色の簡易URLエンコードを行う関数のような、文字列をちょっといじるというようなことをCustom Functionを作ることなく行えるようになる。" property="twitter:description">
@@ -38,22 +39,22 @@
 
 <p>以下はSass 3.3.0.alpha.218 (Bleeding Edge)での話なので、3.3の正式リリースでは動く保証はない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-comment">// encode-color() - Encode color by percent encoding</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">// @param {color} $color Color that you want to encode</span>
-<span class="hljs-comment">// @return {string}</span>
-<span class="hljs-keyword">@function</span> encode-color(<span class="hljs-variable">$color</span>) {
-	<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;&quot;</span> + <span class="hljs-variable">$color</span>;
+<pre><code class="language-scss">// encode-color() - Encode color by percent encoding
+//
+// @param {color} $color Color that you want to encode
+// @return {string}
+@function encode-color($color) {
+	$str_color: "" + $color;
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">&quot;#&quot;</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;%23&quot;</span> + str-slice(<span class="hljs-variable">$str_color</span>, <span class="hljs-number">2</span>);
+	@if (str-index($str_color, "#") == 1) {
+		$str_color: "%23" + str-slice($str_color, 2);
 	}
 
-	<span class="hljs-keyword">@if</span> (str-index(<span class="hljs-variable">$str_color</span>, <span class="hljs-string">&quot;rgba&quot;</span>) == <span class="hljs-number">1</span>) {
-		<span class="hljs-variable">$str_color</span>: <span class="hljs-string">&quot;rgba(&quot;</span> + red(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + green(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + blue(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;%2C&quot;</span> + alpha(<span class="hljs-variable">$color</span>) + <span class="hljs-string">&quot;)&quot;</span>;
+	@if (str-index($str_color, "rgba") == 1) {
+		$str_color: "rgba(" + red($color) + "%2C" + green($color) + "%2C" + blue($color) + "%2C" + alpha($color) + ")";
 	}
 
-	<span class="hljs-keyword">@return</span> <span class="hljs-variable">$str_color</span>;
+	@return $str_color;
 }</code></pre>
 
 <p><code>str-index()</code>や<code>str-slice()</code>関数は文字列専用で色を投げるとエラーになるので、まずは色に空文字を連結することによって型をキャストすることろから。今までは型キャストが必要なケースはほとんど無かったけど、これからは使う機会増えそう。</p>
@@ -64,11 +65,11 @@
 
 <p>これらにマッチしなかった場合は色キーワードなのでそのまま返す。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(#336699)}&quot;</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(rgb(51, 102, 153))}&quot;</span>; <span class="hljs-comment">// %23369</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(rgba(51, 102, 153, 0.2))}&quot;</span>; <span class="hljs-comment">// rgba(51%2C102%2C153%2C0.2)</span>
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;#{encode-color(beige)}&quot;</span>; <span class="hljs-comment">// beige</span>
+<pre><code class="language-scss">.test {
+	content: "#{encode-color(#336699)}"; // %23369
+	content: "#{encode-color(rgb(51, 102, 153))}"; // %23369
+	content: "#{encode-color(rgba(51, 102, 153, 0.2))}"; // rgba(51%2C102%2C153%2C0.2)
+	content: "#{encode-color(beige)}"; // beige
 }</code></pre>
 
 <p>このテストはうまくいったのでこれでだいたい大丈夫そう。</p>

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024（多分）を超えると落ちる。Linuxの設定を変更してもいい（らしい）が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" property="twitter:description">
@@ -38,55 +39,55 @@
 
 <p>並行実行数を固定するコードを書くと確実だが、スパッと書けなかった。ならば1024を超えない程度に配列を分割するだけでもいいかと、目先を変えた。今回は、このウェブサイトのHTML生成スクリプトでどうするかという話だ。まだ3268記事なので、4つに（800強ずつに）分割すれば大丈夫だろう。5で割る必要が出てくるのは、月に10記事でもあと7年以上かかる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
-<span class="hljs-keyword">const</span> chunks = longArray.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">previous, current, index</span>) =&gt;</span> {
-	previous[index % previous.<span class="hljs-property">length</span>].<span class="hljs-title function_">push</span>(current);
-	<span class="hljs-keyword">return</span> previous;
+<pre><code class="language-javascript">const longArray = [...];
+const chunks = longArray.reduce((previous, current, index) => {
+	previous[index % previous.length].push(current);
+	return previous;
 }, [[], [], [], []]);
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> chunks) {
-	<span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(chunks.<span class="hljs-title function_">map</span>(doSomething));
+for (const chunk of chunks) {
+	await Promise.all(chunks.map(doSomething));
 }</code></pre>
 
 <p>配列を分割して配列の配列にしたかったので、<code>Array#reduce()</code>を使って書いた。5年後に5分割するよう書き換えるなら、初期配列を書き換える。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
-<span class="hljs-keyword">const</span> chunkCount = <span class="hljs-number">4</span>;
-<span class="hljs-keyword">const</span> chunkLength = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(longArray.<span class="hljs-property">length</span> / chunkCount);
+<pre><code class="language-javascript">const longArray = [...];
+const chunkCount = 4;
+const chunkLength = Math.floor(longArray.length / chunkCount);
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; chunkCount; i++) {
-	<span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+for (let i = 0; i < chunkCount; i++) {
+	await Promise.all(
 		longArray
-			.<span class="hljs-title function_">slice</span>(chunkLength * i, chunkLength * (i + <span class="hljs-number">1</span>))
-			.<span class="hljs-title function_">map</span>(doSomething)
+			.slice(chunkLength * i, chunkLength * (i + 1))
+			.map(doSomething)
 	);
 }</code></pre>
 
 <p>普通に<code>Array#slice()</code>で書いた方が、ループが1回で済むので速そうだ。ここまで書いて、ようやく並行実行数を固定するコードがスパッと書けることがわかった。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
-<span class="hljs-keyword">const</span> limit = <span class="hljs-number">32</span>;
-<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
+<pre><code class="language-javascript">const longArray = [...];
+const limit = 32;
+let i = 0;
 
-<span class="hljs-keyword">while</span> (i &gt; longArray.<span class="hljs-property">length</span>) {
-	<span class="hljs-keyword">const</span> to = i + limit;
-	<span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+while (i > longArray.length) {
+	const to = i + limit;
+	await Promise.all(
 		longArray
-			.<span class="hljs-title function_">slice</span>(i, to)
-			.<span class="hljs-title function_">map</span>(doSomething)
+			.slice(i, to)
+			.map(doSomething)
 	);
 	i = to;
 }</code></pre>
 
 <p><code>Array#splice()</code>で破壊しながら実行すると、もっと短くなりそうだ。うろ覚えだが、後ろから削っていくと速かったはずだ。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> longArray = [...];
+<pre><code class="language-javascript">const longArray = [...];
 
-<span class="hljs-keyword">while</span> (longArray.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
-	<span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+while (longArray.length > 0) {
+	await Promise.all(
 		longArray
-			.<span class="hljs-title function_">splice</span>(-<span class="hljs-number">32</span>)
-			.<span class="hljs-title function_">map</span>(doSomething)
+			.splice(-32)
+			.map(doSomething)
 	);
 }</code></pre>
 

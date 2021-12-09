@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="SCSSなCSSフレームワークを使うのでも良いんですけど、ちょっとしたパーツだけグリッド・レイアウトしたいとかには少し大げさです。まぁつまりこのサイトのトップで使っているエントリー一覧をSCSSでどう効率的に調節しながら書いたかという話です。" property="twitter:description">
@@ -38,47 +39,47 @@
 
 <p>エントリー一覧のHTMLは簡単にすると以下のような形になっています。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;news&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Lastest entry<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Summary of latest entry.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">hr</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;sub-news&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span>
+<pre><code class="language-html">&lt;section class="news"&gt;
+	&lt;h2&gt;Lastest entry&lt;/h2&gt;
+	&lt;p&gt;Summary of latest entry.&lt;/p&gt;
+	&lt;hr&gt;
+	&lt;section class="sub-news"&gt;&lt;/section&gt;
 	...
-	<span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;sub-news&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span></code></pre>
+	&lt;section class="sub-news"&gt;&lt;/section&gt;
+&lt;/section&gt;</code></pre>
 
 <p>グリッドにするためのCSSは以下のような形になります。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.sub-news</span> {
-	<span class="hljs-attribute">float</span>: left;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">256px</span>;
+<pre><code class="language-css">.sub-news {
+	float: left;
+	width: 256px;
 }</code></pre>
 
 <p>CSSでゴリゴリ書く場合は、これにマージンなどを加えていくわけですが、その度に幅も微調整しないとなりません。枠線やパディング、更にはグリッド分割数の増減も加わってくるとカオスです。</p>
 
 <p>SCSSでは変数とそれを利用した計算が可能なので以下のように書くことが可能になります。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$cwidth</span>: <span class="hljs-number">768px</span>;
-<span class="hljs-variable">$count</span>: <span class="hljs-number">3</span>;
-<span class="hljs-variable">$gap</span>: <span class="hljs-number">8px</span>;
+<pre><code class="language-scss">$cwidth: 768px;
+$count: 3;
+$gap: 8px;
 
-<span class="hljs-selector-class">.news</span> {
-	<span class="hljs-attribute">margin-right</span>: (- <span class="hljs-variable">$gap</span>);
-	<span class="hljs-attribute">margin-left</span>: (- <span class="hljs-variable">$gap</span>);
+.news {
+	margin-right: (- $gap);
+	margin-left: (- $gap);
 }
 
-<span class="hljs-selector-class">.news</span> <span class="hljs-selector-tag">h2</span>,
-<span class="hljs-selector-class">.news</span> <span class="hljs-selector-tag">p</span>,
-<span class="hljs-selector-class">.news</span> hr {
-	<span class="hljs-attribute">margin-right</span>: <span class="hljs-variable">$gap</span>;
-	<span class="hljs-attribute">margin-left</span>: <span class="hljs-variable">$gap</span>;
+.news h2,
+.news p,
+.news hr {
+	margin-right: $gap;
+	margin-left: $gap;
 }
 
-<span class="hljs-selector-class">.sub-news</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-variable">$gap</span>;
-	<span class="hljs-attribute">padding</span>: <span class="hljs-variable">$gap</span>;
-	<span class="hljs-attribute">float</span>: left;
-	<span class="hljs-attribute">width</span>: ((<span class="hljs-variable">$cwidth</span> + <span class="hljs-variable">$gap</span> * <span class="hljs-number">2</span>) / <span class="hljs-variable">$count</span> - <span class="hljs-variable">$gap</span> * <span class="hljs-number">2</span> - <span class="hljs-variable">$gap</span> * <span class="hljs-number">2</span>);
+.sub-news {
+	margin: $gap;
+	padding: $gap;
+	float: left;
+	width: (($cwidth + $gap * 2) / $count - $gap * 2 - $gap * 2);
 }</code></pre>
 
 <p>コンテンツの幅とグリッドの分割数、その間隔（<code>float</code>によりマージンが相殺されなくなるので、実際には間隔の半分）などを変数として定義しています。最後の<code>width</code>だけ調整する必要が出てきますが、ひとつひとつ調整することを考えたら大したことはないでしょう。CSSで書いた方が短く書けますが、いかに効率よく書けかつ書き直せるかのバランスが重要なので、そこはあまり気にする必要はないと思います。</p>

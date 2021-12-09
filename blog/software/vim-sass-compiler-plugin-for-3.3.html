@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Sass 3.3でコンパイラーの出すエラー・メッセージがちょっと変わる（った）。Vimプラグインの構文チェッカーで最も有名と思われるSyntasticでは既に反映されているので、これ使っている人は最新版にするだけで良い。僕みたいに使ってない人は書きかえる必要がある。" property="twitter:description">
@@ -43,27 +44,27 @@ test.scss:2:in `test&apos;: Undefined variable: &quot;$foo&quot;. (Sass::SyntaxE
 
 <p><code>test.scss</code>の<code>test</code>というミックスインでエラーがあるとこうなる（<code>--trace</code>オプション付きの場合）。少なくともこれに対応してやらないとエラーの取りこぼしが起き、エラーがあるのにQuickFixウィンドウに何も出ないとか起きる。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;current_compiler&quot;</span>)
-	<span class="hljs-keyword">finish</span>
-<span class="hljs-keyword">endif</span>
-<span class="hljs-keyword">let</span> current_compiler = <span class="hljs-string">&quot;sass_scss&quot;</span>
+<pre><code class="language-vim">if exists(&quot;current_compiler&quot;)
+	finish
+endif
+let current_compiler = &quot;sass_scss&quot;
 
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;:CompilerSet&quot;</span>) != <span class="hljs-number">2</span>
-	<span class="hljs-keyword">command</span> -nargs=* CompilerSet <span class="hljs-keyword">setlocal</span> <span class="hljs-symbol">&lt;args&gt;</span>
-<span class="hljs-keyword">endif</span>
+if exists(&quot;:CompilerSet&quot;) != 2
+	command -nargs=* CompilerSet setlocal &lt;args&gt;
+endif
 
-<span class="hljs-keyword">let</span> <span class="hljs-variable">s:cpo_save</span> = &amp;cpo
-<span class="hljs-keyword">set</span> cpo&amp;<span class="hljs-keyword">vim</span>
+let s:cpo_save = &amp;cpo
+set cpo&amp;vim
 
 CompilerSet makeprg=scss\ --check\ --trace\ %
 
 CompilerSet errorformat=
-			\%<span class="hljs-keyword">f</span>:%<span class="hljs-keyword">l</span>:\ %<span class="hljs-keyword">m</span>,
-			\%<span class="hljs-keyword">f</span>:%<span class="hljs-variable">l:in</span>\ %.%#:\ %<span class="hljs-keyword">m</span>,
+			\%f:%l:\ %m,
+			\%f:%l:in\ %.%#:\ %m,
 			\%-G%.%#
 
-<span class="hljs-keyword">let</span> &amp;cpo = <span class="hljs-variable">s:cpo_save</span>
-<span class="hljs-keyword">unlet</span> <span class="hljs-variable">s:cpo_save</span></code></pre>
+let &amp;cpo = s:cpo_save
+unlet s:cpo_save</code></pre>
 
 <p>SassのCLIアプリケーションは<code>--trace</code>オプションを付けてるとVimの<code>errorformat</code>を書きやすくなる。自前でSassのコンパイラー・プラグインを用意する場合は付けるの前提で書くとすごく楽。</p>
 			</article>

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" property="twitter:description">
@@ -36,10 +37,10 @@
 
 				<p>WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレス<em>だけ</em>がわかるので、これと<a href="https://docs.microsoft.com/ja-jp/windows-server/networking/technologies/netsh/netsh-interface-portproxy">netsh interface portproxyコマンド</a>を使って、バッチファイルを書く。</p>
 
-<pre><code class="highlight language-bat">@<span class="hljs-built_in">echo</span> off
+<pre><code class="language-bat">@echo off
 
-<span class="hljs-keyword">for</span> /f &quot;tokens=* usebackq&quot; <span class="hljs-variable">%%F</span> <span class="hljs-keyword">in</span> (`wsl --distribution Ubuntu --exec hostname --all-ip-addresses`) <span class="hljs-keyword">do</span> <span class="hljs-built_in">set</span> IP=<span class="hljs-variable">%%F</span>
-netsh interface portproxy add v4tov4 listenport=<span class="hljs-number">8080</span> connectaddress=<span class="hljs-variable">%IP%</span></code></pre>
+for /f &quot;tokens=* usebackq&quot; %%F in (`wsl --distribution Ubuntu --exec hostname --all-ip-addresses`) do set IP=%%F
+netsh interface portproxy add v4tov4 listenport=8080 connectaddress=%IP%</code></pre>
 
 <p>このバッチファイルを管理者権限で実行すると設定される。WSL2をホストしているコンピューターのローカル・ネットワークでのIPアドレスが192.168.11.11とすると、他のコンピューターから192.168.11.11:8080へのアクセスが、Ubuntu仮想マシン上で動いている（8080で待機している）ウェブサーバーに届く。</p>
 

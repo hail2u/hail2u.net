@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="フィードを検証するようにした。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、W3C Feed ValidatorのAPIを利用した。" property="twitter:description">
@@ -40,14 +41,14 @@
 
 <p>node-fetchパッケージを使う場合は、<code>&</code>でつなげた文字列を<code>body</code>オプションに指定するのではなく、<code>URLSearchParams</code>オブジェクトを使う。Fetch標準では、<code>body</code>オプションの値が<code>URLSearchParams</code>だった場合、<a href="https://fetch.spec.whatwg.org/#bodyinit-unions"><code>Content-Type</code>ヘッダーを設定すると規定</a>されているので、<code>headers</code>オプションを指定しなくて済む。もちろんnode-fetchパッケージでも実装されている。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">const</span> body = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>();
-body.<span class="hljs-title function_">append</span>(<span class="hljs-string">&quot;manual&quot;</span>, <span class="hljs-number">1</span>);
-body.<span class="hljs-title function_">append</span>(<span class="hljs-string">&quot;output&quot;</span>, <span class="hljs-string">&quot;soap12&quot;</span>);
-<span class="hljs-keyword">const</span> feed = <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&quot;feed.xml&quot;</span>, <span class="hljs-string">&quot;utf8&quot;</span>);
-body.<span class="hljs-title function_">append</span>(<span class="hljs-string">&quot;rawdata&quot;</span>, feed);
-<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;https://validator.w3.org/feed/check.cgi&quot;</span>, {
+<pre><code class="language-javascript">const body = new URLSearchParams();
+body.append(&quot;manual&quot;, 1);
+body.append(&quot;output&quot;, &quot;soap12&quot;);
+const feed = await fs.readFile("feed.xml", "utf8");
+body.append(&quot;rawdata&quot;, feed);
+const res = await fetch(&quot;https://validator.w3.org/feed/check.cgi&quot;, {
 	body,
-	<span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>
+	method: &quot;POST&quot;
 });</code></pre>
 
 <p>よくFetchと共に使うFormDataオブジェクトの書き方と合わせるために<code>append()</code>を使っている。普通にオブジェクトを渡して<code>URLSearchParams</code>オブジェクトを作成した方がすっきりする。あとは<code>fetch()</code>するだけなので、<code>body</code>という名前で<code>URLSearchParams</code>オブジェクトを作っておくと、ちょっと短く書ける。</p>

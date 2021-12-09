@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" property="twitter:description">
@@ -38,35 +39,35 @@
 
 <p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-title function_">callback</span>({
-	<span class="hljs-attr">foo</span>:    <span class="hljs-string">&#x27;This is foo.&#x27;</span>,
-	<span class="hljs-attr">bar</span>:    <span class="hljs-string">&#x27;This is bar.&#x27;</span>,
-	<span class="hljs-attr">foobar</span>: <span class="hljs-string">&#x27;This is foobar.&#x27;</span>
+<pre><code class="language-js">callback({
+	foo:    &apos;This is foo.&apos;,
+	bar:    &apos;This is bar.&apos;,
+	foobar: &apos;This is foobar.&apos;
 });</code></pre>
 
 <p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;jsr_class.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>JSONScriptRequest Test<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="language-javascript">
-<span class="hljs-keyword">var</span> oJsr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSON</span>scriptRequest(<span class="hljs-string">&#x27;http://example.com/json/data.json?dummy=1&#x27;</span>);
-oJsr.<span class="hljs-title function_">buildScriptTag</span>();
-oJsr.<span class="hljs-title function_">addScriptTag</span>();
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var oJsr = new JSONscriptRequest(&apos;http://example.com/json/data.json?dummy=1&apos;);
+oJsr.buildScriptTag();
+oJsr.addScriptTag();
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">callback</span>(<span class="hljs-params">data</span>) {
-	<span class="hljs-title function_">alert</span>(data.<span class="hljs-property">foo</span>);
-	<span class="hljs-title function_">alert</span>(data.<span class="hljs-property">bar</span>);
-	<span class="hljs-title function_">alert</span>(data.<span class="hljs-property">foobar</span>);
-	oJsr.<span class="hljs-title function_">removeScriptTag</span>();
+function callback(data) {
+	alert(data.foo);
+	alert(data.bar);
+	alert(data.foobar);
+	oJsr.removeScriptTag();
 }
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
 <p>HTML(やJavaScript)ファイル側でcallback関数を定義しておく必要もある（<a href="/test/054.html" title="JSONScriptRequest Test">サンプル</a>）。</p>
 

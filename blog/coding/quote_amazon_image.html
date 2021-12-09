@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="いくつかAmazonの画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、event.srcElementでimg要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。" property="twitter:description">
@@ -36,33 +37,33 @@
 
 				<p>いくつか<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！">Amazon</a>の画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで（あるならばですがね）、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、<code>event.srcElement</code>で<code>img</code>要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。</p>
 <p>てなわけで画像付きのAmazonアソシエイトリンクを作成するMenuExtのコードを書いてみる。</p>
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span> <span class="hljs-attr">defer</span>&gt;</span><span class="language-javascript">
+<pre><code class="language-html">&lt;html&gt;
+&lt;script type=&quot;text/javascript&quot; defer&gt;
 &lt;!--
-	<span class="hljs-keyword">var</span> aid = <span class="hljs-string">&#x27;hail2unet-22&#x27;</span>;
+	var aid = &apos;hail2unet-22&apos;;
 
-	<span class="hljs-keyword">var</span> pWin = external.<span class="hljs-property">menuArguments</span>;
+	var pWin = external.menuArguments;
 
-	<span class="hljs-keyword">if</span> (pWin.<span class="hljs-property">event</span>.<span class="hljs-property">srcElement</span>.<span class="hljs-property">tagName</span> == <span class="hljs-string">&#x27;IMG&#x27;</span>) {
-		<span class="hljs-keyword">var</span> uri = pWin.<span class="hljs-property">location</span>.<span class="hljs-property">href</span>;
-		<span class="hljs-keyword">var</span> i = uri.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;ASIN&#x27;</span>);
-		<span class="hljs-keyword">var</span> asin = uri.<span class="hljs-title function_">substring</span>(i + <span class="hljs-number">5</span>, i + <span class="hljs-number">15</span>);
-		<span class="hljs-keyword">var</span> uri = <span class="hljs-string">&quot;https://www.amazon.co.jp/exec/obidos/ASIN/&quot;</span> + asin + <span class="hljs-string">&quot;/&quot;</span> + aid;
-		<span class="hljs-keyword">var</span> imguri = <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(pWin.<span class="hljs-property">event</span>.<span class="hljs-property">srcElement</span>.<span class="hljs-property">src</span>);
-		<span class="hljs-keyword">var</span> title = pWin.<span class="hljs-property">document</span>.<span class="hljs-property">title</span>;
-		pWin.<span class="hljs-property">clipboardData</span>.<span class="hljs-title function_">setData</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;&lt;a href=\&quot;&quot;</span> + uri + <span class="hljs-string">&quot;\&quot; title=\&quot;&quot;</span> +
-			title + <span class="hljs-string">&quot;\&quot;&gt;&lt;img src=\&quot;&quot;</span> + imguri + <span class="hljs-string">&quot;\&quot; alt=\&quot;&quot;</span> + title + <span class="hljs-string">&quot;\&quot; /&gt;&lt;/a&gt;&quot;</span>);
+	if (pWin.event.srcElement.tagName == &apos;IMG&apos;) {
+		var uri = pWin.location.href;
+		var i = uri.indexOf(&apos;ASIN&apos;);
+		var asin = uri.substring(i + 5, i + 15);
+		var uri = &quot;https://www.amazon.co.jp/exec/obidos/ASIN/&quot; + asin + &quot;/&quot; + aid;
+		var imguri = new String(pWin.event.srcElement.src);
+		var title = pWin.document.title;
+		pWin.clipboardData.setData(&quot;text&quot;, &quot;&lt;a href=\&quot;&quot; + uri + &quot;\&quot; title=\&quot;&quot; +
+			title + &quot;\&quot;&gt;&lt;img src=\&quot;&quot; + imguri + &quot;\&quot; alt=\&quot;&quot; + title + &quot;\&quot; /&gt;&lt;/a&gt;&quot;);
 	}
-<span class="hljs-comment">//--&gt;</span>
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></code></pre>
+//--&gt;
+&lt;/script&gt;
+&lt;/html&gt;</code></pre>
 <p>これを適当なフォルダに保存して、<a href="http://www.uryusoft.com/software/IEMenuExt/" title="IE MenuExt">IE MenuExt</a>で「Associate this!」などというタイトルで登録するだけ。登録時には忘れずに、表示方法のところで画像上にチェックを入れておきましょう。</p>
 <p>で、Amazonの各商品のページの*画像上で*右クリックし、Associate this!を選択すると、</p>
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22&quot;</span>
-	<span class="hljs-attr">title</span>=<span class="hljs-string">&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://m.media-amazon.com/images/P/B00021LRWM.jpg&quot;</span>
-		<span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;</span> /&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;a href=&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22&quot;
+	title=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;&gt;
+	&lt;img src=&quot;https://m.media-amazon.com/images/P/B00021LRWM.jpg&quot;
+		alt=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot; /&gt;
+&lt;/a&gt;</code></pre>
 <p>というようなコードがクリップボードにコピーされます（見やすいように改行を入れていますが、実際には一行で）。</p>
 <p>お、なかなか良いかも。</p>
 <p>Bookmarkletには移植できるかな？　各商品ページではユニークっぽい「vspace=3 hspace=5 align=left border=0」とかいう文字列をキーにして探すこともできないことは無さそうだけど、かなり力技になりそう。興味がある方は作ってみたらどうでしょう？　人気者になれるかも！</p>

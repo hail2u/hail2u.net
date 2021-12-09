@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="普通のHTMLの書き方では目次にol要素を使っ（てしまっ）たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、counters()による連結だけでいけるかと考えたが、うまくいかなかった。" property="twitter:description">
@@ -43,13 +44,13 @@
 
 <p>対象のHTML文書では、<code>section</code>と<code>h1</code>要素のみというストイックな記述になっている。そのため<code>section</code>要素でリセットして、<code>h1</code>要素でインクリメントすれば良いだろうと、まずは以下のように書いた。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">section</span> {
-	<span class="hljs-attribute">counter-reset</span>: section;
+<pre><code class="language-css">section {
+	counter-reset: section;
 }
 
-<span class="hljs-selector-tag">section</span> <span class="hljs-selector-tag">h1</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">counters</span>(section, <span class="hljs-string">&quot;.&quot;</span>) <span class="hljs-string">&quot;. &quot;</span>;
-	<span class="hljs-attribute">counter-increment</span>: section;
+section h1::before {
+	content: counters(section, &quot;.&quot;) &quot;. &quot;;
+	counter-increment: section;
 }</code></pre>
 
 <p>これだとすべての見出しに「1.」や「1.1.」が付く。当たり前だが<code>section</code>要素ごとにリセットされるからだ。このパターンは<code>ol</code>と<code>li</code>要素のような構造ではうまく振られる。</p>
@@ -60,14 +61,14 @@
 
 <p>数字をリセットするタイミングが悪い、と勘違いした。そのため次はそれを制御しようと以下のように書いた。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">main</span>,
-<span class="hljs-selector-tag">main</span> &gt; <span class="hljs-selector-tag">section</span> {
-	<span class="hljs-attribute">counter-reset</span>: section;
+<pre><code class="language-css">main,
+main &gt; section {
+	counter-reset: section;
 }
 
-<span class="hljs-selector-tag">section</span> <span class="hljs-selector-tag">h1</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">counters</span>(section, <span class="hljs-string">&quot;.&quot;</span>) <span class="hljs-string">&quot;. &quot;</span>;
-	<span class="hljs-attribute">counter-increment</span>: section;
+section h1::before {
+	content: counters(section, &quot;.&quot;) &quot;. &quot;;
+	counter-increment: section;
 }</code></pre>
 
 <p>これだとカウンターとその利用がうまくマッピングされない。そのため「0.1」や「0.3」などセクションのネストを無視した連番になってしまう。</p>
@@ -78,22 +79,22 @@
 
 <p>落ち着いて考えると<code>counters()</code>で連番を振れるのはネストしあう要素同士だけで、それに含まれる要素へは無理だった。最後にたどり着いたのはカウンターを大見出しと小見出しでわける方法だ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">main</span> {
-	<span class="hljs-attribute">counter-reset</span>: section;
+<pre><code class="language-css">main {
+	counter-reset: section;
 }
 
-<span class="hljs-selector-tag">main</span> &gt; <span class="hljs-selector-tag">section</span> {
-	<span class="hljs-attribute">counter-reset</span>: subsection;
+main &gt; section {
+	counter-reset: subsection;
 }
 
-<span class="hljs-selector-tag">main</span> &gt; <span class="hljs-selector-tag">section</span> &gt; <span class="hljs-selector-tag">h1</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">counter</span>(section) <span class="hljs-string">&quot;. &quot;</span>;
-	<span class="hljs-attribute">counter-increment</span>: section;
+main &gt; section &gt; h1::before {
+	content: counter(section) &quot;. &quot;;
+	counter-increment: section;
 }
 
-<span class="hljs-selector-tag">main</span> &gt; <span class="hljs-selector-tag">section</span> &gt; <span class="hljs-selector-tag">section</span> &gt; <span class="hljs-selector-tag">h1</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">counter</span>(section) <span class="hljs-string">&quot;.&quot;</span> <span class="hljs-built_in">counter</span>(subsection) <span class="hljs-string">&quot;. &quot;</span>;
-	<span class="hljs-attribute">counter-increment</span>: subsection;
+main &gt; section &gt; section &gt; h1::before {
+	content: counter(section) &quot;.&quot; counter(subsection) &quot;. &quot;;
+	counter-increment: subsection;
 }</code></pre>
 
 <p><code>section</code>要素がある分、<code>h1</code>や<code>h2</code>要素でフラットな構造を持つ場合と違って複雑になるが、これでうまく振れる。</p>

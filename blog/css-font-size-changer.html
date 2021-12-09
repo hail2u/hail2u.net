@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。:target疑似クラスを使う方法が最もコストが低いように思えた。" property="twitter:description">
@@ -42,8 +43,8 @@
 
 <p>このままではページ移動が起きてしまうので、HTMLコードにはもう少し工夫が必要かもしれない。<code>div</code>要素で括らずに空要素として固定位置に隠して配置し、兄弟セレクターで制御するとうまくいきそうだ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#large</span><span class="hljs-selector-pseudo">:target</span> ~ <span class="hljs-selector-tag">main</span> {
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-number">24px</span>;
+<pre><code class="language-css">#large:target ~ main {
+	font-size: 24px;
 }</code></pre>
 
 <p>既存のウェブページへCSSにおける副作用なしに追加するには、こちらの方法が優れている。</p>
@@ -52,16 +53,16 @@
 
 <p>もし<code>has()</code>疑似クラスの実装があると、カスタム・プロパティーと組み合わせられる。例えば以下のようにも書けるだろう。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-pseudo">:root</span> {
-	<span class="hljs-attr">--base-font-size</span>: <span class="hljs-number">16px</span>;
+<pre><code class="language-css">:root {
+	--base-font-size: 16px;
 }
 
-<span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-built_in">var</span>(--base-text-size);
+body {
+	font-size: var(--base-text-size);
 }
 
-<span class="hljs-selector-pseudo">:root</span><span class="hljs-selector-pseudo">:has</span>(<span class="hljs-selector-id">#large</span><span class="hljs-selector-pseudo">:target</span>) {
-	<span class="hljs-attr">--base-text-size</span>: <span class="hljs-number">24px</span>;
+:root:has(#large:target) {
+	--base-text-size: 24px;
 }</code></pre>
 
 <p>この場合はページ内アンカーそのものに<code>id</code>要素を振れば良いので、<code>div</code>要素が必要なくなる。ただし自身を参照するアンカーという存在そのものが微妙になる。</p>

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="意外と多い!? Web フォントに対応していない環境 ～2012 年の Web フォント事情の最後でアイコン・フォントが意味不明な文字になってしまうことに対して警鐘を鳴らしている。僕もDingbatのWebフォントというタイトルで似たようなことは書いたが、最近はU+E000からU+F8FFのPrivate Use Area(私用領域または外字領域）へアイコンをマッピングするもの増えてきており、そういった問題については一部解決しつつある。ただしフォールバックできない問題は依然として残るので、JavaScriptの力を借りつつCSS側で対応してやる必要がある。" property="twitter:description">
@@ -40,17 +41,17 @@
 
 <p>この問題に対して適切なフォールバックを行うにはCSSだけでは難しい（不可能というわけではない）ので、<a href="http://www.modernizr.com/">Modernizr</a>を使うと良さそう。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Icon Font&quot;</span>, fantasy;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;\E000&quot;</span>;
+<pre><code class="language-css">.test::before {
+	font-family: "Icon Font", fantasy;
+	content: "\E000";
 }
 
-<span class="hljs-selector-class">.no-fontface</span> <span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">&quot;fallback.svg&quot;</span>);
+.no-fontface .test::before {
+	content: url("fallback.svg");
 }
 
-<span class="hljs-selector-class">.no-fontface</span><span class="hljs-selector-class">.no-svg</span> <span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">::before</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">&quot;fallback.png&quot;</span>);
+.no-fontface.no-svg .test::before {
+	content: url("fallback.png");
 }</code></pre>
 
 <p>スケーリングのことも考えてSVGも使う場合はこうなる。まぁSVGは冗談なので普通にPNGでフォールバックすれば良いと思う。</p>

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="少し前のCSS Transitionを使ったスムーズにスクロールしてトップに戻る機能という記事では、CSS Transitionを使ってスムーズにスクロールさせるためにbody要素のmargin-topプロパティーを負の値を設定した。これはとにかく上方向へのスクロールにしか使うことは出来ない。下方向にスムーズにスクロールさせるためにはまた別のアプローチが必要になるようだ。" property="twitter:description">
@@ -46,21 +47,21 @@
 
 <p>デモではJump to Bottomというボタンを押すとページの最下部までスクロールするようになっている。スムーズなことがわかりやすいように長めのアニメーションにしておいた。今回のものは任意の要素の位置へにもスクロールすることが可能だ。Jump to Middleというボタンでは中程までスクロールしてピタッと止まる。また上方向にも対応させた。Back to Topというボタンではページの先頭にスムーズにスクロールしながら戻ることができる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">scrollToElm</span>(<span class="hljs-params">to</span>) {
-	<span class="hljs-keyword">var</span> root = <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>;
-	<span class="hljs-keyword">var</span> styleRoot = root.<span class="hljs-property">style</span>;
-	<span class="hljs-keyword">var</span> doScroll = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-		styleRoot.<span class="hljs-property">transition</span> = styleRoot.<span class="hljs-property">transform</span> = <span class="hljs-string">&#x27;initial&#x27;</span>;
-		<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">scrollTo</span>(<span class="hljs-number">0</span>, to.<span class="hljs-property">offsetTop</span>);
-		root.<span class="hljs-title function_">removeEventListener</span>(<span class="hljs-string">&#x27;transitionend&#x27;</span>, doScroll, <span class="hljs-literal">false</span>);
+<pre><code class="language-javascript">function scrollToElm(to) {
+	var root = document.documentElement;
+	var styleRoot = root.style;
+	var doScroll = function () {
+		styleRoot.transition = styleRoot.transform = &apos;initial&apos;;
+		window.scrollTo(0, to.offsetTop);
+		root.removeEventListener(&apos;transitionend&apos;, doScroll, false);
 	};
-	<span class="hljs-keyword">var</span> scrollDistance = <span class="hljs-variable language_">window</span>.<span class="hljs-property">pageYOffset</span> - <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(
-		to.<span class="hljs-property">offsetTop</span>,
-		root.<span class="hljs-property">scrollHeight</span> - <span class="hljs-variable language_">window</span>.<span class="hljs-property">innerHeight</span>
+	var scrollDistance = window.pageYOffset - Math.min(
+		to.offsetTop,
+		root.scrollHeight - window.innerHeight
 	);
-	root.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;transitionend&#x27;</span>, doScroll, <span class="hljs-literal">false</span>);
-	styleRoot.<span class="hljs-property">transition</span> = <span class="hljs-string">&#x27;transform 1s ease-in-out&#x27;</span>;
-	styleRoot.<span class="hljs-property">transform</span> = <span class="hljs-string">&#x27;translate3d(0, &#x27;</span> + scrollDistance + <span class="hljs-string">&#x27;px, 0)&#x27;</span>;
+	root.addEventListener(&apos;transitionend&apos;, doScroll, false);
+	styleRoot.transition = &apos;transform 1s ease-in-out&apos;;
+	styleRoot.transform = &apos;translate3d(0, &apos; + scrollDistance + &apos;px, 0)&apos;;
 }</code></pre>
 
 <p>少しややこしくなったが、それでも16行程度で実装することができる。上下へスクロールさせる場合、後処理が重要になるので<code>transitionend</code>イベントを使うことが必須になる（使わなくても不可能ではない）。</p>

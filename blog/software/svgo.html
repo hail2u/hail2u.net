@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="SVGOはSVGに不要なホワイトスペースの削除に留まらない最適化を行ってくれるステキなソフトウェア。ちょっと前までなかなか挙動不審だったので、利用を避けていたんだけどv0.3.7では安定している感じなのでまた使い始めた。デフォルトでは入力ファイルを上書きしちゃうのでバックアップを取るように心がけたい。" property="twitter:description">
@@ -44,15 +45,15 @@
 
 <p>普通は<a href="https://github.com/sindresorhus/grunt-svgmin">Gruntタスク</a>でもちろん良いんだけど、Vimで以下のようなコマンドと関数を<code>.vimrc</code>で定義すると、CSSとかに書いたSVGファイルへのパスにカーソルを載せて<code>:SVGO</code>するとData URIに置き換わる。</p>
 
-<pre><code class="highlight language-vim">command! SVGO :<span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>OptimizeSVG()
+<pre><code class="language-vim">command! SVGO :call &lt;SID&gt;OptimizeSVG()
 
-<span class="hljs-keyword">function!</span> <span class="hljs-title">s</span>:OptimizeSVG<span class="hljs-params">()</span>
-	<span class="hljs-keyword">let</span> <span class="hljs-keyword">cfile</span> = <span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;&lt;cfile&gt;&#x27;</span>)
-	<span class="hljs-keyword">let</span> datauri = <span class="hljs-built_in">system</span>(<span class="hljs-string">&#x27;svgo -i &#x27;</span> . <span class="hljs-keyword">cfile</span> . <span class="hljs-string">&#x27; -o - --datauri=base64&#x27;</span>)
-	<span class="hljs-keyword">let</span> datauri = <span class="hljs-keyword">substitute</span>(datauri, <span class="hljs-string">&#x27;\n$&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>)
-	<span class="hljs-keyword">call</span> <span class="hljs-built_in">setreg</span>(<span class="hljs-string">&#x27;d&#x27;</span>, <span class="hljs-keyword">substitute</span>(<span class="hljs-built_in">getline</span>(<span class="hljs-string">&#x27;.&#x27;</span>), <span class="hljs-keyword">cfile</span>, datauri, <span class="hljs-string">&#x27;&#x27;</span>))
-	normal! V<span class="hljs-comment">&quot;dp</span>
-<span class="hljs-keyword">endfunction</span></code></pre>
+function! s:OptimizeSVG()
+	let cfile = expand('&lt;cfile&gt;')
+	let datauri = system('svgo -i ' . cfile . ' -o - --datauri=base64')
+	let datauri = substitute(datauri, '\n$', '', '')
+	call setreg('d', substitute(getline('.'), cfile, datauri, ''))
+	normal! V"dp
+endfunction</code></pre>
 
 <p>SVGOのSTDOUTに吐くオプションでは<a href="https://github.com/svg/svgo/blob/v0.3.7/lib/svgo/coa.js#L223">最後に<code>\n</code>が付く</a>ようになってるので消してる。レジスター使っちゃうのは許してくれ。</p>
 

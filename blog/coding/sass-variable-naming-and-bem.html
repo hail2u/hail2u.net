@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="$type-subtype-component-contextというような形でSassの変数を命名していたけど、これにもBEMを使うかという感じになってきた。ただでさえ長いのが、セパレーターで更に長くなるけど、元々そんなに短くないので気にしないことにした。BEMをクラス名で使うような形で単純に利用するケースと、3.3で導入される予定のマップを使って構造化して定義し、複雑に参照するケースを比較して検証している。" property="twitter:description">
@@ -72,16 +73,16 @@
 <section>
 <h2>BEMを使った簡単な実装</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$color-bg_searchbox</span>: <span class="hljs-number">#f9f9f9</span>;
+<pre><code class="language-scss">$color-bg_searchbox: #f9f9f9;
 
-<span class="hljs-variable">$color-fg_searchbox__input</span>: black;
-<span class="hljs-variable">$color-bg_searchbox__input</span>: white;
-<span class="hljs-variable">$color-border_searchbox__input</span>: lighten(black, <span class="hljs-number">25%</span>);
-<span class="hljs-variable">$color-border_searchbox__input--focus</span>: cyan;
+$color-fg_searchbox__input: black;
+$color-bg_searchbox__input: white;
+$color-border_searchbox__input: lighten(black, 25%);
+$color-border_searchbox__input--focus: cyan;
 
-<span class="hljs-variable">$color-fg_searchbox__button</span>: white;
-<span class="hljs-variable">$color-bg_searchbox__button</span>: grayscale(mix(cyan, white, <span class="hljs-number">60%</span>));
-<span class="hljs-variable">$color-bg_searchbox__button--hover</span>: cyan;</code></pre>
+$color-fg_searchbox__button: white;
+$color-bg_searchbox__button: grayscale(mix(cyan, white, 60%));
+$color-bg_searchbox__button--hover: cyan;</code></pre>
 
 <p>まず、変数の型をプリフィックスとして付けたい。変数を参照する時は「どういう変数を参照するか」が優先的に意識されるので、先に型があった方が良い。ハンガリアン記法と同じと考えるとわかりやすそう。IDEの補完に向くとかそういう実用上の理由もある。</p>
 
@@ -91,13 +92,13 @@
 <section>
 <h2>マップを使って構造化</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$searchbox</span>: (
-	color_bg: <span class="hljs-number">#f9f9f9</span>,
+<pre><code class="language-scss">$searchbox: (
+	color_bg: #f9f9f9,
 
 	input: (
 		color_fg: black,
 		color_bg: white,
-		color_border: lighten(black, <span class="hljs-number">25%</span>),
+		color_border: lighten(black, 25%),
 		_focus: (
 			color_border: cyan
 		)
@@ -105,7 +106,7 @@
 
 	button: (
 		color_fg: white,
-		color_bg: grayscale(mix(cyan, white, <span class="hljs-number">60%</span>)),
+		color_bg: grayscale(mix(cyan, white, 60%)),
 		_hover: (
 			color_bg: cyan
 		)
@@ -116,20 +117,20 @@
 
 <p>参照は<code>map-get()</code>関数を使う。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.searchbox</span> {
-	<span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$searchbox</span>, color_bg);
+<pre><code class="language-scss">.searchbox {
+	background-color: map-get($searchbox, color_bg);
 
-	<span class="hljs-selector-tag">input</span> {
-		<span class="hljs-variable">$input</span>: map-get(<span class="hljs-variable">$searchbox</span>, input);
+	input {
+		$input: map-get($searchbox, input);
 
-			<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid map-get(<span class="hljs-variable">$input</span>, color_border);
-<span class="hljs-attribute">color</span>: map-get(<span class="hljs-variable">$input</span>, color_fg);
-			 <span class="hljs-attribute">background-color</span>: map-get(<span class="hljs-variable">$input</span>, color_bg);
+			border: 1px solid map-get($input, color_border);
+color: map-get($input, color_fg);
+			 background-color: map-get($input, color_bg);
 
-			 &amp;<span class="hljs-selector-pseudo">:focus</span> {
-				 <span class="hljs-variable">$focus</span>: map-get(<span class="hljs-variable">$input</span>, _focus);
+			 &amp;:focus {
+				 $focus: map-get($input, _focus);
 
-				 <span class="hljs-attribute">border-color</span>: map-get(<span class="hljs-variable">$focus</span>, color_border);
+				 border-color: map-get($focus, color_border);
 			 }
 	}
 }</code></pre>

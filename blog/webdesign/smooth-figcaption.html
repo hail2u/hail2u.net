@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="画像に続けてfigcaptionをそのまま普通に表示するといまいちなことが多いです。それでも英語ならイタリック体にするとかでなんとなくその文字列がfigure要素に係っているものだということが表現できるような気がしますが、日本語の斜体はいろいろアレなので使いたくないです（よね！）。そこで画像にキャプションを綺麗に重ねる方法を模索してみました。" property="twitter:description">
@@ -44,43 +45,43 @@
 
 <p>まずは画像のHTMLです。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">figure</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.com/&quot;</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://example.com/images/logo.png&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">figcaption</span>&gt;</span>Example.com&#x27;s Logo<span class="hljs-tag">&lt;/<span class="hljs-name">figcaption</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">figure</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;figure&gt;
+	&lt;a href="http://example.com/"&gt;
+		&lt;img src="http://example.com/images/logo.png"&gt;
+	&lt;/a&gt;
+	&lt;figcaption&gt;Example.com's Logo&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
 
 <p>このHTMLに対してどんなサイズの画像にも対応できるようにCSSを書いていきます。<code>a</code>要素には依存しませんが、入っていてもいなくても大丈夫なようにもします。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">figure</span> {
-	<span class="hljs-attribute">display</span>: inline-block;
-	<span class="hljs-attribute">position</span>: relative;
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">1</span>;
-	<span class="hljs-attribute">overflow</span>: hidden;
+<pre><code class="language-css">figure {
+	display: inline-block;
+	position: relative;
+	line-height: 1;
+	overflow: hidden;
 }</code></pre>
 
 <p>まずは<code>figure</code>要素を<code>inline-block</code>にします。こうすることによって内包される画像に合わせて<code>figure</code>要素のサイズが変化します。そして<code>position</code>や<code>overflow</code>プロパティーで効率的に<code>figcaption</code>をレイアウトできるようにしておきます。<code>line-height</code>プロパティーはなくてもうまくいくことがありますが、なるべく<code>1</code>にしておいたほうが良いでしょう。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">figure</span> <span class="hljs-selector-tag">img</span> {
-	<span class="hljs-attribute">vertical-align</span>: text-bottom;
+<pre><code class="language-css">figure img {
+	vertical-align: text-bottom;
 }</code></pre>
 
 <p>次に画像の行ボックスに対する位置決めを行います。デフォルト値である<code>baseline</code>だと<code>figure</code>要素の下端に数ピクセルの隙間ができてしまいますが、<code>text-bottom</code>にすることによってその隙間を消すことができます。</p>
 
 <p>最後に<code>figcaption</code>のデザインです。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">figure</span> <span class="hljs-selector-tag">figcaption</span> {
-	<span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span> <span class="hljs-number">1em</span>;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">bottom</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">3</span>;
-	<span class="hljs-attribute">color</span>: white;
-	<span class="hljs-attribute">background-color</span>: black;
-	<span class="hljs-attribute">text-align</span>: right;
-	<span class="hljs-attribute">opacity</span>: <span class="hljs-number">0.75</span>;
+<pre><code class="language-css">figure figcaption {
+	padding: 0 1em;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	line-height: 3;
+	color: white;
+	background-color: black;
+	text-align: right;
+	opacity: 0.75;
 }</code></pre>
 
 <p>幅は<code>width</code>プロパティーで<code>100%</code>を指定すると<code>figure</code>要素の幅一杯になります。つまり画像の幅と揃うことになりますね。<code>padding</code>プロパティーで左右に余白を確保しているので、実際には飛び出してしまいますが、<code>figure</code>要素で<code>overflow: hidden</code>となっているので問題ありません。高さは<code>line-height</code>プロパティーでやると、高さと同時に縦方向のセンタリングも行えるのでお手軽でしょう。</p>
@@ -98,14 +99,14 @@
 
 <p>オンマウスでスルッとキャプションを隠す場合は位置をいじるよりも<code>line-height</code>プロパティーをいじった方がアニメーションさせやすいと思います。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> <span class="hljs-selector-tag">figcaption</span> {
-	<span class="hljs-attribute">overflow</span>: hidden;
-	<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">0.5s</span>;
+<pre><code class="language-css">.test figcaption {
+	overflow: hidden;
+	transition-duration: 0.5s;
 }
 
-<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:hover</span> <span class="hljs-selector-tag">figcaption</span> {
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">0.5s</span>;
+.test:hover figcaption {
+	line-height: 0;
+	transition-duration: 0.5s;
 }</code></pre>
 
 <p><code>bottom</code>いじる場合はキャプションの高さを知らなくちゃいけないのでちょっと面倒なので。まぁ吹っ飛ぶくらいの量を適当に指定するとかで逃げるという手もありますけどね。</p>

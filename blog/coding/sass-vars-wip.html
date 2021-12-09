@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="時代はとっくにSass 3.4なのでローカル変数メインにしたいということが前提にある。そうすることで変数名にBEM等のしっかりとした命名規則を使わずに済み、自己言及的な変数名と数文字の変数名でおおむね完結することになる。パーシャル間で共有したい場合はしょうがないので!globalを使ってローカル変数をグローバルへエクスポートするようなあきらめを許容して誤魔化す。" property="twitter:description">
@@ -38,32 +39,32 @@
 
 <p>まずある程度はグローバル変数として定義しておく必要がある。それらグローバル変数は自己言及的なもの（それこそ<code>$color-black: #000;</code>といったようなもの）で、実際にウェブサイトで使われる要素やクラスとは無関係に定義していく。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-comment">// _variables.scss</span>
-<span class="hljs-variable">$ratio</span>: <span class="hljs-number">1.7</span>;
+<pre><code class="language-scss">// _variables.scss
+$ratio: 1.7;
 
-<span class="hljs-variable">$ratio-text</span>: <span class="hljs-number">1</span>;
-<span class="hljs-variable">$ratio-text-large</span>: <span class="hljs-number">1.5</span>;
+$ratio-text: 1;
+$ratio-text-large: 1.5;
 
-<span class="hljs-variable">$line-height-default</span>: <span class="hljs-variable">$ratio</span>;</code></pre>
+$line-height-default: $ratio;</code></pre>
 
 <p>BEMで言うところのブロックのような意味のある単位で切り分けたパーシャルでは、グローバル変数を使いつつ、繰り返し使うならローカル変数を作る。ローカル変数はちゃんとスコープを抜けたら破棄されるので、短い名前で良い。が、ロゴとサイト・ナビゲーションで高さを揃えたいという要件があった場合、ルールセットの最後（他のスコープが始まる<em>前</em>）で<code>!global</code>フラグを使ってグローバル変数へとエクスポートする。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-comment">// _logo.scss</span>
-<span class="hljs-selector-class">.logo</span> {
-	<span class="hljs-variable">$fs</span>: (<span class="hljs-variable">$ratio-text-large</span> * <span class="hljs-number">1rem</span>);
-	<span class="hljs-variable">$lh</span>: <span class="hljs-variable">$line-height-default</span>;
+<pre><code class="language-scss">// _logo.scss
+.logo {
+	$fs: ($ratio-text-large * 1rem);
+	$lh: $line-height-default;
 
-	<span class="hljs-attribute">font-size</span>: <span class="hljs-variable">$fs</span>;
-	<span class="hljs-attribute">line-height</span>: <span class="hljs-variable">$lh</span>;
+	font-size: $fs;
+	line-height: $lh;
 
-	<span class="hljs-variable">$height-logo</span>: (<span class="hljs-variable">$lh</span> * <span class="hljs-variable">$fs</span>) !global;
+	$height-logo: ($lh * $fs) !global;
 }</code></pre>
 
 <p>サイト・ナビゲーションでは定義済みのグローバル変数を参照するだけだ。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-comment">// _site-navigation.scss</span>
-<span class="hljs-selector-class">.site-navigation</span> {
-	<span class="hljs-attribute">height</span>: <span class="hljs-variable">$height-logo</span>;
+<pre><code class="language-scss">// _site-navigation.scss
+.site-navigation {
+	height: $height-logo;
 }</code></pre>
 
 <p>こうすると長い変数名を極力減らすことが可能になる。グローバル変数へとエクスポートする時だけ他との衝突が起こりうるので、その時だけ工夫した長い名前を付ける。</p>

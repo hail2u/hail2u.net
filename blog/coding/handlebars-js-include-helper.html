@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Handlebars.jsでのテンプレートファイルの取り込みはpartial使えみたいな感じだけど、partialにするものを全て定義しなくちゃいけない。partialのテンプレートでの記述もpartialごとに変わる。それをSSIのインクルードみたいに{{include &quot;foo.hbs&quot;}}でコンテキストを考慮して取り込めたら簡単なんじゃないかなーと。でincludeするだけのヘルパーを作って使うようにしたメモ。" property="twitter:description">
@@ -38,36 +39,36 @@
 
 <p>色々遠回りしたけど、結局はテンプレート・ファイルを読んでコンパイル→レンダーする関数を作ってそれをヘルパー関数にすれば良いだけだった。Handlebars.jsがカシコイのでコンテキストとかは自動的に良しなにしてくれる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
-<span class="hljs-keyword">var</span> hbs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;handlebars&#x27;</span>);
+<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
+var hbs = require(&apos;handlebars&apos;);
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">applyTemplate</span>(<span class="hljs-params">file, data</span>) {
-	<span class="hljs-keyword">var</span> tmpl = hbs.<span class="hljs-title function_">compile</span>(fs.<span class="hljs-title function_">readFileSync</span>(file, <span class="hljs-string">&#x27;UTF-8&#x27;</span>));
+function applyTemplate(file, data) {
+	var tmpl = hbs.compile(fs.readFileSync(file, &apos;UTF-8&apos;));
 
-	<span class="hljs-keyword">return</span> <span class="hljs-title function_">tmpl</span>(data);
+	return tmpl(data);
 }
 
-hbs.<span class="hljs-title function_">registerHelper</span>(<span class="hljs-string">&#x27;include&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">file, options</span>) {
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> hbs.<span class="hljs-title class_">SafeString</span>(<span class="hljs-title function_">applyTemplate</span>(file, <span class="hljs-variable language_">this</span>));
+hbs.registerHelper(&apos;include&apos;, function (file, options) {
+	return new hbs.SafeString(applyTemplate(file, this));
 });
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">applyTemplate</span>(<span class="hljs-string">&#x27;./template.hbs&#x27;</span>, {
-	<span class="hljs-string">&quot;he&quot;</span>: {
-		<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;John&quot;</span>
+console.log(applyTemplate(&apos;./template.hbs&apos;, {
+	&quot;he&quot;: {
+		&quot;name&quot;: &quot;John&quot;
 	},
-	<span class="hljs-string">&quot;she&quot;</span>: {
-		<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Jane&quot;</span>
+	&quot;she&quot;: {
+		&quot;name&quot;: &quot;Jane&quot;
 	}
 }));</code></pre>
 
 <p>使うテンプレート・ファイルは、<code>template.hbs</code></p>
 
-<pre><code class="highlight language-handlebars"><span class="hljs-template-tag">{{#<span class="hljs-name">he</span>}}</span><span class="language-xml">His name is </span><span class="hljs-template-variable">{{<span class="hljs-name">include</span> <span class="hljs-string">&quot;./include.hbs&quot;</span>}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">he</span>}}</span><span class="language-xml">
-</span><span class="hljs-template-tag">{{#<span class="hljs-name">she</span>}}</span><span class="language-xml">His girlfriend name is </span><span class="hljs-template-variable">{{<span class="hljs-name">include</span> <span class="hljs-string">&quot;./include.hbs&quot;</span>}}</span><span class="hljs-template-tag">{{/<span class="hljs-name">she</span>}}</span></code></pre>
+<pre><code class="language-handlebars">{{#he}}His name is {{include &quot;./include.hbs&quot;}}{{/he}}
+{{#she}}His girlfriend name is {{include &quot;./include.hbs&quot;}}{{/she}}</code></pre>
 
 <p>と、<code>include.hbs</code></p>
 
-<pre><code class="highlight language-handlebars"><span class="hljs-template-variable">{{<span class="hljs-name">name</span>}}</span></code></pre>
+<pre><code class="language-handlebars">{{name}}</code></pre>
 
 <p>の2つ。実行すると結果はこうなる。</p>
 

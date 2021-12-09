@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" property="twitter:description">
@@ -38,33 +39,33 @@
 
 <p>form-dataモジュールは<a href="http://www.w3.org/TR/XMLHttpRequest2/">XMLHTTPRequest Level 2</a>の<a href="http://www.w3.org/TR/XMLHttpRequest2/#interface-formdata">FormDataインターフェイス</a>に似たものを提供するNode.jsモジュール。<code>append()</code>でパラメーターを追加していき、<code>submit()</code>で指定したURLにPOSTすることができる。Validator.nuは<code>application/x-www-form-urlencoded</code>に対応しておらず、Query Stringモジュールとかでポンと叩くことはできないため、このform-dataモジュールや<a href="https://github.com/coolaj86/abstract-http-request">ahr2モジュール</a>などが（面倒くさいので）必要。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
+<pre><code class="language-js">#!/usr/bin/env node
 
-<span class="hljs-keyword">var</span> <span class="hljs-title class_">FormData</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;form-data&#x27;</span>);
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+var FormData = require('form-data');
+var fs = require('fs');
 
-<span class="hljs-keyword">var</span> htmlfile = process.<span class="hljs-property">argv</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">2</span>)[<span class="hljs-number">0</span>];
+var htmlfile = process.argv.slice(2)[0];
 
-<span class="hljs-keyword">var</span> fd = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FormData</span>();
-fd.<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;out&#x27;</span>, <span class="hljs-string">&#x27;json&#x27;</span>);
-fd.<span class="hljs-title function_">append</span>(<span class="hljs-string">&#x27;file&#x27;</span>, fs.<span class="hljs-title function_">createReadStream</span>(htmlfile));
-fd.<span class="hljs-title function_">submit</span>(<span class="hljs-string">&#x27;http://validator.nu/&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error, response</span>) {
-	<span class="hljs-keyword">if</span> (error) {
-		<span class="hljs-keyword">throw</span> error;
+var fd = new FormData();
+fd.append('out', 'json');
+fd.append('file', fs.createReadStream(htmlfile));
+fd.submit('http://validator.nu/', function (error, response) {
+	if (error) {
+		throw error;
 	}
 
-	<span class="hljs-keyword">var</span> chunks = <span class="hljs-string">&#x27;&#x27;</span>;
+	var chunks = '';
 
-	response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) {
+	response.on('data', function (chunk) {
 		chunks += chunk;
 	});
 
-	response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-		<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(chunks).<span class="hljs-property">messages</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">message</span>) {
-			<span class="hljs-keyword">if</span> (message.<span class="hljs-property">type</span> === <span class="hljs-string">&#x27;error&#x27;</span>) {
-				<span class="hljs-keyword">var</span> line = (message.<span class="hljs-property">lastLine</span> ? message.<span class="hljs-property">lastLine</span> : <span class="hljs-number">0</span>);
-				<span class="hljs-keyword">var</span> column = (message.<span class="hljs-property">firstColumn</span> ? message.<span class="hljs-property">firstColumn</span>: <span class="hljs-number">0</span>);
-				<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>([htmlfile, line, column, message.<span class="hljs-property">message</span>].<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;:&#x27;</span>));
+	response.on('end', function () {
+		JSON.parse(chunks).messages.forEach(function (message) {
+			if (message.type === 'error') {
+				var line = (message.lastLine ? message.lastLine : 0);
+				var column = (message.firstColumn ? message.firstColumn: 0);
+				console.log([htmlfile, line, column, message.message].join(':'));
 			}
 		});
 	});

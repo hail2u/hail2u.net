@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Sassの存在意義の話があんまりうまく伝わってない感じなので、3の別々に書けてSassで関連付けられるということについて少しだけ書く。抽象的な概念の話なので具体的な説明というのもなかなか難しいけど、CSSフレームワークを使う時にどうなるかみたいなことを取り上げる。" property="twitter:description">
@@ -38,30 +39,30 @@
 
 <p><a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a>を始めCSSフレームワークはいくつもあるが、それらはだいたいユニークなクラス名を持っている。例えばTwitter Bootstrapで2カラムレイアウトを作る場合は以下のようなHTMLに<em>しなくてはならない</em>。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;row&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;span4&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;span8&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;div class="row"&gt;
+	&lt;div class="span4"&gt;...&lt;/div&gt;
+	&lt;div class="span8"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
 
 <p><code>div</code>要素は<code>section</code>や<code>aside</code>要素などを使っても良いが、クラス名はこうでなくてはならない。Sass(や<a href="http://lesscss.org/">LESS</a>）があるとまず変わるのはここ。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;wrapper&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">aside</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">aside</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;main&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;div class="wrapper"&gt;
+	&lt;aside&gt;...&lt;/aside&gt;
+	&lt;div role="main"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
 
 <p>ほとんどのケースでこのようにHTML文書側では適切な要素の使用やクラス名の割り振りだけで良くなる。このことが意味するのはHTML文書のソースが（自己満足的に）キレイになるとかそういう話でもあるんだけど、もっと重要なのはコンテンツを把握できるバックエンド側で適切に<em>マークアップ</em>することができるようになるという点だと思う。クラス名の命名規則等のコーディング規約で少しは改善できるが、根本的な解決にはならない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.wrapper</span> {
-	<span class="hljs-keyword">@extend</span> .row;
+<pre><code class="language-scss">.wrapper {
+	@extend .row;
 
-	&gt; <span class="hljs-selector-tag">aside</span> {
-		<span class="hljs-keyword">@extend</span> .span4;
+	&gt; aside {
+		@extend .span4;
 	}
 }
 
-<span class="hljs-selector-attr">[role=<span class="hljs-string">&quot;main&quot;</span>]</span> {
-	<span class="hljs-keyword">@extend</span> .span8;
+[role="main"] {
+	@extend .span8;
 }</code></pre>
 
 <p>CSSのHTML文書への適用はSassでCSSで定義したデザインを継承する形で行う。CSSフレームワークやOOCSSではHTMLで複数のクラスを割り当てる形なわけだけど、SassやLESSでそれを代行できると言い換えても良い。</p>
@@ -70,50 +71,50 @@
 
 <p>対して、SassやLESSでデザインを継承する形で書く場合、特にHTMLの構造を考慮することなくデザインを行う（CSSを書く）ことができる。とりあえず直観的なクラス名のセレクターで好きに書けば良い。具体的に言うのならならサイトロゴやclearfixなどデザインや機能単位でそれぞれ定義してやるだけ。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.add-quote-mark</span> {
-	<span class="hljs-attribute">padding-left</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">min-height</span>: <span class="hljs-number">48px</span>;
-	<span class="hljs-attribute">background</span>: {
-		image: url(<span class="hljs-string">&quot;/img/quote.png&quot;</span>);
+<pre><code class="language-scss">.add-quote-mark {
+	padding-left: 48px;
+	min-height: 48px;
+	background: {
+		image: url("/img/quote.png");
 		repeat: no-repeat;
-		size: <span class="hljs-number">48px</span> <span class="hljs-number">48px</span>;
+		size: 48px 48px;
 	}
 }</code></pre>
 
 <p>例えば<code>blockquote</code>要素で使うために引用符の画像を背景に仕込むというようなデザインを定義するなら、こういう形でそのためのプロパティーだけを書けば良い。マージンやフォントの変更などもそれぞれ別に定義する。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.default-margin</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">2em</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>;
+<pre><code class="language-scss">.default-margin {
+	margin: 2em 0 0 0;
 }
 
-<span class="hljs-selector-class">.quote-text</span> {
-	<span class="hljs-attribute">font</span>: {
-		family: <span class="hljs-string">&quot;Palatino&quot;</span>, <span class="hljs-string">&quot;Palatino Linotype&quot;</span>, serif;
+.quote-text {
+	font: {
+		family: "Palatino", "Palatino Linotype", serif;
 		style: italic;
 	}
 }</code></pre>
 
 <p>テストは個々のデザインごとにテストすれば良いので、<code>blockquote</code>要素で使われるデザインだからといってテストでも<code>blockquote</code>要素を使う必要はない。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;add-quote-mark&quot;</span>&gt;</span>Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;default-margin&quot;</span>&gt;</span>Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;quote-text&quot;</span>&gt;</span>Lorem ipsum dolor sit amet.<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;div class="add-quote-mark"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
+&lt;div class="default-margin"&gt;Lorem ipsum dolor sit amet.&lt;/div&gt;
+&lt;span class="quote-text"&gt;Lorem ipsum dolor sit amet.&lt;/span&gt;</code></pre>
 
 <p>実際にはそれぞれを<code>section</code>要素で括って見出しをつけたり、テストページといえども見やすいように構造と体裁を整えた方が良いけど、基本はこんなもので良い。長い行の折り返しを省略する<code>text-overflow: ellipsis</code>を使うならサンプル文字列を長文にするとか、<em>デザインに合わせて</em>テストをちゃんと書くだけ。ここでも最終的にこのデザインが利用されるHTML文書のことを考える必要はほとんどない。</p>
 
 <p>LESSではこの定義したデザインをCSSにコンパイルすることなくほぼ直接テストできるので（<code>less.js</code>使うだけ）、その点で大きくSassに優る。Sassではテスト用のCSSを別途コンパイルする必要があるので、そこをどうにかするための環境を整えるのはかなり面倒くさい。僕はSassをCSSにコンパイルして返すCGIを作ってそれを利用してやってるけど色々アレで、もっとなんかこう<code>less.js</code>並に手軽な仕組みが欲しいところ。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-attr">[role=<span class="hljs-string">&quot;main&quot;</span>]</span> <span class="hljs-selector-tag">blockquote</span> {
-	<span class="hljs-keyword">@extend</span> .default-margin;
-	<span class="hljs-keyword">@extend</span> .add-quote-mark;
-	<span class="hljs-keyword">@extend</span> .quote-text;
+<pre><code class="language-scss">[role="main"] blockquote {
+	@extend .default-margin;
+	@extend .add-quote-mark;
+	@extend .quote-text;
 }</code></pre>
 
 <p>最後にSassでこのデザインを継承する。理想的に書くことが出来ればワンオフになるのはこの<code>@extend</code>を使うファイル（とコンパイルされたCSS)だけ。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;main&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">blockquote</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;add-quote-mark default-margin quote-text&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">blockquote</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;div role="main"&gt;
+	&lt;blockquote class="add-quote-mark default-margin quote-text"&gt;...&lt;/blockquote&gt;
+&lt;/div&gt;</code></pre>
 
 <p>CSSフレームワークやOOCSS的なアプローチだとHTMLでこうする必要がある。CSSをよく知らないバックエンド開発者に「<code>add-quote-mark</code>と<code>default-margin</code>、<code>quote-text</code>を<code>role="main"</code>配下の<code>blockquote</code>要素のクラスに追加してください」とか「デザイン変えるためにテンプレートを更新したけどGitわからないので取り込んでください」とかお願いしているところを想像して欲しい。</p>
 

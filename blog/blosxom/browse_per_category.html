@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="この機能は実現できたっぽいです。多分（ぉ。paginateプラグインのstartを、" property="twitter:description">
@@ -35,20 +36,20 @@
 				</header>
 
 				<p>この機能は実現できたっぽいです。多分（ぉ。paginateプラグインの<code>start</code>を、</p>
-<pre><code class="highlight language-perl"><span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
-	$path_info = <span class="hljs-string">&quot;$blosxom::datadir/$blosxom::path_info&quot;</span>;
-	<span class="hljs-keyword">if</span> (-d $path_info <span class="hljs-keyword">and</span> $blosxom::path_info <span class="hljs-keyword">ne</span> <span class="hljs-string">&#x27;&#x27;</span>) {
-		<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+<pre><code class="language-perl">sub start {
+	$path_info = &quot;$blosxom::datadir/$blosxom::path_info&quot;;
+	if (-d $path_info and $blosxom::path_info ne &apos;&apos;) {
+		return 1;
 	}
-	<span class="hljs-keyword">if</span> ($ENV{<span class="hljs-string">&#x27;PATH_INFO&#x27;</span>} <span class="hljs-keyword">ne</span> <span class="hljs-string">&#x27;&#x27;</span>) {
-		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	if ($ENV{&apos;PATH_INFO&apos;} ne &apos;&apos;) {
+		return 0;
 	}
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }</code></pre>
 <p>として、普通に閲覧またはカテゴリ単位での閲覧の場合のみpaginateプラグインをロードするっぽいように（ちと、怪しげ）して、<code>filter</code>の中で、</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">keys</span> %$files_ref) {
-	<span class="hljs-keyword">if</span> ($blosxom::path_info <span class="hljs-keyword">ne</span> <span class="hljs-string">&#x27;&#x27;</span> <span class="hljs-keyword">and</span> $_ !~ m!/$blosxom::path_info!) {
-		<span class="hljs-keyword">delete</span> $files_ref-&gt;{$_};
+<pre><code class="language-perl">foreach (keys %$files_ref) {
+	if ($blosxom::path_info ne &apos;&apos; and $_ !~ m!/$blosxom::path_info!) {
+		delete $files_ref-&gt;{$_};
 	}
 }</code></pre>
 <p>とすることによって、当該カテゴリ以外のエントリを出力対象ファイルから外してやってます。</p>

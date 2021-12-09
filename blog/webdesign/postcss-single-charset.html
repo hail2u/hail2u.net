@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。" property="twitter:description">
@@ -38,14 +39,14 @@
 
 <p>PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの<code>use()</code>でプロセッサーとして読み込んでやる必要がある。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
-<span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;postcss&#x27;</span>);
+<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
+var postcss = require(&apos;postcss&apos;);
 
-<span class="hljs-keyword">var</span> input = fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">&#x27;input.css&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>);
-<span class="hljs-keyword">var</span> output = <span class="hljs-title function_">postcss</span>().<span class="hljs-title function_">use</span>(
-	<span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;postcss-single-charset&#x27;</span>)()
-).<span class="hljs-title function_">process</span>(input).<span class="hljs-property">css</span>;
-fs.<span class="hljs-title function_">writeFileSync</span>(<span class="hljs-string">&#x27;output.css&#x27;</span>, output);</code></pre>
+var input = fs.readFileSync(&apos;input.css&apos;, &apos;utf8&apos;);
+var output = postcss().use(
+	require(&apos;postcss-single-charset&apos;)()
+).process(input).css;
+fs.writeFileSync(&apos;output.css&apos;, output);</code></pre>
 
 <p>PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には<a href="https://github.com/nDmitry/grunt-postcss">grunt-postcss</a>や<a href="https://github.com/w0rm/gulp-postcss">gulp-postcss</a>経由で使うことになるだろう。</p>
 

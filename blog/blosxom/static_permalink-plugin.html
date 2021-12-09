@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="重い腰を上げてpermalinkを静的なHTMLとして吐いておくプラグインを書いて使い始めた。誰かしらがアクセスした時にHTMLが作られてなかったら作成するというシンプルなもの。振り分けはmod_rewriteに丸投げ。今までもRSSだけはそうしていたので、それをpermalinkでも使えるように深い階層でも大丈夫な感じに書き足そうと思ったけど、結局一から書き直した。これでいつでもBlosxomを捨てる用意が整った。" property="twitter:description">
@@ -48,13 +49,13 @@
 
 <p>ルーティングを担当するmod_rewriteの設定ではディレクトリの存在チェックを外しておくと、カテゴリごとのページや年月日ごとのページは動的なままで提供できて楽。ただしスラッシュ補完との兼ね合いにより、Blosxomの設置ディレクトリへのスラッシュなしアクセスで400 Bad Requestになる（ことがある）ので、カテゴリごとのページは捨てるか<code>-d</code>でチェックして明示的にBlosxomに渡してやる必要がある。</p>
 
-<pre><code class="highlight language-apache"><span class="hljs-section">&lt;IfModule mod_rewrite.c&gt;</span>
-	<span class="hljs-attribute">RewriteEngine</span> <span class="hljs-literal">On</span>
+<pre><code class="language-apache">&lt;IfModule mod_rewrite.c&gt;
+	RewriteEngine On
 
-	<span class="hljs-attribute">RewriteCond</span> <span class="hljs-variable">%{REQUEST_FILENAME}</span> !-f
-	<span class="hljs-comment"># RewriteCond %{REQUEST_FILENAME} !-d</span>
-	<span class="hljs-attribute">RewriteRule</span> ^(.*)$ blosxom.cgi/$<span class="hljs-number">1</span><span class="hljs-meta"> [L,QSA]</span>
-<span class="hljs-section">&lt;/IfModule&gt;</span></code></pre>
+	RewriteCond %{REQUEST_FILENAME} !-f
+	# RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ blosxom.cgi/$1 [L,QSA]
+&lt;/IfModule&gt;</code></pre>
 
 <p>記事を更新した後に作り直したい時はリモートのファイルを好きな方法で消し、アクセスされて作り直されるのを待つという丸投げ運用を想定してる。mod_rewriteでクエリ文字列は低コストで調べられるので、クエリ文字列で<code>password</code>パラメーターがあったら作り直すとかでも良さそう。このあたりで迷ってるのと、<code>rel=&quot;next&quot;</code>どうするかなぁ……というところで詰まっているので、まだ<a href="https://github.com/blosxom-fanatics/plugins">墓場</a>には置かない。</p>
 

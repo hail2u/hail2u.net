@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="間違えて同じルールセットに::-moz-selectionと::selectionを並べて書いていた。これ不明なセレクターになってエラーになる……と思って直したんだけど、Safari 5やChrome 17(と19)ではエラーにならず素通しされてた（Firefox 11やInternet Explorer 9、Opera 11ではエラーになって無視される）。どうもこれだけ（か擬似要素すべて）が特別扱いされているかバグっているのかのどちらかな感じ。" property="twitter:description">
@@ -38,20 +39,20 @@
 
 <p>Demo: <a href="/test/392.html"><code>::-moz-selection</code> and <code>::selection</code> on WebKit</a></p>
 
-<pre><code class="highlight language-css">::-moz-selection,
+<pre><code class="language-css">::-moz-selection,
 ::selection {
-	<span class="hljs-attribute">color</span>:  <span class="hljs-number">#000</span>;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#ff0</span>;
+	color:  #000;
+	background-color: #ff0;
 }</code></pre>
 
 <p>みたいにベンダー拡張プリフィックス付きの<code>::selection</code>セレクターをまとめて書いてもSafari 5とChrome 17は通ってしまう。他のブラウザーは<code>::-moz-selection</code>か<code>::selection</code>のどちらかが不明なセレクターのため、エラーとしてルールセット全体が無視される。</p>
 
 <p><code>::selection</code>とかそもそもWeb標準に今はないじゃん……とかそういう話や問題ではなくて（まぁないんだけど）、不明なセレクターの解釈がCSS2.1の仕様にそぐわないものになっているという話。Developer Toolsで覗くとちょっと変な感じになっていた。</p>
 
-<pre><code class="highlight language-css">*::-moz-selection,
+<pre><code class="language-css">*::-moz-selection,
 ::selection {
-	<span class="hljs-attribute">color</span>:  <span class="hljs-number">#fff</span>;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#589</span>;
+	color:  #fff;
+	background-color: #589;
 }</code></pre>
 
 <p>全称セレクターのアスタリスク（<code>*</code>）が補完されて解釈されていて、ココらへんにバグか特別扱いがありそう。試しにアスタリスクを消して選択してみようとしたらクラッシュ再現率100%でひどい……。もうちょっと詰めたらChromiumのIssuesに書きたいけど、仕様でこうこうこうだから今の便利な状態を修正して不便にしろみたいなめんどくさい人の感じになりそうで躊躇う……。</p>

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="開発の止まったConsole2の後継っぽいConsoleZを試している。シェルでずっと作業するわけじゃないのでckw-modで不満はなくて、Console2には乗り換える意味はなさそうだったんだけど、ConsoleZではウィンドウの再利用が行え、他のアプリケーションから新しいタブを開くということが可能になったのでちょっと良い。" property="twitter:description">
@@ -46,35 +47,35 @@
 
 <p>Vimから簡単に呼べるように設定も書いた。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">if</span> <span class="hljs-built_in">has</span>(<span class="hljs-string">&#x27;win32&#x27;</span>)
-	<span class="hljs-comment">&quot; Reuse existing ConsoleZ instance</span>
-	<span class="hljs-keyword">function!</span> <span class="hljs-title">s</span>:ReuseConsoleZ<span class="hljs-params">(...)</span>
-		<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = &amp;<span class="hljs-keyword">shell</span>
+<pre><code class="language-vim">if has(&apos;win32&apos;)
+	&quot; Reuse existing ConsoleZ instance
+	function! s:ReuseConsoleZ(...)
+		let tab = &amp;shell
 
-		<span class="hljs-keyword">if</span> <span class="hljs-variable">a:0</span> != <span class="hljs-number">0</span>
-			<span class="hljs-keyword">let</span> <span class="hljs-keyword">tab</span> = <span class="hljs-variable">a:1</span>
-		<span class="hljs-keyword">endif</span>
+		if a:0 != 0
+			let tab = a:1
+		endif
 
-		<span class="hljs-keyword">execute</span> <span class="hljs-string">&#x27;silent !start Console.exe -reuse -t &#x27;</span> . <span class="hljs-keyword">tab</span> .<span class="hljs-string">&#x27; -d &#x27;</span> . <span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:h&#x27;</span>)
-	<span class="hljs-keyword">endfunction</span>
+		execute &apos;silent !start Console.exe -reuse -t &apos; . tab .&apos; -d &apos; . expand(&apos;%:p:h&apos;)
+	endfunction
 
-	<span class="hljs-comment">&quot; Complete ConsoleZ tab</span>
-	<span class="hljs-keyword">function!</span> <span class="hljs-title">s</span>:ConsoleZTabComplete<span class="hljs-params">(A, L, P)</span>
-		<span class="hljs-keyword">let</span> commands = [<span class="hljs-string">&#x27;cmd&#x27;</span>, <span class="hljs-string">&#x27;bash&#x27;</span>, <span class="hljs-string">&#x27;ps&#x27;</span>]
-		<span class="hljs-keyword">let</span> matches = []
+	&quot; Complete ConsoleZ tab
+	function! s:ConsoleZTabComplete(A, L, P)
+		let commands = [&apos;cmd&apos;, &apos;bash&apos;, &apos;ps&apos;]
+		let matches = []
 
-		<span class="hljs-keyword">for</span> cmd in commands
-			<span class="hljs-keyword">if</span> cmd =~? <span class="hljs-string">&#x27;^&#x27;</span> . <span class="hljs-variable">a:A</span>
-				<span class="hljs-keyword">call</span> <span class="hljs-built_in">add</span>(matches, cmd)
-			<span class="hljs-keyword">endif</span>
-		<span class="hljs-keyword">endfor</span>
+		for cmd in commands
+			if cmd =~? &apos;^&apos; . a:A
+				call add(matches, cmd)
+			endif
+		endfor
 
-		<span class="hljs-keyword">return</span> matches
-	<span class="hljs-keyword">endfunction</span>
+		return matches
+	endfunction
 
-	<span class="hljs-comment">&quot; ConsoleZ: Open ConsoleZ</span>
-	command! -nargs=* -<span class="hljs-built_in">complete</span>=customlist,<span class="hljs-symbol">&lt;SID&gt;</span>ConsoleZTabComplete ConsoleZ <span class="hljs-keyword">call</span> <span class="hljs-symbol">&lt;SID&gt;</span>ReuseConsoleZ(<span class="hljs-symbol">&lt;f-args&gt;</span>)
-<span class="hljs-keyword">endif</span></code></pre>
+	&quot; ConsoleZ: Open ConsoleZ
+	command! -nargs=* -complete=customlist,&lt;SID&gt;ConsoleZTabComplete ConsoleZ call &lt;SID&gt;ReuseConsoleZ(&lt;f-args&gt;)
+endif</code></pre>
 
 <p>デフォルトはVimのシェル設定から引っ張るようにして、追加でタブ設定を補完できるようにしておき、たまに必要になるPowerShellを起動しやすくしたりとかそんな感じ。あらかじめ<code>-reuse</code>オプションでConsoleZを立ち上げておく必要はある。</p>
 

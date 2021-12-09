@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="コールバック関数を指定する形のJSONPへforループなどで複数回リクエストする場合、コールバック関数の実行される順はforループで回した順と一致するとは限らない（Opera除く）。そのため何番目にリクエストした結果に実行されたコールバック関数なのかといった処理状況をコールバック関数内で知ることが面倒だったりする（不可能というわけではない、多分）。それをあえて同期リクエストにすることでどうにかしてみようとかいう話。" property="twitter:description">
@@ -40,39 +41,39 @@
 
 <p>つまり、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> urls = [
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/cho45&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/drawnboy&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/gorou&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/hail2u&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/miyagawa&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/nagayama&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/typester&#x27;</span>,
-	<span class="hljs-string">&#x27;http://del.icio.us/feeds/json/yoko&#x27;</span>
+<pre><code class="language-js">var urls = [
+	&apos;http://del.icio.us/feeds/json/cho45&apos;,
+	&apos;http://del.icio.us/feeds/json/drawnboy&apos;,
+	&apos;http://del.icio.us/feeds/json/gorou&apos;,
+	&apos;http://del.icio.us/feeds/json/hail2u&apos;,
+	&apos;http://del.icio.us/feeds/json/miyagawa&apos;,
+	&apos;http://del.icio.us/feeds/json/nagayama&apos;,
+	&apos;http://del.icio.us/feeds/json/typester&apos;,
+	&apos;http://del.icio.us/feeds/json/yoko&apos;
 ];</code></pre>
 
 <p>という<a href="http://del.icio.us/">del.icio.us</a>で提供されているJSONフィードのURLのリストへ順番にリクエストし、その順番通りにコールバック関数を実行させるには、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-title function_">addScript</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">&#x27;?callback=diplayPosts&#x27;</span>);
+<pre><code class="language-js">addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">addScript</span>(<span class="hljs-params">url</span>) {
-	<span class="hljs-keyword">var</span> script = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;script&#x27;</span>);
-	script.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&#x27;type&#x27;</span>, <span class="hljs-string">&#x27;text/javascript&#x27;</span>);
-	script.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&#x27;src&#x27;</span>, url);
-	script.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&#x27;charset&#x27;</span>, <span class="hljs-string">&#x27;UTF-8&#x27;</span>);
-	<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&#x27;head&#x27;</span>).<span class="hljs-title function_">item</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">appendChild</span>(script);
+function addScript(url) {
+	var script = document.createElement(&apos;script&apos;);
+	script.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
+	script.setAttribute(&apos;src&apos;, url);
+	script.setAttribute(&apos;charset&apos;, &apos;UTF-8&apos;);
+	document.getElementsByTagName(&apos;head&apos;).item(0).appendChild(script);
 }
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">diplayPosts</span>(<span class="hljs-params">posts</span>) {
-	<span class="hljs-comment">// JSONフィードに含まれるブックマークのJSONデータに対する処理色々</span>
+function diplayPosts(posts) {
+	// JSONフィードに含まれるブックマークのJSONデータに対する処理色々
 
-	<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>loadNext()<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span>;
+	<em>loadNext()</em>;
 }
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">loadNext</span>(<span class="hljs-params"></span>) {
-	<span class="hljs-keyword">if</span> (urls.<span class="hljs-property">length</span> &lt;= <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>;
-	urls.<span class="hljs-title function_">shift</span>();
-	<span class="hljs-title function_">addScript</span>(<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>urls[0]<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span></span> + <span class="hljs-string">&#x27;?callback=diplayPosts&#x27;</span>);
+function loadNext() {
+	if (urls.length &lt;= 1) return;
+	urls.shift();
+	addScript(<em>urls[0]</em> + &apos;?callback=diplayPosts&apos;);
 }</code></pre>
 
 <p>という感じに、コールバック関数（<code>displayPosts()</code>）内で次に進む関数（<code>loadNext()</code>）を呼び出すように<a href="/test/082.html">実装する</a>ということになる。こうするとコールバック関数内で<code>urls[0]</code>を参照すれば、どのURLへのリクエストした結果として呼び出されたコールバック関数なのかすぐにわかる。単純に<code>for</code>ループで回した場合は、ブックマークのデータを処理するコールバック関数が呼び出される順番が狂う場合がある（ネットワーク状態に依存）し、コールバック関数内からは誰のブックマークのJSONデータを処理しているのかを知る手段がなくなってしまう。</p>

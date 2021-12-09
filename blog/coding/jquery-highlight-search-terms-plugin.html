@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う（そこまで考えてるなら実装しろ）。" property="twitter:description">
@@ -38,19 +39,19 @@
 
 <p>使い方は多くのjQueryプラグインと同じで、</p>
 
-<pre><code class="highlight language-js">$(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title function_">highlightSearchTerms</span>();</code></pre>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms();</code></pre>
 
 <p>と検索語のハイライトを行いたい要素からつなげて使う。プラグイン側でインライン・スタイルを付加したりはしないので、デフォルトの<code>em.highlight</code>に対してスタイル指定をあらかじめしておく必要がある。</p>
 
 <p><code>highlightSearchTerms()</code>にはオプションとして、</p>
 
-<pre><code class="highlight language-js">
-$(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title function_">highlightSearchTerms</span>({
-	<span class="hljs-attr">className</span>: <span class="hljs-string">&quot;search-keyword&quot;</span>,
-	<span class="hljs-attr">referrerPatterns</span>: [
-		<span class="hljs-string">&quot;^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$&quot;</span>
+<pre><code class="language-js">
+$(&quot;body&quot;).highlightSearchTerms({
+	className: &quot;search-keyword&quot;,
+	referrerPatterns: [
+		&quot;^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$&quot;
 	],
-	<span class="hljs-attr">unsafeChars</span>: <span class="hljs-string">&quot;[!-*,-/:-@[-`{-~]&quot;</span>
+	unsafeChars: &quot;[!-*,-/:-@[-`{-~]&quot;
 });</code></pre>
 
 <p>このように指定することができる。</p>
@@ -59,9 +60,9 @@ $(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title fun
 
 <p><code>referrerPatters</code>はリファラを評価する正規表現のパターン。配列なので複数指定可能。デフォルトでGoogle(comとco.jp)・Yahoo!(comとco.jp)・Bingの計5つが設定されており、オプションで指定されたものとマージされる。オプションで指定したものが先に評価され、マッチした時点で評価のループを抜けるので、デフォルトのパターンよりも優先されることになる（上書きではないが、近い挙動になる）。例えば自分のサイト内検索のリファラを拾うようにするためには、</p>
 
-<pre><code class="highlight language-js">$(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title function_">highlightSearchTerms</span>({
-	<span class="hljs-attr">referrerPatterns</span>: [
-		<span class="hljs-string">&quot;^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$&quot;</span>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+	referrerPatterns: [
+		&quot;^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$&quot;
 	]
 });</code></pre>
 
@@ -71,8 +72,8 @@ $(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title fun
 
 <p>また、デバッグ用に<code>referrer</code>というオプションがある。</p>
 
-<pre><code class="highlight language-js">$(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title function_">highlightSearchTerms</span>({
-	<span class="hljs-attr">referrer</span>: <span class="hljs-string">&quot;http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet&quot;</span>
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+	referrer: &quot;http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet&quot;
 });</code></pre>
 
 <p>とすることによって<code>document.referrer</code>の代わりに<code>referrer</code>で指定されたURL(URLじゃなくても通っちゃうけど）が検索語の取り出し元になる。なので、色々なリファラを想定して試すことができる。</p>
@@ -81,7 +82,7 @@ $(<span class="hljs-string">&quot;body&quot;</span>).<span class="hljs-title fun
 
 <p>内容のコードはあまり変わっていない。変えたところは<code>$(&quot;*&quot;).not(&quot;iframe&quot;)</code>というような感じで書いていた部分を<code>find()</code>と<code>:not()</code>セレクタを使うようにしたことくらい。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>(<span class="hljs-string">&quot;:not(iframe)&quot;</span>).<span class="hljs-title function_">contents</span>().<span class="hljs-title function_">each</span>();</code></pre>
+<pre><code class="language-js">this.find(&quot;:not(iframe)&quot;).contents().each();</code></pre>
 
 <p>という感じになっている。jQueryのここらへんの柔軟性はすごくて、XPathなんか目じゃないね（おおげさ）。</p>
 

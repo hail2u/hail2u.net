@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Gruntのタスク内から今実行されているタスクの名前とターゲットは、それぞれthis.nameとthis.targetで取得できる。しかしエイリアス・タスク経由での実行の場合、その名前やターゲットを簡単に取得する方法は用意されてない。どうやっても拾えないかというとそうでもなく、grunt.cli.tasksにコマンドラインで実際に指定されたタスク群が配列として格納されるので、それから拾えば良い。" property="twitter:description">
@@ -42,24 +43,24 @@
 
 <p>この場合<code>grunt.cli.tasks</code>は以下のような配列になる。</p>
 
-<pre><code class="highlight language-javascript">[
-	<span class="hljs-string">&#x27;multi:foo&#x27;</span>,
-	<span class="hljs-string">&#x27;alias:bar&#x27;</span>
+<pre><code class="language-javascript">[
+	&apos;multi:foo&apos;,
+	&apos;alias:bar&apos;
 ];</code></pre>
 
 <p>この<code>grunt.cli.tasks</code>にはコマンドライン・オプションで指定したタスクがそのままの順序で格納される。そのためエイリアス・タスクの名前やターゲットへアクセスできるというわけだ。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-meta">&#x27;use strict&#x27;</span>;
+<pre><code class="language-javascript">&apos;use strict&apos;;
 
-<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) {
-	grunt.<span class="hljs-title function_">registerMultiTask</span>(
-		<span class="hljs-string">&#x27;example&#x27;</span>,
-		<span class="hljs-string">&#x27;Example task.&#x27;</span>,
-		<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-			<span class="hljs-keyword">if</span> (grunt.<span class="hljs-property">cli</span>.<span class="hljs-property">tasks</span>.<span class="hljs-title function_">some</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">task</span>) {
-				<span class="hljs-keyword">return</span> task === <span class="hljs-string">&#x27;alias:bar&#x27;</span>;
+module.exports = function (grunt) {
+	grunt.registerMultiTask(
+		&apos;example&apos;,
+		&apos;Example task.&apos;,
+		function () {
+			if (grunt.cli.tasks.some(function (task) {
+				return task === &apos;alias:bar&apos;;
 			})) {
-				<span class="hljs-comment">// Do task.</span>
+				// Do task.
 			}
 		}
 	);</code></pre>

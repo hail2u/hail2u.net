@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="リファラから拾ったChepooka::cssでfloatの振る舞いにトラブってる感じだったので、はてなダイアリーでもうちのサイトみたいなのできないもんかと移植してみました。こちらのエントリの内容は気にしてはいけません。" property="twitter:description">
@@ -38,27 +39,27 @@
 <p>あるボックスの内容物が<code>float</code>されているボックスのみの場合、そのボックスの枠線や背景色、背景画像は内容物の高さに合わせて自動的に高さが調節されないという<code>float</code>によるレイアウトでまず間違いなく遭遇するトラブルをどうやって解決するかということになります。</p>
 <p>うちのサイトでは<code>html</code>と<code>body</code>でそれぞれ背景画像を指定することによって、2カラムのベースを作成し、ヘッダやコンテンツの背景画像をその上に重ねることによって、上記トラブルを解決せずに擬似的に実現しています。が、はてなダイアリーでは<code>html</code>に背景画像を仕込むのは不可能らしいので別のアプローチが必要になります。</p>
 <p>そこで、<a href="http://www.quirksmode.org/css/clearing.html" title="CSS - Clearing floats">QuirksMode - CSS - Clearing floats</a>で詳しく解説されている、<code>overflow</code>を利用したテクニックを利用してみました。このテクニックは、内容物が<code>float</code>されているボックスのみのボックスに、</p>
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">div</span><span class="hljs-selector-id">#container</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">overflow</span>: hidden;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f0f</span>;
+<pre><code class="language-css">div#container {
+	width: 100%;
+	overflow: hidden;
+	background-color: #f0f;
 }</code></pre>
 <p>と指定すると、内容物の高さに合わせてきちんと背景色で塗りつぶされるというモノ。</p>
 <p>はてなダイアリーでは、</p>
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
-		<span class="hljs-comment">&lt;!-- はてなのヘッダ --&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>ダイアリーのタイトル<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;hatena-body&quot;</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;main&quot;</span>&gt;</span>
-			<span class="hljs-comment">&lt;!-- 本文 --&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;sidebar&quot;</span>&gt;</span>
-			<span class="hljs-comment">&lt;!-- サイドバー --&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;body&gt;
+	&lt;table&gt;
+		&lt;!-- はてなのヘッダ --&gt;
+	&lt;/table&gt;
+	&lt;h1&gt;ダイアリーのタイトル&lt;/h1&gt;
+	&lt;div class=&quot;hatena-body&quot;&gt;
+		&lt;div class=&quot;main&quot;&gt;
+			&lt;!-- 本文 --&gt;
+		&lt;/div&gt;
+		&lt;div class=&quot;sidebar&quot;&gt;
+			&lt;!-- サイドバー --&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/body&gt;</code></pre>
 <p>という構成になっているので、<code>div.hatena-body</code>に上記のような指定をしてやれば、本文とサイドバーの長さに関わらずキレイに下まで背景色や背景画像で埋めることが出来ます。</p>
 <p>上記の僕のはてなダイアリーでは、本文があまりにも短すぎたりとか何とか色々あって、微妙なところで不具合があったりしますが、ベース的にはあんな感じでいけると思います。もうこれ以上はやる気はないんですが。</p>
 			</article>

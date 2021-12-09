@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="text-overflow: ellipsisのためにtitle属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。@ykztsにも書いてもらったのでそちらもどうぞ。" property="twitter:description">
@@ -36,22 +37,22 @@
 
 				<p><code>text-overflow: ellipsis</code>のために<code>title</code>属性を仕込むのもバカバカしい。またそういった定義がある要素のクラス名を決め打ちで動的に仕込んでいくのもまたバカバカしい。ということでCSS定義を使ってHTML要素群を取得するような関数を書くことにした。<a href="https://gist.github.com/ykzts/564afcc4e8c9a700cc54">@ykztsにも書いてもらった</a>のでそちらもどうぞ。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-comment">// var elms = getElementsByDeclaration(&quot;text-overflow&quot;, &quot;ellipsis&quot;);</span>
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">getElementsByDeclaration</span>(<span class="hljs-params">property, value</span>) {
-	<span class="hljs-keyword">var</span> elements;
-	<span class="hljs-keyword">var</span> i;
-	<span class="hljs-keyword">var</span> l;
-	<span class="hljs-keyword">var</span> nodes = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&quot;*&quot;</span>);
+<pre><code class="language-javascript">// var elms = getElementsByDeclaration("text-overflow", "ellipsis");
+function getElementsByDeclaration(property, value) {
+	var elements;
+	var i;
+	var l;
+	var nodes = document.querySelectorAll(&quot;*&quot;);
 
-	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, l = nodes.<span class="hljs-property">length</span>; i &lt; l; i++) {
-		<span class="hljs-keyword">var</span> node = nodes[i];
+	for (i = 0, l = nodes.length; i &lt; l; i++) {
+		var node = nodes[i];
 
-		<span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">getComputedStyle</span>(node)[property] === value) {
-			elements.<span class="hljs-title function_">push</span>(node);
+		if (window.getComputedStyle(node)[property] === value) {
+			elements.push(node);
 		}
 	}
 
-	<span class="hljs-keyword">return</span> elements;
+	return elements;
 }</code></pre>
 
 <p>実際に使うことはなさそうだ。理由は簡単で、ループして列挙した要素群をもう一度ループしなくてはならないからだ。普通に書いた方がかなり速くなることだろう。また計算済みスタイルの値に依存するので、特定の文字列を値としてとるプロパティーしか探せない。</p>

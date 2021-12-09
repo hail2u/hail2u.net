@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="SassをSCSSで書いていてはまった落とし穴についてのメモ。" property="twitter:description">
@@ -39,25 +40,25 @@
 <section>
 <h2>プロパティのネスト</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-attribute">font</span> {
-		family: <span class="hljs-string">&quot;Gabriola&quot;</span>, sans-serif;
-		size: <span class="hljs-number">400%</span>;
+<pre><code class="language-scss">h1 {
+	font {
+		family: &quot;Gabriola&quot;, sans-serif;
+		size: 400%;
 	}
 }</code></pre>
 
 <p>とうっかり書いてしまうと、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">h1</span> <span class="hljs-attribute">font</span> {
-	family: <span class="hljs-string">&quot;Gabriola&quot;</span>, sans-serif;
-	size: <span class="hljs-number">400%</span>; }</code></pre>
+<pre><code class="language-css">h1 font {
+	family: &quot;Gabriola&quot;, sans-serif;
+	size: 400%; }</code></pre>
 
 <p>となる。プロパティのネストを使う時はコロンが必要で、他の部分と記述が違うので注意が必要。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-attribute">font</span>&lt;<span class="hljs-selector-tag">em</span>&gt;:&lt;/em&gt; {
-		family: <span class="hljs-string">&quot;Gabriola&quot;</span>, sans-serif;
-		size: <span class="hljs-number">400%</span>;
+<pre><code class="language-scss">h1 {
+	font<em>:</em> {
+		family: &quot;Gabriola&quot;, sans-serif;
+		size: 400%;
 	}
 }</code></pre>
 
@@ -67,17 +68,17 @@
 <section>
 <h2>負の値の計算</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$gutter</span>: <span class="hljs-number">20px</span>;
+<pre><code class="language-scss">$gutter: 20px;
 
-<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> -<span class="hljs-variable">$gutter</span>;</code></pre>
+margin: 0 0 0 -$gutter;</code></pre>
 
 <p>だと、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> -<span class="hljs-number">20px</span>;</code></pre>
+<pre><code class="language-css">margin: 0 0 -20px;</code></pre>
 
 <p>にコンパイルされるので意図したとおりにならない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> (- <span class="hljs-variable">$gutter</span>);</code></pre>
+<pre><code class="language-scss">margin: 0 0 0 (- $gutter);</code></pre>
 
 <p>などと括弧でくくる。計算式を書く場合は必ず括弧で括ると習慣づけた方が安全そう（必要ない場合でも）。</p>
 </section>
@@ -85,18 +86,18 @@
 <section>
 <h2>負の値の計算 #2</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$column</span>: <span class="hljs-number">60px</span>;
-<span class="hljs-variable">$gutter</span>: <span class="hljs-number">20px</span>;
+<pre><code class="language-scss">$column: 60px;
+$gutter: 20px;
 
-<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> (- <span class="hljs-variable">$column</span> * <span class="hljs-number">3</span> + <span class="hljs-variable">$gutter</span> * <span class="hljs-number">2</span>);</code></pre>
+margin: 0 (- $column * 3 + $gutter * 2);</code></pre>
 
 <p>などと、<em>計算結果にマイナス記号を付ける</em>というようなことはできない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> (- <span class="hljs-variable">$column</span> * <span class="hljs-number">3</span> - <span class="hljs-variable">$gutter</span> * <span class="hljs-number">2</span>);</code></pre>
+<pre><code class="language-scss">margin: 0 (- $column * 3 - $gutter * 2);</code></pre>
 
 <p>と普通に書く。計算式の括弧もネスト出来るので、</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> (- (<span class="hljs-variable">$column</span> * <span class="hljs-number">3</span> + <span class="hljs-variable">$gutter</span> * <span class="hljs-number">2</span>));</code></pre>
+<pre><code class="language-scss">margin: 0 (- ($column * 3 + $gutter * 2));</code></pre>
 
 <p>と面倒がらずにちゃんと書く方がより良いと思う。</p>
 </section>
@@ -104,12 +105,12 @@
 <section>
 <h2>ミックスインにカンマを含む文字列を引数として渡せない</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-keyword">@mixin</span> fonts(<span class="hljs-variable">$families</span>) {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-variable">$families</span>;
+<pre><code class="language-scss">@mixin fonts($families) {
+	font-family: $families;
 }
 
-<span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-keyword">@include</span> fonts(<span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif);
+h1 {
+	@include fonts(&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, sans-serif);
 }</code></pre>
 
 <p>だと、カンマが引数の区切りとして解釈されるので、</p>
@@ -118,14 +119,14 @@
 
 <p>となりコンパイルエラー。エスケープする方法がありそうだけど調べてない。基本的にCSSのプロパティの値としてカンマを使うことはあまり無いので、はまることはあまりなさそう。よくわかっていない時になんでもミックスインにしようとして作った、こういう変で役に立たないミックスインでのみはまる。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$heading</span>: <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, <span class="hljs-string">&quot;Lucida Sans&quot;</span>, sans-srif;
+<pre><code class="language-scss">$heading: &quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, &quot;Lucida Sans&quot;, sans-srif;
 
-<span class="hljs-keyword">@mixin</span> fonts(<span class="hljs-variable">$families</span>) {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-variable">$families</span>;
+@mixin fonts($families) {
+	font-family: $families;
 }
 
-<span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-keyword">@include</span> fonts(<span class="hljs-variable">$heading</span>);
+h1 {
+	@include fonts($heading);
 }</code></pre>
 
 <p>変数経由なら問題はない。</p>
@@ -134,19 +135,19 @@
 <section>
 <h2>カスケーディングを考慮したセレクタ順</h2>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-id">#nav</span> {
-	<span class="hljs-selector-tag">li</span> {
-		<span class="hljs-selector-tag">a</span> {
-			<span class="hljs-attribute">color</span>: blue;
+<pre><code class="language-scss">#nav {
+	li {
+		a {
+			color: blue;
 
-			&amp;<span class="hljs-selector-pseudo">:hover</span> {
-				<span class="hljs-attribute">color</span>: green;
+			&amp;:hover {
+				color: green;
 			}
 		}
 
-		&amp;<span class="hljs-selector-class">.active</span> {
-			<span class="hljs-selector-tag">a</span> {
-				<span class="hljs-attribute">color</span>: red;
+		&amp;.active {
+			a {
+				color: red;
 			}
 		}
 	}
@@ -154,48 +155,48 @@
 
 <p>とセレクタのネストを優先させて書くと、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: blue; }
-	<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-pseudo">:hover</span> {
-		<span class="hljs-attribute">color</span>: green; }
-<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span><span class="hljs-selector-class">.active</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: red; }</code></pre>
+<pre><code class="language-css">#nav li a {
+	color: blue; }
+	#nav li a:hover {
+		color: green; }
+#nav li.active a {
+	color: red; }</code></pre>
 
 <p>となるので、<code>#nav li.active a</code>がオンマウスで色が変わらない。<code>a</code>と<code>&amp;.active</code>を入れ替えれば、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span><span class="hljs-selector-class">.active</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: red; }
-<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: blue; }
-	<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-pseudo">:hover</span> {
-		<span class="hljs-attribute">color</span>: green; }</code></pre>
+<pre><code class="language-css">#nav li.active a {
+	color: red; }
+#nav li a {
+	color: blue; }
+	#nav li a:hover {
+		color: green; }</code></pre>
 
 <p>となるので、カスケーディングの規則に従ってちゃんと意図通りになるが、カスケーディングをきちんと理解していないと生成されるCSSがわかりづらい。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: blue; }
-<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span><span class="hljs-selector-class">.active</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: red; }
-<span class="hljs-selector-id">#nav</span> <span class="hljs-selector-tag">li</span> <span class="hljs-selector-tag">a</span><span class="hljs-selector-pseudo">:hover</span> {
-	<span class="hljs-attribute">color</span>: green; }</code></pre>
+<pre><code class="language-css">#nav li a {
+	color: blue; }
+#nav li.active a {
+	color: red; }
+#nav li a:hover {
+	color: green; }</code></pre>
 
 <p>という比較的直観的なセレクタの順序（普通にCSSを書く時のセレクタの順序）でCSSを生成するためには、</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-id">#nav</span> {
-	<span class="hljs-selector-tag">li</span> {
-		<span class="hljs-selector-tag">a</span> {
-			<span class="hljs-attribute">color</span>: blue;
+<pre><code class="language-scss">#nav {
+	li {
+		a {
+			color: blue;
 		}
 
-		&amp;<span class="hljs-selector-class">.active</span> {
-			<span class="hljs-selector-tag">a</span> {
-				<span class="hljs-attribute">color</span>: red;
+		&amp;.active {
+			a {
+				color: red;
 			}
 		}
 
-		<span class="hljs-selector-tag">a</span> {
-			&amp;<span class="hljs-selector-pseudo">:hover</span> {
-				<span class="hljs-attribute">color</span>: green;
+		a {
+			&amp;:hover {
+				color: green;
 			}
 		}
 	}
@@ -209,26 +210,26 @@
 
 <p>ミックスインにはカンマを含む引数を<em>絶対に</em>渡せないというわけではない。例えば以下の様なケースでは問題ない。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-keyword">@mixin</span> transform(<span class="hljs-variable">$func</span>) {
-	-moz-<span class="hljs-attribute">transform</span>: <span class="hljs-variable">$func</span>;
-	-webkit-<span class="hljs-attribute">transform</span>: <span class="hljs-variable">$func</span>;
-	-o-<span class="hljs-attribute">transform</span>: <span class="hljs-variable">$func</span>;
-	-ms-<span class="hljs-attribute">transform</span>: <span class="hljs-variable">$func</span>;
-	<span class="hljs-attribute">transform</span>: <span class="hljs-variable">$func</span>;
+<pre><code class="language-scss">@mixin transform($func) {
+	-moz-transform: $func;
+	-webkit-transform: $func;
+	-o-transform: $func;
+	-ms-transform: $func;
+	transform: $func;
 }
 
-<span class="hljs-selector-class">.flip-vertical</span> {
-	<span class="hljs-keyword">@include</span> transform(matrix(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span> , -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>));
+.flip-vertical {
+	@include transform(matrix(1, 0, 0 , -1, 0, 0));
 }</code></pre>
 
 <p>カンマを含んでいるが、これは正常にコンパイルされる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.flip-vertical</span> {
-	-moz-<span class="hljs-attribute">transform</span>: <span class="hljs-built_in">matrix</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-	-webkit-<span class="hljs-attribute">transform</span>: <span class="hljs-built_in">matrix</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-	-o-<span class="hljs-attribute">transform</span>: <span class="hljs-built_in">matrix</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-	-ms-<span class="hljs-attribute">transform</span>: <span class="hljs-built_in">matrix</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-	<span class="hljs-attribute">transform</span>: <span class="hljs-built_in">matrix</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>); }</code></pre>
+<pre><code class="language-css">.flip-vertical {
+	-moz-transform: matrix(1, 0, 0, -1, 0, 0);
+	-webkit-transform: matrix(1, 0, 0, -1, 0, 0);
+	-o-transform: matrix(1, 0, 0, -1, 0, 0);
+	-ms-transform: matrix(1, 0, 0, -1, 0, 0);
+	transform: matrix(1, 0, 0, -1, 0, 0); }</code></pre>
 
 <p>さっき知った！関係ないけど、この<code>matrix(1, 0, 0, -1, 0, 0)</code>は対象を上下に反転するもの。180度回転ではない。ショートカット関数は用意されてないので覚えておくと良いかも。CSSも数学できないともうダメっぽい……。せめて行列だけでもちゃんと思い出そう。</p>
 </section>

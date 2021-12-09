@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ちょっとした事情で20回ほど再帰呼び出しする関数をSassで書いたらコンパイラーが落ちた。これは単に関数にバグがあっただけだった。100回程再帰呼び出しする関数を書いてみたが、これは落ちた……と思ったらこれも間違えて無限ループさせてただけだった……。ちゃんと書いてちゃんと限界を確認した。" property="twitter:description">
@@ -38,21 +39,21 @@
 
 <p>以下のようなテスト・コードを書き、<code>$max</code>を書きかえて限界を探った。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$initial</span>: <span class="hljs-number">0</span>;
-<span class="hljs-variable">$max</span>: <span class="hljs-number">302</span>;
+<pre><code class="language-scss">$initial: 0;
+$max: 302;
 
-<span class="hljs-keyword">@function</span> loop(<span class="hljs-variable">$i</span>) {
-	<span class="hljs-variable">$i</span>: <span class="hljs-variable">$i</span> + <span class="hljs-number">1</span>;
+@function loop($i) {
+	$i: $i + 1;
 
-	<span class="hljs-keyword">@if</span> (<span class="hljs-variable">$i</span> &lt; <span class="hljs-variable">$max</span>) {
-		<span class="hljs-keyword">@return</span> loop(<span class="hljs-variable">$i</span>);
-	} <span class="hljs-keyword">@else</span> {
-		<span class="hljs-keyword">@return</span> <span class="hljs-variable">$i</span>;
+	@if ($i &lt; $max) {
+		@return loop($i);
+	} @else {
+		@return $i;
 	}
 }
 
-<span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">z-index</span>: loop(<span class="hljs-variable">$initial</span>);
+.test {
+	z-index: loop($initial);
 }</code></pre>
 
 <p>コンパイラーが落ちず、出力されるCSSで<code>z-index</code>プロパティーの値が<code>$initial + $max</code>と等しくなれば良い。手元の環境（Sass v3.4.9)では302までは問題なく通り、303にするとstack level too deep (SystemStackError)で落ちた。</p>

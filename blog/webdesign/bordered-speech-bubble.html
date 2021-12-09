@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="ミニブログの隆盛以降ウェブ上でよく見かける吹き出しをCSSで作るお話。単色のものはかなり前に書いた。今回はそれに枠線をつけてみよう！みよう！みよう！" property="twitter:description">
@@ -49,20 +50,20 @@
 
 <p><code>:before</code>擬似要素を使う。デモの3番目のサンプルのように、まず枠線と同じ色で三角形を作る。三角形は以前のエントリで書いた手法と同じで、左右の<code>border</code>を<code>transparent</code>にすることによって作る。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.speech-bubble</span><span class="hljs-selector-pseudo">:before</span> {
-	<span class="hljs-attribute">border-top-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-right-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-bottom-width</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">border-left-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-color</span>: <span class="hljs-number">#369</span> &lt;em&gt;transparent&lt;/em&gt;;
-	<span class="hljs-attribute">border-style</span>: solid;
-	<span class="hljs-attribute">display</span>: block;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">bottom</span>: &lt;em&gt;-<span class="hljs-number">16px</span>&lt;/em&gt;;
-	<span class="hljs-attribute">left</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
+<pre><code class="language-css">.speech-bubble:before {
+	border-top-width: 16px;
+	border-right-width: 16px;
+	border-bottom-width: 0;
+	border-left-width: 16px;
+	border-color: #369 <em>transparent</em>;
+	border-style: solid;
+	display: block;
+	position: absolute;
+	bottom: <em>-16px</em>;
+	left: 16px;
+	width: 0;
+	height: 0;
+	content: &quot;&quot;;
 }</code></pre>
 
 <p><code>bottom</code>に負の値を指定して下方向にずらせば下に尻尾がつくようになる。</p>
@@ -73,20 +74,20 @@
 
 <p><code>:before</code>擬似要素で作った三角と同じものを今度は<code>:after</code>擬似要素で背景色と同じ色で作る。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.speech-bubble</span><span class="hljs-selector-pseudo">:after</span> {
-	<span class="hljs-attribute">border-top-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-right-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-bottom-width</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">border-left-width</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">border-color</span>: &lt;em&gt;<span class="hljs-number">#9cf</span>&lt;/em&gt; transparent;
-	<span class="hljs-attribute">border-style</span>: solid;
-	<span class="hljs-attribute">display</span>: block;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">bottom</span>: &lt;em&gt;-<span class="hljs-number">10px</span>&lt;/em&gt;;
-	<span class="hljs-attribute">left</span>: <span class="hljs-number">16px</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
+<pre><code class="language-css">.speech-bubble:after {
+	border-top-width: 16px;
+	border-right-width: 16px;
+	border-bottom-width: 0;
+	border-left-width: 16px;
+	border-color: <em>#9cf</em> transparent;
+	border-style: solid;
+	display: block;
+	position: absolute;
+	bottom: <em>-10px</em>;
+	left: 16px;
+	width: 0;
+	height: 0;
+	content: &quot;&quot;;
 }</code></pre>
 
 <p>コードはほとんど同じ。内側をくり抜くようにするため<code>bottom</code>で指定する負の値を控えめ（<code>borderWidth - Math.sqrt(Math.pow(borderWidth, 2) * 2)</code>）にするだけ。具体的には以下の様な位置に配置する。</p>
@@ -107,53 +108,53 @@
 
 <p>長いのでSCSSのpartialを作っておいたりすると便利な気がする。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-keyword">@mixin</span> bordered-speech-bubble(<span class="hljs-variable">$background-color</span>: <span class="hljs-number">#9cf</span>, <span class="hljs-variable">$border-color</span>: <span class="hljs-number">#369</span>) {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">4px</span> solid <span class="hljs-variable">$border-color</span>;
-	<span class="hljs-attribute">position</span>: relative;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-variable">$background-color</span>;
-	-moz-<span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
-	-webkit-<span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
-	<span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
+<pre><code class="language-scss">@mixin bordered-speech-bubble($background-color: #9cf, $border-color: #369) {
+	border: 4px solid $border-color;
+	position: relative;
+	background-color: $background-color;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 
-	&amp;<span class="hljs-selector-pseudo">:before</span> {
-		<span class="hljs-attribute">border-top-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-right-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-bottom-width</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">border-left-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-color</span>: <span class="hljs-variable">$border-color</span> transparent;
-		<span class="hljs-attribute">border-style</span>: solid;
-		<span class="hljs-attribute">display</span>: block;
-		<span class="hljs-attribute">position</span>: absolute;
-		<span class="hljs-attribute">bottom</span>: -<span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">left</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">width</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">height</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
+	&amp;:before {
+		border-top-width: 16px;
+		border-right-width: 16px;
+		border-bottom-width: 0;
+		border-left-width: 16px;
+		border-color: $border-color transparent;
+		border-style: solid;
+		display: block;
+		position: absolute;
+		bottom: -16px;
+		left: 16px;
+		width: 0;
+		height: 0;
+		content: &quot;&quot;;
 	}
 
-	&amp;<span class="hljs-selector-pseudo">:after</span> {
-		<span class="hljs-attribute">border-top-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-right-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-bottom-width</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">border-left-width</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">border-color</span>: <span class="hljs-variable">$background-color</span> transparent;
-		<span class="hljs-attribute">border-style</span>: solid;
-		<span class="hljs-attribute">display</span>: block;
-		<span class="hljs-attribute">position</span>: absolute;
-		<span class="hljs-attribute">bottom</span>: -<span class="hljs-number">10px</span>;
-		<span class="hljs-attribute">left</span>: <span class="hljs-number">16px</span>;
-		<span class="hljs-attribute">width</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">height</span>: <span class="hljs-number">0</span>;
-		<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
+	&amp;:after {
+		border-top-width: 16px;
+		border-right-width: 16px;
+		border-bottom-width: 0;
+		border-left-width: 16px;
+		border-color: $background-color transparent;
+		border-style: solid;
+		display: block;
+		position: absolute;
+		bottom: -10px;
+		left: 16px;
+		width: 0;
+		height: 0;
+		content: &quot;&quot;;
 	}
 }</code></pre>
 
 <p>というミックスインを含んだSCSSファイルを<code>_bordered-speech-bubble.scss</code>という名前で作っておけば、</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;bordered-speech-bubble&quot;</span>;
+<pre><code class="language-scss">@import &quot;bordered-speech-bubble&quot;;
 
-<span class="hljs-selector-class">.speech-buble</span> {
-	<span class="hljs-keyword">@include</span> bordered-speech-bubble(<span class="hljs-number">#9cf</span>, <span class="hljs-number">#369</span>);
+.speech-buble {
+	@include bordered-speech-bubble(#9cf, #369);
 }</code></pre>
 
 <p>と書くだけで使える。大抵作っても使わないんですけども！</p>

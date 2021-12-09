@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" property="twitter:description">
@@ -41,8 +42,8 @@
 
 <p>tidy.vimが用意されているので、<a href="http://tidy.sourceforge.net/">HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">compiler</span> tidy
-<span class="hljs-keyword">autocmd</span> FileType html :<span class="hljs-keyword">setlocal</span> makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \<span class="hljs-string">&quot;%\&quot;</span></code></pre>
+<pre><code class="language-vim">autocmd FileType html :compiler tidy
+autocmd FileType html :setlocal makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \&quot;%\&quot;</code></pre>
 
 <p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</p>
 </section>
@@ -83,24 +84,24 @@
 
 <p>以下のPerlスクリプトをパスの通った場所に置いておく。</p>
 
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/bin/perl</span>
+<pre><code class="language-perl">#!/usr/bin/perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> warnings;
+use strict;
+use warnings;
 
-<span class="hljs-keyword">use</span> HTML::Entities;
+use HTML::Entities;
 
-<span class="hljs-keyword">print</span> encode_entities(<span class="hljs-keyword">join</span>(<span class="hljs-string">&#x27;&#x27;</span>, &lt;STDIN&gt;), <span class="hljs-string">&#x27;&amp;&lt;&gt;&quot;\&#x27;&#x27;</span>);</code></pre>
+print encode_entities(join(&apos;&apos;, &lt;STDIN&gt;), &apos;&amp;&lt;&gt;&quot;\&apos;&apos;);</code></pre>
 
 <p>その上でコマンドを作成。</p>
 
-<pre><code class="highlight language-vim">command! -<span class="hljs-built_in">range</span> EncodeEntities :<span class="hljs-string">&#x27;&lt;,&#x27;</span>&gt;!perl -S encode-entities.pl</code></pre>
+<pre><code class="language-vim">command! -range EncodeEntities :&apos;&lt;,&apos;&gt;!perl -S encode-entities.pl</code></pre>
 </section>
 
 <section>
 <h2>W3CDTFで日付と時刻の挿入</h2>
 
-<pre><code class="highlight language-vim">command! InsertDateTime :<span class="hljs-keyword">execute</span> <span class="hljs-string">&quot;normal! i&quot;</span>.<span class="hljs-built_in">strftime</span>(<span class="hljs-string">&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;</span>)</code></pre>
+<pre><code class="language-vim">command! InsertDateTime :execute &quot;normal! i&quot;.strftime(&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;)</code></pre>
 
 <p>必要な人は少ないだろうけど。</p>
 </section>
@@ -110,7 +111,7 @@
 
 <p><a href="http://www.vim.org/scripts/script.php?script_id=1577">css.vim</a>をダウンロードしてインストールする。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">autocmd</span> FileType css :<span class="hljs-keyword">compiler</span> css</code></pre>
+<pre><code class="language-vim">autocmd FileType css :compiler css</code></pre>
 
 <p>同梱のPerlスクリプト（validate_css)はパスの通ったディレクトリにコピーする必要がある。</p>
 </section>
@@ -120,30 +121,30 @@
 
 <p><a href="http://www.javascriptlint.com/">JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code>（Windowsでは<code>$HOME/vimfiles/compiler</code>）以下に作成する。</p>
 
-<pre><code class="highlight language-vim">
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;current_compiler&quot;</span>)
-	<span class="hljs-keyword">finish</span>
-<span class="hljs-keyword">endif</span>
+<pre><code class="language-vim">
+if exists(&quot;current_compiler&quot;)
+	finish
+endif
 
-<span class="hljs-keyword">let</span> current_compiler = <span class="hljs-string">&quot;javascriptlint&quot;</span>
+let current_compiler = &quot;javascriptlint&quot;
 
-<span class="hljs-keyword">if</span> <span class="hljs-built_in">exists</span>(<span class="hljs-string">&quot;:CompilerSet&quot;</span>) != <span class="hljs-number">2</span>
-	<span class="hljs-keyword">command</span> -nargs=* CompilerSet <span class="hljs-keyword">setlocal</span> <span class="hljs-symbol">&lt;args&gt;</span>
-<span class="hljs-keyword">endif</span>
+if exists(&quot;:CompilerSet&quot;) != 2
+	command -nargs=* CompilerSet setlocal &lt;args&gt;
+endif
 
-<span class="hljs-keyword">let</span> <span class="hljs-variable">s:cpo_save</span> = &amp;cpo
-<span class="hljs-keyword">set</span> cpo-=C
+let s:cpo_save = &amp;cpo
+set cpo-=C
 
 CompilerSet makeprg=jsl\ -nologo\ -nofilelisting\ -nosummary\ -nocontext\ -process\ %
 
-CompilerSet errorformat=%<span class="hljs-keyword">f</span>(%<span class="hljs-keyword">l</span>):\ %<span class="hljs-keyword">m</span>
+CompilerSet errorformat=%f(%l):\ %m
 
-<span class="hljs-keyword">let</span> &amp;cpo = <span class="hljs-variable">s:cpo_save</span>
-<span class="hljs-keyword">unlet</span> <span class="hljs-variable">s:cpo_save</span></code></pre>
+let &amp;cpo = s:cpo_save
+unlet s:cpo_save</code></pre>
 
 <p>そして.vimrcに以下のように書く。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">autocmd</span> FileType javascript :<span class="hljs-keyword">compiler</span> javascriptlint</code></pre>
+<pre><code class="language-vim">autocmd FileType javascript :compiler javascriptlint</code></pre>
 </section>
 
 <section>
@@ -163,28 +164,28 @@ CompilerSet errorformat=%<span class="hljs-keyword">f</span>(%<span class="hljs-
 
 <p>インストールすると以下のような典型的なPowered by jQueryのJavaScriptファイルがすんなりインデントされるようになる。気持ち良い！</p>
 
-<pre><code class="highlight language-js">$(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-	<span class="hljs-keyword">var</span> num = <span class="hljs-number">32</span>;
+<pre><code class="language-js">$(function () {
+	var num = 32;
 
-	$(<span class="hljs-string">&quot;#monthly_archives &gt; li&quot;</span>).<span class="hljs-title function_">each</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">i, li</span>) {
-		<span class="hljs-keyword">if</span> (i === num) {
-			$(li).<span class="hljs-title function_">before</span>($(<span class="hljs-string">&quot;&lt;li/&gt;&quot;</span>).<span class="hljs-title function_">append</span>($(<span class="hljs-string">&quot;&lt;a/&gt;&quot;</span>).<span class="hljs-title function_">attr</span>({
-				<span class="hljs-attr">href</span>: <span class="hljs-string">&quot;#archives-by-month&quot;</span>
-			}).<span class="hljs-title function_">append</span>(<span class="hljs-string">&quot;» more&quot;</span>).<span class="hljs-title function_">click</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-				$(<span class="hljs-variable language_">this</span>).<span class="hljs-title function_">hide</span>();
-				$(<span class="hljs-string">&quot;#monthly_archives .folded&quot;</span>).<span class="hljs-title function_">show</span>();
-			}))).<span class="hljs-title function_">addClass</span>(<span class="hljs-string">&quot;folded&quot;</span>).<span class="hljs-title function_">hide</span>();
-		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (i &gt; num) {
-			$(li).<span class="hljs-title function_">addClass</span>(<span class="hljs-string">&quot;folded&quot;</span>).<span class="hljs-title function_">hide</span>();
+	$(&quot;#monthly_archives &gt; li&quot;).each(function (i, li) {
+		if (i === num) {
+			$(li).before($(&quot;&lt;li/&gt;&quot;).append($(&quot;&lt;a/&gt;&quot;).attr({
+				href: &quot;#archives-by-month&quot;
+			}).append(&quot;» more&quot;).click(function () {
+				$(this).hide();
+				$(&quot;#monthly_archives .folded&quot;).show();
+			}))).addClass(&quot;folded&quot;).hide();
+		} else if (i &gt; num) {
+			$(li).addClass(&quot;folded&quot;).hide();
 		}
 	});
 });</code></pre>
 
 <p>気付いた範囲では、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> foo = {
-	<span class="hljs-attr">bar</span>:
-		<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {</code></pre>
+<pre><code class="language-js">var foo = {
+	bar:
+		function () {</code></pre>
 
 <p>と書いた時に、</p>
 
@@ -197,17 +198,17 @@ CompilerSet errorformat=%<span class="hljs-keyword">f</span>(%<span class="hljs-
 
 <p>また、これをインストールすると<code>gg=G</code>によるインデントのやり直しも改善される（当たり前だけど）。ただし複数行コメント内の行頭の空白が消えてしまうので、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-comment">/*!
+<pre><code class="language-js">/*!
  * foobar
  * hogehoge
- */</span></code></pre>
+ */</code></pre>
 
 <p>といった<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>向けなコメントなどは、</p>
 
-<pre><code class="highlight language-js"><span class="hljs-comment">/*!
+<pre><code class="language-js">/*!
 * foobar
 * hogehoge
-*/</span></code></pre>
+*/</code></pre>
 
 <p>となってしまうので注意が必要。</p>
 </section>

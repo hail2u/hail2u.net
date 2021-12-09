@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="NDO::WeblogのnaoyaさんがMonday Module ひとり - HTML::LinkExtorというエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。" property="twitter:description">
@@ -36,104 +37,104 @@
 
 				<p><a href="http://naoya.dyndns.org/%7Enaoya/mt/" title="NDO::Weblog">NDO::Weblog</a>のnaoyaさんが<a href="http://naoya.dyndns.org/%7Enaoya/mt/archives/000718.html" title="NDO::Weblog: Monday Module ひとり - HTML::LinkExtor">Monday Module ひとり - HTML::LinkExtor</a>というエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。</p>
 <p><a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ということで、HTMLからURLを抜き出すものなわけですが、単にURLリストではやはり面白くないですね。かなり考えて（嘘、10分くらい）、個人的にこんなのがあったら面白いかもと思い、<a href="http://www.towerrecords.com/" title="Tower Records - No Music, No Life!">Tower Records</a>から検索してサンプル提供されているWindows Mediaのプレイリストを作成するスクリプトにしました。お題のHTML::LinkExtorを2回使ってます。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/local/bin/perl</span>
+<pre><code class="language-perl">#!/usr/local/bin/perl
 
-<span class="hljs-comment"># Monday Module: HTML::LinkExtor</span>
-<span class="hljs-comment">#</span>
-<span class="hljs-comment"># 引数に与えた文字列でTowerRecords.comを検索し、その結果からWindows</span>
-<span class="hljs-comment"># Mediaで提供されているサウンドクリップを更に探して、Windows Media</span>
-<span class="hljs-comment"># Playlistとして出力する</span>
-<span class="hljs-comment">#</span>
-<span class="hljs-comment"># Kyo Nagashima &lt;kyo@hail2u.net&gt;</span>
-<span class="hljs-comment"># 2003/11/20 作成</span>
+# Monday Module: HTML::LinkExtor
+#
+# 引数に与えた文字列でTowerRecords.comを検索し、その結果からWindows
+# Mediaで提供されているサウンドクリップを更に探して、Windows Media
+# Playlistとして出力する
+#
+# Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# 2003/11/20 作成
 
-<span class="hljs-keyword">use</span> strict;
+use strict;
 
-<span class="hljs-keyword">use</span> HTML::LinkExtor;
-<span class="hljs-keyword">use</span> LWP::Simple;
+use HTML::LinkExtor;
+use LWP::Simple;
 
-<span class="hljs-comment"># 引数を取得してURLエンコード</span>
-<span class="hljs-keyword">my</span> $query = <span class="hljs-keyword">shift</span>;
-$query =~ <span class="hljs-regexp">s!([^a-zA-Z0-9_.-])!uc sprintf &quot;%%%02x&quot;, ord($1)!</span>eg;
+# 引数を取得してURLエンコード
+my $query = shift;
+$query =~ s!([^a-zA-Z0-9_.-])!uc sprintf &quot;%%%02x&quot;, ord($1)!eg;
 
-<span class="hljs-comment"># 検索</span>
-<span class="hljs-keyword">my</span> $content = LWP::Simple::get(<span class="hljs-string">&quot;http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query&quot;</span>);
+# 検索
+my $content = LWP::Simple::get(&quot;http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query&quot;);
 
-<span class="hljs-comment"># HTMLソースから検索結果の一覧のところまでを削除</span>
-$content =~ <span class="hljs-regexp">s!^.*?Sort items by!!is</span>;
+# HTMLソースから検索結果の一覧のところまでを削除
+$content =~ s!^.*?Sort items by!!is;
 
-<span class="hljs-comment"># リンク抽出</span>
-<span class="hljs-keyword">my</span> @urls;
-<span class="hljs-keyword">my</span> $p = HTML::LinkExtor-&gt;new(\&amp;callback, <span class="hljs-string">&quot;http://www.towerrecords.com/music/&quot;</span>);
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">callback</span> </span>{
-	<span class="hljs-keyword">my</span>($tag, %links) = @_;
-	<span class="hljs-keyword">if</span> ($tag eq <span class="hljs-string">&quot;a&quot;</span>) {
-		<span class="hljs-keyword">push</span>(@urls, <span class="hljs-keyword">values</span> %links);
+# リンク抽出
+my @urls;
+my $p = HTML::LinkExtor-&gt;new(\&amp;callback, &quot;http://www.towerrecords.com/music/&quot;);
+sub callback {
+	my($tag, %links) = @_;
+	if ($tag eq &quot;a&quot;) {
+		push(@urls, values %links);
 	}
 }
 $p-&gt;parse($content);
 
-<span class="hljs-comment"># CDのURLだけにする（callbackでやれよ）</span>
-<span class="hljs-keyword">my</span> @cds;
-<span class="hljs-keyword">foreach</span> (@urls) {
-	<span class="hljs-keyword">if</span> (m!^http:<span class="hljs-regexp">//</span>www\.towerrecords\.com/product\.aspx\?pfid=!) {
-		<span class="hljs-keyword">push</span>(@cds, $_);
+# CDのURLだけにする（callbackでやれよ）
+my @cds;
+foreach (@urls) {
+	if (m!^http://www\.towerrecords\.com/product\.aspx\?pfid=!) {
+		push(@cds, $_);
 	}
 }
 
-<span class="hljs-comment"># 重複URLを削除</span>
-<span class="hljs-keyword">my</span> %count;
-@cds = <span class="hljs-keyword">grep</span>(!$count{$_}++, @cds);
+# 重複URLを削除
+my %count;
+@cds = grep(!$count{$_}++, @cds);
 
-<span class="hljs-keyword">my</span> @wms;
-<span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $cd (@cds) {
-	<span class="hljs-comment"># CDのURLを取得</span>
+my @wms;
+foreach my $cd (@cds) {
+	# CDのURLを取得
 	$content = LWP::Simple::get($cd);
 	@urls = ();
 	$p-&gt;parse($content);
 
-	<span class="hljs-comment"># Windows MediaのURLだけにする</span>
-	<span class="hljs-keyword">foreach</span> (@urls) {
-		<span class="hljs-keyword">if</span> (m!^http:<span class="hljs-regexp">//m</span>file\.akamai\.com/.*?\.asx\?obj=!) {
-			<span class="hljs-keyword">push</span>(@wms, $_);
+	# Windows MediaのURLだけにする
+	foreach (@urls) {
+		if (m!^http://mfile\.akamai\.com/.*?\.asx\?obj=!) {
+			push(@wms, $_);
 		}
 	}
 }
 
-<span class="hljs-comment"># Windows Mediaがなかったら終了</span>
-<span class="hljs-keyword">if</span> (!@wms) {
-	<span class="hljs-keyword">exit</span>;
+# Windows Mediaがなかったら終了
+if (!@wms) {
+	exit;
 }
 
-<span class="hljs-comment"># Windows Media Playlistを出力（再生できるからこれで良さげ）</span>
-<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">&quot;_WPL_&quot;</span>;
-&lt;?wpl version=<span class="hljs-string">&quot;1.0&quot;</span>?&gt;
+# Windows Media Playlistを出力（再生できるからこれで良さげ）
+print &lt;&lt;&quot;_WPL_&quot;;
+&lt;?wpl version=&quot;1.0&quot;?&gt;
 &lt;smil&gt;
 	&lt;body&gt;
 		&lt;seq&gt;
-_WPL<span class="hljs-number">_</span>
+_WPL_
 
-<span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $wm (@wms) {
-	$wm =~ <span class="hljs-regexp">s!&amp;!&amp;amp;!</span>;
-	<span class="hljs-keyword">print</span> <span class="hljs-keyword">qq</span>!      &lt;media src=<span class="hljs-string">&quot;$wm&quot;</span>/&gt;\n!;
+foreach my $wm (@wms) {
+	$wm =~ s!&amp;!&amp;amp;!;
+	print qq!      &lt;media src=&quot;$wm&quot;/&gt;\n!;
 }
 
-<span class="hljs-keyword">print</span> &lt;&lt;<span class="hljs-string">&quot;_WPL_&quot;</span>;
-		&lt;<span class="hljs-regexp">/seq&gt;
-	&lt;/</span>body&gt;
+print &lt;&lt;&quot;_WPL_&quot;;
+		&lt;/seq&gt;
+	&lt;/body&gt;
 &lt;/smil&gt;
-_WPL<span class="hljs-number">_</span>
+_WPL_
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 <p>標準出力に出てくるファイルはこんな感じ。</p>
-<pre><code class="highlight language-xml">&lt;?wpl version=&quot;1.0&quot;?&gt;
-<span class="hljs-tag">&lt;<span class="hljs-name">smil</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">seq</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">media</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729<span class="hljs-symbol">&amp;amp;</span>urlid=b67557aff4096b9abd&quot;</span>/&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">seq</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">smil</span>&gt;</span></code></pre>
+<pre><code class="language-xml">&lt;?wpl version=&quot;1.0&quot;?&gt;
+&lt;smil&gt;
+	&lt;body&gt;
+		&lt;seq&gt;
+			&lt;media src=&quot;http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729&amp;amp;urlid=b67557aff4096b9abd&quot;/&gt;
+		&lt;/seq&gt;
+	&lt;/body&gt;
+&lt;/smil&gt;</code></pre>
 <p>これをWindows Media Player 9で開いてやれば、ずらーっと再生できます。サンプルのサウンド・クリップなので短いのが難点。リンクを取得する時にHTMLをパースしてタイトルとかを取ってきて各asxファイルのタイトルにしたり、asxのURLからもう一回、LWP::Simple::getしてWindwos MediaそのもののURLを拾って来たり、もっと綺麗なプレイリストになりますが、メンドイので。再生できさえすればいいですしね。</p>
 <p>こんな感じの軽い感じでやると良いかもしれないっすね。なんでMonday Moduleなのかというのはnaoyaさんが言ってるように、語呂が良いからだけです。</p>
 <p>さて、本当にこの企画は始まるのでしょうか！！！</p>

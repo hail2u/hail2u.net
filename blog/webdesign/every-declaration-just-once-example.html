@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="同じ定義は書かないCSSの簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。" property="twitter:description">
@@ -36,99 +37,99 @@
 
 				<p><a href="https://developers.google.com/speed/articles/optimizing-css">同じ定義は書かないCSS</a>の簡単な例とその書き方に対する覚え書きを残しておく。同じ定義を書かないようにしていくと、CSSプリプロセッサーはおろか、セレクターのネストもなくて良いのかと感じてくる。もしかするとCSSの着地点はここなのかと洗脳されつつある。もはや第三者の目で見ることができなくなったので、他の人の意見も聞いてみたい。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.foo</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid red;
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">40rem</span>;
+<pre><code class="language-css">.foo {
+	border: 1px solid red;
+	margin: 0 auto;
+	width: 40rem;
 }
 
-<span class="hljs-selector-class">.bar</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid green;
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">40rem</span>;
+.bar {
+	border: 1px solid green;
+	margin: 0 auto;
+	width: 40rem;
 }
 
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid blue;
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">40rem</span>;
+.baz {
+	border: 1px solid blue;
+	margin: 0 auto;
+	width: 40rem;
 }</code></pre>
 
 <p>このような共通する定義を持つセレクターは以下のように書かれる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+<pre><code class="language-css">.foo,
+.bar,
+.baz {
+	margin: 0 auto;
 }
 
-<span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">40rem</span>;
+.foo,
+.bar,
+.baz {
+	width: 40rem;
 }
 
-<span class="hljs-selector-class">.foo</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid red;
+.foo {
+	border: 1px solid red;
 }
 
-<span class="hljs-selector-class">.bar</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid green;
+.bar {
+	border: 1px solid green;
 }
 
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid blue;
+.baz {
+	border: 1px solid blue;
 }</code></pre>
 
 <p>まずは定義ごとというのがポイントだ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+<pre><code class="language-css">.foo,
+.bar,
+.baz {
+	margin: 0 auto;
 }
 
-<span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">40rem</span>;
+.foo,
+.bar,
+.baz {
+	width: 40rem;
 }</code></pre>
 
 <p>このようにまとめられそうなブロックでもあえて分割する。そうしておくことによって、後に<code>margin: 0 auto</code>だけ使うクラスを追加したい時に分割し直す手間が省ける。こういった後のメンテナンス性を考えた場合、先頭に定義をわかりやすくしたクラスを追加するのも悪くなかった。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.centering</span>,
-<span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+<pre><code class="language-css">.centering,
+.foo,
+.bar,
+.baz {
+	margin: 0 auto;
 }</code></pre>
 
 <p>こうしておくと<code>,\n\.foo</code>で置換を行えるようになる。しかし使いもしないセレクターが書かれているのは無駄が多い気がしたのでやめてしまった。ただし、そのブロックがどういう定義のためのブロックなのかをわかりやすくできるので、すこし規模が大きくなると助かるかもしれない。その場合は後にツールで削除してやると良さそうだ。</p>
 
 <p>またどこまで定義を分けるかというのもちょっと悩む。例えば<code>border</code>ショートカット・プロパティーなどだ。上記例だと以下のようにも書くことができ、定義をなるべく重複しないようにとするとこのように書くべきようにも思える。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">border-style</span>: solid;
+<pre><code class="language-css">.foo,
+.bar,
+.baz {
+	border-style: solid;
 }
 
-<span class="hljs-selector-class">.foo</span>,
-<span class="hljs-selector-class">.bar</span>,
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">border-width</span>: <span class="hljs-number">1px</span>;
+.foo,
+.bar,
+.baz {
+	border-width: 1px;
 }
 
-<span class="hljs-selector-class">.foo</span> {
-	<span class="hljs-attribute">border-color</span>: red;
+.foo {
+	border-color: red;
 }
 
-<span class="hljs-selector-class">.bar</span> {
-	<span class="hljs-attribute">border-color</span>: green;
+.bar {
+	border-color: green;
 }
 
-<span class="hljs-selector-class">.baz</span> {
-	<span class="hljs-attribute">border-color</span>: blue;
+.baz {
+	border-color: blue;
 }</code></pre>
 
 <p>さすがに冗長すぎる印象だ。どこまで分割するかの線引きはもうちょっと考える必要があるだろう。</p>

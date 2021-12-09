@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="HTML LintにはAPIが用意されているのでVimからいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。WebService::Validator::HTML::W3Cも使ってMarkup Validation Serviceにまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。" property="twitter:description">
@@ -36,46 +37,46 @@
 
 				<p><a href="http://lint.brihten.com/html/">HTML Lint</a>にはAPIが用意されているので<a href="http://www.vim.org/">Vim</a>からいけるようにPerlスクリプトを書いてみましたが、やばそうなHTMLだと「Validじゃない」と言ってすぐ止まってしまうし、妥当な感じで書いたHTMLだと大体Lintもパスしちゃうので、あまり意味ない感じでした……。<a href="http://search.cpan.org/perldoc?WebService::Validator::HTML::W3C">WebService::Validator::HTML::W3C</a>も使って<a href="http://validator.w3.org/">Markup Validation Service</a>にまず通してエラーが出たらそこで終了、通ったらHTML Lintにも投げるとかにすればそこそこ良さそうではありますが、んー。</p>
 
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/bin/env perl</span>
+<pre><code class="language-perl">#!/usr/bin/env perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> warnings;
+use strict;
+use warnings;
 
-<span class="hljs-keyword">use</span> JSON;
-<span class="hljs-keyword">use</span> LWP::UserAgent;
+use JSON;
+use LWP::UserAgent;
 
-<span class="hljs-keyword">my</span> $file = <span class="hljs-keyword">shift</span>;
+my $file = shift;
 
-<span class="hljs-keyword">my</span> $ua = LWP::UserAgent-&gt;new();
-<span class="hljs-keyword">my</span> $res = $ua-&gt;post(<span class="hljs-string">&quot;http://lint.brihten.com/html/lint/&quot;</span>,
-	<span class="hljs-string">Content_type =&gt;</span> <span class="hljs-string">&quot;form-data&quot;</span>, 
-	<span class="hljs-string">Content      =&gt;</span> [
-		<span class="hljs-string">filesource           =&gt;</span> [$file],
-		<span class="hljs-string">tags_closeoptional   =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_lowercase       =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_closeempty      =&gt;</span> <span class="hljs-number">0</span>,
-		<span class="hljs-string">attrs_quoted         =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">attrs_lowercase      =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">attrs_simplebooleans =&gt;</span> <span class="hljs-number">1</span>,
-		<span class="hljs-string">tags_whitespace      =&gt;</span> <span class="hljs-number">0</span>,
-		<span class="hljs-string">response_format      =&gt;</span> <span class="hljs-string">&quot;json&quot;</span>
+my $ua = LWP::UserAgent-&gt;new();
+my $res = $ua-&gt;post("http://lint.brihten.com/html/lint/",
+	Content_type =&gt; "form-data", 
+	Content      =&gt; [
+		filesource           =&gt; [$file],
+		tags_closeoptional   =&gt; 1,
+		tags_lowercase       =&gt; 1,
+		tags_closeempty      =&gt; 0,
+		attrs_quoted         =&gt; 1,
+		attrs_lowercase      =&gt; 1,
+		attrs_simplebooleans =&gt; 1,
+		tags_whitespace      =&gt; 0,
+		response_format      =&gt; "json"
 	]
 );
 
-<span class="hljs-keyword">if</span> ($res-&gt;is_success) {
-	<span class="hljs-keyword">my</span> $result = from_json($res-&gt;decoded_content);
-	<span class="hljs-keyword">my</span> $errors = $result-&gt;{mistakes};
+if ($res-&gt;is_success) {
+	my $result = from_json($res-&gt;decoded_content);
+	my $errors = $result-&gt;{mistakes};
 
-	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">scalar</span>(@$errors) &gt; <span class="hljs-number">0</span>) {
-		<span class="hljs-keyword">foreach</span> <span class="hljs-keyword">my</span> $e (@$errors) {
-			<span class="hljs-keyword">print</span> <span class="hljs-keyword">join</span>(<span class="hljs-string">&quot;:&quot;</span>, $file, $e-&gt;{line}, $e-&gt;{message}), <span class="hljs-string">&quot;\n&quot;</span>;
+	if (scalar(@$errors) &gt; 0) {
+		foreach my $e (@$errors) {
+			print join(":", $file, $e-&gt;{line}, $e-&gt;{message}), "\n";
 		}
 	}
-} <span class="hljs-keyword">else</span> {
-	<span class="hljs-keyword">die</span> $res-&gt;status_line;
+} else {
+	die $res-&gt;status_line;
 }
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 
 <p>空要素を閉じてない場合の警告をオフっている以外はデフォルトです。</p>
 

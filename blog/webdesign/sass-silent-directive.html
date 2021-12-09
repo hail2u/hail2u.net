@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Compass開発者のChristopher M. EppsteinがSassに@silentというディレクティブを追加してた。どうやら待望の出力CSSに含めないCSSルールを書けるようになるもののようで、これがマージされれば思う存分@extendまくれそう。" property="twitter:description">
@@ -38,41 +39,41 @@
 
 <p>カラム定義も</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$col</span>: <span class="hljs-number">60px</span>;
-<span class="hljs-variable">$gap</span>: <span class="hljs-number">20px</span>;
+<pre><code class="language-scss">$col: 60px;
+$gap: 20px;
 
-<span class="hljs-keyword">@function</span> column-width(<span class="hljs-variable">$i</span>) {
-	<span class="hljs-keyword">@return</span> (<span class="hljs-variable">$col</span> * <span class="hljs-variable">$num</span>) + (<span class="hljs-variable">$gap</span> * (<span class="hljs-variable">$num</span> - <span class="hljs-number">1</span>));
+@function column-width($i) {
+	@return ($col * $num) + ($gap * ($num - 1));
 }
 
-<span class="hljs-selector-class">.column</span> {
-	<span class="hljs-keyword">@silent</span>;
-	<span class="hljs-attribute">margin-right</span>: (<span class="hljs-variable">$gap</span> / <span class="hljs-number">2</span>);
-	<span class="hljs-attribute">margin-left</span>: (<span class="hljs-variable">$gap</span> /<span class="hljs-number">2</span>);
-	<span class="hljs-attribute">float</span>: left;
+.column {
+	@silent;
+	margin-right: ($gap / 2);
+	margin-left: ($gap /2);
+	float: left;
 }
 
-<span class="hljs-selector-id">#main</span> {
-	<span class="hljs-keyword">@extend</span> .column;
-	<span class="hljs-attribute">width</span>: column-width(<span class="hljs-number">9</span>);
+#main {
+	@extend .column;
+	width: column-width(9);
 }
 
-<span class="hljs-selector-id">#sidebar</span> {
-	<span class="hljs-keyword">@extend</span> .column;
-	<span class="hljs-attribute">width</span>: column-width(<span class="hljs-number">3</span>);
+#sidebar {
+	@extend .column;
+	width: column-width(3);
 }</code></pre>
 
 <p>という感じで書け、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#main</span>,
-<span class="hljs-selector-id">#sidebar</span> {
-	<span class="hljs-attribute">margin-right</span>: <span class="hljs-number">10px</span>;
-	<span class="hljs-attribute">margin-left</span>: <span class="hljs-number">10px</span>;
-	<span class="hljs-attribute">float</span>: left }
-<span class="hljs-selector-id">#main</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">700px</span> }
-<span class="hljs-selector-id">#sidebar</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">220px</span> }</code></pre>
+<pre><code class="language-css">#main,
+#sidebar {
+	margin-right: 10px;
+	margin-left: 10px;
+	float: left }
+#main {
+	width: 700px }
+#sidebar {
+	width: 220px }</code></pre>
 
 <p>出力スッキリ！</p>
 
@@ -83,10 +84,10 @@
 
 <p>危惧していた通り<code>@silent</code>はダメだろーという感じで取り下げられ、パーセント（<code>%</code>）を使って出力しないルールを作れるようになった。</p>
 
-<pre><code class="highlight language-scss">%column {
-	<span class="hljs-attribute">margin-right</span>: (<span class="hljs-variable">$gap</span> / <span class="hljs-number">2</span>);
-	<span class="hljs-attribute">margin-left</span>: (<span class="hljs-variable">$gap</span> /<span class="hljs-number">2</span>);
-	<span class="hljs-attribute">float</span>: left;
+<pre><code class="language-scss">%column {
+	margin-right: ($gap / 2);
+	margin-left: ($gap /2);
+	float: left;
 }</code></pre>
 
 <p>というようにクラスのピリオド（<code>.</code>）やIDのナンバー（<code>#</code>）の代わりにパーセントを使って書く。わかりやすい！</p>

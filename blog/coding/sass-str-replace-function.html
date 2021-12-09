@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Sass 3.3で入る予定の文字列関数の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。" property="twitter:description">
@@ -36,49 +37,49 @@
 
 				<p><a href="https://github.com/nex3/sass/blob/0ef77dc0e3cff821aadca09aca98cac46354093d/lib/sass/script/value/string.rb">Sass 3.3で入る予定の文字列関数</a>の使い道を色々考えているけど、まったく「これは！」みたいなのが思いつかない。なので、実際に利用しがいがあるかどうかは置いておいて、色々作ってみようかなと考えている。まずは文字列の置換。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-comment">// str-replace() - Replace in a string</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">// @param {string}  $string    String that you want to replace</span>
-<span class="hljs-comment">// @param {string}  $substr    String that is to be replaced by `$newsubstr`</span>
-<span class="hljs-comment">// @param {string}  $newsubstr String that replaces `$substr`</span>
-<span class="hljs-comment">// @param {number*} $all       Flag for replacing all (1+) or not (0)</span>
-<span class="hljs-comment">// @return {string}</span>
-<span class="hljs-keyword">@function</span> str-replace(<span class="hljs-variable">$string</span>, <span class="hljs-variable">$substr</span>, <span class="hljs-variable">$newsubstr</span>, <span class="hljs-variable">$all</span>: <span class="hljs-number">0</span>) {
-	<span class="hljs-variable">$position-found</span>: str-index(<span class="hljs-variable">$string</span>, <span class="hljs-variable">$substr</span>);
-	<span class="hljs-variable">$processed</span>: ();
+<pre><code class="language-scss">// str-replace() - Replace in a string
+//
+// @param {string}  $string    String that you want to replace
+// @param {string}  $substr    String that is to be replaced by `$newsubstr`
+// @param {string}  $newsubstr String that replaces `$substr`
+// @param {number*} $all       Flag for replacing all (1+) or not (0)
+// @return {string}
+@function str-replace($string, $substr, $newsubstr, $all: 0) {
+	$position-found: str-index($string, $substr);
+	$processed: ();
 
-	<span class="hljs-keyword">@while</span> (<span class="hljs-variable">$position-found</span> &gt; <span class="hljs-number">0</span>) {
-		<span class="hljs-variable">$length-substr</span>: str-length(<span class="hljs-variable">$substr</span>);
-		<span class="hljs-variable">$processed</span>: append(<span class="hljs-variable">$processed</span>, str-slice(<span class="hljs-variable">$string</span>, <span class="hljs-number">0</span>, <span class="hljs-variable">$position-found</span> - <span class="hljs-number">1</span>));
-		<span class="hljs-variable">$processed</span>: append(<span class="hljs-variable">$processed</span>, <span class="hljs-variable">$newsubstr</span>);
-		<span class="hljs-variable">$string</span>: str-slice(<span class="hljs-variable">$string</span>, <span class="hljs-variable">$position-found</span> + <span class="hljs-variable">$length-substr</span>);
-		<span class="hljs-variable">$position-found</span>: <span class="hljs-number">0</span>;
+	@while ($position-found &gt; 0) {
+		$length-substr: str-length($substr);
+		$processed: append($processed, str-slice($string, 0, $position-found - 1));
+		$processed: append($processed, $newsubstr);
+		$string: str-slice($string, $position-found + $length-substr);
+		$position-found: 0;
 
-		<span class="hljs-keyword">@if</span> (<span class="hljs-variable">$all</span> &gt; <span class="hljs-number">0</span>) {
-			<span class="hljs-variable">$position-found</span>: str-index(<span class="hljs-variable">$string</span>, <span class="hljs-variable">$substr</span>);
+		@if ($all &gt; 0) {
+			$position-found: str-index($string, $substr);
 		}
 	}
 
-	<span class="hljs-variable">$processed</span>: append(<span class="hljs-variable">$processed</span>, <span class="hljs-variable">$string</span>);
-	<span class="hljs-variable">$string</span>: <span class="hljs-string">&quot;&quot;</span>;
+	$processed: append($processed, $string);
+	$string: &quot;&quot;;
 
-	<span class="hljs-keyword">@each</span> <span class="hljs-variable">$s</span> in <span class="hljs-variable">$processed</span> {
-		<span class="hljs-variable">$string</span>: #{<span class="hljs-variable">$string</span>}#{<span class="hljs-variable">$s</span>};
+	@each $s in $processed {
+		$string: #{$string}#{$s};
 	}
 
-	<span class="hljs-keyword">@return</span> <span class="hljs-variable">$string</span>;
+	@return $string;
 }</code></pre>
 
 <p><code>str-index()</code>で置換対象文字列<code>$substr</code>見つけたら、<code>$substr</code>までを抜き出したのと置換後文字列<code>$newstr</code>をリストである<code>$processed</code>に追加していくという作業を行うだけ。最後に<code>$processed</code>を連結して返す。<code>$all</code>は全置換を行うかどうかのフラグで、<code>0</code>か省略した場合は最初の１つだけ置換する。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">margin</span>: str-replace(<span class="hljs-string">&quot;1em 2em&quot;</span>, <span class="hljs-string">&quot;em&quot;</span>, <span class="hljs-string">&quot;rem&quot;</span>, <span class="hljs-number">1</span>);
+<pre><code class="language-scss">.test {
+	margin: str-replace(&quot;1em 2em&quot;, &quot;em&quot;, &quot;rem&quot;, 1);
 }</code></pre>
 
 <p>と書くと、</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">1rem</span> <span class="hljs-number">2rem</span>; }</code></pre>
+<pre><code class="language-css">.test {
+	margin: 1rem 2rem; }</code></pre>
 
 <p>となる。この利用例にまったく意味はない。</p>
 

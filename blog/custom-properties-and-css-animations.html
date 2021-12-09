@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="本当は色相を徐々に変えたかったが、今の書き方のCSSとこの実装ではうまくできなかった。色をスクリプトで作ってやれば可能だが、カスタム・プロパティーで管理できなくなるので見送った。どう書いてうまくいかなかったか、の記録を残しておく。" property="twitter:description">
@@ -36,23 +37,23 @@
 
 				<p>本当は色相を徐々に変えたかったが、今の書き方のCSSとこの実装ではうまくできなかった。色をスクリプトで作ってやれば可能だが、カスタム・プロパティーで管理できなくなるので見送った。どう書いてうまくいかなかったか、の記録を残しておく。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-pseudo">:root</span> {
-	<span class="hljs-attr">--hue</span>: <span class="hljs-number">45</span>;
-	<span class="hljs-attr">--color-background</span>: <span class="hljs-built_in">hsl</span>(<span class="hljs-built_in">var</span>(--hue) <span class="hljs-number">50%</span> <span class="hljs-number">95%</span>);
+<pre><code class="language-css">:root {
+	--hue: 45;
+	--color-background: hsl(var(--hue) 50% 95%);
 
-	<span class="hljs-attribute">transition</span>: --hue <span class="hljs-number">0.3s</span> ease-in;
+	transition: --hue 0.3s ease-in;
 }</code></pre>
 
 <p>色相を徐々に変えたいだけだったので、このようにしたかったが、動かない。カスタム・プロパティーは<code>transition-property</code>プロパティー（やそれに相当するもの）では指定できないようだ。もちろん<code>all</code>でも動かない。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-pseudo">:root</span> {
-	<span class="hljs-attr">--hue</span>: <span class="hljs-number">45</span>;
-	<span class="hljs-attr">--color-background</span>: <span class="hljs-built_in">hsl</span>(<span class="hljs-built_in">var</span>(--hue) <span class="hljs-number">50%</span> <span class="hljs-number">95%</span>);
+<pre><code class="language-css">:root {
+	--hue: 45;
+	--color-background: hsl(var(--hue) 50% 95%);
 }
 
-<span class="hljs-selector-tag">html</span> {
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--color-background);
-	<span class="hljs-attribute">transition</span>: background-color <span class="hljs-number">0.3s</span> ease-in;
+html {
+	background-color: var(--color-background);
+	transition: background-color 0.3s ease-in;
 }</code></pre>
 
 <p>また、カスタム・プロパティーの更新では値が変化したと認識されないようで、<code>transition-property</code>プロパティーで指定しても反応してくれない。値そのものが変化する必要がありそうだ。</p>

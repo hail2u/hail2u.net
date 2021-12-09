@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="HTMLの簡単な文法チェックには長らくValidator.nuのAPIを利用していたけど、Node.jsパッケージのHTMLHintがそこそこ使えそうだったので今はこっちを使っている。ローカルで動くと気軽に使える度が増す。ただデフォルトでインストールされるCLIプログラムはリッチな感じの出力にしか対応していないので、ちょっと扱いづらい。Vimのデフォルトのerrorformatに応じた形でチェック結果を出力するだけのNode.jsスクリプトを書いて使ってる。" property="twitter:description">
@@ -40,12 +41,12 @@
 
 <p>あらかじめグローバルにHTMLHintをインストールしておく必要がある。<code>htmlhint</code>をパスの通った場所に、<code>htmlhint.vim</code>を<code>~/.vim/compiler</code>ディレクトリにコピーし、<code>~/.vim/vimrc</code>などで以下の様に設定してやるとインストール完了。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">autocmd</span> HTMLHint
+<pre><code class="language-vim">autocmd HTMLHint
 	autocmd!
 
-	<span class="hljs-keyword">autocmd</span> FileType html <span class="hljs-keyword">compiler</span> htmlhint
-	<span class="hljs-keyword">autocmd</span> FileType html autocmd! BufWritePost <span class="hljs-symbol">&lt;buffer&gt;</span> <span class="hljs-keyword">silent</span> <span class="hljs-keyword">make</span>
-<span class="hljs-keyword">autocmd</span> END</code></pre>
+	autocmd FileType html compiler htmlhint
+	autocmd FileType html autocmd! BufWritePost &lt;buffer&gt; silent make
+autocmd END</code></pre>
 
 <p>これで保存するたびにHTMLHintが走ってくれる。もちろん手動で<code>make</code>しても良い。</p>
 
@@ -55,28 +56,28 @@
 
 <p>上記Node.jsスクリプトでは、チェックするルールは僕の好みで以下のように設定してある。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> ruleset = {
-	<span class="hljs-string">&#x27;tagname-lowercase&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;attr-lowercase&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;attr-value-double-quotes&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;attr-no-duplication&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;doctype-first&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;tag-pair&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;tag-self-close&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;spec-char-escape&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;id-unique&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;src-not-empty&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;head-script-disabled&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;img-alt-require&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;doctype-html5&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;id-class-value&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;style-disabled&#x27;</span>: <span class="hljs-literal">true</span>,
-	<span class="hljs-string">&#x27;space-tab-mixed-disabled&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;id-class-ad-disabled&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;href-abs-or-rel&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;attr-unsafe-chars&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;csslint&#x27;</span>: <span class="hljs-literal">false</span>,
-	<span class="hljs-string">&#x27;jshint&#x27;</span>: <span class="hljs-literal">false</span>
+<pre><code class="language-javascript">var ruleset = {
+	&apos;tagname-lowercase&apos;: true,
+	&apos;attr-lowercase&apos;: true,
+	&apos;attr-value-double-quotes&apos;: true,
+	&apos;attr-no-duplication&apos;: true,
+	&apos;doctype-first&apos;: true,
+	&apos;tag-pair&apos;: true,
+	&apos;tag-self-close&apos;: false,
+	&apos;spec-char-escape&apos;: true,
+	&apos;id-unique&apos;: true,
+	&apos;src-not-empty&apos;: true,
+	&apos;head-script-disabled&apos;: false,
+	&apos;img-alt-require&apos;: false,
+	&apos;doctype-html5&apos;: true,
+	&apos;id-class-value&apos;: false,
+	&apos;style-disabled&apos;: true,
+	&apos;space-tab-mixed-disabled&apos;: false,
+	&apos;id-class-ad-disabled&apos;: false,
+	&apos;href-abs-or-rel&apos;: false,
+	&apos;attr-unsafe-chars&apos;: false,
+	&apos;csslint&apos;: false,
+	&apos;jshint&apos;: false
 };</code></pre>
 
 <p>書き方の都合上、空要素のスラッシュの省略（書かない）や<code>img</code>要素の<code>alt</code>属性の省略（書かなくて良い時もある）を許可したりしてる。半角空白とタブの混在を許可してるのは<code>pre</code>要素で稀に混ざることがあることへの対策で、<code>href</code>属性はData URIを使うこともあるのでチェックしないようにした。他は必要なさそうというものだけを無効にしてる。</p>

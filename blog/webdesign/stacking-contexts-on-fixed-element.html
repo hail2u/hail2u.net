@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="Chrome 22で隠し設定にposition: fixedされた要素配下でのz-indexプロパティーの扱われ方を仕様に準拠する形へ変えるものが用意された……とか言われてもStacking Contextsの仕様を読んでもまったくわからなかったので簡単なテストを書いて理解した。" property="twitter:description">
@@ -42,34 +43,34 @@
 
 <p>HTMLは以下のような形。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;red&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;fixed&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;green&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;blue&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;div class="red"&gt;&lt;/div&gt;
+&lt;div class="fixed"&gt;
+	&lt;div class="green"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="blue"&gt;&lt;/div&gt;</code></pre>
 
 <p>これをCSSで赤緑青に色分けして、<code>z-index</code>プロパティーを赤緑青の順にする。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.red</span> {
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">z-index</span>: <span class="hljs-number">1</span>;
-	<span class="hljs-attribute">background-color</span>: red;
+<pre><code class="language-css">.red {
+	position: absolute;
+	z-index: 1;
+	background-color: red;
 }
 
-<span class="hljs-selector-class">.fixed</span> {
-	<span class="hljs-attribute">position</span>: fixed;
+.fixed {
+	position: fixed;
 }
 
-<span class="hljs-selector-class">.green</span> {
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">z-index</span>: <span class="hljs-number">2</span>;
-	<span class="hljs-attribute">background-color</span>: green;
+.green {
+	position: absolute;
+	z-index: 2;
+	background-color: green;
 }
 
-<span class="hljs-selector-class">.blue</span> {
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">z-index</span>: <span class="hljs-number">3</span>;
-	<span class="hljs-attribute">background-color</span>: blue;
+.blue {
+	position: absolute;
+	z-index: 3;
+	background-color: blue;
 }</code></pre>
 
 <p>Chrome 22の隠し設定を有効にしない限り<code>position: fixed</code>で新しいスタッキング・コンテキストが作成されないので、<code>z-index</code>プロパティーの値通りに下（背面）から<em>赤緑青</em>の順に並ぶ。隠し設定を有効にすると新しいスタッキング・コンテキストが作成されるようになり、その子にある<code>.green</code>への<code>z-index: 2</code>は<code>.fixed</code>内のローカルなものとみなされるようになる。というわけで<code>.red</code>や<code>.blue</code>が<code>.fixed</code>よりも前面にくることになり、スクリーンショットの右のように下（背面）から<em>緑赤青</em>の順に重なる。</p>

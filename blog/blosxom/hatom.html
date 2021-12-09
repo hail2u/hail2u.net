@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="フィードの将来を模索してるとやはりhAtomは避けて通れないかなーという感じなので、今更ながら対応した。blosxomのビルトイン変数とフレーバーで実現できるのでそんなに面倒でもない。" property="twitter:description">
@@ -36,18 +37,18 @@
 
 				<p>フィードの将来を模索してるとやはり<a href="http://microformats.org/wiki/hatom">hAtom</a>は避けて通れないかなーという感じなので、今更ながら対応した。blosxomのビルトイン変数とフレーバーで実現できるのでそんなに面倒でもない。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;hentry&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;$fn&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">h3</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;entry-title&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;bookmark&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;$url$path/$fn.$default_flavour&quot;</span>&gt;</span>$title<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">h3</span>&gt;</span>
+<pre><code class="language-html">&lt;div class=&quot;hentry&quot; id=&quot;$fn&quot;&gt;
+	&lt;h3 class=&quot;entry-title&quot;&gt;&lt;a rel=&quot;bookmark&quot; href=&quot;$url$path/$fn.$default_flavour&quot;&gt;$title&lt;/a&gt;&lt;/h3&gt;
 
-	<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;entry-content&quot;</span>&gt;</span>$body<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+	&lt;div class=&quot;entry-content&quot;&gt;$body&lt;/div&gt;
 
-	<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>
+	&lt;p&gt;
 		Posted on
-		<span class="hljs-tag">&lt;<span class="hljs-name">abbr</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;published&quot;</span> <span class="hljs-attr">title</span>=<span class="hljs-string">&quot;$yr-$mo_num-$da<span class="hljs-symbol">&amp;#54;</span>$ti:00+09:00&quot;</span>&gt;</span>$da $mo, $yr<span class="hljs-tag">&lt;/<span class="hljs-name">abbr</span>&gt;</span>
+		&lt;abbr class=&quot;published&quot; title=&quot;$yr-$mo_num-$da&amp;#54;$ti:00+09:00&quot;&gt;$da $mo, $yr&lt;/abbr&gt;
 		in
-		<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;tag&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;$url$path/&quot;</span>&gt;</span>$path<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
-	<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+		&lt;a rel=&quot;tag&quot; href=&quot;$url$path/&quot;&gt;$path&lt;/a&gt;
+	&lt;/p&gt;
+&lt;/div&gt;</code></pre>
 
 <p><code>updated</code>は必須だが、ない場合は<code>published</code>を見る<a href="http://microformats.org/wiki/hatom#Entry_Updated">ということになっている</a>ので、どちらかで良い。両方あってもいいけどblosxomでは<code>updated</code>を作るのはコストがかさむので目をつぶった方が良いと思う（似たような理由でフィードのフォーマットとしてAtomを使用するのをずいぶん前にやめた）。</p>
 
@@ -59,9 +60,9 @@
 
 <p><code>author</code>も必須だが、<code>hentry</code>以下になかった場合は親を辿って<code>vcard</code>というクラス名を含む<code>address</code>要素を探す<a href="http://microformats.org/wiki/hatom#Entry_Author">ということになっている</a>ので、こちらも省略可能。foot.htmlで以下のようにしておけば良いはず。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">address</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;vcard author&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://example.com/about&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;fn&quot;</span>&gt;</span>John Doe<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">address</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;address class=&quot;vcard author&quot;&gt;
+	&lt;a href=&quot;http://example.com/about&quot; class=&quot;fn&quot;&gt;John Doe&lt;/a&gt;
+&lt;/address&gt;</code></pre>
 
 <p><code>address</code>要素縛りが謎い。複数著者の場合どうするんだろ。</p>
 

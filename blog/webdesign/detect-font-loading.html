@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="TypeKitとかがやってるWebフォントの読み込みが終わったらhtml要素にクラス名を振るアレの話。TypeKitがオープンソースでリリースしているWebFont Loaderを使う方法が安全で安定。Googleがホスティングしているのもあるので手軽でもある。でも読み込み完了の検知以外にも機能があってパワフルすぎる気がするので、Adobe Blankを使って自前で書いてみることにした。" property="twitter:description">
@@ -49,9 +50,9 @@
 
 <p>外部リクエストにすると意味が薄れるのでDataURIを使って既存のCSSに混ぜ込む。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-keyword">@font-face</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&#x27;Adobe Blank&#x27;</span>;
-	<span class="hljs-attribute">src</span>: <span class="hljs-built_in">url</span>(<span class="hljs-string">&#x27;data:application/font-woff;base64,d09GRgAB...&#x27;</span>) <span class="hljs-built_in">format</span>(<span class="hljs-string">&#x27;woff&#x27;</span>);
+<pre><code class="language-css">@font-face {
+	font-family: &apos;Adobe Blank&apos;;
+	src: url(&apos;data:application/font-woff;base64,d09GRgAB...&apos;) format(&apos;woff&apos;);
 }</code></pre>
 </section>
 
@@ -60,11 +61,11 @@
 
 <p>これを<code>font-family</code>に指定した要素では、<code>a</code>しかテキストのない場合に幅が<code>0</code>になる。なので以下の様な要素を作っておくとWebフォント（Source Sans Proを例にする）の読み込みが完了すると幅が増えることになる。つまりこの要素の幅を監視すれば読み込み完了の検知が出来る。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;font-family:&#x27;Source Sans Pro&#x27;, &#x27;Adobe Blank&#x27;;
+<pre><code class="language-html">&lt;div style=&quot;font-family:&apos;Source Sans Pro&apos;, &apos;Adobe Blank&apos;;
 	position: absolute;
-	top: -100px;&quot;</span>&gt;</span>
+	top: -100px;&quot;&gt;
 	a
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+&lt;/div&gt;</code></pre>
 </section>
 
 <section>
@@ -72,26 +73,26 @@
 
 <p>要素の生成から監視までを全てJavaScriptでやると良い。タイマー使わない方法も模索したい所だけどまずは普通のアプローチで。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">detectFontLoading</span>(<span class="hljs-params">fontName</span>) {
-	<span class="hljs-keyword">var</span> tester = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;span&#x27;</span>);
-	tester.<span class="hljs-property">style</span>.<span class="hljs-property">fontFamily</span> = <span class="hljs-string">&#x27;&quot;&#x27;</span> + fontName + <span class="hljs-string">&#x27;&quot;, &quot;Adobe Blank&quot;&#x27;</span>;
-	tester.<span class="hljs-property">style</span>.<span class="hljs-property">position</span> = <span class="hljs-string">&#x27;absolute&#x27;</span>;
-	tester.<span class="hljs-property">style</span>.<span class="hljs-property">top</span> = <span class="hljs-string">&#x27;-100px&#x27;</span>;
-	tester.<span class="hljs-title function_">appendChild</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createTextNode</span>(<span class="hljs-string">&#x27;a&#x27;</span>));
-	<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(tester);
+<pre><code class="language-javascript">function detectFontLoading(fontName) {
+	var tester = document.createElement(&apos;span&apos;);
+	tester.style.fontFamily = &apos;&quot;&apos; + fontName + &apos;&quot;, &quot;Adobe Blank&quot;&apos;;
+	tester.style.position = &apos;absolute&apos;;
+	tester.style.top = &apos;-100px&apos;;
+	tester.appendChild(document.createTextNode(&apos;a&apos;));
+	document.body.appendChild(tester);
 
-	<span class="hljs-keyword">var</span> timerId = <span class="hljs-built_in">setInterval</span>(checkWidth, <span class="hljs-number">500</span>);
+	var timerId = setInterval(checkWidth, 500);
 
-	<span class="hljs-keyword">function</span> <span class="hljs-title function_">checkWidth</span>(<span class="hljs-params"></span>) {
-		<span class="hljs-keyword">if</span> (tester.<span class="hljs-property">offsetWidth</span> &gt; <span class="hljs-number">0</span>) {
-			<span class="hljs-built_in">clearInterval</span>(timerId);
-			<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>.<span class="hljs-property">className</span> += <span class="hljs-string">&#x27; &#x27;</span> + fontName.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\s/g</span>, <span class="hljs-string">&#x27;_&#x27;</span>);
-			tester.<span class="hljs-property">parentNode</span>.<span class="hljs-title function_">removeChild</span>(tester);
+	function checkWidth() {
+		if (tester.offsetWidth &gt; 0) {
+			clearInterval(timerId);
+			document.documentElement.className += &apos; &apos; + fontName.toLowerCase().replace(/\s/g, &apos;_&apos;);
+			tester.parentNode.removeChild(tester);
 		}
 	}
 }
 
-<span class="hljs-title function_">detectFontLoading</span>(<span class="hljs-string">&quot;Source Sans Pro&quot;</span>);</code></pre>
+detectFontLoading(&quot;Source Sans Pro&quot;);</code></pre>
 
 <p>これでSource Sans Proの読み込みが完了すると、<code>html</code>要素に<code>source_sans_pro</code>というクラス名が振られる。どのブラウザーでも読み込みの完了前から文字は表示され読めるという前提の話になっているので、特に急がずに500ミリ秒間隔とかでチェックすれば良さそう。もっとゆっくりでも良いかも。ずっとチェックし続けるのでタイムアウトは設定できるようにするべきだけどやってない。</p>
 </section>
@@ -101,12 +102,12 @@
 
 <p>あとはCSSをこれに見合った形で書いてやるだけ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Helvetica Neue&quot;</span>, <span class="hljs-string">&quot;Calibri&quot;</span>, sans-serif;
+<pre><code class="language-css">body {
+	font-family: &quot;Helvetica Neue&quot;, &quot;Calibri&quot;, sans-serif;
 }
 
-<span class="hljs-selector-class">.source_sans_pro</span> <span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Source Sans Pro&quot;</span>, sans-serif;
+.source_sans_pro body {
+	font-family: &quot;Source Sans Pro&quot;, sans-serif;
 }</code></pre>
 
 <p>Source Sans Proの読み込みが完了するまではHelvetica NeueまたはCalibriでとりあえず表示され、読み込みが完了するとSource Sans Pronに置き換わる。</p>

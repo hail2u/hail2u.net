@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Firefoxにインストール済みのExtensionは、もちろんExtension Managerで確認できるわけですが、なんかの拍子にプロファイル作り直しの刑を受けてしまうと当然Extensionも入れ直しなわけです。この作業は、新たなExtensionを導入する作業と違ってかったるいだけの作業だったりするわけで。てなわけでその作業の手間を少し楽にするためにインストール済みのExtensionの情報が書かれているExtension.rdfを（かなり適当に）パースして、Extensionの名前とバージョン、配布サイトのURLをリスト・アップするスクリプトを書いてみました。・・・WSH with JScriptで。" property="twitter:description">
@@ -36,49 +37,49 @@
 
 				<p><a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>にインストール済みのExtensionは、もちろんExtension Managerで確認できるわけですが、なんかの拍子にプロファイル作り直しの刑を受けてしまうと当然Extensionも入れ直しなわけです。この作業は、新たなExtensionを導入する作業と違ってかったるいだけの作業だったりするわけで。てなわけでその作業の手間を少し楽にするためにインストール済みのExtensionの情報が書かれているExtension.rdfを（かなり適当に）パースして、Extensionの名前とバージョン、配布サイトのURLをリスト・アップするスクリプトを書いてみました。・・・WSH with JScriptで。</p>
 <p>Extensions.rdfの構造はちゃんと調べてないのでよく知らない（最低）のですが、どうもインストールしたExtensionについては<code>em:version</code>とか<code>em:name</code>とかいう属性を持つ<code>RDF:Description</code>要素が追加されるようなので、それを単純にリストアップしてみました。</p>
-<pre><code class="highlight language-js"><span class="hljs-comment">// fxexts.js</span>
+<pre><code class="language-js">// fxexts.js
 
-<span class="hljs-keyword">var</span> oArgs = WScript.<span class="hljs-property">Arguments</span>;
-<span class="hljs-keyword">var</span> fFxExtsRdf = <span class="hljs-title function_">oArgs</span>(<span class="hljs-number">0</span>);
+var oArgs = WScript.Arguments;
+var fFxExtsRdf = oArgs(0);
 
-<span class="hljs-keyword">var</span> oFileSys = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Active</span>XObject(<span class="hljs-string">&quot;Scripting.FileSystemObject&quot;</span>);
+var oFileSys = new ActiveXObject(&quot;Scripting.FileSystemObject&quot;);
 
-<span class="hljs-keyword">if</span> (!oFileSys.<span class="hljs-title class_">FileExists</span>(fFxExtsRdf)) {
-	WScript.<span class="hljs-title class_">Echo</span>(fFxExtsRdf + <span class="hljs-string">&quot;\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。&quot;</span>);
-	WScript.<span class="hljs-title class_">Quit</span>();
+if (!oFileSys.FileExists(fFxExtsRdf)) {
+	WScript.Echo(fFxExtsRdf + &quot;\nファイルが見つかりません。\n指定したファイル名が正しいかどうか確認してください。&quot;);
+	WScript.Quit();
 }
 
-<span class="hljs-keyword">var</span> xmlDoc  = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Active</span>XObject(<span class="hljs-string">&quot;Msxml2.DOMDocument.3.0&quot;</span>);
+var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
 
-xmlDoc.<span class="hljs-property">async</span> = <span class="hljs-literal">false</span>;
-xmlDoc.<span class="hljs-title function_">load</span>(fFxExtsRdf);
+xmlDoc.async = false;
+xmlDoc.load(fFxExtsRdf);
 
-<span class="hljs-keyword">if</span> (xmlDoc.<span class="hljs-property">parseError</span>.<span class="hljs-property">errorCode</span> != <span class="hljs-number">0</span>) {
-	WScript.<span class="hljs-title class_">Echo</span>(xmlDoc.<span class="hljs-property">parseError</span>.<span class="hljs-property">reason</span>);
-	WScript.<span class="hljs-title class_">Quit</span>();
+if (xmlDoc.parseError.errorCode != 0) {
+	WScript.Echo(xmlDoc.parseError.reason);
+	WScript.Quit();
 }
 
-<span class="hljs-keyword">var</span> descriptionNodes = xmlDoc.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&quot;RDF:Description&quot;</span>);
-<span class="hljs-keyword">var</span> sExtsList = <span class="hljs-string">&quot;&quot;</span>;
+var descriptionNodes = xmlDoc.getElementsByTagName(&quot;RDF:Description&quot;);
+var sExtsList = &quot;&quot;;
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; descriptionNodes.<span class="hljs-property">length</span>; i++) {
-	<span class="hljs-keyword">var</span> description   = descriptionNodes.<span class="hljs-title function_">item</span>(i);
-	<span class="hljs-keyword">var</span> emName        = description.<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&quot;em:name&quot;</span>);
-	<span class="hljs-keyword">var</span> emVersion     = description.<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&quot;em:version&quot;</span>);
-	<span class="hljs-keyword">var</span> emHomepageUrl = description.<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&quot;em:homepageURL&quot;</span>);
+for (var i = 0; i &lt; descriptionNodes.length; i++) {
+	var description   = descriptionNodes.item(i);
+	var emName        = description.getAttribute(&quot;em:name&quot;);
+	var emVersion     = description.getAttribute(&quot;em:version&quot;);
+	var emHomepageUrl = description.getAttribute(&quot;em:homepageURL&quot;);
 
-	<span class="hljs-keyword">if</span> (emName &amp;&amp; emVersion &amp;&amp; emHomepageUrl) {
-		sExtsList += emName + <span class="hljs-string">&quot; version &quot;</span> + emVersion + <span class="hljs-string">&quot;\n&quot;</span> + emHomepageUrl + <span class="hljs-string">&quot;\n&quot;</span>;
-		sExtsList += <span class="hljs-string">&quot;----------------------------------------\n&quot;</span>;
+	if (emName &amp;&amp; emVersion &amp;&amp; emHomepageUrl) {
+		sExtsList += emName + &quot; version &quot; + emVersion + &quot;\n&quot; + emHomepageUrl + &quot;\n&quot;;
+		sExtsList += &quot;----------------------------------------\n&quot;;
 	}
 }
 
-<span class="hljs-keyword">if</span> (sExtsList) {
-	sExtsList = <span class="hljs-string">&quot;Firefox installed Extensions\n========================================\n&quot;</span> + sExtsList;
-	WScript.<span class="hljs-title class_">Echo</span>(sExtsList);
+if (sExtsList) {
+	sExtsList = &quot;Firefox installed Extensions\n========================================\n&quot; + sExtsList;
+	WScript.Echo(sExtsList);
 }
 
-WScript.<span class="hljs-title class_">Quit</span>();</code></pre>
+WScript.Quit();</code></pre>
 <p>使い方は、コマンドプロンプトでfxexts.jsを保存したフォルダに移動し、</p>
 <pre><samp>C:&gt; <kbd>cscript.exe //Nologo fxexts.js &lt;Extensions.rdfのパス&gt;</kbd></samp></pre>
 <p>とすると、標準出力にそのまま単純なリストが出力されます（わかりづら）。出力例はこんな感じ。</p>

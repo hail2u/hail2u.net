@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="AWSをガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと（今さら）気づいた。ので、画像置換のためのチェック方法にはContent-Typeを利用する方法もあるわけ。てかAmazon Hacksに載ってるらしいです（持ってない）。" property="twitter:description">
@@ -36,27 +37,27 @@
 
 				<p><a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>をガリガリいじってたら、通常の画像はimage/jpegなのに対して1*1のダメ画像はimage/gifなことにふと（今さら）気づいた。ので、画像置換のためのチェック方法には<code>Content-Type</code>を利用する方法もあるわけ。てか<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873111811/hail2unet-22" title="Amazon.co.jp： 本: Amazon Hacks 世界最大のショッピングサイト完全活用テクニック100選">Amazon Hacks</a>に載ってるらしいです（持ってない）。</p>
 <p><code>Content-Type</code>がimage/jpegな場合はちゃんと画像がある（はず）なので、チェックするためのコードはこんなシンプルなものでOKなはず。</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">use</span> LWP::Simple;
+<pre><code class="language-perl">use LWP::Simple;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_image</span> </span>{
-	<span class="hljs-keyword">my</span> $url = <span class="hljs-keyword">shift</span>;
+sub check_image {
+	my $url = shift;
 
-	<span class="hljs-keyword">my</span> $header = head($url);
+	my $header = head($url);
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> $header-&gt;content_type eq <span class="hljs-string">&quot;image/jpeg&quot;</span>;
-	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	return 1 if $header-&gt;content_type eq &quot;image/jpeg&quot;;
+	return 0;
 }</code></pre>
 <p>とか書いたけど、ちゃんとした画像がimage/gifだったりすることもあるかもなぁ。いまいち一貫性に欠けるところがあるので信用できない（偉そう）。</p>
 <p><code>Content-Length</code>でチェックする場合はこんなコード。</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">use</span> LWP::Simple;
+<pre><code class="language-perl">use LWP::Simple;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">check_image</span> </span>{
-	<span class="hljs-keyword">my</span> $url = <span class="hljs-keyword">shift</span>;
+sub check_image {
+	my $url = shift;
 
-	<span class="hljs-keyword">my</span> $header = head($url);
+	my $header = head($url);
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> $header-&gt;content_length &gt; <span class="hljs-number">807</span>;
-	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	return 1 if $header-&gt;content_length &gt; 807;
+	return 0;
 }</code></pre>
 <p>どっちにしても、失敗する時は失敗する気がする。しかも結構頻繁に。</p>
 <p>そもそもAWSがきちんとしたURLを返さないのが悪い。とか、いつも思うわけで。</p>

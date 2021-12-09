@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="FuzzyFinderのbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、statuslineにも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。" property="twitter:description">
@@ -50,7 +51,7 @@
 
 <p>こんな感じになる。この<code>statusline</code>のコードは、</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">set</span> statusline=%{<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:t&#x27;</span>)}\ %&lt;\(%{<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:h&#x27;</span>)}\)%=\ %<span class="hljs-keyword">m</span>%r%<span class="hljs-keyword">y</span>%<span class="hljs-keyword">w</span>%{<span class="hljs-string">&#x27;[&#x27;</span>.(&amp;fenc!=<span class="hljs-string">&#x27;&#x27;</span>?&amp;fenc:&amp;enc).<span class="hljs-string">&#x27;][&#x27;</span>.&amp;ff.<span class="hljs-string">&#x27;]&#x27;</span>}[%<span class="hljs-number">3</span><span class="hljs-keyword">l</span>,%<span class="hljs-number">3</span><span class="hljs-keyword">c</span>]</code></pre>
+<pre><code class="language-vim">set statusline=%{expand(&apos;%:p:t&apos;)}\ %&lt;\(%{expand(&apos;%:p:h&apos;)}\)%=\ %m%r%y%w%{&apos;[&apos;.(&amp;fenc!=&apos;&apos;?&amp;fenc:&amp;enc).&apos;][&apos;.&amp;ff.&apos;]&apos;}[%3l,%3c]</code></pre>
 
 <p>というもので、しばらくこれを使っていた。悪くはないが、パスの先頭を省略するような書き方なのでドライブレターが見えなくなってしまいWindowsだとちょっとアレ。これをベースにFuzzyFinderから長いパスの中間を省略する関数をパクって最適化すると、</p>
 
@@ -60,20 +61,20 @@
 
 <p>こうなる。ドライブレターも見えるし、ファイルのあるフォルダ名も大体見えるのでわかりやすい！</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">set</span> statusline=%{<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:t&#x27;</span>)}\ %&lt;\(<span class="hljs-symbol">&lt;em&gt;</span>%{SnipMid(<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:h&#x27;</span>),<span class="hljs-number">80</span>-<span class="hljs-built_in">len</span>(<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:t&#x27;</span>)),<span class="hljs-string">&#x27;...&#x27;</span>)}&lt;/<span class="hljs-keyword">em</span>&gt;\)%=\ %<span class="hljs-keyword">m</span>%r%<span class="hljs-keyword">y</span>%<span class="hljs-keyword">w</span>%{<span class="hljs-string">&#x27;[&#x27;</span>.(&amp;fenc!=<span class="hljs-string">&#x27;&#x27;</span>?&amp;fenc:&amp;enc).<span class="hljs-string">&#x27;][&#x27;</span>.&amp;ff.<span class="hljs-string">&#x27;]&#x27;</span>}[%<span class="hljs-number">3</span><span class="hljs-keyword">l</span>,%<span class="hljs-number">3</span><span class="hljs-keyword">c</span>]
+<pre><code class="language-vim">set statusline=%{expand(&apos;%:p:t&apos;)}\ %&lt;\(<em>%{SnipMid(expand(&apos;%:p:h&apos;),80-len(expand(&apos;%:p:t&apos;)),&apos;...&apos;)}</em>\)%=\ %m%r%y%w%{&apos;[&apos;.(&amp;fenc!=&apos;&apos;?&amp;fenc:&amp;enc).&apos;][&apos;.&amp;ff.&apos;]&apos;}[%3l,%3c]
 
-<span class="hljs-keyword">function!</span> <span class="hljs-title">SnipMid</span><span class="hljs-params">(str, len, mask)</span>
-	<span class="hljs-keyword">if</span> <span class="hljs-variable">a:len</span> &gt;= <span class="hljs-built_in">len</span>(<span class="hljs-variable">a:str</span>)
-		<span class="hljs-keyword">return</span> <span class="hljs-variable">a:str</span>
-	<span class="hljs-keyword">elseif</span> <span class="hljs-variable">a:len</span> &lt;= <span class="hljs-built_in">len</span>(<span class="hljs-variable">a:mask</span>)
-		<span class="hljs-keyword">return</span> <span class="hljs-variable">a:mask</span>
-	<span class="hljs-keyword">endif</span>
+function! SnipMid(str, len, mask)
+	if a:len &gt;= len(a:str)
+		return a:str
+	elseif a:len &lt;= len(a:mask)
+		return a:mask
+	endif
 
-	<span class="hljs-keyword">let</span> len_head = (<span class="hljs-variable">a:len</span> - <span class="hljs-built_in">len</span>(<span class="hljs-variable">a:mask</span>)) / <span class="hljs-number">2</span>
-	<span class="hljs-keyword">let</span> len_tail = <span class="hljs-variable">a:len</span> - <span class="hljs-built_in">len</span>(<span class="hljs-variable">a:mask</span>) - len_head
+	let len_head = (a:len - len(a:mask)) / 2
+	let len_tail = a:len - len(a:mask) - len_head
 
-	<span class="hljs-keyword">return</span> (len_head &gt; <span class="hljs-number">0</span> ? <span class="hljs-variable">a:str</span>[: len_head - <span class="hljs-number">1</span>] : <span class="hljs-string">&#x27;&#x27;</span>) . <span class="hljs-variable">a:mask</span> . (len_tail &gt; <span class="hljs-number">0</span> ? <span class="hljs-variable">a:str</span>[-len_tail :] : <span class="hljs-string">&#x27;&#x27;</span>)
-<span class="hljs-keyword">endfunction</span></code></pre>
+	return (len_head &gt; 0 ? a:str[: len_head - 1] : &apos;&apos;) . a:mask . (len_tail &gt; 0 ? a:str[-len_tail :] : &apos;&apos;)
+endfunction</code></pre>
 
 <p><code>SnipMid()</code>はFuzzyFinderからコピペしただけ（<a href="http://bitbucket.org/ns9tks/vim-fuzzyfinder/src/tip/autoload/fuf.vim#cl-505">autoload/fuf.vimの505行目</a>あたりにある）。切り詰める長さは<code>SnipMid()</code>の第二引数で指定する。ここでは、</p>
 
@@ -83,7 +84,7 @@
 
 <p><code>titlestring</code>に使っても良い。</p>
 
-<pre><code class="highlight language-vim"><span class="hljs-keyword">set</span> titlestring=%{<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:t&#x27;</span>)}%(\ %<span class="hljs-keyword">m</span>%r%<span class="hljs-keyword">w</span>%)\ %&lt;\(%{SnipMid(<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:h&#x27;</span>),<span class="hljs-number">80</span>-<span class="hljs-built_in">len</span>(<span class="hljs-built_in">expand</span>(<span class="hljs-string">&#x27;%:p:t&#x27;</span>)),<span class="hljs-string">&#x27;...&#x27;</span>)}\)\ -\ Vim</code></pre>
+<pre><code class="language-vim">set titlestring=%{expand(&apos;%:p:t&apos;)}%(\ %m%r%w%)\ %&lt;\(%{SnipMid(expand(&apos;%:p:h&apos;),80-len(expand(&apos;%:p:t&apos;)),&apos;...&apos;)}\)\ -\ Vim</code></pre>
 
 <hr>
 

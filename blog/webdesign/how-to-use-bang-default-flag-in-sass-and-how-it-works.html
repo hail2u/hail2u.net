@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="Sassを書く時には変数を多用することと思います。それら変数は自分で定義して自分で使うので、同じプロジェクト内で再定義する必要はあまりありません。しかし他人や自分の作ったSassファイルを流用する場合、その中で使われている変数の値を最適化する必要が出てきます。もしその変数がハード・コーディングされているだけだとしたらどうでしょうか？　その場合変数を直接書き換えることになるでしょう。こういったSassファイルの再利用における問題を解決するためにSassには!defaultというフラグが用意されています。" property="twitter:description">
@@ -51,20 +52,20 @@
 
 <p>例えば以下のように書くと:</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$content</span>: <span class="hljs-string">&quot;First content&quot;</span>;
-<span class="hljs-variable">$content</span>: <span class="hljs-string">&quot;Second content?&quot;</span> !default;
-<span class="hljs-variable">$new_content</span>: <span class="hljs-string">&quot;First time reference&quot;</span> !default;
+<pre><code class="language-scss">$content: "First content";
+$content: "Second content?" !default;
+$new_content: "First time reference" !default;
 
-<span class="hljs-selector-id">#main</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-variable">$content</span>;
-	new-<span class="hljs-attribute">content</span>: <span class="hljs-variable">$new_content</span>;
+#main {
+	content: $content;
+	new-content: $new_content;
 }</code></pre>
 
 <p>以下のようにコンパイルされます:</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#main</span> {
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;First content&quot;</span>;
-	new-<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;First time reference&quot;</span>; }</code></pre>
+<pre><code class="language-css">#main {
+	content: "First content";
+	new-content: "First time reference"; }</code></pre>
 </blockquote>
 
 <section>
@@ -78,27 +79,27 @@
 
 <p>ライブラリで<code>!default</code>フラグを使わなかった場合にどうなるのでしょうか？　例えば以下のようなデフォルトのフォント設定を定義するライブラリを<code>_font.scss</code>というファイル名で作成したとします。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$font-family</span>: <span class="hljs-string">&quot;Helvetica Neue&quot;</span>, <span class="hljs-string">&quot;Helvetica&quot;</span>, <span class="hljs-string">&quot;Arial&quot;</span>, sans-serif;
+<pre><code class="language-scss">$font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 
-<span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font</span>: <span class="hljs-number">16px</span>/<span class="hljs-number">1.5</span> <span class="hljs-variable">$font-family</span>;
+body {
+	font: 16px/1.5 $font-family;
 }</code></pre>
 
 <p>この小さなライブラリを利用した上でフォント・ファミリだけを変えたいという場合、以下のようにすることが多いでしょう。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;font&quot;</span>;
+<pre><code class="language-scss">@import "font";
 
-<span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif;
+body {
+	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
 }</code></pre>
 
 <p>SCSSファイルとしては特に悪いと言えるところはありません（良いとも言えませんが）。しかしコンパイルすると以下のようなCSSになってしまいます。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font</span>: <span class="hljs-number">16px</span>/<span class="hljs-number">1.5</span> <span class="hljs-string">&quot;Helvetica Neue&quot;</span>, <span class="hljs-string">&quot;Helvetica&quot;</span>, <span class="hljs-string">&quot;Arial&quot;</span>, sans-serif; }
+<pre><code class="language-css">body {
+	font: 16px/1.5 "Helvetica Neue", "Helvetica", "Arial", sans-serif; }
 
-<span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif; }</code></pre>
+body {
+	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif; }</code></pre>
 
 <p>CSSとしては無駄が多く美しくないですよね？</p>
 </section>
@@ -108,24 +109,24 @@
 
 <p>それでは<code>_font.scss</code>を<code>!default</code>フラグを使って再利用しやすいように書き直してみましょう。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$font-size</span>: <span class="hljs-number">16px</span> !default;
-<span class="hljs-variable">$line-height</span>: <span class="hljs-number">1.5</span> !default;
-<span class="hljs-variable">$font-family</span>: <span class="hljs-string">&quot;Helvetica Neue&quot;</span>, <span class="hljs-string">&quot;Helvetica&quot;</span>, <span class="hljs-string">&quot;Arial&quot;</span>, sans-serif !default;
+<pre><code class="language-scss">$font-size: 16px !default;
+$line-height: 1.5 !default;
+$font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif !default;
 
-<span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font</span>: <span class="hljs-variable">$font-size</span>/#{<span class="hljs-variable">$line-height</span>} <span class="hljs-variable">$font-family</span>;
+body {
+	font: $font-size/#{$line-height} $font-family;
 }</code></pre>
 
 <p>このようにライブラリ側で適切に<code>!default</code>が使われていれば、先程の例と同じようにフォント・ファミリを変更するとすると、利用先では以下のように書くことができます。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$font-family</span>: <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif;
+<pre><code class="language-scss">$font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
 
-<span class="hljs-keyword">@import</span> <span class="hljs-string">&quot;font&quot;</span>;</code></pre>
+@import "font";</code></pre>
 
 <p><code>$font-family</code>を<em><code>@import</code>の前で</em>設定してやることに注意してください。こうすることによってライブラリが変数が設定済みであることを認識し、ライブラリ側での変数設定が行われないようになります。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> {
-	<span class="hljs-attribute">font</span>: <span class="hljs-number">16px</span>/<span class="hljs-number">1.5</span> <span class="hljs-string">&quot;Lucida Grande&quot;</span>, <span class="hljs-string">&quot;Lucida Sans Unicode&quot;</span>, sans-serif; }</code></pre>
+<pre><code class="language-css">body {
+	font: 16px/1.5 "Lucida Grande", "Lucida Sans Unicode", sans-serif; }</code></pre>
 
 <p>コンパイルするとこのような綺麗なCSSが出力されるようになるでしょう。<code>$font-size</code>や<code>$line-height</code>も同様にして設定することが可能です。勿論何も設定しなければ<code>_font.scss</code>で指定されている値が利用されます。</p>
 </section>

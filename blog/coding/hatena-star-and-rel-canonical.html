@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" property="twitter:description">
@@ -38,20 +39,20 @@
 
 <p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
 
-<pre><code class="highlight language-js">} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selector == <span class="hljs-string">&#x27;link[rel=&quot;canonical&quot;]&#x27;</span>) {
-	<span class="hljs-keyword">var</span> z = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementsByTagName</span>(<span class="hljs-string">&quot;link&quot;</span>),
+<pre><code class="language-js">} else if (selector == 'link[rel="canonical"]') {
+	var z = document.getElementsByTagName("link"),
 		y,
-		x = z.<span class="hljs-property">length</span>,
+		x = z.length,
 		w,
-		v = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;a&quot;</span>);
+		v = document.createElement("a");
 
-	<span class="hljs-keyword">for</span> (y = <span class="hljs-number">0</span>; y &lt; x; y++) {
+	for (y = 0; y &lt; x; y++) {
 		w = z[y];
 
-		<span class="hljs-keyword">if</span> (w.<span class="hljs-property">rel</span> === <span class="hljs-string">&quot;canonical&quot;</span>) {
-			v.<span class="hljs-title function_">setAttribute</span>(<span class="hljs-string">&quot;href&quot;</span>, w.<span class="hljs-property">href</span>);
-			result = v.<span class="hljs-title function_">cloneNode</span>(<span class="hljs-literal">false</span>);
-			<span class="hljs-keyword">break</span>;
+		if (w.rel === "canonical") {
+			v.setAttribute("href", w.href);
+			result = v.cloneNode(false);
+			break;
 		}
 	}</code></pre>
 
@@ -63,22 +64,22 @@
 
 <p>このブログのように、Blosxomで一覧ページとpermalinkで対象とするURLを切り替える場合は<a href="http://blosxom.sourceforge.net/plugins/interpolate/interpolate_fancy.htm">interpolcate_fancy</a>を使って以下のようにすれば良いでしょう。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="language-javascript">
-<span class="hljs-title class_">Hatena</span>.<span class="hljs-property">Star</span>.<span class="hljs-property">SiteConfig</span> = {
-	<span class="hljs-attr">entryNodes</span>: {
-		<span class="hljs-string">&quot;article&quot;</span>: {
-&lt;?$path_info like=<span class="hljs-string">&quot;\.html$&quot;</span>&gt;
-			<span class="hljs-attr">uri</span>:       <span class="hljs-string">&quot;link[rel=\&quot;canonical\&quot;]&quot;</span>,
+<pre><code class="language-html">&lt;script type="text/javascript"&gt;
+Hatena.Star.SiteConfig = {
+	entryNodes: {
+		"article": {
+&lt;?$path_info like="\.html$"&gt;
+			uri:       "link[rel=\"canonical\"]",
 &lt;/?&gt;
-&lt;?$path_info unlike=<span class="hljs-string">&quot;\.html$&quot;</span>&gt;
-			<span class="hljs-attr">uri</span>:       <span class="hljs-string">&quot;h2 a&quot;</span>,
+&lt;?$path_info unlike="\.html$"&gt;
+			uri:       "h2 a",
 &lt;/?&gt;
-			<span class="hljs-attr">title</span>:     <span class="hljs-string">&quot;h2&quot;</span>,
-			<span class="hljs-attr">container</span>: <span class="hljs-string">&quot;footer p&quot;</span>
+			title:     "h2",
+			container: "footer p"
 		}
 	}
 };
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+&lt;/script&gt;</code></pre>
 
 <p>これでスター通知でニヤニヤする日々が帰ってきますね！</p>
 			</article>

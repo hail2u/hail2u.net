@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="blosxomの出力に、プラグインで生成した何か（大抵の場合はHTMLとか）を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの（単なるリストとか）を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、HTML::Templateなりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。" property="twitter:description">
@@ -41,23 +42,23 @@
 </blockquote>
 <p>とあるように、プラグインで<code>template</code>サブルーチンを利用するという事が意味するのは、デフォルトのテンプレートを差し替えるということです（よくわからない説明になってますけど、察してください）。</p>
 <p>blosxomの<code>template</code>サブルーチンは、</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">my</span> $tmpl = &amp;$blosxom::template($path, $chunk, $flavour);</code></pre>
+<pre><code class="language-perl">my $tmpl = &amp;$blosxom::template($path, $chunk, $flavour);</code></pre>
 <p>という形で呼び、<code>$tmpl</code>には、<code>$datadir/$path/$chunk.$flavour</code>というファイルの内容がそのまま格納されます。<code>$path</code>は<code>$blosxom::path_info</code>などをそのまま渡してやり、<code>$chunk</code>はプラグイン名などを利用、<code>$flavour</code>は<code>$blosxom::flavour</code>をそのまま渡すと、blosxomの挙動を真似することが出来、わかりやすく（ユーサーにもデベロッパーにも）ます。実際のコードを書いてみると、</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">package</span> foo;
+<pre><code class="language-perl">package foo;
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> vars <span class="hljs-string">qw($bar)</span>;
+use strict;
+use vars qw($bar);
 
-<span class="hljs-keyword">my</span> $hoge = <span class="hljs-string">&#x27;hogehoge&#x27;</span>;
+my $hoge = &apos;hogehoge&apos;;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
-	$bar = &amp;$blosxom::template($blosxom::path_info, <span class="hljs-string">&#x27;foo&#x27;</span>, $blosxom::flavour);
-	$bar =~ <span class="hljs-regexp">s/\$foo::hoge/$hoge/g</span>e;
+sub start {
+	$bar = &amp;$blosxom::template($blosxom::path_info, &apos;foo&apos;, $blosxom::flavour);
+	$bar =~ s/\$foo::hoge/$hoge/ge;
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }
 
-<span class="hljs-number">1</span>;</code></pre>
+1;</code></pre>
 <p>という感じになります。これでhead.htmlなどで<code>$foo::bar</code>と書いておくと、その場所にfoo.htmlというflavourの内容が入ることになります。blosxomの<code>template</code>サブルーチンは、blosxomの<code>interpolate</code>サブルーチンが呼ばれないので、独自flavour内のblosxomスタイルの変数は自前で処理してやる必要があります（10行目）。</p>
 <p>より実践的なコードは、<a href="http://www.blosxom.com/plugins/input/writeback.htm">writeback</a>の<code>story</code>サブルーチンや、僕の作成した<a href="/archives/blugins.html#back_and_forth">back_and_forth</a>の<code>head</code>サブルーチンあたりで見ることが出来ます。</p>
 <p>blosxomの<code>template</code>サブルーチンを利用した独自flavourを利用するようにプラグインを作成すると、ユーザーに優しいプラグインになると思います。一方で説明が面倒になることも否定はしないですが。</p>

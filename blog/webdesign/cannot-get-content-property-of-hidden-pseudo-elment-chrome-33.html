@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="contentプロパティーの値とgetComputedStyle()の最後で触れたように擬似要素ならcontentプロパティーの値をgetComputedStyle()経由で拾えていた。Chrome 33でちょうどこの辺りに変更が加わったのか、擬似要素がdisplay: noneの場合にcontentプロパティーの計算済みスタイルが空になるようになった。らしきIssueは見つけた。" property="twitter:description">
@@ -38,10 +39,10 @@
 
 <p><code>display: none</code>の場合に限った挙動の様なので、スタイル・ガイドでは<code>position</code>プロパティーで画面外にふっ飛ばしてとりあえずごまかした。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">html</span><span class="hljs-selector-pseudo">::after</span> {
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">bottom</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;6.52.3&quot;</span>;
+<pre><code class="language-css">html::after {
+	position: absolute;
+	bottom: 100%;
+	content: &quot;6.52.3&quot;;
 }</code></pre>
 
 <p>利用が制限されることが多い<code>content</code>プロパティーの計算済みスタイルを使うのはダメそうなので、何か別の手段を考えた方が良さそう。どうしても<code>getComputedStyle()</code>を使うのなら<code>font-family</code>プロパティーを使うのが無難で、実績もある。<code>id</code>属性を振った<code>link</code>要素で参照しているCSSの最後（か最初）のルールセットに仕込んで、うまいこと拾ってくるとかのが素直な感じか。</p>

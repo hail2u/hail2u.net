@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="npmのCSS Lintを使うようにしようかなと思って入れたけどCLIがなんかうまく動かない。動くようにちゃんと直すにも色々よくわからないので、CSSファイルを受け取ってチェックするだけのオレオレCLIを書いて使うことにした。" property="twitter:description">
@@ -36,19 +37,19 @@
 
 				<p>npmの<a href="http://csslint.net/">CSS Lint</a>を使うようにしようかなと思って入れたけどCLIがなんかうまく動かない。動くようにちゃんと直すにも色々よくわからないので、CSSファイルを受け取ってチェックするだけのオレオレCLIを書いて使うことにした。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
+<pre><code class="language-js">#!/usr/bin/env node
 
-<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
-<span class="hljs-keyword">var</span> cl = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;csslint&#x27;</span>);
-<span class="hljs-keyword">var</span> cssfile = process.<span class="hljs-property">argv</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">2</span>)[<span class="hljs-number">0</span>];
+var fs = require('fs');
+var cl = require('csslint');
+var cssfile = process.argv.slice(2)[0];
 
-<span class="hljs-keyword">var</span> results = cl.<span class="hljs-property">CSSLint</span>.<span class="hljs-title function_">verify</span>(fs.<span class="hljs-title function_">readFileSync</span>(cssfile, <span class="hljs-string">&#x27;UTF-8&#x27;</span>));
+var results = cl.CSSLint.verify(fs.readFileSync(cssfile, 'UTF-8'));
 
-<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, l = results.<span class="hljs-property">messages</span>.<span class="hljs-property">length</span>; i &lt; l; i++) {
-	<span class="hljs-keyword">var</span> m = results.<span class="hljs-property">messages</span>[i];
+for (i = 0, l = results.messages.length; i &lt; l; i++) {
+	var m = results.messages[i];
 
-	<span class="hljs-keyword">if</span> (!m.<span class="hljs-property">rollup</span>) {
-		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>([cssfile, m.<span class="hljs-property">line</span>, m.<span class="hljs-property">col</span>, m.<span class="hljs-property">message</span>].<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;:&#x27;</span>));
+	if (!m.rollup) {
+		console.log([cssfile, m.line, m.col, m.message].join(':'));
 	}
 }</code></pre>
 

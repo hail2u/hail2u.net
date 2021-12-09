@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="印刷向けCSSだけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。" property="twitter:description">
@@ -36,25 +37,25 @@
 
 				<p><a href="/blog/webdesign/async-print-css.html">印刷向けCSS</a>だけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> csses = [
-	{ <span class="hljs-attr">href</span>: <span class="hljs-string">&#x27;/styles/print.min.css&#x27;</span>, <span class="hljs-attr">media</span>: <span class="hljs-string">&#x27;print&#x27;</span>; },
-	{ <span class="hljs-attr">href</span>: <span class="hljs-string">&#x27;/fonts/megrim.css&#x27;</span>; },
-	{ <span class="hljs-attr">href</span>: <span class="hljs-string">&#x27;/fonts/source-code-pro.css&#x27;</span> },
-	{ <span class="hljs-attr">href</span>: <span class="hljs-string">&#x27;/fonts/source-sans-pro.css&#x27;</span> }
+<pre><code class="language-javascript">var csses = [
+	{ href: &apos;/styles/print.min.css&apos;, media: &apos;print&apos;; },
+	{ href: &apos;/fonts/megrim.css&apos;; },
+	{ href: &apos;/fonts/source-code-pro.css&apos; },
+	{ href: &apos;/fonts/source-sans-pro.css&apos; }
 ];
-<span class="hljs-keyword">var</span> links = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createDocumentFragment</span>();
-csses.<span class="hljs-title function_">forEach</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">css</span>) {
-	<span class="hljs-keyword">var</span> link = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;link&#x27;</span>);
-	link.<span class="hljs-property">rel</span> = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
-	link.<span class="hljs-property">href</span> = css.<span class="hljs-property">href</span>;
+var links = document.createDocumentFragment();
+csses.forEach(function (css) {
+	var link = document.createElement(&apos;link&apos;);
+	link.rel = &apos;stylesheet&apos;;
+	link.href = css.href;
 
-	<span class="hljs-keyword">if</span> (css.<span class="hljs-property">media</span>) {
-		link.<span class="hljs-property">media</span> = css.<span class="hljs-property">media</span>;
+	if (css.media) {
+		link.media = css.media;
 	}
 
-	links.<span class="hljs-title function_">appendChild</span>(link);
+	links.appendChild(link);
 });
-<span class="hljs-variable language_">document</span>.<span class="hljs-property">head</span>.<span class="hljs-title function_">appendChild</span>(links);</code></pre>
+document.head.appendChild(links);</code></pre>
 
 <p>オプションで<code>media</code>属性を指定できるようにして、印刷向けとウェブフォントのCSSを混ぜられるようにした。一応<code>DocumentFragment</code>を使ったけど、<code>body</code>要素以下にねじ込むわけじゃないのであんまり意味はなさそう。むしろ遅くなるかも。</p>
 

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="CSSでのフォント指定を無効にする手段はブラウザーに用意されていることもあるが、ウェブフォントだけを無効にする手段は用意されていないように思う。もちろんMobile Safariのコンテンツブロッカーに対応したアプリのいくつかでは対応しているようだが、それをデスクトップからテストするのはなかなか難しい。" property="twitter:description">
@@ -38,19 +39,19 @@
 
 <p>僕はまずはSCSSのレベルで工夫してデバッグしやすいように整えておき、JavaScriptの助けを借りる形にした。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-variable">$font-family-sans-serif-local</span>: -apple-system, <span class="hljs-string">&quot;Helvetica Neue&quot;</span>, <span class="hljs-string">&quot;Calibri&quot;</span>, sans-serif;
-<span class="hljs-variable">$font-family-sans-serif</span>: <span class="hljs-string">&quot;Eau Douce&quot;</span>, <span class="hljs-variable">$font-family-sans-serif-local</span>;</code></pre>
+<pre><code class="language-scss">$font-family-sans-serif-local: -apple-system, &quot;Helvetica Neue&quot;, &quot;Calibri&quot;, sans-serif;
+$font-family-sans-serif: &quot;Eau Douce&quot;, $font-family-sans-serif-local;</code></pre>
 
 <p>フォント定義ではまずローカルのフォントを参照する変数を作成する。実際に使う変数ではそれを参照したうえでウェブフォントを先頭に追加する。</p>
 
-<pre><code class="highlight language-scss"><span class="hljs-selector-class">.no-webfont</span> {
-	<span class="hljs-attribute">font-family</span>: <span class="hljs-variable">$font-family-sans-serif-local</span>;
+<pre><code class="language-scss">.no-webfont {
+	font-family: $font-family-sans-serif-local;
 }</code></pre>
 
 <p>デバッグ用のCSSファイルの元になるSCSSファイルでは、このように<code>no-webfont</code>クラスを作っておく。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;toggle-webfont&quot;</span>).<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-	<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">classList</span>.<span class="hljs-title function_">toggle</span>(<span class="hljs-string">&quot;no-webfont&quot;</span>);
+<pre><code class="language-javascript">document.getElementById(&quot;toggle-webfont&quot;).addEventListener(&quot;click&quot;, function () {
+	document.body.classList.toggle(&quot;no-webfont&quot;);
 });</code></pre>
 
 <p>テストに使うウェブページではこのようなJavaScriptを仕込み、<code>toggle-webfont</code>というIDを持つ要素（<code>button</code>要素など）で<code>body</code>要素の<code>no-webfont</code>クラスをトグルできるようにする。これでその要素をクリックするとウェブフォントの有効と無効をエミュレートすることができる。</p>

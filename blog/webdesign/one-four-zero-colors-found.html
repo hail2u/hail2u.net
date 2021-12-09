@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="140 Colors FoundというCSSで使える色キーワードをランダムにちょっとかっこよく表示するツールを作った。CSS Color Keywordsのアレンジ。実用性はまったくない。本当にない。" property="twitter:description">
@@ -47,19 +48,19 @@
 
 <p>色キーワードから<code>rgb(R, G, B)</code>か<code>#RRGGBB</code>に変換するために、その色キーワードを指定した要素の計算済みスタイルを拾おうとした。どんな色のフォーマットでも計算済みスタイルでは統一されている記憶があった（Operaは<code>#RRGGBB</code>で返ってきてしまうけど）ので利用したが、あえなく失敗。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-property">style</span>.<span class="hljs-property">backgroundColor</span> = <span class="hljs-string">&quot;Red&quot;</span>;
-<span class="hljs-keyword">var</span> c = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">getComputedStyle</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>, <span class="hljs-literal">null</span>).<span class="hljs-title function_">getPropertyValue</span>(<span class="hljs-string">&quot;background-color&quot;</span>);
-<span class="hljs-comment">// rgba(0, 0, 0, 0) or transparent</span></code></pre>
+<pre><code class="language-js">document.body.style.backgroundColor = &quot;Red&quot;;
+var c = window.getComputedStyle(document.body, null).getPropertyValue(&quot;background-color&quot;);
+// rgba(0, 0, 0, 0) or transparent</code></pre>
 
 <p>このコード自体にはあまり問題はない。<code>rgba(0, 0, 0, 0)</code>等が返ってきてしまう理由は<code>body</code>要素のスタイルに<code>transition</code>プロパティがあったことで、色を変更した直後だとアニメーション中なため正確な値が拾えなかった。当たり前ですよねー。<code>transition</code>プロパティがなければ意図した通りに変換される。</p>
 
 <p><code>transition</code>が原因なので、そういった余計なスタイルが付かないダミーの要素を作ってそこから拾えばいいんじゃないかとやってみたら、今度は一部ブラウザで空文字列が返された。</p>
 
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> span = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;span&quot;</span>);
-span.<span class="hljs-property">style</span>.<span class="hljs-property">backgroundColor</span> = <span class="hljs-string">&quot;Red&quot;</span>;
-<span class="hljs-keyword">var</span> c = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">getComputedStyle</span>(span, <span class="hljs-literal">null</span>).<span class="hljs-title function_">getPropertyValue</span>(<span class="hljs-string">&quot;background-color&quot;</span>);
-<span class="hljs-comment">// Chrome, Safari and Opera: empty string</span>
-<span class="hljs-comment">// Internet Explorer and Firefox: rgb(255, 0, 0)</span></code></pre>
+<pre><code class="language-js">var span = document.createElement(&quot;span&quot;);
+span.style.backgroundColor = &quot;Red&quot;;
+var c = window.getComputedStyle(span, null).getPropertyValue(&quot;background-color&quot;);
+// Chrome, Safari and Opera: empty string
+// Internet Explorer and Firefox: rgb(255, 0, 0)</code></pre>
 
 <p>ChromeやSafari・Operaでは<code>appendChild()</code>等をしていない要素の計算済みスタイルを参照できないようだ。パフォーマンス上の理由でこうなってるんだろうか。</p>
 

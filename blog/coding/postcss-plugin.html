@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="PostCSS v4.1.0からプラグインAPIが実装され、postcss.plugin()でプラグインを作ることが推奨されるようになった。このガイドラインに従って作ることで、プラグイン間で一貫性が保たれ、エラーもわかりやすくなるというわけだ。一見良いとこずくめだが、それだけだとPostCSSプラグインの実行に常にPostCSSが必要になってしまう。Node.jsモジュールとして機能しているかというと微妙なところだ。" property="twitter:description">
@@ -38,37 +39,37 @@
 
 <p>仮に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>が<code>postcss.plugin()</code>だけを使って作り直されたとしてみよう。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
-<span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;postcss&quot;</span>);
-<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;csswring&quot;</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+var postcss = require(&quot;postcss&quot;);
+var csswring = require(&quot;csswring&quot;);
 
-<span class="hljs-keyword">var</span> input = <span class="hljs-string">&quot;main.css&quot;</span>;
-<span class="hljs-keyword">var</span> output = <span class="hljs-string">&quot;main.min.css&quot;</span>;
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
 
-<span class="hljs-title function_">postcss</span>([
-	<span class="hljs-title function_">csswring</span>()
-]).<span class="hljs-title function_">process</span>(fs.<span class="hljs-title function_">readFileSync</span>(input, <span class="hljs-string">&quot;utf8&quot;</span>), {
-	<span class="hljs-attr">from</span>: input,
-	<span class="hljs-attr">to</span>: output
-}).<span class="hljs-title function_">then</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">result</span>) {
-	fs.<span class="hljs-title function_">writeFileSync</span>(output, result.<span class="hljs-property">css</span>);
+postcss([
+	csswring()
+]).process(fs.readFileSync(input, &quot;utf8&quot;), {
+	from: input,
+	to: output
+}).then(function (result) {
+	fs.writeFileSync(output, result.css);
 });</code></pre>
 
 <p>PostCSSプラグインなので、このようにPostCSSの使い方をちゃんと知って使わざるをえない。もちろん他のPostCSSプラグインと組み合わせることもあるので、最終的にはこういう利用に落ち着くことはありうる。しかしCSSWringの機能のみを必要とする場合にもこう書かざるをえないのは無駄が多い。Autoprefixerのようにこういった形でコアを書き、別にラッパーを提供するという手もあるが、メンテナンスの手間が倍増することは確実だ。</p>
 
 <p>また必要なPostCSSのバージョンを調べて、手作業で依存を解決しなくてはならないことも欠点になる。CSSWring側の<code>package.json</code>ですでに依存バージョンを明示していることを効果的に利用することができない。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
-<span class="hljs-keyword">var</span> csswring = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;csswring&quot;</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+var csswring = require(&quot;csswring&quot;);
 
-<span class="hljs-keyword">var</span> input = <span class="hljs-string">&quot;main.css&quot;</span>;
-<span class="hljs-keyword">var</span> output = <span class="hljs-string">&quot;main.min.css&quot;</span>;
+var input = &quot;main.css&quot;;
+var output = &quot;main.min.css&quot;;
 
-<span class="hljs-keyword">var</span> result = csswring.<span class="hljs-title function_">wring</span>(fs.<span class="hljs-title function_">readFileSync</span>(input, <span class="hljs-string">&quot;utf8&quot;</span>), {
-	<span class="hljs-attr">from</span>: input,
-	<span class="hljs-attr">to</span>: output
+var result = csswring.wring(fs.readFileSync(input, &quot;utf8&quot;), {
+	from: input,
+	to: output
 });
-fs.<span class="hljs-title function_">writeFileSync</span>(output, result.<span class="hljs-property">css</span>);</code></pre>
+fs.writeFileSync(output, result.css);</code></pre>
 
 <p>CSSWringではこのように標準的なNode.jsモジュールのように利用することができる。Promiseではないことを考慮しても、コードは短くなっている。そもそもとしてPostCSSプラグインとしての使い方を知らなくても、はっきり言うのならPostCSSの存在を知らなくても書けるようになっている。</p>
 

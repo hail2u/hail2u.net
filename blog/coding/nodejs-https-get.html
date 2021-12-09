@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="HTTPモジュールのhttp.get()と違いHTTPSモジュールのhttps.get()は第一引数にURLが取れない。HTTPモジュールと同じようにURLを指定するとECONNREFUSEDになる。ソース読んだら文字列かどうかチェックしてURLモジュールでパースする処理がHTTPSモジュールにはなかった。1時間くらいハマりました！" property="twitter:description">
@@ -36,17 +37,17 @@
 
 				<p>HTTPモジュールの<code>http.get()</code>と違いHTTPSモジュールの<code>https.get()</code>は第一引数にURLが取れない。HTTPモジュールと同じようにURLを指定すると<code>ECONNREFUSED</code>になる。ソース読んだら文字列かどうかチェックしてURLモジュールでパースする<a href="https://github.com/joyent/node/blob/master/lib/http.js#L1585">処理</a>が<a href="https://github.com/joyent/node/blob/master/lib/https.js#L90">HTTPSモジュールにはなかった</a>。1時間くらいハマりました！</p>
 
-<pre><code class="highlight language-js"><span class="hljs-meta">#!/usr/bin/env node</span>
+<pre><code class="language-js">#!/usr/bin/env node
 
-<span class="hljs-keyword">var</span> https = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;https&#x27;</span>);
-<span class="hljs-keyword">var</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;url&#x27;</span>);
+var https = require('https');
+var url = require('url');
 
-https.<span class="hljs-title function_">get</span>(url.<span class="hljs-title function_">parse</span>(<span class="hljs-string">&#x27;https://example.com/&#x27;</span>), <span class="hljs-keyword">function</span> (<span class="hljs-params">response</span>) {
-	response.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">chunk</span>) {
-		process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">write</span>(chunk);
+https.get(url.parse('https://example.com/'), function (response) {
+	response.on('data', function (chunk) {
+		process.stdout.write(chunk);
 	});
-}).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) {
-	<span class="hljs-keyword">throw</span> error;
+}).on('error', function (error) {
+	throw error;
 });</code></pre>
 
 <p>とかURLモジュールでパースしてから渡すだけで問題無さそう。</p>

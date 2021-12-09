@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="mod_rewriteでBlosxomにリクエストされたパスをパラメーターとして渡すようにしている関係で、カテゴリーや年月ごとのページでmod_dirのような末尾のスラッシュ補完が効かないことに今さら気づいたので直した。いろいろ今さら。" property="twitter:description">
@@ -36,13 +37,13 @@
 
 				<p><a href="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</a>で<a href="http://blosxom.sourceforge.net/">Blosxom</a>にリクエストされたパスをパラメーターとして渡すようにしている関係で、カテゴリーや年月ごとのページで<a href="http://httpd.apache.org/docs/current/mod/mod_dir.html">mod_dir</a>のような末尾のスラッシュ補完が効かないことに今さら気づいたので直した。いろいろ今さら。</p>
 
-<pre><code class="highlight language-apache"><span class="hljs-attribute">RewriteEngine</span> <span class="hljs-literal">On</span>
+<pre><code class="language-apache">RewriteEngine On
 
-<span class="hljs-attribute">RewriteBase</span> /blog/
+RewriteBase /blog/
 
-<span class="hljs-attribute">RewriteCond</span> <span class="hljs-variable">%{REQUEST_FILENAME}</span> !-f
-<span class="hljs-attribute">RewriteCond</span> <span class="hljs-variable">%{REQUEST_FILENAME}</span> !-d
-<span class="hljs-attribute">RewriteRule</span> ^([-/<span class="hljs-number">0</span>-<span class="hljs-number">9</span>A-Z_a-z]+[^/])$ $<span class="hljs-number">1</span>/<span class="hljs-meta"> [R=301,L]</span></code></pre>
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([-/0-9A-Z_a-z]+[^/])$ $1/ [R=301,L]</code></pre>
 
 <p>通常は<code>RewriteBase</code>が必須で、無いと<code>$1</code>がサーバーのファイルシステムの絶対パスになってしまう。勿論Blosxomに渡す<code>RewriteRule</code>より前に書く。クソみたいな正規表現なのはApache 1.3系のmod_rewriteだから。</p>
 

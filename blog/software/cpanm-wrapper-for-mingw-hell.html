@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="MinGWに加えてGit for Windows、Strawberry Perl、DevKit付きのRubyInstallerと、MinGWがいっぱい入ってる。こういう環境だとStrawberry PerlのセットアップでPATH環境変数にld.exeとかがあるフォルダーへのパスを追加される（または追加する必要がある）のがコンフリクトの原因になってとても厄介。どうせもうcpanmしか使わないので、そのラッパー書いてRubyInstallerのDevKitとRubyGemの挙動に似たような感じにごまかすことにしたメモ。" property="twitter:description">
@@ -38,10 +39,10 @@
 
 <p>RubyInstallerのDevKitとRubyGemはうまく出来ていて、DevKitをインストールするとRubyGemでインストール系のコマンドを使う時にだけ<a href="https://github.com/oneclick/rubyinstaller/blob/master/resources/devkit/dk.rb.erb#L61-L75"><code>PATH</code>にDevKitのフォルダーを追加してくれるようになっている</a>（んだと思う）。優先して<code>PATH</code>に追加されるので、かなりコンフリクトに強い。というかMinGWは使うときにだけ<code>PATH</code>に追加するのが王道だと思うので、こっちの方が素直な利用法な気がする。</p>
 
-<pre><code class="highlight language-bat">@<span class="hljs-built_in">echo</span> off
+<pre><code class="language-bat">@echo off
 
-<span class="hljs-built_in">echo</span> Temporary enhancing <span class="hljs-built_in">PATH</span> to include build tools...
-<span class="hljs-built_in">cmd</span> /c <span class="hljs-built_in">set</span> <span class="hljs-built_in">PATH</span>=C:\strawberry\c\bin;<span class="hljs-variable">%PATH%</span> &amp;&amp; C:\strawberry\perl\bin\cpanm.bat %*</code></pre>
+echo Temporary enhancing PATH to include build tools...
+cmd /c set PATH=C:\strawberry\c\bin;%PATH% &amp;&amp; C:\strawberry\perl\bin\cpanm.bat %*</code></pre>
 
 <p>これを<code>cpanmw.bat</code>などとしてパスの通った所に置いておくだけ。Windowsのパス管理の仕様上、<code>cpanm.bat</code>としてそれを使わせようとするのは茨の道なので止めておいた方が良い。</p>
 

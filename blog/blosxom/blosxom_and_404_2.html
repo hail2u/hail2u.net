@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="やはり存在しないエントリにアクセスしようとした場合、Statusで404 Not Foundを返したい。いろいろやってみて、404 Not Foundを返しつつ、サイトの独自404ドキュメントと同じものを出力するようにできました。かなり怪しいというか強引。" property="twitter:description">
@@ -36,25 +37,25 @@
 
 				<p>やはり存在しないエントリにアクセスしようとした場合、Statusで404 Not Foundを返したい。いろいろやってみて、404 Not Foundを返しつつ、サイトの独自404ドキュメントと同じものを出力するようにできました。かなり怪しいというか強引。</p>
 <p>改造するところは<a href="/blog/blosxom/blosxom_and_404.html" title="hail2u.net - Weblog - blosxomと404">blosxomと404</a>で改造したところと同じで、オリジナルのままだと394行目辺り。そこに以下のコードを挿入します。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment"># No matching entries treated as a 404 Not Found</span>
-<span class="hljs-keyword">if</span> ($ne eq $num_entries) {
-	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">open</span>(FH, <span class="hljs-string">&quot;/www_root/john/public_html/404.html&quot;</span>)) {
-		<span class="hljs-keyword">print</span> header(
-			<span class="hljs-string">-type    =&gt;</span> <span class="hljs-string">&#x27;text/html&#x27;</span>,
-			<span class="hljs-string">-charset =&gt;</span> <span class="hljs-string">&#x27;UTF-8&#x27;</span>,
-			<span class="hljs-string">-status  =&gt;</span> <span class="hljs-string">&#x27;404 Not Found&#x27;</span>,
+<pre><code class="language-perl"># No matching entries treated as a 404 Not Found
+if ($ne eq $num_entries) {
+	if (open(FH, &quot;/www_root/john/public_html/404.html&quot;)) {
+		print header(
+			-type    =&gt; &apos;text/html&apos;,
+			-charset =&gt; &apos;UTF-8&apos;,
+			-status  =&gt; &apos;404 Not Found&apos;,
 		);
 
-		<span class="hljs-keyword">foreach</span> (&lt;FH&gt;) {
-			<span class="hljs-keyword">print</span> $_;
+		foreach (&lt;FH&gt;) {
+			print $_;
 		}
 
-		<span class="hljs-keyword">close</span>(FH);
-	} <span class="hljs-keyword">else</span> {
-		<span class="hljs-keyword">print</span> redirect(<span class="hljs-string">&quot;http://example.com/john/404.html&quot;</span>);
+		close(FH);
+	} else {
+		print redirect(&quot;http://example.com/john/404.html&quot;);
 	}
 
-	<span class="hljs-keyword">exit</span>;
+	exit;
 }</code></pre>
 <p>サイトの独自404ドキュメントを開いた後、Statusヘッダを追加してヘッダを普通に出力。その後、サイトの独自404ドキュメントの内容をそのまま出力してやるという感じ。ファイルを開くのに失敗した時は、<code>redirect</code>でフォロー。</p>
 <p>マジで強引過ぎ。てか、これで良いのか？　やりたいことは出来ているので良いことにしよう。</p>

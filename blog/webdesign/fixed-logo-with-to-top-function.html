@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。" property="twitter:description">
@@ -36,26 +37,26 @@
 
 				<p>ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> globalHeader = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;.global-header&#x27;</span>);
-<span class="hljs-keyword">var</span> logo = globalHeader.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;.logo&#x27;</span>);
-<span class="hljs-keyword">var</span> siteNavigation = globalHeader.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;.site-navigation&#x27;</span>);
+<pre><code class="language-javascript">var globalHeader = document.querySelector(&apos;.global-header&apos;);
+var logo = globalHeader.querySelector(&apos;.logo&apos;);
+var siteNavigation = globalHeader.querySelector(&apos;.site-navigation&apos;);
 
-<span class="hljs-keyword">var</span> scrollToTop = <span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) {
-	<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">scrollTo</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
-	evt.<span class="hljs-title function_">preventDefault</span>();
+var scrollToTop = function (evt) {
+	window.scrollTo(0, 0);
+	evt.preventDefault();
 };
 
-<span class="hljs-keyword">var</span> toggleLogoAction = <span class="hljs-keyword">function</span> (<span class="hljs-params">evt</span>) {
-	<span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">pageYOffset</span> &gt; globalHeader.<span class="hljs-property">offsetTop</span> + siteNavigation.<span class="hljs-property">scrollHeight</span>) {
-		logo.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, scrollToTop, <span class="hljs-literal">false</span>);
+var toggleLogoAction = function (evt) {
+	if (window.pageYOffset &gt; globalHeader.offsetTop + siteNavigation.scrollHeight) {
+		logo.addEventListener(&apos;click&apos;, scrollToTop, false);
 
-		<span class="hljs-keyword">return</span>;
+		return;
 	}
 
-	logo.<span class="hljs-title function_">removeEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, scrollToTop, <span class="hljs-literal">false</span>);
+	logo.removeEventListener(&apos;click&apos;, scrollToTop, false);
 };
 
-<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;scroll&#x27;</span>, toggleLogoAction, <span class="hljs-literal">false</span>);</code></pre>
+window.addEventListener(&apos;scroll&apos;, toggleLogoAction, false);</code></pre>
 
 <p>スクロール・イベントで<code>window.pageYOffset</code>と<code>globalHeader.offsetTop + siteNavigation.scrollHeight</code>を比べて、前者が大きい場合はナビゲーションが見えないだろうと推測して、トップヘモドル機能をロゴに割り当てるというシンプルなものだ。トップへモドル機能は単純にリンク先を<code>#top</code>に書きかえるだけでも良かったが、URLの分散と履歴の汚染をもたらしてしまうので<code>window.scrollTo(0, 0)</code>を使った。</p>
 

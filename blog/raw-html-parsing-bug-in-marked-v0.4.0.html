@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="少し前に出たmarkedのv0.4.0では色々と修正が入り、かつ見出しにid属性を振らないオプションが追加された。更新してみたが、結構な感じでバグがある。一番ハマったのがMarkdownファイル内に含まれるHTMLがぶった切られるので、突然p要素が挿入されたりするものだ。同じバグについてのイシューは既に立っていた。" property="twitter:description">
@@ -36,19 +37,19 @@
 
 				<p>少し前に出た<a href="https://github.com/markedjs/marked">marked</a>のv0.4.0では色々と修正が入り、かつ見出しに<code>id</code>属性を振らないオプションが追加された。更新してみたが、結構な感じでバグがある。一番ハマったのがMarkdownファイル内に含まれるHTMLがぶった切られるので、突然<code>p</code>要素が挿入されたりするものだ。<a href="https://github.com/markedjs/marked/issues/1277">同じバグについてのイシュー</a>は既に立っていた。</p>
 
-<pre><code class="highlight language-markdown"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">section</span>&gt;</span></span>
-<span class="hljs-section"># Subsection</span>
+<pre><code class="language-markdown">&lt;section&gt;
+# Subsection
 
 This is a subsection paragraph.
-<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span></span></code></pre>
+&lt;/section&gt;</code></pre>
 
 <p>v0.3.19ではこのまま出力されるはずだ（<code>section</code>タグの間はインラインのレンダラーだけ通される）。しかしv0.4.0ではパーサーが切り出しを間違えるようで、<code># Subsection</code>までとそれ以降が別々にブロックとして処理されてしまう。そのため前者はHTMLとしてそのまま出力されるが、後者が<code>p</code>要素で括られてしまう。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">section</span>&gt;</span>
+<pre><code class="language-html">&lt;section&gt;
 # Subsection
 
-<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>This is a subsection paragraph.
-<span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></code></pre>
+&lt;p&gt;This is a subsection paragraph.
+&lt;/section&gt;&lt;/p&gt;</code></pre>
 
 <p>具体的にはこのような出力になる。完全に壊れている。ワークアラウンドもなさそうなので、僕はバージョンを戻した。Markdownで生HTMLを書くことがある人は更新してはいけない。</p>
 

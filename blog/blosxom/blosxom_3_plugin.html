@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="とりあえず手始めにExcerptという、要約になってない短文を作り出すプラグインを作りました。動いた！とか感動してみる。半日くらいかかりました。2.0のプラグインのことは忘れましょう。まったく今までの知識は役に立たないと思われます。" property="twitter:description">
@@ -36,32 +37,32 @@
 
 				<p>とりあえず手始めにExcerptという、要約になってない短文を作り出すプラグインを作りました。動いた！とか感動してみる。半日くらいかかりました。2.0のプラグインのことは忘れましょう。まったく今までの知識は役に立たないと思われます。</p>
 <p>まずはコード。</p>
-<pre><code class="highlight language-perl">
-<span class="hljs-comment"># Blosxom 3.0 Plugin: Excerpt</span>
-<span class="hljs-comment"># Kyo Nagashima &lt;kyo@hail2u.net&gt;</span>
+<pre><code class="language-perl">
+# Blosxom 3.0 Plugin: Excerpt
+# Kyo Nagashima &lt;kyo@hail2u.net&gt;
 
-<span class="hljs-keyword">package</span> Blosxom::Plugin::Excerpt;
+package Blosxom::Plugin::Excerpt;
 
-<span class="hljs-keyword">use</span> strict;
+use strict;
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">run</span> </span>{
-	<span class="hljs-keyword">my</span> $self = <span class="hljs-keyword">shift</span>;
+sub run {
+	my $self = shift;
 
-	<span class="hljs-keyword">my</span> $body = $self-&gt;{state}-&gt;{current_entry}-&gt;{body};
+	my $body = $self-&gt;{state}-&gt;{current_entry}-&gt;{body};
 
-	<span class="hljs-keyword">my</span> $excerpt = $body;
-	$excerpt =~ <span class="hljs-regexp">s/&lt;.*?&gt;//g</span>;
-	$excerpt .= <span class="hljs-string">&quot;...&quot;</span>;
+	my $excerpt = $body;
+	$excerpt =~ s/&lt;.*?&gt;//g;
+	$excerpt .= &quot;...&quot;;
 
 	$self-&gt;{state}-&gt;{current_entry}-&gt;{Plugin}-&gt;{Excerpt}-&gt;{excerpt} = $excerpt;
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }
 
-<span class="hljs-number">1</span>;</code></pre>
+1;</code></pre>
 <p>これをデフォルトだとpluginsディレクトリにExcerpt.pmという名前で保存します。</p>
 <p>次にこれはエントリごとの処理なので、handlers.entryを更新。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment"># Entry Handlers</span>
+<pre><code class="language-perl"># Entry Handlers
 
 Blosxom::filter_entry_by_path
 Blosxom::build_entry_date

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="miyagawaさんのエントリを見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、innerHTMLとかじゃなくて、ドキュメントのノードを全てチェックし、nodeTypeが8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。" property="twitter:description">
@@ -36,27 +37,27 @@
 
 				<p><a href="http://blog.bulknews.net/mt/archives/001078.html" title="blog.bulknews.net: Trackback Discovery Bookmarklet">miyagawaさんのエントリ</a>を見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、<code>innerHTML</code>とかじゃなくて、ドキュメントのノードを全てチェックし、<code>nodeType</code>が8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。</p>
 <p>JavaScriptのコードはこんな感じになっています。</p>
-<pre><code class="highlight language-js"><span class="hljs-keyword">var</span> tburl;
-<span class="hljs-keyword">var</span> comments = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Array</span>();
-<span class="hljs-title function_">getComment</span>();
+<pre><code class="language-js">var tburl;
+var comments = new Array();
+getComment();
 
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; comments.<span class="hljs-property">length</span>; i++) {
-	<span class="hljs-keyword">if</span> (comments[i].<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/trackback:ping=&quot;([^&quot;]+)&quot;/</span>)) {
-		tburl = <span class="hljs-title class_">RegExp</span>.<span class="hljs-property">$1</span>;
-		<span class="hljs-keyword">break</span>;
+for (var i = 0; i &lt; comments.length; i++) {
+	if (comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)) {
+		tburl = RegExp.$1;
+		break;
 	}
 }
 
-<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;TrackBack ping URL&#x27;</span>, tburl);
+prompt(&apos;TrackBack ping URL&apos;, tburl);
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">getComment</span>(<span class="hljs-params">elm</span>) {
-	<span class="hljs-keyword">if</span> (!elm) elm = <span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>;
+function getComment(elm) {
+	if (!elm) elm = document.documentElement;
 
-	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; elm.<span class="hljs-property">childNodes</span>.<span class="hljs-property">length</span>; i++) {
-		<span class="hljs-keyword">if</span> (elm.<span class="hljs-property">childNodes</span>[i].<span class="hljs-property">nodeType</span> == <span class="hljs-number">8</span>) {
-			comments[comments.<span class="hljs-property">length</span>] = elm.<span class="hljs-property">childNodes</span>[i].<span class="hljs-property">data</span>;
-		} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (elm.<span class="hljs-property">childNodes</span>[i].<span class="hljs-property">nodeType</span> == <span class="hljs-number">1</span>) {
-			<span class="hljs-title function_">getComment</span>(elm.<span class="hljs-property">childNodes</span>[i]);
+	for (var i = 0; i &lt; elm.childNodes.length; i++) {
+		if (elm.childNodes[i].nodeType == 8) {
+			comments[comments.length] = elm.childNodes[i].data;
+		} else if (elm.childNodes[i].nodeType == 1) {
+			getComment(elm.childNodes[i]);
 		}
 	}
 }</code></pre>

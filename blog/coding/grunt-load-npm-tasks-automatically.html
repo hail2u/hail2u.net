@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="GruntでいちいちloadNpmTasks()しなくて済むようになるload-grunt-tasksパッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクはpackage.jsonのdevDependenciesに必ず書いてあり、Gruntfile.js内ではどこでもそれを利用することが可能なので、grunt-で始まるNodeパッケージだけを自動でloadNpmTasks()するようなコードを書くと簡単に自動読み込みを実装できる。" property="twitter:description">
@@ -36,16 +37,16 @@
 
 				<p>Gruntでいちいち<code>loadNpmTasks()</code>しなくて済むようになる<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>パッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクは<code>package.json</code>の<code>devDependencies</code>に必ず書いてあり、<code>Gruntfile.js</code>内ではどこでもそれを利用することが可能なので、<code>grunt-</code>で始まるNodeパッケージだけを自動で<code>loadNpmTasks()</code>するようなコードを書くと簡単に自動読み込みを実装できる。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-meta">&#x27;use strict&#x27;</span>;
+<pre><code class="language-javascript">&apos;use strict&apos;;
 
-<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">grunt</span>) {
-	grunt.<span class="hljs-title function_">initConfig</span>({
-		<span class="hljs-attr">pkg</span>: grunt.<span class="hljs-property">file</span>.<span class="hljs-title function_">readJSON</span>(<span class="hljs-string">&#x27;package.json&#x27;</span>)
+module.exports = function (grunt) {
+	grunt.initConfig({
+		pkg: grunt.file.readJSON(&apos;package.json&apos;)
 	});
 
-	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> devDependency <span class="hljs-keyword">in</span> grunt.<span class="hljs-property">config</span>.<span class="hljs-property">data</span>.<span class="hljs-property">pkg</span>.<span class="hljs-property">devDependencies</span>) {
-		<span class="hljs-keyword">if</span> (devDependency.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/^grunt-/</span>)) {
-			grunt.<span class="hljs-title function_">loadNpmTasks</span>(devDependency);
+	for (var devDependency in grunt.config.data.pkg.devDependencies) {
+		if (devDependency.match(/^grunt-/)) {
+			grunt.loadNpmTasks(devDependency);
 		}
 	}
 };</code></pre>

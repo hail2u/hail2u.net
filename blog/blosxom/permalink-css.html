@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" property="twitter:description">
@@ -38,18 +39,18 @@
 
 <p>記事ファイルでは特別なCSSを使うかどうかのフラグのみ書く。</p>
 
-<pre><code class="highlight language-markdown">パーマリンクに特別なCSSを追加
-meta-special<span class="hljs-emphasis">_css: 1
+<pre><code class="language-markdown">パーマリンクに特別なCSSを追加
+meta-special_css: 1
 
-<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span></span>...<span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span></span></code></pre>
+&lt;p&gt;...&lt;/p&gt;</code></pre>
 
 <p>フレーバーでは以下のようにして、<code>$meta::special_css</code>を使った分岐を利用する。CSSファイルのパスは記事ファイル名を利用することでユニークさを保証できる。</p>
 
-<pre><code class="highlight language-html">&lt;?$meta::special_css eq=&quot;1&quot;&gt;
-	<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/styles$path/$fn.css&quot;</span>&gt;</span>
+<pre><code class="language-html">&lt;?$meta::special_css eq=&quot;1&quot;&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;/styles$path/$fn.css&quot;&gt;
 &lt;/?&gt;
 &lt;?$meta::special_css ne=&quot;1&quot;&gt;
-	<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/styles/style.css&quot;</span>&gt;</span>
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;/styles/style.css&quot;&gt;
 &lt;/?&gt;</code></pre>
 
 <p>まだ採用はしてない。</p>
@@ -58,14 +59,14 @@ meta-special<span class="hljs-emphasis">_css: 1
 
 <p>常に記事ファイル名を利用したCSSファイルのパスを参照するようにしておいて、mod_rewriteでそのパスが見つからなかった場合にデフォルトのCSSにフォールバックさせる方がもっと手っ取り早い感じする。普通にURL書き換えしちゃうとキャッシュが効かなくなるけど、302での外部リダイレクトにすれば良さそう。</p>
 
-<pre><code class="highlight language-apache"><span class="hljs-section">&lt;IfModule mod_rewrite.c&gt;</span>
-	<span class="hljs-attribute">RewriteEngine</span> <span class="hljs-literal">On</span>
+<pre><code class="language-apache">&lt;IfModule mod_rewrite.c&gt;
+	RewriteEngine On
 
-	<span class="hljs-attribute">RewriteBase</span> /styles/
+	RewriteBase /styles/
 
-	<span class="hljs-attribute">RewriteCond</span> <span class="hljs-variable">%{REQUEST_FILENAME}</span> !-f
-	<span class="hljs-attribute">RewriteRule</span> ^(.*)$ style.css<span class="hljs-meta"> [L,R=302]</span>
-<span class="hljs-section">&lt;/IfModule&gt;</span></code></pre>
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^(.*)$ style.css [L,R=302]
+&lt;/IfModule&gt;</code></pre>
 
 <p>こういう実装だとBlosxomに依存しないので、CSSファイルのパスをユニークにする仕組みさえ用意できれば、様々なCMSで実現できる。</p>
 			</article>

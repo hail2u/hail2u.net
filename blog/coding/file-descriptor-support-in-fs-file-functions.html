@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Node.js v5のリリース案を見ていたところ、fs.readFile()等の第一引数でファイル記述子（file descriptor)がサポートされるようになるようだ。便利極まりない/dev/stdinなどがない環境（Windowsとか）で標準入出力の読み込みが簡単になるのかなと想像している。" property="twitter:description">
@@ -38,18 +39,18 @@
 
 <p>今までは標準入力を一気読みしようとするとこのようなコードを書く必要があった。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
 
-<span class="hljs-keyword">var</span> fd = process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>;
-<span class="hljs-keyword">var</span> len = fs.<span class="hljs-title function_">fstatSync</span>(fd).<span class="hljs-property">size</span>;
-<span class="hljs-keyword">var</span> buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Buffer</span>(len);
-<span class="hljs-keyword">var</span> input = buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&quot;utf8&quot;</span>, <span class="hljs-number">0</span>, fs.<span class="hljs-title function_">readSync</span>(fd, buf, <span class="hljs-number">0</span>, len, <span class="hljs-number">0</span>));</code></pre>
+var fd = process.stdin.fd;
+var len = fs.fstatSync(fd).size;
+var buf = new Buffer(len);
+var input = buf.toString(&quot;utf8&quot;, 0, fs.readSync(fd, buf, 0, len, 0));</code></pre>
 
 <p>もちろんこれと同じことをやってくれる便利パッケージがいっぱいあるので、それらのうちのどれかを使えば良いという話ではある。しかし<code>/dev/stdin</code>を読むくらい手軽に読む手段が標準モジュールでできるときっとうれしいはずだ。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;fs&quot;</span>);
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
 
-<span class="hljs-keyword">var</span> input = fs.<span class="hljs-title function_">readFileSync</span>(process.<span class="hljs-property">stdin</span>.<span class="hljs-property">fd</span>, <span class="hljs-string">&quot;utf8&quot;</span>);</code></pre>
+var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);</code></pre>
 
 <p>ソースを読んだ限りでは、ファイル記述子サポートの実装は上記コードと同じように見えた。そのため、このような簡単なコードで標準入力を一気に読めるという風に理解しているが、実際にはどうなるのだろう。こうなったらとてもうれしい。</p>
 

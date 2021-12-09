@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="window.localStorageが実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったんdelete window.localStorageしてから、らしきものを作ってやるとうまくいく。" property="twitter:description">
@@ -36,29 +37,29 @@
 
 				<p><code>window.localStorage</code>が実装されているブラウザーでは、セキュリティー上の制限により、ローカル・ファイルでは参照するとUncaught DOM Exceptionを返す。普通のポリフィルのように、それらしきものを作ってやっても、Uncaught DOM Exceptionを返すのは変わらない。いったん<code>delete window.localStorage</code>してから、らしきものを作ってやるとうまくいく。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">try</span> {
-	<span class="hljs-keyword">const</span> test = <span class="hljs-string">&quot;__test__&quot;</span>;
-	<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(test, test);
-	<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(test);
-} <span class="hljs-keyword">catch</span> (e) {
-	<span class="hljs-keyword">delete</span> <span class="hljs-variable language_">window</span>.<span class="hljs-property">localStorage</span>;
-	<span class="hljs-variable language_">window</span>.<span class="hljs-property">localStorage</span> = {
-		<span class="hljs-attr">_data</span>: {},
+<pre><code class="language-javascript">try {
+	const test = &quot;__test__&quot;;
+	localStorage.setItem(test, test);
+	localStorage.removeItem(test);
+} catch (e) {
+	delete window.localStorage;
+	window.localStorage = {
+		_data: {},
 
-		<span class="hljs-title function_">clear</span>(<span class="hljs-params"></span>) {
-			<span class="hljs-keyword">return</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">_data</span> = {});
+		clear() {
+			return (this._data = {});
 		},
 
-		<span class="hljs-title function_">getItem</span>(<span class="hljs-params">key</span>) {
-			<span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">_data</span>[key];
+		getItem(key) {
+			return this._data[key];
 		},
 
-		<span class="hljs-title function_">removeItem</span>(<span class="hljs-params">key</span>) {
-			<span class="hljs-keyword">return</span> <span class="hljs-keyword">delete</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">_data</span>[key];
+		removeItem(key) {
+			return delete this._data[key];
 		},
 
-		<span class="hljs-title function_">setItem</span>(<span class="hljs-params">key, value</span>) {
-			<span class="hljs-keyword">return</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">_data</span>[key] = <span class="hljs-title class_">String</span>(value));
+		setItem(key, value) {
+			return (this._data[key] = String(value));
 		}
 	};
 }</code></pre>

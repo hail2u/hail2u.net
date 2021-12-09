@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="npmが仕込んでくれる環境変数のNPM_PACKAGE_VERSIONなどを参照するために、CSSファイルをコンパイルするスクリプトなどがちゃんとした実行ファイルになるよう、手元で書き直していた。ES modulesで書くようにしてからrequire(&quot;../package.json&quot;)などが使えなくなったため、無理やりpackage.jsonを読んでいたのが気になったからだ。でも結局はimport.meta.urlを使って、package.jsonを読むよう、さらに書き直した。" property="twitter:description">
@@ -36,12 +37,12 @@
 
 				<p>npmが仕込んでくれる環境変数のNPM_PACKAGE_VERSIONなどを参照するために、CSSファイルをコンパイルするスクリプトなどがちゃんとした実行ファイルになるよう、手元で書き直していた。ES modulesで書くようにしてから<code>require("../package.json")</code>などが使えなくなったため、無理やりpackage.jsonを読んでいたのが気になったからだ。でも結局は<a href="https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_import_meta_url"><code>import.meta.url</code></a>を使って、package.jsonを読むよう、さらに書き直した。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs/promises&quot;</span>;
+<pre><code class="language-javascript">import fs from &quot;fs/promises&quot;;
 
-<span class="hljs-keyword">const</span> file = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">&quot;../package.json&quot;</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
-<span class="hljs-keyword">const</span> json = <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">readFile</span>(file, <span class="hljs-string">&quot;utf8&quot;</span>);
-<span class="hljs-keyword">const</span> pkg = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(json);
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${pkg.name}</span> v<span class="hljs-subst">${pkg.version}</span>`</span>);</code></pre>
+const file = new URL(&quot;../package.json&quot;, import.meta.url);
+const json = await fs.readFile(file, &quot;utf8&quot;);
+const pkg = JSON.parse(json);
+console.log(`${pkg.name} v${pkg.version}`);</code></pre>
 
 <p>すでにフラグ付きで実行すればimportでJSONファイルを読める。このフラグがなくなるまでのつなぎと考えると、この方が書き直しやすそうという目算だ。環境変数を参照するやり方と違って、npm経由で実行しなくてもいいので、雑に動作を確認しやすいという利点もある。また、パーミッションのことを忘れられ、環境耐性が高いかもしれない。</p>
 

@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="昨日も少し書いたEvery Declaration Just Onceアプローチ（以下EDJOと略す）について、皆が目を瞑っているOOCSSの欠点、CSSが持つ特徴、HTMLとの兼ね合いという点からもう少し書いてみたい。これについては未だ誰ともちゃんと議論していない。機会があったらこの記事をベースにでも誰かと話してみたい。" property="twitter:description">
@@ -55,12 +56,12 @@
 
 <p>CSSでは<a href="http://www.w3.org/TR/CSS2/cascade.html#specificity">セレクターの詳細度</a>というものがある。例えば<code>.foo</code>より<code>.bar .foo</code>が強いというような、セレクターの書かれた順序を越えて定義が適用される仕組みだ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> <span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-attribute">font-family</span>: serif;
+<pre><code class="language-css">body h1 {
+	font-family: serif;
 }
 
-<span class="hljs-selector-tag">h1</span> {
-	<span class="hljs-attribute">font-family</span>: sans-serif;
+h1 {
+	font-family: sans-serif;
 }</code></pre>
 
 <p>このCSSの場合<a href="/test/606.html"><code>h1</code>は<code>serif</code>で表示されること</a>だろう。OOCSSにおいてマルチ・クラスを利用する場合、このセレクターの詳細度というものと格闘する必要が出てくる。なぜかと言えばオブジェクトとして定義された<a href="http://www.w3.org/TR/CSS2/syndata.html#rule-sets">ルールセット</a>の順序通りにビジュアル・デザインが適用されていくとは限らないからだ。</p>
@@ -75,28 +76,28 @@
 
 <p>問題はクラス名の付け方だ。詳細度の仕組みの都合上、クラス名を複数組み合わせることはできない。つまり以下のようなセレクターは書くことが出来ない。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.global-header</span> <span class="hljs-selector-class">.nav</span> <span class="hljs-selector-class">.item</span> <span class="hljs-selector-class">.icon</span> {
+<pre><code class="language-css">.global-header .nav .item .icon {
 	...
 }</code></pre>
 
 <p>従ってこのようなクラス名を付けることになる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.global-header-nav-item-icon</span> {
+<pre><code class="language-css">.global-header-nav-item-icon {
 	...
 }</code></pre>
 
 <p>HTMLは当然のようにこうなる。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header&quot;</span>&gt;</span>
+<pre><code class="language-html">&lt;header class=&quot;global-header&quot;&gt;
 	...
-	<span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header-nav&quot;</span>&gt;</span>
-		<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header-nav-item&quot;</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header-nav-item-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-			<span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;global-header-nav-item-title&quot;</span>&gt;</span>Blog<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-		<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+	&lt;nav class=&quot;global-header-nav&quot;&gt;
+		&lt;li class=&quot;global-header-nav-item&quot;&gt;
+			&lt;span class=&quot;global-header-nav-item-icon&quot;&gt;&lt;/span&gt;
+			&lt;span class=&quot;global-header-nav-item-title&quot;&gt;Blog&lt;/span&gt;
+		&lt;/li&gt;
 		...
-	<span class="hljs-tag">&lt;/<span class="hljs-name">nav</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span></code></pre>
+	&lt;/nav&gt;
+&lt;/header&gt;</code></pre>
 
 <p>おおっと。</p>
 
@@ -116,24 +117,24 @@
 
 <p>そしてCSSではビジュアル・デザインを決定する定義をまず書き、それを適用するセレクターを割り当て、ひとつの定義ごとにルールセットを作っていく。例えばこのような形だ。わかりやすいように様々なパターンでセレクターを書いてみたが、実際には開発者やプロジェクトごとにパターン化されてくるだろう。とりあえず一意に確定する形で書いておけば、後で置換をかけることでそのフォーマットを統一することも容易いはずだ。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> &gt; <span class="hljs-selector-tag">header</span>,
-<span class="hljs-selector-tag">main</span>,
-<span class="hljs-selector-class">.searchbox</span>,
-<span class="hljs-selector-attr">[role=<span class="hljs-string">&quot;contentinfo&quot;</span>]</span> {
-	<span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+<pre><code class="language-css">body &gt; header,
+main,
+.searchbox,
+[role=&quot;contentinfo&quot;] {
+	margin: 0 auto;
 }
 
-<span class="hljs-selector-tag">body</span> &gt; <span class="hljs-selector-tag">header</span>,
-<span class="hljs-selector-attr">[role=<span class="hljs-string">&quot;contentinfo&quot;</span>]</span> {
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#333</span>;
+body &gt; header,
+[role=&quot;contentinfo&quot;] {
+	background-color: #333;
 }
 
-<span class="hljs-selector-tag">main</span> {
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#fff</span>;
+main {
+	background-color: #fff;
 }
 
-<span class="hljs-selector-class">.searchbox</span> {
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#999</span>;
+.searchbox {
+	background-color: #999;
 }</code></pre>
 
 <p>EDJOではセレクターの詳細度はほとんど無視することができる。なぜならある要素を表現するセレクターは常に同じで良いからだ。つまりある要素に複数のクラス名が割り当てられることはないし、同じ要素を違うセレクターで参照することもないということで、それゆえに値の上書きがそもそも起こらないということになる。状態を表すようなクラスは別途追加する必要が出てくるが、例外はそれくらいだろう。</p>

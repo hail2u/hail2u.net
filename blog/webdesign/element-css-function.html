@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="せめてWebKitに実装されてからとか思ってたけど、CSS Image Values and Replaced Content Module Level 3がLast Callになったのでいい機会ということにしてelement()関数についてエントリを書く。element()関数は任意のIDを引数に取ることができ、その要素を画像として参照できるというなかなかの荒業な関数。具体的には画像のサムネイルを簡単に作成できるとかそういうものをイメージするとわかりやすいと思う。" property="twitter:description">
@@ -42,34 +43,34 @@
 
 <p><code>element()</code>では既に書いたようにIDで参照する。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">element</span>(#foo);
-	<span class="hljs-attribute">background-size</span>: contain;
+<pre><code class="language-css">.test {
+	background-image: element(#foo);
+	background-size: contain;
 }</code></pre>
 
 <p>Firefoxでも完全な実装ではなく、背景でしか使えないように制限されているので、今のところはこういった使い方になるだろう（<code>list-style-image</code>や<code>content</code>プロパティーで使えるようになると便利そう）。サムネイル化する場合に限らずそのままのサイズで表示しようということはまずないと思うので、<code>background-size</code>プロパティーを使ってサイズを調整してやると良い。<code>contain</code>で納まるように調節してくれるはずなので、大体はこれだけで意図した通りに表示されるだろう（勿論<code>.test</code>への幅と高さの指定は必要）。</p>
 
 <p>ただレンダリングされていない要素は参照しても表示されない。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#foo</span> {
-	<span class="hljs-attribute">display</span>: none;
+<pre><code class="language-css">#foo {
+	display: none;
 }
 
-<span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">element</span>(#foo);
-	<span class="hljs-attribute">background-size</span>: contain;
+.test {
+	background-image: element(#foo);
+	background-size: contain;
 }</code></pre>
 
 <p><code>display</code>に限らず、<code>visibility</code>や<code>height</code>プロパティーで見えなくしても同様に表示されない。デモではどうやっているかというと、<code>position</code>プロパティーで見えない位置に吹っ飛ばすことによって元画像は隠すがサムネイルは見えるようにしている。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#foo</span> {
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">top</span>: -<span class="hljs-number">100%</span>;
+<pre><code class="language-css">#foo {
+	position: absolute;
+	top: -100%;
 }
 
-<span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">background-image</span>: <span class="hljs-built_in">element</span>(#foo);
-	<span class="hljs-attribute">background-size</span>: contain;
+.test {
+	background-image: element(#foo);
+	background-size: contain;
 }</code></pre>
 
 <p>つまりレンダリングはされるものの見えないような状態を工夫すれば良いわけで、ネガティブ・マージンなどでも可能。</p>

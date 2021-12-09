@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="async離れが完了したが、気づくとPromiseでasync-waterfall的なものを何度も書いていた。Promise.resolve()で始めたり、そうでなかったり。名前付き関数を受け取るだけのthen()を何度も書き、読みにくいなとなったり。" property="twitter:description">
@@ -38,23 +39,23 @@
 
 <p>とりあえず、<code>Array#reduce()</code>を使って配列と初期変数を渡すと順に実行していくものを書いた。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-comment">// waterfall([funcA, funcB, funcC], foo)</span>
-<span class="hljs-comment">//   .then((r) =&gt; {</span>
-<span class="hljs-comment">//     console.log(r);</span>
-<span class="hljs-comment">//   })</span>
-<span class="hljs-comment">//   .catch((e) =&gt; {</span>
-<span class="hljs-comment">//     console.error(e.stack);</span>
-<span class="hljs-comment">//   });</span>
-<span class="hljs-meta">&quot;use strict&quot;</span>;
+<pre><code class="language-javascript">// waterfall([funcA, funcB, funcC], foo)
+//   .then((r) =&gt; {
+//     console.log(r);
+//   })
+//   .catch((e) =&gt; {
+//     console.error(e.stack);
+//   });
+&quot;use strict&quot;;
 
-<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-function">(<span class="hljs-params">tasks, initialValue</span>) =&gt;</span> {
-	<span class="hljs-keyword">if</span> (!initialValue) {
-		initialValue = <span class="hljs-literal">null</span>;
+module.exports = (tasks, initialValue) =&gt; {
+	if (!initialValue) {
+		initialValue = null;
 	}
 
-	<span class="hljs-keyword">return</span> tasks.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">p, t</span>) =&gt;</span> {
-		<span class="hljs-keyword">return</span> p.<span class="hljs-title function_">then</span>(t);
-	}, <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(initialValue));
+	return tasks.reduce((p, t) =&gt; {
+		return p.then(t);
+	}, Promise.resolve(initialValue));
 };</code></pre>
 
 <p>多少読みやすくはなるが、<code>then()</code>を書かないで済むくらいしかメリットがない。途中で止められないな（常に<code>then()</code>なので）とかも考えると普通に書いた方が良さそうだ。</p>

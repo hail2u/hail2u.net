@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="PostCSS v3.0.0がリリースされ、かなり高速化した。一部互換性のないAPIの変更があるが、多くは内部的な変更でそれほど影響はないような印象だ。" property="twitter:description">
@@ -42,24 +43,24 @@
 
 <p>もうひとつはSource Mapの生成でインラインのものがデフォルトになったことだ。別ファイルに吐きたい場合は明示的に無効にする必要がある。言い換えると<code>from</code>や<code>to</code>が事実上必須ではなくなったということでもある。</p>
 
-<pre><code class="highlight language-javascript"><span class="hljs-keyword">var</span> postcss = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;postcss&#x27;</span>);
-<span class="hljs-keyword">var</span> css = <span class="hljs-string">&#x27;.foo { color: black }&#x27;</span>;
+<pre><code class="language-javascript">var postcss = require(&apos;postcss&apos;);
+var css = &apos;.foo { color: black }&apos;;
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(postcss.<span class="hljs-title function_">process</span>(css, {
-	<span class="hljs-attr">map</span>: <span class="hljs-literal">true</span>
+console.log(postcss.process(css, {
+	map: true
 }));
-<span class="hljs-comment">// .foo { color: black }</span>
-<span class="hljs-comment">// /*# sourceMappingURL=data:application/json:base64,... */</span>
+// .foo { color: black }
+// /*# sourceMappingURL=data:application/json:base64,... */
 
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(postcss.<span class="hljs-title function_">process</span>(css, {
-	<span class="hljs-attr">map</span>: {
-		<span class="hljs-attr">inline</span>: <span class="hljs-literal">false</span>
+console.log(postcss.process(css, {
+	map: {
+		inline: false
 	},
-	<span class="hljs-attr">from</span>: <span class="hljs-string">&#x27;in.css&#x27;</span>,
-	<span class="hljs-attr">to</span>: <span class="hljs-string">&#x27;out.css&#x27;</span>
+	from: &apos;in.css&apos;,
+	to: &apos;out.css&apos;
 }));
-<span class="hljs-comment">// .foo { color: black }</span>
-<span class="hljs-comment">// /*# sourceMappingURL=to.css.map */</span></code></pre>
+// .foo { color: black }
+// /*# sourceMappingURL=to.css.map */</code></pre>
 
 <p>ただし既に外部Source Mapファイルを参照しているCSSを処理する場合は、そのまま外部Source Mapファイルを更新するようになっている。ここらへんを強制的に変更する手段が用意されていないようで、片手落ちっぽい。</p>
 

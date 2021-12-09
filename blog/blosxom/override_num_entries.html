@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Tadahilo&apos;s Diaryのindexというエントリより。" property="twitter:description">
@@ -39,25 +40,25 @@
 <p>あるflavourだけ$num_entriesの数を変えるか無視するようにできないかなぁ。</p>
 </blockquote>
 <p>これ、結構簡単です。うちのサイトの場合、通常は5件、RSSのflavourは10件にしてます。rssでしか利用する気ないので、rss10プラグインを直接拡張してるんですけど、単独でやるんならこんな感じでよろしいかと。</p>
-<pre><code class="highlight language-perl"><span class="hljs-keyword">package</span> override_num_entries;
+<pre><code class="language-perl">package override_num_entries;
 
-<span class="hljs-keyword">use</span> strict;
+use strict;
 
-<span class="hljs-keyword">my</span> %flavours = (
-	<span class="hljs-string">&#x27;rss&#x27;</span> =&gt; <span class="hljs-string">&#x27;10&#x27;</span>,
-	<span class="hljs-string">&#x27;writeback&#x27;</span> =&gt; <span class="hljs-number">10</span>,
+my %flavours = (
+	&apos;rss&apos; =&gt; &apos;10&apos;,
+	&apos;writeback&apos; =&gt; 10,
 );
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
-	<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">keys</span> %flavours) {
-		<span class="hljs-keyword">if</span> ($_ eq $blosxom::flavour) {
+sub start {
+	foreach (keys %flavours) {
+		if ($_ eq $blosxom::flavour) {
 			$blosxom::num_entries = $flavours{$_};
 		}
 	}
-	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	return 1;
 }
 
-<span class="hljs-number">1</span>;</code></pre>
+1;</code></pre>
 <p><code>%flavours</code>っつーハッシュでflavourと上書きする<code>$num_entries</code>の値を定義するだけ。</p>
 			</article>
 		</main>

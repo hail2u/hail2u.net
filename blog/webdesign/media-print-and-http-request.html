@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="スクリーン向けスタイルシートと印刷向けスタイルシートを分けるように戻そうかと考えてた。過去ログ検索すると何度か切り替えてることがわかる。最近印刷向けとかに注意を向けてなかったので忘れてたけど、media=printとしてもHTTPリクエストは常に書いたところで走る。ので、別ファイルにするとHTTPリクエストがほぼ無駄な形で増えてしまう。" property="twitter:description">
@@ -38,12 +39,12 @@
 
 <p>HTTPリクエストを無駄に増やさず印刷向けスタイルシートを別にするには、印刷前にJavaScriptでスタイルシート読んでやれば良さそう。スタイルシートの読み込みを待ってから<code>print()</code>するボタンを用意するみたいのなら簡単そうだけど、印刷はブラウザーの機能を使ってもらいたい。となると<a href="http://www.w3.org/TR/html5/webappapis.html#printing"><code>beforeprint</code>イベント</a>を使うのが王道のようだ。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;print-css&quot;</span> <span class="hljs-attr">media</span>=<span class="hljs-string">&quot;only print&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;/css/print.css&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript">
-	<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListner</span>(<span class="hljs-string">&#x27;beforeprint&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
-		<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;print-css&#x27;</span>).<span class="hljs-property">rel</span> = <span class="hljs-string">&#x27;stylesheet&#x27;</span>;
+<pre><code class="language-html">&lt;link id=&quot;print-css&quot; media=&quot;only print&quot; href=&quot;/css/print.css&quot;&gt;
+&lt;script&gt;
+	window.addEventListner(&apos;beforeprint&apos;, function () {
+		document.getElementById(&apos;print-css&apos;).rel = &apos;stylesheet&apos;;
 	});
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+&lt;/script&gt;</code></pre>
 
 <p>Internet Explorer 11では<a href="/550.html">期待通り</a>動いた。しかしFirefox 28では印刷向けスタイルシートのリクエストは走るもののスタイルは反映されない。また<code>beforeprint</code>にはChrome 34とSafari 7が対応してないので、これらではこのやり方ではどうにもならない。</p>
 

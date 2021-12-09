@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。@cho45が書いたのを見て重い腰が上がった。" property="twitter:description">
@@ -36,35 +37,35 @@
 
 				<p>Data URIはまだそれほど使いまくっているわけでもないので、ブラウザーでやったりVimからWSHでやったりいろいろしてたけど、必要な時はだいたい複数ファイルを何回も変換する必要があったりしていろいろ大変なのでPerlで書き直して右クリックから使う方法も考えた。<a href="https://github.com/cho45/dotfiles/blob/master/bin/data-scheme">@cho45が書いたの</a>を見て重い腰が上がった。</p>
 
-<pre><code class="highlight language-perl"><span class="hljs-comment">#!/usr/bin/env perl</span>
+<pre><code class="language-perl">#!/usr/bin/env perl
 
-<span class="hljs-keyword">use</span> strict;
-<span class="hljs-keyword">use</span> warnings;
+use strict;
+use warnings;
 
-<span class="hljs-keyword">use</span> MIME::Base64;
-<span class="hljs-keyword">use</span> MIME::Types;
-<span class="hljs-keyword">use</span> Path::Extended <span class="hljs-string">qw(file)</span>;
+use MIME::Base64;
+use MIME::Types;
+use Path::Extended qw(file);
 
-<span class="hljs-keyword">my</span> $mt = MIME::Types-&gt;new();
-<span class="hljs-keyword">my</span> @r;
+my $mt = MIME::Types-&gt;new();
+my @r;
 
-<span class="hljs-keyword">foreach</span> (@ARGV) {
-	<span class="hljs-keyword">my</span> $f = file($_);
-	<span class="hljs-keyword">my</span> $t = $mt-&gt;mimeTypeOf($file-&gt;stringify);
-	<span class="hljs-keyword">push</span>(@r, <span class="hljs-string">&#x27;data:&#x27;</span> . ($t ? $t : <span class="hljs-string">&#x27;text/plain&#x27;</span>) . <span class="hljs-string">&#x27;;base64,&#x27;</span> . encode_base64(<span class="hljs-keyword">scalar</span>($f-&gt;slurp(<span class="hljs-string">binmode =&gt;</span> <span class="hljs-number">1</span>)), <span class="hljs-string">&#x27;&#x27;</span>));
+foreach (@ARGV) {
+	my $f = file($_);
+	my $t = $mt-&gt;mimeTypeOf($file-&gt;stringify);
+	push(@r, 'data:' . ($t ? $t : 'text/plain') . ';base64,' . encode_base64(scalar($f-&gt;slurp(binmode =&gt; 1)), ''));
 }
 
-<span class="hljs-keyword">print</span> <span class="hljs-keyword">join</span>(<span class="hljs-string">&quot;\n&quot;</span>, @r);
+print join("\n", @r);
 
-<span class="hljs-keyword">exit</span>;</code></pre>
+exit;</code></pre>
 
 <p><a href="https://metacpan.org/module/URI">URI</a>モジュールでの<code>new('data:')</code>だとBase64でエンコードするかどうかよしなにしてくれちゃうので、普通に<a href="https://metacpan.org/module/MIME::Base64">MIME::Base64</a>を使った。メディアタイプ判別のモジュールはいくつか試したけど、未知の時に例外吐いて死ぬ奴とか常に配列で返す奴とか色々アレなのが多くて、未知の場合は空で返ってくる<a href="https://metacpan.org/module/MIME::Types">MIME::Types</a>が結局一番ましな感じだった。</p>
 
 <p>右クリックから使う場合は、</p>
 
-<pre><code class="highlight language-bat">@<span class="hljs-built_in">echo</span> off
+<pre><code class="language-bat">@echo off
 
-perl -S <span class="hljs-built_in">convert</span>-to-data-uri.pl %* | clip</code></pre>
+perl -S convert-to-data-uri.pl %* | clip</code></pre>
 
 <p>というようなバッチファイルを送るに置いておくとクリップボードに即コピーとかできる。</p>
 

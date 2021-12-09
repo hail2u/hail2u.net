@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="V. W. MarshallのIn Which the Fly Invites the Spider Into His Parlorと言うエントリにinspireされて（inspireとはパクったのを誤魔化したい時に使う言葉です）、Googlebotが自分が設置したblosxomのどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。" property="twitter:description">
@@ -36,47 +37,47 @@
 
 				<p><a href="http://www.vwmarshall.net/" title="V. W. Marshall">V. W. Marshall</a>の<a href="http://www.vwmarshall.net/archives/000998.php" title="V. W. Marshall: In Which the Fly Invites the Spider Into His Parlor">In Which the Fly Invites the Spider Into His Parlor</a>と言うエントリにinspireされて（inspireとはパクったのを誤魔化したい時に使う言葉です）、<a href="http://www.google.com/bot.html" title="Googlebot">Googlebot</a>が自分が設置した<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のどこかしらのページをクロールした時メールを送信するプラグイン、googlebotと言うものを作ってみました。</p>
 <p>以下、コード。</p>
-<pre><code class="highlight language-perl"><span class="hljs-comment"># Blosxom Plugin: googlebot</span>
-<span class="hljs-comment"># Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;</span>
-<span class="hljs-comment"># Version: 1.0</span>
-<span class="hljs-comment"># Blosxom Home/Docs/Licensing: http://www.blosxom.com/</span>
+<pre><code class="language-perl"># Blosxom Plugin: googlebot
+# Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 1.0
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
 
-<span class="hljs-keyword">package</span> googlebot;
+package googlebot;
 
-<span class="hljs-keyword">use</span> strict;
+use strict;
 
-<span class="hljs-comment"># --- Configurable variables -----------</span>
+# --- Configurable variables -----------
 
-<span class="hljs-keyword">my</span> $sendmail = <span class="hljs-string">&#x27;/usr/sbin/sendmail&#x27;</span>;
-<span class="hljs-keyword">my</span> $from     = <span class="hljs-string">&#x27;googlebot@example.com&#x27;</span>;
-<span class="hljs-keyword">my</span> $to       = <span class="hljs-string">&#x27;john.doe@example.com&#x27;</span>;
-<span class="hljs-keyword">my</span> $subject  = <span class="hljs-string">&#x27;Welcome Googlebot.&#x27;</span>;
+my $sendmail = &apos;/usr/sbin/sendmail&apos;;
+my $from     = &apos;googlebot@example.com&apos;;
+my $to       = &apos;john.doe@example.com&apos;;
+my $subject  = &apos;Welcome Googlebot.&apos;;
 
-<span class="hljs-comment"># --- Plug-in package variables --------</span>
+# --- Plug-in package variables --------
 
-<span class="hljs-comment"># --------------------------------------</span>
+# --------------------------------------
 
-<span class="hljs-function"><span class="hljs-keyword">sub</span> <span class="hljs-title">start</span> </span>{
-	<span class="hljs-keyword">if</span> (
-		$ENV{<span class="hljs-string">&#x27;HTTP_USER_AGENT&#x27;</span>} =~ <span class="hljs-regexp">/Googlebot/</span> <span class="hljs-keyword">and</span>
-		<span class="hljs-keyword">open</span>(MAIL, <span class="hljs-string">&quot;| $sendmail -t&quot;</span>)
+sub start {
+	if (
+		$ENV{&apos;HTTP_USER_AGENT&apos;} =~ /Googlebot/ and
+		open(MAIL, &quot;| $sendmail -t&quot;)
 	) {
-		<span class="hljs-keyword">print</span> MAIL &lt;&lt;<span class="hljs-string">&quot;_MAIL_&quot;</span>;
+		print MAIL &lt;&lt;&quot;_MAIL_&quot;;
 From: $from
 To: $to
 Subject: $subject
-Content-Type: text/plain; charset=ISO-<span class="hljs-number">2022</span>-JP
+Content-Type: text/plain; charset=ISO-2022-JP
 
-Googlebot tries to <span class="hljs-keyword">index</span> the following page:
-http:<span class="hljs-regexp">//</span>example.com$ENV{<span class="hljs-string">&#x27;REQUEST_URI&#x27;</span>}
-_MAIL<span class="hljs-number">_</span>
-		<span class="hljs-keyword">close</span>(MAIL);
+Googlebot tries to index the following page:
+http://example.com$ENV{&apos;REQUEST_URI&apos;}
+_MAIL_
+		close(MAIL);
 	}
 
-	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	return 0;
 }
 
-<span class="hljs-number">1</span>;</code></pre>
+1;</code></pre>
 <p>てか、使ってないので動くかどうかは知りませんけど。</p>
 <p>なんて奴だ。</p>
 <p>inspire元のエントリにもあるように、いろいろな検索エンジンのロボットをトラッキングすると面白いかもしれないですね。</p>

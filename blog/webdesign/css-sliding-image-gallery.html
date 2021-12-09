@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="ポートフォリオとかでよく見かけるクリックすると横にスライドしながら画像を切り替えるギャラリーUIをCSS3だけで作ってみた。最終的に、エフェクト的には満足のいかないところがあるもののすごくシンプルに作成できたのでまぁ満足。:target擬似クラスとtransitionプロパティ（とtransformプロパティ）の組み合わせは色々できて楽しい。" property="twitter:description">
@@ -40,39 +41,39 @@
 
 <p>ギャラリー全体のマークアップは以下のような単純なもの。</p>
 
-<pre><code class="highlight language-html"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;gallery&quot;</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;image&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;first&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;#second&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;161-1.png&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;image&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;second&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;#third&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;161-2.png&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
-	<span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;image&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;third&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;#first&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;161-3.png&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></code></pre>
+<pre><code class="language-html">&lt;ul id=&quot;gallery&quot;&gt;
+	&lt;li class=&quot;image&quot; id=&quot;first&quot;&gt;&lt;a href=&quot;#second&quot;&gt;&lt;img src=&quot;161-1.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+	&lt;li class=&quot;image&quot; id=&quot;second&quot;&gt;&lt;a href=&quot;#third&quot;&gt;&lt;img src=&quot;161-2.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+	&lt;li class=&quot;image&quot; id=&quot;third&quot;&gt;&lt;a href=&quot;#first&quot;&gt;&lt;img src=&quot;161-3.png&quot;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
 
 <p>HTML的にも不自然なところはない。画像の数を増やす時にはリンクを適宜書き換えなくてはならないという欠点はあるが、リストの画像をクリックして次々に見ていくというものなので、避けようがない作業だと思う。</p>
 
 <p>CSSは以下のようなコードになる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-id">#gallery</span> <span class="hljs-selector-class">.image</span> {
-	<span class="hljs-attribute">display</span>: block;
-	<span class="hljs-attribute">float</span>: left;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">0px</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">450px</span>;
-	<span class="hljs-attribute">overflow</span>: hidden;
-	-moz-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	-webkit-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	-o-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
+<pre><code class="language-css">#gallery .image {
+	display: block;
+	float: left;
+	width: 0px;
+	height: 450px;
+	overflow: hidden;
+	-moz-transition-duration: 1s;
+	-webkit-transition-duration: 1s;
+	-o-transition-duration: 1s;
+	transition-duration: 1s;
 }
 
-<span class="hljs-selector-id">#gallery</span> <span class="hljs-selector-class">.image</span><span class="hljs-selector-pseudo">:target</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">450px</span>;
-	-moz-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	-webkit-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	-o-<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
-	<span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">1s</span>;
+#gallery .image:target {
+	width: 450px;
+	-moz-transition-duration: 1s;
+	-webkit-transition-duration: 1s;
+	-o-transition-duration: 1s;
+	transition-duration: 1s;
 }
 
-<span class="hljs-selector-id">#gallery</span> <span class="hljs-selector-class">.image</span> <span class="hljs-selector-tag">a</span> <span class="hljs-selector-tag">img</span> {
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+#gallery .image a img {
+	width: 100%;
+	height: 100%;
 }</code></pre>
 
 <p><code>.image</code>で<code>width: 0px;</code>を指定して通常は見えないようにしておき、それを<code>:target</code>擬似クラスを利用して画像へのリンクを踏んだ時に<code>width: 450px;</code>に変更して見えるようにする。この変化を<code>transition</code>プロパティを使ってアニメーションさせるというただそれだけのもの。CSS自体に難しいところはまったく無く、不自然なところもあまり無い。強いて注意すべき点を挙げるとするなら画像のリサイズはコンテナ（<code>.image</code>）に任せて<code>img</code>要素では<code>100%</code>にすること。こうすることによって<code>.image</code>の<code>width</code>プロパティの変化によるアニメーションが綺麗に反映される。</p>

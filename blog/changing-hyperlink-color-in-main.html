@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="本文だけ、具体的にはmain要素以下でだけ、ハイパーリンクの色を変えたい、というようなことはよくあるだろう。色々なやり方がある。上書きするか、ハイパーリンクごとにクラスを振るのが主流と思われる。セレクターを工夫すれば、すみ分けることもできる。僕は、最近になって、カスタム・プロパティーで切り替える手法に落ち着きつつある。" property="twitter:description">
@@ -38,24 +39,24 @@
 
 <h2>上書きする</h2>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: red;
+<pre><code class="language-css">a {
+	color: red;
 }
 
-<span class="hljs-selector-tag">main</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: green;
+main a {
+	color: green;
 }</code></pre>
 
 <p>普通の書き方はこうだろう。特に言うことはないが、上書きが入るので、よくわかっていない人にいじられると破綻しやすい。また、詳細度が違うので、そのことを意識しながらコードを把握しなくてはならない。</p>
 
 <h2>すみ分ける</h2>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">body</span> &gt; <span class="hljs-selector-pseudo">:not</span>(<span class="hljs-selector-tag">main</span>) <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: red;
+<pre><code class="language-css">body > :not(main) a {
+	color: red;
 }
 
-<span class="hljs-selector-tag">body</span> &gt; <span class="hljs-selector-tag">main</span> <span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: green;
+body > main a {
+	color: green;
 }
 </code></pre>
 
@@ -63,16 +64,16 @@
 
 <h2>カスタム・プロパティーで切り替える</h2>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-pseudo">:root</span> {
-	<span class="hljs-attr">--color-a</span>: red;
+<pre><code class="language-css">:root {
+	--color-a: red;
 }
 
-<span class="hljs-selector-tag">main</span> {
-	<span class="hljs-attr">--color-a</span>: green;
+main {
+	--color-a: green;
 }
 
-<span class="hljs-selector-tag">a</span> {
-	<span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--color-a);
+a {
+	color: var(--color-a);
 }</code></pre>
 
 <p>カスタム・プロパティーを使うと、こうも書ける。ルールセットが増えているので、回り道をしているように見えるが、デザイン・トークンのような側面から考えると、意味がありそうに見えてくる。CSSコード自体はほとんどいじらずに、デザイン・トークンへの参照を切り替えるだけで済むからだ。詳細度の問題も起きない。</p>

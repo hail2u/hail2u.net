@@ -16,7 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/index.9.21.10.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.21.11.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.21.11.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary_large_image" name="twitter:card">
 		<meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" property="twitter:description">
@@ -44,30 +45,30 @@
 
 <p><code>pre</code>要素の左右が<code>#f0f</code>の矩形で埋められている。Chrome 35、Firefox 30、そしてInternet Explorer 11で確認できる。Mobile Safari 7ではうまく動かない（多分<code>vw</code>単位の問題のような気がする）。わかりやすいように左右に追加する擬似要素の背景の色を変えておいたけど、同じ色にすればあたかも<code>pre</code>要素が飛び出すように見えるはず。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-class">.test</span> {
-	<span class="hljs-attribute">margin-right</span>: auto;
-	<span class="hljs-attribute">margin-left</span>: auto;
-	<span class="hljs-attribute">position</span>: relative;
-	<span class="hljs-attribute">width</span>: <span class="hljs-number">480px</span>;
+<pre><code class="language-css">.test {
+	margin-right: auto;
+	margin-left: auto;
+	position: relative;
+	width: 480px;
 }
 
-<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:before</span>,
-<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:after</span> {
-	<span class="hljs-attribute">display</span>: block;
-	<span class="hljs-attribute">position</span>: absolute;
-	<span class="hljs-attribute">top</span>: <span class="hljs-number">0</span>;
-	<span class="hljs-attribute">width</span>: <span class="hljs-built_in">calc</span>((<span class="hljs-number">100vw</span> - <span class="hljs-number">100%</span>) / <span class="hljs-number">2</span>);
-	<span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
-	<span class="hljs-attribute">content</span>: <span class="hljs-string">&quot;&quot;</span>;
-	<span class="hljs-attribute">background-color</span>: <span class="hljs-number">#f0f</span>;
+.test:before,
+.test:after {
+	display: block;
+	position: absolute;
+	top: 0;
+	width: calc((100vw - 100%) / 2);
+	height: 100%;
+	content: &quot;&quot;;
+	background-color: #f0f;
 }
 
-<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:before</span> {
-	<span class="hljs-attribute">right</span>: <span class="hljs-number">100%</span>;
+.test:before {
+	right: 100%;
 }
 
-<span class="hljs-selector-class">.test</span><span class="hljs-selector-pseudo">:after</span> {
-	<span class="hljs-attribute">left</span>: <span class="hljs-number">100%</span>;
+.test:after {
+	left: 100%;
 }</code></pre>
 
 <p><code>vw</code>単位は<code>1vw</code>でビューポートの幅の<em>1/100</em>なので、<code>100vw</code>がビューポートの幅になる。<code>calc()</code>では<code>%</code>も使え、<code>width</code>プロパティーで<code>calc(100%)</code>とすると<em>その要素の幅</em>になる。つまり<code>calc(100vw - 100%)</code>で<em>ビューポート幅からその要素の幅を引いた余り</em>を計算できることになる。デモでは<code>pre</code>要素は真ん中寄せなので単純にこれを半分にし、左右に追加する擬似要素の幅にすれば良い。高さは<code>100%</code>で自動的に揃うので計算不要。</p>
@@ -86,8 +87,8 @@
 
 <p>ただしInternet Explorer 11以降では<code>-ms-overflow-style</code>独自プロパティーでオーバーレイのスクロールバーに変更できるのでなんとか解決できる。</p>
 
-<pre><code class="highlight language-css"><span class="hljs-selector-tag">html</span> {
-	-ms-<span class="hljs-attribute">overflow</span>-style: -ms-autohiding-scrollbar;
+<pre><code class="language-css">html {
+	-ms-overflow-style: -ms-autohiding-scrollbar;
 }</code></pre>
 
 <p><code>overflow-style</code>プロパティー自体は一時期いくつかの標準仕様に存在したんだけど、今は<code>overflow</code>プロパティーへ統合された。元々<code>overflow</code>した時の内容物の扱われ方を定義するプロパティーだったようなので、スクロールバーの表示形式の変更に使うのは間違ってたりとかすることもあるので、独自プロパティーであることに目をつぶったとしても使わない方が良さそう。</p>
