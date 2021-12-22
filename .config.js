@@ -45,12 +45,6 @@ export default {
 				src: "src/feed.mustache",
 				type: ["links"],
 			},
-			{
-				dest: "dist/statuses/feed",
-				metadata: "src/statuses/index.json",
-				src: "src/feed.mustache",
-				type: ["statuses"],
-			},
 		],
 		html: [
 			{
@@ -94,11 +88,6 @@ export default {
 				src: "src/sitemap.mustache",
 			},
 			{
-				dest: "dist/statuses/index.html",
-				metadata: "src/statuses/index.json",
-				src: "src/statuses/index.mustache",
-			},
-			{
 				dest: "dist/subscriptions/index.html",
 				metadata: "src/subscriptions/index.json",
 				src: "src/subscriptions/index.mustache",
@@ -118,7 +107,6 @@ export default {
 			books: "data/books.json",
 			documents: "data/documents.json",
 			links: "data/links.json",
-			statuses: "data/statuses.json",
 			subscriptions: "data/subscriptions.json",
 		},
 		dest: {

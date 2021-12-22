@@ -78,15 +78,13 @@ const main = async () => {
 		articles,
 		books,
 		documents,
-		links,
-		statuses
+		links
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		readLatestItems(config.paths.data.articles),
 		readLatestItems(config.paths.data.books),
 		readLatestItems(config.paths.data.documents),
-		readLatestItems(config.paths.data.links),
-		readLatestItems(config.paths.data.statuses)
+		readLatestItems(config.paths.data.links)
 	]);
 	return Promise.all(
 		config.files.feed.map(
@@ -95,8 +93,7 @@ const main = async () => {
 				articles,
 				books,
 				documents,
-				links,
-				statuses
+				links
 			})
 		)
 	);

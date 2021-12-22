@@ -154,7 +154,6 @@ const build = async (basic, partials, file) => {
 		data.books = data.books.slice(0, 3);
 		data.documents = data.documents.slice(0, 1);
 		data.links = data.links.slice(0, 6);
-		data.statuses = data.statuses.slice(0, 1);
 	}
 
 	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
@@ -193,7 +192,6 @@ const main = async () => {
 		books,
 		documents,
 		links,
-		statuses,
 		subscriptions,
 		partials,
 		{ version }
@@ -203,7 +201,6 @@ const main = async () => {
 		readItems(config.paths.data.books),
 		readItems(config.paths.data.documents),
 		readItems(config.paths.data.links),
-		readItems(config.paths.data.statuses),
 		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
 		readJSONFile(file)
@@ -214,7 +211,6 @@ const main = async () => {
 		books,
 		documents,
 		links,
-		statuses,
 		subscriptions,
 		version
 	};
