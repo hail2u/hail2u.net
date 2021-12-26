@@ -152,7 +152,6 @@ const build = async (basic, partials, file) => {
 	if (data.isHome) {
 		data.articles = data.articles.slice(0, 6);
 		data.books = data.books.slice(0, 3);
-		data.documents = data.documents.slice(0, 1);
 		data.links = data.links.slice(0, 6);
 	}
 
@@ -190,7 +189,6 @@ const main = async () => {
 		metadata,
 		articles,
 		books,
-		documents,
 		links,
 		subscriptions,
 		partials,
@@ -199,7 +197,6 @@ const main = async () => {
 		readJSONFile(config.paths.metadata.root),
 		readItems(config.paths.data.articles),
 		readItems(config.paths.data.books),
-		readItems(config.paths.data.documents),
 		readItems(config.paths.data.links),
 		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
@@ -209,7 +206,6 @@ const main = async () => {
 		...metadata,
 		articles,
 		books,
-		documents,
 		links,
 		subscriptions,
 		version

@@ -77,13 +77,11 @@ const main = async () => {
 		metadata,
 		articles,
 		books,
-		documents,
 		links
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
 		readLatestItems(config.paths.data.articles),
 		readLatestItems(config.paths.data.books),
-		readLatestItems(config.paths.data.documents),
 		readLatestItems(config.paths.data.links)
 	]);
 	return Promise.all(
@@ -92,7 +90,6 @@ const main = async () => {
 				...metadata,
 				articles,
 				books,
-				documents,
 				links
 			})
 		)
