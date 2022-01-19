@@ -1,33 +1,14 @@
-import {
-	escapeCharacters,
-	unescapeReferences
-} from "../lib/character-reference.js";
 import config from "../.config.js";
+import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "fs/promises";
-import minimist from "minimist";
 import mustache from "mustache";
 import os from "os";
 import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import { readJSONFile } from "../lib/json-file.js";
 import { runCommand } from "../lib/run-command.js";
+import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
-
-const getDraft = async (file) => {
-	const content = await fs.readFile(file, "utf8");
-	const [
-		title,
-		...rest
-	] = content.split("\n");
-	const body = rest
-		.join("\n")
-		.trim()
-		.replace(/(?<=\b(href|src)=")\.\.\/dist\//gu, "/");
-	return {
-		body,
-		title: unescapeReferences(title.replace(/<.*?>/gu, ""))
-	};
-};
 
 const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
 
@@ -65,25 +46,21 @@ const makeTempDir = async () => {
 };
 
 const main = async () => {
-	const { _: [ file ] } = minimist(process.argv.slice(2));
-
-	if (!file) {
-		throw new Error("A file path must be passed.");
-	}
-
-	const draft = await getDraft(file);
+	const {
+		selected
+	} = await selectDraft();
 	const [
 		dir,
 		template
 	] = await Promise.all([
 		makeTempDir(),
 		fs.readFile(config.paths.src.testArticle, "utf8"),
-		validateBody(draft.body, file)
+		validateBody(selected.body, config.paths.src.draft)
 	]);
 	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
-		.render(template, draft, null, {
+		.render(template, selected, null, {
 			escape: escapeCharacters
 		})
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);

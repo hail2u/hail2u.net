@@ -1,53 +1,19 @@
 import {
+	escapeCharacters,
+	unescapeReferences
+} from "../lib/character-reference.js";
+import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../.config.js";
-import { constants } from "fs";
-import fs from "fs/promises";
 import { getDateDetails } from "../lib/get-date-details.js";
-import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import { outputFile } from "../lib/output-file.js";
 import path from "path";
 import { runCommand } from "../lib/run-command.js";
-import { unescapeReferences } from "../lib/character-reference.js";
+import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
-
-const getArticle = async (file) => {
-	const content = await fs.readFile(file, "utf8");
-	const [
-		title,
-		...rest
-	] = content.split("\n");
-	const body = rest
-		.join("\n")
-		.trim()
-		.replace(/(?<=\b(href|src)=")\.\.\/dist\//gu, "/");
-	return {
-		body,
-		name: path.basename(file, path.extname(file)),
-		src: file,
-		title: unescapeReferences(title.replace(/<.*?>/gu, ""))
-	};
-};
-
-const checkNameCharacter = (name) => {
-	if (!/^[a-z0-9][-.a-z0-9]*[a-z0-9]$/u.test(name)) {
-		throw new Error("This draft does not have a valid name. A draft filename must start and end with “a-z” or “0-9” and must not contain other than “-.a-z0-9”.");
-	}
-};
-
-const checkNameConflict = async (name) => {
-	const file = path.join(config.paths.dest.article, `${name}.html`);
-
-	try {
-		await fs.access(file, constants.F_OK);
-	} catch (e) {
-		return true;
-	}
-
-	throw new Error("This draft name is already used.");
-};
 
 const checkTitleLength = (title) => {
 	const textEncoder = new TextEncoder();
@@ -87,62 +53,67 @@ const validateBody = async (body, src) => {
 	}
 };
 
+const rebuildDraft = ({
+	body,
+	title
+}) => `<h1>${escapeCharacters(title)}</h1>
+
+${body}
+`;
+
 const main = async () => {
-	const { _: [ file ] } = minimist(process.argv.slice(2));
-
-	if (!file) {
-		throw new Error("A file path must be passed.");
-	}
-
 	const [
 		{
-			body,
-			name,
-			src,
-			title
+			remains,
+			selected: {
+				body,
+				title
+			}
 		},
 		cache
 	] = await Promise.all([
-		getArticle(file),
+		selectDraft(),
 		readJSONFile(config.paths.data.articles)
 	]);
 	await Promise.all([
-		checkNameCharacter(name),
-		checkNameConflict(name),
 		checkTitleLength(title),
 		checkTitleType(title),
-		validateBody(body, src)
+		validateBody(body, config.paths.src.draft)
 	]);
 	const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
+	const published = Date.now();
+	const dt = getDateDetails(published);
+	const name = `${dt.strYear}-${dt.strMonth}-${dt.strDate}`;
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
 		`${name}.html`
 	);
-	const published = Date.now();
-	const dt = getDateDetails(published);
-	await outputJSONFile(config.paths.data.articles, [
-		{
-			body,
-			description,
-			link,
-			published,
-			...dt,
-			title,
-			type: "article"
-		},
-		...cache
-	]);
+	const drafts = remains
+		.map(rebuildDraft)
+		.join("\n");
 	await Promise.all([
-		fs.rm(src),
-		runCommand("git", [
-			"add",
-			"--",
-			config.paths.data.articles
-		])
+		outputJSONFile(config.paths.data.articles, [
+			{
+				body,
+				description,
+				link,
+				published,
+				...dt,
+				title,
+				type: "article"
+			},
+			...cache
+		]),
+		outputFile(config.paths.src.draft, drafts)
+	]);
+	await runCommand("git", [
+		"add",
+		"--",
+		config.paths.data.articles
 	]);
 	const th = cache.length + 1;
 	const [{
