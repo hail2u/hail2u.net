@@ -10,7 +10,7 @@ import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { outputFile } from "../lib/output-file.js";
-import path from "path";
+import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";

@@ -1,7 +1,7 @@
 import config from "../.config.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { outputFile } from "../lib/output-file.js";
-import path from "path";
+import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
 const removeCommentLine = (line) => {

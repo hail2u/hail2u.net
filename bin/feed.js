@@ -1,6 +1,6 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";

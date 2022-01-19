@@ -1,7 +1,7 @@
 import config from "../.config.js";
 import fastXMLParser from "fast-xml-parser";
 import fetch from "node-fetch";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 const cancelFetch = (abortController) => {
 	abortController.abort();

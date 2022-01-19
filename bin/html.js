@@ -1,10 +1,10 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
-import path from "path";
+import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
 const isFirstInDate = (current, previous) => {

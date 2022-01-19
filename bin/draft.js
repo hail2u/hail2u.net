@@ -1,10 +1,10 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import mustache from "mustache";
-import os from "os";
+import os from "node:os";
 import { outputFile } from "../lib/output-file.js";
-import path from "path";
+import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
