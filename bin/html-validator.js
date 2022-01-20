@@ -52,7 +52,9 @@ const main = async () => {
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath).filter(isNotStyleGuide);
+	const indexes = Array
+		.from(sitemap.matchAll(indexRe), rewritePath)
+		.filter(isNotStyleGuide);
 	const articleRe = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = Array.from(sitemap.matchAll(articleRe), rewritePath);
 	const picked = shuffleArray(articles).slice(0, 3);

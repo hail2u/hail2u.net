@@ -29,7 +29,10 @@ const inline = async (src, line) => {
 	const filename = line.substring(openQuote + 1, closeQuote);
 	const file = path.resolve(root, filename);
 	const css = await fs.readFile(file, "utf8");
-	return css.split("\n").map(removeCommentLine).join("\n");
+	return css
+		.split("\n")
+		.map(removeCommentLine)
+		.join("\n");
 };
 
 const build = async (version, {
