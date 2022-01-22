@@ -109,7 +109,7 @@ export default {
 		},
 		src: {
 			article: "src/blog/article.mustache",
-			draft: ".draft.html",
+			draft: "src/blog/drafts.html",
 			partial: "src/partial/",
 			root: "src/",
 			styleGuide: "src/css/test.html",
