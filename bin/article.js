@@ -94,7 +94,7 @@ const main = async () => {
 	);
 	const drafts = remains
 		.map(rebuildDraft)
-		.join("\n");
+		.join("\n\n");
 	await Promise.all([
 		outputJSONFile(config.paths.data.articles, [
 			{
