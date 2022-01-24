@@ -10,6 +10,14 @@ import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
 
+const rebuildDraft = ({
+	body,
+	title
+}) => `<h1>${escapeCharacters(title)}</h1>
+
+${body}
+`;
+
 const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
 
 const validateBody = async (body, src) => {
@@ -47,14 +55,22 @@ const makeTempDir = async () => {
 
 const main = async () => {
 	const {
+		remains,
 		selected
 	} = await selectDraft();
+	const drafts = [
+		selected,
+		...remains
+	]
+		.map(rebuildDraft)
+		.join("\n\n");
 	const [
 		dir,
 		template
 	] = await Promise.all([
 		makeTempDir(),
 		fs.readFile(config.paths.src.testArticle, "utf8"),
+		outputFile(config.paths.src.draft, drafts),
 		validateBody(selected.body, config.paths.src.draft)
 	]);
 	const test = path.join(dir, "test.html");
