@@ -65,16 +65,15 @@ const main = async () => {
 	const [
 		{
 			remains,
-			selected: {
-				body,
-				title
-			}
+			selected
 		},
 		cache
 	] = await Promise.all([
 		selectDraft(),
 		readJSONFile(config.paths.data.articles)
 	]);
+	const body = selected.body.replace(/(?<=\b(href|src)=")\.\.\/\.\.\/dist\//gu, "/");
+	const { title } = selected;
 	await Promise.all([
 		checkTitleLength(title),
 		checkTitleType(title),

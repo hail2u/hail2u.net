@@ -76,7 +76,10 @@ const main = async () => {
 	const test = path.join(dir, "test.html");
 	const toRoot = path.relative(dir, config.paths.dest.root);
 	const rendered = mustache
-		.render(template, selected, null, {
+		.render(template, {
+			...selected,
+			body: selected.body.replace(/(?<=\b(href|src)=")\.\.\/\.\.\/dist\//gu, "/")
+		}, null, {
 			escape: escapeCharacters
 		})
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
