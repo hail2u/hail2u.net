@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.22.3.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.22.3.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.22.4.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.22.4.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="blosxomのパワフルなプラグインのひとつに、configプラグインという、グローバルな設定（$blog_titleとか）を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、設定の説明がMLのアーカイブにしかないことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。" property="twitter:description">
@@ -45,7 +45,7 @@ $blog_title = &apos;FooBarBlosxom&apos;;
 <p>とか書いて、configとかconfig.htmlとかいうファイル名でファイルを作ってやれば良いということまでは理解できました。</p>
 <p>しかし、動きません。</p>
 <p>まず第一の原因は、どうやら<code>head</code>サブルーチンで設定ファイルを読んでいることにあるようです。プラグインを読み込む順番によっては、うまく読んでくれないことがあるかもしれないとか。これに対しての解は<code>head</code>サブルーチンから<code>filter</code>サブルーチンに変更してやるか、configプラグインを最初に読み込むように00configなどと名前を変更してやるだけです。</p>
-<p>次の原因は、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>との兼ね合いっぽいです。blosxomはエントリのファイルをリストアップする際に、エントリ・ファイルとみなす拡張子以外のファイルを<code>%others</code>というハッシュに格納するので、configプラグインの設定ファイルはこちらに格納されることになります。また、configプラグインでは、その<code>%others</code>に格納されているかどうかで、設定ファイルの存在を確認しています。通常はこれで問題ないのですが、entries_indexでは、この<code>%others</code>をまるごと吹っ飛ばしているっぽいので、configプラグインで設定ファイルの存在を検知できていないような。なので、その部分をちょっと書き換えてやる必要があるかもないかも。本格的な対策はentries_indexを書き換えるべきなんでしょうけど、あれのコードはかなりトリッキーで僕にはちょっと正確に読めないです。configプラグインの</p>
+<p>次の原因は、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>との兼ね合いっぽいです。blosxomはエントリのファイルをリストアップする際に、エントリ・ファイルとみなす拡張子以外のファイルを<code>%others</code>というハッシュに格納するので、configプラグインの設定ファイルはこちらに格納されることになります。また、configプラグインでは、その<code>%others</code>に格納されているかどうかで、設定ファイルの存在を確認しています。通常はこれで問題ないのですが、entries_indexでは、この<code>%others</code>をまるごと吹っ飛ばしているっぽいので、configプラグインで設定ファイルの存在を検知できていないような。なので、その部分をちょっと書き換えてやる必要があるかもないかも。本格的な対策はentries_indexを書き換えるべきなんでしょうけど、あれのコードはかなりトリッキーで私にはちょっと正確に読めないです。configプラグインの</p>
 <pre><code class="language-perl">$blosxom::others{&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;}
 	and eval { require &quot;$blosxom::datadir$path/config.$blosxom::flavour&quot; }
 	and ( $@ ? warn $@ : last );
@@ -70,7 +70,7 @@ $blosxom::others{&quot;$blosxom::datadir$path/config&quot;}
 
 			<p><a href="/about/">このウェブサイトについて</a>&#x2003;/&#x2003;<a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内を検索</a></p>
 
-			<p><a href="mailto:hail2u@gmail.com">ながしまきょう</a>&#x2003;/&#x2003;<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>&#x2003;<a href="/feed" type="application/rss+xml">RSS</a>&#x2003;<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>&#x2003;<a href="https://twitter.com/hail2u_">Twitter</a></p>
+			<p><a href="mailto:hail2u@gmail.com">ながしまきょう</a>&#x2003;/&#x2003;<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>&#x2003;<a href="/feed" type="application/rss+xml">RSS</a>&#x2003;（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）&#x2003;<a href="https://twitter.com/hail2u_">Twitter</a></p>
 		</footer>
 	</body>
 </html>
