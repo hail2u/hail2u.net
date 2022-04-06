@@ -122,17 +122,6 @@ const mergeData = async (file, data) => {
 	};
 };
 
-const markFirstItem = (items) => {
-	const firstItem = items.shift();
-	firstItem.isFirstInDate = true;
-	firstItem.isFirstInMonth = true;
-	firstItem.isFirstInYear = true;
-	return [
-		firstItem,
-		...items
-	];
-};
-
 const build = async (basic, partials, file) => {
 	const [
 		data,
@@ -141,13 +130,6 @@ const build = async (basic, partials, file) => {
 		mergeData(file, basic),
 		fs.readFile(file.src, "utf8")
 	]);
-
-	if (data.isBookshelf && !data.isLog) {
-		data.otherBooks = data.books.slice(9);
-		data.otherBooks = markFirstItem(data.otherBooks);
-		data.numOtherBooks = data.otherBooks.length;
-		data.books = data.books.slice(0, 9);
-	}
 
 	if (data.isHome) {
 		data.articles = data.articles.slice(0, 6);
