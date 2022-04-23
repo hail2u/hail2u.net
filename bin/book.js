@@ -4,7 +4,6 @@ import {
 } from "../lib/json-file.js";
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
-import fetch from "node-fetch";
 import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
@@ -60,20 +59,14 @@ const main = async () => {
 
 	try {
 		const cover = `https://m.media-amazon.com/images/P/${asin}.jpg`;
-		const [
-			res,
-			img
-		] = await Promise.all([
-			fetch(cover, { signal: abortController.signal }),
-			sharp()
-		]);
+		const res = await fetch(cover, { signal: abortController.signal });
 
 		if (!res.ok) {
 			throw new Error(`${res.status} ${res.statusText}`);
 		}
 
-		res.body.pipe(img);
-		const metadata = await img.metadata();
+		const img = await res.arrayBuffer();
+		const metadata = await sharp(Buffer.from(img)).metadata();
 
 		if (metadata.height === 1 && metadata.width === 1) {
 			throw new Error(`${title} does not have a cover image.`);
