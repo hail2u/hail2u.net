@@ -43,7 +43,7 @@ const validateFeed = async (feed) => {
 
 		return json.errorlist.error;
 	} catch (e) {
-		if (e.type === "aborted") {
+		if (e.name === "AbortError") {
 			return "Skipped. W3C Feed Validator does not respond in 10s.";
 		}
 
