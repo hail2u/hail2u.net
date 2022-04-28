@@ -7,6 +7,8 @@ import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
+const isNotComic = (book) => !(/（\d+）/u).test(book.title);
+
 const isFirstInDate = (current, previous) => {
 	if (!previous || current.date !== previous.date) {
 		return true;
@@ -71,6 +73,11 @@ const markItem = (item, index, items) => {
 
 const readItems = async (file) => {
 	const items = await readJSONFile(file);
+
+	if (items[0].type === "book") {
+		return Promise.all(items.filter(isNotComic).map(markItem));
+	}
+
 	return Promise.all(items.map(markItem));
 };
 
