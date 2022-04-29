@@ -3,6 +3,8 @@ export default {
 		css: [
 			{
 				dest: "dist/css/index.{{version}}.css",
+				prefix: "@supports (--custom-property: true) {",
+				postfix: "}",
 				src: "src/css/index.css",
 			},
 			{

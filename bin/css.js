@@ -37,14 +37,16 @@ const inline = async (src, line) => {
 
 const build = async (version, {
 	dest,
-	src
+	src,
+	prefix = '',
+	postfix = ''
 }) => {
 	const versioned = dest.replace(/\{\{version\}\}/gu, version);
 	const css = await fs.readFile(src, "utf8");
 	const lines = css.split("\n");
 	const inlined = await Promise.all(lines.map(inline.bind(null, src)));
 	const removed = await Promise.all(inlined.map(removeCommentLine));
-	await outputFile(versioned, removed.join("\n"));
+	await outputFile(versioned, [prefix, ...removed, postfix].join("\n"));
 };
 
 const main = async () => {
