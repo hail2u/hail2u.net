@@ -5,35 +5,31 @@
 	<body>
 		{{> page-header}}
 
-		<main>
+		<h1>{{title}}</h1>
+
+		<p>このページにすべての過去記事が並んでいるので、ページ内検索でタイトルを検索できます。記事の内容を含めて検索したい場合は、<a href="https://www.google.com/search?q=site%3A{{domain}}">Google</a>や<a href="https://duckduckgo.com/?q=site%3A{{domain}}">DuckDuckGo</a>で検索してください。</p>
+
+		<nav>
+			<p>{{#articles}}{{#isFirstInYear}}<a href="#on-{{strYear}}">{{year}}&#x2060;年</a>&#x2003;{{/isFirstInYear}}{{/articles}}</p>
+		</nav>
+
+		{{#articles}}
+			{{#isFirstInMonth}}
+				<section{{#isFirstInYear}} id="on-{{strYear}}"{{/isFirstInYear}}>
+					<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
+			{{/isFirstInMonth}}
+
+
 			<section>
-				<h1>{{title}}</h1>
+				<p class="date"><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00">{{date}}日</time></p>
 
-				<p>このページにすべての過去記事が並んでいるので、ページ内検索でタイトルを検索できます。記事の内容を含めて検索したい場合は、<a href="https://www.google.com/search?q=site%3A{{domain}}">Google</a>や<a href="https://duckduckgo.com/?q=site%3A{{domain}}">DuckDuckGo</a>で検索してください。</p>
-
-				<nav>
-					<p>{{#articles}}{{#isFirstInYear}}<a href="#on-{{strYear}}">{{year}}&#x2060;年</a>&#x2003;{{/isFirstInYear}}{{/articles}}</p>
-				</nav>
-
-				{{#articles}}
-					{{#isFirstInMonth}}
-						<section{{#isFirstInYear}} id="on-{{strYear}}"{{/isFirstInYear}}>
-							<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
-					{{/isFirstInMonth}}
-
-
-					<section>
-						<p class="date"><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00">{{date}}日</time></p>
-
-						<h3><a href="{{link}}">{{title}}</a></h3>
-					</section>
-
-					{{#isLastInMonth}}
-						</section>
-					{{/isLastInMonth}}
-				{{/articles}}
+				<h3><a href="{{link}}">{{title}}</a></h3>
 			</section>
-		</main>
+
+			{{#isLastInMonth}}
+				</section>
+			{{/isLastInMonth}}
+		{{/articles}}
 
 		{{> page-footer}}
 	</body>
