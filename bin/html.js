@@ -79,7 +79,6 @@ const build = async (basic, partials, file) => {
 	if (data.isHome) {
 		data.articles = data.articles.slice(0, 6);
 		data.books = data.books.slice(0, 3);
-		data.documents = data.documents.slice(0, 1);
 		data.links = data.links.slice(0, 6);
 	}
 
