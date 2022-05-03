@@ -9,76 +9,14 @@ import { readJSONFile } from "../lib/json-file.js";
 
 const isNotComic = (book) => !(/（\d+）/u).test(book.title);
 
-const isFirstInDate = (current, previous) => {
-	if (!previous || current.date !== previous.date) {
-		return true;
-	}
-
-	return false;
-};
-
-const isFirstInMonth = (current, previous) => {
-	if (!previous || current.month !== previous.month) {
-		return true;
-	}
-
-	return false;
-};
-
-const isFirstInYear = (current, previous) => {
-	if (!previous || current.year !== previous.year) {
-		return true;
-	}
-
-	return false;
-};
-
-const isLastInDate = (current, next) => {
-	if (!next || current.date !== next.date) {
-		return true;
-	}
-
-	return false;
-};
-
-const isLastInMonth = (current, next) => {
-	if (!next || current.month !== next.month) {
-		return true;
-	}
-
-	return false;
-};
-
-const isLastInYear = (current, next) => {
-	if (!next || current.year !== next.year) {
-		return true;
-	}
-
-	return false;
-};
-
-const markItem = (item, index, items) => {
-	const nextItem = items[index + 1];
-	const previousItem = items[index - 1];
-	return {
-		...item,
-		isFirstInDate: isFirstInDate(item, previousItem),
-		isFirstInMonth: isFirstInMonth(item, previousItem),
-		isFirstInYear: isFirstInYear(item, previousItem),
-		isLastInDate: isLastInDate(item, nextItem),
-		isLastInMonth: isLastInMonth(item, nextItem),
-		isLastInYear: isLastInYear(item, nextItem)
-	};
-};
-
 const readItems = async (file) => {
 	const items = await readJSONFile(file);
 
 	if (items[0].type === "book") {
-		return Promise.all(items.filter(isNotComic).map(markItem));
+		return Promise.all(items.filter(isNotComic));
 	}
 
-	return Promise.all(items.map(markItem));
+	return Promise.all(items);
 };
 
 const readPartial = async (filename) => {
