@@ -12,13 +12,27 @@ import { validateHTML } from "../lib/validate-html.js";
 
 const rebuildDraft = ({
 	body,
+	id,
 	title
-}) => `<h1>${escapeCharacters(title)}</h1>
+}) => {
+	if (id) {
+		return `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
 `;
+	}
 
-const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
+	return `<h1>${escapeCharacters(title)}</h1>
+
+${body}
+`;
+};
+
+const formatMessage = (file, {
+	lastColumn,
+	lastLine,
+	message
+}) => `${file}:${lastLine + 2}:${lastColumn}: ${message}`;
 
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);

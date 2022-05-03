@@ -15,6 +15,12 @@ import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
 
+const checkIDFormat = (id) => {
+	if (id && !/[0-9a-z][-0-9a-z_.]*[0-9a-z]/u.test(id)) {
+		throw new Error("This draft ID is not valid. ID must be started and ended with [0-9a-z], and must not contain other than [-0-9a-z_.].");
+	}
+};
+
 const checkTitleLength = (title) => {
 	const textEncoder = new TextEncoder();
 	const bytes = textEncoder.encode(title);
@@ -30,7 +36,11 @@ const checkTitleType = (title) => {
 	}
 };
 
-const formatMessage = (file, message) => `${file}:${message.lastLine + 2}:${message.lastColumn}: ${message.message}`;
+const formatMessage = (file, {
+	lastColumn,
+	lastLine,
+	message
+}) => `${file}:${lastLine + 2}:${lastColumn}: ${message}`;
 
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
@@ -53,13 +63,35 @@ const validateBody = async (body, src) => {
 	}
 };
 
+const generateName = ({
+	strDate,
+	strMonth,
+	strYear
+}, id) => {
+	if (id) {
+		return id;
+	}
+
+	return `${strYear}-${strMonth}-${strDate}`;
+};
+
 const rebuildDraft = ({
 	body,
+	id,
 	title
-}) => `<h1>${escapeCharacters(title)}</h1>
+}) => {
+	if (id) {
+		return `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
 `;
+	}
+
+	return `<h1>${escapeCharacters(title)}</h1>
+
+${body}
+`;
+};
 
 const main = async () => {
 	const [
@@ -73,8 +105,12 @@ const main = async () => {
 		readJSONFile(config.paths.data.articles)
 	]);
 	const body = selected.body.replace(/(?<=\b(href|src)=")\.\.\/\.\.\/dist\//gu, "/");
-	const { title } = selected;
+	const {
+		id,
+		title
+	} = selected;
 	await Promise.all([
+		checkIDFormat(id),
 		checkTitleLength(title),
 		checkTitleType(title),
 		validateBody(body, config.paths.src.draft)
@@ -85,7 +121,7 @@ const main = async () => {
 		.shift();
 	const published = Date.now();
 	const dt = getDateDetails(published);
-	const name = `${dt.strYear}-${dt.strMonth}-${dt.strDate}`;
+	const name = generateName(dt, id);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
