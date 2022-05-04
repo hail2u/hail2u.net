@@ -7,6 +7,8 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../.config.js";
+import { constants } from "node:fs";
+import fs from "node:fs/promises";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { outputFile } from "../lib/output-file.js";
@@ -16,9 +18,21 @@ import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const checkIDFormat = (id) => {
-	if (id && !/[0-9a-z][-0-9a-z_.]*[0-9a-z]/u.test(id)) {
-		throw new Error("This draft ID is not valid. ID must be started and ended with [0-9a-z], and must not contain other than [-0-9a-z_.].");
+	if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
+		throw new Error("This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.");
 	}
+};
+
+const checkNameConflict = async (name) => {
+	const file = path.join(config.paths.dest.article, `${name}.html`);
+
+	try {
+		await fs.access(file, constants.F_OK);
+	} catch (e) {
+		return true;
+	}
+
+	throw new Error(`“${name}” is already used.`);
 };
 
 const checkTitleLength = (title) => {
@@ -122,6 +136,7 @@ const main = async () => {
 	const published = Date.now();
 	const dt = getDateDetails(published);
 	const name = generateName(dt, id);
+	await checkNameConflict(name);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
