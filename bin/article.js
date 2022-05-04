@@ -77,6 +77,52 @@ const validateBody = async (body, src) => {
 	}
 };
 
+const checkHoliday = ({
+	strDate,
+	strMonth,
+	strYear
+}) => {
+	const holidays = [
+		"20220101",
+		"20220110",
+		"20220211",
+		"20220223",
+		"20220321",
+		"20220429",
+		"20220503",
+		"20220504",
+		"20220505",
+		"20220718",
+		"20220811",
+		"20220919",
+		"20220923",
+		"20221010",
+		"20221103",
+		"20221123",
+		"20230101",
+		"20230102",
+		"20230109",
+		"20230211",
+		"20230223",
+		"20230321",
+		"20230429",
+		"20230503",
+		"20230504",
+		"20230505",
+		"20230717",
+		"20230811",
+		"20230918",
+		"20230923",
+		"20231009",
+		"20231103",
+		"20231123"
+	];
+
+	if (holidays.includes(`${strYear}${strMonth}${strDate}`)) {
+		throw new Error("Today is holiday!");
+	}
+};
+
 const generateName = ({
 	strDate,
 	strMonth,
@@ -136,7 +182,10 @@ const main = async () => {
 	const published = Date.now();
 	const dt = getDateDetails(published);
 	const name = generateName(dt, id);
-	await checkNameConflict(name);
+	await Promise.all([
+		checkHoliday(dt),
+		checkNameConflict(name)
+	]);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
