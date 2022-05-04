@@ -13,6 +13,7 @@ import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
+import readline from "node:readline/promises";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 import { validateHTML } from "../lib/validate-html.js";
@@ -77,7 +78,8 @@ const validateBody = async (body, src) => {
 	}
 };
 
-const checkHoliday = ({
+const confirmPublishing = async ({
+	day,
 	strDate,
 	strMonth,
 	strYear
@@ -118,8 +120,20 @@ const checkHoliday = ({
 		"20231123"
 	];
 
-	if (holidays.includes(`${strYear}${strMonth}${strDate}`)) {
-		throw new Error("Today is holiday!");
+	if (day !== 0 && !holidays.includes(`${strYear}${strMonth}${strDate}`)) {
+		return;
+	}
+
+	const menu = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+	const input = await menu.question("Today is Sunday or holiday. Are you sure you want to publish an article? (No)");
+	menu.close();
+	const answer = input.toLowerCase();
+
+	if (typeof answer === "string" && (answer !== "y" || answer !== "yes")) {
+		throw new Error("Aborted.");
 	}
 };
 
@@ -169,12 +183,6 @@ const main = async () => {
 		id,
 		title
 	} = selected;
-	await Promise.all([
-		checkIDFormat(id),
-		checkTitleLength(title),
-		checkTitleType(title),
-		validateBody(body, config.paths.src.draft)
-	]);
 	const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
@@ -183,9 +191,13 @@ const main = async () => {
 	const dt = getDateDetails(published);
 	const name = generateName(dt, id);
 	await Promise.all([
-		checkHoliday(dt),
-		checkNameConflict(name)
+		checkIDFormat(id),
+		checkNameConflict(name),
+		checkTitleLength(title),
+		checkTitleType(title),
+		validateBody(body, config.paths.src.draft)
 	]);
+	await confirmPublishing(dt);
 	const link = path.posix.join(
 		"/",
 		path.relative(config.paths.dest.root, config.paths.dest.article),
