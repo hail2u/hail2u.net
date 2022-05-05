@@ -116,7 +116,6 @@ const main = async () => {
 		metadata,
 		articles,
 		books,
-		documents,
 		links,
 		subscriptions,
 		partials,
@@ -125,7 +124,6 @@ const main = async () => {
 		readJSONFile(config.paths.metadata.root),
 		readItems(config.paths.data.articles),
 		readItems(config.paths.data.books),
-		readItems(config.paths.data.documents),
 		readItems(config.paths.data.links),
 		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
@@ -135,7 +133,6 @@ const main = async () => {
 		...metadata,
 		articles,
 		books,
-		documents,
 		links,
 		subscriptions,
 		version

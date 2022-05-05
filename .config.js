@@ -30,12 +30,6 @@ export default {
 				type: ["books"],
 			},
 			{
-				dest: "dist/documents/feed",
-				metadata: "src/documents/index.json",
-				src: "src/feed.mustache",
-				type: ["documents"],
-			},
-			{
 				dest: "dist/feed",
 				metadata: "src/index.json",
 				src: "src/feed.mustache",
@@ -63,11 +57,6 @@ export default {
 				dest: "dist/bookshelf/index.html",
 				metadata: "src/bookshelf/index.json",
 				src: "src/bookshelf/index.mustache",
-			},
-			{
-				dest: "dist/documents/index.html",
-				metadata: "src/documents/index.json",
-				src: "src/documents/index.mustache",
 			},
 			{
 				dest: "dist/index.html",
@@ -127,7 +116,6 @@ export default {
 		data: {
 			articles: "data/articles.json",
 			books: "data/books.json",
-			documents: "data/documents.json",
 			links: "data/links.json",
 			subscriptions: "data/subscriptions.json",
 		},
