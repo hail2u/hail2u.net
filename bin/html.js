@@ -93,7 +93,7 @@ const findCover = (html) => {
 const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
 
-	if (overrides.isWeblogArticle) {
+	if (overrides.isArticle) {
 		const article = data.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
