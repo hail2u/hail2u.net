@@ -9,14 +9,6 @@ import { readJSONFile } from "../lib/json-file.js";
 
 const isNotComic = (book) => !(/（\d+）/u).test(book.title);
 
-const isFirstInDate = (current, previous) => {
-	if (!previous || current.date !== previous.date) {
-		return true;
-	}
-
-	return false;
-};
-
 const isFirstInMonth = (current, previous) => {
 	if (!previous || current.month !== previous.month) {
 		return true;
@@ -27,14 +19,6 @@ const isFirstInMonth = (current, previous) => {
 
 const isFirstInYear = (current, previous) => {
 	if (!previous || current.year !== previous.year) {
-		return true;
-	}
-
-	return false;
-};
-
-const isLastInDate = (current, next) => {
-	if (!next || current.date !== next.date) {
 		return true;
 	}
 
@@ -62,10 +46,8 @@ const markItem = (item, index, items) => {
 	const previousItem = items[index - 1];
 	return {
 		...item,
-		isFirstInDate: isFirstInDate(item, previousItem),
 		isFirstInMonth: isFirstInMonth(item, previousItem),
 		isFirstInYear: isFirstInYear(item, previousItem),
-		isLastInDate: isLastInDate(item, nextItem),
 		isLastInMonth: isLastInMonth(item, nextItem),
 		isLastInYear: isLastInYear(item, nextItem)
 	};
