@@ -69,19 +69,9 @@ export default {
 				src: "src/links/index.mustache",
 			},
 			{
-				dest: "dist/mysubscriptions.opml",
-				metadata: "src/metadata.json",
-				src: "src/mysubscriptions.mustache",
-			},
-			{
 				dest: "dist/sitemap.xml",
 				metadata: "src/metadata.json",
 				src: "src/sitemap.mustache",
-			},
-			{
-				dest: "dist/subscriptions/index.html",
-				metadata: "src/subscriptions/index.json",
-				src: "src/subscriptions/index.mustache",
 			},
 		],
 		img: [
@@ -117,7 +107,6 @@ export default {
 			articles: "data/articles.json",
 			books: "data/books.json",
 			links: "data/links.json",
-			subscriptions: "data/subscriptions.json",
 		},
 		dest: {
 			article: "dist/blog/",

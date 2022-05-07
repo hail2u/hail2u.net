@@ -188,7 +188,6 @@ const main = async () => {
 		articles,
 		books,
 		links,
-		subscriptions,
 		partials,
 		{ version }
 	] = await Promise.all([
@@ -196,7 +195,6 @@ const main = async () => {
 		readItems(config.paths.data.articles),
 		readItems(config.paths.data.books),
 		readItems(config.paths.data.links),
-		readJSONFile(config.paths.data.subscriptions),
 		readPartials(),
 		readJSONFile(file)
 	]);
@@ -205,7 +203,6 @@ const main = async () => {
 		articles,
 		books,
 		links,
-		subscriptions,
 		version
 	};
 
