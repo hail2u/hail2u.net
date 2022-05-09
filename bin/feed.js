@@ -10,7 +10,7 @@ const readLatestItems = async (file) => {
 	return items.slice(0, 10);
 };
 
-const pickItems = (basicData, type) => basicData[type];
+const pickItem = (types, item) => types.includes(item.type);
 
 const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
@@ -51,9 +51,7 @@ const mergeData = async (file, data) => {
 	return {
 		...data,
 		...overrides,
-		items: file.type
-			.map(pickItems.bind(null, data))
-			.flat()
+		items: data.items.filter(pickItem.bind(null, file.types))
 			.sort(comparePublished)
 			.slice(0, 10)
 			.map(extendItem.bind(null, prefix))
@@ -88,9 +86,11 @@ const main = async () => {
 		config.files.feed.map(
 			build.bind(null, {
 				...metadata,
-				articles,
-				books,
-				links
+				items: [
+					...articles,
+					...books,
+					...links
+				]
 			})
 		)
 	);
