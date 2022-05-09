@@ -36,15 +36,6 @@ const checkNameConflict = async (name) => {
 	throw new Error(`“${name}” is already used.`);
 };
 
-const checkTitleLength = (title) => {
-	const textEncoder = new TextEncoder();
-	const bytes = textEncoder.encode(title);
-
-	if (bytes.length < 9) {
-		throw new Error("This draft title is too short. A draft title must be long enough (9 in English, 3 in Japanese).");
-	}
-};
-
 const checkTitleType = (title) => {
 	if (typeof title !== "string") {
 		throw new Error("This draft does not have a valid title. A draft title must be a string.");
@@ -196,7 +187,6 @@ const main = async () => {
 	await Promise.all([
 		checkIDFormat(id),
 		checkNameConflict(name),
-		checkTitleLength(title),
 		checkTitleType(title),
 		validateBody(body, config.paths.src.draft)
 	]);
