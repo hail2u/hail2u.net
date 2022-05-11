@@ -122,7 +122,7 @@ const confirmPublishing = async ({
 		input: process.stdin,
 		output: process.stdout
 	});
-	const input = await menu.question("Today is Sunday or holiday. Are you sure you want to publish an article? (No)");
+	const input = await menu.question("Today is Sunday or holiday. Are you sure you want to publish an article? (No) ");
 	menu.close();
 	const answer = input.toLowerCase();
 
