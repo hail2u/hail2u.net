@@ -76,9 +76,6 @@ const confirmPublishing = async ({
 	strYear
 }) => {
 	const holidays = [
-		"20220506",
-		"20220510",
-		"20220512",
 		"20220101",
 		"20220110",
 		"20220211",
