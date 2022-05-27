@@ -56,15 +56,15 @@ const validateBody = async (body, src) => {
 };
 
 const makeTempDir = async () => {
-	const file = new URL("../package.json", import.meta.url);
+	const pkg = new URL("../package.json", import.meta.url);
 	const [
 		osTemp,
-		pkg
+		{ name }
 	] = await Promise.all([
 		fs.realpath(os.tmpdir()),
-		readJSONFile(file)
+		readJSONFile(pkg)
 	]);
-	return fs.mkdtemp(path.join(osTemp, path.sep, `${pkg.name}-`));
+	return fs.mkdtemp(path.join(osTemp, path.sep, `${name}-`));
 };
 
 const main = async () => {

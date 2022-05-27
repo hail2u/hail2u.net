@@ -191,7 +191,7 @@ const main = async () => {
 			latest: false
 		}
 	});
-	const file = new URL("../package.json", import.meta.url);
+	const pkg = new URL("../package.json", import.meta.url);
 	const [
 		metadata,
 		data,
@@ -201,7 +201,7 @@ const main = async () => {
 		readJSONFile(config.paths.metadata.root),
 		readJSONFile(config.paths.data),
 		readPartials(),
-		readJSONFile(file)
+		readJSONFile(pkg)
 	]);
 	const extended = {
 		...metadata,
