@@ -25,7 +25,7 @@ const checkIDFormat = (id) => {
 };
 
 const checkNameConflict = async (name) => {
-	const file = path.join(config.paths.dest.article, `${name}.html`);
+	const file = path.join(config.dest.article, `${name}.html`);
 
 	try {
 		await fs.access(file, constants.F_OK);
@@ -159,7 +159,7 @@ ${body}
 };
 
 const main = async () => {
-	const file = config.paths.data;
+	const file = config.data;
 	const [
 		{
 			remains,
@@ -186,12 +186,12 @@ const main = async () => {
 		checkIDFormat(id),
 		checkNameConflict(name),
 		checkTitleType(title),
-		validateBody(body, config.paths.src.draft)
+		validateBody(body, config.src.draft)
 	]);
 	await confirmPublishing(dt);
 	const link = path.posix.join(
 		"/",
-		path.relative(config.paths.dest.root, config.paths.dest.article),
+		path.relative(config.dest.root, config.dest.article),
 		`${name}.html`
 	);
 	const drafts = remains
@@ -210,7 +210,7 @@ const main = async () => {
 			},
 			...cache
 		]),
-		outputFile(config.paths.src.draft, drafts)
+		outputFile(config.src.draft, drafts)
 	]);
 	await runCommand("git", [
 		"add",
@@ -222,7 +222,7 @@ const main = async () => {
 		domain,
 		scheme
 	}] = await Promise.all([
-		readJSONFile(config.paths.metadata.root),
+		readJSONFile(config.metadata.root),
 		runCommand("git", [
 			"commit",
 			`--message=Contribute ${name} (${th})`

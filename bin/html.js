@@ -9,20 +9,20 @@ import { readJSONFile } from "../lib/json-file.js";
 
 const readPartial = async (filename) => {
 	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(path.join(config.paths.src.partial, filename), "utf8");
+	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
 	return { [ name ]: content };
 };
 
 const readPartials = async () => {
-	const filenames = await fs.readdir(config.paths.src.partial);
+	const filenames = await fs.readdir(config.src.partial);
 	const partials = await Promise.all(filenames.map(readPartial));
 	return Object.assign(...partials);
 };
 
 const toFilesFormat = (article) => ({
-	dest: path.join(config.paths.dest.root, article.link),
-	metadata: config.paths.metadata.article,
-	src: config.paths.src.article,
+	dest: path.join(config.dest.root, article.link),
+	metadata: config.metadata.article,
+	src: config.src.article,
 	...article
 });
 
@@ -198,8 +198,8 @@ const main = async () => {
 		partials,
 		{ version }
 	] = await Promise.all([
-		readJSONFile(config.paths.metadata.root),
-		readJSONFile(config.paths.data),
+		readJSONFile(config.metadata.root),
+		readJSONFile(config.data),
 		readPartials(),
 		readJSONFile(pkg)
 	]);

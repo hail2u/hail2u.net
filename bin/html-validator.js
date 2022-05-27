@@ -9,13 +9,13 @@ const rewritePath = ([
 		relative
 	]) => {
 	if (relative.endsWith("/")) {
-		return path.join(config.paths.dest.root, relative, "index.html");
+		return path.join(config.dest.root, relative, "index.html");
 	}
 
-	return path.join(config.paths.dest.root, relative);
+	return path.join(config.dest.root, relative);
 };
 
-const isNotStyleGuide = (file) => file !== config.paths.dest.styleGuide;
+const isNotStyleGuide = (file) => file !== config.dest.styleGuide;
 
 const swapRandomly = (elm, i, arr) => {
 	const j = Math.floor(Math.random() * (i + 1));
@@ -68,8 +68,8 @@ const main = async () => {
 		},
 		sitemap
 	] = await Promise.all([
-		readJSONFile(config.paths.metadata.root),
-		fs.readFile(config.paths.dest.sitemap, "utf8")
+		readJSONFile(config.metadata.root),
+		fs.readFile(config.dest.sitemap, "utf8")
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");

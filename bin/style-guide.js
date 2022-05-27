@@ -12,17 +12,17 @@ const toAbsolutePath = (m, attr, prefix, path) => {
 };
 
 const main = async () => {
-	const html = await fs.readFile(config.paths.src.styleGuide, "utf8");
+	const html = await fs.readFile(config.src.styleGuide, "utf8");
 	const {
 		domain,
 		scheme
-	} = await readJSONFile(config.paths.metadata.root);
+	} = await readJSONFile(config.metadata.root);
 	const urlRe = new RegExp(
 		`\\b(href|src)="(\\.\\.|${scheme}://${domain})(/.*?)"`,
 		"gu"
 	);
 	const optimized = html.replace(urlRe, toAbsolutePath);
-	await outputFile(config.paths.dest.styleGuide, optimized);
+	await outputFile(config.dest.styleGuide, optimized);
 };
 
 main().catch((e) => {

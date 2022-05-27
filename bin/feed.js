@@ -84,8 +84,8 @@ const main = async () => {
 		metadata,
 		data
 	] = await Promise.all([
-		readJSONFile(config.paths.metadata.root),
-		readJSONFile(config.paths.data)
+		readJSONFile(config.metadata.root),
+		readJSONFile(config.data)
 	]);
 	return Promise.all(
 		config.files.feed.map(

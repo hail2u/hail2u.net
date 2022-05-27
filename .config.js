@@ -1,10 +1,18 @@
 export default {
+	data: "data.json",
+	dest: {
+		article: "dist/blog/",
+		favicon: "dist/favicon.ico",
+		root: "dist/",
+		sitemap: "dist/sitemap.xml",
+		styleGuide: "dist/style-guide/index.html"
+	},
 	files: {
 		css: [
 			{
 				dest: "dist/css/index.{{version}}.css",
 				prefix: "@supports (--custom-property: true) {",
-				postfix: "}",
+				suffix: "}",
 				src: "src/css/index.css"
 			},
 			{
@@ -120,26 +128,16 @@ export default {
 			}
 		]
 	},
-	paths: {
-		data: "data.json",
-		dest: {
-			article: "dist/blog/",
-			favicon: "dist/favicon.ico",
-			root: "dist/",
-			sitemap: "dist/sitemap.xml",
-			styleGuide: "dist/style-guide/index.html"
-		},
-		metadata: {
-			article: "src/blog/article.json",
-			root: "src/metadata.json"
-		},
-		src: {
-			article: "src/blog/article.mustache",
-			draft: "src/blog/drafts.html",
-			partial: "src/partial/",
-			root: "src/",
-			styleGuide: "src/css/test.html",
-			testArticle: "src/blog/test.mustache"
-		}
+	metadata: {
+		article: "src/blog/article.json",
+		root: "src/metadata.json"
+	},
+	src: {
+		article: "src/blog/article.mustache",
+		draft: "src/blog/drafts.html",
+		partial: "src/partial/",
+		root: "src/",
+		styleGuide: "src/css/test.html",
+		testArticle: "src/blog/test.mustache"
 	}
 };
