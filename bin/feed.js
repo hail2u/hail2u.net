@@ -81,17 +81,17 @@ const build = async (basic, file) => {
 
 const main = async () => {
 	const [
-		metadata,
-		data
+		contents,
+		metadata
 	] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		readJSONFile(config.data)
+		readJSONFile(config.src.contents),
+		readJSONFile(config.metadata.root)
 	]);
 	return Promise.all(
 		config.files.feed.map(
 			build.bind(null, {
 				...metadata,
-				items: data
+				items: contents
 			})
 		)
 	);

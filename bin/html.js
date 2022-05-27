@@ -193,41 +193,41 @@ const main = async () => {
 	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
+		contents,
 		metadata,
-		data,
 		partials,
 		{ version }
 	] = await Promise.all([
+		readJSONFile(config.src.contents),
 		readJSONFile(config.metadata.root),
-		readJSONFile(config.data),
 		readPartials(),
 		readJSONFile(pkg)
 	]);
-	const extended = {
+	const data = {
 		...metadata,
-		items: data,
+		items: contents,
 		version
 	};
 
 	if (latest) {
-		const latestData = toFilesFormat(data[0]);
-		await build(extended, partials, latestData);
+		const latestContents = toFilesFormat(contents[0]);
+		await build(data, partials, latestContents);
 	}
 
 	if (all) {
-		const articles = data.filter(pickItem.bind(null, ["article", "document"]));
+		const articles = contents.filter(pickItem.bind(null, ["article", "document"]));
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
 			/* eslint-disable-next-line no-await-in-loop */
 			await Promise.all(articleFiles
 				.splice(-1024)
-				.map(build.bind(null, extended, partials))
+				.map(build.bind(null, data, partials))
 			);
 		}
 	}
 
-	await Promise.all(config.files.html.map(build.bind(null, extended, partials)));
+	await Promise.all(config.files.html.map(build.bind(null, data, partials)));
 };
 
 main().catch((e) => {

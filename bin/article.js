@@ -159,7 +159,7 @@ ${body}
 };
 
 const main = async () => {
-	const file = config.data;
+	const file = config.src.contents;
 	const [
 		{
 			remains,

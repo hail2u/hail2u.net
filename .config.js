@@ -1,5 +1,4 @@
 export default {
-	data: "data.json",
 	dest: {
 		article: "dist/blog/",
 		favicon: "dist/favicon.ico",
@@ -134,6 +133,7 @@ export default {
 	},
 	src: {
 		article: "src/blog/article.mustache",
+		contents: "src/contents.json",
 		draft: "src/blog/drafts.html",
 		partial: "src/partial/",
 		root: "src/",
