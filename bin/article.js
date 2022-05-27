@@ -159,6 +159,7 @@ ${body}
 };
 
 const main = async () => {
+	const file = config.paths.data;
 	const [
 		{
 			remains,
@@ -167,7 +168,7 @@ const main = async () => {
 		cache
 	] = await Promise.all([
 		selectDraft(),
-		readJSONFile(config.paths.data.articles)
+		readJSONFile(file)
 	]);
 	const body = selected.body.replace(/(?<=\b(href|src)=")\.\.\/\.\.\/dist\//gu, "/");
 	const {
@@ -197,7 +198,7 @@ const main = async () => {
 		.map(rebuildDraft)
 		.join("\n\n");
 	await Promise.all([
-		outputJSONFile(config.paths.data.articles, [
+		outputJSONFile(file, [
 			{
 				body,
 				description,
@@ -214,7 +215,7 @@ const main = async () => {
 	await runCommand("git", [
 		"add",
 		"--",
-		config.paths.data.articles
+		file
 	]);
 	const th = cache.length + 1;
 	const [{

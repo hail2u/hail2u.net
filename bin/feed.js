@@ -5,15 +5,6 @@ import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
-const readLatestItems = async (file) => {
-	const items = await readJSONFile(file);
-	return items.slice(0, 10);
-};
-
-const pickItem = (types, item) => types.includes(item.type);
-
-const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
-
 const toAbsoluteURL = (prefix, url) => {
 	if (!url.startsWith("/")) {
 		return url;
@@ -45,16 +36,34 @@ const extendItem = (prefix, item) => {
 	};
 };
 
+const pickItems = (types, prefix, items) => {
+	const picked = [];
+	let i = 0;
+
+	for (const item of items) {
+		if (!types.includes(item.type)) {
+			continue;
+		}
+
+		picked.push(item);
+		i += 1;
+
+		if (i === 10) {
+			break;
+		}
+	}
+
+	return picked.map(extendItem.bind(null, prefix));
+};
+
 const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
 	const prefix = `${data.scheme}://${data.domain}`;
+	const items = pickItems(file.types, prefix, data.items);
 	return {
 		...data,
 		...overrides,
-		items: data.items.filter(pickItem.bind(null, file.types))
-			.sort(comparePublished)
-			.slice(0, 10)
-			.map(extendItem.bind(null, prefix))
+		items
 	};
 };
 
@@ -73,24 +82,16 @@ const build = async (basic, file) => {
 const main = async () => {
 	const [
 		metadata,
-		articles,
-		books,
-		links
+		data
 	] = await Promise.all([
 		readJSONFile(config.paths.metadata.root),
-		readLatestItems(config.paths.data.articles),
-		readLatestItems(config.paths.data.books),
-		readLatestItems(config.paths.data.links)
+		readJSONFile(config.paths.data)
 	]);
 	return Promise.all(
 		config.files.feed.map(
 			build.bind(null, {
 				...metadata,
-				items: [
-					...articles,
-					...books,
-					...links
-				]
+				items: data
 			})
 		)
 	);
