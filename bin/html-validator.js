@@ -2,7 +2,6 @@ import config from "../.config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
-import { shuffleArray } from "../lib/shuffle-array.js";
 import { validateHTML } from "../lib/validate-html.js";
 
 const rewritePath = ([
@@ -17,6 +16,28 @@ const rewritePath = ([
 };
 
 const isNotStyleGuide = (file) => file !== config.paths.dest.styleGuide;
+
+const swapRandomly = (elm, i, arr) => {
+	const j = Math.floor(Math.random() * (i + 1));
+
+	if (i === j) {
+		return;
+	}
+
+	[
+		arr[i],
+		arr[j]
+	] = [
+		arr[j],
+		arr[i]
+	];
+};
+
+const shuffleArray = (array) => {
+	const shuffled = [...array];
+	shuffled.forEach(swapRandomly);
+	return shuffled;
+};
 
 const formatMessage = (file, message) => `${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
 
