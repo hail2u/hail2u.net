@@ -2,7 +2,9 @@ export default {
 	contents: {
 		articles: "contents/articles.json",
 		books: "contents/books.json",
-		links: "contents/links.json"
+		links: "contents/links.json",
+		statuses: "contents/statuses.json",
+		subscriptions: "contents/subscriptions.json"
 	},
 	dest: {
 		article: "dist/blog/",
