@@ -129,24 +129,41 @@ const markFirstItem = (items) => {
 	];
 };
 
-const pickItems = (type, length, items) => {
-	const picked = [];
-	let i = 0;
+const pickItems = (items) => {
+	const articles = [];
+	const books = [];
+	const links = [];
 
 	for (const item of items) {
-		if (item.type !== type) {
+		if ([
+			...articles,
+			...books,
+			...links
+		].length === 15) {
+			break;
+		}
+
+		if (item.type === "article" && articles.length < 6) {
+			articles.push(item);
 			continue;
 		}
 
-		picked.push(item);
-		i += 1;
+		if (item.type === "book" && books.length < 3) {
+			books.push(item);
+			continue;
+		}
 
-		if (i === length) {
-			break;
+		if (item.type === "link" && links.length < 6) {
+			links.push(item);
+			continue;
 		}
 	}
 
-	return picked;
+	return {
+		articles,
+		books,
+		links
+	};
 };
 
 const build = async (basic, partials, file) => {
@@ -164,9 +181,14 @@ const build = async (basic, partials, file) => {
 	}
 
 	if (data.isHome) {
-		data.articles = pickItems("article", 6, data.items);
-		data.books = pickItems("book", 3, data.items);
-		data.links = pickItems("link", 6, data.items);
+		const {
+			articles,
+			books,
+			links
+		} = pickItems(data.items);
+		data.articles = articles;
+		data.books = books;
+		data.links = links;
 	}
 
 	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
