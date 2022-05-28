@@ -47,7 +47,7 @@ const main = async () => {
 		throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 	}
 
-	const file = config.src.contents;
+	const file = config.contents.books;
 	const books = await readJSONFile(file);
 
 	if (books.find(isReadBook.bind(null, title))) {

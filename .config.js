@@ -1,4 +1,9 @@
 export default {
+	contents: {
+		articles: "contents/articles.json",
+		books: "contents/books.json",
+		links: "contents/links.json"
+	},
 	dest: {
 		article: "dist/blog/",
 		favicon: "dist/favicon.ico",
@@ -34,10 +39,7 @@ export default {
 				dest: "dist/bookshelf/feed",
 				metadata: "src/bookshelf/index.json",
 				src: "src/feed.mustache",
-				types: [
-					"book",
-					"comic"
-				]
+				types: ["book"]
 			},
 			{
 				dest: "dist/feed",
@@ -46,7 +48,7 @@ export default {
 				types: [
 					"article",
 					"book",
-					"comic",
+					"document",
 					"link"
 				]
 			},
@@ -66,17 +68,12 @@ export default {
 			{
 				dest: "dist/blog/index.html",
 				metadata: "src/blog/index.json",
-				src: "src/blog/index.mustache",
-				types: [
-					"article",
-					"document"
-				]
+				src: "src/blog/index.mustache"
 			},
 			{
 				dest: "dist/bookshelf/index.html",
 				metadata: "src/bookshelf/index.json",
-				src: "src/bookshelf/index.mustache",
-				types: ["book"]
+				src: "src/bookshelf/index.mustache"
 			},
 			{
 				dest: "dist/index.html",
@@ -86,17 +83,12 @@ export default {
 			{
 				dest: "dist/links/index.html",
 				metadata: "src/links/index.json",
-				src: "src/links/index.mustache",
-				types: ["link"]
+				src: "src/links/index.mustache"
 			},
 			{
 				dest: "dist/sitemap.xml",
 				metadata: "src/metadata.json",
-				src: "src/sitemap.mustache",
-				types: [
-					"article",
-					"document"
-				]
+				src: "src/sitemap.mustache"
 			}
 		],
 		img: [
@@ -133,7 +125,6 @@ export default {
 	},
 	src: {
 		article: "src/blog/article.mustache",
-		contents: "src/contents.json",
 		draft: "src/blog/drafts.html",
 		partial: "src/partial/",
 		root: "src/",

@@ -7,47 +7,7 @@ import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const readPartial = async (filename) => {
-	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
-	return { [ name ]: content };
-};
-
-const readPartials = async () => {
-	const filenames = await fs.readdir(config.src.partial);
-	const partials = await Promise.all(filenames.map(readPartial));
-	return Object.assign(...partials);
-};
-
-const toFilesFormat = (article) => ({
-	dest: path.join(config.dest.root, article.link),
-	metadata: config.metadata.article,
-	src: config.src.article,
-	...article
-});
-
-const hasSameLink = (dest, article) => dest.endsWith(article.link);
-
-const findCover = (html) => {
-	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
-
-	if (!image) {
-		return {};
-	}
-
-	return {
-		cover: image[1],
-		twitterCard: "summary_large_image"
-	};
-};
-
-const pickItem = (types, item) => {
-	if (!types) {
-		return true;
-	}
-
-	return types.includes(item.type);
-};
+const isNotComic = (book) => !(/（\d+）/u).test(book.title);
 
 const isFirstInMonth = (current, previous) => {
 	if (!previous || current.month !== previous.month) {
@@ -93,11 +53,48 @@ const markItem = (item, index, items) => {
 	};
 };
 
+const readItems = async (file) => {
+	const items = await readJSONFile(file);
+
+	if (items[0].type === "book") {
+		return Promise.all(items.filter(isNotComic).map(markItem));
+	}
+
+	return Promise.all(items.map(markItem));
+};
+
+const readPartial = async (filename) => {
+	const name = path.basename(filename, ".mustache");
+	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
+	return { [ name ]: content };
+};
+
+const readPartials = async () => {
+	const filenames = await fs.readdir(config.src.partial);
+	const partials = await Promise.all(filenames.map(readPartial));
+	return Object.assign(...partials);
+};
+
+const hasSameLink = (dest, article) => dest.endsWith(article.link);
+
+const findCover = (html) => {
+	const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
+
+	if (!image) {
+		return {};
+	}
+
+	return {
+		cover: image[1],
+		twitterCard: "summary_large_image"
+	};
+};
+
 const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
 
 	if (overrides.isArticle) {
-		const article = data.items.find(hasSameLink.bind(null, file.dest));
+		const article = data.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
 			...data,
@@ -110,10 +107,7 @@ const mergeData = async (file, data) => {
 
 	return {
 		...data,
-		...overrides,
-		items: data.items
-			.filter(pickItem.bind(null, file.types))
-			.map(markItem)
+		...overrides
 	};
 };
 
@@ -129,43 +123,6 @@ const markFirstItem = (items) => {
 	];
 };
 
-const pickItems = (items) => {
-	const articles = [];
-	const books = [];
-	const links = [];
-
-	for (const item of items) {
-		if ([
-			...articles,
-			...books,
-			...links
-		].length === 15) {
-			break;
-		}
-
-		if (item.type === "article" && articles.length < 6) {
-			articles.push(item);
-			continue;
-		}
-
-		if (item.type === "book" && books.length < 3) {
-			books.push(item);
-			continue;
-		}
-
-		if (item.type === "link" && links.length < 6) {
-			links.push(item);
-			continue;
-		}
-	}
-
-	return {
-		articles,
-		books,
-		links
-	};
-};
-
 const build = async (basic, partials, file) => {
 	const [
 		data,
@@ -175,25 +132,37 @@ const build = async (basic, partials, file) => {
 		fs.readFile(file.src, "utf8")
 	]);
 
-	if (!data.isArticle && (data.isBlog || data.isBookshelf || data.isLinks)) {
-		data.latestItems = data.items.slice(0, 9);
-		data.items = markFirstItem(data.items.slice(9));
+	if (!data.isArticle && data.isBlog) {
+		data.latestArticles = data.articles.slice(0, 9);
+		data.articles = markFirstItem(data.articles.slice(9));
+	}
+
+	if (data.isBookshelf) {
+		data.latestBooks = data.books.slice(0, 9);
+		data.books = markFirstItem(data.books.slice(9));
+	}
+
+	if (data.isLinks) {
+		data.latestLinks = data.links.slice(0, 9);
+		data.links = markFirstItem(data.links.slice(9));
 	}
 
 	if (data.isHome) {
-		const {
-			articles,
-			books,
-			links
-		} = pickItems(data.items);
-		data.articles = articles;
-		data.books = books;
-		data.links = links;
+		data.articles = data.articles.slice(0, 6);
+		data.books = data.books.slice(0, 3);
+		data.links = data.links.slice(0, 6);
 	}
 
 	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
 };
+
+const toFilesFormat = (article) => ({
+	dest: path.join(config.dest.root, article.link),
+	metadata: config.metadata.article,
+	src: config.src.article,
+	...article
+});
 
 const main = async () => {
 	const {
@@ -215,29 +184,34 @@ const main = async () => {
 	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
-		contents,
 		metadata,
+		articles,
+		books,
+		links,
 		partials,
 		{ version }
 	] = await Promise.all([
-		readJSONFile(config.src.contents),
 		readJSONFile(config.metadata.root),
+		readItems(config.contents.articles),
+		readItems(config.contents.books),
+		readItems(config.contents.links),
 		readPartials(),
 		readJSONFile(pkg)
 	]);
 	const data = {
 		...metadata,
-		items: contents,
+		articles,
+		books,
+		links,
 		version
 	};
 
 	if (latest) {
-		const latestContents = toFilesFormat(contents[0]);
-		await build(data, partials, latestContents);
+		const article = toFilesFormat(articles[0]);
+		await build(data, partials, article);
 	}
 
 	if (all) {
-		const articles = contents.filter(pickItem.bind(null, ["article", "document"]));
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
