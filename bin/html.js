@@ -42,6 +42,10 @@ const isLastInYear = (current, next) => {
 };
 
 const markItem = (item, index, items) => {
+	if (!item.published) {
+		return item;
+	}
+
 	const nextItem = items[index + 1];
 	const previousItem = items[index - 1];
 	return {
@@ -53,14 +57,14 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const readItems = async (file) => {
-	const items = await readJSONFile(file);
+const readContents = async (file) => {
+	const contents = await readJSONFile(file);
 
-	if (items[0].type === "book") {
-		return Promise.all(items.filter(isNotComic).map(markItem));
+	if (contents[0].type === "book") {
+		return Promise.all(contents.filter(isNotComic).map(markItem));
 	}
 
-	return Promise.all(items.map(markItem));
+	return Promise.all(contents.map(markItem));
 };
 
 const readPartial = async (filename) => {
@@ -129,7 +133,7 @@ const build = async (basic, partials, file) => {
 		template
 	] = await Promise.all([
 		mergeData(file, basic),
-		fs.readFile(file.src, "utf8")
+		fs.readFile(file.template, "utf8")
 	]);
 
 	if (!data.isArticle && data.isBlog) {
@@ -158,10 +162,10 @@ const build = async (basic, partials, file) => {
 };
 
 const toFilesFormat = (article) => ({
+	...article,
 	dest: path.join(config.dest.root, article.link),
 	metadata: config.metadata.article,
-	src: config.src.article,
-	...article
+	template: config.template.article
 });
 
 const main = async () => {
@@ -184,26 +188,32 @@ const main = async () => {
 	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
-		metadata,
 		articles,
 		books,
 		links,
-		partials,
-		{ version }
+		statuses,
+		subscriptions,
+		metadata,
+		{ version },
+		partials
 	] = await Promise.all([
+		readContents(config.src.articles),
+		readContents(config.src.books),
+		readContents(config.src.links),
+		readContents(config.src.statuses),
+		readContents(config.src.subscriptions),
 		readJSONFile(config.metadata.root),
-		readItems(config.contents.articles),
-		readItems(config.contents.books),
-		readItems(config.contents.links),
-		readPartials(),
-		readJSONFile(pkg)
+		readJSONFile(pkg),
+		readPartials()
 	]);
 	const data = {
 		...metadata,
 		articles,
 		books,
 		links,
-		version
+		statuses,
+		subscriptions,
+		version,
 	};
 
 	if (latest) {

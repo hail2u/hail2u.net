@@ -159,13 +159,13 @@ ${body}
 };
 
 const main = async () => {
-	const file = config.contents.articles;
+	const file = config.src.articles;
 	const [
 		{
 			remains,
 			selected
 		},
-		cache
+		articles
 	] = await Promise.all([
 		selectDraft(),
 		readJSONFile(file)
@@ -208,7 +208,7 @@ const main = async () => {
 				title,
 				type: "article"
 			},
-			...cache
+			...articles
 		]),
 		outputFile(config.src.draft, drafts)
 	]);
@@ -217,7 +217,7 @@ const main = async () => {
 		"--",
 		file
 	]);
-	const th = cache.length + 1;
+	const th = articles.length + 1;
 	const [{
 		domain,
 		scheme

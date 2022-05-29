@@ -83,7 +83,7 @@ const main = async () => {
 		template
 	] = await Promise.all([
 		makeTempDir(),
-		fs.readFile(config.src.testArticle, "utf8"),
+		fs.readFile(config.template.testArticle, "utf8"),
 		outputFile(config.src.draft, drafts),
 		validateBody(selected.body, config.src.draft)
 	]);

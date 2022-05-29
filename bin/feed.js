@@ -5,7 +5,7 @@ import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import { readJSONFile } from "../lib/json-file.js";
 
-const readLatestItems = async (file) => {
+const readLatestContents = async (file) => {
 	const items = await readJSONFile(file);
 	return items.slice(0, 10);
 };
@@ -64,7 +64,7 @@ const build = async (basic, file) => {
 		template
 	] = await Promise.all([
 		mergeData(file, basic),
-		fs.readFile(file.src, "utf8")
+		fs.readFile(file.template, "utf8")
 	]);
 	const rendered = mustache.render(template, data, null, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
@@ -78,9 +78,9 @@ const main = async () => {
 		links
 	] = await Promise.all([
 		readJSONFile(config.metadata.root),
-		readLatestItems(config.contents.articles),
-		readLatestItems(config.contents.books),
-		readLatestItems(config.contents.links)
+		readLatestContents(config.src.articles),
+		readLatestContents(config.src.books),
+		readLatestContents(config.src.links)
 	]);
 	return Promise.all(
 		config.files.feed.map(

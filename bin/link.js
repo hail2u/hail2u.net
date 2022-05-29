@@ -43,7 +43,7 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const file = config.contents.links;
+	const file = config.src.links;
 	const links = await readJSONFile(file);
 	const published = Date.now();
 	const dt = getDateDetails(published);

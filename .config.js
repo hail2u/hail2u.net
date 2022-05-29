@@ -1,11 +1,4 @@
 export default {
-	contents: {
-		articles: "contents/articles.json",
-		books: "contents/books.json",
-		links: "contents/links.json",
-		statuses: "contents/statuses.json",
-		subscriptions: "contents/subscriptions.json"
-	},
 	dest: {
 		article: "dist/blog/",
 		favicon: "dist/favicon.ico",
@@ -34,19 +27,19 @@ export default {
 			{
 				dest: "dist/blog/feed",
 				metadata: "src/blog/index.json",
-				src: "src/feed.mustache",
+				template: "src/feed.mustache",
 				types: ["article"]
 			},
 			{
 				dest: "dist/bookshelf/feed",
 				metadata: "src/bookshelf/index.json",
-				src: "src/feed.mustache",
+				template: "src/feed.mustache",
 				types: ["book"]
 			},
 			{
 				dest: "dist/feed",
 				metadata: "src/index.json",
-				src: "src/feed.mustache",
+				template: "src/feed.mustache",
 				types: [
 					"article",
 					"book",
@@ -57,7 +50,7 @@ export default {
 			{
 				dest: "dist/links/feed",
 				metadata: "src/links/index.json",
-				src: "src/feed.mustache",
+				template: "src/feed.mustache",
 				types: ["link"]
 			}
 		],
@@ -65,32 +58,47 @@ export default {
 			{
 				dest: "dist/about/index.html",
 				metadata: "src/about/index.json",
-				src: "src/about/index.mustache"
+				template: "src/about/index.mustache"
 			},
 			{
 				dest: "dist/blog/index.html",
 				metadata: "src/blog/index.json",
-				src: "src/blog/index.mustache"
+				template: "src/blog/index.mustache"
 			},
 			{
 				dest: "dist/bookshelf/index.html",
 				metadata: "src/bookshelf/index.json",
-				src: "src/bookshelf/index.mustache"
+				template: "src/bookshelf/index.mustache"
 			},
 			{
 				dest: "dist/index.html",
 				metadata: "src/index.json",
-				src: "src/index.mustache"
+				template: "src/index.mustache"
 			},
 			{
 				dest: "dist/links/index.html",
 				metadata: "src/links/index.json",
-				src: "src/links/index.mustache"
+				template: "src/links/index.mustache"
+			},
+			{
+				dest: "dist/mysubscriptions.opml",
+				metadata: "src/metadata.json",
+				template: "src/mysubscriptions.mustache",
 			},
 			{
 				dest: "dist/sitemap.xml",
 				metadata: "src/metadata.json",
-				src: "src/sitemap.mustache"
+				template: "src/sitemap.mustache"
+			},
+			{
+				dest: "dist/statuses/index.html",
+				metadata: "src/statuses/index.json",
+				template: "src/statuses/index.mustache"
+			},
+			{
+				dest: "dist/subscriptions/index.html",
+				metadata: "src/subscriptions/index.json",
+				template: "src/subscriptions/index.mustache"
 			}
 		],
 		img: [
@@ -126,11 +134,18 @@ export default {
 		root: "src/metadata.json"
 	},
 	src: {
-		article: "src/blog/article.mustache",
+		articles: "src/blog/articles.json",
+		books: "src/bookshelf/books.json",
 		draft: "src/blog/drafts.html",
+		links: "src/links/links.json",
 		partial: "src/partial/",
 		root: "src/",
+		statuses: "src/statuses/statuses.json",
 		styleGuide: "src/css/test.html",
+		subscriptions: "src/subscriptions/subscriptions.json"
+	},
+	template: {
+		article: "src/blog/article.mustache",
 		testArticle: "src/blog/test.mustache"
 	}
 };
