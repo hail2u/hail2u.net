@@ -52,7 +52,7 @@ const build = async (version, {
 const main = async () => {
 	const pkg = new URL("../package.json", import.meta.url);
 	const { version } = await readJSONFile(pkg);
-	await Promise.all(config.files.css.map(build.bind(null, version)));
+	await Promise.all(config.css.map(build.bind(null, version)));
 };
 
 main().catch((e) => {

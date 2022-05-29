@@ -78,12 +78,12 @@ const main = async () => {
 		links
 	] = await Promise.all([
 		readJSONFile(config.metadata.root),
-		readLatestContents(config.src.articles),
-		readLatestContents(config.src.books),
-		readLatestContents(config.src.links)
+		readLatestContents(config.data.articles),
+		readLatestContents(config.data.books),
+		readLatestContents(config.data.links)
 	]);
 	return Promise.all(
-		config.files.feed.map(
+		config.feed.map(
 			build.bind(null, {
 				...metadata,
 				items: [

@@ -197,11 +197,11 @@ const main = async () => {
 		{ version },
 		partials
 	] = await Promise.all([
-		readContents(config.src.articles),
-		readContents(config.src.books),
-		readContents(config.src.links),
-		readContents(config.src.statuses),
-		readContents(config.src.subscriptions),
+		readContents(config.data.articles),
+		readContents(config.data.books),
+		readContents(config.data.links),
+		readContents(config.data.statuses),
+		readContents(config.data.subscriptions),
 		readJSONFile(config.metadata.root),
 		readJSONFile(pkg),
 		readPartials()
@@ -233,7 +233,7 @@ const main = async () => {
 		}
 	}
 
-	await Promise.all(config.files.html.map(build.bind(null, data, partials)));
+	await Promise.all(config.html.map(build.bind(null, data, partials)));
 };
 
 main().catch((e) => {

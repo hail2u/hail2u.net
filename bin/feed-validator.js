@@ -75,7 +75,7 @@ const validate = async ({ dest: file }) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-	const results = await Promise.all(config.files.feed.map(validate));
+	const results = await Promise.all(config.feed.map(validate));
 	const errors = results.flat();
 
 	if (errors.length > 0) {
