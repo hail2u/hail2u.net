@@ -24,7 +24,6 @@ export default {
 	},
 	dest: {
 		article: "dist/blog/",
-		favicon: "dist/favicon.ico",
 		root: "dist/",
 		sitemap: "dist/sitemap.xml",
 		styleGuide: "dist/style-guide/index.html"
@@ -109,24 +108,8 @@ export default {
 	],
 	img: [
 		{
+			dest: "dist/favicon.ico",
 			src: "src/img/icon.svg",
-			width: 16
-		},
-		{
-			src: "src/img/icon.svg",
-			width: 24
-		},
-		{
-			src: "src/img/icon.svg",
-			width: 32
-		},
-		{
-			src: "src/img/icon.svg",
-			width: 48
-		},
-		{
-			src: "src/img/icon.svg",
-			width: 128
 		},
 		{
 			dest: "dist/apple-touch-icon.png",
