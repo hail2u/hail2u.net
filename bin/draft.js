@@ -1,3 +1,8 @@
+import {
+	formatMessage,
+	validateHTML,
+	writeErrors
+} from "../lib/validate-html.js";
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
@@ -8,7 +13,6 @@ import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
-import { validateHTML } from "../lib/validate-html.js";
 
 const rebuildDraft = ({
 	body,
@@ -28,12 +32,6 @@ ${body}
 `;
 };
 
-const formatMessage = (file, {
-	lastColumn,
-	lastLine,
-	message
-}) => `${file}:${lastLine + 2}:${lastColumn}: ${message}`;
-
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
@@ -41,18 +39,8 @@ const validateBody = async (body, src) => {
 		return;
 	}
 
-	if (typeof messages === "string") {
-		process.stdout.write(`${src}:1:1: ${messages}
-`);
-		return;
-	}
-
-	if (messages.length > 0) {
-		const errors = messages.map(formatMessage.bind(null, src));
-		process.stdout.write(errors.join("\n"));
-		process.stdout.write("\n\n");
-		throw new Error(`${errors.length} error(s) in ${src}`);
-	}
+	const errors = messages.map(formatMessage.bind(null, src, 2));
+	writeErrors(errors, [src]);
 };
 
 const makeTempDir = async () => {

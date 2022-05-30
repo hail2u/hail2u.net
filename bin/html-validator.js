@@ -1,9 +1,13 @@
+import {
+	formatMessage,
+	validateHTML,
+	writeErrors
+} from "../lib/validate-html.js";
 import config from "../.config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
-import { validateHTML } from "../lib/validate-html.js";
 
 const rewritePath = ([
 		,
@@ -18,8 +22,6 @@ const rewritePath = ([
 
 const isNotStyleGuide = (file) => file !== config.dest.styleGuide;
 
-const formatMessage = (file, message) => `${file}:${message.lastLine}:${message.lastColumn}: ${message.message}`;
-
 const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
 	const messages = await validateHTML(html);
@@ -28,13 +30,7 @@ const validate = async (file) => {
 		return [];
 	}
 
-	if (typeof messages === "string") {
-		process.stdout.write(`${file}:1:1: ${messages}
-`);
-		return [];
-	}
-
-	return messages.map(formatMessage.bind(null, file));
+	return messages.map(formatMessage.bind(null, file, 0));
 };
 
 const isNotEmpty = (element) => element.length !== 0;
@@ -65,10 +61,8 @@ const main = async () => {
 	const errors = results.flat();
 
 	if (errors.length > 0) {
-		process.stdout.write(errors.join("\n"));
-		process.stdout.write("\n\n");
 		const errorFiles = results.filter(isNotEmpty);
-		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
+		writeErrors(errors, errorFiles);
 	}
 };
 

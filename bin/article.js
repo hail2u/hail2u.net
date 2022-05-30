@@ -3,6 +3,11 @@ import {
 	unescapeReferences
 } from "../lib/character-reference.js";
 import {
+	formatMessage,
+	validateHTML,
+	writeErrors
+} from "../lib/validate-html.js";
+import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
@@ -16,7 +21,6 @@ import path from "node:path";
 import readline from "node:readline/promises";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
-import { validateHTML } from "../lib/validate-html.js";
 
 const checkIDFormat = (id) => {
 	if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
@@ -42,12 +46,6 @@ const checkTitleType = (title) => {
 	}
 };
 
-const formatMessage = (file, {
-	lastColumn,
-	lastLine,
-	message
-}) => `${file}:${lastLine + 2}:${lastColumn}: ${message}`;
-
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
@@ -55,18 +53,8 @@ const validateBody = async (body, src) => {
 		return;
 	}
 
-	if (typeof messages === "string") {
-		process.stdout.write(`${src}:1:1: ${messages}
-`);
-		return;
-	}
-
-	if (messages.length > 0) {
-		const errors = messages.map(formatMessage.bind(null, src));
-		process.stdout.write(errors.join("\n"));
-		process.stdout.write("\n\n");
-		throw new Error(`${errors.length} error(s) in ${src}`);
-	}
+	const errors = messages.map(formatMessage.bind(null, src, 2));
+	writeErrors(errors, [src]);
 };
 
 const confirmPublishing = async ({
