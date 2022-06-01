@@ -147,7 +147,7 @@ ${body}
 };
 
 const main = async () => {
-	const file = config.data.articles;
+	const file = path.join(config.src.data, "articles.json");
 	const [
 		{
 			remains,
@@ -206,17 +206,11 @@ const main = async () => {
 		file
 	]);
 	const th = articles.length + 1;
-	const [{
-		domain,
-		scheme
-	}] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		runCommand("git", [
-			"commit",
-			`--message=Contribute ${name} (${th})`
-		])
+	await runCommand("git", [
+		"commit",
+		`--message=Contribute ${name} (${th})`
 	]);
-	await openTwitter(`${title} ${scheme}://${domain}${link}`);
+	await openTwitter(`${title} ${config.metadata.scheme}://${config.metadata.domain}${link}`);
 };
 
 main().catch((e) => {

@@ -3,11 +3,20 @@ import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
+import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const readLatestContents = async (file) => {
-	const items = await readJSONFile(file);
-	return items.slice(0, 10);
+const readData = async (filename) => {
+	const name = path.basename(filename, ".json");
+	const file = path.join(config.src.data, filename);
+	const data = await readJSONFile(file);
+	return { [ name ]: data.slice(0, 10) };
+};
+
+const readLatestData = async () => {
+	const filenames = await fs.readdir(config.src.data);
+	const data = await Promise.all(filenames.map(readData));
+	return Object.assign(...data);
 };
 
 const pickItem = (types, item) => types.includes(item.type);
@@ -71,21 +80,15 @@ const build = async (basic, file) => {
 };
 
 const main = async () => {
-	const [
-		metadata,
+	const {
 		articles,
 		books,
 		links
-	] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		readLatestContents(config.data.articles),
-		readLatestContents(config.data.books),
-		readLatestContents(config.data.links)
-	]);
+	} = await readLatestData();
 	return Promise.all(
 		config.feed.map(
 			build.bind(null, {
-				...metadata,
+				...config.metadata,
 				items: [
 					...articles,
 					...books,

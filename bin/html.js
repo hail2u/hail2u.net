@@ -57,25 +57,36 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const readContents = async (file) => {
-	const contents = await readJSONFile(file);
+const readData = async (filename) => {
+	const name = path.basename(filename, ".json");
+	const file = path.join(config.src.data, filename);
+	const data = await readJSONFile(file);
 
-	if (contents[0].type === "book") {
-		return Promise.all(contents.filter(isNotComic).map(markItem));
+	if (name !== "books") {
+		const marked = await Promise.all(data.map(markItem));
+		return { [ name ]: marked };
 	}
 
-	return Promise.all(contents.map(markItem));
+	const marked = await Promise.all(data.filter(isNotComic).map(markItem));
+	return { [ name ]: marked };
 };
 
-const readPartial = async (filename) => {
+const readAllData = async () => {
+	const filenames = await fs.readdir(config.src.data);
+	const data = await Promise.all(filenames.map(readData));
+	return Object.assign(...data);
+};
+
+const readPartial = async (dir, filename) => {
 	const name = path.basename(filename, ".mustache");
-	const content = await fs.readFile(path.join(config.src.partial, filename), "utf8");
+	const content = await fs.readFile(path.join(dir, filename), "utf8");
 	return { [ name ]: content };
 };
 
 const readPartials = async () => {
-	const filenames = await fs.readdir(config.src.partial);
-	const partials = await Promise.all(filenames.map(readPartial));
+	const dir = path.join(config.src.templates, "partials");
+	const filenames = await fs.readdir(dir);
+	const partials = await Promise.all(filenames.map(readPartial.bind(null, dir)));
 	return Object.assign(...partials);
 };
 
@@ -164,8 +175,8 @@ const build = async (basic, partials, file) => {
 const toFilesFormat = (article) => ({
 	...article,
 	dest: path.join(config.dest.root, article.link),
-	metadata: config.metadata.article,
-	template: config.template.article
+	metadata: path.join(config.src.metadata, "blog/article.json"),
+	template: path.join(config.src.templates, "blog/article.mustache")
 });
 
 const main = async () => {
@@ -188,32 +199,28 @@ const main = async () => {
 	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
-		articles,
-		books,
-		links,
-		statuses,
-		subscriptions,
-		metadata,
+		{
+			articles,
+			books,
+			links,
+			statuses,
+			subscriptions
+		},
 		{ version },
 		partials
 	] = await Promise.all([
-		readContents(config.data.articles),
-		readContents(config.data.books),
-		readContents(config.data.links),
-		readContents(config.data.statuses),
-		readContents(config.data.subscriptions),
-		readJSONFile(config.metadata.root),
+		readAllData(),
 		readJSONFile(pkg),
 		readPartials()
 	]);
 	const data = {
-		...metadata,
+		...config.metadata,
 		articles,
 		books,
 		links,
 		statuses,
 		subscriptions,
-		version,
+		version
 	};
 
 	if (latest) {

@@ -6,7 +6,6 @@ import {
 import config from "../.config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readJSONFile } from "../lib/json-file.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 
 const rewritePath = ([
@@ -36,17 +35,8 @@ const validate = async (file) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-	const [
-		{
-			domain,
-			scheme
-		},
-		sitemap
-	] = await Promise.all([
-		readJSONFile(config.metadata.root),
-		fs.readFile(config.dest.sitemap, "utf8")
-	]);
-	const prefix = `${scheme}://${domain}`;
+	const sitemap = await fs.readFile(config.dest.sitemap, "utf8");
+	const prefix = `${config.metadata.scheme}://${config.metadata.domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
 	const indexes = Array
 		.from(sitemap.matchAll(indexRe), rewritePath)

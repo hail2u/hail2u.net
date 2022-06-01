@@ -4,24 +4,17 @@ export default {
 			dest: "dist/css/index.{{version}}.css",
 			prefix: "@supports (--custom-property: true) {",
 			suffix: "}",
-			src: "src/css/index.css"
+			src: "assets/css/index.css"
 		},
 		{
 			dest: "dist/css/print.{{version}}.css",
-			src: "src/css/print.css"
+			src: "assets/css/print.css"
 		},
 		{
 			dest: "dist/css/test.css",
-			src: "src/css/test.css"
+			src: "assets/css/test.css"
 		}
 	],
-	data: {
-		articles: "src/blog/articles.json",
-		books: "src/bookshelf/books.json",
-		links: "src/links/links.json",
-		statuses: "src/statuses/statuses.json",
-		subscriptions: "src/subscriptions/subscriptions.json"
-	},
 	dest: {
 		article: "dist/blog/",
 		root: "dist/",
@@ -31,20 +24,20 @@ export default {
 	feed: [
 		{
 			dest: "dist/blog/feed",
-			metadata: "src/blog/index.json",
-			template: "src/feed.mustache",
+			metadata: "metadata/blog/index.json",
+			template: "templates/feed.mustache",
 			types: ["article"]
 		},
 		{
 			dest: "dist/bookshelf/feed",
-			metadata: "src/bookshelf/index.json",
-			template: "src/feed.mustache",
+			metadata: "metadata/bookshelf/index.json",
+			template: "templates/feed.mustache",
 			types: ["book"]
 		},
 		{
 			dest: "dist/feed",
-			metadata: "src/index.json",
-			template: "src/feed.mustache",
+			metadata: "metadata/index.json",
+			template: "templates/feed.mustache",
 			types: [
 				"article",
 				"book",
@@ -54,81 +47,94 @@ export default {
 		},
 		{
 			dest: "dist/links/feed",
-			metadata: "src/links/index.json",
-			template: "src/feed.mustache",
+			metadata: "metadata/links/index.json",
+			template: "templates/feed.mustache",
 			types: ["link"]
 		}
 	],
 	html: [
 		{
 			dest: "dist/about/index.html",
-			metadata: "src/about/index.json",
-			template: "src/about/index.mustache"
+			metadata: "metadata/about/index.json",
+			template: "templates/about/index.mustache"
 		},
 		{
 			dest: "dist/blog/index.html",
-			metadata: "src/blog/index.json",
-			template: "src/blog/index.mustache"
+			metadata: "metadata/blog/index.json",
+			template: "templates/blog/index.mustache"
 		},
 		{
 			dest: "dist/bookshelf/index.html",
-			metadata: "src/bookshelf/index.json",
-			template: "src/bookshelf/index.mustache"
+			metadata: "metadata/bookshelf/index.json",
+			template: "templates/bookshelf/index.mustache"
 		},
 		{
 			dest: "dist/index.html",
-			metadata: "src/index.json",
-			template: "src/index.mustache"
+			metadata: "metadata/index.json",
+			template: "templates/index.mustache"
 		},
 		{
 			dest: "dist/links/index.html",
-			metadata: "src/links/index.json",
-			template: "src/links/index.mustache"
+			metadata: "metadata/links/index.json",
+			template: "templates/links/index.mustache"
 		},
 		{
 			dest: "dist/mysubscriptions.opml",
-			metadata: "src/metadata.json",
-			template: "src/mysubscriptions.mustache",
+			metadata: "metadata/mysubscriptions.json",
+			template: "templates/mysubscriptions.mustache",
 		},
 		{
 			dest: "dist/sitemap.xml",
-			metadata: "src/metadata.json",
-			template: "src/sitemap.mustache"
+			metadata: "metadata/sitemap.json",
+			template: "templates/sitemap.mustache"
 		},
 		{
 			dest: "dist/statuses/index.html",
-			metadata: "src/statuses/index.json",
-			template: "src/statuses/index.mustache"
+			metadata: "metadata/statuses/index.json",
+			template: "templates/statuses/index.mustache"
 		},
 		{
 			dest: "dist/subscriptions/index.html",
-			metadata: "src/subscriptions/index.json",
-			template: "src/subscriptions/index.mustache"
+			metadata: "metadata/subscriptions/index.json",
+			template: "templates/subscriptions/index.mustache"
 		}
 	],
 	img: [
 		{
 			dest: "dist/favicon.ico",
-			src: "src/img/icon.svg",
+			src: "assets/img/icon.svg",
 		},
 		{
 			dest: "dist/apple-touch-icon.png",
-			src: "src/img/icon.svg",
+			src: "assets/img/icon.svg",
 			width: 180
 		}
 	],
 	metadata: {
-		article: "src/blog/article.json",
-		root: "src/metadata.json"
+		domain: "hail2u.net",
+		email: "hail2u@gmail.com",
+		encoding: "UTF-8",
+		favicon: "/favicon.svg",
+		feed: "/feed",
+		fullname: "Kyo Nagashima",
+		github: "hail2u",
+		lang: "ja",
+		licenseName: "クリエイティブ・コモンズ・表示ライセンス",
+		licenseURL: "https://creativecommons.org/licenses/by/4.0/",
+		region: "JP",
+		scheme: "https",
+		schemaType: "WebPage",
+		shimei: "ながしまきょう",
+		siteTitle: "Hail2u",
+		touchIcon: "/apple-touch-icon.png",
+		twitter: "hail2u_",
+		twitterCard: "summary"
 	},
 	src: {
+		data: "data/",
 		draft: "drafts.html",
-		partial: "src/partial/",
-		root: "src/",
-		styleGuide: "src/css/test.html"
-	},
-	template: {
-		article: "src/blog/article.mustache",
-		testArticle: "src/blog/test.mustache"
+		metadata: "metadata/",
+		styleGuide: "assets/css/test.html",
+		templates: "templates/"
 	}
 };

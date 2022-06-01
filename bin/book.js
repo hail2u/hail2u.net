@@ -7,6 +7,7 @@ import { escapeCharacters } from "../lib/character-reference.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
 
@@ -47,7 +48,7 @@ const main = async () => {
 		throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 	}
 
-	const file = config.data.books;
+	const file = path.join(config.src.data, "books.json");
 	const books = await readJSONFile(file);
 
 	if (books.find(isReadBook.bind(null, title))) {

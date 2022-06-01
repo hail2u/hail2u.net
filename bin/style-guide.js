@@ -1,9 +1,8 @@
 import config from "../.config.js";
 import fs from "node:fs/promises";
 import { outputFile } from "../lib/output-file.js";
-import { readJSONFile } from "../lib/json-file.js";
 
-const toAbsolutePath = (m, attr, prefix, path) => {
+const toAbsolutePath = (m, attr, path) => {
 	if (path === "/style-guide/") {
 		return m;
 	}
@@ -13,12 +12,8 @@ const toAbsolutePath = (m, attr, prefix, path) => {
 
 const main = async () => {
 	const html = await fs.readFile(config.src.styleGuide, "utf8");
-	const {
-		domain,
-		scheme
-	} = await readJSONFile(config.metadata.root);
 	const urlRe = new RegExp(
-		`\\b(href|src)="(\\.\\.|${scheme}://${domain})(/.*?)"`,
+		`\\b(href|src)="(?:\\.\\./\\.\\./(?:assets|static)|${config.metadata.scheme}://${config.metadata.domain})(/.*?)"`,
 		"gu"
 	);
 	const optimized = html.replace(urlRe, toAbsolutePath);

@@ -6,6 +6,7 @@ import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
@@ -43,7 +44,7 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const file = config.data.links;
+	const file = path.join(config.src.data, "links.json");
 	const links = await readJSONFile(file);
 	const published = Date.now();
 	const dt = getDateDetails(published);
