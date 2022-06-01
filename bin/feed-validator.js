@@ -1,6 +1,15 @@
 import config from "../.config.js";
 import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
+import { globAsync } from "../lib/glob-async.js";
+import { guessPath } from "../lib/guess-path.js";
+
+const toDest = (template) => guessPath(template, config.dest.root, "feed");
+
+const gatherFiles = async () => {
+	const templates = await globAsync(`${config.src.templates}**/feed.mustache`);
+	return Promise.all(templates.map(toDest));
+};
 
 const cancelFetch = (abortController) => {
 	abortController.abort();
@@ -8,8 +17,8 @@ const cancelFetch = (abortController) => {
 
 const parseXML = (xml) => {
 	const json = fastXMLParser.parse(xml, {
-		"arrayMode": /^error$/iu,
-		"ignoreNameSpace": true
+		arrayMode: /^error$/iu,
+		ignoreNameSpace: true
 	});
 	return json.Envelope.Body.feedvalidationresponse.errors;
 };
@@ -55,7 +64,7 @@ const validateFeed = async (feed) => {
 
 const formatMessage = (file, message) => `${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
 
-const validate = async ({ dest: file }) => {
+const validate = async (file) => {
 	const feed = await fs.readFile(file, "utf8");
 	const messages = await validateFeed(feed);
 
@@ -75,7 +84,8 @@ const validate = async ({ dest: file }) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-	const results = await Promise.all(config.feed.map(validate));
+	const feeds = await gatherFiles();
+	const results = await Promise.all(feeds.map(validate));
 	const errors = results.flat();
 
 	if (errors.length > 0) {

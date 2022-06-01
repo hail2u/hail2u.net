@@ -1,6 +1,8 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
+import { globAsync } from "../lib/glob-async.js";
+import { guessPath } from "../lib/guess-path.js";
 import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
@@ -90,6 +92,35 @@ const readPartials = async () => {
 	return Object.assign(...partials);
 };
 
+const toFilesFormat = (file) => {
+	if (typeof file === "object") {
+		return {
+			...file,
+			dest: path.join(config.dest.root, file.link),
+			metadata: path.join(config.src.metadata, "blog/article.json"),
+			template: path.join(config.src.templates, "blog/article.mustache")
+		};
+	}
+
+	return {
+		dest: guessPath(file, config.dest.root, ".html"),
+		metadata: guessPath(file, config.src.metadata, ".json"),
+		template: file
+	};
+};
+
+const gatherFiles = async () => {
+	const templates = await globAsync(`${config.src.templates}**/*.mustache`, {
+		ignore: [
+			"**/feed.mustache",
+			`${config.src.templates}blog/article.mustache`,
+			`${config.src.templates}blog/test.mustache`,
+			`${config.src.templates}partials/**/*`
+		]
+	});
+	return Promise.all(templates.map(toFilesFormat));
+};
+
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
 const findCover = (html) => {
@@ -172,13 +203,6 @@ const build = async (basic, partials, file) => {
 	await outputFile(file.dest, rendered);
 };
 
-const toFilesFormat = (article) => ({
-	...article,
-	dest: path.join(config.dest.root, article.link),
-	metadata: path.join(config.src.metadata, "blog/article.json"),
-	template: path.join(config.src.templates, "blog/article.mustache")
-});
-
 const main = async () => {
 	const {
 		all,
@@ -207,11 +231,13 @@ const main = async () => {
 			subscriptions
 		},
 		{ version },
-		partials
+		partials,
+		files
 	] = await Promise.all([
 		readAllData(),
 		readJSONFile(pkg),
-		readPartials()
+		readPartials(),
+		gatherFiles()
 	]);
 	const data = {
 		...config.metadata,
@@ -224,7 +250,7 @@ const main = async () => {
 	};
 
 	if (latest) {
-		const article = toFilesFormat(articles[0]);
+		const article = await toFilesFormat(articles[0]);
 		await build(data, partials, article);
 	}
 
@@ -240,7 +266,7 @@ const main = async () => {
 		}
 	}
 
-	await Promise.all(config.html.map(build.bind(null, data, partials)));
+	await Promise.all(files.map(build.bind(null, data, partials)));
 };
 
 main().catch((e) => {

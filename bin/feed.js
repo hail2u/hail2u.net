@@ -1,27 +1,23 @@
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
+import { globAsync } from "../lib/glob-async.js";
+import { guessPath } from "../lib/guess-path.js";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const readData = async (filename) => {
-	const name = path.basename(filename, ".json");
-	const file = path.join(config.src.data, filename);
-	const data = await readJSONFile(file);
-	return { [ name ]: data.slice(0, 10) };
+const toFilesFormat = (template) => ({
+	dest: guessPath(template, config.dest.root, "feed"),
+	metadata: guessPath(template, config.src.metadata, "index.json"),
+	template
+});
+
+const gatherFiles = async () => {
+	const templates = await globAsync(`${config.src.templates}**/feed.mustache`);
+	return Promise.all(templates.map(toFilesFormat));
 };
-
-const readLatestData = async () => {
-	const filenames = await fs.readdir(config.src.data);
-	const data = await Promise.all(filenames.map(readData));
-	return Object.assign(...data);
-};
-
-const pickItem = (types, item) => types.includes(item.type);
-
-const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const toAbsoluteURL = (prefix, url) => {
 	if (!url.startsWith("/")) {
@@ -36,7 +32,8 @@ const toAbsoluteURLAll = (prefix, match, attr, url) => {
 	return `${attr}="${absoluteURL}"`;
 };
 
-const extendItem = (prefix, item) => {
+const extendItem = (item) => {
+	const prefix = `${config.metadata.scheme}://${config.metadata.domain}`;
 	const link = toAbsoluteURL(prefix, item.link);
 
 	if (item.body) {
@@ -54,16 +51,24 @@ const extendItem = (prefix, item) => {
 	};
 };
 
+const readData = async (filename) => {
+	const name = path.basename(filename, ".json");
+	const file = path.join(config.src.data, filename);
+	const data = await readJSONFile(file);
+	return { [ name ]: data.slice(0, 10).map(extendItem) };
+};
+
+const readLatestData = async () => {
+	const filenames = await fs.readdir(config.src.data);
+	const data = await Promise.all(filenames.map(readData));
+	return Object.assign(...data);
+};
+
 const mergeData = async (file, data) => {
 	const overrides = await readJSONFile(file.metadata);
-	const prefix = `${data.scheme}://${data.domain}`;
 	return {
 		...data,
-		...overrides,
-		items: data.items.filter(pickItem.bind(null, file.types))
-			.sort(comparePublished)
-			.slice(0, 10)
-			.map(extendItem.bind(null, prefix))
+		...overrides
 	};
 };
 
@@ -79,21 +84,33 @@ const build = async (basic, file) => {
 	await outputFile(file.dest, rendered);
 };
 
+const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
 const main = async () => {
-	const {
-		articles,
-		books,
-		links
-	} = await readLatestData();
+	const [
+		files,
+		{
+			articles,
+			books,
+			links
+		}
+	] = await Promise.all([
+		gatherFiles(),
+		readLatestData()
+	]);
 	return Promise.all(
-		config.feed.map(
+		files.map(
 			build.bind(null, {
 				...config.metadata,
+				articles,
+				books,
 				items: [
 					...articles,
 					...books,
 					...links
-				]
+				].sort(comparePublished)
+					.slice(0, 10),
+				links
 			})
 		)
 	);
