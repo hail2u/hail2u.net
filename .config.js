@@ -122,7 +122,7 @@ export default {
 		root: "src/metadata.json"
 	},
 	src: {
-		draft: "src/blog/drafts.html",
+		draft: "drafts.html",
 		partial: "src/partial/",
 		root: "src/",
 		styleGuide: "src/css/test.html"
