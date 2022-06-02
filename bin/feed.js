@@ -32,8 +32,7 @@ const toAbsoluteURLAll = (prefix, match, attr, url) => {
 	return `${attr}="${absoluteURL}"`;
 };
 
-const extendItem = (item) => {
-	const prefix = `${config.metadata.scheme}://${config.metadata.domain}`;
+const extendItem = (prefix, item) => {
 	const link = toAbsoluteURL(prefix, item.link);
 
 	if (item.body) {
@@ -51,16 +50,16 @@ const extendItem = (item) => {
 	};
 };
 
-const readData = async (filename) => {
+const readData = async (prefix, filename) => {
 	const name = path.basename(filename, ".json");
 	const file = path.join(config.src.data, filename);
 	const data = await readJSONFile(file);
-	return { [ name ]: data.slice(0, 10).map(extendItem) };
+	return { [ name ]: data.slice(0, 10).map(extendItem.bind(null, prefix)) };
 };
 
-const readLatestData = async () => {
+const readLatestData = async (prefix) => {
 	const filenames = await fs.readdir(config.src.data);
-	const data = await Promise.all(filenames.map(readData));
+	const data = await Promise.all(filenames.map(readData.bind(null, prefix)));
 	return Object.assign(...data);
 };
 
@@ -87,6 +86,8 @@ const build = async (basic, file) => {
 const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
+	const metadata = await readJSONFile(path.join(config.src.metadata, "global.json"));
+	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const [
 		files,
 		{
@@ -96,12 +97,12 @@ const main = async () => {
 		}
 	] = await Promise.all([
 		gatherFiles(),
-		readLatestData()
+		readLatestData(prefix)
 	]);
 	return Promise.all(
 		files.map(
 			build.bind(null, {
-				...config.metadata,
+				...metadata,
 				articles,
 				books,
 				items: [

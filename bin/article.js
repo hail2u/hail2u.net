@@ -206,11 +206,17 @@ const main = async () => {
 		file
 	]);
 	const th = articles.length + 1;
-	await runCommand("git", [
-		"commit",
-		`--message=Contribute ${name} (${th})`
+	const [{
+		domain,
+		scheme
+	}] = await Promise.all([
+		readJSONFile(path.join(config.src.metadata, "global.json")),
+		runCommand("git", [
+			"commit",
+			`--message=Contribute ${name} (${th})`
+		])
 	]);
-	await openTwitter(`${title} ${config.metadata.scheme}://${config.metadata.domain}${link}`);
+	await openTwitter(`${title} ${scheme}://${domain}${link}`);
 };
 
 main().catch((e) => {

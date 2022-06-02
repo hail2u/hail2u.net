@@ -223,6 +223,7 @@ const main = async () => {
 	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
+		metadata,
 		{
 			articles,
 			books,
@@ -234,13 +235,14 @@ const main = async () => {
 		partials,
 		files
 	] = await Promise.all([
+		readJSONFile(path.join(config.src.metadata, "global.json")),
 		readAllData(),
 		readJSONFile(pkg),
 		readPartials(),
 		gatherFiles()
 	]);
 	const data = {
-		...config.metadata,
+		...metadata,
 		articles,
 		books,
 		links,
