@@ -23,10 +23,7 @@ const main = async () => {
 		readJSONFile(path.join(config.src.metadata, "global.json")),
 		fs.readFile(config.src.styleGuide, "utf8")
 	]);
-	const urlRe = new RegExp(
-		`\\b(href|src)="(?:\\.\\./\\.\\./(?:assets|static)|${scheme}://${domain})(/.*?)"`,
-		"gu"
-	);
+	const urlRe = new RegExp(`\\b(href|src)="(?:\\.\\./\\.\\./(?:assets|static)|${scheme}://${domain})(/.*?)"`, "gu");
 	const optimized = html.replace(urlRe, toAbsolutePath);
 	await outputFile(config.dest.styleGuide, optimized);
 };

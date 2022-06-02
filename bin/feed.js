@@ -51,10 +51,10 @@ const extendItem = (prefix, item) => {
 };
 
 const readData = async (prefix, filename) => {
-	const name = path.basename(filename, ".json");
+	const basename = path.basename(filename, ".json");
 	const file = path.join(config.src.data, filename);
 	const data = await readJSONFile(file);
-	return { [ name ]: data.slice(0, 10).map(extendItem.bind(null, prefix)) };
+	return { [ basename ]: data.slice(0, 10).map(extendItem.bind(null, prefix)) };
 };
 
 const readLatestData = async (prefix) => {

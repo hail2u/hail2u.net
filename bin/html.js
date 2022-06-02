@@ -60,17 +60,18 @@ const markItem = (item, index, items) => {
 };
 
 const readData = async (filename) => {
-	const name = path.basename(filename, ".json");
+	const basename = path.basename(filename, ".json");
 	const file = path.join(config.src.data, filename);
 	const data = await readJSONFile(file);
 
-	if (name !== "books") {
+	if (basename !== "books") {
 		const marked = await Promise.all(data.map(markItem));
-		return { [ name ]: marked };
+		return { [ basename ]: marked };
 	}
 
-	const marked = await Promise.all(data.filter(isNotComic).map(markItem));
-	return { [ name ]: marked };
+	const books = data.filter(isNotComic);
+	const marked = await Promise.all(books.map(markItem));
+	return { [ basename ]: marked };
 };
 
 const readAllData = async () => {
@@ -80,9 +81,9 @@ const readAllData = async () => {
 };
 
 const readPartial = async (dir, filename) => {
-	const name = path.basename(filename, ".mustache");
+	const basename = path.basename(filename, ".mustache");
 	const content = await fs.readFile(path.join(dir, filename), "utf8");
-	return { [ name ]: content };
+	return { [ basename ]: content };
 };
 
 const readPartials = async () => {
@@ -204,23 +205,6 @@ const build = async (basic, partials, file) => {
 };
 
 const main = async () => {
-	const {
-		all,
-		latest
-	} = minimist(process.argv.slice(2), {
-		alias: {
-			a: "all",
-			l: "latest"
-		},
-		boolean: [
-			"all",
-			"latest"
-		],
-		default: {
-			all: false,
-			latest: false
-		}
-	});
 	const pkg = new URL("../package.json", import.meta.url);
 	const [
 		metadata,
@@ -233,12 +217,30 @@ const main = async () => {
 		},
 		{ version },
 		partials,
+		{
+			all,
+			latest
+		},
 		files
 	] = await Promise.all([
 		readJSONFile(path.join(config.src.metadata, "global.json")),
 		readAllData(),
 		readJSONFile(pkg),
 		readPartials(),
+		minimist(process.argv.slice(2), {
+			alias: {
+				a: "all",
+				l: "latest"
+			},
+			boolean: [
+				"all",
+				"latest"
+			],
+			default: {
+				all: false,
+				latest: false
+			}
+		}),
 		gatherFiles()
 	]);
 	const data = {
@@ -260,11 +262,9 @@ const main = async () => {
 		const articleFiles = await Promise.all(articles.map(toFilesFormat));
 
 		while (articleFiles.length > 0) {
+			const chunk = articleFiles.splice(-1024);
 			/* eslint-disable-next-line no-await-in-loop */
-			await Promise.all(articleFiles
-				.splice(-1024)
-				.map(build.bind(null, data, partials))
-			);
+			await Promise.all(chunk.map(build.bind(null, data, partials)));
 		}
 	}
 
