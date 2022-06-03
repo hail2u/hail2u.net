@@ -5,8 +5,8 @@ import {
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import { getDateDetails } from "../lib/get-date-details.js";
-import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
@@ -19,21 +19,21 @@ const cancelFetch = (abortController) => {
 
 const main = async () => {
 	const {
-		asin,
-		title
-	} = minimist(process.argv.slice(2), {
-		alias: {
-			a: "asin",
-			t: "title"
-		},
-		default: {
-			asin: "",
-			title: ""
-		},
-		string: [
-			"asin",
-			"title"
-		]
+		values: {
+			asin,
+			title
+		}
+	} = parseArgs({
+		options: {
+			asin: {
+				short: "a",
+				type: "string"
+			},
+			title: {
+				short: "t",
+				type: "string"
+			}
+		}
 	});
 
 	if (!asin) {

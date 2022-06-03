@@ -3,9 +3,9 @@ import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";
 import { guessPath } from "../lib/guess-path.js";
-import minimist from "minimist";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
+import { parseArgs } from "node:util";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
@@ -218,8 +218,10 @@ const main = async () => {
 		{ version },
 		partials,
 		{
-			all,
-			latest
+			values: {
+				all,
+				latest
+			}
 		},
 		files
 	] = await Promise.all([
@@ -227,18 +229,16 @@ const main = async () => {
 		readAllData(),
 		readJSONFile(pkg),
 		readPartials(),
-		minimist(process.argv.slice(2), {
-			alias: {
-				a: "all",
-				l: "latest"
-			},
-			boolean: [
-				"all",
-				"latest"
-			],
-			default: {
-				all: false,
-				latest: false
+		parseArgs({
+			options: {
+				all: {
+					short: "a",
+					type: "boolean"
+				},
+				latest: {
+					short: "l",
+					type: "boolean"
+				}
 			}
 		}),
 		gatherFiles()

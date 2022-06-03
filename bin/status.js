@@ -4,12 +4,16 @@ import {
 } from "../lib/json-file.js";
 import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
-import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import { parseArgs } from "node:util";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
-	const { _: [ text ] } = minimist(process.argv.slice(2));
+	const {
+		positionals: [ text ]
+	} = parseArgs({
+		strict: false
+	});
 
 	if (!text) {
 		throw new Error("Only 1 argument is required.");

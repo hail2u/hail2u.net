@@ -4,32 +4,33 @@ import {
 } from "../lib/json-file.js";
 import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
-import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
 	const {
-		comment,
-		title,
-		url
-	} = minimist(process.argv.slice(2), {
-		alias: {
-			c: "comment",
-			t: "title",
-			u: "url"
-		},
-		default: {
-			comment: "",
-			title: "",
-			url: ""
-		},
-		string: [
-			"comment",
-			"title",
-			"url"
-		]
+		values: {
+			comment,
+			title,
+			url
+		}
+	} = parseArgs({
+		options: {
+			comment: {
+				short: "c",
+				type: "string"
+			},
+			title: {
+				short: "t",
+				type: "string"
+			},
+			url: {
+				short: "u",
+				type: "string"
+			}
+		}
 	});
 
 	if (!comment) {

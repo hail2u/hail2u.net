@@ -3,8 +3,8 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../.config.js";
-import minimist from "minimist";
 import { openTwitter } from "../lib/open-twitter.js";
+import { parseArgs } from "node:util";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 
@@ -12,25 +12,26 @@ const isSubscribed = (url, subscription) => url === subscription.url;
 
 const main = async () => {
 	const {
-		feed,
-		title,
-		url
-	} = minimist(process.argv.slice(2), {
-		alias: {
-			f: "feed",
-			t: "title",
-			u: "url"
-		},
-		default: {
-			feed: "",
-			title: "",
-			url: ""
-		},
-		string: [
-			"feed",
-			"title",
-			"url"
-		]
+		values: {
+			feed,
+			title,
+			url
+		}
+	} = parseArgs({
+		options: {
+			feed: {
+				short: "f",
+				type: "string"
+			},
+			title: {
+				short: "t",
+				type: "string"
+			},
+			url: {
+				short: "u",
+				type: "string"
+			}
+		}
 	});
 
 	if (!feed) {
