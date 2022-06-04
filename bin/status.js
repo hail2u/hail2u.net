@@ -12,7 +12,7 @@ const main = async () => {
 	const {
 		positionals: [ text ]
 	} = parseArgs({
-		strict: false
+		allowPositionals: true
 	});
 
 	if (!text) {
