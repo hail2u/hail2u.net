@@ -5,22 +5,28 @@ import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const toFilesFormat = (src) => {
+const toFilesFormat = (version, src) => {
 	const relpath = src.replace(config.src.assets, config.dest.root);
 	const dirname = path.dirname(relpath);
 	const basename = path.basename(src, path.extname(src));
 	return {
-		dest: path.join(dirname, `${basename}.css`),
+		dest: path.join(dirname, `${basename}.${version}.css`),
 		src
 	};
 };
 
 const gatherFiles = async () => {
-	const css = await globAsync(`${config.src.assets}**/*.css`, {
-		ignore: "**/_*.css"
-	});
-	return Promise.all(css.map(toFilesFormat));
+	const pkg = new URL("../package.json", import.meta.url);
+	const [
+		files,
+		{ version }
+	] = await Promise.all([
+		globAsync(`${config.src.assets}**/*.css`),
+		readJSONFile(pkg)
+	]);
+	return Promise.all(files.map(toFilesFormat.bind(null, version)));
 };
+
 
 const processComment = (line) => {
 	const trimmed = line.trim();
@@ -53,36 +59,22 @@ const inline = async (src, line) => {
 	const filename = line.substring(openQuote + 1, closeQuote);
 	const file = path.resolve(root, filename);
 	const css = await fs.readFile(file, "utf8");
-	return css
-		.split("\n")
-		.map(processComment)
-		.join("\n");
+	const lines = css.split("\n");
+	const processed = await Promise.all(lines.map(processComment));
+	return processed.join("\n");
 };
 
-const build = async (version, {
-	dest,
-	src
-}) => {
-	const versioned = dest.replace(".css", `.${version}.css`);
-	const css = await fs.readFile(src, "utf8");
+const build = async (file) => {
+	const css = await fs.readFile(file.src, "utf8");
 	const lines = css.split("\n");
-	const inlined = await Promise.all(lines.map(inline.bind(null, src)));
-	const processed = inlined
-		.map(processComment)
-		.join("\n");
-	await outputFile(versioned, processed);
+	const inlined = await Promise.all(lines.map(inline.bind(null, file.src)));
+	const processed = await Promise.all(inlined.map(processComment));
+	await outputFile(file.dest, processed.join("\n"));
 };
 
 const main = async () => {
-	const pkg = new URL("../package.json", import.meta.url);
-	const [
-		files,
-		{ version }
-	] = await Promise.all([
-		gatherFiles(),
-		readJSONFile(pkg)
-	]);
-	await Promise.all(files.map(build.bind(null, version)));
+	const files = await gatherFiles();
+	await Promise.all(files.map(build));
 };
 
 main().catch((e) => {
