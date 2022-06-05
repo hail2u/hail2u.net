@@ -50,16 +50,17 @@ const extendItem = (prefix, item) => {
 	};
 };
 
-const readData = async (prefix, filename) => {
-	const basename = path.basename(filename, ".json");
-	const file = path.join(config.src.data, filename);
-	const data = await readJSONFile(file);
-	return { [ basename ]: data.slice(0, 10).map(extendItem.bind(null, prefix)) };
+const readData = async (prefix, dataFile) => {
+	const basename = path.basename(dataFile, ".json");
+	const data = await readJSONFile(dataFile);
+	const latest = data.slice(0, 10);
+	const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
+	return { [ basename ]: extended };
 };
 
 const readLatestData = async (prefix) => {
-	const filenames = await fs.readdir(config.src.data);
-	const data = await Promise.all(filenames.map(readData.bind(null, prefix)));
+	const dataFiles = await globAsync(`${config.src.data}**/*.json`);
+	const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
 	return Object.assign(...data);
 };
 
