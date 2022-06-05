@@ -53,7 +53,7 @@ const validateBody = async (body, src) => {
 		return;
 	}
 
-	const errors = messages.map(formatMessage.bind(null, src, 2));
+	const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
 	writeErrors(errors, [src]);
 };
 
@@ -182,9 +182,7 @@ const main = async () => {
 		path.relative(config.dest.root, config.dest.article),
 		`${name}.html`
 	);
-	const drafts = remains
-		.map(rebuildDraft)
-		.join("\n\n");
+	const drafts = await Promise.all(remains.map(rebuildDraft));
 	await Promise.all([
 		outputJSONFile(file, [
 			{
@@ -198,7 +196,7 @@ const main = async () => {
 			},
 			...articles
 		]),
-		outputFile(config.src.draft, drafts)
+		outputFile(config.src.draft, drafts.join("\n\n"))
 	]);
 	await runCommand("git", [
 		"add",

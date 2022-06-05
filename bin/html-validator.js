@@ -30,7 +30,7 @@ const validate = async (file) => {
 		return [];
 	}
 
-	return messages.map(formatMessage.bind(null, file, 0));
+	return Promise.all(messages.map(formatMessage.bind(null, file, 0)));
 };
 
 const isNotEmpty = (element) => element.length !== 0;

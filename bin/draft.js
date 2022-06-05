@@ -39,7 +39,7 @@ const validateBody = async (body, src) => {
 		return;
 	}
 
-	const errors = messages.map(formatMessage.bind(null, src, 2));
+	const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
 	writeErrors(errors, [src]);
 };
 
@@ -60,19 +60,17 @@ const main = async () => {
 		remains,
 		selected
 	} = await selectDraft();
-	const drafts = [
+	const drafts = await Promise.all([
 		selected,
 		...remains
-	]
-		.map(rebuildDraft)
-		.join("\n\n");
+	].map(rebuildDraft));
 	const [
 		dir,
 		template
 	] = await Promise.all([
 		makeTempDir(),
 		fs.readFile(path.join(config.src.templates, "blog/test.mustache"), "utf8"),
-		outputFile(config.src.draft, drafts),
+		outputFile(config.src.draft, drafts.join("\n\n")),
 		validateBody(selected.body, config.src.draft)
 	]);
 	const test = path.join(dir, "test.html");
