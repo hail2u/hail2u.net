@@ -6,6 +6,7 @@ import config from "../.config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { parseArgs } from "node:util";
+import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
@@ -19,7 +20,7 @@ const main = async () => {
 		throw new Error("Only 1 argument is required.");
 	}
 
-	const file = config.contents.statuses;
+	const file = path.join(config.src.data, "statuses.json");
 	const statuses = await readJSONFile(file);
 	const published = Date.now();
 	const dt = getDateDetails(published);

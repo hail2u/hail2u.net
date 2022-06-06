@@ -5,6 +5,7 @@ import {
 import config from "../.config.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { parseArgs } from "node:util";
+import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
 
@@ -46,7 +47,7 @@ const main = async () => {
 		throw new Error("--url is required.");
 	}
 
-	const file = config.contents.subscriptions;
+	const file = path.join(config.src.data, "subscriptions.json");
 	const subscriptions = await readJSONFile(file);
 
 	if (subscriptions.find(isSubscribed.bind(null, url))) {
