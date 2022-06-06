@@ -86,8 +86,7 @@ const readPartial = async (partialFile) => {
 };
 
 const readPartials = async () => {
-	const dir = path.join(config.src.templates, "partials");
-	const partialFiles = await globAsync(`${dir}**/*.mustache`);
+	const partialFiles = await globAsync(`${config.src.templates}partials/*.mustache`);
 	const partials = await Promise.all(partialFiles.map(readPartial));
 	return Object.assign(...partials);
 };
@@ -112,10 +111,10 @@ const toFilesFormat = (file) => {
 const gatherFiles = async () => {
 	const templates = await globAsync(`${config.src.templates}**/*.mustache`, {
 		ignore: [
-			"**/feed.mustache",
+			`${config.src.templates}**/feed.mustache`,
 			`${config.src.templates}blog/article.mustache`,
 			`${config.src.templates}blog/test.mustache`,
-			`${config.src.templates}partials/**/*`
+			`${config.src.templates}partials/*.mustache`
 		]
 	});
 	return Promise.all(templates.map(toFilesFormat));
