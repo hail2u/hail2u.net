@@ -100,22 +100,18 @@ const main = async () => {
 		gatherFiles(),
 		readLatestData(prefix)
 	]);
-	return Promise.all(
-		files.map(
-			build.bind(null, {
-				...metadata,
-				articles,
-				books,
-				items: [
-					...articles,
-					...books,
-					...links
-				].sort(comparePublished)
-					.slice(0, 10),
-				links
-			})
-		)
-	);
+	return Promise.all(files.map(build.bind(null, {
+		...metadata,
+		articles,
+		books,
+		items: [
+			...articles,
+			...books,
+			...links
+		].sort(comparePublished)
+			.slice(0, 10),
+		links
+	})));
 };
 
 main().catch((e) => {

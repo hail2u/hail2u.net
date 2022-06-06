@@ -79,9 +79,7 @@ const main = async () => {
 		.render(template, {
 			...selected,
 			body: selected.body.replace(/(?<=\b(href|src)=")dist\//gu, "/")
-		}, null, {
-			escape: escapeCharacters
-		})
+		}, null, { escape: escapeCharacters })
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
 	await outputFile(test, rendered);
 	await runCommand("open", [ test ]);

@@ -10,11 +10,7 @@ import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 
 const main = async () => {
-	const {
-		positionals: [ text ]
-	} = parseArgs({
-		allowPositionals: true
-	});
+	const { positionals: [ text ] } = parseArgs({ allowPositionals: true });
 
 	if (!text) {
 		throw new Error("Only 1 argument is required.");

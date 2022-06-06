@@ -177,11 +177,7 @@ const main = async () => {
 		validateBody(body, config.src.draft)
 	]);
 	await confirmPublishing(dt);
-	const link = path.posix.join(
-		"/",
-		path.relative(config.dest.root, config.dest.article),
-		`${name}.html`
-	);
+	const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${name}.html`);
 	const drafts = await Promise.all(remains.map(rebuildDraft));
 	await Promise.all([
 		outputJSONFile(file, [
