@@ -20,8 +20,6 @@ const rewritePath = ([
 	return path.join(config.dest.root, relative);
 };
 
-const isNotStyleGuide = (file) => file !== config.dest.styleGuide;
-
 const validate = async (file) => {
 	const html = await fs.readFile(file, "utf8");
 	const messages = await validateHTML(html);
@@ -48,9 +46,7 @@ const main = async () => {
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-	const indexes = Array
-		.from(sitemap.matchAll(indexRe), rewritePath)
-		.filter(isNotStyleGuide);
+	const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath);
 	const articleRe = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
 	const articles = Array.from(sitemap.matchAll(articleRe), rewritePath);
 	const picked = shuffleArray(articles).slice(0, 3);
