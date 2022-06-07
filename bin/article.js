@@ -158,7 +158,7 @@ const main = async () => {
 		selectDraft(),
 		readJSONFile(file)
 	]);
-	const body = selected.body.replace(/(?<=\b(href|src)=")dist\//gu, "/");
+	const body = selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/");
 	const {
 		id,
 		title

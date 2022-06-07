@@ -78,7 +78,7 @@ const main = async () => {
 	const rendered = mustache
 		.render(template, {
 			...selected,
-			body: selected.body.replace(/(?<=\b(href|src)=")dist\//gu, "/")
+			body: selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/")
 		}, null, { escape: escapeCharacters })
 		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
 	await outputFile(test, rendered);
