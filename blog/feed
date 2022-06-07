@@ -13,6 +13,75 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[Node.js v18.3.0でutilモジュールにparseArgsというものが生えた。コマンドライン引数（のような配列）をパースできる。minimistくらいで済んでいるものは置き換えられそうだ。]]></description>
+				<guid>https://hail2u.net/blog/2022-06-08.html</guid>
+				<link>https://hail2u.net/blog/2022-06-08.html</link>
+				<pubDate>Wed, 8 Jun 2022 06:41:19 +0900</pubDate>
+				<title><![CDATA[minimist→util.parseArgs]]></title>
+				<content:encoded><![CDATA[<p>Node.js v18.3.0でutilモジュールに<a href="https://nodejs.org/dist/latest-v18.x/docs/api/util.html#utilparseargsconfig">parseArgs</a>というものが生えた。コマンドライン引数（のような配列）をパースできる。<a href="https://github.com/substack/minimist">minimist</a>くらいで済んでいるものは置き換えられそうだ。</p>
+
+<p>例えば以下のような引数と出力のコードを考えてみる。真偽値と、文字列、2語のもの、加えてオプションではない引数が最後に付くものだ。</p>
+
+<pre><samp>$ <kbd>node ./test.js --boolean --string &apos;Test&apos; --two-words -- &apos;Rest&apos; &apos;--of&apos; &apos;Test&apos;</kbd>
+true Test true Rest --of Test
+</samp></pre>
+
+<p>minimistの場合は以下のように書ける。</p>
+
+<pre><code class="language-javascript">import minimist from &quot;minimist&quot;;
+
+const {
+	_: rest,
+	boolean,
+	string,
+	&quot;two-words&quot;: twoWords
+} = minimist(process.argv.slice(2), {
+	alias: {
+		b: &quot;boolean&quot;,
+		s: &quot;string&quot;
+	},
+	boolean: [
+		&quot;boolean&quot;,
+		&quot;two-words&quot;
+	],
+	string: [
+		&quot;string&quot;
+	]
+});
+console.log(boolean, string, twoWords, ...rest);</code></pre>
+
+<p>対して<code>util.parseArgs</code>では以下のように書ける。</p>
+
+<pre><code class="language-javascript">import { parseArgs } from &quot;node:util&quot;;
+
+const {
+	positionals: rest,
+	values: {
+		boolean,
+		string,
+		&quot;two-words&quot;: twoWords
+	}
+} = parseArgs({
+	allowPositionals: true,
+	options: {
+		boolean: {
+			short: &quot;b&quot;,
+			type: &quot;boolean&quot;
+		},
+		string: {
+			short: &quot;s&quot;,
+			type: &quot;string&quot;
+		},
+		&quot;two-words&quot;: {
+			type: &quot;boolean&quot;
+		}
+	}
+});
+console.log(boolean, string, twoWords, ...rest);</code></pre>
+
+<p>コード量はあまり変わらない。--foo-barのようなオプションの書き方もほぼ同じだ。minimistでstopEarlyや--を使っていないなら、簡単に置き換えられる。私見ではオプションごとに定義できる<code>util.parseArgs</code>の方が書きやすい。ただし、minimistでは引数が省略された時の既定の値を指定できるが、<code>util.parseArgs</code>では指定できないなど、周辺のコードに影響を与える違いもある。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[健診の日は1食抜きだったので、帰りにカフェに寄った。紅茶のパウンド・ケーキとピスタチオのアイスクリームがおいしかった。カフェの壁にはかなり大きなマティスのブルー・ヌードIIのパネルがかけてあり、なかなかの迫力だ。印刷も良さそうで、近くから見てもなかなか良い。]]></description>
 				<guid>https://hail2u.net/blog/2022-06-07.html</guid>
 				<link>https://hail2u.net/blog/2022-06-07.html</link>
@@ -131,16 +200,6 @@
 				<content:encoded><![CDATA[<p>ダニエル・クレイグとピアース・ブロスナンの007を見終わった。ロザムンド・パイクの映画デビューが007だったことは知らなかった。今のところはカジノ・ロワイヤルが一番面白い。主題歌のアーティストを当ててみようとしていたが、さすがにSam Smithはわからなかった。Garbageも歌っていたのかと懐かしく思う。Ace of Baseや、Pulp、Muse、Radioheadも主題歌候補だったというような話もあり、やはりUKを感じる。</p>
 
 <p>ちょっと前にはスパイダー・バースを見て「これがTK from 凛として時雨か」となった。昔は映画をエンドロールの最後まで見て、主題歌や挿入歌を調べ、CDを買っていたことを思い出す。サウンドトラックもよく買っていた。一番よく聞いたのは、ブランドン・リー主演の<a href="https://en.wikipedia.org/wiki/The_Crow:_Original_Motion_Picture_Soundtrack">The Crowのそれ</a>かもしれない。オルタナ大戦争という感じで、The CureやThe Jesus and Mary Chainまでもが入っており、楽しく聞いていたように思う。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[1週間くらい、繰り返しこむらがえりが起こっていた。立っている時や歩いている時はあまり起こらず、座っている時や寝ている時にビリビリっと襲ってくる。スクワットをやりすぎて、筋肉を傷めたせいだったようだ。しばらくスクワットをやめたところ、徐々に頻度が落ち、最終的に治った。]]></description>
-				<guid>https://hail2u.net/blog/2022-05-27.html</guid>
-				<link>https://hail2u.net/blog/2022-05-27.html</link>
-				<pubDate>Fri, 27 May 2022 06:42:26 +0900</pubDate>
-				<title><![CDATA[こむらがえる日々]]></title>
-				<content:encoded><![CDATA[<p>1週間くらい、繰り返しこむらがえりが起こっていた。立っている時や歩いている時はあまり起こらず、座っている時や寝ている時にビリビリっと襲ってくる。スクワットをやりすぎて、筋肉を傷めたせいだったようだ。しばらくスクワットをやめたところ、徐々に頻度が落ち、最終的に治った。</p>
-
-<p>新しくできた、クリニックやジムが入っている商業施設には、健診センターもある。今年もちゃんと受けようと思い、申し込んだ。予約日までに完調に戻したい。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>
