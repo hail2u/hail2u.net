@@ -21,12 +21,11 @@ const gatherFiles = async () => {
 		files,
 		{ version }
 	] = await Promise.all([
-		globAsync(`${config.src.assets}**/*.css`, { ignore: "**/_*.css" }),
+		globAsync(`${config.src.assets}css/**/*.css`, { ignore: "**/_*.css" }),
 		readJSONFile(pkg)
 	]);
 	return Promise.all(files.map(toFilesFormat.bind(null, version)));
 };
-
 
 const processComment = (line) => {
 	const trimmed = line.trim();
