@@ -7,7 +7,7 @@ import { guessPath } from "../lib/guess-path.js";
 const toDest = (template) => guessPath(template, config.dest.root, "feed");
 
 const gatherFiles = async () => {
-	const templates = await globAsync(`${config.src.templates}**/feed.mustache`);
+	const templates = await globAsync(`${config.src.templates}**/_feed.mustache`);
 	return Promise.all(templates.map(toDest));
 };
 

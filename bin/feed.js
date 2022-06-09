@@ -15,7 +15,7 @@ const toFilesFormat = (template) => ({
 });
 
 const gatherFiles = async () => {
-	const templates = await globAsync(`${config.src.templates}**/feed.mustache`);
+	const templates = await globAsync(`${config.src.templates}**/_feed.mustache`);
 	return Promise.all(templates.map(toFilesFormat));
 };
 
