@@ -111,8 +111,8 @@ const toFilesFormat = (file) => {
 };
 
 const gatherFiles = async () => {
-	const templates = await globAsync(`${config.src.templates}**/*.mustache`, { ignore: `${config.src.templates}**/_*.mustache` });
-	return Promise.all(templates.map(toFilesFormat));
+	const files = await globAsync(`${config.src.templates}**/*.mustache`, { ignore: `**/_*` });
+	return Promise.all(files.map(toFilesFormat));
 };
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);

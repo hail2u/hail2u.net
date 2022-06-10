@@ -21,7 +21,7 @@ const gatherFiles = async () => {
 		files,
 		{ version }
 	] = await Promise.all([
-		globAsync(`${config.src.assets}js/**/*.js`),
+		globAsync(`${config.src.assets}js/**/*.js`, { ignore: "**/_*" }),
 		readJSONFile(pkg)
 	]);
 	return Promise.all(files.map(toFilesFormat.bind(null, version)));
