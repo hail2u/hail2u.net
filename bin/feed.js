@@ -8,15 +8,15 @@ import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
 
-const toFilesFormat = (template) => ({
-	dest: guessPath(template, config.dest.root, "feed"),
-	metadata: guessPath(template, config.src.metadata, "index.json"),
-	template
+const toFilesFormat = (file) => ({
+	dest: guessPath(file, config.dest.root, "feed"),
+	metadata: guessPath(file, config.src.metadata, "index.json"),
+	template: file
 });
 
 const gatherFiles = async () => {
-	const templates = await globAsync(`${config.src.templates}**/_feed.mustache`);
-	return Promise.all(templates.map(toFilesFormat));
+	const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+	return Promise.all(files.map(toFilesFormat));
 };
 
 const toAbsoluteURL = (prefix, url) => {

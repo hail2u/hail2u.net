@@ -59,9 +59,9 @@ const markItem = (item, index, items) => {
 	};
 };
 
-const readData = async (dataFile) => {
-	const basename = path.basename(dataFile, ".json");
-	const data = await readJSONFile(dataFile);
+const readData = async (file) => {
+	const basename = path.basename(file, ".json");
+	const data = await readJSONFile(file);
 
 	if (basename !== "books") {
 		const marked = await Promise.all(data.map(markItem));
@@ -74,22 +74,22 @@ const readData = async (dataFile) => {
 };
 
 const readAllData = async () => {
-	const dataFiles = await globAsync(`${config.src.data}**/*.json`);
-	const data = await Promise.all(dataFiles.map(readData));
+	const files = await globAsync(`${config.src.data}**/*.json`);
+	const data = await Promise.all(files.map(readData));
 	return Object.assign(...data);
 };
 
-const readPartial = async (partialFile) => {
+const readPartial = async (file) => {
 	const basename = path
-		.basename(partialFile, ".mustache")
+		.basename(file, ".mustache")
 		.substring(1);
-	const partial = await fs.readFile(partialFile, "utf8");
+	const partial = await fs.readFile(file, "utf8");
 	return { [ basename ]: partial };
 };
 
 const readPartials = async () => {
-	const partialFiles = await globAsync(`${config.src.templates}partials/*.mustache`);
-	const partials = await Promise.all(partialFiles.map(readPartial));
+	const files = await globAsync(`${config.src.templates}partials/*.mustache`);
+	const partials = await Promise.all(files.map(readPartial));
 	return Object.assign(...partials);
 };
 

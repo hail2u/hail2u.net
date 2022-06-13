@@ -4,11 +4,11 @@ import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";
 import { guessPath } from "../lib/guess-path.js";
 
-const toDest = (template) => guessPath(template, config.dest.root, "feed");
+const toDest = (file) => guessPath(file, config.dest.root, "feed");
 
 const gatherFiles = async () => {
-	const templates = await globAsync(`${config.src.templates}**/_feed.mustache`);
-	return Promise.all(templates.map(toDest));
+	const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+	return Promise.all(files.map(toDest));
 };
 
 const cancelFetch = (abortController) => {
