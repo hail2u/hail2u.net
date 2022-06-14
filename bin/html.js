@@ -198,7 +198,6 @@ const build = async (basic, partials, file) => {
 };
 
 const main = async () => {
-	const pkg = new URL("../package.json", import.meta.url);
 	const [
 		metadata,
 		{
@@ -208,7 +207,6 @@ const main = async () => {
 			statuses,
 			subscriptions
 		},
-		{ version },
 		partials,
 		{
 			values: {
@@ -220,7 +218,6 @@ const main = async () => {
 	] = await Promise.all([
 		readJSONFile(path.join(config.src.metadata, "global.json")),
 		readAllData(),
-		readJSONFile(pkg),
 		readPartials(),
 		parseArgs({
 			options: {
@@ -243,7 +240,7 @@ const main = async () => {
 		links,
 		statuses,
 		subscriptions,
-		version
+		version: config.version
 	};
 
 	if (latest) {

@@ -3,28 +3,20 @@ import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
-import { readJSONFile } from "../lib/json-file.js";
 
-const toFilesFormat = (version, src) => {
+const toFilesFormat = (src) => {
 	const relpath = src.replace(config.src.assets, config.dest.root);
 	const dirname = path.dirname(relpath);
 	const basename = path.basename(src, path.extname(src));
 	return {
-		dest: path.join(dirname, `${basename}.${version}.css`),
+		dest: path.join(dirname, `${basename}.${config.version}.css`),
 		src
 	};
 };
 
 const gatherFiles = async () => {
-	const pkg = new URL("../package.json", import.meta.url);
-	const [
-		files,
-		{ version }
-	] = await Promise.all([
-		globAsync(`${config.src.assets}css/**/*.css`, { ignore: "**/_*" }),
-		readJSONFile(pkg)
-	]);
-	return Promise.all(files.map(toFilesFormat.bind(null, version)));
+	const files = await globAsync(`${config.src.assets}css/**/*.css`, { ignore: "**/_*" });
+	return Promise.all(files.map(toFilesFormat));
 };
 
 const processComment = (line) => {

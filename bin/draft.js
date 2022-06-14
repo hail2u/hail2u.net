@@ -10,7 +10,6 @@ import mustache from "mustache";
 import os from "node:os";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
-import { readJSONFile } from "../lib/json-file.js";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 
@@ -44,15 +43,8 @@ const validateBody = async (body, src) => {
 };
 
 const makeTempDir = async () => {
-	const pkg = new URL("../package.json", import.meta.url);
-	const [
-		osTemp,
-		{ name }
-	] = await Promise.all([
-		fs.realpath(os.tmpdir()),
-		readJSONFile(pkg)
-	]);
-	return fs.mkdtemp(path.join(osTemp, path.sep, `${name}-`));
+	const osTemp = await fs.realpath(os.tmpdir());
+	return fs.mkdtemp(path.join(osTemp, path.sep, `${config.name}-`));
 };
 
 const main = async () => {

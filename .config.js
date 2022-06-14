@@ -1,3 +1,11 @@
+import { readJSONFile } from "./lib/json-file.js";
+
+const pkg = new URL("./package.json", import.meta.url);
+const {
+	name,
+	version
+} = await readJSONFile(pkg);
+
 export default {
 	dest: {
 		article: "dist/blog/",
@@ -5,6 +13,7 @@ export default {
 		sitemap: "dist/sitemap.xml",
 		styleGuide: "dist/style-guide/index.html"
 	},
+	name,
 	src: {
 		assets: "assets/",
 		data: "data/",
@@ -13,5 +22,6 @@ export default {
 		metadata: "metadata/",
 		styleGuide: "assets/css/test.html",
 		templates: "templates/"
-	}
+	},
+	version
 };
