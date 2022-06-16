@@ -95,11 +95,12 @@ const readPartials = async () => {
 
 const toFilesFormat = (file) => {
 	if (typeof file === "object") {
+		const template = path.join(config.src.templates, "blog/_article.mustache");
 		return {
 			...file,
 			dest: path.join(config.dest.root, file.link),
-			metadata: path.join(config.src.metadata, "blog/article.json"),
-			template: path.join(config.src.templates, "blog/_article.mustache")
+			metadata: guessPath(template, config.src.metadata, "article.json"),
+			template
 		};
 	}
 
