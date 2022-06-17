@@ -13,6 +13,22 @@
 		<creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
 			<item>
+				<description><![CDATA[Web StreamsからNode.jsで扱いやすい形にするヘルパー関数が用意されていることを教えてもらった。Node.jsでFetch標準が使えるようになったので、出番は多くなるのかもしれない。Node.jsのBufferにするコードを読むと、ReadableStreamを全て読んでBlobに変換し、更にArrayBufferに変換し、Buffer.from()を使っているようだ。]]></description>
+				<guid>https://hail2u.net/blog/2022-06-18.html</guid>
+				<link>https://hail2u.net/blog/2022-06-18.html</link>
+				<pubDate>Sat, 18 Jun 2022 07:03:36 +0900</pubDate>
+				<title><![CDATA[node:streams/consumers]]></title>
+				<content:encoded><![CDATA[<p>Web StreamsからNode.jsで扱いやすい形にする<a href="https://nodejs.org/api/webstreams.html#utility-consumers">ヘルパー関数</a>が用意されていることを教えてもらった。Node.jsでFetch標準が使えるようになったので、出番は多くなるのかもしれない。<a href="https://github.com/nodejs/node/blob/8c4cf96967d00fc36b2af9aa2b3ee81c422c6a2f/lib/stream/consumers.js#L49">Node.jsのBufferにするコード</a>を読むと、ReadableStreamを全て読んでBlobに変換し、更にArrayBufferに変換し、<code>Buffer.from()</code>を使っているようだ。</p>
+
+<pre><code class="language-javascript">import { buffer } from &quot;node:streams/consumers&quot;;
+
+const response = await fetch(&quot;https://example.com/test.jpg&quot;);
+const image = await buffer(res.body);
+const metadata = await sharp(image).metadata();</code></pre>
+
+<p><a href="https://hail2u.net/blog/2022-04-27.html">node-fetchパッケージからFetch標準へ移行した時</a>、レスポンスをsharpパッケージで使えるよう、ArrayBufferで受け取ってからBufferに変換していた。ここをヘルパー関数の<code>buffer()</code>を使うとちょっとだけ書きやすく感じる。ただ、やっていることはほとんど変わらない上、Blobを経由するので効率が悪そうだ。Fetch標準のレスポンスにはいろいろ生えていることも考えると、ヘルパー関数を使わずに書いた方が後悔が少なそうだ。</p>]]></content:encoded>
+			</item>
+			<item>
 				<description><![CDATA[最寄り駅付近にクリニック・ビルがにょきにょき建っている。通院している皮膚科もクリニック・ビルに入っている。3つ以上何ならかの病院が入っているビルだと、5つもあるようだ。病院のみとしても3つある。10年ほど振り返ってみると、歯医者も含めて単独の病院が開業した記憶がないかもしれない。駅から少し離れると、内科や整形外科が開業していた記憶はある。]]></description>
 				<guid>https://hail2u.net/blog/2022-06-17.html</guid>
 				<link>https://hail2u.net/blog/2022-06-17.html</link>
@@ -196,16 +212,6 @@ const {
 console.log(boolean, string, twoWords, ...rest);</code></pre>
 
 <p>コード量はあまり変わらない。--foo-barのようなオプションの書き方もほぼ同じだ。minimistでstopEarlyや--を使っていないなら、簡単に置き換えられる。私見ではオプションごとに定義できる<code>util.parseArgs</code>の方が書きやすい。ただし、minimistでは引数が省略された時の既定の値を指定できるが、<code>util.parseArgs</code>では指定できないなど、周辺のコードに影響を与える違いもある。</p>]]></content:encoded>
-			</item>
-			<item>
-				<description><![CDATA[健診の日は1食抜きだったので、帰りにカフェに寄った。紅茶のパウンド・ケーキとピスタチオのアイスクリームがおいしかった。カフェの壁にはかなり大きなマティスのブルー・ヌードIIのパネルがかけてあり、なかなかの迫力だ。印刷も良さそうで、近くから見てもなかなか良い。]]></description>
-				<guid>https://hail2u.net/blog/2022-06-07.html</guid>
-				<link>https://hail2u.net/blog/2022-06-07.html</link>
-				<pubDate>Tue, 7 Jun 2022 05:47:43 +0900</pubDate>
-				<title><![CDATA[黒いマティスのブルー・ヌード]]></title>
-				<content:encoded><![CDATA[<p>健診の日は1食抜きだったので、帰りにカフェに寄った。紅茶のパウンド・ケーキとピスタチオのアイスクリームがおいしかった。カフェの壁にはかなり大きな<a href="https://en.wikipedia.org/wiki/Blue_Nudes">マティスのブルー・ヌードII</a>のパネルがかけてあり、なかなかの迫力だ。印刷も良さそうで、近くから見てもなかなか良い。</p>
-
-<p>一方で、青ではなく黒だったので、残念な気持ちにもなった。黒も制作していたのかなと検索してみたが、ポスターとしてはいくつかあるようだが、作品がある気配はない。死後70年近くになるので、いろいろなところが勝手に作っているのかもしれない。去年、新国立美術館で開かれる予定だった<a href="https://www.nact.jp/exhibition_special/2021/matisse2021/">マティス展</a>にその後の情報がないが、もう無理なのだろうか。</p>]]></content:encoded>
 			</item>
 	</channel>
 </rss>

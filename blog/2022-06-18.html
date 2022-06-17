@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>node:streams/consumers</title>
+
+		<link href="/feed" rel="alternate" type="application/rss+xml">
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
+		<link href="mailto:hail2u@gmail.com" rel="author">
+		<link href="https://hail2u.net/blog/2022-06-18.html" rel="canonical">
+		<meta content="light dark" name="color-scheme">
+		<meta content="Web StreamsからNode.jsで扱いやすい形にするヘルパー関数が用意されていることを教えてもらった。Node.jsでFetch標準が使えるようになったので、出番は多くなるのかもしれない。Node.jsのBufferにするコードを読むと、ReadableStreamを全て読んでBlobに変換し、更にArrayBufferに変換し、Buffer.from()を使っているようだ。" name="description">
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
+		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+		<meta content="width=device-width" name="viewport">
+
+		<link href="/css/print.9.23.23.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.23.23.css" media="only screen" rel="stylesheet">
+
+		<meta content="summary" name="twitter:card">
+		<meta content="Web StreamsからNode.jsで扱いやすい形にするヘルパー関数が用意されていることを教えてもらった。Node.jsでFetch標準が使えるようになったので、出番は多くなるのかもしれない。Node.jsのBufferにするコードを読むと、ReadableStreamを全て読んでBlobに変換し、更にArrayBufferに変換し、Buffer.from()を使っているようだ。" property="twitter:description">
+		
+		<meta content="@hail2u_" name="twitter:site">
+		<meta content="node:streams/consumers" property="twitter:title">
+	</head>
+
+	<body>
+		<header>
+				<p class="date"><time datetime="2022-06-18T07:03:36+09:00">2022年6月18日</time></p>
+
+			<h1>node:streams/consumers</h1>
+
+				<nav>
+					<p class="back-to-home"><a href="/" aria-label="ホームへ戻る">←</a></p>
+				</nav>
+		</header>
+
+		<p>Web StreamsからNode.jsで扱いやすい形にする<a href="https://nodejs.org/api/webstreams.html#utility-consumers">ヘルパー関数</a>が用意されていることを教えてもらった。Node.jsでFetch標準が使えるようになったので、出番は多くなるのかもしれない。<a href="https://github.com/nodejs/node/blob/8c4cf96967d00fc36b2af9aa2b3ee81c422c6a2f/lib/stream/consumers.js#L49">Node.jsのBufferにするコード</a>を読むと、ReadableStreamを全て読んでBlobに変換し、更にArrayBufferに変換し、<code>Buffer.from()</code>を使っているようだ。</p>
+
+<pre><code class="language-javascript">import { buffer } from &quot;node:streams/consumers&quot;;
+
+const response = await fetch(&quot;https://example.com/test.jpg&quot;);
+const image = await buffer(res.body);
+const metadata = await sharp(image).metadata();</code></pre>
+
+<p><a href="/blog/2022-04-27.html">node-fetchパッケージからFetch標準へ移行した時</a>、レスポンスをsharpパッケージで使えるよう、ArrayBufferで受け取ってからBufferに変換していた。ここをヘルパー関数の<code>buffer()</code>を使うとちょっとだけ書きやすく感じる。ただ、やっていることはほとんど変わらない上、Blobを経由するので効率が悪そうだ。Fetch標準のレスポンスにはいろいろ生えていることも考えると、ヘルパー関数を使わずに書いた方が後悔が少なそうだ。</p>
+
+		<footer class="page-footer">
+			<nav>
+				<p><a href="/">ホーム</a>&#x2003;<a href="/about/">案内</a>&#x2003;/&#x2003;<a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></p>
+
+				<ul>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+			</nav>
+
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や<a href="https://twitter.com/hail2u_">Twitter</a>で、お気軽にどうぞ。</p>
+		</footer>
+	</body>
+</html>
