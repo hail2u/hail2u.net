@@ -2,7 +2,6 @@ import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
-import { buffer } from "node:stream/consumers";
 import config from "../.config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import { getDateDetails } from "../lib/get-date-details.js";
@@ -67,8 +66,8 @@ const main = async () => {
 			throw new Error(`${res.status} ${res.statusText}`);
 		}
 
-		const img = await buffer(res.body);
-		const metadata = await sharp(img).metadata();
+		const img = await res.arrayBuffer();
+		const metadata = await sharp(Buffer.from(img)).metadata();
 
 		if (metadata.height === 1 && metadata.width === 1) {
 			throw new Error(`${title} does not have a cover image.`);
