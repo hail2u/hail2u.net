@@ -26,10 +26,7 @@ const testContrast_getLuminance = (color) => {
 	return testContrast_clampLuminance(luminance);
 };
 
-const testContrast_getPerceptualContrast = (
-	backgroundLuminance,
-	foregroundLuminance
-) => {
+const testContrast_getPerceptualContrast = (backgroundLuminance, foregroundLuminance) => {
 	const deltaYmin = 0.0005;
 	const scale = 1.25;
 
@@ -80,10 +77,7 @@ const testContrast_toScore = (float) => (float * 100).toFixed(3);
 const testContrast_getScore = (background, foreground) => {
 	const backgroundLuminance = testContrast_getLuminance(background);
 	const foregroundLuminance = testContrast_getLuminance(foreground);
-	const contrast = testContrast_getPerceptualContrast(
-		backgroundLuminance,
-		foregroundLuminance
-	);
+	const contrast = testContrast_getPerceptualContrast(backgroundLuminance, foregroundLuminance);
 	const scaled = testContrast_scaleContrast(contrast);
 	return testContrast_toScore(scaled);
 };
