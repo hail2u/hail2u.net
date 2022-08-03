@@ -11,7 +11,7 @@ import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
-import config from "../.config.js";
+import config from "../config.js";
 import { constants } from "node:fs";
 import fs from "node:fs/promises";
 import { getDateDetails } from "../lib/get-date-details.js";

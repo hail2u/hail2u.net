@@ -1,4 +1,4 @@
-import config from "../.config.js";
+import config from "../config.js";
 import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";

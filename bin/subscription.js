@@ -2,7 +2,7 @@ import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
-import config from "../.config.js";
+import config from "../config.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { parseArgs } from "node:util";
 import path from "node:path";

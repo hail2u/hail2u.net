@@ -1,5 +1,5 @@
 import babel from "@babel/core";
-import config from "../.config.js";
+import config from "../config.js";
 import { globAsync } from "../lib/glob-async.js";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";

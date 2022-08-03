@@ -2,7 +2,7 @@ import {
 	outputJSONFile,
 	readJSONFile
 } from "../lib/json-file.js";
-import config from "../.config.js";
+import config from "../config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";

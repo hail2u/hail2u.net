@@ -1,4 +1,4 @@
-import config from "../.config.js";
+import config from "../config.js";
 import fs from "node:fs/promises";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";

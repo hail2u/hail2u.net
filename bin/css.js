@@ -1,4 +1,4 @@
-import config from "../.config.js";
+import config from "../config.js";
 import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";
 import { outputFile } from "../lib/output-file.js";

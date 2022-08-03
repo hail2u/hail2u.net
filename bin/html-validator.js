@@ -3,7 +3,7 @@ import {
 	validateHTML,
 	writeErrors
 } from "../lib/validate-html.js";
-import config from "../.config.js";
+import config from "../config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";

@@ -3,7 +3,7 @@ import {
 	validateHTML,
 	writeErrors
 } from "../lib/validate-html.js";
-import config from "../.config.js";
+import config from "../config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import fs from "node:fs/promises";
 import mustache from "mustache";
