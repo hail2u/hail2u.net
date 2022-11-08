@@ -94,7 +94,8 @@ const main = async () => {
 		{
 			articles,
 			books,
-			links
+			links,
+			statuses
 		}
 	] = await Promise.all([
 		gatherFiles(),
@@ -107,10 +108,12 @@ const main = async () => {
 		items: [
 			...articles,
 			...books,
-			...links
+			...links,
+			...statuses
 		].sort(comparePublished)
 			.slice(0, 10),
-		links
+		links,
+		statuses
 	})));
 };
 
