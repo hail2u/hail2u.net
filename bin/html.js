@@ -186,6 +186,7 @@ const build = async (basic, partials, file) => {
 		data.articles = data.articles.slice(0, 6);
 		data.books = data.books.slice(0, 3);
 		data.links = data.links.slice(0, 6);
+		data.statuses = data.statuses.slice(0, 1);
 	}
 
 	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
