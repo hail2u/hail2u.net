@@ -167,7 +167,7 @@ const build = async (basic, partials, file) => {
 		fs.readFile(file.template, "utf8")
 	]);
 
-	if (!data.isArticle && data.isBlog) {
+	if (!data.isArticle && data.isBlog && !data.isLog) {
 		data.latestArticles = data.articles.slice(0, 9);
 		data.articles = markFirstItem(data.articles.slice(9));
 	}
@@ -177,9 +177,14 @@ const build = async (basic, partials, file) => {
 		data.books = markFirstItem(data.books.slice(9));
 	}
 
-	if (data.isLinks) {
+	if (data.isLinks && !data.isLog) {
 		data.latestLinks = data.links.slice(0, 9);
 		data.links = markFirstItem(data.links.slice(9));
+	}
+
+	if (data.isStatuses && !data.isLog) {
+		data.latestStatuses = data.statuses.slice(0, 9);
+		data.statuses = markFirstItem(data.statuses.slice(9));
 	}
 
 	if (data.isHome) {

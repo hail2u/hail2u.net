@@ -11,16 +11,21 @@
 			<p><a href="{{link}}">{{title}}</a></p>
 		{{/latestArticles}}
 
-		<nav>
-			<h2>年別</h2>
-
-			<p>{{#articles}}{{#isFirstInYear}}<a href="#{{strYear}}">{{year}}&#x2060;年</a>&#x2003;{{/isFirstInYear}}{{/articles}}</p>
+		<nav class="js-append-next-fallback">
+			<p>これ以前の雑多な記録は、<a href="{{canonical}}log.html">ログ・ページ</a>にすべて残されています。</p>
 		</nav>
+
+		<template class="js-append-next">
+			<p class="square"><button class="push" type="button">残りの記録を表示</button></p>
+		</template>
+
+		<script async defer src="/js/append-next.{{version}}.js"></script>
 
 		{{#articles}}
 			{{#isFirstInMonth}}
-				<section{{#isFirstInYear}} id="{{strYear}}"{{/isFirstInYear}}>
-					<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
+				<template class="js-append-next">
+					<section>
+						<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
 			{{/isFirstInMonth}}
 
 			<p class="date"><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00">{{year}}年{{month}}月{{date}}日</time></p>
@@ -28,7 +33,12 @@
 			<p><a href="{{link}}">{{title}}</a></p>
 
 			{{#isLastInMonth}}
-				</section>
+				{{^isOldest}}
+					<p class="square"><button class="push" type="button">残りの記録を更に表示</button></p>
+				{{/isOldest}}
+
+					</section>
+				</template>
 			{{/isLastInMonth}}
 		{{/articles}}
 

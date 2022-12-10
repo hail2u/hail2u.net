@@ -5,11 +5,27 @@
 	<body>
 		{{> page-header}}
 
-		<nav>
-			<p>Twitterでのみ投稿していた<a href="/statuses/log.html">2009年から2018年までの記録</a>も公開しています。</p>
+		<ul>
+			{{#latestStatuses}}
+				<li id="on-{{published}}">{{title}}（<time datetime="{{strYear}}-{{strMonth}}-{{strDate}}T{{strHour}}:{{strMinute}}:{{strSecond}}+09:00">{{year}}年{{month}}月{{date}}日 {{hour}}時{{minute}}分</time>）</li>
+			{{/latestStatuses}}
+		</ul>
+
+		<nav class="js-append-next-fallback">
+			<p>これ以前の近ごろの様子は、<a href="{{canonical}}log.html">ログ・ページ</a>にすべて残されています。</p>
 		</nav>
 
+		<template class="js-append-next">
+			<p class="square"><button class="push" type="button">残りの様子を表示</button></p>
+		</template>
+
+		<script async defer src="/js/append-next.{{version}}.js"></script>
+
 		{{#statuses}}
+			{{#isFirstInMonth}}
+				<template class="js-append-next">
+			{{/isFirstInMonth}}
+
 			{{#isFirstInDate}}
 				<section{{#isFirstInYear}} id="{{strYear}}"{{/isFirstInYear}}>
 					<h2><time datetime="{{strYear}}-{{strMonth}}-{{strDate}}">{{year}}年{{month}}月{{date}}日</time></h2>
@@ -23,6 +39,14 @@
 					</ul>
 				</section>
 			{{/isLastInDate}}
+
+			{{#isLastInMonth}}
+				{{^isOldest}}
+					<p class="square"><button class="push" type="button">残りの様子を更に表示</button></p>
+				{{/isOldest}}
+
+				</template>
+			{{/isLastInMonth}}
 		{{/statuses}}
 
 		{{> page-footer}}
