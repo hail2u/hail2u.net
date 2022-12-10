@@ -172,7 +172,7 @@ const build = async (basic, partials, file) => {
 		data.articles = markFirstItem(data.articles.slice(9));
 	}
 
-	if (data.isBookshelf) {
+	if (data.isBookshelf && !data.isLog) {
 		data.latestBooks = data.books.slice(0, 9);
 		data.books = markFirstItem(data.books.slice(9));
 	}

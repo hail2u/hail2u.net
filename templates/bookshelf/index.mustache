@@ -11,25 +11,35 @@
 			{{/latestBooks}}
 		</ol>
 
-		<nav>
-			<h2>年別</h2>
-
-			<p>{{#books}}{{#isFirstInYear}}<a href="#{{strYear}}">{{year}}&#x2060;年</a>&#x2003;{{/isFirstInYear}}{{/books}}</p>
+		<nav class="js-append-next-fallback">
+			<p>これ以前の読み終えた本は、<a href="{{canonical}}log.html">ログ・ページ</a>にすべて残されています。画像が大量に表示されるため、閲覧には注意してください。</p>
 		</nav>
+
+		<template class="js-append-next">
+			<p class="square"><button class="push" type="button">残りの本を表示</button></p>
+		</template>
+
+		<script async defer src="/js/append-next.{{version}}.js"></script>
 
 		{{#books}}
 			{{#isFirstInMonth}}
-				<section{{#isFirstInYear}} id="{{strYear}}"{{/isFirstInYear}}>
-					<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
+				<template class="js-append-next">
+					<section>
+						<h2><time datetime="{{strYear}}-{{strMonth}}">{{year}}年{{month}}月</time></h2>
 
-					<ul>
+						<ol class="showcase">
 			{{/isFirstInMonth}}
 
-			<li><a href="{{link}}">{{title}}</a></li>
+			<li>{{{body}}}</li>
 
 			{{#isLastInMonth}}
-					</ul>
-				</section>
+						</ol>
+
+						{{^isOldest}}
+							<p class="square"><button class="push" type="button">残りの本を更に表示</button></p>
+						{{/isOldest}}
+					</section>
+				</template>
 			{{/isLastInMonth}}
 		{{/books}}
 
