@@ -210,7 +210,7 @@ const main = async () => {
 			`--message=Contribute ${name} (${th})`
 		])
 	]);
-	await openTwitter(`${title} ${scheme}://${domain}${link}`);
+	await openTwitter(`${scheme}://${domain}${link}`);
 };
 
 main().catch((e) => {

@@ -3,7 +3,6 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../config.js";
-import { openTwitter } from "../lib/open-twitter.js";
 import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
@@ -72,7 +71,6 @@ const main = async () => {
 		"commit",
 		`--message=Subscribe ${url}`
 	]);
-	await openTwitter(`「${title}」を購読開始 ${url}`);
 };
 
 main().catch((e) => {
