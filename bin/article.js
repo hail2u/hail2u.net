@@ -18,7 +18,6 @@ import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
 import { outputFile } from "../lib/output-file.js";
 import path from "node:path";
-import readline from "node:readline/promises";
 import { runCommand } from "../lib/run-command.js";
 import { selectDraft } from "../lib/select-draft.js";
 
@@ -55,65 +54,6 @@ const validateBody = async (body, src) => {
 
 	const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
 	writeErrors(errors, [src]);
-};
-
-const confirmPublishing = async ({
-	day,
-	strDate,
-	strMonth,
-	strYear
-}) => {
-	const holidays = [
-		"20220101",
-		"20220110",
-		"20220211",
-		"20220223",
-		"20220321",
-		"20220429",
-		"20220503",
-		"20220504",
-		"20220505",
-		"20220718",
-		"20220811",
-		"20220919",
-		"20220923",
-		"20221010",
-		"20221103",
-		"20221123",
-		"20230101",
-		"20230102",
-		"20230109",
-		"20230211",
-		"20230223",
-		"20230321",
-		"20230429",
-		"20230503",
-		"20230504",
-		"20230505",
-		"20230717",
-		"20230811",
-		"20230918",
-		"20230923",
-		"20231009",
-		"20231103",
-		"20231123"
-	];
-
-	if (day !== 0 && !holidays.includes(`${strYear}${strMonth}${strDate}`)) {
-		return;
-	}
-
-	const menu = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout
-	});
-	const input = await menu.question("Today is Sunday or holiday. Are you sure you want to publish an article? (No) ");
-	menu.close();
-	const answer = input.toLowerCase();
-
-	if (typeof answer === "string" && (answer !== "y" || answer !== "yes")) {
-		throw new Error("Aborted.");
-	}
 };
 
 const generateName = ({
@@ -176,7 +116,6 @@ const main = async () => {
 		checkTitleType(title),
 		validateBody(body, config.src.draft)
 	]);
-	await confirmPublishing(dt);
 	const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${name}.html`);
 	const drafts = await Promise.all(remains.map(rebuildDraft));
 	await Promise.all([
