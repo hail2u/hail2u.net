@@ -45,9 +45,9 @@ const inline = async (src, line) => {
 	}
 
 	const root = path.dirname(src);
-	const openQuote = line.indexOf('"');
-	const closeQuote = line.lastIndexOf('"');
-	const filename = line.substring(openQuote + 1, closeQuote);
+	const openParenthesis = line.indexOf('(');
+	const closeParenthesis = line.lastIndexOf(')');
+	const filename = line.substring(openParenthesis + 1, closeParenthesis);
 	const file = path.resolve(root, filename);
 	const css = await fs.readFile(file, "utf8");
 	const lines = css.split("\n");
