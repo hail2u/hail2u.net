@@ -184,29 +184,29 @@ const build = async (basic, partials, file) => {
 
 	if (!data.isArticle && data.isBlog) {
 		data.latestArticles = data.articles.slice(0, 9);
-		data.articles = markFirstItem(data.articles.slice(9));
+		data.otherArticles = markFirstItem(data.articles.slice(9));
 	}
 
 	if (data.isBookshelf) {
 		data.latestBooks = data.books.slice(0, 9);
-		data.books = markFirstItem(data.books.slice(9));
+		data.otherBooks = markFirstItem(data.books.slice(9));
 	}
 
 	if (data.isLinks) {
 		data.latestLinks = data.links.slice(0, 9);
-		data.links = markFirstItem(data.links.slice(9));
+		data.otherLinks = markFirstItem(data.links.slice(9));
 	}
 
 	if (data.isStatuses) {
 		data.latestStatuses = data.statuses.slice(0, 9);
-		data.statuses = markFirstItem(data.statuses.slice(9));
+		data.otherStatuses = markFirstItem(data.statuses.slice(9));
 	}
 
 	if (data.isHome) {
-		data.articles = data.articles.slice(0, 6);
-		data.books = data.books.slice(0, 3);
-		data.links = data.links.slice(0, 6);
-		data.statuses = data.statuses.slice(0, 1);
+		data.homeArticles = data.articles.slice(0, 6);
+		data.homeBooks = data.books.slice(0, 3);
+		data.homeLinks = data.links.slice(0, 6);
+		data.homeStatuses = data.statuses.slice(0, 1);
 	}
 
 	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
