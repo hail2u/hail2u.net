@@ -206,6 +206,7 @@ const build = async (basic, partials, file) => {
 		data.homeArticles = data.articles.slice(0, 6);
 		data.homeBooks = data.books.slice(0, 3);
 		data.homeLinks = data.links.slice(0, 6);
+		data.homeProjects = data.projects.slice(0, 3);
 		data.homeStatuses = data.statuses.slice(0, 1);
 	}
 
@@ -220,6 +221,7 @@ const main = async () => {
 			articles,
 			books,
 			links,
+			projects,
 			statuses,
 			subscriptions
 		},
@@ -254,6 +256,7 @@ const main = async () => {
 		articles,
 		books,
 		links,
+		projects,
 		statuses,
 		subscriptions,
 		version: config.version
