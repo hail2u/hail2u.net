@@ -1,5 +1,5 @@
+import { XMLParser } from "fast-xml-parser";
 import config from "../config.js";
-import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
 import { globAsync } from "../lib/glob-async.js";
 import { guessPath } from "../lib/guess-path.js";
@@ -16,10 +16,11 @@ const cancelFetch = (abortController) => {
 };
 
 const parseXML = (xml) => {
-	const json = fastXMLParser.parse(xml, {
+	const parser = new XMLParser({
 		arrayMode: /^error$/iu,
-		ignoreNameSpace: true
+		removeNSPrefix: true
 	});
+	const json = parser.parse(xml);
 	return json.Envelope.Body.feedvalidationresponse.errors;
 };
 
