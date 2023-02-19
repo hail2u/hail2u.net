@@ -161,18 +161,6 @@ const mergeData = async (file, data) => {
 	};
 };
 
-const markFirstItem = (items) => {
-	const cloned = JSON.parse(JSON.stringify(items));
-	const firstItem = cloned.shift();
-	firstItem.isFirstInDate = true;
-	firstItem.isFirstInMonth = true;
-	firstItem.isFirstInYear = true;
-	return [
-		firstItem,
-		...cloned
-	];
-};
-
 const build = async (basic, partials, file) => {
 	const [
 		data,
@@ -181,26 +169,6 @@ const build = async (basic, partials, file) => {
 		mergeData(file, basic),
 		fs.readFile(file.template, "utf8")
 	]);
-
-	if (!data.isArticle && data.isBlog) {
-		data.latestArticles = data.articles.slice(0, 9);
-		data.otherArticles = markFirstItem(data.articles.slice(9));
-	}
-
-	if (data.isBookshelf) {
-		data.latestBooks = data.books.slice(0, 9);
-		data.otherBooks = markFirstItem(data.books.slice(9));
-	}
-
-	if (data.isLinks) {
-		data.latestLinks = data.links.slice(0, 9);
-		data.otherLinks = markFirstItem(data.links.slice(9));
-	}
-
-	if (data.isStatuses) {
-		data.latestStatuses = data.statuses.slice(0, 9);
-		data.otherStatuses = markFirstItem(data.statuses.slice(9));
-	}
 
 	if (data.isHome) {
 		data.homeArticles = data.articles.slice(0, 6);
