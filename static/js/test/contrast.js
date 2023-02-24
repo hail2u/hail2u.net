@@ -82,6 +82,31 @@ const testContrast_getScore = (background, foreground) => {
 	return testContrast_toScore(scaled);
 };
 
+/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
+const testContrast_getComponentLuminance = (color) => {
+	const sRGB = color / 255;
+
+	if (sRGB <= 0.03928) {
+		return sRGB / 12.92;
+	}
+
+	return ((sRGB + 0.055) / 1.055) ** 2.4;
+};
+
+const testContrast_getRelativeLuminance = ([red, green, blue]) =>
+	0.2126 * testContrast_getComponentLuminance(red) +
+	0.7152 * testContrast_getComponentLuminance(green) +
+	0.0722 * testContrast_getComponentLuminance(blue);
+
+/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
+const testContrast_getContrast = (foreground, background) => {
+	const backgroundLuminance = testContrast_getRelativeLuminance(background.match(/\d+/gu));
+	const foregroundLuminance = testContrast_getRelativeLuminance(foreground.match(/\d+/gu));
+	const lighter = Math.max(backgroundLuminance, foregroundLuminance);
+	const darker = Math.min(backgroundLuminance, foregroundLuminance);
+	return parseFloat((lighter + 0.05) / (darker + 0.05)).toFixed(3);
+};
+
 const testContrast = () => {
 	const queryColorCell = ".test-color > tbody > tr > td:nth-child(2)";
 	const colorCells = document.querySelectorAll(queryColorCell);
@@ -92,15 +117,16 @@ const testContrast = () => {
 		const foreground = style.getPropertyValue("color");
 		colorCell.lastChild.textContent = background;
 		const contrastCell = colorCell.nextElementSibling;
+		const ratio = testContrast_getContrast(foreground, background);
 
 		if (colorCell.classList.contains("js-test-color-flip")) {
 			const score = testContrast_getScore(foreground, background);
-			contrastCell.lastChild.textContent = `${score}`;
+			contrastCell.lastChild.textContent = `${score} (${ratio})`;
 			continue;
 		}
 
 		const score = testContrast_getScore(background, foreground);
-		contrastCell.lastChild.textContent = `${score}`;
+		contrastCell.lastChild.textContent = `${score} (${ratio})`;
 	}
 };
 
