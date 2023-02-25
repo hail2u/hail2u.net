@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.26.7.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.26.7.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.27.0.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.27.0.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="writebackの投稿されたコメントのマークアップをpでうまくどうにかするようにしてみました。うまいこと動いてる模様。" property="twitter:description">
@@ -28,34 +28,31 @@
 
 	<body>
 		<nav class="site-menu">
-			<ul>
-				<li><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></li>
-				<li>
-					<ul>
-						<li><a href="/statuses/">近ごろの様子</a></li>
-						<li><a href="/blog/">雑多な記録</a></li>
-						<li><a href="/projects/">行ってきた活動</a></li>
-						<li><a href="/links/">気になったウェブページ</a></li>
-						<li><a href="/bookshelf/">読み終えた書籍</a></li>
-					</ul>
-				</li>
-				<li>
-					<ul>
-						<li><a href="/about/">案内</a></li>
-						<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
+			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-		<header>
+			<div>
+				<ul>
+					<li><a href="/statuses/">近ごろの様子</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/projects/">行ってきた活動</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+
+				<ul>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</div>
+		</nav>
+		<header class="page-header">
 				<p class="date"><time datetime="2004-08-29T00:23:15+09:00">2004年8月29日</time></p>
 
 			<h1><b>Customize writeback plugin #11</b></h1>
 		</header>
 
 		<p><a href="http://www.blosxom.com/plugins/input/writeback.htm" title="blosxom :: the zen of blogging :: plugins/input/writeback.htm">writeback</a>の投稿されたコメントのマークアップを<code>p</code>でうまくどうにかするようにしてみました。うまいこと動いてる模様。</p>
-<p>実装的には単純で、予め改行をタブ文字（<code>\t</code>）に変換しておき、</p>
+<p>実装的には単純で、予め改行をタブ文字(<code>\t</code>)に変換しておき、</p>
 <pre><code class="language-perl">$str =~ s!\t{2,}!&lt;/p&gt;&lt;p&gt;!g;
 $str =~ s!\t!&lt;br /&gt;!g;
 $str = &quot;&lt;p&gt;$str&lt;/p&gt;&quot;;</code></pre>
@@ -64,20 +61,20 @@ $str = &quot;&lt;p&gt;$str&lt;/p&gt;&quot;;</code></pre>
 
 改行*1はbr要素に、改行*2以上はp要素に変換した上で、最後に全体をp要素で括るというありがちなもの。
 
-できるかな？
-できるかな？
-できるかな？
+できるかな？　
+できるかな？　
+できるかな？　
 
 writebackの新しいマークアップ機能のテストの終わり。</pre>
 <p>と、投稿すると、</p>
 <pre><code class="language-html">&lt;p&gt;writebackの新しいマークアップ機能のテストの始まり。&lt;/p&gt;
 &lt;p&gt;改行*1はbr要素に、改行*2以上はp要素に変換した上で、最後に全体をp要素で括るというありがちなもの。&lt;/p&gt;
-&lt;p&gt;できるかな？&lt;br /&gt;
-できるかな？&lt;br /&gt;
-できるかな？&lt;/p&gt;
+&lt;p&gt;できるかな？　&lt;br /&gt;
+できるかな？　&lt;br /&gt;
+できるかな？　&lt;/p&gt;
 &lt;p&gt;writebackの新しいマークアップ機能のテストの終わり。&lt;/p&gt;</code></pre>
-<p>となります（データファイル上では改行は消えます）。</p>
-<p>同時にテンプレにベタ書きしていた<code>p</code>要素を取っ払いました。そのため、今までのコメントを変換する必要がある（<code>p</code>要素で括られていないので）のですが、grepして置換するのすらメンドウなので、</p>
+<p>となります(データファイル上では改行は消えます)。</p>
+<p>同時にテンプレにベタ書きしていた<code>p</code>要素を取っ払いました。そのため、今までのコメントを変換する必要がある(<code>p</code>要素で括られていないので)のですが、grepして置換するのすらメンドウなので、</p>
 <pre><code class="language-perl">$param{&apos;comment&apos;} = &quot;&lt;p&gt;&quot; . $param{&apos;comment&apos;} . &quot;&lt;/p&gt;&quot; if $param{&apos;comment&apos;} !~ m!^&lt;p&gt;.+&lt;/p&gt;$!;</code></pre>
 <p>という<code>p</code>要素で括られていなかったら括るというコードで逃げました。ヒマな時にちゃんと変換して、このコードは外すようにしよう。</p>
 <p><a href="/archives/bsk.html" title="hail2u.net - Archives - blosxom starter kit">blosxom starter kit</a>にも導入したいところだけど、どうだろうな。互換性が失われるのが難。利点もコレといってないしなぁ。</p>
@@ -87,7 +84,7 @@ writebackの新しいマークアップ機能のテストの終わり。</pre>
 </section>
 
 		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
 			<ul>
 				<li><a href="/">ホーム</a></li>
@@ -100,12 +97,10 @@ writebackの新しいマークアップ機能のテストの終わり。</pre>
 
 			<ul>
 				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内の検索</a></li>
+				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
 			</ul>
-		</footer>
 
-		<nav class="back-to-top">
 			<p><a href="#top">🔝 トップに戻る</a></p>
-		</nav>
+		</footer>
 	</body>
 </html>

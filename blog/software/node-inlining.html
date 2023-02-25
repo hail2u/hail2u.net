@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.26.7.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.26.7.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.27.0.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.27.0.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="HTMLからlink要素で参照しているCSSの内容をstyle属性に全部展開するNode.jsパッケージ、node-inliningを書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。" property="twitter:description">
@@ -28,27 +28,24 @@
 
 	<body>
 		<nav class="site-menu">
-			<ul>
-				<li><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></li>
-				<li>
-					<ul>
-						<li><a href="/statuses/">近ごろの様子</a></li>
-						<li><a href="/blog/">雑多な記録</a></li>
-						<li><a href="/projects/">行ってきた活動</a></li>
-						<li><a href="/links/">気になったウェブページ</a></li>
-						<li><a href="/bookshelf/">読み終えた書籍</a></li>
-					</ul>
-				</li>
-				<li>
-					<ul>
-						<li><a href="/about/">案内</a></li>
-						<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
+			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-		<header>
+			<div>
+				<ul>
+					<li><a href="/statuses/">近ごろの様子</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/projects/">行ってきた活動</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+
+				<ul>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</div>
+		</nav>
+		<header class="page-header">
 				<p class="date"><time datetime="2015-06-05T00:57:20+09:00">2015年6月5日</time></p>
 
 			<h1><b>node-inlining</b></h1>
@@ -74,7 +71,7 @@ inlining(fs.readFileSync(&quot;input.html&quot;, &quot;utf8&quot;), function (re
 
 <ol>
 <li>HTMLコード</li>
-<li>HTMLファイルの（想定される）パス（省略可能）</li>
+<li>HTMLファイルの(想定される)パス(省略可能)</li>
 <li>コールバック</li>
 </ol>
 
@@ -110,7 +107,7 @@ inlining(fs.readFileSync(&quot;input.html&quot;, &quot;utf8&quot;), function (re
 
 <p>内部ではHTMLをパースしてDOM API群を提供してくれる<a href="https://github.com/tmpvar/jsdom">jsdomパッケージ</a>とおなじみCSSをパースしてくれる<a href="https://github.com/postcss/postcss">postcssパッケージ</a>を利用した。jsdomはその存在は知っていたものの、初めてまともに使った。概ね使いやすかったが、やはりバグとはいえないまでも、いくつか特徴的な挙動は持つようだ。</p>
 
-<p>例えばjsdomで<code>HTMLElement.style.cssText</code>を使うとノーマライズされてしまう。そのためベンダー拡張プリフィックス付きのプロパティーや存在しないプロパティー（<code>foo</code>とか）、そして未知のプロパティー（<code>font-feature-settings</code>プロパティーとか）がうまく追加できなかった。仕方がないので<code>Element.setAttribute()</code>を使って強引にそのまま設定している。</p>
+<p>例えばjsdomで<code>HTMLElement.style.cssText</code>を使うとノーマライズされてしまう。そのためベンダー拡張プリフィックス付きのプロパティーや存在しないプロパティー(<code>foo</code>とか)、そして未知のプロパティー(<code>font-feature-settings</code>プロパティーとか)がうまく追加できなかった。仕方がないので<code>Element.setAttribute()</code>を使って強引にそのまま設定している。</p>
 
 <p>また<code>querySelectorAll()</code>で<code>::-moz-selection</code>擬似要素を含むものなど不明なセレクターを投げるとブラウザーと同じように例外を吐く。ブラウザーではそのまま処理は続行されるが、Node.js上では当然落ちる。使いづらいが挙動としては正しそうなため、<code>try..catch</code>で握りつぶして無視した。</p>
 
@@ -137,7 +134,7 @@ jsdom.env(
 <p>とりあえず動くところまでという形で書いた。続きはわからないけれど、必要な機能はもうあまりなさそうだ。強いて言うのならHTMLファイル内の画像ファイルのDataURL化くらいだろうか。</p>
 
 		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
 			<ul>
 				<li><a href="/">ホーム</a></li>
@@ -150,12 +147,10 @@ jsdom.env(
 
 			<ul>
 				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内の検索</a></li>
+				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
 			</ul>
-		</footer>
 
-		<nav class="back-to-top">
 			<p><a href="#top">🔝 トップに戻る</a></p>
-		</nav>
+		</footer>
 	</body>
 </html>

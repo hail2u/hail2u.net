@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.26.7.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.26.7.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.27.0.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.27.0.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" property="twitter:description">
@@ -28,27 +28,24 @@
 
 	<body>
 		<nav class="site-menu">
-			<ul>
-				<li><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></li>
-				<li>
-					<ul>
-						<li><a href="/statuses/">近ごろの様子</a></li>
-						<li><a href="/blog/">雑多な記録</a></li>
-						<li><a href="/projects/">行ってきた活動</a></li>
-						<li><a href="/links/">気になったウェブページ</a></li>
-						<li><a href="/bookshelf/">読み終えた書籍</a></li>
-					</ul>
-				</li>
-				<li>
-					<ul>
-						<li><a href="/about/">案内</a></li>
-						<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
+			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-		<header>
+			<div>
+				<ul>
+					<li><a href="/statuses/">近ごろの様子</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/projects/">行ってきた活動</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+
+				<ul>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</div>
+		</nav>
+		<header class="page-header">
 				<p class="date"><time datetime="2020-05-05T09:59:32+09:00">2020年5月5日</time></p>
 
 			<h1><b>HTML Best PracticesのREADME*.mdを生成する仕組み</b></h1>
@@ -80,9 +77,9 @@
 	<li><code>index.js</code> ... 生成するスクリプト</li>
 </ul>
 
-<p><code>data.json</code>に、ローカライズ一覧（バリエーション）と目次（文書の構造）がくる。他には、ローカライズ不要な寄稿者や翻訳者のGitHub ID、ライセンスなどが含まれる。スクリプトが書きやすいように、この構造を決めた。</p>
+<p><code>data.json</code>に、ローカライズ一覧(バリエーション)と目次(文書の構造)がくる。他には、ローカライズ不要な寄稿者や翻訳者のGitHub ID、ライセンスなどが含まれる。スクリプトが書きやすいように、この構造を決めた。</p>
 
-<p>Node.jsで書くので、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">分割代入</a>でオブジェクトをマージしていくと、Mustacheで扱うデータができあがるようにしたかった。オブジェクトの配列が含まれる場合、分割代入でうまく扱うのが難しくなるため、英語用データをデフォルトに（<code>data.json</code>に含めるように）はしなかった。</p>
+<p>Node.jsで書くので、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">分割代入</a>でオブジェクトをマージしていくと、Mustacheで扱うデータができあがるようにしたかった。オブジェクトの配列が含まれる場合、分割代入でうまく扱うのが難しくなるため、英語用データをデフォルトに(<code>data.json</code>に含めるように)はしなかった。</p>
 
 <p>ファイル配置では、セクションごとにさらにディレクトリーを掘っても良さそうだったけど、そういうツリーの管理も<code>data.json</code>だけで済ませれば楽かなと思ってやめた。なのでプラクティスIDのディレクトリーがズラッと並び、その配下に<code>ja.md</code>というようなファイル名で、ローカライズされたプラクティスが配置される。</p>
 
@@ -94,7 +91,7 @@
 
 <p>GitHubの作る見出しIDは、それはそれは正しく機能するけど、目次は作ってくれない。今のNode.jsでは、正規表現でユニコード・プロパティー・エスケープが使えるので、完全な移植も可能だと思うし、実装もいくつか見つかる。けれど、ファイルを分けた場合、順序を管理する必要があるし、そのデータがあるなら、それを再利用した方が手っ取りばやいと思う。</p>
 
-<p>目次は、自分で考えたIDにジャンプするよう、リスト記法で並べる。本文では、見出しの末尾に空の<code>span</code>要素を追加し、それに考えたIDを振る（ここのIDはMarkdownレンダラーで処理されないので、Mustacheでエスケープされるように<code>{{...}}</code>で書く）。目次と本文で2回、同じセクションを回す。</p>
+<p>目次は、自分で考えたIDにジャンプするよう、リスト記法で並べる。本文では、見出しの末尾に空の<code>span</code>要素を追加し、それに考えたIDを振る(ここのIDはMarkdownレンダラーで処理されないので、Mustacheでエスケープされるように<code>{{...}}</code>で書く)。目次と本文で2回、同じセクションを回す。</p>
 
 <pre><code class="language-handlebars">{{#sections}}
 - [{{{title}}}](#{{{id}}})
@@ -114,7 +111,7 @@
 {{/practices}}
 {{/sections}}</code></pre>
 
-<p>IDを振った要素で見出しを括ってしまってもいいけど、それだとMarkdownとして読みづらくなるので、空要素にした。HTMLにすることを前提とした、こういったMarkdownはよくないと思うものの、GitHubのためならエンヤコラという感じだ。同時に、GitHubの見出しIDに依存しない（共存できる）ので、どこでHTMLにされても多分機能するという利点もある。</p>
+<p>IDを振った要素で見出しを括ってしまってもいいけど、それだとMarkdownとして読みづらくなるので、空要素にした。HTMLにすることを前提とした、こういったMarkdownはよくないと思うものの、GitHubのためならエンヤコラという感じだ。同時に、GitHubの見出しIDに依存しない(共存できる)ので、どこでHTMLにされても多分機能するという利点もある。</p>
 
 <hr>
 
@@ -123,7 +120,7 @@
 <p>あわせて、<a href="/documents/html-best-practices.html">普通のHTMLの書き方</a>としてここで公開している長い方は、<a href="https://github.com/hail2u/html-best-practices-ja-detailed">別のリポジトリー</a>に分けた。こっちも似たような仕組みで生成するようになっていて、Markdownファイルも作るようになり、逆にGitHubでも一気に読めるようになった。</p>
 
 		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
 			<ul>
 				<li><a href="/">ホーム</a></li>
@@ -136,12 +133,10 @@
 
 			<ul>
 				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内の検索</a></li>
+				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
 			</ul>
-		</footer>
 
-		<nav class="back-to-top">
 			<p><a href="#top">🔝 トップに戻る</a></p>
-		</nav>
+		</footer>
 	</body>
 </html>

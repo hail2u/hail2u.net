@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.26.7.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.26.7.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.27.0.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.27.0.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="0の値の場合に短い単位を採用するという処理は単純に実装できるが、0でない値の場合はそれなりに面倒くさい。単純に考えれば愚直に単位の変換を行い一番短いものを採用するという形で良いが、それだとかなりコストがかかるだろう。つまり変換すると短くなるケースをある程度想定しなければならない。" property="twitter:description">
@@ -28,27 +28,24 @@
 
 	<body>
 		<nav class="site-menu">
-			<ul>
-				<li><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></li>
-				<li>
-					<ul>
-						<li><a href="/statuses/">近ごろの様子</a></li>
-						<li><a href="/blog/">雑多な記録</a></li>
-						<li><a href="/projects/">行ってきた活動</a></li>
-						<li><a href="/links/">気になったウェブページ</a></li>
-						<li><a href="/bookshelf/">読み終えた書籍</a></li>
-					</ul>
-				</li>
-				<li>
-					<ul>
-						<li><a href="/about/">案内</a></li>
-						<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
+			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-		<header>
+			<div>
+				<ul>
+					<li><a href="/statuses/">近ごろの様子</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/projects/">行ってきた活動</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+
+				<ul>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</div>
+		</nav>
+		<header class="page-header">
 				<p class="date"><time datetime="2016-06-24T10:19:55+09:00">2016年6月24日</time></p>
 
 			<h1><b>時間と角度をより短い単位へ</b></h1>
@@ -79,7 +76,7 @@
 <section>
 <h2>角度</h2>
 
-<p>角度は<code>rad</code>単位と<code>turn</code>単位は短くなる可能性はあまりない（後述）。<code>deg</code>単位は小数点が必要なく、概ね短くなりやすいので、これまた変換する必要はない。つまり短くなる可能性が高いのは<code>grad</code>単位だけになる。</p>
+<p>角度は<code>rad</code>単位と<code>turn</code>単位は短くなる可能性はあまりない(後述)。<code>deg</code>単位は小数点が必要なく、概ね短くなりやすいので、これまた変換する必要はない。つまり短くなる可能性が高いのは<code>grad</code>単位だけになる。</p>
 
 <p><code>grad</code>単位は<code>400</code>で一周する。つまり<code>400grad</code>が<code>360deg</code>と等しいわけだ。小数の場合は変換すると問題が起こりそうなので、実際には整数の値を持つ<code>grad</code>単位のことだけを考えれば良いだろう。短くなるパターンを頭の中だけで考えてみるのも難しいので、愚直に調査することにした。以下は<code>deg</code>単位に変換した方が短くなった場合のみ列挙するコードだ。</p>
 
@@ -108,7 +105,7 @@ for (var i = 0; i &lt;=400; i++) {
 
 <p>例外はこちらにもある。それは<code>360deg</code>や<code>1200grad</code>のような場合だ。この場合は<code>turn</code>単位を使うと<code>1turn</code>なり<code>3turn</code>なり書けるため、何文字かの節約になる。</p>
 
-<p>ベースが円周率である<code>rad</code>単位ではどう書かれていてもどう計算しても小数点以下が多くなるので、うまく短くなることはないだろう。<code>turn</code>単位に関しては<code>.25turn</code>は<code>90deg</code>へと短く変換できる。小数点以下3桁までに限って整数の<code>deg</code>単位に変換できる場合はそうする、というのが良さそうだ……と、ここまで考えて<code>turn</code>単位はサポートが怪しい（Android 2辺りが危険）ことがわかった。先の整数のパターンも含めて、この<code>turn</code>単位へ変換するのはまずいようだ。</p>
+<p>ベースが円周率である<code>rad</code>単位ではどう書かれていてもどう計算しても小数点以下が多くなるので、うまく短くなることはないだろう。<code>turn</code>単位に関しては<code>.25turn</code>は<code>90deg</code>へと短く変換できる。小数点以下3桁までに限って整数の<code>deg</code>単位に変換できる場合はそうする、というのが良さそうだ……と、ここまで考えて<code>turn</code>単位はサポートが怪しい(Android 2辺りが危険)ことがわかった。先の整数のパターンも含めて、この<code>turn</code>単位へ変換するのはまずいようだ。</p>
 </section>
 
 <hr>
@@ -118,7 +115,7 @@ for (var i = 0; i &lt;=400; i++) {
 <p>もう少し寝かせたら<a href="https://github.com/hail2u/node-csswring">CSSWring</a>へ取り込むことにした。多少、想定が甘いところがあるようなので、もう少し見守ってやる必要がありそうだ。</p>
 
 		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
 			<ul>
 				<li><a href="/">ホーム</a></li>
@@ -131,12 +128,10 @@ for (var i = 0; i &lt;=400; i++) {
 
 			<ul>
 				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内の検索</a></li>
+				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
 			</ul>
-		</footer>
 
-		<nav class="back-to-top">
 			<p><a href="#top">🔝 トップに戻る</a></p>
-		</nav>
+		</footer>
 	</body>
 </html>

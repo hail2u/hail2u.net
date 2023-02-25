@@ -16,8 +16,8 @@
 		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
 		<meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.9.26.7.css" media="only print" rel="stylesheet">
-		<link href="/css/index.9.26.7.css" media="only screen" rel="stylesheet">
+		<link href="/css/print.9.27.0.css" media="only print" rel="stylesheet">
+		<link href="/css/index.9.27.0.css" media="only screen" rel="stylesheet">
 
 		<meta content="summary" name="twitter:card">
 		<meta content="Amazon E-Commerce Service 4.0のXSLTサービスを利用してJSONに整形するというひとつ前のエントリでのアイディアを利用した和書ストアのAmazon.co.jpを検索をするSIXTY-SIXってものを作ってみました。作ってみただけ・・・ですが、一応あまりメジャーでない感じのJavaScriptテクニックも使ったりしたのでそれの紹介も兼ねてエントリってみた。" property="twitter:description">
@@ -28,27 +28,24 @@
 
 	<body>
 		<nav class="site-menu">
-			<ul>
-				<li><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></li>
-				<li>
-					<ul>
-						<li><a href="/statuses/">近ごろの様子</a></li>
-						<li><a href="/blog/">雑多な記録</a></li>
-						<li><a href="/projects/">行ってきた活動</a></li>
-						<li><a href="/links/">気になったウェブページ</a></li>
-						<li><a href="/bookshelf/">読み終えた書籍</a></li>
-					</ul>
-				</li>
-				<li>
-					<ul>
-						<li><a href="/about/">案内</a></li>
-						<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
+			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-		<header>
+			<div>
+				<ul>
+					<li><a href="/statuses/">近ごろの様子</a></li>
+					<li><a href="/blog/">雑多な記録</a></li>
+					<li><a href="/projects/">行ってきた活動</a></li>
+					<li><a href="/links/">気になったウェブページ</a></li>
+					<li><a href="/bookshelf/">読み終えた書籍</a></li>
+				</ul>
+
+				<ul>
+					<li><a href="/about/">案内</a></li>
+					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+				</ul>
+			</div>
+		</nav>
+		<header class="page-header">
 				<p class="date"><time datetime="2005-08-27T11:00:10+09:00">2005年8月27日</time></p>
 
 			<h1><b>SIXTY-SIXとかいうの</b></h1>
@@ -56,7 +53,7 @@
 
 		<p><a href="https://www.amazon.com/gp/browse.html?node=3435361" title="Amazon.com: Web Services">Amazon E-Commerce Service 4.0</a>のXSLTサービスを利用してJSONに整形するという<a href="/blog/coding/ecs4_to_feed_and_json.html" title="hail2u.net - Weblog - Amazon ECS 4.0のXMLからフィードやJSONに">ひとつ前のエントリ</a>でのアイディアを利用した<del>和書ストアの</del>Amazon.co.jpを検索をするSIXTY-SIXってものを作ってみました。作ってみただけ・・・ですが、一応あまりメジャーでない感じのJavaScriptテクニックも使ったりしたのでそれの紹介も兼ねてエントリってみた。</p>
 <p><a href="http://www.crockford.com/JSON/" title="Introducing JSON">JSON</a>への変換は<a href="http://www.w3.org/TR/xslt" title="XSL Transformations (XSLT)">XSLT</a>がなんとなくわかってれば簡単です。注意するのはちゃんと値が帰ってきているかチェックしてやることくらい。前回のエントリでも言及したように、<code>ContentType</code>パラメータで<code>text-javascript</code>も指定するのも忘れずに。</p>
-<p>問題はどうやってそのJSONに整形された検索結果を動的に（フォームに入力されたキーワードに合わせて）受け取ってやるかってことです。どうやるかというとJSONに整形されているので<code>script</code>要素で読み込んでやれば良いわけです。つまり、</p>
+<p>問題はどうやってそのJSONに整形された検索結果を動的に(フォームに入力されたキーワードに合わせて)受け取ってやるかってことです。どうやるかというとJSONに整形されているので<code>script</code>要素で読み込んでやれば良いわけです。つまり、</p>
 <pre><code class="language-js">var s = document.createElement(&quot;script&quot;);
 s.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
 s.setAttribute(&apos;src&apos;, &apos;http://webservices.amazon.co.jp/...&amp;Keywords=&apos; + q);
@@ -69,11 +66,11 @@ s.setAttribute(&apos;type&apos;, &apos;text/javascript&apos;);
 s.setAttribute(&apos;src&apos;, &apos;http://webservices.amazon.co.jp/...&amp;Keywords=&apos; + q);
 <em>s.addEventListener(&apos;load&apos;, showResults, true);</em>
 document.body.appendChild(s);</code></pre>
-<p>と、<code>script</code>要素の<code>load</code>イベントに、結果をHTMLとして表示する関数を登録してやると、JSONに整形された結果を受け取った後に<code>showResults()</code>が実行されるようになります。<a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>では。このテクニックは<a href="http://tokyoenvious.xrea.jp/b/" title="weblog | 東京嫉妬">JavaScriptマイスターの人</a>のスクリプトを見て知りました。モテメン！モテメン！</p>
+<p>と、<code>script</code>要素の<code>load</code>イベントに、結果をHTMLとして表示する関数を登録してやると、JSONに整形された結果を受け取った後に<code>showResults()</code>が実行されるようになります。<a href="http://www.mozilla.org/products/firefox/" title="Firefox - Rediscover the web">Firefox</a>では。このテクニックは<a href="http://tokyoenvious.xrea.jp/b/" title="weblog | 東京嫉妬">JavaScriptマイスターの人</a>のスクリプトを見て知りました。モテメン！　モテメン！</p>
 <p>Amazonの検索ならXSLT+JavaScriptでガンガン作れちゃいますよ？　とかそういう話でした。</p>
 <section>
 <h2>追記</h2>
-<p><code>SearchIndex</code>を<code>Blended</code>にして、なんとなく全体から検索できるようにしたつもり。ていうかBlendedダメダメすぎてヤバイ。他にもハッシュにクエリをプットしたり、HTMLを読み込んだ時にハッシュに何か文字列が指定されていたら自動的にその検索を実行したりするようにとか。XSLTスタイルシートもBlended用に書き換えてみたりもしました。JSONの出力の仕方は、アーティスト（Artist)とか著者（Author)とかその他諸々の情報をいちいち考えるのが面倒なので、見つかった重要そうな情報を添え字なしで<code>Details</code>というリストに放り込んでみました。ちょっとずるい感じ。</p>
+<p><code>SearchIndex</code>を<code>Blended</code>にして、なんとなく全体から検索できるようにしたつもり。ていうかBlendedダメダメすぎてヤバイ。他にもハッシュにクエリをプットしたり、HTMLを読み込んだ時にハッシュに何か文字列が指定されていたら自動的にその検索を実行したりするようにとか。XSLTスタイルシートもBlended用に書き換えてみたりもしました。JSONの出力の仕方は、アーティスト(Artist)とか著者(Author)とかその他諸々の情報をいちいち考えるのが面倒なので、見つかった重要そうな情報を添え字なしで<code>Details</code>というリストに放り込んでみました。ちょっとずるい感じ。</p>
 </section>
 <section>
 <h2>追記 #2</h2>
@@ -86,7 +83,7 @@ document.body.appendChild(s);</code></pre>
 </section>
 
 		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>（<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>）や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
 			<ul>
 				<li><a href="/">ホーム</a></li>
@@ -99,12 +96,10 @@ document.body.appendChild(s);</code></pre>
 
 			<ul>
 				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">ウェブサイト内の検索</a></li>
+				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
 			</ul>
-		</footer>
 
-		<nav class="back-to-top">
 			<p><a href="#top">🔝 トップに戻る</a></p>
-		</nav>
+		</footer>
 	</body>
 </html>
