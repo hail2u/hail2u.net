@@ -23,7 +23,7 @@ const main = async () => {
 	await outputJSONFile(file, [
 		{
 			description: text,
-			link: `/statuses/#on-${published}`,
+			link: `/statuses/#${published}`,
 			published,
 			...dt,
 			title: text,
