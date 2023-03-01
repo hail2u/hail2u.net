@@ -5,9 +5,9 @@ import {
 import config from "../config.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
-import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
+import util from "node:util";
 
 const main = async () => {
 	const {
@@ -16,7 +16,7 @@ const main = async () => {
 			title,
 			url
 		}
-	} = parseArgs({
+	} = util.parseArgs({
 		options: {
 			comment: {
 				short: "c",

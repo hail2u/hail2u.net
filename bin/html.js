@@ -5,9 +5,9 @@ import { globAsync } from "../lib/glob-async.js";
 import { guessPath } from "../lib/guess-path.js";
 import mustache from "mustache";
 import { outputFile } from "../lib/output-file.js";
-import { parseArgs } from "node:util";
 import path from "node:path";
 import { readJSONFile } from "../lib/json-file.js";
+import util from "node:util";
 
 const isFirstInDate = (current, previous) => {
 	if (!previous || current.date !== previous.date) {
@@ -205,7 +205,7 @@ const main = async () => {
 		readJSONFile(path.join(config.src.metadata, "global.json")),
 		readAllData(),
 		readPartials(),
-		parseArgs({
+		util.parseArgs({
 			options: {
 				all: {
 					short: "a",

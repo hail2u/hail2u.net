@@ -3,10 +3,10 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../config.js";
-import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import { shuffleArray } from "../lib/shuffle-array.js";
+import util from "node:util";
 
 const isSubscribed = (url, subscription) => url === subscription.url;
 
@@ -17,7 +17,7 @@ const main = async () => {
 			title,
 			url
 		}
-	} = parseArgs({
+	} = util.parseArgs({
 		options: {
 			feed: {
 				short: "f",

@@ -1,10 +1,7 @@
-import {
-	Ico,
-	IcoImage
-} from "@fiahfy/ico";
 import config from "../config.js";
+import ico from "@fiahfy/ico";
 import { outputFile } from "../lib/output-file.js";
-import path from "path";
+import path from "node:path";
 import sharp from "sharp";
 
 const generatePNG = async (src, width) => {
@@ -17,7 +14,7 @@ const generatePNG = async (src, width) => {
 
 const appendTo = async (favicon, img) => {
 	const png = await img.png().toBuffer();
-	favicon.append(IcoImage.fromPNG(png));
+	favicon.append(ico.IcoImage.fromPNG(png));
 };
 
 const main = async () => {
@@ -26,7 +23,7 @@ const main = async () => {
 		touchIcon,
 		...icons
 	] = await Promise.all([
-		new Ico(),
+		new ico.Ico(),
 		generatePNG(config.src.icon, 180),
 		generatePNG(config.src.icon, 16),
 		generatePNG(config.src.icon, 24),

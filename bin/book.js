@@ -6,10 +6,10 @@ import config from "../config.js";
 import { escapeCharacters } from "../lib/character-reference.js";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
-import { parseArgs } from "node:util";
 import path from "node:path";
 import { runCommand } from "../lib/run-command.js";
 import sharp from "sharp";
+import util from "node:util";
 
 const isReadBook = (title, book) => title === book.title;
 
@@ -23,7 +23,7 @@ const main = async () => {
 			asin,
 			title
 		}
-	} = parseArgs({
+	} = util.parseArgs({
 		options: {
 			asin: {
 				short: "a",

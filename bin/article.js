@@ -12,7 +12,6 @@ import {
 	readJSONFile
 } from "../lib/json-file.js";
 import config from "../config.js";
-import { constants } from "node:fs";
 import fs from "node:fs/promises";
 import { getDateDetails } from "../lib/get-date-details.js";
 import { openTwitter } from "../lib/open-twitter.js";
@@ -31,7 +30,7 @@ const checkNameConflict = async (name) => {
 	const file = path.join(config.dest.article, `${name}.html`);
 
 	try {
-		await fs.access(file, constants.F_OK);
+		await fs.access(file, fs.constants.F_OK);
 	} catch (e) {
 		return true;
 	}
