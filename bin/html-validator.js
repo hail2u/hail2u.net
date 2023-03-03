@@ -42,7 +42,7 @@ const main = async () => {
 		sitemap
 	] = await Promise.all([
 		readJSONFile(path.join(config.src.metadata, "global.json")),
-		fs.readFile(config.dest.sitemap, "utf8")
+		fs.readFile(path.join(config.dest.root, "sitemap.xml"), "utf8")
 	]);
 	const prefix = `${scheme}://${domain}`;
 	const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");

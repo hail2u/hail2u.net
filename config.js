@@ -9,8 +9,7 @@ const {
 export default {
 	dest: {
 		article: "dist/blog/",
-		root: "dist/",
-		sitemap: "dist/sitemap.xml"
+		root: "dist/"
 	},
 	name,
 	src: {
