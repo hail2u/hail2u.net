@@ -1,3 +1,5 @@
+/* layout.js | MIT License */
+
 const testLayout = () => {
 	document.body.classList.toggle("js-test-layout");
 };
