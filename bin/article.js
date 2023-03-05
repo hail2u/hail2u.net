@@ -1,24 +1,24 @@
 import {
 	escapeCharacters,
 	unescapeReferences
-} from "../lib/character-reference.js";
+} from "./lib/character-reference.js";
 import {
 	formatMessage,
 	validateHTML,
 	writeErrors
-} from "../lib/validate-html.js";
+} from "./lib/validate-html.js";
 import {
 	outputJSONFile,
 	readJSONFile
-} from "../lib/json-file.js";
+} from "./lib/json-file.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
-import { getDateDetails } from "../lib/get-date-details.js";
-import { openTwitter } from "../lib/open-twitter.js";
-import { outputFile } from "../lib/output-file.js";
+import { getDateDetails } from "./lib/get-date-details.js";
+import { openTwitter } from "./lib/open-twitter.js";
+import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
-import { runCommand } from "../lib/run-command.js";
-import { selectDraft } from "../lib/select-draft.js";
+import { runCommand } from "./lib/run-command.js";
+import { selectDraft } from "./lib/select-draft.js";
 
 const checkIDFormat = (id) => {
 	if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {

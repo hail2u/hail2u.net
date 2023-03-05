@@ -2,12 +2,12 @@ import {
 	formatMessage,
 	validateHTML,
 	writeErrors
-} from "../lib/validate-html.js";
+} from "./lib/validate-html.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readJSONFile } from "../lib/json-file.js";
-import { shuffleArray } from "../lib/shuffle-array.js";
+import { readJSONFile } from "./lib/json-file.js";
+import { shuffleArray } from "./lib/shuffle-array.js";
 
 const rewritePath = ([
 		,

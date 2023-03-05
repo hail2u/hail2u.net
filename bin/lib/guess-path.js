@@ -1,4 +1,4 @@
-import config from "../config.js";
+import config from "../../config.js";
 import path from "node:path";
 
 const guessPath = (template, dir, filename) => {

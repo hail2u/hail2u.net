@@ -1,12 +1,12 @@
 import {
 	outputJSONFile,
 	readJSONFile
-} from "../lib/json-file.js";
+} from "./lib/json-file.js";
 import config from "../config.js";
-import { getDateDetails } from "../lib/get-date-details.js";
-import { openTwitter } from "../lib/open-twitter.js";
+import { getDateDetails } from "./lib/get-date-details.js";
+import { openTwitter } from "./lib/open-twitter.js";
 import path from "node:path";
-import { runCommand } from "../lib/run-command.js";
+import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
 
 const main = async () => {

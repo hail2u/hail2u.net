@@ -1,12 +1,12 @@
 import config from "../config.js";
-import { escapeCharacters } from "../lib/character-reference.js";
+import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
-import { globAsync } from "../lib/glob-async.js";
-import { guessPath } from "../lib/guess-path.js";
+import { globAsync } from "./lib/glob-async.js";
+import { guessPath } from "./lib/guess-path.js";
 import mustache from "mustache";
-import { outputFile } from "../lib/output-file.js";
+import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
-import { readJSONFile } from "../lib/json-file.js";
+import { readJSONFile } from "./lib/json-file.js";
 
 const toFilesFormat = (file) => ({
 	dest: guessPath(file, config.dest.root, "feed"),

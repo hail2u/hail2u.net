@@ -1,8 +1,8 @@
 import config from "../config.js";
 import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
-import { globAsync } from "../lib/glob-async.js";
-import { guessPath } from "../lib/guess-path.js";
+import { globAsync } from "./lib/glob-async.js";
+import { guessPath } from "./lib/guess-path.js";
 
 const toDest = (file) => guessPath(file, config.dest.root, "feed");
 

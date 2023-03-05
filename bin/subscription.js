@@ -1,11 +1,11 @@
 import {
 	outputJSONFile,
 	readJSONFile
-} from "../lib/json-file.js";
+} from "./lib/json-file.js";
 import config from "../config.js";
 import path from "node:path";
-import { runCommand } from "../lib/run-command.js";
-import { shuffleArray } from "../lib/shuffle-array.js";
+import { runCommand } from "./lib/run-command.js";
+import { shuffleArray } from "./lib/shuffle-array.js";
 import util from "node:util";
 
 const isSubscribed = (url, subscription) => url === subscription.url;

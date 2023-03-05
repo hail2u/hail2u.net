@@ -2,16 +2,16 @@ import {
 	formatMessage,
 	validateHTML,
 	writeErrors
-} from "../lib/validate-html.js";
+} from "./lib/validate-html.js";
 import config from "../config.js";
-import { escapeCharacters } from "../lib/character-reference.js";
+import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
 import mustache from "mustache";
 import os from "node:os";
-import { outputFile } from "../lib/output-file.js";
+import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
-import { runCommand } from "../lib/run-command.js";
-import { selectDraft } from "../lib/select-draft.js";
+import { runCommand } from "./lib/run-command.js";
+import { selectDraft } from "./lib/select-draft.js";
 
 const rebuildDraft = ({
 	body,

@@ -1,4 +1,4 @@
-import config from "../config.js";
+import config from "../../config.js";
 import fs from "node:fs/promises";
 import readline from "node:readline/promises";
 import { unescapeReferences } from "./character-reference.js";

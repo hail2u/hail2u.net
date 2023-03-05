@@ -1,10 +1,16 @@
-import { readJSONFile } from "./lib/json-file.js";
+import fs from "node:fs/promises";
 
-const pkg = new URL("./package.json", import.meta.url);
+const file = new URL("./package.json", import.meta.url);
+const json = await fs.readFile(file, "utf8");
 const {
 	name,
 	version
-} = await readJSONFile(pkg);
+} = await JSON.parse(json);
+
+// import {
+// 	name,
+// 	version
+// } from './package.json' assert { type: 'json' };
 
 export default {
 	dest: {
