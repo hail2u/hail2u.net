@@ -1,16 +1,17 @@
-// https://github.com/Myndex/SAPC-APCA#the-plain-english-steps-are
-// 0.98d12e
+/* contrast.js | MIT License */
+
+// https://github.com/Myndex/apca-w3#apca-w3-basic-math-srgb
 const testContrast_linearizeColorComponent = (val) => (val / 255.0) ** 2.4;
 
 const testContrast_clampLuminance = (luminance) => {
-	const blkThrs = 0.03;
-	const blkClmp = 1.45;
+	const blkThrs = 0.022;
+	const blkClmp = 1.414;
 
-	if (luminance > blkThrs) {
+	if (luminance >= blkThrs) {
 		return luminance;
 	}
 
-	return Math.abs(blkThrs - luminance) ** blkClmp + luminance;
+	return luminance + Math.abs(blkThrs - luminance) ** blkClmp;
 };
 
 const testContrast_getLuminance = (color) => {
@@ -28,28 +29,26 @@ const testContrast_getLuminance = (color) => {
 
 const testContrast_getPerceptualContrast = (backgroundLuminance, foregroundLuminance) => {
 	const deltaYmin = 0.0005;
-	const scale = 1.25;
+	const scale = 1.14;
 
 	if (Math.abs(backgroundLuminance - foregroundLuminance) < deltaYmin) {
 		return 0.0;
 	}
 
 	if (backgroundLuminance > foregroundLuminance) {
-		return (backgroundLuminance ** 0.55 - foregroundLuminance ** 0.58) * scale;
+		return (backgroundLuminance ** 0.56 - foregroundLuminance ** 0.57) * scale;
 	}
 
 	if (backgroundLuminance < foregroundLuminance) {
-		return (backgroundLuminance ** 0.62 - foregroundLuminance ** 0.57) * scale;
+		return (backgroundLuminance ** 0.65 - foregroundLuminance ** 0.62) * scale;
 	}
 
 	return 0.0;
 };
 
 const testContrast_scaleContrast = (contrast) => {
-	const loClip = 0.001;
-	const loConThresh = 0.078;
-	const loConFactor = 1 / loConThresh;
-	const loConOffset = 0.06;
+	const loClip = 0.1;
+	const loConOffset = 0.027;
 
 	const absContrast = Math.abs(contrast);
 
@@ -57,32 +56,26 @@ const testContrast_scaleContrast = (contrast) => {
 		return 0.0;
 	}
 
-	if (absContrast <= loConThresh) {
-		return contrast - contrast * loConFactor * loConOffset;
-	}
-
-	if (contrast > loConThresh) {
+	if (contrast > 0) {
 		return contrast - loConOffset;
 	}
 
-	if (contrast < 0 - loConThresh) {
+	if (contrast < 0) {
 		return contrast + loConOffset;
 	}
 
 	return 0.0;
 };
 
-const testContrast_toScore = (float) => (float * 100).toFixed(3);
-
 const testContrast_getScore = (background, foreground) => {
 	const backgroundLuminance = testContrast_getLuminance(background);
 	const foregroundLuminance = testContrast_getLuminance(foreground);
 	const contrast = testContrast_getPerceptualContrast(backgroundLuminance, foregroundLuminance);
 	const scaled = testContrast_scaleContrast(contrast);
-	return testContrast_toScore(scaled);
+	return (scaled * 100).toFixed(3);
 };
 
-/* https://www.w3.org/TR/WCAG21/#dfn-relative-luminance */
+// https://www.w3.org/TR/WCAG21/#dfn-relative-luminance
 const testContrast_getComponentLuminance = (color) => {
 	const sRGB = color / 255;
 
@@ -98,7 +91,7 @@ const testContrast_getRelativeLuminance = ([red, green, blue]) =>
 	0.7152 * testContrast_getComponentLuminance(green) +
 	0.0722 * testContrast_getComponentLuminance(blue);
 
-/* https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio */
+// https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio
 const testContrast_getContrast = (foreground, background) => {
 	const backgroundLuminance = testContrast_getRelativeLuminance(background.match(/\d+/gu));
 	const foregroundLuminance = testContrast_getRelativeLuminance(foreground.match(/\d+/gu));
