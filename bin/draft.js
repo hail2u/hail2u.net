@@ -36,7 +36,7 @@ const main = async () => {
     template
   ] = await Promise.all([
     makeTempDir(),
-    fs.readFile(path.join(config.dir.template, config.file.template.test), "utf8"),
+    fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8"),
     validateBody(selected.body, config.file.draft)
   ]);
   const test = path.join(tempDir, "test.html");

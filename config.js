@@ -8,10 +8,7 @@ export default {
     template: "templates/"
 	},
 	file: {
-    draft: "drafts.html",
-    template: {
-      test: "templates/blog/_test.mustache"
-    }
+    draft: "drafts.html"
 	},
 	name: pkg.name,
 	version: pkg.version
