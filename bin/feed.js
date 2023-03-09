@@ -9,116 +9,116 @@ import path from "node:path";
 import { readJSONFile } from "./lib/json-file.js";
 
 const toFilesFormat = (file) => ({
-	dest: guessPath(file, config.dest.root, "feed"),
-	metadata: guessPath(file, config.src.metadata, "index.json"),
-	template: file
+  dest: guessPath(file, config.dest.root, "feed"),
+  metadata: guessPath(file, config.src.metadata, "index.json"),
+  template: file
 });
 
 const gatherFiles = async () => {
-	const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
-	return Promise.all(files.map(toFilesFormat));
+  const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+  return Promise.all(files.map(toFilesFormat));
 };
 
 const toAbsoluteURL = (prefix, url) => {
-	if (!url.startsWith("/")) {
-		return url;
-	}
+  if (!url.startsWith("/")) {
+    return url;
+  }
 
-	return `${prefix}${url}`;
+  return `${prefix}${url}`;
 };
 
 const toAbsoluteURLAll = (prefix, match, attr, url) => {
-	const absoluteURL = toAbsoluteURL(prefix, url);
-	return `${attr}="${absoluteURL}"`;
+  const absoluteURL = toAbsoluteURL(prefix, url);
+  return `${attr}="${absoluteURL}"`;
 };
 
 const extendItem = (prefix, item) => {
-	const link = toAbsoluteURL(prefix, item.link);
+  const link = toAbsoluteURL(prefix, item.link);
 
-	if (item.body) {
-		const urlRe = /(href|src)="(\/.*?)"/gu;
-		return {
-			...item,
-			body: item.body.replace(urlRe, toAbsoluteURLAll.bind(null, prefix)),
-			link
-		};
-	}
+  if (item.body) {
+    const urlRe = /(href|src)="(\/.*?)"/gu;
+    return {
+      ...item,
+      body: item.body.replace(urlRe, toAbsoluteURLAll.bind(null, prefix)),
+      link
+    };
+  }
 
-	return {
-		...item,
-		link
-	};
+  return {
+    ...item,
+    link
+  };
 };
 
 const readData = async (prefix, dataFile) => {
-	const basename = path.basename(dataFile, ".json");
-	const data = await readJSONFile(dataFile);
-	const latest = data.slice(0, 10);
-	const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
-	return { [ basename ]: extended };
+  const basename = path.basename(dataFile, ".json");
+  const data = await readJSONFile(dataFile);
+  const latest = data.slice(0, 10);
+  const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
+  return { [ basename ]: extended };
 };
 
 const readLatestData = async (prefix) => {
-	const dataFiles = await globAsync(`${config.src.data}**/*.json`);
-	const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
-	return Object.assign(...data);
+  const dataFiles = await globAsync(`${config.src.data}**/*.json`);
+  const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
+  return Object.assign(...data);
 };
 
 const mergeData = async (file, metadata, data) => {
-	const overrides = await readJSONFile(file.metadata);
-	return {
-		...metadata,
-		...data,
-		...overrides
-	};
+  const overrides = await readJSONFile(file.metadata);
+  return {
+    ...metadata,
+    ...data,
+    ...overrides
+  };
 };
 
 const build = async (metadata, data, file) => {
-	const [
-		merged,
-		template
-	] = await Promise.all([
-		mergeData(file, metadata, data),
-		fs.readFile(file.template, "utf8")
-	]);
-	const rendered = mustache.render(template, merged, null, { escape: escapeCharacters });
-	await outputFile(file.dest, rendered);
+  const [
+    merged,
+    template
+  ] = await Promise.all([
+    mergeData(file, metadata, data),
+    fs.readFile(file.template, "utf8")
+  ]);
+  const rendered = mustache.render(template, merged, null, { escape: escapeCharacters });
+  await outputFile(file.dest, rendered);
 };
 
 const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-	const metadata = await readJSONFile(path.join(config.src.metadata, "root.json"));
-	const prefix = `${metadata.scheme}://${metadata.domain}`;
-	const [
-		files,
-		{
-			articles,
-			books,
-			links,
-			statuses
-		}
-	] = await Promise.all([
-		gatherFiles(),
-		readLatestData(prefix)
-	]);
-	return Promise.all(files.map(build.bind(null, metadata, {
-		articles,
-		books,
-		items: [
-			...articles,
-			...books,
-			...links,
-			...statuses
-		].sort(comparePublished)
-			.slice(0, 10),
-		links,
-		statuses
-	})));
+  const metadata = await readJSONFile(path.join(config.src.metadata, "root.json"));
+  const prefix = `${metadata.scheme}://${metadata.domain}`;
+  const [
+    files,
+    {
+      articles,
+      books,
+      links,
+      statuses
+    }
+  ] = await Promise.all([
+    gatherFiles(),
+    readLatestData(prefix)
+  ]);
+  return Promise.all(files.map(build.bind(null, metadata, {
+    articles,
+    books,
+    items: [
+      ...articles,
+      ...books,
+      ...links,
+      ...statuses
+    ].sort(comparePublished)
+      .slice(0, 10),
+    links,
+    statuses
+  })));
 };
 
 main().catch((e) => {
-	/* eslint-disable-next-line no-console */
-	console.trace(e);
-	process.exitCode = 1;
+  /* eslint-disable-next-line no-console */
+  console.trace(e);
+  process.exitCode = 1;
 });

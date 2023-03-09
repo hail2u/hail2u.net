@@ -1,17 +1,17 @@
 const characters = {
-	'"': "&quot;",
-	"&": "&amp;",
-	"'": "&apos;",
-	"<": "&lt;",
-	">": "&gt;"
+  '"': "&quot;",
+  "&": "&amp;",
+  "'": "&apos;",
+  "<": "&lt;",
+  ">": "&gt;"
 };
 const charactersRe = /[<>"']|&(?!#?\w+;)/gu;
 const references = {
-	"&amp;": "&",
-	"&apos;": "'",
-	"&gt;": ">",
-	"&lt;": "<",
-	"&quot;": '"'
+  "&amp;": "&",
+  "&apos;": "'",
+  "&gt;": ">",
+  "&lt;": "<",
+  "&quot;": '"'
 };
 const referencesRe = /&(amp|lt|gt|quot|apos);/gu;
 
@@ -24,6 +24,6 @@ const toCharacter = (r) => references[r];
 const unescapeReferences = (text) => String(text).replace(referencesRe, toCharacter);
 
 export {
-	escapeCharacters,
-	unescapeReferences
+  escapeCharacters,
+  unescapeReferences
 };

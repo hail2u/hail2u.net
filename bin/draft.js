@@ -1,7 +1,7 @@
 import {
-	formatMessage,
-	validateHTML,
-	writeErrors
+  formatMessage,
+  validateHTML,
+  writeErrors
 } from "./lib/validate-html.js";
 import config from "../config.js";
 import { escapeCharacters } from "./lib/character-reference.js";
@@ -14,62 +14,62 @@ import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
 const rebuildDraft = ({
-	body,
-	id,
-	title
+  body,
+  id,
+  title
 }) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
 `;
 
 const validateBody = async (body, src) => {
-	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
+  const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
-	if (!messages) {
-		return;
-	}
+  if (!messages) {
+    return;
+  }
 
-	const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
-	writeErrors(errors, [ src ]);
+  const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
+  writeErrors(errors, [ src ]);
 };
 
 const makeTempDir = async () => {
-	const osTemp = await fs.realpath(os.tmpdir());
-	return fs.mkdtemp(path.join(osTemp, path.sep, `${config.name}-`));
+  const osTemp = await fs.realpath(os.tmpdir());
+  return fs.mkdtemp(path.join(osTemp, path.sep, `${config.name}-`));
 };
 
 const main = async () => {
-	const {
-		remains,
-		selected
-	} = await selectDraft();
-	const drafts = await Promise.all([
-		selected,
-		...remains
-	].map(rebuildDraft));
-	const [
-		tempDir,
-		template
-	] = await Promise.all([
-		makeTempDir(),
-		fs.readFile(path.join(config.src.templates, "blog/_test.mustache"), "utf8"),
-		outputFile(config.src.draft, drafts.join("\n\n")),
-		validateBody(selected.body, config.src.draft)
-	]);
-	const test = path.join(tempDir, "test.html");
-	const toTempDir = path.relative(tempDir, config.dest.root);
-	const rendered = mustache
-		.render(template, {
-			...selected,
-			body: selected.body
-		}, null, { escape: escapeCharacters });
-	const fixed = rendered.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toTempDir}/`);
-	await outputFile(test, fixed);
-	await runCommand("open", [ test ]);
+  const {
+    remains,
+    selected
+  } = await selectDraft();
+  const drafts = await Promise.all([
+    selected,
+    ...remains
+  ].map(rebuildDraft));
+  const [
+    tempDir,
+    template
+  ] = await Promise.all([
+    makeTempDir(),
+    fs.readFile(path.join(config.src.templates, "blog/_test.mustache"), "utf8"),
+    outputFile(config.src.draft, drafts.join("\n\n")),
+    validateBody(selected.body, config.src.draft)
+  ]);
+  const test = path.join(tempDir, "test.html");
+  const toTempDir = path.relative(tempDir, config.dest.root);
+  const rendered = mustache
+    .render(template, {
+      ...selected,
+      body: selected.body
+    }, null, { escape: escapeCharacters });
+  const fixed = rendered.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toTempDir}/`);
+  await outputFile(test, fixed);
+  await runCommand("open", [ test ]);
 };
 
 main().catch((e) => {
-	/* eslint-disable-next-line no-console */
-	console.trace(e);
-	process.exitCode = 1;
+  /* eslint-disable-next-line no-console */
+  console.trace(e);
+  process.exitCode = 1;
 });

@@ -7,98 +7,98 @@ import { guessPath } from "./lib/guess-path.js";
 const toDest = (file) => guessPath(file, config.dest.root, "feed");
 
 const gatherFiles = async () => {
-	const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
-	return Promise.all(files.map(toDest));
+  const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+  return Promise.all(files.map(toDest));
 };
 
 const cancelFetch = (abortController) => {
-	abortController.abort();
+  abortController.abort();
 };
 
 const parseXML = (xml) => {
-	const parser = new fastXMLParser.XMLParser({
-		arrayMode: /^error$/iu,
-		removeNSPrefix: true
-	});
-	const json = parser.parse(xml);
-	return json.Envelope.Body.feedvalidationresponse.errors;
+  const parser = new fastXMLParser.XMLParser({
+    arrayMode: /^error$/iu,
+    removeNSPrefix: true
+  });
+  const json = parser.parse(xml);
+  return json.Envelope.Body.feedvalidationresponse.errors;
 };
 
 const validateFeed = async (feed) => {
-	const body = new URLSearchParams();
-	body.append("manual", 1);
-	body.append("output", "soap12");
-	body.append("rawdata", feed);
-	const abortController = new AbortController();
-	const abortID = setTimeout(cancelFetch.bind(null, abortController), 10000);
+  const body = new URLSearchParams();
+  body.append("manual", 1);
+  body.append("output", "soap12");
+  body.append("rawdata", feed);
+  const abortController = new AbortController();
+  const abortID = setTimeout(cancelFetch.bind(null, abortController), 10000);
 
-	try {
-		const res = await fetch("https://validator.w3.org/feed/check.cgi", {
-			body,
-			method: "POST",
-			signal: abortController.signal
-		});
+  try {
+    const res = await fetch("https://validator.w3.org/feed/check.cgi", {
+      body,
+      method: "POST",
+      signal: abortController.signal
+    });
 
-		if (!res.ok) {
-			return `Skipped. ${res.status} ${res.statusText}.`;
-		}
+    if (!res.ok) {
+      return `Skipped. ${res.status} ${res.statusText}.`;
+    }
 
-		const xml = await res.text();
-		const json = await parseXML(xml);
-		const errorcount = parseInt(json.errorcount, 10);
+    const xml = await res.text();
+    const json = await parseXML(xml);
+    const errorcount = parseInt(json.errorcount, 10);
 
-		if (errorcount === 0) {
-			return null;
-		}
+    if (errorcount === 0) {
+      return null;
+    }
 
-		return json.errorlist.error;
-	} catch (e) {
-		if (e.name === "AbortError") {
-			return "Skipped. W3C Feed Validator does not respond in 10s.";
-		}
+    return json.errorlist.error;
+  } catch (e) {
+    if (e.name === "AbortError") {
+      return "Skipped. W3C Feed Validator does not respond in 10s.";
+    }
 
-		throw e;
-	} finally {
-		clearTimeout(abortID);
-	}
+    throw e;
+  } finally {
+    clearTimeout(abortID);
+  }
 };
 
 const formatMessage = (file, message) => `${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
 
 const validate = async (file) => {
-	const feed = await fs.readFile(file, "utf8");
-	const messages = await validateFeed(feed);
+  const feed = await fs.readFile(file, "utf8");
+  const messages = await validateFeed(feed);
 
-	if (!messages) {
-		return [];
-	}
+  if (!messages) {
+    return [];
+  }
 
-	if (typeof messages === "string") {
-		process.stdout.write(`${file}:1:1: ${messages}
+  if (typeof messages === "string") {
+    process.stdout.write(`${file}:1:1: ${messages}
 `);
-		return [];
-	}
+    return [];
+  }
 
-	return Promise.all(messages.map(formatMessage.bind(null, file)));
+  return Promise.all(messages.map(formatMessage.bind(null, file)));
 };
 
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-	const feeds = await gatherFiles();
-	const results = await Promise.all(feeds.map(validate));
-	const errors = results.flat();
+  const feeds = await gatherFiles();
+  const results = await Promise.all(feeds.map(validate));
+  const errors = results.flat();
 
-	if (errors.length > 0) {
-		process.stdout.write(errors.join("\n"));
-		process.stdout.write("\n\n");
-		const errorFiles = results.filter(isNotEmpty);
-		throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
-	}
+  if (errors.length > 0) {
+    process.stdout.write(errors.join("\n"));
+    process.stdout.write("\n\n");
+    const errorFiles = results.filter(isNotEmpty);
+    throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
+  }
 };
 
 main().catch((e) => {
-	/* eslint-disable-next-line no-console */
-	console.trace(e);
-	process.exitCode = 1;
+  /* eslint-disable-next-line no-console */
+  console.trace(e);
+  process.exitCode = 1;
 });
