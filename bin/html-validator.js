@@ -14,10 +14,10 @@ const rewritePath = ([
     relative
   ]) => {
   if (relative.endsWith("/")) {
-    return path.join(config.dest.root, relative, "index.html");
+    return path.join(config.dir.dest, relative, "index.html");
   }
 
-  return path.join(config.dest.root, relative);
+  return path.join(config.dir.dest, relative);
 };
 
 const validate = async (file) => {
@@ -41,8 +41,8 @@ const main = async () => {
     },
     sitemap
   ] = await Promise.all([
-    readJSONFile(path.join(config.src.metadata, "root.json")),
-    fs.readFile(path.join(config.dest.root, "sitemap.xml"), "utf8")
+    readJSONFile(path.join(config.dir.metadata, "root.json")),
+    fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8")
   ]);
   const prefix = `${scheme}://${domain}`;
   const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");

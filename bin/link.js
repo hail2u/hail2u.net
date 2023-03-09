@@ -45,7 +45,7 @@ const main = async () => {
     throw new Error("--url is required.");
   }
 
-  const file = path.join(config.src.data, "links.json");
+  const file = path.join(config.dir.data, "links.json");
   const links = await readJSONFile(file);
   const published = Date.now();
   const dt = getDateDetails(published);

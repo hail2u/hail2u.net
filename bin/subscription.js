@@ -46,7 +46,7 @@ const main = async () => {
     throw new Error("--url is required.");
   }
 
-  const file = path.join(config.src.data, "subscriptions.json");
+  const file = path.join(config.dir.data, "subscriptions.json");
   const subscriptions = await readJSONFile(file);
 
   if (subscriptions.find(isSubscribed.bind(null, url))) {

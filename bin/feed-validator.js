@@ -4,10 +4,10 @@ import fs from "node:fs/promises";
 import { globAsync } from "./lib/glob-async.js";
 import { guessPath } from "./lib/guess-path.js";
 
-const toDest = (file) => guessPath(file, config.dest.root, "feed");
+const toDest = (file) => guessPath(file, config.dir.dest, "feed");
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+  const files = await globAsync(`${config.dir.template}**/_feed.mustache`);
   return Promise.all(files.map(toDest));
 };
 

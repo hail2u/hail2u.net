@@ -9,13 +9,13 @@ import path from "node:path";
 import { readJSONFile } from "./lib/json-file.js";
 
 const toFilesFormat = (file) => ({
-  dest: guessPath(file, config.dest.root, "feed"),
-  metadata: guessPath(file, config.src.metadata, "index.json"),
+  dest: guessPath(file, config.dir.dest, "feed"),
+  metadata: guessPath(file, config.dir.metadata, "index.json"),
   template: file
 });
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.src.templates}**/_feed.mustache`);
+  const files = await globAsync(`${config.dir.template}**/_feed.mustache`);
   return Promise.all(files.map(toFilesFormat));
 };
 
@@ -59,7 +59,7 @@ const readData = async (prefix, dataFile) => {
 };
 
 const readLatestData = async (prefix) => {
-  const dataFiles = await globAsync(`${config.src.data}**/*.json`);
+  const dataFiles = await globAsync(`${config.dir.data}**/*.json`);
   const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
   return Object.assign(...data);
 };
@@ -88,7 +88,7 @@ const build = async (metadata, data, file) => {
 const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-  const metadata = await readJSONFile(path.join(config.src.metadata, "root.json"));
+  const metadata = await readJSONFile(path.join(config.dir.metadata, "root.json"));
   const prefix = `${metadata.scheme}://${metadata.domain}`;
   const [
     files,

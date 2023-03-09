@@ -36,11 +36,11 @@ const main = async () => {
     template
   ] = await Promise.all([
     makeTempDir(),
-    fs.readFile(path.join(config.src.templates, "blog/_test.mustache"), "utf8"),
-    validateBody(selected.body, config.src.draft)
+    fs.readFile(path.join(config.dir.template, config.file.template.test), "utf8"),
+    validateBody(selected.body, config.file.draft)
   ]);
   const test = path.join(tempDir, "test.html");
-  const toTempDir = path.relative(tempDir, config.dest.root);
+  const toTempDir = path.relative(tempDir, config.dir.dest);
   const rendered = mustache
     .render(template, {
       ...selected,

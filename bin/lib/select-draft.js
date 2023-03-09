@@ -37,7 +37,7 @@ ${body}
 `;
 
 const selectDraft = async () => {
-  const file = config.src.draft;
+  const file = config.file.draft;
   const html = await fs.readFile(file, "utf8");
   const sections = html.split("\n\n\n");
   const drafts = await Promise.all(sections.map(toDraft));

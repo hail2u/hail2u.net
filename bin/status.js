@@ -16,7 +16,7 @@ const main = async () => {
     throw new Error("Only 1 argument is required.");
   }
 
-  const file = path.join(config.src.data, "statuses.json");
+  const file = path.join(config.dir.data, "statuses.json");
   const statuses = await readJSONFile(file);
   const published = Date.now();
   const dt = getDateDetails(published);

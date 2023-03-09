@@ -27,7 +27,7 @@ const checkIDFormat = (id) => {
 };
 
 const checkIDConflict = async (id) => {
-  const file = path.join(config.dest.article, `${id}.html`);
+  const file = path.join(config.dir.dest, "blog", `${id}.html`);
 
   try {
     await fs.access(file, fs.constants.F_OK);
@@ -56,7 +56,7 @@ const validateBody = async (body, src) => {
 };
 
 const main = async () => {
-  const file = path.join(config.src.data, "articles.json");
+  const file = path.join(config.dir.data, "articles.json");
   const [
     selected,
     articles
@@ -73,13 +73,13 @@ const main = async () => {
     checkIDFormat(id),
     checkIDConflict(id),
     checkTitleType(title),
-    validateBody(body, config.src.draft)
+    validateBody(body, config.file.draft)
   ]);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n")
     .shift();
-  const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${id}.html`);
+  const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
   await outputJSONFile(file, [
@@ -104,7 +104,7 @@ const main = async () => {
     domain,
     scheme
   }] = await Promise.all([
-    readJSONFile(path.join(config.src.metadata, "root.json")),
+    readJSONFile(path.join(config.dir.metadata, "root.json")),
     runCommand("git", [
       "commit",
       `--message=Contribute ${id} (${th})`

@@ -83,7 +83,7 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const files = await globAsync(`${config.src.data}**/*.json`);
+  const files = await globAsync(`${config.dir.data}**/*.json`);
   const data = await Promise.all(files.map(readData));
   return Object.assign(...data);
 };
@@ -97,31 +97,31 @@ const readPartial = async (file) => {
 };
 
 const readPartials = async () => {
-  const files = await globAsync(`${config.src.templates}partials/*.mustache`);
+  const files = await globAsync(`${config.dir.template}partials/*.mustache`);
   const partials = await Promise.all(files.map(readPartial));
   return Object.assign(...partials);
 };
 
 const toFilesFormat = (file) => {
   if (typeof file === "object") {
-    const template = path.join(config.src.templates, "blog/_article.mustache");
+    const template = path.join(config.dir.template, "blog/_article.mustache");
     return {
       ...file,
-      dest: path.join(config.dest.root, file.link),
-      metadata: guessPath(template, config.src.metadata, "article.json"),
+      dest: path.join(config.dir.dest, file.link),
+      metadata: guessPath(template, config.dir.metadata, "article.json"),
       template
     };
   }
 
   return {
-    dest: guessPath(file, config.dest.root, ".html"),
-    metadata: guessPath(file, config.src.metadata, ".json"),
+    dest: guessPath(file, config.dir.dest, ".html"),
+    metadata: guessPath(file, config.dir.metadata, ".json"),
     template: file
   };
 };
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.src.templates}**/*.mustache`, { ignore: `**/_*` });
+  const files = await globAsync(`${config.dir.template}**/*.mustache`, { ignore: `**/_*` });
   return Promise.all(files.map(toFilesFormat));
 };
 
@@ -208,7 +208,7 @@ const main = async () => {
     },
     files
   ] = await Promise.all([
-    readJSONFile(path.join(config.src.metadata, "root.json")),
+    readJSONFile(path.join(config.dir.metadata, "root.json")),
     readAllData(),
     readPartials(),
     util.parseArgs({

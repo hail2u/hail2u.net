@@ -1,16 +1,18 @@
 import pkg from "./package.json" assert { type: "json" };
 
 export default {
-  dest: {
-    article: "dist/blog/",
-    root: "dist/"
-  },
-  name: pkg.name,
-  src: {
+	dir: {
     data: "data/",
-    draft: "drafts.html",
+		dest: "dist/",
     metadata: "metadata/",
-    templates: "templates/"
-  },
-  version: pkg.version
+    template: "templates/"
+	},
+	file: {
+    draft: "drafts.html",
+    template: {
+      test: "templates/blog/_test.mustache"
+    }
+	},
+	name: pkg.name,
+	version: pkg.version
 };
