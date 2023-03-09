@@ -1,8 +1,4 @@
 import {
-  escapeCharacters,
-  unescapeReferences
-} from "./lib/character-reference.js";
-import {
   formatMessage,
   validateHTML,
   writeErrors
@@ -15,10 +11,10 @@ import config from "../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
 import { openTwitter } from "./lib/open-twitter.js";
-import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
+import { unescapeReferences } from "./lib/character-reference.js";
 
 const checkIDFormat = (id) => {
   if (!id) {
@@ -59,22 +55,10 @@ const validateBody = async (body, src) => {
   writeErrors(errors, [ src ]);
 };
 
-const rebuildDraft = ({
-  body,
-  id,
-  title
-}) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
-
-${body}
-`;
-
 const main = async () => {
   const file = path.join(config.src.data, "articles.json");
   const [
-    {
-      remains,
-      selected
-    },
+    selected,
     articles
   ] = await Promise.all([
     selectDraft(),
@@ -98,21 +82,17 @@ const main = async () => {
   const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
-  const drafts = await Promise.all(remains.map(rebuildDraft));
-  await Promise.all([
-    outputJSONFile(file, [
-      {
-        body,
-        description,
-        link,
-        published,
-        ...dt,
-        title,
-        type: "article"
-      },
-      ...articles
-    ]),
-    outputFile(config.src.draft, drafts.join("\n\n"))
+  await outputJSONFile(file, [
+    {
+      body,
+      description,
+      link,
+      published,
+      ...dt,
+      title,
+      type: "article"
+    },
+    ...articles
   ]);
   await runCommand("git", [
     "add",

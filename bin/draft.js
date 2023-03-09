@@ -13,15 +13,6 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
-const rebuildDraft = ({
-  body,
-  id,
-  title
-}) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
-
-${body}
-`;
-
 const validateBody = async (body, src) => {
   const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
 
@@ -39,21 +30,13 @@ const makeTempDir = async () => {
 };
 
 const main = async () => {
-  const {
-    remains,
-    selected
-  } = await selectDraft();
-  const drafts = await Promise.all([
-    selected,
-    ...remains
-  ].map(rebuildDraft));
+  const selected = await selectDraft();
   const [
     tempDir,
     template
   ] = await Promise.all([
     makeTempDir(),
     fs.readFile(path.join(config.src.templates, "blog/_test.mustache"), "utf8"),
-    outputFile(config.src.draft, drafts.join("\n\n")),
     validateBody(selected.body, config.src.draft)
   ]);
   const test = path.join(tempDir, "test.html");
