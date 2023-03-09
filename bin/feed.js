@@ -64,23 +64,24 @@ const readLatestData = async (prefix) => {
 	return Object.assign(...data);
 };
 
-const mergeData = async (file, data) => {
+const mergeData = async (file, metadata, data) => {
 	const overrides = await readJSONFile(file.metadata);
 	return {
+		...metadata,
 		...data,
 		...overrides
 	};
 };
 
-const build = async (basic, file) => {
+const build = async (metadata, data, file) => {
 	const [
-		data,
+		merged,
 		template
 	] = await Promise.all([
-		mergeData(file, basic),
+		mergeData(file, metadata, data),
 		fs.readFile(file.template, "utf8")
 	]);
-	const rendered = mustache.render(template, data, null, { escape: escapeCharacters });
+	const rendered = mustache.render(template, merged, null, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
 };
 
@@ -101,8 +102,7 @@ const main = async () => {
 		gatherFiles(),
 		readLatestData(prefix)
 	]);
-	return Promise.all(files.map(build.bind(null, {
-		...metadata,
+	return Promise.all(files.map(build.bind(null, metadata, {
 		articles,
 		books,
 		items: [

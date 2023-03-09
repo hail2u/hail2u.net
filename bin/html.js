@@ -140,13 +140,14 @@ const findCover = (html) => {
 	};
 };
 
-const mergeData = async (file, data) => {
+const mergeData = async (file, metadata, data) => {
 	const overrides = await readJSONFile(file.metadata);
 
 	if (overrides.isArticle) {
 		const article = data.articles.find(hasSameLink.bind(null, file.dest));
 		const cover = findCover(article.body);
 		return {
+			...metadata,
 			...data,
 			...overrides,
 			...article,
@@ -155,30 +156,35 @@ const mergeData = async (file, data) => {
 		};
 	}
 
+	if (overrides.isHome) {
+		return {
+			...metadata,
+			...data,
+			...overrides,
+			homeArticles: data.articles.slice(0, 6),
+			homeBooks: data.books.slice(0, 3),
+			homeLinks: data.links.slice(0, 6),
+			homeProjects: data.projects.slice(0, 3),
+			homeStatuses: data.statuses.slice(0, 1)
+		};
+	}
+
 	return {
+		...metadata,
 		...data,
 		...overrides
 	};
 };
 
-const build = async (basic, partials, file) => {
+const build = async (metadata, data, partials, file) => {
 	const [
-		data,
+		merged,
 		template
 	] = await Promise.all([
-		mergeData(file, basic),
+		mergeData(file, metadata, data),
 		fs.readFile(file.template, "utf8")
 	]);
-
-	if (data.isHome) {
-		data.homeArticles = data.articles.slice(0, 6);
-		data.homeBooks = data.books.slice(0, 3);
-		data.homeLinks = data.links.slice(0, 6);
-		data.homeProjects = data.projects.slice(0, 3);
-		data.homeStatuses = data.statuses.slice(0, 1);
-	}
-
-	const rendered = mustache.render(template, data, partials, { escape: escapeCharacters });
+	const rendered = mustache.render(template, merged, partials, { escape: escapeCharacters });
 	await outputFile(file.dest, rendered);
 };
 
@@ -220,7 +226,6 @@ const main = async () => {
 		gatherFiles()
 	]);
 	const data = {
-		...metadata,
 		articles,
 		books,
 		links,
@@ -232,7 +237,7 @@ const main = async () => {
 
 	if (latest) {
 		const article = await toFilesFormat(articles[0]);
-		await build(data, partials, article);
+		await build(metadata, data, partials, article);
 	}
 
 	if (all) {
@@ -241,11 +246,11 @@ const main = async () => {
 		while (articleFiles.length > 0) {
 			const chunk = articleFiles.splice(-1024);
 			/* eslint-disable-next-line no-await-in-loop */
-			await Promise.all(chunk.map(build.bind(null, data, partials)));
+			await Promise.all(chunk.map(build.bind(null, metadata, data, partials)));
 		}
 	}
 
-	await Promise.all(files.map(build.bind(null, data, partials)));
+	await Promise.all(files.map(build.bind(null, metadata, data, partials)));
 };
 
 main().catch((e) => {
