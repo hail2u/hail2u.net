@@ -21,13 +21,17 @@ import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
 const checkIDFormat = (id) => {
+	if (!id) {
+		throw new Error("A draft must have an ID.");
+	}
+
 	if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
 		throw new Error("This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.");
 	}
 };
 
-const checkNameConflict = async (name) => {
-	const file = path.join(config.dest.article, `${name}.html`);
+const checkIDConflict = async (id) => {
+	const file = path.join(config.dest.article, `${id}.html`);
 
 	try {
 		await fs.access(file, fs.constants.F_OK);
@@ -35,7 +39,7 @@ const checkNameConflict = async (name) => {
 		return true;
 	}
 
-	throw new Error(`“${name}” is already used.`);
+	throw new Error(`“${id}” is already used.`);
 };
 
 const checkTitleType = (title) => {
@@ -55,35 +59,14 @@ const validateBody = async (body, src) => {
 	writeErrors(errors, [ src ]);
 };
 
-const generateName = ({
-	strDate,
-	strMonth,
-	strYear
-}, id) => {
-	if (id) {
-		return id;
-	}
-
-	return `${strYear}-${strMonth}-${strDate}`;
-};
-
 const rebuildDraft = ({
 	body,
 	id,
 	title
-}) => {
-	if (id) {
-		return `<h1 id="${id}">${escapeCharacters(title)}</h1>
+}) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
 `;
-	}
-
-	return `<h1>${escapeCharacters(title)}</h1>
-
-${body}
-`;
-};
 
 const main = async () => {
 	const file = path.join(config.src.data, "articles.json");
@@ -102,20 +85,19 @@ const main = async () => {
 		id,
 		title
 	} = selected;
+	await Promise.all([
+		checkIDFormat(id),
+		checkIDConflict(id),
+		checkTitleType(title),
+		validateBody(body, config.src.draft)
+	]);
 	const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
 		.trim()
 		.split("\n")
 		.shift();
+	const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${id}.html`);
 	const published = Date.now();
 	const dt = getDateDetails(published);
-	const name = generateName(dt, id);
-	await Promise.all([
-		checkIDFormat(id),
-		checkNameConflict(name),
-		checkTitleType(title),
-		validateBody(body, config.src.draft)
-	]);
-	const link = path.posix.join("/", path.relative(config.dest.root, config.dest.article), `${name}.html`);
 	const drafts = await Promise.all(remains.map(rebuildDraft));
 	await Promise.all([
 		outputJSONFile(file, [
@@ -145,7 +127,7 @@ const main = async () => {
 		readJSONFile(path.join(config.src.metadata, "global.json")),
 		runCommand("git", [
 			"commit",
-			`--message=Contribute ${name} (${th})`
+			`--message=Contribute ${id} (${th})`
 		])
 	]);
 	await openTwitter(`${scheme}://${domain}${link}`);

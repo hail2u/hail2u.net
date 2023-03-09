@@ -17,19 +17,10 @@ const rebuildDraft = ({
 	body,
 	id,
 	title
-}) => {
-	if (id) {
-		return `<h1 id="${id}">${escapeCharacters(title)}</h1>
+}) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
 `;
-	}
-
-	return `<h1>${escapeCharacters(title)}</h1>
-
-${body}
-`;
-};
 
 const validateBody = async (body, src) => {
 	const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
@@ -70,9 +61,8 @@ const main = async () => {
 	const rendered = mustache
 		.render(template, {
 			...selected,
-			body: selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/")
-		}, null, { escape: escapeCharacters })
-		.replace(/(?<=\b(href|src)=")\//gu, `${toRoot}/`);
+			body: selected.body.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toRoot}/`)
+		}, null, { escape: escapeCharacters });
 	await outputFile(test, rendered);
 	await runCommand("open", [ test ]);
 };
