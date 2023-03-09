@@ -87,7 +87,7 @@ const build = async (basic, file) => {
 const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-	const metadata = await readJSONFile(path.join(config.src.metadata, "global.json"));
+	const metadata = await readJSONFile(path.join(config.src.metadata, "root.json"));
 	const prefix = `${metadata.scheme}://${metadata.domain}`;
 	const [
 		files,

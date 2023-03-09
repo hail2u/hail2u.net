@@ -41,7 +41,7 @@ const main = async () => {
 		},
 		sitemap
 	] = await Promise.all([
-		readJSONFile(path.join(config.src.metadata, "global.json")),
+		readJSONFile(path.join(config.src.metadata, "root.json")),
 		fs.readFile(path.join(config.dest.root, "sitemap.xml"), "utf8")
 	]);
 	const prefix = `${scheme}://${domain}`;

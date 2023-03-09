@@ -124,7 +124,7 @@ const main = async () => {
 		domain,
 		scheme
 	}] = await Promise.all([
-		readJSONFile(path.join(config.src.metadata, "global.json")),
+		readJSONFile(path.join(config.src.metadata, "root.json")),
 		runCommand("git", [
 			"commit",
 			`--message=Contribute ${id} (${th})`

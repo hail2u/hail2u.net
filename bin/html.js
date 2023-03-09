@@ -202,7 +202,7 @@ const main = async () => {
 		},
 		files
 	] = await Promise.all([
-		readJSONFile(path.join(config.src.metadata, "global.json")),
+		readJSONFile(path.join(config.src.metadata, "root.json")),
 		readAllData(),
 		readPartials(),
 		util.parseArgs({
