@@ -86,7 +86,11 @@ const testContrast_getComponentLuminance = (color) => {
 	return ((sRGB + 0.055) / 1.055) ** 2.4;
 };
 
-const testContrast_getRelativeLuminance = ([red, green, blue]) =>
+const testContrast_getRelativeLuminance = ([
+	red,
+	green,
+	blue
+]) =>
 	0.2126 * testContrast_getComponentLuminance(red) +
 	0.7152 * testContrast_getComponentLuminance(green) +
 	0.0722 * testContrast_getComponentLuminance(blue);

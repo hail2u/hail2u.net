@@ -39,7 +39,7 @@ const validateBody = async (body, src) => {
 	}
 
 	const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
-	writeErrors(errors, [src]);
+	writeErrors(errors, [ src ]);
 };
 
 const makeTempDir = async () => {
