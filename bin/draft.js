@@ -48,7 +48,7 @@ const main = async () => {
 		...remains
 	].map(rebuildDraft));
 	const [
-		dir,
+		tempDir,
 		template
 	] = await Promise.all([
 		makeTempDir(),
@@ -56,14 +56,15 @@ const main = async () => {
 		outputFile(config.src.draft, drafts.join("\n\n")),
 		validateBody(selected.body, config.src.draft)
 	]);
-	const test = path.join(dir, "test.html");
-	const toRoot = path.relative(dir, config.dest.root);
+	const test = path.join(tempDir, "test.html");
+	const toTempDir = path.relative(tempDir, config.dest.root);
 	const rendered = mustache
 		.render(template, {
 			...selected,
-			body: selected.body.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toRoot}/`)
+			body: selected.body
 		}, null, { escape: escapeCharacters });
-	await outputFile(test, rendered);
+	const fixed = rendered.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toTempDir}/`);
+	await outputFile(test, fixed);
 	await runCommand("open", [ test ]);
 };
 
