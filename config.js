@@ -1,14 +1,15 @@
 import pkg from "./package.json" assert { type: "json" };
 
 export default {
-	dir: {
-    assets: "assets",
+  dir: {
+    assets: "assets/",
     data: "data/",
-		dest: "dist/",
+    dest: "dist/",
     metadata: "metadata/",
+    static: "static/",
     template: "templates/"
-	},
-	file: {
+  },
+  file: {
     draft: "drafts.html",
     icon: "static/favicon.svg"
   },
