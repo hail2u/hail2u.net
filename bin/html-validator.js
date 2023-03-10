@@ -6,7 +6,6 @@ import {
 import config from "../config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readJSONFile } from "./lib/json-file.js";
 import { shuffleArray } from "./lib/shuffle-array.js";
 
 const rewritePath = ([
@@ -34,21 +33,9 @@ const validate = async (file) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-  const [
-    {
-      domain,
-      scheme
-    },
-    sitemap
-  ] = await Promise.all([
-    readJSONFile(path.join(config.dir.metadata, "root.json")),
-    fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8")
-  ]);
-  const prefix = `${scheme}://${domain}`;
-  const indexRe = RegExp(`<loc>${prefix}(.*?/)</loc>`, "gu");
-  const indexes = Array.from(sitemap.matchAll(indexRe), rewritePath);
-  const articleRe = RegExp(`<loc>${prefix}(/blog/.*?[^/])</loc>`, "gu");
-  const articles = Array.from(sitemap.matchAll(articleRe), rewritePath);
+  const sitemap = await fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8");
+  const indexes = Array.from(sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu), rewritePath);
+  const articles = Array.from(sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu), rewritePath);
   const picked = shuffleArray(articles).slice(0, 3);
   const results = await Promise.all([
     ...indexes,
