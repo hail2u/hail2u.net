@@ -1,9 +1,4 @@
 import {
-  formatMessage,
-  validateHTML,
-  writeErrors
-} from "./lib/validate-html.js";
-import {
   outputJSONFile,
   readJSONFile
 } from "./lib/json-file.js";
@@ -44,17 +39,6 @@ const checkTitleType = (title) => {
   }
 };
 
-const validateBody = async (body, src) => {
-  const messages = await validateHTML(`<!doctype html><title>_</title>${body}`);
-
-  if (!messages) {
-    return;
-  }
-
-  const errors = await Promise.all(messages.map(formatMessage.bind(null, src, 2)));
-  writeErrors(errors, [ src ]);
-};
-
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
   const [
@@ -72,8 +56,7 @@ const main = async () => {
   await Promise.all([
     checkIDFormat(id),
     checkIDConflict(id),
-    checkTitleType(title),
-    validateBody(body, config.file.draft)
+    checkTitleType(title)
   ]);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
