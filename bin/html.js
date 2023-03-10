@@ -104,12 +104,24 @@ const readPartials = async () => {
 
 const toFilesFormat = (file) => {
   if (typeof file === "object") {
-    const template = path.join(config.dir.template, "blog/_article.mustache");
+    const template = path.join(config.dir.template, "blog", "_article.mustache");
     return {
       ...file,
       dest: path.join(config.dir.dest, file.link),
       metadata: guessPath(template, config.dir.metadata, "article.json"),
       template
+    };
+  }
+
+  const basename = path.basename(file, path.extname(file));
+  const doubleExt = path.extname(basename);
+
+  if (doubleExt) {
+    const dirname = path.dirname(file);
+    return {
+      dest: guessPath(path.join(dirname, basename), config.dir.dest, doubleExt),
+      metadata: guessPath(path.join(dirname, basename), config.dir.metadata, ".json"),
+      template: file
     };
   }
 
