@@ -1,10 +1,9 @@
 import config from "../config.js";
-import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
-import mustache from "mustache";
 import os from "node:os";
 import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
+import { renderTemplate } from "./lib/render-template.js";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
@@ -24,11 +23,7 @@ const main = async () => {
   ]);
   const test = path.join(tempDir, "test.html");
   const toTempDir = path.relative(tempDir, config.dir.dest);
-  const rendered = mustache
-    .render(template, {
-      ...selected,
-      body: selected.body
-    }, null, { escape: escapeCharacters });
+  const rendered = renderTemplate(template, selected);
   const fixed = rendered.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toTempDir}/`);
   await outputFile(test, fixed);
   await runCommand("open", [ test ]);

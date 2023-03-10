@@ -1,9 +1,11 @@
+import {
+  escapeCharacters,
+  unescapeReferences
+} from "./character-reference.js";
 import config from "../../config.js";
-import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
-import { outputFile } from "./lib/output-file.js";
+import { outputFile } from "./output-file.js";
 import readline from "node:readline/promises";
-import { unescapeReferences } from "./character-reference.js";
 
 const toDraft = (draft) => {
   const [
