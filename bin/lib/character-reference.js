@@ -5,7 +5,6 @@ const characters = {
   "<": "&lt;",
   ">": "&gt;"
 };
-const charactersRe = /[<>"']|&(?!#?\w+;)/gu;
 const references = {
   "&amp;": "&",
   "&apos;": "'",
@@ -13,15 +12,14 @@ const references = {
   "&lt;": "<",
   "&quot;": '"'
 };
-const referencesRe = /&(amp|lt|gt|quot|apos);/gu;
 
 const toReference = (c) => characters[c];
 
-const escapeCharacters = (text) => String(text).replace(charactersRe, toReference);
+const escapeCharacters = (text) => String(text).replace(/[<>"']|&(?!#?\w+;)/gu, toReference);
 
 const toCharacter = (r) => references[r];
 
-const unescapeReferences = (text) => String(text).replace(referencesRe, toCharacter);
+const unescapeReferences = (text) => String(text).replace(/&(amp|lt|gt|quot|apos);/gu, toCharacter);
 
 export {
   escapeCharacters,

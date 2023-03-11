@@ -35,10 +35,9 @@ const extendItem = (prefix, item) => {
   const link = toAbsoluteURL(prefix, item.link);
 
   if (item.body) {
-    const urlRe = /(href|src)="(\/.*?)"/gu;
     return {
       ...item,
-      body: item.body.replace(urlRe, toAbsoluteURLAll.bind(null, prefix)),
+      body: item.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll.bind(null, prefix)),
       link
     };
   }
