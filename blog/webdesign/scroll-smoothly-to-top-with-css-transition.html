@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能</title>
+    <title>CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/webdesign/scroll-smoothly-to-top-with-css-transition.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/scroll-smoothly-to-top-with-css-transition.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary_large_image" name="twitter:card">
-		<meta content="前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。" property="twitter:description">
-		<meta content="https://hail2u.net/img/blog/scroll-smoothly-to-top-with-css-transition.png" property="twitter:image">
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能" property="twitter:title">
-	</head>
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="前に作ったスクロールした時に位置固定のロゴをトップに戻る機能にすり替えるものを少し手直しして再導入した。今回はスムーズにスクロールさせようかと色々考えていたが、やはりJavaScriptでscrollTo()を制御するのはコストが高い。CSSならどうだと試行錯誤したところ、どうやらbody要素への負のマージンをCSS Transitionで滑らかに変化させれば良いようだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/scroll-smoothly-to-top-with-css-transition.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2015-05-11T04:05:22+09:00">2015年5月11日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2015-05-11T04:05:22+09:00">2015年5月11日</time></p>
 
-			<h1>CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能</h1>
-		</header>
+      <h1>CSS Transitionを使ったスムーズにスクロールしてトップに戻る機能</h1>
+    </header>
 
-		<figure class="hero">
+    <figure class="hero">
 <a href="/img/blog/scroll-smoothly-to-top-with-css-transition.png"><img alt="スムーズニトップヘモドル。" height="627" src="/img/blog/scroll-smoothly-to-top-with-css-transition.png" width="1200"></a>
 </figure>
 
@@ -75,13 +75,13 @@
 <p>実装のコードも9行ほどと短く、色々なものに組み込みやすいと思われる。コードも順序良くCSSを割り当てていくだけだ。</p>
 
 <pre><code class="language-javascript">document.getElementById(&quot;to-top&quot;).addEventListener(&quot;click&quot;, function (evt) {
-	var styleBody = document.body.style;
-	styleBody.transition = &quot;initial&quot;;
-	styleBody.marginTop = &quot;-&quot; + (window.pageYOffset - 1) + &quot;px&quot;;
-	window.scrollTo(0, 0);
-	styleBody.transition = &quot;margin-top 1s ease-in-out&quot;;
-	styleBody.marginTop = &quot;0&quot;;
-	evt.preventDefault();
+  var styleBody = document.body.style;
+  styleBody.transition = &quot;initial&quot;;
+  styleBody.marginTop = &quot;-&quot; + (window.pageYOffset - 1) + &quot;px&quot;;
+  window.scrollTo(0, 0);
+  styleBody.transition = &quot;margin-top 1s ease-in-out&quot;;
+  styleBody.marginTop = &quot;0&quot;;
+  evt.preventDefault();
 });</code></pre>
 
 <p>最初に<code>body</code>要素の<code>transition</code>プロパティーを<a href="http://www.w3.org/TR/css3-values/#common-keywords"><code>initial</code></a>に戻すことで、負のマージンを与えた時にアニメーションしないようにすることができる。最初にこうしておかないと、複数回このトップに戻る機能を利用した場合におかしなことになってしまう。<code>initial</code>というキーワードの値はInternet Explorer 11を始めいくつかのブラウザーでまだサポートされていないが、不正な値を仕込んでも目的である<em>アニメーションを潰すこと</em>は可能だ。そのため行儀が良いとは言えないが、このままでも良いだろう。気になる人は<a href="http://www.w3.org/TR/css3-transitions/#transition-shorthand-property">その仕様</a>で決まっている初期値である<code>all 0s ease 0s</code>にすると良い。</p>
@@ -98,26 +98,12 @@
 
 <p>ここまでくればPure CSSでもいけそうに思えるが、それはちょっと難しそうだ。アニメーションまではHTMLの助けを借りれば容易に実装することができるが、<code>transition</code>プロパティーのリセットまたは<code>:target</code>の解除がCSSだけではできない。</p>
 
-<p>昨今は、とにかくCSSをうまく利用してアニメーションをさせた方が軽いものになることが多い。機能の発動のためのイベントなどでJavaScriptを使う事にはなるだろうが、それ以外では頭をひねってCSS Transition(またはAnimation)でやることを念頭に置くと、挙動と実装が共にスカッとしたアニメーションを提供できることだろう。</p>
+<p>昨今は、とにかくCSSをうまく利用してアニメーションをさせた方が軽いものになることが多い。機能の発動のためのイベントなどでJavaScriptを使う事にはなるだろうが、それ以外では頭をひねってCSS Transition (またはAnimation)でやることを念頭に置くと、挙動と実装が共にスカッとしたアニメーションを提供できることだろう。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

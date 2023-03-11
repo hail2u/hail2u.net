@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>Amazon Product Advertising APIの認証をJavaScriptで</title>
+    <title>Amazon Product Advertising APIの認証をJavaScriptで</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/coding/amazon-product-advertising-api-authentication-in-javascript.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになるという変更は、Pipes(やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/amazon-product-advertising-api-authentication-in-javascript.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになるという変更は、Pipes (やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになるという変更は、Pipes(やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="Amazon Product Advertising APIの認証をJavaScriptで" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="既に色々なところで話題になっているAmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになるという変更は、Pipes (やYQL)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえずAsamashi09を対応させたけど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Amazon Product Advertising APIの認証をJavaScriptで" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2009-05-13T06:52:04+09:00">2009年5月13日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2009-05-13T06:52:04+09:00">2009年5月13日</time></p>
 
-			<h1>Amazon Product Advertising APIの認証をJavaScriptで</h1>
-		</header>
+      <h1>Amazon Product Advertising APIの認証をJavaScriptで</h1>
+    </header>
 
-		<p>既に色々なところで話題になっている<a href="http://affiliate-blog.amazon.co.jp/2009/05/amazon-%E3%82%A2%E3%82%BD%E3%82%B7%E3%82%A8%E3%82%A4%E3%83%88-web-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E5%90%8D%E7%A7%B0%E5%A4%89%E6%9B%B4%E3%81%8A%E3%82%88%E3%81%B3%E7%BD%B2%E5%90%8D%E8%AA%8D%E8%A8%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B.html">AmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになる</a>という変更は、<a href="http://pipes.yahoo.com/pipes/">Pipes</a>(や<a href="http://developer.yahoo.com/yql/">YQL</a>)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえず<a href="http://github.com/hail2u/asamashi09/tree/authen-test">Asamashi09を対応させた</a>けど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。</p>
+    <p>既に色々なところで話題になっている<a href="http://affiliate-blog.amazon.co.jp/2009/05/amazon-%E3%82%A2%E3%82%BD%E3%82%B7%E3%82%A8%E3%82%A4%E3%83%88-web-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AE%E5%90%8D%E7%A7%B0%E5%A4%89%E6%9B%B4%E3%81%8A%E3%82%88%E3%81%B3%E7%BD%B2%E5%90%8D%E8%AA%8D%E8%A8%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B.html">AmazonのECSがProduct Advertising APIに名称変更され、3か月後には認証を要求するようになる</a>という変更は、<a href="http://pipes.yahoo.com/pipes/">Pipes</a>(や<a href="http://developer.yahoo.com/yql/">YQL</a>)などを利用してJavaScriptだけで書かれているアソシエイト・ツールにはかなり厳しい気がする。シグネチャの生成自体はJavaScriptで出来るので、とりあえず<a href="http://github.com/hail2u/asamashi09/tree/authen-test">Asamashi09を対応させた</a>けど、Secret Access Keyを隠さないといけないのでこのままでは公開できない(動作サンプルすら提供できない)。</p>
 
 <p>使ってみる場合は適当な場所にダウンロード(↓downloadとかいうボタンから)して、適当な場所に展開後、asamashi09.jsの11行目と12行目を自分のAccess Key IDとSecret Access Keyに置き換え、index.htmlをブラウザで開けば動く(はず)。</p>
 
@@ -87,24 +87,10 @@
 
 <p>Secret Access Keyを隠す方法とか思いつかないんだけど……。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

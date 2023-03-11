@@ -1,7 +1,7 @@
-const testLayout = () => {
-	document.body.classList.toggle("js-test-layout");
-};
+/* layout.js | MIT License */
 
 document
-	.querySelector(".js-test-layout-button")
-	.addEventListener("click", testLayout);
+  .querySelector(".js-test-layout-button")
+  .addEventListener("click", () => {
+    document.body.classList.toggle("js-test-layout");
+  });

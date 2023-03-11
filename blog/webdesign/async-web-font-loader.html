@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>Webフォントの非同期読み込み</title>
+    <title>Webフォントの非同期読み込み</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/webdesign/async-web-font-loader.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/async-web-font-loader.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="Webフォントの非同期読み込み" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Webフォントの非同期読み込み" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2013-12-25T13:14:38+09:00">2013年12月25日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2013-12-25T13:14:38+09:00">2013年12月25日</time></p>
 
-			<h1>Webフォントの非同期読み込み</h1>
-		</header>
+      <h1>Webフォントの非同期読み込み</h1>
+    </header>
 
-		<p>Webフォントの読み込みは<code>@import</code>だと色々まずいので、主に<code>link</code>要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。</p>
+    <p>Webフォントの読み込みは<code>@import</code>だと色々まずいので、主に<code>link</code>要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。</p>
 
 <p>非同期化することによりWebフォント定義の含まれるCSSファイルのリクエストとパースが、ページのレンダリングと並行して行われるようになる。<code>head</code>要素内で<code>link</code>要素を直接書いた場合は、Webフォント定義の含まれるCSSのリクエストとパース後にページのレンダリングが始まることが多いので、体感速度(ページのレンダリングの開始までの所要時間)は向上する可能性が高い。</p>
 
@@ -61,11 +61,11 @@
 <p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
 
 <pre><code class="language-javascript">(function (d, f) {
-	var l = d.createElement(&apos;link&apos;);
-	l.rel = &apos;stylesheet&apos;;
-	l.href = f;
-	var s = d.getElementsByTagName(&apos;script&apos;)[0];
-	s.parentNode.insertBefore(l, s);
+  var l = d.createElement(&apos;link&apos;);
+  l.rel = &apos;stylesheet&apos;;
+  l.href = f;
+  var s = d.getElementsByTagName(&apos;script&apos;)[0];
+  s.parentNode.insertBefore(l, s);
 })(document, &apos;http://example.com/font/foo.css&apos;);</code></pre>
 
 <p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
@@ -77,16 +77,16 @@
 <p>とりあえずWebフォントのURLを<code>link</code>要素として仕込んでおいて、後で<code>rel=&quot;stylesheet&quot;</code>を追加させることにより非同期化する手法。</p>
 
 <pre><code class="language-html">&lt;link
-	href=&quot;http://example.com/font/foo.css&quot;
-	class=&quot;async-web-fonts&quot;&gt;
+  href=&quot;http://example.com/font/foo.css&quot;
+  class=&quot;async-web-fonts&quot;&gt;
 &lt;script&gt;
-	(function () {
-		var webfonts = document.querySelectorAll(&apos;link.async-web-fonts&apos;);
+  (function () {
+    var webfonts = document.querySelectorAll(&apos;link.async-web-fonts&apos;);
 
-		for (var i = 0, l = webfonts.length; i &lt; l; i++) {
-			webfonts[i].rel = &apos;stylesheet&apos;;
-		}
-	})();
+    for (var i = 0, l = webfonts.length; i &lt; l; i++) {
+      webfonts[i].rel = &apos;stylesheet&apos;;
+    }
+  })();
 &lt;/script&gt;</code></pre>
 
 <p><code>rel=&quot;stylesheet&quot;</code>がなければ読みに行かないので、これでも非同期になる。複数のWebフォントのURLを参照するようなケースでも拡張しやすい。見た感じのままDOM操作を最小限に抑えられているけど、総合的なパフォーマンスは動的に<code>link</code>要素を突っ込むのとさほど変わらなそう。単体のJavaScriptファイルとして切り出せないのが欠点。</p>
@@ -98,24 +98,10 @@
 <p>問題の系統としては、ソーシャルボタンのスクリプトを非同期読込させてページの表示までの速度は上がったけど、遅れて実行されるスクリプトのせいでスクロールがつっかかって悪影響みたいなのとちょっと似てる。こういったページの読み込み速度という面からのみの調整だと漏れてしまう事象について、ユーザーテスト以外のテスト手法があると良いとよく考える。</p>
 </section>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

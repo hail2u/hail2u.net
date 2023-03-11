@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト</title>
+    <title>Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/perl-compile-javascript-code-with-google-closure-compiler-service.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="最近になってGoogleのClosure Compiler Serviceを良く使うようになった。今まで使っていたYUI Compressorと比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、REST APIを利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2009-12-13T14:08:17+09:00">2009年12月13日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2009-12-13T14:08:17+09:00">2009年12月13日</time></p>
 
-			<h1>Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト</h1>
-		</header>
+      <h1>Google Closure Compiler ServiceでJavaScriptファイルをコンパイルするPerlスクリプト</h1>
+    </header>
 
-		<p>最近になってGoogleの<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を良く使うようになった。今まで使っていた<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>と比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、<a href="http://code.google.com/intl/ja/closure/compiler/docs/gettingstarted_api.html">REST API</a>を利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！</p>
+    <p>最近になってGoogleの<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を良く使うようになった。今まで使っていた<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>と比較すると、複数のJavaScriptファイルをまとめて圧縮出来ることと圧縮にとどまらない最適化を行うことも出来ることがメリットで、CSSの圧縮には対応していないことがデメリット。ウェブのUIで圧縮するのは面倒になってきたので、<a href="http://code.google.com/intl/ja/closure/compiler/docs/gettingstarted_api.html">REST API</a>を利用してウェブのUIと同じようにコメントで設定を記述してコンパイルするPerlスクリプトを書いてみた。タイトル長い！</p>
 
 <pre><code class="language-perl">#!/usr/bin/perl
 
@@ -68,58 +68,58 @@ use JSON;
 use LWP::UserAgent;
 
 my @params = (
-	&quot;output_info&quot;,   &quot;compiled_code&quot;,
-	&quot;output_format&quot;, &quot;json&quot;,
+  &quot;output_info&quot;,   &quot;compiled_code&quot;,
+  &quot;output_format&quot;, &quot;json&quot;,
 );
 
 &amp;main;
 exit;
 
 sub main {
-	my @code = &lt;STDIN&gt;;
-	push @params, &quot;js_code&quot;, join(&quot;&quot;, @code);
-	my $idx = 0;
-	my $found_metadata = 0;
+  my @code = &lt;STDIN&gt;;
+  push @params, &quot;js_code&quot;, join(&quot;&quot;, @code);
+  my $idx = 0;
+  my $found_metadata = 0;
 
-	while (my $line = $code[$idx++]) {
-		if ($line =~ /^\/\/ ==ClosureCompiler==/) {
-			$found_metadata = 1;
-			last;
-		}
-	}
+  while (my $line = $code[$idx++]) {
+    if ($line =~ /^\/\/ ==ClosureCompiler==/) {
+      $found_metadata = 1;
+      last;
+    }
+  }
 
-	if ($found_metadata) {
-		while (my $line = $code[$idx++]) {
-			if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
-				last;
-			} elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
-				push @params, $1, $2;
-			}
-		}
-	}
+  if ($found_metadata) {
+    while (my $line = $code[$idx++]) {
+      if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
+        last;
+      } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
+        push @params, $1, $2;
+      }
+    }
+  }
 
-	&amp;compile(@params);
+  &amp;compile(@params);
 }
 
 sub compile {
-	my $ua = LWP::UserAgent-&gt;new;
-	my $res = $ua-&gt;post(&quot;http://closure-compiler.appspot.com/compile&quot;, \@_);
+  my $ua = LWP::UserAgent-&gt;new;
+  my $res = $ua-&gt;post(&quot;http://closure-compiler.appspot.com/compile&quot;, \@_);
 
-	if ($res-&gt;is_success) {
-		my $c = from_json($res-&gt;decoded_content);
+  if ($res-&gt;is_success) {
+    my $c = from_json($res-&gt;decoded_content);
 
-		if (defined $c-&gt;{&quot;serverErrors&quot;}) {
-			foreach (@{$c-&gt;{&quot;serverErrors&quot;}}) {
-				warn &quot;Error(&quot; . $_-&gt;{&quot;code&quot;} . &quot;): &quot; . $_-&gt;{&quot;error&quot;};
-			}
+    if (defined $c-&gt;{&quot;serverErrors&quot;}) {
+      foreach (@{$c-&gt;{&quot;serverErrors&quot;}}) {
+        warn &quot;Error(&quot; . $_-&gt;{&quot;code&quot;} . &quot;): &quot; . $_-&gt;{&quot;error&quot;};
+      }
 
-			die &quot;Failed to compile&quot;;
-		} else {
-			print $c-&gt;{&quot;compiledCode&quot;};
-		}
-	} else {
-		die $res-&gt;status_line;
-	}
+      die &quot;Failed to compile&quot;;
+    } else {
+      print $c-&gt;{&quot;compiledCode&quot;};
+    }
+  } else {
+    die $res-&gt;status_line;
+  }
 }</code></pre>
 
 <p>使い方は、</p>
@@ -134,8 +134,8 @@ sub compile {
 // ==/ClosureCompiler==
  
 $(function () {
-	var who = &quot;Google Closure Compiler Service&quot;;
-	alert(&quot;Hello &quot; + who + &quot;!&quot;);
+  var who = &quot;Google Closure Compiler Service&quot;;
+  alert(&quot;Hello &quot; + who + &quot;!&quot;);
 });</code></pre>
 
 <p>細かい設定は<a href="http://code.google.com/intl/ja/closure/compiler/docs/api-ref.html">APIリファレンス</a>を参照。<code>code_url</code>はいくつでも指定できる。<code>compilation_level</code>はデフォルトで<code>SIMPLE_OPTIMIZATIONS</code>に設定されているので省略可能。パラメータは丸投げなのでリファレンスに載っていない適当なパラメータなども設定できてしまうが、実害はないと思う。結果がJSONで返ってくるとみなしてパースしているので、<code>output_format</code>は指定しない方が良い。また警告やエラーの出力にはまったく対応していないので<code>output_info</code>や<code>warning_level</code>を指定しても無意味。</p>
@@ -159,35 +159,21 @@ $(function () {
 command! -nargs=? -complete=file GCCS :call s:CompileScript(&apos;&lt;args&gt;&apos;)
 
 function! s:CompileScript(file)
-	if a:file == &apos;&apos;
-		silent normal ggVG
-		&apos;&lt;,&apos;&gt;!perl -S gccs.pl
-		silent normal V
-	else
-		execute &apos;!perl -S gccs.pl &lt; &apos; . expand(&apos;%&apos;) . &apos; &gt; &apos; . a:file
-	endif
+  if a:file == &apos;&apos;
+    silent normal ggVG
+    &apos;&lt;,&apos;&gt;!perl -S gccs.pl
+    silent normal V
+  else
+    execute &apos;!perl -S gccs.pl &lt; &apos; . expand(&apos;%&apos;) . &apos; &gt; &apos; . a:file
+  endif
 endfunction</code></pre>
 
 <p>コマンド<code>GCCS</code>にファイルのパスが渡されたらそのファイルに出力、そうでない場合は全選択して差し替えるというもの。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

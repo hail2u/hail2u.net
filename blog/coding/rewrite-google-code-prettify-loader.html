@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>Google Code Prettifyのローダースクリプトを書き直した</title>
+    <title>Google Code Prettifyのローダースクリプトを書き直した</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/coding/rewrite-google-code-prettify-loader.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="単にDOMContentLoadedでGoogle Code PrettifyのprettyPrint()を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのためにpre要素にprettyprintというクラスを指定しないように方針変更したので、それに合わせてcode[class*=language-]な要素を探してその親がpreだったらprettyprintを追加し、その後でprettyPrint()を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。Rainbow移行への布石。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/rewrite-google-code-prettify-loader.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="単にDOMContentLoadedでGoogle Code PrettifyのprettyPrint()を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのためにpre要素にprettyprintというクラスを指定しないように方針変更したので、それに合わせてcode[class*=language-]な要素を探してその親がpreだったらprettyprintを追加し、その後でprettyPrint()を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。Rainbow移行への布石。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="単にDOMContentLoadedでGoogle Code PrettifyのprettyPrint()を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのためにpre要素にprettyprintというクラスを指定しないように方針変更したので、それに合わせてcode[class*=language-]な要素を探してその親がpreだったらprettyprintを追加し、その後でprettyPrint()を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。Rainbow移行への布石。" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="Google Code Prettifyのローダースクリプトを書き直した" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="単にDOMContentLoadedでGoogle Code PrettifyのprettyPrint()を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのためにpre要素にprettyprintというクラスを指定しないように方針変更したので、それに合わせてcode[class*=language-]な要素を探してその親がpreだったらprettyprintを追加し、その後でprettyPrint()を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。Rainbow移行への布石。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Google Code Prettifyのローダースクリプトを書き直した" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2012-04-04T02:03:37+09:00">2012年4月4日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2012-04-04T02:03:37+09:00">2012年4月4日</time></p>
 
-			<h1>Google Code Prettifyのローダースクリプトを書き直した</h1>
-		</header>
+      <h1>Google Code Prettifyのローダースクリプトを書き直した</h1>
+    </header>
 
-		<p>単に<code>DOMContentLoaded</code>で<a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>の<code>prettyPrint()</code>を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのために<code>pre</code>要素に<code>prettyprint</code>というクラスを指定しないように方針変更したので、それに合わせて<code>code[class*=language-]</code>な要素を探してその親が<code>pre</code>だったら<code>prettyprint</code>を追加し、その後で<code>prettyPrint()</code>を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。<a href="http://rainbowco.de/">Rainbow</a>移行への布石。</p>
+    <p>単に<code>DOMContentLoaded</code>で<a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>の<code>prettyPrint()</code>を呼んでただけだったのをゴニョゴニョするようにした。将来性とマークアップのしやすさのために<code>pre</code>要素に<code>prettyprint</code>というクラスを指定しないように方針変更したので、それに合わせて<code>code[class*=language-]</code>な要素を探してその親が<code>pre</code>だったら<code>prettyprint</code>を追加し、その後で<code>prettyPrint()</code>を走らせるという感じ。一応サポートしている言語もチェックしたりとかもするようにした。<a href="http://rainbowco.de/">Rainbow</a>移行への布石。</p>
 
 <p>同じブラウザーかつ同じバージョンなら<code>document.querySelectorAll()</code>におけるセレクターとCSSにおけるセレクターは完全にサポート状況が同じとみなして良いのかわからない。頑張ってググりたい。</p>
 
@@ -60,9 +60,9 @@
 <p>サポートしている言語かそうでないかはごく簡単にチェック。</p>
 
 <pre><code class="language-js">var languages = ["bsh", "c", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm",
-	"html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh",
-	"xhtml", "xml", "xsl", "css", "scss", "vim"],
-	reLanguage = new RegExp("\\blanguage-(" + languages.join("|") + ")\\b");</code></pre>
+  "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh",
+  "xhtml", "xml", "xsl", "css", "scss", "vim"],
+  reLanguage = new RegExp("\\blanguage-(" + languages.join("|") + ")\\b");</code></pre>
 
 <p>追加しづらそう……。Google Code Prettifyの<code>langHandlerRegistry</code>を参照するか<code>langHandlerForExtension()</code>パクった方が良さそう。むしろ頑張ってハイライトしようとするフォールバックの部分なくしちゃえばいいのかなー。</p>
 
@@ -72,24 +72,10 @@
 
 <p>あとRainbowに僕の書いた<code>&lt;code class="language-php"&gt;</code>とかに対応するコードが取り込まれたので<code>data-language</code>へ書きなおさなくても使えるようになった。作者のさじ加減で消えかねないのでマークアップにこだわりがないなら素直に併記した方が良さそう。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

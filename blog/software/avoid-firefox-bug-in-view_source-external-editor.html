@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する</title>
+    <title>Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/software/avoid-firefox-bug-in-view_source-external-editor.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接view_source.editor.pathに外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/avoid-firefox-bug-in-view_source-external-editor.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接view_source.editor.pathに外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary_large_image" name="twitter:card">
-		<meta content="タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接view_source.editor.pathに外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。" property="twitter:description">
-		<meta content="https://hail2u.net/img/blog/config-view-source-editor.png" property="twitter:image">
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する" property="twitter:title">
-	</head>
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接view_source.editor.pathに外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/config-view-source-editor.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2009-04-23T06:48:00+09:00">2009年4月23日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2009-04-23T06:48:00+09:00">2009年4月23日</time></p>
 
-			<h1>Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する</h1>
-		</header>
+      <h1>Firefoxの&quot;ページのソースを表示&quot;で外部エディタを使うと開けないことがあるのを回避する</h1>
+    </header>
 
-		<p>タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接<code>view_source.editor.path</code>に外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。</p>
+    <p>タイトル長い。WindowsのFirefoxで外部エディタを設定するとまず間違いなくはまるバグをどうにか回避してやろうという試み。このバグは対象のページのソースを一時的なファイルに保存までは正常に行えているものの、指定した外部エディタにそのファイル名がUTF-8(多分)で渡されるのが原因。直接<code>view_source.editor.path</code>に外部エディタを指定せずに、ゴニョゴニョするバッチ・ファイルを指定してやるという手法で頑張ってみた。結果、できないことなどないということがわかった。バッチファイルすげー。</p>
 
 <pre>@echo off
 
@@ -105,24 +105,10 @@ user_pref(&quot;view_source.editor.path&quot;, &quot;C:\\Path\\to\\view-source-e
 
 <p>3.5系(3.1b1とか)で直っる予定のバグだったら笑える(3.1b3でちょっと試してみたけど直ってない感じだった)。そういや3.1b2pre以降から<code>view_source.editor.args</code>とかいう外部エディタに引数を渡す設定が出来、行番号等を渡せるようになってるらしい。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

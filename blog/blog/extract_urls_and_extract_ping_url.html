@@ -1,128 +1,114 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>ファイルからURLを抽出し、そのURLからPing送信先を探してみる</title>
+    <title>ファイルからURLを抽出し、そのURLからPing送信先を探してみる</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/blog/extract_urls_and_extract_ping_url.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blog/extract_urls_and_extract_ping_url.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="ファイルからURLを抽出し、そのURLからPing送信先を探してみる" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ファイルからURLを抽出し、そのURLからPing送信先を探してみる" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2003-10-12T02:34:35+09:00">2003年10月12日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2003-10-12T02:34:35+09:00">2003年10月12日</time></p>
 
-			<h1>ファイルからURLを抽出し、そのURLからPing送信先を探してみる</h1>
-		</header>
+      <h1>ファイルからURLを抽出し、そのURLからPing送信先を探してみる</h1>
+    </header>
 
-		<p>自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。</p>
+    <p>自動TrackBackスクリプトのためのサブルーチンを2つ書いてみました。</p>
 <p>引数に渡されたファイルから、URLを抽出するサブルーチン。<a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ってすごいな。</p>
 <pre><code class="language-perl">sub extract_urls {
-	my $entry_path = $_[0];
-	my @urls;
+  my $entry_path = $_[0];
+  my @urls;
 
-	my $p = HTML::LinkExtor-&gt;new(\&amp;callback);
-	sub callback {
-		my($tag, %attr) = @_;
-		if ($tag eq &apos;a&apos; and ($attr{&apos;href&apos;} =~ m!^http://!)) {
-			push(@urls, $attr{&apos;href&apos;});
-		}
-	}
-	$p-&gt;parse_file($entry_path);
+  my $p = HTML::LinkExtor-&gt;new(\&amp;callback);
+  sub callback {
+    my($tag, %attr) = @_;
+    if ($tag eq &apos;a&apos; and ($attr{&apos;href&apos;} =~ m!^http://!)) {
+      push(@urls, $attr{&apos;href&apos;});
+    }
+  }
+  $p-&gt;parse_file($entry_path);
 
-	return @urls;
+  return @urls;
 }</code></pre>
 <p>引数に渡されたURLから、Ping送信先URLを探すサブルーチン。Ping送信先URLを見つけると、Ping送信先URLと1が返ってきます。</p>
 <pre><code class="language-perl">sub extract_ping_url {
-	my $url = $_[0];
-	my $flag = 0;
+  my $url = $_[0];
+  my $flag = 0;
 
-	my $ua = LWP::UserAgent-&gt;new(
-		agent =&gt; &quot;TrackBack/1.1&quot;,
-		timeout =&gt; 15,
-		parse_head =&gt; 0,
-	);
-	my $req = HTTP::Request-&gt;new(GET =&gt; $url);
-	my $res = $ua-&gt;request($req);
-	if ($res-&gt;is_success) {
-		my $content = $res-&gt;content;
-		$url =~ s/#.*$//;
-		while ($content =~ m!(&lt;rdf:RDF.*?&lt;/rdf:RDF&gt;)!sg) {
-			my $rdf = $1;
-			my($perm_url) = $rdf =~ m!dc:identifier=&quot;([^&quot;]+)&quot;!;
-			if ($perm_url eq $url) {
-				if ($rdf =~ m!trackback:ping=&quot;([^&quot;]+)&quot;!) {
-					$url = $1;
-					$flag = 1;
-				}
-				elsif ($rdf =~ m!about=&quot;([^&quot;]+)&quot;!) {
-					$url = $1;
-					$flag = 1;
-				}
-			}
-		}
-	}
+  my $ua = LWP::UserAgent-&gt;new(
+    agent =&gt; &quot;TrackBack/1.1&quot;,
+    timeout =&gt; 15,
+    parse_head =&gt; 0,
+  );
+  my $req = HTTP::Request-&gt;new(GET =&gt; $url);
+  my $res = $ua-&gt;request($req);
+  if ($res-&gt;is_success) {
+    my $content = $res-&gt;content;
+    $url =~ s/#.*$//;
+    while ($content =~ m!(&lt;rdf:RDF.*?&lt;/rdf:RDF&gt;)!sg) {
+      my $rdf = $1;
+      my($perm_url) = $rdf =~ m!dc:identifier=&quot;([^&quot;]+)&quot;!;
+      if ($perm_url eq $url) {
+        if ($rdf =~ m!trackback:ping=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+        elsif ($rdf =~ m!about=&quot;([^&quot;]+)&quot;!) {
+          $url = $1;
+          $flag = 1;
+        }
+      }
+    }
+  }
 
-	return($url, $flag);
+  return($url, $flag);
 }</code></pre>
 <p>ネスト深すぎですよ。</p>
 <p>とりあえず、自動的にTrackBack Pingを送るスクリプトはほとんど完成したので、実験をどうやってやろうかと考え中。自分のblogのエントリでやるべきだな(当たり前)。</p>
 <p>うげ。<a href="http://search.cpan.org/search?module=Net::TrackBack" title="search.cpan.org: Net::TrackBack - A modularized implementation of core TrackBack 1x functionality.">Net::TrackBack</a>モジュールにTrackBack ping URL auto discoveryの機能あったよ！　2番目のコードは考える必要なかった・・・。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>

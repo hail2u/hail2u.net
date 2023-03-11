@@ -1,65 +1,63 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8">
 
-		<title>child_process.spawnSync()のoptions引数</title>
+    <title>child_process.spawnSync()のoptions引数</title>
 
-		<link href="/feed" rel="alternate" type="application/rss+xml">
-		<link href="/apple-touch-icon.png" rel="apple-touch-icon">
-		<link href="mailto:hail2u@gmail.com" rel="author">
-		<link href="https://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html" rel="canonical">
-		<meta content="light dark" name="color-scheme">
-		<meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" name="description">
-		<link href="/favicon.svg" rel="icon" type="image/svg+xml">
-		<link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-		<link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
-		<meta content="width=device-width" name="viewport">
+    <link href="/feed" rel="alternate" type="application/rss+xml">
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/child_process-spawnsync-and-its-options-argument.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
 
-		<link href="/css/print.css?v=9.28.0" media="only print" rel="stylesheet">
-		<link href="/css/index.css?v=9.28.0" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
 
-		<meta content="summary" name="twitter:card">
-		<meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" property="twitter:description">
-		
-		<meta content="@hail2u_" name="twitter:site">
-		<meta content="child_process.spawnSync()のoptions引数" property="twitter:title">
-	</head>
+    <meta content="summary" name="twitter:card">
+    <meta content="child_process.spawnSync()で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。イシュー立てたらすぐ修正された。どうやら内部でoptionsを上書きしてしまっていただけらしい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="child_process.spawnSync()のoptions引数" property="twitter:title">
+  </head>
 
-	<body>
-		<nav class="site-menu">
-			<p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+  <body>
+    <nav class="site-menu">
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
 
-			<div>
-				<ul>
-					<li><a href="/statuses/">近ごろの様子</a></li>
-					<li><a href="/blog/">雑多な記録</a></li>
-					<li><a href="/projects/">行ってきた活動</a></li>
-					<li><a href="/links/">気になったウェブページ</a></li>
-					<li><a href="/bookshelf/">読み終えた書籍</a></li>
-				</ul>
+      <div>
+        <ul>
+          <li><a href="/statuses/">近ごろの様子</a></li>
+          <li><a href="/blog/">雑多な記録</a></li>
+          <li><a href="/projects/">行ってきた活動</a></li>
+          <li><a href="/links/">気になったウェブページ</a></li>
+          <li><a href="/bookshelf/">読み終えた書籍</a></li>
+        </ul>
 
-				<ul>
-					<li><a href="/about/">案内</a></li>
-					<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-				</ul>
-			</div>
-		</nav>
-		<header class="page-header">
-				<p class="date"><time datetime="2015-01-25T18:54:05+09:00">2015年1月25日</time></p>
+        <ul>
+          <li><a href="/about/">案内</a></li>
+          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
+        </ul>
+      </div>
+    </nav>
+    <header class="page-header">
+        <p class="date"><time datetime="2015-01-25T18:54:05+09:00">2015年1月25日</time></p>
 
-			<h1>child_process.spawnSync()のoptions引数</h1>
-		</header>
+      <h1>child_process.spawnSync()のoptions引数</h1>
+    </header>
 
-		<p><a href="https://iojs.org/api/child_process.html#child_process_child_process_spawnsync_command_args_options"><code>child_process.spawnSync()</code></a>で色々書いていたら、3回目で落ちたりすることがわかった。突き詰めていくとどうやら第三引数を再利用していると落ちることがあるようだ。<a href="https://github.com/iojs/io.js/issues/576">イシュー</a>立てたらすぐ<a href="https://github.com/iojs/io.js/pull/579">修正</a>された。どうやら内部で<code>options</code>を上書きしてしまっていただけらしい。</p>
-
-<p>io.js v1.0.3上では以下のようなコードで再現できる。</p>
+    <p>io.js v1.0.3上では以下のようなコードで再現できる。</p>
 
 <pre><code class="language-javascript">var spawnSync = require(&apos;child_process&apos;).spawnSync;
 
 var ls;
 var opts = {
-	stdio: &apos;inherit&apos;
+  stdio: &apos;inherit&apos;
 };
 
 ls = spawnSync(&apos;ls&apos;, [], opts);
@@ -72,40 +70,26 @@ ls = spawnSync(&apos;ls&apos;, [], opts);</code></pre>
 desktop.ini test.js
 desktop.ini test.js
 child_process.js:905
-			throw new TypeError(&apos;Incorrect value for stdio stream: &apos; +
-						^
+      throw new TypeError(&apos;Incorrect value for stdio stream: &apos; +
+            ^
 TypeError: Incorrect value for stdio stream: { type: &apos;fd&apos;, fd: { type: &apos;fd&apos;, fd: 0 } }
-		at child_process.js:905:13
-		at Array.reduce (native)
-		at _validateStdio (child_process.js:829:17)
-		at spawnSync (child_process.js:1251:19)
-		at Object.&lt;anonymous&gt; (c:\Users\Kyo\Desktop\test.js:13:10)
-		at Module._compile (module.js:446:26)
-		at Object.Module._extensions..js (module.js:464:10)
-		at Module.load (module.js:341:32)
-		at Function.Module._load (module.js:296:12)
-		at Function.Module.runMain (module.js:487:10)</pre>
+    at child_process.js:905:13
+    at Array.reduce (native)
+    at _validateStdio (child_process.js:829:17)
+    at spawnSync (child_process.js:1251:19)
+    at Object.&lt;anonymous&gt; (c:\Users\Kyo\Desktop\test.js:13:10)
+    at Module._compile (module.js:446:26)
+    at Object.Module._extensions..js (module.js:464:10)
+    at Module.load (module.js:341:32)
+    at Function.Module._load (module.js:296:12)
+    at Function.Module.runMain (module.js:487:10)</pre>
 
 <p>io.jsではすぐ直りそう(Node.jsではstableに来る頃には直っていることだろう)だが、それまでは<code>options</code>はいちいち書いた方が無難だろう。具体的には<code>JSON.parse(JSON.stringify(opts))</code>とオブジェクトをクローンするテクニックを利用して指定するのが安定して良さそうだ。</p>
 
-		<footer class="page-footer">
-			<p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
+    <footer class="page-footer">
+      <p>Hail2uは<em>ながしまきょう</em>が<a href="https://creativecommons.org/licenses/by/4.0/">クリエイティブ・コモンズ・表示ライセンス</a>の下で公開しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a>(<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)や<a href="https://twitter.com/hail2u_">Twitter</a>で購読できます。また、このウェブサイトの後援を<a href="https://github.com/sponsors/hail2u">GitHub Sponsors</a>で募集しています。お問い合わせは<a href="mailto:hail2u@gmail.com">メール</a>や、<a href="https://twitter.com/hail2u_">Twitter</a>、<a href="https://github.com/hail2u/hail2u.net/issues">GitHubのイシュー</a>で、お気軽にどうぞ。</p>
 
-			<ul>
-				<li><a href="/">ホーム</a></li>
-				<li><a href="/statuses/">近ごろの様子</a></li>
-				<li><a href="/blog/">雑多な記録</a></li>
-				<li><a href="/projects/">行ってきた活動</a></li>
-				<li><a href="/links/">気になったウェブページ</a></li>
-				<li><a href="/bookshelf/">読み終えた書籍</a></li>
-			</ul>
-
-			<ul>
-				<li><a href="/about/">このウェブサイトについて</a></li>
-				<li><a href="https://www.google.com/search?q=site%3Ahail2u.net">Googleで全文検索</a></li>
-			</ul>
-
-			<p><a href="#top">🔝 トップに戻る</a></p>
-		</footer>
-	</body>
+      <p><a href="#top">↑ トップに戻る</a></p>
+    </footer>
+  </body>
 </html>
