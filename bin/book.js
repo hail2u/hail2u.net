@@ -21,12 +21,17 @@ const main = async () => {
   const {
     values: {
       asin,
+      author,
       title
     }
   } = util.parseArgs({
     options: {
       asin: {
         short: "a",
+        type: "string"
+      },
+      author: {
+        short: "u",
         type: "string"
       },
       title: {
@@ -38,6 +43,10 @@ const main = async () => {
 
   if (!asin) {
     throw new Error("--asin is required.");
+  }
+
+  if (!author) {
+    throw new Error("--author is required.");
   }
 
   if (!title) {
@@ -75,13 +84,14 @@ const main = async () => {
 
     const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
     const titleEscaped = escapeCharacters(title);
-    const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" src="${cover}" width="${metadata.width}"></a>`;
+    const authorEscaped = escapeCharacters(author);
+    const body = `<a href="${link}"><img alt="${titleEscaped} / ${authorEscaped}" height="${metadata.height}" src="${cover}" width="${metadata.width}"></a>`;
     const published = Date.now();
     const dt = getDateDetails(published);
     await outputJSONFile(file, [
       {
         body,
-        description: title,
+        description: author,
         link,
         published,
         ...dt,
