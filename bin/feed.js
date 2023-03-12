@@ -51,6 +51,11 @@ const extendItem = (prefix, item) => {
 const readData = async (prefix, dataFile) => {
   const basename = path.basename(dataFile, ".json");
   const data = await readJSONFile(dataFile);
+
+  if (!data[0].published) {
+    return { [ basename ]: [] };
+  }
+
   const latest = data.slice(0, 10);
   const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
   return { [ basename ]: extended };
