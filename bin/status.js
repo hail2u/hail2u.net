@@ -22,6 +22,7 @@ const main = async () => {
   const dt = getDateDetails(published);
   await outputJSONFile(file, [
     {
+      description: text,
       link: `/statuses/#${published}`,
       published,
       ...dt,
