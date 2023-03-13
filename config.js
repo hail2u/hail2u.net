@@ -1,4 +1,10 @@
-import pkg from "./package.json" assert { type: "json" };
+// import pkg from "./package.json" assert { type: "json" };
+
+import fs from "node:fs/promises";
+
+const file = new URL("./package.json", import.meta.url);
+const json = await fs.readFile(file, "utf8");
+const pkg = await JSON.parse(json);
 
 export default {
   dir: {
