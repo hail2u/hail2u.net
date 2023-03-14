@@ -1,29 +1,17 @@
-import {
-  escapeCharacters,
-  unescapeReferences
-} from "./character-reference.js";
+import { escapeCharacters, unescapeReferences } from "./character-reference.js";
 import config from "../../config.js";
 import fs from "node:fs/promises";
 import { outputFile } from "./output-file.js";
 import readline from "node:readline/promises";
 
 const toDraft = (draft) => {
-  const [
-    first,
-    ...rest
-  ] = draft.split("\n");
-  const body = rest
-    .join("\n")
-    .trim();
-  const [
-    ,
-    id,
-    title
-  ] = first.match(/<h1(?: id="(.*?)")?>(.*?)<\/h1>/u);
+  const [first, ...rest] = draft.split("\n");
+  const body = rest.join("\n").trim();
+  const [, id, title] = first.match(/<h1(?: id="(.*?)")?>(.*?)<\/h1>/u);
   return {
     body,
     id,
-    title: unescapeReferences(title.replace(/<.*?>/gu, ""))
+    title: unescapeReferences(title.replace(/<.*?>/gu, "")),
   };
 };
 
@@ -32,7 +20,7 @@ const toMenuitem = ({ title }, index) => `${String(index + 1)}. ${title}`;
 const rebuildDraft = ({
   body,
   id,
-  title
+  title,
 }) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
 
 ${body}
@@ -46,7 +34,7 @@ const selectDraft = async () => {
   const menuitems = await Promise.all(drafts.map(toMenuitem));
   const menu = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
   const menulist = menuitems.join("\n");
   menu.write(`0. QUIT
@@ -64,11 +52,8 @@ ${menulist}
     throw new Error("Aborted.");
   }
 
-  const [ selected ] = drafts.splice(answer - 1, 1);
-  const rebuilt = await Promise.all([
-    selected,
-    ...drafts
-  ].map(rebuildDraft));
+  const [selected] = drafts.splice(answer - 1, 1);
+  const rebuilt = await Promise.all([selected, ...drafts].map(rebuildDraft));
   await outputFile(file, rebuilt.join("\n\n"));
   return selected;
 };

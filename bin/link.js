@@ -1,7 +1,4 @@
-import {
-  outputJSONFile,
-  readJSONFile
-} from "./lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import { getDateDetails } from "./lib/get-date-details.js";
 import { openTwitter } from "./lib/open-twitter.js";
@@ -11,26 +8,22 @@ import util from "node:util";
 
 const main = async () => {
   const {
-    values: {
-      comment,
-      title,
-      url
-    }
+    values: { comment, title, url },
   } = util.parseArgs({
     options: {
       comment: {
         short: "c",
-        type: "string"
+        type: "string",
       },
       title: {
         short: "t",
-        type: "string"
+        type: "string",
       },
       url: {
         short: "u",
-        type: "string"
-      }
-    }
+        type: "string",
+      },
+    },
   });
 
   if (!comment) {
@@ -56,19 +49,12 @@ const main = async () => {
       published,
       ...dt,
       title,
-      type: "link"
+      type: "link",
     },
-    ...links
+    ...links,
   ]);
-  await runCommand("git", [
-    "add",
-    "--",
-    file
-  ]);
-  await runCommand("git", [
-    "commit",
-    `--message=Bookmark ${url}`
-  ]);
+  await runCommand("git", ["add", "--", file]);
+  await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
   await openTwitter(`${comment} ${url}`);
 };
 

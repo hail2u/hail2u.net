@@ -14,19 +14,19 @@ const makeTempDir = async () => {
 
 const main = async () => {
   const selected = await selectDraft();
-  const [
-    tempDir,
-    template
-  ] = await Promise.all([
+  const [tempDir, template] = await Promise.all([
     makeTempDir(),
-    fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8")
+    fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8"),
   ]);
   const test = path.join(tempDir, "test.html");
   const toTempDir = path.relative(tempDir, config.dir.dest);
   const rendered = renderTemplate(template, selected);
-  const fixed = rendered.replace(/(?<=\b(href|src)=")(\.\/dist)?\//gu, `${toTempDir}/`);
+  const fixed = rendered.replace(
+    /(?<=\b(href|src)=")(\.\/dist)?\//gu,
+    `${toTempDir}/`
+  );
   await outputFile(test, fixed);
-  await runCommand("open", [ test ]);
+  await runCommand("open", [test]);
 };
 
 main().catch((e) => {

@@ -1,7 +1,4 @@
-import {
-  outputJSONFile,
-  readJSONFile
-} from "./lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import { escapeCharacters } from "./lib/character-reference.js";
 import { getDateDetails } from "./lib/get-date-details.js";
@@ -19,16 +16,12 @@ const cancelFetch = (abortController) => {
 
 const main = async () => {
   const {
-    values: {
-      asin,
-      author,
-      title
-    }
+    values: { asin, author, title },
   } = util.parseArgs({
     options: {
       asin: {
         short: "a",
-        type: "string"
+        type: "string",
       },
       author: {
         short: "u",
@@ -36,9 +29,9 @@ const main = async () => {
       },
       title: {
         short: "t",
-        type: "string"
-      }
-    }
+        type: "string",
+      },
+    },
   });
 
   if (!asin) {
@@ -96,19 +89,12 @@ const main = async () => {
         published,
         ...dt,
         title,
-        type: "book"
+        type: "book",
       },
-      ...books
+      ...books,
     ]);
-    await runCommand("git", [
-      "add",
-      "--",
-      file
-    ]);
-    await runCommand("git", [
-      "commit",
-      `--message=Read ${asin}`
-    ]);
+    await runCommand("git", ["add", "--", file]);
+    await runCommand("git", ["commit", `--message=Read ${asin}`]);
     const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
     await openTwitter(`${url}`);
   } catch (e) {

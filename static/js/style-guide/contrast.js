@@ -15,11 +15,7 @@ window.addEventListener("load", () => {
   };
 
   const getLuminance = (color) => {
-    const [
-      red,
-      green,
-      blue
-    ] = color.match(/\d+/gu);
+    const [red, green, blue] = color.match(/\d+/gu);
     const luminance =
       0.2126729 * linearizeColorComponent(red) +
       0.7151522 * linearizeColorComponent(green) +
@@ -36,11 +32,15 @@ window.addEventListener("load", () => {
     }
 
     if (backgroundLuminance > foregroundLuminance) {
-      return (backgroundLuminance ** 0.56 - foregroundLuminance ** 0.57) * scale;
+      return (
+        (backgroundLuminance ** 0.56 - foregroundLuminance ** 0.57) * scale
+      );
     }
 
     if (backgroundLuminance < foregroundLuminance) {
-      return (backgroundLuminance ** 0.65 - foregroundLuminance ** 0.62) * scale;
+      return (
+        (backgroundLuminance ** 0.65 - foregroundLuminance ** 0.62) * scale
+      );
     }
 
     return 0.0;
@@ -70,7 +70,10 @@ window.addEventListener("load", () => {
   const getScore = (background, foreground) => {
     const backgroundLuminance = getLuminance(background);
     const foregroundLuminance = getLuminance(foreground);
-    const contrast = getPerceptualContrast(backgroundLuminance, foregroundLuminance);
+    const contrast = getPerceptualContrast(
+      backgroundLuminance,
+      foregroundLuminance
+    );
     const scaled = scaleContrast(contrast);
     return (scaled * 100).toFixed(3);
   };
@@ -86,11 +89,7 @@ window.addEventListener("load", () => {
     return ((sRGB + 0.055) / 1.055) ** 2.4;
   };
 
-  const getRelativeLuminance = ([
-    red,
-    green,
-    blue
-  ]) =>
+  const getRelativeLuminance = ([red, green, blue]) =>
     0.2126 * getComponentLuminance(red) +
     0.7152 * getComponentLuminance(green) +
     0.0722 * getComponentLuminance(blue);

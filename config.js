@@ -13,12 +13,12 @@ export default {
     dest: "dist/",
     metadata: "metadata/",
     static: "static/",
-    template: "templates/"
+    template: "templates/",
   },
   file: {
     draft: "drafts.html",
-    icon: "static/favicon.svg"
+    icon: "static/favicon.svg",
   },
   name: pkg.name,
-  version: pkg.version
+  version: pkg.version,
 };

@@ -1,7 +1,4 @@
-import {
-  outputJSONFile,
-  readJSONFile
-} from "./lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
@@ -12,26 +9,22 @@ const isSubscribed = (url, subscription) => url === subscription.url;
 
 const main = async () => {
   const {
-    values: {
-      feed,
-      title,
-      url
-    }
+    values: { feed, title, url },
   } = util.parseArgs({
     options: {
       feed: {
         short: "f",
-        type: "string"
+        type: "string",
       },
       title: {
         short: "t",
-        type: "string"
+        type: "string",
       },
       url: {
         short: "u",
-        type: "string"
-      }
-    }
+        type: "string",
+      },
+    },
   });
 
   if (!feed) {
@@ -57,20 +50,13 @@ const main = async () => {
     {
       feed,
       link: url,
-      title
+      title,
     },
-    ...subscriptions
+    ...subscriptions,
   ]);
   await outputJSONFile(file, shuffled);
-  await runCommand("git", [
-    "add",
-    "--",
-    file
-  ]);
-  await runCommand("git", [
-    "commit",
-    `--message=Subscribe ${url}`
-  ]);
+  await runCommand("git", ["add", "--", file]);
+  await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
 };
 
 main().catch((e) => {

@@ -1,12 +1,4 @@
-const dowNames = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat"
-];
+const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const monthNames = [
   "Jan",
   "Feb",
@@ -19,7 +11,7 @@ const monthNames = [
   "Sep",
   "Oct",
   "Nov",
-  "Dec"
+  "Dec",
 ];
 
 const getDateDetails = (timestamp) => {
@@ -46,7 +38,7 @@ const getDateDetails = (timestamp) => {
     strMonthName: monthNames[month - 1],
     strSecond: String(second).padStart(2, "0"),
     strYear: String(year).padStart(2, "0"),
-    year
+    year,
   };
 };
 

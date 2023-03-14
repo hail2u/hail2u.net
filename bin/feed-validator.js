@@ -18,7 +18,7 @@ const cancelFetch = (abortController) => {
 const parseXML = (xml) => {
   const parser = new fastXMLParser.XMLParser({
     arrayMode: /^error$/iu,
-    removeNSPrefix: true
+    removeNSPrefix: true,
   });
   const json = parser.parse(xml);
   return json.Envelope.Body.feedvalidationresponse.errors;
@@ -36,7 +36,7 @@ const validateFeed = async (feed) => {
     const res = await fetch("https://validator.w3.org/feed/check.cgi", {
       body,
       method: "POST",
-      signal: abortController.signal
+      signal: abortController.signal,
     });
 
     if (!res.ok) {
@@ -63,7 +63,8 @@ const validateFeed = async (feed) => {
   }
 };
 
-const formatMessage = (file, message) => `${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
+const formatMessage = (file, message) =>
+  `${file}:${message.line}:${message.column}: ${message.text} (${message.msgcount}).`;
 
 const validate = async (file) => {
   const feed = await fs.readFile(file, "utf8");
@@ -93,7 +94,9 @@ const main = async () => {
     process.stdout.write(errors.join("\n"));
     process.stdout.write("\n\n");
     const errorFiles = results.filter(isNotEmpty);
-    throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s)`);
+    throw new Error(
+      `${errors.length} error(s) in ${errorFiles.length} file(s)`
+    );
   }
 };
 

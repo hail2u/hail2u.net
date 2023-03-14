@@ -1,7 +1,4 @@
-import {
-  outputJSONFile,
-  readJSONFile
-} from "./lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import { getDateDetails } from "./lib/get-date-details.js";
 import { openTwitter } from "./lib/open-twitter.js";
@@ -10,7 +7,9 @@ import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
 
 const main = async () => {
-  const { positionals: [ text ] } = util.parseArgs({ allowPositionals: true });
+  const {
+    positionals: [text],
+  } = util.parseArgs({ allowPositionals: true });
 
   if (!text) {
     throw new Error("Only 1 argument is required.");
@@ -27,19 +26,15 @@ const main = async () => {
       published,
       ...dt,
       title: text,
-      type: "status"
+      type: "status",
     },
-    ...statuses
+    ...statuses,
   ]);
-  await runCommand("git", [
-    "add",
-    "--",
-    file
-  ]);
+  await runCommand("git", ["add", "--", file]);
   await runCommand("git", [
     "commit",
     "--message=Update status",
-    `--message=${text}`
+    `--message=${text}`,
   ]);
   await openTwitter(text);
 };

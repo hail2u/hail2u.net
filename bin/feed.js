@@ -10,7 +10,7 @@ import { renderTemplate } from "./lib/render-template.js";
 const toFilesFormat = (file) => ({
   dest: guessPath(file, config.dir.dest, "feed"),
   metadata: guessPath(file, config.dir.metadata, "index.json"),
-  template: file
+  template: file,
 });
 
 const gatherFiles = async () => {
@@ -37,14 +37,17 @@ const extendItem = (prefix, item) => {
   if (item.body) {
     return {
       ...item,
-      body: item.body.replace(/(href|src)="(\/.*?)"/gu, toAbsoluteURLAll.bind(null, prefix)),
-      link
+      body: item.body.replace(
+        /(href|src)="(\/.*?)"/gu,
+        toAbsoluteURLAll.bind(null, prefix)
+      ),
+      link,
     };
   }
 
   return {
     ...item,
-    link
+    link,
   };
 };
 
@@ -53,12 +56,12 @@ const readData = async (prefix, dataFile) => {
   const data = await readJSONFile(dataFile);
 
   if (!data[0].published) {
-    return { [ basename ]: [] };
+    return { [basename]: [] };
   }
 
   const latest = data.slice(0, 10);
   const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
-  return { [ basename ]: extended };
+  return { [basename]: extended };
 };
 
 const readLatestData = async (prefix) => {
@@ -72,52 +75,44 @@ const mergeData = async (file, metadata, data) => {
   return {
     ...metadata,
     ...data,
-    ...overrides
+    ...overrides,
   };
 };
 
 const build = async (metadata, data, file) => {
-  const [
-    merged,
-    template
-  ] = await Promise.all([
+  const [merged, template] = await Promise.all([
     mergeData(file, metadata, data),
-    fs.readFile(file.template, "utf8")
+    fs.readFile(file.template, "utf8"),
   ]);
   const rendered = renderTemplate(template, merged);
   await outputFile(file.dest, rendered);
 };
 
-const comparePublished = (a, b) => Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const comparePublished = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-  const metadata = await readJSONFile(path.join(config.dir.metadata, "root.json"));
+  const metadata = await readJSONFile(
+    path.join(config.dir.metadata, "root.json")
+  );
   const prefix = `${metadata.scheme}://${metadata.domain}`;
-  const [
-    files,
-    {
-      articles,
-      books,
-      links,
-      statuses
-    }
-  ] = await Promise.all([
+  const [files, { articles, books, links, statuses }] = await Promise.all([
     gatherFiles(),
-    readLatestData(prefix)
+    readLatestData(prefix),
   ]);
-  return Promise.all(files.map(build.bind(null, metadata, {
-    articles,
-    books,
-    items: [
-      ...articles,
-      ...books,
-      ...links,
-      ...statuses
-    ].sort(comparePublished)
-      .slice(0, 10),
-    links,
-    statuses
-  })));
+  return Promise.all(
+    files.map(
+      build.bind(null, metadata, {
+        articles,
+        books,
+        items: [...articles, ...books, ...links, ...statuses]
+          .sort(comparePublished)
+          .slice(0, 10),
+        links,
+        statuses,
+      })
+    )
+  );
 };
 
 main().catch((e) => {

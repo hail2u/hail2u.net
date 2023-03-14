@@ -1,7 +1,4 @@
-import {
-  outputJSONFile,
-  readJSONFile
-} from "./lib/json-file.js";
+import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
@@ -17,7 +14,9 @@ const checkIDFormat = (id) => {
   }
 
   if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
-    throw new Error("This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.");
+    throw new Error(
+      "This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”."
+    );
   }
 };
 
@@ -35,28 +34,24 @@ const checkIDConflict = async (id) => {
 
 const checkTitleType = (title) => {
   if (typeof title !== "string") {
-    throw new Error("This draft does not have a valid title. A draft title must be a string.");
+    throw new Error(
+      "This draft does not have a valid title. A draft title must be a string."
+    );
   }
 };
 
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
-  const [
-    selected,
-    articles
-  ] = await Promise.all([
+  const [selected, articles] = await Promise.all([
     selectDraft(),
-    readJSONFile(file)
+    readJSONFile(file),
   ]);
   const body = selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/");
-  const {
-    id,
-    title
-  } = selected;
+  const { id, title } = selected;
   await Promise.all([
     checkIDFormat(id),
     checkIDConflict(id),
-    checkTitleType(title)
+    checkTitleType(title),
   ]);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
@@ -73,25 +68,15 @@ const main = async () => {
       published,
       ...dt,
       title,
-      type: "article"
+      type: "article",
     },
-    ...articles
+    ...articles,
   ]);
-  await runCommand("git", [
-    "add",
-    "--",
-    file
-  ]);
+  await runCommand("git", ["add", "--", file]);
   const th = articles.length + 1;
-  const [{
-    domain,
-    scheme
-  }] = await Promise.all([
+  const [{ domain, scheme }] = await Promise.all([
     readJSONFile(path.join(config.dir.metadata, "root.json")),
-    runCommand("git", [
-      "commit",
-      `--message=Contribute ${id} (${th})`
-    ])
+    runCommand("git", ["commit", `--message=Contribute ${id} (${th})`]),
   ]);
   await openTwitter(`${scheme}://${domain}${link}`);
 };

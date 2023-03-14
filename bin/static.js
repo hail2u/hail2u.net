@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 
 const main = async () => {
   await fs.cp(config.dir.static, config.dir.dest, {
-    recursive: true
+    recursive: true,
   });
 };
 

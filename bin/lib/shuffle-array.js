@@ -5,13 +5,7 @@ const swapRandomly = (elm, i, arr) => {
     return;
   }
 
-  [
-    arr[i],
-    arr[j]
-  ] = [
-    arr[j],
-    arr[i]
-  ];
+  [arr[i], arr[j]] = [arr[j], arr[i]];
 };
 
 const shuffleArray = (array) => {

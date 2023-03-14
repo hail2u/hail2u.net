@@ -70,7 +70,7 @@ const markItem = (item, index, items) => {
     isFirstInYear: isFirstInYear(item, previousItem),
     isLastInDate: isLastInDate(item, nextItem),
     isLastInMonth: isLastInMonth(item, nextItem),
-    isLastInYear: isLastInYear(item, nextItem)
+    isLastInYear: isLastInYear(item, nextItem),
   };
 };
 
@@ -78,7 +78,7 @@ const readData = async (file) => {
   const basename = path.basename(file, ".json");
   const data = await readJSONFile(file);
   const marked = await Promise.all(data.map(markItem));
-  return { [ basename ]: marked };
+  return { [basename]: marked };
 };
 
 const readAllData = async () => {
@@ -88,11 +88,9 @@ const readAllData = async () => {
 };
 
 const readPartial = async (file) => {
-  const basename = path
-    .basename(file, ".mustache")
-    .substring(1);
+  const basename = path.basename(file, ".mustache").substring(1);
   const partial = await fs.readFile(file, "utf8");
-  return { [ basename ]: partial };
+  return { [basename]: partial };
 };
 
 const readPartials = async () => {
@@ -103,12 +101,16 @@ const readPartials = async () => {
 
 const toFilesFormat = (file) => {
   if (typeof file === "object") {
-    const template = path.join(config.dir.template, "blog", "_article.mustache");
+    const template = path.join(
+      config.dir.template,
+      "blog",
+      "_article.mustache"
+    );
     return {
       ...file,
       dest: path.join(config.dir.dest, file.link),
       metadata: guessPath(template, config.dir.metadata, "article.json"),
-      template
+      template,
     };
   }
 
@@ -119,20 +121,26 @@ const toFilesFormat = (file) => {
     const dirname = path.dirname(file);
     return {
       dest: guessPath(path.join(dirname, basename), config.dir.dest, doubleExt),
-      metadata: guessPath(path.join(dirname, basename), config.dir.metadata, ".json"),
-      template: file
+      metadata: guessPath(
+        path.join(dirname, basename),
+        config.dir.metadata,
+        ".json"
+      ),
+      template: file,
     };
   }
 
   return {
     dest: guessPath(file, config.dir.dest, ".html"),
     metadata: guessPath(file, config.dir.metadata, ".json"),
-    template: file
+    template: file,
   };
 };
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.dir.template}**/*.mustache`, { ignore: `**/_*` });
+  const files = await globAsync(`${config.dir.template}**/*.mustache`, {
+    ignore: `**/_*`,
+  });
   return Promise.all(files.map(toFilesFormat));
 };
 
@@ -147,7 +155,7 @@ const findCover = (html) => {
 
   return {
     cover: image[1],
-    twitterCard: "summary_large_image"
+    twitterCard: "summary_large_image",
   };
 };
 
@@ -163,7 +171,7 @@ const mergeData = async (file, metadata, data) => {
       ...overrides,
       ...article,
       ...cover,
-      canonical: article.link
+      canonical: article.link,
     };
   }
 
@@ -176,24 +184,21 @@ const mergeData = async (file, metadata, data) => {
       homeBooks: data.books.slice(0, 3),
       homeLinks: data.links.slice(0, 6),
       homeProjects: data.projects.slice(0, 3),
-      homeStatuses: data.statuses.slice(0, 1)
+      homeStatuses: data.statuses.slice(0, 1),
     };
   }
 
   return {
     ...metadata,
     ...data,
-    ...overrides
+    ...overrides,
   };
 };
 
 const build = async (metadata, data, partials, file) => {
-  const [
-    merged,
-    template
-  ] = await Promise.all([
+  const [merged, template] = await Promise.all([
     mergeData(file, metadata, data),
-    fs.readFile(file.template, "utf8")
+    fs.readFile(file.template, "utf8"),
   ]);
   const rendered = renderTemplate(template, merged, partials);
   await outputFile(file.dest, rendered);
@@ -202,22 +207,12 @@ const build = async (metadata, data, partials, file) => {
 const main = async () => {
   const [
     metadata,
-    {
-      articles,
-      books,
-      links,
-      projects,
-      statuses,
-      subscriptions
-    },
+    { articles, books, links, projects, statuses, subscriptions },
     partials,
     {
-      values: {
-        all,
-        latest
-      }
+      values: { all, latest },
     },
-    files
+    files,
   ] = await Promise.all([
     readJSONFile(path.join(config.dir.metadata, "root.json")),
     readAllData(),
@@ -226,15 +221,15 @@ const main = async () => {
       options: {
         all: {
           short: "a",
-          type: "boolean"
+          type: "boolean",
         },
         latest: {
           short: "l",
-          type: "boolean"
-        }
-      }
+          type: "boolean",
+        },
+      },
     }),
-    gatherFiles()
+    gatherFiles(),
   ]);
   const data = {
     articles,
@@ -243,7 +238,7 @@ const main = async () => {
     projects,
     statuses,
     subscriptions,
-    version: config.version
+    version: config.version,
   };
 
   if (latest) {

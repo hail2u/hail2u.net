@@ -4,10 +4,7 @@ import path from "node:path";
 import { shuffleArray } from "./lib/shuffle-array.js";
 import util from "node:util";
 
-const rewritePath = ([
-    ,
-    relative
-  ]) => {
+const rewritePath = ([, relative]) => {
   if (relative.endsWith("/")) {
     return path.join(config.dir.dest, relative, "index.html");
   }
@@ -31,7 +28,7 @@ const validateHTML = async (html) => {
     const res = await fetch("https://validator.w3.org/nu/", {
       body,
       method: "POST",
-      signal: abortController.signal
+      signal: abortController.signal,
     });
 
     if (!res.ok) {
@@ -60,11 +57,8 @@ const validateHTML = async (html) => {
   }
 };
 
-const formatMessage = (file, {
-  lastColumn,
-  lastLine,
-  message
-}) => `${file}:${lastLine}:${lastColumn}: ${message}`;
+const formatMessage = (file, { lastColumn, lastLine, message }) =>
+  `${file}:${lastLine}:${lastColumn}: ${message}`;
 
 const validate = async (file) => {
   const html = await fs.readFile(file, "utf8");
@@ -83,23 +77,27 @@ const main = async () => {
   const [
     sitemap,
     {
-      values: {
-        latest
-      }
-    }
+      values: { latest },
+    },
   ] = await Promise.all([
     fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8"),
     util.parseArgs({
       options: {
         latest: {
           short: "l",
-          type: "boolean"
-        }
-      }
-    })
+          type: "boolean",
+        },
+      },
+    }),
   ]);
-  const articles = Array.from(sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu), rewritePath);
-  const files = Array.from(sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu), rewritePath);
+  const articles = Array.from(
+    sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
+    rewritePath
+  );
+  const files = Array.from(
+    sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
+    rewritePath
+  );
 
   if (latest) {
     files.push(articles.shift());
@@ -114,7 +112,9 @@ const main = async () => {
     const errorFiles = results.filter(isNotEmpty);
     process.stdout.write(errors.join("\n"));
     process.stdout.write("\n\n");
-    throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s).`);
+    throw new Error(
+      `${errors.length} error(s) in ${errorFiles.length} file(s).`
+    );
   }
 };
 
