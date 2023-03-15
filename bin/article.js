@@ -40,6 +40,34 @@ const checkTitleType = (title) => {
   }
 };
 
+const buildArticle = (body, description, link, published, dt, title) => {
+  const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
+
+  if (!image) {
+    return {
+      body,
+      description,
+      link,
+      published,
+      ...dt,
+      title,
+      type: "article",
+    };
+  }
+
+  return {
+    body,
+    cover: image[1],
+    description,
+    link,
+    published,
+    ...dt,
+    title,
+    twitterCard: "summary_large_image",
+    type: "article",
+  };
+};
+
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
   const [selected, articles] = await Promise.all([
@@ -60,18 +88,8 @@ const main = async () => {
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
-  await outputJSONFile(file, [
-    {
-      body,
-      description,
-      link,
-      published,
-      ...dt,
-      title,
-      type: "article",
-    },
-    ...articles,
-  ]);
+  const article = buildArticle(body, description, link, published, dt, title);
+  await outputJSONFile(file, [article, ...articles]);
   await runCommand("git", ["add", "--", file]);
   const th = articles.length + 1;
   const [{ domain, scheme }] = await Promise.all([

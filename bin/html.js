@@ -146,31 +146,16 @@ const gatherFiles = async () => {
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
-const findCover = (html) => {
-  const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(html);
-
-  if (!image) {
-    return {};
-  }
-
-  return {
-    cover: image[1],
-    twitterCard: "summary_large_image",
-  };
-};
-
 const mergeData = async (file, metadata, data) => {
   const overrides = await readJSONFile(file.metadata);
 
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
-    const cover = findCover(article.body);
     return {
       ...metadata,
       ...data,
       ...overrides,
       ...article,
-      ...cover,
       canonical: article.link,
     };
   }
