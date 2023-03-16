@@ -25,7 +25,7 @@ const main = async () => {
       },
       author: {
         short: "u",
-        type: "string"
+        type: "string",
       },
       title: {
         short: "t",

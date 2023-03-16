@@ -7,20 +7,20 @@ import { renderTemplate } from "./lib/render-template.js";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
-const makeTempDir = async () => {
-  const osTemp = await fs.realpath(os.tmpdir());
-  return fs.mkdtemp(path.join(osTemp, path.sep, `${config.name}-`));
-};
-
 const main = async () => {
   const selected = await selectDraft();
-  const [tempDir, template] = await Promise.all([
-    makeTempDir(),
+  const [osTemp, template] = await Promise.all([
+    fs.realpath(os.tmpdir()),
     fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8"),
   ]);
-  const test = path.join(tempDir, "test.html");
-  const toTempDir = path.relative(tempDir, config.dir.dest);
-  const rendered = renderTemplate(template, selected);
+  const tempDir = await fs.mkdtemp(
+    path.join(osTemp, path.sep, `${config.name}-`)
+  );
+  const [test, rendered, toTempDir] = await Promise.all([
+    path.join(tempDir, "test.html"),
+    renderTemplate(template, selected),
+    path.relative(tempDir, config.dir.dest),
+  ]);
   const fixed = rendered.replace(
     /(?<=\b(href|src)=")(\.\/dist)?\//gu,
     `${toTempDir}/`
