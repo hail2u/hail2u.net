@@ -3,6 +3,7 @@ import config from "../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
 import { openTwitter } from "./lib/open-twitter.js";
+import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
@@ -89,8 +90,18 @@ const main = async () => {
   const published = Date.now();
   const dt = getDateDetails(published);
   const article = buildArticle(body, description, link, published, dt, title);
-  await outputJSONFile(file, [article, ...articles]);
-  await runCommand("git", ["add", "--", file]);
+  const dataFile = path.join(config.dir.data, link);
+  await Promise.all([
+    outputJSONFile(file, [article, ...articles]),
+    outputFile(
+      dataFile,
+      `<h1>${title}</h1>
+
+${selected.body}
+`
+    ),
+  ]);
+  await runCommand("git", ["add", "--", file, dataFile]);
   const th = articles.length + 1;
   const [{ domain, scheme }] = await Promise.all([
     readJSONFile(path.join(config.dir.metadata, "root.json")),
