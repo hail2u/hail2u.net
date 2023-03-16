@@ -1,3 +1,7 @@
+import {
+  escapeCharacters,
+  unescapeReferences,
+} from "./lib/character-reference.js";
 import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
@@ -7,7 +11,6 @@ import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
-import { unescapeReferences } from "./lib/character-reference.js";
 
 const checkIDFormat = (id) => {
   if (!id) {
@@ -91,11 +94,12 @@ const main = async () => {
   const dt = getDateDetails(published);
   const article = buildArticle(body, description, link, published, dt, title);
   const dataFile = path.join(config.dir.data, link);
+  const escapedTitle = escapeCharacters(title);
   await Promise.all([
     outputJSONFile(file, [article, ...articles]),
     outputFile(
       dataFile,
-      `<h1>${title}</h1>
+      `<h1>${escapedTitle}</h1>
 
 ${selected.body}
 `
