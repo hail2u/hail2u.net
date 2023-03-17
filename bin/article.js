@@ -44,8 +44,23 @@ const checkTitleType = (title) => {
   }
 };
 
-const buildArticle = (body, description, link, published, dt, title) => {
+const buildArticle = async (selected) => {
+  const { id, title } = selected;
+  await Promise.all([
+    checkIDFormat(id),
+    checkIDConflict(id),
+    checkTitleType(title),
+  ]);
+  const body = selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/");
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
+  const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
+    .trim()
+    .split("\n")
+    .shift();
+  const link = path.posix.join("/", "blog", `${id}.html`);
+  const published = Date.now();
+  const dt = getDateDetails(published);
+  const type = "article";
 
   if (!image) {
     return {
@@ -55,7 +70,7 @@ const buildArticle = (body, description, link, published, dt, title) => {
       published,
       ...dt,
       title,
-      type: "article",
+      type,
     };
   }
 
@@ -68,7 +83,7 @@ const buildArticle = (body, description, link, published, dt, title) => {
     ...dt,
     title,
     twitterCard: "summary_large_image",
-    type: "article",
+    type,
   };
 };
 
@@ -78,23 +93,9 @@ const main = async () => {
     selectDraft(),
     readJSONFile(file),
   ]);
-  const body = selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/");
-  const { id, title } = selected;
-  await Promise.all([
-    checkIDFormat(id),
-    checkIDConflict(id),
-    checkTitleType(title),
-  ]);
-  const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
-    .trim()
-    .split("\n")
-    .shift();
-  const link = path.posix.join("/", "blog", `${id}.html`);
-  const published = Date.now();
-  const dt = getDateDetails(published);
-  const article = buildArticle(body, description, link, published, dt, title);
-  const dataFile = path.join(config.dir.data, link);
-  const escapedTitle = escapeCharacters(title);
+  const article = await buildArticle(selected);
+  const dataFile = path.join(config.dir.data, article.link);
+  const escapedTitle = escapeCharacters(article.title);
   await Promise.all([
     outputJSONFile(file, [article, ...articles]),
     outputFile(
@@ -109,9 +110,12 @@ ${selected.body}
   const th = articles.length + 1;
   const [{ domain, scheme }] = await Promise.all([
     readJSONFile(path.join(config.dir.metadata, "root.json")),
-    runCommand("git", ["commit", `--message=Contribute ${id} (${th})`]),
+    runCommand("git", [
+      "commit",
+      `--message=Contribute ${article.link} (${th})`,
+    ]),
   ]);
-  await openTwitter(`${scheme}://${domain}${link}`);
+  await openTwitter(`${scheme}://${domain}${article.link}`);
 };
 
 main().catch((e) => {

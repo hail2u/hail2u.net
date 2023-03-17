@@ -5,18 +5,21 @@ import { getDateDetails } from "./lib/get-date-details.js";
 import path from "node:path";
 import { unescapeReferences } from "./lib/character-reference.js";
 
-const buildArticle = (
-  { cover, link, published, twitterCard, type },
-  body,
-  title
-) => {
+const rebuildArticle = async (article) => {
+  const { link, published } = article;
+  const html = await fs.readFile(path.join(config.dir.data, link), "utf8");
+  const [first, ...rest] = html.split("\n");
+  const body = rest.join("\n").trim();
+  const title = unescapeReferences(first.replace(/<.*?>/gu, ""));
+  const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n")
     .shift();
   const dt = getDateDetails(published);
+  const type = "article";
 
-  if (!cover) {
+  if (!image) {
     return {
       body,
       description,
@@ -30,34 +33,21 @@ const buildArticle = (
 
   return {
     body,
-    cover,
+    cover: image[1],
     description,
     link,
     published,
     ...dt,
     title,
-    twitterCard,
+    twitterCard: "summary_large_image",
     type,
   };
-};
-
-const readArticle = async (article) => {
-  const html = await fs.readFile(
-    path.join(config.dir.data, article.link),
-    "utf8"
-  );
-  const [first, ...rest] = html.split("\n");
-  return buildArticle(
-    article,
-    rest.join("\n").trim(),
-    unescapeReferences(first.replace(/<.*?>/gu, ""))
-  );
 };
 
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
   const articles = await readJSONFile(file);
-  const newArticles = await Promise.all(articles.map(readArticle));
+  const newArticles = await Promise.all(articles.map(rebuildArticle));
   await outputJSONFile(file, newArticles);
 };
 
