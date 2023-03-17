@@ -13,11 +13,11 @@
     <meta content="Sass v3.4.0.rc.1が出た。&amp;の扱いが拡充したこととセレクターを扱う関数の追加がトピック。他に予告されていた変数スコープの改善も思ったよりも早く導入された。後方互換性を失う変更はあるものの、大体は問題なくコンパイルされる。けどコンパイラーのオプション他に変化があったため、それらをラップするツールで不具合が起こりやすい。例えばgrunt-contrib-sassが--load-pathと--sourcemapオプション辺りの変更に対応できておらず、例外を吐いて落ちたりする。" name="description">
     <link href="/favicon.svg" rel="icon" type="image/svg+xml">
     <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-    <link href="https://www.google.com/search?q=site%3Ahail2u.net" rel="search">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
     <meta content="width=device-width" name="viewport">
 
-    <link href="/css/print.css?v=9.28.1" media="only print" rel="stylesheet">
-    <link href="/css/index.css?v=9.28.1" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.29.0" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.29.0" media="only screen" rel="stylesheet">
 
     <meta content="summary" name="twitter:card">
     <meta content="Sass v3.4.0.rc.1が出た。&amp;の扱いが拡充したこととセレクターを扱う関数の追加がトピック。他に予告されていた変数スコープの改善も思ったよりも早く導入された。後方互換性を失う変更はあるものの、大体は問題なくコンパイルされる。けどコンパイラーのオプション他に変化があったため、それらをラップするツールで不具合が起こりやすい。例えばgrunt-contrib-sassが--load-pathと--sourcemapオプション辺りの変更に対応できておらず、例外を吐いて落ちたりする。" property="twitter:description">
@@ -28,21 +28,14 @@
 
   <body>
     <nav class="site-menu">
-      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg" width="16"></a></p>
+      <p><a href="/"><img alt="ホームへ戻る" height="16" src="/img/logo.svg?v=9.29.0" width="16"></a></p>
 
       <div>
-        <ul>
-          <li><a href="/statuses/">近ごろの様子</a></li>
-          <li><a href="/blog/">雑多な記録</a></li>
-          <li><a href="/projects/">行ってきた活動</a></li>
-          <li><a href="/links/">気になったウェブページ</a></li>
-          <li><a href="/bookshelf/">読み終えた書籍</a></li>
-        </ul>
+        <p><a href="/statuses/">近ごろの様子</a>&#x2003;<a href="/blog/">雑多な記録</a>&#x2003;<a href="/projects/">行ってきた活動</a></p>
 
-        <ul>
-          <li><a href="/about/">案内</a></li>
-          <li><a href="https://www.google.com/search?q=site%3Ahail2u.net">検索</a></li>
-        </ul>
+        <p><a href="/links/">気になったウェブページ</a>&#x2003;<a href="/bookshelf/">読み終えた書籍</a></p>
+
+        <p><a href="/about/">案内</a>&#x2003;<a href="https://duckduckgo.com/?q=site%3Ahail2u.net">検索</a></p>
       </div>
     </nav>
     <header class="page-header">
@@ -58,15 +51,12 @@
 
 <p>普通に実行する場合は問題ないが、<code>--load-path</code>オプション付きで実行しようとすると以下の様にSassコンパイラーが<code>NoMethodError</code>で落ち、タスクが止まってしまうことがある。</p>
 
-<blockquote>
 <pre><samp>Running "sass:main" (sass) task
 NoMethodError: undefined method `&lt;&lt;&apos; for nil:NilClass
   Use --trace for backtrace.
 Warning: Exited with error code 1 Use --force to continue.NoMethodError:
 
 Aborted due to warnings.</samp></pre>
-</blockquote>
-</figure>
 
 <p>これはv3.4.0.rc.1でライブラリをロードするパスとして入力ファイルと同じディレクトリが含まれなくなったことに起因する問題のようだ。grunt-contrib-sass経由の場合、<code>--load-path</code>が常に指定されて実行されるので起こりやすい。CHANGELOGで触れられているように<code>SASS_PATH</code>という環境変数を設定しておくと落ちなくなる。</p>
 
@@ -80,14 +70,11 @@ Aborted due to warnings.</samp></pre>
 
 <p>Sass v3.4.0.rc.1ではSource Mapがデフォルトで出力されるようになり、それに伴ってオプションも変更になった。</p>
 
-<blockquote>
 <pre><samp>--sourcemap=TYPE             How link generated output to the source files.
                                auto (default): relative paths where possible, file URIs elsewhere
                                file: always absolute file URIs
                                inline: include the source text in the sourcemap
                                none: no sourcemaps</samp></pre>
-</blockquote>
-</figure>
 
 <p>今までのような真偽値のオプションではなくなり、文字列でSource Mapの出力方法を指定するように変わっている。また他の<code>--style</code>や<code>--default-encoding</code>と違って、このオプションのみ<code>=</code>で値を指定する必要がある。grunt-contrib-sassではこの新しい値の文字列に対応していないのみならず、内部で利用している<a href="https://github.com/sindresorhus/dargs"><code>dargs</code>パッケージ</a>が<code>=</code>で値を指定する方法に対応していないので、<a href="/grunt-contrib-sass-source-map.patch">結構大胆に手をいれる必要</a>があった。</p>
 
