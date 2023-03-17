@@ -1,13 +1,13 @@
 import config from "../config.js";
 import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
-import { globAsync } from "./lib/glob-async.js";
+import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 
 const toDest = (file) => guessPath(file, config.dir.dest, "feed");
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.dir.template}**/_feed.mustache`);
+  const files = await glob(`${config.dir.template}**/_feed.mustache`);
   return Promise.all(files.map(toDest));
 };
 

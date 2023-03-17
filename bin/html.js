@@ -1,6 +1,6 @@
 import config from "../config.js";
 import fs from "node:fs/promises";
-import { globAsync } from "./lib/glob-async.js";
+import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
@@ -82,7 +82,7 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const files = await globAsync(`${config.dir.data}**/*.json`);
+  const files = await glob(`${config.dir.data}**/*.json`);
   const data = await Promise.all(files.map(readData));
   return Object.assign(...data);
 };
@@ -94,7 +94,7 @@ const readPartial = async (file) => {
 };
 
 const readPartials = async () => {
-  const files = await globAsync(`${config.dir.template}partials/*.mustache`);
+  const files = await glob(`${config.dir.template}partials/*.mustache`);
   const partials = await Promise.all(files.map(readPartial));
   return Object.assign(...partials);
 };
@@ -138,7 +138,7 @@ const toFilesFormat = (file) => {
 };
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.dir.template}**/*.mustache`, {
+  const files = await glob(`${config.dir.template}**/*.mustache`, {
     ignore: `**/_*`,
   });
   return Promise.all(files.map(toFilesFormat));

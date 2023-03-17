@@ -1,5 +1,5 @@
 import config from "../config.js";
-import { globAsync } from "./lib/glob-async.js";
+import { glob } from "glob";
 import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
@@ -21,7 +21,7 @@ const main = async () => {
     throw new Error("1 argument is required. This is for an source directory.");
   }
 
-  const files = await globAsync(`${src}*.jpg`);
+  const files = await glob(`${src}*.jpg`);
   const dest = path.join(config.dir.dest, "img/blog/");
   await Promise.all(files.map(mv.bind(null, dest)));
 };

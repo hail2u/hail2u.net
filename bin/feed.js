@@ -1,6 +1,6 @@
 import config from "../config.js";
 import fs from "node:fs/promises";
-import { globAsync } from "./lib/glob-async.js";
+import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
@@ -14,7 +14,7 @@ const toFilesFormat = (file) => ({
 });
 
 const gatherFiles = async () => {
-  const files = await globAsync(`${config.dir.template}**/_feed.mustache`);
+  const files = await glob(`${config.dir.template}**/_feed.mustache`);
   return Promise.all(files.map(toFilesFormat));
 };
 
@@ -65,7 +65,7 @@ const readData = async (prefix, dataFile) => {
 };
 
 const readLatestData = async (prefix) => {
-  const dataFiles = await globAsync(`${config.dir.data}**/*.json`);
+  const dataFiles = await glob(`${config.dir.data}**/*.json`);
   const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
   return Object.assign(...data);
 };
