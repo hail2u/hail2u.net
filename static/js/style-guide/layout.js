@@ -1,5 +1,4 @@
 /* layout.js | MIT License */
-
 document
   .querySelector(".js-test-layout-button")
   .addEventListener("click", () => {
