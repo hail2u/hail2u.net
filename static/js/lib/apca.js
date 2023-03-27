@@ -30,15 +30,11 @@ const getPerceptualContrast = (backgroundLuminance, foregroundLuminance) => {
   }
 
   if (backgroundLuminance > foregroundLuminance) {
-    return (
-      (backgroundLuminance ** 0.56 - foregroundLuminance ** 0.57) * scale
-    );
+    return (backgroundLuminance ** 0.56 - foregroundLuminance ** 0.57) * scale;
   }
 
   if (backgroundLuminance < foregroundLuminance) {
-    return (
-      (backgroundLuminance ** 0.65 - foregroundLuminance ** 0.62) * scale
-    );
+    return (backgroundLuminance ** 0.65 - foregroundLuminance ** 0.62) * scale;
   }
 
   return 0.0;
