@@ -1,9 +1,9 @@
-import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
-import config from "../config.js";
+import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
+import config from "../../config.js";
 import fs from "node:fs/promises";
-import { getDateDetails } from "./lib/get-date-details.js";
+import { getDateDetails } from "../lib/get-date-details.js";
 import path from "node:path";
-import { unescapeReferences } from "./lib/character-reference.js";
+import { unescapeReferences } from "../lib/character-reference.js";
 
 const rebuildArticle = async (article) => {
   const { link, published } = article;
