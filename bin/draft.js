@@ -22,7 +22,7 @@ const main = async () => {
     path.relative(tempDir, config.dir.dest),
   ]);
   const fixed = rendered.replace(
-    /(?<=\b(href|src)=")(\.\/dist)?\//gu,
+    /(?<=\b(href|src|srcset)=")(\.\/dist)?\//gu,
     `${toTempDir}/`
   );
   await outputFile(test, fixed);

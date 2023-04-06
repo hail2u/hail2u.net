@@ -51,7 +51,7 @@ const buildArticle = async (selected) => {
     checkIDConflict(id),
     checkTitleType(title),
   ]);
-  const body = selected.body.replace(/(?<=\b(href|src)=")\.\/dist\//gu, "/");
+  const body = selected.body.replace(/(?<=\b(href|src|srcset)=")\.\/dist\//gu, "/");
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
