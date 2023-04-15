@@ -45,16 +45,12 @@ const checkTitleType = (title) => {
 };
 
 const buildArticle = async (selected) => {
-  const { id, title } = selected;
+  const { body, id, title } = selected;
   await Promise.all([
     checkIDFormat(id),
     checkIDConflict(id),
     checkTitleType(title),
   ]);
-  const body = selected.body.replace(
-    /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
-    "/"
-  );
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
@@ -96,7 +92,14 @@ const main = async () => {
     selectDraft(),
     readJSONFile(file),
   ]);
-  const article = await buildArticle(selected);
+  const body = selected.body.replace(
+    /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
+    "/"
+  );
+  const article = await buildArticle({
+    ...selected,
+    body,
+  });
   const dataFile = path.join(config.dir.data, article.link);
   const escapedTitle = escapeCharacters(article.title);
   await Promise.all([
@@ -105,7 +108,7 @@ const main = async () => {
       dataFile,
       `<h1>${escapedTitle}</h1>
 
-${selected.body}
+${body}
 `
     ),
   ]);
