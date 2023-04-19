@@ -55,7 +55,7 @@ const buildArticle = async (selected) => {
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n")
-    .shift();
+    .slice(0, 1);
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);

@@ -12,6 +12,19 @@ const rewritePath = ([, relative]) => {
   return path.join(config.dir.dest, relative);
 };
 
+const listArticle = (sitemap, latest) => {
+  const articles = Array.from(
+    sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
+    rewritePath
+  );
+
+  if (latest) {
+    return articles.slice(0, 1);
+  }
+
+  return shuffleArray(articles).slice(0, 3);
+};
+
 const cancelFetch = (abortController) => {
   abortController.abort();
 };
@@ -90,22 +103,12 @@ const main = async () => {
       },
     }),
   ]);
-  const articles = Array.from(
-    sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
-    rewritePath
-  );
-  const files = Array.from(
+  const indexes = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
     rewritePath
   );
-
-  if (latest) {
-    files.push(articles.shift());
-  } else {
-    files.push(...shuffleArray(articles).slice(0, 3));
-  }
-
-  const results = await Promise.all(files.map(validate));
+  const articles = listArticle(sitemap, latest);
+  const results = await Promise.all([...indexes, ...articles].map(validate));
   const errors = results.flat();
 
   if (errors.length > 0) {

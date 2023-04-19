@@ -52,8 +52,10 @@ ${menulist}
     throw new Error("Aborted.");
   }
 
-  const [selected] = drafts.splice(answer - 1, 1);
-  const rebuilt = await Promise.all([selected, ...drafts].map(rebuildDraft));
+  const index = answer - 1;
+  const selected = drafts[index];
+  const remains = drafts.toSpliced(index, 1);
+  const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
   await outputFile(file, rebuilt.join("\n\n"));
   return selected;
 };

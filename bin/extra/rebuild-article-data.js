@@ -15,7 +15,7 @@ const rebuildArticle = async (article) => {
   const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n")
-    .shift();
+    .slice(0, 1);
   const dt = getDateDetails(published);
   const type = "article";
 

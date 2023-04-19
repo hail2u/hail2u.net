@@ -106,7 +106,7 @@ const main = async () => {
         articles,
         books,
         items: [...articles, ...books, ...links, ...statuses]
-          .sort(comparePublished)
+          .toSorted(comparePublished)
           .slice(0, 10),
         links,
         statuses,

@@ -233,9 +233,11 @@ const main = async () => {
 
   if (all) {
     const articleFiles = await Promise.all(articles.map(toFilesFormat));
+    const thread = 1024;
+    const repeat = Math.ceil(articleFiles.length / thread);
 
-    while (articleFiles.length > 0) {
-      const chunk = articleFiles.splice(-1024);
+    for (let i = 0; i < repeat; i += 1) {
+      const chunk = articleFiles.slice(i * thread, (i + 1) * thread);
       /* eslint-disable-next-line no-await-in-loop */
       await Promise.all(chunk.map(build.bind(null, metadata, data, partials)));
     }
