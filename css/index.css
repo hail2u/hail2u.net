@@ -18,6 +18,10 @@
   --line-height-default: calc(var(--ratio-2));
   --line-height-small: calc(var(--line-height-default) / var(--ratio-1));
 
+  /* Leading */
+  --leading: calc((var(--line-height-default) - 1) * 1rem);
+  --leading-half: calc(var(--leading) / 2);
+
   /* Ratio */
   --ratio-1: 1.272;
   --ratio-2: calc(var(--ratio-1) * var(--ratio-1));
@@ -30,14 +34,15 @@
   --space-tiny: calc(var(--space-small) / var(--ratio-2));
   --space-huge: calc(var(--space-large) * var(--ratio-2));
   --space-gargantuan: calc(var(--space-huge) * var(--ratio-2));
+  --space-rect: calc(var(--space-default) + var(--leading-half));
 
   /* Width */
   --width-column: 44rem;
-  --width-half-gutter: calc(
+  --width-gutter-half: calc(
     var(--width-column) / var(--ratio-4) / var(--ratio-4) / var(--ratio-4) /
       var(--ratio-4)
   );
-  --width-gutter: calc(var(--width-half-gutter) * 2);
+  --width-gutter: calc(var(--width-gutter-half) * 2);
 
   background-color: var(--color-background);
   color: var(--color-on-background);
@@ -66,8 +71,8 @@ body {
   --margin-inline-start: clamp(
     0px,
     (
-      100vw - var(--width-half-gutter) - var(--width-column) -
-        var(--width-half-gutter) - 20px
+      100vw - var(--width-gutter-half) - var(--width-column) -
+        var(--width-gutter-half) - 20px
     ) / 2,
     var(--ratio-4) * var(--ratio-4) * var(--ratio-2) * 1vw
   );
@@ -76,7 +81,7 @@ body {
   margin-block: var(--margin-block);
   margin-inline: var(--margin-inline-start) auto;
   max-width: var(--width-column);
-  padding-inline: var(--width-half-gutter);
+  padding-inline: var(--width-gutter-half);
 }
 
 h1 {
@@ -116,9 +121,13 @@ hr {
   border-block-start-style: solid;
   border-block-start-width: thin;
   border-inline: none;
-  margin-block: var(--space-large);
+  margin-block: var(--space-rect);
   margin-inline-start: 0;
   width: calc(var(--width-column) / var(--ratio-4) / var(--ratio-4));
+}
+
+:where(main) + hr {
+  margin-block-start: var(--space-gargantuan);
 }
 
 pre {
@@ -126,9 +135,9 @@ pre {
   /* stylelint-disable-next-line font-family-no-duplicate-names */
   font-family: monospace, monospace;
   font-size: inherit;
-  margin-block: var(--space-large);
+  margin-block: var(--space-rect);
   overflow-x: auto;
-  padding: var(--space-small) var(--width-half-gutter);
+  padding: var(--space-small) var(--width-gutter-half);
   tab-size: 4;
 }
 
@@ -151,7 +160,7 @@ li {
 }
 
 figure {
-  margin: var(--space-large) 0;
+  margin: var(--space-rect) 0;
 }
 
 figcaption {
@@ -209,7 +218,7 @@ svg {
 table {
   border-spacing: 0;
   display: block;
-  margin-block: var(--space-large);
+  margin-block: var(--space-rect);
   max-width: 100%;
   overflow-x: auto;
 }
@@ -218,7 +227,7 @@ td {
   background-color: var(--color-background-tone);
   border-block-start-style: solid;
   border-block-start-width: thin;
-  padding: var(--space-small) var(--width-half-gutter);
+  padding: var(--space-small) var(--width-gutter-half);
   vertical-align: top;
   white-space: pre;
 }
@@ -227,7 +236,7 @@ th {
   background-color: var(--color-background-tone);
   border-block-end-style: solid;
   border-block-end-width: thin;
-  padding: var(--space-small) var(--width-half-gutter);
+  padding: var(--space-small) var(--width-gutter-half);
   text-align: inherit;
   vertical-align: top;
   white-space: pre;
@@ -275,12 +284,8 @@ h2 + .date {
   font-size: var(--font-size-small);
 }
 
-.page-footer > :first-child {
-  margin-block-start: var(--space-gargantuan);
-}
-
 .page-footer ul {
-  padding-inline-start: var(--width-half-gutter);
+  padding-inline-start: var(--width-gutter-half);
 }
 
 /* Site Menu */
@@ -308,4 +313,8 @@ h2 + .date {
 /* Yearly Archives */
 .yearly-archives p {
   text-align: start;
+}
+
+.yearly-archives a {
+  word-break: keep-all;
 }
