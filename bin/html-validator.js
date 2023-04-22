@@ -12,6 +12,8 @@ const rewritePath = ([, relative]) => {
   return path.join(config.dir.dest, relative);
 };
 
+const isNotStyleGuide = (file) => !file.endsWith("/style-guide/index.html");
+
 const listArticle = (sitemap, latest) => {
   const articles = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
@@ -106,7 +108,7 @@ const main = async () => {
   const indexes = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
     rewritePath
-  );
+  ).filter(isNotStyleGuide);
   const articles = listArticle(sitemap, latest);
   const results = await Promise.all([...indexes, ...articles].map(validate));
   const errors = results.flat();
