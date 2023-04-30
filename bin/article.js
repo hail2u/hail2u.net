@@ -52,10 +52,9 @@ const buildArticle = async (selected) => {
     checkTitleType(title),
   ]);
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
-  const description = unescapeReferences(body.replace(/<.*?>/gu, ""))
+  const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
-    .split("\n")
-    .slice(0, 1);
+    .split("\n");
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
