@@ -12,9 +12,8 @@ const rebuildArticle = async (article) => {
   const body = rest.join("\n").trim();
   const title = unescapeReferences(first.replace(/<.*?>/gu, ""));
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
-  const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
-    .trim()
-    .split("\n");
+  const [firstline] = body.trim().split("\n");
+  const description = unescapeReferences(firstline.replace(/<.*?>/gu, ""));
   const dt = getDateDetails(published);
   const type = "article";
 

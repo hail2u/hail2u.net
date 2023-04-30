@@ -52,9 +52,8 @@ const buildArticle = async (selected) => {
     checkTitleType(title),
   ]);
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
-  const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
-    .trim()
-    .split("\n");
+  const [firstline] = body.trim().split("\n");
+  const description = unescapeReferences(firstline.replace(/<.*?>/gu, ""));
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
