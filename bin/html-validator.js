@@ -47,9 +47,7 @@ const validateHTML = async (html) => {
     });
 
     if (!res.ok) {
-      process.stdout.write(`Skipped. ${res.status} ${res.statusText}.
-`);
-      return null;
+      return `Skipped. ${res.status} ${res.statusText}.`;
     }
 
     const json = await res.json();
@@ -80,6 +78,12 @@ const validate = async (file) => {
   const messages = await validateHTML(html);
 
   if (!messages) {
+    return [];
+  }
+
+  if (typeof messages === "string") {
+    process.stdout.write(`${file}:1:1: ${messages}
+`);
     return [];
   }
 
