@@ -165,10 +165,10 @@ const mergeData = async (file, metadata, data) => {
       ...metadata,
       ...data,
       ...overrides,
-      homeArticles: data.articles.slice(0, 6),
+      homeArticles: data.articles.slice(0, 12),
       homeBooks: data.books.slice(0, 6),
       homeLinks: data.links.slice(0, 6),
-      homeProjects: data.projects.slice(0, 6),
+      homeProjects: data.projects.slice(0, 3),
       homeStatuses: data.statuses.slice(0, 1),
     };
   }
