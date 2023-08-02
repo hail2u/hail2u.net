@@ -104,7 +104,7 @@ const toFilesFormat = (file) => {
     const template = path.join(
       config.dir.template,
       "blog",
-      "_article.mustache"
+      "_article.mustache",
     );
     return {
       ...file,
@@ -124,7 +124,7 @@ const toFilesFormat = (file) => {
       metadata: guessPath(
         path.join(dirname, basename),
         config.dir.metadata,
-        ".json"
+        ".json",
       ),
       template: file,
     };

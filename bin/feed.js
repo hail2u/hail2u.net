@@ -39,7 +39,7 @@ const extendItem = (prefix, item) => {
       ...item,
       body: item.body.replace(
         /(href|src)="(\/.*?)"/gu,
-        toAbsoluteURLAll.bind(null, prefix)
+        toAbsoluteURLAll.bind(null, prefix),
       ),
       link,
     };
@@ -93,7 +93,7 @@ const comparePublished = (a, b) =>
 
 const main = async () => {
   const metadata = await readJSONFile(
-    path.join(config.dir.metadata, "root.json")
+    path.join(config.dir.metadata, "root.json"),
   );
   const prefix = `${metadata.scheme}://${metadata.domain}`;
   const [files, { articles, books, links, statuses }] = await Promise.all([
@@ -111,8 +111,8 @@ const main = async () => {
           .slice(0, 10),
         links,
         statuses,
-      })
-    )
+      }),
+    ),
   );
 };
 

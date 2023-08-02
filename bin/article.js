@@ -19,7 +19,7 @@ const checkIDFormat = (id) => {
 
   if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
     throw new Error(
-      "This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”."
+      "This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.",
     );
   }
 };
@@ -39,7 +39,7 @@ const checkIDConflict = async (id) => {
 const checkTitleType = (title) => {
   if (typeof title !== "string") {
     throw new Error(
-      "This draft does not have a valid title. A draft title must be a string."
+      "This draft does not have a valid title. A draft title must be a string.",
     );
   }
 };
@@ -93,7 +93,7 @@ const main = async () => {
   ]);
   const body = selected.body.replace(
     /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
-    "/"
+    "/",
   );
   const article = await buildArticle({
     ...selected,
@@ -108,7 +108,7 @@ const main = async () => {
       `<h1>${escapedTitle}</h1>
 
 ${body}
-`
+`,
     ),
   ]);
   await runCommand("git", ["add", "--", file, dataFile]);

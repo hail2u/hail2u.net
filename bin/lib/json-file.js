@@ -6,7 +6,7 @@ const outputJSONFile = async (file, obj) => {
   await outputFile(
     file,
     `${formatted}
-`
+`,
   );
 };
 

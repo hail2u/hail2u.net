@@ -95,7 +95,7 @@ const main = async () => {
     process.stdout.write("\n\n");
     const errorFiles = results.filter(isNotEmpty);
     throw new Error(
-      `${errors.length} error(s) in ${errorFiles.length} file(s)`
+      `${errors.length} error(s) in ${errorFiles.length} file(s)`,
     );
   }
 };

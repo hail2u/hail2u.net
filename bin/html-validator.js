@@ -17,7 +17,7 @@ const isNotStyleGuide = (file) => !file.endsWith("/style-guide/index.html");
 const listArticle = (sitemap, latest) => {
   const articles = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
-    rewritePath
+    rewritePath,
   );
 
   if (latest) {
@@ -111,7 +111,7 @@ const main = async () => {
   ]);
   const indexes = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
-    rewritePath
+    rewritePath,
   ).filter(isNotStyleGuide);
   const articles = listArticle(sitemap, latest);
   const results = await Promise.all([...indexes, ...articles].map(validate));
@@ -122,7 +122,7 @@ const main = async () => {
     process.stdout.write(errors.join("\n"));
     process.stdout.write("\n\n");
     throw new Error(
-      `${errors.length} error(s) in ${errorFiles.length} file(s).`
+      `${errors.length} error(s) in ${errorFiles.length} file(s).`,
     );
   }
 };

@@ -14,7 +14,7 @@ const main = async () => {
     fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8"),
   ]);
   const tempDir = await fs.mkdtemp(
-    path.join(osTemp, path.sep, `${config.name}-`)
+    path.join(osTemp, path.sep, `${config.name}-`),
   );
   const [test, rendered, toTempDir] = await Promise.all([
     path.join(tempDir, "test.html"),
@@ -23,7 +23,7 @@ const main = async () => {
   ]);
   const fixed = rendered.replace(
     /(?<=\b(href|src|srcset)=")(\.\/dist)?\//gu,
-    `${toTempDir}/`
+    `${toTempDir}/`,
   );
   await outputFile(test, fixed);
   await runCommand("open", [test]);
