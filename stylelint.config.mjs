@@ -1,6 +1,6 @@
-{
-  "ignoreFiles": ["**/*.min.css"],
-  "rules": {
+export default {
+  ignoreFiles: ["**/*.min.css"],
+  rules: {
     "at-rule-no-unknown": true,
     "block-no-empty": true,
     "color-no-hex": true,
@@ -9,8 +9,8 @@
     "declaration-block-no-duplicate-properties": [
       true,
       {
-        "ignore": ["consecutive-duplicates-with-different-values"]
-      }
+        ignore: ["consecutive-duplicates-with-different-values"],
+      },
     ],
     "declaration-block-no-redundant-longhand-properties": true,
     "declaration-block-no-shorthand-property-overrides": true,
@@ -39,6 +39,6 @@
     "selector-type-no-unknown": true,
     "shorthand-property-no-redundant-values": true,
     "string-no-newline": true,
-    "unit-no-unknown": true
-  }
-}
+    "unit-no-unknown": true,
+  },
+};
