@@ -66,7 +66,7 @@ const getContrastScore = (background, foreground) => {
   const foregroundLuminance = getLuminance(foreground);
   const contrast = getPerceptualContrast(
     backgroundLuminance,
-    foregroundLuminance
+    foregroundLuminance,
   );
   const scaled = scaleContrast(contrast);
   return (scaled * 100).toFixed(3);
