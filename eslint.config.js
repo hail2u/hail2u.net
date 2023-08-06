@@ -164,7 +164,6 @@ export default [
   },
   {
     files: ["bin/**/*", "*.js"],
-    ignores: ["**/*.min.js"],
     languageOptions: {
       globals: {
         ...globals.nodeBuiltin,
