@@ -77,8 +77,7 @@ const main = async () => {
 
     const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
     const titleEscaped = escapeCharacters(title);
-    const authorEscaped = escapeCharacters(author);
-    const body = `<a href="${link}"><img alt="${titleEscaped} / ${authorEscaped}" height="${metadata.height}" src="${cover}" width="${metadata.width}"></a>`;
+    const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" src="${cover}" width="${metadata.width}"></a>`;
     const published = Date.now();
     const dt = getDateDetails(published);
     await outputJSONFile(file, [
