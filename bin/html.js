@@ -166,7 +166,7 @@ const mergeData = async (file, metadata, data) => {
       ...data,
       ...overrides,
       homeArticles: data.articles.slice(0, 6),
-      homeBooks: data.books.slice(0, 6),
+      homeBooks: data.books.slice(0, 12),
       homeLinks: data.links.slice(0, 6),
       homeProjects: data.projects.slice(0, 3),
       homeStatuses: data.statuses.slice(0, 1),
@@ -189,7 +189,7 @@ const mergeData = async (file, metadata, data) => {
     ...metadata,
     ...data,
     ...overrides,
-    latestBooks: data.books.slice(0, 9),
+    latestBooks: data.books.slice(0, 12),
   };
 };
 
