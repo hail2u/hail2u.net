@@ -192,7 +192,6 @@ const mergeData = async (file, metadata, data) => {
     ...metadata,
     ...data,
     ...overrides,
-    latestBooks: data.books.slice(0, 12),
   };
 };
 
