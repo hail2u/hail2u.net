@@ -12,7 +12,7 @@ const rewritePath = ([, relative]) => {
   return path.join(config.dir.dest, relative);
 };
 
-const isNotStyleGuide = (file) => !file.endsWith("/style-guide/index.html");
+const isNormalHTML = (file) => !file.endsWith("/statuses/index.html");
 
 const listArticle = (sitemap, latest) => {
   const articles = Array.from(
@@ -59,9 +59,7 @@ const validateHTML = async (html) => {
     return json.messages;
   } catch (e) {
     if (e.name === "AbortError") {
-      process.stdout.write(`Skipped. Nu HTML Checker does not respond in 10s.
-`);
-      return null;
+      return "Skipped. Nu HTML Checker does not respond in 10s.";
     }
 
     throw e;
@@ -112,7 +110,7 @@ const main = async () => {
   const indexes = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
     rewritePath,
-  ).filter(isNotStyleGuide);
+  ).filter(isNormalHTML);
   const articles = listArticle(sitemap, latest);
   const results = await Promise.all([...indexes, ...articles].map(validate));
   const errors = results.flat();
