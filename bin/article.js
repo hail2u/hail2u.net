@@ -86,6 +86,16 @@ const buildArticle = async (selected) => {
   };
 };
 
+const buildText = (article, domain, scheme) => {
+  const url = `${scheme}://${domain}${article.link}`;
+
+  if (article.twitterCard === "summary_large_image") {
+    return `${article.shortDescription} ${url}`;
+  }
+
+  return url;
+};
+
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
   const [selected, articles] = await Promise.all([
@@ -121,7 +131,8 @@ ${body}
       `--message=Contribute ${article.link} (${th})`,
     ]),
   ]);
-  await openTwitter(`${scheme}://${domain}${article.link}`);
+  const text = buildText(article, domain, scheme);
+  await openTwitter(text);
 };
 
 main().catch((e) => {
