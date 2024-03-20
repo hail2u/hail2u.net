@@ -54,7 +54,7 @@ const buildArticle = async (selected) => {
   const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
-    .split("。");
+    .split("\n");
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
@@ -63,10 +63,11 @@ const buildArticle = async (selected) => {
   if (!image) {
     return {
       body,
-      description: `${description}。`,
+      description: `${description}`,
       link,
       published,
       ...dt,
+      shortDescription: `${description.split("。")[0]}。`,
       title,
       type,
     };

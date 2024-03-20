@@ -48,6 +48,7 @@ const main = async () => {
       link: url,
       published,
       ...dt,
+      shortDescription: `${comment.split("。")[0]}。`,
       title,
       type: "link",
     },
