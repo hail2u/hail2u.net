@@ -94,8 +94,7 @@ const main = async () => {
     ]);
     await runCommand("git", ["add", "--", file]);
     await runCommand("git", ["commit", `--message=Read ${asin}`]);
-    const url = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
-    await openTwitter(`${url}`);
+    await openTwitter(`${link}`);
   } catch (e) {
     if (e.name === "AbortError") {
       throw new Error("Amazon image server does not respond in 5s.");
