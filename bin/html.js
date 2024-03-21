@@ -174,11 +174,7 @@ const mergeData = async (file, metadata, data) => {
   }
 
   if (overrides.isStatuses) {
-    const logFile = guessPath(
-      file.template,
-      config.dir.template,
-      "_log.mustache",
-    );
+    const logFile = guessPath(file.template, config.dir.data, "log.html");
     const log = await fs.readFile(logFile, "utf8");
     return {
       ...metadata,
