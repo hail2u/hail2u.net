@@ -22,7 +22,7 @@ export default {
     "function-url-no-scheme-relative": true,
     "keyframe-declaration-no-important": true,
     "media-feature-name-no-unknown": true,
-    "no-descending-specificity": true,
+    "no-descending-specificity": null,
     "no-duplicate-at-import-rules": true,
     "no-duplicate-selectors": true,
     "no-empty-source": true,
