@@ -58,6 +58,7 @@ const buildArticle = async (selected) => {
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
+  const shortDescription = `${description.split("。")[0]}。`;
   const type = "article";
 
   if (!image) {
@@ -67,7 +68,7 @@ const buildArticle = async (selected) => {
       link,
       published,
       ...dt,
-      shortDescription: `${description.split("。")[0]}。`,
+      shortDescription,
       title,
       type,
     };
@@ -80,6 +81,7 @@ const buildArticle = async (selected) => {
     link,
     published,
     ...dt,
+    shortDescription,
     title,
     twitterCard: "summary_large_image",
     type,
