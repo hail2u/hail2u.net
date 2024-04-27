@@ -29,6 +29,7 @@ export default {
     "no-invalid-double-slash-comments": true,
     "no-invalid-position-at-import-rule": true,
     "no-unknown-animations": true,
+    "no-unknown-custom-media": true,
     "number-max-precision": 3,
     "property-no-unknown": true,
     "selector-anb-no-unmatchable": true,

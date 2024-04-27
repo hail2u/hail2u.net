@@ -29,6 +29,7 @@ const checkIDConflict = async (id) => {
 
   try {
     await fs.access(file, fs.constants.F_OK);
+    /* eslint-disable-next-line no-unused-vars */
   } catch (e) {
     return true;
   }
