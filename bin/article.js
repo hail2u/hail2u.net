@@ -26,15 +26,14 @@ const checkIDFormat = (id) => {
 
 const checkIDConflict = async (id) => {
   const file = path.join(config.dir.dest, "blog", `${id}.html`);
+  const exists = await fs
+    .access(file, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
 
-  try {
-    await fs.access(file, fs.constants.F_OK);
-    /* eslint-disable-next-line no-unused-vars */
-  } catch (e) {
-    return true;
+  if (exists) {
+    throw new Error(`“${id}” is already used.`);
   }
-
-  throw new Error(`“${id}” is already used.`);
 };
 
 const checkTitleType = (title) => {
