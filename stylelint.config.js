@@ -1,5 +1,5 @@
 export default {
-  "ignoreFiles": ["**/*.min.css"],
+  ignoreFiles: ["**/*.min.css"],
   rules: {
     "at-rule-no-unknown": true,
     "block-no-empty": true,
