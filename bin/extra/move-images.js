@@ -1,5 +1,5 @@
 import config from "../../config.js";
-import { glob } from "glob";
+import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
@@ -26,13 +26,8 @@ const main = async () => {
     throw new Error("1 argument is required. This is for an source directory.");
   }
 
-  const files = await glob(`${src}*.jpg`);
-
-  if (files.length < 1) {
-    throw new Error(`There is no JPEG files in the source directory: ${src}`);
-  }
-
-  await Promise.all(files.map(cp));
+  const files = await fs.glob(`${src}*.jpg`);
+  await Array.fromAsync(files, cp);
 };
 
 main().catch((e) => {

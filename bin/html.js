@@ -1,6 +1,5 @@
 import config from "../config.js";
 import fs from "node:fs/promises";
-import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
@@ -82,8 +81,8 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const files = await glob(`${config.dir.data}**/*.json`);
-  const data = await Promise.all(files.map(readData));
+  const files = await fs.glob(`${config.dir.data}**/*.json`);
+  const data = await Array.fromAsync(files, readData);
   return Object.assign(...data);
 };
 
@@ -94,8 +93,8 @@ const readPartial = async (file) => {
 };
 
 const readPartials = async () => {
-  const files = await glob(`${config.dir.template}partials/*.mustache`);
-  const partials = await Promise.all(files.map(readPartial));
+  const files = await fs.glob(`${config.dir.template}partials/*.mustache`);
+  const partials = await Array.fromAsync(files, readPartial);
   return Object.assign(...partials);
 };
 
@@ -137,11 +136,16 @@ const toFilesFormat = (file) => {
   };
 };
 
+const startsWithUnderscore = (file) => {
+  const filename = file.split("/").at(-1);
+  return filename.startsWith("_");
+};
+
 const gatherFiles = async () => {
-  const files = await glob(`${config.dir.template}**/*.mustache`, {
-    ignore: `**/_*`,
+  const files = await fs.glob(`${config.dir.template}**/*.mustache`, {
+    exclude: startsWithUnderscore,
   });
-  return Promise.all(files.map(toFilesFormat));
+  return Array.fromAsync(files, toFilesFormat);
 };
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);

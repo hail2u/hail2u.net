@@ -1,14 +1,13 @@
 import config from "../config.js";
 import fastXMLParser from "fast-xml-parser";
 import fs from "node:fs/promises";
-import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 
 const toDest = (file) => guessPath(file, config.dir.dest, "feed");
 
 const gatherFiles = async () => {
-  const files = await glob(`${config.dir.template}**/_feed.mustache`);
-  return Promise.all(files.map(toDest));
+  const files = await fs.glob(`${config.dir.template}**/_feed.mustache`);
+  return Array.fromAsync(files, toDest);
 };
 
 const cancelFetch = (abortController) => {

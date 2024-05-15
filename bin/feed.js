@@ -1,6 +1,5 @@
 import config from "../config.js";
 import fs from "node:fs/promises";
-import { glob } from "glob";
 import { guessPath } from "./lib/guess-path.js";
 import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
@@ -14,8 +13,8 @@ const toFilesFormat = (file) => ({
 });
 
 const gatherFiles = async () => {
-  const files = await glob(`${config.dir.template}**/_feed.mustache`);
-  return Promise.all(files.map(toFilesFormat));
+  const files = await fs.glob(`${config.dir.template}**/_feed.mustache`);
+  return Array.fromAsync(files, toFilesFormat);
 };
 
 const toAbsoluteURL = (prefix, url) => {
@@ -65,8 +64,8 @@ const readData = async (prefix, dataFile) => {
 };
 
 const readLatestData = async (prefix) => {
-  const dataFiles = await glob(`${config.dir.data}**/*.json`);
-  const data = await Promise.all(dataFiles.map(readData.bind(null, prefix)));
+  const dataFiles = await fs.glob(`${config.dir.data}**/*.json`);
+  const data = await Array.fromAsync(dataFiles, readData.bind(null, prefix));
   return Object.assign(...data);
 };
 
