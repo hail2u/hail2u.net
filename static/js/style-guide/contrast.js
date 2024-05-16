@@ -16,11 +16,11 @@ window.addEventListener("load", () => {
 
     if (colorCell.classList.contains("js-test-color-flip")) {
       const score = getContrastScore(foreground, background);
-      contrastCell.lastChild.textContent = `${score} (${ratio})`;
+      contrastCell.lastChild.textContent = `${ratio} (${score})`;
       continue;
     }
 
     const score = getContrastScore(background, foreground);
-    contrastCell.lastChild.textContent = `${score} (${ratio})`;
+    contrastCell.lastChild.textContent = `${ratio} (${score})`;
   }
 });
