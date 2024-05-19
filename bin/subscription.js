@@ -58,7 +58,7 @@ const main = async () => {
   await outputJSONFile(file, shuffled);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
-  await openTwitter(`${title}の購読を開始 ${url}`);
+  await openTwitter(`${title} のウェブログを購読 ${url}`);
 };
 
 main().catch((e) => {
