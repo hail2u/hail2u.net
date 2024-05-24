@@ -9,13 +9,10 @@ import { selectDraft } from "./lib/select-draft.js";
 
 const main = async () => {
   const selected = await selectDraft();
-  const [osTemp, template] = await Promise.all([
-    fs.realpath(os.tmpdir()),
+  const [tempDir, template] = await Promise.all([
+    fs.mkdtemp(path.join(os.tmpdir(), `${config.name}-`)),
     fs.readFile(path.join(config.dir.template, "_draft.mustache"), "utf8"),
   ]);
-  const tempDir = await fs.mkdtemp(
-    path.join(osTemp, path.sep, `${config.name}-`),
-  );
   const [test, rendered, toTempDir] = await Promise.all([
     path.join(tempDir, "test.html"),
     renderTemplate(template, selected),
