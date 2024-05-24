@@ -1,0 +1,86 @@
+<h1>1.125 (v9.31.0)</h1>
+
+<p>3^2 / 2^3の答えである1.125を基本の比にし、様々な大きさをすべて計算しなおす。「黄金比なんて誰も設計に使っていない」というような本を読み、黄金比を使っているのがちょっと恥ずかしくなったからだ。4乗していくとなんとなく大きくなっていくようで、キリの良い数字が増え、自己満足度が上がる。結局は黄金比に近い(1.125^4 = 1.602)ので、最終的な結果は変わらない。</p>
+
+<nav>
+<h2>目次</h2>
+
+<ul>
+<li><a href="#huge-hyperlink">巨大なハイパーリンク</a></li>
+<li><a href="#fs-glob">fs.glob()</a></li>
+<li><a href="#on-fluid-typography">Fluid Typographyの見送り</a></li>
+</ul>
+</nav>
+
+<section id="huge-hyperlink">
+<h2>巨大なハイパーリンク</h2>
+
+<p>まず、かつてTwitterとして知られていたプラットフォームへ投稿する時に使う、短めの概要を別に作るようにする。それに使うだけではもったいないので、ホームの投稿一覧をリストからセクションに変えて、そこでも使うようにする。その流れで<code>section</code>要素全体をハイパーリンクにするようにし、その結果CSSが複雑になる。ここで言う「複雑」とは、やりたいことと実装に大きな乖離があり、レンダリング結果とコードのどちらからも互いに見通しが悪いというような意味だ。</p>
+
+<p>親の<code>a</code>要素が持つ<code>text-decoration</code>プロパティーを、子孫要素で上書き(に近いことが)できるのに削除できないことによる。この場合だと日付や短い概要の下線を消したいだけなのに、一旦すべて消してから見出しでのみ改めて引くという大回りな実装になってしまう。何を言っているのかわからないかもしれないし、なぜそうなのかもわからないかもしれないし、正直なぜそういう仕様になっているのかは僕も知らない。まだまだ世のウェブサイトで「続きを読む」やら「Read more」やらが多い理由は、最終的にこの辺に求められるのではないかと思っている。</p>
+
+<p>HTML側で<code>section</code>要素の各子孫要素へ<code>a</code>要素をばらまくと、それぞれに<code>tabindex</code>属性が必要になるし、各子孫要素の外側の余白がハイパーリンクではなくなるし、CSSは複雑なままだし、良いことが無い。消したい要素のみ<code>display: inline-block</code>にする(仕様的に言うなら<a href="https://www.w3.org/TR/css-display-3/#atomic-inline">atomic inline</a>にする)という手段もあるが、目に見えない何かが壊れそうな気がする。</p>
+
+<p>また、この過程でCSSを簡単にするため<code>:has()</code>を解禁したが、再封印する。Firefox ESRを使っているわけではないが、これを安全ラインとしたい気持ちになっている。年1回くらいは更新されるようなので、そうそう時代遅れとはならないし、良い落としどころであり、かつ忘れがちなFirefoxのことを思い出す役にも立つ。たまにFirefoxだけで実装されているものをうっかり使ってしまい失敗することもある(<code>overflow-inline</code>プロパティーでやらかした)。</p>
+</section>
+
+<section id="fs-glob">
+<h2>fs.glob()</h2>
+
+<p>内部的には<code>fs.glob()</code>への書き換えがある。<a href="https://github.com/isaacs/node-glob">isaacs/node-globパッケージ</a>では配列でPromiseが履行されるが、<code>fs.glob()</code>ではAsyncIteratorで返ってくるので、そのまま置き換えることはできない。AsyncIteratorをきちんと扱うように書き直すか、<code>Array.fromAsync()</code>で配列に直す。配列を<code>Promise.all()</code>と<code>Array.map()</code>で並行処理をするように書いていた場合は、<code>Array.fromAsync()</code>の第二引数に<code>Array.map()</code>に渡していた関数を指定するだけで良い。</p>
+
+<pre><code class="language-js">import fs from &quot;node:fs/promises&quot;
+import { glob } from &quot;glob&quot;
+
+const toLowerCase = (str) =&gt; str.toLowerCase();
+
+const isaacsGlob = async () =&gt; {
+  const files = await glob(&quot;**/*&quot;);
+  return Promise.all(files.map(toLowerCase));
+};
+
+const fsGlob = async () =&gt; {
+  const files = await fs.glob(&quot;**/*&quot;);
+  return Array.fromAsync(files, toLowerCase);
+};</code></pre>
+</section>
+
+<section id="on-fluid-typography">
+<h2>Fluid Typographyの見送り</h2>
+
+<p>いわゆるFluid Typographyなどと呼ばれている描画領域に応じて文字サイズが変わる機能も復活させていたが、結局はまた見送る。利用者の文字サイズ設定には追随するものの、その動機とはうまく噛み合っていないと感じるからだ。利用者が文字サイズを変えているのなら、Fluid Typographyが行う読みやすさの提供は<em>利用者が既に行っている</em>と見做せると思う。</p>
+
+<p>また、<code>rem</code>単位での実装とすると、大きくしているとそれに応じて文字サイズが二重に大きくなってしまうし、小さくしているなら忌避したはずの標準の大きさをいとも簡単に超えてしまう。もちろん<code>px</code>単位で実装した場合はそういう問題は起きないが、文字サイズの設定を完全に無視する。どちらの場合でもウェブサイトのさじ加減として許せる範囲を超えていると利用者が感じてしまうかもしれない。</p>
+
+<p>このウェブサイトが<code>112.5%</code>くらいに抑えている理由もこの辺りにある。これなら利用者が<code>12px</code>くらいにしていても<code>13.5px</code>、<code>32px</code>にしていても<code>36px</code>に抑えられる。小さくしている場合に既定の<code>16px</code>を超えることはまずないし、大きくしている場合でも<code>6px</code>以上巨大化することはまずない。おおむね「さじ加減」として許容されるのではないかと思う。</p>
+
+<p><code>clamp()</code>などで<code>initial</code>キーワードを利用できれば、Fluidしつつユーザー設定とも比較できるので、うまく馴染ませられそうだが、できないものはできない。メディア・クエリーで利用者の文字サイズ設定が引ければ良いのかもしれない。アクセシビリティーという観点からの実装になりそうなので、例えば<code>prefers-text-size</code>メディア特性などがあり、<code>prefers-contrast</code>メディア特性のように<code>no-preference</code>という値を取れれば、その中でのみFluid Typographyを実装できるだろう。現状では、JavaScriptを使って既定の<code>16px</code>ではなさそうな場合はFluidしない、というあたりが現実的な落としどころだろうか。</p>
+
+<hr>
+
+<pre><code class="language-css">:root {
+  --ratio-1: calc((3 * 3) / (2 * 2 * 2));
+  --ratio-2: calc(var(--ratio-1) * var(--ratio-1));
+  --ratio-4: calc(var(--ratio-2) * var(--ratio-2));
+
+  font-size: clamp(
+    var(--ratio-1) * 1rem,
+    1rem / var(--ratio-1) + 1vi / var(--ratio-4) / var(--ratio-2),
+    var(--ratio-4) * var(--ratio-2) * 1rem
+  );
+}</code></pre>
+
+<p>実装は上記のようなコードになっていた。すべて計算されていて楽しい、というくらいしかない。文字サイズの拡大は<code>750px</code>くらいから始まり、<code>3700px</code>くらいで最大値に到達する。ブラウザーの文字サイズ設定が既定の<code>16px</code>の場合、横長で幅<code>1280px</code>の画面だと<code>20px</code>くらい、幅<code>1920px</code>の画面だと<code>24px</code>くらいになり、<code>3700px</code>くらいで最大値の<code>32px</code>くらいになる。Firefox ESRが更新されて、CSSの計算で<code>pow()</code>が気軽に使えるようになると読みやすくなりそうだ。</p>
+</section>
+
+<hr>
+
+<p>まとめると以下のようなボヤキのようだ。</p>
+
+<ul>
+<li>Decoration Boxという概念は一体何なのか、そしてどこから生まれたのか</li>
+<li><code>fs.glob()</code>に<code>returnArray</code>オプションが欲しい</li>
+<li>最大多数の最大幸福(Fluid Typography)と多様性の尊重(ユーザー設定の尊重)が競合していそう</li>
+</ul>
+
+<p>他、色が多少変わっている。特に暗色の方で大きく変わり、青っぽい背景から褐色っぽい背景になる。文字色も褐色になり、全体的に黄ばんだと言える。ファビコンも四角い背景をやめて、アウトラインを描いておくように戻す。両端揃えや三点リーダーによる省略を導入しつつ、すぐにやめたりもする。日本語・横書き・両端揃えは、1カラムの中央揃えや段組みでこそ威力を発揮する思いを強くした。三点リーダーに限らず、省略されたものに対する扱いがSafariでは独特なので、できうる限り避けるようにしたい。</p>
