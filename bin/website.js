@@ -40,10 +40,10 @@ const main = async () => {
     throw new Error("--url is required.");
   }
 
-  const file = path.join(config.dir.data, "subscriptions.json");
-  const subscriptions = await readJSONFile(file);
+  const file = path.join(config.dir.data, "websites.json");
+  const websites = await readJSONFile(file);
 
-  if (subscriptions.find(isSubscribed.bind(null, url))) {
+  if (websites.find(isSubscribed.bind(null, url))) {
     throw new Error(`${title} has already been subscribed.`);
   }
 
@@ -53,7 +53,7 @@ const main = async () => {
       link: url,
       title,
     },
-    ...subscriptions,
+    ...websites,
   ]);
   await outputJSONFile(file, shuffled);
   await runCommand("git", ["add", "--", file]);

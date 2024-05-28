@@ -207,7 +207,7 @@ const build = async (metadata, data, partials, file) => {
 const main = async () => {
   const [
     metadata,
-    { articles, books, links, projects, statuses, subscriptions },
+    { articles, books, links, projects, statuses, websites },
     partials,
     {
       values: { all, latest },
@@ -237,8 +237,8 @@ const main = async () => {
     links,
     projects,
     statuses,
-    subscriptions,
     version: config.version,
+    websites,
   };
 
   if (latest) {
