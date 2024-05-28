@@ -1,4 +1,4 @@
-/* contrast.js | MIT License */
+/* Calculate contrast | MIT License */
 import { getContrastRatio } from "../lib/wcag21.js";
 import { getContrastScore } from "../lib/apca.js";
 
@@ -17,10 +17,9 @@ window.addEventListener("load", () => {
     if (colorCell.classList.contains("js-test-color-flip")) {
       const score = getContrastScore(foreground, background);
       contrastCell.lastChild.textContent = `${ratio} (${score})`;
-      continue;
+    } else {
+      const score = getContrastScore(background, foreground);
+      contrastCell.lastChild.textContent = `${ratio} (${score})`;
     }
-
-    const score = getContrastScore(background, foreground);
-    contrastCell.lastChild.textContent = `${ratio} (${score})`;
   }
 });

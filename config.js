@@ -1,5 +1,6 @@
-// import pkg from "./package.json" with { type: "json" };
-
+/* ESLint v9 does not support `import .. from .. with`
+ * import pkg from "./package.json" with { type: "json" };
+ */
 import fs from "node:fs/promises";
 
 const file = new URL("./package.json", import.meta.url);

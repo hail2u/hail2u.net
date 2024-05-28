@@ -1,4 +1,4 @@
-/* layout.js | MIT License */
+/* Toggle layout overlays | MIT License */
 document
   .querySelector(".js-test-layout-button")
   .addEventListener("click", () => {

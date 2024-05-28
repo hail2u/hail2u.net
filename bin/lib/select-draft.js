@@ -53,11 +53,9 @@ ${menulist}
   }
 
   const index = answer - 1;
-  const [selected] = drafts.splice(index, 1);
-  const rebuilt = await Promise.all([selected, ...drafts].map(rebuildDraft));
-  // const selected = drafts[index];
-  // const remains = drafts.toSpliced(index, 1);
-  // const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
+  const selected = drafts[index];
+  const remains = drafts.toSpliced(index, 1);
+  const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
   await outputFile(file, rebuilt.join("\n\n"));
   return selected;
 };

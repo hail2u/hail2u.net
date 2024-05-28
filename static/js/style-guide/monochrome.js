@@ -1,4 +1,4 @@
-/* color.js | MIT License */
+/* Toggle monochrome CSS filter | MIT License */
 document
   .querySelector(".js-test-monochrome-button")
   .addEventListener("click", () => {
