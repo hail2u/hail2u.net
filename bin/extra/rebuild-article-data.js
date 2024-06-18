@@ -16,6 +16,7 @@ const rebuildArticle = async (article) => {
     .trim()
     .split("\n");
   const dt = getDateDetails(published);
+  const shortDescription = `${description.split("。")[0]}。`;
   const type = "article";
 
   if (!image) {
@@ -24,6 +25,7 @@ const rebuildArticle = async (article) => {
       description,
       link,
       published,
+      shortDescription,
       ...dt,
       title,
       type,
@@ -37,6 +39,7 @@ const rebuildArticle = async (article) => {
     link,
     published,
     ...dt,
+    shortDescription,
     title,
     twitterCard: "summary_large_image",
     type,
