@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>枠線付きの吹き出し</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/bordered-speech-bubble.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ミニブログの隆盛以降ウェブ上でよく見かける吹き出しをCSSで作るお話。単色のものはかなり前に書いた。今回はそれに枠線をつけてみよう！　みよう！　みよう！" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ミニブログの隆盛以降ウェブ上でよく見かける吹き出しをCSSで作るお話。単色のものはかなり前に書いた。今回はそれに枠線をつけてみよう！　みよう！　みよう！" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/bordered-speech-bubble.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="枠線付きの吹き出し" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-02-23T08:02:43+09:00">2011年2月23日</time></p>
+
+        <h1><em>枠線付きの吹き出し</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="枠線付き吹き出しの完成！" height="126" src="/img/blog/bordered-speech-bubble.png" width="354">
+</figure>
+
+<p>ミニブログの隆盛以降ウェブ上でよく見かける吹き出しをCSSで作るお話。単色のものは<a href="/blog/webdesign/pure-css-speech-bubble.html">かなり前に書いた</a>。今回はそれに枠線をつけてみよう！　みよう！　みよう！</p>
+
+<p>Demo: <a href="/test/179.html">Bordered Speech Bubble</a></p>
+
+<p>枠線は単なる<code>solid</code>な<code>border</code>で少し角を丸めただけ。</p>
+
+<section>
+<h2>尻尾を付ける</h2>
+
+<p><code>:before</code>擬似要素を使う。デモの3番目のサンプルのように、まず枠線と同じ色で三角形を作る。三角形は以前のエントリで書いた手法と同じで、左右の<code>border</code>を<code>transparent</code>にすることによって作る。</p>
+
+<pre><code class="language-css">.speech-bubble:before {
+  border-top-width: 16px;
+  border-right-width: 16px;
+  border-bottom-width: 0;
+  border-left-width: 16px;
+  border-color: #369 <em>transparent</em>;
+  border-style: solid;
+  display: block;
+  position: absolute;
+  bottom: <em>-16px</em>;
+  left: 16px;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}</code></pre>
+
+<p><code>bottom</code>に負の値を指定して下方向にずらせば下に尻尾がつくようになる。</p>
+</section>
+
+<section>
+<h2>尻尾の中をくり抜く</h2>
+
+<p><code>:before</code>擬似要素で作った三角と同じものを今度は<code>:after</code>擬似要素で背景色と同じ色で作る。</p>
+
+<pre><code class="language-css">.speech-bubble:after {
+  border-top-width: 16px;
+  border-right-width: 16px;
+  border-bottom-width: 0;
+  border-left-width: 16px;
+  border-color: <em>#9cf</em> transparent;
+  border-style: solid;
+  display: block;
+  position: absolute;
+  bottom: <em>-10px</em>;
+  left: 16px;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}</code></pre>
+
+<p>コードはほとんど同じ。内側をくり抜くようにするため<code>bottom</code>で指定する負の値を控えめ(<code>borderWidth - Math.sqrt(Math.pow(borderWidth, 2) * 2)</code>)にするだけ。具体的には以下の様な位置に配置する。</p>
+
+<figure>
+<img alt="尻尾のくり抜き。" height="126" src="/img/blog/cut-tail-inner.png" width="354">
+</figure>
+
+<p>わかりやすいように色を変えておいたが、これを背景色と合わせればきれいにくり抜かれることになる。</p>
+</section>
+
+<hr>
+
+<p>以上を組み合わせるとポストモダンブラウザ(要出典)では最初に挙げたスクリーンショットのような枠線付き吹き出しが完成する。</p>
+
+<section>
+<h2>おまけ</h2>
+
+<p>長いのでSCSSのpartialを作っておいたりすると便利な気がする。</p>
+
+<pre><code class="language-scss">@mixin bordered-speech-bubble($background-color: #9cf, $border-color: #369) {
+  border: 4px solid $border-color;
+  position: relative;
+  background-color: $background-color;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+
+  &amp;:before {
+    border-top-width: 16px;
+    border-right-width: 16px;
+    border-bottom-width: 0;
+    border-left-width: 16px;
+    border-color: $border-color transparent;
+    border-style: solid;
+    display: block;
+    position: absolute;
+    bottom: -16px;
+    left: 16px;
+    width: 0;
+    height: 0;
+    content: &quot;&quot;;
+  }
+
+  &amp;:after {
+    border-top-width: 16px;
+    border-right-width: 16px;
+    border-bottom-width: 0;
+    border-left-width: 16px;
+    border-color: $background-color transparent;
+    border-style: solid;
+    display: block;
+    position: absolute;
+    bottom: -10px;
+    left: 16px;
+    width: 0;
+    height: 0;
+    content: &quot;&quot;;
+  }
+}</code></pre>
+
+<p>というミックスインを含んだSCSSファイルを<code>_bordered-speech-bubble.scss</code>という名前で作っておけば、</p>
+
+<pre><code class="language-scss">@import &quot;bordered-speech-bubble&quot;;
+
+.speech-buble {
+  @include bordered-speech-bubble(#9cf, #369);
+}</code></pre>
+
+<p>と書くだけで使える。大抵作っても使わないんですけども！</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

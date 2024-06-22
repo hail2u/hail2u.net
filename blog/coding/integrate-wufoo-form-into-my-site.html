@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Wufooのフォームを自分のサイトに統合</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/integrate-wufoo-form-into-my-site.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Wufooのフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といってもdocument.write()なJavaScriptコードやiframe要素を張り付けて使うEmbed Form Code等やREST APIを利用したものではなく、決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良いようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Wufooのフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といってもdocument.write()なJavaScriptコードやiframe要素を張り付けて使うEmbed Form Code等やREST APIを利用したものではなく、決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良いようだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/integrate-wufoo-in-my-site-1.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Wufooのフォームを自分のサイトに統合" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-01-11T11:50:35+09:00">2011年1月11日</time></p>
+
+        <h1><em>Wufooのフォームを自分のサイトに統合</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://wufoo.com/">Wufoo</a>のフォームを利用する場合、通常はWufooでホストされているフォームにリンクを張って使う。このサイトのフィードバック・フォームもそうしていたが、どうも結構簡単に既存のウェブページからPOSTできるようにすることができるらしい。といっても<code>document.write()</code>なJavaScriptコードや<code>iframe</code>要素を張り付けて使う<a href="http://wufoo.com/docs/code-manager/">Embed Form Code等</a>や<a href="http://wufoo.com/docs/api/">REST APIを利用したもの</a>ではなく、<a href="http://wufoo.com/docs/api/external-post-to-wufoo/">決められたURLにPOST Keyというユーザー固有の付きでPOSTするフォームを作成すれば良い</a>ようだ。</p>
+
+<p>まずはWufooにログインしてフォームを作成しておく必要がある。作成したら管理画面からCodeをクリックしてForm Code Managerを開く。</p>
+
+<figure>
+<img alt="Form Code Managerへのリンク。" height="180" src="/img/blog/integrate-wufoo-in-my-site-1.png" width="320">
+</figure>
+
+<p>Form Code Managerのページの右上にあるAPI Informationをクリックして、作成したフォームのAPI情報ページを開く。</p>
+
+<figure>
+<img alt="API Informationのリンク。" height="180" src="/img/blog/integrate-wufoo-in-my-site-2.png" width="320">
+</figure>
+
+<p>このページにフォームの作成に必要なものは揃っている。必要なものはAPI IDとPOST Keyだけで、API KeyやHashは必要ない。ドキュメントではForm Code ManagerからXHTML/CSS Codeをダウンロードしてそれに入っているHTMLを書き換えろと支持されているが、そのHTMLはかなり読みづらいので、API IDとPOST Keyをコピーして一から書いた方が楽だと思う。</p>
+
+<p>API IDは以下のような表で記載されている。</p>
+
+<figure>
+<img alt="API ID。" height="180" src="/img/blog/integrate-wufoo-in-my-site-3.png" width="320">
+</figure>
+
+<p>POST Keyはページ右下にちょこんと記載されている。</p>
+
+<figure>
+<img alt="POST Key。" height="180" src="/img/blog/integrate-wufoo-in-my-site-4.png" width="320">
+</figure>
+
+<p>以上の情報を元に以下のような点に気をつけてフォームを作成すれば良い。</p>
+
+<ul>
+<li><code>form</code>要素の<code>action</code>には作成したフォームのURLを記入する</li>
+<li>各フォームの入力要素の<code>name</code>と<code>id</code>に<em>Field{API ID}</em>(API IDが174ならField174)を指定する</li>
+<li><code>type=&quot;hidden&quot;</code>の<code>input</code>要素の<code>name</code>と<code>id</code>に<code>idstamp</code>を割り当て、<code>value</code>でPOST Keyを指定する</li>
+</ul>
+
+<p>つまり以下のようなフォームを作成することになる。</p>
+
+<pre><code class="language-html">&lt;form action=&quot;http://username.wufoo.com/forms/formname/&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;
+  &lt;label&gt;
+    Name
+    &lt;input type=&quot;text&quot; name=&quot;Field6&quot; id=&quot;Field6&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Email
+    &lt;input type=&quot;text&quot; name=&quot;Field119&quot; id=&quot;Field119&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Website
+    &lt;input type=&quot;text&quot; name=&quot;Field126&quot; id=&quot;Field126&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Summary
+    &lt;input type=&quot;text&quot; name=&quot;Field229&quot; id=&quot;Field229&quot;&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Message
+    &lt;textarea rows=&quot;10&quot; cols=&quot;50&quot; name=&quot;Field115&quot; id=&quot;Field115&quot;&gt;&lt;/textarea&gt;
+  &lt;/label&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;idstamp&quot; value=&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot; id=&quot;idstamp&quot;&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Submit&quot; name=&quot;saveForm&quot; id=&quot;saveForm&quot;&gt;
+&lt;/form&gt;</code></pre>
+
+<p>あとはサイトのデザインに合わせてCSSで飾り付けるのみ。Wufooは<a href="http://wufoo.com/2010/08/30/use-over-150-fonts-on-your-forms-with-wufoos-new-typography-features/">Webフォント</a>が使えたりと元々かなり強力なデザイン機能を持っているが、やはり一からフォームを構築できると自己満足度は高い。Wufooのドキュメントで<em>公式にサポートしていない</em>と明言されており、突然停止することもありうるということには注意が必要だが、それに目をつぶっても使う価値があると個人的には感じた。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Amazonの商品個別ページでのwindow.productTagsオブジェクト</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/window-producttags-in-amazon.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Amazon.co.jp(Amazon.comでも)の商品個別ページのDOMにはwindow.productTagsというオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名(CDとかならアーティスト名)など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Amazon.co.jp(Amazon.comでも)の商品個別ページのDOMにはwindow.productTagsというオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名(CDとかならアーティスト名)など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Amazonの商品個別ページでのwindow.productTagsオブジェクト" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-05-29T21:50:54+09:00">2009年5月29日</time></p>
+
+        <h1><em>Amazonの商品個別ページでのwindow.productTagsオブジェクト</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://www.amazon.co.jp/">Amazon.co.jp</a>(<a href="https://www.amazon.com/">Amazon.com</a>でも)の商品個別ページのDOMには<code>window.productTags</code>というオブジェクトがあり、その中にASINをはじめ商品のタイトルや商品画像のURL、著者名(CDとかならアーティスト名)など基本的な情報が格納されている。これを使えば簡単な商品紹介リンクならば外部のサービスを介することなく作成することが出来る。</p>
+
+<p><code>window.productTags</code>オブジェクトは商品個別ページにあるタグをつける機能のために用意されているものみたい。<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873112028/hail2unet-22">Perlクックブック〈VOLUME1〉</a>のページを例に<code>window.productTags</code>オブジェクトを探してみると、</p>
+
+<pre><code class="language-js">productTags: {
+  asin: &quot;4873112028&quot;,
+  image: &quot;http://ec2.images-amazon.com/images/I/51FHW5B8GQL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU09_.jpg&quot;,
+  title: &quot;Perl\u30AF\u30C3\u30AF\u30D6\u30C3\u30AF\u3008VOLUME1\u3009&quot;,
+  authors: [
+    &quot;\u30C8\u30E0 \u30AF\u30EA\u30B9\u30C1\u30E3\u30F3\u30BB\u30F3&quot;,
+    &quot;\u30CD\u30A4\u30B6\u30F3 \u30C8\u30FC\u30AD\u30F3\u30C8\u30F3&quot;,
+    &quot;Tom Christiansen&quot;,
+    &quot;Nathan Torkington&quot;,
+    &quot;Shibuya Perl Mongers&quot;,
+    &quot;\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8\u30B7\u30B9\u30C6\u30E0&quot;
+  ],
+  appID: &quot;retail&quot;,
+  // 以下、タグをつける機能に関するプロパティが色々
+}</code></pre>
+
+<p>こんな感じになっている。<code>productTags.authors</code>もジャンルによってプロパティ名が違うとかそういうことは無く(空の配列だったりすることはあるけど)、どこでも同じように値を取り出すことが出来る。試しに画像つきのアソシエイト・リンクを生成するブックマークレットを作ってみた。</p>
+
+<p>Install Bookmarklet: <a href="javascript:(function(){var p=productTags;if(p.authors.length&gt;0){p.title+=&apos; by &apos;+p.authors.join(&quot;、&quot;);}prompt(p.title,&apos;&lt;p&gt;&lt;a href=&quot;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+p.asin+&apos;/hail2unet-22/ref=nosim&quot; style=&quot;padding-left:75px;display:block;height:75px;line-height:75px;background:url(&apos;+p.image+&apos;) no-repeat;text-decoration:none;&quot;&gt;&apos;+p.title+&apos;&lt;/a&gt;&lt;/p&gt;&apos;);})();">Associate this!</a></p>
+
+<p>style指定とかを削除すればもっと短くなる。</p>
+
+<p>画像のサイズは基本的に長辺が75pxにリサイズされているものを参照している(_SL75_)が、なか見！　検索のマークやおすすめマークと混ぜられたりしてると83pxとかそれ以上の時もあるので、適当に正規表現で削除してやると良さそう。</p>
+
+<pre><code class="language-js">productTags.image.replace(/_SL75_.*\.jpg$/, &quot;_SL75_.jpg&quot;);</code></pre>
+
+<p>こんなんで多分いける。ついでに画像を大きくしたかったりする場合は<code>_SL120_.jpg</code>で置換してやるとかで。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

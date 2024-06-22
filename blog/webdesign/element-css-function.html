@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSのelement()関数</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/element-css-function.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="せめてWebKitに実装されてからとか思ってたけど、CSS Image Values and Replaced Content Module Level 3がLast Callになったのでいい機会ということにしてelement()関数についてエントリを書く。element()関数は任意のIDを引数に取ることができ、その要素を画像として参照できるというなかなかの荒業な関数。具体的には画像のサムネイルを簡単に作成できるとかそういうものをイメージするとわかりやすいと思う。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="せめてWebKitに実装されてからとか思ってたけど、CSS Image Values and Replaced Content Module Level 3がLast Callになったのでいい機会ということにしてelement()関数についてエントリを書く。element()関数は任意のIDを引数に取ることができ、その要素を画像として参照できるというなかなかの荒業な関数。具体的には画像のサムネイルを簡単に作成できるとかそういうものをイメージするとわかりやすいと思う。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSのelement()関数" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-01-27T05:48:21+09:00">2012年1月27日</time></p>
+
+        <h1><em>CSSのelement()関数</em></h1>
+      </header>
+
+    <main>
+
+    <p>せめてWebKitに実装されてからとか思ってたけど、<a href="http://www.w3.org/TR/css3-images/">CSS Image Values and Replaced Content Module Level 3</a>がLast Callになったのでいい機会ということにして<a href="http://www.w3.org/TR/css3-images/#element-reference"><code>element()</code>関数</a>についてエントリを書く。<code>element()</code>関数は任意のIDを引数に取ることができ、その要素を<em>画像として</em>参照できるというなかなかの荒業な関数。具体的には画像のサムネイルを簡単に作成できるとかそういうものをイメージするとわかりやすいと思う。</p>
+
+<p>Demo: <a href="/test/350.html">Filmstrip View</a></p>
+
+<p>いわゆる「フィルムストリップ」のようなものを作るデモだけど、<code>element()</code>はまだFirefox 4以降でしかサポートされていないので、ChromeやSafariなどでは意図した通りに動かない。Firefoxなら下に並んだサムネイルをクリックすると大きな画像が表示される。切り替えやアニメーションについては<code>element()</code>の力ではなく、<code>:target</code>擬似クラスの力なので特に解説はしない。</p>
+
+<p><code>element()</code>では既に書いたようにIDで参照する。</p>
+
+<pre><code class="language-css">.test {
+  background-image: element(#foo);
+  background-size: contain;
+}</code></pre>
+
+<p>Firefoxでも完全な実装ではなく、背景でしか使えないように制限されているので、今のところはこういった使い方になるだろう(<code>list-style-image</code>や<code>content</code>プロパティーで使えるようになると便利そう)。サムネイル化する場合に限らずそのままのサイズで表示しようということはまずないと思うので、<code>background-size</code>プロパティーを使ってサイズを調整してやると良い。<code>contain</code>で納まるように調節してくれるはずなので、大体はこれだけで意図した通りに表示されるだろう(勿論<code>.test</code>への幅と高さの指定は必要)。</p>
+
+<p>ただレンダリングされていない要素は参照しても表示されない。</p>
+
+<pre><code class="language-css">#foo {
+  display: none;
+}
+
+.test {
+  background-image: element(#foo);
+  background-size: contain;
+}</code></pre>
+
+<p><code>display</code>に限らず、<code>visibility</code>や<code>height</code>プロパティーで見えなくしても同様に表示されない。デモではどうやっているかというと、<code>position</code>プロパティーで見えない位置に吹っ飛ばすことによって元画像は隠すがサムネイルは見えるようにしている。</p>
+
+<pre><code class="language-css">#foo {
+  position: absolute;
+  top: -100%;
+}
+
+.test {
+  background-image: element(#foo);
+  background-size: contain;
+}</code></pre>
+
+<p>つまりレンダリングはされるものの見えないような状態を工夫すれば良いわけで、ネガティブ・マージンなどでも可能。</p>
+
+<p>参照先、つまり引数に指定したIDを持つ要素は画像である必要は無いので、<a href="/test/351.html">Webページ全体のプレビューを右に表示する</a>などということもできる。表示しているエリアをハイライトするような感じになれば実用性は有りそうだけど、CSSだけでうまくやる方法は思いつかなかった。描画エリア内のみを覆う白いレイヤーを最背面に配置して、他は暗くするとかやってみたけど<code>element()</code>で作られた画像は全部白くなってしまった。実装の不備かそういう仕様なのかはわからない。単に表示するだけのもの、例えば印刷プレビュー的なものなら結構簡単に作れるんじゃないかと思う(CSSを丸ごと差し替えるだけ)。</p>
+
+<p>さっさと他のブラウザも実装しろやみたいな。あとこの関数名の検索ビリティの低さは異常なので、どうにかならなかったのかとかちょっと思ってる。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>最後にちょっと書いたWebページのプレビューで表示しているところをハイライトは<a href="http://jsdo.it/xl1/vSVh/fullscreen"><code>background-attachment: fixed</code>でいける</a>と@<a href="https://twitter.com/xl1blue">xl1blue</a>が考えてくれた。思いつかなかった。なんかに使えそう。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Aex: Amazon.co.jpの全商品から検索するよ！</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/aex.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Amazon Product Advertising APIのItemSearchオペレーションのパラメータとしてSearchIndex=Allが日本でも利用できるようになったらしいので、とりあえずAexという名前でAmazon.co.jpの検索サイトを作ってみた。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Amazon Product Advertising APIのItemSearchオペレーションのパラメータとしてSearchIndex=Allが日本でも利用できるようになったらしいので、とりあえずAexという名前でAmazon.co.jpの検索サイトを作ってみた。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Aex: Amazon.co.jpの全商品から検索するよ！" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-07-31T15:16:41+09:00">2009年7月31日</time></p>
+
+        <h1><em>Aex: Amazon.co.jpの全商品から検索するよ！</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=5">Amazon Product Advertising API</a>の<code>ItemSearch</code>オペレーションのパラメータとして<a href="http://affiliate-blog.amazon.co.jp/2009/07/paapi_maintenance_aug2009.html">SearchIndex=Allが日本でも利用できるようになったらしい</a>ので、とりあえず<a href="http://hail2u.github.io/aex.html">Aexという名前でAmazon.co.jpの検索サイトを作ってみた</a>。これでドロップダウンでカテゴリを選択とかいう腐ったUIから解放される。</p>
+
+<p><code>SearchIndex=All</code>を指定すると全商品からKeywordsに指定した文字列で検索してくれる。<code>SearchIndex=Blended</code>とはまったく違い、カテゴリごとに検索結果が分けられて返ってきたりはしない。色々検索してみたところ、Amazon.co.jpでの検索と同じ結果で、概ね期待通りの検索結果が返ってくるようだ(<code>ItemSearch</code>オペレーションのデフォルトでは<code>Condition=New</code>なので中古商品などが含まれないというような違いはあったりもする)。</p>
+
+<ul>
+<li><a href="http://hail2u.github.io/aex.html#q=jQuery">jQuery を検索した結果</a></li>
+<li><a href="http://hail2u.github.io/aex.html#q=jQuery;p=2">jQuery を検索した結果の2ページ目</a></li>
+<li><a href="http://hail2u.github.io/aex.html#q=%E5%86%85%E6%9D%91%E3%81%95%E3%81%BE%E3%81%81%EF%BD%9E%E3%81%9A">内村さまぁ～ず を検索した結果</a></li>
+</ul>
+
+<p><code>SearchIndex=All</code>のみの制限として、検索結果のページングに使用する<code>ItemPage</code>の最大値が<em>5</em>(<code>SearchIndex=Books</code>などの場合は<em>400</em>)までというのがあるようだ。また<code>Sort</code>に指定できる値も、</p>
+
+<ol>
+<li><code>price</code></li>
+<li><code>-price</code></li>
+<li><code>relevancerank</code></li>
+<li><code>salesrank</code></li>
+</ol>
+
+<p>の4つだけになっており、名前順でソートなどは不可能。他にも何か制限ありそう……。</p>
+
+<p><code>ItemAttributes/ProductGroup</code>の値の一覧が(できれば対訳も)欲しい。今までは<code>SearchIndex</code>でカテゴリを絞っていたので<code>ProductGroup</code>の値を意識しないでも何とかなったけど、全カテゴリから検索できるようになるとどのカテゴリの商品かを<code>ProductGroup</code>から類推することになるが、ローカライズされていないのでCEとか言われてもわからない。</p>
+
+<p>Amazon アソシエイト・プログラム(アフィリエイト)公式ブログではProduct Advertising APIをPAAPIって略してるんだな。ぱーぴ！！　1</p>
+
+<section>
+<h2>追記@2009-08-01T20:44:44+09:00</h2>
+
+<p>IE8では<code>onhashchange</code>、それ以外のブラウザでは古の<code>setInterval()</code>を使った簡単なjQueryプラグインを書いて、ブラウザの戻る・進むに対応させた。普通に<a href="http://www.mikage.to/jquery/jquery_history.html">jQuery history plugin</a>を使えば良かったという……。Firefox 3.xでは、</p>
+
+<pre><code class="language-js">location.watch(&quot;hash&quot;, function (obj, oldVal, newVal) {
+    $(window).trigger(&quot;hashchange&quot;);
+    });</code></pre>
+
+<p>とか初めて<code>Object.watch()</code>を使ってやってみたんだけど、<code>location.hash</code>に値をセットしようとすると<code>#undefined</code>とかなってわけがわからなくなった。どうせ3.6で<code>onhashchange</code>導入されるから良いか。</p>
+</section>
+
+<section>
+<h2>追記2009-08-02T15:27:24+09:00</h2>
+
+<p>クエリの方式を<code>#q=foo;p=3</code>という形に変えたり、スタイルをモノクロにしたり、バグ直したり。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

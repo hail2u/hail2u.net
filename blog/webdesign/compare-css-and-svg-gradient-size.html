@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSグラデーションとSVGグラデーションのサイズの比較</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/compare-css-and-svg-gradient-size.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="単純なものならあまり変わらないような気がしたので実際に比較してみます。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="単純なものならあまり変わらないような気がしたので実際に比較してみます。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSグラデーションとSVGグラデーションのサイズの比較" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-10-13T14:53:14+09:00">2011年10月13日</time></p>
+
+        <h1><em>CSSグラデーションとSVGグラデーションのサイズの比較</em></h1>
+      </header>
+
+    <main>
+
+    <p>単純なものならあまり変わらないような気がしたので実際に比較してみます。</p>
+
+<p>比較するグラデーションはCSSグラデーションで書くと</p>
+
+<pre><code class="language-css">linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%)</code></pre>
+
+<p>という縦方向に半透明の赤から半透明の青に変化するものです。</p>
+
+<p>CSSグラデーションでは、各ベンダー拡張プリフィックスを並べることになります。</p>
+
+<pre><code class="language-css">background-image: -moz-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -webkit-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -o-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: -ms-linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);
+background-image: linear-gradient(top, rgba(255, 0, 0, 0.5) 0, rgba(0, 0, 255, 0.5) 100%);</code></pre>
+
+<p>改行を含めて<em>475</em>バイトになりました。</p>
+
+<p>対してSVGグラデーションでは、以下のようになり、これを更にBase64変換してをData URIスキーム化することになります。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" version="1.0"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient x1="0" y1="0" x2="0" y2="100%" id="gradient"&gt;
+      &lt;stop offset="0%" style="stop-color: rgb(255, 0, 0); stop-opacity: 0.5;"/&gt;
+      &lt;stop offset="100%" style="stop-color: rgb(0, 0, 255); stop-opacity: 0.5;"/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect x="0" y="0" fill="url(#gradient)"/&gt;
+&lt;/svg&gt;</code></pre>
+
+<p>これから改行や省略できる空白・文字等を削除して、Data URIスキーム化してCSSにすると以下のようになります。</p>
+
+<pre>data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjAiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxMDAlIiBpZD0iZ3JhZGllbnQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjogcmdiKDI1NSwgMCwgMCk7IHN0b3Atb3BhY2l0eTogMC41OyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMCwgMjU1KTsgc3RvcC1vcGFjaXR5OiAwLjU7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSIwIiB5PSIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPgo8L3N2Zz4K</pre>
+
+<p>最後の改行を含めると<em>595</em>バイトで、CSSグラデーションとの差は100バイト強に収まっています。元のSVGからXML宣言を削除したり、<code>id</code>を短くしたりとかすれば更に小さくすることもできるはずです。</p>
+
+<p>複雑なグラデーションになるとこのような微差に収まることはまず無くなると思いますが、今のところはこういった単純なグラデーションを使うことが多いので、SVGグラデーションでもサイズ的なデメリットは殆ど無いと言っても良さそうです。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

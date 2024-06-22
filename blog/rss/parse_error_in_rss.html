@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>RSSファイルのパースエラー</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/rss/parse_error_in_rss.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="PerlでRSSファイルをパースする時、" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="PerlでRSSファイルをパースする時、" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="RSSファイルのパースエラー" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2003-08-10T13:13:56+09:00">2003年8月10日</time></p>
+
+        <h1><em>RSSファイルのパースエラー</em></h1>
+      </header>
+
+    <main>
+
+    <p>PerlでRSSファイルをパースする時、</p>
+<pre><code class="language-perl">eval{
+  $rss-&gt;parse($j-&gt;set(\$content)-&gt;utf8);
+};</code></pre>
+<p>とか処理してたのですよ。こういう事すると、XML宣言にUTF-8以外の文字コードが明記されていると、パースエラー起こすようです。</p>
+<p>当たり前っていや、当たり前なんですが、まるで気づかなかった。</p>
+<p>あるRSSファイルが、</p>
+<pre><code class="language-html">&lt;%xml version=&quot;1.0&quot; encoding=&quot;iso-8859-1&quot;%&gt;</code></pre>
+<p>となってて、UTF-8に変換してパースすると、「なんか変だぞ、コラ」と怒られ、気づきました。</p>
+<p>今までは、パースエラーが出る時は、</p>
+<ul>
+<li>メチャクチャな構造になっている</li>
+<li>Shift_JISやEUC-JPで書かれている</li>
+</ul>
+<p>の、どちらかであることばかりだったので、どうしようもないかなと目をつぶっていたわけで。とにかく間抜けな間違いに気づくことが出来てよかった。</p>
+<p>RSS Headline Grabber更新せねば。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

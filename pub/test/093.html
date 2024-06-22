@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>はてブコメント スター風味</title>
+
+<style type="text/css">
+#bookmarks {
+  overflow: hidden;
+}
+
+#bookmarks ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  line-height: 1;
+}
+
+#bookmarks ul li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+}
+
+#bookmarks ul li a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: block;
+  float: left;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+
+#bookmarks ul li a img {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#comment {
+  padding: 1em;
+  border: 1px solid #000;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: none;
+  color: #000;
+  background-color: #fff;
+}
+</style>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript">
+$(function () {
+  var t = $('#bookmarks').empty();
+  $("<p/>").append($("<em/>").append("データを取得中･･･")).appendTo(t);
+
+  var loc = "http://hail2u.net/blog/software/turn-off-zip-folder.html";
+  // var loc = location.href;
+  $.getJSON("http://b.hatena.ne.jp/entry/json/?callback=?", {
+    url: loc
+  }, function (data) {
+    t.empty();
+
+    if (data) {
+      var ul = $("<ul/>");
+      $.each(data.bookmarks, function (i, b) {
+        if (i == 128) return false; // 多いと死ぬ
+        var icon = "http://www.hatena.ne.jp/users/" + b.user.slice(0, 2) + "/" + b.user + "/profile_s.gif";
+        $("<li/>").attr({
+          id: "c" + i
+        }).append($("<a/>").attr({
+          href: "http://b.hatena.ne.jp/" + b.user
+        }).append($("<img/>").attr({
+          src: icon,
+          alt: b.user + "@" + b.timestamp,
+          width: 16,
+          height: 16
+        }).hover(function (e) {
+          $("#comment").text(this.alt).css({
+            top: (e.pageY + 8) + "px",
+            left: (e.pageX + 8) + "px"
+          }).show();
+        }, function () {
+          $("#comment").hide();
+        }))).appendTo(ul);
+      });
+      ul.appendTo(t);
+    } else {
+      $("<p/>").append("データを取得できませんでした。").appendTo(t);
+    }
+  });
+});
+</script>
+</head>
+<body>
+<h1>はてブコメント スター風味</h1>
+
+<div id="bookmarks"></div>
+<div id="comment"></div>
+</body>
+</html>

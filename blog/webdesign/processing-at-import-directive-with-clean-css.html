@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Clean CSSと@importのインライン展開</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/processing-at-import-directive-with-clean-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="最近のClean CSSには@importで参照しているCSSを読み込んでインライン展開する機能がある。この機能を使うとGitやBowerを使ってNormalize.cssやTwitter Bootstrapをローカルにダウンロードし(、リネームし)ておいて……などとしなくて済むので、CSSライブラリーの管理の手間がだいぶ減る。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="最近のClean CSSには@importで参照しているCSSを読み込んでインライン展開する機能がある。この機能を使うとGitやBowerを使ってNormalize.cssやTwitter Bootstrapをローカルにダウンロードし(、リネームし)ておいて……などとしなくて済むので、CSSライブラリーの管理の手間がだいぶ減る。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Clean CSSと@importのインライン展開" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-10-25T08:23:03+09:00">2014年10月25日</time></p>
+
+        <h1><em>Clean CSSと@importのインライン展開</em></h1>
+      </header>
+
+    <main>
+
+    <p>最近の<a href="https://github.com/jakubpawlowicz/clean-css">Clean CSS</a>には<code>@import</code>で参照しているCSSを読み込んでインライン展開する機能がある。この機能を使うとGitや<a href="http://bower.io/">Bower</a>を使って<a href="http://necolas.github.io/normalize.css/">Normalize.css</a>や<a href="http://getbootstrap.com/">Twitter Bootstrap</a>をローカルにダウンロードし(、リネームし)ておいて……などとしなくて済むので、CSSライブラリーの管理の手間がだいぶ減る。</p>
+
+<p>デフォルトで有効になっているので、普通に書くだけで展開される。</p>
+
+<pre><code class="language-css">@import url(&apos;http://necolas.github.io/normalize.css/latest/normalize.css&apos;);</code></pre>
+
+<p>は、</p>
+
+<pre><code class="language-css">/*! normalize.css v3.0.2 | MIT License | git.io/normalize */html{...</code></pre>
+
+<p>と展開され、更に圧縮される。Normalize.cssのように最新版を参照するURLが用意されていれば、バージョンの管理も不要になる。</p>
+
+<p>Clean CSSには他に相対パスを解決する仕組みなども用意されているので、CSSにおける静的リソースのほぼ全てをうまいこと管理できるようになっている。</p>
+
+<hr>
+
+<p>ただし<code>//</code>で始まるURLでCSSを参照すると例外を吐いて落ちるバグがあったり、すべての<code>@import</code>ディレクティブが処理されることには注意が必要かも。前者は致命的っぽいけどWindows限定のような気もする(ドライブレター！)。後者は処理して欲しくない<code>@import</code>ディレクティブが必要なことは稀なので、あまりハマらない。</p>
+
+<p>処理して欲しくない<code>@import</code>ディレクティブというのは、例えばUAで振り分けて返すCSSを変えているようなURLを参照しているケース。具体的には<a href="http://www.google.com/fonts">Google Fonts</a>のCSSとか。最近のChromeに対してはたまにWOFF2も参照するCSSを返したり、古いブラウザーに対しては忘れた方が良さそうなフォーマットを参照するCSSを返す。Clean CSSに対してはTTFを参照するCSSを返してしまう。</p>
+
+<p>このような些細な問題はあるけど、ライブラリー管理にBower等を使ってディレクトリーやファイルのレイアウトに四苦八苦するくらいならClean CSSをうまく使ってやった方が良い。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

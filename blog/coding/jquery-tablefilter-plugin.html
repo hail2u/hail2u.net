@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>jQueryプラグイン: TableFilter</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/jquery-tablefilter-plugin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="表にインクリメンタル・サーチで行を絞り込むフォームを付けるjQueryプラグイン、TableFilterを作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="表にインクリメンタル・サーチで行を絞り込むフォームを付けるjQueryプラグイン、TableFilterを作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="jQueryプラグイン: TableFilter" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-05-28T00:53:38+09:00">2009年5月28日</time></p>
+
+        <h1><em>jQueryプラグイン: TableFilter</em></h1>
+      </header>
+
+    <main>
+
+    <p>表にインクリメンタル・サーチで行を絞り込むフォームを付ける<a href="http://jquery.com/">jQuery</a>プラグイン、<a href="https://github.com/hail2u/jquery.table-filter">TableFilter</a>を作った。似たようなものは前に書いたのだけどjQueryプラグインを作ってみたかったので書き直した。習作。</p>
+
+<p>使い方は、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.tablefilter.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+$(function () {
+  $(&quot;table&quot;).addTableFilter({
+    labelText: &quot;絞込み: &quot;,
+    size:      48
+  });
+});
+&lt;/script&gt;</code></pre>
+
+<p>という感じで、他のjQueryプラグインと変わらない(と思う)。以下はサンプル。</p>
+
+<table id="tablefilter-sample">
+<caption>セ・リーグで4勝以上している投手(2009/05/27時点)</caption>
+<thead>
+<tr>
+<th>名前</th>
+<th>チーム</th>
+<th>勝利数</th>
+<th>利き腕</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>石川 雅規</td>
+<td>ヤクルト</td>
+<td>6</td>
+<td>左</td>
+</tr>
+<tr>
+<td>館山 昌平</td>
+<td>ヤクルト</td>
+<td>5</td>
+<td>右</td>
+</tr>
+<tr>
+<td>三浦 大輔</td>
+<td>横浜</td>
+<td>5</td>
+<td>右</td>
+</tr>
+<tr>
+<td>朝倉 健太</td>
+<td>中日</td>
+<td>5</td>
+<td>右</td>
+</tr>
+<tr>
+<td>グライシンガー</td>
+<td>巨人</td>
+<td>5</td>
+<td>右</td>
+</tr>
+<tr>
+<td>大竹 寛</td>
+<td>広島</td>
+<td>4</td>
+<td>右</td>
+</tr>
+<tr>
+<td>山口 鉄也</td>
+<td>巨人</td>
+<td>4</td>
+<td>左</td>
+</tr>
+<tr>
+<td>ゴンザレス</td>
+<td>巨人</td>
+<td>4</td>
+<td>右</td>
+</tr>
+<tr>
+<td>吉見 一起</td>
+<td>中日</td>
+<td>4</td>
+<td>右</td>
+</tr>
+</tbody>
+</table>
+<script>
+/*
+ jQuery Plugin: Table Filter v0.2.3
+
+ LICENSE: http://hail2u.mit-license.org/2009
+*/
+(function(a){a.fn.addTableFilter=function(d){var b=a.extend({},a.fn.addTableFilter.defaults,d),c,e;this.is("table")&&(this.attr("id")||this.attr({id:"t-"+Math.floor(99999999*Math.random())}),c=this.attr("id"),d=c+"-filtering",e=a("<label/>").attr({"for":d}).append(b.labelText),b=a('<input type="search"/>').attr({id:d,size:b.size}).on("click",function(){a(this).keyup()}),a("<p/>").addClass("formTableFilter").append(e).append(b).insertBefore(this),a("#"+d).delayBind("keyup",function(b){var d=a(this).val().toLowerCase().split(" ");
+a("#"+c+" tbody tr").each(function(){var b=a(this).html().toLowerCase().replace(/<.+?>/g,"").replace(/\s+/g," "),c=0;a.each(d,function(){if(0>b.indexOf(this))return c=1,!1});c?a(this).hide():a(this).show()})},300));return this};a.fn.addTableFilter.defaults={labelText:"Keyword(s): ",size:32};a.fn.delayBind=function(d,b,c,e){a.isFunction(b)&&(e=c,c=b,b=void 0);var g=this,f=null;return this.bind(d,b,function(b){clearTimeout(f);f=setTimeout(function(){c.apply(g,[a.extend({},b)])},e)})}})(jQuery);
+</script>
+<script>
+$(function () {
+  $("#tablefilter-sample").addTableFilter({
+    labelText: "フィルタ: ",
+    size:      24
+  });
+});
+</script>
+
+<p>阪神でフィルタかけるとショボーン。</p>
+
+<p><code>addTableFilter()</code>に渡すjQueryオブジェクトが<code>table</code>の時だけフォームを付けるので、<code>$(&quot;body&quot;).addTableFilter();</code>とかはダメ。そこらへんはCSSセレクタを使って<code>$(&quot;#content table&quot;).addTableFilter()</code>とするとか、目的の<code>table</code>要素に<code>id</code>属性(<code>class</code>属性でも良いけど)を振ってやる必要がある。他の注意点は<code>tbody</code>要素が必須なことくらい(のはず)。</p>
+
+<p>フィルタに「&gt; 200」とか入力して、数値での比較によるフィルタリングとかを使えたりしたら面白いかも。表以外に使えても良さそう。とか書くだけはタダ。</p>
+
+<section>
+<h2>追記@2009/06/05</h2>
+
+<p>Gistページから<a href="http://github.com/hail2u/jquery.table-filter">GitHubにリポジトリを作って移動させた</a>。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Vimで#RRGGBBからrgb(r,g,b)に変換</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/convert-hex-color-to-functional-color-with-vim.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSでrgba()を使うようになったので、#RRGGBBで書いていた色もrgb()で書き直すことにした。手作業でやるのはとても面倒なので、Vimスクリプトの勉強がてら#RRGGBBからrgb(r, g, b)に変換する関数を作って変換した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSでrgba()を使うようになったので、#RRGGBBで書いていた色もrgb()で書き直すことにした。手作業でやるのはとても面倒なので、Vimスクリプトの勉強がてら#RRGGBBからrgb(r, g, b)に変換する関数を作って変換した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Vimで#RRGGBBからrgb(r,g,b)に変換" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-12-03T20:26:42+09:00">2009年12月3日</time></p>
+
+        <h1><em>Vimで#RRGGBBからrgb(r,g,b)に変換</em></h1>
+      </header>
+
+    <main>
+
+    <p>CSSで<code>rgba()</code>を使うようになったので、<code>#RRGGBB</code>で書いていた色も<code>rgb()</code>で書き直すことにした。手作業でやるのはとても面倒なので、Vimスクリプトの勉強がてら<code>#RRGGBB</code>から<code>rgb(r, g, b)</code>に変換する関数を作って変換した。</p>
+
+<pre>function! HexToFunc(hex)
+  let color = matchlist(a:hex, &apos;\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)&apos;)
+  return &apos;rgb(&apos; . printf(&apos;%d&apos;, &apos;0x&apos; . color[1]) . &apos;, &apos; . printf(&apos;%d&apos;, &apos;0x&apos; . color[2]) . &apos;, &apos; . printf(&apos;%d&apos;, &apos;0x&apos; . color[3]) . &apos;)&apos;
+endfunction</pre>
+
+<p><code>matchlist()</code>で2桁ずつ区切ってやり、それぞれを<code>printf()</code>で10進数に変換するというもの。<code>matchlist()</code>の使い方がなんとなくわかった気がする。面倒だったので<code>#RGB</code>とかいう3桁の書き方には対応してない。</p>
+
+<p>あとはCSSファイルを開いて置換でこの関数を呼んでやる。</p>
+
+<pre>:%s/\(#[0-9A-F]\{6\}\)/\=HexToFunc(submatch(1))/gi</pre>
+
+<p><code>\=</code>で関数を呼ぶ場合はサブマッチを<code>submatch()</code>で拾うことを知らなくて、最初は<code>\=HexToFunc(\1)</code>とか書いて全然動かなかった……。</p>
+
+<p>あとでワンライナーでも書けるかなとちょっと頑張ってみたら結構簡単にできた。Vimすごい！</p>
+
+<pre>:%s/#\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)\([0-9A-F]\{2\}\)/\=&apos;rgb(&apos;.printf(&apos;%d&apos;,&apos;0x&apos;.submatch(1)).&apos;, &apos;.printf(&apos;%d&apos;,&apos;0x&apos;.submatch(2)).&apos;, &apos;.printf(&apos;%d&apos;,&apos;0x&apos;.submatch(3)).&apos;)&apos;/gi</pre>
+
+<p>こんなワンライナーがさっと書けるようになりたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>文書構造を見なおした(ている)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/document-structure.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTML5化した後、アウトラインがおかしかったところを修正したり、WAI-ARIAを導入したり、少し調整してたりしました。まだまだ行き届いていない所があるし、本当にこれでいいのとか色々座りが悪い感じですね。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTML5化した後、アウトラインがおかしかったところを修正したり、WAI-ARIAを導入したり、少し調整してたりしました。まだまだ行き届いていない所があるし、本当にこれでいいのとか色々座りが悪い感じですね。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="文書構造を見なおした(ている)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-11-09T19:31:06+09:00">2011年11月9日</time></p>
+
+        <h1><em>文書構造を見なおした(ている)</em></h1>
+      </header>
+
+    <main>
+
+    <p>HTML5化した後、アウトラインがおかしかったところを修正したり、<a href="http://www.w3.org/TR/wai-aria/">WAI-ARIA</a>を導入したり、少し調整してたりしました。まだまだ行き届いていない所があるし、本当にこれでいいのとか色々座りが悪い感じですね。</p>
+
+<pre>body
+|
++--header role="banner"
+|  |
+|  +--h1
+|  |
+|  +--nav
+|
++--div id="main" role="main"
+|  |
+|  +--section or article or nav
+|
++--footer role="contentinfo"
+   |
+   +--address
+   |
+   +--section</pre>
+
+<p>おおよそのページで共通の部分は以上のような形になっています。<code>div#main</code>がちょっとアレな気がしますね。本当はページによって<code>article</code>要素に<code>role="main"</code>持たせたりとか色々ちゃんとしたいところなんですが、<a href="http://blosxom.sourceforge.net/">Blosxom</a>のflavour (テンプレート)を書くのが面倒になって妥協しました。これに補助ナビゲーションやら広告やら<a href="http://developers.facebook.com/docs/reference/plugins/like/">いいね！　ボタン</a>が追加されるわけです。</p>
+
+<pre>body
+|
++--header
+|
++--div id="main" role="main"
+|  |
+|  +--article
+|
++--nav class="paging"
+|
++--footer</pre>
+
+<p>ページング・ナビゲーションは<code>body</code>直下に置きました。HTML5化した当初は<code>article</code>要素直下にスタイリングの都合上配置してたりしました……。ページングと同じく同一サイト内のコンテンツにリンクする「関連するエントリ」なら<code>aside/nav</code>として、一覧ページからpermalinkへリンクする「続きを読む」というようなものの場合は<code>nav</code>としてそれぞれ<code>article</code>要素直下に配置した方が良いと思います。</p>
+
+<pre>body
+|
++--header
+|
++--div id="main" role="main"
+|  |
+|  +--article
+|  |
+|  +--aside class="adsense"
+|
++--footer</pre>
+
+<p>広告もコンテキスト広告のようなものであっても<code>article</code>要素には含めない方が良さそうです。Google AdSenseの場合は親のセクションを見てマッチングを調節とか、自動で<a href="http://www.google.com/adsense/support/bin/answer.py?hl=ja&amp;answer=23168">セクション ターゲット</a>をやってそうな気がしますけどどうなんですかね？　<code>#main</code>直下なのは配置上の都合(<code>article</code>要素の間に挟みたいという都合)なので良くないですね。CSSで要素をコピーしてまったく別の場所に移動させるとかできるようになる何かがあったような気がしますが、思い出せません……。<a href="http://www.w3.org/TR/html5/content-models.html#wai-aria">HTML5とWAI-ARIAの関係</a>において<code>aside</code>要素はデフォルトで<code>note</code>ロールとなってたりするので、<code>complementaly</code>とか指定した方が良さそうですが、<code>complementaly</code>もなんか違うなぁという感じでまだ何も指定していません……。</p>
+
+<pre>body
+|
++--header
+|
++--div id="main" role="main"
+|  |
+|  +--article
+|     |
+|     +--aside class="like"
+|
++--footer</pre>
+
+<p>対していいね！　ボタンはその対象となるセクショニング・コンテンツ(かセクショニング・ルート)の要素に属する形で置くべきでしょう。ブログの記事などの場合はこのように<code>article</code>要素の直下が、Webサイトのホームページの場合は<code>body</code>要素直下が適切な場所になると思います。<a href="http://s.hatena.ne.jp/">はてなスター</a>もいいね！　ボタンと同様の扱いをすべきですがこれもまた配置の都合上で……ごにょごにょ。</p>
+
+<hr>
+
+<p>まぁ以上でわかるように同じ要素・同じクラスで違う階層にあったりとかするので、繰り返し使うことになる<code>aside</code>や<code>nav</code>要素等にあまりスタイルを当てることができなかったりします。複雑怪奇なセレクタルールで上書きしまくらないとならなくなるので。加えてIDをCSSで使わないようにする強化月間中なのでCSSを書くのが結構辛かったですが、なんとなく慣れてきました。隣接セレクタを使ってたりもするのでプロダクション・レベルで使えるような知識では今のところありませんが、やろうと思えば結構出来るもんですね。</p>
+
+<p>複雑なクラス指定と馬鹿丁寧なセレクタによって自由自在にデザインすることができますが、その反面それではCSSコードのポータビリティが失われます。HTMLレベルから手を加えるようなCSSフレームワークで揃えるならそのポータビリティはあまり問題にならないでしょうが、まぁそううまくはいかないですよね。リセットからノーマライズへというのもそういうCSSコードそれ自体のポータビリティを確保するという理由もあるんじゃないかなと思います。DOM操作によるリペイントやリフローの問題とかもあるので、一概に「ID使うな！　クラス指定も減らせ！」とは言えないんですけどね。</p>
+
+<hr>
+
+<p>HTML5では否応なく文書構造を意識せざるを得ないので、実際にHTML5としてインターネット上に公開しなくても手持ちの(X)HTMLの文書をHTML5化してみると、その(X)HTMLの構造がどういう問題を抱えているかなどがよくわかると思います。精神衛生上良くないですけどね！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

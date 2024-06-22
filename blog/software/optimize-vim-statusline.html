@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Vimのstatuslineを最適化する</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/optimize-vim-statusline.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="FuzzyFinderのbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、statuslineにも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="FuzzyFinderのbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、statuslineにも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/optimize-vim-statusline-default.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Vimのstatuslineを最適化する" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-11-02T09:49:50+09:00">2009年11月2日</time></p>
+
+        <h1><em>Vimのstatuslineを最適化する</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.vim.org/scripts/script.php?script_id=1984">FuzzyFinder</a>のbufferモードやmrufileモードの補完メニューでパスの真ん中が省略されているのがわかりやすかったので、<code>statusline</code>にも導入してよりわかりやすくしようという試み。インストール済みのGreasemonkeyスクリプトをちょっと編集する時など、ものすごく長いパスのファイルを編集する時のみ便利。</p>
+
+<p>Vimのデフォルトの<code>statusline</code>は以下のようなもの。</p>
+
+<figure>
+<img alt="デフォルトのstatuslineのスクリーンショット。" height="30" src="/img/blog/optimize-vim-statusline-default.png" width="868">
+</figure>
+
+<p>これにファイルの種類や文字コード・改行コードなどあると便利な情報を追加した上で、ファイル名を先頭に持ってきて、残りのパスを<code>%&lt;</code>を利用して省略させるようにすると、</p>
+
+<figure>
+<img alt="ビルトインの省略機能を利用したカスタマイズ済みのstatuslineのスクリーンショット。" height="30" src="/img/blog/optimize-vim-statusline-customized.png" width="868">
+</figure>
+
+<p>こんな感じになる。この<code>statusline</code>のコードは、</p>
+
+<pre><code class="language-vim">set statusline=%{expand(&apos;%:p:t&apos;)}\ %&lt;\(%{expand(&apos;%:p:h&apos;)}\)%=\ %m%r%y%w%{&apos;[&apos;.(&amp;fenc!=&apos;&apos;?&amp;fenc:&amp;enc).&apos;][&apos;.&amp;ff.&apos;]&apos;}[%3l,%3c]</code></pre>
+
+<p>というもので、しばらくこれを使っていた。悪くはないが、パスの先頭を省略するような書き方なのでドライブレターが見えなくなってしまいWindowsだとちょっとアレ。これをベースにFuzzyFinderから長いパスの中間を省略する関数をパクって最適化すると、</p>
+
+<figure>
+<img alt="最適化されたstatuslineのスクリーンショット。" height="30" src="/img/blog/optimize-vim-statusline-optimized.png" width="868">
+</figure>
+
+<p>こうなる。ドライブレターも見えるし、ファイルのあるフォルダ名も大体見えるのでわかりやすい！</p>
+
+<pre><code class="language-vim">set statusline=%{expand(&apos;%:p:t&apos;)}\ %&lt;\(<em>%{SnipMid(expand(&apos;%:p:h&apos;),80-len(expand(&apos;%:p:t&apos;)),&apos;...&apos;)}</em>\)%=\ %m%r%y%w%{&apos;[&apos;.(&amp;fenc!=&apos;&apos;?&amp;fenc:&amp;enc).&apos;][&apos;.&amp;ff.&apos;]&apos;}[%3l,%3c]
+
+function! SnipMid(str, len, mask)
+  if a:len &gt;= len(a:str)
+    return a:str
+  elseif a:len &lt;= len(a:mask)
+    return a:mask
+  endif
+
+  let len_head = (a:len - len(a:mask)) / 2
+  let len_tail = a:len - len(a:mask) - len_head
+
+  return (len_head &gt; 0 ? a:str[: len_head - 1] : &apos;&apos;) . a:mask . (len_tail &gt; 0 ? a:str[-len_tail :] : &apos;&apos;)
+endfunction</code></pre>
+
+<p><code>SnipMid()</code>はFuzzyFinderからコピペしただけ(<a href="http://bitbucket.org/ns9tks/vim-fuzzyfinder/src/tip/autoload/fuf.vim#cl-505">autoload/fuf.vimの505行目</a>あたりにある)。切り詰める長さは<code>SnipMid()</code>の第二引数で指定する。ここでは、</p>
+
+<pre>80-len(expand(&quot;%:p:h&quot;))</pre>
+
+<p>と80からファイル名を引いた数で切り詰めているが、ターミナルの横幅や<code>columns</code>にあわせて要調節。<code>set columns=120</code>な環境だとこれくらいが丁度良かった。頑張れば環境に合わせてフレキシブルに切り詰める長さを調節できそうだけど面倒なので……。</p>
+
+<p><code>titlestring</code>に使っても良い。</p>
+
+<pre><code class="language-vim">set titlestring=%{expand(&apos;%:p:t&apos;)}%(\ %m%r%w%)\ %&lt;\(%{SnipMid(expand(&apos;%:p:h&apos;),80-len(expand(&apos;%:p:t&apos;)),&apos;...&apos;)}\)\ -\ Vim</code></pre>
+
+<hr>
+
+<p>Vimはどうにかしようと思うと大抵はどうにかできて幸せ……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

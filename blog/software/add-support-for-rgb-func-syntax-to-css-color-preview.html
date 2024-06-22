@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSS color previewをrgb()に対応させた</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/add-support-for-rgb-func-syntax-to-css-color-preview.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="VimでCSSを編集中に色をインライン・プレビューしてくれるCSS color previewというスクリプトをrgb()に対応させてみた。一応rgba()にも対応しているような感じで、透明度を無視してプレビューされる。hsl()とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。hsl()とか使わねーよ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="VimでCSSを編集中に色をインライン・プレビューしてくれるCSS color previewというスクリプトをrgb()に対応させてみた。一応rgba()にも対応しているような感じで、透明度を無視してプレビューされる。hsl()とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。hsl()とか使わねーよ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/css-color-preview-mod.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSS color previewをrgb()に対応させた" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-11-10T09:38:31+09:00">2009年11月10日</time></p>
+
+        <h1><em>CSS color previewをrgb()に対応させた</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.vim.org/">Vim</a>でCSSを編集中に色をインライン・プレビューしてくれる<a href="http://vim.sourceforge.net/scripts/script.php?script_id=2150">CSS color preview</a>というスクリプトを<code>rgb()</code>に対応させてみた。一応<code>rgba()</code>にも対応しているような感じで、透明度を無視してプレビューされる。<code>hsl()</code>とかも対応しようと思ったのだけどRGBからHSLへの変換が面倒になってすぐに諦めた。<code>hsl()</code>とか使わねーよ。</p>
+
+<p>Download: <a href="/css.vim">rgb()/rgba()に対応したCSS color preview</a></p>
+
+<p>インストールは$HOME/.vim/after/ftplugin(Windowsでは$HOME/vimfiles/after/ftplugin)にcss.vimとしてコピーするだけ。インストールしてCSSファイルを開くと、</p>
+
+<figure>
+<img alt="rgb()/rgba()に対応したCSS color previewのプレビュー画像。" height="266" src="/img/blog/css-color-preview-mod.png" width="400">
+</figure>
+
+<p>というように背景色でインライン・プレビューされる。プレビューの通り<code>rgba()</code>の透明度は反映されない。<code>matchlist()</code>で書こうとしたのだけどよくわからなかったので<code>eval()</code>で書いた……。</p>
+
+<p>元のスクリプトで<code>set ut=100</code>とかなっていたところがちょっと気になったので削除して、<code>autocmd InsertLeave</code>で更新するようにした。改行の時とか;を入力した時にも更新できるともっと良いような気もするけど書き方わからない……。ついでに<code>autocmd</code>もグルーピングして*.cssに対してのみ行うようにした。<code>rgb()</code>対応以外の変更点はこれだけ。カーソル行の強調表示が有効な時に場合によっては文字が見づらくなる不具合も直したかったのだけど、うまい方法を思いつかなかった。</p>
+
+<hr>
+
+<p>最近、</p>
+
+<pre>set guifont=DejaVu_Sans_Mono:h12:w6</pre>
+
+<p>でgVimを使っているのだけどなかなか良い。上のプレビュー画像もこれ。デフォルトでは幅広すぎてちょっとかっこ悪い感じだけど<code>w6</code>にするとスマート。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

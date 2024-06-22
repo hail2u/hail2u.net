@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>検索語の強調</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/highlight-search-terms.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="かなり昔から色々な人が作ってるリファラを調べて検索語を取得しドキュメントの単語を強調表示するスクリプトを今さら書いた。jQueryのおかげでそこそこ短く書けた。遅いけど。リファラから検索語を取得する部分はまぁ置いておいて(あんまり考えずに書いたので)、ドキュメントの単語をハイライトするコードの部分についてだけ書いておく。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="かなり昔から色々な人が作ってるリファラを調べて検索語を取得しドキュメントの単語を強調表示するスクリプトを今さら書いた。jQueryのおかげでそこそこ短く書けた。遅いけど。リファラから検索語を取得する部分はまぁ置いておいて(あんまり考えずに書いたので)、ドキュメントの単語をハイライトするコードの部分についてだけ書いておく。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="検索語の強調" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-06-03T22:26:06+09:00">2009年6月3日</time></p>
+
+        <h1><em>検索語の強調</em></h1>
+      </header>
+
+    <main>
+
+    <p>かなり昔から色々な人が作ってるリファラを調べて検索語を取得しドキュメントの単語を強調表示するスクリプトを<a href="/highlight-search-terms.js">今さら書いた</a>。<a href="http://jquery.com/">jQuery</a>のおかげでそこそこ短く書けた。遅いけど。リファラから検索語を取得する部分はまぁ置いておいて(あんまり考えずに書いたので)、ドキュメントの単語をハイライトするコードの部分についてだけ書いておく。</p>
+
+<pre><code class="language-js">$(&quot;#contents &gt; .section *&quot;).not(&quot;iframe&quot;).contents().each(function () {
+  if (this.nodeType === 3) {
+    var s = this.nodeValue.replace(words, &quot;&lt;em class=\&quot;highlight\&quot;&gt;$1&lt;/em&gt;&quot;);
+    $(this).replaceWith(s);
+  }
+});</code></pre>
+
+<p>だけ。<code>words</code>にはリファラから取得した単語の正規表現が入っている。このサイトではメインのコンテンツは必ず<code>#contents &gt; .section</code>以下にあるので最初のセレクタはこうなってるが、<code>$(&quot;body *&quot;)</code>とかでもOK。そこからテキスト・ノードも含めて拾える<a href="http://docs.jquery.com/Traversing/contents">contents()</a>、<code>each()</code>と繋げて全ノードを走査する。で、テキスト・ノードだったら<code>nodeValue</code>から内容(テキスト・データ)を拾い、<a href="http://docs.jquery.com/Manipulation/replaceWith">replaceWith()</a>でノードの内容を置き換えている。</p>
+
+<p>テキスト・ノードを全部拾うまではすぐに書けたけど、<code>replaceWith()</code>を知らなくて色々変なことやってた。親ノードに戻ってノード作り直して入れ替えとか。</p>
+
+<p>jQueryの<code>contents()</code>は<code>iframe</code>要素だけ特別扱いしているので、<code>iframe</code>要素だけ除外しておいてやらないと、<a href="http://www.microsoft.com/japan/windows/products/winfamily/ie/default.mspx">Internet Explorer</a>や<a href="http://www.opera.com/browser/">Opera</a>でjQueryがエラ－を吐く。<a href="http://mozilla.jp/firefox/">Firefox</a>ではエラーが出なかったのでちょっとはまったが、Operaの開発者ツールで原因を調査できたので助かった。</p>
+
+<p>ここには既に導入してあるので、「<a href="http://www.google.com/search?hl=ja&amp;safe=off&amp;q=%E5%9C%A7%E7%B8%AE%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80+%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%97%E3%83%AD%E3%83%BC%E3%83%A9+%E3%82%AD%E3%83%93%E3%82%AD%E3%83%93+zipfldr&amp;btnG=%E6%A4%9C%E7%B4%A2&amp;lr=lang_ja">圧縮フォルダ エクスプローラ キビキビ zipfldr - Google 検索</a>」などからこのサイトを開くとハイライトされる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

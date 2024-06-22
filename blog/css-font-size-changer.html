@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>フォント・サイズ変更機能をCSSで</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/css-font-size-changer.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。:target疑似クラスを使う方法が最もコストが低いように思えた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。:target疑似クラスを使う方法が最もコストが低いように思えた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="フォント・サイズ変更機能をCSSで" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-03-14T14:27:51+09:00">2018年3月14日</time></p>
+
+        <h1><em>フォント・サイズ変更機能をCSSで</em></h1>
+      </header>
+
+    <main>
+
+    <p>実装と実行の両面でコストの低いフォント・サイズ変更機能の実装を考えていた。<code>:target</code>疑似クラスを使う方法が最もコストが低いように思えた。</p>
+
+<p>Demo: <a href="/test/677.html">CSS Font Size Changer</a></p>
+
+<p><code>id</code>属性を振った<code>div</code>要素でフォント・サイズを変更したいコンテンツを括り、それにページ内アンカーでジャンプすることによって<code>:target</code>疑似クラスを有効化するという仕組みだ。<code>:target</code>属性を使った画像のズーム機能の実装と考え方としては同じだ。フラグメント識別子を消したり、ブラウザーの履歴をクリーンに保つにはJavaScriptが必要になる。</p>
+
+<p>このままではページ移動が起きてしまうので、HTMLコードにはもう少し工夫が必要かもしれない。<code>div</code>要素で括らずに空要素として固定位置に隠して配置し、兄弟セレクターで制御するとうまくいきそうだ。</p>
+
+<pre><code class="language-css">#large:target ~ main {
+  font-size: 24px;
+}</code></pre>
+
+<p>既存のウェブページへCSSにおける副作用なしに追加するには、こちらの方法が優れている。</p>
+
+<hr>
+
+<p>もし<code>has()</code>疑似クラスの実装があると、カスタム・プロパティーと組み合わせられる。例えば以下のようにも書けるだろう。</p>
+
+<pre><code class="language-css">:root {
+  --base-font-size: 16px;
+}
+
+body {
+  font-size: var(--base-text-size);
+}
+
+:root:has(#large:target) {
+  --base-text-size: 24px;
+}</code></pre>
+
+<p>この場合はページ内アンカーそのものに<code>id</code>要素を振れば良いので、<code>div</code>要素が必要なくなる。ただし自身を参照するアンカーという存在そのものが微妙になる。</p>
+
+<p>しかし<code>has()</code>があるなら<code>:checked</code>疑似クラスから親を参照できるので、アンカー(や<code>id</code>属性)を使わず、ラジオボタンだけで実装できる。<code>:root:has(.large:checked)</code>というようなセレクターで良い。この場合はHTMLコードがフォーム要素だけでよくなるため、誰でも操作しやすくなる可能性が高い。</p>
+
+<hr>
+
+<p><code>has()</code>はかなりのポテンシャルを秘めている。想像しやすいところだとウェブログの記事にカバー画像がある場合とない場合でレイアウトを変えるとかだ。セレクターに簡単な条件節が追加できると考えるとわかりやすいかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

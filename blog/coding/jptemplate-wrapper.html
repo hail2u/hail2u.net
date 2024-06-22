@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JPTemplateのラッパーを書いた</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/jptemplate-wrapper.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Vimのスニペット系のプラグインとしてJPTemplateを愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、template-vimの補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Vimのスニペット系のプラグインとしてJPTemplateを愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、template-vimの補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/jptemplate-wrapper.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JPTemplateのラッパーを書いた" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-10-27T04:59:48+09:00">2011年10月27日</time></p>
+
+        <h1><em>JPTemplateのラッパーを書いた</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="JPTemplateのスニペットを補完メニューで選択出来るようになりました。" height="270" src="/img/blog/jptemplate-wrapper.png" width="480">
+</figure>
+
+<p><a href="http://www.vim.org/">Vim</a>のスニペット系のプラグインとして<a href="http://www.lunar-linux.org/~jannis/jptemplate/">JPTemplate</a>を愛用しているんですが、テンプレート名を忘れるとどうしようもないという結構致命的な欠点があります。僕はそれほど数多くのスニペットを使うわけではないのであまり気にしてなかったんですけど、<a href="https://github.com/mattn/template-vim">template-vim</a>の補完を見て「やっぱあると良いなー」と思ったので、ラッパー関数を書いてみました。</p>
+
+<pre><code class="language-vim">let g:jpTemplateKey = '&lt;C-S-F12&gt;'
+
+function! s:JPTemplateWrapper()
+  let templdir_ft = g:jpTemplateDir.'/'.&amp;ft
+  let templdir_general = g:jpTemplateDir.'/general'
+  let cword = matchstr(strpart(getline('.'), -1, col('.')), '[-0-9a-zA-Z_]*$')
+
+  if filereadable(templdir_ft.'/'.cword) || filereadable(templdir_general.'/'.cword)
+    call jp:InsertTemplate()
+  else
+    let templates = split(globpath(templdir_ft, '*'), "\n")
+    let templates += split(globpath(templdir_general, '*'), "\n")
+    call complete(col('.') - strlen(cword), map(filter(templates, 'v:val =~ "'.cword.'"'), 'fnamemodify(v:val, ":t:r")'))
+  endif
+
+  return ''
+endfunc
+
+inoremap &lt;C-Tab&gt; &lt;C-R&gt;=&lt;SID&gt;JPTemplateWrapper()&lt;CR&gt;</code></pre>
+
+<p>挿入モードで<code>Ctrl+Tab</code>(デフォルトのマッピング)を押すと、カーソル位置のファイル名っぽい文字列(<code>[-0-9a-zA-Z_]</code>)を拾い、もしその文字列でスニペットがあったらJPTemplateを呼んでやってます。スニペットが見つからなかったら全スニペット候補からその文字列で絞り込んで補完メニューを出すので、選択して確定後もう一回<code>Ctrl+Tab</code>でスニペットが挿入されます。</p>
+
+<p>補完メニューで確定したら即スニペット補完とかは難しくて出来ませんでした！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

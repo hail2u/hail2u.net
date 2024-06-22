@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>HTML Best PracticesのREADME*.mdを生成する仕組み</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/generating-html-best-practices-readme-md.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Markdownを普通に書いて済ませていたHTML Best Practicesを、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="HTML Best PracticesのREADME*.mdを生成する仕組み" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-05-05T09:59:32+09:00">2020年5月5日</time></p>
+
+        <h1><em>HTML Best PracticesのREADME*.mdを生成する仕組み</em></h1>
+      </header>
+
+    <main>
+
+    <p>Markdownを普通に書いて済ませていた<a href="https://github.com/hail2u/html-best-practices">HTML Best Practices</a>を、プラクティスごとにファイルに分割した。といっても一覧できないと読む気が起きないと思うので、簡単なスクリプトでREADME*.mdを生成している。主な目的は目次をちゃんと安定した形で作れるようにするためと、小さな文書群をがばっと生成する仕組みの実験のため。</p>
+
+<ul>
+<li><code>src</code>
+<ul>
+<li>...</li>
+<li><code>start-with-doctype</code> ... プラクティスID
+<ul>
+<li><code>en.md</code> ... ローカライズされたプラクティス</li>
+<li><code>ja.md</code> ... 〃</li>
+<li><code>ko.md</code> ... 〃</li>
+<li><code>tr.md</code> ... 〃</li>
+</ul>
+</li>
+<li>...</li>
+<li><code>data.json</code> ... 基本データ</li>
+<li><code>en.json</code> ... ローカライズ・データ</li>
+<li><code>ja.json</code> ... 〃</li>
+<li><code>ko.json</code> ... 〃</li>
+<li><code>tr.json</code> ... 〃</li>
+<li><code>template.mustache</code> ..．テンプレート</li>
+</ul>
+</li>
+<li><code>index.js</code> ... 生成するスクリプト</li>
+</ul>
+
+<p><code>data.json</code>に、ローカライズ一覧(バリエーション)と目次(文書の構造)がくる。他には、ローカライズ不要な寄稿者や翻訳者のGitHub ID、ライセンスなどが含まれる。スクリプトが書きやすいように、この構造を決めた。</p>
+
+<p>Node.jsで書くので、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">分割代入</a>でオブジェクトをマージしていくと、Mustacheで扱うデータができあがるようにしたかった。オブジェクトの配列が含まれる場合、分割代入でうまく扱うのが難しくなるため、英語用データをデフォルトに(<code>data.json</code>に含めるように)はしなかった。</p>
+
+<p>ファイル配置では、セクションごとにさらにディレクトリーを掘っても良さそうだったけど、そういうツリーの管理も<code>data.json</code>だけで済ませれば楽かなと思ってやめた。なのでプラクティスIDのディレクトリーがズラッと並び、その配下に<code>ja.md</code>というようなファイル名で、ローカライズされたプラクティスが配置される。</p>
+
+<p>テンプレートはMustacheだけど、生成するのはMarkdownなので、エスケープされないように<code>{{{...}}}</code>を駆使して書く。Mustacheセクションでインデントすると読みやすくなるけど、Markdown記法と競合しやすいので、インデントせず、ずらずらと書いていく。</p>
+
+<p>スクリプトは<code>Promise.all</code>を濫用し、ローカライズごとに並行実行し、セクションごとに並行実行し、プラクティスごとに並行実行する。プラクティスは古の手法でタイトルと本文に分割し、うまいことしてデータとして格納するだけ。</p>
+
+<hr>
+
+<p>GitHubの作る見出しIDは、それはそれは正しく機能するけど、目次は作ってくれない。今のNode.jsでは、正規表現でユニコード・プロパティー・エスケープが使えるので、完全な移植も可能だと思うし、実装もいくつか見つかる。けれど、ファイルを分けた場合、順序を管理する必要があるし、そのデータがあるなら、それを再利用した方が手っ取りばやいと思う。</p>
+
+<p>目次は、自分で考えたIDにジャンプするよう、リスト記法で並べる。本文では、見出しの末尾に空の<code>span</code>要素を追加し、それに考えたIDを振る(ここのIDはMarkdownレンダラーで処理されないので、Mustacheでエスケープされるように<code>{{...}}</code>で書く)。目次と本文で2回、同じセクションを回す。</p>
+
+<pre><code class="language-handlebars">{{#sections}}
+- [{{{title}}}](#{{{id}}})
+{{#practices}}
+    - [{{{title}}}](#{{{id}}})
+{{/practices}}
+{{/sections}}
+
+
+{{#sections}}
+## {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
+
+{{#practices}}
+### {{{title}}}&lt;span id=&quot;{{id}}&quot;&gt;&lt;/span&gt;
+
+{{{body}}}
+{{/practices}}
+{{/sections}}</code></pre>
+
+<p>IDを振った要素で見出しを括ってしまってもいいけど、それだとMarkdownとして読みづらくなるので、空要素にした。HTMLにすることを前提とした、こういったMarkdownはよくないと思うものの、GitHubのためならエンヤコラという感じだ。同時に、GitHubの見出しIDに依存しない(共存できる)ので、どこでHTMLにされても多分機能するという利点もある。</p>
+
+<hr>
+
+<p>MarkdownからMarkdownを生成していて、いったい何をやっているのか、ただつなげればいいんじゃないのかという感じだけど、ボチボチ遊んでいる。もうすぐスターが1500になりそうでうれしい。<code>docs</code>ディレクトリーにHTMLファイルも生成して、GitHub Pagesとして公開されるようにもしたので、<a href="https://hail2u.github.io/html-best-practices/">ディストラクション・フリーな形</a>でも読める。</p>
+
+<p>あわせて、<a href="/documents/html-best-practices.html">普通のHTMLの書き方</a>としてここで公開している長い方は、<a href="https://github.com/hail2u/html-best-practices-ja-detailed">別のリポジトリー</a>に分けた。こっちも似たような仕組みで生成するようになっていて、Markdownファイルも作るようになり、逆にGitHubでも一気に読めるようになった。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

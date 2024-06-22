@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>calc()内の0</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/unitless-zero-inside-css-calc-notation.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="感覚としてcalc(1rem + 1)は明らかにダメそうだとわかるが、なんとなく通りそうに見えるcalc(1rem + 0)もダメになるということをCSSWringへのPRで知った。0ならユニットを省略できることが多いが、calc()内では別のようだ。最初良くわからなかったが、この辺りを定義しているCSS Values and Units Module Level 3仕様でもちゃんとそうなっていた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="感覚としてcalc(1rem + 1)は明らかにダメそうだとわかるが、なんとなく通りそうに見えるcalc(1rem + 0)もダメになるということをCSSWringへのPRで知った。0ならユニットを省略できることが多いが、calc()内では別のようだ。最初良くわからなかったが、この辺りを定義しているCSS Values and Units Module Level 3仕様でもちゃんとそうなっていた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="calc()内の0" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-10-24T13:23:52+09:00">2015年10月24日</time></p>
+
+        <h1><em>calc()内の0</em></h1>
+      </header>
+
+    <main>
+
+    <p>感覚として<code>calc(1rem + 1)</code>は明らかにダメそうだとわかるが、なんとなく通りそうに見える<code>calc(1rem + 0)</code>もダメになるということを<a href="https://github.com/hail2u/node-csswring/pull/62">CSSWringへのPR</a>で知った。<code>0</code>ならユニットを省略できることが多いが、<code>calc()</code>内では別のようだ。最初良くわからなかったが、この辺りを定義している<a href="http://www.w3.org/TR/css3-values/">CSS Values and Units Module Level 3仕様</a>でもちゃんとそうなっていた。</p>
+
+<p>仕様では<code>calc()</code>の内容を処理する時に、<a href="http://www.w3.org/TR/css3-values/#calc-type-checking">右辺と左辺の型をチェックすること</a>を求められている。<code>*</code>(乗算)の場合は両辺のどちらかが数字であることが、<code>/</code>(除算)では右辺が数字でありかつ<code>0</code>ではないことが求められる。そして<code>+</code>(加算)と<code>-</code>(減算)では<em>両辺の型が同じである</em>か<em><code>&lt;number&gt;</code>と<code>&lt;integer&gt;</code>の組み合わせである</em>ことが求められる。</p>
+
+<p>問題の<code>calc(1em + 0)</code>は左辺が<code>&lt;length&gt;</code>で右辺が<code>&lt;integer&gt;</code>となる。そのため両辺の型が一致せず文法違反になる。実際に各ブラウザーでもことごとく無視されるようになる。</p>
+
+<hr>
+
+<p>CSSWringではプロパティーの値の中で単位を外せそうな<code>0</code>の長さかパーセンテージを見つけたら問答無用に削除していたため、このバグを作ってしまっていた。PRでは<code>calc()</code>かどうか簡単に探してスキップされるようになっており、これで問題なさそうだったため、ちょっとだけマッチ方法を変えてマージした。そういうわけで<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.1.0">CSSWring v4.1.0</a>では既に修正済みだ。</p>
+
+<hr>
+
+<p>v4.1.0では<code>::before</code>を<code>:before</code>に縮める機能も追加している。すべての擬似要素というわけではなく、以下の4つの擬似要素でのみ1つに縮められる。</p>
+
+<ul>
+<li><code>::before</code></li>
+<li><code>::after</code></li>
+<li><code>::first-line</code></li>
+<li><code>::first-letter</code></li>
+</ul>
+
+<p>これら以外の擬似要素でコロンを1つにすることは<a href="http://www.w3.org/TR/css3-selectors/#pseudo-elements">セレクターの仕様</a>では許されていない。同時にこれらの擬似要素では後方互換性のために必ずコロン1つでも良いように実装することとなっているので、安全に縮めることが可能だろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

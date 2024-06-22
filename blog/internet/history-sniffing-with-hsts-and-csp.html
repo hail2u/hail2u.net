@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/internet/history-sniffing-with-hsts-and-csp.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLをimg要素で読み込ませることで、訪問済みかどうか調べるというSnifflyという手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLをimg要素で読み込ませることで、訪問済みかどうか調べるというSnifflyという手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-10-29T00:46:49+09:00">2015年10月29日</time></p>
+
+        <h1><em>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</em></h1>
+      </header>
+
+    <main>
+
+    <p>Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLを<code>img</code>要素で読み込ませることで、訪問済みかどうか調べるという<a href="https://github.com/diracdeltas/sniffly">Sniffly</a>という手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。</p>
+
+<p>HSTSを提供している場合、そのウェブサイトへのアクセスはすべてHTTPSにブラウザー側で書き換えられる。つまりHSTSを提供しているウェブサイトへ訪問済みの場合、そのウェブサイトへHTTPで画像をリクエストしてもHTTPSに書き換わることになる。そうするとCSPでHTTPな画像に制限している場合、必ず読み込みエラーになることになる。</p>
+
+<p>それだけでは普通の読み込みエラーと判別できない。しかしHTTPSへの書き換えとCSPによる読み込みエラーはブラウザー側で高速に行われるため、<code>error</code>イベントでエラーになるまでの時間を調査することで通常の読み込みエラーと識別できる。</p>
+
+<p>だいたいこのような仕組みのようだ。HSTSの仕組みでどうにかするのは難しそうなので、CSP側で……ということになりそう。いずれにせよHTTPS化が一気に進みそうになる前になんとか解決されると良いなと思う。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

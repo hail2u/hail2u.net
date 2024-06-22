@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Blog Hacks: Hack #79</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blog/blog_hacks_79.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="もう第二刷！　な、ぶろがーのますとあいてむBlog HacksのHack #79ではPerlでBloglinesの新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在はMozilla Extensionとして動作するものやKDE上で動作するものが公開されています。ので、通常はこちらを使った方が良いと思います。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="もう第二刷！　な、ぶろがーのますとあいてむBlog HacksのHack #79ではPerlでBloglinesの新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在はMozilla Extensionとして動作するものやKDE上で動作するものが公開されています。ので、通常はこちらを使った方が良いと思います。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/bloglines_and_tclockl.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Blog Hacks: Hack #79" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-08-31T22:39:07+09:00">2004年8月31日</time></p>
+
+        <h1><em>Blog Hacks: Hack #79</em></h1>
+      </header>
+
+    <main>
+
+    <p>もう第二刷！　な、ぶろがーのますとあいてむ<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873111749/hail2unet-22" title="Amazon.co.jp： 本: Blog Hacks ―プロが教えるテクニック&amp;ツール100選">Blog Hacks</a>のHack #79ではPerlで<a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>の新着記事数をチェックするスクリプトのお話です。このHackの子見出しは、「WindowsやMac OS Xと違ってBloglines Notifierの用意されていないLinuxなどで・・・」となっていますが、現在は<a href="http://www.bloglines.com/about/notifier#moz" title="Bloglines | Bloglines Notifier">Mozilla Extensionとして動作するもの</a>や<a href="http://www.bloglines.com/about/notifier#kde" title="Bloglines | Bloglines Notifier">KDE上で動作するもの</a>が公開されています。ので、通常はこちらを使った方が良いと思います。</p>
+<p>と、するとこのHackが無意味なモノになってしまうのでいろいろと誤魔化してみる。子見出しと違う形になってしまいますが、いろいろなプログラムからBloglinesの新着は取得できるんだよ！　みたいなHackとして受け取ってもらえれば幸いです。Hackの前半で書いているように、ごく簡単な手続きでパースしやすい文字列が返ってくるってわけです。</p>
+<p>Windowsだと、簡単なスクリプトが動かせたりする<a href="http://www.samurize.com/modules/news/" title="Samurize.com - News">Samurize</a>や<a href="http://www.coolmon.org/" title="CoolMon - system stats on your desktop">CoolMon</a>、<a href="http://kapsules.shellscape.org/" title="Kapsules">Kapsules</a>などでBloglinesのNotifierを作ることができるでしょう(使ってないので僕は作りませんけど)。また、TClock Lightのユーザー定義文字列を引数でセットできる機能を利用して、WSHで新着記事数を取得して<a href="http://homepage1.nifty.com/kazubon/tclocklight/index.html" title="TClock Light">TClock Light</a>に渡し、タスクトレイに表示するなんてことも可能です。</p>
+<figure>
+<img alt="TClock Lightを利用してBloglinesの新着記事数をタスクトレイに表示。" height="24" src="/img/blog/bloglines_and_tclockl.png" width="260">
+</figure>
+<p>これを実現するためには以下のようなVBScriptファイルでOK。</p>
+<pre><code class="language-vbs">sMail = &quot;&lt;登録したメールアドレス&gt;&quot;
+sTClock = &quot;C:\Program Files\TClock Light\tclock.exe&quot;
+
+Set oXmlHttp  = CreateObject(&quot;Msxml2.XMLHTTP.3.0&quot;)
+Set oWshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+
+sTClock = Chr(34) &amp; sTClock &amp; Chr(34)
+
+oXmlHttp.open &quot;GET&quot;, &quot;http://www.bloglines.com/update?user=&quot; &amp; sMail, False
+oXmlHttp.send
+sRes = oXmlHttp.responseText
+
+aRes = Split(sStr, &quot;|&quot;, -1, 0)
+
+oWshShell.Run sTClock &amp; &quot; /ustr9 &quot; &amp; aRes(1)</code></pre>
+<p>あとはTClock Lightの書式設定に<code>USTR9</code>と書いてやればこのVBScriptを実行するたびにタスクトレイの表示が更新されます。定期的にこのVBScriptを実行したい場合は、同じくTClock Lightのアラーム設定で適度な間隔を指定してやれば良いです。さらにはTClock Lightのマウス操作設定で、タスクトレイのダブルクリックをファイルを開くにしてやり、ファイルに、</p>
+<pre>http://www.bloglines.com/myblogs</pre>
+<p>を指定すると、タスクトレイのダブルクリックからMy Blogsが開けて完璧！</p>
+<p>まぁ僕は<a href="/blog/rss/tcbloglines.html" title="hail2u.net - Weblog - tcbloglines">tcbloglines</a>を使っているんですけどね。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

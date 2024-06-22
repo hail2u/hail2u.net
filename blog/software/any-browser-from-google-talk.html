@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Google Talkから任意のブラウザを起動</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/any-browser-from-google-talk.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Google Talkは「これ凄い！　最強！　うわくぁっわくぁｗせｄｒｆｔｇｙふじこ。」という訳ではないですが、MSN MessengerやAOL Instant Messangerなんかのコッテリギトギト具合を鑑みると、「これくらいで良いよな」みたいなさりげない良さがありますね。一昨日、Gmailに本格的に移行したこともあって、Gmailの通知としても使えるGoogle Talkをメインにしようかなとか。とりあえずなぜかInternet Explorerが立ち上がってしまうアレに悩まされたのでまとめ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Google Talkは「これ凄い！　最強！　うわくぁっわくぁｗせｄｒｆｔｇｙふじこ。」という訳ではないですが、MSN MessengerやAOL Instant Messangerなんかのコッテリギトギト具合を鑑みると、「これくらいで良いよな」みたいなさりげない良さがありますね。一昨日、Gmailに本格的に移行したこともあって、Gmailの通知としても使えるGoogle Talkをメインにしようかなとか。とりあえずなぜかInternet Explorerが立ち上がってしまうアレに悩まされたのでまとめ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Google Talkから任意のブラウザを起動" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-09-07T20:23:00+09:00">2005年9月7日</time></p>
+
+        <h1><em>Google Talkから任意のブラウザを起動</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://talk.google.com/" title="Google Talk">Google Talk</a>は「これ凄い！　最強！　うわくぁっわくぁｗせｄｒｆｔｇｙふじこ。」という訳ではないですが、<a href="http://messenger.msn.com/" title="MSN Messenger Version 7.5">MSN Messenger</a>や<a href="http://www.aim.com/" title="AIM.com">AOL Instant Messanger</a>なんかのコッテリギトギト具合を鑑みると、「これくらいで良いよな」みたいなさりげない良さがありますね。一昨日、Gmailに本格的に移行したこともあって、<a href="https://mail.google.com/" title="Welcome to Gmail">Gmail</a>の通知としても使えるGoogle Talkをメインにしようかなとか。とりあえずなぜかInternet Explorerが立ち上がってしまうアレに悩まされたのでまとめ。</p>
+<p>例によって<a href="http://www.sysinternals.com/Utilities/Regmon.html" title="Sysinternals Freeware - Regmon">Regmon</a>でgoogletalk.exeでフィルタかけて眺めてると、httpやらなにやらいろいろと参照した上で最終的にはhttpsの関連付けをどうやら参照し、これに関連付けられているアプリケーションでGmailを開いてやっているようです。つまり、https(URL: HyperText 保護機能付き転送プロトコル(HTTP))の関連付けをフォルダオプションから編集してやれば、任意のブラウザでGmailを開くことが可能です。多分。検証にはあまり時間をかけていないので違うかも。</p>
+<p>もう一点。Google TalkからGmailを開くとhttpsじゃないとか言う罠(罠というほどでもない)があるので、そっちへ対策したつもりな<a href="/gmail.js" title="gmail.js">gmail.js</a>とかいうWSHなJavaScriptファイルをでっち上げてみました。これをhttpsへ関連付けてやってみたところ、httpsでGmailが開かれるようになりました。こっちはもう適当すぎなのでわかる人だけやってみてください。commandは、</p>
+<pre>wscript.exe C:\scripts\gmail.js %1</pre>
+<p>てな感じ。gmail.jsのパスは保存したところに修正しましょ。</p>
+<p>ちなみに、Google Talkからブラウザへ渡されるURLは、</p>
+<pre>https://www.google.com/accounts/TokenAuth?auth={authentication-token}
+  &amp;service=mail
+  &amp;continue=http%3A%2F%2Fmail.google.com%2Fmail
+  &amp;source=googletalk</pre>
+<p>と、こんな感じになっているみたいです(見やすいように改行とインデントを入れました)。<code>continue</code>パラメータの値がhttpになっているため、httpでGmailが開かれるみたい。gmail.jsではそれをhttpsに書き換えているだけ。なんかうまく動かない人もいるみたいです。直せたら誰か直して。僕の環境では動いているのでもうどうでも良くなった。</p>
+<section>
+<h2>追記</h2>
+<p>僕と同様に暇人な某氏が<a href="http://www.unknownplace.org/blosxom/coding/googletalk_hacks.html" title="UnknownPlace. - Google Talk から任意のブラウザを起動するつーる">同じことをするだいなみっくりんくらいぶらり</a>を作ってましたよ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

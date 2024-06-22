@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>安全な@font-faceの書き方</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/bulletproof-at-font-face-syntax.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Translation of: Bulletproof @font-face syntax" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Translation of: Bulletproof @font-face syntax" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="安全な@font-faceの書き方" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-09-19T00:00:00+09:00">2009年9月19日</time></p>
+
+        <h1><em>安全な@font-faceの書き方</em></h1>
+      </header>
+
+    <main>
+
+    <p>Translation of: <a href="http://paulirish.com/2009/bulletproof-font-face-implementation-syntax/">Bulletproof @font-face syntax</a></p>
+
+<p>最も優れた<code>@font-face</code>の定義方法を解説させて貰おう:</p>
+
+<pre><code>@font-face {
+  font-family: &#39;Graublau Web&#39;;
+  src: url(GraublauWeb.eot);
+  src: local(&#39;Graublau Web Regular&#39;), local(&#39;Graublau Web&#39;),
+         url(GraublauWeb.otf) format(&#39;opentype&#39;);
+}
+</code></pre>
+
+<p>最後に<em>なぜ</em>この方法が最も優れたものなのかは説明することにして、最初に他の方法の欠点を解説することにしたい。もちろん、問題の中心になるのはIEが.eotフォントが必要なのに対して、他のブラウザでは.ttfか.otfを必要とすることである。それでは順に解説していこう。</p>
+
+<h2><a href="http://jontangerine.com/silo/typography/font-face/">条件付コメントによる方法</a></h2>
+
+<pre><code>&lt;style type=&quot;text/css&quot; media=&quot;screen&quot;&gt;
+@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.otf&#39;) format(&#39;opentype&#39;);
+}
+&lt;/style&gt;
+&lt;!--[if IE]&gt;
+&lt;style type=&quot;text/css&quot; media=&quot;screen&quot;&gt;
+@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.eot&#39;);
+}
+&lt;/style&gt;
+&lt;![endif]--&gt;
+</code></pre>
+
+<p>本気なのだろうか？　ありとあらゆるHTMLファイルにこのコードを挿入するか、iefont.cssというファイルを作成して参照させなくてはならない。面倒で、美しくない。</p>
+
+<h2><a href="http://readableweb.com/mo-bulletproofer-font-face-css-syntax/">二重に定義する方法</a></h2>
+
+<pre><code>@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.eot&#39;); /* here you go, IE */
+}
+@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.otf&#39;); /* everyone else take this */
+}
+</code></pre>
+
+<p><a href="http://webreflection.blogspot.com/2009/09/font-face-we-are-already-doing-wrong.html">Andreaが指摘した</a>この方法の問題点はIEが.otfファイルをダウンロードしてしまうことだ。無駄なHTTP接続が発生させることは許されない。この問題に対するよくある対処はこうなる:</p>
+
+<pre><code>@font-face {
+  font-family: &#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.otf&#39;) format(&#39;opentype&#39;); /* IE no comprende format()! */
+}
+</code></pre>
+
+<p>知っていると思うが、IEは<code>format()</code>を解釈できない。ではそこで何が起こるかというと、IEは以下のようなファイルをリクエストする:</p>
+
+<pre>
+GraublauWeb.otf&#39;)%20format(&#39;opentype
+</pre>
+
+<p>これは……正規表現で<code>?</code>を使うの忘れたようだ。しかし、20から100 KBのファイルをダウンロードさせるよりは404の方がまだマシではある。それでは404をどうにかしてみよう:</p>
+
+<h2><a href="http://readableweb.com/mo-bulletproofer-font-face-css-syntax/">もっと安全な方法</a></h2>
+
+<pre><code>@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(&#39;GraublauWeb.eot&#39;); /* here you go, IE */
+}
+@font-face{
+  font-family:&#39;Graublau Web&#39;;
+  src: url(//:) format (&#39;no404&#39;), url(&#39;GraublauWeb.otf&#39;); /* tricky! */
+}
+</code></pre>
+
+<p>このエントリに対してRichard Finkが別の書き方を提示してくれたので、ここに追記しておく。その方法は<code>url(//:)</code>を利用して、IEが404になるようなリクエストをさせなくするものだ。<a href="http://readableweb.com/mo-bulletproofer-font-face-css-syntax/">彼のエントリ</a>にはこの書き方を利用する理由を理論付けている。その主張は理解できるが、自分では利用したいとは思えない。</p>
+
+<h2>ローカルへの参照を利用する方法</h2>
+
+<pre><code>@font-face {
+  font-family: &#39;Graublau Web&#39;;
+  src: url(GraublauWeb.eot);
+  src: local(&#39;Graublau Web Regular&#39;), url(GraublauWeb.otf) format(&#39;opentype&#39;);
+}
+</code></pre>
+
+<p>かなり簡潔で明瞭だ。IE以外のブラウザは.eotファイルを飛ばし次の定義を参照する。一方、IEは二番目の定義を解釈しようとするが、<code>local()</code>によるファイルの場所の指定を理解できない上に、複数のファイルの場所の指定も理解できない。ということで.eotファイルを参照することになる。IEは必ず最後の<code>src: url()</code>を参照することになるので、<a href="http://randsco.com/test/fontFace/peter.html">この方法はうまく動作しないだろう</a>。</p>
+
+<pre>
+src: url(GraublauWeb.eot);
+src: url(GraublauWeb.otf); /* Yeah IE will only try this one. :( */
+</pre>
+
+<p>また他の利点として、もしユーザー(訳注: サイトの訪問者)がカスタム・フォントをインストールしていた場合、ダウンロードさせないで済むことになる点が挙げられる。注意点としては、<a href="http://hacks.mozilla.org/2009/06/beautiful-fonts-with-font-face/">OS X上のSafariは完全なフォント名ではなくPostscriptフォント名のみを受け付ける</a>ので、両者が違う場合は両方含めて記述しなければならない:</p>
+
+<h2>安全な<code>@font-face</code>な書き方</h2>
+
+<pre><code>@font-face {
+  font-family: &#39;Graublau Web&#39;;
+  src: url(GraublauWeb.eot);
+  src: local(&#39;Graublau Web Regular&#39;), local(&#39;Graublau Web&#39;),
+         url(GraublauWeb.otf) format(&#39;opentype&#39;);
+}
+</code></pre>
+
+<h2>補足その他:</h2>
+
+<ul>
+<li><code>font-variant</code>プロパティを定義に含めてしまうと、IE 6-8やSafari(4.0.3で確認)では動作しない(Thanks <a href="http://sidisinsane.com/">Sid</a>)。</li>
+<li><code>font-style</code>プロパティを定義に含めても安全で全てのブラウザで正常に動作するが、IEはその値を無視する。</li>
+<li>Operaは<code>local()</code>の値を引用符で括らないと参照に失敗する。なので、こう書く: <code>local(&#39;Use Quotes&#39;)</code>。仕様の違反としてOperaにバグ報告をした。<a href="http://randsco.com/">Scott Kinler</a>と<a href="http://readableweb.com/mo-bulletproofer-font-face-css-syntax/">Richard Fink</a>のOperaの適切でない振る舞いに対する根気強い調査に感謝する。</li>
+<li>Safariのパーミッションエラー？<code>local(&#39;Fontin&#39;)</code>というように使った場合、もしユーザーがローカルにFontinをインストールしていた場合、セキュリティの警告ダイアログでそのファイルの使用の許可を求められる、というような報告があった。まだこの挙動について返答することはできない。しかし、僕がテストしたところでは、すべてのブラウザがローカルのフォントを利用するわけではないようだ: Opera 10 (Win XP)とSafari 4 (Win XP)は参照しないが、Fx 3.5 (Win &amp; OS X)とSafari 4 (OS X)はちゃんと利用してくれる。</li>
+<li>Chrome？　Chromeのベータ版またはdevビルドで<code>@font-face</code>がサポートされたという噂はある。この機能はインストール時に有効になっていないが、Chrome 3のコマンドライン・オプションで指定することによって有効にできる。僕は<a href="http://webfonts.info/wiki/index.php?title=@font-face_browser_support#Google_Chrome">このブラウザのサポート状況</a>を詳細と共に最新の状態に更新している。</li>
+<li>FxやOpera、Safariに対してTruTypeフォントを提供することもできるが、その場合も<code>format(&#39;opentype&#39;)</code>と指定すると良いだろう。提供するフォントがOpenTypeとTrueTypeのどちらであろうとも、フォーマットのヒントは必須ではない。</li>
+<li>クロスブラウザのテスト用にテストページを作成した: <a href="http://dl.getdropbox.com/u/39519/webfontsdemo/index.html">http://dl.getdropbox.com/u/39519/webfontsdemo/index.html</a></li>
+</ul>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

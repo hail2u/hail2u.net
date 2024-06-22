@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/ch-unit-size-and-japanese-webpage-with-latin-font.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。ch単位の仕様では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。実装もそうなっているようだった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。ch単位の仕様では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。実装もそうなっているようだった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ch単位の大きさと、欧文フォントを指定した日本語ウェブページ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-04-07T07:33:44+09:00">2021年4月7日</time></p>
+
+        <h1><em>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</em></h1>
+      </header>
+
+    <main>
+
+    <p>ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位の仕様</a>では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。<a href="/pub/test/707.html">実装もそうなっているよう</a>だった。</p>
+
+<p>それはそうだろう、という話に聞こえる。しかし、例えば0のないフォントが先頭にあった場合、フォールバックとしての<code>0.5em</code>が使われるのかどうか、という話になる。具体的には、Emoji用にサブセットしたフォントや、ロゴ用にサブセットしたフォント、<a href="https://yakuhanjp.qranoko.jp/">約物用にサブセットしたフォント</a>など、「0」のグリフがないフォントを使う時、どうなるのだろうかという疑問だった。結論としては、「『0』のグリフを実際にレンダリングした幅」であることを確認しただけに終わった。フォールバックの<code>0.5em</code>が使われる状況は縦書きの時だけと考えてよさそうだ。</p>
+
+<p>これを踏まえると、日本語のウェブサイトで欧文フォントを指定した場合、幅が思ったような大きさ、例えば<code>60ch</code>でカタカナ30文字分前後にはならないことが理解できる。欧文フォントには間違いなく「0」のグリフがあるので、その幅で<code>ch</code>単位の大きさは決まり、カタカナはその欧文フォントではないフォントで決まるからだ。例えば、ヒラギノやメイリオではかなり幅が違うため、欧文フォントがその前で指定されている場合、同じ<code>60ch</code>でも、おさまる文字数が変わってしまう。<code>ch</code>単位は、フォントによるおさまりの違いを吸収するものであるはずなので、これではあまり意味がない。</p>
+
+<p>つまり、欧文のみではないウェブサイト独特の挙動になるが、欧文フォントの指定と<code>ch</code>単位の組み合わせは避けるべきと思われる。おさまる文字数を考慮しない幅でいいなら、<code>ch</code>単位を使う意味はまったくない。<code>(r)em</code>や、<code>px</code>、<code>vw</code>単位などを使うべきだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

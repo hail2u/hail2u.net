@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>WOFF2への変換にかかる時間</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/woff2-compression-time.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="自前でビルドすることによってwoff2_compress.exeを手に入れたので、ウェブサイトのビルドに組み込もうと考えていたが、微妙そうだということがわかった。まず元となるファイルが更新されることがあまりないこともそうだが、WOFF2への変換にかなり時間を取られるということが大きい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="自前でビルドすることによってwoff2_compress.exeを手に入れたので、ウェブサイトのビルドに組み込もうと考えていたが、微妙そうだということがわかった。まず元となるファイルが更新されることがあまりないこともそうだが、WOFF2への変換にかなり時間を取られるということが大きい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="WOFF2への変換にかかる時間" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-05-12T02:26:19+09:00">2015年5月12日</time></p>
+
+        <h1><em>WOFF2への変換にかかる時間</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/blog/software/woff2_compress.exe-and-woff2_decompress.exe.html">自前でビルドすること</a>によって<code>woff2_compress.exe</code>を手に入れたので、ウェブサイトのビルドに組み込もうと考えていたが、微妙そうだということがわかった。まず元となるファイルが更新されることがあまりないこともそうだが、WOFF2への変換にかなり時間を取られるということが大きい。</p>
+
+<p>実際にどれくらい遅いのだろうか。Surce Sans ProとM+ 1p、そしてSource Han Sans JPの変換にかかる時間を、<code>time</code>コマンドを使って計測したところ、以下のような結果になった。</p>
+
+<pre><samp>$ <kbd>. ./convert.sh</kbd>
+Processing SourceSansPro-Regular.ttf =&gt; SourceSansPro-Regular.woff2
+
+real    0m22.593s
+user    0m0.000s
+sys     0m0.015s
+
+Processing mplus-1p-regular.ttf =&gt; mplus-1p-regular.woff2
+
+real    1m21.508s
+user    0m0.000s
+sys     0m0.015s
+
+Processing SourceHanSansJP-Regular.otf =&gt; SourceHanSansJP-Regular.woff2
+
+real    30m50.434s
+user    0m0.000s
+sys     0m0.015s</samp></pre>
+
+<p>ファイル・サイズが増えるにつれ変換に大きな時間がかかっていることがわかる。Source Sans Proでも厳しく、M+ 1pで限界、Source Han Sans JPに至っては言語道断という結果だ。WOFFへの変換は概ね高速(数秒)に終わるため、WOFF2で採用された新圧縮アルゴリズムBrotliでの再圧縮に時間がかかっているということだろう。</p>
+
+<p>とてもではないがウェブサイトのビルドに組み込める速度ではない。ファイル・サイズに応じて組み込むかどうか考えるという手もあるだろうが、どのあたりをしきい値とするかで悩むことにもなりそうだ。上述のようにあまり頻繁に更新されるわけではないので、必要な際にバッチ処理してやるくらいで十分だと言えそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

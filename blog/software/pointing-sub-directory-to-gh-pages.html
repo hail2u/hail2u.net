@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>サブディレクトリ－をgh-pagesへ向ける運用</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/pointing-sub-directory-to-gh-pages.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="gh-pagesブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとするとsubtreeを使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーをmasterからは無視しつつ、gh-pagesブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="gh-pagesブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとするとsubtreeを使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーをmasterからは無視しつつ、gh-pagesブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="サブディレクトリ－をgh-pagesへ向ける運用" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-10-26T14:01:59+09:00">2015年10月26日</time></p>
+
+        <h1><em>サブディレクトリ－をgh-pagesへ向ける運用</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>gh-pages</code>ブランチの管理にはいくつか手法はあると思うのだけど、決定版はなさそうに思える。まともにやるとすると<a href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt">subtree</a>を使うのが良さそうだが、パワフルすぎて役不足な印象だ。僕は公開するファイル群を吐くサブディレクトリーを<code>master</code>からは無視しつつ、<code>gh-pages</code>ブランチではそのサブディレクトリーをルートにするみたいな運用に落ち着きつつある。</p>
+
+<pre>example.com/
+├ dist/
+│ └ index.html
+├ src/
+│ └ index.mustache
+├ .gitignore
+├ index.js
+└ package.json</pre>
+
+<p>Node.jsで<code>index.js</code>を使って<code>src/index.mustache</code>を処理し、<code>dist/index.html</code>を吐くという形だ。ルートでは<code>.gitignore</code>で<code>dist/</code>を無視し、普通に<code>origin</code>を追加しておく。<code>dist/</code>で改めて<code>git init</code>し、ルートと同じ<code>origin</code>を追加しつつブランチは<code>gh-pages</code>に向くようにしておく。</p>
+
+<p>サブディレクトリーではファイルの更新と追加、削除しか起こらないので、機械的に以下のようなコマンドを発行するのみでGitHub Pagesが更新できる。</p>
+
+<pre><samp>$ <kbd>cd dist/ &amp;&amp; git add --all &amp;&amp; git commit -m &quot;Build&quot; &amp;&amp; git push origin gh-pages</kbd></samp></pre>
+
+<ul>
+<li>subtreeのような特殊な知識を必要としない</li>
+<li><code>gh-pages</code>ブランチへ切り替える作業が必要ない</li>
+<li><code>dist/</code>サブディレクトリーでルートのnpmスクリプトを使える</li>
+<li><code>gh-pages</code>ブランチに不必要なファイルとログが含まれない</li>
+</ul>
+
+<p>このあたりがメリットと考えて使っている。</p>
+
+<p>デメリットとしては<code>gh-pages</code>ブランチをまとめて<code>push</code>することがGitからはできないので、npmスクリプトなどでまとめて<code>push</code>する手法を編み出す必要があることが挙げられる。他にも2回<code>clone</code>しないと他のPCに作業環境を作れないことあたりもなかなか厳しそうだ。</p>
+
+<p>ここに至って通常はsubtreeに落ち着く理由がようやくわかった。つまり複数の人間が触る環境だと、何よりも<code>clone</code>のしやすさが重要になるということだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

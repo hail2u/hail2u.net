@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Edge 15でのネストされた@font-faceルール</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/nested-font-face-rule-on-edge-15.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="主にウェブフォントの利用やフォントの合成を行う時に使う@font-faceルールはまれに他のAt規則にネストされる。@mediaや@supportsルールを使って条件付きでフォントを変えたいことがあるからだ。しかしEdge 15ではそうやってネストされた@font-faceルールで作られたフォントを参照できない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="主にウェブフォントの利用やフォントの合成を行う時に使う@font-faceルールはまれに他のAt規則にネストされる。@mediaや@supportsルールを使って条件付きでフォントを変えたいことがあるからだ。しかしEdge 15ではそうやってネストされた@font-faceルールで作られたフォントを参照できない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Edge 15でのネストされた@font-faceルール" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2017-10-09T08:46:41+09:00">2017年10月9日</time></p>
+
+        <h1><em>Edge 15でのネストされた@font-faceルール</em></h1>
+      </header>
+
+    <main>
+
+    <p>主にウェブフォントの利用やフォントの合成を行う時に使う<code>@font-face</code>ルールはまれに他のAt規則にネストされる。<code>@media</code>や<code>@supports</code>ルールを使って条件付きでフォントを変えたいことがあるからだ。しかしEdge 15ではそうやってネストされた<code>@font-face</code>ルールで作られたフォントを参照できない。</p>
+
+<p>ネストされているかどうかだけが問題になるようで、以下のようなほぼ無意味な<code>@supports</code>ルールでも表面化する。</p>
+
+<pre><code class="language-css">@supports (top: 0) {
+  @font-face {
+    font-family: &quot;Foo&quot;;
+    src: url(&quot;https://example.com/woff2/foo.woff2&quot;) format(&quot;woff2&quot;);
+  }
+}
+
+body {
+  font-family: Foo, sans-serif;
+}</code></pre>
+
+<p>もうちょっと複雑にした<a href="https://jsfiddle.net/mypeuou0/">このようなコードを含むウェブページ</a>で挙動を確認できる。Firefox 57、Chrome 63、Mobile Safari 11ではFooを参照できるが、Edge 15では参照できず<code>sans-serif</code>になってしまう。</p>
+
+<p><code>@media</code>や<code>@supports</code>ルールと他のCSSコードのネストに関しては、 <a href="http://www.w3.org/TR/css3-conditional/">CSS Conditional Rules Module Level 3</a>に定められている。これによると条件節以降である<code>group_rule_body</code>は<code>{}</code>と<code>nested_statement</code>だけを持つ。そしてこの<code>nested_statement</code>には<code>font_face_rule</code>が含まれる。つまりネストできるので、無効になるEdge 15の挙動はバグだろう。</p>
+
+<hr>
+
+<p>ほぼ同じ内容の<a href="https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10328179/">放置されたイシュー</a>にはコメントしておいた(なぜかAnonymousになった)。Won’t Fixとなっており直りそうもない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

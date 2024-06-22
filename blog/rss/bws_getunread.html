@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>BWS: getunread</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/rss/bws_getunread.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Bloglines Web ServicesのPerlでの実装はそこかしこで取り上げられると思う(既にmiyagawaさんがWebService::Bloglinesというモノを作っていたり)ので、WSH + MSXMLでやってみようかと。てなわけで未読の一覧をHTMLにして標準出力テキスト・ファイルに吐くJScript、getunread.jsを作ってみました。テストも兼ねてなので、スクリプトを実行しても未読は維持されます。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Bloglines Web ServicesのPerlでの実装はそこかしこで取り上げられると思う(既にmiyagawaさんがWebService::Bloglinesというモノを作っていたり)ので、WSH + MSXMLでやってみようかと。てなわけで未読の一覧をHTMLにして標準出力テキスト・ファイルに吐くJScript、getunread.jsを作ってみました。テストも兼ねてなので、スクリプトを実行しても未読は維持されます。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="BWS: getunread" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-09-30T03:23:19+09:00">2004年9月30日</time></p>
+
+        <h1><em>BWS: getunread</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.bloglines.com/services/" title="Bloglines | Bloglines Services">Bloglines Web Services</a>のPerlでの実装はそこかしこで取り上げられると思う(既にmiyagawaさんが<a href="http://blog.bulknews.net/mt/archives/001292.html" title="WebService::Bloglines: blog.bulknews.net">WebService::Bloglines</a>というモノを作っていたり)ので、WSH + MSXMLでやってみようかと。てなわけで未読の一覧をHTMLにして<del>標準出力</del><ins>テキスト・ファイル</ins>に吐くJScript、<a href="/getunread.js" title="getunread.js">getunread.js</a>を作ってみました。テストも兼ねてなので、スクリプトを実行しても未読は維持されます。</p>
+<p>使い方は、</p>
+<pre><samp>C:&gt; <del><kbd>cscript getunread.js //Nologo &gt; unread.html</kbd></del>
+<ins><kbd>cscript getunread.js</kbd></ins></samp></pre>
+<p>てな感じ(wscriptでは動きません)。<del><code>//Nologo</code>オプションを付けないと変なのが頭に出力されます(標準エラー出力に吐けよ)。</del><ins>実行すると、ごく簡単な処理状況が標準出力に出力され、UTF-16LE(BOM付き)なテキスト・ファイルが指定のパスに出力されます。</ins></p>
+<p>BWSが返すXMLは、微妙におかしなXMLだったりするみたいですね。RSSの<code>language</code>要素の値がen-us固定だったり、マルチバイトが欠けたり、文字(数値)実体参照にきちんと変換されてなかったり。パース・エラーになってしまうのはどうにかして欲しいな。</p>
+<p>てか、フォルダの<code>outline</code>要素にも<code>BloglinesSubId</code>属性が付いていたので、フォルダごとに一気に未読記事を取得できたりしそうと思ったけど無理だった。</p>
+<p>個人的にはrelatedfeedsとかcitationsとかのAPIも実装して欲しいな。</p>
+<section>
+<h2>追記@2004/09/30</h2>
+<p>標準出力だとShift_JISに変換される時に一部欠落したりしてしまうので、UTF-16LE(BOM付き)なテキスト・ファイルに出力するように更新しました。ついでにRFC-822な日付けをJSTのW3CDTFな日付けに無理やり変換もしてみる。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

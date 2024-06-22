@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>GetUnreadMailNum</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/getunreadmailnum.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="僕は鶴亀メールを愛用していているのですが、「未読メールがあるかないかしかわからず、総未読メール数は鶴亀メールのウィンドウを開かないとわからない」という不満がありました。ので、マクロを作ってみた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="僕は鶴亀メールを愛用していているのですが、「未読メールがあるかないかしかわからず、総未読メール数は鶴亀メールのウィンドウを開かないとわからない」という不満がありました。ので、マクロを作ってみた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="GetUnreadMailNum" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-06-18T15:20:17+09:00">2004年6月18日</time></p>
+
+        <h1><em>GetUnreadMailNum</em></h1>
+      </header>
+
+    <main>
+
+    <p>僕は<a href="http://hide.maruo.co.jp/software/tk.html" title="秀まるおのホームページ－ソフトウェア－鶴亀メール">鶴亀メール</a>を愛用していているのですが、「未読メールがあるかないかしかわからず、総未読メール数は鶴亀メールのウィンドウを開かないとわからない」という不満がありました。ので、マクロを作ってみた。</p>
+<p>具体的なソースは以下の通り。これを実行するとダイアログボックスで指定アカウントの未読メール数が表示されます。</p>
+<pre>// アカウントごとの未読メール数をゲット
+
+$Account = &quot;&lt;アカウント名&gt;&quot;;
+$Folder  = $Account + &quot;\\&lt;ルートのフォルダ名&gt;&quot;;
+
+loaddll &quot;tkinfo.dll&quot;;
+
+if (!dllfunc(&quot;IsTuruKame&quot;)) {
+  endmacro;
+}
+
+#i = 0;
+
+while ($Folder != &quot;&quot;) {
+  call GetFolderUnreadMailCount $Folder;
+  #i = #i + ##return;
+  $Folder = dllfuncstr(&quot;GetNextFolder&quot;, $Account, $Folder);
+}
+
+message str(#i) + &quot;通の未読メールがあります。&quot;;
+
+endmacro;
+
+GetFolderUnreadMailCount:
+  #x = strstr($$1, &quot;\\&quot;);
+
+  if (#x &gt;= 0) {
+    $Account = leftstr($$1, #x);
+    $Folder  = midstr($$1, #x + 1, 256);
+  } else {
+    $Account = $$1;
+    $Folder  = &quot;&quot;;
+  }
+
+  #n = dllfunc(&quot;GetFolderMailCount&quot;, $Account, $Folder, &quot;unread&quot;);
+  return #n;</pre>
+<p><code>GetNextFolder</code>をうまく呼ぶことによってループさせながら、<code>GetFolderMailCount</code>の第3引数をunreadにして呼ぶことにより、各フォルダの未読メールを取得し、加算していくという推移になってます。ゆえに遅いです。</p>
+<p><code>GetNextFolder</code>で返ってくる文字列に、アカウント名も含まれることになかなか気づかなくてハマりました。アカウント名とフォルダ名の切り分けのコードは鶴亀マクロヘルプからパクりました。</p>
+<p>このソースではダイアログ・ボックスで表示していますが、僕は<a href="http://homepage1.nifty.com/kazubon/tclocklight/index.html" title="TClock Light">TClock Light</a>のユーザー定義文字列をセットしてやり(tclock.exeを<code>run</code>で呼んでやるということ)、タスクトレイに文字列として表示させて使ってます。マクロ登録→自動起動で、受信が一段落した時のマクロに指定してやれば良し。</p>
+<p><code>GetFolderMailCountAll</code>とか欲しいな・・・。</p>
+<p>なんか設定を見逃してそうな気はしないでもない。設定が多すぎて、そろそろ把握できなくなってきました。どのメーラーでも設定多くて把握しづらいですね。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

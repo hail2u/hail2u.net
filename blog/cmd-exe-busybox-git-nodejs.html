@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>コマンド・プロンプト上でBusyBoxを使いつつGitとNode.js</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/cmd-exe-busybox-git-nodejs.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="コマンド・プロンプトでなんとかなりそうにするためにタイトルのような構成にしてみている。Unixコマンド群を手に入れるとすると、UnxUtilsかGnuWinかBusyBoxかだ。安定はGnuWin、簡便さはUnxUtilsに軍配が上がりそうだが、BusyBoxは気持ちいい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="コマンド・プロンプトでなんとかなりそうにするためにタイトルのような構成にしてみている。Unixコマンド群を手に入れるとすると、UnxUtilsかGnuWinかBusyBoxかだ。安定はGnuWin、簡便さはUnxUtilsに軍配が上がりそうだが、BusyBoxは気持ちいい。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/cmd-exe-busybox-git-nodejs.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="コマンド・プロンプト上でBusyBoxを使いつつGitとNode.js" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-05-09T13:58:48+09:00">2018年5月9日</time></p>
+
+        <h1><em>コマンド・プロンプト上でBusyBoxを使いつつGitとNode.js</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<a href="https://frippery.org/busybox/"><img alt="BusyBox本体と個別実行ファイルとしてインストール可能なコマンドの一覧。" height="720" src="/img/blog/cmd-exe-busybox-git-nodejs.png" width="1280"></a>
+</figure>
+
+<p>コマンド・プロンプトでなんとかなりそうにするためにタイトルのような構成にしてみている。Unixコマンド群を手に入れるとすると、UnxUtilsかGnuWinか<a href="https://frippery.org/busybox/">BusyBox</a>かだ。安定はGnuWin、簡便さはUnxUtilsに軍配が上がりそうだが、BusyBoxは気持ちいい。</p>
+
+<p>BusyBoxのコマンド群をインストールする。</p>
+
+<pre>$ busybox --install %HOMEDRIVE%%HOMEPATH%\BusyBox</pre>
+
+<p>例の<code>autoexec.bat</code>的なやつでBusyBoxとそのコマンド群をインストールしたパスを優先してやる。</p>
+
+<pre><code class="language-bat">@echo off
+
+set PATH=%HOMEDRIVE%%HOMEPATH%\BusyBox;%PATH%</code></pre>
+
+<p>Git for WindowsでgVimを呼ぶためのシェルスクリプトを作り、PATHが通ったところに置く。</p>
+
+<pre><code class="language-bash">#!/bin/sh
+
+/c/Program\ Files\ \(x86\)/Vim/vim80/gvim.exe $*</code></pre>
+
+<p>Gitから開くエディターの設定は、gVimをタブで開いて待つようにする。</p>
+
+<pre>$ git config --global core.editor &quot;gvim -p --remote-tab-wait-silent&quot;</pre>
+
+<p><code>git log</code>や<code>git diff</code>での文字化けを解消するために<code>LC_ALL</code>環境変数を作成し、その値を<code>C.UTF-8</code>にする。コマンド・プロンプト側で<code>chcp 65001</code>する必要はない。</p>
+
+<p>Node.jsは特に設定の必要はない。Bashから使うことを考えなくて良いので、prefixなどの設定はデフォルトに戻した。</p>
+
+<hr>
+
+<p>なんか変だなーと思うことはちょくちょくあるが、知らずにBashに依存した使い方をしていたりした。Vimからグレップする時にうまく動いてなかったのは引用符のせいだった。</p>
+
+<pre><code class="language-vim">nnoremap &lt;Leader&gt;/  :grep! &apos;&apos;&lt;Left&gt;</code></pre>
+
+<p>こういうマッピングにしていたので、検索文字列が一重引用符でコマンド・プロンプトに渡されていてうまく動いていなかった。コマンド・プロンプトで一重引用符が使えないことなどは忘却の彼方だった。</p>
+
+<p>他におかしい時はだいたいConEmuのせいで壊れているので、環境としては大丈夫そうだ。</p>
+
+<hr>
+
+<p>BusyBoxでは対話型シェルとしてashも入っている。ビープ音がうるさいくらいで、サクサク使える。他のOS向けのように各コマンドをシンボリック・リンクで作れるともっと良さそうだった。ちゃんとした環境が欲しいのなら<code>make</code>と<code>curl</code>があるGOWやWSLの方がもちろん良いが、限られたUnix系のシェル・コマンドが欲しい場合ならBusyBoxでも良さそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

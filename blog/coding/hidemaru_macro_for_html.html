@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>秀丸マクロ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/hidemaru_macro_for_html.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="$fExt = &quot;&quot;;" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="$fExt = &quot;&quot;;" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="秀丸マクロ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2003-01-16T02:00:00+09:00">2003年1月16日</time></p>
+
+        <h1><em>秀丸マクロ</em></h1>
+      </header>
+
+    <main>
+
+    <pre>$fExt = &quot;&quot;;
+
+$srBuf = searchbuffer;
+#srOpt = searchoption;
+$fNam = filename2;
+
+#fLen = strlen($fNam);
+#i = #fLen;
+while( #i &gt; 0 ){
+  if(midstr($fNam, #i, 1) == &quot;.&quot;){
+    $fExt = midstr($fNam, #i + 1, #fLen - #i);
+    break;
+  }
+  #i = #i - 1;
+}
+
+if($fExt == &quot;htm&quot; || $fExt == &quot;html&quot;){
+  #cCode = colorcode &amp; 0x1f;
+  if(#cCode == 13 || #cCode == 14 || #cCode == 15){
+  searchup &quot;&lt;&quot;;
+    if(result){
+      beginsel;
+      searchdown &quot;&gt;&quot;;
+      if(result){
+        right;
+      }
+    }
+  }
+  else if(#cCode == 20){
+    searchup &quot;\&quot;&quot;;
+    right;
+    if(result){
+      beginsel;
+      searchdown &quot;\&quot;&quot;;
+      if(result){
+        right;
+        left;
+      }
+    }
+  }
+  else{
+    searchup &quot;&gt;&quot;;
+    right;
+    if(result){
+      beginsel;
+      searchdown &quot;&lt;&quot;;
+      if(result){
+        right;
+      left;
+      }
+    }
+  }
+  endsel;
+  setsearch $srBuf, #srOpt;
+}
+else{
+  selectword;
+}
+
+endmacro;</pre>
+<p>このマクロをダブルクリックに割り当てると、HTMLファイルでのダブルクリックでの挙動が少し変わる。タグ内の文字上でダブルクリック→タグ全体を選択、二重引用符に囲まれている文字列上でダブルクリック→二重引用符の間のみを選択、タグの外の文字上でダブルクリック→その文字を挟んでいるタグ間をすべて選択。HTMLエディタに良くある機能です。拡張子がhtml・htmじゃない場合は、デフォルトの割り当てと同じで、単語選択します。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

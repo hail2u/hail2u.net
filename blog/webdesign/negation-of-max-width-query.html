@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>max-widthを否定するクエリー</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/negation-of-max-width-query.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="モバイル・ファーストが浸透して久しくなり、めっきりmin-widthクエリー以外を見かけることはなくなった。そんな中、not (max-width: 768px)という書き方を見かけて、なるほどなと思った。現状のブラウザーにおける実装(と安定した仕様)では768pxを含まずそれより大きいという表現がmin-widthでは書くことができないが、notキーワードとmax-widthを組み合わせることで実現できる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="モバイル・ファーストが浸透して久しくなり、めっきりmin-widthクエリー以外を見かけることはなくなった。そんな中、not (max-width: 768px)という書き方を見かけて、なるほどなと思った。現状のブラウザーにおける実装(と安定した仕様)では768pxを含まずそれより大きいという表現がmin-widthでは書くことができないが、notキーワードとmax-widthを組み合わせることで実現できる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="max-widthを否定するクエリー" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-03-20T07:34:49+09:00">2015年3月20日</time></p>
+
+        <h1><em>max-widthを否定するクエリー</em></h1>
+      </header>
+
+    <main>
+
+    <p>モバイル・ファーストが浸透して久しくなり、めっきり<code>min-width</code>クエリー以外を見かけることはなくなった。そんな中、<code>not (max-width: 768px)</code>という書き方を見かけて、なるほどなと思った。現状のブラウザーにおける実装(と安定した仕様)では<em><code>768px</code>を含まずそれより大きい</em>という表現が<code>min-width</code>では書くことができないが、<code>not</code>キーワードと<code>max-width</code>を組み合わせることで実現できる。</p>
+
+<p>Demo: <a href="/test/616.html">Negation of max-width query</a></p>
+
+<p>特定のデバイスや解像度を強く意識したクエリーの是非はとりあえず脇へ置いておいて、iPhone 5s以下やらiPad Airやら一般的なノートブックやらを意識してクエリーを書くことはままある。多くの場合はそれら特定のデバイスのサイズ<em>から</em>を区切りにしてクエリーを書くわけだが、それらのサイズ<em>まで</em>で書くとなると少し曖昧な記述になる。</p>
+
+<pre><code class="language-css">@media (min-width: 321px) {}
+@media (min-width: 769px) {}
+@media (min-width: 1025px) {}</code></pre>
+
+<p>つまりこのように<code>1px</code>足した値を使ってクエリーを書くわけだ。慣れればわかるとは言え微妙な感じは否定できない。</p>
+
+<pre><code class="language-css">@media not all and (max-width: 320px) {}
+@media not all and (max-width: 768px) {}
+@media not all and (max-width: 1024px) {}</code></pre>
+
+<p><code>not</code>キーワードと<code>min-width</code>と対になる<code>max-width</code>を組み合わせると、このようにも書けることになる。<code>all</code>などのメディア・タイプと共に指定してやる必要があり、<code>width</code>や<code>resolution</code>などといった具体的なメディア特性だけを否定することは出来ない……らしいが特に<a href="http://www.w3.org/TR/css3-mediaqueries/">Level 3仕様</a>でも<a href="http://www.w3.org/TR/2014/WD-mediaqueries-4-20140605/">2014/06/05のLevel 4仕様のWorking Draft</a>でも触れられていない。CSS 2.1仕様との後方互換性のためそういう実装になっているのかもしれない。</p>
+
+<hr>
+
+<p>Media Queries Level 4 (Public Wrking Draft, 5 June 2014)では<code>width</code>クエリー他で<a href="http://www.w3.org/TR/2014/WD-mediaqueries-4-20140605/#mq-ranges">範囲指定</a>が可能になる予定で、それと同時により下・以下・以上・より上を区別して書くことができるようになる。この実装が広まるまでは<code>not</code>キーワードを利用して表現してやるというのも窮余の一策としてはまずまずなものだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

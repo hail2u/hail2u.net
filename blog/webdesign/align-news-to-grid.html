@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ホームの記事一覧をグリッド表示に</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/align-news-to-grid.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="味も素っ気もないリストから既に廃れ始めた感のあるグリッドに変えてみました。一覧性があるようなないような微妙な感じですね。すぐ戻しそう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="味も素っ気もないリストから既に廃れ始めた感のあるグリッドに変えてみました。一覧性があるようなないような微妙な感じですね。すぐ戻しそう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ホームの記事一覧をグリッド表示に" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-11-14T03:04:12+09:00">2011年11月14日</time></p>
+
+        <h1><em>ホームの記事一覧をグリッド表示に</em></h1>
+      </header>
+
+    <main>
+
+    <p>味も素っ気もないリストから既に廃れ始めた感のあるグリッドに変えてみました。一覧性があるようなないような微妙な感じですね。すぐ戻しそう。</p>
+
+<p>普通に<code>float</code>プロパティを使って作りました。<a href="/test/299.html">モックアップ</a>のコードで解説すると、各記事のHTMLが、</p>
+
+<pre><code class="language-html">&lt;section class="sub-news"&gt;
+  &lt;h3&gt;&lt;a href="http://example.com/blog/entry"&gt;Entry Title&lt;/a&gt;&lt;/h3&gt;
+  &lt;p&gt;Entry Summary&lt;/p&gt;
+&lt;/section&gt;</code></pre>
+
+<p>となっているので、この<code>section</code>要素の高さをうまく固定して並べます。</p>
+
+<pre><code class="language-css">.sub-news {
+  margin: 0 0.7%;
+  float: left;
+  width: 32%;
+  font-size: 75%;
+}
+
+.sub-news h3 {
+  margin: 24px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sub-news p {
+  margin: 24px 0;
+  height: 84px;
+  display: block;
+  overflow: hidden;
+}</code></pre>
+
+<p>並べるのは幅を適当に指定して<code>float</code>プロパティで良いですが、ちゃんと高さを揃えてやらないとうまく並ばなかったりすることがあります。そのために<code>h3</code>要素では<code>white-space</code>と<code>overflow</code>プロパティを使って複数行にならないようにし、<code>p</code>要素では<code>height</code>と<code>overflow</code>プロパティで4行以上にならないようにします。実際のCSSは他のルールとの兼ね合いなどもあって、もうちょっと複雑になっています。高さの計算などはSassでやってたりとかするので、書くのは面倒ではないですけどね。</p>
+
+<p>もっと手軽に<a href="http://masonry.desandro.com/">jQuery Masonry</a>とか<a href="https://github.com/yoko/brickmaker-js">Brickmaker-js</a>など敷き詰める系のJavaScriptライブラリを使っても良いかもしれないですね。文字だとちょっと読みづらいかもしれませんが。</p>
+
+<p>狭い画面では今までと同じようにリスト表示にしてます。HTMLはそのままで<code>h3</code>で<code>list-item</code>にしてやってます。</p>
+
+<p><a href="http://www.w3.org/TR/css3-multicol/">CSS Multi-column Layout Module</a>を使った奴も<a href="/test/300.html">書いてみました</a>。Opera 11で普通にずれました……。カラム切り替えのタイミングがちょっと違うようなので、ちゃんと<code>column-break-before</code>等で制御しないとダメそうですね。まぁそれよりもそもそもカラム・レイアウトのためのもので、グリッド・レイアウトのためのものではないので、読まれる方向と並び方が噛み合っていないですね。<a href="http://www.w3.org/TR/css3-grid-layout/">Grid Layout</a>さん……。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>そのままだと空白がバラバラでなんか揃っているのに揃っていない感じだったので薄い半透明の背景をちょっと加えました。ボタンっぽいイメージになると思うので、ついでに<code>a</code>要素で括って全体をクリックできるようにも。最初はなんかいまいちだなーとか作っときながら思ってましたが、段々気に入ってきました！</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>GitHub Pagesへ移行した</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/internet/hello-github-pages.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="好みの問題でJekyllはどうしても使う気になれないのでビルド・システムはそのままに、ホスティング先をGitHub Pagesに移動した。DNS設定もTTL通り5分で反映され、www付きのリダイレクトもうまくいっているようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="好みの問題でJekyllはどうしても使う気になれないのでビルド・システムはそのままに、ホスティング先をGitHub Pagesに移動した。DNS設定もTTL通り5分で反映され、www付きのリダイレクトもうまくいっているようだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/hello-github-pages.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="GitHub Pagesへ移行した" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-10-14T10:12:54+09:00">2014年10月14日</time></p>
+
+        <h1><em>GitHub Pagesへ移行した</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="GitHub Pages。" height="627" src="/img/blog/hello-github-pages.png" width="1200">
+</figure>
+
+<p>好みの問題で<a href="http://jekyllrb.com/">Jekyll</a>はどうしても使う気になれないのでビルド・システムはそのままに、ホスティング先を<a href="https://pages.github.com/">GitHub Pages</a>に移動した。DNS設定もTTL通り5分で反映され、www付きのリダイレクトもうまくいっているようだ。</p>
+
+<p>ビルド・システムは変えないと決めたので、今まではrsyncでリモート・サーバーにミラーしていたのを、そのまま<code>build</code>という名前のサブディレクトリーにミラーするように変える方法にした。その後常に<code>gh-pages</code>ブランチをチェックアウトしている<code>build</code>ディレクトリーで全追加(<code>add --all</code>)してからコミット、そして<code>push</code>するという形で公開する。</p>
+
+<ol>
+<li>記事ファイルの作成</li>
+<li>ウェブサイト管理用リポジトリー(プライベート)にコミット</li>
+<li>HTMLとRSS、およびサイトマップの生成</li>
+<li>rsyncで必要なファイルだけサブディレクトリーにミラー</li>
+<li><a href="https://github.com/hail2u/hail2u.net">ウェブサイト公開用リポジトリー</a>にコミット</li>
+</ol>
+
+<p>このようなフローがGruntで自動実行され、ウェブログの記事はさっくりと公開される。</p>
+
+<section>
+<h2>ドメインの設定</h2>
+
+<p>wwwの無いいわゆるエイペックス・ドメインはAレコードで設定した。<a href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/">Tips for configuring an A record with your DNS provider</a>によると、昔と違って今は複数のIPアドレスを割り当ててやる必要があるようで、それだけには注意した。</p>
+
+<pre><samp>C:&gt; <kbd>nslookup hail2u.net</kbd>
+権限のない回答:
+名前:    hail2u.net
+Addresses:  192.30.252.153
+          192.30.252.154</samp></pre>
+
+<p>www付きでのアクセスをwww無しへリダイレクトさせたい場合は、更にwwwサブドメインをCNAMEを使って<code>hail2u.github.io.</code>に割り当ててやるだけで良いようだ。そうすると対象リポジトリに置かれた<code>CNAME</code>ファイルの内容に従ってGitHub側が良きに計らってくれるようになっている。</p>
+</section>
+
+<hr>
+
+<p>色々あーでもないこーでもないと考えたりしてる中で、デプロイに使っているオレオレGruntタスクが総入れ替えみたいな感じになった。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

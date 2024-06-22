@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>fixpackにおけるscriptsフィールドのソート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/fixpack-scripts-sorting.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="package.jsonをフォーマットしなおしてくれるfixpackを愛用している。ひとつだけ気になるところがあり、それがscriptsフィールドがアルファベット順に並ぶことだ。つまりpre*やpost*コマンドがその元コマンドと関係ない場所へとまとめられてしまう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="package.jsonをフォーマットしなおしてくれるfixpackを愛用している。ひとつだけ気になるところがあり、それがscriptsフィールドがアルファベット順に並ぶことだ。つまりpre*やpost*コマンドがその元コマンドと関係ない場所へとまとめられてしまう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="fixpackにおけるscriptsフィールドのソート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-10T14:44:21+09:00">2016年4月10日</time></p>
+
+        <h1><em>fixpackにおけるscriptsフィールドのソート</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>package.json</code>をフォーマットしなおしてくれる<a href="https://github.com/HenrikJoreteg/fixpack">fixpack</a>を愛用している。ひとつだけ気になるところがあり、それが<code>scripts</code>フィールドがアルファベット順に並ぶことだ。つまり<code>pre*</code>や<code>post*</code>コマンドがその元コマンドと関係ない場所へとまとめられてしまう。</p>
+
+<p>例えば<code>pre*</code>や<code>post*</code>コマンドを駆使した場合、fixpackを通すと以下のようになってしまう。</p>
+
+<pre><code class="language-json">{
+  &quot;scripts&quot;: {
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;,
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;
+  }
+}</code></pre>
+
+<p>元コマンドのソート順はアルファベット順で構わないが、<code>pre*</code>や<code>post*</code>コマンドは元コマンドの前後にあるとわかりやすいはずだ。つまり以下のようになっていると望ましい。</p>
+
+<pre><code class="language-json">{
+  &quot;scripts&quot;: {
+    &quot;prebar&quot;: &quot;echo prebar&quot;,
+    &quot;bar&quot;: &quot;echo bar&quot;,
+    &quot;postbar&quot;: &quot;echo postbar&quot;,
+    &quot;prefoo&quot;: &quot;echo prefoo&quot;,
+    &quot;foo&quot;: &quot;echo foo&quot;,
+    &quot;postfoo&quot;: &quot;echo postfoo&quot;
+  }
+}</code></pre>
+
+<p>ここのところ<code>npm run-script</code>を使い倒してやろうという機運が高まっているため、このように管理しやすい形でソートしてくれると助かる。ということで<a href="https://github.com/HenrikJoreteg/fixpack/pull/16">こういった機能を実装したプル・リクエスト</a>は投げておいた。</p>
+
+<hr>
+
+<p>プリフィックス付きの文字列をうまい具合に一発でソートするアルゴリズムをちゃんと探して、2パスではない実装にしたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

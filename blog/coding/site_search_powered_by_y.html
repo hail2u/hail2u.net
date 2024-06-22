@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Yahoo! Search Web Servicesでサイト内検索機能</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/site_search_powered_by_y.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="なんとなくGoogleを利用したサイト内検索を変更したくなったので、MSN Searchを利用して作ってみました(タイトルと違う)。結局はタイトルの通り、Yahoo! Search Web Servicesを利用したもので作り上げたわけですが。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="なんとなくGoogleを利用したサイト内検索を変更したくなったので、MSN Searchを利用して作ってみました(タイトルと違う)。結局はタイトルの通り、Yahoo! Search Web Servicesを利用したもので作り上げたわけですが。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Yahoo! Search Web Servicesでサイト内検索機能" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-03-09T16:57:23+09:00">2005年3月9日</time></p>
+
+        <h1><em>Yahoo! Search Web Servicesでサイト内検索機能</em></h1>
+      </header>
+
+    <main>
+
+    <p>なんとなく<a href="http://www.google.com/">Google</a>を利用したサイト内検索を変更したくなったので、<a href="http://search.msn.com/">MSN Search</a>を利用して作ってみました(タイトルと違う)。結局はタイトルの通り、<a href="http://developer.yahoo.net/">Yahoo! Search Web Services</a>を利用したもので作り上げたわけですが。</p>
+<p>MSN SearchはWeb Serviceとして開発者向けに何かを公開しているわけではないのですが、検索結果のRSSフィード(RSS 2.0)を提供をしています。そのRSSフィードへのアクセスは至極単純で、<code>format=rss</code>を通常の検索結果のページのURLに追加するだけです(<a href="http://search.msn.com/results.aspx?q=rss+site%3ahail2u.net&format=rss">例: rss site:hail2u.net</a>)。なので、RSSをHTMLに変換するようなCGIで比較的簡単にサイト内検索を構築できたりします。実際に<a href="http://search.cpan.org/search?module=LWP%3A%3ASimple">LWP::Simple</a>と<a href="http://search.cpan.org/search?module=XML%3A%3ARSS">XML::RSS</a>を利用したものはものの数分で作れました。</p>
+<p>ただ、検索結果のRSSフィードには、</p>
+<blockquote>
+<p>Copyright &#169; 2005 Microsoft. All rights reserved. These XML results may not be used, reproduced or transmitted in any manner or for any purpose other than rendering MSN Search results within an RSS aggregator for your personal, non-commercial use. Any other use of these results requires express written permission from Microsoft Corporation. By accessing this web page or using these results in any manner whatsoever, you agree to be bound by the foregoing restrictions.</p>
+</blockquote>
+<p>と記述されているので、いわゆるフィード・リーダー以外で利用するには、Microsoftからきちんとした許可証を頂かなくてはならないっぽい。</p>
+<p>てなわけでYahoo! Search Web Servicesでやってみたわけですよ。</p>
+<p>Yahoo! Search Web Servicesは、</p>
+<pre>http://api.search.yahoo.com/{ServiceName}/{ServiceVersion}}/{ServiceMethod}</pre>
+<p>というURLにパラメータで細かい指定をし、そのURLをGETするとXMLで検索結果が返ってくるというWeb Serviceなので、作業の推移は、</p>
+<ol>
+<li>URLを作成</li>
+<li>URLにGETをかける</li>
+<li>返ってきたXMLをパース</li>
+<li>出力</li>
+</ol>
+<p>と言う感じになります。つまり<a href="http://search.cpan.org/search?module=URI">URI</a>+LWP::Simple+<a href="http://search.cpan.org/search?module=XML%3A%3ASimple">XML::Simple</a>という組み合わせで扱えるもの。<a href="https://www.amazon.co.jp/exec/obidos/subst/associates/join/webservices.html">Amazon Web Services</a>のXML over HTTPとほとんど同じ感覚で扱えるってわけですね。</p>
+<p>実際にはYahoo! Search Web ServicesのSDKに<a href="http://search.cpan.org/search?module=Yahoo%3A%3ASearch">Yahoo::Search</a>という、上記推移だと1～3をやってくれるモジュールが含まれており、単純に作れる・・・のですが、サイト内検索などの限定した利用の場合はURI+LWP::Simple+XML::Simpleを使った方が把握しやすい気がする。リクエストが不正な場合などはステータス・コードで拾えるので、エラー時に返されるXMLは意識しなくて良いっぽい感じですし(気を付けるのは検索結果が0件の場合くらい)。</p>
+<p>完成はしたもののあまり使い勝手の良いものにはならなかったので、まだ採用はしていません。流行りのLiveSearch系(xmlHttpRequestによるページ遷移の無い検索)で実装しようかなとかくだらないことばかり考えてたりとか。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

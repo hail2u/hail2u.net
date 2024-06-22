@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JavaScriptとYQLでReadabilityの短縮URLを作る</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/create-readability-shorturl-with-js-and-yql.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Readabilityにはrdd.meという短縮URLサービスがあり、それを使ってReadability化された読みやすい状態の記事を共有することができます。短縮URLの取得はWeb UIやReadability化したページで行える他、ウィジェットもありますが、APIも用意されているのでWebアプリケーションへの統合にはこちらを使った方が自由度が高いでしょう。YQLを使えばJavaScriptだけでも何とかなります。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Readabilityにはrdd.meという短縮URLサービスがあり、それを使ってReadability化された読みやすい状態の記事を共有することができます。短縮URLの取得はWeb UIやReadability化したページで行える他、ウィジェットもありますが、APIも用意されているのでWebアプリケーションへの統合にはこちらを使った方が自由度が高いでしょう。YQLを使えばJavaScriptだけでも何とかなります。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JavaScriptとYQLでReadabilityの短縮URLを作る" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-11-28T08:17:16+09:00">2011年11月28日</time></p>
+
+        <h1><em>JavaScriptとYQLでReadabilityの短縮URLを作る</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.readability.com/">Readability</a>には<a href="http://rdd.me/">rdd.me</a>という短縮URLサービスがあり、それを使ってReadability化された読みやすい状態の記事を共有することができます。短縮URLの取得はWeb UIやReadability化したページで行える他、<a href="http://www.readability.com/publishers/tools">ウィジェット</a>もありますが、<a href="http://www.readability.com/publishers/rdd">APIも用意されている</a>のでWebアプリケーションへの統合にはこちらを使った方が自由度が高いでしょう。<a href="http://developer.yahoo.com/yql/">YQL</a>を使えばJavaScriptだけでも何とかなります。</p>
+
+<p>APIは認証不要の単純なHTTPリクエストで叩きます。</p>
+
+<pre><samp>$ <kbd>curl https://readability.com/api/shortener/v1/urls -d url=http://hail2u.net/documents/diveintohtml5-semantics.html</kbd></samp></pre>
+
+<p>cURLで短縮URLの作成APIを叩く場合はこのようにリソースに<code>url</code>パラメータとして任意のURLを<em>POST</em>で投げるわけです。レスポンスはJSONで返ってきます。</p>
+
+<pre><code class="language-json">{
+  "meta": {
+    "url": "/api/shortener/v1/urls/thu5ivbh",
+    "rdd_url": "<a href="http://rdd.me/thu5ivbh">http://rdd.me/thu5ivbh</a>",
+    "id": "thu5ivbh"
+  },
+  "messages": ["URL shortened."],
+  "success": true
+}</code></pre>
+
+<p>クエリが成功すれば<code>meta.rdd_url</code>から短縮URLを拾うことができます。</p>
+
+<p>JavaScriptで叩く場合はクロスドメインという壁があるのでYQLで逃げ……られると思いきや、POSTなので素のYQLでは叩けません(できるらしいですけどよく知らないです……)。しかし、Community Tableを有効にすると<a href="http://developer.yahoo.com/yql/console/?q=show%20tables&amp;env=store://datatables.org/alltableswithkeys#h=select%20*%20from%20jsonpost%20where%20url%3D%27http%3A//search.twitter.com/search.json%27%20and%20postdata%3D%22q%3Dtest%22">jsonpost</a>(POSTでJSONが返ってくるサービスに使うテーブル)というまさに必要なものがあるのでこれを使います。</p>
+
+<p>Demo: <a href="/test/310.html">JavaScript rdd.me Shortener</a></p>
+
+<p>YQLに投げるYQL文は以下のような形になります。</p>
+
+<pre><code class="language-sql">SELECT * FROM jsonpost WHERE url='https://readability.com/api/shortener/v1/urls' AND postdata='url=http://hail2u.net/documents/diveintohtml5-semantics.html'</code></pre>
+
+<p><code>postdata</code>でリソースに投げる<code>url</code>パラメータをセットして使います。クロスドメインの問題はYQLのJSONPラッパーで解決できるので、<a href="http://jquery.com/">jQuery</a>などと組み合わせればデモのように数行のJavaScriptでReadabilityの短縮URLが作成可能になります。</p>
+
+<hr>
+
+<p>Readabilityのウィジェットはカッコイイと思うんですけど、ちょっと主張が強いというかボタンボタンしすぎてる感じで白背景のクリーンなWebサイト(例えば<a href="http://blog.readability.com/">Readability Blog</a>など)にしかハマらない気がします。それでAPIを叩いて短縮URLを作ってリンクを叩こうとしました。最初は思わず<a href="http://blosxom.sourceforge.net/">blosxom</a>のプラグインとして作ったんですが、APIが結構遅いのとやることの割にガッツリ様々なPerlモジュールが必要になるあたりで放棄しました。で、JavaScriptでページのロード後に叩けば良いかなーということでこんな感じになりました。</p>
+
+<p>JavaScriptでロード後に叩く場合でも結局APIが遅いというのがボトルネックになって、ユーザーが読み始めた後で短縮URLが表示される、もしくは短縮URLが表示される前に読むのをやめてタブを閉じそうというなんともアレな感じです……。キャッシュ作ったりとかちゃんとやらないと実用化するのは厳しそうです。フィードの再構築みたいに記事の公開時だけに短縮URLを作ってキャッシュして、それ以外ではそのキャッシュを読むだけのblosxomプラグインでも書こうかなでも面倒くさいな(←今ここ)みたいな。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

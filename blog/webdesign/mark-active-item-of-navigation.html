@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ナビゲーションのアクティブな項目をマークする</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/mark-active-item-of-navigation.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ウェブサイトのナビゲーションでよくある、アクティブ、つまりユーザーが閲覧中のページに対応する項目にマークを付ける場合、画像ファイルでやることが多い。最近はCSSグラデーションを使ってアクティブな時にへこませたような効果を与えたりすることもあるが、よく見かける三角のマークを付けるとなるとやはり画像で……となってしまう。しかし、単純な形に限ってなら枠線付きの吹き出しでも利用した:before又は:after擬似要素を使えば実現できる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ウェブサイトのナビゲーションでよくある、アクティブ、つまりユーザーが閲覧中のページに対応する項目にマークを付ける場合、画像ファイルでやることが多い。最近はCSSグラデーションを使ってアクティブな時にへこませたような効果を与えたりすることもあるが、よく見かける三角のマークを付けるとなるとやはり画像で……となってしまう。しかし、単純な形に限ってなら枠線付きの吹き出しでも利用した:before又は:after擬似要素を使えば実現できる。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/mark-active-item-of-navigation.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ナビゲーションのアクティブな項目をマークする" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-02-28T10:25:06+09:00">2011年2月28日</time></p>
+
+        <h1><em>ナビゲーションのアクティブな項目をマークする</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="三角や丸でアクティブな項目をマークする。" height="131" src="/img/blog/mark-active-item-of-navigation.png" width="295">
+</figure>
+
+<p>ウェブサイトのナビゲーションでよくある、アクティブ、つまりユーザーが閲覧中のページに対応する項目にマークを付ける場合、画像ファイルでやることが多い。最近はCSSグラデーションを使ってアクティブな時にへこませたような効果を与えたりすることもあるが、よく見かける三角のマークを付けるとなるとやはり画像で……となってしまう。しかし、単純な形に限ってなら<a href="/blog/webdesign/bordered-speech-bubble.html">枠線付きの吹き出し</a>でも利用した<code>:before</code>又は<code>:after</code>擬似要素を使えば実現できる。</p>
+
+<p>Demo: <a href="/test/181.html">Pure CSS Navigation Indicator</a></p>
+
+<p>CSSのコードは吹き出しとほとんど変わらない。ただし、位置合わせの方法が異なる。</p>
+
+<pre><code class="language-css">nav #example1 li a:after {
+  margin: -8px auto 0 auto;
+  border-top-width: 0px;
+  border-right-width: 8px;
+  border-bottom-width: 8px;
+  border-left-width: 8px;
+  border-style: solid;
+  border-color: transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  content: &quot;&quot;;
+}
+
+nav #example1 li a.active:after {
+  border-color: yellow transparent;
+}</code></pre>
+
+<p>吹き出しと違い<code>position</code>プロパティによる細かい位置調整を行わなくて良い。というよりもナビゲーション項目の幅が不定(項目のテキストの長さによって変化する)場合が多いので、<code>px</code>単位による絶対配置で中揃えを行うことが難しい。代わりに<code>margin</code>プロパティを使ってナビゲーション項目の下端中央に揃うようにする。</p>
+
+<p><code>:before</code>(<code>:after</code>)擬似要素は指定した要素の前後ではなく、<em>そのコンテンツの前後</em>に<code>content</code>で指定した文字列(や画像等)を挿入するものなので、<code>display: block;</code>した上で左右のマージンを自動調整にすれば、ブロック要素の中揃えと同じように親要素にあたるナビゲーション項目の中央に揃う。</p>
+
+<pre><code class="language-css">margin: -8px auto 0 auto;
+display: block;</code></pre>
+
+<p>と、あとは上のマージンを枠線、つまり三角の高さ分マイナスすることでナビゲーション項目の下端に配置される。</p>
+
+<p>三角のマークを付ける場合はこうやって吹き出しと同じように<code>border</code>プロパティを使うが、最近(僕の中だけで)流行っているユニコード・グリフを利用してマークを付けることもできる。スクリーンショットの丸の方は「&bullet;<code>(=U+2022)</code>」でマークを付けている。</p>
+
+<pre><code class="language-css">nav #example2 li a:after {
+  margin-top: -1em;
+  color: transparent;
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+  content: &quot;\2022&quot;;
+}
+
+nav #example2 li a.active:after {
+  color: yellow;
+}</code></pre>
+
+<p><code>border</code>プロパティでやる場合と違い<code>em</code>単位で調節すると楽。<code>height</code>プロパティと<code>line-height</code>プロパティを揃えて縦方向に中揃えしてやり(この場合は高さが<code>1em</code>なのであまり意味はないが)、<code>text-align</code>プロパティで横方向に中揃えする。<code>:after</code>擬似要素を<code>display: block;</code>し、<code>width</code>を指定せずにおけば、その幅はナビゲーション項目と揃うので<code>text-align</code>プロパティで中揃えがうまくいく。<code>margin</code>プロパティでは左右を<code>auto</code>にする必要はないので、上方向に<code>1em</code>マイナスするだけで良い。</p>
+
+<p><code>content</code>プロパティではユニコードのエスケープを使う。Windowsでは文字コード表、Macでは文字パレットを使えば簡単に調べられる。</p>
+
+<p><img alt="文字コード表。" height="412" src="/img/blog/charmap.png" width="593"></p>
+
+<p>最後の半円も丸と同じく&bullet;で実現できる。親要素であるナビゲーション項目で<code>overflow: hidden;</code>しておき、フォントサイズを三倍にして半分切れるように<code>em</code>単位を使って上のマージンを調節してやるだけ。</p>
+
+<pre><code class="language-css">nav #example3 li a:after {
+  margin-top: -1.5em;
+  color: transparent;
+  display: block;
+  height: 3em;
+  line-height: 3em;
+  font-size: 3em;
+  text-align: center;
+  content: "\2022";
+}</code></pre>
+
+<p>簡単！</p>
+
+<hr>
+
+<p><code>:before</code>・<code>:after</code>擬似要素では追加マークアップなしでちょっとした飾りを付けることができるので色々遊べる。例えば<a href="/test/183.html">「続きを読む」を矢印っぽくデザイン</a>してみたりとか。CSS Transitionと組み合わせると……<a href="http://code.google.com/p/chromium/issues/detail?id=54699">WebKitのバグ(というか未実装)</a>にぶち当たるのはご愛嬌。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

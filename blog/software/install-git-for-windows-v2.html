@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Git for Windows v2.x.xのインストール</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/install-git-for-windows-v2.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Git v2系のWindows版がGit for Windowsの方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Git v2系のWindows版がGit for Windowsの方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Git for Windows v2.x.xのインストール" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-05-06T00:39:28+09:00">2015年5月6日</time></p>
+
+        <h1><em>Git for Windows v2.x.xのインストール</em></h1>
+      </header>
+
+    <main>
+
+    <p>Git v2系のWindows版が<a href="http://git-for-windows.github.io/">Git for Windows</a>の方で少し前から公開され始めていたことを今さら知ったので、更新した。2015/05/05現在はv2.4.0がリリースされている。インストールから動かすまでけっこう手間取ったので、メモがてら記事に残しておく。Git v2の使い勝手とかについては特に書かない。</p>
+
+<section>
+<h2>~/.bashrcの読み込み</h2>
+
+<p>このGit for Windowsでは、デフォルトで<em>無理やり</em><code>~/.bashrc</code>を読みに行くことがなくなった。<code>~/.bash_profile</code>は読みに行くので、<code>~/.bash_profile</code>から<code>~/.bashrc</code>を読みに行くように、つまり普通にBashを設定してやれば良い。</p>
+
+<pre><code class="language-bash">if [ -f ~/.bashrc ]; then . ~/.bashrc; fi</code></pre>
+
+<p>これだけ書いた<code>~/.bash_profile</code>を作成するのが良い。<a href="https://github.com/git-for-windows/git/issues/86">あまり関係ないイシュー</a>ではそのうち<code>~/.bash_profile</code>がなかったら作成するようにするというような事を言っているので、これについてはそのうち直りそうだ。</p>
+</section>
+
+<section>
+<h2>OpenSSLのアップデート</h2>
+
+<p>様々なコマンドから使われる<code>libeay32.dll</code>が、その読み込み優先順の問題で、システムにインストールされている<code>libeay32.dll</code>を呼びに行ってしまうようだ。もしバージョンが古いOpenSSLが何らかの理由でシステムにインストールされていたりすると、エラーで落ちたりする。僕の場合は<code>git-remote-https.exe</code>が「プロシージャ エントリ ポイント EVP_aes_128_ctr がダイナミック リンク ライブラリ LIBEAY32.dll から見つかりませんでした。」というエラーで落ち、<code>push</code>や<code>fetch</code>などがまったくできなかった。</p>
+
+<p><code>libeay32.dll</code>がらみでエラーが出る人は、Git for Windows v2.4.0では最新版の1.0.2aを使っているようなので、それと同じものをシステムにインストールするのが良いだろう。インストーラーで配布しているところもあるが、<a href="http://indy.fulgan.com/SSL/">OpenSSLの公式サイトからリンクされているページで配布されているZIPアーカイブ</a>を展開してコピーする方が良い。</p>
+
+<p>64bit版Windowsを使っている人は<code>openssl-1.0.2-x64_86-win64.zip</code>をダウンロードして、展開し、中に入っている<code>libeay32.dll</code>と<code>ssleay32.dll</code>を<code>C:\Windows\System32</code>へコピーする。</p>
+</section>
+
+<section>
+<h2>環境変数MSYSTEM</h2>
+
+<p>デフォルトでインストールされるGit Bash (実体はMinTTY)を使う場合は問題ないが、他のターミナルを使うとうまく判定されない事があり、パスが上手く通らないことがあるようだ(ConEmuで上手く通らなかった)。パスの最適化は環境変数<code>MSYSTEM</code>を見て行われるようなので、新規ユーザー環境変数として<code>MSYSTEM</code>を作り、その値を<code>MINGW64</code>(32bit版をインストールした人は<code>MINGW32</code>)に設定してやれば良い。</p>
+
+<p>上記OpenSSLがらみのエラーもこのあたりが怪しいが、Git CMDでも同じエラーでダメだったので、アップデートは必須だと思われる。</p>
+</section>
+
+<section>
+<h2>git.exe他、実行ファイル群のパス</h2>
+
+<p>全て一箇所に集約されていたv1系とは違い、多くの実行ファイルがインストール先フォルダーの<code>mingw64/bin/</code>以下に移動した。<code>curl.exe</code>などもここにある。またその他の実行ファイルも<code>usr/bin/</code>に移動されている。<code>bash.exe</code>や<code>vim.exe</code>など、MSYS関係の実行ファイルはこちらにある。</p>
+
+<p>Vimなど他のプログラムから気軽に呼び出したい場合、両者にパスが通っていることが必要になることもあるので、うまいことパスを通す方法を模索する必要がある。僕は<code>~/.vim/vimrc</code>の先頭で無理やり<code>$PATH</code>を最適化してお茶を濁した。</p>
+
+<pre><code class="language-vim">if has(&apos;win32&apos;)
+  let $PATH = substitute($PATH, &apos;\\&apos;, &apos;/&apos;, &apos;g&apos;);
+
+  if $PATH !~? &apos;\(^\|;\)C:/git/usr/bin\(;\|$\)&apos;
+    let $PATH = &apos;C:/git/usr/bin;&apos; . $PATH
+  endif
+
+  if $PATH !~? &apos;\(^\|;\)C:/git/mingw64/bin\(;\|$\)&apos;
+    let $PATH = &apos;C:/git/mingw64/bin;&apos; . $PATH
+  endif
+endif</code></pre>
+</section>
+
+<hr>
+
+<p>ちゃんとインストールできた状態だと、HTTPSでの認証もそのまま継承され、ちゃんと<code>push</code>することができた。問題なく動いている。とはいっても特に何もすごく良くなったところもない気がしないでもないので、興味ある人だけいれるのが良いだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSWringで標準入力を読めるように</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/read-stdin-in-csswring-cli.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="先週末の某カンファレンスの方面から無言の圧力を感じたので、CSSWringのCLIプログラムをパイプで繋げられるようにした。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が-だった場合に……で実装した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="先週末の某カンファレンスの方面から無言の圧力を感じたので、CSSWringのCLIプログラムをパイプで繋げられるようにした。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が-だった場合に……で実装した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSWringで標準入力を読めるように" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-11-18T01:47:46+09:00">2014年11月18日</time></p>
+
+        <h1><em>CSSWringで標準入力を読めるように</em></h1>
+      </header>
+
+    <main>
+
+    <p>先週末の某カンファレンスの方面から無言の圧力を感じたので、<a href="https://github.com/hail2u/node-csswring">CSSWring</a>のCLIプログラムを<a href="https://github.com/hail2u/node-csswring/commit/95d5346b096bf1063afbe4add18f46b82405032d">パイプで繋げられるように</a>した。入力ファイルが省略されたら……で実装しようとしていたが、オプションの組み合わせの分岐がややこしい。面倒そうだったので入力ファイルとして指定した文字列が<code>-</code>だった場合に……で実装した。</p>
+
+<p>利用方法は今まで入力ファイル名を指定した部分を<code>-</code>に差し替えるだけで良い。特に今までの使い方を阻害することもないと思う。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring -</kbd>
+$ <kbd>csswring - &lt;input.css</kbd></samp></pre>
+
+<p>もちろんこのどちらでも大丈夫になっている。この場合は出力ファイルを省略しているので標準出力へ処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring - out.css</kbd></samp></pre>
+
+<p>標準入力を読みつつ、出力ファイルを指定することもできる。この場合は<code>out.css</code>に処理結果が吐かれる。</p>
+
+<pre><samp>$ <kbd>cat input.css | csswring --sourcemap -</kbd>
+$ <kbd>cat input.css | csswring --sourcemap - out.css</kbd></samp></pre>
+
+<p>Source Mapsも問題なく出力される。前者ではインラインでData URI化されて埋め込まれ、後者では<code>out.css.map</code>に吐かれる。</p>
+
+<hr>
+
+<p>実装では<a href="/blog/coding/nodejs-read-stdin.html">標準入力を同期的に読もうか</a>とも考えたが、同期に固執するほどではないのでNode.js界隈のCLIプログラム達でメジャーな<code>process.openStdin()</code>を使って実装した。<code>process.openStdin()</code>はドキュメントに載っていない気がする。ここが非同期になった関係で出力部分に少し手を入れることになったが、概ねそのままで済んだので新たにバグは入っていないと思う。</p>
+
+<p>ここらへんまで面倒を見てくれるNode.jsパッケージなどもいくつかあるようだ。しかしインタラクティブな入力を処理する必要もないプログラムなので、この程度のもので良いだろう。</p>
+
+<hr>
+
+<p><a href="https://github.com/postcss/postcss/issues/134">PostCSS v3のパーサーのバグ</a>の修正を待って、まとめてリリースする予定だ。そのうち気が向いたら出力の方も善処する。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>rsyncをGit for Windowsに混ぜる</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/install-rsync-to-git-for-windows.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Windowsでrsyncをインストールする方法はいくつかあって、一番簡単なのはmingw-getでパッケージとして導入する方法。またはrsyncは諦めてChococaltely経由でcwRsyncパッケージをインストールするのが簡単。両者ともrsyncのためだけに入れるには大仰なので、既に導入されているGit for WindowsにMinGWパッケージと手作業で混ぜてインストールするのも悪くない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Windowsでrsyncをインストールする方法はいくつかあって、一番簡単なのはmingw-getでパッケージとして導入する方法。またはrsyncは諦めてChococaltely経由でcwRsyncパッケージをインストールするのが簡単。両者ともrsyncのためだけに入れるには大仰なので、既に導入されているGit for WindowsにMinGWパッケージと手作業で混ぜてインストールするのも悪くない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="rsyncをGit for Windowsに混ぜる" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-19T12:42:29+09:00">2014年6月19日</time></p>
+
+        <h1><em>rsyncをGit for Windowsに混ぜる</em></h1>
+      </header>
+
+    <main>
+
+    <p>Windowsで<a href="http://rsync.samba.org/">rsync</a>をインストールする方法はいくつかあって、一番簡単なのは<a href="http://sourceforge.net/projects/mingw/files/Installer/">mingw-get</a>でパッケージとして導入する方法。またはrsyncは諦めて<a href="http://chocolatey.org/">Chococaltely</a>経由で<a href="http://chocolatey.org/packages/cwrsync">cwRsync</a>パッケージをインストールするのが簡単。両者ともrsyncのためだけに入れるには大仰なので、既に導入されている<a href="http://msysgit.github.io/">Git for Windows</a>にMinGWパッケージと手作業で混ぜてインストールするのも悪くない。</p>
+
+<p>必要な物は以下の4つの実行ファイルとDLLファイル。</p>
+
+<ul>
+<li><a href="http://sourceforge.net/projects/mingw/files/MSYS/Extension/rsync/"><code>rsync.exe</code></a>(rsync-*-bin.tar.lzma より)</li>
+<li><a href="http://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/"><code>msys-iconv-2.dll</code></a> (libiconv-*-dll-2.tar.lzma)</li>
+<li><a href="http://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/"><code>msys-intl-8.dll</code></a> (libintl-*-dll-8.tar.lzma)</li>
+<li><a href="http://sourceforge.net/projects/mingw/files/MSYS/Extension/popt/"><code>msys-popt-0.dll</code></a> (libpopt-*-dll-0.tar.lzma)</li>
+</ul>
+
+<p>それぞれのLZMAアーカイブには必要になる実行ファイルかDLLファイルだけしか含まれていないので、7-Zipなどで展開してGit for Windowsの<code>bin</code>フォルダー、つまり<code>msys-1.0.dll</code>があるフォルダーにすべてコピーするだけで良い。コピーしたらGit Bashを開いて以下のようにちゃんと実行できるか確認してインストールは完了。</p>
+
+<pre><samp>$ <kbd>rsync --version</kbd>
+rsync  version 3.0.8  protocol version 30
+Copyright (C) 1996-2011 by Andrew Tridgell, Wayne Davison, and others.
+Web site: http://rsync.samba.org/
+Capabilities:
+    32-bit files, 32-bit inums, 32-bit timestamps, 64-bit long ints,
+    socketpairs, hardlinks, symlinks, no IPv6, batchfiles, inplace,
+    append, ACLs, no xattrs, iconv, no symtimes
+
+rsync comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+are welcome to redistribute it under certain conditions.  See the GNU
+General Public Licence for details.</samp></pre>
+
+<p>アンインストールは上記ファイルを削除するだけ。あんまり混ぜるの良くない感じするけど、最近のMinGWパッケージ群はコンフリクトしづらいようにできているので、多分大丈夫。ちゃんと何をコピーして混ぜたかをメモしておくくらい。</p>
+
+<hr>
+
+<p>Grunt経由でrsyncするプラグインはいくつかあったけど、なんかイマイチだったので自分ででっち上げたものを使っている。デフォルトでは<code>-n</code>でDRY RUNで動く安心設計。</p>
+
+<p>Download: <a href="/grunt-rsync.js">grunt-rsync.js</a></p>
+
+<p><code>src</code>を解釈して特定のパス以下を<code>dest</code>にミラーみたいな使い方はできないようにしているので、常にGruntのルートを<code>options.remote</code>で指定した先にミラーする。デフォルトのCLIオプションは<code>-aC --exculude-from=.rsyncignore</code>としてあるので、無視ファイルは<code>-C</code>により有効になるマスク群とグローバルな<code>.cvsignore</code>、最後にGruntのルートにある<code>.rsyncignore</code>を組み合わせて指定する。</p>
+
+<pre><code class="language-javascript">rsync: {
+  options: {
+    remote: &apos;user@example.com:~/Sites/example.com/&apos;
+  },
+
+  main: {
+    dry_run: false,
+    sync: true,
+    progress: true
+  }
+}</code></pre>
+
+<p><code>sync</code>オプションを有効にすると<code>--delete</code>が追加され同期モードに、<code>progress</code>オプションを有効にすると<code>--progress</code>が追加され転送の詳細が確認できるように、それぞれなる。上述の通りデフォルトはDRY RUNなので、明示的に<code>dry_run</code>オプションを無効にする必要がある。<code>stdio: inherit</code>で<code>spawn()</code>するので、実行結果はGruntの出力と混ざる形で表示される。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

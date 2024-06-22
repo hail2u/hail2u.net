@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Google AJAX Search APIのJSONPを利用したサイト内検索</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Google AJAX Search APIは、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通にGwebSearchクラスのsetSiteRestriction()メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Google AJAX Search APIのJSONPを利用したサイト内検索" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-09-27T13:49:32+09:00">2006年9月27日</time></p>
+
+        <h1><em>Google AJAX Search APIのJSONPを利用したサイト内検索</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://code.google.com/apis/ajaxsearch/">Google AJAX Search API</a>は、動的にGoogle検索結果を自分のページに挿入することができるAPI(あまり使っているサイトを見ないけど)。Ajaxっつっても内部はJSONP(みたいなもの)だったりするので、普通に<code>GwebSearch</code>クラスの<code>setSiteRestriction()</code>メソッドを使うのではなく、JSONPを直接叩いてサイト内検索を実装することもできる。もちろんサイト内検索に限った話ではないけど。</p>
+
+<p>Google AJAX Search APIの<code>GwebSearch</code>クラスによる検索は、</p>
+
+<pre>http://www.google.com/uds/GwebSearch?callback=<em>{コールバック関数名}</em>&amp;context=0&amp;lstkp=0&amp;hl=ja&amp;q=<em>{検索文字列}</em>&amp;key=<em>{Google AJAX Search API key}</em>&amp;v=0.1</pre>
+
+<p>というURLへリクエストすることによって検索結果を取得している。また、<code>setSiteRestriction()</code>メソッドによるサイト内検索は特別なURLへのリクエストではなく、検索文字列に<em>site:{ドメイン名}</em>を追加しているだけ(ここらへんのことは<a href="http://livehttpheaders.mozdev.org/">Live HTTP Headers</a>なんかでリクエストを監視していれば直ぐにわかる)。つまり、簡単な文字列の連結でリクエストするURLが作成できるので、コールバック関数さえ定義してやれば簡単にサイト内検索をすることができる。というわけで<a href="/test/086.html">Google AJAX Search APIのJSONPを利用したサイト内検索のサンプル</a>を作成してみた。</p>
+
+<p>上記サンプルでは<a href="/scripts/google/sitesearch.js">google-sitesearch.js</a>という外部JavaScriptファイルで実現している(<a href="http://prototype.conio.net/">prototype.js</a>やJSONPにリクエストするための<a href="/scripts/odj.js">odj.js</a>とかいう自作ライブラリも使ってるけど)。google-sitesearch.jsでは、</p>
+
+<pre><code class="language-js">var url = &apos;http://www.google.com/uds/GwebSearch?&apos; + $H({
+  lstkp:   0,
+  context: 0,
+  rsz:     &apos;small&apos;,
+  hl:      &apos;ja&apos;,
+  q:       $F(&apos;q&apos;) + &apos; site:hail2u.net&apos;,
+  key:     apikey,
+  v:       0.1
+}).toQueryString();</code></pre>
+
+<p>とprototype.jsを使ってJSONPへのリクエストURLを作成しているが、もちろん文字列の連結とかでも問題ない(<code>encodeURIComponent()</code>する必要はあるけど)。コールバック関数は、</p>
+
+<pre><code class="language-js">function handleGwebSearchResults(i, r, n, m) {
+  r.results.each(function (result) {
+    // 各検索結果に対する処理
+  });
+}</code></pre>
+
+<p>と四つ引数があることと第二引数に検索結果が格納されていることを意識して作れば良い。prototype.jsの<code>Array</code>クラスに対する拡張の<code>each()</code>メソッドとか使ってるけど、普通に<code>for</code>ループでも書ける。各検索結果は、</p>
+
+<pre><code class="language-js">{
+  GsearchResultClass:&quot;GwebSearch&quot;,
+  unescapedUrl : &quot;http://hail2u.net/archives/bsk.html&quot;,
+  url : &quot;http://hail2u.net/archives/bsk.html&quot;,
+  visibleUrl : &quot;hail2u.net&quot;,
+  cacheUrl : &quot;http://www.google.com/search?q=cache:2EslMvGB3FEJ:hail2u.net&quot;,
+  title : &quot;hail2u.net - Archives - &lt;b&gt;blosxom&lt;/b&gt; starter kit&quot;,
+  titleNoFormatting : &quot;hail2u.net - Archives - blosxom starter kit&quot;,
+  content : &quot;できることならこれを利用し、&lt;b&gt;blosxom&lt;/b&gt;の挙動を知った上で、一から&lt;b&gt;blosxom&lt;/b&gt;を構築すること&lt;br&gt;  をお薦めします。 &lt;b&gt;...&lt;/b&gt; オリジナルの&lt;b&gt;blosxom&lt;/b&gt;の使い方については説明する気はないです。&lt;br&gt;  公式サイトで公開されているプラグインも、オリジナルで使うときと同様に利用 &lt;b&gt;...&lt;/b&gt;&quot;
+}</code></pre>
+
+<p>という明快な構造になっているので、あとは適当にHTMLを作って吐き出すだけ。特に難しいところはない。ただ、Google AJAX Search APIでは最高でも8件までしか検索結果を取得することができないので、8件以上検索結果がありそうな場合は、最後にGoogleのサイトへ誘導するリンクを付け足すようにした(<code>start</code>パラメータを利用して検索結果を重ならないようにしてある)。このサイトくらいの規模ならば8件とかでも充分だったりするのだけれども。</p>
+
+<p>実際にこういった検索結果を動的に挿入云々をサイトで実装したい場合は、公式にJSON(P)がサポートされている<a href="http://developer.yahoo.com/search/web/V1/webSearch.html">Yahoo! Search Web ServicesのWeb Search</a>を利用するべき(<a href="/test/087.html">Yahoo! Search Web ServicesのJSONPを利用したサイト内検索のサンプル</a>)。ただ、サイト内検索なんかではGoogleの方が明らかに検索結果が優秀なイメージがあって悩ましい。とりあえず<a href="http://siteexplorer.search.yahoo.com/">Yahoo!のSite Explorer</a>でサイトマップ送信してみた。改善したらうれしい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

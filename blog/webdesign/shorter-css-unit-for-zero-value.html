@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>より短い単位へ(0の場合だけ)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/shorter-css-unit-for-zero-value.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSの長さでは、値が0の場合に限って単位を省略できる。このルールは周波数や角度、時間においては適用されないため、たとえば0msは0とは書けない。しかしこの場合は0sと違う単位で書くことによって1文字短くなる。こういった安全な単位の変換機能をCSSWringへ組み込んだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSの長さでは、値が0の場合に限って単位を省略できる。このルールは周波数や角度、時間においては適用されないため、たとえば0msは0とは書けない。しかしこの場合は0sと違う単位で書くことによって1文字短くなる。こういった安全な単位の変換機能をCSSWringへ組み込んだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="より短い単位へ(0の場合だけ)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-06-23T11:16:14+09:00">2016年6月23日</time></p>
+
+        <h1><em>より短い単位へ(0の場合だけ)</em></h1>
+      </header>
+
+    <main>
+
+    <p>CSSの長さでは、値が0の場合に限って単位を省略できる。このルールは周波数や角度、時間においては適用されないため、たとえば<code>0ms</code>は<code>0</code>とは書けない。しかしこの場合は<code>0s</code>と違う単位で書くことによって1文字短くなる。こういった<a href="https://github.com/hail2u/node-csswring/pull/78">安全な単位の変換機能</a>を<a href="https://github.com/hail2u/node-csswring">CSSWring</a>へ組み込んだ。</p>
+
+<p>具体的には角度と周波数、そして時間をそれぞれの最も短い単位へ変換する。それぞれの最も短い単位の対応は以下のようなものだ。</p>
+
+<table>
+<thead>
+<tr>
+<th>型</th>
+<th>変換元</th>
+<th>変換先</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th rowspan="4">角度</th>
+<td><code>deg</code></td>
+<td><code>deg</code></td>
+</tr>
+<tr>
+<td><code>grad</code></td>
+<td><code>deg</code></td>
+</tr>
+<tr>
+<td><code>rad</code></td>
+<td><code>deg</code></td>
+</tr>
+<tr>
+<td><code>turn</code></td>
+<td><code>deg</code></td>
+</tr>
+<tr>
+<th rowspan="2">周波数</th>
+<td><code>Hz</code></td>
+<td><code>Hz</code></td>
+</tr>
+<tr>
+<td><code>kHz</code></td>
+<td><code>Hz</code></td>
+</tr>
+<tr>
+<th rowspan="2">時間</th>
+<td><code>ms</code></td>
+<td><code>s</code></td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td><code>s</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>解像度である<code>0dpcm</code>や<code>0dppx</code>を<code>0dpi</code>へ変換する機能も作ったが、メディア・クエリー内を正規表現でいじるのは危険そうなのでやめておいた。来る<a href="https://www.w3.org/TR/mediaqueries-4/">メディア・クエリーのレベル4仕様</a>におけるクエリー・パラメーターのとてつもない強化との間で整合性をとるのが難しそうだからだ。また<code>0ms</code>などは書かれる可能性がないこともないが、<code>0dppx</code>がメディア・クエリーで使われるとは到底思えないことからでもある。</p>
+
+<p>哲学的にも性能的にもあまり意義深い機能ではないので、まだリリースはしていない。バグや誤爆はなさそうなので、次のリリースには組み込まれるだろう。</p>
+
+<hr>
+
+<p>角度では<code>deg</code>と<code>grad</code>、<code>rad</code>、<code>turn</code>でどれが一番短くなるかを計算できそうだ。時間でも最後が2桁以上の0で終わる<code>ms</code>なら<code>s</code>に変換した方が短いかもしれない。この辺りの単純な変換を考慮した短縮機能も考えてみたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>回転しながらズームイン・ズームアウト</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/zoom-in-and-out-with-rotate.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="オブジェクトを回転しながらズームさせるにはCSS3のtransitionとtransformを組み合わせるだけで良い。ぐるぐるぐるぐるどっか～ん。Ch9とFx4b9、Op11、Sf5あたりなら動く。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="オブジェクトを回転しながらズームさせるにはCSS3のtransitionとtransformを組み合わせるだけで良い。ぐるぐるぐるぐるどっか～ん。Ch9とFx4b9、Op11、Sf5あたりなら動く。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="回転しながらズームイン・ズームアウト" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-01-18T17:00:08+09:00">2011年1月18日</time></p>
+
+        <h1><em>回転しながらズームイン・ズームアウト</em></h1>
+      </header>
+
+    <main>
+
+    <p>オブジェクトを回転しながらズームさせるにはCSS3の<code>transition</code>と<code>transform</code>を組み合わせるだけで良い。ぐるぐるぐるぐるどっか～ん。Ch9とFx4b9、Op11、Sf5あたりなら動く。</p>
+
+<p>Demo: <a href="/test/142.html">Rotate and Zoom</a></p>
+
+<p>CSSコードはややこしくはないが、<code>img</code>のリサイズをCSSでまかなったりマイナー寄りの書き方かもしれない。読みづらいのでベンダー拡張プリフィックスは省略した。実際に書く時はプロパティ名の頭に<code>-webkit-</code>/<code>-moz-</code>/<code>-o-</code>を付けてコピペすれば良い。</p>
+
+<pre><code class="language-css">#zoom {
+  width: 400px;
+  height: 400px;
+}
+
+#zoom img {
+  margin: 150px;
+  border: none;
+  display: block;
+  width: 100px;
+  height: 100px;
+  transition-duration: 3s;
+}
+
+#zoom img:hover {
+  margin: 0;
+  width: 400px;
+  height: 400px;
+  transition-duration: 3s;
+  transform: rotate(1080deg);
+}</code></pre>
+
+<p>キモは<code>transform: rotate(1080deg);</code>で、1080度(三回転分)を指定することによってぐるぐる度を増す。<code>transition-duration</code>でアニメーションの長さを調節できる。あとは通常時は中央に小さく表示し、<code>:hover</code>で大きくなるように<code>margin</code>と<code>width</code>、<code>height</code>を適当に指定してやれば良い。</p>
+
+<p>クリックすると回転しながらズームアウトし消すとかをCSS3だけでできないかなーと思ったが<a href="/test/143-2.html">難しそう</a>。<code>:active</code>を使った場合、クリック後ズームアウトまではいけるが消えることは絶対にない。消すスタイルを定義したクラス名を<code>onclick</code>で割り当てるようにしてやれば<a href="/test/143.html">普通にできる</a>。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>CSS3の<code>:target</code>擬似クラスを利用すると状態の変化を固定することができるので、<a href="/test/143-3.html">CSS3だけでクリックするとズームアウトして消すことができた</a>。</p>
+
+<p>完全に忘れていた<code>:target</code>擬似クラスについては、Delicious経由で<a href="http://lab.simurai.com/css/toggle/">CSS3 toggle-button without JavaScript</a>を見て思い出した。このデモでは重ね合わせた<code>a</code>要素のうち1つを<code>pointer-event</code>を使って無効にすることによってボタンをトグルさせている。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

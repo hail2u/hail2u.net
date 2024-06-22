@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>デバイスを回転させた時の話</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/on-orientation-change.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="少し前に回転させた時にフォント・サイズを変えるとまずいんじゃないかというようなエントリーを書いたんだけど、同じような事を取り上げつつまったく逆の結論にたどり着いてるFluid grids, orientation &amp; resolution independenceというエントリーを見つけたので読んだ。2か月ほど前のエントリーなので、筆者も今はもう違う意見を持っているのかもしれないけど、ざっと要約してその感想を書く。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="少し前に回転させた時にフォント・サイズを変えるとまずいんじゃないかというようなエントリーを書いたんだけど、同じような事を取り上げつつまったく逆の結論にたどり着いてるFluid grids, orientation &amp; resolution independenceというエントリーを見つけたので読んだ。2か月ほど前のエントリーなので、筆者も今はもう違う意見を持っているのかもしれないけど、ざっと要約してその感想を書く。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="デバイスを回転させた時の話" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-02-09T11:06:48+09:00">2012年2月9日</time></p>
+
+        <h1><em>デバイスを回転させた時の話</em></h1>
+      </header>
+
+    <main>
+
+    <p>少し前に<a href="/blog/webdesign/on-scaling-font-size.html">回転させた時にフォント・サイズを変えるとまずいんじゃないか</a>というようなエントリーを書いたんだけど、同じような事を取り上げつつまったく逆の結論にたどり着いてる<a href="http://blog.responsivenews.co.uk/post/13925578846/fluid-grids-orientation-resolution-independence">Fluid grids, orientation &amp; resolution independence</a>というエントリーを見つけたので読んだ。2か月ほど前のエントリーなので、筆者も今はもう違う意見を持っているのかもしれないけど、ざっと要約してその感想を書く。</p>
+
+<p>Fluid～では、<a href="http://www.abookapart.com/products/responsive-web-design">Responsive Web Design</a>では回転により描画領域が拡大した時に画像等のサイズを追随させるがフォント・サイズはそのままなことが多いため、画像と文字のレイアウトのバランスが崩れるという問題が起きることを指摘している。この問題は16:9の縦横比を採用しているタブレット(例えばGalaxy Tab)などで顕著になり、<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>で細かくレイアウトを調整するにも限界があるので、描画領域に合わせてフォント・サイズを調整することにより解決すると良いのではないかと結論づけている。</p>
+
+<p>この解決法を否定するのはごく簡単だと思う。デザイン上の都合でユーザーに制御不能な変化を押し付けているとかそんな感じでぶった斬れる。でも、それはあまりにも浅い気がする。デザインとコンテンツはどちらが先でどちらが後などというものではなく、良いデザインを採用することでコンテンツをより良い形で提供できるというような相関関係にあるはずだ。そういう意味ではこの描画領域のサイズによる画像と文字のレイアウトのバランスの変化を最小限に抑えるためにフォント・サイズを変更するというアイディアそれ自体は素晴らしいものだと思う。</p>
+
+<p>問題なのは回転時にそれを行うことと、デバイスへの対応の限界を知っていながらiPadを強く意識した<code>px</code>単位でのブレークポイント(「which in my case 768px - an iPad in portrait orientation」)を採用したこと。</p>
+
+<section>
+<h2>回転時に行うのはまずそう</h2>
+
+<p>前に書いたエントリでも触れたようにフォント・サイズの変化にユーザーの目がついていかない可能性があるという問題がまず挙げられる。特にタブレットは紙の新聞のように目に近い位置で持たれるものだし、老眼はもちろん強めの乱視持ちとかでもクリティカルな問題になるんじゃないかと思う。それに回転したい時というのはそのレイアウトでは読みづらいので、今より画面を広く(狭く)して読みやすくしたいという時のはず。となると回転時にレイアウトを維持しようというこのテクニックはちょっとユーザーには的外れのテクニックなんではないだろうか。</p>
+</section>
+
+<section>
+<h2>iPad以外のタブレットが不燃ゴミなのは確かだけど</h2>
+
+<p>これはもう「<em>Androidデバイスへの対応がメンドイのでiPadだけ対応してみました～</em>」以外の何者でもない印象を受ける。現実的な妥協案だとは思うけど、それならばコンテンツのレイアウトを根拠にしたブレークポイントを採用した方が良さそう。特にエントリーで取り上げられているような縦方向でのバランスを取る時にはフォント・サイズだけではなく行ボックスの高さ(<code>line-height</code>プロパティー他)の調整も必須になってくるはずなので、それを考えるともっとレイアウトに注目してブレークポイントを探った方が読みやすいデザインになるはず。</p>
+</section>
+
+<hr>
+
+<p>とは言うものの回転時にMedia Queriesを発火させない方法などはなかなか難しいと思う(ちょっと思いつかない)ので、現状では最良に近い解の1つではあるような……。という所あたりまで考えて、もしかしたら回転時にスケーリングが狂うバグとみなされているiOSの挙動は、ここらへんのことを考えて練りに練られた仕様なんじゃないかとか少し思った。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

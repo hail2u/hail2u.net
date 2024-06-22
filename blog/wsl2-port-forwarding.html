@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>WSL2のためのポート・フォワーディング</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/wsl2-port-forwarding.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレスだけがわかるので、これとnetsh interface portproxyコマンドを使って、バッチファイルを書く。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="WSL2のためのポート・フォワーディング" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-01-23T12:38:09+09:00">2021年1月23日</time></p>
+
+        <h1><em>WSL2のためのポート・フォワーディング</em></h1>
+      </header>
+
+    <main>
+
+    <p>WSL2でネットワークまわりが変わった。ローカル・ネットワークの他のコンピューターから、WSL2の仮想マシンで立てたウェブサーバーへ気軽にアクセスしようとすると、ポート・フォワーディングを設定しなくてはならない。WSL2でUbuntuを使っているなら、hostnameコマンドを使うとIPアドレス<em>だけ</em>がわかるので、これと<a href="https://docs.microsoft.com/ja-jp/windows-server/networking/technologies/netsh/netsh-interface-portproxy">netsh interface portproxyコマンド</a>を使って、バッチファイルを書く。</p>
+
+<pre><code class="language-bat">@echo off
+
+for /f &quot;tokens=* usebackq&quot; %%F in (`wsl --distribution Ubuntu --exec hostname --all-ip-addresses`) do set IP=%%F
+netsh interface portproxy add v4tov4 listenport=8080 connectaddress=%IP%</code></pre>
+
+<p>このバッチファイルを管理者権限で実行すると設定される。WSL2をホストしているコンピューターのローカル・ネットワークでのIPアドレスが192.168.11.11とすると、他のコンピューターから192.168.11.11:8080へのアクセスが、Ubuntu仮想マシン上で動いている(8080で待機している)ウェブサーバーに届く。</p>
+
+<p>Windows 10では、Windows Defenderファイアウォールという別の問題もきっとある。初回アクセス時に聞かれるんじゃないかと思う。</p>
+
+<hr>
+
+<p>netsh interface portproxyコマンドのaddやremoveは要管理者権限なので、バッチファイルの実行にもちょっとだけ工夫が必要になる。まともにやるとするなら、バッチファイルを右クリックして「管理者として実行」を選択する。僕は<a href="https://www.nirsoft.net/utils/nircmd.html">nircmd</a>のelavateサブコマンドを使ってWindows Terminalから実行しているが、まったくおすすめはしない。</p>
+
+<figure>
+<img alt="。" height="1190" src="/img/blog/wsl2-port-forwarding-run-with-admin-on-start-menu.png" width="1568">
+
+<figcaption>スタート・メニューからportforwarding.batを探した結果</figcaption>
+</figure>
+
+<p>スタート・メニューの検索機能を利用するのが安全だと思う。バッチファイルを検索パスの通ったところに置いておくと、スタート・メニューからファイル名で検索できるようになる。スタート・メニューの検索結果では、スクリーンショットのように「管理者として実行」が出てくる。<kbd>→↓</kbd>とキーを押せばキーボードだけで選択でき、そこそこ手軽に実行できる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

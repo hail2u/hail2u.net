@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>At規則のネストが起こる可能性</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/possibilities-of-nesting-at-rules.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては@mediaと@supportsが相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては@mediaと@supportsが相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="At規則のネストが起こる可能性" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2017-06-09T11:47:10+09:00">2017年6月9日</time></p>
+
+        <h1><em>At規則のネストが起こる可能性</em></h1>
+      </header>
+
+    <main>
+
+    <p>At規則は無限にネストできる。しかし現実的にネストが起こる可能性としては<code>@media</code>と<code>@supports</code>が相手を子に持つ場合だけだろう。そのネストはどういう目的を持って起こるのだろうか。</p>
+
+<pre><code class="language-css">@media (max-width: 30em) {
+  .foo {
+    position: absolute;
+  }
+
+  @supports (position: sticky) {
+    .foo {
+      position: sticky;
+    }
+  }
+}</code></pre>
+
+<p>ひとつはこのようにプログレッシブ・エンハンスメントを実装する手段として使うパターンだ。とりあえずA、より優れたBの実装があるならB、というようなCSSになる。普通にCSSを書きつつ、条件付きで分岐させるためフィーチャー・クエリーが子になる(なりうる)。</p>
+
+<pre><code class="language-css">@supports (display: flex) {
+  .foo {
+    display: flex;
+  }
+
+  @media (min-width: 60em) {
+    .bar {
+      order: 1;
+    }
+  }
+}</code></pre>
+
+<p>もうひとつはこのような、実装があるかによって0か1かになるパターンだ。実装がなかったら何もしない、というCSSになる。おおまかにフィーチャー・クエリーで分岐し、その中で普通のCSSを書いていくため、メディア・クエリーが子になる。</p>
+
+<p>前者と後者を組み合わせる可能性はなくもない。しかし現実としてそのようなCSSを設計・運用するのはかなり難しいだろう。それこそあらゆるルールセットで逐一<code>@supports</code>を書く羽目になりかねない。適切にベースラインを設定してある程度見切った方が安全で確実なCSSになる。</p>
+
+<hr>
+
+<p>後者の<code>@supports</code>内に‘@media`がくるパターンは以下のように書いても等価だ。</p>
+
+<pre><code class="language-css">@supports (display: flex) {
+  .foo {
+    display: flex;
+  }
+}
+
+@media (min-width: 60em) {
+  @supports (display: flex) {
+    .bar {
+      order: 1;
+    }
+  }
+}</code></pre>
+
+<p>つまり分割してネストをひっくり返せる。CSS MQPackerではネスト可能性を考慮して、<code>@media</code>を常にルート直下になるように<a href="https://github.com/hail2u/node-css-mqpacker/pull/52">調整してからまとめる</a>ような実装にしつつある。可能性と効率を優先し、CSSの構造は大きく変えることにした。</p>
+
+<p>そろそろメディア・クエリーをまとめる意味合いも下がってきた。これくらいの単純な実装で済ませておき、これが効果的でなくなったらCSS全体の設計を見直すべきだと考えている。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

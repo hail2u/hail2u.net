@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>main要素……</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/the-main-element.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="main要素については色んな人が色んな所で書いてるので、そのものがどういうものかとかは今さら書かない。main要素がもし複数出てきていいならアレとアレにdiv要素使わなくて良くなるなーという。アレとアレというのは、hAtomのentry-contentともうひとつはSchema.orgのArticle(BlogPosting)/articleBody。とか言いつつそこら辺は好みの問題っぽいのでちょっと別の話。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="main要素については色んな人が色んな所で書いてるので、そのものがどういうものかとかは今さら書かない。main要素がもし複数出てきていいならアレとアレにdiv要素使わなくて良くなるなーという。アレとアレというのは、hAtomのentry-contentともうひとつはSchema.orgのArticle(BlogPosting)/articleBody。とか言いつつそこら辺は好みの問題っぽいのでちょっと別の話。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="main要素……" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-07-07T12:41:33+09:00">2013年7月7日</time></p>
+
+        <h1><em>main要素……</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>main</code>要素については色んな人が色んな所で書いてるので、そのものがどういうものかとかは今さら書かない。<code>main</code>要素がもし複数出てきていいならアレとアレに<code>div</code>要素使わなくて良くなるなーという。アレとアレというのは、<a href="http://microformats.org/wiki/hatom">hAtom</a>の<code>entry-content</code>ともうひとつは<a href="http://schema.org/">Schema.org</a>の<code>Article(BlogPosting)/articleBody</code>。とか言いつつそこら辺は好みの問題っぽいのでちょっと別の話。</p>
+
+<p>しょうがなく<code>div</code>要素を使うケースというのはそこそこあって、その最たるものが<code>div.wrapper</code>。これに<code>role="main"</code>との対応が考慮されて<code>main</code>要素の誕生につながったわけだけど、あらためて<code>role="main"</code>のことを考えながら<code>main</code>要素を使ってみると、<code>div.wrapper</code>は常に<code>main</code>要素になりうるのかみたいな疑問が湧いた。</p>
+
+<p>例えばウェブログのpermalinkのページ。</p>
+
+<pre><code class="language-html">&lt;body&gt;
+  &lt;header role="banner"&gt;...&lt;/header&gt;
+  &lt;main&gt;
+    &lt;article&gt;...&lt;/article&gt;
+    &lt;aside class="ad"&gt;...&lt;/aside&gt;
+    &lt;nav class="paging"&gt;...&lt;/nav&gt;
+  &lt;/main&gt;
+  &lt;footer role="contentinfo"&gt;...&lt;/footer&gt;
+&lt;/body&gt;</code></pre>
+
+<p><code>main</code>要素を<code>div.wrapper</code>の代わりに使うとこうなったりするわけだけど、この場合<code>role="main"</code>は<code>article</code>要素に振られた方がより良い。仮にそうするとすると、<code>role="document"</code>な<code>body</code>要素に<code>role="document"</code>な<code>main</code>要素があって、その中に<code>role="main"</code>な<code>article</code>要素があることになる(参考: <a href="http://www.w3.org/TR/wai-aria/roles#main"><code>main</code>ロールのNote</a>)。ちょっと気持ち悪いというか<code>role="document"</code>な<code>body</code>要素配下にある<code>role="banner"</code>等と分断されてダメな感じ。</p>
+
+<p>とか考えると<code>div.wrapper</code>にして<code>role="main"</code>を適宜つけたりはずしたりする方が良さそう。<code>main</code>要素が力強すぎて扱いづらくなっちゃってる気がする。特に<a href="http://www.w3.org/TR/2013/WD-html51-20130528/">HTML5.1(2013-05-28付けのWD)</a>だとstrong native semantics持ちなので、そもそも<code>role="main"</code>な<code>article</code>要素を作っちゃうと<code>main</code>要素使えなくなる(と思う)。その場合<code>div.wrapper</code>も併用することになり、間違ってはないけどイラっとする感じに……。</p>
+
+<p><code>main</code>要素をどういうものと規定すればこういう所に感じる気持ち悪さが解消されるのか想像付かない。足並み揃ってなかったり未来もあんまり明るくなさそうな気がするので<code>main</code>要素はしばらく封印することにした。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>SVGのリサイズにおける端</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/resizing-svg.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさのrect要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさのrect要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/svg-edge-on-resizing.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="SVGのリサイズにおける端" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-05-07T03:56:37+09:00">2014年5月7日</time></p>
+
+        <h1><em>SVGのリサイズにおける端</em></h1>
+      </header>
+
+    <main>
+
+    <p>SVGはフレキシブルにリサイズされるけど、実装依存なので細かい部分では想定通りいかないことがある。例えばそのエッジ。キャンバスとちょうど同じ大きさの<code>rect</code>要素をリサイズすると、実装とサイズによっては端がぼやける。SVG側でどうにかできるので、なんとかしてやると良い。</p>
+
+<p>端のぼやけはChrome 34で起こりやすく、Firefox 29ではあまり起こらない。Internet Explorer 11では<code>px</code>単位でのリサイズなら起こらないかも。SVGのリサイズは実装側のパフォーマンス重視かアウトプット重視かで大きく変わってくるので、端のぼやけが起こらないようになることは期待できない。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;
+  width=&quot;1024&quot;
+  height=&quot;1024&quot;
+  viewBox=&quot;0 0 1024 1024&quot;&gt;
+  &lt;rect
+    x=&quot;0&quot;
+    y=&quot;0&quot;
+    width=&quot;1024&quot;
+    height=&quot;1024&quot;
+    style=&quot;fill:#333333&quot;/&gt;
+&lt;/svg&gt;</code></pre>
+
+<p>縦横1024のキャンバスいっぱいいっぱいの矩形を描こうとするとこうなる。このままだとリサイズした時に端がぼやける。</p>
+
+<figure>
+<img alt="上の最適化していないSVGをリサイズした上端の拡大画像ではぼやけるが、下の最適化したSVGではリサイズしてもぼやけない(Chrome 34で)。" height="640" src="/img/blog/svg-edge-on-resizing.png" width="565">
+<figcaption>Chrome 34でリサイズしたSVGのキャプチャを拡大した画像</figcaption>
+</figure>
+
+<p>下のように最適化するにはキャンバスからはみ出すように矩形を描いてやる。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;
+  width=&quot;1024&quot;
+  height=&quot;1024&quot;
+  viewBox=&quot;0 0 1024 1024&quot;&gt;
+  &lt;rect
+    x=&quot;-128&quot;
+    y=&quot;-128&quot;
+    width=&quot;1536&quot;
+    height=&quot;1536&quot;
+    style=&quot;fill:#333333&quot;/&gt;
+&lt;/svg&gt;</code></pre>
+
+<p>縦横に128ずつはみ出すように矩形を描くだけ。SVGではキャンバスが基本透明で、その背景を塗るためにはこのように矩形を作成してやったりする必要があるため、そこそこの頻度でこういったきれいにリサイズされるテクニックは必要になる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ビューポート幅と列数の対応</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/mapping-viewport-width-and-column-number.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ビューポート幅と列数の対応" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-08-14T08:49:07+09:00">2018年8月14日</time></p>
+
+        <h1><em>ビューポート幅と列数の対応</em></h1>
+      </header>
+
+    <main>
+
+    <p>サムネイルで画像を並べるような場合、ネイティブ・アプリケーションでは、ウィンドウ幅が変わると列数を増やすだろう。最近は、それと同時にサムネイルの大きさも調整し、常にウィンドウ幅いっぱいに並ぶように調節してくれるものが増えてきた。iTunesのアルバム・ビューがその例として挙げられる。ウェブでこれを実現するにはFlexboxでサムネイルのサイズを柔軟に決定させつつ、ビューポート幅に応じて列数を増やしていく。両者の対応にはカスタム・プロパティーを使うと楽しい。</p>
+
+<p>狭い画面では3列、ちょっと広い画面では4列、もっと広い画面では5列と、段階的に列数を増やす仕組みを単純化して例に挙げる。実際にどのような感じかは、<a href="/">このウェブサイトのホーム</a>の一番下で確認できるだろう。こちらは折り返さず隠すものだが、基本は同じだ。</p>
+
+<pre><code class="language-css">.container {
+  --num-column: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.thumbnail {
+  width: calc((100% - 1rem * (var(--num-column) - 1)) / var(--num-column));
+}
+
+@media (min-width: 720px) {
+  .container {
+    --num-column: 4;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    --num-column: 5;
+  }
+}</code></pre>
+
+<p>親の<code>.container</code>では、子の<code>.thumbnail</code>を折り返しつつ並べるため、列数を定義しつつFlexboxをうまく使う。後に<code>calc()</code>で使うので、列数は単位なしの整数で定義する。サムネイルの余白は子で制御しても良いが、<code>space-between</code>を使ってFlexboxに任せると<em>必ずキレイに</em>収まるので、考慮することが減る。(多分CSSプリプロセッサーで作られた)小数の扱いがブラウザーによって違うことに由来する「<code>1px</code>はみだした！」や「<code>1px</code>足りない……」という事態がまず起きないからだ。</p>
+
+<p>子の<code>.thumbnail</code>では列数の定義を利用して幅を計算する。<code>100%</code>から各列の間の余白(ここでは<code>1rem</code>とした)を引き、残りを列数で割る。各列の間の数は常に列数から1を引いたものなので、これも計算できる。動的な値から計算するこの手の<code>calc()</code>はCSSプリプロセッサーでは実現できない。</p>
+
+<p>メディア・クエリーでは列数を上書きしていく。それだけで、余白の割り当てや幅の計算をブラウザーが調節してくれる。この場合は、今まで通りに書いても<code>width</code>プロパティーで上書きするだけと、あまり手間が変わらない。そのため中途半端に抽象化しただけに過ぎないが、<code>--num-column</code>を複数の要素とプロパティーで利用していると、それぞれに伝播させられるので効率が良くなる。</p>
+
+<hr>
+
+<p>本当は列数もビューポート幅から計算できると良い。理論的には、サムネイルの最大サイズを決め、それでビューポート幅を割れば計算できる。しかし今の<code>calc()</code>では単位ありの数値から単位なしの整数を作れないので、実装に落とし込むのは難しそうだ。別の方向からのアプローチがないか考えているが、まだうまく思いつかない。</p>
+
+<p>また、<code>calc()</code>では単位を付けることは簡単だが、その逆はできないことも覚えておきたい。<code>100rem</code>を<code>1rem</code>で割っても<code>100</code>にはならないのだ。つまり、<code>calc()</code>でカスタム・プロパティーを使う場合は、できるだけ単位なしの数字で係数や定数として定義しておくべきだろう。</p>
+
+<hr>
+
+<p>まだカスタム・プロパティーどころか<code>calc()</code>すらも怪しい時勢なので使いどころは限られる。しかし、これまでのCSSプリプロセッサーの概念とは大きく違った使い方なので、意識改革をしつつ使えるところ(絶対に動く環境)では積極的に使っていきたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

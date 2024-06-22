@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Web開発周りのVimの設定</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/vim-settings-for-web-development.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Web開発周りのVimの設定" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-10-31T10:58:36+09:00">2009年10月31日</time></p>
+
+        <h1><em>Web開発周りのVimの設定</em></h1>
+      </header>
+
+    <main>
+
+    <p>HTML/CSS/JavaScriptを書くために行ったVimの設定やインストールしたスクリプト等をざっとまとめてみた。「VimでWeb開発を100倍効率的にする方法」といったような生産性を上げるための設定の類ではない。</p>
+
+<section>
+<h2>HTMLファイルを<code>:make</code>で文法チェック</h2>
+
+<p>tidy.vimが用意されているので、<a href="http://tidy.sourceforge.net/">HTML Tidy</a>をインストールし、.vimrcに以下のように書くだけで良い。</p>
+
+<pre><code class="language-vim">autocmd FileType html :compiler tidy
+autocmd FileType html :setlocal makeprg=tidy\ -raw\ -quiet\ -errors\ --gnu-emacs\ yes\ \&quot;%\&quot;</code></pre>
+
+<p>tidy.vimの<code>makeprg</code>では日本語が化けるので<code>-raw</code>を追加する。</p>
+</section>
+
+<section>
+<h2>HTMLファイルのインデントをやり直す</h2>
+
+<pre>gg=G</pre>
+
+<p>ノーマルモードでは<kbd>gg</kbd>でファイルの先頭に移動して<kbd>=G</kbd>でファイル全体をインデントし直すことができる。選択範囲のみをインデントし直す場合は、適当にビジュアルモードで選択した状態で<kbd>=</kbd>を押すだけ。1000行とかあるHTMLファイルだと結構時間がかかる。デフォルトではJavaScriptファイルでやると残念な結果に……。</p>
+</section>
+
+<section>
+<h2>HTMLファイルをブラウザで開く(Windows)</h2>
+
+<p>FirefoxやSafari、Chromeは普通にインストールするとApp Pathsに登録されるので、</p>
+
+<pre>:! start chrome.exe %
+:! start firefox.exe %
+:! start IEXPLORE.EXE %
+:! start Safari.exe %</pre>
+
+<p>でブラウザで開くことができる。<code>! start</code>と間に半角スペースがあることに注意。</p>
+
+<p>OperaのインストーラはApp Pathsに登録しないので、</p>
+
+<pre>REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\opera.exe]
+@=&quot;C:\\Program Files\\Opera\\opera.exe&quot;
+&quot;Path&quot;=&quot;C:\\Program Files\\Opera&quot;</pre>
+
+<p>といったレジストリファイルをインポートして登録してやると<code>:! start opera.exe %</code>で開くことができるようになる。</p>
+</section>
+
+<section>
+<h2>選択範囲を文字参照に変換</h2>
+
+<p>以下のPerlスクリプトをパスの通った場所に置いておく。</p>
+
+<pre><code class="language-perl">#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use HTML::Entities;
+
+print encode_entities(join(&apos;&apos;, &lt;STDIN&gt;), &apos;&amp;&lt;&gt;&quot;\&apos;&apos;);</code></pre>
+
+<p>その上でコマンドを作成。</p>
+
+<pre><code class="language-vim">command! -range EncodeEntities :&apos;&lt;,&apos;&gt;!perl -S encode-entities.pl</code></pre>
+</section>
+
+<section>
+<h2>W3CDTFで日付と時刻の挿入</h2>
+
+<pre><code class="language-vim">command! InsertDateTime :execute &quot;normal! i&quot;.strftime(&quot;%Y-%m-%dT%H:%M:%S+09:00&quot;)</code></pre>
+
+<p>必要な人は少ないだろうけど。</p>
+</section>
+
+<section>
+<h2>CSSファイルを<code>:make</code>で文法チェック</h2>
+
+<p><a href="http://www.vim.org/scripts/script.php?script_id=1577">css.vim</a>をダウンロードしてインストールする。</p>
+
+<pre><code class="language-vim">autocmd FileType css :compiler css</code></pre>
+
+<p>同梱のPerlスクリプト(validate_css)はパスの通ったディレクトリにコピーする必要がある。</p>
+</section>
+
+<section>
+<h2>JavaScriptファイルを<code>:make</code>で文法チェック</h2>
+
+<p><a href="http://www.javascriptlint.com/">JavaScript Lint</a>をインストールし、javascriptlint.vimとして以下のファイルを<code>$HOME/.vim/compiler</code>(Windowsでは<code>$HOME/vimfiles/compiler</code>)以下に作成する。</p>
+
+<pre><code class="language-vim">
+if exists(&quot;current_compiler&quot;)
+  finish
+endif
+
+let current_compiler = &quot;javascriptlint&quot;
+
+if exists(&quot;:CompilerSet&quot;) != 2
+  command -nargs=* CompilerSet setlocal &lt;args&gt;
+endif
+
+let s:cpo_save = &amp;cpo
+set cpo-=C
+
+CompilerSet makeprg=jsl\ -nologo\ -nofilelisting\ -nosummary\ -nocontext\ -process\ %
+
+CompilerSet errorformat=%f(%l):\ %m
+
+let &amp;cpo = s:cpo_save
+unlet s:cpo_save</code></pre>
+
+<p>そして.vimrcに以下のように書く。</p>
+
+<pre><code class="language-vim">autocmd FileType javascript :compiler javascriptlint</code></pre>
+</section>
+
+<section>
+<h2>JavaScriptファイルのインデントの改善</h2>
+
+<p>デフォルトのインデント・スクリプトは<a href="http://jquery.com/">jQuery</a>を利用してJavaScriptを書いているとかなり酷いことになる。</p>
+
+<ul>
+<li><code>foo(function () {</code>の次の行のインデント</li>
+<li><code>foo({</code>の次の行のインデント</li>
+<li><code>})</code>でのアンインデント</li>
+</ul>
+
+<p>あたりがメジャーなインデントがおかしくなる箇所で、「コード書くよりインデントの修正の方が大変！」というくらい(おおげさ)。</p>
+
+<p><a href="http://www.vim.org/scripts/script.php?script_id=1936">あれ</a>や<a href="http://www.vim.org/scripts/script.php?script_id=1840">これ</a>やJavaScriptのインデント・スクリプトは見つかるが、<a href="http://www.vim.org/scripts/script.php?script_id=2765">Better Javascript Indentation</a>が一番良かった。普通にインストールするだけで特に設定等は必要ない。</p>
+
+<p>インストールすると以下のような典型的なPowered by jQueryのJavaScriptファイルがすんなりインデントされるようになる。気持ち良い！</p>
+
+<pre><code class="language-js">$(function () {
+  var num = 32;
+
+  $(&quot;#monthly_archives &gt; li&quot;).each(function (i, li) {
+    if (i === num) {
+      $(li).before($(&quot;&lt;li/&gt;&quot;).append($(&quot;&lt;a/&gt;&quot;).attr({
+        href: &quot;#archives-by-month&quot;
+      }).append(&quot;» more&quot;).click(function () {
+        $(this).hide();
+        $(&quot;#monthly_archives .folded&quot;).show();
+      }))).addClass(&quot;folded&quot;).hide();
+    } else if (i &gt; num) {
+      $(li).addClass(&quot;folded&quot;).hide();
+    }
+  });
+});</code></pre>
+
+<p>気付いた範囲では、</p>
+
+<pre><code class="language-js">var foo = {
+  bar:
+    function () {</code></pre>
+
+<p>と書いた時に、</p>
+
+<ul>
+<li>次の行がインデントされない</li>
+<li>その後<code>}</code>で2段階アンインデントされてしまう</li>
+</ul>
+
+<p>といったラベル絡みでの不具合があった。<code>function</code>の前で改行しない場合は問題ないと思う(そう書けという意味ではない)。</p>
+
+<p>また、これをインストールすると<code>gg=G</code>によるインデントのやり直しも改善される(当たり前だけど)。ただし複数行コメント内の行頭の空白が消えてしまうので、</p>
+
+<pre><code class="language-js">/*!
+ * foobar
+ * hogehoge
+ */</code></pre>
+
+<p>といった<a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a>向けなコメントなどは、</p>
+
+<pre><code class="language-js">/*!
+* foobar
+* hogehoge
+*/</code></pre>
+
+<p>となってしまうので注意が必要。</p>
+</section>
+
+<hr>
+
+<p>他にはMarkdownやTextileなどでHTMLに変換するコマンドを作っておいていたりするくらい。あとはひたすら<a href="http://www.vim.org/scripts/script.php?script_id=1879">AutoComplPop</a>でOmni補完！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

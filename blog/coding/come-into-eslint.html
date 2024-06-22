@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>よろしくESLint</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/come-into-eslint.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="重い腰を上げてESLintを使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="よろしくESLint" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-24T05:14:53+09:00">2015年2月24日</time></p>
+
+        <h1><em>よろしくESLint</em></h1>
+      </header>
+
+    <main>
+
+    <p>重い腰を上げて<a href="http://eslint.org/">ESLint</a>を使い始めた。そろそろv1.0.0になるらしい。これは良いなと思ったところを簡単にまとめておく。ついでに引っかかって対処にちょっと悩んだところも。既にすごく好感触なので、このまま素直に乗り換えられると良いな。</p>
+
+<section>
+<h2>package.jsonに設定が書ける</h2>
+
+<p>外部設定ファイルとしては<code>.eslinrc</code>の他にも<code>package.json</code>に混ぜ込むこともできる。フィールド名は<code>eslintConfig</code>で、それ以下は同じ。</p>
+
+<pre><code class="language-json">{
+  &quot;eslintConfig&quot;: {
+    &quot;env&quot;: {
+      &quot;node&quot;: true
+    }
+  }
+}</code></pre>
+
+<p>通常のnpmパッケージでは別にした方が良さそうだが、依存解決にnpmを使うだけとかコマンド作るためだけのようなプライベートなケースでは特に気にせず混ぜてしまって良さそう。</p>
+</section>
+
+<section>
+<h2>no-multi-spaces</h2>
+
+<p>複数の連続した空白が検出できる。</p>
+
+<pre><code class="language-javascript">var a =  1;</code></pre>
+
+<p>これで警告出るのはかなり助かる。ソロエルノスキーさんには厳しそう。</p>
+</section>
+
+<section>
+<h2>no-comma-dangle</h2>
+
+<p><a href="http://jshint.com/">JSHint</a>では<code>es3</code>オプションを有効にしないと検出できない不必要なカンマを検出できる。とにかくあのカンマを消したい人なのですごくうれしい。</p>
+</section>
+
+<section>
+<h2>curly</h2>
+
+<p>中括弧なしの制御構文を検出できる。一行<code>if</code>とか書くなやみたいな感じで、僕はそっち派なのですごい助かる。</p>
+</section>
+
+<section>
+<h2>出現順の検出</h2>
+
+<p>先に<code>var</code>などで定義されているかや定義される前に関数が使われていないかなどを検出できる。他、定義済みで使われていないというケースも検出できる。メンテナンスのお供に。</p>
+</section>
+
+<hr>
+
+<p>あまり気にしたことがなくて対処に困ったものも挙げておく。</p>
+
+<section>
+<h2>quotes</h2>
+
+<p>JSHintで一重引用符を強制されて以降、そっちを使っていたが、ESlintではデフォルトは二重引用符になっていた。書き直すのがとても面倒な気がするので、<code>~/.eslintrc</code>で以下のようにして一重引用符をデフォルトにしてしまった。</p>
+
+<pre><code class="language-json">{
+  &quot;rules&quot;: {
+    &quot;quotes&quot;: [
+      1,
+      &quot;single&quot;
+    ]
+  }
+}</code></pre>
+</section>
+
+<section>
+<h2>camelcase</h2>
+
+<p>変数名などにアンダースコアを使えなくなり、キャメルケースで書くことを要求される。厳しいのはGruntの設定ファイルなどでアンダースコアがばんばん出てくるあたり。グローバルやファイルごとに無効にしたいところだけど、素直に引用符で括ってパスさせるのが良さそう。</p>
+</section>
+
+<section>
+<h2>no-underscore-dangle</h2>
+
+<p>アンダースコアで始まるまたは終わる変数やプロパティーへアクセスするだけで怒られる。ライブラリー側で使っていることもあるので、そういったファイルでのみ無効にするのが良さそう。</p>
+
+<pre><code class="language-javascript">var _ = require(&apos;underscore&apos;);</code></pre>
+
+<p>だけは特別視されてて、現実的。</p>
+</section>
+
+<section>
+<h2>no-process-exit</h2>
+
+<p>Node.js (つまり<code>&quot;node&quot;: true</code>)で<code>process.exit()</code>を使ってプログラムを終了しようとしていると怒られる。とりあえずは以下のようにして逃げるのも可能だが、完全に悪手っぽい。</p>
+
+<pre><code class="language-javascript">var exit = process.exit;
+
+if (process.argv[3] === &apos;--version&apos;) {
+  console.log(&apos;Foo v0.1.0&apos;);
+  exit();
+}</code></pre>
+
+<p>CLIプログラムのような完全に最上流であることを保証できるファイルのみで無効にするなら悪くはなさそう。だけど埋め込みコメントでの設定はなるべく避けた方が良いという経験則があるので、<code>switch</code>構文などをうまく使って書き直すのが良さそう。</p>
+
+<p>他に<code>ecmaFeatures</code>フィールドで<code>globalReturn</code>を許可してやり、<code>process.exit()</code>の代わりに<code>return</code>を使うという手もなくはないみたいだけど、どうなんだろう。</p>
+</section>
+
+<hr>
+
+<p>凶悪なルール(one-varとか)がデフォルトで無効なことが多いので、JSLintほどイラッとすることはない。しかしコード・スタイル的な面で様々なチェックが入るので、JSHintほどこれ拾えやみたいな辛さもない。肌にあっているのか快適に気持ちよく修正していけた。</p>
+
+<p>無効になっているルールも機会があったら有効にしてみたいと感じるものが多い。例えば以下のルールは気になる。</p>
+
+<ul>
+<li>valid-jsdoc - JSDocのバリデーション</li>
+<li>block-scoped-var - <code>var</code>をなんとなく<code>let</code>扱いするぞ</li>
+<li>no-process-env - <code>process.env</code>いじっちゃダメ</li>
+<li>no-warning-comments - コメントにTODOとか書くなや</li>
+<li>vars-on-top - <code>var</code>はスコープの先頭にまとめてね</li>
+<li>no-undefined - その<code>undefined</code>は<code>undefined</code>なの</li>
+<li>no-sync - 同期とかウケる</li>
+<li>brace-style - 中括弧の前後の改行スタイルは統一してくれ</li>
+<li>sort-vars - 変数はソートするとわかりやすいぞ</li>
+</ul>
+
+<p>歴史的な事情により今すぐJSHintを投げ捨てるということは難しい。まずは手元でESLintを使ってJSHintよりのルール(一重引用符だとか半角空白二つによるインデントだとか)でチェックし、JSHintはタスク・ランナーなどからのみ実行するようにしておくようにするのが良さそう。そうしておけばうまく機会を捉えて切り替えを断行することができるはず。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

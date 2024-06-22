@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSS Transformによるセンタリングのベスト・プラクティス</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/best-practice-for-css-transform-centering.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="上下左右のセンタリングには様々な手法が編み出されてきた。最近はCSS Transformを使う方法がメジャーになりつつある。コンテナーとセンタリングしたい要素のサイズが共に不明でもうまくいくところなど、そこそこ万能感があるのがポイントだろうか。このCSS Transformによるセンタリングは左下に動かしてから右上に戻すパターンと、その逆の右上に動かしてから左下に動かすパターンがある。どちらでも理論的には上手くいくが、ベスト・プラクティスとなりうるのは後者だけだろう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="上下左右のセンタリングには様々な手法が編み出されてきた。最近はCSS Transformを使う方法がメジャーになりつつある。コンテナーとセンタリングしたい要素のサイズが共に不明でもうまくいくところなど、そこそこ万能感があるのがポイントだろうか。このCSS Transformによるセンタリングは左下に動かしてから右上に戻すパターンと、その逆の右上に動かしてから左下に動かすパターンがある。どちらでも理論的には上手くいくが、ベスト・プラクティスとなりうるのは後者だけだろう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSS Transformによるセンタリングのベスト・プラクティス" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-05-24T02:59:56+09:00">2015年5月24日</time></p>
+
+        <h1><em>CSS Transformによるセンタリングのベスト・プラクティス</em></h1>
+      </header>
+
+    <main>
+
+    <p>上下左右のセンタリングには様々な手法が編み出されてきた。最近はCSS Transformを使う方法がメジャーになりつつある。コンテナーとセンタリングしたい要素のサイズが共に不明でもうまくいくところなど、そこそこ万能感があるのがポイントだろうか。このCSS Transformによるセンタリングは左下に動かしてから右上に戻すパターンと、その逆の右上に動かしてから左下に動かすパターンがある。どちらでも理論的には上手くいくが、ベスト・プラクティスとなりうるのは後者だけだろう。</p>
+
+<p>Demo: <a href="/test/631-1.html">Centering Unknown with CSS Transform (top/left)</a></p>
+
+<p>このデモは実際に不具合が起こりうるパターンになっている。センタリングする要素を<code>top</code>と<code>left</code>プロパティーで動かした後、<code>transform: translate(-50%, -50%)</code>で元に戻しているわけだが、Internet Explorer 11では横スクロールバーが出る原因となる。どうやら<code>left</code>と<code>top</code>プロパティーで動かした時点で横スクロールバーの有無が確定してしまうようだ。コンテナー側で<code>overflow</code>プロパティーを使えばアドホックに対処することは可能ではあるが、副作用を伴うのでやらない方が良いだろう。</p>
+
+<p>Demo: <a href="/test/631-2.html">Centering Unknown with CSS Transform (right/bottom)</a></p>
+
+<p>対して<code>right</code>と<code>bottom</code>プロパティーで動かした後、<code>transform: translate(50%, 50%)</code>するパターンでは横スクロールバーが出ることはない。描画領域が拡大しない方向へ動かしているからだ。こちらのパターンには特にデメリットもなく、<code>top</code>と<code>left</code>プロパティーのパターンと比べても極端にコード量が増えるわけでもない(2文字増えるだけだ)。</p>
+
+<p>CSS Transformによるセンタリングの説明では多くの場合、前者の<code>top</code>と<code>left</code>プロパティーを使ったパターンが使われている。その解説は間違っているわけではないが、Internet Explorer 11の挙動を考慮すると<code>right</code>と<code>bottom</code>プロパティーを使ったパターンが安定していると言え、ベスト・プラクティス足りえる。</p>
+
+<hr>
+
+<p>僕はこのCSS Transformによるセンタリングには欠点があると感じていて、あまり多用はしないようにしている。その欠点とは動かした要素がブラーがかかったようにぼやけることがあることだ。以前からWindowsのChromeでは多発する。文字はぼやけないのでわかりづらい(気づきづらい)が、幾何学的なシャープな画像を動かしてみたりすると気づきやすい。再現条件がよくわからないのでサンプルもうまく作れない。</p>
+
+<p>ともあれ上下左右の中央寄せには選択肢は多くないので、結局は使わざるを得ない。<code>position</code>プロパティーでも<code>background-position</code>プロパティーのような配置ができれば良いのになとたまに思う。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

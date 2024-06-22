@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Grid Overlay: The Lasy Way</title>
+
+    <style>
+      body {
+        font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+      }
+
+      pre, code {
+        font-family: "Monaco", "Andale Mono", monospace;
+      }
+
+      body::before {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        content: "";
+        /* background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAABCAYAAABubagXAAAAFElEQVQY02P4z/D/P00xpSbQ2H0ABkG/QcH1phgAAAAASUVORK5CYII="); */
+        background-image: -moz-linear-gradient(
+          left,
+          rgb(255, 0, 255) 0,
+          rgb(255, 0, 255) 37.5%,
+          transparent 37.5%,
+          transparent 62.5%,
+          rgb(255, 0, 255) 62.5%,
+          rgb(255, 0, 255) 100%
+        );
+        background-image: -webkit-linear-gradient(
+          left,
+          rgb(255, 0, 255) 0,
+          rgb(255, 0, 255) 37.5%,
+          transparent 37.5%,
+          transparent 62.5%,
+          rgb(255, 0, 255) 62.5%,
+          rgb(255, 0, 255) 100%
+        );
+        background-image: -o-linear-gradient(
+          left,
+          rgb(255, 0, 255) 0,
+          rgb(255, 0, 255) 37.5%,
+          transparent 37.5%,
+          transparent 62.5%,
+          rgb(255, 0, 255) 62.5%,
+          rgb(255, 0, 255) 100%
+        );
+        background-image: -ms-linear-gradient(
+          left,
+          rgb(255, 0, 255) 0,
+          rgb(255, 0, 255) 37.5%,
+          transparent 37.5%,
+          transparent 62.5%,
+          rgb(255, 0, 255) 62.5%,
+          rgb(255, 0, 255) 100%
+        );
+        background-image: linear-gradient(
+          left,
+          rgb(255, 0, 255) 0,
+          rgb(255, 0, 255) 37.5%,
+          transparent 37.5%,
+          transparent 62.5%,
+          rgb(255, 0, 255) 62.5%,
+          rgb(255, 0, 255) 100%
+        );
+        background-size: 64px 1px;
+        background-position: 50% 0;
+        opacity: 0.1;
+        pointer-events: none;
+      }
+
+      body.hide-grid::before {
+        background-image: none;
+      }
+
+      header, section {
+        margin: 0 auto;
+        width: 752px;
+      }
+
+      section p {
+        line-height: 1.5;
+      }
+
+      section pre {
+        padding: 1em;
+        line-height: 1.25;
+        word-wrap: break-word;
+        color: #fff;
+        background-color: #333;
+        font-size: 87.5%;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+    <script>
+      $(function () {
+        $("body").dblclick(function () {
+          $("body").toggleClass("hide-grid");
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Grid Overlay: The Lasy Way</h1>
+    </header>
+
+    <section>
+      <p><code>::before</code>擬似要素を使ってCSSグラデーションで作成したグリッド画像をviewport全体に敷き詰める方法。</p>
+
+      <p>単純に<code>body</code>要素や<code>html</code>要素の背景にしてしまうと<code>body</code>要素の背景画像等とバッティングする(複数の背景画像を指定するのは後処理が面倒)ので、<strong>最前面</strong>にグリッド画像を表示してやる。すると今度は文章が選択できなくなったり、リンクがクリックできなくなったりする。最前面に画像が敷き詰められているので当然そうなる。これではダメ…と思いきや、<code>pointer-events</code>プロパティを<code>none</code>にすることによって通常通りに選択したりクリックできたりするようになる。</p>
+
+      <pre>/* This CSS code released into the public domain. */
+body::before {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  content: "";
+  background-image: linear-gradient(
+    left,
+    rgb(255, 0, 255) 0,
+    rgb(255, 0, 255) 37.5%,
+    transparent 37.5%,
+    transparent 62.5%,
+    rgb(255, 0, 255) 62.5%,
+    rgb(255, 0, 255) 100%
+  );
+  background-position: 50% 0;
+  background-size: 64px 1px;
+  opacity: 0.2;
+  pointer-events: none;
+}
+</pre>
+
+      <p>このグリッドは16pxベースのグリッドで、溝が16pxでカラムがその3倍の48pxになっている。グリッド画像の作成にはCSSグラデーションを使用し、<code>background-size</code>の変更でグリッドサイズを変更できる(溝とカラムの比率は変更できないが)。例えば960.gsのデフォルトである20pxベースにしたいなら</p>
+
+      <pre>background-size: 80px 1px;</pre>
+
+      <p>に変更すれば良い。</p>
+
+      <p>このグリッドオーバーレイのCSSコードはパブリックドメインとする。</p>
+    </section>
+  </body>
+</html>

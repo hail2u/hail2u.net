@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>アンカーの子要素の余白</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/childs-margin-of-anchor.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTML Standardsではa要素の子にh1とかpとか果てはsection要素まで含めることが出来る。その場合、子要素のmarginプロパティーによる余白があったりするわけだけど、その余白部分もリンクになるかどうかはブラウザーによって違うようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTML Standardsではa要素の子にh1とかpとか果てはsection要素まで含めることが出来る。その場合、子要素のmarginプロパティーによる余白があったりするわけだけど、その余白部分もリンクになるかどうかはブラウザーによって違うようだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="アンカーの子要素の余白" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-09-19T11:23:03+09:00">2013年9月19日</time></p>
+
+        <h1><em>アンカーの子要素の余白</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML Standards</a>では<code>a</code>要素の子に<code>h1</code>とか<code>p</code>とか果ては<code>section</code>要素まで含めることが出来る。その場合、子要素の<code>margin</code>プロパティーによる余白があったりするわけだけど、その余白部分もリンクになるかどうかはブラウザーによって違うようだ。</p>
+
+<p>Demo: <a href="/test/494.html">Block Anchor</a></p>
+
+<p>デモに書いてあるように、余白(見出しと段落の間)がリンクになりクリックできるのはChrome 29だけ(結構な頻度でリンクにならないことがあるけど)。Internet Explorer 10とFirefox 23ではリンクにならずクリックできない。どうなるべきか根拠になりそうな仕様は見つけられなかった。</p>
+
+<p>この挙動の違いをブラウザー間で揃えるには、CSSで<code>a</code>要素に<code>display: inline-block</code>するか、<code>a</code>要素の子要素で<code>margin</code>プロパティーの代わりに<code>padding</code>プロパティーを使う必要がある。前者の方がまだマシだが、どちらの方法もそこそこコストが高いので、<code>a</code>要素が複数の子要素を保たないようにマークアップを変更する方が無難な気がする。</p>
+
+<pre><code class="language-html">&lt;a&gt;
+  &lt;section&gt;
+    &lt;h1&gt;...&lt;/h1&gt;
+    &lt;p&gt;...&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/a&gt;</code></pre>
+
+<p>デモのマークアップの場合は上記のように<code>a</code>要素で<code>section</code>要素全体を括るように修正する。これだけでどのブラウザーでも余白がリンクになりクリックできるようになる。マークアップの都合上<code>div</code>要素を使う必要があったりもするので、そういうのが気になる場合は<code>a</code>要素にクラスを振り<code>display: inline-block</code>を使うと良い。将来的には以下のように書けるようになるはずだけど今は書けないので。</p>
+
+<pre><code class="language-css">a! &gt; :matches(h1, p, hr, pre, ol, ul, dl, div) {
+  display: inline-block;
+}</code></pre>
+
+<p>セレクターの途中を選択する<code>!</code>(頭に<code>$</code>じゃなくなった)と、既にベンダー拡張プリフィックス付きで<code>:any()</code>としていくつかのブラウザーで実装されている<code>:matches()</code>の組み合わせ。わぁわかりやすい！</p>
+
+<hr>
+
+<p>いずれにしろアンカーの子要素の余白はリンクにならずクリックできないという前提の元に、どう振る舞わせるのが良いかを考える必要がありそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

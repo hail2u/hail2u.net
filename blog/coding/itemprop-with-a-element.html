@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>a要素でのitemprop属性</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/itemprop-with-a-element.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Microdataではitemprop属性を指定された要素からどうやって値を選択するか厳密に決められていて、それに外れた書き方はできない。metaやtime、img要素の場合はまぁそうなるよねみたいな感じなんだけど、a要素だけがちょっと。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Microdataではitemprop属性を指定された要素からどうやって値を選択するか厳密に決められていて、それに外れた書き方はできない。metaやtime、img要素の場合はまぁそうなるよねみたいな感じなんだけど、a要素だけがちょっと。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="a要素でのitemprop属性" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-01-16T00:26:27+09:00">2012年1月16日</time></p>
+
+        <h1><em>a要素でのitemprop属性</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.w3.org/TR/microdata/">Microdata</a>では<code>itemprop</code>属性を指定された要素からどうやって値を選択するか厳密に決められていて、それに外れた書き方はできない。<code>meta</code>や<code>time</code>、<code>img</code>要素の場合はまぁそうなるよねみたいな感じなんだけど、<code>a</code>要素だけがちょっと。</p>
+
+<p>仕様では、<code>a</code>要素で<code>itemprop</code>属性を使った場合その値は<code>href</code>属性の値を絶対URLに変換したもの<a href="http://www.w3.org/TR/microdata/#values">となっている</a>。そのため以下のようには書けない。</p>
+
+<pre><code class="language-html">&lt;address itemscope
+  itemtype="http://schema.org/Person"&gt;
+  Copyright &amp;copy; 2012
+  &lt;a href="http://example.com/about/"
+    itemprop="name url"&gt;
+    John Doe
+  &lt;/a&gt;
+&lt;/address&gt;</code></pre>
+
+<p><a href="http://microformats.org/">Microformats</a>の<a href="http://microformats.org/wiki/hcard">hCard</a>のような感覚では書けないということで、以下のように<code>span</code>要素(など)を使って別にしないといけない。</p>
+
+<pre><code class="language-html">&lt;address itemscope
+  itemtype="http://schema.org/Person"&gt;
+  Copyright &amp;copy; 2012
+  &lt;a href="http://example.com/about/"
+    itemprop="url"&gt;
+    &lt;span itemprop="name"&gt;
+      John Doe
+    &lt;/span&gt;
+  &lt;/a&gt;
+&lt;/address&gt;</code></pre>
+
+<p>ボキャブラリーごとに対応しなくても良いようにHTMLの要素側で値の選択法を決定させているのだと思う。ボキャブラリー側でデータ型を決めてそれによって値の選択法を変えるというのだと、処理系でボキャブラリーをちゃんと処理しなければ正確なデータの抽出が行えない。HTML要素で値の選択法が決定されるMicrodataの実装ではデータの抽出自体はボキャブラリーを処理せずに行えることになる。HTMLがマークアップ言語なこともあって理にかなっている実装なんじゃないか(と今は思う)。</p>
+
+<hr>
+
+<p>このWebサイトはまだ直してない……けど今から直す。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sassで行こう！</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/ala-getting-started-with-sass.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Translation of: Getting Started with Sass - A List Apart" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Translation of: Getting Started with Sass - A List Apart" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sassで行こう！" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-12-01T00:00:17+09:00">2011年12月1日</time></p>
+
+        <h1><em>Sassで行こう！</em></h1>
+      </header>
+
+    <main>
+
+    <p>Translation of: <a href="http://www.alistapart.com/articles/getting-started-with-sass/">Getting Started with Sass</a> - <a href="http://www.alistapart.com/">A List Apart</a></p>
+
+<figure>
+<img src="http://www.alistapart.com/d/getting-started-with-sass/getting-started-with-sass.jpg" alt="Getting Started with Sass">
+</figure>
+
+<p>CSSの持つその簡明さは欠かせない特徴の一つで、それは最も歓迎されている点でした。CSSによるスタイルシートは、セレクターといくつかの適用したいスタイル情報を含むルールを羅列したものに過ぎません。しかし、WebサイトやWebアプリケーションが巨大に、そして複雑になり、様々なデバイスや画面サイズに対応せざるを得なくなった現在、この簡明さという特徴―<code>font</code>タグやテーブル・レイアウトの淘汰に大いに役にたったもの―が大きな足かせになっています。</p>
+
+<p>簡単な計算機能や変数を追加するなどといったCSSの修正案が過去に提示されましたが、どれもブラウザー・ベンダーには採用されませんでした。仮にこういった新しく素晴らしい拡張されたCSSがあるブラウザーに実装されたとしても、それが実用に耐える程度に<em>全て</em>のブラウザーで対応されるようになるまではかなりの年月を要するでしょう。</p>
+
+<p>幸運なことに何年か前に<a href="http://hamptoncatlin.com/">Hampton Catlin</a>と<a href="http://nex-3.com/">Nathan Weizenbaum</a>により複雑なスタイルシートをメンテナンスする良い方法が提案されています。ブラウザーが新しいCSSにまだ対応していなくても、複雑なCSSを書くために新しい文法を積極的に使用し、それを<em>プリプロセッサー</em>(サーバーかローカル環境で動かすプログラム)によって既存のCSSの文法に合うように変換すれば良いのではないかとこの二人は気づいたのです。</p>
+
+<p>彼らが開発した新しいスタイルシートの文法はsyntactically awesome style sheetを略して<a href="http://sass-lang.com/">Sass</a>と言います。当初のSassの文法は、中括弧がなかったりプロパティは決まった数の半角スペースでインデントして書くというもので(そうしないとコンパイラーがエラーを吐きます)、通常のCSSの文法とはかけ離れたものでした。このことはプログラマー(新たな文法を学ぶことの苦痛を楽しむことが出来る人達)にとってはあまり問題ではありませんでしたが、多くのWebデザイナー達はよく知っているCSSからかけ離れたSassに近寄ろうとはしませんでした。これはつまり実用上の問題です。Sassのインデント・ベースの文法は既存のCSSとまったく互換性がないので、かなりの時間をかけて古いCSSコードをSassに変換することでようやくその恩恵に預かれるということになります。それでは巨大なWebサイトにおいて採用するのは難しかったということです。</p>
+
+<p>Sass 3.0において新しくCSSによく似た文法、Sassy CSS、略してSCSSが導入されました。SCSSはCSSの「完全な上位互換」とか「メタ言語」などとオタク共が呼ぶようなものにあたり、それはつまりあらゆるValidなCSSはValidなSCSSであるということを意味します。言葉を変えて言うと、全てのあなたが書いたスタイルシートはSassのプロセッサーを通るので、この新しい言語を完全に覚えなくても一部でちょっとその機能を使ってみたりすることも可能というわけです。</p>
+
+<p>通常のCSSと違いSassのSCSSはスクリプト言語で、式や関数・変数・制御構文・ループなどをサポートしています。Sassの恩恵を享受するためにそのすべてを使う必要は特になく、必要な時に必要な場所で使用すれば良いだけです。巨大なプロジェクトにおいてCSSは複雑であるか単調な繰り返しになりやすいですが、それを効率的に書くことができるようになるでしょう。</p>
+
+<p>この記事では実際にいくつかの機能の使い方を具体的に説明し、SassとSCSSで何ができるのかということのとっかかりを示そうと思います。Sassについてもっと詳しく知りたい場合は最後に載せる参考リンクや書籍を参照してください。</p>
+
+<p>わかりやすくそして簡便にするために、以下例示するコードはコンパイルしたCSSコードではなくSCSSのコードのみに統一してあります。Sassがどのように機能するかを覚えるにはSCSSでスタイルを書いてどうコンパイルされるか実際にやってみるのが良いでしょう。参考として<a href="https://github.com/ddemaree/ala_sass_examples">GitHubにこの記事で取り上げた全てのコードがあります</a>。それをコンパイルしたCSSもあるので、これら気の利いた機能によって書かれたSCSSがどのように実際に使うことの出来るCSSへと変換されるかも参照できます。</p>
+
+<h2>Getting started</h2>
+
+<p>Sassは<a href="http://www.ruby-lang.org/en/">Ruby</a>で書かれており、Rubyのパッケージ・マネージャーである<a href="https://rubygems.org/">RubyGems</a>から入手することができます。Ruby (とコマンド・プロンプトやターミナル)のことを少し知っているのなら、インストールについては<a href="http://sass-lang.com/">SassのWebサイト</a>を参照するのが良いでしょう。</p>
+
+<p>あまりコマンド・ラインに詳しくない人やすぐさまSassを動かしたいというような人には、<a href="http://mhs.github.com/scout-app/">Scout</a>というWindowsでもMacでも動作するRubyとSassコンパイラーが内蔵されたAIRアプリケーションがあります。</p>
+
+<p><code>sass</code>というコマンド・ラインのツールもScoutも編集中のSCSSファイルの更新を監視し、自動的にCSSへと変換するものです。Sassファイルがあるディレクトリ(フォルダー)が<em>input folder</em>でCSSファイルを出力したい場所が<em>output folder</em>になります。これらのフォルダーはinput folderの中にoutput dfolderがあっても、あたはその逆でも構いません。通常は以下のように通常スタイルシートを配置するフォルダーの下にscssという名前(僕はこの名前をよく使いますが、別に何でも構いません)でフォルダーを作ると良いでしょう:</p>
+
+<pre><code>my_project/
+  index.html
+  css/
+    main_style.css
+    scss/
+      main_style.scss
+      _mixins.scss
+      _colors.scss
+</code></pre>
+
+<p>この<code>scss</code>フォルダーにアンダースコア(_)で始まるファイルがありますが、これを<em>partial</em>と呼びます。名前の通り「部分的な」スタイルシートで、メインとなるSCSSファイルにインポートして使う小さなSCSSコードが詰まったものです。partialについてはこれからちゃんと説明しますが、どこに置くと良いかはわかったと思います。</p>
+
+<h3>Use partials to organize your code</h3>
+
+<p>CSSには既に<code>@import</code>により別のまたは外部のWebサイトのスタイルシートを読み込む機能があります。開発者の中には巨大なプロジェクトのスタイルを論理的に整理して分け、これを使って読み込ませるという方法を取ることを好む人もいます。例えば<code>main_style.css</code>では以下のように<code>@import</code>でページごとのスタイルシートを読み込むだけなどということもできます:</p>
+
+<pre><code>@import url('/shared/global.css');
+@import url('/pages/home.css');
+@import url('/pages/blog.css');
+</code></pre>
+
+<p>しかし今日ではこれはあまり良い手法だと考えられていません。なぜならインポートするごとにHTTPリクエストとその読み込みがブラウザーで行われるため、Webサイトの読み込みが遅くなるからです。またYSlowやGoogle Page Speedのスコアも下がるでしょう。</p>
+
+<p>Sassでは巨大なスタイルシートを<em>partial</em>に分割でき、<code>@import</code> (CSSのそれとは少し違いますが)を使ってそれらを参照することができます。そうするとメインとなるSCSSファイルを更新した時、そのインポートしたpartialは出力されるCSSファイルにマージされます。(ただしURLを指定してインポートした場合は通常のCSSのそれと同じように動作します。)</p>
+
+<pre><code>@import 'shared/global';
+@import 'pages/home';
+@import 'pages/blog';
+</code></pre>
+
+<p>これをコンパイルすると全てのスタイルを含む一つのファイルになります。Sassでは更に読み込み速度の最適化のためにCSSの出力から空白や改行を削除して圧縮することもできます。</p>
+
+<p>ひとつだけ注意することがあります。それはpartialは少し特別なSCSSファイルで、通常のスタイルシートのようには扱えません。ひとまとめにしたいコードは<em>必ず</em>全てメインのスタイルシートで<code>@import</code>しなければなりません。またpartialのファイル名はアンダースコア(_)で始めます。例えば上記コードでは<code>pages/home</code>というpartialを読み込んでいますが、そのファイルは<code>pages/_home.scss</code>という名前でなくてはなりません(このパスは常にメインのSCSSファイルに対する相対パスである必要があります)。このアンダースコアによってSassのコンパイラーはそのファイルがpartialなのかどうかを知ることができ、それによってCSSに変換すべきではないということを判断します。この制限はそれぞれのpartialに意図を持たせて論理的に整理することができることとの妥当なトレード・オフだと思います。</p>
+
+<h2>Don&#8217;t repeat yourself</h2>
+
+<p>これでスタイルシートを整理することができました。次にCSSが単調な繰り返しにならないようにしてみましょう。</p>
+
+<p>Sassの最も素晴らしい機能の一つは<em>ルールのネスト</em>です。通常のCSSファイルでは全てのルールが並列に並べられています。そしてそれぞれのルールのセレクターはその構成する要素を全て書く必要があります:</p>
+
+<pre><code>body.home .media-unit {
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+body.home  .media-unit .right {
+  border-left: 1px solid #ccc;
+}
+body.home .media-unit .right h1 {
+  font-size: 24px;
+}
+</code></pre>
+
+<p>とても、そうです<em>とても</em>、単調な繰り返しであることに加え、このコードではHTML要素をどのような意図を持ってスタイリングしようとしているかを理解させることは難しいでしょう。ネストすることによってSCSSのコードから冗長な部分が省かれ、より把握しやすくなります:</p>
+
+<pre><code>body.home {
+  .media-unit {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    .right {
+      border-left: 1px solid #ccc;
+      h1 {
+        font-size: 24px;
+      }
+    }
+  }
+}
+</code></pre>
+
+<p>これをコンパイルすると上記CSSと同じコードを得られます。残念ながらこのコンパクトな文法によって出力されるCSSファイルを小さくしたり読み込みを速くしたりすることはできませんが、セレクターをネストすることによってコードをスッキリとさせ、論理的に整理することが出来るので、以前よりもずっと、そしてこれからもずっとメンテナンスしやすくなるでしょう。</p>
+
+<p>Sassではセレクター以外にもmedia queriesをネストすることができます。これによってどのようなスタイルが適用されるかを把握しやすくなるでしょう:</p>
+
+<pre><code>.container {
+  width: 940px;
+
+  // If the device is narrower than 940px, switch to
+  // a fluid layout
+  @media screen and (max-width:940px) {
+    width: auto;
+  }
+}
+</code></pre>
+
+<p>SassはこのようなファイルをどうすればValidなCSSにできるかをちゃんとわかっているので、この場合は<code>.container</code>セレクターをmedia queryルール内へとコピーしてCSSに変換します:</p>
+
+<pre><code>.container {
+  width: 940px;
+}
+
+@media screen and (max-width:940px) {
+  .container {
+    width: auto;
+  }
+}
+</code></pre>
+
+<h3>Variables</h3>
+
+<p>Sassの<em>変数</em>が素晴らしいのは二つの理由があります。ひとつは変数によって重複するコードを減らすことができ、簡単に変更を加えることができるようになることです。これが最も大事な理由です。もう一つは色のような値に特別な<em>名前</em>を付けることによって、そのスタイルがどのような意図を持ったものなのかをわかりやすくすることができるようになることです。</p>
+
+<p>TypekitではそのUIでコーポレート・カラーである緑、<code>#99cc00</code>または「Typekit green」と呼んでいる色を使用しています。この色はボタンから見出しの色まで<em>とてもたくさん</em>CSSに出てきます。もしコーポレート・カラーをTypekit greenから別の色に変更しようとした場合、その全てを変更するには多大な労力が必要となるでしょう。16進数のコードの代わりに変数を使うことによって、その変数(スタイルシートの先頭もしくはpartialで設定します)を変更するだけで、新しい色が使われるようになります。変数を変数を使って定義することも出来るので、それによってもっとスタイルシートを意味づけされたものにすることができます:</p>
+
+<pre><code>$typekit-green: "#99cc00";
+$typekit-link-color: $typekit-green;
+
+a {
+  color: $typekit-link-color;
+}
+</code></pre>
+
+<p>色の16進数コードに限らず大抵の値を変数として定義することが出来ます。フォント・ファミリをまとめたものにはもってこいでしょう:</p>
+
+<pre><code>$sans-serif-font: 'ff-dagny-web-pro', 'Helvetica Neue', Arial,
+Helvetica, 'Liberation Sans', sans-serif;
+$serif-font: 'ff-tisa-web-pro', Georgia, Times, serif;
+
+.banner h1 {
+  font-family: $sans-serif-font;
+}
+</code></pre>
+
+<h3>Mixins</h3>
+
+<p><em>ミックスイン</em>はプロパティやルールのセットで再利用可能なものです。これは単に読み込むだけではなく、他のルールと「ミックス」することもできます。定義するには<code>@mixin</code>というキーワードを使い、読みこむ時には<code>@include</code>というキーワードを使います。</p>
+
+<p>以下の例ではSassに<code>highlighted-bold-text</code>というミックスインに含まれる全てのスタイルを<code>.result-with-highlights</code>以下にある全ての<code>span</code>要素に適用してもらうということになります:</p>
+
+<pre><code>$highlight-color: #ffa;
+
+@mixin highlighted-bold-text {
+  font-weight: bold;
+  background-color: $highlight-color;
+}
+
+.result-with-highlights {
+  span {
+    @include highlighted-bold-text;
+  }
+}
+</code></pre>
+
+<p>一旦ミックスインを定義したら同じファイルのどこでも何回でも利用することができます。例えば<code>highlighted</code>というクラス名を持つ要素にもミックスインで定義済みの<code>color</code>と<code>font-weight</code>プロパティを適用することができます:</p>
+
+<pre><code>.highlighted {
+  @include highlighted-bold-text;
+}
+</code></pre>
+
+<p>ミックスインはCSS3の新しいプロパティを要素に適用する時にとても便利です。それらは各ブラウザ間での互換性のためにベンダー拡張プリフィックスとフォールバックが必要になるからです。CSSでは通常、同じようなコードのコピー・アンド・ペーストを繰り返して対応することになるため非常に面倒なものです。Sassのミックスインではそういった新しいプロパティをあまりコードを書かずに利用することができ、将来の互換性もある程度確保することができます。</p>
+
+<p>以下のコードは4pxの角丸を要素に適用するミックスインです。WebKitやFirefox、そしてIEのベンダー拡張プリフィックス、更にWeb標準であるCSS3仕様で定義されている<code>border-radius</code>プロパティを使っています。また角丸の度合いを変数にすることによって後からも簡単にその度合いを調節できるようにもしています:</p>
+
+<pre><code>@mixin rounded-corners {
+  $rounded-corner-radius: 4px;
+  -webkit-border-radius: $rounded-corner-radius;
+  -moz-border-radius: $rounded-corner-radius;
+  -ms-border-radius: $rounded-corner-radius;
+  border-radius: $rounded-corner-radius;
+}
+
+.button {
+  @include rounded-corners;
+}
+</code></pre>
+
+<p>ミックスインはプロパティーだけでなく、ネストされたルールを抱合することも出来ます。例えばよく知られているclearfixハックをSassのミックスインとして定義する場合はこうなります: </p>
+
+<pre><code>@mixin clearfix {
+  // For modern browsers
+  &amp;:before,
+  &amp;:after {
+    content:&quot;&quot;;
+    display:table;
+  }
+
+  &amp;:after {
+    clear:both;
+  }
+
+  // For IE 6/7 (trigger hasLayout)
+  &amp; {
+    zoom:1;
+  }
+}
+
+.group {
+  @include clearfix;
+}
+</code></pre>
+
+<p>アンパサンド(<code>&amp;</code>)というセレクターはSassにおいて「そのセレクター」を意味します。つまりこのコードをコンパイルすると全ての<code>&amp;</code>をこの場合は<code>.group</code>に置換してCSSへと変換してくれます。</p>
+
+<h2>Making stylesheets smarter</h2>
+
+<p>ミックスインを使って簡単なスタイルを適用するだけでも結構便利ですが、JavaScriptやPHPのようにミックスインで引数を使うようになると<em>とてつもなく</em>便利になります。引数と組み合わせて制御構文や関数を駆使することにより複雑で巨大なスタイルシートを効率良く管理することができるでしょう。</p>
+
+<p>グリッド・レイアウト・システムなどはSassにもってこいです。既に簡単に使える960pxベースのCSSグリッド・システムがいくつもありますが、それらの多くは無意味なクラス名をHTMLに埋め込むことを強要します。それにあまり周知されていませんが、それらのCSSグリッド・システムを利用する場合、その中のごく一部の定義だけを利用したい場合でもそのシステムのCSSを全て読み込む必要があります。</p>
+
+<p>この最後の例では単純な12カラムのグリッドをSassで実装してみます。グリッドそれぞれをクラス名として定義するのではなく、ミックスインによって幅と余白をグリッドに沿うように調節したいと思います。</p>
+
+<p>まずはカラムとその間隔の幅を変数として定義します:</p>
+
+<pre><code>$column-width: 60px;    // 12 columns = 720px
+$gutter-width: 20px;    // 11 gutters = 220px
+</code></pre>
+
+<p>つづいてSassに計算させる必要があるので、その式を考えます。それぞれのグリッドは指定した数のカラムとそのそれぞれの間にある間隔を加えたものになるので、その幅の計算は以下のような式で求められるでしょう:</p>
+
+<p><em>幅 = (カラムの幅 × 数) + (間隔の幅 × (数 &#8211; 1))</em></p>
+
+<p>ではミックスインにとりかかりましょう。今までの例とは違いこのミックスインは引数として「カラムの数」を取ります。引数はミックスイン内で変数と同じように扱えます。グリッドは全て左にフロートさせ、カラムの間隔の幅分右にマージンをとります:</p>
+
+<pre><code>@mixin grid-unit($span) {
+  float: left;
+  margin-right: $gutter-width;
+  width: ($column-width * $span) + ($gutter-width * ($span - 1));
+}
+</code></pre>
+
+<p>簡単なものでしょう？　しかしまだこの僅かなコードの本領は発揮されていません。この簡単なミックスインにより、2/3をコンテンツが残りをサイドバーが占めるベーシックなレイアウトを簡単に、そしてよりわかりやすいクラス名を使って作ることができます:</p>
+
+<pre><code>.container {
+  @include clearfix;
+  @include grid-unit(12);
+  float: none;
+  margin: 0 auto;
+}
+
+.main-content {
+  @include grid-unit(8);
+}
+
+.sidebar {
+  @include grid-unit(4);
+  margin-right: 0;
+}
+</code></pre>
+
+<p>これがどれくらい価値があるか―僕は最近のプロジェクトではだいたいこのグリッドを計算するミックスインのバリエーションを使っています―は、これがSassのできることのうちごくわずかなものでしかないことからわかるのではないでしょうか。</p>
+
+<p>Sassのサポートする基本的な関数群により可変幅のレイアウトも簡単に作成することができます。Ethan Marcotteが編み出した可変幅の計算式を利用して、上記のベーシックなレイアウトのレスポンシブなバージョンを作ってみます。Sassは指定されない限りCSSの単位を適当に変換してくれたりはしないので、ビルトインの<code>percentage()</code>関数を使って変換します:</p>
+
+<pre><code>.container {
+  // result = target / context
+  width: percentage(940px / 960px);
+
+  .main-content {
+    // This is nested inside of .container, so its context is 940px
+    width: percentage(620px / 940px);
+  }
+
+  .sidebar {
+    width: percentage(300px / 940px);
+  }
+}
+</code></pre>
+
+<p>色を変換したり調整したりする関数もあります。暗くしたり明るくしたり、透明度や彩度を調整したり、全てスタイルシートの中で行うことができます:</p>
+
+<pre><code>$base-link-color: #00f;
+a {
+  color: $base-link-color;
+}
+a:visited {
+  // This reduces the lightness of the color (in HSL terms)
+  // by 50%, leaving hue and saturation alone
+  color: darken($base-link-color, 20%);
+}
+
+figcaption {
+  // Generates an rgba() color value with 50% opacity
+  background-color: transparentize(#fff, 50%);
+}
+</code></pre>
+
+<p>もしこれらビルトインの関数では物足りない場合、自分で定義してpartialのように複数のプロジェクトで使いまわせるようにすることもできます。詳しくは<a href="http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html">ビルトイン関数の一覧</a>を参照して何ができるかそしてできないのかを把握してください。</p>
+
+<h2>What&#39;s next?</h2>
+
+<p><a href="http://sass-lang.com/">Sassの公式Webサイト</a>には<a href="http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html">SCSSの完全なリファレンス</a>を始めとした多くの有益な情報があります。例えば<a href="http://sass-lang.com/editors.html">SCSSに対応したエディタのプラグイン一覧</a>などはその最たるものでしょう。これらを導入することによって構文強調や入力補助を自分のエディターで行えるようになるかもしれません。</p>
+
+<p>更には開発者であるHampton Catlinによって<a href="http://pragprog.com/book/pg_sass/pragmatic-guide-to-sass">Sassの詳しい解説本</a>が書き上げられたところです。Pragmatic ProgrammersのWebサイトでは既にベータ版のeBookを発売済みです。</p>
+
+<p>Chris Eppsteinが作成した<a href="http://compass-style.org/">Compass</a>というSCSSの関数やよく使うパターンをまとめたライブラリもあります。このライブラリにはEric MeyerのリセットCSSやBlueprintフレームワーク、更には数多くのCSS3サポートやタイポグラフィー・パターンが含まれており、「スタイルシートのjQueryだ」という開発者たちの説明はまさに的を射たものです。もしScoutを利用している場合はCompassフレームワークは既にインストールされています。そうでない場合はCompassのWebサイトのインストール手順を読んでインストールしましょう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

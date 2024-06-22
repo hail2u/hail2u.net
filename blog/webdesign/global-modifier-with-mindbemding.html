@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>BEMでグローバルなモディファイア</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/global-modifier-with-mindbemding.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろんbody要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろんbody要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="BEMでグローバルなモディファイア" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-03-07T11:13:52+09:00">2014年3月7日</time></p>
+
+        <h1><em>BEMでグローバルなモディファイア</em></h1>
+      </header>
+
+    <main>
+
+    <p>BEMを使ったクラス命名規則で「パーマリンク」といったようなグローバルな(ルートかそれより上位の)モディファイアを表現するの難しい気がする。もちろん<code>body</code>要素というブロックに対してのモディファイアで良いのだけど、実際にそれを利用するのはもっと下位のコンテキストなので、CSSの子孫セレクタで表現しなければならなくなる。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.body--permalink .article__title {
+}</code></pre>
+
+<p>書きにくい。そしてBEMの、ブロックが相互に依存しない利点と矛盾する。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.article__title--permalink {
+}</code></pre>
+
+<p>グローバルなモディファイアをやめるとスッキリする。けれどこのコンテキストのモディファイアじゃないので気持ち悪い。</p>
+
+<pre><code class="language-scss">.article {
+  .title {
+
+    .permalink &amp; {
+    }
+  }
+}</code></pre>
+
+<p>ここのCSSでは、Sassでネストでエレメント・<code>&amp;</code>を使うとモディファイアというルールにしているのでこれで良い。BEMとSassに対する広範な知識を持つことを前提にすれば良い着地点な気がするけど、コンセンサスは取れなそうで実用的でじゃない。</p>
+
+<p><del>結論なし</del>追記した。</p>
+
+<hr>
+
+<p>少し前にパーマリンクだけタイトルを大きく目立つようにした絡みでこんなことを考えていた。太字じゃない方が良い気もするのと、太字の文だけ余白を調節した方が良さそうとかちょっと気になるところがまだある。本当は.HiraKakuInterface-W2や游ゴシック Lightを使った細字でのタイトルにしようかと考えていたんだけど、細字のない環境での違和感がものすごいので諦めた。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>2番目のコンテキストのモディファイアで<code>in-</code>などの接頭詞を使うのが、単純で良いのかなと考えた。</p>
+
+<pre><code class="language-css">.article__title {
+}
+
+.article__title--in-permalink {
+}</code></pre>
+
+<p>多少反則気味だけど、落とし所としては申し分なさそう。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

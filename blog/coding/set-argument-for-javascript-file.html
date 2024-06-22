@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JavaScriptファイルに引数を渡す</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/set-argument-for-javascript-file.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="前回のエントリで触れたscript要素のsrc属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元はscript.aculo.usで、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="前回のエントリで触れたscript要素のsrc属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元はscript.aculo.usで、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JavaScriptファイルに引数を渡す" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-07T12:46:37+09:00">2006年8月7日</time></p>
+
+        <h1><em>JavaScriptファイルに引数を渡す</em></h1>
+      </header>
+
+    <main>
+
+    <p>前回のエントリで触れた<code>script</code>要素の<code>src</code>属性に指定したJavaScriptファイルに引数を渡す方法。ネタ元は<a href="http://script.aculo.us/" title="script.aculo.us - web 2.0 javascript">script.aculo.us</a>で、script.aculo.usでは読み込むライブラリを指定するために使っている模様。引数が指定できるというのは夢が拡がる(った)。</p>
+
+<p>asamashi.jsでは以下のようなコードで引数に指定したASINコードを取得している。</p>
+
+<pre><code class="language-js">$A(document.getElementsByTagName(&quot;script&quot;)).findAll(function(s) {
+  return (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/))
+}).each(function(s) {
+  asin = s.src.replace(/http:\/\/hail2u\.net\/pub\/test\/056_asamashi\.js\#/, &apos;&apos;);
+});</code></pre>
+
+<p><code>$A()</code>や<code>findAll()</code>など<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>を利用したコードなので短くまとまっている。</p>
+
+<pre><code class="language-js">var ss1 = document.getElementsByTagName(&quot;script&quot;);
+var ss2 = new Array();
+
+for (var i = 0; i &lt; ss1.length; i++) {
+  var s = ss1[i];
+  if (s.src &amp;&amp; s.src.match(/asamashi\.js(\#.*)?$/)) ss2.push(s);
+}
+
+for (var i = 0; i &lt; ss2.length; i++) {
+  var s = ss2[i];
+  asin = s.src.replace(/http:\/\/labs\.hail2u\.net\/amazon\/asamashi\/asamashi\.js\#/, &apos;&apos;);
+}</code></pre>
+
+<p>普通に書くとこんな感じ(あんまりチェックしてないので多分)。つまり<code>script</code>要素を列挙して、<code>src</code>属性をチェック。自分自身への参照でかつ引数があれば配列に格納し、正規表現の置換で引数をゲットというわけ。</p>
+
+<p>実際には、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  var asin = &quot;4844322222&quot;;
+&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;asamashi.js&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;</code></pre>
+
+<p>などという形(<a href="http://www.google.com/adsense/" title="Google AdSense">Google AdSense</a>なんかみたいなスタイル)で良いことが多い(と思う)。そのためこういった引数を与えるというテクニックは使う場所が限られそう。もちろんscript.aculo.usのような動的ロードの仕組みなどはその限られた場所のひとつで、大いに力を発揮するだろう。前回のエントリでやったような仕組みを汎用的にし、第三者に積極的に利用してもらう場合にも良いアプローチだと思う。上記のようなコードよりも、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://hail2u.net/pub/test/056_asamashi.js#4844322222&quot;&gt;&lt;/script&gt;
+&lt;div id=&quot;asamashi-4844322222&quot;&gt;&lt;/div&gt;</code></pre>
+
+<p>の方がすっきりしてて気持ちが良いし、利用する第三者に優しいと思うので。コーダー的なメリット(アプリケーションにおいて引数を渡すことができるというメリット)よりも、ユーザー的なメリット(JavaScriptファイルの呼び出しが簡略化できたりするメリット)という面でポイントが高いテクニックかなとかいう印象。</p>
+
+<p>例えばGoogle AdSenseが、</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;
+  src=&quot;http://pagead2.googlesyndication.com/pagead/show_ads.js#pub-8712792805045949:Seaside&quot;&gt;
+&lt;/script&gt;</code></pre>
+
+<p>という感じだったとしたらすっきりしてて良くない？　みたいな。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

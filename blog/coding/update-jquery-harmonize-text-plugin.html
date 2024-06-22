@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>jQueryプラグイン: Harmonize Textを更新</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/update-jquery-harmonize-text-plugin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="jQueryプラグイン化する以前からの懸念事項だった要素の幅に影響を与えるCSSプロパティの扱いと、子にテキストノード以外が含まれる場合の2つを考慮した感じにしてjquery.harmonize-textを0.2に更新しました。Works like a charm!?" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="jQueryプラグイン化する以前からの懸念事項だった要素の幅に影響を与えるCSSプロパティの扱いと、子にテキストノード以外が含まれる場合の2つを考慮した感じにしてjquery.harmonize-textを0.2に更新しました。Works like a charm!?" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="jQueryプラグイン: Harmonize Textを更新" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-05-13T06:10:57+09:00">2011年5月13日</time></p>
+
+        <h1><em>jQueryプラグイン: Harmonize Textを更新</em></h1>
+      </header>
+
+    <main>
+
+    <p>jQueryプラグイン化する以前からの懸念事項だった要素の幅に影響を与えるCSSプロパティの扱いと、子にテキストノード以外が含まれる場合の2つを考慮した感じにして<a href="https://github.com/hail2u/jquery.harmonize-text/tree/v0.2">jquery.harmonize-textを0.2に更新しました</a>。Works like a charm!?</p>
+
+<section>
+<h2>要素の幅に影響を与えるCSSプロパティ</h2>
+
+<p>単純に<code>clone()</code>すると<code>transform</code>プロパティや<code>transition</code>プロパティなどで変なことになりそうな気がしたので、要素の幅に影響を与えそうなプロパティを手作業でリストアップしてそれらのみをコピーすることにしました。そういう面倒なことはやりたくないって言ってたような気がしますけど、きっと気のせいです。</p>
+
+<p>要素の幅に影響を与えるCSSプロパティは</p>
+
+<ul>
+<li>border-collapse</li>
+<li>border-left-width</li>
+<li>border-right-width</li>
+<li>box-sizing</li>
+<li>display</li>
+<li>font-family</li>
+<li>font-size</li>
+<li>font-style</li>
+<li>font-variant</li>
+<li>font-weight</li>
+<li>letter-spacing</li>
+<li>padding-left</li>
+<li>padding-right</li>
+<li>text-transform</li>
+<li>white-space</li>
+<li>word-break</li>
+<li>word-spacing</li>
+<li>word-wrap</li>
+</ul>
+
+<p>位だと思います。ベンダー拡張については面倒だったので見なかったことにしました。<code>box-sizing</code>プロパティの値によっては<code>border-left(right)-width</code>プロパティも必要になるんじゃないかと思います。漏れてるっぽいのがあったら教えてくれると嬉しいです。</p>
+</section>
+
+<section>
+<h2>子要素のコピー</h2>
+
+<p>今までのテキストだけを拾ってコピーするという方法で大体うまくいくんですけど、以下のようなケースでずれます。</p>
+
+<pre><code class="language-html">&lt;h1&gt;Lorem &lt;em&gt;ipsum&lt;/em&gt; dolor &lt;strong&gt;sit&lt;/strong&gt; amet.&lt;/h1&gt;</code></pre>
+
+<p><code>em</code>要素等での幅の変化に対応できないので。他にも内側の要素のスタイルへの考慮もないので色々まずいです。</p>
+
+<pre><code class="language-html">&lt;h1&gt;This website is cool
+  &lt;span style=&quot;font-family: &apos;Palatino&apos;, &apos;Palatino Linotype&apos;, serif;&quot;&gt;&amp;amp;&lt;/span&gt;
+creative!&lt;/h1&gt;</code></pre>
+
+<p>例えばこういうのとかですかね？　なので子要素を丸ごとコピーしてしまうことにしました。</p>
+
+<pre><code class="language-js">temp.append(target.<em>contents()</em>.<em>clone()</em>);</code></pre>
+
+<p><code>children()</code>だと子のテキストノード等が拾えないので、<code>contents()</code>で全部拾って<code>clone()</code>でコピー。jQueryだと町でうわさのアホの子でも書けますね。</p>
+</section>
+
+<hr>
+
+<p>これでだいたいベースは完成したんじゃないかと思います。今はブラウザーの最小フォントサイズに関わる問題をもっとエレガントに解決する方法を模索中です。あと縦方向のみのリサイズの時には発火しないようにもしたいですね。今のままだとDeveloper Toolsの表示切替で発火とかかっこ悪い感じです……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

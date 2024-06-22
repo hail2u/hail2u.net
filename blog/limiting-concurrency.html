@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>並行実行数の制限</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/limiting-concurrency.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024(多分)を超えると落ちる。Linuxの設定を変更してもいい(らしい)が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Windows 10上のNode.jsだと、Promise.all()で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024(多分)を超えると落ちる。Linuxの設定を変更してもいい(らしい)が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="並行実行数の制限" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-08-27T10:46:59+09:00">2020年8月27日</time></p>
+
+        <h1><em>並行実行数の制限</em></h1>
+      </header>
+
+    <main>
+
+    <p>Windows 10上のNode.jsだと、<code>Promise.all()</code>で3000以上、並行にファイルの読み書きを実行しても完走できる。対してWSL上だとLinuxの設定次第になり、デフォルトだと1024(多分)を超えると落ちる。Linuxの設定を変更してもいい(らしい)が、WSLの性質上、シェルやアプリケーションの設定以外にはなるべく手をつけたくない。となると並行実行数を抑える必要があり、配列を分割しなくてはならない。</p>
+
+<p>並行実行数を固定するコードを書くと確実だが、スパッと書けなかった。ならば1024を超えない程度に配列を分割するだけでもいいかと、目先を変えた。今回は、このウェブサイトのHTML生成スクリプトでどうするかという話だ。まだ3268記事なので、4つに(800強ずつに)分割すれば大丈夫だろう。5で割る必要が出てくるのは、月に10記事でもあと7年以上かかる。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const chunks = longArray.reduce((previous, current, index) =&gt; {
+  previous[index % previous.length].push(current);
+  return previous;
+}, [[], [], [], []]);
+
+for (const chunk of chunks) {
+  await Promise.all(chunks.map(doSomething));
+}</code></pre>
+
+<p>配列を分割して配列の配列にしたかったので、<code>Array#reduce()</code>を使って書いた。5年後に5分割するよう書き換えるなら、初期配列を書き換える。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const chunkCount = 4;
+const chunkLength = Math.floor(longArray.length / chunkCount);
+
+for (let i = 0; i &lt; chunkCount; i++) {
+  await Promise.all(
+    longArray
+      .slice(chunkLength * i, chunkLength * (i + 1))
+      .map(doSomething)
+  );
+}</code></pre>
+
+<p>普通に<code>Array#slice()</code>で書いた方が、ループが1回で済むので速そうだ。ここまで書いて、ようやく並行実行数を固定するコードがスパッと書けることがわかった。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+const limit = 32;
+let i = 0;
+
+while (i &gt; longArray.length) {
+  const to = i + limit;
+  await Promise.all(
+    longArray
+      .slice(i, to)
+      .map(doSomething)
+  );
+  i = to;
+}</code></pre>
+
+<p><code>Array#splice()</code>で破壊しながら実行すると、もっと短くなりそうだ。うろ覚えだが、後ろから削っていくと速かったはずだ。</p>
+
+<pre><code class="language-javascript">const longArray = [...];
+
+while (longArray.length &gt; 0) {
+  await Promise.all(
+    longArray
+      .splice(-32)
+      .map(doSomething)
+  );
+}</code></pre>
+
+<p>まずはこれでやっていくことにした。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

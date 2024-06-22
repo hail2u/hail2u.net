@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>検索フォームとそれへのページ内リンクによるフォーカス</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/search-form-and-focusing-by-in-page-link.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="検索フォームへは移動と同時にフォーカスもさせたい。そうしておかないと、入力可能にするにはもう一度クリックしなくてはならず、フラストレーションがたまるからだ。このウェブサイトではinput[type=&quot;search&quot;]にIDを振ることで実現しておいた。HTMLコードだけで実装できる。しかし、Firefox 54やMobile Safari 10.2ではうまくフォーカスが当たってくれない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="検索フォームへは移動と同時にフォーカスもさせたい。そうしておかないと、入力可能にするにはもう一度クリックしなくてはならず、フラストレーションがたまるからだ。このウェブサイトではinput[type=&quot;search&quot;]にIDを振ることで実現しておいた。HTMLコードだけで実装できる。しかし、Firefox 54やMobile Safari 10.2ではうまくフォーカスが当たってくれない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="検索フォームとそれへのページ内リンクによるフォーカス" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2017-04-04T12:32:53+09:00">2017年4月4日</time></p>
+
+        <h1><em>検索フォームとそれへのページ内リンクによるフォーカス</em></h1>
+      </header>
+
+    <main>
+
+    <p>検索フォームへは移動と同時にフォーカスもさせたい。そうしておかないと、入力可能にするにはもう一度クリックしなくてはならず、フラストレーションがたまるからだ。このウェブサイトでは<code>input[type=&quot;search&quot;]</code>にIDを振ることで実現しておいた。HTMLコードだけで実装できる。しかし、Firefox 54やMobile Safari 10.2ではうまくフォーカスが当たってくれない。</p>
+
+<p>Demo: <a href="/test/670.html">Fragment ID and Focus Management</a></p>
+
+<p>Firefox 54ではフォーカス順の位置は入力ボックスの位置に移るが、入力可能な状態にはならない。Mobile Safari 10.2では入力ボックスがズームされ、キーボードが出てくるが、実際には入力することはできない。</p>
+
+<p><a href="https://html.spec.whatwg.org/multipage/browsers.html#scroll-to-fragid">フラグメントをたどる仕様</a>によると「Run the focusing steps for target」というステップが存在する。それならばフォーカスが当たるのが正しいはずだ。Firefox 54やMobile Safari 10.2のバグと言えるだろう。とはいうものの、仕様の後出しのようなので、まだ反映されていないだけとも言える。</p>
+
+<p>バグだ！　と言っててもしょうがないので、JavaScriptでフォローした方が良いかもしれない。JavaScriptで制御する場合は、リンクをジャックするのではなく、<code>hashchange</code>イベントを利用すると良さそうだ。DOM構築を待つ必要がないため、低コストで初期化できるはずだ。</p>
+
+<hr>
+
+<p>今のところブラウザーのせいにして何もしていない。Firefoxはともかくとして、Mobile Safari 10.3で治っていなかったら直すつもりだ。</p>
+
+<p>Firefoxには12年前からバグが立っていた。仕様の更新を受け、実装作業が進んでいるようだ。Safariにも同じようなバグがあり、パッチも登録されている。挙動が統一される可能性は高い。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>iOS 10.3に上げて確認したところうまくフォーカスが当たらないままだったので、とりあえずという形で当たるようにしておいた。Mobie Safariの<code>click</code>イベントなどからしかフォーカスを制御できないという仕様のことをすっかり忘れていたので、なかなか面倒な感じになっている。それだけで済めばまだよかったのだが、Firefox 54では<code>click</code>イベントのコードを実行した<em>あとに</em>ブラウザー側のフォーカス制御が行われるようで、こっちはこっちで<code>hashchange</code>イベントを利用しなければならなかった。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

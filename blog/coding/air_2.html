@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Amazonの画像置換 #2</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/air_2.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました(てか、無限ループします)。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="以前書いたAmazonの画像置換というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました(てか、無限ループします)。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Amazonの画像置換 #2" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-05-30T05:53:01+09:00">2004年5月30日</time></p>
+
+        <h1><em>Amazonの画像置換 #2</em></h1>
+      </header>
+
+    <main>
+
+    <p>以前書いた<a href="/blog/coding/air.html" title="hail2u.net - Weblog - Amazonの画像置換">Amazonの画像置換</a>というエントリででっち上げた、無理やり09を01に置換して表示してみるJavaScriptには「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」という問題がありました(てか、無限ループします)。JavaScriptのコードを少し追加すれば、「両方ともなかった場合は無いよ画像を返す」ということが実現できたので、エントリにしてみる。</p>
+<p>とりあえずコード(把握しやすいように改行つけてますが、実際には一行でガッと解た方が良いと思います)。</p>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot;
+ onload=&quot;if (this.width==&apos;1&apos; &amp;&amp; this.src.match(/\.01\./)) {
+   this.src=&apos;/images/music-no-image.png&apos;;
+ } else if (this.width==&apos;1&apos;) {
+   this.src=this.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
+ }&quot; /&gt;</code></pre>
+<p><code>img</code>の<code>src</code>にまず09で類推した画像のURLを入れます。もし、この画像のURLが幅1pxの画像を返した場合は、01で類推される画像のURLに置き換わります(<code>else if</code>の方)。すると<code>onload</code>イベントが再び起きます。もし、01で類推される画像のURLも幅1pxの画像を返した場合は、画像が無いよ画像(ここでは/images/no-image.png)に置き換わるというわけ。</p>
+<p>うむ。完璧？</p>
+<section>
+<h2>追記</h2>
+<p>異様にわかりにくそうなので例を挙げてみる。</p>
+<p>Led Zeppelinの<a href="https://www.amazon.co.jp/exec/obidos/ASIN/B0000CDLC8/hail2unet-22" title="Amazon.co.jp： 音楽: How the West Was Won [DVD Audio] [FROM US] [IMPORT] [LIVE]">How the West Was Won</a>のASINコードは「B0000CDLC8」です。これから類推される画像のURLは、</p>
+<pre>https://m.media-amazon.com/images/P/B0000CDLC8.jpg</pre>
+<p>または、</p>
+<pre>https://m.media-amazon.com/images/P/B0000CDLC8.jpg</pre>
+<p>となります。が、双方共に幅1pxの画像を返します(つまり画像は無いということ)。そこで、上記のコードに従って<code>img</code>要素を記述する(詳細はHTMLソースを参照)と、このように画像が無いよ画像(この言い方けっこう気に入った)が出てくると。</p>
+</section>
+<section>
+<h2>追記</h2>
+<p>Bookmarkletも作ってみた。ベースにしたのはmiyagawaさんの<a href="http://blog.bulknews.net/mt/archives/000326.html" title="blog.bulknews.net: Amazon bookmarklet">Amazon bookmarklet</a>です。タイトルの替わりに画像という感じのもの。Firefoxでは動きました。これ以上は確認するのメンドウ。hail2unet-22を自分のアソシエイトIDに書き換えて利用してください。</p>
+<p>Bookmarklet: <em><a href="javascript:var assoc=&apos;hail2unet-22&apos;;var t=document.title;var u=document.location.href;var ai=u.indexOf(&apos;ASIN&apos;);var asin=u.substring(ai+5,ai+15);var amazonUrl=&apos;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+assoc;var link=&apos;&lt;a href=&quot;&apos;+amazonUrl+&apos;&quot;&gt;&lt;img src=&quot;http://images-jp.amazon.com/images/P/&apos;+asin+&apos;.09.MZZZZZZZ.jpg&quot; onload=&quot;if (this.width==\&apos;1\&apos; &amp;&amp; this.src.match(/\\.01\\./)) { this.src=\&apos;/images/music-no-image.png\&apos;; } else if (this.width==\&apos;1\&apos;) { this.src=this.src.replace(\&apos;.09.\&apos;,\&apos;.01.\&apos;); }&quot; /&gt;&lt;/a&gt;&apos;;var x=prompt(&apos;&apos;,link);">このアイテムに画像でリンク(Amazonアソシエイト)</a></em></p>
+</section>
+<section>
+<h2>追記</h2>
+<p>以下のようなコードを書いた外部JavaScriptファイルを読み込んでおけば、もっとすっきりとしたHTMLになるかも(ちゃんとは試してないですので多分)。</p>
+<pre><code class="language-js">function replaceImage(img) {
+  if (img.width == &apos;1&apos; &amp;&amp; img.src.match(/\.01\./)) {
+    img.src = &apos;/images/music-no-image.png&apos;;
+  } else if (img.width == &apos;1&apos;) {
+    img.src = img.src.replace(&apos;.09.&apos;,&apos;.01.&apos;);
+  }
+}</code></pre>
+<p><code>img</code>要素は以下のように記述することになります。</p>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/XXXXXXXXXX.jpg&quot; onload=&quot;replaceImage(this)&quot; /&gt;</code></pre>
+<p>すっきり。</p>
+<p>追記ばっか。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

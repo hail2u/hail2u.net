@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>grunt-task-helperが良さそう</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/grunt-task-helper.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="grunt-task-helperというGruntプラグインを使っている。ざっと言うとsrcとdestを比較してフィルターをかけた結果を他のタスクで使えるようになったりするもの。例えばビルトインの比較機能であるnewFileを使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="grunt-task-helperが良さそう" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-08-26T10:40:13+09:00">2013年8月26日</time></p>
+
+        <h1><em>grunt-task-helperが良さそう</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://npmjs.org/package/grunt-task-helper">grunt-task-helper</a>というGruntプラグインを使っている。ざっと言うと<code>src</code>と<code>dest</code>を比較してフィルターをかけた結果を<em>他のタスク</em>で使えるようになったりするもの。例えばビルトインの比較機能である<code>newFile</code>を使うと、更新されたファイルがあった場合にだけ走るタスクと似たようなものが簡単に作れる。</p>
+
+<p><a href="https://npmjs.org/package/grunt-contrib-concat">grunt-contrib-concat</a>を使っているとして、そのタスク設定が以下のようになっているとする。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &apos;;&apos;
+  },
+  prettify: {
+    src: [
+      &apos;scripts/prettify/prettify.js&apos;,
+      &apos;scripts/prettify/lang-config.js&apos;,
+      &apos;scripts/prettify/lang-css.js&apos;,
+      &apos;scripts/prettify/lang-scss.js&apos;,
+      &apos;scripts/prettify/lang-vim.js&apos;,
+      &apos;scripts/prettify/prettify-loader.js&apos;
+    ],
+    dest: &apos;scripts/prettify.js&apos;
+  }
+}</code></pre>
+
+<p>この場合は順番が重要なのでグロブでまとめて拾っていない以外は普通なマルチタスク設定。これをgrunt-task-helperを挟むように書きかえるとこうなる。</p>
+
+<pre><code class="language-javascript">concat: {
+  options: {
+    seperator: &apos;;&apos;
+  },
+  prettify: {
+    files: &apos;&lt;%= taskHelper.prettify.options.filesArray %&gt;&apos;
+  }
+},
+
+taskHelper: {
+  prettify: {
+    options: {
+      handlerByFile: &apos;newFile&apos;,
+      filesArray: []
+    },
+    src: [
+      &apos;scripts/prettify/prettify.js&apos;,
+      &apos;scripts/prettify/lang-config.js&apos;,
+      &apos;scripts/prettify/lang-css.js&apos;,
+      &apos;scripts/prettify/lang-scss.js&apos;,
+      &apos;scripts/prettify/lang-vim.js&apos;,
+      &apos;scripts/prettify/loader.js&apos;
+    ],
+    dest: &apos;scripts/prettify.js&apos;
+  }
+}</code></pre>
+
+<p><code>src</code>と<code>dest</code>をtaskHelperタスクに移して、concatタスクの<code>files</code>で<a href="http://gruntjs.com/configuring-tasks#templates">テンプレート</a>を使ってフィルター結果が格納される<code>filesArray</code>を参照してやる。ここではビルトインの<code>newFile</code>を使っていて、<code>src</code>に指定されたファイルのうちひとつでも<code>dest</code>で指定されたファイルより新しい場合にのみ<code>filesArray</code>に<code>src</code>と<code>dest</code>がコピーされる。そうでない場合は空になるのでconcatタスクは何もせず完走する(エラーにはならない)。</p>
+
+<p>比較に使った<code>newFile</code>の代わりにサイズで比較する<code>size</code>を使うこともできるし、自前で<code>false</code>を返して除外していく関数を書いたりもできる。自前で色々やると誰にも読めなくなる<code>Gruntfile.js</code>の出来上がりなので、公の場では控えた方が良さそう。</p>
+
+<p><code>src</code>と<code>dest</code>の比較だけじゃなくて、<code>src</code>の内容をちょっといじって<code>dest</code>に吐くみたいなことも出来る<code>handlerByContent</code>というオプションなどもある。READMEの例ではSSIのインクルードみたいなことやってて、そういったファイルをちょっと弄るだけのタスクなら自前でファイルの読み書きとかをすることなく簡単に書けるようだ。</p>
+
+<p>まだ公開されたばかりのGruntプラグインなので、いろいろな変更や機能の追加がありそうでどういうものになるかはなんとも言えない。けどGruntのとりあえず全部やる的な大雑把さを効率化させるのに役に立ちそうで期待している。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

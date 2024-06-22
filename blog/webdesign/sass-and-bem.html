@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>SassとBEM</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/sass-and-bem.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="SCSSファイルを整理し直している時、一気にBEMなクラスを使って書きなおしてやろうかとも考えていた。けど途中でSassならSCSSファイルの分割とその中での工夫によってBEMの構造を表現できそうと感じたので、今はそういう方向で試行錯誤している。実際BEMのウェブサイトでもファイルシステムを使ったBEMの表現方法という似た話が書かれているので荒唐無稽な考えではなさそう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="SCSSファイルを整理し直している時、一気にBEMなクラスを使って書きなおしてやろうかとも考えていた。けど途中でSassならSCSSファイルの分割とその中での工夫によってBEMの構造を表現できそうと感じたので、今はそういう方向で試行錯誤している。実際BEMのウェブサイトでもファイルシステムを使ったBEMの表現方法という似た話が書かれているので荒唐無稽な考えではなさそう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="SassとBEM" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-08-08T13:58:08+09:00">2013年8月8日</time></p>
+
+        <h1><em>SassとBEM</em></h1>
+      </header>
+
+    <main>
+
+    <p>SCSSファイルを整理し直している時、一気に<a href="http://bem.info/">BEM</a>なクラスを使って書きなおしてやろうかとも考えていた。けど途中で<a href="http://sass-lang.com/">Sass</a>ならSCSSファイルの分割とその中での工夫によってBEMの構造を表現できそうと感じたので、今はそういう方向で試行錯誤している。実際BEMのウェブサイトでも<a href="http://bem.info/method/filesystem/">ファイルシステムを使ったBEMの表現方法</a>という似た話が書かれているので荒唐無稽な考えではなさそう。</p>
+
+<ul>
+<li>SCSSファイル名でblockを表現</li>
+<li>その中でplaceholder selectorを使ってelementとmodifierを表現<ul>
+<li>外からはこのplaceholder selectorは使わない</li>
+</ul>
+</li>
+<li>既存のマークアップを利用したセレクターから<code>@extend</code>でBEM構造を関連付け<ul>
+<li>HTMLファイルではBEMなクラスは振らない</li>
+<li>必要な場合はシンプルなクラスを振る</li>
+</ul>
+</li>
+</ul>
+
+<p>イメージはこのような感じ。HTMLでのマークアップの簡潔さは維持できるが、CSSでのセレクターが複雑になりがち。そのためCSSのカスケーディングを意識しなくて良くなるという実用的なメリットがなくなったり、HTMLからCSSへの見通しが慣れるまで大変だったりする。それ以外は大体SassのメリットとBEMのメリットを満喫できそうではあるけれども、生産性の向上は見込めない。</p>
+
+<p>最後の既存マークアップの利用をBEMなクラスに差し替えるとわかりやすくなるし、BEMらしい感じになるけど、それだと同じ意味を持つ表現(ファイル名でのブロックの表現とBEMなクラスでのブロックの表現)が重複することになるので無駄が多すぎる気がする。</p>
+
+<hr>
+
+<p><a href="https://github.com/nex3/sass/issues/286">Sass 3.3の予定のひとつ</a>には<code>&amp;</code>のインターポレーションの拡張があり(3.2の予定から延期された)、BEMなクラス名の生成しやすくなるようだ。SassとBEMということなら、それを利用してBEMべったりにした方がSassのコード的にもCSSのコード的にも、HTMLのマークアップの安定性という点でもバランス良くベターになりそう。インターポレーションが多いと、SassのコードをCSSの視点で見た場合にわけのわからない感じになるのであんまり好きではないんだけど。</p>
+
+<hr>
+
+<p>いずれにせよSassのネストとBEMの強力な命名規則のどちらをメインに据えるかというのが焦点になりそう。Sassべったりだった身としてはネストを捨てるのはためらいがあるけど、BEMなクラス名でその代替的なことが出来る今ならSassを<code>calc()</code>とか<code>expression()</code>のすごい奴みたいに割り切ってしまっても良い気もする。複雑になりすぎてついていけないからとかではなくて、一旦Sassのどの機能をどうやって使うべきなのかをちゃんと整理するべき時期に来たと思うので。</p>
+
+<p>また、BEMはちょっと変わってるけど単なる命名規則にすぎないと言って煙に巻けそうなので、わりと早くに広まりそうだと考えているのもある。シンプルだけど強力な命名規則のおかげでStyle Guideの類いがとても書きやすくなるのは大きい。ハイフンやアンダースコアを2つ並べるのはなかなか気持ち悪いと感じる人も多そうだけど、そこに明確な規則性と明るい未来が見いだせれば乗り越えられるはず。</p>
+
+<p>ブロック！　エレメント！　モディフィアー！　……マダファイアー？</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

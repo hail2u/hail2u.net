@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>それYQLで出来るよ！</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/you-can-do-it-with-yql.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="トップページに表示されているRecent Weblog Entriesは、jsというflavourを作ってやっていたのだけど、YQLでフィードからJSONPにコンバートしてゴニョゴニョするものに変えた。フィードはFeedBurnerにあるのでサードパーティのウェブサービスとクライアントサイドのスクリプトで完結するのが良いところでもあり悪いところでもあり。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="トップページに表示されているRecent Weblog Entriesは、jsというflavourを作ってやっていたのだけど、YQLでフィードからJSONPにコンバートしてゴニョゴニョするものに変えた。フィードはFeedBurnerにあるのでサードパーティのウェブサービスとクライアントサイドのスクリプトで完結するのが良いところでもあり悪いところでもあり。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="それYQLで出来るよ！" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-04-21T01:48:41+09:00">2009年4月21日</time></p>
+
+        <h1><em>それYQLで出来るよ！</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/">トップページ</a>に表示されているRecent Weblog Entriesは、jsというflavourを作ってやっていたのだけど、<a href="http://developer.yahoo.com/yql/">YQL</a>でフィードからJSONPにコンバートしてゴニョゴニョするものに変えた。フィードは<a href="http://feedburner.google.com/">FeedBurner</a>にあるのでサードパーティのウェブサービスとクライアントサイドのスクリプトで完結するのが良いところでもあり悪いところでもあり。</p>
+
+<p>フィードのJSONPへのコンバートはYQLに専用の機能があるので、</p>
+
+<pre>select * from <em>rss</em> url=&apos;http://feeds2.feedburner.com/hail2u/blog&apos;</pre>
+
+<p>という式でOK。JSONPで出力して貰えば、コールバック関数に渡されるオブジェクトの<code>query.results</code>以下にフィードの<code>item</code>要素が配列でずらっと並ぶ。RSSモードを使うと<code>channel</code>要素とかはどっか行ってしまうので、そっちも(が)欲しい場合は、</p>
+
+<pre>select * from <em>xml</em> url=&apos;http://feeds2.feedburner.com/hail2u/blog&apos;</pre>
+
+<p>とXMLモードでYQLを使えば良いと思う。</p>
+
+<p>YQLを積極的に使うと良いんじゃないかと思う理由は、手軽さが大きい。コンソールでゴニョゴニョ作ってコピペ。HTMLモードやXMLモードとかなら、XPathと組み合わせるだけな感じなので、直ぐにソラで書けるようになるほど簡単。</p>
+
+<p>また、URLの明晰さも大きい。<code>jQuery.getJSON()</code>と組み合わせてYQLを使う場合、</p>
+
+<pre><code class="language-js">$.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
+  q:      &quot;select * from html where url=&quot;http://sports.yahoo.co.jp/hl?c=npb&quot; and xpath=&apos;//ul[@class=&quot;s130&quot;]/li/a&apos;&quot;,
+  format: &quot;json&quot;
+}, function (d) {
+  // do something with d
+});</code></pre>
+
+<p>こういったコードになる。やっている(やりたい)ことが式としてリクエストするURLにはっきりと含まれるのでわかりやすい。YQLの基本的な知識が少し必要ではあるけど。これに対して<a href="http://pipes.yahoo.com/pipes/">Pipes</a>の場合は、</p>
+
+<pre><code class="language-js">$.getJSON(&quot;http://pipes.yahoo.com/pipes/pipe.run?_callback=?&quot;, {
+  url:     &quot;http://sports.yahoo.co.jp/hl?c=npb&quot;,
+  _id:     &quot;00000000000000000000000000000000&quot;,
+  _render: &quot;json&quot;
+}, function (d) {
+  // do something with d
+});</code></pre>
+
+<p>こうなる(_idはダミー)ので、PipesのURLを参照し更にView Sourceしないと何をやっているのかほとんどわからない(スクリプトがどういうものかはわかっているはずなので、そこから類推することくらいは出来るけど)。</p>
+
+<p>その一方でYQLはそこそこ入力データがまともでないと夢で見たのと違う出力になったりするという特徴もある。Pipesはかなり良きに計らってくれるので、結構ダメダメな入力データでも何とかなる場合が多く、その点はすごく良い。具体的な例だといきなり配列で始まる<a href="http://delicious.com/help/feeds">DeliciousのJSONフィード</a>は、YQLではパースは通るものの<code>query.results</code>が空になるが、Pipesは問題なし。</p>
+
+<p>YQLはFlickrの画像からEXIF抽出とかも面白そうだなー。今年は「それYQLでできるよ」が流行る。とまでは思わないけど便利。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

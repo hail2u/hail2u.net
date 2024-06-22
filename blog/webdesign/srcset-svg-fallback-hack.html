@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>srcset属性を使ったSVGフォールバック・ハック</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/srcset-svg-fallback-hack.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="SVGをサポートする環境がほとんどになってきた。それでもなんとか8であったり、かんとか2.3であったりのことを考慮せざるをえないという状況はありうる。それにはonerror属性を使った対応が有力だが、srcset属性でSVGファイルを指定するだけというハックのことを知った。将来的に使えなくなるわけではないが、やりたいことと実装に食い違いが少なからずあるのでハックと言って良いだろう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="SVGをサポートする環境がほとんどになってきた。それでもなんとか8であったり、かんとか2.3であったりのことを考慮せざるをえないという状況はありうる。それにはonerror属性を使った対応が有力だが、srcset属性でSVGファイルを指定するだけというハックのことを知った。将来的に使えなくなるわけではないが、やりたいことと実装に食い違いが少なからずあるのでハックと言って良いだろう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="srcset属性を使ったSVGフォールバック・ハック" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-10-04T03:31:06+09:00">2015年10月4日</time></p>
+
+        <h1><em>srcset属性を使ったSVGフォールバック・ハック</em></h1>
+      </header>
+
+    <main>
+
+    <p>SVGをサポートする環境がほとんどになってきた。それでもなんとか8であったり、かんとか2.3であったりのことを考慮せざるをえないという状況はありうる。それには<code>onerror</code>属性を使った対応が有力だが、<code>srcset</code>属性でSVGファイルを指定するだけというハックのことを知った。将来的に使えなくなるわけではないが、やりたいことと実装に食い違いが少なからずあるのでハックと言って良いだろう。</p>
+
+<pre><code class="language-html">&lt;img src=&quot;foo.png&quot; srcset=&quot;foo.svg&quot;&gt;</code></pre>
+
+<p>表示したいSVGを<code>srcset</code>属性で、フォールバックに使いたいPNGを<code>src</code>属性で指定するだけだ。これで<code>srcset</code>属性をサポートしているブラウザーではSVGが、そうでないブラウザーではPNGが表示される。<a href="http://caniuse.com/#search=srcset"><code>srcset</code>属性のサポート</a>に対して、<a href="http://caniuse.com/#search=svg">より多くのブラウザーがSVGをサポート</a>していることから成立する。もちろん食い違いがあるのでSVGをサポートしているブラウザーではSVGを、とはいかない。</p>
+
+<p>ただし<code>onerror</code>属性を使ったテクニックと比較すると、画像へのリクエストが必ず1回で収まるという利点がある。<code>onerror</code>属性では古い環境へ負担を強いることに対し、公平な負担(十数文字の追加)だけで済むというのはかなり魅力的だ。</p>
+
+<p>SVGと<code>srcset</code>属性のサポートの食い違いが問題だが、ハック臭なしできれいに書ける<code>picture</code>要素よりはカバー範囲が広いようだ(Safari 8やEdge 12がカバーできる)。<code>srcset</code>属性をサポートしない環境が後ろ向きな環境であること(OSレベルでレガシーであったり、Chromeへと切り替わっていなかったり)することを考えると、妥協点としても見るべきところはある。</p>
+
+<p><a href="http://lynn.ru/examples/svg/en.html">インラインSVGでのフォールバック・テクニック</a>とこれでかなりの範囲をカバーできることだろう。</p>
+
+<hr>
+
+<p>初期からこのハックの利用を想定して実装を進めるのは薦められないが、SVGで良いと言われていたのにも関わらず急にPNGでフォールバックして欲しいと言われた時の緊急手段などとしては抗いがたい魅力がある。つまり計画的に利用しないことは意識したい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

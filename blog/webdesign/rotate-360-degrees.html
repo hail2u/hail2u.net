@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>rotate(360deg)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/rotate-360-degrees.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="WindowsのGoogle ChromeでWebフォントを使うと、その縁がギザギザになることが多い(もちろん非ClearTypeのフォントならローカルフォントでも)。今まではそれの解消のためにtext-shadowプロパティで軽く文字色と同じ影をつけてやって誤魔化していたが、-webkit-transformプロパティでrotate(360deg)として一周回すといい感じにフォントにアンチエイリアスっぽいぼかしがかかることを発見した。少し前に書いたCSS3のtransformを使ったフォントの変形の派生。テクニックというよりもハック寄り。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="WindowsのGoogle ChromeでWebフォントを使うと、その縁がギザギザになることが多い(もちろん非ClearTypeのフォントならローカルフォントでも)。今まではそれの解消のためにtext-shadowプロパティで軽く文字色と同じ影をつけてやって誤魔化していたが、-webkit-transformプロパティでrotate(360deg)として一周回すといい感じにフォントにアンチエイリアスっぽいぼかしがかかることを発見した。少し前に書いたCSS3のtransformを使ったフォントの変形の派生。テクニックというよりもハック寄り。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/rotate-360-degrees.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="rotate(360deg)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-04-10T04:06:19+09:00">2011年4月10日</time></p>
+
+        <h1><em>rotate(360deg)</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="一周回すとぼかしがかかる。" height="120" src="/img/blog/rotate-360-degrees.png" width="480">
+</figure>
+
+<p>WindowsのGoogle ChromeでWebフォントを使うと、その縁がギザギザになることが多い(もちろん非ClearTypeのフォントならローカルフォントでも)。今まではそれの解消のために<code>text-shadow</code>プロパティで軽く文字色と同じ影をつけてやって誤魔化していたが、<code>-webkit-transform</code>プロパティで<code>rotate(360deg)</code>として一周回すといい感じにフォントにアンチエイリアスっぽいぼかしがかかることを発見した。少し前に書いた<a href="/blog/webdesign/font-transforming-with-css3-transform.html">CSS3のtransformを使ったフォントの変形</a>の派生。テクニックというよりもハック寄り。</p>
+
+<p>Demo: <a href="/test/209.html">Beautify MS PMincho on Google Chrome</a></p>
+
+<p>デモではWebフォントではなく、常にギザギザで悲しいＭＳ Ｐ明朝を使ってさしあげた(グリフが細かいためぼかしのかかり方がよく見え、わかりやすいので)。</p>
+
+<p><code>scaleY(1.1)</code>ではぼかしがかからない。<code>skewX(1deg)</code>はそこそこ綺麗にぼかしがかかるが、<code>rotate(0.01deg)</code>の方が自然な感じがする。双方共にブロックの矩形が変形してしまうので、ピクセルパーフェクトなデザインには向かない。<code>rotate(360deg)</code>ならぴったり一周するだけなので、ブロックの矩形を変化させずにぼかしだけがかけられ、最も優秀。参考に載せておいた<code>text-shadow</code>によるぼかしは少しぼかしのかかりが強いように見えるが、それは影の色の透明度を調節すれば良いだけなので出力的には互角だと思う。</p>
+
+<p>使い方も何もないが一応書いておくと、使いたいセレクタで、</p>
+
+<pre><code class="language-css">.foo {
+  -webkit-transform: rotate(360deg);
+}</code></pre>
+
+<p>とするだけ。このギザギザはGoogle Chrome (とSafariでフォントの滑らかさをWindows 標準した時)固有の癖(仕様)に過ぎないので、他のベンダー拡張プリフィックスまで書く必要はない。</p>
+
+<section>
+<h2>ユーザースタイルシートで使う</h2>
+
+<p>このハックをGoogle Chromeのユーザースタイルシートで使うと、全てのウェブページで文字にアンチエイリアスっぽくぼかしが加わる。</p>
+
+<pre><code class="language-css">body {
+  -webkit-transform: rotate(360deg);
+}</code></pre>
+
+<p>なんとなく綺麗に見えるような気がするが、そんなでもない。ＭＳ Ｐゴシックとメイリオのフォント置換等と違って文字幅が変化しないのでその点ではポイント高い。一部ウェブページ等で表示がぐちゃぐちゃになるので常用は危険。TweetDeck for Chromeでは全てのカラムがまったく見えなくなった。</p>
+</section>
+
+<hr>
+
+<p><code>rotate(360deg)</code>のように、元の状態とまったく同じに状態になるCSS Transformでアンチエイリアスっぽくぼかしがかかるか否かは実装次第だと思うので、そのうちうまく動かなくなったりするんじゃないかという危惧はある。そういう意味では<code>rotate(0.01deg)</code>でのレンダリングはそう変わることはない(と思う)ので、こっちの方が安全な気がする。他にも<code>text-rendering</code>との兼ね合いやSafariにおける<code>-webkit-font-smoothing</code>との組み合わせとかもちゃんと考慮する必要がありそう。</p>
+
+<p>気に入ったのでロゴをこのハックを利用してアンチエイリアス(っぽい何か)をかけるようにした。フォントも<a href="http://www.google.com/webfonts/family?family=Vollkorn">Vollkorn</a>のBold Italicに変更。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

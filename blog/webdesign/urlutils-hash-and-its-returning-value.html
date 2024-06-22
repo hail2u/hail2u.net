@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>URLUtils.hash (location.hash)とその返す値</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/urlutils-hash-and-its-returning-value.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="URLUtilsインターフェイスのブラウザーにおける実装であるLocationオブジェクトのhashプロパティーによりURLのフラグメント識別子(と#)を取得・代入できる。最近のブラウザーは非ASCII文字列もURLエンコードせずに扱えるようになっているが、この辺りの挙動がFirefoxだけ少し違うようだ。それはhashプロパティーの返す値で、常にデコードされた形で返ってくるようになっている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="URLUtilsインターフェイスのブラウザーにおける実装であるLocationオブジェクトのhashプロパティーによりURLのフラグメント識別子(と#)を取得・代入できる。最近のブラウザーは非ASCII文字列もURLエンコードせずに扱えるようになっているが、この辺りの挙動がFirefoxだけ少し違うようだ。それはhashプロパティーの返す値で、常にデコードされた形で返ってくるようになっている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="URLUtils.hash (location.hash)とその返す値" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-12-24T01:05:03+09:00">2014年12月24日</time></p>
+
+        <h1><em>URLUtils.hash (location.hash)とその返す値</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>URLUtils</code>インターフェイスのブラウザーにおける実装である<code>Location</code>オブジェクトの<code>hash</code>プロパティーによりURLのフラグメント識別子(と<code>#</code>)を取得・代入できる。最近のブラウザーは非ASCII文字列もURLエンコードせずに扱えるようになっているが、この辺りの挙動がFirefoxだけ少し違うようだ。それは<code>hash</code>プロパティーの返す値で、常にデコードされた形で返ってくるようになっている。</p>
+
+<p>例えば適当なウェブページで開発者ツール(的なもの)を開き、コンソール(などと呼ばれてるもの)で以下を実行してみる。</p>
+
+<pre><samp>&gt; <kbd>location.hash = &apos;#&apos; + &apos;あいうえお&apos;</kbd>
+&lt; &quot;#あいうえお&quot;
+&gt; <kbd>location.hash</kbd>
+&lt; &quot;#あいうえお&quot;
+&gt; <kbd>location.hash = &apos;#&apos; + encodeURIComponent(&apos;あいうえお&apos;)</kbd>
+&lt; &quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&quot;
+&gt; <kbd>location.hash</kbd>
+&lt; &quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&quot;</samp></pre>
+
+<p>Chrome 39やInternet Explorer 11ではこのようになる。<code>location.hash</code>に代入した文字列はそのまま返ってくるだけだ。対してFirefox 34ではURLエンコードした文字列を代入した場合、デコードされて返ってくる。</p>
+
+<pre><samp>&gt; <kbd>location.hash = &apos;#&apos; + &apos;あいうえお&apos;</kbd>
+&lt; &quot;#あいうえお&quot;
+&gt; <kbd>location.hash</kbd>
+&lt; &quot;#あいうえお&quot;
+&gt; <kbd>location.hash = &apos;#&apos; + encodeURIComponent(&apos;あいうえお&apos;)</kbd>
+&lt; &quot;#%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A&quot;
+&gt; <kbd>location.hash</kbd>
+&lt; &quot;#あいうえお&quot;</samp></pre>
+
+<p>もちろん開発者ツール上だけでなく通常のスクリプト上でも同じなので、この辺りを扱う場合はそれなりの注意が必要になる。常にURLエンコードされているのかどうかを意識するべきということだ。</p>
+
+<p>例えば今のGitHubではこの辺りを使って<code>id</code>属性の重複避けと<code>hashchange</code>イベントの監視によるページ内ジャンプを実装している。しかし、URLエンコード済み(<code>href</code>属性の値)とそうでないもの(<code>id</code>属性の値)が混ざっているため、日本語の見出しではChrome 39やInternet Explorer 11だと比較に失敗してページ内ジャンプがうまく動かない。</p>
+
+<hr>
+
+<p>どちらかというとFirefoxの挙動の方が開発者に優しいとは言えるかもしれない。常にデコードされていると想定できるので、二重にエンコードしてしまうことやデコードし忘れということがない。しかしその一方でURLエンコードされた文字列とそうでない文字列が含まれたフラグメント識別子を元に戻すことができないという欠陥もある。<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=483304">Bug 483304</a>でかなり昔から議論されているようだ。</p>
+
+<p><a href="https://url.spec.whatwg.org/">URL仕様</a>では、とにかくフラグメント識別子は<a href="https://url.spec.whatwg.org/#fragment-state">必要ならURLエンコードされているべき</a>となっている。そして<a href="https://url.spec.whatwg.org/#dom-urlutils-hash"><code>URLUtils</code>インターフェイスの<code>hash</code>プロパティー</a>でもゲッターは<code>#</code>と連結して返せというだけになっているので、勝手にデコードして返すのはバグと言って良さそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

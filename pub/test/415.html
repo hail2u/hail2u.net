@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>links.hail2u.net</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>links.hail2u.net</h1>
+    </header>
+
+    <section id="links">
+      <p>JavaScriptが有効な環境の場合、ここに<a href="http://delicious.com/hail2u">Delicious</a>へ投稿されたリンクが表示されます。</p>
+    </section>
+
+    <script>
+/**
+ * @preserve links.js
+ *
+ * LICENSE: http://hail2u.mit-license.org/2012
+ */
+
+/*jslint indent: 2, browser: true */
+
+(function () {
+  "use strict";
+
+  var js = document.createElement("script"),
+    s = document.getElementsByTagName("script")[0];
+
+  js.async = true;
+  js.src = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D'http%3A%2F%2Ffeeds.delicious.com%2Fv2%2Fjson%2Fhail2u?count=9'&format=json&callback=displayLinks";
+  s.parentNode.insertBefore(js, s);
+}());
+
+function displayLinks(d) {
+  "use strict";
+
+  var placeholder = document.getElementById("links"),
+    items,
+    buf = [],
+    i,
+    l,
+    item;
+
+  if (d === undefined || d.query.results === undefined) {
+    placeholder.innerHTML = "\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002";
+
+    return;
+  }
+
+  items = d.query.results.json.json;
+  buf.push(
+    '<h2>Links</h2>',
+    '<dl>'
+  );
+
+  for (i = 0, l = (items.length > 9) ? 9 : items.length; i < l; i += 1) {
+    item = items[i];
+    buf.push(
+      '<dt>',
+      '<a href="',
+      item.u,
+      '">',
+      item.d,
+      '</a></dt><dd>',
+      item.n,
+      '</dd>'
+    );
+  }
+
+  buf.push('</dl><p><a href="http://delicious.com/hail2u">\u00bb View more</a></p>');
+  placeholder.innerHTML = buf.join("");
+}
+    </script>
+  </body>
+</html>

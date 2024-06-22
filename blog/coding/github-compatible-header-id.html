@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>GitHub互換の見出しID</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/github-compatible-header-id.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="gfmtoc(mdtocから名前を変えた)を作っている時にGitHub flavored Markdown (本当はHTML Pipeline)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="gfmtoc(mdtocから名前を変えた)を作っている時にGitHub flavored Markdown (本当はHTML Pipeline)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた\p{Word}を使っているので、それを作ればあとは簡単なようだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="GitHub互換の見出しID" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-01-01T06:07:48+09:00">2015年1月1日</time></p>
+
+        <h1><em>GitHub互換の見出しID</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/hail2u/node-gfmtoc">gfmtoc(mdtocから名前を変えた)</a>を作っている時にGitHub flavored Markdown (本当は<a href="https://github.com/jch/html-pipeline/">HTML Pipeline</a>)互換の見出しIDをNode.jsで生成する方法を考えていた。GitHubではRubyでサポートされているPOSIX文字クラスをユニコードへ対応させた<code>\p{Word}</code>を使っているので、それを作ればあとは簡単なようだ。</p>
+
+<p><a href="https://github.com/ruby/ruby/blob/1026907467ea3d5441e1bfa95f5f37b431a684f3/doc/regexp.rdoc#character-properties">Rubyのソースコードにある正規表現のドキュメント</a>によると、以下のユニコード文字プロパティーのカテゴリーを組み合わせたものが<code>\p{Word}</code>ということのようだ。</p>
+
+<ul>
+<li><code>\p{L}</code>: Letter</li>
+<li><code>\p{M}</code>: Mark</li>
+<li><code>\p{N}</code>: Number</li>
+<li><code>\p{Pc}</code>: Connector_Punctuation</li>
+</ul>
+
+<p>つまりこれらを連結した正規表現パターンを作れば良い。まともにやったら日が暮れるので、Node.jsでは<a href="https://www.npmjs.com/package/unicode-7.0.0">unicode-7.0.0</a>と<a href="https://www.npmjs.com/package/regenerate">regenerate</a>の両パッケージを使って生成してやる。</p>
+
+<pre><code class="language-javascript">var regenerate = require(&apos;regenerate&apos;);
+
+var word = regenerate().add(
+  require(&apos;unicode-7.0.0/properties/Any/code-points&apos;)
+).remove(
+  require(&apos;unicode-7.0.0/categories/L/code-points&apos;)
+).remove(
+  require(&apos;unicode-7.0.0/categories/M/code-points&apos;)
+).remove(
+  require(&apos;unicode-7.0.0/categories/N/code-points&apos;)
+).remove(
+  require(&apos;unicode-7.0.0/categories/Pc/code-points&apos;)
+).remove(
+  &apos;-&apos;,
+  &apos; &apos;
+);
+
+console.log(word.toString());</code></pre>
+
+<p>ここでは否定形が欲しいので、Anyプロパティーを<code>add()</code>してから上記カテゴリーを<code>remove()</code>していく。最終的には特別視される<code>-</code>と<code> </code>もここでついでに削除しておく。gfmtocでは<a href="https://github.com/hail2u/node-gfmtoc/blob/master/lib/regexp-word.js">生成結果をファイルに保存したもの</a>をライブラリとして使っている。普通はそのまま書けば良い(毎回動的に生成させるととても遅いことには注意が必要)。あとはHTML Pipelineがやっていることをなぞるのみだ。</p>
+
+<ol>
+<li>小文字に変換</li>
+<li><code>\p{Word}</code>と<code>-</code>、<code> </code>(半角空白)以外を削除</li>
+<li>半角空白を<code>-</code>に置換</li>
+<li>IDが被らないように数字を追加</li>
+</ol>
+
+<p>HTML Pipelineではこのような<a href="https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb">生成手順</a>になっているようだ。</p>
+
+<pre><code class="language-javascript">var h = {};
+
+function genID(s, h) {
+  var u = &apos;&apos;;
+  var word = /.../g;
+  s = s.toLowerCase();
+  s = s.replace(word, &apos;&apos;);
+  s = s.replace(/ /g, &apos;-&apos;);
+
+  if (h[s] &gt; 0) {
+    u = &apos;-&apos; + h[s];
+  }
+
+  if (!h[s]) {
+    h[s] = 0;
+  }
+
+  h[s] += 1;
+
+  return s + u;
+}</code></pre>
+
+<p>確認した限りではうまくいっているようだ。<code>id</code>属性の値として使う場合はこのままで問題ないが、<code>href</code>属性の値として使う場合は<code>encodeURIComponent()</code>でURLエンコードしてやることを忘れない方が良い……ような気がするけど、最近のブラウザーはカシコイのでどっちでも良さそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

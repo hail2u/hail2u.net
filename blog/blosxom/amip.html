@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>amip plugin</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/amip.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="久々にプラグインを書いてみる。とはいうものの凝ったことをしていない単純至極なもの。AMIPというWinampやApolloで使えるプラグインを利用して、再生中の曲を適当なデータファイルにし、それをパースして表示するプラグイン。amipというそのまんまな名前を付けてみる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="久々にプラグインを書いてみる。とはいうものの凝ったことをしていない単純至極なもの。AMIPというWinampやApolloで使えるプラグインを利用して、再生中の曲を適当なデータファイルにし、それをパースして表示するプラグイン。amipというそのまんまな名前を付けてみる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="amip plugin" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-02-24T01:59:37+09:00">2004年2月24日</time></p>
+
+        <h1><em>amip plugin</em></h1>
+      </header>
+
+    <main>
+
+    <p>久々にプラグインを書いてみる。とはいうものの凝ったことをしていない単純至極なもの。<a href="http://amip.tools-for.net/" title="AMIP The Best &quot;now-playing&quot; plug-in for Winamp 2, Winamp 3, Foobar 2000(fb2k), QCD, Apollo">AMIP</a>という<a href="http://winamp.com/" title="WINAMP.COM | You are reluctant and angry">Winamp</a>や<a href="http://koti.welho.com/hylinen/apollo/" title="Apollo - Sound quality is not skinnable.">Apollo</a>で使えるプラグインを利用して、再生中の曲を適当なデータファイルにし、それをパースして表示するプラグイン。<a href="/amip_old.txt" title="amipプラグイン">amip</a>というそのまんまな名前を付けてみる。</p>
+<p>最初はJavaScript includeで作ったんですけど、後々いろいろ出来そうな気がするので、blosxomのプラグインにしてみました。</p>
+<p>AMIP側で利用するテンプレートは、</p>
+<pre>stat=Now listening to
+artist=%1
+title=%2
+track=%3
+album=%4
+year=%5
+comment=%6
+genre=%7</pre>
+<p>で、データファイルは、</p>
+<pre>stat=Now listening to
+artist=Nina Gordon
+title=Badway
+track=4
+album=Tonight And The Rest Of My Life
+year=2000
+comment=
+genre=Rock</pre>
+<p>こうなります。プラグインはこれを適当にパースして、エンティティ変換するだけ。こんな感じになってます。</p>
+<p><a href="http://www.oddsock.org/tools/dosomething/" title="ODDSOCK.org　-Do Something">Do Something</a>でID3v2が読めなくて嵌まったのは秘密。</p>
+<p>コメントにASINコードを入れて、<a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>と連携させよう。・・・そのうちね。</p>
+<section>
+<h2>追記</h2>
+<p>書き忘れてましたが、Winampだとまるで問題なく動くのですが、ApolloなどではDDEの不具合からハングしたりします。公式サイトにTopicがあり、</p>
+<pre>[Advanced mIRC Integration Plug-In]
+CFG_MAPPING=1</pre>
+<p>としろとの事で、これでApolloで問題なく動いてます。Apolloのプラグイン・ディレクトリにplugin.iniというファイルを作って、それに上記にように記述すればOK。</p>
+<p>それと、FTPでのアップロードですが、「<a href="http://curl.haxx.se/" title="cURL and libcurl">cURL</a>使え」とかHelpには書いてありますが、コマンドラインで使えるものならなんでもOKなので、<a href="http://cgi19.plala.or.jp/lukewarm/" title="ぬる℃家">LFU</a>とかが良いかも。ftp.exeとかでも大丈夫だとは思いますが、スクリプト書くのメンドウ・・・。</p>
+</section>
+<section>
+<h2>追記</h2>
+<p><code>%stat</code>で停止や終了状態なんかを取れるかと思ったら取れなかったので、サクサク調べていたら、Play/Pause/Stop/Exitそれぞれの時にコマンドを実行することもできるようです。設定ダイアログに無く、Helpにも更新履歴のところにちょこっとかいてあるだけだったので、わかりづらかった・・・。plugin.iniを開くと、</p>
+<pre>CFG_EXITCB=&quot;&quot;</pre>
+<p>とかあるので、DDE_STRINGとかからコピペすれば良いみたいです。</p>
+<pre>stat=Now listening to
+artist=%1
+title=%2
+track=%3
+album=%4
+year=%5
+comment=%6
+genre=%7</pre>
+<p>終了・停止時のテンプレートはこんなんにしてます。</p>
+<p>てか、テンプレートの書き方を調べてたら、正規表現で条件分岐できたり、かなり強力なことがわかりました。かなり遊べそうな予感。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>伝言ゲーム化するバグ報告</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/bug-reporting-telephone-game.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="伝言ゲーム化するバグ報告" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-03-12T14:27:20+09:00">2015年3月12日</time></p>
+
+        <h1><em>伝言ゲーム化するバグ報告</em></h1>
+      </header>
+
+    <main>
+
+    <p>小さく作って組み合わせていくというやり方は、作る方からすると理にかなっている。自分の必要とする機能を実現するコードだけを書けば済むようになるからだ。使う方からしてもパッケージ・マネージャーがそれなりに動作すればさほど問題になることはない。ただバグを見つけた時に伝言ゲームになりやすいという問題がある。</p>
+
+<p>小さく作っていく関係上、多くの場合はそういったライブラリー達をうまくラップしたものがエンド・ユーザーには使われる。具体的には以下のような構成になっていることだろう。</p>
+
+<ol>
+<li>標準仕様のみを正確に実装したライブラリー</li>
+<li>1を限定的に扱うライブラリー</li>
+<li>2を利用した単機能ライブラリー</li>
+<li>3を複数扱うラッパー・ライブラリー</li>
+</ol>
+
+<p>4を使っている人がバグを見つけた場合、当然4に報告する。4の開発者がどうも3に原因があるらしいと判断した場合、3へ報告される。以下、3の開発者が2へ、2の開発者が1へ、と必要ならばバグは伝言ゲームのように伝わっていくことだろう。途中でバグの内容がうまく伝わらなくなり、戻ってきたりすることもある(それで良いことももちろんあるが)。または途中の開発者が忙しかったり、もう開発を投げていたりすると、1などの上流へバグが伝わらないこともある。</p>
+
+<p>つまり、バグ報告に正確さが欠けやすいという問題と、上流のモジュールにバグ報告が到達しづらいという問題がある。これらの問題を避けるためには、なるべく上流にバグ報告をする必要があるが、それをしてしまうとせっかく小さい単位で作っている意味が少なくなってしまう。小さく作ることの目的のひとつに、自分で書いたコード以外におけるバグの調査を他に投げられることがあるはずだからだ。</p>
+
+<p>上流に直接報告することが難しいとなると、いかにこのバグ報告という伝言ゲームを途切らせないかが重要になる。すなわち、小さなライブラリーで構成される世界では、ライブラリーを選択する際、その歴史的な評価よりも開発の活発さの方が重要な要素になりうるということだ。上流へ速やかにバグが伝わり、下流へきちんとその修正が流れてくれば、開発者がアドホックな対策に追われる必要はなくなる。この流れが途切れないようにするためには開発の活発さが重要になるというわけだ。</p>
+
+<hr>
+
+<p>単純にコミットのペースだけではなく、週に閉じられたイシューの数やプル・リクエストが立ってからの反応の早さなどでも開発の活発さを計ることができるだろう。むしろ後者の方が重要かもしれない。パッケージ・リポジトリーでの人気だけではなく、こういった点もライブラリーを選択する参考にすると良さそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

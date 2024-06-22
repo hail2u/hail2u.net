@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>::first-letterをぶら上げる</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/hanging-first-letter.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ぶら上げるってなんだ。段落の一文字目だけを左に飛び出して配置するというテキスト・レイアウトの話。margin-leftプロパティーで負の値を使っても良いのだけど、文字によって要調整なので面倒くさい。position: absoluteを使う場合は、親でposition: relativeが必須になるのでこれもちょっとアレ。他にもいくつかあったと思うけど、floatとmargin-right: 100%を組み合わせて行うのが一番位置合わせが簡単になる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ぶら上げるってなんだ。段落の一文字目だけを左に飛び出して配置するというテキスト・レイアウトの話。margin-leftプロパティーで負の値を使っても良いのだけど、文字によって要調整なので面倒くさい。position: absoluteを使う場合は、親でposition: relativeが必須になるのでこれもちょっとアレ。他にもいくつかあったと思うけど、floatとmargin-right: 100%を組み合わせて行うのが一番位置合わせが簡単になる。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/hanging-first-letter.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="::first-letterをぶら上げる" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-06-27T15:09:43+09:00">2012年6月27日</time></p>
+
+        <h1><em>::first-letterをぶら上げる</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="各段落の最初の位置文字をドロップキャップにしてアウトデントするというテキスト・レイアウト、たまに見る……よね？。" height="270" src="/img/blog/hanging-first-letter.png" width="480">
+</figure>
+
+<p>ぶら上げるってなんだ。段落の一文字目だけを左に飛び出して配置するというテキスト・レイアウトの話。<code>margin-left</code>プロパティーで負の値を使っても良いのだけど、文字によって要調整なので面倒くさい。<code>position: absolute</code>を使う場合は、親で<code>position: relative</code>が必須になるのでこれもちょっとアレ。他にもいくつかあったと思うけど、<code>float</code>と<code>margin-right: 100%</code>を組み合わせて行うのが一番位置合わせが簡単になる。</p>
+
+<p>Demo: <a href="/test/424.html">Hanging <code>:first-letter</code></a></p>
+
+<p>英文ではメジャーなドロップキャップをアウトデントするもの。たまに見る気がするけど気のせいな気もする程度のタイポグラフィー知識……。</p>
+
+<pre><code class="language-css">.test::first-letter {
+  margin-right: 100%;
+  margin-bottom: -999em;
+  float: right;
+  line-height: 1;
+}</code></pre>
+
+<p><code>float: right</code>と<code>margin-right: 100%</code>を使ってまず飛び出させる。ここで<code>float: left</code>だと<code>margin-left</code>プロパティーで負の値を使うのと同じく要調整になるので意味ない。このままでは一文字分上にずれるので<code>margin-bottom</code>プロパティーで一文字分……と思いきやIE9(多分それ以前も)でバグ(後述)があるので大雑把に<code>-999em</code>を指定して戻して揃える(一定以上は下に落ちないのでちゃんと揃う)だけ。親の<code>line-height</code>プロパティーの値を引きずらないように<code>line-height: 1</code>にするのは忘れないようにする。このままだと味も素っ気もないので、フォントを変えて大きくしたり<code>padding-right</code>プロパティーで本文との間を調節したりするとデモのような形になる。<code>text-align: right</code>も入れておいた方が良いかも。</p>
+
+<p>日本語の文章でドロップキャップは使わないことがほとんどなのでこのまま使うことはあまりないけど、擬似要素をぶら上げる時とかにも応用できてたまに使ってる。とにかく<code>float: right</code>と<code>margin-right: 100%</code>(またはその逆)の組み合わせがレイアウトに使えるという話なので、頭の隅にいれておくと結構な頻度で役に立つ。そして新しいイマドキなレイアウトを覚えず済ませることが多く……。</p>
+
+<hr>
+
+<p>IE9でのバグは<code>::first-letter</code>での<code>em</code>単位が親のフォントサイズを基準に計算されるというバグ。結構前からあるような気がする。</p>
+
+<pre><code class="language-css">p {
+  font-size: 20px;
+}
+
+p::first-letter {
+  margin-right: 1em;
+  font-size: 100px;
+}</code></pre>
+
+<p>そのためこう書くと<code>margin-right</code>が<code>20px</code>になってしまう。覚えていてもほとんど役に立たない割に忘れてると痛い目にあう知識。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

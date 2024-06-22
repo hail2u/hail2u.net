@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Amazonの画像置換</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/air.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="AWSで返された画像のURLとかAmazonのASINコードから09で類推した画像が、1*1の黒いGIF画像だった場合に、01で類推できるURL無理やり置換してみる実験。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="AWSで返された画像のURLとかAmazonのASINコードから09で類推した画像が、1*1の黒いGIF画像だった場合に、01で類推できるURL無理やり置換してみる実験。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Amazonの画像置換" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-04-01T13:13:16+09:00">2004年4月1日</time></p>
+
+        <h1><em>Amazonの画像置換</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html" title="Amazon Webサービス">AWS</a>で返された画像のURLとかAmazonのASINコードから09で類推した画像が、1*1の黒いGIF画像だった場合に、01で類推できるURL無理やり置換してみる実験。</p>
+<p>通常Amazon.co.jpの画像は、ASINコードがB00009LVXTだと、</p>
+<pre>https://m.media-amazon.com/images/P/B00009LVXT.jpg</pre>
+<p>となります。しかしながら、このASINの商品は輸入物なので、実際は、</p>
+<pre>https://m.media-amazon.com/images/P/B00009LVXT.jpg</pre>
+<p>です(ASINに続く数字が09ではなく01で、それ以外は固定)。</p>
+<p>また、Amazon Web Services Discussion Boardには、こういった実際には画像が無いURLの場合に「画像が無いよ」画像を返すJavaScriptが投稿されています。</p>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/B00009LVXT.jpg&quot;
+  onload=&quot;if(this.width==&apos;1&apos;) this.src=&apos;/images/no-image.jpg&apos;&quot; /&gt;</code></pre>
+<p>こんなんなっているので、これをHackして無理やり置換してみようとかいう。</p>
+<pre><code class="language-html">&lt;img src=&quot;https://m.media-amazon.com/images/P/B00009LVXT.jpg&quot;
+  onload=&quot;if(this.width==&apos;1&apos;) this.src=this.src.replace(&apos;.09.&apos;,&apos;.01.&apos;)&quot; /&gt;</code></pre>
+<p>こんなんでどうよ？</p>
+<p>「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合はどうするのよ？」とかアレな罠がありますが、<code>onload</code>イベントはJavaScriptで<code>src</code>を書き換えたあとの読み込み終了でも起きる(と思う)ので、うまくJavaScriptコードを書いてやれば、「09で類推できるURLと01で類推できるURLのどちらにも画像がなかった場合は画像が無いよ画像を返す」とかも可能な気がする。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

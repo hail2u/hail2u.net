@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>pre要素での折り返し</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/wrapping-in-pre-element.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="長らくpre要素で折り返されるようにしていたが、少し前に折り返さずにスクロールバーを表示するように変更した。主な理由は狭い画面では折り返されると読めたものではないということがはっきりとわかったからだ。しかしそこそこ広い画面では折り返された方が読みやすいし、見た目の収まりも良い。つまりメディアクエリでうまいこと分岐すると良いようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="長らくpre要素で折り返されるようにしていたが、少し前に折り返さずにスクロールバーを表示するように変更した。主な理由は狭い画面では折り返されると読めたものではないということがはっきりとわかったからだ。しかしそこそこ広い画面では折り返された方が読みやすいし、見た目の収まりも良い。つまりメディアクエリでうまいこと分岐すると良いようだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="pre要素での折り返し" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-10-09T22:44:27+09:00">2014年10月9日</time></p>
+
+        <h1><em>pre要素での折り返し</em></h1>
+      </header>
+
+    <main>
+
+    <p>長らく<code>pre</code>要素で折り返されるようにしていたが、少し前に折り返さずにスクロールバーを表示するように変更した。主な理由は狭い画面では折り返されると読めたものではないということがはっきりとわかったからだ。しかしそこそこ広い画面では折り返された方が読みやすいし、見た目の収まりも良い。つまりメディアクエリでうまいこと分岐すると良いようだ。</p>
+
+<p>このウェブサイトではコンテンツが収まるような幅という基準でレイアウトを切り替えているので、<code>pre</code>要素への折り返しの適用もそこで分岐することにした。</p>
+
+<pre><code class="language-css">pre {
+  overflow-x: auto;
+}
+
+@media (min-width: 39.118rem) {
+  pre {
+    overflow-x: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}</code></pre>
+
+<p>このようにするとデフォルトでは<code>overflow-x: scroll</code>によって横スクロールで表示させるようになる(ブラウザーとOSによってはスクロールバーが表示される)。<code>39.118rem</code>(色々な計算に基づくものなので中途半端な数字になっている)を超えると、<code>overflow-x</code>プロパティーが規定値の<code>visible</code>に戻り、<code>white-space</code>と<code>overflow-wrap</code>プロパティーによりURLのような折り返されにくい文字列も含め折り返されるように変化する。</p>
+
+<hr>
+
+<p>モバイル機器では横スクロールは自然に行える作業なので、横にはみ出していたら横にスワイプするというのはもはやユーザーも学習しえたのではないかと思う。<a href="/blog/webdesign/horizontal-overflowed-navigation.html">Appleのウェブサイトでグローバル・ナビゲーションに採用されたこと</a>も後押ししてくれる。と、思う。</p>
+
+<p>そう考えて横スクロールを強制する形にした(戻した)のだけど、<code>overflow-x</code>により横スクロールバーが表示されると非常にうっとうしいことも思い出した。特にWindowsではいまだ自動非表示スクロールバーに確実にする方法が無いので、読み進める方向と直交する方向にUIウィジェットがどっかと居座るのはかなり厳しい。</p>
+
+<p>それぞれに向いた表示を両立するためには、メディアクエリで適切に分岐するのが良いのではないかと考えてこうしてみた。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

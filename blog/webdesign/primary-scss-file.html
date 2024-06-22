@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>プライマリSCSSファイル</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/primary-scss-file.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Sassでは@importをうまく使うと、SCSSファイルを目的別に整理して管理することができます。モジュール化できるということですね。プライマリSCSSファイルとは僕が勝手に付けた呼称ですが、つまり各モジュールを読み込むだけのSCSSファイルのことです。グローバルに使用する変数の設定ファイルなども含めて整理して、プライマリSCSSファイルではそれらを読みこむだけとしておくと管理が少し楽になるんじゃないかと。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Sassでは@importをうまく使うと、SCSSファイルを目的別に整理して管理することができます。モジュール化できるということですね。プライマリSCSSファイルとは僕が勝手に付けた呼称ですが、つまり各モジュールを読み込むだけのSCSSファイルのことです。グローバルに使用する変数の設定ファイルなども含めて整理して、プライマリSCSSファイルではそれらを読みこむだけとしておくと管理が少し楽になるんじゃないかと。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="プライマリSCSSファイル" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-12-11T02:02:28+09:00">2011年12月11日</time></p>
+
+        <h1><em>プライマリSCSSファイル</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://sass-lang.com/">Sass</a>では<code>@import</code>をうまく使うと、SCSSファイルを目的別に整理して管理することができます。モジュール化できるということですね。プライマリSCSSファイルとは僕が勝手に付けた呼称ですが、つまり各モジュールを読み込む<em>だけ</em>のSCSSファイルのことです。グローバルに使用する変数の設定ファイルなども含めて整理して、プライマリSCSSファイルではそれらを読みこむだけとしておくと管理が少し楽になるんじゃないかと。</p>
+
+<p>このWebサイトのプライマリSCSSファイルは以下のようなものです。</p>
+
+<pre><code class="language-scss">$version: "6.10.21";
+
+/*!
+ * style.css v#{$version}
+ *
+ * LICENSE: http://hail2u.mit-license.org/2011
+ */
+
+// Web Fonts
+@import url("http://fonts.googleapis.com/css?family=Terminal+Dosis");
+
+// Variables
+@import "vars";
+
+// Partials
+@import "normaliz", "clearfix", "vendor-extension";
+
+// Styles
+@import "basics", "layout", "widget", "forprint";</code></pre>
+
+<p>短いですね！</p>
+
+<section>
+<h2><code>/*!...*/</code>を使ったコメントの保護と変数のインターポレーション</h2>
+
+<p><code>/*!...*/</code>を使うと出力形式として<code>compressed</code>を指定していても、出力CSSにコメントを残すことができます。バージョン番号やライセンス情報など出力CSSにも必要なものはこれを使って保護すると良いでしょう。</p>
+
+<p>また<code>/*!...*/</code>の中ではSassの変数を展開(インターポレーション)することが可能です。上記例ではバージョン番号を変数として定義しておき、コメント内で<code>#{$version}</code>とすることによって展開させています。この例はあまり意味がない感じですけど……。</p>
+</section>
+
+<section>
+<h2>CSSの<code>@import</code>ルール</h2>
+
+<p>CSSの<code>@import</code>ルールはCSSの最初にあらゆるCSSルールに先駆けて記述しなくてはならないので、プライマリSCSSファイルに書く必要があります。Sassを使う場合CSSの<code>@import</code>ルールが必要となるケースはあまりないですが、上記例のように<a href="http://www.google.com/webfonts">Google Web Fonts</a>の読み込みなどで使ったりもします。</p>
+</section>
+
+<section>
+<h2>変数定義ファイル</h2>
+
+<p>他の人が作ったSCSS partialsなどを利用する場合、そのpartial向けに設定を行う必要が出てくることがあります。Sassの仕様上、partialを読み込む前に変数設定を行わなければならないので、変数定義ファイルはそれらpartialの読み込みより前で読み込まないとなりません。</p>
+
+<p>partialでユーザーの定義した変数による設定を可能にする<code>!default</code>については数日後に<a href="http://atnd.org/events/21919">LESS &amp; Sass Advent calendar 2011</a>で書きます。</p>
+</section>
+
+<section>
+<h2>SCSS partials</h2>
+
+<p>次に自分や他人が作ったSCSS partialを読み込みます。SCSSの<code>@import</code>ではカンマで区切って複数のパラメーターを取ることができるので、まとめて一気に読み込んでも良いでしょう。</p>
+</section>
+
+<section>
+<h2>自分で書くSCSSファイル</h2>
+
+<p>最後に自分で書くSCSSファイルを読み込みます。僕は<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_basics.scss">基本的な装飾</a>と<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_layout.scss">レイアウト</a>、そして<a href="https://github.com/hail2u/hail2u.net-styles/blob/master/_widget.scss">局所的に使うウィジェット</a>という3つに分けて管理しています。これらに加えて印刷向けのスタイルも<code>@import</code>で読み込んでいますが、これはあまり真似しないほうが良いでしょう。</p>
+</section>
+
+<hr>
+
+<p>実際に全てのケースでこう細かくモジュール化する必要があるわけではありません。例えば変数が数個しかないのならプライマリSCSSファイルに直接書いても良いでしょう。自分で書くスタイルも数10行程度ならそれもプライマリSCSSファイルに書いた方が編集効率が上がるかもしれませんね。</p>
+
+<p>partialはもうライブラリと呼ぶことにしようかな……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

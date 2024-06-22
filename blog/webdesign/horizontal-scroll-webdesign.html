@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>横スクロールのサイトデザイン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/horizontal-scroll-webdesign.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="横スクロールで閲覧するサイトを作りたくなったので、iine!をそうしてみた。ブラウザが横幅8000px以上ならスクロールせずに見ることができる。Ch9とFx3.6、Sf5、Op11、IE8で確認した限りでは特に問題なさそう。手探りでHTMLとCSSを組んだのでdivがものすごく多い。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="横スクロールで閲覧するサイトを作りたくなったので、iine!をそうしてみた。ブラウザが横幅8000px以上ならスクロールせずに見ることができる。Ch9とFx3.6、Sf5、Op11、IE8で確認した限りでは特に問題なさそう。手探りでHTMLとCSSを組んだのでdivがものすごく多い。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="横スクロールのサイトデザイン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-01-17T18:03:07+09:00">2011年1月17日</time></p>
+
+        <h1><em>横スクロールのサイトデザイン</em></h1>
+      </header>
+
+    <main>
+
+    <p>横スクロールで閲覧するサイトを作りたくなったので、iine!をそうしてみた。ブラウザが横幅8000px以上ならスクロールせずに見ることができる。Ch9とFx3.6、Sf5、Op11、IE8で確認した限りでは特に問題なさそう。手探りでHTMLとCSSを組んだので<code>div</code>がものすごく多い。</p>
+
+<section>
+<h2>コンテンツを縦方向にセンタリング</h2>
+
+<p>横スクロールさせる場合、縦方向のセンタリングしておくとおさまりが良い。また視線移動もある程度抑えられると思うので、上に寄っているよりは読みやすくなりそう。CSSによる実装にはいくつか方法があるが、一番明快な<code>display: table;</code>と<code>display: table-cell;</code>を利用したテクニックを使った。</p>
+
+<pre><code class="language-css">html {
+  height: 100%;
+  display: table;
+}
+
+body {
+  height: 100%;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#wrapper {
+  height: 424px;
+}</code></pre>
+
+<p>ブラウザの描画領域全体まで拡大させた<code>body</code>をテーブルのセルにして、コンテンツ全体を<code>.wrapper</code>でくくりセンタリングする。あまり<code>display</code>を使ってレイアウトを誤魔化すのは好きではないので別のやり方でやりたい。</p>
+</section>
+
+<section>
+<h2>ヘッダとフッタをスクロールさせない</h2>
+
+<p>普通の縦スクロールのサイトの場合は<kbd>Home</kbd>と<kbd>End</kbd>でヘッダとフッタに到達できるが、横スクロールの場合は到達できない。そのためフッタはともかくホームページに戻ったりナビゲーションがあったりするヘッダは常に表示された方が良さそう。最初は難しく考えてしまいうまくいかなかったが、普通に<code>position: fixed;</code>を使うだけだった。</p>
+
+<pre><code class="language-css">#wrapper #header {
+  position: relative;
+}
+
+/* ロゴ */
+#wrapper #header h1 {
+  margin: 8px;
+  position: fixed; /* 左寄せなのでtopとleftは不必要 */
+  width: auto;
+  height: 16px;
+  line-height: 16px;
+}
+
+/* フィードやTwitterのリンク */
+#wrapper #header ul {
+  margin: 8px;
+  position: fixed;
+  right: 0; /* 右寄せ */
+  width: auto;
+  height: 16px;
+  line-height: 16px;
+}</code></pre>
+
+<p><code>#header</code>への<code>position: relative;</code>はなくても大丈夫だったが、なぜなくても良いのかわからなかったので入れておいた。<code>display: table-cell;</code>とかの絡みで何か変わるんだろか。</p>
+
+<p>ここではヘッダを中央付近に固定したが、コンテンツの高さが不定な普通のブログ等の場合はヘッダとフッタを<code>#wrapper</code>外に置き、そこでヘッダ(フッタ)ごと<code>position: fixed;</code>で描画領域の上端(下端)に固定するのが良さそう。</p>
+</section>
+
+<section>
+<h2>各エントリの横並べ</h2>
+
+<p><code>float: left;</code>でひたすら並べる。ただそれだとブラウザの横幅で折り返されてしまうので、各エントリを括る<code>#contents</code>を作り、その横幅を770px (エントリの横幅)*10(1ページに表示するエントリ数)+αにして折り返されないようにする。</p>
+
+<pre><code class="language-css">/* インデックス・ページ用 */
+#wrapper #contents {
+  width: 7860px;
+  height: 200px;
+}
+
+/* エントリ個別のページ用 */
+#wrapper #contents.individual {
+  margin: 0 auto;
+  width: 930px;
+}
+
+#wrapper #contents .section {
+  float: left;
+  width: 770px;
+}</code></pre>
+
+<p>αはページング・ナビゲーションのために確保。エントリ個別のページでは1つのエントリをセンタリングして表示するように<code>#contents</code>の幅を制限し、<code>margin</code>でセンタリングしている。</p>
+</section>
+
+<section>
+<h2>横スクロールバーを常に表示させる</h2>
+
+<p>インデックス・ページからエントリ個別のページに飛ぶとスクロールバーの有無で縦方向の位置がずれることへの対策。縦スクロールのサイトでも幅固定のコンテンツをセンタリングした場合にスクロールバーの有無でずれるので、多くのサイトで<a href="http://www.splintered.co.uk/experiments/49/">pixel pushing</a>という古くからあるテクニックが使われている。横スクロールのサイトでも考え方は同じで、<code>margin-bottom</code>の代わりに<code>margin-right</code>を使えば良い。</p>
+
+<pre><code class="language-css">html {
+  margin-right: 1px;
+  width: 100%;
+}</code></pre>
+
+<p>Webkit系やIEならエントリ個別のページでスクロールバーを見えない色合いにしてしまえばすっきりするかもしれない。</p>
+</section>
+
+<hr>
+
+<p>縦方向のホイールスクロールで横にスクロールするような仕組みは必要だと思うので、後でjQueryででも作っておきたい。<code>direction</code>や<code>writing-mode</code>などを使えばCSSだけでもなんとかできそうな気がしないでもない(根拠なし)。あ、<code>transform</code>で全体を反時計回りに90度回転させればいけそう(そんなわけはない)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

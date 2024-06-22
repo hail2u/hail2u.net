@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Webフォントの非同期読み込み</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/async-web-font-loader.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Webフォントの読み込みは@importだと色々まずいので、主にlink要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Webフォントの非同期読み込み" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-12-25T13:14:38+09:00">2013年12月25日</time></p>
+
+        <h1><em>Webフォントの非同期読み込み</em></h1>
+      </header>
+
+    <main>
+
+    <p>Webフォントの読み込みは<code>@import</code>だと色々まずいので、主に<code>link</code>要素を使って並列に読み込むわけだけど、これもまた貴重なHTTPリクエスト数を消費するとか、CSSのパース完了が少し遅れるなどあって、完璧な解というわけじゃない。それを非同期にWebフォント定義の含まれるCSSファイルを読み込むようにして、Webフォントのロードをページのレンダリングと並行して行わせるのはどうか、という試み。</p>
+
+<p>非同期化することによりWebフォント定義の含まれるCSSファイルのリクエストとパースが、ページのレンダリングと並行して行われるようになる。<code>head</code>要素内で<code>link</code>要素を直接書いた場合は、Webフォント定義の含まれるCSSのリクエストとパース後にページのレンダリングが始まることが多いので、体感速度(ページのレンダリングの開始までの所要時間)は向上する可能性が高い。</p>
+
+<section>
+<h2>動的なlink要素の追加</h2>
+
+<p>いわゆるソーシャル・ボタンのやっている動的な<code>script</code>要素の追加と同じ手法。</p>
+
+<pre><code class="language-javascript">(function (d, f) {
+  var l = d.createElement(&apos;link&apos;);
+  l.rel = &apos;stylesheet&apos;;
+  l.href = f;
+  var s = d.getElementsByTagName(&apos;script&apos;)[0];
+  s.parentNode.insertBefore(l, s);
+})(document, &apos;http://example.com/font/foo.css&apos;);</code></pre>
+
+<p><code>script</code>要素の代わりに<code>link</code>要素を作って突っ込む。置く場所は<code>head</code>要素の最後がベストだと思う。複数のWebフォントへの対応は要改善。</p>
+</section>
+
+<section>
+<h2>rel=&quot;stylesheet&quot;の後付け</h2>
+
+<p>とりあえずWebフォントのURLを<code>link</code>要素として仕込んでおいて、後で<code>rel=&quot;stylesheet&quot;</code>を追加させることにより非同期化する手法。</p>
+
+<pre><code class="language-html">&lt;link
+  href=&quot;http://example.com/font/foo.css&quot;
+  class=&quot;async-web-fonts&quot;&gt;
+&lt;script&gt;
+  (function () {
+    var webfonts = document.querySelectorAll(&apos;link.async-web-fonts&apos;);
+
+    for (var i = 0, l = webfonts.length; i &lt; l; i++) {
+      webfonts[i].rel = &apos;stylesheet&apos;;
+    }
+  })();
+&lt;/script&gt;</code></pre>
+
+<p><code>rel=&quot;stylesheet&quot;</code>がなければ読みに行かないので、これでも非同期になる。複数のWebフォントのURLを参照するようなケースでも拡張しやすい。見た感じのままDOM操作を最小限に抑えられているけど、総合的なパフォーマンスは動的に<code>link</code>要素を突っ込むのとさほど変わらなそう。単体のJavaScriptファイルとして切り出せないのが欠点。</p>
+
+<hr>
+
+<p>ただし、どちらの非同期読み込み手法でもフォントの読み込み中は他のフォントで表示されるので、<a href="/blog/webdesign/fout.html">FOUT</a>を強制するということになる。フォントのロード完了後にすり替える実装をこのウェブサイトで採用していた時に同じ様にFOUTを強制していて、無視できない程度の数の気になる・戻して欲しいといった意見を貰ったので、この非同期読み込みも採用は慎重に行った方が良さそう。</p>
+
+<p>問題の系統としては、ソーシャルボタンのスクリプトを非同期読込させてページの表示までの速度は上がったけど、遅れて実行されるスクリプトのせいでスクロールがつっかかって悪影響みたいなのとちょっと似てる。こういったページの読み込み速度という面からのみの調整だと漏れてしまう事象について、ユーザーテスト以外のテスト手法があると良いとよく考える。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

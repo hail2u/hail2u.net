@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>セクション内見出しへの通し番号の追加</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/adding-counters-to-heading-inside-section.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="普通のHTMLの書き方では目次にol要素を使っ(てしまっ)たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、counters()による連結だけでいけるかと考えたが、うまくいかなかった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="普通のHTMLの書き方では目次にol要素を使っ(てしまっ)たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、counters()による連結だけでいけるかと考えたが、うまくいかなかった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="セクション内見出しへの通し番号の追加" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-08-02T09:42:56+09:00">2018年8月2日</time></p>
+
+        <h1><em>セクション内見出しへの通し番号の追加</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/documents/html-best-practices.html">普通のHTMLの書き方</a>では目次に<code>ol</code>要素を使っ(てしまっ)たが、対応する見出しには番号がない。これはあまり良くなさそうだが、文字列として追加するのも何だな……とCSSでやろうとしていた。ひとつのカウンターを作って、<code>counters()</code>による連結だけでいけるかと考えたが、うまくいかなかった。</p>
+
+<p>セクションのレベルごとに<code>couter()</code>を作る、というのが結論だ。<code>counters()</code>はこのケースでは利用できない、というよりもほぼリスト系のためだけに存在することがわかった。</p>
+
+<section>
+<h2><code>counters()</code>の利用</h2>
+
+<p>対象のHTML文書では、<code>section</code>と<code>h1</code>要素のみというストイックな記述になっている。そのため<code>section</code>要素でリセットして、<code>h1</code>要素でインクリメントすれば良いだろうと、まずは以下のように書いた。</p>
+
+<pre><code class="language-css">section {
+  counter-reset: section;
+}
+
+section h1::before {
+  content: counters(section, &quot;.&quot;) &quot;. &quot;;
+  counter-increment: section;
+}</code></pre>
+
+<p>これだとすべての見出しに「1.」や「1.1.」が付く。当たり前だが<code>section</code>要素ごとにリセットされるからだ。このパターンは<code>ol</code>と<code>li</code>要素のような構造ではうまく振られる。</p>
+</section>
+
+<section>
+<h2><code>counter-reset</code>の工夫</h2>
+
+<p>数字をリセットするタイミングが悪い、と勘違いした。そのため次はそれを制御しようと以下のように書いた。</p>
+
+<pre><code class="language-css">main,
+main &gt; section {
+  counter-reset: section;
+}
+
+section h1::before {
+  content: counters(section, &quot;.&quot;) &quot;. &quot;;
+  counter-increment: section;
+}</code></pre>
+
+<p>これだとカウンターとその利用がうまくマッピングされない。そのため「0.1」や「0.3」などセクションのネストを無視した連番になってしまう。</p>
+</section>
+
+<section>
+<h2>複数のカウンターの利用</h2>
+
+<p>落ち着いて考えると<code>counters()</code>で連番を振れるのはネストしあう要素同士だけで、それに含まれる要素へは無理だった。最後にたどり着いたのはカウンターを大見出しと小見出しでわける方法だ。</p>
+
+<pre><code class="language-css">main {
+  counter-reset: section;
+}
+
+main &gt; section {
+  counter-reset: subsection;
+}
+
+main &gt; section &gt; h1::before {
+  content: counter(section) &quot;. &quot;;
+  counter-increment: section;
+}
+
+main &gt; section &gt; section &gt; h1::before {
+  content: counter(section) &quot;.&quot; counter(subsection) &quot;. &quot;;
+  counter-increment: subsection;
+}</code></pre>
+
+<p><code>section</code>要素がある分、<code>h1</code>や<code>h2</code>要素でフラットな構造を持つ場合と違って複雑になるが、これでうまく振れる。</p>
+</section>
+
+<hr>
+
+<p>結局は採用を見送ったので、もはやどうでも良い話だ。頭の体操と仕様を見直すきっかけにはなった。</p>
+
+<p>CSSのカウンターは、CSS2時代から存在するが、Internet Explorer 6などで実装されなかったので日の目を見なかった。ChromeやFirefoxでのサポートで一瞬脚光を浴びたが、同時に使いどころがあまりないことも判明してしまい、そのまま忘れ去られたのだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

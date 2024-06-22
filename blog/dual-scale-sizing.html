@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>2値基準のサイズ決め</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/dual-scale-sizing.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="黄金比を始めとした固定比によるサイズ決めは、SassやCSS Custom Propertiesによって一定の市民権を得たように思う。ただ黄金比(1.618)と1の間のサイズが欲しくなることも多い。例えば見出しのline-heightプロパティーの値だったり、フォーマット済みテキストの文字サイズだったり、だ。HTML版・普通のHTMLの書き方では固定比を1.7にして、それを1と1.25にかけ合わせていくというアプローチにした。最近よく使う手法で、僕の中ではDual Scale Sizingという名前で呼ばれている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="黄金比を始めとした固定比によるサイズ決めは、SassやCSS Custom Propertiesによって一定の市民権を得たように思う。ただ黄金比(1.618)と1の間のサイズが欲しくなることも多い。例えば見出しのline-heightプロパティーの値だったり、フォーマット済みテキストの文字サイズだったり、だ。HTML版・普通のHTMLの書き方では固定比を1.7にして、それを1と1.25にかけ合わせていくというアプローチにした。最近よく使う手法で、僕の中ではDual Scale Sizingという名前で呼ばれている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="2値基準のサイズ決め" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-07-24T13:10:29+09:00">2018年7月24日</time></p>
+
+        <h1><em>2値基準のサイズ決め</em></h1>
+      </header>
+
+    <main>
+
+    <p>黄金比を始めとした固定比によるサイズ決めは、SassやCSS Custom Propertiesによって一定の市民権を得たように思う。ただ黄金比(<code>1.618</code>)と<code>1</code>の間のサイズが欲しくなることも多い。例えば見出しの<code>line-height</code>プロパティーの値だったり、フォーマット済みテキストの文字サイズだったり、だ。<a href="/documents/html-best-practices.html">HTML版・普通のHTMLの書き方</a>では固定比を<code>1.7</code>にして、それを<code>1</code>と<code>1.25</code>にかけ合わせていくというアプローチにした。最近よく使う手法で、僕の中ではDual Scale Sizingという名前で呼ばれている。</p>
+
+<p><code>1</code>と<code>1.25</code>にそれぞれ<code>1.7</code>を掛ける(で割る)だけなので、以下のようにきれいにばらけた数値が生成される。</p>
+
+<pre>0.204   0.346   0.588   1.000   1.700   2.890   4.913
+    0.254   0.433   0.735   1.250   2.125   3.613   6.141</pre>
+
+<p>例えば<code>1.7</code>を通常の<code>line-height</code>プロパティーに使いつつ、<code>1.25</code>を見出しや整形済みテキストに使う。また整形済みテキストの文字サイズを<code>0.735rem</code>にしたり、表の枠線幅を<code>0.254rem</code>にしたりもする。ここに載っていない大きいサイズは、<code>17.748rem</code>(<code>1.25 * (1.7 ** 5)</code>)をサイドバーの幅に使い、<code>41.034rem</code>(<code>1 * (1.7 ** 7)</code>)をコンテンツの幅に使ったりする。</p>
+
+<p><code>margin</code>プロパティーでも<code>1</code>系を上下に、<code>1.25</code>系を左右に、と使い分けるのも良い。行間に伴う余白の微妙な不揃い感が、意図的に余白を作りだしているように変わる(気がする)。</p>
+
+<p>コンテキストで<code>1.7</code>固定比を調節するのも悪くないが、それだとせっかく排した主観に依存するように戻ってしまう。また、固定比を増やすと、ばらけ方がまちまちになり、「これくらいのサイズがほしい」という時にどれを使えばよいか直観的でなくなってしまう。この記事で書いてきたようにベースを増やすと、わかりやすく、そこそこ使い勝手の良い数値が手に入る。</p>
+
+<hr>
+
+<p>HTML版・普通のHTMLの書き方ではあまり真面目にCSSは書いていない。セレクターを見ればわかる。とにかく自動生成の手間をかけない都合上、<code>class</code>属性を排除したので、大きな制限があるからだ。ただできることはなるべくやってあげようとはした。</p>
+
+<pre><code class="language-css">main section h1 {
+  /* 3.913 = 4.913 - 1 */
+  margin-top: 3.913rem;
+  padding-top: 1rem;
+}</code></pre>
+
+<p><a href="/blog/webdesign/target-pseudo-class-and-padding-top.html"><code>:target</code>でやる手法</a>もお気に入りだが、このような形であらかじめ<code>padding-top</code>プロパティーを確保するのもお手軽だ。<code>calc()</code>と<code>var()</code>を使うともうちょっとかっこよく書ける。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

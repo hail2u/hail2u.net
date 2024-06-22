@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja"> 
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Resize Font Based on Content Width #4</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Cabin+Sketch:bold">
+    <style>
+      #tagline {
+        font-family: "Cabin Sketch", sans-serif;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+$(window).load(function () {
+  var start = $.now();
+
+  var t = $("#tagline");
+  var text = t.text();
+  var size = parseInt(t.css("font-size"));
+
+  var temp = $("<div/>").css({
+    "display":     "inline-block",
+    "visibility":  "hidden",
+    "position":    "absolute",
+    "top":         "0px",
+    "left":        "0px",
+    "font-family": t.css("font-family"),
+    "font-size":   size
+  }).text(text).appendTo("body");
+
+  var t_width = t.width();
+  var temp_width = temp.width();
+
+  do {
+    size *= (t_width / temp_width);
+    temp.css("font-size", size + "px");
+    temp_width = temp.width();
+  } while (temp_width < t_width);
+
+  size--;
+  t.css("font-size", size + "px");
+  temp.remove();
+
+  var time = $.now() - start;
+  $("body").append($("<p/>").text("Elapsed Time: " + time));
+});
+    </script>
+  </head>
+
+  <body>
+    <h1>Resize Font Based on Content Width #4</h1>
+
+    <p id="tagline">Make Things Simple.</p>
+
+    <p>コンテンツの幅に文章が納まるようにフォントサイズを変更する。幅計算のための要素をdisplay: none;ではなくvisibilityで隠す。</p>
+  </body>
+</html>

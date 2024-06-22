@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>夜間モード</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/night-mode.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブサイトを、夜(19から5時)の間は黒背景になるようにした。夜間モードかどうかは表示しないので、白かったり黒かったりするウェブサイトになった。通常は、モードを切り替えるボタン等を設置するが、日に何度も訪れるウェブサイトではないので、有無を言わさず適用することにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このウェブサイトを、夜(19から5時)の間は黒背景になるようにした。夜間モードかどうかは表示しないので、白かったり黒かったりするウェブサイトになった。通常は、モードを切り替えるボタン等を設置するが、日に何度も訪れるウェブサイトではないので、有無を言わさず適用することにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="夜間モード" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-09-11T00:15:23+09:00">2018年9月11日</time></p>
+
+        <h1><em>夜間モード</em></h1>
+      </header>
+
+    <main>
+
+    <p>このウェブサイトを、夜(19から5時)の間は黒背景になるようにした。夜間モードかどうかは表示しないので、白かったり黒かったりするウェブサイトになった。通常は、モードを切り替えるボタン等を設置するが、日に何度も訪れるウェブサイトではないので、有無を言わさず適用することにした。</p>
+
+<p>実装は、クラス名を追加する数行のJavaScriptと、カスタム・プロパティーだけを変える数行のCSSで行った。</p>
+
+<pre><code class="language-javascript">const currentHour = new Date().getHours();
+
+if (currentHour &lt; 5 || currentHour &gt; 18) {
+  document.documentElement.classList.add(&quot;night&quot;);
+}</code></pre>
+
+<p>ルート要素に<code>night</code>クラスを追加するだけの簡単なものだ。これを<code>head</code>要素内で同期的に実行しておくと、スムーズに切り替わるだろう。</p>
+
+<pre><code class="language-css">:root.night {
+  --color-fg: hsl(0, 0%, 88%);
+  --color-fg-near: hsl(0, 0%, 66%);
+  --color-fg-far: hsl(0, 0%, 33%);
+  --color-bg: hsl(0, 0%, 11%);
+  --color-accent: hsl(30, 100%, 44%);
+  --color-accent-near: hsl(30, 100%, 77%);
+  --color-accent-far: hsl(30, 100%, 33%);
+}</code></pre>
+
+<p>一方、CSSでは色を定義するカスタム・プロパティーを上書きする。このウェブサイトではすべての色をカスタム・プロパティーで集中管理しているので、これだけで黒背景に白い文字へ変更できる。</p>
+
+<p>将来は、ユーザーの環境をトリガーにしたメディア・クエリーだけで書けるはずだ。周辺光量を拾えるようにもなるので、昼から雨戸を閉めていて部屋が暗いというような場合にも適応できるかもしれない。</p>
+
+<section>
+<h2>夜間モードの必要性</h2>
+
+<p>夜間モードは、夜間の照明環境における目への負担を軽減することが目的だ。最近は多くのアプリケーション(やウェブアプリ、以下同様)で見かけるようになった。</p>
+
+<p>OSで提供される色の反転などは、ユーザーの抱える問題を画一的に解決する。それに対し、アプリケーションで提供される夜間モードは、<em>そのアプリケーションが夜間にのみ抱える問題</em>の解決策を提示する。結果と実装は似るか、同じだが、解決する問題が違う。</p>
+
+<p>また、夜間モードはそのアプリケーションに最適化した形で実装できるので、よりよい結果を提供できるかもしれない。色の反転では失われてしまうかもしれないコーポレート・カラーを維持することも不可能ではないはずだ。</p>
+
+<p>このように一定の効果が夜間モードには見込める。主に文書を扱うアプリケーションでは、採用を積極的に考えても良いだろう。</p>
+</section>
+
+<section>
+<h2>ウェブサイトでの振る舞い</h2>
+
+<p>多くのブラウザーがウェブページを読みやすくするリーダー・モードを持っているので、ウェブサイトではそれで十分かもしれない。しかし、リーダー・モードは主に<em>ウェブページが読みづらいため使われる機能</em>なので、ユーザーが使う時点でそのウェブページは何らかの問題を抱えている、と言える。ウェブサイトに最適化された夜間モードにより、問題がいくつか解決され、リーダー・モードが使われてしまう機会を減らせるかもしれない。</p>
+
+<p>また、アプリケーションと違い、ウェブサイトでは夜間モードを強制しても良いだろう。アプリケーションの色がコロコロ変わると操作性に著しい悪影響を及ぼす。しかし、ウェブサイトは操作性という観点が薄く、短期間の滞在に終わり、通常は日に何度も訪れない。そのため時間によって色が違っていてもユーザーに影響はほとんどないからだ。</p>
+
+<p>その一方で、ユーザーが明示的に有効にしない場合、いつも色が違う印象になりかねない。すると、ユーザーのウェブサイトに対するイメージが安定しない、という問題が発生する。そういった点は、ロゴや強調色をうまく最適化することで対処するしかないだろう。</p>
+</section>
+
+<hr>
+
+<p>当初採用した、オレンジ色のハイパーリンクは、なんというかしっくりこない。白背景で青なので、黒背景ならオレンジでも良いはずだが、なぜかしっくりこない。リンクは青色というような先入観の話ではなく、オレンジが持つ印象がしっくりこないのかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>HTML -&gt; CSS -&gt; SVG -&gt; CSS</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/from-html-to-css-to-svg-to-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="HTML -&gt; CSS -&gt; SVG -&gt; CSS" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-05-29T00:52:56+09:00">2012年5月29日</time></p>
+
+        <h1><em>HTML -&gt; CSS -&gt; SVG -&gt; CSS</em></h1>
+      </header>
+
+    <main>
+
+    <p>HTMLで参照しているCSSでSVGを参照する……まではマイナーとはいえ使っている人はいると思う。これでまぁスケーラブルな画像という条件は満たせるのだけど、せっかくSVGではCSSを参照できるのだから、そのCSSでSVGのスタイルも指定できたら色々便利でリソースの節約にもなるんじゃないかという実験……が失敗に終わった話。タイトルわかりづらい。</p>
+
+<p>Demo: <a href="/test/417.html">HTML -&gt; CSS -&gt; SVG -&gt; CSS</a></p>
+
+<p>SVGでCSSを使う方法は簡単で、<code>&lt;?xml-stylesheet?&gt;</code>を使うだけ。CSSでスタイルを書きやすくするため<code>id</code>属性を指定しておくと良い。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;?xml-stylesheet type="text/css" href="test.css"?&gt;
+&lt;svg id="foo" .../&gt;
+  ...
+&lt;/svg&gt;</code></pre>
+
+<p>これでまぁSVGを直接書き換えることなく簡単な変更、例えば<code>fill</code>プロパティーの調節とかそういった事ならCSSで行えるようになるわけだけど、HTTPリクエストが1つ増えることになる。そこでHTML側で参照しているCSSにSVGのスタイルも混ぜ込んで、SVG側からもHTMLと同じCSSを参照してやれば良いのではないかと考えた。CSSを統合すると<a href="http://sass-lang.com/">Sass</a>等を使っているのならカラースキームの流用などもできることになるのでより便利では！</p>
+
+<p>として上記デモを書いて実験してみたら思わぬ結果に終わった……。期待通りに動いたのはOpera 11だけという結果に。Chrome 19とFirefox 12ではスタイルが反映されず(SVG単体で表示した場合は反映されるのでCSSの問題では無さそう)、<del>Internet Explorer 9ではスタイルは反映されるもののCSSのが二回リクエストされるバグがあった</del>。Ch19とFx12の挙動はバグなのかどうなのかわからない。想像できる理由はいくつかあるけど単なる憶測なので書かない。</p>
+
+<p>仕様がどうなっているにせよHTML文書とSVG画像でCSSを共有するというのは期待通りにいかなそうなので避けた方が無難という感想。ライフ・チェンジングするアイディアだと思ったのにな……。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>IE9での重複リクエストされるバグがあるというのは嘘だった。開発者ツールで<em>そう見える</em>というだけで実際にはHTTPリクエストは飛んでないと<a href="https://twitter.com/mayuki">@mayuki</a>に指摘されたので、Fiddlerとサーバー立てて調べてみたところリクエストは飛んでこないことが確認できた。ごめんなさい。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

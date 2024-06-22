@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Firefox 3のfilefield要素</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/fx3-filefield-element.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Firefox 3のオプション設定ダイアログやダウンロード・ダイアログなどに存在するfilefield要素。nsIFilePickerなどと組み合わせてファイルやフォルダを指定するために使うもののようだけど、MDCに書いてないので使い方が全然わからなかった。けどソースをgrepして探して読んでみたら、ファイルやフォルダの指定に特化したものだったのでそんなに難しくなかった。ということで使い方のメモ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Firefox 3のオプション設定ダイアログやダウンロード・ダイアログなどに存在するfilefield要素。nsIFilePickerなどと組み合わせてファイルやフォルダを指定するために使うもののようだけど、MDCに書いてないので使い方が全然わからなかった。けどソースをgrepして探して読んでみたら、ファイルやフォルダの指定に特化したものだったのでそんなに難しくなかった。ということで使い方のメモ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/filefield-test-preview1.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Firefox 3のfilefield要素" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-05-15T05:53:42+09:00">2009年5月15日</time></p>
+
+        <h1><em>Firefox 3のfilefield要素</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://mozilla.jp/firefox/">Firefox 3</a>のオプション設定ダイアログやダウンロード・ダイアログなどに存在する<code>filefield</code>要素。<code>nsIFilePicker</code>などと組み合わせてファイルやフォルダを指定するために使うもののようだけど、<a href="https://developer.mozilla.org/">MDC</a>に書いてないので使い方が全然わからなかった。けどソースをgrepして探して読んでみたら、ファイルやフォルダの指定に特化したものだったのでそんなに難しくなかった。ということで使い方のメモ。</p>
+
+<p>よくある使い方であろうダイアログでアプリケーションを指定するようなケースでは、</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://global/skin/&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://mozapps/content/preferences/preferences.css&quot;?&gt;
+&lt;?xml-stylesheet href=&quot;chrome://browser/skin/preferences/preferences.css&quot;?&gt;
+&lt;dialog id=&quot;filefield-test&quot;
+  title=&quot;filefield Test&quot;
+  buttons=&quot;accept, cancel&quot;
+  xmlns=&quot;http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul&quot;&gt;
+  &lt;script&gt;
+  &lt;![CDATA[
+    function browseApp () {
+      var nsIFilePicker = Components.interfaces.nsIFilePicker;
+      var filePicker = Components.classes[&quot;@mozilla.org/filepicker;1&quot;].createInstance(nsIFilePicker);
+      filePicker.init(window, &quot;Select a Application&quot;, nsIFilePicker.modeOpen);
+      filePicker.appendFilters(nsIFilePicker.filterApps);
+
+      if (filePicker.show() === nsIFilePicker.returnOK) {
+        document.getElementById(&quot;app-path&quot;).file = filePicker.file;
+      }
+    }
+  ]]&gt;
+  &lt;/script&gt;
+  &lt;vbox&gt;
+    &lt;hbox&gt;
+      &lt;label control=&quot;app-path&quot; value=&quot;Application:&quot;/&gt;
+      &lt;filefield id=&quot;app-path&quot; flex=&quot;1&quot;/&gt;
+      &lt;button label=&quot;Browse...&quot; oncommand=&quot;browseApp();&quot;/&gt;
+    &lt;/hbox&gt;
+  &lt;/vbox&gt;
+&lt;/dialog&gt;</code></pre>
+
+<p>こんな感じで、このダイアログを開くと、</p>
+
+<figure>
+<img alt="filefield要素の実験ダイアログ。" height="107" src="/img/blog/filefield-test-preview1.png" width="358">
+</figure>
+
+<p>というように、<code>filefield</code>要素は編集不可で表示される。</p>
+
+<p><code>filefield</code>要素固有のプロパティは<code>file</code>のみ。<code>file</code>プロパティには<code>nsIFile</code>オブジェクトを丸々渡すだけでOK。試しにFirefoxを選択すると、</p>
+
+<figure>
+<img alt="filefield要素の実験ダイアログでFirefoxを選択。" height="107" src="/img/blog/filefield-test-preview2.png" width="358">
+</figure>
+
+<p>上記画像のようにアイコンとラベルが自動的にセットされる。アイコンはmoz-icon:スキームで表示されるアイコン。ラベルはバージョン情報のあるファイルの場合(多くの実行ファイルやDLLなど)はその説明が、バージョン情報が見つからなかった場合はフルパスが表示されるようになっている(See Also: <a href="http://mxr.mozilla.org/mozilla/source/toolkit/mozapps/preferences/preferences.xml#43">_getDisplayNameForFile</a>)。</p>
+
+<p>積極的に使いたい、使って欲しい気がする。ファイルの参照ボタン付き(<code>&lt;input type=&quot;file&quot;/&gt;</code>的な)とかだともっと使いやすい気がする。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

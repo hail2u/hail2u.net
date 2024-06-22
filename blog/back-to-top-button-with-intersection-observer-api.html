@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Intersection Observer APIを使ったトップに戻るボタン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/back-to-top-button-with-intersection-observer-api.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと10行に満たないJavaScriptで実装できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと10行に満たないJavaScriptで実装できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/back-to-top-button-with-intersection-observer-api.gif" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Intersection Observer APIを使ったトップに戻るボタン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2019-09-12T14:38:41+09:00">2019年9月12日</time></p>
+
+        <h1><em>Intersection Observer APIを使ったトップに戻るボタン</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="スクロールすると出てきて、トップに戻ったり少し戻ったりすると消えるやつ。" height="1080" src="/img/blog/back-to-top-button-with-intersection-observer-api.gif" width="1920">
+</figure>
+
+<p>スクロール監視で作られていたトップに戻るボタンの改修をしていた。Intersection Observer APIを使うと<a href="/test/688.html">10行に満たないJavaScriptで実装</a>できた。グローバル・ヘッダーが見えなくなったらボタンを出す、という条件でのみだが、実用性はありそう。</p>
+
+<section>
+<h2>HTML</h2>
+
+<p>HTMLでは<code>body</code>要素直下の最後にでも<code>button</code>要素を置いておく。最後の方に置くのは重なり順のため。位置はCSSで行うので、あまり考える必要はない。イベントの発生までラグがあるかもしれないので、デフォルトで<code>hidden</code>属性は追加しておく。</p>
+
+<pre><code class="language-html">&lt;body&gt;
+  &lt;header class="global-header"&gt;
+    ...
+  &lt;/header&gt;
+
+  ...
+
+  &lt;button id="to-top" hidden&gt;↑ Back to Top&lt;/button&gt;
+&lt;/body&gt;</code></pre>
+</section>
+
+<section>
+<h2>CSS</h2>
+
+<p>ボタンをビューポートの右下に配置する。位置を固定するだけ。<code>z-index</code>プロパティーが必要なら細心の注意を払う。</p>
+
+<pre><code class="language-css">#to-top {
+  bottom: 1rem;
+  position: fixed;
+  right: 1rem;
+}</code></pre>
+</section>
+
+<section>
+<h2>JavaScript</h2>
+
+<p>ボタンを押すとスクロールするコードと、グローバル・ヘッダーが見えなくなったらボタンを表示するコードを書く。スクロールするコードは<code>window.scrollTo(0, 0)</code>を使う。</p>
+
+<p><code>IntersectionObserver</code>オブジェクトを作る時に渡すコールバック関数で、表示の切り替えを行う。引数から監視するグローバル・ヘッダーの位置情報が手に入るので、そのうちの見えるか見えないかだけを真偽値で返してくれる<code>isIntersecting</code>プロパティーを利用する。ボタンの<code>hidden</code>属性へコピーするだけで、グローバル・ヘッダーとボタンのどちらかのみが表示されるようになるはず。</p>
+
+<pre><code class="language-javascript">var toTop = document.getElementById("to-top");
+toTop.addEventListener("click", function () {
+  window.scrollTo(0, 0);
+});
+(new IntersectionObserver(function (entries) {
+  toTop.hidden = entries[0].isIntersecting;
+})).observe(document.querySelector(".global-header"));</code></pre>
+</section>
+
+<hr>
+
+<p>位置を計算して、見えなくなったかどうかを判定する必要がなくなると、これだけ簡単な実装になる。ボタンにアイコンを使いたい！　とか、ボタンを徐々に表示したい！　とか、スクロールをアニメーションしたい！　とか、グローバル・ヘッダーが見えなくなってから半ページくらいスクロールしたらボタンを表示したい！　とか、要件が増えると、ちょっとややこしくなる。</p>
+
+<p>そういった要件も、様々な標準技術が実装されている現在なら、それぞれに最適な技術の選定さえできれば、基本を変えることなく追加できる。ボタンならインラインSVGの採用、表示のアニメーションなら<code>transition</code>プロパティーの利用、スクロールのアニメーションなら<code>requestAnimationFrame()</code>での制御、スクロール判定のあそびなら<code>rootMargin</code>や<code>threshold</code>の調節、それぞれで達成できるだろう。</p>
+
+<hr>
+
+<p>コード・ハイライトを復活させた。<a href="https://highlightjs.org/">highlight.js</a>を使って、HTMLファイルを作成する時にハイライトしている(RSSやデータでは生のまま)。カラー・スキームは、ダーク・モードで切り替えずに済むように、<a href="https://ethanschoonover.com/solarized/">Solarized</a>のアクセント色を流用した。もうちょっと抑え気味でも良さそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

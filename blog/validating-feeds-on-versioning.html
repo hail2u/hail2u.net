@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>バージョン更新時におけるフィードの検証</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/validating-feeds-on-versioning.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="フィードを検証するようにした。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、W3C Feed ValidatorのAPIを利用した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="フィードを検証するようにした。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、W3C Feed ValidatorのAPIを利用した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="バージョン更新時におけるフィードの検証" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-09-19T06:51:49+09:00">2021年9月19日</time></p>
+
+        <h1><em>バージョン更新時におけるフィードの検証</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/hail2u/hail2u.net/blob/95bc9267a2b4ab65c3b6e8003a8597fae7ffd032/bin/feed-validator.js">フィードを検証するように</a>した。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、<a href="https://validator.w3.org/feed/docs/soap.html">W3C Feed ValidatorのAPI</a>を利用した。</p>
+
+<p>APIはSOAPとなっているが、<code>output</code>パラメーターを<code>soap12</code>にし、普通にウェブ・フォームとして(<code>x-www-form-urlencoded</code>で)POSTするとXMLで返ってくるというもののようだ。node-soapパッケージなどを使う必要はない。</p>
+
+<p>node-fetchパッケージを使う場合は、<code>&amp;</code>でつなげた文字列を<code>body</code>オプションに指定するのではなく、<code>URLSearchParams</code>オブジェクトを使う。Fetch標準では、<code>body</code>オプションの値が<code>URLSearchParams</code>だった場合、<a href="https://fetch.spec.whatwg.org/#bodyinit-unions"><code>Content-Type</code>ヘッダーを設定すると規定</a>されているので、<code>headers</code>オプションを指定しなくて済む。もちろんnode-fetchパッケージでも実装されている。</p>
+
+<pre><code class="language-javascript">const body = new URLSearchParams();
+body.append(&quot;manual&quot;, 1);
+body.append(&quot;output&quot;, &quot;soap12&quot;);
+const feed = await fs.readFile(&quot;feed.xml&quot;, &quot;utf8&quot;);
+body.append(&quot;rawdata&quot;, feed);
+const res = await fetch(&quot;https://validator.w3.org/feed/check.cgi&quot;, {
+  body,
+  method: &quot;POST&quot;
+});</code></pre>
+
+<p>よくFetchと共に使うFormDataオブジェクトの書き方と合わせるために<code>append()</code>を使っている。普通にオブジェクトを渡して<code>URLSearchParams</code>オブジェクトを作成した方がすっきりする。あとは<code>fetch()</code>するだけなので、<code>body</code>という名前で<code>URLSearchParams</code>オブジェクトを作っておくと、ちょっと短く書ける。</p>
+
+<p>返ってきたXMLを扱いやすくするには、xml2jsonパッケージではなく、xml2jsパッケージでもなく、<a href="https://github.com/NaturalIntelligence/fast-xml-parser">fast-xml-parserパッケージ</a>が(現在は)いいようだ。速いし、メンテされている。</p>
+
+<p><code>parse()</code>メソッドでは、それほど厳密に扱う必要もないので、<code>ignoreNameSpace</code>オプションを有効にして、名前空間を削除すると、すらすらとドット表記法で参照できる。また<code>arrayMode</code>に<code>/^(error|warning|info)$/</code>としておくと、エラー等のみ常に配列として処理できるようになる。そうでない場合はエラーがひとつだけの場合に配列に変換するか、<code>[errors].flat().map()</code>というような謎のコードを書く必要が出てくる。便利機能はちゃんと使った方がいい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

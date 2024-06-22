@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>半角カッコから全角カッコ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/hankaku-to-zenkaku-parentheses.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブログの本文で使っていた半角カッコを全角カッコに変えたくなった。文章校正的な理由ではなく、将来の縦書き化を見据えて今のうちに調節しておこうかなという程度の理由だ(半角カッコに戻すのは簡単そうだ、ということもある)。だが単純な置換ではなかなか難しく、手作業でやろうかと思ったが開き半角カッコだけで8000近くあったので無理そう……ということで一時間くらい色々考えた結果、ASCII範囲外の文字を含む開き半角カッコと閉じ半角カッコのペアを探して置換するのがよさそうという結論に至った。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このウェブログの本文で使っていた半角カッコを全角カッコに変えたくなった。文章校正的な理由ではなく、将来の縦書き化を見据えて今のうちに調節しておこうかなという程度の理由だ(半角カッコに戻すのは簡単そうだ、ということもある)。だが単純な置換ではなかなか難しく、手作業でやろうかと思ったが開き半角カッコだけで8000近くあったので無理そう……ということで一時間くらい色々考えた結果、ASCII範囲外の文字を含む開き半角カッコと閉じ半角カッコのペアを探して置換するのがよさそうという結論に至った。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="半角カッコから全角カッコ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-10-06T03:52:20+09:00">2015年10月6日</time></p>
+
+        <h1><em>半角カッコから全角カッコ</em></h1>
+      </header>
+
+    <main>
+
+    <p>このウェブログの本文で使っていた半角カッコを全角カッコに変えたくなった。文章校正的な理由ではなく、将来の縦書き化を見据えて今のうちに調節しておこうかなという程度の理由だ(半角カッコに戻すのは簡単そうだ、ということもある)。だが単純な置換ではなかなか難しく、手作業でやろうかと思ったが開き半角カッコだけで8000近くあったので無理そう……ということで一時間くらい色々考えた結果、<em>ASCII範囲外の文字を含む開き半角カッコと閉じ半角カッコのペア</em>を探して置換するのがよさそうという結論に至った。</p>
+
+<p>Perlの正規表現ならばかなりかっこよく書けそうだったが、ファイル探索から読み込み、置換、保存まで書くのはさすがに面倒そうだ。普通にVimで<a href="https://github.com/thinca/vim-qfreplace">qfreplace</a>を使って行うようにした。</p>
+
+<pre><code class="language-vim">:%s/(\(.*[^!-~ ].\{-}\))/(\1)/gc</code></pre>
+
+<p>Vimの正規表現なので気持ち悪いやつになっている。ASCII範囲外の文字はアバウトに<code>!</code>から<code>~</code>と半角スペースを指定して反転するというアバウトなものにした。これで大抵のプログラム・コードでの半角カッコはスキップすることができる。問題は半角カッコのネストと同じ行に半角カッコを使うコードが複数回出てくるパターン(「`foo()`や`bar()`」というようなパターンだと「()`や`bar()」にマッチしてしまう)だが、うろ覚えのVimの正規表現では考慮するのが厳しく、そこは<code>c</code>フラグも付けて手作業で行うことにした。</p>
+
+<p>だいたい<a href="https://github.com/hail2u/hail2u.net/commit/4258eec859c25ed60f27be8066b66b2ef7a2f3e1">うまくいった</a>のではないかと思う。後処理として<code>(</code>や<code>)</code>といった全角カッコに半角空白がついてしまっているパターンから半角空白を削除しておいたりもした。</p>
+
+<p>本当はHTML断片としてパースして、<code>code</code>や<code>pre</code>要素の子ではないものを置換するという、HTMLから見て真っ当なやり方がベストに近そうだ。しかしHTML断片をパースするためのライブラリーの選定を始めとして、書き捨てになりそうなコードを書くには面倒極まりないので、雑な正規表現で誤魔化した。なんでもエクセルでやる人の気持ちがちょっとわかった。</p>
+
+<hr>
+
+<p>qfreplaceが同じファイルに複数の置換対象があると「既に変更があります」的なエラー・メッセージを出してスキップするようになった気がする。前は普通に動いていたので、最近のVimになって発症したのではないかと思うが、たまにしか使わないので何かVimの設定に依存しているのかもしれない。そのうち調べよう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

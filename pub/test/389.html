@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>display: table-cell and content: "" for image replacement</title>
+
+
+    <style>
+      .test {
+        display: table-cell;
+        background-color: #f0f;
+      }
+
+      .ir {
+        display: block;
+        width: 120px;
+        height: 120px;
+        overflow: hidden;
+      }
+
+      .ir::before {
+        display: block;
+        width: 100%;
+        height: 100%;
+        content: "";
+        background-image: url("389.png");
+        background-position: center center;
+        background-size: contain;
+      }
+
+      .fix .ir::before {
+        content: "\000b";
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1><code>display: table-cell</code> and <code>content: ""</code> for image replacement</h1>
+    </header>
+
+    <div class="test">
+      <div class="ir">Lorem ipsum dolor sit amet.</div>
+    </div>
+
+    <p><code>overflow: hidden</code>にも関わらず空白ができてしまう。<code>.test</code>に高さ指定を行い<code>overflow: hidden</code>してもダメ。</p>
+
+    <div class="test fix">
+      <div class="ir">Lorem ipsum dolor sit amet.</div>
+    </div>
+
+    <p><code>content</code>プロパティーで<code>\00a0</code>(非改行スペース)を指定すると意図した通りになる。</p>
+  </body>
+</html>

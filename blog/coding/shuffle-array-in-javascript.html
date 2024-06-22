@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JavaScriptで配列をシャッフル</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/shuffle-array-in-javascript.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、sortメソッドを使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたらはてのくんがコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JavaScriptで配列をシャッフル" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-28T07:11:08+09:00">2006年8月28日</time></p>
+
+        <h1><em>JavaScriptで配列をシャッフル</em></h1>
+      </header>
+
+    <main>
+
+    <p>配列をシャッフル、つまりランダムに要素の位置を入れ替えるというのを、<a href="http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:sort"><code>sort</code>メソッド</a>を使ってやってみたのだけど、明らかにダメダメなものになってしまった。その後、あーでもないこーでもないと考えたのだけど、算数が得意すぎて頭が痛くなった。ということを某所でぼやいたら<a href="http://d.hatena.ne.jp/secondlife/">はてのくん</a>がコードを見つけてくれた。どうやらFisher-Yatesという有名なアルゴリズムでやると良いらしい。</p>
+
+<p>最初に書いたコードは、</p>
+
+<pre><code class="language-js">var a = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+a.sort(
+  function (a, b) {
+    return Math.ceil(Math.random() * 3) - 2;
+  }
+);</code></pre>
+
+<p>というもの。<code>sort</code>メソッドは、パラメータに与えられた関数が負の値・0・正の値を返すことによって要素の順序を決定するので、その関数がランダムに値を返せばランダムにソートされるであろうというコード。結果は偏るというか、アルゴリズムがおかしいと予想される結果になった。何気にInternet Explorer 6ではシャッフルされているっぽい感じになるのだけど。</p>
+
+<p>その後、ランダムにsortした後reverseしてまたランダムにsortとかもやってみたりと、いろいろ考えたけど、結局頭がこんがらがるだけでちゃんとシャッフルされているという確信が得られない。</p>
+
+<p>はてのくんがCode Snippetsから見つけてくれた<a href="http://www.bigbold.com/snippets/posts/show/849">Array Shuffle //JavaScript Function</a>では、Fisher-Yatesなるアルゴリズムを利用しているらしい。このコードは理解しづらかった(シャッフルされることは確認したけど)ので、Fisher-Yatesについて調べてみると、どうやら<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873112028/hail2unet-22">Perlクックブック〈VOLUME1〉</a>にも載っている有名なアルゴリズムだそうで。記憶に無いです。</p>
+
+<p>Perlクックブックのレシピ4.18 配列の要素をランダムに並べ替えるでは、</p>
+
+<pre><code class="language-perl">sub fisher_yates_shuffle {
+  my $array = shift;
+  my $i;
+  for ($i = @$array; --$i; ) {
+    my $j = int rand ($i+1);
+    next if $i == $j;
+    @$array[$i,$j] = @$array[$j,$i];
+  }
+}</code></pre>
+
+<p>という風になっている。拙い理解でJavaScriptに移植すると、</p>
+
+<pre><code class="language-js">function shuffle(list) {
+  var i = list.length;
+
+  while (--i) {
+    var j = Math.floor(Math.random() * (i + 1));
+    if (i == j) continue;
+    var k = list[i];
+    list[i] = list[j];
+    list[j] = k;
+  }
+
+  return list;
+}</code></pre>
+
+<p>となる(と思う)。<a href="/test/065.html">サンプル・ページ</a>を作成して試したところ、ちゃんとシャッフルされているようだ。並べ替えるというよりも、入れ替えるという形。</p>
+
+<p>最終的にはどうやら解決した(と思う)ので、勉強にもなったし良かったのだけど、こういうアルゴリズム的なお話はやっぱり知っているといないでは雲泥。アルゴリズム系の勉強のためにもPerlクックブックをちゃんと読み直そう。重いんだよな、アレ。</p>
+
+<figure>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4873112028/hail2unet-22"><img alt="Perlクックブック〈VOLUME1〉。" height="475" src="https://m.media-amazon.com/images/I/51FHW5B8GQL.jpg" width="368"></a>
+</figure>
+
+<section>
+<h2>追記</h2>
+
+<p><a href="http://b.hatena.ne.jp/entry/http://hail2u.net/blog/coding/shuffle-array-in-javascript.html">はてブのコメント</a>での指摘を参考にコードをちょっと直した。</p>
+
+<ul>
+<li><code>parseInt()</code>から<code>Math.floor()</code>に変更</li>
+<li><code>var k = list[i]; list[i] = list[j]; list[j] = k;</code>と少し省略</li>
+</ul>
+
+<p>コメントくれた方々に感謝。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

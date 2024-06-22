@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>RUBYOPTを使った外部エンコーディングの指定</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/setting-rubyopt-for-sass.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="今年からSassでcontentプロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数LANGを変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としてはRUBYOPTの方を使うべきなようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="今年からSassでcontentプロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数LANGを変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としてはRUBYOPTの方を使うべきなようだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/setting-rubyopt-environment-variable.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="RUBYOPTを使った外部エンコーディングの指定" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-01-06T08:48:11+09:00">2015年1月6日</time></p>
+
+        <h1><em>RUBYOPTを使った外部エンコーディングの指定</em></h1>
+      </header>
+
+    <main>
+
+    <p>今年からSassで<code>content</code>プロパティーなどでマルチバイトの文字列をエスケープせずにばしばし書くことにしたので、遂にWindowsでもUTF-8をデフォルトにしないとダメそうな感じになった。この場合、環境変数<code>LANG</code>を変えようとか良く書かれているけれど、Ruby以外に影響を及ぼさない真っ当な手段としては<code>RUBYOPT</code>の方を使うべきなようだ。</p>
+
+<p>特に設定していないとマルチバイト文字列を含むSassファイルをコンパイルしようとすると以下のようなエラーメッセージを吐いて落ちる。</p>
+
+<pre><samp>C:\&gt;<kbd>scss test.scss</kbd>
+Error: Invalid Windows-31J character &quot;\xE2&quot;
+        on line 2 of test.scss
+  Use --trace for backtrace.</samp></pre>
+
+<p><code>test.scss</code>の2行目には<code>➔</code>が含まれている。このファイルに<code>@charset "UTF-8";</code>を追加することでも正常にコンパイルされるようになるが、Sass (やRuby)はUTF-8で書くので、ユーザーワイドに設定してやった方が省力化を図れる。</p>
+
+<pre><samp>C:\&gt;<kbd>set RUBYOPT=--encoding=UTF-8</kbd>
+
+C:\&gt;<kbd>scss test.scss</kbd>
+@charset &quot;UTF-8&quot;;
+.test {
+  content: &apos;➔&apos;; }</samp></pre>
+
+<p><code>RUBYOPT</code>環境変数で<code>--encoding</code>オプションを指定してやることで、外部エンコーディングをUTF-8に強制すると動くようになる。動作が確認できたら、あとはシステムのプロパティーからユーザー環境変数に仕込んでやれば良い。</p>
+
+<figure>
+<img alt="システムのプロパティーのダイアログよりユーザー環境変数へRUBYOPTを追加している様子。" height="439" src="/img/blog/setting-rubyopt-environment-variable.png" width="493">
+<figcaption>ユーザー環境変数の設定ダイアログ</figcaption>
+</figure>
+
+<p>なお、今のSassは非ASCII文字列があると、適切な値の<code>@charset</code>ディレクティブを必ず追加するようになっている。先頭の<code>@charset &quot;UTF-8&quot;;</code>を削除したい場合は何かしら別のツールに頼る必要がある。</p>
+
+<hr>
+
+<p>マルチバイト文字列をそのまま書くことにしたのにはいくつか理由があるが、一番大きいのはエスケープされた文字列は人間が書くべきものではないということだ。<code>\0020</code>とか書いているとバカバカしくなる。それ以外にももちろんわかりやすくなることとか、わざわざコメントでどういう文字のエスケープなのかとか書かなくて済むこととか。ただし見てもなにかわからない非改行スペースのようなものだけはエスケープする、というルールにした。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

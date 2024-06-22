@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JScriptでGmailの未読メール数を取得</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/get-gmail-unread-mail-count-by-jscript.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="タスクトレイに鎮座しているGoogle Talkのアイコンにカーソルを合わせてGmailの未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードにはfullcountとかいう要素があったりしたので簡単っぽい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="タスクトレイに鎮座しているGoogle Talkのアイコンにカーソルを合わせてGmailの未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードにはfullcountとかいう要素があったりしたので簡単っぽい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JScriptでGmailの未読メール数を取得" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-07-28T20:35:38+09:00">2006年7月28日</time></p>
+
+        <h1><em>JScriptでGmailの未読メール数を取得</em></h1>
+      </header>
+
+    <main>
+
+    <p>タスクトレイに鎮座している<a href="http://www.google.com/talk/" title="Google Talk">Google Talk</a>のアイコンにカーソルを合わせて<a href="http://mail.google.com/">Gmail</a>の未読数を確認するのが面倒になったので、テキトウにでっち上げてみようと試みる。GmailのAtomフィードには<code>fullcount</code>とかいう要素があったりしたので簡単っぽい。</p>
+
+<p>こういう場合はAtomフィードをパースしてうんたらかんたらとか考えるとバカになりそうなので、JScriptでサクッとXSLT。</p>
+
+<p>JScriptのコードは、</p>
+
+<pre><code class="language-js">var url = &quot;http://username:password@mail.google.com/mail/feed/atom&quot;;
+
+var xml = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xml.async = false;
+xml.load(url);
+
+var xsl = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+xsl.async = false;
+xsl.load(&quot;tcgmail.xsl&quot;);
+
+WScript.Echo(xml.transformNode(xsl));</code></pre>
+
+<p>XSLのコードは、</p>
+
+<pre><code class="language-xsl">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xsl:stylesheet xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+  xmlns:atom=&quot;http://purl.org/atom/ns#&quot;
+  version=&quot;1.0&quot;&gt;
+
+  &lt;xsl:output method=&quot;text&quot; encoding=&quot;Shift_JIS&quot;/&gt;
+
+  &lt;xsl:template match=&quot;/&quot;&gt;
+    &lt;xsl:value-of select=&quot;//atom:feed/atom:fullcount&quot;/&gt;
+  &lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;</code></pre>
+
+<p>これ等をgmail.jsとgmail.xslとしてどっかに保存し、gmail.jsを実行してやれば未読数がダイアログでポップアップしてきます。実際にはもっと表示の仕方を工夫するべき。僕はもちろんT(略。まぁT(略も飽きてきたので、今日見つけた<a href="http://k23productions.com/haiku/snarl.html" title="full phat products : snarl">Snarl</a>使いになろうかなとか(SnarlはMacの<a href="http://growl.info/" title="Welcome to Growl!">Growl</a>っぽい何かを通知するためだけにあるアプリケーション)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

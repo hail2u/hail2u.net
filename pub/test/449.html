@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Remove only utm_xxx parameters silently</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Remove only utm_xxx parameters silently</h1>
+    </header>
+
+    <section>
+      <h1>Tests</h1>
+      <ul>
+        <li>1 utm_xxx: <a href="449.html?utm_source=source"><code>?utm_source=source</code></a></li>
+        <li>2 utm_xxx: <a href="449.html?utm_source=source&amp;utm_medium=media"><code>?utm_source=source&amp;utm_medium=media</code></a></li>
+        <li>utm_xxx with other parameter: <a href="449.html?utm_source=source&amp;foo=bar"><code>?utm_source=source&amp;foo=bar</code></a></li>
+        <li>utm_xxx with other parameter (complex): <a href="449.html?utm_source=source&amp;utm_medium=media&amp;foo=bar&amp;utm_term=keywords"><code>?utm_source=source&amp;utm_medium=media&amp;foo=bar&amp;utm_term=keywords</code></a></li>
+        <li>utm_xxx with hash: <a href="449.html?utm_source=source&amp;foo=bar#buz"><code>?utm_source=source&amp;foo=bar#buz</code></a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h1>Code</h1>
+      <pre><code>var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-9706904-3']);
+_gaq.push(['_trackPageview']);
+<mark>_gaq.push(function() {
+  var h = history, l = location, u;
+  if (!h.replaceState) return;
+  u = l.pathname + l.search.replace(/[?&amp;]utm_[^&amp;]+/g, '').replace(/^&amp;/, '?') + l.hash;
+  h.replaceState(null, '', u);
+});</mark>
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</code></pre>
+    </section>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-9706904-3']);
+      _gaq.push(['_trackPageview']);
+      _gaq.push(function() {
+        var h = history, l = location, u;
+        if (!h.replaceState) return;
+        u = l.pathname + l.search.replace(/[?&]utm_[^&]+/g, '').replace(/^&/, '?') + l.hash;
+        h.replaceState(null, '', u);
+      });
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>

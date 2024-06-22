@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>MSN Messengerから任意のブラウザを起動</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/any_browser_from_msn_messenger.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="MSN MessengerがURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="MSN MessengerがURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="MSN Messengerから任意のブラウザを起動" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-07-09T03:56:24+09:00">2004年7月9日</time></p>
+
+        <h1><em>MSN Messengerから任意のブラウザを起動</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://messenger.msn.co.jp/" title="MSN Messenger">MSN Messenger</a>がURLを開くブラウザを決定する挙動が、大体つかめた気がするので、手順を書いてみようかと。かなりアクロバットなレジストリの参照の仕方をしているなぁという感想。普通にhttpの関連付けから起動とかで良いじゃん。</p>
+<p>MSN MessengerはURLを開く時、以下のような感じでレジストリを参照してました。</p>
+<ol>
+<li><code>HKEY_CLASSES_ROOT\.htm</code>の標準の値を読む
+<ol>
+<li><code>htmlfile</code>だった場合
+<ol>
+<li>IE強制(多分)</li>
+</ol>
+</li>
+<li><code>htmlfile</code>でない場合
+<ol>
+<li><code>HKEY_CURRENT_USER\http</code>をチェック(普通は無い)</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>をチェック(普通はある)</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>の関連付けに従ってURLを開く</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>というわけで、やることは、</p>
+<ul>
+<li><code>HKEY_CLASSES_ROOT\htm.dummy</code>などダミーのキーを作る</li>
+<li><code>HKEY_CLASSES_ROOT\.htm</code>の標準の値を上記のキー名にする</li>
+<li><code>HKEY_CLASSES_ROOT\http</code>の関連付けを起動したいブラウザにする</li>
+</ul>
+<p>ということになります。これでMSN Messengerから任意のブラウザを起動することができるはずです。</p>
+<p>こんな感じのレジストリファイルを作成し、ダブル・クリックしてやれば良いはず。</p>
+<pre>REGEDIT4
+
+[HKEY_CLASSES_ROOT\htm.dummy]
+
+[HKEY_CLASSES_ROOT\.htm]
+@=&quot;htm.dummy&quot;
+
+[HKEY_CLASSES_ROOT\http\shell]
+@=&quot;Moon&quot;
+
+[HKEY_CLASSES_ROOT\http\shell\Moon]
+@=&quot;Moon&quot;
+
+[HKEY_CLASSES_ROOT\http\shell\Moon\command]
+@=&quot;\&quot;C:\\Program Files\\Moon Browser\\mb.exe\&quot; \&quot;%1\&quot;&quot;</pre>
+<p>責任持たないけど。もちろん実行ファイルのパスなどは環境に合わせて、自分の起動したいブラウザのパスなどにしてやる必要はあります。</p>
+<p>以上の作業で、自分の環境では問題なく<a href="http://www.mozilla.org/products/firefox/" title="Firefox - The Browser, Reloaded">Firefox</a>と<a href="http://www.geocities.co.jp/SiliconValley-Cupertino/8986/" title="Moon Browser">Moon Browser</a>、<a href="http://www.opera.com/" title="Opera Web Browser">Opera</a>、よくわからない自作のJScriptファイルなどどんなものでも起動できる様になりました。</p>
+<p>Firefoxの場合は、どうやら設定から標準のブラウザにしてやれば問題なくFirefoxで開かれるようになるのであまり意味は無いですが(手動で関連付けを設定してたりする人には意味はある)、Moon Browserや<a href="http://www.atmark.gr.jp/~s2000/r/" title="Donut RAPT 配布所">Donut RAPT</a>などで開けないものかと苦労していた方は試してみる価値はあると思います。</p>
+<p>間違ってるかもしれないですけどね。</p>
+<section>
+<h2>追記@2004/07/11</h2>
+<p>大体この手順で良さそうな感じですね。<a href="http://sleipnir.pos.to/software/sleipnir/index.html" title="BearFactory | Sleipnir">Sleipnir</a>や<a href="http://donutp.com/" title="Donutカスタム所">DonutP</a>とかでも問題なく起動したようです。</p>
+<p>補足ですが、普通にこれやると拡張子がhtmなファイルをダブルクリックしても、ブラウザで開けなくなります。まぁ滅多に困ることはないと思いますが念のため。元のような挙動にしたい場合は、自分でガリガリレジストリを編集するか、フォルダオプションなんかで改めて設定する必要があります。</p>
+<p>ここでは説明の簡略化のためにそこらへんはすっ飛ばしました。</p>
+</section>
+<section>
+<h2>追記@2004/07/13</h2>
+<p>MSN MessengerからURLをhttpプロトコルの関連付けで開くバイナリ・パッチが<a href="http://pc5.2ch.net/test/read.cgi/win/1088504912/277/" title="MSN Messenger Windows Messenger Part17">MSN Messenger Windows Messenger Part17の277</a>にありました。スバラシイ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

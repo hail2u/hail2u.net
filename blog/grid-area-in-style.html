@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>style属性にgrid-areaプロパティー</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/grid-area-in-style.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="grid-template-areaプロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、grid-areaプロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="style属性にgrid-areaプロパティー" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-04-20T07:29:09+09:00">2021年4月20日</time></p>
+
+        <h1><em>style属性にgrid-areaプロパティー</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>grid-template-area</code>プロパティーで、識別子を使って特化型のグリッドを作ることが増えた。こういう場合、各グリッド項目に対して、<code>grid-area</code>プロパティーで名前を付けていくことになる。この名前付けを、CSSファイルではなく、HTMLファイルに書いてしまった方がいいのではないだろうか。</p>
+
+<p>例えば以下のようなリストがあり、そのレイアウトにグリッドを使うとする。グローバル・ヘッダーのナビゲーションを想定している。例なので<code>a</code>要素は省略した。</p>
+
+<pre><code class="language-html">&lt;ul class="nav"&gt;
+  &lt;li class=&quot;news&quot;&gt;News&lt;/li&gt;
+  &lt;li class=&quot;feature&quot;&gt;Feature&lt;/li&gt;
+  &lt;li class=&quot;column&quot;&gt;Column&lt;/li&gt;
+  &lt;li class=&quot;store&quot;&gt;Store&lt;/li&gt;
+  &lt;li class=&quot;search&quot;&gt;Search&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>このHTMLに対して、CSSファイルで、レイアウトを書き、各項目に識別子を付ける。例えば、3列2行にして、2行目の真ん中を空項目で埋めることにしたい。恣意的だが、空項目の部分にロゴが食い込むようなグローバル・ヘッダーを想像しておいてほしい。</p>
+
+<pre><code class="language-css">.nav {
+  grid-template-areas:
+    &quot;a b c&quot;
+    &quot;d . e&quot;;
+}
+
+.news {
+  grid-area: a;
+}
+
+.feature {
+  grid-area: b;
+}
+
+.column {
+  grid-area: c;
+}
+
+.store {
+  grid-area: d;
+}
+
+.search {
+  grid-area: e;
+}</code></pre>
+
+<p>この名前付けが冗長で、かつ<em>定義より利用が前に</em>来てしまうので、落ち着かない。逆順に書くと、親要素へのルールセットよりも、子要素のルールセットが前に来てしまい、同じく落ち着かない。HTML側でこう書いておきたい。</p>
+
+<pre><code class="language-html">&lt;ul class="nav"&gt;
+  &lt;li style=&quot;grid-area: news&quot;&gt;News&lt;/li&gt;
+  &lt;li style=&quot;grid-area: feature&quot;&gt;Feature&lt;/li&gt;
+  &lt;li style=&quot;grid-area: column&quot;&gt;Column&lt;/li&gt;
+  &lt;li style=&quot;grid-area: store&quot;&gt;Store&lt;/li&gt;
+  &lt;li style=&quot;grid-area: search&quot;&gt;Search&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>クラスの代わりにこうしておくと、CSS側では、<code>.nav</code>へのスタイルのみでよくなる。CSSでクラス名が使いたい場合は、HTML側にクラス名も重ねて書いてもいい。CSS側で属性セレクターを使って<code>[style*="column"]</code>と書いてもいいだろう。</p>
+
+<pre><code class="language-css">.nav {
+  grid-template-areas:
+    &quot;news  feature column&quot;
+    &quot;store ....... search&quot;;
+}</code></pre>
+
+<p>あたかも<em><code>grid-template-areas</code>プロパティーでクラス名を直接使えるように</em>書ける。また、定義済みを参照しているだけなので、とても落ち着く。HTML側は、テンプレート・システムによって生成されるので、コストが下がり、ミスタイプも減る。このように、特化型で、構造や内容物に強く依存する場合なら、<code>style</code>属性に書いてしまってもいい気がしている。</p>
+
+<hr>
+
+<p>こういった<code>grid-template-areas</code>プロパティーで識別子だけを使う、固定的なグリッド・レイアウトは、グローバル・ヘッダーやグローバル・フッターで出番がある。項目の数やラベルが安定しているので、決め打ちで割り当てても問題は起きにくい。描画領域幅に合わせてレイアウトを変える場合も、<code>grid-template-areas</code>プロパティーを上書きするだけと、細かいグリッドを定義しておいて、複雑に組み合わせるようなことをせずに済む。</p>
+
+<p>そんなわけで、現在のページ・ヘッダーは、識別子を使ったグリッド・レイアウトになっている。試行錯誤した過程で、このウェブサイトでいろいろ試していた。左寄せではないが、おさまりがいいので、しばらく使うかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>普通に引かれた下線</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/underlining.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Mediumライクなかっこいいリンクの下線をついに諦めた。目的とコードがあまりにもかけはなれていて、CSSらしくないのが気になるようになったからだ。プロパティーの組み合わせから結果が想像しづらいルールセットに苦しめられた過去を思い出す。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Mediumライクなかっこいいリンクの下線をついに諦めた。目的とコードがあまりにもかけはなれていて、CSSらしくないのが気になるようになったからだ。プロパティーの組み合わせから結果が想像しづらいルールセットに苦しめられた過去を思い出す。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="普通に引かれた下線" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-19T01:42:44+09:00">2015年2月19日</time></p>
+
+        <h1><em>普通に引かれた下線</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://medium.com/designing-medium/crafting-link-underlines-on-medium-7c03a9274f9">Mediumライクなかっこいいリンクの下線</a>をついに諦めた。目的とコードがあまりにもかけはなれていて、CSSらしくないのが気になるようになったからだ。プロパティーの組み合わせから結果が想像しづらいルールセットに苦しめられた過去を思い出す。</p>
+
+<p>とは言うものの、できることなら下線の色だけを変えるようにはしたいので、<code>text-decoration-color</code>プロパティーのサポートで切り替えるようにCSSを書いた。</p>
+
+<pre><code class="language-css">a {
+  color: #1188bb;
+  text-decoration: underline;
+}
+
+@supports (-moz-text-decoration-color: red) or
+  (-webkit-text-decoration-color: red) or
+  (text-decoration-color: red) {
+  a {
+    color: inherit;
+    -moz-text-decoration-color: #5bacd0;
+    -webkit-text-decoration-color: #5bacd0;
+    text-decoration-color: #5bacd0;
+  }
+}</code></pre>
+
+<p>まず通常はリンクの色を変えて、普通にその色で下線が引かれるようにしておく。そして<code>@supports</code>ルールを使い、<code>text-decoration-color</code>プロパティーをサポートしている環境では、文字色を地の文と合わせ(<code>inherit</code>)た上で、下線の色を変更してやる。式で<code>red</code>を使っているのは一番短いからで、他に特に意味はない。</p>
+
+<p><a href="http://caniuse.com/#feat=text-decoration"><code>text-decoration-color</code>プロパティーをサポートしている環境</a>はFirefox 6.0以降とSafari 7.1及びMobile Safari 7.1以降のみだ。Chrome 40やInternet Explorer 11ではまだサポートされていない。また、サポートしている環境でもまだプリフィックスがとれていないので(Firefoxでは36から取れる)、<code>@supports</code>ルールの式とプロパティーの両方でプリフィックスを書く必要がある。</p>
+
+<p>しかしながら<a href="http://caniuse.com/#feat=css-featurequeries"><code>@supports</code>ルール</a>はSafari 7.1以降やMobile Safari 7.1以降でサポートされていない。そのため、ここまで<em>ちゃんと</em>書いてもFirefox 6.0以降でしか有効にならないという現実が待ち受けている。CSSハックを混ぜて適用させることもできるが、ChromeやIEの安定版でサポートされていないことを考えると、まだそこまでする必要もなさそうだ。</p>
+
+<hr>
+
+<p>Mediumライクなリンクの下線は、その表示結果自体の満足度はかなり高いが、時々これはいったい何をどうするためのCSSなのかがわからなくなる。特にそういったものをプレースホルダー・セレクターやミックスインとして定義している場合、<em>ハイパーリンクへ適用されるスタイルであること</em>という文脈が失われるため、何がどうなっていて何のための定義たちなのかまったく想像できないルールセットになる。</p>
+
+<pre><code class="language-scss">%underline {
+  background-image: linear-gradient(
+    transparent 50%,
+    #5bacd0 50%
+  );
+  background-position: 0 87.5%;
+  background-repeat: repeat-x;
+  background-size: 2px 2px;
+  text-decoration: none;
+}</code></pre>
+
+<p>実際に実装するとこんな感じのプレースホルダー・セレクターになる。CSSグラデーションで横方向に繰り返す画像を作ろうとしているまではわかるが、このルールセットを見てスッと<em>文字列の少し下に<code>1px</code>の線を引く</em>というルールセットだということを把握するのは無理があるだろう。プレースホルダー・セレクターの名前で説明を試みても良いが……。</p>
+
+<p>このようなセレクターとセットで初めて意味をなすことがあるようなケースはままある。例えば<code>:target</code>擬似クラスや、<code>:focus</code>擬似クラスと隣接セレクターを組み合わせたセレクターなどは良い例だろう。これらに割り当てられるルールセットは一部プロパティーを変更するだけであったりするため、それだけでは何のために何をやっているのかよくわからない。</p>
+
+<p>僕がCSSにおいてオブジェクト志向を持ち込むことに無理があると考えているのは、このようにロジックが混ざるセレクターとルールセットが事実上不可分だと考えているからだ。一部で例外を設けるという選択もあるが、それを赤の他人に汲んでもらうのは難しい。それならばきちんと設計されたHTMLの構造のような意味のある単位でルールセットを構築するか、CSSを構造化して管理することを放棄するかの方が良いのではないか。</p>
+
+<p>実際にはこの辺りとOOCSSの間を行ったり来たりしているところだ。</p>
+
+<hr>
+
+<p>なおこのウェブサイトではこの新しい普通のリンクの下線がデフォルトになっていて、いくつかのコンポーネント(例えばグローバル・ヘッダー)などでは下線を消すような仕組みになっている(SCSSでプレースホルダー・セレクターを使って当てる)。そちらはそちらで書き直す必要があったりもする。</p>
+
+<pre><code class="language-scss">%link-underline-removal {
+  a {
+    text-decoration: none;
+  }
+
+  @supports (-moz-text-decoration-color: red) or
+    (-webkit-text-decoration-color: red) or
+    (text-decoration-color: red) {
+    a {
+      color: #1188bb;
+      -moz-text-decoration-color: initial;
+      -webkit-text-decoration-color: initial;
+      text-underline-color: initial;
+    }
+  }
+}</code></pre>
+
+<p>プリフィックス付きの式を含む<code>@supports</code>ルールをもう一回書いたりしていると頭がおかしくなってくる。現実は厳しい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

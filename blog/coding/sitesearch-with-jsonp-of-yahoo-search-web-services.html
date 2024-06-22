@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Yahoo! Search Web ServicesのJSON(P)を利用したサイト内検索</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/sitesearch-with-jsonp-of-yahoo-search-web-services.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Yahoo! Search Web ServicesのJSON(P)を利用すれば、JavaScriptのみでサイト内検索が実現できる上、Ajax的にページ遷移無しで検索が実行できる。Google AJAX Searchが内部で利用しているJSONPらしきアレを利用するケースと違い、こちらは公式にアナウンスされているのでおおっぴらに利用できる。というわけで、ほとんど同じタイトルでほとんど同じネタを連続で書いてみる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Yahoo! Search Web ServicesのJSON(P)を利用すれば、JavaScriptのみでサイト内検索が実現できる上、Ajax的にページ遷移無しで検索が実行できる。Google AJAX Searchが内部で利用しているJSONPらしきアレを利用するケースと違い、こちらは公式にアナウンスされているのでおおっぴらに利用できる。というわけで、ほとんど同じタイトルでほとんど同じネタを連続で書いてみる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Yahoo! Search Web ServicesのJSON(P)を利用したサイト内検索" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-09-28T16:47:11+09:00">2006年9月28日</time></p>
+
+        <h1><em>Yahoo! Search Web ServicesのJSON(P)を利用したサイト内検索</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://developer.yahoo.com/search/">Yahoo! Search Web Services</a>の<a href="http://developer.yahoo.com/common/json.html">JSON(P)</a>を利用すれば、JavaScriptのみでサイト内検索が実現できる上、Ajax的にページ遷移無しで検索が実行できる。<a href="/blog/coding/sitesearch-with-jsonp-of-google-ajax-search-api.html">Google AJAX Searchが内部で利用しているJSONPらしきアレを利用するケース</a>と違い、こちらは公式にアナウンスされているのでおおっぴらに利用できる。というわけで、ほとんど同じタイトルでほとんど同じネタを連続で書いてみる。</p>
+
+<p>実装は、ひとつ前のエントリでもリンクを張っておいた<a href="/test/087.html">サンプル・ページ</a>で利用しているJavaScriptファイルのような形になる。</p>
+
+<p>Yahoo! Search Web ServicesのWeb Search APIへのリクエストは、</p>
+
+<pre>http://api.search.yahoo.com/WebSearchService/V1/webSearch?appid=<em>{アプリケーションID}</em>&amp;query=<em>{検索語}</em>&amp;site=<em>{ドメイン名}</em>&amp;<em>output=json</em>&amp;<em>callback=handleWebSearch</em></pre>
+
+<p>という形で、<code>output</code>パラメータで<code>json</code>を指定するとXMLの代わりにJSONで結果を得ることができ、<code>callback</code>パラメータでコールバック関数名を指定すると指定したコールバック関数でpaddingしてくれる(JSONPにしてくれる)。あとはコールバック関数でデータを加工してやれば良い。サンプルでは<a href="http://prototype.conio.net/">prototype.js</a>や自作ライブラリを使ってたりするが、多重リクエストのことなどは考えなくて良いと思われるので、単純に<code>script</code>要素を作成して追加するというコードをベタに書いても問題ないと思う。</p>
+
+<p>Yahoo! Search Web Servicesはドキュメントがしっかりしており、速度や安定性も申し分ない。日本語もきちんと扱われているので、「とりあえずJSONP使ってみよう」とか「JSONPってどんなことができるんだろう？」みたいな人の練習台にちょうど良いと思う。<a href="http://del.icio.us/">del.icio.us</a>は超重かったりするし。</p>
+
+<p>上記サンプルはこのサイトに特化した形になっていてわかりにくいと思うので、<a href="/test/088.html">既存のライブラリを使わずベタにJavaScriptを書いたサンプル</a>も用意した。100行に満たないコードで実装することができている。<code>script</code>要素を削除してないのはデバッグしやすいようにとか、JSONPで返ってくるデータの構造を良く知らない人のためにとか。こういう類の実際に利用されまくるものではちゃんと削除したほうが良いっぽい。</p>
+
+<hr>
+
+<p>とりあえずWeblogの各ページにある検索フォームは差し替えてみた。キャッシュの都合で切り替わってないように見える(Powered by Googleとなってたら切り替わってない)時にはスーパー・リロード(<kbd>Ctrl</kbd>+<kbd>F5</kbd>)で。やはり検索結果がちょっとアレな気がする。どういうのが良いのか具体的にイメージできてないので、挙動的にはこんなもんかなーとかいう感じ。検索結果の表示の工夫よりも、検索語拾ってアサマシ広告を挿入すると良さそうとかそんなことばかり考えてる。</p>
+
+<p>このように検索結果をページ遷移無しで表示することができると、訪問者が検索することイコール訪問者がページに留まることになる。サイト内に訪問者が留まる時間で考えるのなら、ページ遷移ありのごく普通なサイト内検索スクリプトでも変わらないのだけど、ページに留まるというのがミソ。ページに留まる時間が増えるということは、つまりそのページに挿入した広告が表示される時間が増えるということなので、広告収入を得る可能性の増加に直結する。</p>
+
+<p>とかもっともらしいことを書いてみる。ウソ・・・とも言い切れないだろうけど、広告の表示される時間からイメージされる効果には程遠いと思う。検索語を拾ってアサマシの方が効果が高そう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>media_query_listのパース</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/parsing-media-query-list.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Media Queriesの各クエリーは、featureとexpのセットもしくはmedia_typeでexpressionが、expressionをandで繋いでmedia_queryが、media_queryをカンマで繋いでmedia_query_listになり、それで完成する。そこそこ正確にパースしてJavaScriptから扱えるようにするためには、まずカンマで区切り、更にandキーワードまたはスペースで区切り、更に同じfeatureがあることを考慮した多次元配列に変換してやる必要がありそうだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Media Queriesの各クエリーは、featureとexpのセットもしくはmedia_typeでexpressionが、expressionをandで繋いでmedia_queryが、media_queryをカンマで繋いでmedia_query_listになり、それで完成する。そこそこ正確にパースしてJavaScriptから扱えるようにするためには、まずカンマで区切り、更にandキーワードまたはスペースで区切り、更に同じfeatureがあることを考慮した多次元配列に変換してやる必要がありそうだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="media_query_listのパース" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-03-03T07:34:17+09:00">2015年3月3日</time></p>
+
+        <h1><em>media_query_listのパース</em></h1>
+      </header>
+
+    <main>
+
+    <p>Media Queriesの各クエリーは、<code>feature</code>と<code>exp</code>のセットもしくは<code>media_type</code>で<code>expression</code>が、<code>expression</code>を<code>and</code>で繋いで<code>media_query</code>が、<code>media_query</code>をカンマで繋いで<code>media_query_list</code>になり、それで完成する。そこそこ正確にパースしてJavaScriptから扱えるようにするためには、まずカンマで区切り、更に<code>and</code>キーワードまたはスペースで区切り、更に同じ<code>feature</code>があることを考慮した多次元配列に変換してやる必要がありそうだ。</p>
+
+<p>まず存在しなさそうだが、以下のようなクエリーも理論上はありうる。</p>
+
+<pre>only
+  screen and
+  (min-width: 1em) and
+  (min-width: 2em),
+not
+  (min-width: 3em) and
+  (min-height: 4em) and
+  (min-height: 5em)</pre>
+
+<p>例えばこのようなクエリーを以下のようにできれば良さそうだ。</p>
+
+<pre><code class="language-javascript">var mediaQueryList = [
+  {
+    &apos;min-width&apos;: [&apos;1em&apos;, &apos;2em&apos;],
+    &apos;only&apos;: true,
+    &apos;screen&apos;: true
+  },
+  {
+    &apos;min-height&apos;: [&apos;4em&apos;, 5em&apos;],
+    &apos;min-width&apos;: [&apos;3em&apos;],
+    &apos;not&apos;: true
+  }
+];</code></pre>
+
+<p>こうするための実装を書いているけどすごい面倒くさくて嫌になってきている。<code>min-width</code>が複数回出てきても良いとか想定していなかった。</p>
+
+<hr>
+
+<p>パースは出来たとしてもどう扱ってソートするかでまた面倒くさい。<code>min-width</code>に絞っていても<code>media_query</code>の中で<em>最大</em>かつその中で<em>最小</em>を基準にソートする必要がありそうだ。他に<code>print, (min-width: 1em)</code>みたいなものの判断も難しい。もうちょっと時間かかりそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

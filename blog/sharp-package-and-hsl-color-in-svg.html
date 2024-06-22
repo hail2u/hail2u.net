@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>sharpパッケージとSVGでのhsl()</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/sharp-package-and-hsl-color-in-svg.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換にsharpパッケージを使うように変えたところで発生したらしい。sharpがSVGでhsl()をサポートしていない(正確にはSVG 1.1までのサポートのため、その仕様で定義済みの色しかサポートしていない)ことが原因だった(バグではない)。SVG側で#rrggbbに変更し、無事修正できた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換にsharpパッケージを使うように変えたところで発生したらしい。sharpがSVGでhsl()をサポートしていない(正確にはSVG 1.1までのサポートのため、その仕様で定義済みの色しかサポートしていない)ことが原因だった(バグではない)。SVG側で#rrggbbに変更し、無事修正できた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="sharpパッケージとSVGでのhsl()" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-07-26T14:29:10+09:00">2018年7月26日</time></p>
+
+        <h1><em>sharpパッケージとSVGでのhsl()</em></h1>
+      </header>
+
+    <main>
+
+    <p>このウェブサイトのタッチ・アイコンが壊れていた。どうもSVGからPNGへの変換に<a href="https://github.com/lovell/sharp">sharpパッケージ</a>を使うように変えたところで発生したらしい。sharpがSVGで<code>hsl()</code>をサポートしていない(正確にはSVG 1.1までのサポートのため、<a href="https://www.w3.org/TR/SVG/types.html#DataTypeColor">その仕様で定義済みの色</a>しかサポートしていない)ことが原因だった(バグではない)。SVG側で<code>#rrggbb</code>に変更し、無事修正できた。</p>
+
+<p>ファビコンへのコンバートはうまくいっているように見えたが、こちらも実は線が黒(<code>#000000</code>)になっていたようだ。実際には<code>hsl(0, 0%, 16%)</code>なので、<code>#292929</code>になっているべきだったが、さすがに目視ではチェックできなかった。こちらも<code>#rrggbb</code>に変更して修正した。</p>
+
+<p>SVGの安定仕様は1.1(2.0はCR)で、それはきちんとサポートしているようなので、イシューは立てづらい。もうちょっと考えよう。</p>
+
+<hr>
+
+<p>ほぼ最小で確認できるSVGは以下のようなものだ。</p>
+
+<pre><code class="language-xml">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  width=&quot;100&quot;
+  height=&quot;100&quot;
+  viewport=&quot;0 0 100 100&quot;&gt;
+  &lt;rect width=&quot;100&quot;
+    height=&quot;100&quot;
+    x=&quot;0&quot;
+    y=&quot;0&quot;
+    style=&quot;fill:hsl(0, 0%, 50%)&quot;/&gt;
+&lt;/svg&gt;</code></pre>
+
+<p>縦横100ピクセルの正方形を<code>hsl(0, 0%, 50%)</code>というグレーで塗りつぶしたものだ。<code>version</code>属性を削除してSVG 2.0として解釈されることを期待しているくらいだ。</p>
+
+<p>PNGに変換するコードはこのような簡単なものだ。特に何もしない。</p>
+
+<pre><code class="language-javascript">require(&quot;sharp&quot;)(&quot;test.svg&quot;)
+  .png()
+  .toFile(&quot;test.png&quot;);</code></pre>
+
+<p>出力される<code>test.png</code>は真っ黒(<code>#000000</code>)になる。</p>
+
+<hr>
+
+<p>そもそもsharpに乗り換えたのは、<a href="https://www.microsoft.com/ja-jp/p/inkscape/9pd9bhglfc7h">Inkscapeのストア版</a>に乗り換えたため、コマンドライン・アプリケーションへのアクセスが難しくなったからだ。ついでにImageMagikからも脱却させたりしたので不満はないが、ストア版アプリでのコマンドラインでの対応はまだまだだなと感じた。EdgeとiTunesしか対応しているのを見かけていない。頑張ってアプリ実行エイリアスを周知してほしい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

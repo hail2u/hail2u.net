@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Comment Only Syntax Highlight</title>
+
+    <style>
+      .comment {
+        color: #090;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Comment Only Syntax Highlight</h1>
+    </header>
+
+    <pre>/*!
+ * site-news.js
+ *
+ * /* inner commment */
+ *
+ * Copyright (c) 2009 Kyo Nagashima &lt;kyo@hail2u.net&gt;
+ * This library licensed under MIT license:
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+/*global jQuery, $ */
+
+$(function () {
+  &quot;use strict&quot;;
+  
+  // Get placeholer /*
+  var t = $(&quot;#site-news&quot;);
+
+  if (t === undefined) {
+    return false;
+  }
+
+  t.empty().append(
+    // Put loading message
+    $(&quot;&lt;p/&gt;&quot;).append(
+      $(&quot;&lt;em/&gt;&quot;).append(&quot;\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026&quot;)
+    )
+  );
+
+  $.getJSON(&quot;http://query.yahooapis.com/v1/public/yql?callback=?&quot;, {
+    q:      &quot;select * from rss where url=&#39;http://feeds.feedburner.com/hail2u&#39;&quot;,
+    format: &quot;json&quot;
+  }, function (data) {
+    // Clear placeholder
+    t.empty();
+
+    if (data.query.results &amp;&amp; data.query.results.item) {
+      var ul = $(&quot;&lt;ul/&gt;&quot;);
+
+      /*
+       * Process news as list item
+       * li/a/news-title
+       */
+      $.each(data.query.results.item, function () {
+        $(&quot;&lt;li/&gt;&quot;).append(
+          $(&quot;&lt;a/&gt;&quot;).attr({
+            href: this.link
+          }).append(this.title)
+        ).appendTo(ul);
+      });
+
+      ul.appendTo(t);
+    } else {
+      // Put error message
+      $(&quot;&lt;p/&gt;&quot;).append(&quot;\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002&quot;).appendTo(t);
+    }
+  });
+});</pre>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+      var c;
+      $("pre").each(function () {
+        var self = $(this);
+        self.html(highlightComments(self.html()));
+      });
+
+function highlightComments(str) {
+  var uid = '_' + +new Date(),
+    primatives = [],
+    primIndex = 0,
+    tokens = [],
+    i,
+    l,
+    token,
+    type,
+    level = 0;
+
+  str =
+    str
+    // Reserve strings
+    .replace(/(['"])(\\\1|.)+?\1/g, function(match){
+        primatives[primIndex] = match;
+        return (uid + '') + primIndex++;
+    })
+
+    // Reserve regexes
+    .replace(/([^\/])(\/(?!\*|\/)(\\\/|.)+?\/[gim]{0,3})/g, function(match, $1, $2){
+        primatives[primIndex] = $2;
+        return $1 + (uid + '') + primIndex++;
+    })
+
+    // Add mark to comments
+    .replace(/(\/\*|\/\/)/g, "`comment`$1")
+
+    // Restore strings and regexes
+    .replace(RegExp(uid + '(\\d+)', 'g'), function(match, n){
+        return primatives[n];
+    });
+
+  tokens = str.split("`comment`");
+
+  for (i = 0, l = tokens.length; i < l; i++) {
+    token = tokens[i];
+
+    if (/^(\/\*|\/\/)/.test(token)) {
+      if (level === 0 || (type === "m" && RegExp.$1 === "/*") || (type === "s" && RegExp.$1 === "//")) {
+        level++;
+
+        if (level === 1) {
+          token = "<span class=\"comment\">" + token;
+        }
+      }
+
+      if (type === undefined) {
+        type = (RegExp.$1 === "/*") ? "m" : "s";
+      }
+    }
+
+
+    if (type === "m" && /\*\//.test(token)) {
+    console.log(type, level, token);
+      if (level === 1) {
+        token = token.replace(/(\*\/)/, "$1</span>");
+        type = undefined;
+      }
+
+      level--;
+    }
+
+    if (type === "s" && /[\r\n]/.test(token)) {
+      if (level === 1) {
+        token = token.replace(/([\r\n]|$)/, "</span>$1");
+        type = undefined;
+      }
+
+      level--;
+    }
+
+    tokens[i] = token;
+  }
+
+  str = tokens.join("");
+
+  return str;
+}
+    </script>
+  </body>
+</html>

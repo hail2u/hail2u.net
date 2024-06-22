@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Node.jsで標準入力を一気に読む</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/nodejs-read-stdin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="/dev/stdinとかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今はprocess.stdin.fdのsizeを調べてそのサイズでBufferオブジェクトを作り、fs.readSync()で読み込むのが良いみたいだ。本当なのかな？" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="/dev/stdinとかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今はprocess.stdin.fdのsizeを調べてそのサイズでBufferオブジェクトを作り、fs.readSync()で読み込むのが良いみたいだ。本当なのかな？" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Node.jsで標準入力を一気に読む" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-08-02T03:39:50+09:00">2012年8月2日</time></p>
+
+        <h1><em>Node.jsで標準入力を一気に読む</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>/dev/stdin</code>とかそういうカッコイイの無いのでそういうのに依存しない方法を調べていた。今は<code>process.stdin.fd</code>の<code>size</code>を調べてそのサイズでBufferオブジェクトを作り、<code>fs.readSync()</code>で読み込むのが良いみたいだ。本当なのかな？</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var fs = require('fs');
+
+var fd = process.stdin.fd;
+var length = fs.fstatSync(fd).size;
+var buffer = new Buffer(length);
+var bytesRead = fs.readSync(fd, buffer, 0, length, 0);
+var input = buffer.toString('utf8', 0, bytesRead);
+console.log(input);</code></pre>
+
+<p><code>fs.readSync()</code>はその第二引数がBufferオブジェクトじゃない場合はレガシーなモードになるので、Bufferオブジェクトを経由しなくて良かったりもする。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var fs = require('fs');
+
+var fd = process.stdin.fd;
+var length = fs.fstatSync(fd).size;
+var input = fs.readSync(fd, length)[0];
+console.log(input);</code></pre>
+
+<p>レガシーなモードでは返り値は<code>[string, bytesRead]</code>という配列になってるので、最初の要素だけを抜き出せば良い。短い。でもv0.8.4のドキュメントではこのことについて<a href="http://nodejs.org/docs/v0.8.4/api/fs.html#fs_fs_readsync_fd_buffer_offset_length_position">もう書かれていない</a>ので使わない方が良さそう。</p>
+
+<section>
+<h2>追記</h2>
+<p>Node.js v5以降では<code>fs.*File()</code>の第一引数でファイル識別子が利用できるようになった。そのためもはやこのような冗長な記述をする必要はなく、以下のような形で一気に読むことができる。</p>
+
+<pre><code class="language-javascript">var fs = require(&quot;fs&quot;);
+
+var input = fs.readFileSync(process.stdin.fd, &quot;utf8&quot;);</code></pre>
+
+<p>標準入力のファイル識別子は<code>process.stdin.fd</code>で参照できるので、それを第一引数で指定するだけだ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

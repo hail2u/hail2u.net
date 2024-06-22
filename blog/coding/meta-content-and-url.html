@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>meta要素のcontent属性でURL</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/meta-content-and-url.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="meta要素のcontent属性は特にどういう値が入るものか決められていない。のでURLじゃないかもしれないし、URLとみなせる文字列なのかもしれない。OGPではRDFaだからmeta要素を使いましょうと書かれていて、URLを値とするurlやimageプロパティーもmeta要素のcontent属性を使う。昨日見たのだとWindows 8のピンに使われるmsapplication-TileImageとかもそう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="meta要素のcontent属性は特にどういう値が入るものか決められていない。のでURLじゃないかもしれないし、URLとみなせる文字列なのかもしれない。OGPではRDFaだからmeta要素を使いましょうと書かれていて、URLを値とするurlやimageプロパティーもmeta要素のcontent属性を使う。昨日見たのだとWindows 8のピンに使われるmsapplication-TileImageとかもそう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="meta要素のcontent属性でURL" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-06-10T02:41:02+09:00">2012年6月10日</time></p>
+
+        <h1><em>meta要素のcontent属性でURL</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>meta</code>要素の<code>content</code>属性は特にどういう値が入るものか決められていない。のでURLじゃないかもしれないし、URLとみなせる文字列なのかもしれない。<a href="http://ogp.me/">OGP</a>ではRDFaだから<code>meta</code>要素を使いましょうと書かれていて、URLを値とする<code>url</code>や<code>image</code>プロパティーも<code>meta</code>要素の<code>content</code>属性を使う。昨日見たのだと<a href="http://blogs.msdn.com/b/ie/archive/2012/06/08/high-quality-visuals-for-pinned-sites-in-windows-8.aspx">Windows 8のピンに使われる<code>msapplication-TileImage</code></a>とかもそう。</p>
+
+<p>例えば「相対URLを使った場合はどうなるのか？」とか。IEBlogで例示されているコードでは相対URL使ってるので、Windows 8はとりあえずどうにかしてくれそうだけど、「<code>base</code>要素あってもちゃんと判断してくれるの？」とか疑問を持ち始めたらキリがない。こういうのはやっぱりURLだと明示されている要素の属性で行うべきだと思う。他に使えるものがないというのならしょうがないけど、このケースでは<code>rel=&quot;canonical&quot;</code>や<code>rel=&quot;icon&quot;</code>と同じ扱いで良いと思うので、<code>link</code>要素の<code>href</code>属性の方がふさわしそう。</p>
+
+<p><code>meta</code>要素はメタデータのmetaから来ているわけだけど、だからといってメタデータは全部<code>meta</code>要素でというわけではない。<code>title</code>や<code>link</code>要素などが相応しくない場合の最後の楽園。</p>
+
+<p><code>apple-touch-icon</code>とかは<code>link</code>要素使っている。特にGoogle +1ボタンなんかはせっかくMicrodataのおかげでスキーマレスで値の判断が行えるのだから、<code>meta</code>要素を使うべきではないはず。</p>
+
+<pre><code class="language-html">&lt;head itemscope itemtype="http://schema.org/WebPage"&gt;
+  &lt;link src="/images/logo.png" rel="og:image"&gt;
+  &lt;link href="/" rel="canonical og:url"&gt;
+  &lt;link src="/images/logo.png" itemprop="image"&gt;
+  &lt;link href="/" itemprop="url"&gt;
+&lt;/head&gt;</code></pre>
+
+<p><code>rel</code>と<code>itemprop</code>属性は排他なのでまとめることは出来ないけど、<code>rel</code>は空白区切りで複数の値をとれるので<code>canonical</code>と<code>og:url</code>をまとめたりはできる。世のパーサーからは普通に無視されそうなので「書き直しましょう！」とかそういう話ではない。</p>
+
+<hr>
+
+<p>セマンティック期。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

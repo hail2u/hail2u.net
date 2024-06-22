@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>floatで並べたリストのセンタリング</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/centering-floated-list.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ページング・ナビゲーションなどでリスト項目をfloat: left;で横に並べるというのは割りと良く使われると思う。並べること自体は特に難しいわけではないが、その並べたリスト全体をセンタリングしようとするとちょっとややこしい。display: inline-block;を使う手法やdisplay: table;を使う手法という黒魔法的(私見)な手法で実現可能だが、position: relative;でもいける。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ページング・ナビゲーションなどでリスト項目をfloat: left;で横に並べるというのは割りと良く使われると思う。並べること自体は特に難しいわけではないが、その並べたリスト全体をセンタリングしようとするとちょっとややこしい。display: inline-block;を使う手法やdisplay: table;を使う手法という黒魔法的(私見)な手法で実現可能だが、position: relative;でもいける。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/centering-floated-list-complete-preview.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="floatで並べたリストのセンタリング" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-05-20T07:00:39+09:00">2009年5月20日</time></p>
+
+        <h1><em>floatで並べたリストのセンタリング</em></h1>
+      </header>
+
+    <main>
+
+    <p>ページング・ナビゲーションなどでリスト項目を<code>float: left;</code>で横に並べるというのは割りと良く使われると思う。並べること自体は特に難しいわけではないが、その並べたリスト全体をセンタリングしようとするとちょっとややこしい。<a href="http://css-eblog.com/csstechnique/display-inlineblock.html"><code>display: inline-block;</code>を使う手法</a>や<a href="http://css-tricks.com/centering-list-items-horizontally-slightly-trickier-than-you-might-think/"><code>display: table;</code>を使う手法</a>という黒魔法的(私見)な手法で実現可能だが、<code>position: relative;</code>でもいける。</p>
+
+<p>ややこしい理由は簡単で、センタリングでよく使われる<code>text-align: center;</code>や<code>margin: 0 auto;</code>といった手法が通用しないから。検索するとすぐ出てくる比較的メジャーな<code>display</code>で頑張る方法もわかりやすいし悪くはないのだけど、同一セレクタ内で複数の<code>display</code>を駆使する必要があることや<code>zoom</code>マジックなどを併用する必要があることからコードがややこしくなる。</p>
+
+<p>対して、相対的に要素の位置を移動させる<code>position: relative;</code>を複数組み合わせて実現する場合は、CSSハック・フリーで記述できるので簡潔なコードになる。ただし余り使われないので理解しづらい。以下、<a href="/test/108.html">動作サンプル</a>を元に少し解説。</p>
+
+<p>リスト項目を横に並べるためのコード等を省くと、</p>
+
+<pre><code class="language-css">.centered {
+  position: relative;
+  overflow: hidden;
+}
+
+.centered ul {
+  position: relative;
+  left: 50%;
+  float: left;
+}
+
+.centered ul li {
+  position: relative;
+  left: -50%;
+  float: left;
+}</code></pre>
+
+<p>以上がセンタリングさせるために必要なコードで、やっていることは、</p>
+
+<ol>
+<li>リスト全体である<code>ul</code>要素を右に50%移動</li>
+<li>各リスト項目になる<code>li</code>要素を左に50%移動</li>
+</ol>
+
+<p>各リスト項目を左に移動する時の基準は<em>リスト全体のコンテナの左端から各リスト項目の左端までの距離</em>になるので、リスト全体をセンタリングしたような位置に移動することが出来る。<code>left: -50%;</code>は<code>right: 50%;</code>でもOKだが、前者の方が直観的。リスト全体を括る<code>.centered</code>への指定は横スクロールバーが出てしまうことへの対策。<code>position: relative;</code>はIEに必要。</p>
+
+<hr>
+
+<p>色々装飾をつけたりして、</p>
+
+<figure>
+<img alt="ページング・ナビゲーションのプレビュー。" height="74" src="/img/blog/centering-floated-list-complete-preview.png" width="442">
+</figure>
+
+<p>こんな感じにしたもののをこのウェブログのページング・ナビゲーションに採用した。</p>
+
+<section>
+<h2>追記</h2>
+
+<figure>
+<img alt="端を丸めたページング・ナビゲーションのプレビュー。" height="56" src="/img/blog/centering-floated-list-complete-modified-preview.png" width="434">
+</figure>
+
+<p><a href="/img/bg-paging.png">背景画像</a>を書き直して、端を丸くした。ありがちな感じになった。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

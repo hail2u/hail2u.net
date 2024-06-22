@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>meta要素のname=color-schemeについて</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/meta-name-color-scheme.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくるスクロールバーが明るいままなので、かなり浮いてしまう。meta要素でname=color-schemeを適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く(明るく)できる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくるスクロールバーが明るいままなので、かなり浮いてしまう。meta要素でname=color-schemeを適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く(明るく)できる。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/meta-name-color-scheme.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="meta要素のname=color-schemeについて" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-02-15T10:36:25+09:00">2021年2月15日</time></p>
+
+        <h1><em>meta要素のname=color-schemeについて</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="WindowsのEdgeが、ユーザーのダーク・モード設定に適応して、チェックボックスや、メーター、入力ボックス、セレクト・ボックス、ボタン、そしてスクロールバーの色を暗くしてくれている。" height="1440" src="/img/blog/meta-name-color-scheme.png" width="2560">
+</figure>
+
+<p>ダーク・モードへ適応するなら、フォーム関連要素の色も切り替えるよう、CSSを書くだろう。しかし、それだけでは、例えばテキストエリアで出てくる<em>スクロールバー</em>が明るいままなので、かなり浮いてしまう。<code>meta</code>要素で<a href="https://html.spec.whatwg.org/multipage/semantics.html#meta-color-scheme"><code>name=color-scheme</code></a>を適切に設定すると、そういったスクロールバーの色も含めたあらゆるものの色を暗く(明るく)できる。</p>
+
+<p>書き方は特に難しくない。ダーク・モードへ適応しようと、<code>prefers-color-scheme</code>メディア・クエリーを使って、明るい背景と暗い背景を切り替えるなら、以下のようにHTMLファイルの<code>head</code>要素以下に書けばいい。viewportと似たようなものだ。</p>
+
+<pre><code class="language-html">&lt;meta
+  name=&quot;color-scheme&quot;
+  content=&quot;light dark&quot;&gt;</code></pre>
+
+<p><code>light</code>と<code>dark</code>の順序は、逆でも意味は変わらない。これだけでユーザーのOSやブラウザーでのダーク・モード設定にしたがって、フォーム関連要素やスクロールバーの色が切り替わってくれる。具体的にどのように切り替わるかは、<a href="https://webkit.org/blog/8840/dark-mode-support-in-webkit/">Safariでの紹介</a>を参照するといいだろう。ChromeやEdgeでも、同じようになじみやすい色合いに変わってくれる。</p>
+
+<section>
+<h2>CSSに書くか、HTMLに書くか</h2>
+
+<p>Safariでの紹介では、CSSで<a href="https://www.w3.org/TR/css-color-adjust-1/#color-scheme-prop"><code>color-scheme</code>プロパティー</a>を使っている。こうした場合、CSSをパースするまで外観モードに従うべきかはっきりしないため、読み込み時にちらつく可能性がないこともない。そうなった場合、ユーザーへ大きな不利益を与えるので、HTMLに<code>meta</code>要素で書いた方が無難だろう。</p>
+
+<p>また、HTMLに書くと、何らかの理由でCSSが読み込めなかった場合にも利点がある。そういった場合にも、ユーザーのダーク・モード設定にしたがって、背景色が白または黒に適応してくれるからだ。この挙動には議論の余地があるが、ユーザーの環境の尊重という観点では、HTMLに書く方に軍配が上がるだろう。</p>
+
+<p>一方で、CSSに書く利点もある。<code>prefers-color-scheme</code>メディア・クエリーなどと共に、すべてCSSに閉じ込められるからだ。ツールなどでCSSをインライン化する場合などには、ちらつく危険性や読み込み失敗の可能性がほぼなくなるので、CSSに書いてもいいかもしれない。</p>
+</section>
+
+<section>
+<h2>常に書くべきか</h2>
+
+<p>ダーク・モードへ適応せず、明るい背景のウェブページなら、この<code>meta</code>要素を書く必要はない。今まで通り、明るいもので構わないからだ。後方互換性のため、ブラウザーは既定で明るいものを使うままになっている。</p>
+
+<p>逆に、暗い背景のみのウェブページを作っているなら、<code>content</code>属性の値を<code>dark</code>のみにするといい。こうすると、ユーザーの外観モード設定を無視して<em>常に</em>暗いものを使うようになる。今までは扱いが難しかったスクロールバー、特に上述したテキストエリアでのスクロールバーがうまくなじむようになり、ユーザー体験の向上に貢献するだろう。</p>
+</section>
+
+<section>
+<h2>Firefoxについて</h2>
+
+<p>2021年2月15日現在の最新版であるFirefox 85では、<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#browser_compatibility">この<code>meta</code>要素での<code>name=color-scheme</code></a>や<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme#browser_compatibility">CSSの<code>color-scheme</code>プロパティー</a>はサポートされていない。しかし、ウェブページの背景色に基づいて自動で切り替わるようになっており、記述の有無は関係ない。Firefoxだけでのみ挙動が違うということもないはずなので、あまり気にする必要はないだろう。</p>
+
+<p>ただし、CSSの書き方によっては、暗い背景なのに明るいものが使われてしまうことがある。確認は忘れないようにしたい。このウェブサイトでは<a href="https://github.com/hail2u/hail2u.net/commit/aab8fd8dcb234a20e099d371f91d0772c6d71007">最近直した</a>。Firefox 64以降では<a href="https://drafts.csswg.org/css-scrollbars-1/#scrollbar-color"><code>scrollbar-color</code>プロパティー</a>が実装されているので、確実を期すなら、こちらも利用した方がいいかもしれない。</p>
+</section>
+
+<hr>
+
+<p>まとめると以下のようになる。</p>
+
+<ul>
+<li>ダーク・モードへ適応するなら<code>&lt;meta name=&quot;color-scheme&quot; content=&quot;light dark&quot;&gt;</code></li>
+<li>meta要素で書く方が無難</li>
+<li>明るい背景だけなら不要</li>
+<li>暗い背景だけなら<code>&lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot;&gt;</code>に</li>
+<li>Firefoxはダイジョウブ</li>
+</ul>
+
+<p>この<code>meta</code>要素で<code>name=color-scheme</code>の実装は、Safari 12が最初で、後にChrome 81やEdge 81でサポートされた。ChromeとEdgeでのサポートからは、すでに半年以上になる。ダーク・モードの広まりに若干遅れたため、記述していないウェブページはかなり多い。些細なことと思わずに、ぜひ記述してほしい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

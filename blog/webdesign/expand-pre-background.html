@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>preの背景をブラウザの幅いっぱいに拡大する</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/expand-pre-background.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ここ最近のコードブロックのスタイリングの流行りに、本文よりもコードブロックが左右に飛び出すようなデザインがある。有名所だとQuirksModeで見ることができる(ここが発祥かもしれない)。このデザインはmarginプロパティで負の値を指定し、paddingプロパティでその分戻すことによって実現している。そのため非幅固定か幅固定でもQuirksModeのように左寄せならこの方法で実現できるが、うちのサイトのように幅固定で中央寄せな場合は左右のマージンが不定なため実現できない。しかし:before及び:after擬似要素を使うまったく別の方法でも実現することができた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ここ最近のコードブロックのスタイリングの流行りに、本文よりもコードブロックが左右に飛び出すようなデザインがある。有名所だとQuirksModeで見ることができる(ここが発祥かもしれない)。このデザインはmarginプロパティで負の値を指定し、paddingプロパティでその分戻すことによって実現している。そのため非幅固定か幅固定でもQuirksModeのように左寄せならこの方法で実現できるが、うちのサイトのように幅固定で中央寄せな場合は左右のマージンが不定なため実現できない。しかし:before及び:after擬似要素を使うまったく別の方法でも実現することができた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="preの背景をブラウザの幅いっぱいに拡大する" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-05-07T00:14:27+09:00">2011年5月7日</time></p>
+
+        <h1><em>preの背景をブラウザの幅いっぱいに拡大する</em></h1>
+      </header>
+
+    <main>
+
+    <p>ここ最近のコードブロックのスタイリングの流行りに、本文よりもコードブロックが左右に飛び出すようなデザインがある。有名所だと<a href="http://www.quirksmode.org/blog/archives/2010/04/dropdowns_revis.html">QuirksMode</a>で見ることができる(ここが発祥かもしれない)。このデザインは<code>margin</code>プロパティで負の値を指定し、<code>padding</code>プロパティでその分戻すことによって実現している。そのため非幅固定か幅固定でもQuirksModeのように左寄せならこの方法で実現できるが、うちのサイトのように幅固定で中央寄せな場合は左右のマージンが不定なため実現できない。しかし<code>:before</code>及び<code>:after</code>擬似要素を使うまったく別の方法でも実現することができた。</p>
+
+<p>Demo: <a href="/test/243.html">Expand pre Background</a></p>
+
+<p>ブラウザをリサイズしても幅固定と中央寄せのレイアウトを崩すことなく<code>pre</code>要素の背景がブラウザの幅いっぱいに拡大しているように見えるのが確認できると思う。</p>
+
+<pre><code class="language-css">pre {
+  position: relative;
+}
+
+pre:before,
+pre:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 10000px;
+  height: 100%;
+  content: &quot;&quot;;
+}</code></pre>
+
+<p>まず<code>pre</code>要素に<code>position: relative;</code>と指定し、その上で<code>:before</code>及び<code>:after</code>擬似要素を<code>position: absolute;</code>と指定する。こうすることによって2つの擬似要素を<code>pre</code>要素の位置を基準とした絶対配置ができるようになる上に、<code>width</code>プロパティと<code>height</code>プロパティの長さの基準が<code>pre</code>要素の幅と高さになる。つまり、<code>pre</code>要素と同じ高さの空のブロックを作り出すことが可能になる。幅はブラウザの幅が極端に広いケースを考慮して、一応<code>10000px</code>などと大きめな値を指定しておく。</p>
+
+<pre><code class="language-css">pre:before {
+  right: 100%;
+}
+
+pre:after {
+  left: 100%;
+}</code></pre>
+
+<p>あとはこの2つの擬似要素を左右にぴったりとくっつくように<code>right</code>プロパティと<code>left</code>プロパティを使って配置してやる。<code>right: 100%;</code>で<em>その要素の右端が親要素の右端から100%、つまり左端になる</em>。日本語にするとややこしい。<code>position</code>プロパティの組み合わせを使った単純な絶対配置に留まらないブロックのレイアウトは色々応用が効くのできちんと憶えておいた方が良いと思う。特に最近流行りの擬似要素を利用したテクニックでは頻出するので、きちんと理解していないと何をやっているのかよくわからなくなってしまうだろう。</p>
+
+<p><code>:after</code>擬似要素の幅が<code>10000px</code>のため、このままではもちろん水平スクロールバーが出てしまうので、</p>
+
+<pre><code class="language-css">body {
+  overflow-x: hidden;
+}</code></pre>
+
+<p>とする必要もある。これで後は好きな背景を指定するのみ。繰り返し画像を背景画像にする場合は境目でのつながりも考慮して<code>background-position</code>を工夫する必要もあると思う。</p>
+
+<p>気をつけるのは上下に枠線を引く場合で、その場合は<code>:before</code>及び<code>after</code>擬似要素の<code>top</code>及び<code>right</code>、<code>bottom</code>、<code>left</code>プロパティが枠線の内側を基準にするので枠線のサイズ分位置をずらす必要がある。</p>
+
+<pre><code class="language-css">pre {
+  border-top: 3px double #ccc;
+  border-bottom: 3px double #ccc;
+  position: relative;
+}
+
+pre:before,
+pre:after {
+  border-top: 3px double #ccc;
+  border-bottom: 3px double #ccc;
+  display: block;
+  position: absolute;
+  top: <em>-3px</em>;
+  width: 10000px;
+  height: 100%;
+  content: &quot;&quot;;
+}</code></pre>
+
+<p>上記のように上下に<code>3px</code>の二重線を引きたいなら、擬似要素の位置を<code>3px</code>ずらしてやるということだ。</p>
+
+<hr>
+
+<p>擬似要素2つ使わないでもたぶん実現出来るし、最終的にはみ出したのを隠すならば、<code>margin: 0 -10000px</code>とかでも実現できそうだが面倒になったのでこれで。最近<code>:before</code>及び<code>after</code>擬似要素があればなんでもできるんじゃないかと勘違いし始めていて危険な兆候だ……。擬似要素厨とかいう言葉が生まれる日も近い。</p>
+
+<section>
+<h2>追記</h2>
+
+<p><a href="http://twitter.com/cfuy/status/66528263316586497">Mobile Safari (やMac上のSafari)で横スクロールバーが出てしまうらしい</a>。<code>body</code>要素への<code>overflow-x: hidden;</code>がうまく効かないというバグらしいので、<code>body</code>要素直下に全体を括る<code>div</code>要素を作り、そこで<code>overflow-x: hidden;</code>とすれば<a href="http://twitter.com/JForg/status/66590081451958272">回避できる</a>らしいが、そうするくらいならJavaScriptでどうにかした方が良さそう。</p>
+
+<p>また、<code>body</code>要素に<code>position: relative;</code>を加えると<a href="http://www.tonylea.com/2010/safari-overflow-hidden-problem/">直るという話</a>もあったが、うちのサイトではうまくいかなかった。</p>
+
+<p>他には<code>html</code>要素にもCSS指定を追加するという方法も聞いた。</p>
+
+<pre><code class="language-css">html {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}</code></pre>
+
+<p>うちのサイトのスタイルシートに加えたところ、今度はOpera 11でスクロールバーが二重になるという現象が起きた(他のページでは再現できない)。</p>
+
+<p>なんか他の方法考えてみる……。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>スケーラブルな三角形をCSSグラデーションで作る</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/create-scalable-triangle-edge-with-css-gradient.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ひとつ前のエントリで書いたやり方だとスケーラブルじゃないので著しく生産性に欠ける。真っ当にCSSグラデーションを書いてうまく重ねてやるとスケーラブルな三角形を作ることができるようだ。変な書き方を知っているのも良し悪しですね！" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ひとつ前のエントリで書いたやり方だとスケーラブルじゃないので著しく生産性に欠ける。真っ当にCSSグラデーションを書いてうまく重ねてやるとスケーラブルな三角形を作ることができるようだ。変な書き方を知っているのも良し悪しですね！" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="スケーラブルな三角形をCSSグラデーションで作る" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-01-25T05:26:58+09:00">2012年1月25日</time></p>
+
+        <h1><em>スケーラブルな三角形をCSSグラデーションで作る</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/blog/webdesign/create-and-animate-triangle-edge-with-css-gradient.html">ひとつ前のエントリで書いたやり方</a>だとスケーラブルじゃないので著しく生産性に欠ける。真っ当にCSSグラデーションを書いてうまく重ねてやるとスケーラブルな三角形を作ることができるようだ。変な書き方を知っているのも良し悪しですね！</p>
+
+<p>Demo: <a href="/test/349.html">しゅるしゅる動く奴 #2</a></p>
+
+<pre><code class="language-css">.test {
+  background-color: red;
+  background-image:
+    linear-gradient(top right, red   0, red   50%, transparent 50%, transparent 100%),
+    linear-gradient(top  left, white 0, white 50%, red         50%, red         100%)
+  ;
+}</code></pre>
+
+<p>これがベースでCSSグラデーションを使って斜めのグラデーションを作り重ねてやるというもの。複数の背景画像を指定した場合は先に書いた背景画像が手前に来るので、そっちでは<code>transparent</code>キーワードを使ってやることにより三角形になるように整えてやる。</p>
+
+<p>三角形のサイズは<code>height</code>と<code>background-size</code>プロパティーで調節する。</p>
+
+<pre><code class="language-css">.test {
+  height: 32px;
+  background-size: 32px 32px;
+}</code></pre>
+
+<p>これでひとつ前のエントリで作った三角形と同じ大きさになる。</p>
+
+<pre><code class="language-css">.test {
+  height: 48px;
+  background-size: 48px 48px;
+}</code></pre>
+
+<p>全てのサイズを大きくすれば三角形のサイズが大きくなる。小さくしたければ同じように全てのサイズを小さくするのみ。</p>
+
+<p>小さくしてインジケーター風に三角形を配置する場合(デモの最後のやつ)は、<code>bakcground-position</code>プロパティーも使う。</p>
+
+<pre><code class="language-css">.test {
+  height: 32px;
+  background-position: 8px center; /* 8px = (32px - 16px) / 2 */
+  background-size: 16px 16px;
+}</code></pre>
+
+<p>インジケーター風のを更に応用すると吹き出しの尻尾の部分も作ることができる(デモの付録のようなやつ)。</p>
+
+<pre><code class="language-css">.test {
+  background-image:
+    /* 尻尾になる部分 */
+    linear-gradient(top left, red   0, red    50%, white 50%, white 100%),
+    /* 背景色をブロックする部分 */
+    linear-gradient(left,     white 0, white 100%)
+  ;
+  background-position:
+    /* 尻尾の位置 */
+    64px bottom,
+    left bottom
+  ;
+  background-repeat: no-repeat;
+  background-size:
+    /* 尻尾の大きさ */
+    16px 16px,
+    100% 16px
+  ;
+}</code></pre>
+
+<p>もうちょっと工夫すれば<code>linear-gradient()</code>ひとつで作れそうな気がしないでもない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

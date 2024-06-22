@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ページごとのCSS</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/page-specific-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTTPS＋HTTP/2時代なのでCSSを連結しなくても大丈夫だよ、といった風の記事をよく見るようになった。僕はそういった推測や検証は概ね間違っていると考えている(そのうち検証したい)のだが、一方で小さいウェブサイトではそれなりにうまくいくとも考えている。まずは色々やってみようと、このウェブサイトでCSSを論理的な単位で作るように(分割するわけではない)した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTTPS＋HTTP/2時代なのでCSSを連結しなくても大丈夫だよ、といった風の記事をよく見るようになった。僕はそういった推測や検証は概ね間違っていると考えている(そのうち検証したい)のだが、一方で小さいウェブサイトではそれなりにうまくいくとも考えている。まずは色々やってみようと、このウェブサイトでCSSを論理的な単位で作るように(分割するわけではない)した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ページごとのCSS" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-04T13:10:35+09:00">2016年4月4日</time></p>
+
+        <h1><em>ページごとのCSS</em></h1>
+      </header>
+
+    <main>
+
+    <p>HTTPS＋HTTP/2時代なのでCSSを連結しなくても大丈夫だよ、といった風の記事をよく見るようになった。僕はそういった推測や検証は概ね間違っていると考えている(そのうち検証したい)のだが、一方で小さいウェブサイトではそれなりにうまくいくとも考えている。まずは色々やってみようと、このウェブサイトでCSSを論理的な単位で作るように(分割するわけではない)した。</p>
+
+<p>論理的な単位といっても、ウィジェットごとにCSSを作るのはいかにも小さすぎると感じた。様々なツールもそのような利用の仕方を想定されていないため、それぞれのウィジェットで同じコードを何度も書く必要が出てきたりもするだろう。そういうものをうまくまとめても結局はそのまとめたものを参照するコードが必要になる。</p>
+
+<p>感覚としてはページ(の種類)ごとくらいに分けるのがわかりやすそうだ。例えばウェブログの記事ではこの3種が読み込まれることになる。</p>
+
+<ul>
+<li>common.min.css: 共通のスタイル</li>
+<li>permalink.min.css: パーマリンクで使うスタイル</li>
+<li>print.min.css: 印刷用スタイル</li>
+</ul>
+
+<p>パーマリンクで使うスタイルには、画像の特殊な配置や脚注、プルクォートなど、ウェブログの記事を書く上で使うものが含まれる。これらは本当にパーマリンクでしか使われないため、違うページ、例えばホームでは<code>permalink.css</code>の代わりに<code>home.min.css</code>が読み込まれ、それでは記事一覧などのスタイルのみが含まれることになる。<code>permalink.min.css</code>と<code>home.min.css</code>は一部重なるスタイルもあるが、無駄ということにはならないのでそういうものということで良いだろう。</p>
+
+<p>それぞれはSassを使って作られる。</p>
+
+<pre><code class="language-scss">/*!
+ * permalink.css
+ * https://github.com/hail2u/hail2u.net-styles
+ *
+ * Licensed under MIT: http://hail2u.mit-license.org/2011
+ */
+
+@import &quot;init&quot;;
+
+@import &quot;content/first-heading-permalink&quot;;
+@import &quot;content/section-footer-permalink&quot;;
+
+@import &quot;widget/bordered&quot;;
+@import &quot;widget/drop&quot;;
+@import &quot;widget/fill&quot;;
+@import &quot;widget/float&quot;;
+@import &quot;widget/footnote&quot;;
+@import &quot;widget/pull-quote&quot;;
+@import &quot;widget/read-older&quot;;
+@import &quot;widget/seealso&quot;;
+@import &quot;widget/sidenote&quot;;</code></pre>
+
+<p>ウィジェットは他で使われる可能性もあるため、このようなエントリーポイント的なファイルがどうしても必要になりそうだ。逆に絶対共有しないのであればここに書いてしまうのも良いかもしれない。ここでは共有するユーザー定義関数や変数、プレースホルダー・セレクターをまとめてある<code>_init.scss</code>をまずインポートする。そうしないと続くウィジェットがうまく処理できない。改めてページごとに必要な(必要になりそうな)ウィジェットのみをインポートする。</p>
+
+<p>仕組みとしては特に難しいことはないだろう。このウェブサイトでは印刷用CSSを完全に分けているので、HTMLでのCSSの参照は少し変わった形になっているが、普通はそこまで考える必要もない。</p>
+
+<hr>
+
+<p>既にいくつか考えられる問題はある。</p>
+
+<p>最も大きいのはパフォーマンスの向上がコードの煩雑さに見合うものなのかというような点だ。今のところウィジェット間で共有したいものの管理で無駄としか考えられないような作業が膨大に必要とされ、かなり手間がかかる。規模によっては致命的な作業量になりそうだ。もっと単純なCSSから複雑なCSSまでこのような書き方をしてみないと、煩雑さが避けられないものかどうかは判断できないが、あまり期待はできないような印象だ。</p>
+
+<p>もっとコードの面から見た場合、セレクターの書き方次第ではメディア・クエリーの適用順序の問題が浮上する。そうなるとBEMであったりといったいわゆるモバイル・ファーストのCSSコードを前提とした、直列なクラス名管理手法はうまく機能しなくなるかもしれない。</p>
+
+<p>また、僕が大きなウェブサイトではあまり機能しないと考えているのは、こういったCSSの並列リクエストといった考え方がまったく通用しないと考えているいうわけではない。大きなウェブサイトではパフォーマンスが第一であるべきで、それを考えるなら連結したCSSをサーバーの仕様やスペックに従い最適なサイズに機械的に分割した方が効率的なのではないかと想像しているからだ。</p>
+
+<hr>
+
+<p>ひとつのファイルで完結するCSSを意識して10年以上CSSを書いてきたので、まずはその精神構造から修正していかないとならない。そう考えると道のりはかなり厳しいもののように思える。yui-reset.cssやyui-font.cssなどのようなものと自分のウェブサイト用のCSSを組み合わせて使っていた感覚を思い出しつつ、それを特化型かつ汎用的に構築していくような意識を持たなければならない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

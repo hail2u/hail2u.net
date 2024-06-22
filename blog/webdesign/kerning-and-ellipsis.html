@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>font-feature-settingsの罠</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/kerning-and-ellipsis.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Chrome 35でfont-feature-settingsプロパティーで&quot;kern&quot; 1を使いカーニングを有効にしている時、text-overflowプロパティーでellipsisを指定しはみ出した文字を三点リーダーで省略しようとした場合に、追加される三点リーダーがコンテント・エリアをはみ出すバグがあることに気づいた。立て続けにfont-feature-settingsプロパティーでハマってキツい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Chrome 35でfont-feature-settingsプロパティーで&quot;kern&quot; 1を使いカーニングを有効にしている時、text-overflowプロパティーでellipsisを指定しはみ出した文字を三点リーダーで省略しようとした場合に、追加される三点リーダーがコンテント・エリアをはみ出すバグがあることに気づいた。立て続けにfont-feature-settingsプロパティーでハマってキツい。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/kerning-and-ellipsis-on-chrome-35.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="font-feature-settingsの罠" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-06T13:35:33+09:00">2014年7月6日</time></p>
+
+        <h1><em>font-feature-settingsの罠</em></h1>
+      </header>
+
+    <main>
+
+    <p>Chrome 35で<code>font-feature-settings</code>プロパティーで<code>&quot;kern&quot; 1</code>を使いカーニングを有効にしている時、<code>text-overflow</code>プロパティーで<code>ellipsis</code>を指定しはみ出した文字を三点リーダーで省略しようとした場合に、追加される三点リーダーがコンテント・エリアをはみ出すバグがあることに気づいた。立て続けに<code>font-feature-settings</code>プロパティーでハマってキツい。</p>
+
+<p>Demo: <a href="/pub/test/576.html">&quot;kern&quot; 1 and ellipsis on Chrome 35</a></p>
+
+<p>Chrome 35ではカーニングを有効にすると、三点リーダーがはみ出し途中で切れる。<code>padding</code>プロパティーによる内側の余白がある場合は切れずに一応表示されるが、コンテント・エリアからははみ出す。もしかするとOSによるかもしれない。Internet Explorer 11やFirefox 30では問題ない。</p>
+
+<figure>
+<img alt="Chrome 35ではカーニングを有効にすると(上)三点リーダーが欠けることが多くなるが、無効のまま(下)だと問題ない。" height="440" src="/img/blog/kerning-and-ellipsis-on-chrome-35.png" width="320">
+<figcaption>Kerning and Ellipsis on Chrome 35</figcaption>
+</figure>
+
+<p>この問題はChrome 37では既に修正済みなので、近い未来に解決される。</p>
+
+<hr>
+
+<p><code>font-feature-settings</code>プロパティーで立て続けに問題が起こってしまったので、ちょっと使いづらいプロパティーという印象が強くなりつつある。しかも一見して問題がなさそうに見えるところも厄介。継承で指定し直しというような実装の面倒さも含め、もうちょっとこなれないと実戦投入しづらいかなと感じる。今のところ<code>text-rendering: optimizeLegibitilty</code>並に罠が多いと思っておいた方が良さそう。</p>
+
+<p>この辺りは<code>font-feature-settings</code>プロパティーのChromeにおける実装の問題というよりも、もっと根が深いというかフォントのレンダリングにおける問題なような印象も受ける。そうだとするとChromeでDirectWriteによるレンダリングがデフォルトで有効になる辺りで劇的に改善されたりする可能性は高い。</p>
+
+<p>これからはこういった実装の奥の違いが影響を与えそうなCSSプロパティーかどうかとかも軽く意識しながらCSSを書いていく必要もありそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

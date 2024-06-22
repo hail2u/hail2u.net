@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>feed protocol URL</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/rss/feed_protocol_url.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="feed:で始まるURLをa要素のhref属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: feed and rss protocols format)わけですが、Bloglinesは対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="feed:で始まるURLをa要素のhref属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: feed and rss protocols format)わけですが、Bloglinesは対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="feed protocol URL" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-01-02T16:26:48+09:00">2004年1月2日</time></p>
+
+        <h1><em>feed protocol URL</em></h1>
+      </header>
+
+    <main>
+
+    <p>feed:で始まるURLを<code>a</code>要素の<code>href</code>属性に記述することによって、RSSのsubscribeを行わせようという動きがマイナーながらも存在する(SeeAlso: <a href="http://www.brindys.com/winrss/feedformat.html" title="feed and rss protocols format">feed and rss protocols format</a>)わけですが、<a href="http://www.bloglines.com/" title="Bloglines | Free, Web-Based News Aggregator">Bloglines</a>は対応してません(サービス側でどうにかできるわけではないので、やるとしたらBloglines Notifierによってだとは思いますが)。で、VBScriptで無理やり対応してみる。</p>
+<p>まずは何はともあれ、VBScriptを作成します。こんなんで、引数からBloglinesにsubscribeするためのURLを作り、</p>
+<pre>Dim ObjArgs, StrPath, WshShell
+
+Set ObjArgs = WScript.Arguments
+
+StrPath = ObjArgs(0)
+StrPath = StrPath
+StrPath = Replace(StrPath, &quot;feed:&quot;, &quot;&quot;)
+If Left(StrPath, 2) = &quot;//&quot; Then
+  If Left(StrPath, 6) &lt;&gt; &quot;//http&quot; Then
+    StrPath = &quot;http:&quot; &amp; StrPath
+  Else
+    StrPath = Replace(StrPath, &quot;//http&quot;, &quot;http&quot;)
+  End If
+ElseIf Left(StrPath, 4) &lt;&gt; &quot;http&quot; Then
+  StrPath = &quot;http://&quot; &amp; StrPath
+End If
+
+Set WshShell = WScript.CreateObject(&quot;WScript.Shell&quot;)
+WshShell.Run &quot;http://www.bloglines.com/sub/&quot; &amp; StrPath
+
+Set ObjArgs = Nothing
+Set WshShell = Nothing
+WScript.Quit</pre>
+<p>SubscribeFeed.vbsと名前を付けて、パスの通ったフォルダに保存します。</p>
+<p>次に、feed:で始まるリンクをクリックした場合、SubscribeFeed.vbsを起動するように、レジストリへの登録を行います。以下のようなレジストリファイルを作成し登録します。</p>
+<pre>REGEDIT4
+
+[HKEY_CLASSES_ROOT\feed]
+@=&quot;URL:Feed Protocol&quot;
+&quot;URL Protocol&quot;=&quot;&quot;
+
+[HKEY_CLASSES_ROOT\feed\shell]
+@=&quot;open&quot;
+
+[HKEY_CLASSES_ROOT\feed\shell\open]
+
+[HKEY_CLASSES_ROOT\feed\shell\open\command]
+@=&quot;wscript.exe SubscribeFeed.vbs %1&quot;</pre>
+<p>これで、feed:で始まるリンクをクリックすると、BloglinesにRSSが登録され、のMyBlogsのページが開きます。</p>
+<p>正直、無意味に近いです。feed protocolは広まってないですしね。ちなみに、引数にRSSのURLを渡すとSubscribeできるRSSリーダーなら、</p>
+<pre>WshShell.Run &quot;http://www.bloglines.com/sub/&quot; &amp; StrPath</pre>
+<p>の部分を、適当に編集してやれば対応できるはず。試す気ないですが。</p>
+<section>
+<h2>追記@2004/01/05</h2>
+<p>feed protocol URLのシンタックスをかなり誤解しており、うまくhttp:で始まるURLに変換できないっぽいので、VBScriptを更新しました。この更新によって、</p>
+<ul>
+<li>feed:example.com/rss.xml</li>
+<li>feed://example.com/rss.xml</li>
+<li>feed:http://example.com/rss.xml</li>
+<li>feed://http://example.com/rss.xml</li>
+</ul>
+<p>などの記述に対応しました。<a href="http://www.brindys.com/winrss/feedext.html" title="feed protocol extensions">feed protocol extensions</a>へも対応してみようかな・・・。面倒すぎる・・・。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSのルールセットから重複する定義の削除</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/remove-duplicate-declarations-from-css-ruleset.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSWringに同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSWringに同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSのルールセットから重複する定義の削除" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-05T14:33:06+09:00">2014年7月5日</time></p>
+
+        <h1><em>CSSのルールセットから重複する定義の削除</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/hail2u/node-csswring">CSSWring</a>に同じルールセット内で重複する定義(プロパティーとその値のセット)をルールセットから削除する機能をつけてる。最初、重複するプロパティーを問答無用で削除しようかと考えたんだけど、同じプロパティーを同じルールセット内でわざと使うことは結構あるのでダメそうだった。なので完全一致で削除するようにしようとしてる。</p>
+
+<p><a href="https://github.com/ai/postcss">PostCSS</a>でCSSをパースすると、各定義は以下のような構造になる(一部省略)。</p>
+
+<pre><code class="language-javascript">{
+  type: &apos;decl&apos;,
+  before: &apos;\n  &apos;,
+  prop: &apos;color&apos;,
+  between: &apos;: &apos;,
+  value: &apos;white&apos;
+}</code></pre>
+
+<p><code>type</code>に定義であることが明記されていて、<code>prop</code>でプロパティー名、<code>value</code>で値が拾える。また<code>before</code>にプロパティー名の前にある文字列、<code>between</code>にプロパティーと値の間の文字列が入ってる。</p>
+
+<p>一致のチェックは<code>prop</code>と<code>value</code>を単純に連結させ、それをキーにしてその定義のインデックスをオブジェクトに格納していき、<code>hasOwnProperty</code>で探すという形で良さそう。見つかったら重複しているとみなし、格納したインデックスを使って古い方を削除し、新しい方のみ残すようにする。</p>
+
+<p>PostCSSでは全定義をなめるイテレータ(<code>eachDecl()</code>)もあるけど、この場合はルールセット単位で作業するべきなので<code>eachRule()</code>の方で行う。</p>
+
+<pre><code class="language-javascript">var postcss = require(&apos;postcss&apos;);
+var css = fs.readFileSync(&apos;test.css&apos;, &apos;utf-8&apos;);
+var root = postcss.parse(css);
+root.eachRule(function (rule) {
+  var d = &apos;&apos;;
+  var decls = {};
+  rule.each(function (decl, index) {
+    d = decl.prop + decl.value;
+
+    if (decls.hasOwnProperty(d)) {
+      decl.parent.remove(decls[d]);
+    }
+
+    decls[d] = index;
+  });
+});</code></pre>
+
+<p>通常はこのように<code>prop</code>と<code>value</code>が一致すれば良いけど、CSSWringには一部CSSハックを維持する設定がある。この設定がONの時にこれでは判別できない。対応しているCSSハックが格納されているのは<code>before</code>と<code>between</code>なので、それらも含めて完全一致させる必要があった。空白の違いにより重複が判別できなくなりそうだけど、CSSWringでは空白文字の圧縮は事前に行われているのでそこは考えなくて良さそう。上記コードだと8行目を以下のようにするだけ。</p>
+
+<pre><code class="language-javascript">d = decl.before + decl.prop + decl.between + decl.value;</code></pre>
+
+<p>最初<code>hasOwnProperty</code>ではなく<code>decls[d]</code>で存在チェックをしていて、インデックスが0の定義が重複していた時にちゃんとチェックできてないみたいなのやらかした……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

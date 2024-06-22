@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>安全でアクセシブルなアイコン・フォント</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/bulletproof-icon-fonts.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Translation of: Bulletproof Accessible Icon Fonts by Filament Group" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Translation of: Bulletproof Accessible Icon Fonts by Filament Group" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="安全でアクセシブルなアイコン・フォント" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-02-07T00:00:00+09:00">2014年2月7日</time></p>
+
+        <h1><em>安全でアクセシブルなアイコン・フォント</em></h1>
+      </header>
+
+    <main>
+
+    <p>Translation of: <a href="http://filamentgroup.com/lab/bulletproof_icon_fonts/">Bulletproof Accessible Icon Fonts</a> by <a href="http://filamentgroup.com/">Filament Group</a></p>
+
+<p>アイコン・フォントを利用する場合、あらゆるユーザーに適切にアイコンを提供しようとすると、かなり気をつける必要があります。そのフォントが読み込まれなかった時にどうなりますか？<code>@font-face</code>がまだサポートされていないブラウザーでは？　どうすれば安全に(bulletproofに)アイコン・フォントを利用できるかをこれから解説したいと思います。</p>
+
+<p>効率的で機能的なウェブサイトを制作するという、この終わることのない探求において、ベクター形式のアイコンを提供する手段として、簡便であるフォントを利用することが何度も提案されてきました。対して私達は通常<a href="http://filamentgroup.com/lab/grunticon">ベクター形式のアイコンとしてSVG</a>を<a href="http://ianfeather.co.uk/ten-reasons-we-switched-from-an-icon-font-to-svg/">Ian Featherがブログ書いたような</a>理由から選んで(また、薦めて)おり、既にアイコン・フォントを利用しているチームと共同して制作する場合でも、時にはそうしてきました。そのような時のために、どうやればアイコン・フォントをあまねくアクセシブルな形で利用できるかの調査も行ってきました。</p>
+
+<p>あなたはほとんどのアイコン・フォントの実装方法がスクリーン・リーダーにうまく適応していないこと、そしてうまく適応させ、かつアクセシブルにするには追加のマークアップが必要なことを知っていますか？　また、私達は古い<em>(そして新しい)</em>モバイル・ブラウザー—例えばOpera MiniやNokia XPress Browser、Blackberry 4–5、Android 2.1、Windows Phone 7–7.8—が<code>@font-face</code>をまったくサポートしていないことを発見しました。この記事を書こうとした時にちょっと調べてみたところ、これらのブラウザーが少なくとも<a href="https://docs.google.com/presentation/d/1n4NyG4uPRjAA8zn_pSQ_Ket0RhcWC6QlZ6LMjKeECo0/">全世界で3.7億ものユーザー</a>に提供されていることを知り、驚きました。</p>
+
+<p>この記事では、アイコン・フォントがどのような場合にうまく動き、またうまく動かないのか、<code>@font-face</code>がサポートされていない(またはフォントが読み込まれなかった)時にアイコン・フォントがどうなるのかや、このような問題にどう取り組んで安全な方法でアイコン・フォントを提供するのか、私達が学んだことについて解説したいと思います。</p>
+
+<h2>アイコン・フォントの問題</h2>
+
+<h3>アクセシビリティ</h3>
+
+<p>以下のようなマークアップについて考えてみましょう:</p>
+
+<pre><code>&lt;span class=&quot;icon-star&quot;&gt;Favorite&lt;/span&gt;
+</code></pre>
+
+<p>多くのアイコン・フォントはこのようなマークアップを使い、<code>:before</code>や<code>:after</code>を組み合わせてアイコンを表示させています。しかし、この場合<code>content</code>の内容はスクリーン・リーダーからは隠れず、音読されてしまうことがあります。「でもこれ<em>ユニコード</em>ですよ！　スクリーン・リーダーはわざわざユニコードの文字列までをも解釈するんですか？」とあなたは言うかもしれません。そうです。スクリーン・リーダーは解釈します(後述しますが、仮に私用領域の文字であっても解釈します)。</p>
+
+<p>例えば、上記例に以下のようなCSSを適用したとしましょう:</p>
+
+<pre><code>.icon-star:before { content: &quot;★ &quot;; }
+</code></pre>
+
+<p>多くのブラウザーでは以下のように表示され、まったく問題ありません:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-default.png" alt=""></p>
+
+<p>VoiceOver (Mac OS X)では「Black Star Favorite」としゃべってくれることになります。ちょっと良くないですよね。</p>
+
+<p>残念ながら不必要な見た目のためだけの<code>content</code>をスクリーン・リーダーから隠すというようなことはCSSだけでは実現できません(<code>speak: none</code>のサポートは限られたものです)。今のところ最も妥当な方法は<a href="http://www.html5accessibility.com/tests/hidden2013.html"><code>aria-hidden=&quot;true&quot;</code></a>を使うことでしょう。この場合、アイコンのために追加のHTML要素が必要になり、その親要素へ<code>:before</code>や<code>:after</code>を使う代わりにそれに対して使うことになります。</p>
+
+<p>つまり、HTMLとCSSはこのようになります:</p>
+
+<pre><code>&lt;style&gt;
+.icon-star:before { content: &quot;★ &quot;; }
+&lt;/style&gt;
+&lt;span&gt;&lt;span class=&quot;icon-star&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Favorite&lt;/span&gt;
+</code></pre>
+
+<p>見た目は望み通りそのまま維持され、VoiceOverは「Favorite」と読み上げてくれます。</p>
+
+<p><em>注: </em><a href="https://code.google.com/p/chromium/issues/detail?id=327408">Chrome</a>と<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=948540">Firefox</a>には<code>&lt;button&gt;</code>要素の子に<code>aria-hidden</code>の<code>content</code>がある場合に既知の問題があります。ですがそれでも<code>aria-hidden</code>を使うのがスクリーン・リーダーから<code>content</code>を隠すにはもっとも良い方法でしょう。</p>
+
+<h3>フォールバック</h3>
+
+<p>次は<code>@font-face</code>をサポートしていないブラウザーやフォント・ファイルの読み込みに失敗した時にどうなるかについて考えてみましょう。</p>
+
+<p>アイコン・フォントからアイコンを利用するための方法として、ユニコード文字にアイコンを割り当てる方法と、特定の文字列のリガチャに割り当てるという、2つの手法が一般的です。</p>
+
+<h4>ユニコードを使い、絵文字または空白でフォールバック</h4>
+
+<p>ユニコードにはその仕様ではいかなる文字も規定されていないセクションが3つあります。それらは<a href="http://ja.wikipedia.org/wiki/Unicode%E6%96%87%E5%AD%97%E3%81%AE%E3%83%9E%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0#.E7.A7.81.E7.94.A8.E6.96.87.E5.AD.97">私用領域</a>(PUA)と呼ばれており、フォントがこれらの領域にユニコード仕様には存在しないグリフを持つことを許可しています。最初の私用領域(BMP PUAと呼ばれることがあります)はUTF-8エンコーディングで扱うことが出来ます。</p>
+
+<p>多くの有名なアイコン・フォントはそのアイコンを私用領域の範囲に割り当てることにより、既存のユニコード定義との衝突を回避しています。例えば、アイコン・フォントを利用するとユニコードで定義されているBlack Starが虹で上書きされてしまうなどということはありません(もしかしたらあなたは上書きして欲しいかもしれませんが、そうなるべきではありません)。</p>
+
+<p>私用領域を利用することによりセマンティクス(訳注: ユニコード定義におけるセマンティクス)での衝突は回避できますが、その見た目についての衝突は解決されません。例えば、あるOSに含まれるフォントは<a href="http://www.fileformat.info/info/unicode/block/private_use_area/utf8test.htm">私用領域に独自の文字を定義しています</a>。アイコンをこれら独自の文字列の位置にマッピングしていて、かつフォントのロードに失敗した場合、デフォルトのそれら独自のグリフが表示されることになるでしょう。例えばiOS 7では私用領域に絵文字を定義しています:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-ios-pua.png" alt="Screenshot of iOS 7 PUA showing Emoji Characters"></p>
+
+<p>ここで先述のサンプルに戻ってみましょう。独自の黒い星のアイコンをユニコード私用領域にマップしたとすると、マークアップは以下のようになります:</p>
+
+<pre><code>&lt;style&gt;
+.icon-star:before { content: &quot;\e001&quot;; }
+&lt;/style&gt;
+&lt;span&gt;&lt;span class=&quot;icon-star&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Favorite&lt;/span&gt;
+</code></pre>
+
+<p>アイコン・フォントのリクエストの失敗すると、デフォルトのユニコード文字列が代わりに表示されます。iOSでは以下のように表示されるでしょう:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-pua-default.png" alt=""></p>
+
+<p>私用領域における文字との衝突がまったく<strong>なかった</strong>としても、空白になるというわけではありません—その変わりに不明なグリフに使われる文字が見えてしまうでしょう。</p>
+
+<p>大抵の場合、四角(とてもひどいデフォルトの四角グリフ)になります(訳注: 日本では豆腐などと呼ばれています):</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-unicode-android.png" alt=""></p>
+
+<p>場合によってはもっととんでもないことになってしまいます:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-ios-no-emoji.png" alt=""></p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-unicode-osx-webview.png" alt=""></p>
+
+<p>アイコン・フォントはFlash of Invisible Text (FOIT) (詳しくは<a href="http://www.paulirish.com/2009/fighting-the-font-face-fout/">WebKit&#39;s alternative to the Flash of Unstyled Text, or FOUT</a>を参照してください)に依存する形で、<code>@font-face</code>の処理中にこういったフォールバックを表示させないように実装していることもあります。FOITはウェブ開発者達の間ではよく論争の火種になっていますね。万が一、将来ブラウザーがFOITの代わりにFOUTを利用するようになった場合、アイコン・フォントは<code>@font-face</code>の処理中にフォールバックされてしまうグリフを隠すために別の方法を考えださないとならないでしょう。</p>
+
+<h4>リガチャを使い。Real Text™でフォールバック</h4>
+
+<p>限られた文字を使ったフォールバックに頼らないようにするため、フォールバックにリガチャを使うという素晴らしいアイディアを考えだした人がいました。リガチャとは<a href="http://ja.wikipedia.org/wiki/%E5%90%88%E5%AD%97">2文字以上の文字を連結して単一のグリフにする</a>ものです。これを利用すると、特定の連続した文字が文に現れた場合にグリフを置き換えることが可能になります。</p>
+
+<p>例えば、リガチャを使うと「love」という文字のつながりが出現した場合に♥に置き換えることができます。</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-symbolset.png" alt=""></p>
+
+<p>リガチャがサポートされていないような環境(やフォントが読み込まれなかった場合)では、文字列がフォールバックとしてそのまま表示されます。</p>
+
+<p>これは一見<strong>とても</strong>素晴らしく思えますが、いくつか制限もあります。</p>
+
+<p>一時、多くのウェブサイトでリガチャを有効にするために<code>text-rendering: optimizelegibility;</code>を指定するように薦められていました。<code>text-rendering</code>プロパティーはSVGの仕様(CSSの仕様ではありません)で定義されています。この手法は<a href="https://github.com/h5bp/html5-boilerplate/issues/78"><code>letter-spacing</code>プロパティーが効かなくなったり</a>、<em><a href="https://github.com/gruntjs/gruntjs.com/issues/81">違う文字で文章が表示されたり</a></em>、他にも<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-rendering#Browser_Compatibility">様々な問題</a>が確認されています。</p>
+
+<p>リガチャを有効にする別の方法として<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-feature-settings"><code>font-featur-settings</code></a>プロパティーの利用が提案されています。信頼できそうではありますが、残念なことに<a href="http://caniuse.com/font-feature">デスクトップ向けのブラウザーですらサポートが完全ではありません</a>。IE9以下、Android 4.3以下、Blackberry 10まで、そして最新の(訳注: 2014/01/13現在)IE Mobileではまったく表示することが出来ず空白になります。この記事を書いた時点では、つまり全世界の30%程度のユーザーにしかフォールバックが行われないということになります(残念)。</p>
+
+<p>リガチャにおける別の懸念としては、コンテンツと見た目を不可分にしてしまうのではないかというものもあります。特に国際化においてこれは問題になるでしょう。例えば言語ごとに違うリガチャを作る必要があるだろうと考えられるので、メンテナンス性や作業効率における大きな問題を引き起こします。またひとつの言語に対応することに比べ、10の言語に対応する場合、フォント・ファイルのサイズにも大きな違いが表れるでしょう。言語ごとにフォントを作成すれば問題なさそうだと思いますか？　多分ダメでしょう—それでも多少は何かしらダウンロードすることになり、しかもそれはまったく使われないからです。</p>
+
+<p><del>最後にリガチャが空白を含められないことには注意が必要でしょう</del>Larry Foxによると<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-rendering#Browser_Compatibility">リガチャに空白は含められる</a>とのことです。また<a href="https://twitter.com/Keyamoon/status/423206586836721664">Keyamoonによる</a>と<a href="https://code.google.com/p/chromium/issues/detail?id=277677">含められるがChromeで不具合がある</a>ということです。</p>
+
+<h2>では、アイコン・フォントは失策なのか？</h2>
+
+<p>もちろん、そんなことはありません。これまで挙げてきたような危険を鑑みても、アイコン・フォントを利用できます！　ただ単純に<code>@font-face</code>をCSSに組み入れる以上に少しだけ気をつけてやるだけです。</p>
+
+<p>より良い実装についての詳細に入る前に、私達はまず以下の二種類のアイコン・フォントの利用ケースそれぞれに違う手法を用いることを決めました:</p>
+
+<ol>
+<li>飾りのアイコン: 本当に単なる飾りにすぎず、それに意味や機能がないようなアイコンです。アイコンが見えなくなることそれ自体は構いませんが、フォールバックに当たるものがいかなる場合も画面を専有しないようにし、付近のコンテンツの位置揃えに影響を与えないようにしなければなりません。</li>
+<li>重要なアイコン: つまり、そのアイコンによってウェブサイトの何かを認識できたり、機能が示されたりするもので、アイコンそのものかそのフォールバック内容が必ず表示されるべきものです。このようなアイコンは更に二種類に分かれ、<strong>文字列でフォールバックされる</strong>(その長さにもよりますが、専有面積を制限しないようにします)か<strong>別のグリフにフォールバックされる</strong>かします。フォールバックは妥当なユニコード文字(クロス・プラットフォームでクロス・ブラウザーな代替文字は少ないですが、幸運にも<a href="http://unicode.johnholtripley.co.uk/">John Holt Ripleyによりユニコード文字列のサポート状況の表</a>がまとめられています)か、<em>場合によっては</em>画像(互換性の面からPNGになるでしょう)を指定します。</li>
+</ol>
+
+<p>実装はかなりややこしいものなので、簡単に扱えるようにCSSやJavaScriptを簡潔にまとめて、再利用可能なライブラリとしてA Font Gardeを作成しました。<a href="https://github.com/filamentgroup/a-font-garde">GitHubで公開している</a>ので、これを利用して安全でアクセシブルにアイコン・フォントをあなたのウェブサイトでも簡単に利用できるはずです。必要となるModernizrの2つの機能チェックは含まれており、それと<code>afontgarde.css</code>及び<code>afontgarde.js</code>以外には何も必要ありません。</p>
+
+<h3>飾りのアイコン</h3>
+
+<p>飾りのアイコンの場合は実装は簡単です。単純に<code>@font-face</code>がサポートされていれば表示し、そうでない場合は隠すようにすれば良いでしょう。</p>
+
+<p>グレードA(訳注: 完全なサポートをしている)の環境ではこのように見えるでしょう:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-decorative-a.png" alt=""></p>
+
+<p>対してグレードC(訳注: エラーにはならないが機能しない)の環境ではこうなります:</p>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-decorative-c.png" alt=""></p>
+
+<p>多少のマークアップの変更だけでこのような形で実装することができます。</p>
+
+<h4>HTML</h4>
+
+<pre><code>&lt;span class=&quot;icon icon-twitter&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;
+Share on Twitter (Sibling Text)
+</code></pre>
+
+<p>まず別に<code>span</code>要素を追加することによって、スクリーン・リーダーにおけるアクセシビリティ上の問題を解決します。</p>
+
+<h4>CSS</h4>
+
+<p>そして<code>@font-face</code>ブロックに続けて、アイコン・フォントを利用するためのCSSを書くことになります:</p>
+
+<pre><code>.supports-fontface.icomoon .icon:before {
+  font-family: icomoon;
+}
+.supports-fontface.icomoon .icon-twitter:before {
+  content: &quot;\e604&quot;;
+}
+</code></pre>
+
+<p>Moderinzrの機能チェックにより追加される<code>supports-fontface</code>というクラスを利用していることに気をつけてください。<code>icomoon</code>というクラスは<code>afontgarde.js</code> (このライブラリはフォントがちゃんと読み込まれたかどうかをデフォルトのフォントとグリフの幅を比較することによってチェックしています)により追加されます。</p>
+
+<h4>JS</h4>
+
+<pre><code>AFontGarde(&#39;icomoon&#39;, &#39;\uE600\uE601\uE602\uE605&#39;);
+</code></pre>
+
+<p>こうやってチェックするフォントのファミリ名とグリフの大きさの比較に使う文字をいくつか指定します。これはフォントごとに一度だけ呼べば結構です。このように呼ぶと追加されることになる<code>icomoon</code>というクラス名を以下のコード例でも使っていきます。</p>
+
+<p>このようにしてアイコン・フォントを使う時にCSS側でクラス名を2つ組み合わせるようにしておくことにより、既に触れた問題を解決することが出来ます。素晴らしい！　これだけでこのケースは完璧です。</p>
+
+<h3>重要なアイコン</h3>
+
+<p>重要なアイコンの場合、アイコン・フォントの表示が失敗した場合に<em>何かしら</em>を表示させたいところです。こういったケースでは取りうる手段は、アイコンの代わりに文字列で置き換えるか、別のアイコンを使うか、この両者のどちらかになるでしょう。</p>
+
+<h4>文字列によるフォールバック</h4>
+
+<h5>グレードA</h5>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-textfallback-a.png" alt=""></p>
+
+<h5>グレードC</h5>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-textfallback-c.png" alt=""></p>
+
+<h5>HTML</h5>
+
+<pre><code>&lt;span class=&quot;icon-fallback-text&quot;&gt;
+  &lt;span class=&quot;icon icon-twitter&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;
+  &lt;span class=&quot;text&quot;&gt;Twitter&lt;/span&gt;
+&lt;/span&gt;
+</code></pre>
+
+<h5>CSS</h5>
+
+<pre><code>.icon-fallback-text .icon {
+  display: none;
+}
+.supports-fontface.supports-generatedcontent.icomoon .icon-fallback-text .icon {
+  display: inline-block;
+}
+.supports-fontface.supports-generatedcontent.icomoon .icon-fallback-text .text {
+  /* a generic way to visually hide content while remaining accessible to screen readers (h5bp.com) */
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  position: absolute;
+  height: 1px;
+  width: 1px;
+}
+</code></pre>
+
+<p><em>上記は<code>afontgarde.css</code>に含まれるコードです</em></p>
+
+<p>同じように機能チェックを行いますが、<code>supports-generatedcontent</code>というクラス名も併用し<code>:before</code>及び<code>:after</code>がサポートされているかも確認します。もしサポートされていない場合は文字列が表示される、ということになります。</p>
+
+<h4>グリフまたは画像によるフォールバック</h4>
+
+<h5>グレードA</h5>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-glyphfallback-a.png" alt=""></p>
+
+<h5>グレードC (グリフ)</h5>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-glyphfallback-c.png" alt=""></p>
+
+<h5>グレードC (画像)</h5>
+
+<p><img src="/img/documents/bulletproof-icon-fonts-imgfallback-c.png" alt=""></p>
+
+<h5>HTML</h5>
+
+<pre><code>&lt;span class=&quot;icon-fallback-glyph&quot;&gt;&lt;!-- or &quot;icon-fallback-img&quot; --&gt;
+  &lt;span class=&quot;icon icon-hamburger&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;
+  &lt;span class=&quot;text&quot;&gt;Menu&lt;/span&gt;
+&lt;/span&gt;
+</code></pre>
+
+<h5>CSS</h5>
+
+<p><em><code>afontgarde.css</code>に含まれるコードは一部省略されています</em></p>
+
+<pre><code>/***************************
+ * Fallback Glyph
+ ***************************/
+.icon-fallback-glyph .icon-hamburger:before {
+  content: &quot;\2261&quot;; /* Hamburger */
+  font-size: 2em;
+  line-height: .5;
+}
+/* A-Grade */
+.supports-fontface.icomoon .icon-fallback-glyph .icon-hamburger:before {
+  content: &quot;\e601&quot;;
+}
+</code></pre>
+
+<p>フォールバックに使うグリフは細心の注意を払って決定しましょう。クロス・ブラウザー及びクロス・プラットフォームであるかはグリフによって違います。John Holt Ripleyの<a href="http://unicode.johnholtripley.co.uk/">互換性の表</a>を参照してください。</p>
+
+<p>アイコン・フォントとフォールバックに使われるグリフがなるべく同じになるように、<code>font-size</code>や<code>line-height</code>プロパティーも同時に調節していることにも気をつけてください。フォントが正常に読み込まれた場合(そのような場合の時にのみ)、CSSの<code>content</code>プロパティーでアイコン・フォントのグリフを指定します。</p>
+
+<pre><code>/***************************
+ * Fallback Bitmap
+ ***************************/
+.icon-fallback-img .icon-hamburger {
+  width: 1em;
+  height: 1em;
+  background: url(&quot;fonts/png/hamburger.png&quot;) no-repeat;
+}
+/* A-Grade */
+.supports-fontface .icon-fallback-img .icon-hamburger:before {
+  font-family: icomoon;
+  content: &quot;\e601&quot;;
+}
+</code></pre>
+
+<p>機能チェックを厳しく実行し、CSSでは背景画像を利用しているにも関わらず、他のアプローチと比べフォールバックを画像で行うのは確実なものとはあまり言えません。もしスクリプトがフォントの読み込みを監視していたとしても(そして<code>icomoon</code>クラスを追加したとしても)、背景画像へのリクエストはそれよりも早くに実行されるので、フォントの読み込みが成功するか否かは関わらず背景画像は読み込まれます。またこの事情の別の面として、フォントへのHTTPリクエストが失敗した場合、デフォルトのユニコード文字が表示されることになるでしょう。</p>
+
+<p>フォールバックに使う画像をアイコン・フォントのそれとできうる限り同じようにするために<code>width</code>と<code>height</code>プロパティーも調節していることに注意してください。もし背景画像の大きさも調節したい場合は、<code>background-size</code>プロパティーのサポートに制限があることにも気をつけましょう。</p>
+
+<h2>最後に</h2>
+
+<p>これでは冗長すぎると感じる人も多いでしょう。ですから私達は<a href="https://github.com/filamentgroup/a-font-garde">簡単に使えるライブラリ</a>としてパッケージングし、多少の作業でこういった実装パターンを再現できるようにしました。ある機能が実装されているかのチェックがアイコン・フォントにおいては鍵になるので、それらを上手く利用して望まない形でフォールバックされないように気をつけて実装してください。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

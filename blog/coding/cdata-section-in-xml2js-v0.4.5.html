@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>xml2js v0.4.5でCDATAセクションがサポート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/cdata-section-in-xml2js-v0.4.5.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Node.jsでXMLをまともに読み書きできる唯一と言えそうなxml2jsパッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="xml2js v0.4.5でCDATAセクションがサポート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-21T01:28:40+09:00">2015年2月21日</time></p>
+
+        <h1><em>xml2js v0.4.5でCDATAセクションがサポート</em></h1>
+      </header>
+
+    <main>
+
+    <p>Node.jsでXMLをまともに読み書きできる唯一と言えそうな<a href="https://github.com/Leonidas-from-XIV/node-xml2js">xml2js</a>パッケージがv0.4.5に更新され、待望のCDATAセクションの書き込みに対応した。今までも読み込みは普通に行えていたが、書き込みには対応していなかったため全て文字参照で書かれていたが、これできれいに(小さなRSSが)吐ける。</p>
+
+<p>使い方はビルダーのオプションで<code>cdata: true</code>するだけだ。これで要素の値が文字列で、かつ<code>[&amp;&lt;&gt;]</code>のいずれかを含む場合のみCDATAセクションとして書かれるようになる。</p>
+
+<pre><code class="language-javascript">var xml2js = require(&apos;xml2js&apos;);
+
+var builder = new xml2js.Builder({
+  cdata: true
+});
+var obj = {
+  foo: &apos;Foo&apos;,
+  bar: &apos;Bar&apos;
+};
+var xml = builder.buildObject(obj);</code></pre>
+
+<p>このようにグローバルでの設定しかないため、CDATAで書くか書かないかの二択になる。この要素ではCDATAを、この要素では文字参照で、などとはできないのが少し残念だ。</p>
+
+<hr>
+
+<p>まだサポートは完璧ではないようで、パーサー側で<code>explicitArray: false</code>で配列を強制せずに読み込んだ場合にうまくいかない事がある。そう設定した場合に得られるJavaScriptオブジェクトやそれと同じ構造を持つJavaScriptオブジェクトを、CDATAで書くように設定したビルダーに渡しても、配列でないプロパティーの値はCDATAで書いてくれない。最小再現コードは以下の通りだ。</p>
+
+<pre><code class="language-javascript">var xml2js = require(&apos;xml2js&apos;);
+
+console.log(new xml2js.Builder({
+  cdata: true
+}).buildObject({
+  &apos;foo&apos;: {
+    &apos;bar&apos;: &apos;baz &amp; qux&apos;
+  }
+}));</code></pre>
+
+<p>これで<code>bar</code>要素の内容がCDATAセクションになってくれれば良いが、なってくれない。</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;foo&gt;
+  &lt;bar&gt;baz &amp;amp; qux&lt;/bar&gt;
+&lt;/foo&gt;</code></pre>
+
+<p>イシューは立てておいたので早めに直って欲しい。手元では<a href="/xml2js.js.diff">パッチ</a>を(しかもJavaScriptファイルの方に)当ててなんとなく対応してみたが、ちゃんと全部コード読んでないので間違ってそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

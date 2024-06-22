@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSでモーダル・ウィンドウ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/pure-css-modal-window.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="pointer-eventsプロパティでnoneを指定すると最前面に置いた要素を無視して普通にページ操作が可能になります。なので、そういう風にしておいた要素をopacityプロパティで非表示にしておけば、普段は見えないけど特定の操作で最前面に飛び出すモーダル・ウィンドウとかも簡単に出来ます。pointer-eventsプロパティってこういう使い方するためにあるの？" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="pointer-eventsプロパティでnoneを指定すると最前面に置いた要素を無視して普通にページ操作が可能になります。なので、そういう風にしておいた要素をopacityプロパティで非表示にしておけば、普段は見えないけど特定の操作で最前面に飛び出すモーダル・ウィンドウとかも簡単に出来ます。pointer-eventsプロパティってこういう使い方するためにあるの？" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSでモーダル・ウィンドウ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-10-22T21:10:26+09:00">2011年10月22日</time></p>
+
+        <h1><em>CSSでモーダル・ウィンドウ</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>pointer-events</code>プロパティで<code>none</code>を指定すると最前面に置いた要素を無視して普通にページ操作が可能になります。なので、そういう風にしておいた要素を<code>opacity</code>プロパティで非表示にしておけば、普段は見えないけど特定の操作で最前面に飛び出すモーダル・ウィンドウとかも簡単に出来ます。<code>pointer-events</code>プロパティってこういう使い方するためにあるの？</p>
+
+<p>Demo: <a href="/test/277.html">Pure CSS Modal Window</a></p>
+
+<pre><code class="language-css">.window {
+  opacity: 0;
+  pointer-events: none;
+}</code></pre>
+
+<p>で、見えない・操作できないウィンドウが作れるので、<code>:target</code>擬似クラスで表示の切替を行えばOKです。</p>
+
+<pre><code class="language-css">.window:target {
+  opacity: 1;
+  pointer-events: auto;
+}</code></pre>
+
+<p>簡単！　デモのように<code>position: fixed;</code>とかしておくとよりらしいでしょう。</p>
+
+<p>閉じるボタンとかは文字を無理やりねじ込む形でやりました。今のこのサイトのロゴも同じ手法で無理やり一文字にすり替えています(すぐ変わるかもですが)。</p>
+
+<pre><code class="language-css">.window .close-button a {
+  display: block;
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.window .close-button a:before {
+  display: block;
+  content: "\2716";
+}</code></pre>
+
+<p>まず普通に閉じるボタンの<code>a</code>要素のサイズを決めます。ここでは48px四方にしました。そして<code>overflow</code>プロパティで<code>hidden</code>を指定し、48px四方からはみ出すものが隠れるようにします。あとは<code>::before</code>擬似要素で絵文字(<code>\2716</code>はHeavy Multiplication Xとかいう奴です)を流しこんで、<code>display</code>プロパティを<code>block</code>にすれば挿入した絵文字以外が見えなくなります。<code>block</code>にしないと絵文字に続いて元々の文字列が表示されてしまうので気を付けましょう。</p>
+
+<p>面倒だったのでウィンドウは固定サイズにしましたが、<code>display: table-cell;</code>等を使ったセンタリング方法を利用すれば、内容物に合わせたフレキシブルなサイズのウィンドウにも出来ると思います。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

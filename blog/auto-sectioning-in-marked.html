@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>markedで自動セクショニング</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/auto-sectioning-in-marked.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このブログではサブセクションを作る場合、直接&lt;section&gt;タグを書き、その内容を再帰的にmarkedで処理してやっていた。あまり困ってはいないが、普通に書かれたMarkdownをうまく処理して、好みのHTMLコードで出力してやる作業を少しずつ重ねてきたので、ついでに自動セクショニングらしきものを実装した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このブログではサブセクションを作る場合、直接&lt;section&gt;タグを書き、その内容を再帰的にmarkedで処理してやっていた。あまり困ってはいないが、普通に書かれたMarkdownをうまく処理して、好みのHTMLコードで出力してやる作業を少しずつ重ねてきたので、ついでに自動セクショニングらしきものを実装した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="markedで自動セクショニング" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-09-04T11:36:38+09:00">2018年9月4日</time></p>
+
+        <h1><em>markedで自動セクショニング</em></h1>
+      </header>
+
+    <main>
+
+    <p>このブログではサブセクションを作る場合、直接<code>&lt;section&gt;</code>タグを書き、その内容を<a href="/blog/coding/recurisive-markdown.html">再帰的にmarkedで処理</a>してやっていた。あまり困ってはいないが、普通に書かれたMarkdownをうまく処理して、好みのHTMLコードで出力してやる作業を少しずつ重ねてきたので、ついでに自動セクショニングらしきものを実装した。</p>
+
+<p>自動セクショニングは以下の条件で発動させたい:</p>
+
+<ol>
+<li>見出しレベルが増加</li>
+<li>同じ見出しレベルが出現</li>
+<li>見出しレベルが減少</li>
+<li>テーマの区切り(<code>hr</code>要素)が出現</li>
+</ol>
+
+<p>1では<code>section</code>開始タグが、2では<code>section</code>タグの終了と開始が、3と4では<code>section</code>終了タグが、それぞれ追加される。見出しは常に<code>h1</code>要素でマークアップする。またMarkdownの性質上、何かしらのテンプレートに流し込まれることが多く、そのテンプレートがセクションかセクショニング・ルートを持っている(<code>body</code>や<code>article</code>、または<code>blockquote</code>要素が直近に存在する)ので、トップ・レベルは例外としてセクショニングしない。</p>
+
+<pre><code class="language-markdown"># Section 1
+
+This is a level 1 section.
+
+## Section 1-1
+
+This is a level 2 section.
+
+## Section 1-2
+
+This is a level 2 section.
+
+### Section 1-2-1
+
+This is a level 3 section.
+
+---
+
+## Section 1-3
+
+This is a level 2 section.
+
+* * *
+
+This is a level 1 section.</code></pre>
+
+<p>こういうMarkdownを以下のようなHTMLにしたい。</p>
+
+<pre><code class="language-html">&lt;h1&gt;Section 1&lt;/h1&gt;
+&lt;p&gt;This is a level 1 section.&lt;/p&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-1&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-2&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+  &lt;section&gt;
+    &lt;h1&gt;Section 1-2-1&lt;/h1&gt;
+    &lt;p&gt;This is a level 3 section.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;hr&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h1&gt;Section 1-3&lt;/h1&gt;
+  &lt;p&gt;This is a level 2 section.&lt;/p&gt;
+&lt;/section&gt;
+&lt;hr&gt;
+&lt;p&gt;This is a level 1 section.&lt;/p&gt;</code></pre>
+
+<p>実装は、グローバルで現在の見出しレベルを管理し、それを増減しつつ比較することで、出力すべきタグを決めていく。markedのブロック・レンダラーのうち、<code>heading</code>と<code>hr</code>を使う。</p>
+
+<pre><code class="language-javascript">const marked = require(&quot;marked&quot;);
+
+let currentLevel = 1;
+
+const markupHeading = (text, level) =&gt; {
+  if (currentLevel === 1 &amp;&amp; level === 1) {
+    return `&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  if (currentLevel &gt; 1 &amp;&amp; level === currentLevel) {
+    return `&lt;/section&gt;
+&lt;section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  if (currentLevel &gt; 1 &amp;&amp; level &lt; currentLevel) {
+    currentLevel = level;
+    return `&lt;/section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+  }
+
+  currentLevel = level;
+  return `&lt;section&gt;
+&lt;h1&gt;${text}&lt;/h1&gt;
+`;
+};
+
+const markupThematicBreak = () =&gt; {
+  if (currentLevel === 1) {
+    return `&lt;hr&gt;
+`;
+  }
+
+  currentLevel = currentLevel - 1;
+  return `&lt;/section&gt;
+&lt;hr&gt;
+`;
+};
+
+const renderer = new marked.Renderer();
+renderer.heading = markupHeading;
+renderer.hr = markupThematicBreak;
+
+module.exports = t =&gt;
+  marked(t, {
+    renderer: renderer
+  });</code></pre>
+
+<hr>
+
+<p>既に判明している問題は、サブセクションでテーマの区切りが使えないこと、引用やリスト内で見出しが使えないこと、の2つだ。両者ともに使う機会は少ないと思うので目をつぶっている。トップ・レベルでレベル1見出しを複数使えないという制限もあるが、Markdownの使われ方を考慮すると、この点は問題ないだろう。</p>
+
+<p>副作用として生HTMLをmarkedに任せられるようになった。そのため野良Markdownを食わせても、HTMLをそのまま食わせても、うまく扱える。どこかに書いたMarkdown (らしきテキスト)をそのまま処理できるようになったので、相互運用性が高まった……かもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

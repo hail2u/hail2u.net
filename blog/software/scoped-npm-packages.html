@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>パッケージのスコープ化</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/scoped-npm-packages.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="パッケージのスコープ化" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-06-15T11:46:38+09:00">2015年6月15日</time></p>
+
+        <h1><em>パッケージのスコープ化</em></h1>
+      </header>
+
+    <main>
+
+    <p>2015/04/15よりnpmレジストリーでパッケージのスコープ化が行えるようになった。パッケージのスコープ化は名前の衝突を回避することが主な目的のような取り上げられ方だが。僕は今まで色々な理由でnpmレジストリーへは非公開にしてGitHub経由でインストールすることを推奨していたようなパターンで使うのが良さそうだという感想を持った。</p>
+
+<p><code>&quot;private&quot;: true</code>からスコープ化したパッケージへの変換は2ステップで行う。</p>
+
+<section>
+<h2>package.jsonの更新</h2>
+
+<ul>
+<li><code>&quot;private&quot;: true</code>の削除</li>
+<li><code>name</code>フィールドの値へプリフィックスを追加</li>
+</ul>
+
+<p>プリフィックスはなんでも良いようだが、通常はnpmのユーザー名を使うと良いだろう。僕は<code>@hail2u/</code>にしておいた。GitHubオーガニゼーション単位でスコープ化したい場合はその名前の方が良い。</p>
+</section>
+
+<section>
+<h2>公開</h2>
+
+<p>npmレジストリーへの公開にはオプションを追加する必要がある。特にインストールへ制限は設けないのなら<code>public</code>で良い。</p>
+
+<pre><samp>$ <kbd>npm publish --access public</kbd></samp></pre>
+
+<p>このオプションの指定は最初に<code>npm publish</code>する時だけ必要になるようだ。</p>
+</section>
+
+<hr>
+
+<p>特にnpmパッケージ自体を非公開にしたいわけではないけれど、プライベートにすることはたまにある。それほど本気でずっと使う予定もないとか、npmレジストリーの名前を占拠したくないとか、その場合にも変な名前を付けるのも嫌だとか、環境に強く依存していて自分専用に近いものとか。</p>
+
+<p>こういった半プライベートなnpmパッケージをGitHub経由でインストールする(してもらう)というアプローチは、短期的にはあまり問題ない。しかしインストールはやはり遅く、特にCI環境下では致命的といえる。また、バージョン指定が特殊で面倒な感じになりやすい。そのため常に最新版を使うような運用にしてしまいがちで、あっと思ったら環境が壊れたということになりうる(やった)。</p>
+
+<p>スコープ化しておくと通常のnpmパッケージとほとんど変わらず扱える。運用も同じように行うことになるので、GitHub経由特有の問題からは解放され、npmレジストリーとnpmパッケージそのものの問題に集約されることになる。問題が減るわけではないが、少なくとも問題の原因は減るので、その究明は楽になるだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

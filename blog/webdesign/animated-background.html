@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>背景画像をtransitionさせ続ける</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/animated-background.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="JavaScriptで背景画像を動かすだけで怒られる。CSSでやればJavaScriptを無効にされても動かせるので、もっと怒られるのかもしれない。いちいちCSSアニメーションを書くのは面倒なので、transitionプロパティーを使ってインスタントに動かせるような工夫を考えた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="JavaScriptで背景画像を動かすだけで怒られる。CSSでやればJavaScriptを無効にされても動かせるので、もっと怒られるのかもしれない。いちいちCSSアニメーションを書くのは面倒なので、transitionプロパティーを使ってインスタントに動かせるような工夫を考えた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="背景画像をtransitionさせ続ける" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-05-14T09:56:33+09:00">2014年5月14日</time></p>
+
+        <h1><em>背景画像をtransitionさせ続ける</em></h1>
+      </header>
+
+    <main>
+
+    <p>JavaScriptで背景画像を動かすだけで怒られる。CSSでやればJavaScriptを無効にされても動かせるので、もっと怒られるのかもしれない。いちいちCSSアニメーションを書くのは面倒なので、<code>transition</code>プロパティーを使ってインスタントに動かせるような工夫を考えた。</p>
+
+<p>Demo: <a href="/test/560.html">Animated Background</a></p>
+
+<p>ループできない<code>transiton</code>プロパティーで擬似的に永続アニメーションを提供するには、<code>transition-duration</code>プロパティーで大きな値を指定すれば良い。またアニメーションの開始に必要になるトリガーは主に擬似クラスを利用することになるが、<code>body</code>要素に<code>:hover</code>擬似クラスを直接使うとアニメーションをうまく起こせない問題があり、<code>:target</code>擬似クラスではIDの指定とURLが限定される問題がある。ルートの<code>html</code>要素に<code>:hover</code>を指定することで、この二つの問題は解決できる。あとはどれくらいのスピードで動かすのかを考えて<code>background-position</code>プロパティーで大きな値を指定するだけで良い。</p>
+
+<pre><code class="language-css">body {
+  background-image: url(&apos;background.png&apos;);
+  background-position: 0 0;
+}
+
+html:hover body {
+  background-position: 720000px 720000px;
+  transition-property: background-position;
+  transition-timing-function: linear;
+  transition-duration: 3600s;
+}</code></pre>
+
+<p>デモでは800x800の画像を背景にしたので、4秒で1周するように<code>720000px</code>を指定した。アニメーションの長さは1時間確保しておけば大丈夫だろう。リニアなアニメーションなら、このようにちょっと工夫すればできるけど、拡大・縮小を繰り返すとかは<code>animation</code>プロパティーを使った本元CSSアニメーションじゃないと難しい。</p>
+
+<p>パフォーマンスとしてはInternet Explorer 11とFirefox 29ではハードウェア・アクセラレーションが何もせずに効くので問題ない。Chrome 34ではCPUを食いつくすので、なんらかの方法でハードウェア・アクセラレーションを有効にする必要がある。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

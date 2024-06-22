@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>configプラグイン動かねぇ！</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/config_plugin_does_not_work.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="blosxomのパワフルなプラグインのひとつに、configプラグインという、グローバルな設定($blog_titleとか)を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、設定の説明がMLのアーカイブにしかないことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="blosxomのパワフルなプラグインのひとつに、configプラグインという、グローバルな設定($blog_titleとか)を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、設定の説明がMLのアーカイブにしかないことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="configプラグイン動かねぇ！" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-03-24T06:35:30+09:00">2004年3月24日</time></p>
+
+        <h1><em>configプラグイン動かねぇ！</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のパワフルなプラグインのひとつに、<a href="http://www.blosxom.com/plugins/general/config.htm" title="blosxom :: the zen of blogging :: plugins/general/config.txt">configプラグイン</a>という、グローバルな設定(<code>$blog_title</code>とか)を、カテゴリごとやフレーバーごと、さらにはあるカテゴリのあるフレーバーに限って書き換えることができるようになるものがあるのですが、<a href="http://groups.yahoo.com/group/blosxom/message/990" title="Yahoo! Groups : blosxom Messages : Message 990 of 7272">設定の説明がMLのアーカイブにしかない</a>ことや、検索しようにもconfigとかいう非常に一般的な単語なのでなかなか引っ掛けづらく、利用には結構壁があるかもしれませんね。</p>
+<p>どうにかこうにか、</p>
+<pre><code class="language-perl">package blosxom;
+
+$blog_title = &apos;FooBarBlosxom&apos;;
+
+1;</code></pre>
+<p>とか書いて、configとかconfig.htmlとかいうファイル名でファイルを作ってやれば良いということまでは理解できました。</p>
+<p>しかし、動きません。</p>
+<p>まず第一の原因は、どうやら<code>head</code>サブルーチンで設定ファイルを読んでいることにあるようです。プラグインを読み込む順番によっては、うまく読んでくれないことがあるかもしれないとか。これに対しての解は<code>head</code>サブルーチンから<code>filter</code>サブルーチンに変更してやるか、configプラグインを最初に読み込むように00configなどと名前を変更してやるだけです。</p>
+<p>次の原因は、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.txt">entries_index</a>との兼ね合いっぽいです。blosxomはエントリのファイルをリストアップする際に、エントリ・ファイルとみなす拡張子以外のファイルを<code>%others</code>というハッシュに格納するので、configプラグインの設定ファイルはこちらに格納されることになります。また、configプラグインでは、その<code>%others</code>に格納されているかどうかで、設定ファイルの存在を確認しています。通常はこれで問題ないのですが、entries_indexでは、この<code>%others</code>をまるごと吹っ飛ばしているっぽいので、configプラグインで設定ファイルの存在を検知できていないような。なので、その部分をちょっと書き換えてやる必要があるかもないかも。本格的な対策はentries_indexを書き換えるべきなんでしょうけど、あれのコードはかなりトリッキーで僕にはちょっと正確に読めないです。configプラグインの</p>
+<pre><code class="language-perl">$blosxom::others{&quot;$blosxom::datadir$path/config.$blosxom::flavour&quot;}
+  and eval { require &quot;$blosxom::datadir$path/config.$blosxom::flavour&quot; }
+  and ( $@ ? warn $@ : last );
+$blosxom::others{&quot;$blosxom::datadir$path/config&quot;}
+  and eval { require &quot;$blosxom::datadir$path/config&quot; }
+  and ( $@ ? warn $@ : last );</code></pre>
+<p>となっている部分を、</p>
+<pre><code class="language-perl">-e $blosxom::datadir$path/config.$blosxom::flavour
+  and eval { require &quot;$blosxom::datadir$path/config.$blosxom::flavour&quot; }
+  and ( $@ ? warn $@ : last );
+-e $blosxom::datadir$path/config
+  and eval { require &quot;$blosxom::datadir$path/config&quot; }
+  and ( $@ ? warn $@ : last );</code></pre>
+<p>と、ファイルテスト演算子で存在確認するようにしたらちゃんと動作するようになりました。適当過ぎな改造ですので、あまり参考にしないほうが良いです。ていうか、正確に挙動をつかめてないですしね。</p>
+<p>ちなみに、entries_indexを大幅に拡張した<a href="http://www.blosxom.com/plugins/indexing/entries_cache.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_cache.txt">entries_cache</a>の方では、<code>%others</code>をきちんと扱っているようなので、そのままでうまく動くような気がします。entries_indexはパフォーマンス的にも機能的にもちょっと落ちるので、entries_cacheが使える環境の場合はこちらを使った方が良いような気も。</p>
+<p>blosxomの抱える大きな問題のひとつは、こういったプラグイン同士の相性かなぁ。基本的に多くのプラグインを使うことが多いでしょうしね。まぁ、大概はよーくコードを眺めてみれば解決できたりするわけなんですが(構造上巨大なプラグインというのはそう無いですし)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

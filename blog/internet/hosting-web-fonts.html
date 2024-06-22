@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Webフォントのホスティング</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/internet/hosting-web-fonts.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Webフォントのホスティングのみを提供するようなサービス、つまりWebフォント専用のカスタムCDNを探していた。しかし、Webフォントがメジャーになったとはいえ、そこまでニッチなサービスはあんまりないようだ。代表的なものだとTypeFront。が、かなり制限厳しい。試してすらいないけど、$15/月は払わないとまともに機能しそうもないような仕様だった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Webフォントのホスティングのみを提供するようなサービス、つまりWebフォント専用のカスタムCDNを探していた。しかし、Webフォントがメジャーになったとはいえ、そこまでニッチなサービスはあんまりないようだ。代表的なものだとTypeFront。が、かなり制限厳しい。試してすらいないけど、$15/月は払わないとまともに機能しそうもないような仕様だった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Webフォントのホスティング" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-10-09T17:33:32+09:00">2013年10月9日</time></p>
+
+        <h1><em>Webフォントのホスティング</em></h1>
+      </header>
+
+    <main>
+
+    <p>Webフォントのホスティングのみを提供するようなサービス、つまりWebフォント専用のカスタムCDNを探していた。しかし、Webフォントがメジャーになったとはいえ、そこまでニッチなサービスはあんまりないようだ。代表的なものだと<a href="http://typefront.com/">TypeFront</a>。が、かなり制限厳しい。試してすらいないけど、$15/月は払わないとまともに機能しそうもないような仕様だった。</p>
+
+<p>Webフォント専用にこだわらずに、<a href="http://pages.github.com/">GitHub Pages</a>や<a href="https://www.dropbox.com/">Dropbox</a>を利用するという手もありそうだけど、Internet Explorer 9以降やFirefox 3.5以降における<a href="http://www.w3.org/TR/cors/">CORS</a>による制限に対応できない。また、パフォーマンスに難点があったり、<code>Content-Type</code>でトラブりそうとかも。</p>
+
+<section>
+<h2><a href="https://drive.google.com/">Google Drive</a></h2>
+
+<p>Google Driveだとどうかなーとテストしてみたら、<code>Access-Control-Origin: *</code>となってて問題なく利用できた。</p>
+
+<p>Demo: <a href="/test/506.html">Hosting Web Fonts on Google Drive</a></p>
+
+<p>数多くのブログで取り上げられているような、HTMLをホスティングする方法と同じようにアップロードして、URLを調べるだけで、ちゃんと読めた。<code>.woff</code>のURLは<code>http</code>でも表示は可能だけど、リダイレクトが挟まれてしまうので、<code>https</code>の必要がある(要検証)。<code>.woff</code>の<code>Content-Type</code>は<code>application/octet-stream</code>なので、全てのブラウザーで大丈夫なはず。パフォーマンス的には遅いってほどではないけど、取り立てて速くもない。</p>
+
+<p>選択肢としてはアリなのではないかと思う。CSSの書き方とかはディレクトリ構成も特にトリッキーなことをする必要はない。同期アプリを使えばアップデートも簡単。</p>
+</section>
+
+<section>
+<h2><a href="http://www.cloudflare.com/">Cloudflare</a></h2>
+
+<p>もっと普通にCloudflareを使っても良いのかもしれない。<a href="https://support.cloudflare.com/hc/en-us/articles/200172516-What-file-extensions-does-Cloudflare-cache-for-static-content-">キャッシュしてくれる静的ファイルの拡張子一覧</a>に<code>.css</code>はもちろん、<code>.woff</code>も入っているので意図した通りに機能しそう。専用のサブドメイン管理にもできるので、クッキーとかの問題もなくせ、パフォーマンスは一番期待できる。</p>
+</section>
+
+<hr>
+
+<p>Webフォントは<a href="http://www.google.com/fonts">Google Fonts</a>や<a href="https://typekit.com/">TypeKit</a>に頼りがちだが、それらで提供されていないフォントとなると、なかなか敷居が高くなる。その結果、利用を諦めるという選択になりやすい。比較的手軽に管理できるGoogle Driveを利用することにより諦めずに済むかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

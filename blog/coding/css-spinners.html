@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSのローディング・アイコンのコスト</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/css-spinners.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="今までは主にアニメーションGIFで作られていたローディング・アイコンをCSSアニメーションで作るみたいなのが流行っている。面白いとは思うし、ちゃんと作ればスケーラブルなので便利そうでもある。けれどもローディング・アイコンを表示するための空要素が必要になり、かつ後にそれを消さなくてはならない。CSSだけだと面倒くさそうだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="今までは主にアニメーションGIFで作られていたローディング・アイコンをCSSアニメーションで作るみたいなのが流行っている。面白いとは思うし、ちゃんと作ればスケーラブルなので便利そうでもある。けれどもローディング・アイコンを表示するための空要素が必要になり、かつ後にそれを消さなくてはならない。CSSだけだと面倒くさそうだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSのローディング・アイコンのコスト" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-05-18T12:59:49+09:00">2014年5月18日</time></p>
+
+        <h1><em>CSSのローディング・アイコンのコスト</em></h1>
+      </header>
+
+    <main>
+
+    <p>今までは主にアニメーションGIFで作られていたローディング・アイコンをCSSアニメーションで作るみたいなのが流行っている。面白いとは思うし、ちゃんと作ればスケーラブルなので便利そうでもある。けれどもローディング・アイコンを表示するための空要素が必要になり、かつ後にそれを消さなくてはならない。CSSだけだと面倒くさそうだ。</p>
+
+<p>どういうローディング・アイコンかはこの際問題ではないので、とりあえず<code>main</code>要素以下に何かしら(仮にサムネイルとする)をロードするまでローディング・アイコンを表示することを考えてみる。普通はJavaScriptでローディング・アイコンの追加→サムネイルのビルド→ローディング・アイコンの削除→サムネイルの追加とやるわけだけど、ローディング・アイコンの追加と削除でDOM操作を伴うのはコストがある気がする。</p>
+
+<pre><code class="language-html">&lt;main id=&quot;result&quot;&gt;
+  &lt;div class=&quot;spinner&quot;&gt;&lt;/div&gt;
+&lt;/main&gt;</code></pre>
+
+<p>最初からこうしておいて、ローディング・アイコンの表示切り替えをCSSから制御するとコストが下がりそう。</p>
+
+<pre><code class="language-css">.spinner {
+  /* ローディング・アイコンのスタイル */
+  display: none;
+}
+
+.spinner:only-child {
+  display: block;
+}</code></pre>
+
+<p><code>:only-child</code>擬似クラスを使って表示するようにしてやり、サムネイルが追加されて唯一の子でなくなったら消してやるという<a href="/test/562.html">仕組み</a>。</p>
+
+<hr>
+
+<p>実際にはこういう何かを読みこむまでローディング・アイコンを表示するケースでは、何かしらのDOM操作を伴うので、大幅にコストが下がるということはなさそう。しかしそういったDOM操作を行うJavaScriptにローディング・アイコンの表示切り替えを行う制御を混ぜずに済む、CSSだけで完結するというような効果はある。使いどころはありそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

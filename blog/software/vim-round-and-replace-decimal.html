@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Vimで小数を四捨五入して置換</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/vim-round-and-replace-decimal.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="渡されたSVGファイルを見たらpath要素のアンカーポイントの数字が小数点以下6桁くらいから30桁まで混在していて、無駄な感じがあった。SVGOでできるのでそれでやっても良かったが、まずは単純に小数を指定桁(3から5桁)で四捨五入したいだけなので他に何かされてしまう可能性があるツールはちょっと避けたい。ということでVimの置換でどうにかした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="渡されたSVGファイルを見たらpath要素のアンカーポイントの数字が小数点以下6桁くらいから30桁まで混在していて、無駄な感じがあった。SVGOでできるのでそれでやっても良かったが、まずは単純に小数を指定桁(3から5桁)で四捨五入したいだけなので他に何かされてしまう可能性があるツールはちょっと避けたい。ということでVimの置換でどうにかした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Vimで小数を四捨五入して置換" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-04-22T01:09:50+09:00">2015年4月22日</time></p>
+
+        <h1><em>Vimで小数を四捨五入して置換</em></h1>
+      </header>
+
+    <main>
+
+    <p>渡されたSVGファイルを見たら<code>path</code>要素のアンカーポイントの数字が小数点以下6桁くらいから30桁まで混在していて、無駄な感じがあった。<a href="https://github.com/svg/svgo/blob/master/plugins/cleanupNumericValues.js">SVGOでできる</a>のでそれでやっても良かったが、まずは単純に小数を指定桁(3から5桁)で四捨五入したいだけなので他に何かされてしまう可能性があるツールはちょっと避けたい。ということでVimの置換でどうにかした。</p>
+
+<p>コマンドとしては長いがやっていることは普通なので、後述の説明が理解できればソラで打てるんじゃないかと思う。</p>
+
+<pre><code class="language-vim">:%s@\d\+\.\d\+@\=round(str2float(submatch(0))*1000)/1000@g</code></pre>
+
+<p>例えば、</p>
+
+<pre><code> 0.12345
+12.34567
+ 0.99999
+56.78999</code></pre>
+
+<p>は、</p>
+
+<pre><code> 0.123
+12.346
+ 1.0
+56.79</code></pre>
+
+<p>と置換される。それぞれ切り捨て、切り上げ、切り上げて余分な0を削除、切り上げて余分な0を削除と置換されている。できれば<code>1.0</code>が<code>1</code>になって欲しいが、<code>round()</code>の仕様上少し面倒くさそう。</p>
+
+<hr>
+
+<p>使うのは</p>
+
+<ul>
+<li><a href="http://vim-jp.org/vimdoc-ja/change.html#%3Asubstitute">:substitute</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/change.html#sub-replace-special">sub-replace-special (:s\=)</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#submatch()">submatch()</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#str2float()">str2float()</a></li>
+<li><a href="http://vim-jp.org/vimdoc-ja/eval.html#round()">round()</a></li>
+</ul>
+
+<p>になる。</p>
+
+<section>
+<h2>:substitute</h2>
+
+<p>全置換なので<code>:s[ubstitute]</code>に<code>%</code>を付けて<code>g</code>フラグ付きで行う。通常は<code>/</code>で検索パターンと置換パターンを区切るが、置換側で<code>/</code>を使いたいので<code>@</code>を使って区切るとエスケープで頭が混乱することはない。</p>
+</section>
+
+<section>
+<h2>sub-replace-special (:s\=)</h2>
+
+<p>単純な置換ではなく、検索した文字列を加工したいので、置換パターンの方を<code>\=</code>で始めて、Vimの内蔵関数を使えるようにする。</p>
+</section>
+
+<section>
+<h2>submatch()</h2>
+
+<p>通常の置換では置換パターンで<code>\0</code>を使うことで、検索パターン全体のマッチ拾うことが出来る。しかし<code>\=</code>ではそれは使えない(と思う)ので、代わりに<code>submatch()</code>で直前の検索パターンの全体のマッチ(及びサブマッチ)を拾うことができるのでこれを使う。ここではマッチ全体を拾えば良いので<code>submatch(0)</code>で良い。</p>
+</section>
+
+<section>
+<h2>str2float()</h2>
+
+<p>検索文字列は<code>String</code>なので<code>Float</code>へキャストする必要がある。暗黙の型変換でもうまくいくような気がするが念のためキャストした方が良い。</p>
+</section>
+
+<section>
+<h2>round()</h2>
+
+<p>小数の丸めには3種類あるが、四捨五入したい場合は<code>round()</code>を使う。しかしこれは強制的に整数へ(<code>.0</code>付きで)丸められるため、事前に維持したい桁数だけ少数点をずらしておく必要がある。ここでは3桁維持するとして、まず1000を掛けておき、<code>round()</code>した後に1000で割って戻す。</p>
+</section>
+
+<hr>
+
+<p>ちゃんと関数を書かないと面倒かと思ったが、それほどでもなかった。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

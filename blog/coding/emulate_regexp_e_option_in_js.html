@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>正規表現のeオプションをJavaScriptでエミュレート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/emulate_regexp_e_option_in_js.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Perlなどの置換系の正規表現ではeというオプション(フラグ)をつけると、置換後の文字列をプログラム・コードとみなしてくれるわけですが、JavaScriptのreplace()の第一引数で指定する正規表現にはeオプションなどというモノはありません。しかし、replace()の第二引数である置換後の文字列にはStringオブジェクトや文字列リテラル以外にも関数を指定することもできるので、事実上eオプション相当のことが実現できます。エミュレートというのは正確ではない気がするけど気にしない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Perlなどの置換系の正規表現ではeというオプション(フラグ)をつけると、置換後の文字列をプログラム・コードとみなしてくれるわけですが、JavaScriptのreplace()の第一引数で指定する正規表現にはeオプションなどというモノはありません。しかし、replace()の第二引数である置換後の文字列にはStringオブジェクトや文字列リテラル以外にも関数を指定することもできるので、事実上eオプション相当のことが実現できます。エミュレートというのは正確ではない気がするけど気にしない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="正規表現のeオプションをJavaScriptでエミュレート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-03-30T00:31:34+09:00">2005年3月30日</time></p>
+
+        <h1><em>正規表現のeオプションをJavaScriptでエミュレート</em></h1>
+      </header>
+
+    <main>
+
+    <p>Perlなどの置換系の正規表現では<code>e</code>というオプション(フラグ)をつけると、置換後の文字列をプログラム・コードとみなしてくれるわけですが、JavaScriptの<code>replace()</code>の第一引数で指定する正規表現には<code>e</code>オプションなどというモノはありません。しかし、<code>replace()</code>の第二引数である置換後の文字列にはStringオブジェクトや文字列リテラル以外にも関数を指定することもできるので、事実上<code>e</code>オプション相当のことが実現できます。エミュレートというのは正確ではない気がするけど気にしない。</p>
+<p>具体的には、</p>
+<pre><code class="language-js">var s = &quot;asdf123asdf123456asdf123asdf&quot;;
+document.write(
+  s.replace(
+    /123/g,
+    function (num, idx, old) {
+      return parseInt(num) + 333;
+    }
+  )
+);</code></pre>
+<p>という感じ。上記例では「asdf456asdf456456asdf456asdf」と書き出されます。</p>
+<p>第二引数に指定した関数には、強制的に引数が渡されます。その引数は<code>replace()</code>によって随時変更されるグローバルな<code>RegExp</code>オブジェクトのプロパティの一部で、「<code>RegExp.lastMatch</code>, <code>RegExp.$1</code>..<code>RegExp.$9</code>, <code>RegExp.index</code>, <code>RegExp.input</code>」となっています(引数の数は正規表現に依存)。上記例では</p>
+<pre>123, 4, asdf123asdf123456asdf123asdf
+123, 11, asdf123asdf123456asdf123asdf
+123, 21, asdf123asdf123456asdf123asdf</pre>
+<p>などと渡されることになります(上記例の正規表現では<code>()</code>によるグルーピングはしていないので<code>RegExp.$1</code>..<code>RegExp.$9</code>は飛ばされます)。</p>
+<p>ちなみに、僕は知らなかったのですが、<a href="http://tdiary.ishinao.net/20050329.html#p01" title="tdiary.ishinao.net - JavaScriptでpreg_replace_callback (17:16) , WikiParserをアップデート (18:19)">JavaScriptでpreg_replace_callback</a>というエントリが某所で話題になった時、「無いことは無いだろー」とWSH 5.6のヘルプの<code>replace()</code>のページを読んでみたところ、そのものずばりな答えが載ってたりしました。知られざる常識・・・じゃなくてめちゃくちゃ常識だったりして。</p>
+<p>JavaScriptの<code>replace()</code>ではベタな正規表現による置換くらいしかやったことが無かったので、これを使えばエレガントなコードを書けるような気がしないでもない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

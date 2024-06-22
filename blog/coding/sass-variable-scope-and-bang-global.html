@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sassの変数スコープと!global</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/sass-variable-scope-and-bang-global.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Sassの変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。LESSでは多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、!globalフラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sassの変数スコープと!global" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-03-11T12:03:09+09:00">2014年3月11日</time></p>
+
+        <h1><em>Sassの変数スコープと!global</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://sass-lang.com/">Sass</a>の変数スコープの仕様では、ローカル・コンテキストからグローバル変数を上書きできていた。<a href="http://lesscss.org/">LESS</a>では多くのプログラミング言語と一緒で上書きはできないという素直な仕様になっている。Sass 3.3では上書きしようとすると警告が出るようになり、<code>!global</code>フラグを使い明示的に上書きしていることを教える必要があるようになった。将来的には仕様が変更され、警告なしでLESSと同じ挙動になるようだ。</p>
+
+<p>Sassではローカル・コンテキストでグローバル変数を上書きでき、そのスコープを抜けてもそのままになる。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #0f0
+}</code></pre>
+
+<p>対してLESSでは上書きされない。</p>
+
+<pre><code class="language-less">@color: #f00;
+
+.test-local {
+  @color: #0f0;
+  color: @var; // #0f0
+}
+
+.test-global {
+  color: @color; // #f00 yay!
+}</code></pre>
+
+<p>Sass 3.3では<a href="https://github.com/nex3/sass/blob/bd8d8db2eb2ec57b1ef851816a95ef23e68abbe9/doc-src/SASS_CHANGELOG.md#backwards-incompatibilities----must-read#">グローバル変数をローカル・コンテキストで変更しようとした時に警告(Backwards Incompatibilitiesの12個目の項目を参照)</a>が出るようになった。具体的には以下のような警告メッセージをSassコンパイラが吐く。</p>
+
+<pre><samp>$ <kbd>scss test.scss test.css</kbd>
+DEPRECATION WARNING on line 4 of test.scss:
+Assigning to global variable &quot;$color&quot; by default is deprecated.
+In future versions of Sass, this will create a new local variable.
+If you want to assign to the global variable, use &quot;$color: #0f0 !global&quot; instead.
+Note that this will be incompatible with Sass 3.2.</samp></pre>
+
+<p>この警告を出さないようにするには<code>!global</code>フラグを使う。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0 !global;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #0f0
+}</code></pre>
+
+<p>警告が出るのみで、そのメッセージの通り実際にはまだ挙動は変わらない。しかし、将来的にはローカル変数を新しく作成する(this wil create a new local variable)と書かれているので、挙動はLESSと同じになるのだろう。</p>
+
+<pre><code class="language-scss">$color: #f00;
+
+.test-local {
+  $color: #0f0;
+  color: $color; // #0f0
+}
+
+.test-global {
+  color: $color; // #f00 gotcha!
+}</code></pre>
+
+<p>つまり<code>!global</code>フラグを使うことにより<em>今までの挙動を維持したまま警告は出なくなるが、それは一時しのぎに過ぎない</em>ということだ。そこそこ大きな互換性のない変更なので、その「一時」はかなり長い間ではありそうだが。元々ローカル・コンテキストでグローバル変数を上書きするのは、そのルールセットの順番を変えるだけで破綻するようなあまり行儀の良い書き方ではないので、なるべくなら仕様の変更を見据えて書き直した方が良いだろう。</p>
+
+<hr>
+
+<p>現状の仕様だとグローバル変数で全てやった方が効率的なので、世のSassコードはだいたいそうなっている。しかしグローバル変数を多用する場合、変数へ厳しい命名規則を適用しないと、保守性があからさまに落ちる。例えば<a href="http://bem.info/">BEM</a>を応用するのはひとつの手で、そのようなことを行っている人もちらほら聞くし、僕も使ったりしている。ただ、そういった厳しい命名規則は、長い変数名や特殊な言い回しとセットと言って良いので、書きやすさや導入しやすさに大きく欠ける。</p>
+
+<p>LESSのようにローカル変数が新しく作成されるようになれば、ローカル・スコープでの衝突のみを考慮すれば良くなる。そうすれば命名規則が随分とゆるやかになるか、ほとんどいらなくなるだろう。特殊な言い回しに至っては害悪ということにすらなるかもしれない。ただ<a href="http://www.w3.org/TR/css-variables-1/">CSS Variables</a>との兼ね合いから考えると、SassにしろLESSにしろ、カスケーディングを考慮しない変数システムは将来性に欠けるところもある。少なくとも<code>!global</code>が不要なように書き直す必要はあるが、それ以上にSassべったりな形での変数の取り扱いへ移行するのは、まだ自重するべき段階だと言えるだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

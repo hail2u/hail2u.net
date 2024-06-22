@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Git配下のファイルかどうかでCtrlPを切り替える</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/call-ctrlp-vim-based-on-git-status.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CtrlP (ctrlp.vim)では上位ディレクトリを辿って.gitとかがあったらそこを基準に起動するようにデフォルトではなっている。でもちょっと考えれば分かる通り、深い階層でかつGit配下ではない場合に非常に重い。ので設定でアクティブなバッファーのファイルのディレクトリを基準にしたりとかしてた。けどやはりGit配下の場合はやっぱりそれを考慮して欲しいので、Git配下かどうかを調べて適宜切り替える関数を書いて使い始めた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CtrlP (ctrlp.vim)では上位ディレクトリを辿って.gitとかがあったらそこを基準に起動するようにデフォルトではなっている。でもちょっと考えれば分かる通り、深い階層でかつGit配下ではない場合に非常に重い。ので設定でアクティブなバッファーのファイルのディレクトリを基準にしたりとかしてた。けどやはりGit配下の場合はやっぱりそれを考慮して欲しいので、Git配下かどうかを調べて適宜切り替える関数を書いて使い始めた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Git配下のファイルかどうかでCtrlPを切り替える" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-01-09T15:13:59+09:00">2012年1月9日</time></p>
+
+        <h1><em>Git配下のファイルかどうかでCtrlPを切り替える</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/kien/ctrlp.vim">CtrlP (ctrlp.vim)</a>では上位ディレクトリを辿って<code>.git</code>とかがあったらそこを基準に起動するようにデフォルトではなっている。でもちょっと考えれば分かる通り、深い階層でかつ<a href="http://git-scm.com/">Git</a>配下ではない場合に非常に重い。ので設定でアクティブなバッファーのファイルのディレクトリを基準にしたりとかしてた。けどやはりGit配下の場合はやっぱりそれを考慮して欲しいので、Git配下かどうかを調べて適宜切り替える関数を書いて使い始めた。</p>
+
+<p><code>system()</code>でシェルのコマンドを呼ぶとその終了コードが<code>v:shell_error</code>に格納されるので、それを利用した。</p>
+
+<pre><code class="language-vim">nnoremap &lt;Leader&gt;f :call &lt;SID&gt;CallCtrlPBasedOnGitStatus()&lt;Return&gt;
+
+function! s:CallCtrlPBasedOnGitStatus()
+  let s:git_status = system("git status")
+
+  if v:shell_error == 128
+    execute "CtrlPCurFile"
+  else
+    execute "CtrlPRoot"
+  endif
+endfunction</code></pre>
+
+<p>Git配下じゃない場合の<code>git status</code>の終了コードは<code>128</code>固定だと思うんだけどどうなんですかね！？</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

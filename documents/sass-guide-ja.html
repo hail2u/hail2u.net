@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sassの基本</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/sass-guide-ja.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Translation of Sass: Sass Basics" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Translation of Sass: Sass Basics" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sassの基本" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-02-08T00:00:00+09:00">2014年2月8日</time></p>
+
+        <h1><em>Sassの基本</em></h1>
+      </header>
+
+    <main>
+
+    <p>Translation of <a href="http://sass-lang.com/guide">Sass: Sass Basics</a></p>
+
+<p>Sassを使えるようにするには、まずあなたのプロジェクトにSassをセットアップする必要があります。もし単にこの文書を読みに来ただけなら、そのまま読み進めてください。しかしながらまずSassをインストールすることを薦めます。<a href="http://sass-lang.com/install">インストール手順の解説</a>を読めば、セットアップに必要なことは全て知ることができるでしょう。</p>
+
+<ul>
+<li><a href="#pre-processing">プリプロセス</a></li>
+<li><a href="#variables">変数</a></li>
+<li><a href="#nesting">ネスト</a></li>
+<li><a href="#partials">パーシャル</a></li>
+<li><a href="#import">インポート</a></li>
+<li><a href="#mixins">ミックスイン</a></li>
+<li><a href="#inheritance">継承</a></li>
+<li><a href="#operators">演算子</a></li>
+</ul>
+
+<h2 id="pre-processing">プリプロセス</h2>
+
+<p>CSSはただそれだけで楽しいものです。しかし、スタイルシートは大きく、より複雑に、そしてメンテナンスしづらくなっていってしまいます。プリプロセッサーが改善するのはそういったところです。SassはまだCSSにない機能、例えば変数やネスト、ミックスイン、そして継承などの機能を使えるようにし、CSSを再び楽しい物にしてくれます。</p>
+
+<p>Sassを使ってスタイルシートをいじくり回し終わったなら、そのあなたの書いたプリプロセスされたSassファイルは、ウェブサイトで使えるように普通のCSSファイルとして保存されます。</p>
+
+<h2 id="variables">変数</h2>
+
+<p>スタイルシート全体で何回も使いたい情報を保存できる変数について考えてみてください。色やフォント・スタック他あらゆるCSSの値を再利用できるように保存できるのです。Sassでは<code>$</code>という記号を使って変数を作成できます。例えば:</p>
+
+<pre><code>$font-stack:    Helvetica, sans-serif;
+$primary-color: #333;
+
+body {
+  font: 100% $font-stack;
+  color: $primary-color;
+}</code></pre>
+
+<p>Sassで処理すると、定義した<code>$font-stack</code>と<code>$primary-color</code>という変数を認識し、出力する普通のCSSでその変数の値で置き換えられます。ブランド・カラーを扱う場合や、ウェブサイト全体で一貫性を持たせたい場合にとても強力な味方になってくれます。</p>
+
+<pre><code>body {
+  font: 100% Helvetica, sans-serif;
+  color: #333;
+}</code></pre>
+
+<h2 id="nesting">ネスト</h2>
+
+<p>HTMLを書いていると、それが明確にネストされていて、わかりやすく階層化されていることに気づくことでしょう。一方CSSは……というと……。SassではHTMLと同じようにセレクターをネストさせることができます。ウェブサイトのナビゲーションを例にしてみましょう:</p>
+
+<pre><code>nav {
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li { display: inline-block; }
+
+  a {
+    display: block;
+    padding: 6px 12px;
+    text-decoration: none;
+  }
+}</code></pre>
+
+<p><code>ul</code>と<code>li</code>、そして<code>a</code>というセレクターが<code>nav</code>というセレクターにネストされていますよね。こうやって読みやすいようにCSSを管理できるようになります。CSSを生成すると以下のような形になるでしょう:</p>
+
+<pre><code>nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav li {
+  display: inline-block;
+}
+
+nav a {
+  display: block;
+  padding: 6px 12px;
+  text-decoration: none;
+}</code></pre>
+
+<h2 id="partials">パーシャル</h2>
+
+<p>パーシャル(訳注: いわゆるライブラリなどと呼ばれるものと同じようなものです)という、CSSの小さなスニペットを、他のSassファイルから読み込めるように作成することが出来ます。CSSをモジュール化し、メンテナンスしやすいようにするにはとても良いでしょう。パーシャルはSassファイルにアンダースコア(_)で始まるファイル名を付けるだけです。例えば<code>_partial.scss</code>などです。アンダースコアを付けることによってSassにパーシャルのファイルであることを教え、生成するCSSに含めるようにすることができるわけです。Sassのパーシャルは<code>@import</code>ディレクティブで読み込みます。</p>
+
+<h2 id="import">インポート</h2>
+
+<p>CSSにはインポート機能があり、CSSを小さくよりメンテナンスしやすい単位に分割することが可能になっています。しかしこの機能には<code>@import</code>が使われる度にHTTPリクエストが発生するという欠点があります。Sassでは<code>@import</code>をCSSのそれの上位互換として実装していますが、余計なHTTPリクエストが発生しないようにインポートしようとしているファイルを連結して取り込み、ブラウザーにはたったひとつのCSSファイルを提供するという形になっています。</p>
+
+<p>例えば<code>_resrt.scss</code>と<code>base.scss</code>という2つのSassファイルがあるとしましょう。そして<code>_reset.scss</code>を<code>base.scss</code>へインポートしたいします。</p>
+
+<pre><code>/* _reset.scss */
+
+html,
+body,
+ul,
+ol {
+  margin:  0;
+  padding: 0;
+}</code></pre>
+
+<pre><code>/* base.scss */
+
+@import &#39;reset&#39;;
+
+body {
+  font-size: 100% Helvetica, sans-serif;
+  background-color: #efefef;
+}</code></pre>
+
+<p>ここで<code>@import &#39;reset&#39;;</code>と<code>base.scss</code>に書いているのに気づいたでしょうか。Sassは賢いのでインポートする場合にファイルの拡張子である<code>.scss</code>は必要ありません。適切に解釈します。生成したCSSは以下のようになるでしょう:</p>
+
+<pre><code>html, body, ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #efefef;
+  font-size: 100% Helvetica, sans-serif;
+}</code></pre>
+
+<h2 id="mixins">ミックスイン</h2>
+
+<p>CSSでは書くのが面倒だったりすること、特にCSS3においていくつものベンダー拡張プリフィックスが必要であったりする場合があります。ミックスインによってCSSの定義をグルーピングし、ウェブサイト全体で再利用できるようになります。ミックスインには引数を与えることもできるので、柔軟なものを作ることができるでしょう。ミックスインの利用例としてはベンダー拡張プリフィックスの追加が挙げられます。<code>border-radius</code>を例にしてみましょう。</p>
+
+<pre><code>@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+     -moz-border-radius: $radius;
+      -ms-border-radius: $radius;
+       -o-border-radius: $radius;
+          border-radius: $radius;
+}
+
+.box { @include border-radius(10px); }</code></pre>
+
+<p>ミックスインの作成には<code>@mixin</code>ディレクティブを使い、名前を付けます。ここでは<code>border-radius</code>としました。カッコ内で<code>$radius</code>という変数を使っていますが、これによりどんな丸まり度をも引数として与えることが可能になります。ミックスインを作成した後、<code>@include</code>でミックスインの名前を指定して使うことになります。生成されるCSSは以下のようになるでしょう:</p>
+
+<pre><code>.box {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}</code></pre>
+
+<h2 id="inheritance">継承</h2>
+
+<p>継承はSassの最も便利な機能のひとつです。<code>@extend</code>を使うことにより、CSSプロパティーをあるセレクターと他のセレクターで共有することが可能になります。SassをDRY(訳注: Don&#39;t Repeat Yourself)に保つために非常に助けになるでしょう。以下の例ではエラーと警告、そして成功のメッセージのための一連のスタイルを作ってみます:</p>
+
+<pre><code>.message {
+  border: 1px solid #ccc;
+  padding: 10px;
+  color: #333;
+}
+
+.success {
+  @extend .message;
+  border-color: green;
+}
+
+.error {
+  @extend .message;
+  border-color: red;
+}
+
+.warning {
+  @extend .message;
+  border-color: yellow;
+}</code></pre>
+
+<p>上記コードがやろうとしていることは<code>.message</code>で定義されたのCSSプロパティーを<code>.success</code>や<code>.error</code>、そして<code>.warning</code>にも適用しようというものです。生成されたCSSでは魔法のようにうまくいくので、HTML側でいくつものクラス名を指定する必要はなくなります。例えばこのように:</p>
+
+<pre><code>.message, .success, .error, .warning {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  color: #333;
+}
+
+.success {
+  border-color: green;
+}
+
+.error {
+  border-color: red;
+}
+
+.warning {
+  border-color: yellow;
+}</code></pre>
+
+<h2 id="operators">演算子</h2>
+
+<p>計算をCSSの中で行えるととても便利なことでしょう。Sassでは標準的な演算子、<code>+</code>や<code>-</code>、<code>*</code>、<code>/</code>、そして<code>%</code>を利用することが出来ます。以下の例では<code>aside</code>と<code>article</code>の幅を計算で指定してみたいと思います。</p>
+
+<pre><code>.container { width: 100%; }
+
+    article[role=&quot;main&quot;] {
+  float: left;
+  width: 600px / 960px * 100%;
+}
+
+aside[role=&quot;complimentary&quot;] {
+  float: right;
+  width: 300px / 960px * 100%;
+}</code></pre>
+
+<p>これは960pxベースの簡単なパーセント・グリッドを作成しています。こういう計算により、ごく簡単にピクセル単位をパーセントに変換することもできるでしょう。生成されたCSSは以下のようなものになります:</p>
+
+<pre><code>.container {
+  width: 100%;
+}
+
+article[role=&quot;main&quot;] {
+  float: left;
+  width: 62.5%;
+}
+
+aside[role=&quot;complimentary&quot;] {
+  float: right;
+  width: 31.25%;
+}</code></pre>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

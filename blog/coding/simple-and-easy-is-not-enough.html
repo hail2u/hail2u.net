@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>シンプルで簡単なだけでは十分ではない</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/simple-and-easy-is-not-enough.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ある機能を追加しようとした時、いくつかある手法から選択する条件として、シンプルであることや簡単であることをが重要視されることは多い。けど、それと同じくらい今だけでなくこれからの機能との兼ね合いも考慮するべきで、シンプルで簡単という作業上のメリットのみで選択してしまうのは良くない。フロントエンドの人なのでclearfixを例にして書く。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ある機能を追加しようとした時、いくつかある手法から選択する条件として、シンプルであることや簡単であることをが重要視されることは多い。けど、それと同じくらい今だけでなくこれからの機能との兼ね合いも考慮するべきで、シンプルで簡単という作業上のメリットのみで選択してしまうのは良くない。フロントエンドの人なのでclearfixを例にして書く。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="シンプルで簡単なだけでは十分ではない" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-11-14T04:21:32+09:00">2013年11月14日</time></p>
+
+        <h1><em>シンプルで簡単なだけでは十分ではない</em></h1>
+      </header>
+
+    <main>
+
+    <p>ある機能を追加しようとした時、いくつかある手法から選択する条件として、シンプルであることや簡単であることをが重要視されることは多い。けど、それと同じくらい今だけでなくこれからの機能との兼ね合いも考慮するべきで、シンプルで簡単という作業上のメリットのみで選択してしまうのは良くない。フロントエンドの人なのでclearfixを例にして書く。</p>
+
+<p>マークアップの追加によるものを論外とすると、clearfixの実装としては主に以下の4つが挙げられると思う。</p>
+
+<ol>
+<li><a href="http://www.positioniseverything.net/easyclearing.html">オリジナルの<code>content: &quot;.&quot;</code>を使ったもの</a></li>
+<li><a href="http://perishablepress.com/new-clearfix-hack/">マージンの相殺を考慮したもの</a></li>
+<li><a href="http://nicolasgallagher.com/micro-clearfix-hack/">Micro clearfix</a></li>
+<li><code>overflow: hidden</code>を指定するだけのもの</li>
+</ol>
+
+<p>シンプルであることや簡単であることのみを考えるのなら、間違いなく<code>overflow: hidden</code>を指定するだけのものを選択することになると思う。</p>
+
+<p>なんといっても1行で済むことと、擬似要素が不要なことは魅力的。またclearfixを適用したい要素そのものに対して指定すれば良いという点も簡単でわかりやすい。その手軽さから採用されることが増えているような感じもする。一部フレームワークではほとんどベスト・プラクティス扱いだったり。</p>
+
+<section>
+<h2>使った結果どうなるのか</h2>
+
+<p>今とこれからの機能との兼ね合いという点では<code>overflow: hidden</code>による手法にはかなりの難点がある。この手法が脚光を浴びた頃には使われていなかった<code>box-shadow</code>プロパティーや、ネガティブ・マージンによる飛び出した配置、<code>transform</code>プロパティーによるはみ出しなど、競合するものは多い。こういった影響の大きさを考えるとちょっと使いづらい。</p>
+
+<p>競合とは少し違うが、マージンの相殺というCSSの(厄介だが)特徴的な機能を無効化してしまうMicro clearfixも、CSSの振る舞いに大きな変更を加えてしまうという点が気になる。知っててあえて使うのなら構わないという気もするけど、<code>* { box-sizing: border-box }</code>と似た危うさを抱えている気がする。</p>
+
+<p>つまり、実現できること以外になにがしかが起き、それが未知数だったり、CSSとしては当たり前の挙動を崩しかねないものだったりするわけ。</p>
+</section>
+
+<section>
+<h2>最小限で抑える</h2>
+
+<p>最終手段や何かとして<code>overflow: hidden</code>を使った手法を覚えておくと助かることもある。違う用途で擬似要素を既に利用していて他の手法が使えない時なんかはまさにそう。また、他の理由で<code>overflow: hidden</code>を使っている要素になら改めてclearfixを使わなくても良いことがわかるので、CSSを少しスッキリさせることもできることになる。なんかの時には思い出してやると良いかも。</p>
+
+<p>つまり<em><code>float</code>プロパティーをclearする以外の機能を持っている</em>のが問題ということになる。これからの機能に対して正確に予知することは出来ないわけだし、なるべく影響がないようにやりたいことだけを実装する方が安全で望ましいんじゃないかな、と。</p>
+
+<p>ハックを使わないとか、<a href="http://jquery.com/">jQuery</a>に対する<a href="http://remysharp.com/2010/10/08/what-is-a-polyfill/">Polyfill</a>、<a href="http://meyerweb.com/eric/tools/css/reset/">CSS Reset</a>に対する<a href="http://necolas.github.io/normalize.css/">Normalize.css</a>、といった<em>これからのウェブ</em>を意識した思想と通じる考え方だと思う。</p>
+</section>
+
+<hr>
+
+<p>シンプルなことや簡単なことは、覚えやすさや導入の容易さという面でメリットは大きい。と同時に全容を把握したつもりにもなりやすく、それが万能で最高だと勘違いもしやすい。その機能は本当に必要なのか、その手法は実装したい機能だけを実現するものなのか、他の人はしっかり理解できるのか、デメリットをちゃんと説明できるのか。ある機能を実装する手法を選択するまでにもっといろいろ考えておくと後に苦しまなくて済むし、他人を苦しめなくて済むはず。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>link要素の順序を後から変更する</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/changing-link-order-dynamically.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ちょっとした事情があって干渉するルールを持つ二つのlink要素を状況によってスワップさせたいことがあった。どちらかのみを書いておいて条件に合わせて差し替えるのが普通のアプローチだと思うけど、先読みさせたかったのであらかじめ両方共読み込ませておいて、head要素内での順序を変えてカスケーディング順序を変えるという方法で行った。動的にlink要素の順序を変更すると、カスケーディングの順序に影響を与えるようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ちょっとした事情があって干渉するルールを持つ二つのlink要素を状況によってスワップさせたいことがあった。どちらかのみを書いておいて条件に合わせて差し替えるのが普通のアプローチだと思うけど、先読みさせたかったのであらかじめ両方共読み込ませておいて、head要素内での順序を変えてカスケーディング順序を変えるという方法で行った。動的にlink要素の順序を変更すると、カスケーディングの順序に影響を与えるようだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="link要素の順序を後から変更する" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-21T12:39:41+09:00">2014年6月21日</time></p>
+
+        <h1><em>link要素の順序を後から変更する</em></h1>
+      </header>
+
+    <main>
+
+    <p>ちょっとした事情があって干渉するルールを持つ二つの<code>link</code>要素を状況によってスワップさせたいことがあった。どちらかのみを書いておいて条件に合わせて差し替えるのが普通のアプローチだと思うけど、先読みさせたかったのであらかじめ両方共読み込ませておいて、<code>head</code>要素内での順序を変えてカスケーディング順序を変えるという方法で行った。動的に<code>link</code>要素の順序を変更すると、カスケーディングの順序に影響を与えるようだ。</p>
+
+<p>Demo: <a href="/test/573.html">link Element Order</a></p>
+
+<p>デモは<code>.test</code>の前景色を緑にするCSS・赤にするCSSの順で両方読み込み、後で緑にするCSSを<code>head</code>要素の最後に動かしている。だいたいのブラウザで意図した通りに緑になるようだ。考えて見れば当然とも言えるんだけど、やろうとすら考えたこともなかったのでちゃんとしてるんだなーという感想。</p>
+
+<pre><code class="language-javascript">var elmHead = document.head;
+var cssGreen = document.getElementById(&apos;green&apos;);
+elmHead.appendChild(cssGreen.cloneNode());
+elmHead.removeChild(cssGreen);</code></pre>
+
+<p>クローンして追加してから削除するようにすると、大きな干渉がある時にもオーバーヘッドが最小限に抑えられると思う。元のノードの削除は遅延させても良いかもしれない。</p>
+
+<hr>
+
+<p>結局はその事情には別の方法で対処することになったので無駄な調査だったけど、なんかの時に思い出して使いたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

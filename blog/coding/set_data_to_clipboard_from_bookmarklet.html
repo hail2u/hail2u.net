@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Bookmarkletからクリップボードに文字列をコピー</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/set_data_to_clipboard_from_bookmarklet.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Bookmarkletからクリップボードに文字列をコピー" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-07-04T00:08:01+09:00">2004年7月4日</time></p>
+
+        <h1><em>Bookmarkletからクリップボードに文字列をコピー</em></h1>
+      </header>
+
+    <main>
+
+    <p>前回のエントリの応用で、Bookmarkletからクリップボードにコピーすることも出来ました。なにげに便利。てか、もうこれ無しでは生きていけない予感。</p>
+<p>今回でっちあげたURIスキーマはset-data-to-clipboard:にしてみた。前回のレジストリと同じような感覚でまず登録。今度はスクリプトをSetDataToClipBoard.jsとします。</p>
+<pre>REGEDIT4
+
+[HKEY_CLASSES_ROOT\set-data-to-clipboard]
+@=&quot;URL:Set Data To Clipboard Protocol&quot;
+&quot;URL Protocol&quot;=&quot;&quot;
+
+[HKEY_CLASSES_ROOT\set-data-to-clipboard\shell]
+
+[HKEY_CLASSES_ROOT\set-data-to-clipboard\shell\open]
+
+[HKEY_CLASSES_ROOT\set-data-to-clipboard\shell\open\command]
+@=&quot;wscript.exe C:\\Scripts\\SetDataToClipBoard.js \&quot;%1\&quot;&quot;</pre>
+<p>SetDataToClipBoard.jsはこんな感じ。</p>
+<pre><code class="language-js">var oArgs = WScript.Arguments
+var s = oArgs(0);
+s = s.replace(/^set-data-to-clipboard:\/\//, &quot;&quot;);
+s = s.replace(/\/$/, &quot;&quot;);
+
+var oIe = new ActiveXObject(&quot;InternetExplorer.Application&quot;);
+oIe.Navigate(&quot;about:blank&quot;);
+
+while (oIe.Busy) WScript.Sleep(100);
+
+oIe.Document.parentWindow.clipboardData.setData(&quot;text&quot;, unescape(s));
+oIe.Quit();</code></pre>
+<p>WSHでクリップボードを扱う場合、IEを隠れて起動させて、clipboardDataオブジェクトを利用するというバッド・ノウハウに基づいて、引数をクリップボードにコピーするというだけのJScriptです。JScriptな理由は、<code>unescape()</code>使うからというだけです。前回と違い最後に付くスラッシュを消しているのは、スラッシュがない文字列をURLスキーマに渡すとどうもWindowsが勝手にスラッシュ付けてくれちゃうみたいなので。</p>
+<p>あとはテキトウにBookmarkletを作成してみましょう。例えば閲覧中のページのタイトルとリンクをコピーするBookmarkletだと、Locationには、</p>
+<pre>javascript:document.location.href=&apos;set-data-to-clipboard://&apos;+escape(document.title+&apos;\n&apos;+document.location.href+&apos;\n&apos;)+&apos;/&apos;;</pre>
+<p>と、なります。エスケープしてやることと、最後にスラッシュを付けてやるのがポイント。</p>
+<p>これでリンクタグ作成とかAmazonの個別商品リンク作成とかもコピーするのがメンドウな<code>prompt()</code>経由ではなく一気にクリップボードにセットできる様になります。</p>
+<p>すげー便利だよ。俺、天才。</p>
+<p>寝ぼけてるのか。</p>
+<p>前回と今回のエントリを実践するのはかなりメンドウだと思いますが(説明わかりにくいし)、やれば必ずそれだけの利点はあるような気がします。</p>
+<p>WSHマンセー。</p>
+<p>ちなみに、前回と今回のエントリを実践するとJavaScript Consoleにガンガンエラーが溜まっていきます。まー実害はないし、個人の裁量で使うものなのでまぁ良いかなとか、投げやりな。</p>
+<section>
+<h2>追記@2004/07/04</h2>
+<p>書き忘れていたのですが、インターネット オプションのセキュリティ設定のレベルのカスタマイズから、「スクリプトによる貼り付け処理の許可」を「有効にする」にしないとうまく動かないと思います。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>DingbatのWebフォント</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/dingbat-web-font.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="将来的にブラウザでJavaScriptのリサイズや移動の許可・不許可設定みたいにWebフォントを使う・使わないを設定できるようになると思うんですよ(CSSアニメーションやトランスフォームとかも)。そうなるとDingbatのWebフォントを使った場合、その部分は普通のフォントで表示される可能性が高く、無意味な文字列が表示されるんではないかなと。既に現状でもドキュメントで指定されたフォントを使用しないという設定を有効にしているとそうなります。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="将来的にブラウザでJavaScriptのリサイズや移動の許可・不許可設定みたいにWebフォントを使う・使わないを設定できるようになると思うんですよ(CSSアニメーションやトランスフォームとかも)。そうなるとDingbatのWebフォントを使った場合、その部分は普通のフォントで表示される可能性が高く、無意味な文字列が表示されるんではないかなと。既に現状でもドキュメントで指定されたフォントを使用しないという設定を有効にしているとそうなります。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="DingbatのWebフォント" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-11-22T22:48:59+09:00">2011年11月22日</time></p>
+
+        <h1><em>DingbatのWebフォント</em></h1>
+      </header>
+
+    <main>
+
+    <p>将来的にブラウザでJavaScriptのリサイズや移動の許可・不許可設定みたいにWebフォントを使う・使わないを設定できるようになると思うんですよ(CSSアニメーションやトランスフォームとかも)。そうなるとDingbatのWebフォントを使った場合、その部分は普通のフォントで表示される可能性が高く、無意味な文字列が表示されるんではないかなと。既に現状でもドキュメントで指定されたフォントを使用しないという設定を有効にしているとそうなります。</p>
+
+<p>例えばDingbatのWebフォントの利用デモである<a href="http://css-tricks.com/">CSS-Tricks</a>の<a href="http://css-tricks.com/examples/IconFont/">Icon Fonts are Awesome</a>で使われている<a href="http://fico.lensco.be/">Fico</a>では<code>B</code>に吹き出しの絵が割り当てられています。この吹き出しは以下のようなコメント数の表示などに対して使うことになるでしょう。</p>
+
+<pre><code class="language-html">&lt;a href="#comments" class="icon comment-info"&gt;Comments (12)&lt;/a&gt;</code></pre>
+
+<p>勿論HTMLで以下のように予め<code>B</code>という無意味な文字を埋め込むのは良くないでしょう。</p>
+
+<pre><code class="language-html">&lt;a href="#" class="comment-info"&gt;&lt;span class="icon"&gt;B&lt;/span&gt; Comments (12)&lt;/a&gt;</code></pre>
+
+<p>なのでCSSの<code>::before</code>擬似要素を使うことになります。</p>
+
+<pre><code class="language-css">.icon::before {
+  font-family: "Fico";
+}
+
+.comment-info::before {
+  content: "B ";
+}</code></pre>
+
+<p>これでカワイイ吹き出しアイコンがコメント数の表示の前に付きますね。</p>
+
+<p>ではWebフォントを無効にすることができるブラウザが出現し、無効に設定したらどうなるでしょうか？　またはドキュメントで指定されたフォントを使用しない設定にしているユーザーには？</p>
+
+<pre>B Comments (12)</pre>
+
+<p>当然このような表示になりますよね。「<code>B</code>ってなに？　ブコメ？」と混乱するのはまず間違いないでしょう。そしてこの<code>B</code>は適切にフォールバック、あるいは非表示にすることはできないでしょう(少なくとも僕はまだ思いつきません)。そういう意味でCSS Tricksのデモ・ページに煽り気味に書かれている「SVG is better.」はいくらか正しいんじゃないかと思います。SVGを画像や背景画像として流しこむ場合は、画像の非表示というブラウザで可能な設定が意識すべきことに変わりますが、その場合は単なる空白ができるだけ(うまくやれば空白もできない)なのでDingbatのWebフォントに比べれば問題は少なそうです。</p>
+
+<p>Webフォントのような外部リソースを引っ張ってきたりするものや、ページの状態に大きな効果を与えるものを嫌う人は少なくありません。もちろんJavaScriptを無効にしている人程度かそれ以下の割り合いでしょうが、そのことはしっかりと意識しておくべきでしょう。その上であえて無視するというのなら構わないと思いますが。</p>
+
+<p>またちょっと本題から外れますが、擬似要素についてはその文字列がコピーできるブラウザ(Internet Explorer 9など)もあったりするので、色々考えて使ったほうが良いと思います。この例では<code>B Comments (12)</code>というおそらくユーザーが意図しない文字列がコピーされます。<a href="http://twitter.com/hail2u_/status/131561921114681344">コードの行番号とかに使っちゃダメですよ！</a>バカですね、この人！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

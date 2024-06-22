@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>git cleanを使ったGitHub Pagesの管理フロー</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/github-pages-management-flow-with-git-clean.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="submodule (やsubtree)を使ったGitHub Pagesの管理フローは良いのだけど、もっと適当な感じでやりたいなと色々試している。要件としては生成に使ってる仕組みやログは非公開にしたいので、rebaseからpush -fのような変更を取り込んで更新する仕組みは使えない、というくらい。最新の実験ではclean -fでステージされてないファイルを削除できることを利用してやってみている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="submodule (やsubtree)を使ったGitHub Pagesの管理フローは良いのだけど、もっと適当な感じでやりたいなと色々試している。要件としては生成に使ってる仕組みやログは非公開にしたいので、rebaseからpush -fのような変更を取り込んで更新する仕組みは使えない、というくらい。最新の実験ではclean -fでステージされてないファイルを削除できることを利用してやってみている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="git cleanを使ったGitHub Pagesの管理フロー" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-08T11:38:59+09:00">2014年7月8日</time></p>
+
+        <h1><em>git cleanを使ったGitHub Pagesの管理フロー</em></h1>
+      </header>
+
+    <main>
+
+    <p>submodule (やsubtree)を使ったGitHub Pagesの管理フローは良いのだけど、もっと適当な感じでやりたいなと色々試している。要件としては生成に使ってる仕組みやログは非公開にしたいので、<code>rebase</code>から<code>push -f</code>のような変更を取り込んで更新する仕組みは使えない、というくらい。最新の実験では<code>clean -f</code>でステージされてないファイルを削除できることを利用してやってみている。</p>
+
+<p>まずはビルド。<code>master</code>ブランチでビルドして<code>index.html</code>などをバンバンそこに吐いていくような雑なケース。</p>
+
+<pre><samp>$ <kbd>npm run build</kbd>
+$ <kbd>git add --all</kbd>
+$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd></samp></pre>
+
+<p>これでGitHub Pagesに必要なファイルが生成され、<code>master</code>ブランチにコミットされた状態になった。</p>
+
+<pre><samp>$ <kbd>git checkout gh-pages</kbd>
+$ <kbd>git checkout master -- &quot;*&quot;</kbd></samp></pre>
+
+<p><code>gh-pages</code>ブランチへ切り替えて、<code>master</code>ブランチで変更されたファイルを全部持ってくる。事前に<code>gh-pages</code>ブランチでは手作業で必要なファイルだけを残したり、<code>CNAME</code>や<code>.nojekyll</code>など<code>gh-pages</code>ブランチでのみ必要になるファイルをコミットしたりして構成を整えておく。このまま全部コミットすると構成がグチャグチャになるので、以下のようにして必要な(<code>*.html</code>)のみコミットするように頑張る。</p>
+
+<pre><samp>$ <kbd>git reset</kbd>
+$ <kbd>git add *.html **/*.html</kbd>
+$ <kbd>git clean -f</kbd>
+$ <kbd>git commit --all --message=&quot;Rebuild&quot;</kbd></samp></pre>
+
+<p><code>reset</code>を引数なしで呼んで、全ファイルをステージされていない状態にし、必要なファイルだけステージし直す。その後余ったステージされていないファイルを<code>clean -f</code>で削除するという形。これで<code>master</code>ブランチで変更された<code>*.html</code>だけ<code>gh-pages</code>ブランチにもコミットされた。</p>
+
+<pre><samp>$ <kbd>git push origin gh-pages</kbd>
+$ <kbd>git checkout master</kbd></samp></pre>
+
+<p>最後に<code>gh-pages</code>ブランチだけ<code>push</code>して<code>master</code>ブランチへ戻って完了。</p>
+
+<hr>
+
+<p>Gitでは<code>git checkout master -- &lt;paths&gt;...</code>で<code>master</code>ブランチから特定のファイルを持ってこれるのだけど、ここでグロブがうまく使えなくてハマり、こういった強引なやり方になった。多分だけどGit側の制限ではなく、MSYSのエスケープがらみの問題だと思うけど、解決できなかったので分からない。<code>&quot;*&quot;</code>だと全部持ってこれることはわかったので、<code>clean -f</code>を組み合わせて強引にやってみている。今のところうまく動いてる。</p>
+
+<p>HTMLやCSSなど、GitHub Pagesに必要なファイルをサブディレクトリに保存したり、吐くようにして、そこをGitリポジトリにすると安定だとは思う。ビルドをこなす親ディレクトリ側からは無視するようにすれば良い。けれどそうするとサブディレクトリに移動してGitの操作をし、それから戻ってこなくてはならなくなるので、npmやGruntなんかで自動化しようとすると面倒くさいかなと思う。</p>
+
+<p>これ！　という管理フローが見つからない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

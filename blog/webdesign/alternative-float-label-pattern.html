@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>入力フォームのラベルをフワッと浮かせるパターンの別解</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/alternative-float-label-pattern.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Float Label Patternはかっこよくて、単にラベルをプレースホルダーにするよりはマシなので使いたくなる。しかしラベルとプレースホルダーは別に提供してやりたい。機能も違うものなので、その方がきっと良いはずだ。そこで別解として、ラベルが斜めに動くものを考えた。もちろんCSSのみで実装している。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Float Label Patternはかっこよくて、単にラベルをプレースホルダーにするよりはマシなので使いたくなる。しかしラベルとプレースホルダーは別に提供してやりたい。機能も違うものなので、その方がきっと良いはずだ。そこで別解として、ラベルが斜めに動くものを考えた。もちろんCSSのみで実装している。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/alternative-float-label-pattern.gif" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="入力フォームのラベルをフワッと浮かせるパターンの別解" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-06T11:36:34+09:00">2014年6月6日</time></p>
+
+        <h1><em>入力フォームのラベルをフワッと浮かせるパターンの別解</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="入力フォームにフォーカスすると、入力フォームが拡大すると同時にラベルが斜めに動く。" height="627" src="/img/blog/alternative-float-label-pattern.gif" width="1200">
+</figure>
+
+<p><a href="https://dribbble.com/shots/1254439--GIF-Mobile-Form-Interaction">Float Label Pattern</a>はかっこよくて、単にラベルをプレースホルダーにするよりはマシなので使いたくなる。しかしラベルとプレースホルダーは別に提供してやりたい。機能も違うものなので、その方がきっと良いはずだ。そこで別解として、ラベルが斜めに動くものを考えた。もちろんCSSのみで実装している。</p>
+
+<p>Demo: <a href="/test/572.html">Alternative Float Label Pattern</a></p>
+
+<p>入力フォームにフォーカスすると、左にあるラベルが斜め右上に少し移動すると同時に入力フォームが左へ拡大する。これによりFloat Label Patternと同じような結果になるが、デフォルトの状態ではラベルとプレースホルダーを両立させることができる。</p>
+
+<p>ラベルを入力フォームのフォーカスと連携させるには、<a href="http://www.w3.org/TR/css3-selectors/#adjacent-sibling-combinators">隣接兄弟セレクター</a>を使うくらいしか方法はなさそうなので、マークアップは入力フォーム→ラベルの順にする必要がある。またそうするためには、両者の関連付けもネストではなく<code>for</code>属性を使う必要もある。</p>
+
+<pre><code class="language-html">&lt;form&gt;
+  &lt;p&gt;
+    &lt;input id=&quot;foo&quot;
+      type=&quot;text&quot;
+      placeholder=&quot;Input example for Foo&quot;&gt;
+    &lt;label for=&quot;foo&quot;&gt;Foo:&lt;/label&gt;
+  &lt;/p&gt;
+&lt;/form&gt;</code></pre>
+
+<p>CSSでは親要素(ここでは<code>p</code>要素)の高さと幅を制限した上で、<code>margin-left</code>や<code>top</code>プロパティーなどをうまく使ってレイアウトしてやる。</p>
+
+<p>仮に<code>18em</code>(iPhoneのportraitでも収まる幅)、ラベルで<code>6em</code>と入力フォームで<code>12em</code>を使うとすると以下の様なCSSになる。</p>
+
+<pre><code class="language-css">p {
+  width: 18em;
+  height: 2em;
+}
+
+input,
+label {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+input {
+  margin-left: 6em;
+  width: 12em;
+  height: 2em;
+  line-height: 2;
+}
+
+label {
+  position: relative;
+  top: -1.5em;
+  left: 0;
+  height: 1em;
+  line-height: 1;
+}</code></pre>
+
+<p>入力フォームの位置は<code>margin-left</code>プロパティーでラベルの幅分の余白を作ってやり、<code>width</code>プロパティーで<code>12em</code>を指定しておく。ラベルでは<code>position: relative</code>を使い、位置を上にずらす。両者ともに<code>height</code>と<code>line-height</code>プロパティーを使って適切な高さを指定しておくが、ラベルをちょっと重ねることを考えると、入力フォームは最低でも<code>2em</code>程度は必要になる。</p>
+
+<p>あとはこれを<code>input:focus</code>をトリガーにして、入力フォームとラベルの位置を動かしてやるだけだ。入力フォームは<code>margin-left</code>と<code>width</code>プロパティーで、ラベルは<code>top</code>と<code>left</code>プロパティーで動かす。</p>
+
+<pre><code class="language-css">input:focus {
+  margin-left: 0;
+  width: 18em;
+}
+
+input:focus + label {
+  top: -2.5em;
+  left: 0.5em;
+}</code></pre>
+
+<p>アニメーションは<code>transition</code>プロパティーを使って適当にやれば良い。元ネタのFloat Label Patternのように下線のみのフォーム要素の場合にはもうちょっと単純化できると思う。その一方で描画領域や親要素の大きさに合わせてフレキシブルに入力フォームの幅を調整するのは難しい(うまい方法が思いつかなかった)。</p>
+
+<hr>
+
+<p>元々のFloat Label Patternの要件は以下の通りだと考えている。</p>
+
+<ul>
+<li>入力フォームの幅を最大限に確保する</li>
+<li>ラベルをフォームに重ねて表示し、ラベルに領域を消費させない</li>
+<li>入力開始時にもラベルを消さない</li>
+</ul>
+
+<p>このパターンの問題点は、ラベルとプレースホルダーを混同させずに両立させるのが難しいことだ。入力フォームに重なって表示された文字列をラベルと解釈させるには、アイコンの追加なども含め、かなり気を使って作りこむ必要がある。もしくはそのような形でのプレースホルダーの濫用による、ユーザーの慣れを期待することになる。</p>
+
+<p>僕が考えたパターンは、元パターンの要件を満たした上でラベルとプレースホルダーの両立を実現している。</p>
+
+<p>しかし同時に、入力フォームの入力開始位置が動くという別の新たな欠点も持ってしまう。元パターンでもラベルの移動により視線を奪うことは起こりうるので、元パターンとの比較では欠点とまではならないが、ユーザビリティ的な問題を解消しようとして別のユーザービリティ上の問題を抱えることになるので、あまり良い解とは言えないかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

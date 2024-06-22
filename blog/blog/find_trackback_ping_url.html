@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Find TrackBack ping URL</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blog/find_trackback_ping_url.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="miyagawaさんのエントリを見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、innerHTMLとかじゃなくて、ドキュメントのノードを全てチェックし、nodeTypeが8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="miyagawaさんのエントリを見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、innerHTMLとかじゃなくて、ドキュメントのノードを全てチェックし、nodeTypeが8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Find TrackBack ping URL" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-07-03T00:16:34+09:00">2004年7月3日</time></p>
+
+        <h1><em>Find TrackBack ping URL</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://blog.bulknews.net/mt/archives/001078.html" title="blog.bulknews.net: Trackback Discovery Bookmarklet">miyagawaさんのエントリ</a>を見て、「TrackBack Auto-discovery用のRDFはコメントアウトされているから、<code>innerHTML</code>とかじゃなくて、ドキュメントのノードを全てチェックし、<code>nodeType</code>が8かどうかをチェックすればコメントを抽出できるので、そこから正規表現かけてやればTrackBack ping URL探せそう！」と思ったのでシコシコ作ってみました。</p>
+<p>JavaScriptのコードはこんな感じになっています。</p>
+<pre><code class="language-js">var tburl;
+var comments = new Array();
+getComment();
+
+for (var i = 0; i &lt; comments.length; i++) {
+  if (comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)) {
+    tburl = RegExp.$1;
+    break;
+  }
+}
+
+prompt(&apos;TrackBack ping URL&apos;, tburl);
+
+function getComment(elm) {
+  if (!elm) elm = document.documentElement;
+
+  for (var i = 0; i &lt; elm.childNodes.length; i++) {
+    if (elm.childNodes[i].nodeType == 8) {
+      comments[comments.length] = elm.childNodes[i].data;
+    } else if (elm.childNodes[i].nodeType == 1) {
+      getComment(elm.childNodes[i]);
+    }
+  }
+}</code></pre>
+<p><code>getComment()</code>が要素のノードを全部チェックし、定義済みの<code>comments</code>という名前の配列にコメントの内容をまとめてどんどん追加していく関数です。<code>nodeType</code>が1、すなわち要素の場合は、その要素からさらに<code>getComment()</code>をよぶといういわゆる再帰的な仕組み。この関数が終了した後、今度は<code>comments</code>でループを回し、内容を、<code>/trackback:ping=&quot;([^&quot;]+)&quot;/</code>という正規表現でチェックしていきます。で、マッチしたら<code>RegExp.$1</code>でTrackBack ping URLを抜き出して、最後にプロンプトを表示ということ。</p>
+<p>Bookmarklet: <em><a href="javascript:var tburl;var comments=new Array();function getComment(elm){if(!elm)elm=document.documentElement;for(var i=0;i&lt;elm.childNodes.length;i++){if(elm.childNodes[i].nodeType==8){comments[comments.length]=elm.childNodes[i].data;}else if(elm.childNodes[i].nodeType==1){getComment(elm.childNodes[i]);}}}getComment();for(var i=0;i&lt;comments.length;i++){if(comments[i].match(/trackback:ping=&quot;([^&quot;]+)&quot;/)){tburl=RegExp.$1;break;}}prompt(&apos;TrackBack ping URL&apos;, tburl);" title="Extract TrackBack ping URL">Extract TrackBack ping URL</a></em></p>
+<p>FirefoxとIE6で動作を確認しました。まーこのままではあまり使い物になるとは思えないシロモノですが、これをベースに何かいろいろ出来るかも出来ないかも。</p>
+<p>僕はほらローカルからPerlでTrackBack Auto-discoveryしちゃってるので・・・。誰かスゴイの作ってください。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

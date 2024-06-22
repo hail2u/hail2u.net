@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSの非同期読み込み</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/async-csses.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="印刷向けCSSだけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="印刷向けCSSだけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSの非同期読み込み" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-08-08T18:02:30+09:00">2014年8月8日</time></p>
+
+        <h1><em>CSSの非同期読み込み</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/blog/webdesign/async-print-css.html">印刷向けCSS</a>だけじゃなく、ウェブフォントのCSSも非同期で読み込むことにした。FOUTが起こるようになるので、気になったら戻すかも。</p>
+
+<pre><code class="language-javascript">var csses = [
+  { href: &apos;/styles/print.min.css&apos;, media: &apos;print&apos;; },
+  { href: &apos;/fonts/megrim.css&apos;; },
+  { href: &apos;/fonts/source-code-pro.css&apos; },
+  { href: &apos;/fonts/source-sans-pro.css&apos; }
+];
+var links = document.createDocumentFragment();
+csses.forEach(function (css) {
+  var link = document.createElement(&apos;link&apos;);
+  link.rel = &apos;stylesheet&apos;;
+  link.href = css.href;
+
+  if (css.media) {
+    link.media = css.media;
+  }
+
+  links.appendChild(link);
+});
+document.head.appendChild(links);</code></pre>
+
+<p>オプションで<code>media</code>属性を指定できるようにして、印刷向けとウェブフォントのCSSを混ぜられるようにした。一応<code>DocumentFragment</code>を使ったけど、<code>body</code>要素以下にねじ込むわけじゃないのであんまり意味はなさそう。むしろ遅くなるかも。</p>
+
+<hr>
+
+<p>CSSに直接<code>@font-face</code>定義を書くと扱いが難しかったり、イニシャル・ペイントまでが遅れたりもする。後者はData URIでフォント・ファイルを埋め込んだりしてなければ気にするほどではないと思ってるけど、メンテナンス性も含めて色々問題は考えられる。</p>
+
+<p>かといって<code>head</code>要素で<code>link</code>要素を書いて読み込もうとすると、貴重なHTTPリクエスト枠を消費してしまう。このウェブサイトのようにウェブフォントが必要不可欠な要素ではない場合は、非同期で読み込むのは悪くない妥協だと思う。</p>
+
+<p>他に例えばグローバル・フッターにソーシャル・アイコンを並べ、それをアイコン・フォントで表示してる場合なんかも非同期で良いと思う。いきなりグローバル・フッターから読み始める人もいないと思うので、多少遅れて表示されても問題ないはず。クリティカルなんとか的なアレ。CSSならJavaScriptと違って非同期にしてもCPUを専有したりもしないので、スクロールがカクつくとかもない。</p>
+
+<p>やり過ぎるとわけがわからなくなる危険性が高いので、見える部分だけを優先ではなく、<em>遅れても大丈夫そうな部分を後回しにする</em>ような感じで分けてくと良さそうかなと考えてる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

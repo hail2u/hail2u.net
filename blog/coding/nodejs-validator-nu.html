@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Node.jsでValidator.Nuを叩く</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/nodejs-validator-nu.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Node.jsでValidator.nuを使ってHTMLファイルをチェックするスクリプトを書いていた。form-dataモジュールを見つけるのに1時間、スクリプト書くのに15分。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Node.jsでValidator.Nuを叩く" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-07-31T02:19:51+09:00">2012年7月31日</time></p>
+
+        <h1><em>Node.jsでValidator.Nuを叩く</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://nodejs.org/">Node.js</a>で<a href="http://validator.nu/">Validator.nu</a>を使ってHTMLファイルをチェックするスクリプトを書いていた。<a href="https://github.com/felixge/node-form-data">form-dataモジュール</a>を見つけるのに1時間、スクリプト書くのに15分。</p>
+
+<p>form-dataモジュールは<a href="http://www.w3.org/TR/XMLHttpRequest2/">XMLHTTPRequest Level 2</a>の<a href="http://www.w3.org/TR/XMLHttpRequest2/#interface-formdata">FormDataインターフェイス</a>に似たものを提供するNode.jsモジュール。<code>append()</code>でパラメーターを追加していき、<code>submit()</code>で指定したURLにPOSTすることができる。Validator.nuは<code>application/x-www-form-urlencoded</code>に対応しておらず、Query Stringモジュールとかでポンと叩くことはできないため、このform-dataモジュールや<a href="https://github.com/coolaj86/abstract-http-request">ahr2モジュール</a>などが(面倒くさいので)必要。</p>
+
+<pre><code class="language-js">#!/usr/bin/env node
+
+var FormData = require('form-data');
+var fs = require('fs');
+
+var htmlfile = process.argv.slice(2)[0];
+
+var fd = new FormData();
+fd.append('out', 'json');
+fd.append('file', fs.createReadStream(htmlfile));
+fd.submit('http://validator.nu/', function (error, response) {
+  if (error) {
+    throw error;
+  }
+
+  var chunks = '';
+
+  response.on('data', function (chunk) {
+    chunks += chunk;
+  });
+
+  response.on('end', function () {
+    JSON.parse(chunks).messages.forEach(function (message) {
+      if (message.type === 'error') {
+        var line = (message.lastLine ? message.lastLine : 0);
+        var column = (message.firstColumn ? message.firstColumn: 0);
+        console.log([htmlfile, line, column, message.message].join(':'));
+      }
+    });
+  });
+});</code></pre>
+
+<p>コマンドラインに渡された最初の引数をHTMLファイルのパスとみなし、その内容を<code>multipart/form-data</code>でバリデーターにPOSTし、返ってきたJSONフォーマットの結果を<a href="http://nodejs.org/">GNUの標準エラーフォーマット</a>に整形して標準出力に吐いている。</p>
+
+<p>form-dataモジュールはHTTPモジュール決め打ちだったりなんかアレな気がするので、<code>append()</code>だけ使って<code>submit()</code>を使わずに<code>pipe()</code>でHTTP(S)モジュールに渡す形で書いた方が良いかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

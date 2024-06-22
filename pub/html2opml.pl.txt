@@ -1,0 +1,95 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+my $template = <<"_TMPL_";
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+	<head>
+		<title>RSS Subscriptions</title>
+		<dateCreated><TMPL_VAR name="dateCreated"></dateCreated>
+	</head>
+	<body>
+<TMPL_LOOP name="outlines">
+		<outline text="<TMPL_VAR ESCAPE=HTML name="title">" htmlUrl="<TMPL_VAR name="htmlUrl">" description="<TMPL_VAR ESCAPE=HTML name="description">" xmlUrl="<TMPL_VAR name="xmlUrl">" type="rss"/>
+</TMPL_LOOP>
+	</body>
+</opml>
+_TMPL_
+
+my $html = shift or die "Usage: html2opml.pl <HTML file> > <OPML file>\n\n";
+
+use Jcode;
+use LWP::Simple;
+use HTML::RSSAutodiscovery;
+use HTML::Template;
+use URI;
+use XML::RSS;
+
+my $j    = Jcode->new();
+my $tmpl = HTML::Template->new(scalarref => \$template);
+my $rss  = XML::RSS->new();
+
+open(FH, "< $html") or die "Error: failed to open $html. $!\n";
+my @file = <FH>;
+close(FH);
+
+my @urls;
+
+foreach my $line (@file) {
+	if ($line =~ /HREF="(.*?)"/i) {
+		push @urls, $1;
+	}
+}
+
+die "Error: no URL found.\n\n" if (!@urls);
+
+my @rssurls;
+
+foreach my $url (@urls) {
+	print STDERR "$url\n";
+
+	my $parser = HTML::RSSAutodiscovery->new();
+	my $result = $parser->parse($url);
+
+	next if !$result;
+
+	foreach (@$result) {
+		my $rssurl = URI->new_abs($_->{'href'}, $url);
+		push @rssurls, $rssurl;
+	}
+}
+
+my @outlines;
+
+foreach my $rssurl (@rssurls) {
+	print STDERR "$rssurl\n";
+	my $content = LWP::Simple::get($rssurl);
+
+	if ($content) {
+		$content = $j->set($content)->utf8;
+		$content =~ s/<\?xml.*?\?>/<\?xml version="1.0" encoding="UTF-8"\?>/;
+		eval { $rss->parse($content); };
+
+		if (!$@) {
+			push @outlines, {
+				title       => $rss->{'channel'}->{'title'},
+				htmlUrl     => $rss->{'channel'}->{'link'},
+				description => $rss->{'channel'}->{'description'},
+				xmlUrl      => $rssurl,
+			};
+		}
+	}
+}
+
+# Output
+(my $dateCreated = gmtime) =~ s/^(\w+) (\w+) (\d+) (\d\d:\d\d:\d\d) (\d{4})/$1, $3 $2 $5 $4 GMT/;
+
+$tmpl->param(
+	dateCreated => $dateCreated,
+	outlines    => \@outlines,
+);
+
+print $tmpl->output();
+
+exit;

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Gruntタスクの自動読み込み</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/grunt-load-npm-tasks-automatically.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="GruntでいちいちloadNpmTasks()しなくて済むようになるload-grunt-tasksパッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクはpackage.jsonのdevDependenciesに必ず書いてあり、Gruntfile.js内ではどこでもそれを利用することが可能なので、grunt-で始まるNodeパッケージだけを自動でloadNpmTasks()するようなコードを書くと簡単に自動読み込みを実装できる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="GruntでいちいちloadNpmTasks()しなくて済むようになるload-grunt-tasksパッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクはpackage.jsonのdevDependenciesに必ず書いてあり、Gruntfile.js内ではどこでもそれを利用することが可能なので、grunt-で始まるNodeパッケージだけを自動でloadNpmTasks()するようなコードを書くと簡単に自動読み込みを実装できる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Gruntタスクの自動読み込み" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-02-08T05:04:37+09:00">2014年2月8日</time></p>
+
+        <h1><em>Gruntタスクの自動読み込み</em></h1>
+      </header>
+
+    <main>
+
+    <p>Gruntでいちいち<code>loadNpmTasks()</code>しなくて済むようになる<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>パッケージは便利だけど、そもそもこれをインストールするのが面倒くさい。インストールしたGruntタスクは<code>package.json</code>の<code>devDependencies</code>に必ず書いてあり、<code>Gruntfile.js</code>内ではどこでもそれを利用することが可能なので、<code>grunt-</code>で始まるNodeパッケージだけを自動で<code>loadNpmTasks()</code>するようなコードを書くと簡単に自動読み込みを実装できる。</p>
+
+<pre><code class="language-javascript">&apos;use strict&apos;;
+
+module.exports = function (grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON(&apos;package.json&apos;)
+  });
+
+  for (var devDependency in grunt.config.data.pkg.devDependencies) {
+    if (devDependency.match(/^grunt-/)) {
+      grunt.loadNpmTasks(devDependency);
+    }
+  }
+};</code></pre>
+
+<p><code>Gruntfile.js</code>では<a href="http://gruntjs.com/getting-started#an-example-gruntfile">サンプル・コード</a>でもそうなっているように<code>package.json</code>の内容を読み込ませることが多い。これは主にGruntタスクの設定においてテンプレートを使ってプロジェクト名やバージョン番号などを参照できるようにする目的でそうする。こうして読み込んだ<code>package.json</code>の内容は<code>grunt.config.data</code>以下に保存されるので、実際はどこからでも参照できる。ので上記のように<code>for...in</code>などを使って調べつつ、<code>grunt-</code>で始まるなら<code>loadNpmTasks()</code>を呼ぶだけ。</p>
+
+<p>一度書いたら終わりという点ではload-grunt-tasksとほぼ同じで、起動コストという点ではこの5行のコードが勝るけど、保守性という点ではload-grunt-tasksの方が良い。ので、複数人が触るようなプロジェクトではload-grunt-taskの方が良さそう。</p>
+
+<hr>
+
+<p>load-grunt-tasksは確かに便利だけど、僕はわざわざNodeパッケージを別途インストールする程ではないという感じ。また、できればちゃんと個別にロードした方が良いとも考えてて、実際にこういったコードでやるのは、頻繁にGruntプラグインを入れ替える実験的な性格の強いプロジェクトでだけ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

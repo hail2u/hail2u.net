@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>本文明朝、見出しゴシック</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/serif-for-body-sans-serif-for-heading.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="懸念だった転送サイズによる問題がほとんど見られなかったので、本文を明朝、見出しをゴシックにした。すべてはGoogle FontsとHTTPS+HTTP/2のおかげだ。小さく分割されたWOFF2ファイルが、並列で高速に必要なだけダウンロードされる。それぞれが小さいので、キャッシュからも並列で超高速(それぞれ数ms)にロードされるだろう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="懸念だった転送サイズによる問題がほとんど見られなかったので、本文を明朝、見出しをゴシックにした。すべてはGoogle FontsとHTTPS+HTTP/2のおかげだ。小さく分割されたWOFF2ファイルが、並列で高速に必要なだけダウンロードされる。それぞれが小さいので、キャッシュからも並列で超高速(それぞれ数ms)にロードされるだろう。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/serif-for-body-sans-serif-for-heading.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="本文明朝、見出しゴシック" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2018-09-13T12:58:22+09:00">2018年9月13日</time></p>
+
+        <h1><em>本文明朝、見出しゴシック</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="HTTPS+HTTP/2環境下でのGoogle Fontsの利用は、特にページの表示速度等を犠牲にすることなく、素晴らしい速さでウェブ・フォントが読み込まれ、反映されるようだ。" height="664" src="/img/blog/serif-for-body-sans-serif-for-heading.png" width="1366">
+</figure>
+
+<p>懸念だった転送サイズによる問題がほとんど見られなかったので、本文を明朝、見出しをゴシックにした。すべては<a href="https://fonts.google.com/">Google Fonts</a>とHTTPS+HTTP/2のおかげだ。小さく分割されたWOFF2ファイルが、並列で高速に必要なだけダウンロードされる。それぞれが小さいので、キャッシュからも並列で超高速(それぞれ数ms)にロードされるだろう。</p>
+
+<p>もちろん話題のNoto Serif JPを本文に、見出しやヘッダー、フッターにはNoto Sans JPを使っている。CSSファイルを見た時には不安になったが、さすがGoogleという結果だった。</p>
+
+<section>
+<h2>先読み</h2>
+
+<p><a href="https://www.w3.org/TR/resource-hints/">リソース・ヒント</a>を使った先読みを仕込んでおくと一定の高速化が見込めるのではないか、という仮説は立て、検証をした。巨大なHTMLに、同期的に実行されるスクリプトが組み合わさっているウェブサイトがあり、それに導入する場合には、考慮すべきだろう。</p>
+
+<p>Google Fontsで配信されるフォント・ファイルは、ビルドごとにURLが変わる。そのため直接フォント・ファイルを先読み(<code>rel=prefetch</code>)することは難しい。また、HTTPSでの配信なので、名前解決だけの<code>rel=dns-prefetch</code>より、SSL/TLSハンドシェイクなどまでやってくれる<code>rel=preconnect</code>の方が適切だろう。</p>
+
+<pre><code class="language-html">&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com&quot; rel=&quot;preconnect&quot;&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.gstatic.com&quot; rel=&quot;preconnect&quot;&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+
+<p>しかし、CSSファイルのURLは将来に渡って固定(のはず)だ。ならば投機的にリソースのダウンロードを行える<a href="https://www.w3.org/TR/preload/"><code>rel=preload</code></a>の方が適切かもしれない。また、このCSSファイルが応答ヘッダーでフォント・ファイル用の<code>rel=preconnect</code>を返してくれている。そのためフォント・ファイルへの<code>rel=preconnect</code>は必要ない。</p>
+
+<pre><code class="language-html">&lt;link as=&quot;style&quot; crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; rel=&quot;preload&quot;&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700|Noto+Serif+JP&quot; rel=&quot;stylesheet&quot;&gt;</code></pre>
+
+<p>このウェブサイトではどのように先読みしても、また先読みしなくても、結果に有意な差は見つけられなかった。元々CSSファイルは投機的に読み込みが始まるため、<code>rel=preload</code>程度ならば不要なのかもしれない。もうちょっと探査する必要がありそうだ。</p>
+</section>
+
+<hr>
+
+<p>気軽に使えそうで、とにかく助かる。この勢いでNoto Mono JPやNoto Sans Mono JPも欲しい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

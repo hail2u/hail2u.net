@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>bakcground-sizeをtransition</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/background-size-transtion.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="背景画像をbackground-sizeプロパティーで縦横サイズを制限して敷き詰めるというのは昔id:hitode909がやってた。それをCSS Transitionsで元のサイズに戻したらどうなるかなーとやってみたらそこそこ面白かった。きっかけは96x96.netを見たことで、こっちはborder-imageプロパティーを組み合わせていて、widthプロパティーをtransitionしている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="背景画像をbackground-sizeプロパティーで縦横サイズを制限して敷き詰めるというのは昔id:hitode909がやってた。それをCSS Transitionsで元のサイズに戻したらどうなるかなーとやってみたらそこそこ面白かった。きっかけは96x96.netを見たことで、こっちはborder-imageプロパティーを組み合わせていて、widthプロパティーをtransitionしている。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/background-size-transition.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="bakcground-sizeをtransition" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-02-17T12:25:12+09:00">2012年2月17日</time></p>
+
+        <h1><em>bakcground-sizeをtransition</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="background-sizeを制限してから敷き詰めるとTimelapseっぽくてカッコイイ。" height="270" src="/img/blog/background-size-transition.png" width="480">
+</figure>
+
+<p>背景画像を<code>background-size</code>プロパティーで縦横サイズを制限して敷き詰めるというのは昔<a href="http://www.hatena.ne.jp/hitode909/">id:hitode909</a>がやってた。それを<a href="http://www.w3.org/TR/css3-transitions/">CSS Transitions</a>で元のサイズに戻したらどうなるかなーとやってみたらそこそこ面白かった。きっかけは<a href="http://96x96.net/">96x96.net</a>を見たことで、こっちは<code>border-image</code>プロパティーを組み合わせていて、<code>width</code>プロパティーをtransitionしている。</p>
+
+<p>Demo: <a href="/test/374.html"><code>background-size</code> Transition</a></p>
+
+<p>CSSは至って普通。<code>background-position</code>プロパティーでセンタリングすると中央からブワッとなる。どちらかというと縦に並べた方がカッコイイ気がする。</p>
+
+<pre><code class="language-css">.test {
+  width: 640px; /* 背景画像の横幅 */
+  height: 360px; /* 背景画像の縦幅 */
+  background-image: url("http://example.com/img/bg.png");
+  background-size: 100% 0.001%;
+  background-repeat: repeat-y;
+  background-position: center;
+  transition-duration: 1s;
+}
+
+.test:hover {
+  background-size: 100% 100%;
+  transition-duration: 1s;
+}</code></pre>
+
+<p>CSS Transitionsのサポートがマチマチなこと以外にもいろいろダメな所が多い。</p>
+
+<ul>
+<li>Chromeでは<code>px</code>単位から<code>%</code>単位へのTransitionsができない</li>
+<li>上記仕様を考慮して<code>background-size: 100% 0.001%</code>とかちょっと苦しい指定をすると、小数の丸め方がブラウザーにより違うため敷き詰めることができるものとそうでないものに分かれる</li>
+<li>Firefoxでは敷き詰めが想像以上におかしくなる(参考: <a href="http://d.hatena.ne.jp/rikuo/20120214">background-sizeで1ピクセルにした時の各ブラウザの挙動の違い</a>)</li>
+<li>Operaでは<code>transition-property</code>プロパティーで<code>background-size</code>プロパティーが<a href="http://www.opera.com/docs/specs/presto2.10/css/transitions/#anima">サポートされていない</a>のでアニメーションできない</li>
+<li>Internet Explorerはアンチエイリアスがきついような……など微妙にブラウザー間で違いがある</li>
+<li>運が良いとブルースクリーンを召喚できる</li>
+</ul>
+
+<p>小数の丸め(や<code>%</code>単位の<code>px</code>への変換における丸め)はそろそろ統一して欲しい。<code>%</code>ベースのグリッド・レイアウトの採用が進まない理由のひとつにこれがあるんじゃないかと思う。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>再帰的にMarkdownを処理</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/recurisive-markdown.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年はmarkedを使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、sectionやfigure要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="再帰的にMarkdownを処理" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-16T13:56:09+09:00">2016年4月16日</time></p>
+
+        <h1><em>再帰的にMarkdownを処理</em></h1>
+      </header>
+
+    <main>
+
+    <p>このウェブログではHTMLを直接ぺちぺち書くことが多いが、たまにiPhoneで書く時にはMarkdownで書いている。Markdownの処理系にはここ数年は<a href="https://github.com/chjj/marked">marked</a>を使っており(宗教上の理由でCommonMark系は使うことができない)、あまり困ってはいないのだが、<code>section</code>や<code>figure</code>要素を使うとその中のMarkdown文字列がうまく処理できないという問題がある。</p>
+
+<p>例えば<code>figure</code>要素を使って<code>table</code>要素を図としてマークアップしたいとする。その場合、markedでは表の記法が拡張されているので、以下のように書くことになる。</p>
+
+<pre><code class="language-markdown">&lt;figure&gt;
+|Name|Num|
+|-|-|
+|foo|128|
+|bar|256|
+
+&lt;figcaption&gt;表1&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
+
+<p>このMarkdown文字列をmarkedで処理しても何も起きず、そのまま出てくる。つまり何らかのHTMLタグで括られた間はインライン系の記法しか処理されない。</p>
+
+<hr>
+
+<p>markedには処理をフックする機構が用意されているので、それを使うとうまく処理することできる。こういったHTML文字列の場合、<code>Renderer.html</code>でそういった文字列を処理する関数を指定してやれば良い。</p>
+
+<pre><code class="language-javascript">// node this.js &lt; test.md
+var marked = require(&quot;marked&quot;);
+var renderer = new marked.Renderer();
+
+function processHTML(html) {
+  var attributes;
+  var contents;
+  var tag;
+  var tags = [&quot;aside&quot;, &quot;figure&quot;, &quot;section&quot;];
+  var tokens = html.trim().match(/^&lt;(\w+)(.*?)&gt;([\s\S]*)&lt;\/\1&gt;/);
+
+  if (!tokens) {
+    return html;
+  }
+
+  tag = tokens[1];
+
+  if (tags.indexOf(tag) === -1) {
+    return html;
+  }
+
+  attributes = tokens[2];
+  contents = marked(tokens[3].replace(/&amp;gt;/g, &quot;&gt;&quot;), {
+    renderer: renderer
+  }).trim();
+
+  return &quot;&lt;&quot; + tag + attributes + &quot;&gt;\n&quot; + contents + &quot;\n&lt;/&quot; + tag + &quot;&gt;\n&quot;;
+}
+
+renderer.html = processHTML;
+console.log(marked(fs.readFileSync(process.stdin.fd, &quot;utf8&quot;), {
+  renderer: renderer
+}));</code></pre>
+
+<p>空白文字を削った一番外側のHTMLタグを拾い、その内容を更にmarkedで処理するようにしているわけだ。インライン記法は処理できるので、markedがサポートしていない<code>figure</code>や<code>section</code>、<code>aside</code>要素のみを処理するようにしている。<code>&gt;</code>の文字参照だけを解除しているのは、引用記法がうまく処理できなくなるからで、そもそもの正規表現も含め、この辺りはもうちょっとちゃんとした方が良さそうだ。</p>
+
+<p>この関数を利用すると、最初に挙げたMarkdown文字列の例は以下のように期待通りに処理される(インデントは読みやすいように追加した)。</p>
+
+<pre><code class="language-html">&lt;figure&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Name&lt;/th&gt;
+        &lt;th&gt;Num&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;foo&lt;/td&gt;
+        &lt;td&gt;128&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;bar&lt;/td&gt;
+        &lt;td&gt;256&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;figcaption&gt;表1&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
+
+<hr>
+
+<p>本当はこういったアドホックなプラグイン志向でMarkdownを拡張するのは好きではない。Markdownは拡張性なしの安定志向のもの(それこそオリジナルで良い)を使い、プリプロセッサーで<code>table</code>や<code>dl</code>要素の独自記法を処理して渡す方が良いと考えている。そうしてプリプロセッサーで処理済みのものをデータとして保存しておけば、ほぼあらゆるMarkdown処理系で正常に処理できることが期待できるからだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Bloglines Web Services</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/rss/bloglines_web_services.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="遂に来ました。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="遂に来ました。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Bloglines Web Services" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-09-29T12:43:51+09:00">2004年9月29日</time></p>
+
+        <h1><em>Bloglines Web Services</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.wingedpig.com/archives/000178.html">遂に来ました</a>。RSS 2.0(or OPML) over HTTPな感じで、Basic認証で制限がかかるだけなので、簡単なPerlスクリプトとかでチェックすることが可能。</p>
+<p><a href="http://www.bloglines.com/services/">Bloglines Web Services</a>アツイ。ちょっといじってみた感じでは、<a href="https://www.amazon.co.jp/exec/obidos/redirect?tag=hail2unet-22&amp;path=subst/associates/join/webservices.html">AWS</a>とほぼ同じ感覚で扱えるという感じ。こちらはRSS 2.0(or OPML)なので扱いも楽。</p>
+<p>中でもアツイのはSync APIでしょう。基本的にはlistsubsによりOPML形式で購読リストを拾って、siteのidを取得、それを使ってgetitemsにより未読を取得となるみたい。RSS 2.0が返ってくるので、うまく使えばRSSリーダーのバックエンド(ほとんどキャッシング・プロクシ)として利用可能で、<a href="http://www.feeddemon.com/">FeedDemon</a>などは既に対応しているとな。凄いことにFeedDemonは未読情報の同期なんかも実装しているみたい。パッと見た感じでは簡単には実装できなそうな感じなので、スゲーとしか言えない。</p>
+<p>スゲー。</p>
+<p>気になるのはBloglinesのトラフィックがどれだけ増えるかということですね。エライこといなりそうな気はしないでもない。</p>
+<section>
+<h2>追記</h2>
+<p>BWSには<a href="http://www.bloglines.com/services/api/notifier">Notifier API</a>があるので、「これは利用するべき！」みたいな。ので、Bloglines Checkerを1.3に更新し、それを利用するようにしました。機能的には何も変更がありませんが、なるべくなら更新してください。変更文字数は13文字(ぉ。今までのシステムと互換性を持たせているところがニクイ。Bloglinesマンセー！</p>
+</section>
+<section>
+<h2>追記</h2>
+<p>とりあえずSync APIの<a href="http://www.bloglines.com/services/api/listsubs">listsubs</a>を叩くPerlスクリプトを書いてみた。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+
+my $uname = &apos;メールアドレス&apos;;
+my $pass  = &apos;パスワード&apos;;
+
+my $loc   = &apos;rpc.bloglines.com:80&apos;;
+my $realm = &apos;Bloglines RPC&apos;;
+
+use LWP::UserAgent;
+
+my $ua = LWP::UserAgent-&gt;new();
+$ua-&gt;credentials($loc, $realm, $uname, $pass);
+
+print $ua-&gt;get(&quot;http://rpc.bloglines.com/listsubs&quot;)-&gt;as_string;
+
+exit;</code></pre>
+<p>遅！　仕様的にキャッシュできない(未読状態が少しでも変わると内容が変わってしまう)ので辛いかも。</p>
+<p>本筋とは関係ないですけど、<a href="http://www.mozilla.org/products/firefox/">Firefox</a>のPassword Managerでrealmを調べることができました(まぁ間違ったのを送った場合はレスポンスヘッダに正しいrealmが書かれているんですけどね)。Siteカラムの()で括られている部分。</p>
+</section>
+<section>
+<h2>追記@2004/09/29</h2>
+<p>とりあえずWSHでもlistsubsを叩いてみる。以下はVBScriptでのコード。</p>
+<pre>Set xmlHttp = WScript.CreateObject(&quot;Msxml2.XMLHTTP.3.0&quot;)
+Set xmlDoc  = WScript.CreateObject(&quot;Msxml2.DOMDocument.3.0&quot;)
+
+xmlHttp.open &quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, False, &quot;メールアドレス&quot;, &quot;パスワード&quot;
+xmlHttp.send
+
+xmlDoc.async = False
+xmlDoc.loadXML xmlHttp.responseText
+
+If xmlDoc.parseError.errorCode &lt;&gt; 0 Then
+  WScript.Echo &quot;You have error &quot; + xmlDoc.parseError.reason
+Else
+  WScript.Echo xmlDoc.xml
+End If
+
+WScript.Quit</pre>
+<p>続いてJScriptのコード。</p>
+<pre><code class="language-js">var xmlHttp = new ActiveXObject(&quot;Msxml2.XMLHTTP.3.0&quot;);
+var xmlDoc  = new ActiveXObject(&quot;Msxml2.DOMDocument.3.0&quot;);
+
+xmlHttp.open(&quot;GET&quot;, &quot;http://rpc.bloglines.com/listsubs&quot;, false, &quot;メールアドレス&quot;, &quot;パスワード&quot;);
+xmlHttp.send();
+
+xmlDoc.async = false;
+xmlDoc.loadXML(xmlHttp.responseText);
+
+if (xmlDoc.parseError.errorCode != 0) {
+  WScript.Echo(&quot;You have error &quot; + xmlDoc.parseError.reason);
+} else {
+  WScript.Echo(xmlDoc.xml);
+}
+
+WScript.Quit();</code></pre>
+<p>うむ、良い感じ。これをベースにして、未読をすべて取得して単一のHTMLファイルに吐くアプリケーション作るかな。DelphiでGUI用意しても良いのだけど、表示の仕組みを作るのがメンドイ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

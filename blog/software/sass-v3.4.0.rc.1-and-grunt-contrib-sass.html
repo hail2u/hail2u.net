@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sass v3.4.0.rc.1とgrunt-contrib-sass</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/sass-v3.4.0.rc.1-and-grunt-contrib-sass.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Sass v3.4.0.rc.1が出た。&amp;の扱いが拡充したこととセレクターを扱う関数の追加がトピック。他に予告されていた変数スコープの改善も思ったよりも早く導入された。後方互換性を失う変更はあるものの、大体は問題なくコンパイルされる。けどコンパイラーのオプション他に変化があったため、それらをラップするツールで不具合が起こりやすい。例えばgrunt-contrib-sassが--load-pathと--sourcemapオプション辺りの変更に対応できておらず、例外を吐いて落ちたりする。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Sass v3.4.0.rc.1が出た。&amp;の扱いが拡充したこととセレクターを扱う関数の追加がトピック。他に予告されていた変数スコープの改善も思ったよりも早く導入された。後方互換性を失う変更はあるものの、大体は問題なくコンパイルされる。けどコンパイラーのオプション他に変化があったため、それらをラップするツールで不具合が起こりやすい。例えばgrunt-contrib-sassが--load-pathと--sourcemapオプション辺りの変更に対応できておらず、例外を吐いて落ちたりする。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sass v3.4.0.rc.1とgrunt-contrib-sass" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-18T10:50:39+09:00">2014年7月18日</time></p>
+
+        <h1><em>Sass v3.4.0.rc.1とgrunt-contrib-sass</em></h1>
+      </header>
+
+    <main>
+
+    <p>Sass v3.4.0.rc.1が出た。<code>&amp;</code>の扱いが拡充したこととセレクターを扱う関数の追加がトピック。他に<a href="/blog/coding/sass-variable-scope-and-bang-global.html">予告されていた変数スコープの改善</a>も思ったよりも早く導入された。後方互換性を失う変更はあるものの、大体は問題なくコンパイルされる。けどコンパイラーのオプション他に変化があったため、それらをラップするツールで不具合が起こりやすい。例えば<a href="https://github.com/gruntjs/grunt-contrib-sass">grunt-contrib-sass</a>が<code>--load-path</code>と<code>--sourcemap</code>オプション辺りの変更に対応できておらず、例外を吐いて落ちたりする。</p>
+
+<section>
+<h2>NoMethodErrorへの対策</h2>
+
+<p>普通に実行する場合は問題ないが、<code>--load-path</code>オプション付きで実行しようとすると以下の様にSassコンパイラーが<code>NoMethodError</code>で落ち、タスクが止まってしまうことがある。</p>
+
+<pre><samp>Running "sass:main" (sass) task
+NoMethodError: undefined method `&lt;&lt;&apos; for nil:NilClass
+  Use --trace for backtrace.
+Warning: Exited with error code 1 Use --force to continue.NoMethodError:
+
+Aborted due to warnings.</samp></pre>
+
+<p>これはv3.4.0.rc.1でライブラリをロードするパスとして入力ファイルと同じディレクトリが含まれなくなったことに起因する問題のようだ。grunt-contrib-sass経由の場合、<code>--load-path</code>が常に指定されて実行されるので起こりやすい。CHANGELOGで触れられているように<code>SASS_PATH</code>という環境変数を設定しておくと落ちなくなる。</p>
+
+<pre><samp>$ <kbd>export SASS_PATH=.</kbd></samp></pre>
+
+<p>Bashの場合は<code>export</code>で、Windowsでコマンド・プロンプトなら<code>set</code>を使う。<code>.bashrc</code>などには書かずにGruntを実行するターミナルなどで設定するのが良さそう。環境変数の有無が問題なような感じなので、<code>.</code>じゃなくても良さそう。</p>
+</section>
+
+<section>
+<h2>Source Mapへの対応</h2>
+
+<p>Sass v3.4.0.rc.1ではSource Mapがデフォルトで出力されるようになり、それに伴ってオプションも変更になった。</p>
+
+<pre><samp>--sourcemap=TYPE             How link generated output to the source files.
+                               auto (default): relative paths where possible, file URIs elsewhere
+                               file: always absolute file URIs
+                               inline: include the source text in the sourcemap
+                               none: no sourcemaps</samp></pre>
+
+<p>今までのような真偽値のオプションではなくなり、文字列でSource Mapの出力方法を指定するように変わっている。また他の<code>--style</code>や<code>--default-encoding</code>と違って、このオプションのみ<code>=</code>で値を指定する必要がある。grunt-contrib-sassではこの新しい値の文字列に対応していないのみならず、内部で利用している<a href="https://github.com/sindresorhus/dargs"><code>dargs</code>パッケージ</a>が<code>=</code>で値を指定する方法に対応していないので、<a href="/grunt-contrib-sass-source-map.patch">結構大胆に手をいれる必要</a>があった。</p>
+
+<p>おおまかにv3.3.xにも対応したつもりだけど、オプションを省略した時の挙動がSassのバージョンによって変わる(ためにテストが通らない)。もっとうまく書けそうだったらプル・リクエストを送るつもりだけど、テストの修正なしにはちょっと難しそう。</p>
+</section>
+
+<hr>
+
+<p>とりあえず手元の環境ではちゃんと動くようにできたので、今のところはまぁ良いかという感じ。<code>--sourcemap=auto</code>とかへの対応はSass側で修正されそうな気がするので、焦ってプル・リクエスト送らない方が良さそうとも思ってる。</p>
+
+<section>
+<h2>追記</h2>
+
+<p><a href="https://github.com/gruntjs/grunt-contrib-sass/releases/tag/v0.8.0">grunt-contrib-sassのv0.8.0</a>がリリースされ、Sass v3.4.0がサポートされた。上記の問題は解決したが、代わりにv3.3.14以下でSource Mapを出力することはできなくなったことには注意が必要。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

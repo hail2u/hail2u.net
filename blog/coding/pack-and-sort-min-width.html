@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>min-widthを含むクエリーをソート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/pack-and-sort-min-width.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSS MQPackerにmin-widthを使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSS MQPackerにmin-widthを使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="min-widthを含むクエリーをソート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-27T05:40:48+09:00">2015年2月27日</time></p>
+
+        <h1><em>min-widthを含むクエリーをソート</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/hail2u/node-css-mqpacker">CSS MQPacker</a>に<code>min-width</code>を使ったクエリーのみ(なんとなく)ソートしてやる機能を付けている。あまり付けるつもりはなかったけれど、ユーザー層が広がったっぽいこともあり、たまにメールで聞かれたりもしていたので、まぁやるかという感じになった。</p>
+
+<p>色々面倒なのがあるので、多くの人が必要なのは<code>min-width</code>だけだろうと決めつけて実装している。その上で以下の条件にマッチするクエリーを<em>後ろ</em>に回して、その中でソートするようにした。</p>
+
+<ul>
+<li><code>min-width</code>をどこかに含む</li>
+<li>対応している単位である</li>
+<li><code>calc()</code>は使っていない</li>
+</ul>
+
+<p>クエリーはまずカンマで分割されて、その中で更に空白文字で分割し、クエリーをなんとなく多次元配列へ変換する。ここで<code>min-width</code>が見つかったら後ろに回すようになっている。対応した単位は<code>px</code>を基準に<code>ch</code>、<code>em</code>、<code>ex</code>、<code>pc</code>、<code>pt</code>、そして<code>rem</code>までだ。どうやっても描画領域を基準にした<code>v*</code>単位には対応できない。<code>cm</code>や<code>in</code>は対応しても良いけれどさほど意味はなさそうだ。ソートは<code>px</code>単位に変換されて行われる。</p>
+
+<pre><code class="language-css">@media (min-width: 48px) {}
+@media (min-width: 2em) {}
+@media (min-width: 1rem) {}</code></pre>
+
+<p>このように単位系が混在している場合は以下のように良い感じ(私見)にソートされる。それぞれの単位系ごとにソートとしても良いのだけど、それはそれで面倒そうなので一気にソートしてしまうことにした。</p>
+
+<pre><code class="language-css">@media (min-width: 1rem) {}
+@media (min-width: 2em) {}
+@media (min-width: 48px) {}</code></pre>
+
+<p><code>1rem</code>は<code>16px</code>、<code>2em</code>は<code>32px</code>とみなされ<code>48px</code>より前に来るようになるわけだ。</p>
+
+<p>式自体の書き換えはもちろん行わない。<code>calc()</code>にも対応したい気はすごくあるのだけど、フルスクラッチで書くのはなかなか厳しそうだ。<a href="https://www.npmjs.com/package/reduce-css-calc">reduce-css-calc</a>を使おうかなと考えている。</p>
+
+<p>CSSの書き方自体は普通にメディア・クエリーを書いてくれればなんとかなるはずだ。気をつけるのはなるべく単位を揃えることくらいだろう。気取って<code>screen</code>とか書いていても、Retina対応の<code>resolution</code>が混ざっていたりとかも大丈夫だと思うのだけど、もっと色々テスト書かないと不安だ。</p>
+
+<hr>
+
+<p>メディア・クエリーは<em>後方互換性を維持して</em>今度更に強化されていく。実装の方も進みつつある上、<code>calc()</code>の存在や憎むべきCSS Variablesも控えているので、やはり一時的なソリューションにしかならないと思う。<code>min-width</code>だけにしたのもその辺りが理由だ。でもソリューションとして機能しなくなった頃にはHTTP/2やらWeb Componentsやらで大量の細かいCSSファイルを気軽に投げつけられる時代になっているはずなので、きっとメディア・クエリーをまとめなくても良くなっているのではないかとも思う。</p>
+
+<p><code>not</code>キーワードの扱いをどうしようか悩んでいて、それが解決したらリリースするつもりだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>git subtreeの練習</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/git-subtree-training.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Gitのサブモジュールでは面倒そうな、頻繁に更新される別のリポジトリを取り込む方法としてサブツリーマージを行うラッパーであるgit subtreeコマンドを使う練習を始めた。どちらかというと「参照する」要素の強いサブモジュールに対して、サブツリーは「切り分ける」や「取り込む」という感じなんじゃないかと理解している。全般的に間違ってそうで怖い。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Gitのサブモジュールでは面倒そうな、頻繁に更新される別のリポジトリを取り込む方法としてサブツリーマージを行うラッパーであるgit subtreeコマンドを使う練習を始めた。どちらかというと「参照する」要素の強いサブモジュールに対して、サブツリーは「切り分ける」や「取り込む」という感じなんじゃないかと理解している。全般的に間違ってそうで怖い。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="git subtreeの練習" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-18T11:16:08+09:00">2014年6月18日</time></p>
+
+        <h1><em>git subtreeの練習</em></h1>
+      </header>
+
+    <main>
+
+    <p>Gitのサブモジュールでは面倒そうな、頻繁に更新される別のリポジトリを取り込む方法としてサブツリーマージを行うラッパーである<code>git subtree</code>コマンドを使う練習を始めた。どちらかというと「参照する」要素の強いサブモジュールに対して、サブツリーは「切り分ける」や「取り込む」という感じなんじゃないかと理解している。全般的に間違ってそうで怖い。</p>
+
+<p>「切り分ける」、つまりリポジトリのサブディレクトリを別のリポジトリにしたい場合は、単純なケースだと親にあたる方で<code>.gitignore</code>や<code>.git/info/exclude</code>を使ってサブディレクトリを除外してやれば良い。でもこの場合、両方のリポジトリで関連した変更がある時にそれぞれのリポジトリでコミットしてやらないとならないので面倒くさい。</p>
+
+<p>「取り込む」場合はサブモジュールが基本なわけだけど、他で作業して戻ってきてたりする必要があるし、サブモジュールの更新ほど面倒くさい作業はない。理解が足らないとミスもしやすいと思う。</p>
+
+<p>サブツリーを使うと、親となるリポジトリでまとめてコミットしたり、子になるリモート・リポジトリを取り込んだサブディレクトリでシームレスに作業を行ったりしたりできる。そしてその後、サブツリーとして登録したリモート・リポジトリへ、サブディレクトリのファイルへのコミットだけを反映させることもできる。</p>
+
+<pre><samp>$ <kbd>git subtree push --prefix=subtree_dir/ subtree_origin master</kbd></samp></pre>
+
+<p>まさにこれを目的としていた。つまり作業を一元化し、特定のディレクトリへ加わった変更だけを別のリポジトリに投げる、という感じ。親の方にプライベートなファイルが存在していたりして公開したくない(バージョン管理はしたい)が、サブディレクトリは普通に公開しておきたいとかそういうの。単一のリポジトリで普通に扱うので、ミスはしづらいような気がする。</p>
+
+<section>
+<h2>リモート・リポジトリをサブツリーとして登録</h2>
+
+<p><code>git remote add</code>と<code>git subtree add</code>を使う。</p>
+
+<pre><samp>$ <kbd>git remote add -f subtree_origin https://example.com/bob/foo.git</kbd>
+$ <kbd>git subtree add --prefix=foo/ --squash subtree_origin master</kbd></samp></pre>
+
+<p>取り込みたいリモート・リポジトリを<code>subtree_origin</code>として登録し、サブディレクトリ<code>foo/</code>として取り込む。<del><code>--squash</code>を省略すると履歴を継承できるので、サブモジュールや上述のようなリポジトリのネストから移行する場合はつけない方が良さそう。履歴が読みづらくなるのがちょっとアレだけど、<code>log</code>コマンドに<code>--date-order</code>オプションを付ければなんとかなる気がする(または<a href="http://www.sourcetreeapp.com/">SourceTree</a>で)。</del><ins>リモートに反映させる時に死ぬので必ず<code>--squash</code>を付けるべきとした方が良さそう。</ins></p>
+</section>
+
+<section>
+<h2>コミット</h2>
+
+<p>ファイルへ加えた変更のコミットはサブツリーのファイルだろうとそうでなかろうと普通にコミットするだけ。</p>
+
+<pre><samp>$ <kbd>git add file-a.txt</kbd>
+$ <kbd>git add foo/file-b.txt</kbd>
+$ <kbd>git commit -m &apos;Modified!&apos;</kbd></samp></pre>
+
+<p>単純にひとつのリポジトリとみなして操作すれば良い。</p>
+</section>
+
+<section>
+<h2>コミットをリモート・リポジトリへ反映</h2>
+
+<p><code>git push</code>と<code>git subtree push</code>を使う。</p>
+
+<pre><samp>$ <kbd>git push origin master</kbd>
+$ <kbd>git subtree push --prefix=foo/ subtree_origin master</kbd></samp></pre>
+
+<p>これで<code>origin</code>には<code>file-a.txt</code>と<code>foo/file-b.txt</code>へ加わった変更が、<code>subtree_origin</code>へは<code>foo/file-b.txt</code>へ加わった変更<em>のみ</em>が反映される。</p>
+</section>
+
+<hr>
+
+<p>サブツリー関係はウェブで調べてもノイズが多くてよくわからなかった。古い情報も勿論混ざっているし、新しく書かれた記事でも古い情報を元にしていたり、混ぜこぜになっていたり。前提知識がなさすぎて取捨選択できなかったので、一旦全て忘れてとにかく<code>git subtree -h</code>と<a href="https://github.com/git/git/blob/v2.0.0/contrib/subtree/git-subtree.txt"><code>contirib/subtree/git-subtree.txt</code></a>だけを読んで、色々試してみて覚えることにした。</p>
+
+<p>このウェブサイト全体のリポジトリをBitbucketでプライベートなリポジトリとして作り、<a href="https://github.com/hail2u/hail2u.net-weblog">ウェブログ</a>や<a href="https://github.com/hail2u/hail2u.net-documents">ドキュメント</a>、<a href="https://github.com/hail2u/hail2u.net-styles">CSS</a>のリポジトリをsubtreeとして混ぜるみたいな形で色々試行錯誤してみて、なんとなく理解できたような気がする。<code>git reset --hard</code>と<code>git push -f</code>を数十回繰り返した価値はあった。</p>
+
+<p>誰かが管理してるリポジトリはサブモジュールで特定のコミットに縛り、自分がメインで管理しているリポジトリはサブツリーでいじりやすいようにしておく、というのが良いのかな。他のリポジトリを取り込むという利用だけでなく、サンプルを置いたディレクトリを<code>gh-pages</code>ブランチを使ったサブツリーにして、GitHub Pagesの生成をシームレスに行うとかも出来そう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

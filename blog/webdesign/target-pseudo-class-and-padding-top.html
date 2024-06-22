@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>:targetでpadding-top</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/target-pseudo-class-and-padding-top.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ちょっと何を言っているのかよくわからないですね。つまり:target擬似クラスでpadding-topを使うことによって、アンカーでページ内ジャンプ(&lt;a href=&quot;#foo&quot;&gt;...&lt;/a&gt;とかで飛ぶやつです)した時に上部に余白をとってやろうというアイディアです。こうすることによって上部にメニューを固定していても重ならなくすることができるでしょうし、そうでなくても多くの場合ジャンプした先のコンテンツに対してキレイに余白が確保できるんではないかと。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ちょっと何を言っているのかよくわからないですね。つまり:target擬似クラスでpadding-topを使うことによって、アンカーでページ内ジャンプ(&lt;a href=&quot;#foo&quot;&gt;...&lt;/a&gt;とかで飛ぶやつです)した時に上部に余白をとってやろうというアイディアです。こうすることによって上部にメニューを固定していても重ならなくすることができるでしょうし、そうでなくても多くの場合ジャンプした先のコンテンツに対してキレイに余白が確保できるんではないかと。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content=":targetでpadding-top" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-12-01T13:26:41+09:00">2011年12月1日</time></p>
+
+        <h1><em>:targetでpadding-top</em></h1>
+      </header>
+
+    <main>
+
+    <p>ちょっと何を言っているのかよくわからないですね。つまり<code>:target</code>擬似クラスで<code>padding-top</code>を使うことによって、アンカーでページ内ジャンプ(<code>&lt;a href="#foo"&gt;...&lt;/a&gt;</code>とかで飛ぶやつです)した時に上部に余白をとってやろうというアイディアです。こうすることによって上部にメニューを固定していても重ならなくすることができるでしょうし、そうでなくても多くの場合ジャンプした先のコンテンツに対してキレイに余白が確保できるんではないかと。</p>
+
+<p>Demo: <a href="/test/311.html">Refine Anchor Jump with <code>:target</code></a></p>
+
+<p>Section #4に飛ぶリンクはデフォルトのもので、描画領域の上端に見出しが来てしまっています。Section #7に飛ぶリンクが<code>:target</code>を使って改良したもので、上部に少し余白が確保されていることと思います。</p>
+
+<pre><code class="language-css">#test7:target {
+  padding-top: 1em;
+}</code></pre>
+
+<p>CSSではこのようにしただけ(<code>1em</code>以上確保されているのはマージンの相殺が解除されるからです)ですが、想像以上に効果的な気がします。上部に固定メニューがある場合もデザイン全体を弄る必要はなく、そのメニューの高さ分多めに確保するだけでしょう。またここではデモなので<code>#test7</code>に対してのみ指定しましたが、実際に使う場合は以下のようにすると良いのではないかと思います。</p>
+
+<pre><code class="language-css">section:target,
+article:target {
+  padding-top: 1em;
+}</code></pre>
+
+<p>このままだと<code>:target</code>だけ余白が変わってしまうので、元のマージンを減らしてやるなどの工夫もすると良いかもしれませんね。</p>
+
+<pre><code class="language-css">section,
+article {
+  margin: 2em 0;
+}
+
+section:target,
+article:target {
+  margin-top: 1em;
+  padding-top: 1em;
+}</code></pre>
+
+<p>指定する要素(ここでは<code>secion</code>と<code>article</code>要素)で<code>border</code>や<code>background</code>プロパティーを使いづらくなるなどといった問題が浮上してきたりもすることには注意が必要そうです。</p>
+
+<p><code>padding-top</code>を使う以外にも<code>secion</code>要素の先頭に<code>:before</code>擬似要素を使ってスペーサーを埋め込むなどでも可能です。</p>
+
+<pre><code class="language-css">section:target::before {
+  display: block;
+  height: 1em;
+  content: "";
+}</code></pre>
+
+<p>実際に使う場合はマージンの相殺が解除されることやセクションに対する枠線やパディング、さらにはセクションに含まれる最初の要素のマージンなど考慮すべきことが数多くあるので、このまま流用できるというものではないと思います。が、CSSルールのセレクターで<code>:target</code>擬似クラスを利用することによってスタイルのセットにわかりやすい意味を持たせることができるので、単にアンカーでジャンプしてくることがある要素に余白を予め確保しておくよりはわかりやすいCSSが書けるんじゃないでしょうか。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>postcss-single-charset</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/postcss-single-charset.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="minifyしてからconcatという手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある@charsetルールが無意味になる。そこで最初の@charsetを先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="postcss-single-charset" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-01-10T01:52:36+09:00">2015年1月10日</time></p>
+
+        <h1><em>postcss-single-charset</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/blog/webdesign/minify-then-concat.html">minifyしてからconcat</a>という手順でCSSをビルドしているため、連結するそれぞれのCSSファイルにある<code>@charset</code>ルールが無意味になる。そこで最初の<code>@charset</code>を先頭に持ってくるだけのPostCSSプラグインを書き、それをconcatした後に使うことにした。</p>
+
+<p>PostCSSプラグインとして作ったのでパブリックなAPIはない。つまり必ずPostCSSの<code>use()</code>でプロセッサーとして読み込んでやる必要がある。</p>
+
+<pre><code class="language-javascript">var fs = require(&apos;fs&apos;);
+var postcss = require(&apos;postcss&apos;);
+
+var input = fs.readFileSync(&apos;input.css&apos;, &apos;utf8&apos;);
+var output = postcss().use(
+  require(&apos;postcss-single-charset&apos;)()
+).process(input).css;
+fs.writeFileSync(&apos;output.css&apos;, output);</code></pre>
+
+<p>PostCSSを知らないとよくわからないと思うけど、PostCSS界隈ではこれで普通な感じということになっている。実際には<a href="https://github.com/nDmitry/grunt-postcss">grunt-postcss</a>や<a href="https://github.com/w0rm/gulp-postcss">gulp-postcss</a>経由で使うことになるだろう。</p>
+
+<p>利用サンプルを兼ねてGruntプラグインも同梱しておいた。<code>grunt-</code>プリフィックスが付いていないため、<a href="https://github.com/sindresorhus/load-grunt-tasks">load-grunt-tasks</a>では読み込んでくれない(と思う)ので、READMEにあるように書いてちゃんと読み込む必要がある。他は特に変なことはないが、あまり行儀良くはなさそうなので利用は非推奨ということにしておく。</p>
+
+<hr>
+
+<p>あんまりパッケージ化するつもりはなかったけど、PostCSSプラグインというような形で書いたことがなかったので試しに書いてみた。特に何ということもなかった。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

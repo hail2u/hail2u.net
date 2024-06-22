@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>IEでフロートさせたボックスのマージンが倍になるバグ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/doubled_margin_bug_at_ie.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="WindowsのIE5.5や6など(5とか5.01は知らない)にはfloatさせたボックスへ指定した左右のmarginが正常に反映されない(倍になる)というバグがあります。最近はfloatを使ってゴニョゴニョする機会も多いと思うので厄介に考えている人も多いでしょう。実はdisplay: inline;とか指定してやると回避できちゃったりとかします。ネタ元はThe IE Doubled Float-Margin Bugだったような気がしますが、別なところで見つけたような気もする。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="WindowsのIE5.5や6など(5とか5.01は知らない)にはfloatさせたボックスへ指定した左右のmarginが正常に反映されない(倍になる)というバグがあります。最近はfloatを使ってゴニョゴニョする機会も多いと思うので厄介に考えている人も多いでしょう。実はdisplay: inline;とか指定してやると回避できちゃったりとかします。ネタ元はThe IE Doubled Float-Margin Bugだったような気がしますが、別なところで見つけたような気もする。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="IEでフロートさせたボックスのマージンが倍になるバグ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-04-04T17:33:53+09:00">2005年4月4日</time></p>
+
+        <h1><em>IEでフロートさせたボックスのマージンが倍になるバグ</em></h1>
+      </header>
+
+    <main>
+
+    <p>WindowsのIE5.5や6など(5とか5.01は知らない)には<code>float</code>させたボックスへ指定した左右の<code>margin</code>が正常に反映されない(倍になる)という<a href="http://members.at.infoseek.co.jp/cssbug/detail/winie/b107.html" title="Internet Explorer (Windows) CSSバグリスト">バグがあります</a>。最近は<code>float</code>を使ってゴニョゴニョする機会も多いと思うので厄介に考えている人も多いでしょう。実は<code>display: inline;</code>とか指定してやると回避できちゃったりとかします。ネタ元は<a href="http://positioniseverything.net/explorer/doubled-margin.html" title="IE Doubled Float-Margin Bug - CSS fixes and workarounds">The IE Doubled Float-Margin Bug</a>だったような気がしますが、別なところで見つけたような気もする。</p>
+<p>バグの状況自体は上記CSSバグリストのURLを参照していただければわかりやすいです。と言いつつ回避手段の使用前/後を並べてみた<a href="/test/033.html" title="IE Doubled Margin Bug">HTMLを用意してみました</a>。IEで見れば一目瞭然で、1つ目のコンテナ内のフロートさせたボックスの左のマージンは倍(80px)になっているのに対し、2つ目のコンテナ内のフロートさせたボックスの左のマージンは指定どおり(40px)です。</p>
+<p>コードは<code>float: left;</code>(<code>float: right:</code>)と同時に<code>display: inline;</code>を指定するというだけで、HTMLに特に手を加える必要も、IE用にCSSコードを切り分ける必要もありません。</p>
+<pre><code class="language-css">#floatbox {
+  margin-left: 40px;
+  float: left;
+  width: 160px;
+  display: inline;
+}</code></pre>
+<p>FirefoxやOperaではCSS2の仕様に従って<code>float</code>を指定した要素への<code>display</code>の指定を無視してくれる(See Also: <a href="http://www.w3.org/TR/REC-CSS2/visuren.html#float-position" title="Visual formatting model">Positioning the float: the &apos;float&apos; property</a>)ということもあるので、将来的にも<code>display: inline;</code>という意味の無い指定による誤作動は起こらないんじゃないかなと。</p>
+<p>バッド・ノウハウ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

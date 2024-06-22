@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Flexbox、おもしろいですよ？</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/learn-you-a-flexbox-for-great-good.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Translation of: Learn You a Flexbox for Great Good! | The Haystack. written by Stephen Hay" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Translation of: Learn You a Flexbox for Great Good! | The Haystack. written by Stephen Hay" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Flexbox、おもしろいですよ？" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-02-18T10:36:27+09:00">2012年2月18日</time></p>
+
+        <h1><em>Flexbox、おもしろいですよ？</em></h1>
+      </header>
+
+    <main>
+
+    <p>Translation of: <a href="http://www.the-haystack.com/2012/01/04/learn-you-a-flexbox/">Learn You a Flexbox for Great Good! | The Haystack.</a> written by <a href="http://www.the-haystack.com/">Stephen Hay</a></p>
+
+<p>Flexboxについて知っていますか？　多分、名前は聞いたことがあるでしょう。もしかしたら<a href="http://www.the-haystack.com/2010/01/23/css3-flexbox-part-1">チュートリアル</a>くらいは読んだことがあるかもしれません。既に試していたりしますか？</p>
+
+<p>Flexboxという代物についてあまり聞いたことがなかったり、前に試してから随分と経つなら、そのFlexboxに関する知識のことは一旦全て忘れてしまいましょう！　現時点での最新版である2011年11月29日にリリースされた仕様では完全に別物になっています。</p>
+
+
+<h6>訳注</h6>
+
+<p>2012年3月22日に新しく公開されたWorking Draftでもまた大きな変更が加わり、この文書の一部はそのWDにそぐわないものになっています。大筋は変わりませんし、2012年3月26日現在ではこのWDに対応した実装はないので、あまり気にする必要は<em>今のところ</em>ありません。</p>
+
+<h2>What you’ll need</h2>
+
+<p>現時点での最新の仕様を一部でも満たしているのはChrome Canaryだけです。つまり必要なものはChrome Canaryとテキスト・エディターだけということになります。</p>
+
+<ul>
+<li><a href="http://tools.google.com/dlpage/chromesxs">Chrome Canary: </a></li>
+<li><a href="http://www.vim.org">好きなテキスト・エディター</a> (てへ<em>ぺろ</em>)</li>
+</ul>
+
+<p>準備はいいですか？　それでは始めましょう！</p>
+
+
+<h6>訳注</h6>
+
+<p>この日本語訳を公開した時点のChrome安定版では既にこの文書で触れるFlexboxのプロパティーは実装されています。つまり最新のChrome安定版をインストールしているならわざわざCanaryを入れる必要はありません。</p>
+
+<h2>What is Flexbox?</h2>
+
+<p>FlexboxとはCSS Flexible Box Layout Moduleのことで、CSSでレイアウトを行うために策定されている仕様の一つです。FlexboxではUI向けに最適化された柔軟なボックス・モデルが提供されます。簡単に言うと、「ボックス」を親のサイズに合わせて縦方向にも横方向にもきれいに並べることができるようになると同時に、その余白の部分の制御も行えるようになるものです。それら「ボックス」はネストすることもできるので、複雑なレイアウトもFlexboxのみで可能になります。</p>
+
+<h3>CAUTION!</h3>
+
+<p>CSSでレイアウトを行うために策定されている仕様は他にもあり、その中には僕の考えでは通常のWebページのレイアウトにおいてはFlexboxよりも向いているものがあります。Flexboxは単純明快なものですが、複雑なレイアウトを行う際には御しがたいものにもなりうるでしょう。<a href="http://www.xanthir.com/blog/b4580">どんなレイアウトにも対応できる仕様などはありません</a>。ただしボタンやフォーム、ツールバーなどのUIコンポーネントや<code>float</code>を使ったカラム・レイアウトに関しては、Flexboxよってもっとシンプルに書くことが出来るので大幅な時間の節約につながるでしょう。またFlexboxは既存のCSSプロパティーとは干渉しないように設計されてもいます。そのお陰でFlexboxを使いつつ、<code>float</code>や<code>position</code>を使ったレイアウトを組み合わせることも可能になっています。</p>
+
+<h2>Three Little Boxes</h2>
+
+<p>面倒くさいなら<a href="http://www.the-haystack.com/playground/css3-flexbox/new-flexbox.html">デモ・ページ</a>をダウンロードして、それを直接変更してください。そうでないなら……</p>
+
+<p>エディターを開き、ボックスが一つだけあるHTMLドキュメントを作成してください。とりあえず<code>div</code>要素を使って作りましょう:</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+    &lt;head&gt;
+         &lt;meta charset="utf-8"&gt;
+         &lt;title&gt;Flexbox&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>できましたか？　わかりやすいように少しスタイルを加えましょう:</p>
+
+<pre><code>&lt;style&gt;
+    body&gt;div {
+        height: 500px;
+        padding: 1em;
+        background-color: gray;
+    }
+&lt;/style&gt;
+</code></pre>
+
+<p>次にボックスを3つ<code>div</code>要素に追加します。勿論、最初に作った<code>div</code>要素の子として作るという意味です:</p>
+
+<pre><code>&lt;div&gt;
+    &lt;div&gt;A&lt;/div&gt;
+    &lt;div&gt;B&lt;/div&gt;
+    &lt;div&gt;C&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>これらにもスタイルを追加しておきましょう:</p>
+
+<pre><code>div&gt;div {
+    width: 100px;
+    height: 100px;
+    background-color: pink;
+}
+</code></pre>
+
+<p>Canaryで見てみてください。特に不思議なこともなく3つのブロック要素が縦に並んでいるはずです。<em>とりあえず</em>これでFlexboxを試す土台は整いました。では実際にFlexboxを使ってみましょう。</p>
+
+<h2>Defining a flexbox</h2>
+
+<p>子である3つボックスに対してFlexboxを使いたいわけですが、そのためには<code>display</code>プロパティーを使うことになります。<code>display: flexbox;</code>を<em>親のdiv要素</em>に対して指定し、ボックス・モデルとしてFlexboxを採用することを宣言します。もしこの親の<code>div</code>要素をインラインにしたいのなら<code>display: inline-flexbox;</code>を代わりに使ってください。</p>
+
+<pre><code>body&gt;div {
+    display: -webkit-flexbox; /* 残念ながらプリフィックスが必要です */
+    display: flexbox;
+    height: 500px;
+    padding: 1em;
+    background-color: gray;
+}
+</code></pre>
+
+<p>これで<em>子の3つの<code>div</code>要素</em>はFlexboxのボックス・モデルに準じた形でレイアウトされる<em>Flexboxアイテム</em>になります。ただし、それらがFlexboxアイテムであるかどうかについてはいくつかルールがあることは覚えておいてください。例えば<code>position: absolute;</code>をこれら3つの<code>div</code>要素のどれか一つに指定した場合、その要素は<em>Flexboxアイテムではなくなります</em>。詳しくは仕様の<a href="http://www.w3.org/TR/2011/WD-css3-flexbox-20111129/#flex-items">Flexboxアイテムについてのセクション</a>を読みましょう。</p>
+
+<p>それではCanaryでこのページを見てみましょう。Flexboxアイテムがあたかも<code>inline</code>か<code>inline-block</code>を指定したような、もしくは<code>float</code>プロパティーを指定したような形に見えますよね？　FlexboxではデフォルトでFlexboxアイテムを水平方向に並べてくれます。<code>float</code>プロパティーを使うレイアウトとの大きな違いは、レイアウトしたい要素それ自身ではなく<em>その親に</em>CSSのルールを指定することです。</p>
+
+<h2>Source-order independence</h2>
+
+<p>Flexible Box Layout Moduleという名前の通り、Flexboxでは柔軟な(flexible)ボックスを作成することができるようになります。どういうことかというと、Flexboxの領域に合わせて柔軟にサイズや位置を制御できるということです。そのことについては後ほど扱いますが、その前に「ソースの記述順に束縛されない」という特にモバイル時代には重要になる特殊な概念について説明しておきたいと思います。それではどうやればFlexboxアイテムの順序を変更することができるのか試してみましょう。</p>
+
+<pre><code>body&gt;div {
+    display: -webkit-flexbox;
+    display: flexbox;
+    -webkit-flex-flow: row-reverse;
+    flex-flow: row-reverse;
+    height: 500px;
+    padding: 1em;
+    background-color: gray;
+}
+</code></pre>
+
+<p>なんと！　Flexboxアイテムが右から左へ並んでしまいました。順序の制御には<code>flex-flow</code>プロパティー(初期値は<code>row</code>です)を使います。<code>row-reverse</code>で逆向きに並ぶということですね。なんとなく想像が付くように縦方向にFlexboxアイテムを並べたいなら<code>column</code>か<code>column-reverse</code>を使うことになりますが、現時点ではCanaryでもまだ<code>column-reverse</code>はサポートされていません。まぁとにかく<code>column</code>は試してみてくださいね！　ひと通り試し終わったなら<code>row</code>に戻しておいてください。</p>
+
+<p><code>flex-flow</code>プロパティーは他にもFlexboxアイテムの行(または列)の折り返しを制御するための値を指定することができます。<code>wrap</code>と<code>wrap-reverse</code>がそのための値になり、デフォルトでは親からはみ出しても折り返されず一列(一行)で表示されるFlexboxアイテムを折り返すようになります。<code>wrap</code>も<code>wrap-reverse</code>も現時点では実装されていません(何度も言っていますね……)が。ですが使えるようになったら便利そうですよね:</p>
+
+<pre><code>body&gt;div {
+    display: -webkit-flexbox;
+    display: flexbox;
+    -webkit-flex-flow: row wrap; /* `wrap`により複数行に渡るFlexboxが作成できる */
+    flex-flow: row wrap;
+    height: 500px;
+    padding: 1em;
+    background-color: gray;
+}
+</code></pre>
+
+<h3>MIRROR, MIRROR…</h3>
+
+<p>Flexboxの全てのプロパティー、順序や向き、並び順を制御するものは<em>文字表記の方向(writing mode)</em>に影響を受けます。我々の多くはデフォルトで上から下、左から右を利用していますが、その方向を変更した場合Flexboxによるレイアウトもまた変化します。既に<code>row-reverse</code>でどうなるかは確認したことと思いますが、デフォルト(上から下、左から右)とは違う文字表示の方向、上から下、右から左ではどうなるかわかりますか？　この場合Flexboxアイテムは<em>通常は</em>右から左へ並ぶことになり、<code>row-reverse</code>を質すると逆順、つまり左から右に並ぶことになります。</p>
+
+<p>では試してみましょう:</p>
+
+<pre><code>body&gt;div {
+    display: -webkit-flexbox;
+    display: flexbox;
+    direction: rtl; /* `writing-mode`プロパティーはCanaryに実装されていないので、代わりに`direction`プロパティーを使っています。 */
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    height: 500px;
+    padding: 1em;
+    background-color: gray;
+}
+</code></pre>
+
+<p>Canaryで見てみましょう。さらに<code>row</code>を<code>row-reverse</code>に書き換えてみると……どうなりましたか？</p>
+
+<p>わかりにくいかもしれませんが、Flexboxのプロパティーは全て文字表記の方向に従って論理的に決定されるということに過ぎません。大抵の場合は文字表記の方向は統一されているはずなので大きな問題が起こることはないでしょう。</p>
+
+<p>Flexboxのプロパティーがどういう効果を持つか理解するには、その基準となる方向(main axis)とそれに直交する方向(cross axis)を正確に把握することが大切です。基準となる方向とはつまりFlexboxアイテムが並べられる方向のことです。言葉を変えて言うと、Flexboxアイテムが水平方向に並んでいる(<code>flex-flow: row;</code>)ならば、基準となる方向は水平方向ということになります。直交する方向とは基準となる方向に直角に交わる方向ということで、この例では垂直方向ということになるでしょう。<code>flex-flow: column;</code>として方向を変更したなら、基準となる方向が垂直方向になり、直交する方向が水平方向になります。</p>
+
+<p>うまく説明するのはなかなか難しいですが、この画像が参考になるかもしれません:</p>
+
+<p><img src="/img/documents/fb-axis.png" alt="When items are horizontally positioned, the main axis is horizontal."></p>
+
+<p>基準となる方向と直交する方向のことは頭に入れておいてください。後ほど利用することになります。</p>
+
+<h2>Order! Order in the court!</h2>
+
+<p>他にもソースの順序に束縛されないようにするためのプロパティーとして<code>flex-order</code>プロパティーもあります。</p>
+
+<p>編集中のサンプルコードで<code>flex-flow</code>プロパティーが<code>row</code>になっていることと<code>direction: rtl;</code>が削除されていることを確認してください。ちゃんとそうなっているなら、Flexboxアイテムが<code>body&gt;div</code>の左上にA-B-Cという順序で3つ並んでいることでしょう。例えばコードでの順序はこのままで、A-C-Bという順序でFlexboxアイテムを並べたいとします。そのために使うのが<code>flex-order</code>プロパティーです:</p>
+
+<pre><code>div:nth-child(2) { /* IDやクラスを使ってもいいですが、こんな感じで構わない */
+    -webkit-flex-order: 1;
+    flex-order: 1;
+}
+</code></pre>
+
+<p>Canaryで見てみるとA-C-Bと並んでいますよね？</p>
+
+<p><code>flex-order</code>プロパティーはFlexboxアイテムを<em>序列付きのグループ</em>に分類します。<code>flex-order</code>プロパティーを指定されていないFlexboxアイテムはグループ0に分類され、ソースでの順序のままレイアウトされます。この例では二番目のFlexboxアイテム(B)をグループ1に分類しており、AとCはグループ0のまま、つまりソースでの順序のままレイアウトされることになります。グループ1は常にグループ0の後ろにレイアウトされるので、Bは最後にレイアウトされる……ということになります。B-A-Cという順にしたいならBをグループ0のままにしておき、AとCをグループ1にすれば良いでしょう:</p>
+
+<pre><code>div&gt;div:first-child,
+div&gt;div:last-child {
+    -webkit-flex-order: 1;
+    flex-order: 1;
+}
+</code></pre>
+
+<h2>Flexibility</h2>
+
+<p>Flexboxで最も便利な機能の一つとしてフレキシブルなボックスを作ることができることが挙げられます。この例で言うところの<code>body&gt;div</code>の余った部分を利用できるということで、全てのFlexboxアイテムで均等に分割することや、Flexboxアイテムの一つで残りの領域を<em>埋める</em>などということができます。</p>
+
+<p>まずは均等な幅の割り振りについて説明します。残りの領域をうまく割り振る方法についてはその後説明することにしましょう。</p>
+
+<p>サンプルコードにおける3つのFlexboxアイテムがモバイル機器で使われるWebアプリケーションのボタンだと想像してみてください。3つだったり2つ(同意して次へ進むなどというようなもののみのケース)だったり……つまり「ボタンの数に係わらず、全て同じ幅で、親の幅一杯に表示したい」というようなケースです。これまではこういったレイアウトを行いたい場合JavaScriptの助けを借りてきましたが、Flexboxがあればもうその必要はありません。Flexboxアイテムで<code>flex()</code>関数を利用するとどうなるか見てみましょう:</p>
+
+<pre><code>div&gt;div {
+    /* width: 100px; */
+    width: -webkit-flex(1 0 100px);
+    width: flex(1 0 100px);
+    height: 100px;
+    background-color: pink;
+}
+</code></pre>
+
+<p><code>flex()</code>関数は<code>width</code>や<code>height</code>プロパティーの値として利用することができます。引数として拡大するかどうか、縮小するかどうか、そして<em>デフォルト・サイズ</em>の3つを取ることができます。3つの引数のうち最後の2つはオプションで、省略した場合は縮小するかどうかは<code>0</code>、デフォルト・サイズは<code>0px</code>とみなされます。<code>flex()</code>がどう機能するかを簡単に説明すると以下のような形になります:</p>
+
+<ol>
+<li>Flexboxアイテムにはまずデフォルト・サイズが割り当てられる。</li>
+<li>親に余っている領域があるなら、拡大するかどうかの指定に従って均等に余りが分配される。</li>
+<li>逆にFlexboxアイテムが親をはみ出す場合は、縮小するかどうかの指定に従って均等に幅が狭められる。縮小するかどうかの指定は正の数値で指定することには注意(例: <code>-2</code>ではなく<code>2</code>)。</li>
+</ol>
+
+<p>拡大するかどうかの指定で<code>1</code>を指定されると、通常は「残りの領域を均等に分けて貰う」ということになり、<code>2</code>を指定された場合は、「残りの領域から<code>flex(1)</code>の倍分けてもらう」ということになります。つまり「2で分けるとウィスキーになって、1ではコーラ」というような支離滅裂な話ではありません。どういう挙動になるのかは実際に試してみるのが手っ取り早いでしょう。<code>div&gt;div</code>に続けて以下のCSSルールセットを書いてみてください:</p>
+
+<pre><code>div&gt;div:first-child,
+div&gt;div:last-child {
+    width: -webkit-flex(2);
+    width: flex(2);
+    background-color: magenta; /* わかりやすいように色を変えているだけで、目に悪い */
+}
+</code></pre>
+
+<p>Canaryで見ると、最初と最後のFlexboxアイテムが余っている領域を二つに分けているわけではないことがわかりますよね？<code>flex(1)</code>である真ん中のボックスが確保する領域の倍確保されているはずです。もちろんあなたがブラウザーの開発者ではないことは百も承知ですが、それでも「可及的速やかに実装しろ！」とここで声を大にして言わせていただきたい。</p>
+
+<p>注意すべき点としては、外側のボックスは真ん中のボックスの倍の幅にはならないということが挙げられます。つまり、残りの領域をどう分割するかということのみ制御できるという言い方もできますね。</p>
+
+<p>とりあえず最後に追加したコード(<code>flex(2)</code>を指定したコード)はここで一旦削除してください。そしてFlexboxアイテムである<code>div</code>要素の内一つを削除して、その結果どうなるかをCanaryで確認してみてください。ひと通り<code>flex()</code>の挙動を確認したら忘れずに<code>div</code>要素を戻しておきましょう。</p>
+
+<p><code>flex()</code>についてはバカみたいに細かく<a href="http://www.w3.org/TR/2011/WD-css3-flexbox-20111129/">仕様</a>でいろいろ取り決められているので、Flexboxについてより詳しく知りたいなら熟読すると良いでしょう。</p>
+
+<h2>Alignment of flexbox items</h2>
+
+<p>基準となる方向と直交する方向のことは覚えていますか？　おっ、覚えてるとはすごいですね！<code>flex-pack</code>プロパティーは基準となる方向に対してFlexboxアイテムがどう並ぶかを決定するものになります。サンプルでは基準となる方向は水平方向になっています。<code>flex-pack</code>プロパティーがどう機能するかをきちんと把握するために<code>width</code>プロパティーを<code>100px</code>に戻しておきましょう:</p>
+
+<pre><code>div&gt;div {
+    width: 100px;
+    height: 100px;
+    background-color: pink;
+}
+</code></pre>
+
+<p><code>flex-pack</code>プロパティーは<code>start</code>と<code>end</code>、<code>justify</code>、そして<code>center</code>の4種類を値として取ることができます。わかりやすいですね。ではまずFlexboxアイテムを中央寄せしてみましょう。このプロパティーは親要素で使用します:</p>
+
+<pre><code>body&gt;div {
+    display: -webkit-flexbox;
+    display: flexbox;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    -webkit-flex-pack: center; /* &lt;-- */
+    flex-pack: center;
+    height: 500px;
+    padding: 1em;
+    background-color: gray;
+}
+</code></pre>
+
+<p>ついでに他の値も試してみてください。</p>
+
+<p>もちろんFlexboxアイテムを直交する方向に対して並べるためのプロパティー、<code>flex-align</code>プロパティーもあります。<code>flex-pack</code>プロパティーとは値として取れるキーワードに少し違いがありますが似たようなものです。<code>flex-pack</code>プロパティーがFlexboxアイテムの親に対して使用するプロパティーであるのに対して、<code>flex-align</code>プロパティーはFlexboxアイテム自身で使用するということはきちんと覚えておいたほうが良いでしょう。</p>
+
+<pre><code>div&gt;div {
+    width: 100px;
+    height: 100px;
+    background-color: pink;
+    -webkit-flex-align: center; /* start | end | baseline | stretch  &lt;-- これらも試してみましょう！　 */
+    flex-align: center;
+}
+</code></pre>
+
+<p>Canaryでも全ての値がサポートされているわけではありませんが、それほど遠くない将来にサポートされることでしょう。仕様が固まってくれば、実装も増えるに違いありません。ブラウザーベンダーはFlexboxにかなり注目しています。</p>
+
+<h2>Enough! Time to play</h2>
+
+<p>他にも複数行にまたがるFlexboxを制御するためのプロパティーがたくさん策定されていますが、現時点でそれらは試すことすら出来ません。うまくいけばこの「<em>新しい</em>」Flexboxを使い倒すための様々なプロパティーが実装されることにより、Webアプリケーションの開発に大きな変化が起きることでしょう。「レスポンシブ・デザイン」やモバイルにおいてFlexboxが役に立つ機会は相当なものでしょうし、フォーム要素のレイアウトやナビゲーションにおいてもまた然りです。</p>
+
+<p>まだ実際のWebプロジェクトで利用する必要は無いですが、実際のWebプロジェクトのレイアウトにおいてFlexboxで何ができるかを調べることはできます。きっと思っているよりも早く実装されると思うので、今のうちに調べておくおくとライバル達に一歩差を付けられることでしょう。</p>
+
+<p>楽しんでください！</p>
+
+<h2>訳について</h2>
+
+<p>この日本語訳は<a href="mailto:hail2u@gmail.com">Kyo Nagashima</a>が全て行いました。元文書がブログであることも踏まえてあまり硬くないですます調で意訳したため、一部原文とはかけ離れた文章になっているところもあります。また今後の更新で情報に違いが出る可能性を考えて、Web標準仕様へのリンクには<a href="http://www.w3.org/TR/2011/WD-css3-flexbox-20111129/">2011-11-29版のWorking Draft</a>のURLを使いました。他はなるべく原文ままにしたつもりですが、コード・サンプルに限りWeb標準プロパティーも併記するように大幅に追記しています。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

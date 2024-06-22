@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sass、そしてSassy CSS (SCSS)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/sass-and-sassy-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSを拡張したメタ言語であるSass、そしてその別文法として定義されたSCSSについて、960.gsなどのCSSフレームワークと絡めて、Sass (主にSCSS)の良さを解説する。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSを拡張したメタ言語であるSass、そしてその別文法として定義されたSCSSについて、960.gsなどのCSSフレームワークと絡めて、Sass (主にSCSS)の良さを解説する。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sass、そしてSassy CSS (SCSS)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-02-11T18:56:33+09:00">2011年2月11日</time></p>
+
+        <h1><em>Sass、そしてSassy CSS (SCSS)</em></h1>
+      </header>
+
+    <main>
+
+    <p>CSSを拡張したメタ言語である<a href="http://sass-lang.com/">Sass</a>、そしてその別文法として定義されたSCSSについて、960.gsなどのCSSフレームワークと絡めて、Sass (主にSCSS)の良さを解説する。</p>
+
+<ul>
+<li><a href="#css-framework">CSSフレームワーク</a></li>
+<li><a href="#sass">Sass</a></li>
+<li><a href="#scss">Sassy CSS aka SCSS</a></li>
+<li><a href="#css-framework-with-scss">SCSSでCSSフレームワーク</a>
+<ul>
+<li><a href="#create-2col-layout">2カラムレイアウトの作成</a></li>
+<li><a href="#import-clearfix-and-reset-css">clearfixやReset CSSの組み込み</a></li>
+<li><a href="#change-column-size">カラム幅の変更</a></li>
+<li><a href="#flip-column">カラムの入れ替え</a></li>
+</ul>
+</li>
+<li><a href="#importance">SCSSで完結することの意義</a></li>
+<li><a href="#conclusion">まとめ</a></li>
+<li><a href="#final-words">最後に</a></li>
+</ul>
+
+<h2 id="css-framework">CSSフレームワーク</h2>
+
+<p><a href="http://960.gs/">960.gs</a>や<a href="http://blueprintcss.org/">Blueprint</a>、<a href="http://bluetrip.org/">BlueTrip</a>などCSSフレームワークと呼ばれるものは色々ある。フレームワークと名乗るだけのことはあって、それらの生産性はとても高い。テンプレートで適切にクラス名やIDを埋め込むだけなので、複雑怪奇なCSSコーディングを意識することなく誰でも簡潔にきれいなカラム・レイアウトを作成できる。</p>
+
+<p>HTML 4.01の控えめな表現力とCSS 2.1の控えめな文法を考えると、こういったクラス名ベースのCSSフレームワークというのは妥協点として申し分のないものだと思う。つまりHTML5やCSS3どころかCSS 2.1の文法の半分くらいしか解釈できないブラウザがそこそこいる現状では、安全確実なクラス名ベースでのスタイルのカスタマイズにならざるを得ないということだ。都合の良いことにブログのブレイク以降テンプレートによるウェブサイトの一括生成というシステムが山のようにあり、それらではHTMLの修正からウェブサイト全体の再構築というのは非常に簡単になっている。そういう面でもHTMLを更新するだけで済むというのは非常に手軽なアプローチだろう。また細かく機能別に分けたクラス名を組み合わせて指定してデザインを整えるという仕組みは直感的で、CSSに疎い人にはうってつけだとも思う。</p>
+
+<p>そんな便利なCSSフレームワークが白い目で見られることが多いのも事実だ。それはせっかく長い時間をかけてテーブル・レイアウトのようなゴミを駆逐して構造とデザインの分離が一歩進み、HTML5とCSS3でなんとか満足行く程度には達成されそうになったのにも関わらず、またHTMLをゴリゴリいじるのが流行るのかというような嘆息からそうなるのだと思う。でもこれは今ポピュラーなCSSフレームワークやグリッドシステムの実装が悪いわけでもなく(前段落で書いたように現状に即した妥協に過ぎない)、HTMLやCSSの目指す構造とデザインの分離が理想に過ぎるというわけでもない。悪いのはCSSが言語として貧弱すぎ、フレームワーク(的なもの)をCSSだけで完結させることができないことだ。CSSフレームワークはCSSの文法の弱さを仕方が無いものとして捉え、作業の簡便さのためHTMLの部分的な編集を行うという選択をしただけだ。CSSフレームワークに対する「これじゃぁテーブルレイアウトの派生だ」などという批判はある意味正しいような面もあるとは思うし、そんな構成のCSSフレームワークもあるが、多くは苦渋の選択の結果または実装上の限界からの妥協だと思う。</p>
+
+<p>しかし今、私達にはSass、そしてSassy CSS (SCSS)がある。</p>
+
+<h2 id="sass">Sass</h2>
+
+<p>Sassは<a href="http://haml-lang.com/">HAML</a>という慣れるとものすごく生産性が上がるが慣れるまでがものすごく辛い文法でスタイルシートを記述し、CSSにコンパイルするというメタ言語で、結構昔からあった。Sassはとても魅力的なメタ言語でCSSに欠けている様々な機能を提供してくれる。</p>
+
+<ul>
+<li>変数</li>
+<li>セレクタのネスト</li>
+<li>ミックスイン</li>
+<li>セレクタの継承</li>
+</ul>
+
+<p>これらが主なものだが、他にもCSSを書いている時に「欲しいな…」と思うようなものや「なんでないの…」というような機能がある。特にミックスインの存在が大きく、これがあれば今のCSSフレームワークの機能はまずSassに移植することが出来るだろう。移植できさえすればSass内で完結することが出来るので、HTMLの更新は不必要になり、Sassで書いてCSSにコンパイルしデザインを更新という作業フローになる。開発それ自体のコストはあまり変わらないか若干増えるだろうが、更新されるファイルはCSSだけでHTMLは全く変化しないので、大量のHTMLファイルを再構築するという作業は必要ないし、動的にページを生成している場合でも訪問者のキャッシュが効くので転送量や負荷の削減にもつながるなどメリットの方が多いと思う。</p>
+
+<p>一方で学習コストの高さというデメリットがある。僕は何度か触ったがどうしてもHAMLに慣れることが出来ず、その度挫折した。HAML自体が極端に難しいというわけではなく、CSSを意識しながらHAMLで書くというのはかなり難易度が高いと思う。</p>
+
+<p>それを解決してくれるのがSass 3.0でサポートされたSassの新文法であるSassy CSS、つまりSCSSだ。</p>
+
+<h2 id="scss">Sassy CSS aka SCSS</h2>
+
+<p>SCSSはSassの機能をCSS(CSS3のMedia Queriesなども含め)の文法とほぼ互換性がある形で再実装したもの。そのためCSSと同じような感覚で記述できる。</p>
+
+<pre>
+$black_half: rgba(0, 0, 0, 0.5);
+
+@mixin logofont {
+  font: {
+    family: &quot;lucida grande&quot;, &quot;lucida sans&quot;, sans-serif;
+    size:   300%;
+    weight: bold;
+  }
+}
+
+body {
+  margin: 0 auto;
+  width: 800px;
+
+  header {
+    h1 {
+      @include logofont;
+      border-bottom: 1px dotted $black_half;
+    }
+  }
+
+  footer {
+    border-top: 1px solid black;
+
+    address {
+      font-size: 90%;
+    }
+  }
+}
+</pre>
+
+<p>こうCSSが書けたらいいのに！　みたいな理想に近いと思う。セレクタを書く時も必ずネストしなければならないなどというルールはないので、既存のCSSをコピペしても大丈夫というのも非常に大きい。これをtest.scssとして保存し、コンパイルする。</p>
+
+<pre>
+$ sass --unix-newlines --scss test.scss test.css
+</pre>
+
+<p>出来上がったtest.cssはこうなる。</p>
+
+<pre>
+body {
+  margin: 0 auto;
+  width: 800px; }
+  body header h1 {
+    font-family: &quot;lucida grande&quot;, &quot;lucida sans&quot;, sans-serif;
+    font-size: 300%;
+    font-weight: bold;
+    border-bottom: 1px dotted rgba(0, 0, 0, 0.5); }
+  body footer {
+    border-top: 1px solid black; }
+    body footer address {
+      font-size: 90%; }
+</pre>
+
+<p>文句なし。</p>
+
+<p>このようにCSSをほぼ完全に継承しつつ、それらと互換性のある形で機能を追加しているところがSCSSの最大の魅力だ。</p>
+
+<h2 id="css-framework-with-scss">SCSSでCSSフレームワーク</h2>
+
+<p>実際にSCSSにCSSフレームワークを移植する例として、エントリのきっかけになったウェブページで触れられていたBlueTripを一部移植し、2カラムレイアウトを作ってみる。</p>
+
+<h3 id="create-2col-layout">2カラムレイアウトの作成</h3>
+
+<p>まずはベースとなるHTMLを作成する。以下のような簡潔なHTML5、極端に簡潔だが、2カラムレイアウトのサイトは多くの場合このようなHTMLになると思う。</p>
+
+<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;Simple 2-Column Template&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;
+      &lt;h1&gt;Simple 2-Column Template&lt;/h1&gt;
+    &lt;/header&gt;
+    &lt;div id=&quot;contents&quot;&gt;
+      &lt;article&gt;
+        &lt;h1&gt;Article Title&lt;/h1&gt;
+        &lt;p&gt;Article contents&lt;/p&gt;
+      &lt;/article&gt;
+      &lt;article&gt;
+        &lt;h1&gt;Article Title&lt;/h1&gt;
+        &lt;p&gt;Article contents&lt;/p&gt;
+      &lt;/article&gt;
+      &lt;article&gt;
+        &lt;h1&gt;Article Title&lt;/h1&gt;
+        &lt;p&gt;Article contents&lt;/p&gt;
+      &lt;/article&gt;
+    &lt;/div&gt;
+    &lt;aside&gt;
+      &lt;h1&gt;Side menu&lt;/h1&gt;
+      &lt;ul&gt;
+        &lt;li&gt;sidebar menu item&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/aside&gt;
+    &lt;hr&gt;
+    &lt;footer&gt;
+      &lt;address&gt;Site Footer&lt;/address&gt;
+    &lt;/footer&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>これに適用するBlueTripのCSSをSCSSに移植する。ミックスインで定義してしまうのが一番簡単だ。</p>
+
+<pre>
+@mixin column {
+  float: left;
+}
+
+@mixin span-6 {
+  width: 230px;
+}
+
+@mixin span-17 {
+  width: 670px;
+}
+
+@mixin span-24 {
+  width: 950px;
+}
+
+@mixin colborder {
+  padding-right: 24px;
+  margin-right: 25px;
+  border-right: 1px solid #eee;
+}
+
+@mixin last {
+  margin-right: 0;
+}
+
+@mixin space {
+  background: #fff;
+  color: #fff;
+}
+</pre>
+
+<p>そしてこれらを<code>@include</code>で参照してレイアウトを組み上げる。</p>
+
+<pre>
+body {
+  @include span-24;
+  margin: 0 auto;
+}
+
+body &gt; header {
+  @include column;
+  @include span-24;
+}
+
+#contents {
+  @include column;
+  @include span-17;
+  @include colborder;
+}
+
+body &gt; aside {
+  @include column;
+  @include span-6;
+  @include last;
+}
+
+body &gt; hr {
+  @include space;
+}
+
+body &gt; footer {
+  @include column;
+  @include span-24;
+}
+</pre>
+
+<p>CSSにコンパイルすると、</p>
+
+<pre>
+body {
+  width: 950px;
+  margin: 0 auto; }
+
+body &gt; header {
+  float: left;
+  width: 950px; }
+
+#contents {
+  float: left;
+  width: 670px;
+  padding-right: 24px;
+  margin-right: 25px;
+  border-right: 1px solid #eee; }
+
+body &gt; aside {
+  float: left;
+  width: 230px;
+  margin-right: 0; }
+
+body &gt; hr {
+  background: #fff;
+  color: #fff; }
+
+body &gt; footer {
+  float: left;
+  width: 950px; }
+</pre>
+
+<p>こうなり、これを最初のHTMLに追加すると<a href="/pub/test/174.html">ちゃんと2カラムレイアウトが出来上がる</a>。ファイルにして<code>link</code>要素で読むべきところだが、ソースを見ればすぐ中身がわかるようにベタにコピペにした。またReset CSS他のBlueTripのベースとなる部分もコピペしてある。</p>
+
+<p>ここではミックスインの定義から始めたのでCSSフレームワークを一から作るような煩雑さがあるが、移植はクラス名をミックスインにほぼそのまま変換するだけと非常に簡単だ。</p>
+
+<h3 id="import-clearfix-and-reset-css">clearfixとReset CSSの組み込み</h3>
+
+<p>少しCSSフレームワークとは話題がそれるが、clearfixやReset CSSが非常に便利に使えることにも触れておく。clearfixは通常以下のようにクラスで作り、必要な場所でクラス指定するというCSSフレームワークと同じようなアプローチで使用する。</p>
+
+<pre>
+.clearfix:before, .clearfix:after {
+  content: &quot;\0020&quot;;
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.clearfix {
+  zoom: 1;
+}
+</pre>
+
+<p><a href="http://html5boilerplate.com/">HTML5 Boilerplate</a>ではこのようなclearfixが使われている。これを例えば<code>header</code>要素で使いたい場合は、</p>
+
+<pre>
+&lt;header class=&quot;clearfix&quot;&gt;
+</pre>
+
+<p>とする。これをクラス指定なしで書くとすると、適用したい要素のセレクタごとにclearfixをゴリゴリ書くことになり非常に面倒でかつ、見通しが悪くなる。SCSSではミックスインで定義してしまえば簡単に再利用でき、SCSSだけできれいに完結させることができる。</p>
+
+<pre>
+@mixin clearfix {
+  zoom: 1;
+
+  &amp;:before,
+  &amp;:after {
+    display: block;
+    height: 0;
+    visibility: hidden;
+    content: &quot;\0020&quot;;
+  }
+
+  &amp;:after {
+
+    clear: both;
+  }
+}
+
+header {
+  @include clearfix;
+}
+</pre>
+
+<p>見通しの良いコードですよね？</p>
+
+<p>同じようにReset CSSも簡単に組み込むことができる。単純にベタにコピペしても問題ないが、拡張された<code>@import</code>ルールを使うと良い。</p>
+
+<pre>
+@import &quot;reset&quot;;
+</pre>
+
+<p>SCSSに書くのはこの一行。必要なのは使いたいReset CSSを<em>_reset.scss</em>というファイル名で保存することだけだ(CSSの文法と互換性があるのでそのまま拡張子を変えるだけで大丈夫)。そうすればコンパイル時自動的に_reset.scssの中身をインラインに展開してくれる。</p>
+
+<p>このように数多くあるCSSテクニックを簡単に組み込むことができるのもSCSSのさらなる魅力だ</p>
+
+<h3 id="change-column-size">カラム幅の変更</h3>
+
+<p>CSSフレームワークの移植の話に戻る。CSSフレームワークの良いところのひとつはレイアウトの変更がクラス名の変更で完了する手軽さだ。SCSSではミックスインが定義済みなら参照を変更するだけと、CSSフレームワークと同じ程度の作業で済む。</p>
+
+<pre>
+#contents {
+  @include column;
+  @include span-14;
+  @include colborder;
+}
+
+body &gt; aside {
+  @include column;
+  @include span-9;
+  @include last;
+}
+</pre>
+
+<p>このように参照を書き換えると、<a href="/pub/test/174-1.html">カラム幅の違う2カラムレイアウトになる</a>。もちろんHTMLには一切手を加えていない。</p>
+
+<h3 id="flip-column">カラムの入れ替え</h3>
+
+<p>BlueTripのようなCSSフレームワークでは主にHTMLの編集でレイアウトの変更を行うことになるため、例えばサイドバーを左に持ってきたいというような場合、HTMLを編集しコンテンツのブロックとサイドバーのブロックを入れ替える。さほど大変な作業ではないかもしれないが、CSSで出来ることなのになぜHTMLを編集しなければならないのか釈然としない人もいるだろう。SCSSでは既存のミックスインを派生させることでそういったことの実現もSCSS内で完結することが出来る。</p>
+
+<pre>
+@mixin flipcolumn {
+  float: right;
+}
+
+@mixin flipcolborder {
+  padding-left: 24px;
+  margin-left: 25px;
+  border-left: 1px solid #eee;
+}
+
+@mixin first {
+  margin-left: 0;
+}
+</pre>
+
+<p>最初のミックスインをフリップ(反転)させただけのミックスインを作成し、それを参照するように書き換える。</p>
+
+<pre>
+#contents {
+  @include flipcolumn;
+  @include span-17;
+  @include flipcolborder;
+}
+
+body &gt; aside {
+  @include flipcolumn;
+  @include span-6;
+  @include first;
+}
+</pre>
+
+<p>これで<a href="/pub/test/174-2.html">左サイドバーの2カラムレイアウトになる</a>。もちろんこの程度のCSSのカスタマイズならCSSフレームワークでもCSSの定義を作成して、それを参照するようにHTMLでクラス名を編集をすれば良いので作業量自体はあまり変わらない。大きいのはSCSSがSCSS内で完結するということだ。</p>
+
+<h2 id="importance">SCSSで完結することの意義</h2>
+
+<p>ではなぜSCSSで完結することが大きいのかという話になる。単純に作業量で言えばSCSSの方が若干多いくらいで、別に効率的ではない。大きいのはSCSSならばSCSSとCSSという親子のような存在のみを意識すれば良いことだ。CSSフレームワークではそうはいかない。HTMLとCSSだけで済むわけもなく、テンプレート言語のことも頭に入れる必要があるだろう。</p>
+
+<p>そういう事が問題にならないケース、例えばバックエンド開発者とフロントエンド開発者が同じだったり密に連携できるようなケースならばCSSフレームワークはかなりの威力を発揮する。ここ数年でCSSフレームワークが大きく広まったのもそういった開発体制で作られるウェブサイトが多いことが一つの要因だと思う。</p>
+
+<p>しかしそれでもCSSフレームワークはある種のジレンマがある。CSSフレームワークで定義されていないデザインへの変更のコストが非常にかさむことだ。色々用意されているプリセットの中では非常に簡単にカスタマイズ出来るのに対して、一歩その枠を超えようとすると途端に面倒さが跳ね上がる。貧弱な文法で既存のスタイルとの兼ね合いを意識しながらCSSを記述しなければならないということもそうだが、そう書いた上でCSSフレームワークとの整合性を保つために細かいクラス名を設定してそれをテンプレートで指定していくという作業がまた必要になるだろう。もちろん使用中のCSSフレームワークのことを無視して書いてしまうことも不可能ではないが、メンテナンスの困難なものが出来上がるか、最悪の場合は破綻してCSSフレームワークの使用を中止することになると思う。</p>
+
+<p>SCSSでは様々なCSSテクニックをミックスインとして定義し、それらをSCSS内で適宜参照するようにしていくというのが基本的な使い方なのは前章で何となくわかったんじゃないかと思う。ミックスイン同士のバッティングというのは簡単に起こるが、参照側で適宜修正してやるだけで済む上、参照されたミックスインのみCSSコードとして出てくるので、CSSにコンパイルされた時にはそれらのバッティングが表に現れることはない。そしてこの章のタイトルのようにSCSS内で全ては完結する。CSSを定義して、HTMLを編集し、ウェブサイト全体を再構築する必要はない。SCSSで頑張ればそれをコンパイルしたCSSを更新するだけですべてが終わる。</p>
+
+<p>これは作業量が減るというだけではなく、人的リソースの節約にもなると思う。HTMLで一部書かれているとは言えテンプレートは多くの場合バックエンドと密接に関わるもので、その編集にはそれ相応の知識が必要になるし、その関係の深さからバックエンド開発者が管理しているということもあるだろう。SCSSならば最終的にCSSの更新だけで終わるので、それらを考慮する必要性は少なく、独断で作業を行うことも可能だろう。そういった面でもSCSSで完結することの意義は大きい。</p>
+
+<h2 id="conclusion">まとめ</h2>
+
+<p>CSSフレームワークを引き合いに出して長々と書いてきたが、Sass、そしてSCSSは960.gsやBlueprintにとって変わるものではない。それらとテンプレート・システム及びCSSの間を取り持つものだ。既存のCSSフレームワークを組み込んでしまい、SCSSフレームワークを作ることができるし、様々なところで公開されているCSSのエッセンスを取り込んだ自分なりのCSS製作環境を構築するというような利用の仕方もできる。つまりはこれこそが必要とされていたスタイルシート<em>言語</em>ということなのではないか。</p>
+
+<p>また、HTML5の簡素だが強力な構造化する力に比して、CSS3が表現自体は進化したものの文法が全く進歩していないという現状にもうってつけなはずだ。ミックスインはベンダー拡張プロパティにも強いという特徴もあるのでCSS3の表現力とは非常に相性が良い。</p>
+
+<pre>
+@mixin border-radius($size) {
+  -moz-border-radius: $size;
+  -webkit-border-radius: $size;
+  -o-border-radius: $size;
+  border-radius: $size;
+}
+
+pre {
+  @include border-radius(1em);
+}
+
+button {
+  @include border-radius(4px);
+}
+</pre>
+
+<p>こういう面でも今まさに求められている言語だと思う。</p>
+
+<p>僕はSCSSに次のような<code>link</code>要素を書ける時代がきてもおかしくないと思ってしまうほどの可能性を感じる。</p>
+
+<pre>
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/scss&quot; href=&quot;style.scss&quot;&gt;
+</pre>
+
+<p>Sass、そしてSCSSを使ってみませんか？</p>
+
+<h2 id="final-words">最後に</h2>
+
+<p>ここまでで触れなかったことをいくつか最後に書いておく。</p>
+
+<h3>SassはCSSの文法だけを拡張する</h3>
+
+<p>CSSの<em>表現</em>に何かを追加するわけではない。SassならIE6でも<code>position: fixed;</code>ができるようになるとかそういうものではない。CSSでできない表現はSCSSでもできない。</p>
+
+<h3>SCSSはCSSへの広範な知識が必要である</h3>
+
+<p>仕組み上CSSの知識がないとCSSフレームワークのコンバート程度でも戸惑う可能性はかなり高い。特にカスケーディングに関する知識はあったほうが良い。</p>
+
+<h3><a href="http://compass-style.org/">Compass</a></h3>
+
+<p>Sass上のCSSフレームワーク。少し大仰すぎるような嫌いはあるが、インストールから使用まで今時のLL開発と同じ感覚で使用できると思うので、バックエンド開発者が使うならSass飛ばしてこっちでも良いと思う。</p>
+
+<h3><a href="http://lesscss.com/">LESS</a></h3>
+
+<p>Sassと同じようなアプローチのもので、これもほぼ同じような機能を持つ。どっちがいいかを判断できるほどlessを使っていないのでわからない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

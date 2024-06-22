@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>無限スクロール向け雑なローディング画像</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/easy-loading-marker-for-infinite-scroll.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="無限スクロール向け雑なローディング画像" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-06-10T03:15:58+09:00">2015年6月10日</time></p>
+
+        <h1><em>無限スクロール向け雑なローディング画像</em></h1>
+      </header>
+
+    <main>
+
+    <p>無限スクロールはちょくちょく実装することはあるが、追加するコンテンツの読み込みや挿入はともかく、ローディング画像の処理で悩むことがある。その表示の切り替えには実装と処理のどちらにおいてもそこそこコストがかかるからだ。かなり前に色々考えるのが面倒になり、常に表示しておくという雑な手をよく使うようになった。</p>
+
+<p>Demo: <a href="/test/634.html">Easy Loading Marker for Infinite Scroll</a></p>
+
+<p>デモでは90%ほどスクロールすると無限スクロールっぽくコンテンツが少し時間をおいてから追加される。コンテナーである<code>#content</code>の最下部には常にローディング画像を背景画像として表示してあるので、特に操作することなく無限スクロールのためにコンテンツを読込中であることを示すことができる。SVGアニメーションでローディング画像を作ったためInternet Explorer 11では回らないが、おおまかにどういう挙動をするのかはわかることだろう。</p>
+
+<p>こういった雑なローディング画像の実装には利点が3つ挙げられる。</p>
+
+<ul>
+<li>コンテンツの読み込み以外のコードを書く必要がなくなる</li>
+<li>ローディング画像が必要(とされそう)な時に即表示される</li>
+<li>レンダリングのコストを下げられる</li>
+</ul>
+
+<section>
+<h2>コード</h2>
+
+<p>単純にローディング画像の挿入と削除を担当するコードがなくなり、ローディング画像の状態を保存する必要もなくなる。アニメーションGIFではなくスケーラブルにしたい場合も、デモのようにSVGアニメーションで完結させれば、HTMLへ空要素の挿入が必要ない(CSSでやる場合は擬似要素のアニメーションという点でいろいろあるので空要素などが必要になる)。もちろんCSSのコードが単純明快になるという点も見逃せない。</p>
+</section>
+
+<section>
+<h2>ローディング画像の表示</h2>
+
+<p>常に表示されているので、パフォーマンスを考慮したスクロール・イベントの間引きによる若干の遅延に影響を受けない。もちろんコンテンツの挿入そのもの自体は影響を受けるが、ローディング画像の表示においては影響を受けず、長めにアニメーションするだけになる。</p>
+</section>
+
+<section>
+<h2>レンダリング・コスト</h2>
+
+<p>画面外で常にアニメーションをさせることにはそれなりにコストはあるが、突然DOMに要素を追加(リフローやリレイアウト)し、アニメーションを開始(アニメーションの初期化コスト)するよりは低い。デモの場合はSVG内で完結させており、GPUのサポートも期待できる。</p>
+</section>
+
+<hr>
+
+<p>欠点としては無限スクロール中のエラーに対して弱いことだ。追加コンテンツの読み込みとローディング画像の表示が完全に分離しているので、エラーが起きた時だけ両者を連動させる必要が出てくる。追加コンテンツの読み込み側ではエラー時にクラスを振るだけに留め、ローディング画像の表示と同じく簡単なCSSで見えなくしてやるのが妥当か。</p>
+
+<hr>
+
+<p>無限スクロールにおいては、ローディング画像などを表示することなく必要そうになる前に読み込み挿入しておく方が実装としては理想に近い。しかしその理想を実現するまでには、コンテンツを送る側のパフォーマンスやいつ読み込み始めるかのタイミング、ユーザーの回線への負担など解決が必要な問題がいくつもある。まずは実装ということを考えると、この雑なローディング画像は面倒がなく、便利に使っている。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

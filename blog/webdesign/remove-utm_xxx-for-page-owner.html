@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>utm_xxxを削除してURLの分散をちょっとだけ防ぐ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/remove-utm_xxx-for-page-owner.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、replaceState()を使ってURLだけ書きかえるという話。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/remove-utm_xxx-for-page-owner.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="utm_xxxを削除してURLの分散をちょっとだけ防ぐ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-06-09T11:28:11+09:00">2013年6月9日</time></p>
+
+        <h1><em>utm_xxxを削除してURLの分散をちょっとだけ防ぐ</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="utm_foobars。" height="270" src="/img/blog/remove-utm_xxx-for-page-owner.png" width="480">
+</figure>
+
+<p>utm_xxxを利用したユーザー追跡はまぁ便利ではあるのだけど、どうしてもURLの正規化に悪影響がある。設置したツイートボタンやブックマークボタンはこちら側で正規のURLを仕込んでどうにかすればいいのだけど、ブラウザーの拡張やブックマークレットにはどうしようもない。かといってリダイレクトでは訪問者にも管理者にもコストが高いので、<code>replaceState()</code>を使ってURLだけ書きかえるという話。</p>
+
+<p>正規化する関数を発火させるタイミングの制御には色々アプローチがあると思うけど、素で書くといろいろ面倒そうなので<a href="http://www.google.com/analytics/">Google Analytics</a>のコードに混ぜることにした。</p>
+
+<pre><code class="language-js">var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXX-X']);
+_gaq.push(['_trackPageview']);
+_gaq.push(function() {
+  var h = history, l = location, u;
+  if (!l.search || !h.replaceState) return;
+  u = l.pathname + l.search.replace(/[?&amp;]utm_[^&amp;]+/g, '').replace(/^&amp;/, '?') + l.hash;
+  h.replaceState(null, '', u);
+});
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();</code></pre>
+
+<p>まだちゃんと運用していないけど、複数のutm_xxxがあるケースや他のパラメーターがある場合、更にはハッシュ付きだった場合なども含めた<a href="/test/449.html">簡単なテスト</a>を行った限りでは大丈夫そう。もしかしたらAnalyticsのutm_xxx解析は維持したままURLを綺麗にできるかなと思ったけど、これだとダメな気もする。Analyticsの解析完了で発火するとかだと確実だと思うんだけど、まだ調べてない。</p>
+
+<section>
+<h2>追記</h2>
+
+<p><code>location.search</code>が空じゃない時だけ書きかえるように修正した。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

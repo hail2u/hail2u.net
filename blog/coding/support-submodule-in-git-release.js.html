@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>git-release.jsでのsubmoduleのサポート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/support-submodule-in-git-release.js.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="自分で作った、バージョンのインクリメントからコミット、タグ付け、最後にpushする(こともできる)git-release.jsが使い勝手良いので愛用してる。ただ.gitディレクトリがあることを前提としているので、このままではsubmoduleのディレクトリではリリースできなかった。そこをちゃんとするようにしたり、iniパッケージを使うようにしたりした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="自分で作った、バージョンのインクリメントからコミット、タグ付け、最後にpushする(こともできる)git-release.jsが使い勝手良いので愛用してる。ただ.gitディレクトリがあることを前提としているので、このままではsubmoduleのディレクトリではリリースできなかった。そこをちゃんとするようにしたり、iniパッケージを使うようにしたりした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="git-release.jsでのsubmoduleのサポート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-01T12:42:23+09:00">2014年7月1日</time></p>
+
+        <h1><em>git-release.jsでのsubmoduleのサポート</em></h1>
+      </header>
+
+    <main>
+
+    <p>自分で作った、バージョンのインクリメントからコミット、タグ付け、最後に<code>push</code>する(こともできる)git-release.jsが使い勝手良いので愛用してる。ただ<code>.git</code>ディレクトリがあることを前提としているので、このままではsubmoduleのディレクトリではリリースできなかった。そこをちゃんとするようにしたり、<a href="https://www.npmjs.org/package/ini">iniパッケージ</a>を使うようにしたりした。</p>
+
+<p>Download: <a href="/git-release.js">git-release.js</a></p>
+
+<p><code>git rev-parse --git-dir</code>で普通のリポジトリでもsubmoduleでも適切なGitディレクトリのパスを返してくれる。submoduleの場合は親の<code>.git/modules/submodule_name</code>になる。今までは2回Gitを呼ぶのが面倒だったので、<code>git rev-parse --show-toplevel</code>でリポジトリのルートを拾って、決め打ちで<code>.git/config</code>を加えて設定ファイルを探していたけどやめた。</p>
+
+<p>submoduleのディレクトリには<code>.git</code>ディレクトリの代わり<code>.git</code>ファイルがあり、これに以下の様な形でGitディレクトリへの相対パスが記録されているので、これを見てもできそうに見える。</p>
+
+<pre><code>gitdir: ../../.git/modules/submodule_name</code></pre>
+
+<p>しかし<code>.git</code>ファイルがどのような構造でどのようなデータが記録されるかが明文化されていないので、これを見るのは良くなさそう。</p>
+
+<hr>
+
+<p><code>git config --local --get-regexp release.*</code>とかで拾った方が良いのかな。けどどっちにしろリポジトリのルートは必要だし、パースしやすさも考えるとINIファイルな<code>$GIT_DIR/config</code>を直接読んだ方が良さそうな気がする。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

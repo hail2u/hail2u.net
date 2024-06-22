@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Preview OpenType Features</title>
+
+
+    <style>
+      .test {
+        font-size: 24px;
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Preview OpenType Features</h1>
+    </header>
+
+    <section>
+      <h2>概要</h2>
+
+      <p>ドロップしたOpenTypeフォントをData URIにし、ランダムな名前で<code>@font-face</code>デスクリプタ―を定義した後、そのランダムなフォント名で<code>.test</code>のフォント・ファミリを上書きすることによってOpenTypeのfeatureを全表示するもの。</p>
+    </section>
+
+    <section>
+      <h2>動作環境</h2>
+
+      <ul>
+        <li>Internet Explorer 10+</li>
+        <li>Firefox 15+</li>
+        <li>Chrome 16+</li>
+        <li>Opera 15+</li>
+        <li>Safari 7+ (maybe)</li>
+      </ul>
+    </section>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+      var features = [
+        'aalt',
+        'abvf',
+        'abvm',
+        'abvs',
+        'afrc',
+        'akhn',
+        'alig',
+        'bare',
+        'blwf',
+        'blwm',
+        'blws',
+        'c2pc',
+        'c2sc',
+        'calt',
+        'case',
+        'ccmp',
+        'cfar',
+        'cjct',
+        'clig',
+        'cpct',
+        'cpsp',
+        'cswh',
+        'curs',
+        'cv01',
+        'dist',
+        'dlig',
+        'dnom',
+        'expt',
+        'falt',
+        'fin2',
+        'fin3',
+        'fina',
+        'frac',
+        'fwid',
+        'half',
+        'haln',
+        'halt',
+        'hist',
+        'hkna',
+        'hlig',
+        'hngl',
+        'hojo',
+        'hwid',
+        'init',
+        'isol',
+        'ital',
+        'jalt',
+        'jp04',
+        'jp78',
+        'jp83',
+        'jp90',
+        'kern',
+        'lfbd',
+        'liga',
+        'ljmo',
+        'lnum',
+        'locl',
+        'ltra',
+        'ltrm',
+        'mark',
+        'math',
+        'med2',
+        'medi',
+        'mgrk',
+        'mkmk',
+        'mono',
+        'mset',
+        'nalt',
+        'nlck',
+        'nukt',
+        'numr',
+        'onum',
+        'opbd',
+        'ordn',
+        'ornm',
+        'palt',
+        'pcap',
+        'pkna',
+        'pnum',
+        'pref',
+        'pres',
+        'pstf',
+        'psts',
+        'pwid',
+        'qwid',
+        'rand',
+        'rkrf',
+        'rlig',
+        'rmnz',
+        'rphf',
+        'rtbd',
+        'rtla',
+        'rtlm',
+        'ruby',
+        'salt',
+        'sinf',
+        'size',
+        'smcp',
+        'smpl',
+        'ss01',
+        'ss02',
+        'ss03',
+        'ss04',
+        'ss05',
+        'ss06',
+        'ss07',
+        'ss08',
+        'ss09',
+        'ss10',
+        'ss11',
+        'ss12',
+        'ss13',
+        'ss14',
+        'ss15',
+        'ss16',
+        'ss17',
+        'ss18',
+        'ss19',
+        'ss20',
+        'subs',
+        'sups',
+        'swsh',
+        'titl',
+        'tjmo',
+        'tnam',
+        'tnum',
+        'trad',
+        'trns',
+        'twid',
+        'typo',
+        'unic',
+        'valt',
+        'vatu',
+        'vert',
+        'vhal',
+        'vjmo',
+        'vkna',
+        'vkrn',
+        'vpal',
+        'vrt2',
+        'zero'
+      ],
+      text = 'The Quick Brown Fox Jumps Over The Lazy Dogs. 0123456789.',
+      test = [
+        '<tr>',
+          '<th><%FEATURE_NAME%></th>',
+          '<td class="test" style="-moz-font-feature-settings:\'<%FEATURE_NAME%>\' 1;-webkit-font-feature-settings:\'<%FEATURE_NAME%>\' 1;-ms-font-feature-settings:\'<%FEATURE_NAME%>\' 1;font-feature-settings:\'<%FEATURE_NAME%>\' 1">', text, '</td>',
+        '</tr>'
+      ].join(''),
+      preview = '<table>';
+
+      for (var i = 0, l = features.length; i < l; i+=1) {
+        var feature = features[i];
+        preview += test.replace(/<%FEATURE_NAME%>/g, feature);
+      }
+
+      preview += '</table>';
+
+      $('body').append(preview);
+
+      $(document.body).bind('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.originalEvent.dataTransfer.dropEffect = 'copy';
+      }).bind('drop', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var reader = new FileReader(),
+          otf = e.originalEvent.dataTransfer.files[0];
+        reader.onload = (function (f) {
+          return function (e) {
+            var name = "test" + Math.floor(Math.random() * 65536),
+              face_rule = [
+                '@font-face {',
+                  'font-family: ' + name + ';',
+                  'src: url(' + e.target.result + ') format("woff");',
+                '}'
+              ].join(''),
+              class_rule = [
+                '.test {',
+                  'font-family: ' + name + ';',
+                '}'
+              ].join(''),
+              css = document.styleSheets[1];
+            css.insertRule(face_rule, css.cssRules.length);
+            css.insertRule(class_rule, css.cssRules.length);
+          };
+        }(otf));
+        reader.readAsDataURL(otf);
+      });
+    </script>
+  </body>
+</html>

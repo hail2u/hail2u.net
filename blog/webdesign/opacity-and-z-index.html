@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>opacityとz-index</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/opacity-and-z-index.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="opacityプロパティーで1より下が指定された要素はその重なり順が変化するという仕様があるようだ。擬似要素を複数組み合わせて紙をずらして重ねたようにロゴをちょっと改悪した時に初めて知った。いつものChromeのバグかと思った……。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="opacityプロパティーで1より下が指定された要素はその重なり順が変化するという仕様があるようだ。擬似要素を複数組み合わせて紙をずらして重ねたようにロゴをちょっと改悪した時に初めて知った。いつものChromeのバグかと思った……。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/opacity-and-z-index.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="opacityとz-index" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-02-04T00:45:04+09:00">2012年2月4日</time></p>
+
+        <h1><em>opacityとz-index</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="2012-02-03に改悪されたロゴ。" height="270" src="/img/blog/opacity-and-z-index.png" width="480">
+</figure>
+
+<p><code>opacity</code>プロパティーで<code>1</code>より下が指定された要素はその重なり順が変化するという<a href="http://www.w3.org/TR/css3-color/#transparency">仕様があるようだ</a>。擬似要素を複数組み合わせて紙をずらして重ねたようにロゴをちょっと改悪した時に初めて知った。いつものChromeのバグかと思った……。</p>
+
+<p>仕様では<code>position</code>プロパティーが<code>static</code>以外の要素で<code>opacity</code>プロパティーを<code>1</code>より下にすると<code>z-index</code>プロパティーが<code>0</code>であるとみなされるようになっている。そのためその要素で<code>z-index</code>プロパティーを<code>-1</code>にして背面に移動するようにしたり、<code>100</code>等で意識的に手前に持ってきたりするようにしている場合、その重なり順が壊れてしまう。</p>
+
+<p>と、こう書くと結構単純な感じなんだけど、実際には<code>0</code>とみなされた上で新たな重なり順が作られるので、いくつかの要素をまとめて半透明にして重ねまくってたりすると、どういう重なり順になるかとてもイメージしにくい。ので余程の理由がない限りは<code>opacity</code>と<code>z-index</code>プロパティーの組み合わせには近寄らない方が良さそう。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>例えば最初のスクリーンショットは件の<code>opacity</code>と<code>z-index</code>プロパティーを組み合わせて作ったもの。<code>a</code>要素と<code>a::before</code>、<code>a::after</code>でそれぞれ正方形を作りTransformさせて重ねているだけ。</p>
+
+<ol>
+<li><code>a</code>要素の文字(hail2u.net)</li>
+<li><code>z-index: -1</code>の<code>a::before</code></li>
+<li><code>z-index: -2</code>の<code>a::after</code></li>
+<li><code>a</code>要素の背景</li>
+</ol>
+
+<p>という重なり順になる。普通に<code>-1</code>等を使うと<code>a</code>要素の背景より後ろになるはずだがならない。かといって単純に上に重ねられるわけでもなく、<em>背景と文字列の間</em>に挟まっている。ややこしいですね！</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

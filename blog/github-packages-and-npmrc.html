@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>GitHub Packagesと.npmrcファイル</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/github-packages-and-npmrc.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="興味があったのでGitHub Packagesを試してみている。node-css-mqpackerを復活させて、公開するところまではできた。ヘルプの通りでうまくいったが、.npmrcファイルで気になるところがあったので、メモを残しておく。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="GitHub Packagesと.npmrcファイル" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-06-16T11:31:37+09:00">2020年6月16日</time></p>
+
+        <h1><em>GitHub Packagesと.npmrcファイル</em></h1>
+      </header>
+
+    <main>
+
+    <p>興味があったので<a href="https://github.co.jp/features/packages">GitHub Packages</a>を試してみている。node-css-mqpackerを復活させて、<a href="https://github.com/hail2u/node-css-mqpacker/packages">公開するところ</a>まではできた。ヘルプの通りでうまくいったが、<code>.npmrc</code>ファイルで気になるところがあったので、メモを残しておく。</p>
+
+<h2>公開時</h2>
+
+<p>オーナーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package">公開する場合</a>、<code>.npmrc</code>ファイルを編集して<code>registry</code>を編集しろとなっている。もちろんこれで公開できる(できた)けれど、npmの<code>audit</code>コマンドが動かなくなってしまった。</p>
+
+<pre><samp>$ <kbd>npm audit</kbd>
+npm ERR! code ENOAUDIT
+npm ERR! audit Your configured registry (https://npm.pkg.github.com/hail2u) does not support audit requests.
+npm ERR! audit The server said: 404 page not found
+npm ERR! audit</samp></pre>
+
+<p>それはそうかというエラーだが、これは困る。後述のスコープで絞る方法で設定しても良いようだが、ヘルプに併記されている<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#publishing-a-package-using-publishconfig-in-the-packagejson-file"><code>package.json</code>ファイルで<code>publishConfig</code>フィールドを使う方法</a>でもうまくいく。</p>
+
+<pre><code class="language-json">{
+  "name": "@hail2u/css-mqpacker",
+  "version": "8.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hail2u/node-css-mqpacker.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}</code></pre>
+
+<p><code>.npmrc</code>ファイルを編集する場合と違い、<code>registry</code>フィールドの値にはオーナー名まで含めなくていい。こちらは「公開設定」というそのものズバリのフィールドで設定することになるので、わかりやすいと感じた。他に<code>.npmrc</code>ファイルを使う必要がない場合に、ファイルが増えないという点でもやりやすい。</p>
+
+<h2>インストール時</h2>
+
+<p>ユーザーとして<a href="https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-npm-for-use-with-github-packages#installing-a-package">インストールする場合</a>も、<code>.npmrc</code>ファイルを編集して<code>registry</code>を設定しろとなっている。しかし、これだと影響範囲が大きすぎるような気がする。npmの<code>audit</code>コマンドが動かないのも同じだ。</p>
+
+<pre><code class="language-ini">@hail2u:registry=https://npm.pkg.github.com/</code></pre>
+
+<p>このようにスコープで絞って設定してやっても大丈夫だった。これならプリフィックスで<code>@hail2u</code>を持つ依存パッケージのみがGitHub Packagesを見に行くだろう。</p>
+
+<hr>
+
+<p>ローカルの<code>.npmrc</code>ファイルを使ったことがなかったので、基本的な知識がなく混乱した。registryを変更する場合は「とりあえずスコープをつける」などと覚えるだけも良いのかもしれない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

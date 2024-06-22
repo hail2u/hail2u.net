@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>hAtomに対応した</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/hatom.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="フィードの将来を模索してるとやはりhAtomは避けて通れないかなーという感じなので、今更ながら対応した。blosxomのビルトイン変数とフレーバーで実現できるのでそんなに面倒でもない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="フィードの将来を模索してるとやはりhAtomは避けて通れないかなーという感じなので、今更ながら対応した。blosxomのビルトイン変数とフレーバーで実現できるのでそんなに面倒でもない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="hAtomに対応した" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-04-07T04:30:45+09:00">2011年4月7日</time></p>
+
+        <h1><em>hAtomに対応した</em></h1>
+      </header>
+
+    <main>
+
+    <p>フィードの将来を模索してるとやはり<a href="http://microformats.org/wiki/hatom">hAtom</a>は避けて通れないかなーという感じなので、今更ながら対応した。blosxomのビルトイン変数とフレーバーで実現できるのでそんなに面倒でもない。</p>
+
+<pre><code class="language-html">&lt;div class=&quot;hentry&quot; id=&quot;$fn&quot;&gt;
+  &lt;h3 class=&quot;entry-title&quot;&gt;&lt;a rel=&quot;bookmark&quot; href=&quot;$url$path/$fn.$default_flavour&quot;&gt;$title&lt;/a&gt;&lt;/h3&gt;
+
+  &lt;div class=&quot;entry-content&quot;&gt;$body&lt;/div&gt;
+
+  &lt;p&gt;
+    Posted on
+    &lt;abbr class=&quot;published&quot; title=&quot;$yr-$mo_num-$da&amp;#54;$ti:00+09:00&quot;&gt;$da $mo, $yr&lt;/abbr&gt;
+    in
+    &lt;a rel=&quot;tag&quot; href=&quot;$url$path/&quot;&gt;$path&lt;/a&gt;
+  &lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+<p><code>updated</code>は必須だが、ない場合は<code>published</code>を見る<a href="http://microformats.org/wiki/hatom#Entry_Updated">ということになっている</a>ので、どちらかで良い。両方あってもいいけどblosxomでは<code>updated</code>を作るのはコストがかさむので目をつぶった方が良いと思う(似たような理由でフィードのフォーマットとしてAtomを使用するのをずいぶん前にやめた)。</p>
+
+<p>W3C DTFでの日付表示は数値文字参照で逃げるとプラグイン不要になる。パーサー側が対応してるかどうかはかなり疑問が残るのでinterpolate_fancyを使っている場合は、</p>
+
+<pre>$yr-$mo_num-$da&lt;?$fn&gt;T&lt;/?&gt;$ti:00+09:00</pre>
+
+<p>とかするのも良い。</p>
+
+<p><code>author</code>も必須だが、<code>hentry</code>以下になかった場合は親を辿って<code>vcard</code>というクラス名を含む<code>address</code>要素を探す<a href="http://microformats.org/wiki/hatom#Entry_Author">ということになっている</a>ので、こちらも省略可能。foot.htmlで以下のようにしておけば良いはず。</p>
+
+<pre><code class="language-html">&lt;address class=&quot;vcard author&quot;&gt;
+  &lt;a href=&quot;http://example.com/about&quot; class=&quot;fn&quot;&gt;John Doe&lt;/a&gt;
+&lt;/address&gt;</code></pre>
+
+<p><code>address</code>要素縛りが謎い。複数著者の場合どうするんだろ。</p>
+
+<p>フィードはまだまだ有用なものだと思うんだけど、概要がしっかりしてるフィードがないことやフィードを横断的に整理してくれるツールがまだまだ少ないことなどを理由として、<em>利用形態的に</em>行き詰まってる感じが強い。Facebookのハイライトのような時系列にあまりとらわれない形のものでフィードを利用したものがもっと増えれば「終わコン」とか言われないで済む気がする。それでも出力と配信のコスト的に「hAtomだけ」とかのが将来性ありそうな気がするけど……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

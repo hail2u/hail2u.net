@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>jQueryプラグイン: Highlight Search Terms</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/jquery-highlight-search-terms-plugin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="前回のエントリで取り上げたスクリプトをjQueryプラグイン化した。だけ。GitHubにリポジトリを作って公開しておいた。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装はhighlight-1とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="jQueryプラグイン: Highlight Search Terms" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-06-04T11:26:19+09:00">2009年6月4日</time></p>
+
+        <h1><em>jQueryプラグイン: Highlight Search Terms</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="/blog/coding/highlight-search-terms.html">前回のエントリ</a>で取り上げたスクリプトをjQueryプラグイン化した。だけ。<a href="http://github.com/hail2u/jquery.highlight-search-terms">GitHubにリポジトリを作って公開しておいた</a>。基本的にはこれでもう良いやとか思ってるんだけど、URLパターンはもうちょっと何とかならないかなとかは思ってる。あとマルチカラーなハイライトを実現できるようにはしたいかも。実装は<code>highlight-1</code>とかクラス名を順に振っていくだけとか簡単そうなものになると思う(そこまで考えてるなら実装しろ)。</p>
+
+<p>使い方は多くのjQueryプラグインと同じで、</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms();</code></pre>
+
+<p>と検索語のハイライトを行いたい要素からつなげて使う。プラグイン側でインライン・スタイルを付加したりはしないので、デフォルトの<code>em.highlight</code>に対してスタイル指定をあらかじめしておく必要がある。</p>
+
+<p><code>highlightSearchTerms()</code>にはオプションとして、</p>
+
+<pre><code class="language-js">
+$(&quot;body&quot;).highlightSearchTerms({
+  className: &quot;search-keyword&quot;,
+  referrerPatterns: [
+    &quot;^http://ask\.jp.+[?&amp;]q=([^&amp;]+).*$&quot;
+  ],
+  unsafeChars: &quot;[!-*,-/:-@[-`{-~]&quot;
+});</code></pre>
+
+<p>このように指定することができる。</p>
+
+<p><code>className</code>は強調する時に使用する<code>em</code>要素に指定される<code>class</code>属性。デフォルトは<code>highlight</code>。</p>
+
+<p><code>referrerPatters</code>はリファラを評価する正規表現のパターン。配列なので複数指定可能。デフォルトでGoogle(comとco.jp)・Yahoo!(comとco.jp)・Bingの計5つが設定されており、オプションで指定されたものとマージされる。オプションで指定したものが先に評価され、マッチした時点で評価のループを抜けるので、デフォルトのパターンよりも優先されることになる(上書きではないが、近い挙動になる)。例えば自分のサイト内検索のリファラを拾うようにするためには、</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+  referrerPatterns: [
+    &quot;^http://hail2u\.net.+[?&amp;]q=([^&amp;]+).*$&quot;
+  ]
+});</code></pre>
+
+<p>とかしてやれば良い(これはこのサイトの場合の例)。</p>
+
+<p><code>unsafeChars</code>は検索語から削除する文字列の正規表現パターン。デフォルトではほとんど全ての半角記号を削除するようになっている。なので、記号が強調されることはない。あまり指定する必要はないと思うが一応。むしろデフォルトの削除パターンをもっと充実させたい。このオプション指定は追加ではなく上書きなので注意が必要。</p>
+
+<p>また、デバッグ用に<code>referrer</code>というオプションがある。</p>
+
+<pre><code class="language-js">$(&quot;body&quot;).highlightSearchTerms({
+  referrer: &quot;http://www.google.com/search?q=lorem+ipsum+dolor+sit+amet&quot;
+});</code></pre>
+
+<p>とすることによって<code>document.referrer</code>の代わりに<code>referrer</code>で指定されたURL(URLじゃなくても通っちゃうけど)が検索語の取り出し元になる。なので、色々なリファラを想定して試すことができる。</p>
+
+<p>ビルトインのリファラ・パターンはパブリックにしてあるので上書きしてしまうことも可能。だが、オプションで優先して評価させることができるのでそっちを使った方が無難だと思う。コードも汚くなっちゃうし。</p>
+
+<p>内容のコードはあまり変わっていない。変えたところは<code>$(&quot;*&quot;).not(&quot;iframe&quot;)</code>というような感じで書いていた部分を<code>find()</code>と<code>:not()</code>セレクタを使うようにしたことくらい。</p>
+
+<pre><code class="language-js">this.find(&quot;:not(iframe)&quot;).contents().each();</code></pre>
+
+<p>という感じになっている。jQueryのここらへんの柔軟性はすごくて、XPathなんか目じゃないね(おおげさ)。</p>
+
+<p>検索サイトのURLパターンとか調べて書くのがちょっと面倒だったので、こういうのはオープンなデータベースがあったら便利かもしれないなと思った。パラメータごとにきちんと分けてデータベース化すれば、こういうリファラから検索語を強調するスクリプト(ユーザー・スクリプトも含め)とかに使う以外にも、アクセスログ解析とかは勿論、逆に検索を投げるためにも使えそう。「言うだけならタダだよね」。ですよねー。てか知らないだけで既にありそうな気もする(検索してない)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

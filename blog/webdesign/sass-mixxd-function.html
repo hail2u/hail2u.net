@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>mixxd()というSassの関数を作った</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/sass-mixxd-function.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="rgba()のエミュレートにはadjust-rgb()だけでは不十分なので、ちゃんと背景色と混ぜるmixxd()という関数を作りました。mix()の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="rgba()のエミュレートにはadjust-rgb()だけでは不十分なので、ちゃんと背景色と混ぜるmixxd()という関数を作りました。mix()の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="mixxd()というSassの関数を作った" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-12-27T05:24:14+09:00">2011年12月27日</time></p>
+
+        <h1><em>mixxd()というSassの関数を作った</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>rgba()</code>のエミュレートには<a href="/blog/webdesign/sass-adjust-rgb-function.html"><code>adjust-rgb()</code></a>だけでは不十分なので、ちゃんと背景色と混ぜる<code>mixxd()</code>という関数を作りました。<code>mix()</code>の第三引数が小数のバージョンで、xdはBy Decimalの略です。ユーザー定義関数のうまい命名規則欲しいなぁ……。</p>
+
+<pre><code class="language-scss">@function mixxd($color-1, $color-2, $weight: 0.5) {
+  $percentage: percentage(1 - $weight);
+
+  @return mix($color-1, $color-2, $percentage);
+}</code></pre>
+
+<p><code>rgba()</code>や<code>transparentize()</code>と同じ小数を引数に取ることが出来るので、%を引数に取る<code>mix()</code>よりも混乱しにくいんじゃないかと思います。</p>
+
+<pre><code class="language-scss">$bg: #f9f6f0;
+
+body {
+  background-color: $bg;
+
+  &gt; footer {
+    background-color: mix(black, $bg, 0.9);
+    background-color: transparentize(black, 0.9);
+    // background-color: rgba(0, 0, 0, 0.9);
+  }
+}</code></pre>
+
+<p>第一引数でベースになる色、第二引数で混ぜる対象の背景色、第三引数で混ぜる割合を指定して使います。割合は0に近づくほどベースになる色に近づき、1に近づくほど混ぜる対象の背景色に近づくので、<code>rgba()</code>の透過率とほぼ同じと考えてください。小数点以下の扱いがSass任せなので完全に一致はしませんが、ほぼ同じような色合いになると思います。背景画像と混ぜる場合は……まぁ頑張って工夫してください。</p>
+
+<hr>
+
+<p><code>mix()</code>で小数が通るということに気づいて「うわ無駄なことした……」とか一瞬思ったんですが、そんなことはなかったので良かったです。</p>
+
+<pre><samp>$ <kbd>sass -i</kbd>
+&gt;&gt; <kbd>mix(black, white, 0.1)</kbd>
+#fefefe
+&gt;&gt; <kbd>mix(black, white, 0.1%)</kbd>
+#fefefe
+&gt;&gt; <kbd>mix(black, white, 0.9)</kbd>
+#fcfcfc
+&gt;&gt; <kbd>mix(black, white, 0.9%)</kbd>
+#fcfcfc</samp></pre>
+
+<p>インタラクティブ・モードで試すとこういう感じなので、通ることは通るんですが%とみなされている感じですね。エラー吐かないのはバグでしょう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

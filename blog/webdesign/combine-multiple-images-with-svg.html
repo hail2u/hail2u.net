@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>SVGで複数の画像をまとめる</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/combine-multiple-images-with-svg.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="アイコン(image/vnd.microsoft.icon)のような複数解像度をまとめる仕組みを考えている。SVGを使ってアイコンとほぼ同等なんじゃないかみたいなことは比較的簡単に出来たけど、全部の画像をリクエストしてしまうので使いものにはならなそう。というメモ。メモ多い。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="アイコン(image/vnd.microsoft.icon)のような複数解像度をまとめる仕組みを考えている。SVGを使ってアイコンとほぼ同等なんじゃないかみたいなことは比較的簡単に出来たけど、全部の画像をリクエストしてしまうので使いものにはならなそう。というメモ。メモ多い。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="SVGで複数の画像をまとめる" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-06-25T03:11:56+09:00">2012年6月25日</time></p>
+
+        <h1><em>SVGで複数の画像をまとめる</em></h1>
+      </header>
+
+    <main>
+
+    <p>アイコン(<code>image/vnd.microsoft.icon</code>)のような複数解像度をまとめる仕組みを考えている。SVGを使ってアイコンとほぼ同等なんじゃないかみたいなことは比較的簡単に出来たけど、全部の画像をリクエストしてしまうので使いものにはならなそう。というメモ。メモ多い。</p>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;svg
+  version="1.1"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns="http://www.w3.org/2000/svg"&gt;
+  &lt;defs&gt;
+    &lt;style type="text/css"&gt;
+      &lt;![CDATA[
+        image {
+          display: none;
+        }
+
+        @media screen and (-webkit-max-device-pixel-ratio: 1.999) {
+          #x1 {
+            display: inline;
+          }
+        }
+
+        @media screen and (-webkit-min-device-pixel-ratio: 2) {
+          #x2 {
+            display: inline;
+          }
+        }
+      ]]&gt;
+    &lt;/style&gt;
+  &lt;/defs&gt;
+  &lt;svg viewbox="0 0 180 180"&gt;
+    &lt;image
+      xlink:href="default.png"
+      id="x1"/&gt;
+  &lt;/svg&gt;
+  &lt;svg viewbox="0 0 360 360"&gt;
+    &lt;image
+      xlink:href="retina.png"
+      id="x2"/&gt;
+  &lt;/svg&gt;
+&lt;/svg&gt;</code></pre>
+
+<p>PNG画像へのリンクだけを含むSVG画像を複数まとめて、<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>で分岐するというもの。<code>viewbox</code>属性を怠らなければ適切なサイズでブラウザーには表示されるはず。<code>img</code>要素でもCSSからでも使えると思う。とりあえずな感じなので<code>device-pixel-ratio</code>を使ったクエリーでやってみたけど、将来的には<code>resolution</code>と<code>dppx</code>単位の組み合わせになりそう。</p>
+
+<p>直接参照するのではなくSVGでは透明な<code>rect</code>要素で幅と高さを確保するにとどめておいて、メディアクエリー内で背景として仕込むみたいにすればリクエストも必要なものだけになるような気がする……けどもう飽きた。</p>
+
+<p>ありものでできれば<code>img</code>要素の<code>srcset</code>属性や<code>-webkit-image-set</code>関数のpolyfill的なものを作れるかなーと思ったけど、まぁそううまくはいかないか。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

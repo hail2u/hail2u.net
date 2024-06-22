@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>RSS Tutorial for Content Publishers and Webmasters</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/rss-tutorial.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このチュートリアルはRSSと呼ばれるウェブ上で利用されるフォーマットの特徴や利点を解説し、更にその技術的な概要も手短に説明します。また、RSSと同じようなフォーマットであるAtomについての情報も含まれます。読者はXMLやその他ウェブ上で利用される技術について良く知っていることと仮定します。このチュートリアルは徹底的なものではないので、より多くの情報については更なる情報セクションを参照してください." name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このチュートリアルはRSSと呼ばれるウェブ上で利用されるフォーマットの特徴や利点を解説し、更にその技術的な概要も手短に説明します。また、RSSと同じようなフォーマットであるAtomについての情報も含まれます。読者はXMLやその他ウェブ上で利用される技術について良く知っていることと仮定します。このチュートリアルは徹底的なものではないので、より多くの情報については更なる情報セクションを参照してください." property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="RSS Tutorial for Content Publishers and Webmasters" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-07-23T00:00:00+09:00">2005年7月23日</time></p>
+
+        <h1><em>RSS Tutorial for Content Publishers and Webmasters</em></h1>
+      </header>
+
+    <main>
+
+    <p>このチュートリアルはRSSと呼ばれるウェブ上で利用されるフォーマットの特徴や利点を解説し、更にその技術的な概要も手短に説明します。また、RSSと同じようなフォーマットであるAtomについての情報も含まれます。読者はXMLやその他ウェブ上で利用される技術について良く知っていることと仮定します。このチュートリアルは徹底的なものではないので、より多くの情報については<a href="#Related">更なる情報</a>セクションを参照してください.</p>
+
+<ol>
+<li><a href="#Intro">RSSの概説</a>
+<ol>
+<li><a href="#What">フィードには何が入っているのか？</a></li>
+<li><a href="#How">フィードはどうやって使うのか？</a></li>
+<li><a href="#Why">なぜフィードを用意すべきなのか？</a></li>
+<li><a href="#Rights">しかし、僕のコンテンツを寄付することになるのではないか？</a></li>
+</ol>
+</li>
+<li><a href="#Content">フィードに含めるコンテンツを選択する</a></li>
+<li><a href="#Publishing">フィードを公開する</a></li>
+<li><a href="#Telling">フィードを通知する</a></li>
+<li><a href="#Versions">バージョン</a>
+<ol>
+<li><a href="#RSS09x">RSS 2.0</a></li>
+<li><a href="#RSS10">RSS 1.0</a>
+<ol>
+<li><a href="#DC">Dublin Coreモジュール</a></li>
+</ol>
+</li>
+<li><a href="#Atom">Atom</a></li>
+</ol>
+</li>
+<li><a href="#Choose">どのフォーマットを選択するべきか？</a></li>
+<li><a href="#Tips">良いフィードを生成するためのテクニック</a></li>
+<li><a href="#Tools">フィード・ツール</a></li>
+<li><a href="#Related">更なる情報</a></li>
+<li><a href="#About">この文書について</a></li>
+</ol>
+
+<h2 id="Intro">RSSの概説</h2>
+
+<p>ニュース・ヘッドラインや検索結果、更新履歴、雇用情報など、日々アクセスするウェブ上の情報について考えてみてください。それらの大量なコンテンツはリスト、おそらくHTMLの<code>li</code>要素ではないですが、リスト的な傾向を持つ情報と考えることが出来ます。</p>
+
+<p>多くの人々はたくさんのこれらリストを追いかける必要がありますが、ひとたび手に余るほどの量になったら追いかけることは難しくなります。それぞれのページを訪問し、読み込み、どのようなページであったかを思い出した上で、リストの最後にチェックした時の場所を探さなければならないからです。</p>
+
+<p>RSSはXMLベースのフォーマットなので、他の情報やメタデータと共にハイパーリンク、閲覧者がそのリンクを辿るかどうか決められるように、のリストを配信することが出来ます。</p>
+
+<p>また、コンピューターで情報を取得し理解することができるので、全ての興味のあるリストを追いかけ、個人々々に合わせることが可能です。つまり、これはむしろHTMLのように直接人々に見せられるものではなく、人に代わってコンピューターが利用するためのフォーマットです。</p>
+
+<p>これを可能にするためには、ウェブサイトは他のファイルやリソースと同じように利用できるフィード、またはチャンネルを作成しなければならないでしょう。一度フィードを用意したのならば、コンピューターはリストの最新の項目を得るために定期的にそれを取得することが出来るようになります。大抵の場合、人々はそれをアグリゲーター、単一のインターフェイスで管理と表示を行うことの出来るプログラム、で行うでしょう。</p>
+
+<p>フィードはリスト的な傾向を持つ情報、例えばリンクと共に内容物そのものの配信(ウェブログのような)、にも使うことが出来ます。しかし、このチュートリアルではリンクの配信にRSSを利用することに焦点を置きます。</p>
+
+<h3 id="What">フィードには何が入っているのか？</h3>
+
+<p>フィードはリンクによって特定されるアイテムまたはエントリのリストから成ります。それぞれのアイテムは、同じようにリンクと関連付けられた様々なメタデータを持つことが出来ます。</p>
+
+<p>最も基本的なエントリのメタデータは、リンクのタイトルとその概要です。例えば、ニュース・ヘッドラインの配信の場合、これらはニュースの見出しと最初の段落または要約になるでしょう。例えば、シンプルなエントリは以下のようになります。</p>
+
+<pre>
+&lt;item&gt;
+  &lt;title&gt;Earth Invaded&lt;/title&gt;
+  &lt;link&gt;http://news.example.com/2004/12/17/invasion&lt;/link&gt;
+  &lt;description&gt;The earth was attacked by an invasion fleet
+  from halfway across the galaxy; luckily, a fatal
+  miscalculation of scale resulted in the entire armada
+  being eaten by a small dog.&lt;/description&gt;
+&lt;/item&gt;
+</pre>
+
+<p>加えて、フィードそのものもそれに関連付けられるメタデータを持つことが出来るので、タイトル(例: &quot;Bob’s news headlines&quot;)や概要、その他の発行者や著作権情報などを付記することが出来ます。</p>
+
+<p>完全なフィードがどのようなものかは、&quot;<a href="#Versions">フォーマットのバージョンとモジュール</a>&quot;を参照してください。</p>
+
+<h3 id="How">フィードはどうやって使うのか？</h3>
+
+<p>アグリゲーターが一般的なフィードを利用するもので、それらには様々なタイプのものがあります。ウェブ・アグリゲーター(ポータルなどと呼ばれることもあります)はフィードをウェブ・ページに表示してくれます。代表的なものは<a href="http://my.yahoo.com/">My Yahoo!</a>でしょう。アグリゲーターはE-メール・クライアントやユーザーのデスクトップに統合された形、または独立した専用のソフトウェアとして提供されているかもしれません。</p>
+
+<p>アグリゲーターは、複数の関連したフィードをまとめて表示する機能や既に閲覧したエントリを隠す機能、フィードやエントリをカテゴリ分けする機能などいろいろな機能を提供します。</p>
+
+<p>フィードの他の利用としては、フィードは機械的に扱え、検索エンジンはサイトのどの部分が重要であるかどうかやどの部分が単なるナビゲーションや広告であるかどうかを把握する必要が無いため、検索エンジンやその他ソフトウェアでサイトのトラッキングに利用することが挙げられます。人々が彼らのウェブ・サイトでフィードを再利用すること、必要に応じてあなたのコンテンツを表示するといったことを許可することもできます。</p>
+
+<h3 id="Why">なぜフィードを用意すべきなのか？</h3>
+
+<p>Your viewers will thank you, and there will be more of them, because it allows them to see your site without going out of their way to visit.</p>
+
+<p>While this seems bad at first glance, it actually improves your site’s visibility; by making it easier for your users to keep up with your site - allowing them to see it the way they want to - it’s more likely that they’ll know when something that interests them is available on your site.</p>
+
+<p>For example, imagine that your company announces a new product or feature every month or two. Without a feed, your viewers have to remember to come to your site and see if they find anything new - if they have time. If you provide a feed for them, they can point their aggregator or other software at it, and it will give them a link and a description of developments at your site almost as soon as they happen.</p>
+
+<p>News is similar; because there are so many sources of news on the Web, most of your viewers won’t come to your site every day. By providing a feed, you are in front of them constantly, improving the chances that they’ll click through to an article that catches their eye.</p>
+
+<h3 id="Rights">しかし、僕のコンテンツを寄付することになるのではないか？</h3>
+
+<p>いいえ！(あなたが望むなら)あなたは依然として自分のコンテンツに対する著作権を保有します。</p>
+
+<p>フィードで配信する情報を、完全な内容か煽りだけかといったように制御することもできます。Your content can still be protected by your current access control mechanisms; only the links and metadata are distributed. You can also protect the RSS feed itself with SSL encryption and HTTP username/password authentication too, if you’d like.</p>
+
+<p>In many ways, syndication is similar to the subscription newsletters that many sites offer to keep viewers up-to-date. The big difference is that they don’t have to supply an e-mail address, lowering the barrier of privacy concerns, while still giving you a direct channel to your viewers. Also, they get to see the content in the manner that’s most convenient to them, which means that you get more eyes looking at your content.</p>
+
+<h2 id="Content">フィードに含めるコンテンツを選択する</h2>
+
+<p>Any list-oriented information on your site that your viewers might be interested in tracking or reusing is a good candidate for a feed. This can encompass news headlines and press releases, job listings, conference calendars and rankings (like ‘top 10’ lists).</p>
+
+<p>For example;</p>
+
+<ul>
+<li>News &amp; Announcements - headlines, notices and any list of announcements that are added to over time</li>
+<li>Document listings - lists of added or changed pages, so that people don’t need to constantly check for different content</li>
+<li>Bookmarks and other external links - while most people use RSS for sharing links from their own sites, it’s a natural fit for sharing lists of external links</li>
+<li>Calendars - listings of past or upcoming events, deadlines or holidays</li>
+<li>Mailing lists - to compliment a Web-based archive of public or private e-mail lists</li>
+<li>Search results - to let people track changing or new results to their searches</li>
+<li>Databases - job listings, software releases, etc.</li>
+</ul>
+
+<p>While it’s a good start to have a “master feed” for your site that lists recent news and events, don’t stop there. Generally, each area of your site that features a changing list of information should have a corresponding feed; this allows viewers to precisely target their interests.</p>
+
+<p>For example, if your news site has pages for World news, national news, local news, business, sports, etc., there should be a feed for each of these sections.</p>
+
+<p>If your site offers a personalized view of data (e.g., people can choose categories of information that will show up on their home page), offer this as a feed, so that the viewers’ Web pages match the content of their feeds.</p>
+
+<p>A great example of this is the variety of feeds that Netflix provides; not only can you keep track of new releases, but also personalised reccommendations and even a listing of the movies in your queue.</p>
+
+<p>Another good example is Apple’s iTunes Music Store RSS feed generator; you can customize it based on your preferences, and the views it allows match those provided in the Music Store itself.</p>
+
+<p>Finally, remember that feeds are just as - if not more - useful on an Intranet as they are on the Internet. Syndication can be a powerful tool for sharing and integrating information inside a company.</p>
+
+<h2 id="Publishing">フィードを公開する</h2>
+
+<p>There are a number of ways to generate a feed from your content. First of all, explore your content management system - it might already have an option to generate an RSS feed.</p>
+
+<p>If that option isn’t available, you have a number of choices;</p>
+
+<ul>
+<li>Self-scraping - The easiest way to publish a feed from existing content. Scraping tools fetch your Web page and pull out the relevant parts for the feed, so that you don’t have to change your publishing system. Some use regular expressions or XPath expressions, while others require you to mark up your page with minimal hints (usually using &lt;div&gt; or &lt;span&gt; tags) that help it decide what should be put into the feed.</li>
+<li>Feed integration - If your site is dynamically generated (using languages like Perl, Python or PHP), it may have a RSS library available, so that you can integrate the feed into your publishing process.</li>
+<li>Starting with the feed - Alternatively, you can manage the list-oriented parts of your content in the RSS feed itself, and generate your Web pages (as well as other content, like e-mail lists) from the feed. This has the advantage of always having the correct information in the feed, and tools like XSLT make this option easy, especially if you’re starting from scratch.</li>
+<li>Third party scraping - If none of these options work for you, some people on the Web will scrape your site for you and make the feed available. Be warned, however, that this is never as reliable or accurate as doing it yourself, because they don’t know the details of your content or your system. Also, using third parties introduces another point of failure in the delivery process; problems there (network, server or business) will cause your feed to be unavailable.</li>
+</ul>
+
+<p>For more information about all of these options, see “Feed Tools” and “More Information”.</p>
+
+<h2 id="Telling">フィードを通知する</h2>
+
+<p>An important step after publishing a feed is letting your viewers know that it exists; there are a lot of feeds available on the Web now, but it’s hard to find them, making it difficult for viewers to utilize them.</p>
+
+<p>Pages that have an associated RSS feed should clearly indicate this to viewers by using a link containing like ‘RSS feed’. For example,</p>
+
+<pre>
+    &lt;a type=&quot;application/rss+xml&quot; href=&quot;feed.rss&quot;&gt;RSS feed for this page&lt;/a&gt;
+</pre>
+
+<p>where ‘feed.rss’ is the URL for the feed. the ‘type’ attribute tells browsers that this is a link to an RSS feed in a way that they understand.</p>
+
+<p>Additionally, some programs look for a link in the &lt;head&gt; section of your HTML. To support this, include a &lt;link&gt; tag;</p>
+
+<pre>
+&lt;head&gt;
+  &lt;title&gt;My Page&lt;/title&gt;
+  &lt;link rel=&quot;alternate&quot;
+ type=&quot;application/rss+xml&quot;
+ href=&quot;feed.rss&quot;
+ title=&quot;RSS feed for My Page&quot;&gt;
+&lt;/head&gt;
+</pre>
+
+<p>These links should be placed on the Web page that is most similar to the feed content; this enables people to find them as they browse.</p>
+
+<p>Note that Atom feeds should use application/atom+xml rather than application/rss+xml in both styles of use.</p>
+
+<p>Finally, there are a number of guides and registries for RSS feeds that people can search and browse through, much like the Yahoo directory for Web sites; it’s a good idea to register your feed; see More Information.</p>
+
+<h2 id="Versions">フォーマットのバージョンとモジュール</h2>
+
+<p>There are a number of different versions of the RSS format in use today, but the main choices are RSS 1.0 and RSS 2.0. Each version has its benefits and drawbacks; RSS 2.0 is known for its simplicity, while RSS 1.0 is more extensible and fully specified. Both formats are XML-based and have the same basic structure.</p>
+
+<p>There’s one more choice; Atom is an effort in the IETF (an Internet standards body) to come up with a well-documented, standard syndication format. Although it has a different name, it has the same basic functions as RSS, and many people use the term “RSS” to refer to RSS or Atom syndication.</p>
+
+<p>This section presents a quick overview of each; for more information, see their specifications and supporting materials.</p>
+
+<h3 id="RSS09x">RSS 2.0</h3>
+
+<p>RSS 2.0 is championed by UserLand’s Dave Winer. In this version, RSS stands for “Really Simple Syndication,” and simplicity is its focus.</p>
+
+<p>This branch of RSS is based on RSS 0.91, which was first documented at Netscape and later refined by Userland.</p>
+
+<p>Included in 2.0.1 - the latest stable version of this branch - are channel metadata like link, title, description; image, which allows you to specify a thumbnail image to display with the feed); webMaster and managingEditor, to identify who’s responsible for the feed, and lastBuildDate, which shows when the feed was last updated.</p>
+
+<p>Items have the standard link, title and description metadata, as well as other, more experimental facilities like enclosure, which allows attachments to be automatically downloaded (don’t expect these features to be supported by all aggregators, however). Finally, items can have a guid element that identifies the item uniquely; this allows some advanced functionality in some aggregators.</p>
+
+<p>Here’s an example of a minimal RSS 2.0 feed:</p>
+
+<pre>
+&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;rss version=&quot;2.0&quot;&gt;
+  &lt;channel&gt;
+ &lt;title&gt;Example Channel&lt;/title&gt;
+ &lt;link&gt;http://example.com/&lt;/link&gt;
+ &lt;description&gt;My example channel&lt;/description&gt;
+ &lt;item&gt;
+    &lt;title&gt;News for September the Second&lt;/title&gt;
+    &lt;link&gt;http://example.com/2002/09/01&lt;/link&gt;
+    &lt;description&gt;other things happened today&lt;/description&gt;
+ &lt;/item&gt;
+ &lt;item&gt;
+    &lt;title&gt;News for September the First&lt;/title&gt;
+    &lt;link&gt;http://example.com/2002/09/02&lt;/link&gt;
+ &lt;/item&gt;
+  &lt;/channel&gt;
+&lt;/rss&gt;
+</pre>
+
+<p>In the RSS 2.0 roadmap, Winer states that this branch is, for all practical purposes, frozen, except for clarifications to the specification.</p>
+
+<p>However, exensions to the format are allowed in separate modules, using XML Namespaces to avoid conflicts in their names. For example, if you had an ISBN module to track books, it might look like this;</p>
+
+<pre>
+&lt;item xmlns:book=&quot;http://namespace.example.com/book/1.0&quot;&gt;
+  &lt;title&gt;Excession&lt;/link&gt;
+  &lt;link&gt;http://www.amazon.com/exec/obidos/tg/detail/-/0553575376&lt;/link&gt;
+  &lt;book:isbn&gt;0553575376&lt;/book:isbn&gt;
+&lt;/item&gt;
+</pre>
+
+<p>Generally, though, you should look for available RSS Modules, rather than defining your own, unless you’re sure that what you need doesn’t exist.</p>
+
+<h3 id="RSS10">RSS 1.0</h3>
+
+<p>RSS 1.0 stands for “RDF Site Summary.” This flavor of RSS incorporates RDF, a Web standard for metadata. Because RSS 1.0 uses RDF, any RDF processor can understand RSS without knowing anything about it in particular. This allows syndicated feeds to easily become part of the Semantic Web.</p>
+
+<p>RSS 1.0 also uses XML Namespaces to allow extensions, in a manner similar to RSS 2.0.</p>
+
+<p>RSS 1.0 feeds look very similar to RSS 2.0 feeds, with a few key differences;</p>
+
+<ul>
+<li>The entire feed is wrapped in &lt;rdf:RDF&gt; … &lt;/rdf:RDF&gt; elements (so that processors know that it’s RDF)</li>
+<li>Each &lt;item&gt; has an rdf:about attribute that usually, but not always, matches the &lt;link&gt;; this assigns an identifier to each item</li>
+<li>There’s an &lt;items&gt; element in the channel metadata that contains a list of items in the channel, so that RDF processors can keep track of the relationship between the items</li>
+<li>Some metadata uses the rdf:resource attribute to carry links, instead of putting it inside the element.</li>
+</ul>
+
+<p>RSS 1.0 is developed and maintained by an ad hoc group of interested people; see their Web site for more information about RSS 1.0 and RSS Modules. See below for an example of an RSS 1.0 feed.</p>
+
+<h4 id="DC">Dublin Coreモジュール</h4>
+
+<p>The most well-known example of an RSS 1.0 Module is the Dublin Core Module. The Dublin Core is a set of metadata developed by librarians and information scientists that standardizes a set of common metadata that is useful for describing documents, among other things. The Dublin Core Module uses these metadata to attach information to both feeds (in the channel metadata) and to individual items.</p>
+
+<p>This module includes useful elements like dc:date, for associating dates with items, dc:subject, which can be useful for categorizing items or feeds, and dc:rights, for dictating the intellectual property rights associated with an item or a feed.</p>
+
+<p>Here’s an example of a minimal RSS 1.0 feed that uses the Dublin Core Module:</p>
+
+<pre>
+&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;rdf:RDF
+  xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+  xmlns=&quot;http://purl.org/rss/1.0/&quot;
+  xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;&gt;
+  &lt;channel rdf:about=&quot;http://example.com/news.rss&quot;&gt;
+ &lt;title&gt;Example Channel&lt;/title&gt;
+ &lt;link&gt;http://example.com/&lt;/link&gt;
+ &lt;description&gt;My example channel&lt;/description&gt;
+ &lt;items&gt;
+   &lt;rdf:Seq&gt;
+     &lt;rdf:li resource=&quot;http://example.com/2002/09/01/&quot;/&gt;
+     &lt;rdf:li resource=&quot;http://example.com/2002/09/02/&quot;/&gt;
+   &lt;/rdf:Seq&gt;
+ &lt;/items&gt;
+  &lt;/channel&gt;
+  &lt;item rdf:about=&quot;http://example.com/2002/09/01/&quot;&gt;
+  &lt;title&gt;News for September the First&lt;/title&gt;
+  &lt;link&gt;http://example.com/2002/09/01/&lt;/link&gt;
+  &lt;description&gt;other things happened today&lt;/description&gt;
+  &lt;dc:date&gt;2002-09-01&lt;/dc:date&gt;
+  &lt;/item&gt;
+  &lt;item rdf:about=&quot;http://example.com/2002/09/02/&quot;&gt;
+  &lt;title&gt;News for September the Second&lt;/title&gt;
+  &lt;link&gt;http://example.com/2002/09/02/&lt;/link&gt;
+  &lt;dc:date&gt;2002-09-02&lt;/dc:date&gt;
+  &lt;/item&gt;
+&lt;/rdf:RDF&gt;
+</pre>
+
+<p>As you can see, RSS 1.0 is a bit more verbose than 2.0, mostly because it needs to be compatible with other versions of RSS while containing the markup that RDF processors need.</p>
+
+<h3 id="Atom">Atom</h3>
+
+<p>Both RSS 1.0 and 2.0 are informal specifications; that is, they aren’t published by a well-known standards body or industry consortium, but instead by a small group of people.</p>
+
+<p>Some people are concerned by this, because such specifications can be changed at the whim of the people who control it. Standards bodies bring stability, by limiting change and having well-established procedures for introducing it. To introduce such stability to syndication, a group of people established an IETF Working Group to standardise a format called Atom.</p>
+
+<p>Atom is functionally similar to both branches of RSS, and is also an XML-based format.</p>
+
+<p>For example;</p>
+
+<pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
+  &lt;title&gt;Example Feed&lt;/title&gt;
+  &lt;link href=&quot;http://example.org/&quot;/&gt;
+  &lt;updated&gt;2003-12-13T18:30:02Z&lt;/updated&gt;
+  &lt;author&gt;
+ &lt;name&gt;John Doe&lt;/name&gt;
+  &lt;/author&gt;
+  &lt;id&gt;urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6&lt;/id&gt;
+  &lt;entry&gt;
+ &lt;title&gt;Atom-Powered Robots Run Amok&lt;/title&gt;
+ &lt;link href=&quot;http://example.org/2003/12/13/atom03&quot;/&gt;
+ &lt;id&gt;urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a&lt;/id&gt;
+ &lt;updated&gt;2003-12-13T18:30:02Z&lt;/updated&gt;
+ &lt;summary&gt;Some text.&lt;/summary&gt;
+  &lt;/entry&gt;
+&lt;/feed&gt;
+</pre>
+
+<p>As you can see, Atom has a feed element that contains both the feed-level metadata as well as the entrys (analogous to RSS’ items), and entry can contain similar metadata, such as title, link, id (instead of RSS 1.0’s rdf:about or RSS 2.0’s guid), and a short textual summary (instead of RSS’ description).</p>
+
+<p>Generally, Atom isn’t as widely supported as RSS 1.0 or 2.0 right now, because it’s relatively new. However, it should catch up quickly, because of the broad base of vendors supporting the standardisation effort.</p>
+
+<h2 id="Choose">どのフォーマットを選択するべきか？</h2>
+
+<p>One of the most confusing and unfortunate problems in syndication is the large number of formats in use. In addition to those listed above, there are many other formats (e.g., RSS 0.9, 0.91, 0.92) that are commonly encountered on the Web.</p>
+
+<p>For better or worse, the decision isn’t as critical as you might think. Most aggregators and other software use syndication libraries which abstract out the particular format that a feed is in, so that they can consume any popular syndication feed.</p>
+
+<p>As a result, which format to choose is a matter of personal taste. RSS 1.0 is very extensible, and useful if you want to integrate it into Semantic Web systems. RSS 2.0 is very simple and easy to author by hand. Atom is now an IETF Standard, bringing stability and a natural community to support its use.</p>
+
+<h2 id="Tips">良いフィードを生成するためのテクニック</h2>
+
+<p>RSS and Atom are easy to work with, but like any new format, you may encounter some problems in using them. This section attempts to address the most common issues that arise when generating a feed.</p>
+
+<ul>
+<li>Distinct Entries - Make sure that aggregators can tell your entries apart, by using different identifiers in rdf:about (RSS 1.0), guid (RSS 2.0) and id (Atom). This will save a lot of headaches down the road.</li>
+<li>Meaningful Metadata - Try to make the metadata useful on its own; for example, if you only include a short &lt;title&gt;, people may not know what the link is about. By the same token, if you shove an entire article into &lt;description&gt;, it’ll crowd people’s view of the feed, and they’re less likely to stay interested in what you have to say. Generally, you want to put enough into the feed to help someone decide whether they should follow the link.</li>
+<li>Encoding HTML - Although it’s tempting, refrain from including HTML markup (like &lt;a href=&quot;...&quot;&gt;, &lt;b&gt; or &lt;p&gt;) in your RSS feed; because you don’t know how it will be presented, doing so can prevent your feed from being displayed correctly. If you need to include a a tag in the text of the feed (e.g., the title of an entry is “Ode to &lt;title&gt;”), make sure you escape ampersands and angle brackets (so that it would be “Ode to &lt;title&gt;”).</li>
+<li>XML Entities - Remember that XML doesn’t predefine entities like HTML does; therefore, you won’t have &amp;nbsp; &amp;copy; and other common entities available. You can define them in the XML, or alternatively just use an character encoding that makes what you need available.</li>
+<li>Character Encoding - Some software generates feeds using Windows character sets, and sometimes mislabels them. The safest thing to do is to encode your feed as UTF-8 and check it by parsing it with an XML parser.</li>
+<li>Communicating with Viewers - Don’t use entries in your feed to communicate to your users; for example, some feeds have been known to use the &lt;description&gt; to dictate copyright terms. Use the appropriate element or module.</li>
+<li>Communicating with Machines - Likewise, use the appropriate HTTP status codes if your feed has relocated (usually, 301 Moved Permanently) or is no longer available (410 Gone or 404 Not Found).</li>
+<li>Making your Feed Cache-Friendly - Successful feeds see a fair amount of traffic because clients poll them often to see if they’ve changed. To support the load, Web Caching can help; see the caching tutorial.</li>
+<li>Validate - use the Feed Validator to catch any problems in your feed; it works with RSS and Atom. Also, don’t just run it once; make sure you regularly check your feed, so that you can catch transient errors.</li>
+</ul>
+
+<h2 id="Tools">フィード・ツール</h2>
+
+<p>This is an incomplete list of tools for creating feeds and checking them to make sure that you’ve done so correctly. Note that there are many more libraries that help parsing feeds; these haven’t been included here because this tutorial focuses on the Webmaster, not consumers of feeds.</p>
+
+<ul>
+<li>xpath2rss - Tool for scraping Web sites using XPath expressions (a method of selecting parts of HTML and XML documents).</li>
+<li>Site Summaries in XHTML - Online service (also available as an XSLT stylesheet) that uses hints in your HTML to generate a feed.</li>
+<li>myRSS - An online, third-party automated scraping service. Doesn’t require any special markup.</li>
+<li>RSS.py - Python library for generating and parsing RSS.</li>
+<li>ROME - Java library for parsing and generating RSS and Atom feeds, as well as translating between formats.</li>
+<li>XML::RSS - Perl module for generating and parsing RSS.</li>
+<li>Online Validator - Check your RSS 1.0, 2.0 and Atom feeds.</li>
+</ul>
+
+<h2 id="Related">更なる情報</h2>
+
+<ul>
+<li>Syndicated content - Good list of best practices for creating an RSS feed.</li>
+<li>Syndic8 - A community effort to gather, validate and search feeds with lots of other information.</li>
+<li>RSS Workshop - A well-regarded introduction to publishing RSS feeds, from the state of Utah Online Services division.</li>
+<li>RSS Devcenter - O’reilly’s Web portal for all things RSS.</li>
+</ul>
+
+<h2 id="About">この文書について</h2>
+
+<p>This document is Copyright &copy; 2002-2005 Mark Nottingham &lt;<a href="mailto:mnot@pobox.com">mnot@pobox.com</a>&gt;.
+
+
+<!-- Creative Commons License -->
+      This work is licensed under a <a href="http://creativecommons.org/licenses/by-nd-nc/2.0/">Creative Commons License</a>.
+<!-- /Creative Commons License --></p>
+
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+<license rdf:resource="http://creativecommons.org/licenses/by-nd-nc/2.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by-nd-nc/2.0/">
+<permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+<permits rdf:resource="http://web.resource.org/cc/Distribution" />
+<requires rdf:resource="http://web.resource.org/cc/Notice" />
+<requires rdf:resource="http://web.resource.org/cc/Attribution" />
+<prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+</License>
+</rdf:RDF>
+    -->
+
+<p>If you do mirror this document, please send e-mail to the address above, so that you can be informed of updates.</p>
+
+<p>All trademarks within are property of their respective holders.</p>
+
+<p>Although the author believes the contents to be accurate at the time of publication, no liability is assumed for them, their application or any consequences thereof. If any misrepresentations, errors or other need for clarification is found, please contact the author.</p>
+
+<p>The latest revision of this document can always be obtained from <a href="http://www.mnot.net/rss/tutorial/">http://www.mnot.net/rss/tutorial/</a></p>
+
+<p>Version 0.91 &#8212; September 7, 2005</p>
+
+<p><a href="http://creativecommons.org/licenses/by-nc-nd/2.0/"><img alt="Creative Commons License" src="http://creativecommons.org/img/public/somerights.gif"></a></p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

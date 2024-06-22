@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>IE11でのfile:プロトコルに対するHistory APIによる操作</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/history-api-for-file-protocol-on-ie11.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Internet Explorer 11でfile:///で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に/C:が先頭に追加されていく。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Internet Explorer 11でfile:///で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に/C:が先頭に追加されていく。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="IE11でのfile:プロトコルに対するHistory APIによる操作" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-13T01:08:09+09:00">2015年2月13日</time></p>
+
+        <h1><em>IE11でのfile:プロトコルに対するHistory APIによる操作</em></h1>
+      </header>
+
+    <main>
+
+    <p>Internet Explorer 11で<code>file:///</code>で始まるローカル・ファイルのURLをHistory APIで変更すると、ドライブレターがどんどん増えていく現象が起こることを知った。実行する度に<code>/C:</code>が先頭に追加されていく。</p>
+
+<pre><code class="language-javascript">history.replaceState(null, &apos;&apos;, location.pathname);</code></pre>
+
+<p>相対URLで書きかえが起こるはずなので、こうするとクエリー文字列やフラグメント識別子を削除してクリーンなURLに書き換わるはずだ。実際、普通のウェブサイトで試すと問題なくうまくいく。しかし<code>file:///</code>プロトコルでローカルのファイルを開いている場合、想定通りに動かない。</p>
+
+<pre><samp>&gt; <kbd>location.pathname</kbd>
+&lt; &quot;/C:/Users/Kyo/Desktop/test.html&quot;
+&gt; <kbd>history.replaceState(null, &apos;&apos;, location.pathname)</kbd>
+&lt; undefined
+&gt; <kbd>location.pathname</kbd>
+&lt; &quot;/C:/C:/Users/Kyo/Desktop/test.html&quot;</samp></pre>
+
+<p>このようにドライブレターが増殖する。URLの書き換え自体はこのおかしなURLにちゃんと(？)書き換わっているので、この状態で再読込すると「このページは表示できません」になる。</p>
+
+<hr>
+
+<p>明らかにバグと言えそうだが、実際に何か致命的なことが起こるとも思えないバグだ。報告はしておいたけど、悪いこともできなそうな気がするので放置されそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

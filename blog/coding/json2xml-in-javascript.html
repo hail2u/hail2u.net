@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JavaScriptでJSON2XML</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/json2xml-in-javascript.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="多くのウェブサービスで提供されるJSONデータは改行もインデントもなく読みづらい。PipesとかPipesとかPipesとか。Big SkyではGUIツールを作っていたけど、単にデータの構造を把握したいだけとかならXMLに変換してブラウザで見るのでも良いと思う。今まではその変換を適当なPerlスクリプトでやってたが、JavaScriptだけで出来そうな気がしたのでとりあえず作ってみた。そこそこ使えそう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="多くのウェブサービスで提供されるJSONデータは改行もインデントもなく読みづらい。PipesとかPipesとかPipesとか。Big SkyではGUIツールを作っていたけど、単にデータの構造を把握したいだけとかならXMLに変換してブラウザで見るのでも良いと思う。今まではその変換を適当なPerlスクリプトでやってたが、JavaScriptだけで出来そうな気がしたのでとりあえず作ってみた。そこそこ使えそう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JavaScriptでJSON2XML" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-04-19T21:19:05+09:00">2009年4月19日</time></p>
+
+        <h1><em>JavaScriptでJSON2XML</em></h1>
+      </header>
+
+    <main>
+
+    <p>多くのウェブサービスで提供されるJSONデータは改行もインデントもなく読みづらい。<a href="http://pipes.yahoo.com/pipes/">Pipes</a>とかPipesとかPipesとか。<a href="http://mattn.kaoriya.net/software/lang/python/20090414042822.htm">Big SkyではGUIツールを作っていた</a>けど、単にデータの構造を把握したいだけとかならXMLに変換してブラウザで見るのでも良いと思う。今まではその変換を適当なPerlスクリプトでやってたが、JavaScriptだけで出来そうな気がしたので<a href="http://hail2u.github.io/json2xml.html">とりあえず作ってみた</a>。そこそこ使えそう。</p>
+
+<p>コアになるコードは20行ほどの再帰的に呼ばれる関数だけ。</p>
+
+<pre><code class="language-js">function JSONtoXML (obj, depth) {
+  var result = &quot;&quot;, indent = &quot;&quot;;
+
+  for (var i = 0; i &lt; depth; i++) {
+    indent += &quot;  &quot;;
+  }
+
+  for (var key in obj) {
+    var name = key;
+
+    if (key.match(/^\d+$/)) name = &quot;item&quot;;
+
+    if (typeof(obj[key]) == &quot;object&quot;) {
+      result += indent + &quot;&lt;&quot; + name + &quot;&gt;\n&quot;;
+      depth++;
+      result += JSONtoXML(obj[key], depth);
+      depth--;
+      result += indent + &quot;&lt;/&quot; + name + &quot;&gt;\n&quot;;
+    } else {
+      result += indent + &quot;&lt;&quot; + name + &quot;&gt;&quot; + encodeEntities(obj[key]) + &quot;&lt;/&quot; + name + &quot;&gt;\n&quot;;
+    }
+  }
+
+  return result;
+}</code></pre>
+
+<p>結果をインデントしないならもっと短くなる(インデントは趣味)。JSONデータ内に配列がある場合は<code>item</code>という要素にして並べるので、<code>item</code>という文字列のキーを持つJSONとかではきっとややこしいことになる(arrayとかに変えたほうが良さそうだ)。上記URLのではこの返り値をダミーの<code>root</code>という要素でくくって、XML宣言を付け出力を作っている。ダミーの要素を追加する理由は、いきなり配列で始まるJSONデータでおかしなことになることへの対策。</p>
+
+<p>あとは&quot;data&quot; URLスキームを使ってリンクを生成するだけでOK。&quot;data&quot; URLスキームを利用するアイディアは<a href="http://piro.sakura.ne.jp/latest/blosxom.cgi/webtech/javascript/2005-10-05_download.htm">JavaScriptでテキストファイルを生成してダウンロードさせる</a>から。今まで積極的に使ったことがなかった&quot;data&quot; URLスキームだけど、こんな感じでXMLに限らずHTMLとかの表示もいけるんだなーと思ったら、ブログツールのエントリやコメントの投稿プレビューとかに使えるんじゃないかとか妄想した。リンククリックさせるのは手間かかるから<code>iframe</code>作ってそこにプレビューみたいな。</p>
+
+<p>なお、<a href="http://d.hatena.ne.jp/keyword/%A4%CF%A4%C6%A4%CA%A5%D6%A5%C3%A5%AF%A5%DE%A1%BC%A5%AF%A5%A8%A5%F3%A5%C8%A5%EA%A1%BC%BE%F0%CA%F3%BC%E8%C6%C0API?kid=184075">はてなブックマークエントリー情報取得API</a>の返すJSONのように<code>eval()</code>できるように括弧でくくられてるものとかは変換できない。</p>
+
+<p><a href="http://hail2u.github.io/json2xml.html#http://feeds.delicious.com/v2/json/hail2u/json">JSON2XMLのURLのハッシュにJSONデータのURLを渡してやる</a>と変換を即実行できたりも。あまり使いどころないけど。</p>
+
+<p>逆(XML2JSON)は<a href="http://developer.yahoo.com/yql/">YQL</a>を使うのが良い。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

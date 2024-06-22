@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSWring v4.2.2</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/csswring-v4.2.2.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSWringではfont-familyプロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値にvar()を使われることを想定していなかったため、var()が引用符で括られてしまうというバグがあったようだ。修正してv4.2.2をリリースした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSWringではfont-familyプロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値にvar()を使われることを想定していなかったため、var()が引用符で括られてしまうというバグがあったようだ。修正してv4.2.2をリリースした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSWring v4.2.2" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-03-17T07:57:44+09:00">2016年3月17日</time></p>
+
+        <h1><em>CSSWring v4.2.2</em></h1>
+      </header>
+
+    <main>
+
+    <p>CSSWringでは<code>font-family</code>プロパティーでできうる限り引用符を削除しようとしている。逆に必要な場合は付けるようにもなっている。今までその値に<code>var()</code>を使われることを想定していなかったため、<code>var()</code>が引用符で括られてしまうというバグがあったようだ。修正して<a href="https://github.com/hail2u/node-csswring/releases/tag/v4.2.2">v4.2.2</a>をリリースした。</p>
+
+<p><code>font-family</code>プロパティーの値で引用符が必要かどうかは簡単だが、誤解も多い。大まかにいえば<a href="https://www.w3.org/TR/CSS2/syndata.html#value-def-identifier">識別子</a>の連続のセットならば引用符はいらない。</p>
+
+<pre><code class="language-css">.test {
+  font-family: Helvetica, Arial, sans-serif;
+}</code></pre>
+
+<p>識別子の連続とは、ASCIIの記号を除いたものと考えると近い。つまりカタカナや漢字が含まれていても引用符で括る必要はない。ただし数字やハイフン2つ、そしてハイフンに続いて数字では始めることはできないというような規則もある。</p>
+
+<pre><code class="language-css">.test {
+  font-family: ヒラギノ角ゴ ProN, ＭＳ Ｐゴシック, sans-serif;
+}</code></pre>
+
+<p>識別子の連続のセットとは識別子の連続を空白文字で連結したものだ。つまりフォント名に空白があっても引用符で括る必要はない。また空白文字(改行やタブ文字も含まれる)は1つの半角空白文字にまとめられるので、フォント名と正確に同じでなくても良い。</p>
+
+<pre><code class="language-css">.test {
+  font-family:
+    Lucida         Grande,
+    Lucida
+    Sans
+    Unicode, sans-serif;
+}</code></pre>
+
+<p>こう書いてもいいという話ではなく、こういったものをうまいこと処理するようになっているツールはいくつかある(CSSWringを含め)ので、安全のために<em>常に引用符付きでフォント名を書いても最適化してくれる</em>という話だ。仕様でも触れられているように引用符で括るようにするのが良く、こういったミスをしやすいところはツールに任せるのが無難だろう。</p>
+
+<hr>
+
+<p><code>var()</code>の大文字・小文字のパターンを考えている過程で開発者ツールのバグが見つかったりした。<code>var()</code>自体はCSS一般と同じで大文字・小文字を区別しないが、<a href="https://www.w3.org/TR/css-variables-1/#defining-variables">定義したカスタム・プロパティーでは区別する</a>ということを学んだ。つまり<code>vAr(--foo)</code>とは書け、<code>--foo</code>を参照できるが、<code>var(-Foo)</code>とは書くことができず、<code>--foo</code>を参照することはできない。</p>
+
+<p>ついついCSS VariablesとかCSS変数とか書いてしまい、言ってしまうので、ちょくちょくCustom Propertiesとかカスタム・プロパティーと書いたり、言ったりするようにしたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

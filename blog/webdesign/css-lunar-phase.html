@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSで月の満ち欠け</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/css-lunar-phase.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="月の満ち欠けは球体に光を当てた結果のもので、円を円でカットするようなものではない。CSSでは立体を立体としては扱うのは難しいので、それを平面として捉え、半円を円で膨らませたり押し出したりすることで近いものにすることが可能になりそうだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="月の満ち欠けは球体に光を当てた結果のもので、円を円でカットするようなものではない。CSSでは立体を立体としては扱うのは難しいので、それを平面として捉え、半円を円で膨らませたり押し出したりすることで近いものにすることが可能になりそうだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/css-lunar-phase.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSで月の満ち欠け" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-04-14T00:20:05+09:00">2015年4月14日</time></p>
+
+        <h1><em>CSSで月の満ち欠け</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="新月から新月へ。" height="627" src="/img/blog/css-lunar-phase.png" width="1200">
+</figure>
+
+<p>月の満ち欠けは球体に光を当てた結果のもので、円を円でカットするようなものではない。CSSでは立体を立体としては扱うのは難しいので、それを平面として捉え、半円を円で膨らませたり押し出したりすることで近いものにすることが可能になりそうだ。</p>
+
+<p>Demo: <a href="/test/620.html">Lunar Phase</a></p>
+
+<p>CSSグラデーションで作った半円に、<code>border-radius</code>で作った半楕円を組み合わせることで実現している。月齢15以上の場合は半円を逆転させる。地球と太陽と月の位置関係から平面で捉えると、半円を基本にするということであっている(と思う)。</p>
+
+<p>例えば月齢5の場合は以下の様なCSSで構成されている。</p>
+
+<pre><code class="language-css">.moon {
+  border-radius: 51%;
+  height: 3rem;
+  overflow: hidden;
+  position: relative;
+  width: 3rem;
+}
+
+.phase5 {
+  background-image: linear-gradient(to right, #ff0 0, #ff0 50%, #000 50%, #000 100%);
+}</code></pre>
+
+<p><code>.moon</code>が基本の月で、それに前述のとおりCSSグラデーションで半円になるように色を塗っておく。左から明るくなっていく。</p>
+
+<pre><code class="language-css">.moon::before,
+.moon::after {
+  content: &apos;&apos;;
+  display: block;
+  height: 100%;
+  position: absolute;
+}
+
+.moon::before {
+  border-top-left-radius: 3rem 200%;
+  border-bottom-left-radius: 3rem 200%;
+  right: 50%;
+}
+
+.moon::after {
+  border-top-right-radius: 3rem 200%;
+  border-bottom-right-radius: 3rem 200%;
+  left: 50%;
+}</code></pre>
+
+<p><code>.moon</code>の擬似要素が影と光になる。影も光も半楕円にする必要があるので、<code>border-*-radius</code>プロパティーでちゃんと半円かつ幅を変えた場合もきれいな半楕円にスケールするように、全体単位と%を組み合わせて調節してやる。</p>
+
+<pre><code class="language-css">.phase5::before {
+  background-color: #000;
+  width: 33.333%;
+}</code></pre>
+
+<p>月齢5だと擬似要素は影として扱われるので、<code>#000</code>で塗る。そして月齢15で満月なので、その1/3ほど影が後退することになることから幅を<code>33.333%</code>に減らしてやっている。</p>
+
+<p>こういう風に、形を実現するだけでなく、現実世界の状態をある程度反映させた形でCSSによってエミュレートするのは頭の体操になる。</p>
+
+<hr>
+
+<p>Sassをつかうとミックスイン化できるが二度と使わないので書くのはやめた。そして記事を書いてから気づいたけれど、北半球だと月は右から明るくなるんだった……。頭の体操になっていない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

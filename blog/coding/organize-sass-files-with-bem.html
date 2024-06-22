@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>BEMを使ったSassファイルの整理</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/organize-sass-files-with-bem.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="このウェブサイトのSassファイル群はずっとフラットなファイル構成でやっていた。主にSassが相対パスの修正を行うことができないことが理由だったけど、最近はポストプロセスすればどうにでも出来そうな感じなので、あまり気にせず整理することにした。単純にカテゴリ分けするだけでも良いのだけど、BEMを応用してやってみている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="このウェブサイトのSassファイル群はずっとフラットなファイル構成でやっていた。主にSassが相対パスの修正を行うことができないことが理由だったけど、最近はポストプロセスすればどうにでも出来そうな感じなので、あまり気にせず整理することにした。単純にカテゴリ分けするだけでも良いのだけど、BEMを応用してやってみている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="BEMを使ったSassファイルの整理" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-02-10T08:13:41+09:00">2014年2月10日</time></p>
+
+        <h1><em>BEMを使ったSassファイルの整理</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/hail2u/hail2u.net-styles">このウェブサイトのSassファイル群</a>はずっとフラットなファイル構成でやっていた。主にSassが相対パスの修正を行うことができないことが理由だったけど、最近はポストプロセスすればどうにでも出来そうな感じなので、<a href="https://github.com/hail2u/hail2u.net-styles/commit/dd1cf941a2d3949508c8beaf20759b225829ea14">あまり気にせず整理することに</a>した。単純にカテゴリ分けするだけでも良いのだけど、<a href="http://bem.info/">BEM</a>を応用してやってみている。</p>
+
+<p>CSSのクラス名及び変数やプレースホルダー・クラスにはまだ手を付けず、まずはBEMツリーとルールセットの配置の対応を作るところから始めた。</p>
+
+<ul>
+<li>ファイル名でブロック<ul>
+<li>ディレクトリでブロックのネスト</li>
+</ul>
+</li>
+<li>セレクターの1段階のネストでエレメント</li>
+<li><code>&amp;</code>を使ったセレクターのネストでモディファイア</li>
+</ul>
+
+<p>以上のようなルール付けの元にやってる(未完成)。</p>
+
+<section>
+<h2>ブロック</h2>
+
+<pre>scss/
+├ _header.scss
+└ header/
+   ├ _logo.scss
+   └ _site-navigation.scss</pre>
+
+<p>ファイル名がブロックになり、かつ繰り返しにならないようにディレクトリを使って配置する。CSSのクラス名で<code>.header__site-navigation</code>になるであろうルールセットが含まれるのが<code>header/_site-navigation.scss</code>になる。必要なら必要なだけネストしていけば良い。例えば<code>.header__site-navigation</code>にナビゲーションのリスト以外に検索ボックスやRSSフィードを表示するブロックがあるなら以下のようにする。</p>
+
+<pre>scss/
+├ _header.scss
+└ header/
+   ├ _logo.scss
+   ├ _site-navigation.scss
+   └ site-navigation/
+      ├ _feed.scss
+      ├ _list.scss
+      └ _searchbox.scss</pre>
+
+<p><code>header/</code>と<code>_header.scss</code>あるのはちょっと気持ち悪いし、ブロック単位での一括削除がしづらくなるので、<code>header/_index.scss</code>とかの方が良いのかもしれない。</p>
+</section>
+
+<section>
+<h2>エレメント</h2>
+
+<pre><code class="language-scss">body &gt; header nav {
+  ul {
+    display: inline-table;
+  }
+
+  li {
+    display: table-cell;
+  }
+}</code></pre>
+
+<p>ルールセット内で1段階ネストするとエレメントになる。先述のようにブロックは必ずファイルになるので、<code>&amp;</code>を使わないネストは必ずエレメントとすることができ、読みやすくなる。</p>
+
+<p>ブロックが分散する前提なので、ブロックをまたいだエレメント間でのルールの共有が難しい。そのためプレースホルダー・クラス頼みになるので、見通しがちょっと悪くなる。</p>
+</section>
+
+<section>
+<h2>モディファイア</h2>
+
+<pre><code class="language-scss">body &gt; header nav {
+  li {
+    &amp;.current {
+      border-bottom: 3px double;
+    }
+  }
+}</code></pre>
+
+<p><code>&amp;</code>を使ってネストさせるとモディファイアになる。ネストでモディファイアでも良さそうだけど、それだとブロックに対するモディファイアが、エレメントと同じになってしまうので混乱する。Sass (に限らないけど)のネストは深くするべきではないので、2段階のネストをモディファイアと確定させると、これ以上のネストがまず起こらないようになる。</p>
+
+<p>出力されるセレクターに無駄が出るのと、<code>&amp;</code>をSass本来の用途として使っていないところが良くない。</p>
+</section>
+
+<hr>
+
+<p>BEMの命名規則を使ったクラス名は役に立つとは思うけど、好きではない。ので、ファイル構成を使ってSassのモジュール化を進めてみた。<a href="/blog/webdesign/sass-and-bem.html">前にちょっと書いたの</a>を実戦投入し始めたみたいな話。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

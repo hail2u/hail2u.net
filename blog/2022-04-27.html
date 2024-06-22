@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>node-fetchからの脱出</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/2022-04-27.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体はimport文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的にはsharpパッケージにpipe()で渡していたところだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体はimport文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的にはsharpパッケージにpipe()で渡していたところだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="node-fetchからの脱出" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2022-04-27T06:17:31+09:00">2022年4月27日</time></p>
+
+        <h1><em>node-fetchからの脱出</em></h1>
+      </header>
+
+    <main>
+
+    <p>Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体は<code>import</code>文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的には<a href="https://sharp.pixelplumbing.com/">sharpパッケージ</a>に<code>pipe()</code>で渡していたところだ。</p>
+
+<p><code>fetch()</code>の<code>response.body</code>は、node-fetchパッケージではNode.jsのstream.Readableなので、sharpパッケージでサポートされている。一方、標準Fetchでは、同じく標準StreamのReadableStreamなので、サポートされておらず、そのまま扱えない、大したことをしておらず、それほど大きな画像ではないなら、arrayBuffer経由でNode.jsのBufferに変換してしまうと簡単そうだった。</p>
+
+<pre><code class="language-javascript">const response = await fetch("https://example.com/test.jpg");
+const image = await response.arrayBuffer();
+const metadata = await sharp(Buffer.from(image)).metadata();</code></pre>
+
+<p>標準Fetchが気軽に使えるようになり、node-fetchパッケージを使う時の<a href="/blog/2022-01-28.html">ちょっと落ち着かない書き方</a>が削除できたのでうれしい。他にエラーの扱いを標準に準じたものに変えたりもした。node-fetchパッケージのREADMEによると、それなりに仕様に準拠していないものはあるので、置き換えに苦労するケースもありそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

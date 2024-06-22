@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Gruntプラグイン: selector4096</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/grunt-selector4096.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="IE9以下で4096個以上のセレクターがあるとスタイルが反映されなくなるバグのチェックを行うGruntプラグイン、selector4096を作った。CSSプリプロセッサーでネストしつつ@extendするとぽんぽんセレクター増えていくので、最近はまめにチェックするようにしている。自己最多記録は3400くらいで、バグに引っかかったことはまだない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="IE9以下で4096個以上のセレクターがあるとスタイルが反映されなくなるバグのチェックを行うGruntプラグイン、selector4096を作った。CSSプリプロセッサーでネストしつつ@extendするとぽんぽんセレクター増えていくので、最近はまめにチェックするようにしている。自己最多記録は3400くらいで、バグに引っかかったことはまだない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Gruntプラグイン: selector4096" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-12-18T12:54:05+09:00">2013年12月18日</time></p>
+
+        <h1><em>Gruntプラグイン: selector4096</em></h1>
+      </header>
+
+    <main>
+
+    <p>IE9以下で4096個以上のセレクターがあるとスタイルが反映されなくなるバグのチェックを行うGruntプラグイン、<a href="https://github.com/hail2u/grunt-selector4096">selector4096</a>を作った。CSSプリプロセッサーでネストしつつ<code>@extend</code>するとぽんぽんセレクター増えていくので、最近はまめにチェックするようにしている。自己最多記録は3400くらいで、バグに引っかかったことはまだない。</p>
+
+<p>npmで普通にインストールした後、<code>Gruntfile.js</code>に以下のように書いて準備完了。</p>
+
+<pre><code class="language-javascript">grunt.initConfig({
+  selector4096: {
+    all: [&apos;src/css/**/*.css&apos;]
+  }
+});
+
+grunt.loadNpmTasks(&apos;grunt-selector4096&apos;);</code></pre>
+
+<p>読み取り専用タスクなので、<code>dest</code>とかは必要ない。</p>
+
+<pre><samp>$ <kbd>grunt selector4096:all</kbd></samp></pre>
+
+<p>実行すると、<code>src/css/</code>以下のすべてのCSSファイルがチェックされ、2047以下だとセレクター数を教えるメッセージのみ、2048以上だと警告のみで続行、4096以上だと警告してタスクが止まる。</p>
+
+<pre><samp>Running &quot;selector4096&quot; (selector4096) task
+&gt;&gt; File &quot;test/fixtures/100.css&quot; had 100 selectors. Looks good.
+&gt;&gt; File &quot;test/fixtures/2048.css&quot; had 2048 selectors. Not bad, but not good either.
+Warning: File &quot;test/fixtures/4096.css&quot; had 4096 selectors. Split to avoid bug on ~IE9. Use --force to continue.</samp></pre>
+
+<p>メッセージはこんな感じで、CSSファイルのパス・セレクター数・評価が出力される。4096以上でも警告のみにするオプションとかはあっても良さそう。</p>
+
+<hr>
+
+<p><a href="https://github.com/phamann/grunt-css-metrics">grunt-css-metrics</a>がもっと色々総合的にできるならこれで良さそうと思っていたんだけど、ふたつしか機能がなくそれほどでもなかった。それに単機能なGruntプラグインを組み合わせる方が小回り効いて良いんではないかなーとも考えているので、セレクタ数えて殺すみたいなだけのを作ることにした。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

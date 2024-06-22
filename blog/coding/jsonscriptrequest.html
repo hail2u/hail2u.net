@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JSONScriptRequest</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/jsonscriptrequest.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="動的にscript要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。Firefoxの場合は動的に追加するscript要素のonload属性で読み込んだJavaScriptファイルを処理するfunctionを指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつがJSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScriptで取り上げられているJSONScriptRequest。XmlHttpRequestと比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JSONScriptRequest" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-04T17:26:20+09:00">2006年8月4日</time></p>
+
+        <h1><em>JSONScriptRequest</em></h1>
+      </header>
+
+    <main>
+
+    <p>動的に<code>script</code>要素を追加してやることによってクロス・ドメインのJavaScriptファイルを読み込むというテクニック。<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox</a>の場合は動的に追加する<code>script</code>要素の<code>onload</code>属性で読み込んだJavaScriptファイルを処理する<code>function</code>を指定してやれば問題ない。しかし、これをクロス・ブラウザで実現するには違ったアプローチが必要になる。そのひとつが<a href="http://www.xml.com/pub/a/2005/12/21/json-dynamic-script-tag.html" title="XML.com: JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript">JSON and the Dynamic Script Tag: Easy, XML-less Web Services for JavaScript</a>で取り上げられているJSONScriptRequest。<code>XmlHttpRequest</code>と比較するとかなり機能が限定されたものだけど、扱いが手軽で限定された環境ではなかなか威力を発揮するっぽい。</p>
+
+<p>JSONScriptRequestはどうやらJSONPと呼ばれている、JSONデータをcallback関数経由で渡すようにするアプローチを利用するためのクラス。つまり動的に読み込むJavaScriptファイルは、</p>
+
+<pre><code class="language-js">callback({
+  foo:    &apos;This is foo.&apos;,
+  bar:    &apos;This is bar.&apos;,
+  foobar: &apos;This is foobar.&apos;
+});</code></pre>
+
+<p>というようにcallback関数が呼ばれる形のものでなければならない。そして、</p>
+
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;JSONScriptRequest Test&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jsr_class.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;JSONScriptRequest Test&lt;/h1&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var oJsr = new JSONscriptRequest(&apos;http://example.com/json/data.json?dummy=1&apos;);
+oJsr.buildScriptTag();
+oJsr.addScriptTag();
+
+function callback(data) {
+  alert(data.foo);
+  alert(data.bar);
+  alert(data.foobar);
+  oJsr.removeScriptTag();
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<p>HTML(やJavaScript)ファイル側でcallback関数を定義しておく必要もある(<a href="/test/054.html" title="JSONScriptRequest Test">サンプル</a>)。</p>
+
+<p>つまるところ、Webサービス側でJSONPに対応していないと使い道がない。<a href="http://developer.yahoo.com/search/index.html" title="Yahoo! Search Web Services">Yahoo! Search Web Services</a>などでは対応しているが、やはり絶対数は少ない。</p>
+
+<p>しかし、<a href="http://aws.amazon.com/" title="Amazon.com Amazon Web Services Store: Amazon Web Services">Amazon Web Services</a>のXSLTサービスなどの場合は、XSLファイルを工夫すればJavaScriptファイルを自由に作り上げることができるので、XSLファイル側で対処できる。labs.hail2u.net/amazon/やlabs.hail2u.net/amazon/asamashi/では実際に対処してみた。それぞれのHTMLファイル内のJavaScriptコードや利用しているXSLファイルを見てくれればどういう感じなのかわかるかもしれない。無闇にコードが長いので読みづらいけど。</p>
+
+<p>jsr_class.jsは<code>removeScriptTag()</code>とか長くて書くの面倒な感じなので、テキトウに書き直すのが良いかも。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

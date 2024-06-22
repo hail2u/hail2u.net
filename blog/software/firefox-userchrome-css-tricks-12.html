@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>FirefoxのuserChrome.cssネタ #12</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/firefox-userchrome-css-tricks-12.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="久々。Firefox 3になったときにずいぶん減らしたんだけど、だんだん増えてきたので整理しつつここではまだ書いてなかったものだけ。別のところで書いたやつもあるけど、ここでは初出ということで。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="久々。Firefox 3になったときにずいぶん減らしたんだけど、だんだん増えてきたので整理しつつここではまだ書いてなかったものだけ。別のところで書いたやつもあるけど、ここでは初出ということで。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/hide-forward-botton.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="FirefoxのuserChrome.cssネタ #12" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-10-24T01:52:19+09:00">2009年10月24日</time></p>
+
+        <h1><em>FirefoxのuserChrome.cssネタ #12</em></h1>
+      </header>
+
+    <main>
+
+    <p>久々。Firefox 3になったときにずいぶん減らしたんだけど、だんだん増えてきたので整理しつつここではまだ書いてなかったものだけ。別のところで書いたやつもあるけど、ここでは初出ということで。</p>
+
+<section>
+<h2>ロケーションバーや検索バーでIMEをオフにする</h2>
+
+<pre><code class="language-css">#urlbar input,
+#FindToolbar input {
+  ime-mode: inactive !important;
+}</code></pre>
+
+<p>「g 検索語」などキーワード検索機能を多用する場合、IMEがオンだと悲しいことになるので設定。検索バーでもオフにするかどうかは好みで。</p>
+</section>
+
+<section>
+<h2>進むボタンを無効な時は隠す</h2>
+
+<pre><code class="language-css">#forward-button[disabled=&quot;true&quot;] {
+  display: none !important;
+}</code></pre>
+
+<figure>
+<img alt="進むボタンを隠すとすっきりする。" height="36" src="/img/blog/hide-forward-botton.png" width="46">
+</figure>
+
+<p>進むは戻るを使った時にしか有効にならないので、ほとんどの時間は無効。そのためにスペースを割くのはもったいないので無効なときは削除するとすっきり。そもそも戻るに比べて進むは使用頻度が低い(と思う)ので、完全に非表示でも良いかもしれない。</p>
+</section>
+
+<section>
+<h2>ロケーションバーのドロップダウンの高さを変更する</h2>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult {
+  height: 514px !important;
+}</code></pre>
+
+<p>デフォルトでは6件分の高さ(テーマ依存)。僕の環境では上記サイズで12件分表示されている(もちろんシステムのUIフォント設定などさまざまなものに依存するので12件分とは限らない)。各候補の高さが一様ではない(アイコンが表示されたりするとずれるっぽい)ので、丁度○○件分の高さにするとかは難しそう。またデフォルトではリストアップする最大数が12になっているので、about:configから<code>browser.urlbar.maxRichResults</code>を変更するとより多くの候補が表示される(多くしすぎると重くなるので注意)。</p>
+
+<p>残念ながら候補が少ない場合、ドロップダウンに空白ができてしまいものすごいかっこ悪い。これを解決する方法は今のところ見つかっていない……。</p>
+</section>
+
+<section>
+<h2>ロケーションバーでの絞り込みのハイライトを赤く</h2>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult span.ac-emphasize-text {
+  color: #cc0000 !important;
+  font-weight: normal !important;
+}</code></pre>
+
+<figure>
+<img alt="絞込みのキーワードを赤でハイライト。" height="180" src="/img/blog/highlight-richresult-in-red.png" width="320">
+</figure>
+
+<p>デフォルトでは太字+下線で色は変わらない。見づらいというほどではないのだけど、色を変えたほうが見やすかった。赤文字はちょっと気持ち悪いかもしれないので、テーマに合わせて調節すると良いと思う。</p>
+
+<pre><code class="language-css">#PopupAutoCompleteRichResult span.ac-emphasize-text {
+  color: #000000 !important;
+  background-color: #ff8000 !important;
+}</code></pre>
+
+<p>というように背景を変更してもなかなか見やすい。</p>
+</section>
+
+<section>
+<h2>ブックマークツールバーをシンプルに</h2>
+
+<pre><code class="language-css">#bookmarksBarContent &gt; .bookmark-item {
+  padding: 3px 12px !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-icon {
+  display: none !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-menu-dropmarker {
+  display: -moz-box !important;
+}
+
+#bookmarksBarContent &gt; .bookmark-item &gt; .toolbarbutton-menu-dropmarker &gt; .dropmarker-icon {
+  display: -moz-box !important;
+}</code></pre>
+
+<figure>
+<img alt="シンプルなブックマークツールバー。" height="36" src="/img/blog/simple-bookmark-toolbar.png" width="320">
+</figure>
+
+<p>Safariっぽくアイコンを非表示にして、フォルダにはドロップダウンのマーカーをつける。<code>.bookmark-item</code>のスタイルで<code>-moz-border-radius</code>を使ったり、もっと細くなるように調節したりすればもっとSafariに近づけることができる……が、子要素の<code>.bookmark-item</code>でスタイルを戻さないとならないので非常に面倒なことになるのでオススメしない。素直に<a href="https://addons.mozilla.org/ja/firefox/addon/12782">MacOSX Theme</a>などをインストールした方が良い。</p>
+</section>
+
+<hr>
+
+<p>Google Chromeもこんな感じで簡単にUIカスタマイズできたら良いなぁ……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>interpolate-fancy.js: JavaScriptのごく簡単なテンプレート・システム</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/interpolate-fancy-js.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="blosxomのプラグインにinterpolate_fancyというものがある。このプラグインは、あまり強力ではないblosxomのテンプレート・システムを強化するもので、ベーシックなif/unless系の分岐が可能になる(他にインストールしているプラグインのサブルーチンを呼べたりもする)。あまりややこしくない正規表現による置換で実装されている。というわけで、簡単なテンプレートシステムとして使うためにJavaScriptに移植してみた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="blosxomのプラグインにinterpolate_fancyというものがある。このプラグインは、あまり強力ではないblosxomのテンプレート・システムを強化するもので、ベーシックなif/unless系の分岐が可能になる(他にインストールしているプラグインのサブルーチンを呼べたりもする)。あまりややこしくない正規表現による置換で実装されている。というわけで、簡単なテンプレートシステムとして使うためにJavaScriptに移植してみた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="interpolate-fancy.js: JavaScriptのごく簡単なテンプレート・システム" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-13T15:08:33+09:00">2006年8月13日</time></p>
+
+        <h1><em>interpolate-fancy.js: JavaScriptのごく簡単なテンプレート・システム</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のプラグインに<a href="http://www.blosxom.com/downloads/plugins/interpolate_fancy" title="interpolate_fancy">interpolate_fancy</a>というものがある。このプラグインは、あまり強力ではないblosxomのテンプレート・システムを強化するもので、ベーシックなif/unless系の分岐が可能になる(他にインストールしているプラグインのサブルーチンを呼べたりもする)。あまりややこしくない正規表現による置換で実装されている。というわけで、簡単なテンプレートシステムとして使うためにJavaScriptに移植してみた。</p>
+
+<p>ベースになったのは<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>の1.5.0_rc1に実装されている<code>Template</code>クラス。これのテンプレート変数の書き方をinterpolate_fancyに合わせた<code>&lt;foo/&gt;</code>という形固定にして、条件分岐の正規表現を付け加えるという形でライブラリにしてみた。</p>
+
+<p>使い方は、interpolate-fancy.jsを読み込んでおいた上で、</p>
+
+<pre><code class="language-js">var tmpl = new InterpolateFancy(&apos;&lt;foo/&gt; &lt;bar/&gt; &lt;foobar/&gt;&apos;);
+return tmpl.evaluate({
+  foo:    &apos;this is foo.&apos;,
+  bar:    &apos;this is bar.&apos;,
+  foobar: &apos;this is foobar.&apos;
+});</code></pre>
+
+<p>と、テンプレートを渡して初期化し、データを渡して<code>evaluate()</code>(つまりprototype.jsのTemplateクラスと一緒)。データはフラットな連想配列で、<a href="http://json.org/" title="Introducing JSON">JSON</a>というわけではない。テンプレートはinterpolate_fancyと一緒、といってもほとんどの人は知らないのでちょこっと書いておく。</p>
+
+<pre>&lt;foo/&gt; display &quot;foo&quot;
+
+&lt;?foo&gt;display if &quot;foo&quot; is defined&lt;/?&gt;
+&lt;?!foo&gt;display if &quot;foo&quot; is not defined&lt;/?&gt;
+
+&lt;?foo eq=&quot;123&quot;&gt;display if &quot;foo&quot; is equal 123&lt;/?&gt;
+&lt;?foo ne=&quot;123&quot;&gt;display if &quot;foo&quot; is not equal than 123&lt;/?&gt;
+&lt;?foo lt=&quot;123&quot;&gt;display if &quot;foo&quot; is less than 123&lt;/?&gt;
+&lt;?foo gt=&quot;123&quot;&gt;display if &quot;foo&quot; is greater than 123&lt;/?&gt;
+&lt;?foo like=&quot;123&quot;&gt;display if &quot;foo&quot; includes 123&lt;/?&gt;
+&lt;?foo unlike=&quot;123&quot;&gt;display if &quot;foo&quot; does not include 123&lt;/?&gt;</pre>
+
+<p>最初のが基本形で<code>foo</code>の値に置換される。上記のデータの場合だと一行目は<code>this is foo.</code>になるということ。次がdefined/undefinedの分岐で、<code>foo</code>が定義されているかどうか(または定義されていないかどうか)で<code>&lt;/?&gt;</code>までを表示するかどうか分岐する。残りは簡単な比較による分岐で、文字列を比較・数字の大きさを比較・正規表現で検索による結果の真偽値で分岐。簡単な実験HTMLを作っておいたので、これも参考にどうぞ。</p>
+
+<p>渡せるデータがフラットな連想配列のみだったりとか、ループが無いのでループしたいときはテンプレートを小分けにしなくてはならないとか、そもそも書きづらいとかいろいろと欠点がある。特に前者はどっかから拾ってきたJSONのデータを丸投げというとても便利そうな手段が使えないということになるので、JSONが確固たる位置を築きはじめた現在においてはかなり致命的な欠点と言える。</p>
+
+<p>それでも要素をシコシコ作って<code>appendChild()</code>よりはマシ・・・だと思う。てか、こういったテンプレート・システムのことを考えてると「XMLをXSLTで最強じゃん？」みたいな方向に思考が流れていってしまう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

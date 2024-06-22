@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Firefoxの拡張のドロップダウンなツールバー・ボタン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/dropdown-toolbarbutton-in-firefox-extension.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Firefoxの拡張でツールバー・ボタンはtoolbarbutton要素で作る。これをドロップダウンにするにはtype属性にmenuを指定してやり、子にmenupopupを作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Firefoxの拡張でツールバー・ボタンはtoolbarbutton要素で作る。これをドロップダウンにするにはtype属性にmenuを指定してやり、子にmenupopupを作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/dropdown-toolbarbutton-sample.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Firefoxの拡張のドロップダウンなツールバー・ボタン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-05-02T00:17:12+09:00">2009年5月2日</time></p>
+
+        <h1><em>Firefoxの拡張のドロップダウンなツールバー・ボタン</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://mozilla.jp/firefox/">Firefox</a>の拡張でツールバー・ボタンは<a href="https://developer.mozilla.org/en/XUL/toolbarbutton"><code>toolbarbutton</code></a>要素で作る。これをドロップダウンにするには<code>type</code>属性に<code>menu</code>を指定してやり、子に<code>menupopup</code>を作ってやれば良い。が、このままだと微妙に表示がおかしいというかちょっと残念な形になるということに気づいたのでメモ。別にバグるとかそういう致命的なものではないけどしっくりこない感じの挙動。</p>
+
+<p>繰り返しになるけどドロップダウンなツールバー・ボタンは、</p>
+
+<pre><code class="language-xml">&lt;toolbarbutton id=&quot;dropdown-test&quot;
+  label=&quot;ドロップダウン&quot;
+  type=&quot;menu&quot;&gt;
+  &lt;menupoup&gt;
+    &lt;menuitem label=&quot;項目 #1&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #2&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #3&quot;/&gt;
+    &lt;menuitem label=&quot;項目 #4&quot;/&gt;
+  &lt;/menupoup&gt;
+&lt;/toolbarbutton&gt;</code></pre>
+
+<p>このように作る。この<code>dropdown-test</code>のスタイルに<code>list-style-image</code>で画像を与えてやるとそれがアイコンになり、</p>
+
+<figure>
+<img alt="ドロップダウンなツールバー・ボタンの例。" height="36" src="/img/blog/dropdown-toolbarbutton-sample.png" width="36">
+</figure>
+
+<p>といったように右に(ロケールによるけど)矢印付きで表示される。まるで問題ないように見えるのだが、ちょっとアレな感じになるのは、大きいアイコン表示でかつテキストも表示する場合。わかりやすいように他の普通のツールバー・ボタンと並べてみると、こんな感じになる。</p>
+
+<figure>
+<img alt="大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタンの例。" height="64" src="/img/blog/big-dropdown-toolbarbutton-with-label-sample.png" width="154">
+</figure>
+
+<p>普通のツールバー・ボタンのラベルが下に来ているのに対して、ドロップダウンの方はラベルが右に来てしまう。<code>toolbarbutton</code>要素に対して、<code>class</code>属性で<code>toolbarbutton-1</code>を指定してやるとラベルは下に来るが、今度は矢印も下に来てしまう(上記画像のHomeというラベルの更に下に矢印が出る感じ)。見た目が悪いうえにツールバーが太くなってしまう。また、<code>type</code>で<code>menu-button</code>を指定した場合は、ラベルは下、矢印は右に来るのだけどアイコン部分をクリックした時の動作をきちんとコーディングしなければならなくなる。</p>
+
+<p>これを<code>type=&quot;menu&quot;</code>の挙動のままラベルは下、矢印は右にするには<code>toolbarbutton</code>へのスタイル指定で、</p>
+
+<pre><code class="language-css">#dropdown-test {
+  -moz-binding: url(&quot;chrome://global/content/bindings/toolbarbutton.xml#menu-vertical&quot;);
+}</code></pre>
+
+<p>と<code>menu-vertical</code>というビルトインのスタイルを適用してやれば良い。</p>
+
+<figure>
+<img alt="menu-verticalな大きいアイコン・テキスト付きのドロップダウンなツールバー・ボタン。" height="64" src="/img/blog/perfect-big-dropdown-toolbarbutton-with-label.png" width="122">
+</figure>
+
+<p>この<code>menu-vertical</code>はFirefoxのデフォルトのテーマでは使われていないからか、あまりメジャーじゃない模様。ゴリゴリCSSを書いて無理やり矢印を右に持っていこうとしてた苦労はいったい……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

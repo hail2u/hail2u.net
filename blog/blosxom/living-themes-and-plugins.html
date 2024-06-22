@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>テーマとプラグインをリポジトリへ追加</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/living-themes-and-plugins.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ローカルで動かすようにして環境もスッキリできたので、テーマとプラグインもウェブログのリポジトリに置くようにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ローカルで動かすようにして環境もスッキリできたので、テーマとプラグインもウェブログのリポジトリに置くようにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="テーマとプラグインをリポジトリへ追加" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-08T01:50:24+09:00">2014年6月8日</time></p>
+
+        <h1><em>テーマとプラグインをリポジトリへ追加</em></h1>
+      </header>
+
+    <main>
+
+    <p>ローカルで動かすようにして環境もスッキリできたので、テーマとプラグインも<a href="https://github.com/hail2u/hail2u.net-weblog">ウェブログのリポジトリ</a>に置くようにした。</p>
+
+<p><a href="https://github.com/hail2u/hail2u.net-weblog/blob/master/entries/themes/html/page">テーマ</a>はこのウェブサイトの他のページと同じように<a href="/blog/coding/generate-files-grunt-task-using-handlebars-js.html">Handlebars.jsを使ったGruntタスク</a>で生成している。今まではいくつか<a href="http://blosxom.sourceforge.net/plugins/general/theme.htm">themeプラグイン</a>に対応してないプラグインを使っていたのでちょっと面倒な感じになってたけど、プラグイン構成がシンプルになったのでついでにthemeプラグインに移行した。2014年になって新しいプラグイン入れるとはなかなか。</p>
+
+<p>プラグインは大幅に整理された。適切なHTTPヘッダーを出力したり、アクセス制限をしたり、静的生成を補助したりなど、サーバーで動かす時にのみ必要なプラグインはすべて不必要になったので<a href="https://github.com/hail2u/hail2u.net-weblog/tree/master/plugins">すごい減った</a>。数字のプリフィックスはサーバーで動かしてた時の名残り。</p>
+
+<hr>
+
+<p>themeプラグインで処理されるテーマは<code>page</code>というファイル名で特定のディレクトリに置くようになっている。Gruntで拡張子なしのファイルを出力するには直接ファイル名を出力するのが一番簡単だけど、動的マッピングの時はそれはできない。この場合は<code>rename</code>オプションを使ってやる。</p>
+
+<pre><code class="language-javascript">&apos;use strict&apos;;
+
+module.exports = function (grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON(&apos;package.json&apos;),
+
+    generate: {
+      blog_theme: {
+        expand: true,
+        cwd: &apos;.grunt/html/&apos;,
+        src: [&apos;blog/theme.mustache&apos;],
+        dest: &apos;.grunt/weblog/entries/themes/html/&apos;,
+        rename: function (dest, src) {
+          return dest + &apos;page&apos;;
+        }
+      }
+    }
+  });
+};</code></pre>
+
+<p>このような形で出力ファイル名を処理する関数を書いてやる。上記設定で仮に<code>rename</code>オプションがない場合、出力ファイル名は以下のような形になる。</p>
+
+<pre>.grunt/weblog/entries/themes/html/blog/theme.mustache</pre>
+
+<p><code>rename</code>オプションで指定する関数には<code>dest</code>と<code>src</code>が<em>そのまま</em>渡されるので、それを使って出力したいファイルのパスを返してやれば良い。この場合は固定で返すだけなのでハードコードしているけど、グロブから受ける場合は以下のようにして拡張子を削除したりとかする。</p>
+
+<pre><code class="language-javascript">function (dest, src) {
+  return dest + src.replace(/\.[^.]*?$/, &apos;&apos;);
+}</code></pre>
+
+<hr>
+
+<p>Blosxomと関係ない話の方が長かった。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

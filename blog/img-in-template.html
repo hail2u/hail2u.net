@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>template要素内のimg要素</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/img-in-template.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="大量の画像を一気に読み込ませないように写真や書棚のページではログ・ページを別に作っていたが、やはり統一したい。CSSなどで隠すとHTTPリクエストが発行されてしまうし、遅延読み込みはせめてネイティブ実装が揃わないと落ち着かない。実装とユーザー操作、転送量においてコストの低い方法を模索し、template要素内に書かれたimg要素ではHTTPリクエストが発行されないことがわかったので、これを利用した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="大量の画像を一気に読み込ませないように写真や書棚のページではログ・ページを別に作っていたが、やはり統一したい。CSSなどで隠すとHTTPリクエストが発行されてしまうし、遅延読み込みはせめてネイティブ実装が揃わないと落ち着かない。実装とユーザー操作、転送量においてコストの低い方法を模索し、template要素内に書かれたimg要素ではHTTPリクエストが発行されないことがわかったので、これを利用した。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="template要素内のimg要素" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2019-08-15T09:17:34+09:00">2019年8月15日</time></p>
+
+        <h1><em>template要素内のimg要素</em></h1>
+      </header>
+
+    <main>
+
+    <p>大量の画像を一気に読み込ませないように<a href="/photos/">写真</a>や<a href="/bookshelf/">書棚</a>のページではログ・ページを別に作っていたが、やはり統一したい。CSSなどで隠すとHTTPリクエストが発行されてしまうし、遅延読み込みはせめてネイティブ実装が揃わないと落ち着かない。実装とユーザー操作、転送量においてコストの低い方法を模索し、<code>template</code>要素内に書かれた<code>img</code>要素では<a href="/test/687.html">HTTPリクエストが発行されないこと</a>がわかったので、これを利用した。</p>
+
+<p>最初の36枚以外は、月ごとにセクション分けし、それを<code>template</code>要素で括っておく。つまりHTMLファイルのサイズはかなり増える。あとはユーザーが明示的に押す読み込むためのボタンを置き、それを押すと<code>main</code>要素へコピーするだけの数行のJavaScriptを読んでおく。</p>
+
+<pre><code class="language-javascript">document.querySelector("button").addEventListener("click", event =&gt; {
+  const others = document.querySelector("template");
+  others.parentNode.appendChild(others.content);
+  const button = event.target;
+  button.hidden = true;
+});</code></pre>
+
+<p>真面目に書けば、(オート・)ページングもどきにもできそうだ。数百くらいの画像ならそこまですることもなさそうなので、2段階に分けるくらいで十分だろう、ということにしている。</p>
+
+<hr>
+
+<p>遅延読み込みのネイティブ実装は素晴らしいものだけど、Blinkの提案(と実装)のままだと、事実上ポリフィルが必須になってしまうような気がしてならない。もし、ポリフィルを導入しないと、実装がないブラウザーでは大量に画像が読み込まれる。また、実装がないブラウザーはCPUや回線速度などの点で低性能な環境で使われている可能性は低くないだろう。低性能な環境で負荷が高く、高性能な環境で負荷が低い、というミスマッチが起こってしまう。</p>
+
+<p>このようなことを考えているが、この<code>template</code>要素を使ったアプローチも、実装がない環境で負荷が高いものだった。<code>template</code>要素とその振る舞いは、Chrome 26とSafari 8、Firefox 22から仕様通りに動き、デスクトップでもEdge 13から動く。デスクトップのInternet Explorer 11でのみ負荷が高くなる、と考えられ、現状ではさほど気にする必要はないだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

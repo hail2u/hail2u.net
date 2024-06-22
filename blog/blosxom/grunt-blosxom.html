@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Blosxom用Gruntプラグイン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/grunt-blosxom.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="前にちょっと書いたけどBlosxomの動的生成インターフェイスをGruntから叩き、その結果を指定ディレクトリに保存するだけのGruntプラグインを書いて使ってる。汎用性はあんまり考えてないけど、Blosxom側が優秀なのでそれなりにあるような気がする。本体の書き換えが不要で、特殊なプラグインを必要とせず、動的生成向けのプラグインたちが普通に動くといった辺りが、ビルトインの静的生成システムと比べた利点。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="前にちょっと書いたけどBlosxomの動的生成インターフェイスをGruntから叩き、その結果を指定ディレクトリに保存するだけのGruntプラグインを書いて使ってる。汎用性はあんまり考えてないけど、Blosxom側が優秀なのでそれなりにあるような気がする。本体の書き換えが不要で、特殊なプラグインを必要とせず、動的生成向けのプラグインたちが普通に動くといった辺りが、ビルトインの静的生成システムと比べた利点。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/grunt-blosxom.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Blosxom用Gruntプラグイン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-06-04T02:15:27+09:00">2014年6月4日</time></p>
+
+        <h1><em>Blosxom用Gruntプラグイン</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="Generat Blosxom files with Grunt。" height="627" src="/img/blog/grunt-blosxom.png" width="1200">
+</figure>
+
+<p>前にちょっと書いたけど<a href="http://blosxom.sourceforge.net/">Blosxom</a>の動的生成インターフェイスを<a href="http://gruntjs.com/">Grunt</a>から叩き、その結果を指定ディレクトリに保存するだけのGruntプラグインを書いて使ってる。汎用性はあんまり考えてないけど、Blosxom側が優秀なのでそれなりにあるような気がする。本体の書き換えが不要で、特殊なプラグインを必要とせず、動的生成向けのプラグインたちが普通に動くといった辺りが、ビルトインの静的生成システムと比べた利点。</p>
+
+<p>Download: <a href="/grunt-blosxom.js">grunt-blosxom.js</a></p>
+
+<p>設定は以下の様な形で書く。普通のGruntプラグインとは違うので、混乱しないように<code>src</code>や<code>dest</code>は使わず、固定か<code>--file</code>オプションで生成すべきファイルのパスを指定する。</p>
+
+<pre><code class="language-javascript">blosxom: {
+  options: {
+    root: &apos;.grunt/weblog/&apos;,
+    datadir: &apos;.grunt/weblog/entries/&apos;,
+    static_dir: &apos;blog/&apos;
+  },
+
+  article: {
+    file: grunt.option(&apos;file&apos;)
+  },
+
+  feed: {
+    file: &apos;index.rss&apos;
+  }
+}</code></pre>
+
+<p><code>options</code>は以下の様な構成になっている。本当はほとんど同じことが書かれるはずの<code>blosxom.conf</code>を読みたい所だけど、<code>blosxom.conf</code>はPerlスクリプトのため、Node.jsからパースするのは面倒そうなのでやめた。</p>
+
+<ul>
+<li><code>root</code>: <code>blosxom.cgi</code>が置かれているディレクトリ</li>
+<li><code>datadir</code>: <code>$blosxom::datadir</code>と同じディレクトリ</li>
+<li><code>static_dir</code>: 生成したファイルを保存するディレクトリ</li>
+</ul>
+
+<p>実行は、生成するファイルを固定で指定したターゲット(上記設定だと<code>feed</code>ターゲット)の場合はそのまま、それ以外では<code>--file</code>オプションで、以下のいずれかの形のパスを渡す。</p>
+
+<ul>
+<li>生成したい記事データの絶対パス</li>
+<li><em><code>$blosxom::datadir</code></em>からの相対パス</li>
+<li>サーバー上で動かす場合と同じ<code>path/to/entry.flavour</code></li>
+</ul>
+
+<p>日付指定などを組み合わせることも可能(のはず)。相対パスのみ許可するとGruntプラグイン側では何もすることなくて簡単なんだけど、ターミナルではともかく、エディタ等の他のプログラムから呼ぶ場合は絶対パスの方が手軽なので、プラグイン側に相対パスに変換する機能をもたせた。</p>
+
+<pre><samp>$ <kbd>grunt blosxom:article --file=blosxom/grunt-blosxom.txt</kbd></samp></pre>
+
+<p>上記設定だと、このようなコマンドで<code>blog/blosxom/grunt-blosxom.html</code>が作成される。わかりやすい！</p>
+
+<hr>
+
+<p>実際に使ってるものはもうちょっと汎用性を犠牲にした特化型のもの(<code>index.rss</code>を<code>feed</code>にリネームして保存する機能とかがある)だけど、まぁ大体はこんな感じ。Blosxomを叩くこういった補助ツールは結構昔から作っていた。古くは秀丸マクロでリレイアウトからFTPでアップロードなどとしてたものから、Perlでフロントエンドを作るようになった。一時Vimスクリプトで書き直したけど、それはすぐ投げ捨て、Node.jsで書き直した。一年ほど前にGruntプラグインにするように路線変更をし、今に至ってローカルで生成するように書き直した。という遍歴。変歴。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Vimでメタ構文変数を簡単入力</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/cycle-foo-bar-buz-in-vim.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の(&lt;C-x&gt;だと前の)を選択してくれるように関数とマッピングを書いて使うことにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="メタ構文変数とか呼ばれてるらしいfooとかbarとかのアレがまったく覚えられない。のでVimに一般的なメタ構文変数のリストを覚えさせておいて、fooの上で&lt;C-a&gt;するとbarに、barの上で&lt;C-a&gt;するとbuzに、と順に次の(&lt;C-x&gt;だと前の)を選択してくれるように関数とマッピングを書いて使うことにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Vimでメタ構文変数を簡単入力" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-09-15T06:22:04+09:00">2013年9月15日</time></p>
+
+        <h1><em>Vimでメタ構文変数を簡単入力</em></h1>
+      </header>
+
+    <main>
+
+    <p>メタ構文変数とか呼ばれてるらしい<code>foo</code>とか<code>bar</code>とかのアレがまったく覚えられない。のでVimに<a href="http://en.wikipedia.org/wiki/Metasyntactic_variable#English">一般的なメタ構文変数のリスト</a>を覚えさせておいて、<code>foo</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>bar</code>に、<code>bar</code>の上で<kbd>&lt;C-a&gt;</kbd>すると<code>buz</code>に、と順に次の(<kbd>&lt;C-x&gt;</kbd>だと前の)を選択してくれるように関数とマッピングを書いて使うことにした。</p>
+
+<pre><code class="language-vim">&quot; Cycle metasyntactic variables
+function! s:CycleMetasyntacticVariables(num)
+  if type(a:num) != type(0)
+    return
+  endif
+
+  let vars = [&apos;foo&apos;, &apos;bar&apos;, &apos;baz&apos;, &apos;qux&apos;, &apos;quux&apos;, &apos;corge&apos;, &apos;grault&apos;, &apos;garply&apos;, &apos;waldo&apos;, &apos;fred&apos;, &apos;plugh&apos;, &apos;xyzzy&apos;, &apos;thud&apos;]
+  let i = index(vars, expand(&apos;&lt;cword&gt;&apos;))
+
+  if (i == -1)
+    if (a:num &gt; 0)
+      execute &quot;normal! \&lt;C-a&gt;&quot;
+    else
+      execute &quot;normal! \&lt;C-x&gt;&quot;
+    endif
+
+    return
+  endif
+
+  let i += a:num
+
+  if (i == -1)
+    let i = len(vars) - 1
+  elseif (i == len(vars))
+    let i = 0
+  endif
+
+  let @w = vars[i]
+  execute &quot;normal! viw\&quot;wp&quot;
+endfunction
+
+nnoremap &lt;C-a&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(1)&lt;Enter&gt;
+nnoremap &lt;C-x&gt; :call &lt;SID&gt;CycleMetasyntacticVariables(-1)&lt;Enter&gt;</code></pre>
+
+<p>レジスターを使ってることに注意。<kbd>&lt;C-a&gt;</kbd>と<kbd>&lt;C-x&gt;</kbd>にマッピングする前提で書いたので、数字の上とかだとデフォルトと同じようにインクリメント・デクリメントする。あんまり行儀よくない気もするのでフォールバックさせるのやめて、<kbd>&lt;Leader&gt;a</kbd>とかにマッピングさせるように書いた方が良さそう……な気もするけど、自分で使う分には良いか。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

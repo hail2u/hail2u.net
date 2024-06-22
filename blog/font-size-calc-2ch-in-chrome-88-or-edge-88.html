@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Chrome 88やEdge 88でのfont-size: calc(2ch)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/font-size-calc-2ch-in-chrome-88-or-edge-88.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="利用しているフォントの「0」のグリフ幅によって変わるch単位は、実装されて久しい。これを、font-sizeプロパティーでcalc()やclamp()など計算するCSS関数を通して使うと、Chrome 88やEdge 88で想定より大きくなってしまうバグがあるようだ。Firefox 85やSafari 14では問題なく、またwidthプロパティーなどでなら発生しない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="利用しているフォントの「0」のグリフ幅によって変わるch単位は、実装されて久しい。これを、font-sizeプロパティーでcalc()やclamp()など計算するCSS関数を通して使うと、Chrome 88やEdge 88で想定より大きくなってしまうバグがあるようだ。Firefox 85やSafari 14では問題なく、またwidthプロパティーなどでなら発生しない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Chrome 88やEdge 88でのfont-size: calc(2ch)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2021-02-09T08:39:46+09:00">2021年2月9日</time></p>
+
+        <h1><em>Chrome 88やEdge 88でのfont-size: calc(2ch)</em></h1>
+      </header>
+
+    <main>
+
+    <p>利用しているフォントの「0」のグリフ幅によって変わる<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位</a>は、実装されて久しい。これを、<code>font-size</code>プロパティーで<code>calc()</code>や<code>clamp()</code>など計算するCSS関数を通して使うと、<a href="/pub/test/703.html">Chrome 88やEdge 88で想定より大きくなってしまうバグ</a>があるようだ。Firefox 85やSafari 14では問題なく、また<code>width</code>プロパティーなどでなら発生しない。</p>
+
+<pre><code class="language-css">.test .raw {
+  font-size: 2ch;
+}
+
+.test .calc {
+  font-size: calc(2ch);
+}</code></pre>
+
+<p>このようなコードで再現する。同じ大きさ(16px前後)になるはずだが、Chrome 88やEdge 88で<code>.calc</code>の方が倍の大きさになってしまう。例えばNoto Sans CJK JPだと、17.76pxのはずが35.52pxになった。</p>
+
+<p>2度計算してしまっているような気がするが、<code>3ch</code>にしても倍なので、そういうわけでもないようだ。単に<code>1ch</code>が倍に解釈されてしまうように見える。とにかく挙動不審だ。解決策もなさそうで、使わないようにするしかない。フォントによって変わるサイズを利用する時は頭に入れておくべきだろう。<code>ex</code>単位でも発生する(<code>cap</code>や<code>lh</code>単位は実装がない)。</p>
+
+<hr>
+
+<p>このウェブサイトのカラム幅を<code>ch</code>単位で指定しようとしたら、まんまと遭遇した。<code>html</code>要素の文字サイズを描画領域幅とカラム幅の差から計算していたので、ぴったりとこのような使い方になっていた。変わったことをしている自覚はあったので、すぐに気づけた。カスタム・プロパティーで定義、それを使って計算、というような書き方だと、どこでどのような単位を使っているか忘れてしまうので、遭遇しやすいかもしれない。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>このバグはどうもWindows 10でスケーリングを200%にすると起こるようだ。100%にすると起こらず、150%にすると1.5倍になった。高解像度なWindows 10のパソコンはそこそこ存在すると思うので、気をつける必要があるし、エミュレーター(スケーリングが100%のまま)などでは気づけない可能性も高いので、より注意が必要かもしれない。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

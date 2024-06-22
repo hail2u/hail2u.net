@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Gruntプラグイン: pubsubhubbub_publish</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/grunt-pubsubhubbub_publish-plugin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="GoogleのPubSubHubbubハブへ指定したURLのフィードをpublishするだけのGruntプラグインを公開した。静的ウェブサイト生成ツールをGruntを通して実行している時などに、それらと組み合わせて使うもの。世界はPubSubHubbubってなんだったっけ……みたいな感じになってるような気がするけどそれはそれ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="GoogleのPubSubHubbubハブへ指定したURLのフィードをpublishするだけのGruntプラグインを公開した。静的ウェブサイト生成ツールをGruntを通して実行している時などに、それらと組み合わせて使うもの。世界はPubSubHubbubってなんだったっけ……みたいな感じになってるような気がするけどそれはそれ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Gruntプラグイン: pubsubhubbub_publish" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-09T15:56:24+09:00">2014年7月9日</time></p>
+
+        <h1><em>Gruntプラグイン: pubsubhubbub_publish</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://pubsubhubbub.appspot.com">GoogleのPubSubHubbubハブ</a>へ指定したURLのフィードを<code>publish</code>するだけのGruntプラグインを公開した。静的ウェブサイト生成ツールをGruntを通して実行している時などに、それらと組み合わせて使うもの。世界はPubSubHubbubってなんだったっけ……みたいな感じになってるような気がするけどそれはそれ。</p>
+
+<p><code>publish</code>するフィードのURLは、ターゲットごとに<code>hubUrl</code>を指定して行う。<code>options</code>を通さないのはあんまり行儀良くないけど他に設定もないので、混乱することもないだろうとこうしてた。公開するとなるとこういうところもちょっと気になってくる。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.initConfig({
+    pubsubhubbub_publish: {
+      main: {
+        hubUrl: &apos;http://example.com/feed&apos;
+      },
+
+      sub: {
+        hubUrl: &apos;http://example.com/another/feed&apos;
+      }
+    }
+  });
+};
+grunt.loadNpmTasks(&apos;grunt-pubsubhubbub_publish&apos;);</code></pre>
+
+<p>実行はターゲットを指定して行うことになる。</p>
+
+<pre><samp>$ <kbd>grunt pubsubhubbub_publish:main</kbd></samp></pre>
+
+<p>多くの場合はエイリアス・タスクに組み込んで使うので、このような長いコマンドを使うことはまずない。</p>
+
+<pre><code class="language-javascript">grunt.registerTask(&apos;publish&apos;, [
+  &apos;assemble:main&apos;,
+  &apos;gitpush:main&apos;,
+  &apos;pubsubhubbub_publish:main&apos;
+]);</code></pre>
+
+<hr>
+
+<p>Feedlyではフィードの更新頻度でクロール間隔が調節されている節がある。更新の少ないフィードだとクロール間隔が結構長くなり、遅いと1日かそれ以上反映が遅れる。人気のあるブログの記事では先にはてなブックマークのお気に入りフィードで流れてきたりすることがほとんど。PubSubHubbubには対応しているので、反映を早くしたい場合はこっちを使えってことなんじゃないかと想像してる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

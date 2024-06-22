@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>カスケーディングとSassの@extend</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/cascading-sass-at-extend.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Sassの@extendを駆使すると出力されるCSSを効率化することができます。ただ@extendは様々な場所に書かれている複数のセレクタをなんとなくまとめるものなので、CSSのカスケーディング順位も入れ替わってしまう。あまりハマることは無さそう……なんですけど、僕はばっちりハマりました……。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Sassの@extendを駆使すると出力されるCSSを効率化することができます。ただ@extendは様々な場所に書かれている複数のセレクタをなんとなくまとめるものなので、CSSのカスケーディング順位も入れ替わってしまう。あまりハマることは無さそう……なんですけど、僕はばっちりハマりました……。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="カスケーディングとSassの@extend" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-01-01T11:14:19+09:00">2012年1月1日</time></p>
+
+        <h1><em>カスケーディングとSassの@extend</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://sass-lang.com/">Sass</a>の<code>@extend</code>を駆使すると出力されるCSSを効率化することができます。ただ<code>@extend</code>は様々な場所に書かれている複数のセレクタを<em>なんとなく</em>まとめるものなので、CSSのカスケーディング順位も入れ替わってしまう。あまりハマることは無さそう……なんですけど、僕はばっちりハマりました……。</p>
+
+<p>簡略化したハマるコードがうまく思いつかなかったので、実際にハマったコードをちょっと略して書きます。具体的にはMobile firstでMedia Queriesを使ったケース。</p>
+
+<pre><code class="language-scss">.column {
+  @media screen and (min-width: 768px) {
+    padding: 0;
+    display: block;
+    float: left;
+    width: 50%;
+  }
+}
+
+.news {
+  padding-left: 40px;
+  display: list-item;
+  @extend .column;
+}</code></pre>
+
+<p>更新情報が含まれる<code>.news</code>の表示をブラウザの幅が狭い時はリスト、広い時はカラム分けに切り替えようという意図で、定義済みのカラムを<code>@extend</code>で利用して以上のように書いた。ベースとして単純なカラム(やグリッド)を定義しておいて、特定のパーツで少し追加でスタイルを書くというような使い方で、あんまり変でもないと思います。</p>
+
+<pre><code class="language-css">@media screen and (min-width: 768px) {
+  .column,
+  .news {
+    padding: 0;
+    display: block;
+    float: left;
+    width: 50% }
+}
+
+.news {
+  padding-left: 40px;
+  display: list-item }</code></pre>
+
+<p>出力CSSはこうなるので、<code>@media</code>ブロックのルールよりも後に書かれた普通のルールが優先される。つまり、ブラウザ幅が広い時にも左のマージンとリスト表示のままで、それに加えて<code>float</code>されるということになってしまう。</p>
+
+<p>サンプルが悪くてエッジケースにしか見えないんだけど、<code>@extend</code>を使うとSassのコードを書いた順序の通りにカスケーディング順位が決まるわけではなくなってしまうことには注意が必要なんじゃないかと。CSSに慣れ親しんでいる人程ハマりそう。</p>
+
+<hr>
+
+<p>ゆるい文体書けなくなってる。とか意識するのが悪そうなのでもっと適当な感じで書く。あ、あと年男です、祝え。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

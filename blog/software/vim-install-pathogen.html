@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>pathogenのインストール</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/vim-install-pathogen.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="~/.vimの整理のために重い腰を上げてpathogenをインストールした。pathogenは~/.vim/bundle以下でプラグインごとにディレクトリを作ってインストールできるようにもなるプラグイン。バージョンアップでファイル構成が変わったプラグインとかでもディレクトリごとサヨナラして入れ直すだけで良くなる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="~/.vimの整理のために重い腰を上げてpathogenをインストールした。pathogenは~/.vim/bundle以下でプラグインごとにディレクトリを作ってインストールできるようにもなるプラグイン。バージョンアップでファイル構成が変わったプラグインとかでもディレクトリごとサヨナラして入れ直すだけで良くなる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="pathogenのインストール" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-01-08T19:42:31+09:00">2011年1月8日</time></p>
+
+        <h1><em>pathogenのインストール</em></h1>
+      </header>
+
+    <main>
+
+    <p>~/.vimの整理のために重い腰を上げて<a href="https://github.com/tpope/vim-pathogen">pathogen</a>をインストールした。pathogenは~/.vim/bundle以下でプラグインごとにディレクトリを作ってインストールできるようにもなるプラグイン。バージョンアップでファイル構成が変わったプラグインとかでもディレクトリごとサヨナラして入れ直すだけで良くなる。</p>
+
+<p>一旦~/.vim以下をコピーしてバックアップしてから内容を空にし、その後pathogenをgit cloneで拾ってくる。</p>
+
+<pre><samp>$ <kbd>cd ~/.vim</kbd>
+$ <kbd>mkdir bundle</kbd>
+$ <kbd>cd bundle</kbd>
+$ <kbd>git clone https://github.com/tpope/vim-pathogen.git</kbd></samp></pre>
+
+<p>Windowsなので管理者としてコマンドプロンプトを起動してsymlinkを張る。</p>
+
+<pre><samp>C:&gt; <kbd>cd %USERPROFILE%\.vim</kbd>
+C:&gt; <kbd>mklink .\autoload\pathogen.vim .\bundle\vim-pathogen\autoload\pathogen.vim</kbd></samp></pre>
+
+<p>として、vimを起動したらvimがpathogen見つけられませんでした……。ので普通にコピペしてインストール。</p>
+
+<p>.vimrcはこんな風にしておいた。</p>
+
+<pre><code class="language-vim">&quot; Windows specific
+if has(&apos;win32&apos;) || has(&apos;win64&apos;)
+  &quot; Reset, prepend ~/.vim and add ~/.vim/after to runtimepath
+  set runtimepath&amp; runtimepath^=$HOME/.vim runtimepath+=$HOME/.vim/after
+
+  &quot; Normalize $PATH to unix style
+  let $PATH = substitute($PATH, &quot;\\&quot;, &quot;/&quot;, &quot;g&quot;)
+endif
+
+&quot; pathogen
+filetype off
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+
+&quot; Filetype support
+filetype plugin indent on
+
+&quot; Syntax support
+syntax on</code></pre>
+
+<p>filetype offはいらない気がする。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

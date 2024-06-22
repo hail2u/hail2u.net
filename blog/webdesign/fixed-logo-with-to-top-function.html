@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>トップヘモドル機能付きの位置固定なロゴ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/fixed-logo-with-to-top-function.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="トップヘモドル機能付きの位置固定なロゴ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-09-04T08:32:27+09:00">2014年9月4日</time></p>
+
+        <h1><em>トップヘモドル機能付きの位置固定なロゴ</em></h1>
+      </header>
+
+    <main>
+
+    <p>ロゴを位置固定にして、スクロールについてくるようにした。あまりスクロールしておらずナビゲーションがまだ見えている場合は、今まで通りウェブサイトのホームへ移動する。変わって、スクロールしてナビゲーションが見えなくなっていると、ページの最上部に移動する、いわゆる「トップヘモドル」ボタンに変わる。</p>
+
+<pre><code class="language-javascript">var globalHeader = document.querySelector(&apos;.global-header&apos;);
+var logo = globalHeader.querySelector(&apos;.logo&apos;);
+var siteNavigation = globalHeader.querySelector(&apos;.site-navigation&apos;);
+
+var scrollToTop = function (evt) {
+  window.scrollTo(0, 0);
+  evt.preventDefault();
+};
+
+var toggleLogoAction = function (evt) {
+  if (window.pageYOffset &gt; globalHeader.offsetTop + siteNavigation.scrollHeight) {
+    logo.addEventListener(&apos;click&apos;, scrollToTop, false);
+
+    return;
+  }
+
+  logo.removeEventListener(&apos;click&apos;, scrollToTop, false);
+};
+
+window.addEventListener(&apos;scroll&apos;, toggleLogoAction, false);</code></pre>
+
+<p>スクロール・イベントで<code>window.pageYOffset</code>と<code>globalHeader.offsetTop + siteNavigation.scrollHeight</code>を比べて、前者が大きい場合はナビゲーションが見えないだろうと推測して、トップヘモドル機能をロゴに割り当てるというシンプルなものだ。トップへモドル機能は単純にリンク先を<code>#top</code>に書きかえるだけでも良かったが、URLの分散と履歴の汚染をもたらしてしまうので<code>window.scrollTo(0, 0)</code>を使った。</p>
+
+<p>実際にはいわゆるdebounceで遅延させて、<a href="/toggle-logo-action.js">イベントを間引いてたりも</a>している。スクロール・イベントで何かする場合にdebounceを使うとカクつくため、間引きつつ定期的に発火できるthrottleを使うことが多い。しかし、こういう目に見える変化をもたらさないものならdebounceの方が効率的だろう。</p>
+
+<p>また、再読み込み時などにスクロール・イベントなしでナビゲーションが見えない状態になっている場合を考慮して、最初に一回だけ機能の割り当てを試みるようにもした。その後、スクロールごとに<code>addEventListener()</code>を繰り返し行う実装になっており無駄が多いが、同じものは<a href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener">複数割り当てられることはない</a>ので、わざわざフラグ管理などをしなくても悪くはない(良くはない)。</p>
+
+<p>他にはリンクの<code>href</code>属性の値を<code>#top</code>に書きかえ、ページを遷移するリンクではないことがわかるようにもしておいた。実際には<code>#top</code>に移動するわけではない上、現状のブラウザーの実装だと<code>#</code>以降が見えないこともあるので、完璧な解ではない。とは言っても、少なくともページを遷移するように見えるリンクのままよりは良いだろうし、機能的にはほぼ同等なので及第点と考えた。</p>
+
+<hr>
+
+<p>これはイメージとしては最近色々言われることの多いハンバーガー・ボタンによるナビゲーションの展開のごくシンプルな変種というと近い。ページの最上部へ戻らせることではなく、<em>トップにあるナビゲーションを表示させる</em>ことを目的としてる。</p>
+
+<p>欠点は、どうあがいても結局のところ「トップヘモドル」ボタンのため、押した時点で今まで読んでいたところに戻る手段がないことだ。ナビゲーションも位置固定にして、スクロールと同時に隠し、ロゴを押すと展開されるといった形にすると解決するが、Homeキーを押すのと同じと考えると、それほど気にするほどのことでもないだろう。</p>
+
+<p>もうひとつの欠点はウェブサイトのホームへ移動する方法がわかりづらくなることだ。これはロゴからハンバーガーのアイコンに変更するなどして、画像でそれぞれの機能を示せば良いかもしれない。しかし、そうなると別にハンバーガー・ボタンを配置した方が明らかに効率的になるので、微妙なところだ。</p>
+
+<p>Internet Explorer 8以下への対応などを除いたとしてもいくつかの欠点があるものの、ナビゲーションへの簡単なアクセスを可能にする方法としては、シンプルで悪くないアプローチではあるとは言える。少なくとも「トップ」が何を指しているのかよくわからない「トップヘモドル」ボタンをそのまま設置したり、そこかしこに<code>#top</code>を使ったリンクを張るよりは随分とマシであるはずだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

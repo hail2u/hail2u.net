@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>transformプロパティーを使ったセンタリングで○○がぼやける</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/centering-with-transform-causes-blurry-something.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="幅や高さがわからない要素を上下左右にセンタリングするには長らくdisplay: table-cellを使ったものが主流だった。最近は、よりシンプルに実装できることからtransformプロパティーを使って50%戻すというような手法がメジャーになりつつある。しかしtransformプロパティーで動かすと常に何かがぼやけるリスクを伴う。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="幅や高さがわからない要素を上下左右にセンタリングするには長らくdisplay: table-cellを使ったものが主流だった。最近は、よりシンプルに実装できることからtransformプロパティーを使って50%戻すというような手法がメジャーになりつつある。しかしtransformプロパティーで動かすと常に何かがぼやけるリスクを伴う。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/centering-with-transform-causes-blurry-something.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="transformプロパティーを使ったセンタリングで○○がぼやける" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-09-08T07:58:17+09:00">2014年9月8日</time></p>
+
+        <h1><em>transformプロパティーを使ったセンタリングで○○がぼやける</em></h1>
+      </header>
+
+    <main>
+
+    <p>幅や高さがわからない要素を上下左右にセンタリングするには長らく<code>display: table-cell</code>を使ったものが主流だった。最近は、よりシンプルに実装できることから<code>transform</code>プロパティーを使って<code>50%</code>戻すというような手法がメジャーになりつつある。しかし<code>transform</code>プロパティーで動かすと常に何かがぼやけるリスクを伴う。</p>
+
+<p><code>transform</code>プロパティーによる上下左右のセンタリングは、<a href="http://css-tricks.com/centering-css-complete-guide/">CSS Tricksに書かれた記事</a>を見るのが一番わかりやすいだろう。</p>
+
+<pre><code class="language-css">.parent {
+  position: relative;
+}
+
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}</code></pre>
+
+<p><code>transform</code>プロパティーの<code>translate()</code>で<code>%</code>を使う場合、その要素の幅と高さが基準になる。そのため要素の幅や高さがわからなくても、<code>%</code>を使うだけでうまくセンタリングできるというわけだ。</p>
+
+<p>では実際にぼやける例を見てみよう。下記デモはWindowsにおいて、Firefox 31では微妙に、Chrome 37では若干強くぼやける。Internet Explorer 11ではぼやけない。ブラウザーだけでなくOSやハードウェアにも依存するので、スクリーンショットも併記しておく。</p>
+
+<p>Demo: <a href="/pub/test/593.html">Blurry Translated Button</a></p>
+
+<figure>
+<img alt="translate()を使って移動しただけでも、button要素の左右の端がぼやけているのがわかる。" height="370" src="/img/blog/centering-with-transform-causes-blurry-something.png" width="750">
+<figcaption>Screenshot on Windows Chrome 37 @5x</figcaption>
+</figure>
+
+<p>5倍に拡大すると逆にわかりづらくなるが、ボタン要素の端がぼやけている。場合によってはボタンの文字列が微妙に崩れることもある。フォーム部品で発生する確率が高く、次にSVGなどのベクター画像でよく起こる。これらはシャープな輪郭を持つので気づきやすいということだろう。通常のテキストやビットマップ画像ではあまり発生しない(か、起こっても認識できない)。</p>
+
+<p>違いは微妙なものだとも言えるが、安定した形状を持ち、無意識化にそれが意識されているフォーム部品では、強い違和感を持つユーザーもいることは無視できない。</p>
+
+<hr>
+
+<p><code>transform</code>プロパティーを使った何かしらのテクニックには常にこのぼやけるリスクをはらむ。上下左右のセンタリングにおいては万能ではあるが、安定であるとは決して言えない。特にオーバーレイでフォームを出す時などに使うことがあるので、フォーム部品でよくぼやけるというのはそこそこリスクが高いと言えるだろう。</p>
+
+<p>今さらハック的な要素を多分に含む<code>display: table-cell</code>を使った手法に戻るのは色々問題があるので、素直にFlexboxを使いつつうまくフォールバックさせるのが良いだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

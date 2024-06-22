@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>模造紙風の背景色</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/mozoushi.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑(105度)と紫(285度)が見やすいと思う。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑(105度)と紫(285度)が見やすいと思う。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/mozoushi.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="模造紙風の背景色" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-07-01T09:39:09+09:00">2020年7月1日</time></p>
+
+        <h1><em>模造紙風の背景色</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="6種類の色相でのプレビューを並べてみたもの。" height="1440" src="/img/blog/mozoushi.png" width="2560">
+</figure>
+
+<p>ユーザーがアクセスした時間に応じて、背景色とハイパーリンクの色が変わるようになった。10秒おきに再読み込みすると変わるのが確認できる。模造紙のような色で、ちょっと懐かしい。すぐ飽きて戻すと思うが、現時点では気に入っている。緑(105度)と紫(285度)が見やすいと思う。</p>
+
+<p>当初はDay of the Yearで変わるようにしようと考えていた。しかし、これでは変化に乏しいし、DotYを計算するのが面倒(うるう年とか)だし、360におさまらないのをどうなじませるか考えるのも面倒だったので、秒数を使うことにした。</p>
+
+<pre><code class="language-javascript">const seconds = Math.floor((new Date()).getSeconds() / 10);
+const hue = seconds * 60 - 15;</code></pre>
+
+<p>秒数をそのまま使い、色のバリエーションは60種類にしても良かったが、ハイパーリンクのコントラスト要件が満たされるかどうかを確認するのが大変で、6種類に絞った。つまり秒数を10で割った商に60を掛け、60刻みで0から300まで作り、それを色相に設定する。60の倍数だときれいな色になりやすいので、15度だけ反時計回りに回して、若干ずらした。</p>
+
+<pre><code class="language-javascript">const lightness = [&quot;49%&quot;, &quot;34%&quot;, &quot;33%&quot;, &quot;33%&quot;, &quot;52%&quot;, &quot;50%&quot;];</code></pre>
+
+<p>彩度は50%で固定し、明度は使われる場所で使い分ける。前バージョンのカラー・パレットと同じく、背景色なら95%、文字色なら10%にしている。ハイパーリンクの色は、背景色と文字色の両方とコントラスト比を確保したいので、手作業で適切な明度を探し、色相に応じて選択できるようにした。</p>
+
+<pre><code class="language-javascript">document.documentElement.style = `--hue:${hue};--lightness:${lightness[seconds]}`;</code></pre>
+
+<p>最後に生成した色相と明度をカスタム・プロパティーで仕込むだけだ。ここではルート要素の<code>style</code>属性に仕込んだが、<code>style</code>要素を作ってもいい。</p>
+
+<pre><code class="language-css">:root {
+  --hue: -15;
+  --lightness: 49%;
+
+  --color-primary: hsl(var(--hue) 50% 10%);
+  --color-secondary: hsl(var(--hue) 50% var(--lightness));
+  --color-background: hsl(var(--hue) 50% 95%);
+  --color-surface: hsl(var(--hue) 50% 92%);
+}</code></pre>
+
+<p><code>hsl()</code>関数の中でもカスタム・プロパティーが使えるので、CSSはこのように書ける。ちょうど4色まで減らしていたところだったので、調整することもなくちょっと書き換えるだけで済んだ。</p>
+
+<hr>
+
+<p>テーマ・カラー的なものがなくなってしまった。その一方で、無個性なようでいて主張が強い色とも言える。ダーク・モードへの反発で、軽やかな色構成に魅かれており、こういうものも作ってみたかった。スクロールと共に変化しても面白そうだが、コストが高いのでやめておく。<code>onscroll100vh</code>などという組み込みイベントができたら、実装したい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>BPT #2: 独自flavourを利用する方法</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/bpt_2_how_to_apply_original_flavour.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="blosxomの出力に、プラグインで生成した何か(大抵の場合はHTMLとか)を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの(単なるリストとか)を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、HTML::Templateなりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="blosxomの出力に、プラグインで生成した何か(大抵の場合はHTMLとか)を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの(単なるリストとか)を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、HTML::Templateなりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="BPT #2: 独自flavourを利用する方法" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-08-26T19:15:18+09:00">2004年8月26日</time></p>
+
+        <h1><em>BPT #2: 独自flavourを利用する方法</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.blosxom.com/">blosxom</a>の出力に、プラグインで生成した何か(大抵の場合はHTMLとか)を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの(単なるリストとか)を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、<a href="http://search.cpan.org/search?module=HTML::Template">HTML::Template</a>なりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。</p>
+<p>プラグインから独自のflavourを利用するには、blosxomの<code>template</code>というサブルーチンを呼んでやります。ここで注意するのは、プラグインで<code>template</code>サブルーチンを利用するのではないということ。<a href="http://www.blosxom.com/documentation/developers/plugins.html">プラグインのドキュメント</a>に、</p>
+<blockquote>
+<p>The <code>template</code> subroutine offers the plugin the chance to swap in a replacement for the default template subroutine (the one that brings in your flavour templates).</p>
+</blockquote>
+<p>とあるように、プラグインで<code>template</code>サブルーチンを利用するという事が意味するのは、デフォルトのテンプレートを差し替えるということです(よくわからない説明になってますけど、察してください)。</p>
+<p>blosxomの<code>template</code>サブルーチンは、</p>
+<pre><code class="language-perl">my $tmpl = &amp;$blosxom::template($path, $chunk, $flavour);</code></pre>
+<p>という形で呼び、<code>$tmpl</code>には、<code>$datadir/$path/$chunk.$flavour</code>というファイルの内容がそのまま格納されます。<code>$path</code>は<code>$blosxom::path_info</code>などをそのまま渡してやり、<code>$chunk</code>はプラグイン名などを利用、<code>$flavour</code>は<code>$blosxom::flavour</code>をそのまま渡すと、blosxomの挙動を真似することが出来、わかりやすく(ユーサーにもデベロッパーにも)ます。実際のコードを書いてみると、</p>
+<pre><code class="language-perl">package foo;
+
+use strict;
+use vars qw($bar);
+
+my $hoge = &apos;hogehoge&apos;;
+
+sub start {
+  $bar = &amp;$blosxom::template($blosxom::path_info, &apos;foo&apos;, $blosxom::flavour);
+  $bar =~ s/\$foo::hoge/$hoge/ge;
+
+  return 1;
+}
+
+1;</code></pre>
+<p>という感じになります。これでhead.htmlなどで<code>$foo::bar</code>と書いておくと、その場所にfoo.htmlというflavourの内容が入ることになります。blosxomの<code>template</code>サブルーチンは、blosxomの<code>interpolate</code>サブルーチンが呼ばれないので、独自flavour内のblosxomスタイルの変数は自前で処理してやる必要があります(10行目)。</p>
+<p>より実践的なコードは、<a href="http://www.blosxom.com/plugins/input/writeback.htm">writeback</a>の<code>story</code>サブルーチンや、僕の作成した<a href="/archives/blugins.html#back_and_forth">back_and_forth</a>の<code>head</code>サブルーチンあたりで見ることが出来ます。</p>
+<p>blosxomの<code>template</code>サブルーチンを利用した独自flavourを利用するようにプラグインを作成すると、ユーザーに優しいプラグインになると思います。一方で説明が面倒になることも否定はしないですが。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

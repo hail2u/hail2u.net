@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ReworkとPostCSS</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/rework-and-postcss.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="AutoprefixerやMyth経由で話題になったRework。そしてAutoprefixerが乗り換えたPostCSS。両者はどのようなことに主眼を置いているライブラリなのか、SassやLESSとの関係はどうなのか、そしてどのようなツールを書く時にそれらを使うべきなのだろうか。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="AutoprefixerやMyth経由で話題になったRework。そしてAutoprefixerが乗り換えたPostCSS。両者はどのようなことに主眼を置いているライブラリなのか、SassやLESSとの関係はどうなのか、そしてどのようなツールを書く時にそれらを使うべきなのだろうか。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ReworkとPostCSS" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-02-20T11:13:25+09:00">2014年2月20日</time></p>
+
+        <h1><em>ReworkとPostCSS</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://github.com/ai/autoprefixer">Autoprefixer</a>や<a href="http://www.myth.io/">Myth</a>経由で話題になった<a href="https://github.com/reworkcss/rework">Rework</a>。そしてAutoprefixerが乗り換えた<a href="https://github.com/ai/postcss">PostCSS</a>。両者はどのようなことに主眼を置いているライブラリなのか、SassやLESSとの関係はどうなのか、そしてどのようなツールを書く時にそれらを使うべきなのだろうか。</p>
+
+<section>
+<h2>Rework</h2>
+
+<p>ReworkはCSSをプリプロセスするためのライブラリということになっている。サポートされているかどうかよくわからない最先端の標準仕様のドラフトに従って書かれたCSSをブラウザーがちゃんと解釈できるようにするとか、特殊な記法を展開するとか、だ。こういった現実世界ではうまく動かないCSSをプリプロセスしてちゃんと動くCSSに変換するツールを作るためのものということになる。</p>
+
+<p>SassやLESSと同じ立ち位置のものを作るためのものなので、共存させることにはあまり意味が無い(まったく無いわけではない)。現状のSassやLESSは安定しており、高機能で、開発も活発なので、これらと並ぶ機能性のものをReworkを使って作るのは無理がある。ウェブ標準の変化に左右されやすいという点でも、独自に実装していけば良いSassやLESSに小回りという点で劣る。</p>
+
+<p>つまり、SassやLESSのようにCSSに大きなレイヤーを付け加えるのではなく、Mythのようなウェブ標準と実装のギャップを埋めるような形のツールを作るのに向いているということだ。ウェブ標準と実装のギャップが少なくなればなるほど、CSSから乖離しつつあるSassやLESSよりもMyth (のようなReworkを使ったCSSプリプロセッサー)の方がより快適なCSSプリプロセッサーと成っていくはずだ。</p>
+</section>
+
+<section>
+<h2>PostCSS</h2>
+
+<p>PostCSSは反対に、既にCSSとしてはほとんど問題のないものをポストプロセスして、より効果的なCSSに変換するためのライブラリだ。SassやLESS、またはMythでざっと書いて、PostCSSを使ったツールに機械的に行っても問題のないような作業を任せるということになる。</p>
+
+<p>SassやLESSは拡張性という点でかなりの難点がある。Sassはちょっと難しいことをしようとしたらRubyに触らなければならないし、その利用を汎用化させるのは難しい。<a href="http://compass-style.org/">Compass</a>を利用することによりある程度解消されるが、必ずしも自分の必要な物があるとは限らない。LESSはJavaScriptで書けるので敷居は大幅に下がるが、利用の汎用化が難しいのは同じだ。</p>
+
+<p>PostCSSならばパーサーに便利機能が付いたという形のものなので、単機能のツールに限れば実装はストレートに行える可能性が高い。SassやLESSに欠けている機能をPostCSSを使って単機能のツールとして作り、Gruntを始めとしたタスク・ランナーやビルド・ツールでまとめて実行させるというのは、コスト(作成時及び実行時)はそこそこかかるものの、そこそこ賢い選択肢と言える。</p>
+</section>
+
+<hr>
+
+<p>SassやLESSが浸透した現在、Rework印のCSSプリプロセッサーが支持を確保するのは難しい。ただ複雑化し、し続けるであろうCSSプリプロセッサーに対する反発は少なからずあるので、今後は存在感を増していくだろう。今のSassのように幅広い人々に支持されるかは未知だが、コンパクトで愛される良いプリプロセッサー言語が出てくる可能性は高い。</p>
+
+<p>一方PostCSSは、それを使った単機能のツールが数多く出て来ないと広まる可能性は低い。理由は単純で、無くても力技や運用でどうにかなることが多い辺りを改善しようというものだからだ。もし様々な単機能ツールが提供されるような状況になったら、プロジェクトに必要そうな物を必要なだけ導入し、そのプロジェクトに最適化されたCSSを提供しやすくなる。Source Mapへの柔軟な対応など生態系の充実へのカギになりそうな機能はあるので、期待はできる。</p>
+
+<p>ReworkやMythにおいてはあまりやれることはなさそうだが、PostCSSにおいては色々なツールを書くことで、比較的手軽に貢献できそうな気がする。様子を見つつ、PostCSSを使っていくつかポストプロセッサーを書いていこうと思う。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

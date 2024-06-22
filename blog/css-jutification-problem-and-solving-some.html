@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSによる両端揃えの問題点とその解決へ向けて</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/css-jutification-problem-and-solving-some.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="日本語の文章の場合、両端が揃っているとおさまりが良い。CSSではその両端揃えを行うためにtext-alignプロパティーにjustifyという値が用意されている。完全に日本語だけの段落ならほぼ100%、和欧混在の段落でも9割以上の段落で想定通り機能するが、まれに無残な結果になる。それは自動折り返しで長めの英単語が行頭に来る場合だ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="日本語の文章の場合、両端が揃っているとおさまりが良い。CSSではその両端揃えを行うためにtext-alignプロパティーにjustifyという値が用意されている。完全に日本語だけの段落ならほぼ100%、和欧混在の段落でも9割以上の段落で想定通り機能するが、まれに無残な結果になる。それは自動折り返しで長めの英単語が行頭に来る場合だ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/css-justification-problem-and-solving-some.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSによる両端揃えの問題点とその解決へ向けて" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-11-04T12:17:58+09:00">2016年11月4日</time></p>
+
+        <h1><em>CSSによる両端揃えの問題点とその解決へ向けて</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="Justfication。" height="1440" src="/img/blog/css-justification-problem-and-solving-some.png" width="2560">
+</figure>
+
+<p>日本語の文章の場合、両端が揃っているとおさまりが良い。CSSではその両端揃えを行うために<code>text-align</code>プロパティーに<code>justify</code>という値が用意されている。完全に日本語だけの段落ならほぼ100%、和欧混在の段落でも9割以上の段落で想定通り機能するが、まれに無残な結果になる。それは自動折り返しで長めの英単語が行頭に来る場合だ。</p>
+
+<p>両端揃えは文字と文字の間を開けることで行われる。日本語だけの段落の場合、ほとんどどこでも改行することができる上、行送りの禁則処理が起こっても最大2文字分なので、行の長さが十分にあればその調整は認識されないだろう。問題は和欧混在の段落だ。</p>
+
+<p>Demo: <a href="/test/657.html">Justifying Problem</a></p>
+
+<p>この「contemporary」くらいの長さの単語だとまだマシな方で、あまり問題が起こることはない。しかし、このウェブサイトのように<code>compareDocumentPosition()</code>とか<code>DOCUMENT_POSITION_CONTAINS</code>などといった途中で改行できない長い語がよく出てくると、こういった問題は発生しやすくなる。</p>
+
+<p>「contemporary」という多少長めの単語が行頭に来るとその前の行でトラッキングが狂ってしまっている。デモは環境によって再現しないかもしれないが、掲載しておいたスクリーンショットのようになる環境は少なくない。ほとんどのブラウザーで、メイリオや游ゴシック、ヒラギノ明朝で表示された場合再現するはずだ。</p>
+
+<p>以下の2つの方法以外では解決できない(と思う)。</p>
+
+<ol>
+<li>全角の英数字を使う</li>
+<li><code>word-break: break-all</code>を使う</li>
+</ol>
+
+<p>間違いなく1を採用するのは馬鹿げているので、現実的な解は2ということになる。<code>break-all</code>はこの両端揃えでおかしくなるのは防ぐが、それと同時に他の場所にも顕著な影響を与えてしまう。どちらもあまり良い解ではない。</p>
+
+<p>このウェブサイトでは<code>hyphens</code>プロパティーの柔軟な実装を期待する形で両端揃えを試しつつ、<code>code</code>要素などのみで単語中で折り返せるようにした。これで95%くらいのケースでうまくいくはずだがどうだろうか。8文字以上の長い単語を自動で折り返せるようにするスクリプトでも書けば98%くらいまで解決できそうだが、コストに見合わないのでやめておいた。</p>
+
+<hr>
+
+<p>本当はここでハイフネーションができれば良い形で解決するのだが、Chromeではまだ<a href="http://caniuse.com/#search=hyphens"><code>hyphens</code>プロパティー</a>が実装されていない。しかし<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=652964">最近作られたイシュー</a>はあったので、ちょっと期待できそうになってきた。そのため現状の両端揃えにおける問題点には目を瞑って、<code>hyphens: auto</code>を併用するというのも悪くはなさそうだが、<code>lang=ja</code>だとハイフネーションが機能しないというまた別の問題もある。前途多難だ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

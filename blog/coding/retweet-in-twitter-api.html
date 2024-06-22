@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Twitter APIにおけるリツイート</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/retweet-in-twitter-api.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Twitter APIのusers/showは認証なしで手軽に最新のツイートのみを拾えるので、JavaScriptでウェブサイトにツイートを表示するなどといったケースに適しており、使っている人も多いと思う。が、最新のツイートがリツイートの場合はAPIが返すJSONからstatus以下がバッサリとなくなってしまうため、最新のツイートを拾うことができなくなってしまう。これに対処するためにもっと柔軟にツイートを拾えるstatuses/user_timelineを使ってcount=1にした……が、それだけではうまくいかなかったという話。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Twitter APIのusers/showは認証なしで手軽に最新のツイートのみを拾えるので、JavaScriptでウェブサイトにツイートを表示するなどといったケースに適しており、使っている人も多いと思う。が、最新のツイートがリツイートの場合はAPIが返すJSONからstatus以下がバッサリとなくなってしまうため、最新のツイートを拾うことができなくなってしまう。これに対処するためにもっと柔軟にツイートを拾えるstatuses/user_timelineを使ってcount=1にした……が、それだけではうまくいかなかったという話。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Twitter APIにおけるリツイート" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-03-26T15:54:07+09:00">2011年3月26日</time></p>
+
+        <h1><em>Twitter APIにおけるリツイート</em></h1>
+      </header>
+
+    <main>
+
+    <p>Twitter APIの<a href="http://dev.twitter.com/doc/get/users/show">users/show</a>は認証なしで手軽に最新のツイートのみを拾えるので、JavaScriptでウェブサイトにツイートを表示するなどといったケースに適しており、使っている人も多いと思う。が、最新のツイートがリツイートの場合はAPIが返すJSONから<code>status</code>以下がバッサリとなくなってしまうため、最新のツイートを拾うことができなくなってしまう。これに対処するためにもっと柔軟にツイートを拾える<a href="http://dev.twitter.com/doc/get/statuses/user_timeline">statuses/user_timeline</a>を使って<code>count=1</code>にした……が、それだけではうまくいかなかったという話。</p>
+
+<p>最新のツイートだけを拾いたかったので、単純に<code>count=1</code>を指定してみた。</p>
+
+<pre>http://api.twitter.com/1/statuses/user_timeline.json?screen_name=abcde<em>&amp;count=1</em></pre>
+
+<p>しかし、最新のツイートがリツイートだと返されるJSONが空になる(リツイートではない最新のツイートまで遡ってくれたりはしない)。つまりはusers/showと似たような挙動でこれだけではうまくいかない。空にならないようにするためには、リツイートを含めて返させるように、<code>include_rts</code>パラメータも追加する必要がある。</p>
+
+<pre>http://api.twitter.com/1/statuses/user_timeline.json?screen_name=abcde&amp;count=1<em>&amp;include_rts=true</em></pre>
+
+<p>どうしてもusers/showでリツイートを含めて返して欲しい場合は、JSONではなくXMLで返してもらうと良い。JavaScriptで扱う場合はYQL等を経由することが多いと思うので、JSONとXMLのどちらでも大して変わらないはず。</p>
+
+<pre>http://api.twitter.com/1/users/show.<em>xml</em>?screen_name=abcde</pre>
+
+<p>認証なしAPIでリツイートを飛ばした最新のツイートだけをサクっと拾う方法はなさそうな感じ。リツイートが後付けの機能だからなのか、パフォーマンスの問題からなのか、この仕様は明文化されてないこととかもあって微妙に困る。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

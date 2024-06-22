@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>node-inlining</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/node-inlining.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTMLからlink要素で参照しているCSSの内容をstyle属性に全部展開するNode.jsパッケージ、node-inliningを書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="HTMLからlink要素で参照しているCSSの内容をstyle属性に全部展開するNode.jsパッケージ、node-inliningを書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="node-inlining" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-06-05T00:57:20+09:00">2015年6月5日</time></p>
+
+        <h1><em>node-inlining</em></h1>
+      </header>
+
+    <main>
+
+    <p>HTMLから<code>link</code>要素で参照しているCSSの内容を<code>style</code><em>属性</em>に全部展開するNode.jsパッケージ、<a href="https://github.com/hail2u/node-inlining">node-inlining</a>を書いていた。HTMLとCSSを別々に普通に書き、このパッケージに含まれるCLIプログラムでコンパイルすると、HTMLメールとしてうまく機能するHTMLができあがるということになる。GitHubで推奨されている外部リソースに依存しない静的なエラー・ページを作成するためにも使えるかもしれない。</p>
+
+<p>CLIプログラムはごく簡単に使うことができる。</p>
+
+<pre><samp>$ <kbd>npm install -g inlining</kbd>
+$ <kbd>inlining input.html &gt;output.html</kbd></samp></pre>
+
+<p>これで<code>output.html</code>にインライン化されたHTMLファイルが吐かれる。処理例は<a href="https://github.com/hail2u/node-inlining#readme">README</a>の簡単な例や<a href="https://github.com/hail2u/node-inlining/tree/master/test">testディレクトリー</a>を見てくれればわかるはずだ。</p>
+
+<p>Node.jsパッケージとしての利用は少しややこしくなる。</p>
+
+<pre><code class="language-javascript">var inlining = require(&quot;inlining&quot;);
+inlining(fs.readFileSync(&quot;input.html&quot;, &quot;utf8&quot;), function (result) {
+  console.log(result);
+});</code></pre>
+
+<p>引数は以下の3つになる。</p>
+
+<ol>
+<li>HTMLコード</li>
+<li>HTMLファイルの(想定される)パス(省略可能)</li>
+<li>コールバック</li>
+</ol>
+
+<p>HTMLコードを直接渡すと処理して、コールバック関数が処理結果を引数として実行される。HTMLファイルのパスは相対パスを解決するために使っている。省略した場合はカレント・ディレクトリーになる。</p>
+
+<hr>
+
+<p>パッケージ内では以下の様な順で処理される。</p>
+
+<ol>
+<li><code>rel=&quot;stylesheet&quot;</code>である<code>link</code>要素を列挙<ol>
+<li><code>href</code>属性の値をパスとして解決</li>
+<li>CSSを読み込んでパース<ol>
+<li>読み込みに失敗したらスキップして次の<code>link</code>要素へ</li>
+</ol>
+</li>
+<li>ルールセットのセレクターを分割<ol>
+<li>セレクターにマッチする要素を列挙</li>
+<li>ルールセットの内容を連結して、<code>style</code>属性の値に設定</li>
+</ol>
+</li>
+<li>ルールセットを削除</li>
+<li>残ったCSSを<code>style</code>要素の内容として<code>head</code>要素に追加</li>
+<li><code>link</code>要素を削除</li>
+</ol>
+</li>
+<li>処理結果を標準出力に出力</li>
+</ol>
+
+<p><code>@media</code>ルールなどの<code>style</code>属性へ記述できないルールセット群はそのまま残り、出力HTMLの<code>head/style</code>にそのままコピーされることになる。ここで詳細度が逆転してしまう可能性があるので、<code>@media</code>ルールで上書きしたい場合は<code>!important</code>フラグを駆使する必要がある。他、相対パスで指定された画像ファイルなどはDataURLで埋め込まれる。</p>
+
+<hr>
+
+<p>内部ではHTMLをパースしてDOM API群を提供してくれる<a href="https://github.com/tmpvar/jsdom">jsdomパッケージ</a>とおなじみCSSをパースしてくれる<a href="https://github.com/postcss/postcss">postcssパッケージ</a>を利用した。jsdomはその存在は知っていたものの、初めてまともに使った。概ね使いやすかったが、やはりバグとはいえないまでも、いくつか特徴的な挙動は持つようだ。</p>
+
+<p>例えばjsdomで<code>HTMLElement.style.cssText</code>を使うとノーマライズされてしまう。そのためベンダー拡張プリフィックス付きのプロパティーや存在しないプロパティー(<code>foo</code>とか)、そして未知のプロパティー(<code>font-feature-settings</code>プロパティーとか)がうまく追加できなかった。仕方がないので<code>Element.setAttribute()</code>を使って強引にそのまま設定している。</p>
+
+<p>また<code>querySelectorAll()</code>で<code>::-moz-selection</code>擬似要素を含むものなど不明なセレクターを投げるとブラウザーと同じように例外を吐く。ブラウザーではそのまま処理は続行されるが、Node.js上では当然落ちる。使いづらいが挙動としては正しそうなため、<code>try..catch</code>で握りつぶして無視した。</p>
+
+<p>最後に完全なHTMLソースを手に入れることに少し苦労した。<code>window.document.documentElement.innerHTML</code>だと<code>html</code>要素が除外され、<code>window.document.documentElement.outerHTML</code>だとDOCTYPEが拾えない。<code>window.document.doctype</code>を使って連結するのは少しややこしすぎる。どうやら専用の非標準APIが用意されているようで、それを使うとうまく手に入れられた。</p>
+
+<pre><code class="language-javascript">var jsdom = require(&quot;jsdom&quot;);
+
+jsdom.env(
+  &quot;&lt;!DOCTYPE html&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&quot;,
+  function (errors, window) {
+    console.log(window.document.documentElement.innerHTML);
+    // &lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;
+    console.log(window.document.documentElement.outerHTML);
+    // &lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+    console.log(jsdom.serializeDocument(window.document));
+    // &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Lorem ipsum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+  }
+);</code></pre>
+
+<p>他、MIMEタイプの推定には<a href="https://github.com/broofa/node-mime"><code>mime</code></a>パッケージ、画像のDataURL化には<a href="https://nodejs.org/api/buffer.html#buffer_buf_tostring_encoding_start_end"><code>Buffer.toString(&quot;base64&quot;)</code></a>に当たるものを利用した。</p>
+
+<hr>
+
+<p>とりあえず動くところまでという形で書いた。続きはわからないけれど、必要な機能はもうあまりなさそうだ。強いて言うのならHTMLファイル内の画像ファイルのDataURL化くらいだろうか。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

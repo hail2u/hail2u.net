@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>はてなスターでrel=&quot;canonical&quot;を見るように</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/hatena-star-and-rel-canonical.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！　ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Googleの+1はデフォルトでrel=&quot;canonical&quot;を見るようになってたりします。Facebookのいいね！　ボタンやはてなブックマークボタンは対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターはa要素かwindow.locationやdocument.locationという訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張るa要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、対応してくれそうもないので重い腰を上げてHatenaStar.jsに処理を追加しました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="はてなスターでrel=&quot;canonical&quot;を見るように" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-11-07T11:34:03+09:00">2011年11月7日</time></p>
+
+        <h1><em>はてなスターでrel=&quot;canonical&quot;を見るように</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.google.com/webmasters/+1/button/">Googleの+1</a>はデフォルトで<code>rel="canonical"</code>を見るようになってたりします。<a href="https://developers.facebook.com/docs/reference/plugins/like/">Facebookのいいね！　ボタン</a>や<a href="http://b.hatena.ne.jp/guide/bbutton">はてなブックマークボタン</a>は対応していませんが、明示的に対象のURLを指定できるようになっているのであまり問題はありません。しかし、はてなスターは<code>a</code>要素か<code>window.location</code>や<code>document.location</code>という訪問者側がいくらでも細工ができるものしか指定できないため、宗教上の理由で自身のURLへリンクを張る<code>a</code>要素を書くことができない人は詰みます。そんな理由で外してしまったんですが、<a href="http://i.hatena.ne.jp/idea/29643">対応してくれそうもない</a>ので重い腰を上げてHatenaStar.jsに処理を追加しました。</p>
+
+<p>ざっと読んだところ<code>Hatena.Star.EntryLoader.getElementByConfigSelector()</code>でうまいこと<code>rel="canonical"</code>な<code>link</code>要素を返すようにすれば良さそうです。<code>gEBCS()</code>はCSSセレクタを渡して要素を選択するものだが、内部で<code>querySelector()</code>のラッパーになってたりとかそういううまい話はないので、<code>link[rel="canonical"]</code>を渡してもそのままではうまく動きません。なので<code>window.location</code>等と同じように特別視する処理を入れてやる必要があります。</p>
+
+<pre><code class="language-js">} else if (selector == 'link[rel="canonical"]') {
+  var z = document.getElementsByTagName("link"),
+    y,
+    x = z.length,
+    w,
+    v = document.createElement("a");
+
+  for (y = 0; y &lt; x; y++) {
+    w = z[y];
+
+    if (w.rel === "canonical") {
+      v.setAttribute("href", w.href);
+      result = v.cloneNode(false);
+      break;
+    }
+  }</code></pre>
+
+<p><code>getElementsByTagName()</code>で<code>link</code>要素を全て取得し、<code>rel</code>属性が<code>canonical</code>なものを<code>result</code>にセットするというだけです。変数がはっちゃけているのは気にしない。<code>cloneNode()</code>を使っているのは相対URLで<code>rel="canonical"</code>が書かれていた場合に某ブラウザもどきで絶対URLにならないことへの対策で、元ネタは<a href="http://subtech.g.hatena.ne.jp/secondlife/20090624/1245809935">グループ日記のタイトルを変えすぎる人のエントリ</a>です。<a href="/HatenaStar.js.111107.patch">パッチ</a>もあります。</p>
+
+<p>これで<code>Hatena.Star.SiteConfig</code>で特殊なセレクタとして<code>link[rel="canonical"]</code>が使えるようになります。</p>
+
+<hr>
+
+<p>このブログのように、Blosxomで一覧ページとpermalinkで対象とするURLを切り替える場合は<a href="http://blosxom.sourceforge.net/plugins/interpolate/interpolate_fancy.htm">interpolcate_fancy</a>を使って以下のようにすれば良いでしょう。</p>
+
+<pre><code class="language-html">&lt;script type="text/javascript"&gt;
+Hatena.Star.SiteConfig = {
+  entryNodes: {
+    "article": {
+&lt;?$path_info like="\.html$"&gt;
+      uri:       "link[rel=\"canonical\"]",
+&lt;/?&gt;
+&lt;?$path_info unlike="\.html$"&gt;
+      uri:       "h2 a",
+&lt;/?&gt;
+      title:     "h2",
+      container: "footer p"
+    }
+  }
+};
+&lt;/script&gt;</code></pre>
+
+<p>これでスター通知でニヤニヤする日々が帰ってきますね！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

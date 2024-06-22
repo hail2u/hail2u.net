@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>HTMLの最小化</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/minifying-html.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTMLのいわゆる最小化(圧縮)を行うようにした。HTML Minifierを何度か使う機会があり、それなりに安定していることがわかったので、得られるパフォーマンスと背負うリスクが妥当なのではないかという方向へ傾いてきた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="HTMLのいわゆる最小化(圧縮)を行うようにした。HTML Minifierを何度か使う機会があり、それなりに安定していることがわかったので、得られるパフォーマンスと背負うリスクが妥当なのではないかという方向へ傾いてきた。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/minifying-html.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="HTMLの最小化" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-06T14:33:46+09:00">2016年4月6日</time></p>
+
+        <h1><em>HTMLの最小化</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="不要なスペースやコメントその他が削除されたHTMLコード。" height="720" src="/img/blog/minifying-html.png" width="1280">
+</figure>
+
+<p>HTMLのいわゆる最小化(圧縮)を行うようにした。<a href="http://kangax.github.io/html-minifier/">HTML Minifier</a>を何度か使う機会があり、それなりに安定していることがわかったので、得られるパフォーマンスと背負うリスクが妥当なのではないかという方向へ傾いてきた。</p>
+
+<p>HTML Minifierのオプションは以下のようなものにした。かなりの数のオプションを有効化し、すこしきつめに圧縮してみている。</p>
+
+<pre><code class="language-javascript">var optionsHTMLMinifier = {
+  collapseBooleanAttributes: true,
+  collapseInlineTagWhitespace: true,
+  collapseWhitespace: true,
+  minifyCSS: true,
+  minifyJS: true,
+  removeAttributeQuotes: true,
+  removeComments: true,
+  removeEmptyElements: true,
+  removeOptionalTags: true,
+  removeRedundantAttributes: true,
+  removeScriptTypeAttributes: true,
+  removeStyleLinkTypeAttributes: true,
+  sortAttributes: true,
+  sortClassName: true,
+  useShortDoctype: true
+};</code></pre>
+
+<p>開発者ツールがあるので、HTMLがおかしいかどうかはチェックすることは難しくない。ソースマップが欲しいかなと思ってはいたが、現状のHTMLという存在の性格上、必要ないようだ。最小化したHTMLが壊れている場合、そこに至るまでのどこかしらのツールがおかしいだけで、制作者のミスという可能性はかなり低い。ということはソースマップを使ってデバッグしても原因が特定できないことになるからだ。</p>
+
+<p>こういったHTML(に限らずCSSやJavaScript)の最小化は<a href="https://www.cloudflare.com/features-optimizer/">Cloudflareなどでも一機能</a>として提供されている。しかしどういうツールを使っているのか明らかにされておらず、結果が保証されない。自分の書くコードと最小化ツールとの相性は当然あるため、背負うリスクはかなり高いのではないかと感じる。</p>
+
+<hr>
+
+<p>どうせ最小化するからといって色々と省略しつつHTMLコードを書くのはあまり薦められない。ただそれは省略することを意識すると書きにくいという理由ではない(そういうのは慣れの問題と言える)。HTMLコードでの様々な省略した書き方が多くの人が想像する以上にややこしく、完全に理解するのはまず無理だからだ。またネストがカギの構造であるHTMLコードでは、インデントと改行は読みやすさに直結するであろうからだ。</p>
+
+<section>
+<h2>追記</h2>
+
+<p><code>collapseInlineTagWhitespace</code>が<code>true</code>だと記号間の調整に使っている空白が消えるので、無効にした。またDIFFが確認しづらく、出力されたHTMLが正しいか把握しづらい問題には、<code>preserveLineBreaks</code>を有効にすればよいことを学んだ。このウェブサイトでは巨大な(3000行やそれ以上の)HTMLファイルがあるため、有効にしていない。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

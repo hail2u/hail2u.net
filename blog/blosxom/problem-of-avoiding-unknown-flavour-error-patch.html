@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>不明なflavour回避パッチの問題点</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/problem-of-avoiding-unknown-flavour-error-patch.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="かなり前に書いた不明なflavourというエントリで紹介したパッチは概ねうまく機能しているのだけど、検索エンジンなどで意図しないURLが検索結果に出てきてしまうことがあるという問題が。通常は多くのページでリンクを張られている.htmlで終わるURLの方が圧倒的に強く、Web全体からの検索などではあまり問題にならないが、サイト内検索などではかなりゴミとして目立ってしまう。ので、redirectif_noflavourを使い、存在しないflavourの場合は.htmlで終わるURLにリダイレクトさせることにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="かなり前に書いた不明なflavourというエントリで紹介したパッチは概ねうまく機能しているのだけど、検索エンジンなどで意図しないURLが検索結果に出てきてしまうことがあるという問題が。通常は多くのページでリンクを張られている.htmlで終わるURLの方が圧倒的に強く、Web全体からの検索などではあまり問題にならないが、サイト内検索などではかなりゴミとして目立ってしまう。ので、redirectif_noflavourを使い、存在しないflavourの場合は.htmlで終わるURLにリダイレクトさせることにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="不明なflavour回避パッチの問題点" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-10-05T00:19:24+09:00">2006年10月5日</time></p>
+
+        <h1><em>不明なflavour回避パッチの問題点</em></h1>
+      </header>
+
+    <main>
+
+    <p>かなり前に書いた<a href="/blog/blosxom/unknown_flavour.html">不明なflavour</a>というエントリで<a href="http://agilitynerd.com/index.cgi/tech/web/blogging/blosxom/UnknownFlavourError.html">紹介したパッチ</a>は概ねうまく機能しているのだけど、検索エンジンなどで意図しないURLが検索結果に出てきてしまうことがあるという問題が。通常は多くのページでリンクを張られている.htmlで終わるURLの方が圧倒的に強く、Web全体からの検索などではあまり問題にならないが、サイト内検索などではかなりゴミとして目立ってしまう。ので、<a href="http://tokyoenvious.xrea.jp/b/blog/blosxom/redirectif_noflavour.html">redirectif_noflavour</a>を使い、存在しないflavourの場合は.htmlで終わるURLにリダイレクトさせることにした。</p>
+
+<p>redirectif_noflavourはflavourが見つからなかった場合、設定で指定したflavourのURLに302 Foundでリダイレクトさせるというプラグイン。301 Moved Permanentlyを使いたかったり、設定させなくても<code>$blosxom::default_flavour</code>使えば良さそうと思ったので、</p>
+
+<pre><code class="language-perl"># Blosxom Plugin: redirectif_noflavour
+# Author(s): motormean, Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 2006-10-04
+# Blosxom Home/Docs/Licensing: http://www.blosxom.com/
+
+package redirectif_noflavour;
+
+use strict;
+
+# --- Configurable variables -----------
+
+# --- Plug-in package variables --------
+
+# --------------------------------------
+
+sub start {
+  1;
+}
+
+sub skip {
+  my $path = $blosxom::path_info;
+
+  do {
+    return 0 if -e &quot;$blosxom::datadir/$path/story.$blosxom::flavour&quot;;
+  } while ($path =~ s/(\/*[^\/]*)$// and $1);
+
+  $path = $blosxom::path_info;
+  $path =~ s/\..+?$/.$blosxom::default_flavour/;
+  $blosxom::header-&gt;{-status} = &apos;301 Moved Permanently&apos;;
+  $blosxom::header-&gt;{-Location} = &quot;$blosxom::url/$path&quot;;
+  $blosxom::output = &apos;&apos;;
+
+  return 1;
+}
+
+1;</code></pre>
+
+<p>と、少しだけ改造した。自前でflavourを漁らなくても何とかなりそうな気はする。けどコード考えるのがめんどくさい。303 See Otherのが良いかな？　微妙だ。移動させたわけじゃないから303 See Otherのほうが妥当かもしれない。</p>
+
+<p>こういうケースは404 Not Foundでももちろん良いと思う。というか本来は404 Not Foundであるべきなのだけど、301 Moved Permanently (などのリダイレクトするHTTPステータスコード)を使った方が訪問者を逃さないので、サイト・オーナー的にはプラスだと思う。訪問者にも(多くの場合は)プラスになるはず。</p>
+
+<p>redirectif_noflavourは使いたくないけどerror flavourなページを検索エンジンに拾わせたくないなどという場合は、blosxom.cgiの最後のに書いてあるerror flavourの定義に、</p>
+
+<pre><code class="language-html">&lt;meta name=&quot;robots&quot; content=&quot;noindex, nofollow&quot; /&gt;</code></pre>
+
+<p>といったロボット対策の<code>meta</code>要素を追加するとかが良さそう。</p>
+
+<figure>
+<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4839915016/hail2unet-22"><img alt="スタイルシート スタンダード・デザインガイド―SEO/ユーザビリティ/アクセシビリティを考慮した実践的HTML&amp;CSSデザイン術。" height="475" src="https://m.media-amazon.com/images/I/5154QAQFKFL.jpg" width="335"></a>
+</figure>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

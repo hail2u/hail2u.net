@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSS圧縮ツールとCSSハック</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/css-minifier-and-css-hacks.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="少し前にCSSWringにCSSハックを維持するオプションを付けた。デフォルトはオフで、必要ならばpreserveHacksをtrueにするという形で、CLIツールでも--preserve-hacksオプションで有効にするという形にした。これに対してデフォルトで有効であるべきじゃないかというイシューが立てられた。大体のことはそこで答えて、オフのままであるべきだと考えていると主張しておいたけど、もうちょっと書きたい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="少し前にCSSWringにCSSハックを維持するオプションを付けた。デフォルトはオフで、必要ならばpreserveHacksをtrueにするという形で、CLIツールでも--preserve-hacksオプションで有効にするという形にした。これに対してデフォルトで有効であるべきじゃないかというイシューが立てられた。大体のことはそこで答えて、オフのままであるべきだと考えていると主張しておいたけど、もうちょっと書きたい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSS圧縮ツールとCSSハック" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-03T12:40:34+09:00">2014年7月3日</time></p>
+
+        <h1><em>CSS圧縮ツールとCSSハック</em></h1>
+      </header>
+
+    <main>
+
+    <p>少し前に<a href="https://github.com/hail2u/node-csswring">CSSWring</a>にCSSハックを維持するオプションを付けた。デフォルトはオフで、必要ならば<code>preserveHacks</code>を<code>true</code>にするという形で、CLIツールでも<code>--preserve-hacks</code>オプションで有効にするという形にした。これに対して<a href="https://github.com/hail2u/node-csswring/issues/10">デフォルトで有効であるべきじゃないか</a>というイシューが立てられた。大体のことはそこで答えて、オフのままであるべきだと考えていると主張しておいたけど、もうちょっと書きたい。</p>
+
+<p>CSSの圧縮ツールの場合、対処すべきバグというのは大きく二つに分けられる。ひとつはブラウザーの実装バグで、これはCSSを書く上でどうしようもないことなため、ある程度は考慮する必要がある。もうひとつがCSSコード自体のバグだ。こちらは、どれが単なるCSSのコードのバグでどれがCSSハックによる作為的なバグなのかを切り分けることがとても難しい。そういったコードを含むCSSが正確にパースされるかどうかもわからないので、ツールはもちろんパーサー側でも取り扱いには困難が伴う。</p>
+
+<p>CSSハックは多くの場合はブラウザーの実装バグを悪用したものではあるが、ちゃんとした実装ならばCSSのバグとみなされるものがほとんどだ。そしてそういったバグを利用してでも特別扱いが必要なブラウザーがあることも確かでもある。しかしそれは実装の上でも明確に区別して扱われるべき、具体的には<a href="http://csswizardry.com/2013/04/shame-css/">shame.css</a>のようなアプローチにより、本流のコードとは別に管理されるべきだと思う。</p>
+
+<p>またCSSの圧縮とCSSハックは相容れないとも感じる。仮に改行や複数の空白文字を使ったCSSハックなどが編み出された時、主にそういったものを削除するためのもであるCSSの圧縮ツールでどう扱えばいいのか、と考えるとそうなってしまう。これは極端な例だが、つまり「無駄」なものを削除するためのものが、「無駄」を利(悪)用したテクニックについて考慮するというのはよくわからないというような話だ。どこまでサポートすべきかという判断も難しい。</p>
+
+<p>ツールは処理する対象のバグに寛容であるべきではない。なので、そういったバグをデフォルトで見逃すようなツールは作るべきではない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

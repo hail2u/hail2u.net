@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/support-slash-started-relative-url-in-vim-gf.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Vimではファイル名らしき箇所でgfを押すと、見つけることができればそのファイルを開いてくれる。この機能はとても便利なのだが、HTMLファイルにスラッシュで始まる相対URLでCSSファイルやJavaScriptファイルのURLを書いた場合は、そこでgfを押してもうまく開くことができない。これを解決するためにvimでHTMLとかを編集するときに絶対パスのファイルを開くで公開されているプラグインをちょっと使っていたのだけど、どうやらpathオプションとincludeexprオプションを設定することでも対応できるようだ。Vimすげー。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Vimではファイル名らしき箇所でgfを押すと、見つけることができればそのファイルを開いてくれる。この機能はとても便利なのだが、HTMLファイルにスラッシュで始まる相対URLでCSSファイルやJavaScriptファイルのURLを書いた場合は、そこでgfを押してもうまく開くことができない。これを解決するためにvimでHTMLとかを編集するときに絶対パスのファイルを開くで公開されているプラグインをちょっと使っていたのだけど、どうやらpathオプションとincludeexprオプションを設定することでも対応できるようだ。Vimすげー。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-11-07T04:02:30+09:00">2009年11月7日</time></p>
+
+        <h1><em>Vimで&quot;gf&quot;をスラッシュで始まる相対URLに対応させる</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.vim.org/">Vim</a>ではファイル名らしき箇所で<kbd>gf</kbd>を押すと、見つけることができればそのファイルを開いてくれる。この機能はとても便利なのだが、HTMLファイルにスラッシュで始まる相対URLでCSSファイルやJavaScriptファイルのURLを書いた場合は、そこで<kbd>gf</kbd>を押してもうまく開くことができない。これを解決するために<a href="http://webtech-walker.com/archive/2009/10/02230656.html">vimでHTMLとかを編集するときに絶対パスのファイルを開く</a>で公開されているプラグインをちょっと使っていたのだけど、どうやら<code>path</code>オプションと<code>includeexpr</code>オプションを設定することでも対応できるようだ。Vimすげー。</p>
+
+<p>とりあえず設定から。</p>
+
+<pre><code class="language-vim">autocmd FileType html :setlocal path+=W:/www/test,W:/www/hail2u.net,W:/www/blosxom.info
+autocmd FileType html :setlocal includeexpr=substitute(v:fname,&apos;^\\/&apos;,&apos;&apos;,&apos;&apos;)</code></pre>
+
+<p><code>W:/www/test</code>等のパスはカンマ区切りで自分の環境に合わせて必要なだけカンマで区切って書く。追加するパスはサイトのトップページのあるディレクトリ(フォルダ)のパス。ややこしく言うならウェブサイトのドキュメント・ルートに対応するローカル(またはリモート)のファイルシステム上のパス。</p>
+
+<hr>
+
+<p>デフォルトでは以下のように書くと<code>gf</code>で開くことができない。</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/twitter/speech-bubble.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<p>ファイルシステム上のルートとドキュメント・ルートが一致しないため<em>/scripts/twitter/speech-bubble.js</em>の上で<kbd>gf</kbd>を押しても「ファイルがありません」と怒られるだけ。<code>:help gf</code>によると<kbd>gf</kbd>は以下のようにしてファイルを探しているようだ。</p>
+
+<ol>
+<li><code>isfname</code>オプションに従ってカーソルの前後からファイル名を抜き出す</li>
+<li><code>path</code>オプションに従ってファイルを探す</li>
+<li>見つからなかったら<code>suffixesadd</code>オプションに従って接尾語を付けファイルを探す</li>
+<li>見つからなかったら<code>includeexpr</code>オプションに従ってファイル名を変更しファイルを探す</li>
+</ol>
+
+<p>ポイントになるのは2と4で、この2つのオプションをうまく設定してやると開くことができるようになる。まず<code>path</code>にドキュメント・ルートに対応するファイルシステム上のパスを追加してやり、ドキュメント・ルートからの相対パスをなんとなく解釈できそうな感じに準備する。このままではまだスラッシュ始まりに対応できないので、今度は<code>includeexpr</code>で頭のスラッシュを削除してやる。というわけで上記のような設定になる。after/html.vimとかの使い方をいまだにちゃんと覚えていないので<code>autocmd</code>ばっか使ってる……。</p>
+
+<section>
+<h2>追記@2009-11-10T12:48:31+09:00</h2>
+
+<p>上位ディレクトリの参照は<a href="http://vimdoc.sourceforge.net/htmldoc/editing.html#file-searching">セミコロンを使えばできる</a>ということを教えてもらった。なので<code>path</code>オプションの設定は、</p>
+
+<pre><code class="language-vim">autocmd FileType html :setlocal path+=;/</code></pre>
+
+<p>というシンプルなものでもいける。こっちの方が誤爆も無さそうだし良さそう。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

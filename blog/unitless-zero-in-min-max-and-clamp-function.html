@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>min()やmax()、clamp()関数での単位なしの0</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/unitless-zero-in-min-max-and-clamp-function.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ようやくmin()やmax()、clamp()関数が、安定して使えるように揃った。で、いろいろ試していたんだけど、値に&lt;length-percentage&gt;を要求するプロパティーで使う時、その中で0を使うことができなくてハマった。なので0pxや、短くしたいなら0%や0Qと書かないといけない。calc()関数での制限と同じ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ようやくmin()やmax()、clamp()関数が、安定して使えるように揃った。で、いろいろ試していたんだけど、値に&lt;length-percentage&gt;を要求するプロパティーで使う時、その中で0を使うことができなくてハマった。なので0pxや、短くしたいなら0%や0Qと書かないといけない。calc()関数での制限と同じ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="min()やmax()、clamp()関数での単位なしの0" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-05-08T09:39:04+09:00">2020年5月8日</time></p>
+
+        <h1><em>min()やmax()、clamp()関数での単位なしの0</em></h1>
+      </header>
+
+    <main>
+
+    <p>ようやく<code>min()</code>や<code>max()</code>、<code>clamp()</code>関数が、安定して使えるように揃った。で、いろいろ試していたんだけど、値に<code>&lt;length-percentage&gt;</code>を要求するプロパティーで使う時、その中で0を使うことができなくてハマった。なので<code>0px</code>や、短くしたいなら<code>0%</code>や<code>0Q</code>と書かないといけない。<a href="https://www.w3.org/TR/css-values-4/#calc-type-checking"><code>calc()</code>関数での制限</a>と同じ。</p>
+
+<p>具体的には以下のように書くと動かない。よく<code>margin-left: 0</code>と書くのでハマりやすそう。</p>
+
+<pre><code class="language-css">.test {
+  margin-left: clamp(
+    0,
+    (100vw - 37rem - 1em) / 2,
+    5vw
+  );
+}</code></pre>
+
+<p>これらの関数のカンマで区切られた値は、それぞれ数式として処理される。そのため、<code>calc()</code>関数と同じように、<code>0</code>は計算結果として<code>0</code>を返すので、&lt;integer&gt;を受け入れるプロパティーにのみしか使えない。仕様でも「Additionally, math functions that resolve to &lt;number&gt; can be used in any place that only accepts &lt;integer&gt;.」と触れられている。<code>margin-left</code>プロパティーの値は<code>&lt;length-percentage&gt; | auto</code>なので、3行目の<code>0</code>でエラーになってしまう。</p>
+
+<p><code>0%</code>と書けば、問題なく動く。<code>calc(0 - 20rem)</code>などと、<code>0</code>から引いて負の値を作ろうとしてエラーになるのと似ているけど、ちょっと違う。こっちは両辺の型が一致していないので、計算式として成立しないというエラー。</p>
+
+<hr>
+
+<p>上記例の<code>clamp()</code>関数は、幅<code>37rem</code>の要素をほぼセンタリングしつつ、大きい画面では<code>5vw</code>の余白で左に寄せようというもの。普通、センタリングするには<code>auto</code>キーワードを使えばいいけど、<code>clamp()</code>関数内では<code>auto</code>キーワードが使えないので、計算しなきゃならない。5行目の最大値だけでなく、3行目の最低値が必要なのは、描画領域の幅が<code>37rem</code>以下だった場合に、負の値になってしまうから。</p>
+
+<p>こういうものは、通常、メディア・クエリーでやる。この場合は多分こう書くだろう。</p>
+
+<pre><code class="language-css">.test {
+  margin-left: auto;
+}
+
+@media (min-width: 41.111em) {
+  .test {
+    margin-left: 5vw;
+  }
+}</code></pre>
+
+<p><code>37rem</code>をセンタリングした時に、左の余白が<code>5vw</code>以上にならないようにしたいので、<code>37 / 0.9 = 41.111</code>がメディア・クエリーの<code>min-width</code>で指定する値になる。これで期待通りに動作する。</p>
+
+<p>この例では<code>clamp()</code>関数で書いた方が短くなっているので、CSSの軽量化にもつながる……と言いたいところだけど、ならない。サポート状況の前後を考慮すると、だいたい<code>clamp()</code>関数内でカスタム・プロパティーを使うだろうと考えられる、かなり長くなる。</p>
+
+<hr>
+
+<p>スコープ化できるカスタム・プロパティーを利用できるため、引数の解釈が初期状態で固定されるメディア・クエリーよりも、柔軟に対応できる。対して、<code>calc()</code>関数と同じように単位付きの値から単位なしの値を計算できないので、やれることにも限界がある。いろいろな知識を増やしたうえで、どう使うのが正しいのか、どうメディア・クエリーと使い分けるのか、これらの関数にしかできないことは何かなどを見極めなければならない。</p>
+
+<p>その前に、最小値を設定したいなら<code>max()</code>関数で、最大値を設定したいなら<code>min()</code>関数だという、<code>max-width</code>プロパティーと逆なことをおぼえないといけない。間違えまくった。</p>
+
+<hr>
+
+<p><code>min()</code>や<code>max()</code>関数は、引数がひとつだけの場合(<code>min(1.618 * 1rem)</code>とか)、<code>calc()</code>と等価になる。CSSの最小化ツールに<code>calc()</code>を<code>min()</code>に置き換える機能があっても良さそう。数年後くらいには。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

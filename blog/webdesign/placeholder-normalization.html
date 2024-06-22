@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>プレースホルダーのスタイルにおけるノーマリゼーション</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/placeholder-normalization.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="テキスト入力コントロールにplaceholder属性を使って入力例を表示することができるようになってから、もうかなりの年月がたった。悪用されてもいるが、わかりやすいフォームには不可欠になりつつある程度には浸透したと言ってよいだろう。ただMozilla Developer Networkのグローバル・ナビゲーションに設置されている検索フォームのようにそのスタイリングに失敗しているケースはままある(Chrome 43だと入力済みかどうかまったく判断できない)。そういった失敗を極力減らすためには、Firefoxのようにopacityプロパティーを使ってノーマライズしてやるのが良いだろう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="テキスト入力コントロールにplaceholder属性を使って入力例を表示することができるようになってから、もうかなりの年月がたった。悪用されてもいるが、わかりやすいフォームには不可欠になりつつある程度には浸透したと言ってよいだろう。ただMozilla Developer Networkのグローバル・ナビゲーションに設置されている検索フォームのようにそのスタイリングに失敗しているケースはままある(Chrome 43だと入力済みかどうかまったく判断できない)。そういった失敗を極力減らすためには、Firefoxのようにopacityプロパティーを使ってノーマライズしてやるのが良いだろう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="プレースホルダーのスタイルにおけるノーマリゼーション" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-06-02T03:10:38+09:00">2015年6月2日</time></p>
+
+        <h1><em>プレースホルダーのスタイルにおけるノーマリゼーション</em></h1>
+      </header>
+
+    <main>
+
+    <p>テキスト入力コントロールに<code>placeholder</code>属性を使って入力例を表示することができるようになってから、もうかなりの年月がたった。悪用されてもいるが、わかりやすいフォームには不可欠になりつつある程度には浸透したと言ってよいだろう。ただ<a href="https://developer.mozilla.org/">Mozilla Developer Networkのグローバル・ナビゲーションに設置されている検索フォーム</a>のようにそのスタイリングに失敗しているケースはままある(Chrome 43だと入力済みかどうかまったく判断できない)。そういった失敗を極力減らすためには、Firefoxのように<code>opacity</code>プロパティーを使ってノーマライズしてやるのが良いだろう。</p>
+
+<p>ではFirefoxの挙動に合わせるようにノーマリゼーションする場合はどのようにCSSを書くことになるのだろうか。</p>
+
+<p>Firefoxではユーザー・エージェントCSSで<code>opacity</code>の値に<code>0.54</code>を指定している(以前は<code>0.4</code>だったようだが、Firefox 38では<code>0.54</code>のようだ)。これと他のブラウザー及びウェブ標準での挙動を合わせるためには以下のように書く必要がある。</p>
+
+<pre><code class="language-css">/*
+::-moz-placeholder {
+  color: inherit;
+  opacity: .54;
+}
+*/
+
+:-ms-input-placeholder {
+  color: inherit;
+  opacity: .54;
+}
+
+::-webkit-input-placeholder {
+  color: inherit;
+  opacity: .54;
+}
+
+:placeholder-shown {
+  opacity: .54;
+}</code></pre>
+
+<p>プレースホルダー文字列のスタイルは、Internet Explorer 10以降では<code>:-ms-input-placeholder</code><del>擬似要素</del><ins>擬似クラス</ins>で、ChromeやSafariでは<code>::-webkit-input-placeholder</code>擬似要素、そしてSelectors Level 4となることになるウェブ標準仕様では<a href="http://www.w3.org/TR/2013/WD-selectors4-20130502/#placeholder"><code>:placeholder-shown</code><em>擬似クラス</em></a>になる予定で、それぞれ行うことができる。ウェブ標準では擬似クラスになっていることは頭の隅に入れておいた方がよいが、まだこれに従った実装はない。</p>
+
+<p>現行ブラウザー群の実装では擬似要素になっていることと、Internet ExplorerやChromeで決め打ちで色が指定されていることから、<code>color</code>プロパティーを<code>inherit</code>にしておく(<code>initial</code>でも悪くない)。ウェブ標準では擬似クラスのため<code>color</code>プロパティーを<code>inherit</code>にする必要はなくなる。<a href="/blog/webdesign/unknown-css-selector.html">不明なセレクターによるルールセットの無視</a>が起こらないように、それぞれのルールセットは別々に記述していく必要がある。</p>
+
+<p>Firefoxの挙動に合わせるので<code>::-moz-placeholder</code>擬似要素の記述は不要だが、コメントで残しておいた。</p>
+
+<hr>
+
+<p>Firefoxが単に<code>grayText</code>キーワードや特定の色を指定しないようになった理由には、ユーザーの設定やテーマの設定によりフォーム要素の背景が何色になるか変化するからなどいくつかの理由は思い当たる。最適解ではない(制作者が色を指定したい時に<code>opacity</code>プロパティーを戻さなければならない)が、悪くはないデフォルト値ではあるだろう。</p>
+
+<p>ウェブサイト制作者サイドから見てドキュメントのCSSでも<code>opacity</code>プロパティーを使う理由はあまりない。しかしユーザー側から見ると<em>常に入力テキストよりもコントラストが下がった色</em>でプレースホルダー文字列が表示されるということはそれなりにメリットがあると考えられる。ユーザーは入力例はグレーの文字列で表示されているというよりも、薄い色の文字で表示されていると捉えているからだ。</p>
+
+<p>フォーム要素の前景色と背景色のコントラストが十分に確保されているという前提だと、プレースホルダー文字列の色は色相は変えずコントラストを落とすだけにするのがもっともわかりすい。色相を変えてしまうと特別な意味や機能が存在するように捉えられる可能がある上、デフォルトの<em>薄い文字</em>という感覚からかけ離れてしまう。もちろんそれぞれのウェブサイトのカラースキームを元にして完璧な色を追求するのも良いが、多くの場合は<code>opacity</code>プロパティーをうまく使ってノーマリゼーションというレベルで行うだけで十二分に機能させることが可能だろう。</p>
+
+<h2>追記</h2>
+
+<p>Internet Explorer 10以降では<code>:-ms-input-placeholder</code><em>擬似クラス</em>だった。修正し、サンプル・コードも修正しておいた。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

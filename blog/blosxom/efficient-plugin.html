@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>効率の良いBlosxomプラグイン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/efficient-plugin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Blosxomではプラグイン同士が連携することはほとんど考慮されていない。プラグインで何でも出来るけど、なんでも効率的にできるわけではないということで、ここらへんはBlosxomの語られていない闇の部分(誰も興味ないから)。例えばhead.flavourでエントリーのタイトルとかを利用しようとするとプラグインが必要になるので書くわけだけど、いずれblosxom.cgiが読んでくれるファイルを自前で読まなくてはならなくてスーパー非効率的。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Blosxomではプラグイン同士が連携することはほとんど考慮されていない。プラグインで何でも出来るけど、なんでも効率的にできるわけではないということで、ここらへんはBlosxomの語られていない闇の部分(誰も興味ないから)。例えばhead.flavourでエントリーのタイトルとかを利用しようとするとプラグインが必要になるので書くわけだけど、いずれblosxom.cgiが読んでくれるファイルを自前で読まなくてはならなくてスーパー非効率的。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="効率の良いBlosxomプラグイン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-04-10T01:10:47+09:00">2012年4月10日</time></p>
+
+        <h1><em>効率の良いBlosxomプラグイン</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://blosxom.sourceforge.net/">Blosxom</a>ではプラグイン同士が連携することはほとんど考慮されていない。プラグインで何でも出来るけど、なんでも効率的にできるわけではないということで、ここらへんはBlosxomの語られていない闇の部分(誰も興味ないから)。例えば<code>head.flavour</code>でエントリーのタイトルとかを利用しようとするとプラグインが必要になるので書くわけだけど、いずれ<code>blosxom.cgi</code>が読んでくれるファイルを自前で読まなくてはならなくてスーパー非効率的。</p>
+
+<p>上で例として挙げたpermalinkでエントリーのタイトルを<code>title</code>要素にぶち込むプラグインというのを考えてみる。ストレートに実装すると、<a href="http://muli.cc/blosxom/plugins/v2/better_title-v2i0b.txt">better_title</a>や<a href="http://exo.org.uk/code/storytitle/">storytitle</a>、<a href="https://github.com/hail2u/blosxom-plugins/blob/master/entry_title">entry_title</a>みたいに<code>head</code>サブルーチンでエントリーファイルを読んでタイトルを切り出して変数に格納することになる。これをどうにかして自前でファイルを読まないようにするには一工夫が必要。</p>
+
+<pre><code class="language-perl"># Blosxom Plugin: permalink
+# Author(s): Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# Version: 2012-04-05T15:28:39+09:00
+# Blosxom Home/Docs/Licensing: http://blosxom.sourceforge.net/
+
+package permalink;
+
+use strict;
+use vars qw($title $title_sep);
+
+# --- Configurable variables -----------
+
+# separator string between $blog_title and $title
+my $str_title_sep = " - ";
+
+# --- Plug-in package variables --------
+
+my $title_placeholder = '{{{permalink::title}}}';
+my $t;
+
+# --------------------------------------
+
+sub start {
+  if ($blosxom::path_info !~ /\.\Q$blosxom::flavour\E$/) {
+    return 0;
+  }
+
+  $title     = $title_placeholder;
+  $title_sep = $str_title_sep;
+
+  return 1;
+}
+
+sub story {
+  my($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+  $t = $$title_ref;
+
+  return 1;
+}
+
+sub last {
+  $blosxom::output =~ s/$title_placeholder/$t/m;
+}
+
+1;
+# vim:ft=perl:</code></pre>
+
+<p>最終的にはrss10プラグインなどでも使われているプレースホルダーを作って<code>last</code>サブルーチンで置換するというテクニックを使うわけだけど、flavourにも<code>$permalink::title</code>などと書けるようにしてある。permalinkではない場合は<code>$permalink::title</code>は空になるので、<code>head.flavour</code>では以下のように書くだけで良い。</p>
+
+<pre><code class="language-html">&lt;title&gt;$permalink::title$permalink::title_sep$blog_title&lt;/title&gt;</code></pre>
+
+<p>これでインデックスページではこうなり、</p>
+
+<pre><code class="language-html">&lt;title&gt;Weblog - hail2u.net&lt;/title&gt;</code></pre>
+
+<p>permalinkでの出力はこうなる。</p>
+
+<pre><code class="language-html">&lt;title&gt;効率の良いBlosxomプラグイン - Weblog - hail2u.net&lt;/title&gt;</code></pre>
+
+<p>flavourに<code>{{{plugin:placeholder}}}</code>みたいに書かせると、常にそのプラグインを有効化しておかないとHTMLに無意味な文字列が出てしまう<ins>ことがある</ins>し(コメントとかにすれば少しは改善するけど)、必要のない時も置換しないといけなくてちょっとアレなので上記のような実装が一番効率的なんじゃないかと思う。</p>
+
+<p>久々にBlosxomプラグインを書いたのでなんか見落としてそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

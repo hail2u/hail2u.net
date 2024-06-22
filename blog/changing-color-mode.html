@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>色モードの切り替え</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/changing-color-mode.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Windows 10では「アプリ モード(App mode)」、Android 10では「ダークモード(Dark Theme)」、macOS 10.15やiOS 13では「外観モード(Appearance)」と、それぞれ呼ばれている色モードを尊重しつつ、ユーザーの好みで明るくも暗くもできるようにした。どう実装すると効率的かを考えたかっただけなので、次期マイナーバージョンでは消える。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Windows 10では「アプリ モード(App mode)」、Android 10では「ダークモード(Dark Theme)」、macOS 10.15やiOS 13では「外観モード(Appearance)」と、それぞれ呼ばれている色モードを尊重しつつ、ユーザーの好みで明るくも暗くもできるようにした。どう実装すると効率的かを考えたかっただけなので、次期マイナーバージョンでは消える。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="色モードの切り替え" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-07-15T16:30:00+09:00">2020年7月15日</time></p>
+
+        <h1><em>色モードの切り替え</em></h1>
+      </header>
+
+    <main>
+
+    <p>Windows 10では「アプリ モード(App mode)」、Android 10では「ダークモード(Dark Theme)」、macOS 10.15やiOS 13では「外観モード(Appearance)」と、それぞれ呼ばれている色モードを尊重しつつ、ユーザーの好みで明るくも暗くもできるようにした。どう実装すると効率的かを考えたかっただけなので、次期マイナーバージョンでは消える。</p>
+
+<p>ウェブページでの色モードの設定には、3つの状態の管理が必要らしい。ダーク・モードにしているが特定のウェブページは白背景で見たい、またはその逆があるため、<em>自動</em>(OSやブラウザーでユーザーが設定したモードに従う)と、<em>強制的にダーク</em>、そして<em>強制的にライト</em>にできるべきという主張だ。実装はあまり見ないが、主張は散見される。</p>
+
+<p>僕はアプリケーション側、つまりブラウザーが本来持っているべき設定だと思うので、あまり納得はしていないが、ないものはないので実装するしかなさそうだ。代替スタイルシートの切り替えなどと同じく、ブラウザーに実装されないかもしれないので、なおさらだろう。</p>
+
+<pre><code class="language-css">:root {
+  --color-primary: var(--palette-accent-dark);
+  --color-background: var(--palette-lightest);
+  --color-surface: var(--palette-light);
+  --color-on-background: var(--palette-darkest);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: var(--palette-accent-light);
+    --color-background: var(--palette-darkest);
+    --color-surface: var(--palette-dark);
+    --color-on-background: var(--palette-lightest);
+  }
+}
+
+:root.js-color-mode-light {
+  --color-primary: var(--palette-accent-dark);
+  --color-background: var(--palette-lightest);
+  --color-surface: var(--palette-light);
+  --color-on-background: var(--palette-darkest);
+}
+
+:root.js-color-mode-dark {
+  --color-primary: var(--palette-accent-light);
+  --color-background: var(--palette-darkest);
+  --color-surface: var(--palette-dark);
+  --color-on-background: var(--palette-lightest);
+}</code></pre>
+
+<p>色の反転はカスタム・プロパティーで、ユーザーによる強制はクラス名で、それぞれCSSで管理する。いろいろなウェブサイトで解説されているように、パレットを定義しておいて参照するだけにしておくと簡単だ。最初の2つのルールセットが自動の時に使われるもので、あとの2つがユーザーが設定した時に使われる。詳細度がうまく機能するので、これらルールセットはほぼ順不同だが、この順序が書きやすいだろう。</p>
+
+<pre><code class="language-javascript">const changeColorMode = (mode) =&gt; {
+  localStorage.setItem("color-mode", mode);
+  const rootClass = document.documentElement.classList;
+
+  if (mode === "dark") {
+    rootClass.add("js-color-mode-dark");
+    rootClass.remove("js-color-mode-light");
+    return;
+  }
+
+  if (mode === "light") {
+    rootClass.add("js-color-mode-light");
+    rootClass.remove("js-color-mode-dark");
+    return;
+  }
+
+  rootClass.remove("js-color-mode-dark", "js-color-mode-light");
+  localStorage.removeItem("color-mode");
+};</code></pre>
+
+<p>ユーザー設定の保存はローカル・ストレージにした。「自動」に戻すと削除する。復元する時は<code>html</code>要素にクラス名を振っている。そのまま保存できるカスタム・データ属性の方が書きやすいが、スタイル目的なのでクラス名を振るのが正しいと思う。ややこしいことは、ややこしいことができる仕組みの中で、できるだけやるべきだ。</p>
+
+<p>また、このコードはページ読み込み中に1回呼ばれ、状態が復元される。これを非同期で実行すると、画面がフラッシュするかもしれないので、同期で実行すべきだろう。スクリプト・ファイルを分割するとよいだろう。</p>
+
+<pre><code class="language-javascript">const onchange = (event) =&gt; {
+  changeColorMode(event.srcElement.value);
+};
+
+const elements = document.querySelectorAll(".js-color-mode");
+
+for (const element of elements) {
+  element.addEventListener("change", onchange);
+}</code></pre>
+
+<p>あとはラジオ・ボタンの切り替えで色モードを変えるコードを呼ぶだけだ。<code>value</code>属性をよしなにしておけば数行で片付く。</p>
+
+<hr>
+
+<p>クラス名については<code>:has()</code>があれば必要なくなり、ローカル・ストレージへの保存と復元だけで済みそうなので、早く欲しい。たぶん<code>:root:has(#color-mode-light:checked)</code>と書けるようになる(<code>#color-mode-light</code>は、ペアになる<code>label</code>要素用にあるであろう<code>id</code>属性の値)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

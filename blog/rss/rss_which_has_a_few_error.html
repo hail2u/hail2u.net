@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ちょっとだけ問題のあるRSS</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/rss/rss_which_has_a_few_error.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする(XML::RSSも含む)場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ishinao.net/mylogの微妙にinvalidなRSSを手軽にvalidにする方法で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSをXML::Parserを利用してゴニョゴニョする(XML::RSSも含む)場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ちょっとだけ問題のあるRSS" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-03-16T16:59:14+09:00">2004年3月16日</time></p>
+
+        <h1><em>ちょっとだけ問題のあるRSS</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://mylog.ishinao.net/">ishinao.net/mylog</a>の<a href="http://mylog.ishinao.net/id/1174">微妙にinvalidなRSSを手軽にvalidにする方法</a>で、charsetが宣言と違うRSSが結構あるということが触れられていました。PerlでRSSを<a href="http://search.cpan.org/search?module=XML::Parser">XML::Parser</a>を利用してゴニョゴニョする(<a href="http://search.cpan.org/search?module=XML::RSS">XML::RSS</a>も含む)場合、このトラブルに加えて、Shift_JISやEUC-JPのエンコード・マッピング・ファイルが無いことが多いので、うまくゴニョゴニョできないことが多いですね。</p>
+<p>僕はこんなコードで、この両方の問題をまとめて回避しています。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+use strict;
+use Jcode;
+use LWP::Simple;
+use XML::RSS;
+
+my $res = LWP::Simple::get(&apos;http://example.com/path/to/rss&apos;);
+my $content = Jcode-&gt;new($res)-&gt;utf8;
+$content =~ s/&lt;\?xml.*?\?&gt;/&lt;\?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;\?&gt;/;
+my $rss = new XML::RSS;
+eval { $rss-&gt;parse($content); };
+...</code></pre>
+<ol>
+<li>ファイルごとUTF-8にコンバート</li>
+<li>encoding宣言をUTF-8に書き換える</li>
+<li>その後、パース</li>
+</ol>
+<p>ということ。UTF-8に書き換えるところの処理がかなり適当。こうするとUTF-8で扱うことになるので、エンコード・マッピング・ファイルも必要ないです。</p>
+<p>いろいろなアプローチがあると思いますが、ここらへんのことはある程度RSSリーダー側で処理してやった方が良いと、僕も思います。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

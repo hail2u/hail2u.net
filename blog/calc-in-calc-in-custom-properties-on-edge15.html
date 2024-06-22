@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Edge 15でのcalc()をcalc()するカスタム・プロパティーのバグ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/calc-in-calc-in-custom-properties-on-edge15.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="カスタム・プロパティーを使い倒すには、どうしてもcalc()したり、そのcalc()した値を使ってまたcalc()したりする。Sassで複数の変数を使って計算した結果を変数にするのと同じだ。しかしカスタム・プロパティーをサポートしたはずのEdge 15ではcalc()が値のカスタム・プロパティーを使ってcalc()を使ったカスタム・プロパティーがうまく解決されない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="カスタム・プロパティーを使い倒すには、どうしてもcalc()したり、そのcalc()した値を使ってまたcalc()したりする。Sassで複数の変数を使って計算した結果を変数にするのと同じだ。しかしカスタム・プロパティーをサポートしたはずのEdge 15ではcalc()が値のカスタム・プロパティーを使ってcalc()を使ったカスタム・プロパティーがうまく解決されない。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/calc-in-calc-in-custom-properties-on-edge15-result.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Edge 15でのcalc()をcalc()するカスタム・プロパティーのバグ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2017-05-27T10:32:00+09:00">2017年5月27日</time></p>
+
+        <h1><em>Edge 15でのcalc()をcalc()するカスタム・プロパティーのバグ</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://www.w3.org/TR/2015/CR-css-variables-1-20151203/">カスタム・プロパティー</a>を使い倒すには、どうしても<code>calc()</code>したり、その<code>calc()</code>した値を使ってまた<code>calc()</code>したりする。Sassで複数の変数を使って計算した結果を変数にするのと同じだ。しかしカスタム・プロパティーをサポートしたはずのEdge 15では<code>calc()</code>が値のカスタム・プロパティーを使って<code>calc()</code>を使ったカスタム・プロパティーがうまく解決されない。</p>
+
+<p>Demo: <a href="https://jsfiddle.net/9h7vehLz/">calc() in calc() in custom properties</a></p>
+
+<p>デモでは<code>--foo</code>を定義し、それを参照した<code>calc()</code>で<code>--bar</code>を定義している。更に<code>--baz</code>では<code>calc()</code>を使って<code>--bar</code>を参照している。そのため<code>--baz</code>は<code>calc(1rem * 2 * 2)</code>と解釈されるはずだが、Edge 15ではそうならない。Firefox 53.0.3、Chrome 58、Mobile Safari 10.3.2では問題ない。</p>
+
+<figure>
+<img alt="--fooを参照した1行目、--fooを使って計算された--barを参照した2行目は正しく描画されているが、更に--barを使って計算された--bazは不明なプロパティーとして無視されている。" height="540" src="/img/blog/calc-in-calc-in-custom-properties-on-edge15-result.png" width="960">
+<figcaption>Edge 15での結果</figcaption>
+</figure>
+
+<p>仕様では循環参照は不正になるが、そうでないなら問題なく解決されるはずだ。<a href="http://www.w3.org/TR/2015/CR-css-variables-1-20151203/#example-cf4602dd"><code>calc()</code>で<code>calc()</code>を含むカスタム・プロパティーを扱う場合</a>も特例はないように読める。Edge 15の挙動はバグだろう。EdgeHTML issue trackerに<a href="https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/12143022/">報告</a>しておいた。</p>
+
+<hr>
+
+<p>カスタム・プロパティーは計算結果を使って更に計算するケースで大いに役立つはずだ。このバグが修正されないとちょっと便利なDRYくらいにしか役に立たない。そこそこ役に立つという意味でもある。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

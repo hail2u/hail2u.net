@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>JavaScriptをビルドするJavaScript</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/javascript-for-building-javascript.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、npm run-scriptだけでいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕はビルド・ツールをnpm run-scriptで薄くラップする手法というのが現実的だと考えてて、それを確認したいというのもあった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="JavaScriptをビルドするJavaScript" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-28T12:52:29+09:00">2015年2月28日</time></p>
+
+        <h1><em>JavaScriptをビルドするJavaScript</em></h1>
+      </header>
+
+    <main>
+
+    <p>たまには素でJavaScriptファイルをビルドすることも考えないと頭がダメになりそう。他にgulpとかでかすぎるし、<code>npm run-script</code><em>だけ</em>でいけるいけるみたいな話を先行者以外からも聞くようになったので、そっちに比重を移すことも視野に入れたいとか。僕は<a href="http://qiita.com/Jxck_/items/efaff21b977ddc782971">ビルド・ツールを<code>npm run-script</code>で薄くラップする手法</a>というのが現実的だと考えてて、それを確認したいというのもあった。</p>
+
+<p>依存はnpmやBowerで解決している前提で、自前で書いたものを最小化し、依存と連結するようなものを想定しておく。つまり、</p>
+
+<ul>
+<li>node_modules/foo/dist/foo.min.js</li>
+<li>src/js/bar.js</li>
+<li>src/js/baz.js</li>
+</ul>
+
+<p>を<code>build/js/main.min.js</code>へとビルドするくらいにしておく。</p>
+
+<pre><code class="language-javascript">#!/usr/bin/env node
+
+&apos;use strict&apos;;
+
+var async = require(&apos;async&apos;);
+var fs = require(&apos;fs-extra&apos;);
+var path = require(&apos;path&apos;);
+var uglifyjs = require(&apos;uglify-js&apos;);
+
+async.waterfall([
+  function (next) {
+    fs.remove(&apos;tmp/&apos;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.remove(&apos;build/&apos;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&apos;tmp/&apos;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.ensureDir(&apos;tmp/js/&apos;, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.readFile(&apos;src/js/bar.js&apos;, &apos;utf8&apos;, function (err, data) {
+      next(err, data);
+    });
+  },
+
+  function (js, next) {
+    fs.readFile(&apos;src/js/baz.js&apos;, &apos;utf8&apos;, function (err, data) {
+      next(err, js + &apos;;&apos; + data);
+    });
+  },
+
+  function (js, next) {
+    try {
+      next(null, uglifyjs.minify(js, {
+        fromString: true
+      }).code);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  function (js, next) {
+    fs.readFile(
+      path.join(
+        __dirname,
+        &apos;node_modules&apos;,
+        &apos;foo&apos;,
+        &apos;dist&apos;,
+        &apos;foo.min.js&apos;
+      ),
+      &apos;utf8&apos;,
+      function (err, data) {
+        next(err, data + &apos;;&apos; + js);
+      }
+    );
+  },
+
+  function (js, next) {
+    fs.writeFile(&apos;tmp/js/main.min.js&apos;, js, function (err) {
+      next(err);
+    });
+  },
+
+  function (next) {
+    fs.move(&apos;tmp/&apos;, &apos;build/&apos;, function (err) {
+      next(err);
+    });
+  }
+],
+
+function (err) {
+  if (err) {
+    throw err;
+  }
+});</code></pre>
+
+<p>コード自体は簡単でわかりやすい。手軽なので<code>asyn.waterfall()</code>でフローを制御。Streamじゃないけど、中間ファイルを吐かないのでGruntよりは速い。テキトーに書かれたモジュールも<code>try...catch</code>しつつ流せるとか気軽に書ける。ファイルの保証やディレクトリの削除などは<code>fs-extra</code>パッケージに頼ればこんなもので済んだ。</p>
+
+<p>……でも長い。これでも<code>fs-extra</code>パッケージのおかげで短くなってる。読み込みと連結をまとめたりとかでもっと短くできるけど、そこを抽象化するとストレートに書けるという長所が無くなっちゃう。<code>async</code>の代わりに<a href="https://github.com/petkaantonov/bluebird">Promisify</a>するともうちょっと楽だけど、それほど劇的でもない。</p>
+
+<p>ビルド・ツールのキモはやはりグロブを使った抽象化を提供してくれるあたりにあり、そこを毎回自前でどうにかするのは面倒すぎる。Gruntやgulpのような巨大な依存を減らせることは確かだけど、その代わりに小さな依存が増えるので、あんまり変わらない。こういうのを書くためのパッケージをセットにしたメタ・パッケージみたいなのがあればまた少し話が変わる……かなー？</p>
+
+<p>こういうのを抽象化して引数で入力と出力を指定して終わりというパッケージがあっても面白そうだけど、それだとGruntとあんまり変わらないっぽい。<code>Gruntfile.js</code>を書く代わりに<code>package.json</code>で複雑な引数を書くわけだし。</p>
+
+<hr>
+
+<p>つまり<code>make</code>はありだけど、<code>npm run-script</code>はなしかなーという感じになった。引数取れるようになったので<code>npm run-script</code>でいけるいけるとか言ってる人の話はじっくりと聞いて、本気でそれだけで済むと言っていたら聞き流した方が良さそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

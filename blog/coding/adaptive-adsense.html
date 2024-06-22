@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>AdSenseの広告切り替え</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/adaptive-adsense.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Google AdSenseが公式にいくつかのケースに限って広告コードの改変を許可したので、後に手を入れることも考えて効率的なコードを考えている最中のメモ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Google AdSenseが公式にいくつかのケースに限って広告コードの改変を許可したので、後に手を入れることも考えて効率的なコードを考えている最中のメモ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="AdSenseの広告切り替え" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-06-28T06:33:31+09:00">2013年6月28日</time></p>
+
+        <h1><em>AdSenseの広告切り替え</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://www.google.com/adsense/">Google AdSense</a>が<a href="http://adsense-ja.blogspot.jp/2013/06/blog-post.html">公式にいくつかのケースに限って広告コードの改変を許可した</a>ので、後に手を入れることも考えて効率的なコードを考えている最中のメモ。</p>
+
+<p>切り替えるそれぞれの広告スロット番号(や幅、高さの設定)はAdSenseで取得できるコードからコピペするようにしないと、コードの間違いなどミスを起こしそう。本当は外部JavaScriptファイルにそれぞれの広告の設定を保存しておいて、viewportでどれかひとつを読んでやるみたいなのがスッキリして良い気がするけどそこまでして良いのかわからない。</p>
+
+<p><a href="https://support.google.com/adsense/answer/1354736?hl=ja&amp;topic=1271508&amp;ctx=topic">ヘルプ</a>にある<code>document.documentElement.clientWidth</code>で切り替えるのは、広告のサイズと切り替えの条件文で比較する数字にずれができるのでメンテナンス性が悪そう。なので広告を貼る位置の要素の幅を取得し、ウェブサイトごとに余白や枠線分を適当に引いておいた数字と比較するのが良さそう。</p>
+
+<pre><code class="language-javascript">var w = d.querySelector('[role="main"] &gt; .adsense').clientWidth - ((1 + 7) * 2);</code></pre>
+
+<p>このサイトでは<code>[role="main"]</code>直下の<code>adsense</code>というクラスを振った<code>aside</code>要素をAdSenseのコンテナにしており、<code>1px</code>の枠線と<code>7px</code>の<code>padding</code>があったのでその分引いて広告を置けるサイズを計算していた。そうすれば<code>if</code>文の条件式で使いたい広告幅をコピペするだけで良くなる。</p>
+
+<pre><code class="language-javascript">google_ad_client = "pub-xxxxxxxxxxxxxxxx";
+/* 250x250 */
+google_ad_slot = "xxxxxxxxxx";
+google_ad_width = 300;
+google_ad_height = 250;
+
+(function (d) {
+  if (!d.querySelector) return;
+  var w = d.querySelector('[role="main"] &gt; .adsense').clientWidth - ((1 + 7) * 2);
+
+  if (w &gt;= 970) {
+    /* (970x90) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 970;
+    google_ad_height = 90;
+  } else if (w &gt;= 728) {
+    /* (728x90) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 728;
+    google_ad_height = 90;
+  } else if (w &gt;= 468) {
+    /* (468x60) */
+    google_ad_slot = "xxxxxxxxxx";
+    google_ad_width = 468;
+    google_ad_height = 60;
+  }
+})(document);</code></pre>
+
+<p>これはキレイじゃないな。</p>
+
+<p>デフォルトのサイズは<a href="https://support.google.com/adsense/answer/68727?hl=ja">モバイル広告に対応しているもの</a>にしておくと安全そう。<code>documen.querySelector()</code>に対応していないブラウザーでは切り替えが起こらないので、効果が高いとされてる300x250にしておくのが安定か。サイズを切り替えるのではなく、効果が高いとされている300x250を置く数を幅によって増やすみたいなのもアリなのかなと思って聞いてみたけど梨の礫……。</p>
+
+<p>AdSense側で広告の組み合わせを定義できて、貼った場所の幅によって適当に切り替えてくれる……みたいなのが理想だけど、そううまくはいかないか。今後に期待して、とりあえずはこれを使ってみている。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

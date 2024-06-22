@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>適切に改行を行う</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/responsive-line-breaks.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ブラウザーはviewportによって折り返しを自動で行なってくれるわけだけど、場合によっては適切ではない位置で行われてしまうのをコントロールしたいという話。見出しをセンタリングしているようなケースで幅によっては一文字だけ次の行になってかっこ悪い！　みたいなのを解消したいということであったり、逆にびろ～んと間延びしないようによさそうな位置で改行を入れたいということであったり。一年くらい前にResponsive Line Breaksと呼ばれるようになった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ブラウザーはviewportによって折り返しを自動で行なってくれるわけだけど、場合によっては適切ではない位置で行われてしまうのをコントロールしたいという話。見出しをセンタリングしているようなケースで幅によっては一文字だけ次の行になってかっこ悪い！　みたいなのを解消したいということであったり、逆にびろ～んと間延びしないようによさそうな位置で改行を入れたいということであったり。一年くらい前にResponsive Line Breaksと呼ばれるようになった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="適切に改行を行う" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-06-25T18:18:28+09:00">2013年6月25日</time></p>
+
+        <h1><em>適切に改行を行う</em></h1>
+      </header>
+
+    <main>
+
+    <p>ブラウザーはviewportによって折り返しを自動で行なってくれるわけだけど、場合によっては適切ではない位置で行われてしまうのをコントロールしたいという話。見出しをセンタリングしているようなケースで幅によっては一文字だけ次の行になってかっこ悪い！　みたいなのを解消したいということであったり、逆にびろ～んと間延びしないようによさそうな位置で改行を入れたいということであったり。一年くらい前に<a href="http://danielmall.com/articles/responsive-line-breaks/">Responsive Line Breaks</a>と呼ばれるようになった。</p>
+
+<p>具体的なものはResponsive Line Breaksにあるデモやこのウェブログの日付表示の部分とかがそれ。ここではviewportの幅が広い時に良い位置で改行が入るようになっている。</p>
+
+<pre><code class="language-css">article footer br {
+  display: none;
+}
+
+@media (min-width: 60em) {
+  article footer br {
+    display: inline;
+  }
+}</code></pre>
+
+<p>実装はこういった感じの簡単なもの。デフォルトでは一行で表示されるようにしておいて、広い画面では(サイドバー的に横にっひっつくので)よさそうな所で改行が入るようになる。センタリングは使ってないので日本語でデモを作ったが、単語を区切るスペースというものがない日本語により向いていると思えるはず。</p>
+
+<p>Demo: <a href="/test/464.html">日本語でResponsive Line Breaks</a></p>
+
+<hr>
+
+<p><code>br</code>要素を使うことの是非みたいなものも当然ある。本来的に必要そうな<code>br</code>要素ではないので、<code>span</code>要素で固まりを作って擬似要素で改行を挿入してやった方が良い。</p>
+
+<pre><code class="language-css">@media (min-width: 60em) {
+  article footer .rlb::before {
+    content: "\000a"; /* Line Feed */
+    white-space: pre-line;
+  }
+}</code></pre>
+
+<p>とかで良いので、そんなに難しくもない。マークアップが煩雑になるみたいな作業的な難点はあるけど。</p>
+
+<hr>
+
+<p>英文ならば<a href="http://adobe-webplatform.github.io/balance-text/">BalanceText</a>というJavaScriptライブラリがあって、加えて均等割付(<code>text-align: justify</code>)時には行ごとに均等割付になるように単語間の空白が調節されるのではなく、各行の単語量を調節して段落全体で単語間の空白のサイズが一定になるように調節してくれる機能もあったりしてかなりすごい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>YUI 3: CSS Resetの問題</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/yui3-css-reset-problem.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ブラウザごとのデフォルト・スタイルシートの違いを吸収するためのスタイルシートをメンテするのが面倒になったので、YUI 3のCSS Resetを使うことにした。が、このサイトではちょっとした問題が起こった。少し前にTwitterでつぶやいたりしたhtml要素にbackground-colorやbackground-imageを指定した場合、body要素の背景が描画エリアいっぱいにならなくなるというCSSの仕様絡みの問題。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ブラウザごとのデフォルト・スタイルシートの違いを吸収するためのスタイルシートをメンテするのが面倒になったので、YUI 3のCSS Resetを使うことにした。が、このサイトではちょっとした問題が起こった。少し前にTwitterでつぶやいたりしたhtml要素にbackground-colorやbackground-imageを指定した場合、body要素の背景が描画エリアいっぱいにならなくなるというCSSの仕様絡みの問題。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="YUI 3: CSS Resetの問題" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-11-27T11:30:14+09:00">2009年11月27日</time></p>
+
+        <h1><em>YUI 3: CSS Resetの問題</em></h1>
+      </header>
+
+    <main>
+
+    <p>ブラウザごとのデフォルト・スタイルシートの違いを吸収するためのスタイルシートをメンテするのが面倒になったので、<a href="http://developer.yahoo.com/yui/3/cssreset/">YUI 3のCSS Reset</a>を使うことにした。が、このサイトではちょっとした問題が起こった。少し前にTwitterでつぶやいたりした<a href="http://www.w3.org/TR/CSS21/colors.html#background"><code>html</code>要素に<code>background-color</code>や<code>background-image</code>を指定した場合、<code>body</code>要素の背景が描画エリアいっぱいにならなくなるというCSSの仕様</a>絡みの問題。</p>
+
+<p>この仕様によって<code>body</code>要素に指定していたヘッダの背景画像がずれてしまった(<a href="/test/118.html">ずれるサンプル</a>)。ずれる理由は上記仕様により<code>body</code>要素の上下で<code>margin</code>の相殺が起こり、<code>margin</code>の相殺が起こった部分は透明(親である<code>html</code>要素)が透けて見える)ようになり、背景画像の開始点はそれに続く<code>body</code>要素のコンテント・エリアになるから。</p>
+
+<pre><code class="language-css">html {
+  color: #000;
+  background: #FFF;
+}</code></pre>
+
+<p>問題になるのは以上の部分なので、reset(-min).cssより後に読み込まれるCSSファイル内で、</p>
+
+<pre><code class="language-css">html {
+  background-color: transparent;
+  background-image: none;
+}</code></pre>
+
+<p>とすればとりあえず回避できる。</p>
+
+<p>YUI 2.4.0で<code>body</code>要素から<code>html</code>要素に<code>color</code>プロパティと<code>background-color</code>プロパティが移動されたようなんだけど、理由書いてない……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

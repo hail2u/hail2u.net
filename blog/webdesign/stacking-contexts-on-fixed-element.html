@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>位置を固定した要素のすたっきんぐ・こんてきすと？</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/stacking-contexts-on-fixed-element.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Chrome 22で隠し設定にposition: fixedされた要素配下でのz-indexプロパティーの扱われ方を仕様に準拠する形へ変えるものが用意された……とか言われてもStacking Contextsの仕様を読んでもまったくわからなかったので簡単なテストを書いて理解した。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Chrome 22で隠し設定にposition: fixedされた要素配下でのz-indexプロパティーの扱われ方を仕様に準拠する形へ変えるものが用意された……とか言われてもStacking Contextsの仕様を読んでもまったくわからなかったので簡単なテストを書いて理解した。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/stacking-contexts-on-fixed-element.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="位置を固定した要素のすたっきんぐ・こんてきすと？" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-06-28T07:13:04+09:00">2012年6月28日</time></p>
+
+        <h1><em>位置を固定した要素のすたっきんぐ・こんてきすと？</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="左がChrome 20、右がChrme 22のFixed position elements create stacking contextsを有効にした場合のスクリーンショットで、同じHTML/CSSで重なり順が変わることが確認できる。" height="270" src="/img/blog/stacking-contexts-on-fixed-element.png" width="480">
+</figure>
+
+<p>Chrome 22で隠し設定に<code>position: fixed</code>された要素配下での<code>z-index</code>プロパティーの扱われ方を仕様に準拠する形へ変えるものが用意された……とか言われても<a href="http://www.w3.org/TR/CSS2/zindex.html">Stacking Contextsの仕様</a>を読んでもまったくわからなかったので<a href="/test/425.html">簡単なテスト</a>を書いて理解した。</p>
+
+<p>HTMLは以下のような形。</p>
+
+<pre><code class="language-html">&lt;div class="red"&gt;&lt;/div&gt;
+&lt;div class="fixed"&gt;
+  &lt;div class="green"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="blue"&gt;&lt;/div&gt;</code></pre>
+
+<p>これをCSSで赤緑青に色分けして、<code>z-index</code>プロパティーを赤緑青の順にする。</p>
+
+<pre><code class="language-css">.red {
+  position: absolute;
+  z-index: 1;
+  background-color: red;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.green {
+  position: absolute;
+  z-index: 2;
+  background-color: green;
+}
+
+.blue {
+  position: absolute;
+  z-index: 3;
+  background-color: blue;
+}</code></pre>
+
+<p>Chrome 22の隠し設定を有効にしない限り<code>position: fixed</code>で新しいスタッキング・コンテキストが作成されないので、<code>z-index</code>プロパティーの値通りに下(背面)から<em>赤緑青</em>の順に並ぶ。隠し設定を有効にすると新しいスタッキング・コンテキストが作成されるようになり、その子にある<code>.green</code>への<code>z-index: 2</code>は<code>.fixed</code>内のローカルなものとみなされるようになる。というわけで<code>.red</code>や<code>.blue</code>が<code>.fixed</code>よりも前面にくることになり、スクリーンショットの右のように下(背面)から<em>緑赤青</em>の順に重なる。</p>
+
+<hr>
+
+<p>スタッキング・コンテキストの話は結構前に書いた<a href="/blog/webdesign/opacity-and-z-index.html"><code>opacity</code>と<code>z-index</code></a>でもちょろっと書いたけど、あんまり理解できていなかったので良い勉強になった。現行ブラウザーの多くは仕様通りに実装していないままずっと来たのでなんで今さらみたいな感じだけど、<a href="https://plus.google.com/103238735625031210015/posts/PXDRAukeZvd">Mobile Safariだけ実装済み</a>なので仕様もあることだしそっちに合わせた方が良いよね！　みたいなのかな。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

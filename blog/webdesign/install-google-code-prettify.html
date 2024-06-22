@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>google-code-prettifyを導入した</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/install-google-code-prettify.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="どっかのサイトがシンタックス・ハイライトを導入していたので真似した。ローカルでやろうかと思ったけどフィードに&lt;span class=&quot;kwd&quot;&gt;function&lt;/span&gt;とかがたくさん入るのが嫌だったので、JavaScriptでハイライトしてくれるgoogle-code-prettifyにした。正式名称はJavascript code prettifierらしい。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="どっかのサイトがシンタックス・ハイライトを導入していたので真似した。ローカルでやろうかと思ったけどフィードに&lt;span class=&quot;kwd&quot;&gt;function&lt;/span&gt;とかがたくさん入るのが嫌だったので、JavaScriptでハイライトしてくれるgoogle-code-prettifyにした。正式名称はJavascript code prettifierらしい。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="google-code-prettifyを導入した" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-12-11T14:29:44+09:00">2009年12月11日</time></p>
+
+        <h1><em>google-code-prettifyを導入した</em></h1>
+      </header>
+
+    <main>
+
+    <p>どっかのサイトがシンタックス・ハイライトを導入していたので真似した。ローカルでやろうかと思ったけどフィードに<code>&lt;span class=&quot;kwd&quot;&gt;function&lt;/span&gt;</code>とかがたくさん入るのが嫌だったので、JavaScriptでハイライトしてくれる<a href="http://code.google.com/p/google-code-prettify/">google-code-prettify</a>にした。正式名称はJavascript code prettifierらしい。</p>
+
+<p>google-code-prettifyにしたのは、必要な機能がシンタックス・ハイライト<em>だけ</em>でできればフォーマットの自動判定があれば良いかなーくらいだったので。自動判定に頑張って貰おうとして、</p>
+
+<pre><code class="language-js">$(function () {
+  $(&quot;pre&quot;).addClass(&quot;prettyprint&quot;);
+  prettyPrint();
+});</code></pre>
+
+<p>とか書いて全ての<code>pre</code>要素を自動的にハイライトさせてみたんだけど、非対応なものとかでアレなことになってしまったので、結局半手作業でハイライトさせたい<code>pre</code>要素のクラス名に<code>prettyprint</code>を振ってやった……。</p>
+
+<p>CSSのシンタックス・ハイライトはコアに含まれていないので、利用したい場合は以下のように書く必要があった。</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;prettify.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;lang-css.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<p>順序が重要でlang-css.jsはprettify.jsより後ろに書かなくてはならない。当たり前といえば当たり前なんだけどうっかり逆の順序で書いてしまってはまった……。<a href="http://closure-compiler.appspot.com/home">Closure Compiler Service</a>を使えば複数のJavaScriptファイルをまとめたりもできるので、まとめてしまうとそういう間違も起こさず良いかもしれない。流行りのHTTPリクエストの節約にもなる(この場合は1つだけどね！)。実際にこのサイトで使用しているprettify.min.jsはClosure Compiler Serviceでコンパイルしたもの。</p>
+
+<pre><code class="language-js">// ==ClosureCompiler==
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// @output_file_name prettify.min.js
+// @code_url http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js
+// @code_url http://hail2u.net/scripts/prettify/lang-css.js
+// ==/ClosureCompiler==
+
+$(function () {
+  prettyPrint();
+});</code></pre>
+
+<p>Closure Compiler Serviceのフォームには上記のように入力してコンパイルした。<a href="/scripts/prettify/lang-css.js">lang-css.js</a>は<code>rgba()</code>や<code>hsla?()</code>をサポートさせたりプロパティ名のハイライト色を変更したかったので、このサイトにカスタマイズしたものを置いてそれを読み込ませている。ついでにjQueryを使って<code>prettyPrint()</code>が自動的に呼ばれるようにして、<code>&lt;body onload=&quot;prettyPrint()&quot;&gt;</code>とか書かなくて済むようにもした。</p>
+
+<p>CSSテーマはir_blackを適当にカスタマイズしたものでwidget.cssに書いてある。一応ir_black.cssやh2u_black.cssとかも書いたけど使ってない……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

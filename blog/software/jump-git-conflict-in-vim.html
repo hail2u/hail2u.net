@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>VimでGitで衝突したところにジャンプ</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/jump-git-conflict-in-vim.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に&lt;&lt;&lt;&lt;&lt;&lt;&lt;にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に&lt;&lt;&lt;&lt;&lt;&lt;&lt;にジャンプするだけみたいなのがちょっと欲しくなった。VimだとBufReadPostでsearch()を呼べば良さそうだ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="VimでGitで衝突したところにジャンプ" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-02-25T21:37:53+09:00">2015年2月25日</time></p>
+
+        <h1><em>VimでGitで衝突したところにジャンプ</em></h1>
+      </header>
+
+    <main>
+
+    <p>Gitでマージやリベースで衝突が起きた場合、その解消のために該当ファイルを開き、移動する……前に自動的に<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>にジャンプするだけみたいなのがちょっと欲しくなった。Vimだと<code>BufReadPost</code>で<code>search()</code>を呼べば良さそうだ。</p>
+
+<pre><code class="language-vim">augroup LtLtLtLtLtLtLt
+  autocmd!
+
+  &quot; Jump to first conflict position if find
+  autocmd BufReadPost * call search(&apos;^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&apos;, &apos;sw&apos;, 0, 1000)
+augroup END</code></pre>
+
+<p>検索を一周させるようにフラグを立てておくついでに戻れるようにもフラグを立てたつもりだけど、発火するタイミング的に常に先頭で意味が無いような気がしないでもない。あと大きなファイルで死にそうなので1000ミリ秒に制限しておいたけど、もっと短くても良さそう。カーソル位置の復帰など、同じようにファイルを開いた時にカーソル位置を動かすプラグインと相性は悪いけど、なんとかなる。</p>
+
+<p><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>は大体は文法エラーなので、Syntasticを使っている人は、</p>
+
+<ul>
+<li>開いた時にチェック(<code>let g:syntastic_check_on_open = 1</code>)</li>
+<li>最初のエラーにジャンプ(<code>let g:syntastic_auto_jump = 1</code>)</li>
+<li>位置リストを自動的に開く(<code>let g:syntastic_auto_loc_list = 1</code>)</li>
+</ul>
+
+<p>の設定を有効にするとだいたい実現できそうな気がする。最初のエラーじゃなかった時の保険として、位置リストを自動的に開くようにしておくといける。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

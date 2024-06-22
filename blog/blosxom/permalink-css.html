@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>パーマリンクに特別なCSSを追加</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/permalink-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Blosxomで記事ごとに専用のCSSを当てる方法を考えていた。last()でrel=&quot;stylesheet&quot;を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="パーマリンクに特別なCSSを追加" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-04-01T02:39:12+09:00">2014年4月1日</time></p>
+
+        <h1><em>パーマリンクに特別なCSSを追加</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://blosxom.sourceforge.net/">Blosxom</a>で記事ごとに専用のCSSを当てる方法を考えていた。<code>last()</code>で<code>rel=&quot;stylesheet&quot;</code>を削除してCSSの参照を追加するだけのプラグインを作るのも良いけど、やることのわりにコストが高い。単純にmetaプラグインとinterpolate_fancyプラグインを組み合わせて実現するのが手っ取り早そう。</p>
+
+<p>記事ファイルでは特別なCSSを使うかどうかのフラグのみ書く。</p>
+
+<pre><code class="language-markdown">パーマリンクに特別なCSSを追加
+meta-special_css: 1
+
+&lt;p&gt;...&lt;/p&gt;</code></pre>
+
+<p>フレーバーでは以下のようにして、<code>$meta::special_css</code>を使った分岐を利用する。CSSファイルのパスは記事ファイル名を利用することでユニークさを保証できる。</p>
+
+<pre><code class="language-html">&lt;?$meta::special_css eq=&quot;1&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;/styles$path/$fn.css&quot;&gt;
+&lt;/?&gt;
+&lt;?$meta::special_css ne=&quot;1&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;/styles/style.css&quot;&gt;
+&lt;/?&gt;</code></pre>
+
+<p>まだ採用はしてない。</p>
+
+<hr>
+
+<p>常に記事ファイル名を利用したCSSファイルのパスを参照するようにしておいて、mod_rewriteでそのパスが見つからなかった場合にデフォルトのCSSにフォールバックさせる方がもっと手っ取り早い感じする。普通にURL書き換えしちゃうとキャッシュが効かなくなるけど、302での外部リダイレクトにすれば良さそう。</p>
+
+<pre><code class="language-apache">&lt;IfModule mod_rewrite.c&gt;
+  RewriteEngine On
+
+  RewriteBase /styles/
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.*)$ style.css [L,R=302]
+&lt;/IfModule&gt;</code></pre>
+
+<p>こういう実装だとBlosxomに依存しないので、CSSファイルのパスをユニークにする仕組みさえ用意できれば、様々なCMSで実現できる。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

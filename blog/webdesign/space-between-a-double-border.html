@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>border-style: doubleの間のスペース</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/space-between-a-double-border.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="border-styleプロパティーでsolid以外が使われることは滅多にないけど、doubleはそこそこ使われるんじゃないかと思う。他は大体残念な感じになることが多いが、doubleは安定しているので。そのdoubleでは2本の線が引かれその間にスペースが出来る。一体このスペースはどうなってるのかみたいなどうでも良さそうな話。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="border-styleプロパティーでsolid以外が使われることは滅多にないけど、doubleはそこそこ使われるんじゃないかと思う。他は大体残念な感じになることが多いが、doubleは安定しているので。そのdoubleでは2本の線が引かれその間にスペースが出来る。一体このスペースはどうなってるのかみたいなどうでも良さそうな話。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="border-style: doubleの間のスペース" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-02-05T16:50:19+09:00">2012年2月5日</time></p>
+
+        <h1><em>border-style: doubleの間のスペース</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>border-style</code>プロパティーで<code>solid</code>以外が使われることは滅多にないけど、<code>double</code>はそこそこ使われるんじゃないかと思う。他は大体残念な感じになることが多いが、<code>double</code>は安定しているので。その<code>double</code>では2本の線が引かれその間にスペースが出来る。一体このスペースはどうなってるのかみたいな<del>どうでも良さそうな</del>話。</p>
+
+<p>まずその大きさだが、<code>px</code>単位系だと3で割った余りが1の場合は間のスペースが増え、余りが2の場合は枠線の太さが増える。仕様では決められてないが、大体どの実装でも同じようだ。</p>
+
+<table>
+<tr>
+<th>全体の太さ</th><th>枠線の太さ</th><th>間のスペース</th>
+</tr>
+<tr>
+<td><code>3px</code></td><td><code>1px</code></td><td><code>1px</code></td>
+</tr>
+<tr>
+<td><code>4px</code></td><td><code>1px</code></td><td><code>2px</code></td>
+</tr>
+<tr>
+<td><code>5px</code></td><td><code>2px</code></td><td><code>1px</code></td>
+</tr>
+</table>
+
+<p>間のスペースが大きい状態(3で割った余りが1の時)は不恰好になりがちなので、調整できるなら3で割り切れる数にするのが無難。</p>
+
+<p>次は間のスペースの色の話。こちらも仕様では特に触れられていないが、どの実装も<code>transparent</code>になっている。ただし枠線と同時に<code>background-color</code>プロパティーで背景色も指定されていた場合、スペースの色は背景色と同じになる……というより枠線の下まで背景色で塗られるのでそれが見える。そのため背景色を塗りつつ枠線の間を透過させるというようなことは<a href="/test/361.html">そのままではできない</a>。</p>
+
+<del>
+<p>が、背景<em>画像</em>の場合は<code>background-origin</code>プロパティーのデフォルトが<code>padding-box</code>になっていることもあり、間のスペースから背景画像が見えることはない。つまり<code>linear-gradient()</code>を使って単色の背景画像を作ってやれば、上記URLの2番目の例のように間のスペースを透過させつつ背景を単色で塗りつぶすことができる。</p>
+
+<pre><code class="language-css">.test {
+  background-image: linear-gradient(
+    top,
+    #396 0,
+    #396 100%
+  );
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}</code></pre>
+
+<p>サイズと繰り返し指定も必須。このテクニックに背景色を追加すれば間のスペースの色と要素の背景色を違うものにすることができたりもする。</p>
+</del>
+
+<ins>
+<p><code>background-clip</code>プロパティーが<a href="http://b.hatena.ne.jp/vantguarde/20120205#bookmark-79593669">あった</a>(他多数)のでそっち使ってください……。こうやるにはどうしたらいいだろうで考えるとどうもダメだなぁ。</p>
+</ins>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

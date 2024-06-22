@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>たった一行で人生が変わった.vimrcでの設定とその意味</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/only-one-line-life-changing-vimrc-setting.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="僕はVimを使うまでは秀丸エディタを長いこと使用していました。両者の間に設定の項目数やキーバインドに割り当てられる機能に大きな差があるとも思わなかったので、使い始めた当初は「そんな言うほど高機能でもないよなー」とか思っていました。しかし色々なプラグインを試したり、様々な設定を.vimrcに書いているうちに、Vim (やEmacs)がその他エディタと決定的に違うのは設定の豊富さではなく、設定の自由さがもたらすアプローチの多様性なのではないかと考えるようになりました。というわけでそういう設定の自由さを最初に実感した話をVim Advent Calendar 2011の6日目のエントリーとして書かせてもらいます。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="僕はVimを使うまでは秀丸エディタを長いこと使用していました。両者の間に設定の項目数やキーバインドに割り当てられる機能に大きな差があるとも思わなかったので、使い始めた当初は「そんな言うほど高機能でもないよなー」とか思っていました。しかし色々なプラグインを試したり、様々な設定を.vimrcに書いているうちに、Vim (やEmacs)がその他エディタと決定的に違うのは設定の豊富さではなく、設定の自由さがもたらすアプローチの多様性なのではないかと考えるようになりました。というわけでそういう設定の自由さを最初に実感した話をVim Advent Calendar 2011の6日目のエントリーとして書かせてもらいます。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="たった一行で人生が変わった.vimrcでの設定とその意味" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-12-06T00:19:17+09:00">2011年12月6日</time></p>
+
+        <h1><em>たった一行で人生が変わった.vimrcでの設定とその意味</em></h1>
+      </header>
+
+    <main>
+
+    <p>僕は<a href="http://www.vim.org/">Vim</a>を使うまでは<a href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</a>を長いこと使用していました。両者の間に設定の項目数やキーバインドに割り当てられる機能に大きな差があるとも思わなかったので、使い始めた当初は「そんな言うほど高機能でもないよなー」とか思っていました。しかし色々なプラグインを試したり、様々な設定を<code>.vimrc</code>に書いているうちに、Vim (や<a href="http://www.gnu.org/software/emacs/emacs.html">Emacs</a>)がその他エディタと決定的に違うのは設定の豊富さではなく、<em>設定の自由さがもたらすアプローチの多様性</em>なのではないかと考えるようになりました。というわけでそういう設定の自由さを最初に実感した話を<a href="http://atnd.org/events/21925">Vim Advent Calendar 2011</a>の6日目のエントリーとして書かせてもらいます。</p>
+
+<hr>
+
+<p>昨今のWebサイトではCMSなどを利用することが多く、共通のHTMLコードはテンプレートとして作成されます。その場合そのテンプレートの利用されるパスが様々な場所や階層になりうるので、例えばJavaScriptファイルのインクルードを行う場合、以下のようにスラッシュで始まる相対URLを利用することが多いでしょう。</p>
+
+<pre><code class="language-html">&lt;script src="/js/foo.js"&gt;&lt;/script&gt;</code></pre>
+
+<p>しかしこのようなURLを利用していると何かと便利な<a href="http://vim-jp.org/vimdoc-ja/editing.html#gf"><code>gf</code></a>でカーソル下のファイル(この場合は<code>foo.js</code>)を(多くの場合)開くことが出来ません。ローカル(やリモート)のファイルシステム上のパス構成をURL構成とマッチするように整えてやれば開くことができるようになりますが、それは面倒でしょう。それを解決するのが以下の一行です。</p>
+
+<pre><code class="language-vim">autocmd FileType html setlocal includeexpr=substitute(v:fname,'^\\/','','') | setlocal path+=;/</code></pre>
+
+<p>こう~/.vimrcに書いておくだけで<code>gf</code>で開くことができるようになります。<code>includeexpr</code>でファイル名の先頭のスラッシュを削り、<code>path</code>に<code>;/</code>を追加して上流を探すようにすることにより、大体うまく開くことが可能になるわけです。<code>path</code>によって<code>gf</code>や<code>:find</code>などでファイルを探すパスを細かく設定できます。値の<code>;/</code>については、</p>
+
+<pre>:h file-searching</pre>
+
+<p>を参照するのが良いでしょう。</p>
+
+<hr>
+
+<p>この一行の設定がもたらすものにはさほど意味はありません(僕にとっては大きなものでしたが)。単に<code>gf</code>でファイルを開くことができるようにするだけでなく、仮想的なパス構成を扱えるようにするプラグインもありますし、OS側でWebプロジェクトのディレクトリを仮想ドライブとしてマウントしてやったりするなどでもこの小さな問題は解決することができるでしょう。しかしこの程度の設定でも<em>大体</em>うまくいきます。つまりVimでは<em>やりたいことをやりたいようにできる</em>ということです。</p>
+
+<p>設定の書き方もこのようにパイプでコマンドを繋げて無理やり一行にまとめたりすることもできますし、関数として定義してそれを呼び出してやってもいいでしょう。もちろんVimの作法に従って<code>after</code>ディレクトリで設定を記述するのが良いですが、設定を集中させることによって環境の移動に強くなったりというメリットも出てきます。こういったアプローチの多様性がVimが愛されている理由のひとつであることは間違いないでしょう。</p>
+
+<blockquote>
+<p>Once a vimmer, always a vimmer.</p>
+</blockquote>
+
+<p>僕もきっとそうだと思います。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

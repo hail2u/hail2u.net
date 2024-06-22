@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>オールドスタイルな数字を普通のものに</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/turn-off-oldstyle-numbers.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="オールドスタイルな数字っていうのはGeorgiaとかで見るオシャレなあの数字のこと。Corbelというx-heightが高めでオープン・カウンターという読みやすさ重視のなかなか優秀なサンセリフ体もオールドスタイル。ただ和文とは相性が良くないので、どうにかして数字だけ普通のものに差し替えてみようという試み。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="オールドスタイルな数字っていうのはGeorgiaとかで見るオシャレなあの数字のこと。Corbelというx-heightが高めでオープン・カウンターという読みやすさ重視のなかなか優秀なサンセリフ体もオールドスタイル。ただ和文とは相性が良くないので、どうにかして数字だけ普通のものに差し替えてみようという試み。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="オールドスタイルな数字を普通のものに" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-07-28T00:06:00+09:00">2012年7月28日</time></p>
+
+        <h1><em>オールドスタイルな数字を普通のものに</em></h1>
+      </header>
+
+    <main>
+
+    <p>オールドスタイルな数字っていうのはGeorgiaとかで見るオシャレなあの数字のこと。<a href="http://en.wikipedia.org/wiki/Corbel_(typeface)">Corbel</a>というx-heightが高めでオープン・カウンターという読みやすさ重視のなかなか優秀なサンセリフ体もオールドスタイル。ただ和文とは相性が良くないので、どうにかして数字だけ普通のものに差し替えてみようという試み。</p>
+
+<section>
+<h2><code>unicode-range</code>プロパティー</h2>
+
+<p><code>@font-face</code>ディレクティブの<code>unicode-range</code>プロパティーでカスタム・フォントを作成するテクニックを使ってCorbelの数字をCalibriに置き換えてみる。</p>
+
+<p>Demo: <a href="/test/442.html">Use non oldstyle numbers for Corbel</a></p>
+
+<p>Chrome 20とInternet Explorer 9で反映される。それ以外では<code>unicode-range</code>プロパティーが無視されるので、アルファベットや記号も含めて<em>完全にCalibriになる</em>。</p>
+
+<pre><code class="language-css">@font-face {
+  font-family: "Corbel-Mod";
+  src: local("Corbel");
+}
+
+@font-face {
+  font-family: "Corbel-Mod";
+  src: local("Calibri");
+  unicode-range: U+0030-0039;
+}
+
+.test {
+  font-family: "Corbel-Mod", sans-serif;
+}</code></pre>
+
+<p>という形で<code>local()</code>で読むのでパフォーマンスに影響は殆どない。CorbelもCalibriもないOS Xなどではどうなんの……みたいな感じだけど、そもそもどこの誰でもCorbelを使わせようみたいな話ではないので関係ない。</p>
+</section>
+
+<section>
+<h2><code>font-feature-settings</code>プロパティー</h2>
+
+<p>リガチャで脚光を浴びつつある<a href="http://www.w3.org/TR/css3-fonts/#font-feature-settings-prop"><code>font-feature-settings</code></a>プロパティーでも<code>lnum</code>を有効にしてやることでChrome 20やFirefox 14(多分4以降)、Internet Explorer 10では可能。</p>
+
+<p>Demo: <a href="/test/443.html">Use non oldstyle numbers for Corbel #2</a></p>
+
+<p>ちゃんと設計されたグリフが採用されるのと概ね直観的なプロパティーの記述で済むのが良いところ。</p>
+
+<pre><code class="language-css">.test {
+  font-family: "Corbel", sans-serif;
+  font-feature-settings: "lnum" 0;
+}</code></pre>
+
+<p>最初<code>font-feature-settings</code>プロパティーで<code>onum</code>を明示的に無効にしたら普通の数字になるんじゃないかと思って試したんだけどダメだった。それで<code>unicode-range</code>プロパティーのを窮余の策として考えだしたんだけど、やり方が全然間違っていただけだった……。OpenTypeの仕様も読まないとなぁ……。</p>
+</section>
+
+<hr>
+
+<p>後者の<code>font-feature-settings</code>プロパティーを使う方が将来的に安全で字形的に安定だと思う。<code>unicode-range</code>プロパティーだとInternet Explorer 9で反映されるというメリットはあるので、条件付きコメントとかで切り分けたりするとかも良いかも。今度どこかでCorbel使おう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

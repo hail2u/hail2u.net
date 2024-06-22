@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>リンク先が訪問済みかどうかのCSSによる表示</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/show-visited-status-with-css.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="DuckDuckGoでは、検索結果に出てきたページが訪問済みかどうかをわかりやすくアイコンで表示してくれる。Googleではトリッキーなことはせずに、色を変えるだけだ。もちろん色を変えるのが簡単だが、色を増やさずに訪問済みかどうかを示すことも不可能ではないようだ。まずはテスト実装ということで擬似要素がユニバーサル・セレクターにはマッチしないことを利用して考えることにした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="DuckDuckGoでは、検索結果に出てきたページが訪問済みかどうかをわかりやすくアイコンで表示してくれる。Googleではトリッキーなことはせずに、色を変えるだけだ。もちろん色を変えるのが簡単だが、色を増やさずに訪問済みかどうかを示すことも不可能ではないようだ。まずはテスト実装ということで擬似要素がユニバーサル・セレクターにはマッチしないことを利用して考えることにした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="リンク先が訪問済みかどうかのCSSによる表示" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-11-09T15:14:27+09:00">2015年11月9日</time></p>
+
+        <h1><em>リンク先が訪問済みかどうかのCSSによる表示</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://duckduckgo.com/">DuckDuckGo</a>では、検索結果に出てきたページが訪問済みかどうかをわかりやすくアイコンで表示してくれる。<a href="https://www.google.com/">Google</a>ではトリッキーなことはせずに、色を変えるだけだ。もちろん色を変えるのが簡単だが、色を増やさずに訪問済みかどうかを示すことも不可能ではないようだ。まずはテスト実装ということで擬似要素がユニバーサル・セレクターにはマッチしないことを利用して考えることにした。</p>
+
+<p>Demo: <a href="/test/644.html">Show :visited Status</a></p>
+
+<p>デモ・ページでは訪問済みのリンクであった場合に「訪問済み」という文字列を赤で表示するようになっている。「訪問済み」という文字列の代わりにアイコン・フォントを使えばこのインジケーターをDuckDuckGoのそれに似たようなものにできるのではないかと思う。その場合は「訪問済み」とかいう妙な文字列をクローラーに拾われなくなり、より良い実装となりうる。</p>
+
+<p><code>:visited</code>擬似クラスでは特定のCSSプロパティーしか利用できない。仕組みそのものは単純だが、いくつかCSSの独特の仕組みを利用しており、実装は少しややこしくなる。</p>
+
+<ol>
+<li><code>a</code>要素の<code>color</code>プロパティーを背景色と同じにする</li>
+<li><code>a:visited</code>擬似クラスの<code>color</code>プロパティーでインジケーターの前景色を指定する</li>
+<li><code>a:before</code>擬似要素でインジケーターになる文字列を仕込む</li>
+<li><code>a &gt; *</code>の<code>color</code>プロパティーでリンクの前景色を指定する</li>
+</ol>
+
+<p>本来は1か2で指定した前景色がすべての子要素へ適用されることになるが、実際にリンクを張った文字列の前景色は4での指定により上書きされる。ただし4のセレクターは擬似要素にマッチしないので、擬似要素だけは1か2での指定が適用される。ということで訪問済みの場合のみ文字列が見えるようになるという仕組みだ。</p>
+
+<pre><code class="language-html">&lt;li&gt;
+  &lt;a href=&quot;https://example.com/&quot;&gt;
+    &lt;span&gt;Example&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/li&gt;</code></pre>
+
+<p>デモ・ページではこのようなマークアップに依存している。必要な条件を単純化すると<code>a</code>要素の直下がなんらかの要素ですべて括られていれば良いということになる。つまり以下のようなマークアップでもうまくいく。</p>
+
+<pre><code class="language-html">&lt;a href=&quot;https://example.com/&quot;&gt;
+  &lt;section&gt;
+    &lt;h1&gt;Example&lt;/h1&gt;
+  &lt;/section&gt;
+&lt;/a&gt;</code></pre>
+
+<p>利用を想定している箇所はこのようなセクション全体にリンクを張るパターンなので、概ね問題なさそうだ。</p>
+
+<hr>
+
+<p>訪問済みかどうかの表示はユーザーの不安感を煽るとも考えられる。多用は……というよりも、ユーザーのメリットが明らかでない場合は利用するべきではないだろう。しかしながらいざ必要となった時にアイディアがまったくないというのも芸がないので、このような工夫は常に数個ストックしておきたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>box-shadowとradial-gradientで画像をポラロイド写真風に</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/adding-polaroid-effects-to-img-with-box-shadow-and-radial-gradient.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSS3のbox-shadowプロパティではinsetという値を取ることができ、その場合ブロックの内側に影が付く。これをある工夫と共に利用すると写真の端に影がつけられる。更にradial-gradientでセピア色のグラデーションを重ねてやれば、良い具合に古ぼけさせることもできるので、両方の効果を重ねてやればポラロイド写真風に見えないこともない？" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="CSS3のbox-shadowプロパティではinsetという値を取ることができ、その場合ブロックの内側に影が付く。これをある工夫と共に利用すると写真の端に影がつけられる。更にradial-gradientでセピア色のグラデーションを重ねてやれば、良い具合に古ぼけさせることもできるので、両方の効果を重ねてやればポラロイド写真風に見えないこともない？" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/polaroid-effect.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="box-shadowとradial-gradientで画像をポラロイド写真風に" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-01-24T18:09:09+09:00">2011年1月24日</time></p>
+
+        <h1><em>box-shadowとradial-gradientで画像をポラロイド写真風に</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="ポラロイド写真風？。" height="200" src="/img/blog/polaroid-effect.png" width="200">
+</figure>
+
+<p>CSS3の<code>box-shadow</code>プロパティでは<code>inset</code>という値を取ることができ、その場合ブロックの内側に影が付く。これをある工夫と共に利用すると写真の端に影がつけられる。更に<code>radial-gradient</code>でセピア色のグラデーションを重ねてやれば、良い具合に古ぼけさせることもできるので、両方の効果を重ねてやればポラロイド写真風に見えないこともない？</p>
+
+<p>Demo: <a href="/test/149.html">Polaroid effects using inset box-shadow and radial-gradient</a></p>
+
+<p>キモは以下のように<code>z-index</code>を使って画像を背面に回してやること。そうすれば親のブロック要素での<code>box-shadow</code>や<code>background-image</code>を画像の<em>上</em>に重ねることができる。</p>
+
+<pre><code class="language-css">.polaroid {
+  float: left;
+  width: 400px;
+  height: 400px;
+  background-image: -webkit-gradient(radial, 50% 50%, 1, 50% 50%, 283, color-stop(0, rgba(112, 66, 20, 0.2)), color-stop(1, rgba(112, 66, 20, 0.4)));
+  background-image: -webkit-radial-gradient(rgba(112, 66, 20, 0.2), rgba(112, 66, 20, 0.4));
+  background-image: -moz-radial-gradient(rgba(112, 66, 20, 0.2), rgba(112, 66, 20, 0.4));
+  background-image: radial-gradient(rgba(112, 66, 20, 0.2), rgba(112, 66, 20, 0.4));
+  -webkit-box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.polaroid img {
+  position: relative;
+  z-index: -1;
+}</code></pre>
+
+<section>
+<h2>写真の縁に影を付ける</h2>
+
+<p><code>box-shadow</code>の文法は以下の通りで、<code>text-shadow</code>との違いは<code>inset</code>で内側に影を作れることと、ぼかし以外に影のサイズを微調整することができること。</p>
+
+<pre>box-shadow: inset? &lt;offset-x&gt; &lt;offset-y&gt; &lt;blur-radius&gt;? &lt;spread-radius&gt;? &lt;color&gt;?;</pre>
+
+<p>ここではぼかしを40pxにしたがもっと少なくてもいいかもしれないが、少ないと縁が黒くなった感よりも凹んでいる感が強くなってしまう気がする。影の色はある程度透過させた色を指定しないと縁が真っ黒になってしまうので注意。</p>
+</section>
+
+<section>
+<h2>セピア色のフィルタ</h2>
+
+<p>古びた感を出すために、<a href="http://en.wikipedia.org/wiki/Sepia_(color)"><code>rgb(112, 66, 20)</code></a>を適当に透過させて<code>radial-gradient</code>で円形グラデーションを作りセピア色のフィルタの代わりにした。内から外へ少し濃くなっていくようにしたんだけど、逆な気がしてしょうがない。</p>
+
+<p>Safari 5とかはまだだけどChrome 9あたりでは既に<code>-webkit-(linear|radial)-gradient()</code>というCSS3の<code>(linear|radial)-gradient()</code>と同じ文法のベンダー拡張が実装されているのでそれも併記しておいた。早い所<code>-webkit-gradient()</code>書かなくて済むようになるといいな。</p>
+</section>
+
+<hr>
+
+<p>どっちかというと<code>z-index</code>で写真を背面に回し、<code>background-image</code>と重ねたりするといろいろ写真にエフェクトをかけられるよっていう話。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

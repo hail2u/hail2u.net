@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSポストプロセッサー時代の到来</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/documents/css-postprocessor-era.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="SassやLESSといったCSSプリプロセッサーは市民権を得たと言って良いと思う。しかしそれらCSSプリプロセッサーは開発という段階にのみ利をもたらすもので、今のところはそれ以上ではない。CSSを実際にユーザーに届けるまでには、開発だけではなくレビューとリリースという段階もある。レビューとリリースも確実性を持って効率的に行うためには、CSSポストプロセッサーと総称されるようなツール群が必要になるだろう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="SassやLESSといったCSSプリプロセッサーは市民権を得たと言って良いと思う。しかしそれらCSSプリプロセッサーは開発という段階にのみ利をもたらすもので、今のところはそれ以上ではない。CSSを実際にユーザーに届けるまでには、開発だけではなくレビューとリリースという段階もある。レビューとリリースも確実性を持って効率的に行うためには、CSSポストプロセッサーと総称されるようなツール群が必要になるだろう。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSポストプロセッサー時代の到来" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-12-04T00:00:00+09:00">2013年12月4日</time></p>
+
+        <h1><em>CSSポストプロセッサー時代の到来</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img src="/img/documents/css-postprocessor-era.svg" alt="Write with Sass, Compile to Standard CSS, Review, Optimize with Grunt, and Publish">
+</figure>
+
+<p><a href="http://sass-lang.com/">Sass</a>や<a href="http://lesscss.org/">LESS</a>といったCSSプリプロセッサーは市民権を得たと言って良いと思う。しかしそれらCSSプリプロセッサーは開発という段階にのみ利をもたらすもので、今のところはそれ以上ではない。CSSを実際にユーザーに届けるまでには、<em>開発</em>だけではなく<em>レビュー</em>と<em>リリース</em>という段階もある。レビューとリリースも確実性を持って効率的に行うためには、CSSポストプロセッサーと総称されるようなツール群が必要になるだろう。</p>
+
+<p>この文書は<a href="http://www.adventar.org/calendars/62">Frontrend Advent Calendar 2013</a>の4日目への記事として寄稿した。明日は<a href="https://twitter.com/hiloki">@hiloki</a>さんが<q cite="https://twitter.com/hiloki/status/407377583114702848">スタコラサッサ</q>と書くようだ。</p>
+
+<h2>目次</h2>
+
+<ol>
+<li><a href="#what">CSSポストプロセッサーとは</a></li>
+<li><a href="#output-css">CSSプリプロセッサーの出力するCSS</a>
+<ol>
+<li><a href="#css-lint">CSS Lint</a></li>
+</ol>
+</li>
+<li><a href="#dev-rev-rel">開発用とレビュー用、リリース用のCSS</a></li>
+<li><a href="#use-case">CSSポストプロセッサーのユースケース</a>
+<ol>
+<li><a href="#vendor-prefixes">ベンダー拡張プリフィックスの付加</a></li>
+<li><a href="#mediaqueries">Media Queriesの取りまとめ</a></li>
+<li><a href="#data-uri">Data URIへの変換</a></li>
+<li><a href="#minify">空白の削除などによる圧縮</a></li>
+<li><a href="#grunt">Gruntでまとめて実行</a></li>
+</ol>
+</li>
+<li><a href="#conclusion">最後に</a></li>
+</ol>
+
+<h2 id="what">CSSポストプロセッサーとは</h2>
+
+<p>CSSポストプロセッサーとは、<em>CSSを機械的に処理して特定の変更を加えるツールのこと</em>と考えて貰えば良い。代表的なものは<a href="http://yui.github.io/yuicompressor/">YUI Compressor</a>を始めとしたCSS圧縮ツールだ。圧縮ツールも兼ねているCSSプリプロセッサーの広まりによりめっきり影が薄くなったが、その<em>CSSプリプロセッサー自体の複雑化</em>により再び必要性が増している。</p>
+
+<p>現在、複雑なCSSプリプロセッサーの文法を駆使した他人に読めないコードと、圧縮された人間に読めないCSSの2つしかないというような状況に、多少悲観的ではあるかもしれないが、なりつつある。レビューのためには読みやすいCSSを一旦出力する必要があり、そのままではリリースに向かないため、レビュー後リリース前に圧縮等の機械的な処理を行う必要がある。それを担うのがCSSポストプロセッサーというわけだ。</p>
+
+<h2 id="output-css">CSSプリプロセッサーの出力するCSS</h2>
+
+<p>CSSプリプロセッサーではいくつかのフォーマットで出力できることが多い。しかし、多くのプロジェクトで圧縮した形での出力を選択しているのではないかと思う。今年に入って<a href="https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit">Source Maps</a>がCSSプリプロセッサーとブラウザー双方でサポートされたこともあり、その傾向は更に強くなると考えられる。</p>
+
+<p>圧縮されたCSSはまったく可読性に欠けているため、当たり前だが人間がちゃんと読むことはほぼ不可能と言って良い。ちゃんと読めないということは、つまりレビューすることが出来ないということになる。リリース用としては申し分ないし、Source Mapsを利用するのなら開発中やリリース後のデバッグも問題ないが、<em>リリース前のレビュー</em>が難しいというのは変わらないし、規模によっては大きな問題になる。</p>
+
+<p>「Source Mapsで関連付けられる先のCSSプリプロセッサーのコードをレビューすれば良いのでは？」という疑問も当然あるだろう。Sass 3より前くらいまではCSSをちょっと便利にしたもの程度だったので、CSSの知識さえあればCSSプリプロセッサーのコードをレビューすることは難しくなかった。しかしリリースが控えているSass 3.3で導入される<code>@at-root</code>やマップ型変数などが使われるようになるこれからは、Sassの仕様を正確に理解していないとレビューすることは難しくなっていくだろう。</p>
+
+<p>レビューはCSSプリプロセッサーで書く人だけでなく、そのウェブサイトやウェブアプリケーションのマネージャーやバックエンド開発者、そして運用を行う人など<em>様々な人が参加すべき段階</em>だ。彼らにCSSプリプロセッサーの機能を正確に理解するよう求めるのは難しいし、はっきりと言うならそれを求めるのは間違っている。彼らは彼らで他に優先して覚えることがそれぞれあるのだから、ウェブ標準のCSSを理解できるという程度で良しとするべきだ。</p>
+
+<p>また、多くのCSSを扱うツールは<em>普通のCSSファイル</em>を前提にして作られている。そのようなツールたちとうまく連携するためには、アグレッシブな作業を行わず普通のCSSファイルを出力するに留めるのが手っ取り早い。そうでないとCSSプリプロセッサーの対応待ちなどということになる。その場合、利用できるまでかなり待たされることになったり、アドホックなハックを使わないとうまく動かないなどということになるだろう。</p>
+
+<h3 id="css-lint">CSS Lint</h3>
+
+<p>レビュー前に機械的なチェックを行うツールとして、<a href="http://csslint.net/">CSS Lint</a>を利用することができる。CSS Lintではカレント・ディレクトリに<code>.csslintrc</code>というファイルを作って<a href="https://github.com/stubbornella/csslint/wiki/Command-line-interface#configuration-files">そこに設定を書くことができるように</a>なっている。多くの自動テストツールではこれを利用するようになっているが、v0.9.10からは<a href="http://www.jslint.com/">JSLint</a>のようにCSSにコメントとして<a href="https://github.com/stubbornella/csslint/wiki/Command-line-interface#configuration-files">設定を埋め込めるように</a>もなった。</p>
+
+<p>CSSプリプロセッサーで圧縮してしまうと、このCSS Lintの設定を書いたコメントを残すことが難しくなる。もちろん<code>.csslintrc</code>を使えば良いという話ではあるのだが、CSSファイル(プロジェクトではない)のポータビリティという点で埋め込むのも悪くはない。普通のCSSを出力するようにしておけば、こういった利用したいツールの機能性を一部失わせてしまうようなことにはならない。</p>
+
+<hr>
+
+<p>つまり、ほとんどのケースでCSSプリプロセッサーからリリース用に圧縮されたCSSを直接出力するべきではないということだ。</p>
+
+<h2 id="dev-rev-rel">開発用とレビュー用、リリース用のCSS</h2>
+
+<p>この3つの段階では重要視されるものが違う。</p>
+
+<ul>
+<li>開発用: 書きやすく、効率的であること</li>
+<li>レビュー用: 読みやすく、標準的であること</li>
+<li>リリース用: 配信に向く、最適化と圧縮がなされたものであること</li>
+</ul>
+
+<p>大雑把に分けるとこのようになるだろう。CSSプリプロセッサーではリリース用のCSSを直接出力するのではなく、一旦レビュー用に標準的なスタイルで出力し、レビューが通ったらリリース用にCSSポストプロセッサーで変換する、というのが望ましいのではないか。</p>
+
+<p>CSSポストプロセッサーで最適化を行うようにすることにより、開発時にも利はあるだろう。今まではCSSプリプロセッサーの限られた機能で苦労して無理やり複雑に行っていた効率化の多くをなくせるようになり、すっきり簡潔に書けるようになるはずだ。</p>
+
+<h2 id="use-case">CSSポストプロセッサーのユースケース</h2>
+
+<p>現状の説明が長くなったが、CSSポストプロセッサーの必要性は何となくわかったのではないかと思う。では、どういう作業をCSSポストプロセッサーに任せるのが良いのだろうか？</p>
+
+<p>CSSポストプロセッサーに任せられる処理は<em>後回しにできること</em>が絶対条件だが、それだけではワークフローまでも変化させる理由としては乏しいのではないかと思う。以下の利用例では後回しにすることにより編集時とレビュー時にもそれぞれ利点がある処理に絞り紹介する。これらのツールを採用することにより、レビューまではCSSをシンプルなままで維持できるようになり、快適な編集・レビューを行えるようになるはずだ。</p>
+
+<h3 id="vendor-prefixes">ベンダー拡張プリフィックスの付加</h3>
+
+<p>CSSプリプロセッサーでは<a href="http://www.w3.org/TR/CSS2/syndata.html#vendor-keywords">ベンダー拡張プリフィックス</a>をミックスインで一気に追加できて便利というような変革が起こったが、それはすぐに別の問題を引き起こすことになった。</p>
+
+<ul>
+<li>もう必要のないプリフィックスも付いてしまうこと</li>
+<li>実装の細かな違いや修正に対処できないこと</li>
+<li>ミックスインでプロパティーを記述すると、CSSのコードとして理解できないこと</li>
+</ul>
+
+<p>主なものはこの辺りだろう。CSSプリプロセッサーではウェブ標準のCSS文法のみで記述するだけに留め、CSSポストプロセッサーにプリフィックスの付加を任せることにより、より確実で簡潔なCSSを出力できるようになる。</p>
+
+<p>この類いのツールとしては<a href="https://github.com/ai/autoprefixer">Autoprefixer</a>が最も優秀だと思われる。<a href="http://caniuse.com/">Can I Use</a>のサポート状況を参照してくれるので、もう必要のないプリフィックスが付くことがないのは素晴らしい。ブラウザー上で動的に付加してくれる<a href="https://github.com/ai/autoprefixer-rails/blob/master/vendor/autoprefixer.js">スタンドアローン版</a>もあるので、レビュー時も問題ない。</p>
+
+<p>See also: <a href="https://github.com/ai/autoprefixer">Autoprefixer</a></p>
+
+<h3 id="mediaqueries">Media Queriesの取りまとめ</h3>
+
+<p>CSSプリプロセッサーでは<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>をネストして書くことができるものが多い。そのためCSSではルールセットごとにMedia Queriesがセットになって出力されることになる。これは特定の要素に対するルールセットが集約するということになるので、あちこち行ったり来たりする必要がなく、非常に読みやすくなる。その反面、同じクエリーがCSS内にいくつも出てくることになるので、ファイルサイズ他の面では無駄が多くなってしまう。</p>
+
+<p>同じクエリーをまとめることができる<a href="https://github.com/Se7enSky/group-css-media-queries">group-css-media-queries</a>のようなCSSポストプロセッサーを利用すると、それほど絶大な節約にはならないものの確実に減らすことができる。それと同時に、書きやすい形での開発と読みやすい形でのレビューを維持することが可能になる。むしろこちらの方が大きな利点だろう。</p>
+
+<p>See also: <a href="https://github.com/Se7enSky/group-css-media-queries">group-css-media-queries</a></p>
+
+<h3 id="data-uri">Data URIへの変換</h3>
+
+<p>HTTPリクエストの削減のために<a href="http://ja.wikipedia.org/wiki/Data_URI_scheme">Data URI</a>化して埋め込むという手法もそれなりに認知された。しかしレビュー時にData URIである必要はまったくない。それどころか多くの場合は害悪になる。ファイル名が失われるので、どういう画像を参照しているのかというヒントは全くなくなるし、エディターやデバッグ・ツールの構文強調が壊れたりすることも多いだろう。Data URIへの変換は大抵の実装で安定していることだし、率先して機械化するべき処理と言って良いだろう。</p>
+
+<p>これもあまり選択肢はないが、需要は徐々に増えつつあるように思うので、今後は少しづつ増えてくるのではないかと思う。その中でも古株のひとつ、<a href="https://github.com/mhuckaby/image2cssConverter/">Image2CSS</a>は信頼出来るという印象だ。</p>
+
+<p>See also: <a href="https://github.com/mhuckaby/image2cssConverter/">Image2CSS</a></p>
+
+<h3 id="minify">空白の削除などによる圧縮</h3>
+
+<p>転送量の節約はフロントエンドの義務と言って良いので、当然リリース時には圧縮したCSSを配信する方が望ましい。先述のYUI Compressorを始め多くのツールがあるので、好きなものを選択すれば良いだろう。僕は<a href="https://github.com/GoalSmashers/clean-css">clean-css</a>というツールを使っている。利用しているCSSプリプロセッサーにもう一回通して圧縮だけ行う、というのも良いかもしれない。</p>
+
+<p>僕の使っているclean-cssはシンプルなコメントと空白除去が主な機能だが、<code>@import</code>で読み込まれるCSSファイルのインライン展開を行う機能もある。Sassではまだ<code>@import</code>でCSSファイルはインライン展開はしてくれない上、インライン展開できるSCSSファイルでもパスのずれの修正は行えない。clean-cssで処理するように変更すれば、その辺りの問題を解決でき、より効率的にCSSを書くことができるようになるだろう。<a href="http://necolas.github.io/normalize.css/">Normalize.css</a>の拡張子を<code>scss</code>に変えて置いておくなどといったバカバカしい作業も必要なくなるのだ。</p>
+
+<p>See also: <a href="https://github.com/GoalSmashers/clean-css">clean-css</a></p>
+
+<h3 id="grunt">Gruntでまとめて実行</h3>
+
+<p>ここまでに例として上げたCSSポストプロセッサーたちは、それぞれの作業は簡単なものだが、ひとつひとつ手作業で行うのは無理がある。自動実行されるようにリリース作業に組み込むべきだ。プロジェクトによってそれに最適なツールは変わってくるだろうが、有力な候補のひとつとして<a href="http://gruntjs.com/">Grunt</a>が挙げられるだろう。</p>
+
+<p>Gruntの具体的な導入や使い方については<a href="http://gruntjs.com/getting-started">その公式ドキュメント</a>を始め、いくつも素晴らしい解説があるのでここでは省略し、上記CSSポストプロセッサー達の代わりになるGruntプラグインをリストアップするだけにしておく。</p>
+
+<ul>
+<li>autoprefixer: <a href="https://github.com/nDmitry/grunt-autoprefixer">grunt-autoprefixer</a></li>
+<li>group-css-media-queries: <a href="https://github.com/buildingblocks/grunt-combine-media-queries">grunt-combine-css-media-queries</a> (別実装)</li>
+<li>image2cssConverter: <a href="https://github.com/ahomu/grunt-data-uri">grunt-data-uri</a> (別実装)</li>
+<li>clean-css: <a href="https://github.com/gruntjs/grunt-contrib-cssmin">grunt-contrib-cssmin</a></li>
+</ul>
+
+<p>あとはこれらを順に実行するGruntタスクを書き、リリース作業に組み込むだけだ。</p>
+
+<h2 id="conclusion">最後に</h2>
+
+<p>僕が主に使っているのがSassなので、それを前提にして書いてきた。しかしCSSポストプロセッサーは<em>CSSを対象にして動作するツール</em>なので、CSSプリプロセッサーにはSassでもLESSでも<a href="http://learnboost.github.io/stylus/">Stylus</a>でも何でも良い。……<a href="https://code.google.com/p/closure-stylesheets/">Closure Stylesheets</a>でも！　CSSプリプロセッサーを使わない開発にももちろん利用できる。CSSプリプロセッサーに依存しないので、標準的な概念・作業として広く定着できるのではないかと思う。</p>
+
+<p>CSSプリプロセッサーたちは、同じ記号を別の機能に割り当てていたりするので、いずれかの知識に偏っていると勘違いや読み間違いを頻繁に犯してしまう。既にSassに習熟した人がLESSのコードを間違えずに読むのは難しいだろう。そういう点でも標準的なCSSでレビューというのは重要になってきているはずだ。</p>
+
+<p>また、後処理に回せるような機械的な処理ならば、CSSプリプロセッサーの実装を待たずにCSSポストプロセッサーとしてワークフローに取り込むことができるという利点もある。clean-cssの説明で少し触れたSassになくてLESSにはある<code>@import</code>でのパス解決機能などはその例のひとつだ。</p>
+
+<p>もしGruntで実行させているのなら、プロジェクトに依存したちょっとした処理ならさっとJavaScriptで書ける。やりすぎはGrunt依存につながるので禁物だが、フロントエンド側の人間ならばうれしいところだろう。</p>
+
+<hr>
+
+<p>強力なCSSプリプロセッサーのさらなる進化はCSSとの大きなギャップをももたらした。そのギャップはCSSプリプロセッサーの利用を制限することで抑えることは可能ではあるが、それはあまりにも後ろ向きだと思う。CSSプリプロセッサーの利点を最大限に利用した上で、圧縮などリリースのための機械的な作業をCSSポストプロセッサーに任せることにより、<em>開発しやすさ</em>・<em>レビューしやすさ</em>・<em>配信しやすさ</em>のどれも失わずにプロジェクトを完走させることができるのではないだろうか。</p>
+
+<p>ようこそ！　CSSポストプロセッサー時代へ！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Utopia雑感</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/on-utopia.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ビューポートに応じてフォント・サイズを調節するCSSを生成してくれるUtopiaなるものを見ていた。基本のフォント・サイズを調整するだけでなく、スケールの倍率も調節している。こういう考えの実装はしたことがなかった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ビューポートに応じてフォント・サイズを調節するCSSを生成してくれるUtopiaなるものを見ていた。基本のフォント・サイズを調整するだけでなく、スケールの倍率も調節している。こういう考えの実装はしたことがなかった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Utopia雑感" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-03-21T09:22:06+09:00">2020年3月21日</time></p>
+
+        <h1><em>Utopia雑感</em></h1>
+      </header>
+
+    <main>
+
+    <p>ビューポートに応じてフォント・サイズを調節するCSSを生成してくれる<a href="https://utopia.fyi/">Utopia</a>なるものを見ていた。基本のフォント・サイズを調整するだけでなく、スケールの倍率も調節している。こういう考えの実装はしたことがなかった。</p>
+
+<p>デバイスの幅によって、同じフォント・サイズでもコンテンツの圧が変わる。スケールの調整でこの問題を解決したかったようだ。それだけでなく、小さい画面のデバイスと大きい画面のデバイスでは、ユーザーの目とスクリーンの距離も変わる。もしかするとこのあたりの課題も乗り越えられるのかもしれない。</p>
+
+<p>ともかく、機械的にバリエーションのバリエーションを生成できるというのが目を引く。コンテンツのサイズに応じて柔軟に変化するように書けるFlexboxやGridとの相性も良い。特定のデバイスを意識しないCSSになっているところも、これまでのデバイスとこれからのデバイスの双方に優しいはずだ。</p>
+
+<hr>
+
+<p>実装そのものは、既存のもののアレンジに過ぎず、あまり見るところはない。コードを追うのはかなり大変だ。カスタム・プロパティーの名前を見ると絶望する。やはり<code>:root</code>だけで、つまりグローバル変数(的なもの)だけでやるとなると、こうなってしまう。Utopia自体はただ使うだけなので、見なかったことにすれば良いが、似たようなものを実装しようとするとなかなか辛そうだ。</p>
+
+<p><code>body</code>要素で基本のフォント・サイズを設定するので、余白などで<code>rem</code>単位が使えなくなる(使う意味がなくなる)という欠点がありそうだ。<code>calc()</code>で<code>em</code>単位をうまく計算すれば良いとも思うが、フォント・サイズと違ってフォールバックしなくてはならない。Sassなら問題ないかもしれない。</p>
+
+<p>もうひとつ気を付ける点は、ブログでも触れられている通り、<a href="https://utopia.fyi/blog/dealing-with-negativity-in-fluid-type-scales">小さくする時に起こる問題</a>があることだ。スケールが倍率の累乗で計算されていくことに原因があるので、どうしようもない。やはり倍率は固定した方が無難な気もしてくる。</p>
+
+<hr>
+
+<p>しばらく前からこのウェブサイトでは、ルート要素で<code>%</code>を使って基本のフォント・サイズを段階的に設定するようになった。こうするとズームとユーザー指定のフォント・サイズ、<code>rem</code>単位の利用をすべて可能にする。その代わり、<code>calc()</code>で<code>vw</code>単位から<code>%</code>を作れないので、Utopiaのようにfluidに変化させることはできない。</p>
+
+<p><code>min()</code>と<code>max()</code>を組み合わせてどうにかfluidにしようと格闘したこともあったが挫折した。もう一度考え直してみたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

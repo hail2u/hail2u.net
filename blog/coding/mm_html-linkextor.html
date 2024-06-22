@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Monday Moduleふたり</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/mm_html-linkextor.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="NDO::WeblogのnaoyaさんがMonday Module ひとり - HTML::LinkExtorというエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="NDO::WeblogのnaoyaさんがMonday Module ひとり - HTML::LinkExtorというエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Monday Moduleふたり" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2003-11-21T02:59:56+09:00">2003年11月21日</time></p>
+
+        <h1><em>Monday Moduleふたり</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://naoya.dyndns.org/%7Enaoya/mt/" title="NDO::Weblog">NDO::Weblog</a>のnaoyaさんが<a href="http://naoya.dyndns.org/%7Enaoya/mt/archives/000718.html" title="NDO::Weblog: Monday Module ひとり - HTML::LinkExtor">Monday Module ひとり - HTML::LinkExtor</a>というエントリでMonday Moduleの予行演習をやってらっしゃったので、言い出しっぺは僕だし、やはり面白いとは思うので僕もスクリプト作ってみました。</p>
+<p><a href="http://search.cpan.org/search?module=HTML::LinkExtor" title="search.cpan.org: HTML::LinkExtor - Extract links from an HTML document">HTML::LinkExtor</a>ということで、HTMLからURLを抜き出すものなわけですが、単にURLリストではやはり面白くないですね。かなり考えて(嘘、10分くらい)、個人的にこんなのがあったら面白いかもと思い、<a href="http://www.towerrecords.com/" title="Tower Records - No Music, No Life!">Tower Records</a>から検索してサンプル提供されているWindows Mediaのプレイリストを作成するスクリプトにしました。お題のHTML::LinkExtorを2回使ってます。</p>
+<pre><code class="language-perl">#!/usr/local/bin/perl
+
+# Monday Module: HTML::LinkExtor
+#
+# 引数に与えた文字列でTowerRecords.comを検索し、その結果からWindows
+# Mediaで提供されているサウンドクリップを更に探して、Windows Media
+# Playlistとして出力する
+#
+# Kyo Nagashima &lt;kyo@hail2u.net&gt;
+# 2003/11/20 作成
+
+use strict;
+
+use HTML::LinkExtor;
+use LWP::Simple;
+
+# 引数を取得してURLエンコード
+my $query = shift;
+$query =~ s!([^a-zA-Z0-9_.-])!uc sprintf &quot;%%%02x&quot;, ord($1)!eg;
+
+# 検索
+my $content = LWP::Simple::get(&quot;http://www.towerrecords.com/Music/Default.aspx?search_in=music&amp;free_text=$query&quot;);
+
+# HTMLソースから検索結果の一覧のところまでを削除
+$content =~ s!^.*?Sort items by!!is;
+
+# リンク抽出
+my @urls;
+my $p = HTML::LinkExtor-&gt;new(\&amp;callback, &quot;http://www.towerrecords.com/music/&quot;);
+sub callback {
+  my($tag, %links) = @_;
+  if ($tag eq &quot;a&quot;) {
+    push(@urls, values %links);
+  }
+}
+$p-&gt;parse($content);
+
+# CDのURLだけにする(callbackでやれよ)
+my @cds;
+foreach (@urls) {
+  if (m!^http://www\.towerrecords\.com/product\.aspx\?pfid=!) {
+    push(@cds, $_);
+  }
+}
+
+# 重複URLを削除
+my %count;
+@cds = grep(!$count{$_}++, @cds);
+
+my @wms;
+foreach my $cd (@cds) {
+  # CDのURLを取得
+  $content = LWP::Simple::get($cd);
+  @urls = ();
+  $p-&gt;parse($content);
+
+  # Windows MediaのURLだけにする
+  foreach (@urls) {
+    if (m!^http://mfile\.akamai\.com/.*?\.asx\?obj=!) {
+      push(@wms, $_);
+    }
+  }
+}
+
+# Windows Mediaがなかったら終了
+if (!@wms) {
+  exit;
+}
+
+# Windows Media Playlistを出力(再生できるからこれで良さげ)
+print &lt;&lt;&quot;_WPL_&quot;;
+&lt;?wpl version=&quot;1.0&quot;?&gt;
+&lt;smil&gt;
+  &lt;body&gt;
+    &lt;seq&gt;
+_WPL_
+
+foreach my $wm (@wms) {
+  $wm =~ s!&amp;!&amp;amp;!;
+  print qq!      &lt;media src=&quot;$wm&quot;/&gt;\n!;
+}
+
+print &lt;&lt;&quot;_WPL_&quot;;
+    &lt;/seq&gt;
+  &lt;/body&gt;
+&lt;/smil&gt;
+_WPL_
+
+exit;</code></pre>
+<p>標準出力に出てくるファイルはこんな感じ。</p>
+<pre><code class="language-xml">&lt;?wpl version=&quot;1.0&quot;?&gt;
+&lt;smil&gt;
+  &lt;body&gt;
+    &lt;seq&gt;
+      &lt;media src=&quot;http://mfile.akamai.com/3171/wm2/muze.download.akamai.com/2890/us/uswm2/454/488454_1_07.asx?obj=v30729&amp;amp;urlid=b67557aff4096b9abd&quot;/&gt;
+    &lt;/seq&gt;
+  &lt;/body&gt;
+&lt;/smil&gt;</code></pre>
+<p>これをWindows Media Player 9で開いてやれば、ずらーっと再生できます。サンプルのサウンド・クリップなので短いのが難点。リンクを取得する時にHTMLをパースしてタイトルとかを取ってきて各asxファイルのタイトルにしたり、asxのURLからもう一回、LWP::Simple::getしてWindwos MediaそのもののURLを拾って来たり、もっと綺麗なプレイリストになりますが、メンドイので。再生できさえすればいいですしね。</p>
+<p>こんな感じの軽い感じでやると良いかもしれないっすね。なんでMonday Moduleなのかというのはnaoyaさんが言ってるように、語呂が良いからだけです。</p>
+<p>さて、本当にこの企画は始まるのでしょうか！！！</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

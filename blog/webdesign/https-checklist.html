@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>HTTPSにした時に気を付けたこと</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/https-checklist.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="HTTPSにした時に気を付けたこと" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-11-02T11:58:39+09:00">2015年11月2日</time></p>
+
+        <h1><em>HTTPSにした時に気を付けたこと</em></h1>
+      </header>
+
+    <main>
+
+    <p>何回かやる必要が出てきそうなので、どういう形でやったのかをアバウトに記録しておく。本当は何もせずできればいいのだけど、世の仕様はそんなにうまくできてはいない。</p>
+
+<section>
+<h2>内部リンク</h2>
+
+<p>事前に徹底的に書き換えておくのが良い。内部リンクにはドメインも不要なので<code>/</code>で始まる絶対パスで全部書くように統一するのが楽だろう。</p>
+
+<p>ただし<code>rel=canonical</code>は色々なウェブサービスから(時々考えなしにプロトコル・スキームから始まっていると仮定されて)使われるため、<code>http:</code>から始める方が安全かもしれない。そもそもFacebook向けのOGPで<code>og:url</code>を書いている場合もあり、この類もプロトコル・スキームから始める必要があり、どうせ書き換える必要は出てくる。諦めて機械的に書き換えができる仕組みを作っておくのも良い。</p>
+
+<p>このウェブサイトの場合は、OGP他を消した上で全て絶対パスにしておくという手法を取ったが、おすすめしない。</p>
+</section>
+
+<section>
+<h2>Amazonアソシエイトの画像URL</h2>
+
+<p>通常、Amazonアソシエイトを使って画像を得ようとするとHTTPの画像になる。一応リダイレクトで振り分けられるのだが、元々のURLはHTTPなためどうしてもMixed Contentにはなる。リダイレクトされて<code>m.media-amazon.com</code>配下を参照する画像に書き換えるか、リダイレクト元の方をHTTPSに書き換えておくとうまくいく。</p>
+
+<p>HTTPからHTTPSの画像を参照する分には問題は少ないので、これも事前に作業しておくことができる。</p>
+</section>
+
+<section>
+<h2>RSSフィードの再構築</h2>
+
+<p>RSSフィードでは絶対URLでリンクは書く。そのためすべてのリンクを書き換える必要がある。あまり忘れない上、概ねブログ・ツール等から自動的に更新されることになるので、大丈夫だろう。RSSリーダーからは全部新着になったり、IFTTTのようなウェブサービスが暴発することがあることには気を付けた方が良い。</p>
+
+<p>僕のように魂を込めてRSS(一部だが)をテキスト・エディターで書いている人は忘れないようにする。</p>
+</section>
+
+<section>
+<h2>サイトマップの再構築</h2>
+
+<p>RSSフィードは忘れないだろうが、サイトマップは忘れる可能性が高い。それなりに自動生成していない人もいると思うので、再構築した方が良い。</p>
+
+<p>301でのURLの移動とサイトマップのURLが食い違ってると何らかの悪影響がある可能性を否定できないので、特に気を付ける必要がある。</p>
+</section>
+
+<section>
+<h2>連携ウェブサービスの再設定</h2>
+
+<p>HTTPで始まるURLを登録しているウェブサービスを利用している場合は忘れずに書き換える。FacebookページやTwitterアカウントなどは忘れがちだろう。</p>
+
+<p>IFTTTやDlvr.itのようなRSSフィードをトリガーとしているものは注意を要する。これらは新着記事かそうでないかをURLで判断し、多くの場合HTTPのURLとHTTPSのURLを区別する。そのため今までの設定を書き換えて使おうとすると、全部新着とみなされ暴発する(僕はまんまと暴発させた)。面倒だが新しく作り直す必要があるだろう。</p>
+</section>
+
+<section>
+<h2>Search Consoleの再設定</h2>
+
+<p>Googleの検索結果での表示などを制御するSearch ConsoleではHTTPとHTTPSが別のプロファイルになる。そのため改めて追加する必要がある。それだけでなくすべて設定のやり直しなので、ウェブサイトの認証やサイトマップの送信も行う。</p>
+
+<p>特に何かこうというわけではないが、ウェブサイトについてGoogleへの連絡する際の要になるので、作っておいた方が無難だろう。</p>
+</section>
+
+<section>
+<h2>Analyticsの設定変更</h2>
+
+<p>AnalyticsはHTTPとHTTPSの両対応であるが、設定内に優先するプロトコルの設定が複数ある。プロパティのプロパティ設定にあるデフォルトのURLとビューのビュー設定にあるウェブサイトのURLの2つだ。どちらも書き換えておく必要が出てくるだろう。</p>
+
+<p>思い切ってAnalysticsを捨てるという選択もなくはない。どちらにせよ設定は書き換えておいても損はないだろう。</p>
+</section>
+
+<section>
+<h2>他</h2>
+
+<p>HTML生成に使うツールなどでプロトコル・スキームを切り替えられるようにしておくと書き換える場所が少なくて済むので、作業がスムーズに進む。といってもそういうことができることはあまりないので、どこを書き換えればうまく切り替わるかを事前に色々実験しておくと良い。</p>
+
+<p>もう誰が使っているか知らないが<a href="http://blosxom.sourceforge.net/">Blosxom</a>では<code>$blog_url</code>という設定変数で集中管理されるので、それをうまく利用する。</p>
+
+<pre><code class="language-perl">$scheme = &quot;https:&quot;;
+$domain = &quot;hail2u.net&quot;;
+$blog_url = &quot;$scheme//$domain/blog&quot;;</code></pre>
+
+<p>このように<code>blosxom.conf</code>で設定を分離させ、切り替えられるようにしたうえで、プラグインやフレーバーから必ず<code>$blog_url</code>を使うようにしておいた。たまにどうしようもないプラグインもあったりするので、その場合に<code>$blosxom::scheme</code>で拾えるようにするためこうなっている。</p>
+</section>
+
+<hr>
+
+<p>grepして置換など必要のない形に事前に整えるのが<em>最低限のライン</em>で、HTTPで公開済みのHTMLがそのままHTTPSで機能するようになっているのが理想だ。HTTPSへの移行を発動させる直前の作業は、HTTPな参照が残っていないかgrepして確認するくらいで終えたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

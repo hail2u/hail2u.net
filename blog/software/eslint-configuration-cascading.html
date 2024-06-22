@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ESLintの設定継承システム</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/eslint-configuration-cascading.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ESLintのv0.20.0からプロジェクト・ローカルに.eslintrcがある場合は~/.eslintrcから設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ESLintのv0.20.0からプロジェクト・ローカルに.eslintrcがある場合は~/.eslintrcから設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ESLintの設定継承システム" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-04-30T09:49:50+09:00">2015年4月30日</time></p>
+
+        <h1><em>ESLintの設定継承システム</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://eslint.org/">ESLint</a>のv0.20.0からプロジェクト・ローカルに<code>.eslintrc</code>がある場合は<code>~/.eslintrc</code>から設定を読まなくなった。つまりESLintのデフォルトの設定をユーザー・レベルで調節する術がほぼなくなったと言って良い。そうなった理由はわからないこともないのだけど、改悪な気がしてならない。</p>
+
+<p>確かにプロジェクト・ローカルの<code>.eslintrc</code>だけしか見ないようにすると、プロジェクト・メンバー間でのコーディング・スタイルが統一しやすくなる。しかしそれはいわゆるフォーマッターの役目で、リンターの役目ではないように思う。リンターの段階でコーディング・スタイルへの準拠を強いられると、普段それと違う書き方をしている人達にものすごいフラストレーションを与えることだろう。</p>
+
+<p>強いられたスタイルのうちいくつかは<a href="http://editorconfig.org/">EditorConfig</a>などの併用により自動的に対応することはできる。その状態で書かれたコードは確かにコーディング・スタイルに沿っているだろうが、普段インデント幅を半角空白2つに設定している人が半角空白4つのインデントを強いられた場合、普段通りの感覚で書くことができるわけがない。つまり成果物の体裁の保証ができる代わりに、その質の保証が失われるという結果になる。</p>
+
+<hr>
+
+<p>とにかくどれくらい辛いのかと、僕は<code>rules</code>フィールドを書かなくて済むように自分を調教する道をあえて選んで色々書いているところだ。率直な感想としてはこれを他の開発者に強いるのはちょっと僕にはできそうもない。</p>
+
+<p>他の開発者との兼ね合いだけではなく、自分だけのプロジェクトの時もいちいち設定してあげなくてはならないことが辛い。そういう場合はプロジェクト・ローカルの<code>.eslintrc</code>を作らなければ良いようにも思えるが、実際にはまだ多くのプロジェクトで<code>env</code>フィールドを使ってNode.js向けかブラウザー向けかを<code>.eslintrc</code>で設定してやる必要があり、そういう運用は難しいだろう。</p>
+
+<hr>
+
+<p>ESLintでは将来的には<a href="https://github.com/eslint/eslint/issues/2302">ウィザードでルールを設定して<code>.eslintrc</code>を吐くこと</a>ができるように考えられているようだ。<code>~/.eslintrc</code>の継承を元に戻して、強いルール付けを課したいプロジェクトではこのウィザードを使って全ルールを出力するというような形がバランスが良いのかなと思う。とにかくリンターとしては良いツールだとは思っているので、プロジェクトごとにルールを柔軟かつ手軽に設定できるようになってほしいものだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

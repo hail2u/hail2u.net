@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>hr要素を文字で入れ替える</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/swap-hr-element-with-characters.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="HTML5になってhr要素はセクション内での区切りに使うものなどと役割が割りとはっきりと決められました。今までもそんな感じで使ってた人が多いですけど。ただhr要素のCSSによる装飾はなかなか難しいところがあります。そこを擬似要素を利用してゴニョゴニョすることにより、あまり罫線々々してない区切りを作って頑張ろうとかそういうお話です。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="HTML5になってhr要素はセクション内での区切りに使うものなどと役割が割りとはっきりと決められました。今までもそんな感じで使ってた人が多いですけど。ただhr要素のCSSによる装飾はなかなか難しいところがあります。そこを擬似要素を利用してゴニョゴニョすることにより、あまり罫線々々してない区切りを作って頑張ろうとかそういうお話です。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/swap-hr-with-chars.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="hr要素を文字で入れ替える" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-10-15T04:28:12+09:00">2011年10月15日</time></p>
+
+        <h1><em>hr要素を文字で入れ替える</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="画像を使わなくても少し変わった区切り線を引くことができる。" height="270" src="/img/blog/swap-hr-with-chars.png" width="480">
+</figure>
+
+<p>HTML5になって<a href="http://www.w3.org/TR/html5/grouping-content.html#the-hr-element"><code>hr</code>要素</a>はセクション内での区切りに使うものなどと役割が割りとはっきりと決められました。今までもそんな感じで使ってた人が多いですけど。ただ<code>hr</code>要素のCSSによる装飾はなかなか難しいところがあります。そこを擬似要素を利用してゴニョゴニョすることにより、あまり罫線々々してない区切りを作って頑張ろうとかそういうお話です。</p>
+
+<p>Demo: <a href="/test/270.html">Swap HR Element with Character(s)</a></p>
+
+<p>単純に元のスタイルを消して背景を透明にし、そこに擬似要素を重ねてやるという最近良く使われるテクニックです。</p>
+
+<pre><code class="language-css">hr {
+  margin: 2em auto;
+  border: none;
+  position: relative;
+  clear: both;
+  width: 100%;
+  height: 48px;
+  background-color: transparent;
+  box-sizing: content-box;
+}</code></pre>
+
+<p><code>hr</code>要素の装飾はブラウザによって様々なので、とりあえず<code>border</code>プロパティや<code>background-color</code>プロパティあたりをつぶし、挙動をなるべく統一させます。それから擬似要素を簡単に重ねられるように<code>position</code>プロパティの値を<code>relative</code>にして、位置調整を楽にするために<code>width</code>プロパティや<code>height</code>プロパティも指定しておきます。</p>
+
+<p>実際に区切り線として描画されるものの実体は擬似要素に指定された文字になります。</p>
+
+<pre><code class="language-css">hr:before {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  content: "\2022\00a0\2022\00a0\2022";
+  color: rgb(51, 51, 51);
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 48px;
+  text-align: center;
+}</code></pre>
+
+<p>センタリングするには<code>width</code>プロパティで100%を指定すれば親である見えない<code>hr</code>要素と幅が揃うので、その上で<code>text-align</code>プロパティを使うのが一番簡単です。縦方向のセンタリングには<code>line-height</code>プロパティの値を<code>height</code>プロパティの値と揃えるという古からある手法を使うと良いでしょう。あとは好きなフォントと文字で区切り線を作るだけです。</p>
+
+<p><code>content</code>プロパティの値は普通に日本語や絵文字系を書くと、CSSファイルの文字コードに気を使わなければならないので、なるべくならコードで直接指定したほうが良いでしょう。文字のコードを調べるには、Windowsなら文字コード表というOS標準のアプリケーションを、OS Xなら文字ビューアというアプリケーションが使えます。なお、半角スペースを普通に入力すると消えたりするので、代わりに<code>\00a0</code>の<a href="http://ja.wikipedia.org/wiki/%E3%83%8E%E3%83%BC%E3%83%96%E3%83%AC%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9">non-breaking space</a>を利用するのが良さそうです。</p>
+
+<p>デモのようにDive Into HTML5の花柄区切り線とかもこんな感じで比較的簡単にいけます。このサイトではニョロマルニョロみたいな感じにしてみました。<code>color</code>プロパティで<code>rgba()</code>を使って透過させたり、色々やってみてます。CSSトランスフォームなどを使って変形させてみたりしても面白いでしょう。CSSアニメーションなどを利用するのはさすがにうっとうしいと思いますが。オーナメントのフォントをWebフォントとして利用したりすれば、もっと柔軟でエレガントな区切り線にできるかもしれませんね。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

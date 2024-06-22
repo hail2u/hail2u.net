@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Amazonの画像を引用</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/quote_amazon_image.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="いくつかAmazonの画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで(あるならばですがね)、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、event.srcElementでimg要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="いくつかAmazonの画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで(あるならばですがね)、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、event.srcElementでimg要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Amazonの画像を引用" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-06-01T16:12:54+09:00">2004年6月1日</time></p>
+
+        <h1><em>Amazonの画像を引用</em></h1>
+      </header>
+
+    <main>
+
+    <p>いくつか<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！　">Amazon</a>の画像置換とかをJavaScriptで書いてみたりしましたが、そもそもAmazonで商品を見ている時には、画像を見ているわけで(あるならばですがね)、その画像のURLを一発で持ってこれれば良いということなわけだ、と、なんか「普通、最初にそれ考えるだろ」的なことに思い至りました。とりあえず考えてみていたら、Internet ExplorerのMeneExtでは、画像上で発生させると、<code>event.srcElement</code>で<code>img</code>要素が拾えるので、それを使えば画像のURLを持ってくることができるということに気づきました。</p>
+<p>てなわけで画像付きのAmazonアソシエイトリンクを作成するMenuExtのコードを書いてみる。</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;script type=&quot;text/javascript&quot; defer&gt;
+&lt;!--
+  var aid = &apos;hail2unet-22&apos;;
+
+  var pWin = external.menuArguments;
+
+  if (pWin.event.srcElement.tagName == &apos;IMG&apos;) {
+    var uri = pWin.location.href;
+    var i = uri.indexOf(&apos;ASIN&apos;);
+    var asin = uri.substring(i + 5, i + 15);
+    var uri = &quot;https://www.amazon.co.jp/exec/obidos/ASIN/&quot; + asin + &quot;/&quot; + aid;
+    var imguri = new String(pWin.event.srcElement.src);
+    var title = pWin.document.title;
+    pWin.clipboardData.setData(&quot;text&quot;, &quot;&lt;a href=\&quot;&quot; + uri + &quot;\&quot; title=\&quot;&quot; +
+      title + &quot;\&quot;&gt;&lt;img src=\&quot;&quot; + imguri + &quot;\&quot; alt=\&quot;&quot; + title + &quot;\&quot; /&gt;&lt;/a&gt;&quot;);
+  }
+//--&gt;
+&lt;/script&gt;
+&lt;/html&gt;</code></pre>
+<p>これを適当なフォルダに保存して、<a href="http://www.uryusoft.com/software/IEMenuExt/" title="IE MenuExt">IE MenuExt</a>で「Associate this!」などというタイトルで登録するだけ。登録時には忘れずに、表示方法のところで画像上にチェックを入れておきましょう。</p>
+<p>で、Amazonの各商品のページの*画像上で*右クリックし、Associate this!を選択すると、</p>
+<pre><code class="language-html">&lt;a href=&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00021LRWM/hail2unet-22&quot;
+  title=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot;&gt;
+  &lt;img src=&quot;https://m.media-amazon.com/images/P/B00021LRWM.jpg&quot;
+    alt=&quot;Amazon.co.jp： 音楽: To the 5 Boroughs [FROM US] [IMPORT] [EXPLICIT LYRICS]&quot; /&gt;
+&lt;/a&gt;</code></pre>
+<p>というようなコードがクリップボードにコピーされます(見やすいように改行を入れていますが、実際には一行で)。</p>
+<p>お、なかなか良いかも。</p>
+<p>Bookmarkletには移植できるかな？　各商品ページではユニークっぽい「vspace=3 hspace=5 align=left border=0」とかいう文字列をキーにして探すこともできないことは無さそうだけど、かなり力技になりそう。興味がある方は作ってみたらどうでしょう？　人気者になれるかも！</p>
+<p>私？　メンドイ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

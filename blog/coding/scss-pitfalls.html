@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>SCSSでの落とし穴</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/scss-pitfalls.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="SassをSCSSで書いていてはまった落とし穴についてのメモ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="SassをSCSSで書いていてはまった落とし穴についてのメモ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="SCSSでの落とし穴" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-02-18T21:10:35+09:00">2011年2月18日</time></p>
+
+        <h1><em>SCSSでの落とし穴</em></h1>
+      </header>
+
+    <main>
+
+    <p>SassをSCSSで書いていてはまった落とし穴についてのメモ。</p>
+
+<section>
+<h2>プロパティのネスト</h2>
+
+<pre><code class="language-scss">h1 {
+  font {
+    family: &quot;Gabriola&quot;, sans-serif;
+    size: 400%;
+  }
+}</code></pre>
+
+<p>とうっかり書いてしまうと、</p>
+
+<pre><code class="language-css">h1 font {
+  family: &quot;Gabriola&quot;, sans-serif;
+  size: 400%; }</code></pre>
+
+<p>となる。プロパティのネストを使う時はコロンが必要で、他の部分と記述が違うので注意が必要。</p>
+
+<pre><code class="language-scss">h1 {
+  font<em>:</em> {
+    family: &quot;Gabriola&quot;, sans-serif;
+    size: 400%;
+  }
+}</code></pre>
+
+<p>SCSSではこの記述のみがCSSと比較するとかなり特異なので、使わないと決めてしまうのも良さそう。</p>
+</section>
+
+<section>
+<h2>負の値の計算</h2>
+
+<pre><code class="language-scss">$gutter: 20px;
+
+margin: 0 0 0 -$gutter;</code></pre>
+
+<p>だと、</p>
+
+<pre><code class="language-css">margin: 0 0 -20px;</code></pre>
+
+<p>にコンパイルされるので意図したとおりにならない。</p>
+
+<pre><code class="language-scss">margin: 0 0 0 (- $gutter);</code></pre>
+
+<p>などと括弧でくくる。計算式を書く場合は必ず括弧で括ると習慣づけた方が安全そう(必要ない場合でも)。</p>
+</section>
+
+<section>
+<h2>負の値の計算 #2</h2>
+
+<pre><code class="language-scss">$column: 60px;
+$gutter: 20px;
+
+margin: 0 (- $column * 3 + $gutter * 2);</code></pre>
+
+<p>などと、<em>計算結果にマイナス記号を付ける</em>というようなことはできない。</p>
+
+<pre><code class="language-scss">margin: 0 (- $column * 3 - $gutter * 2);</code></pre>
+
+<p>と普通に書く。計算式の括弧もネスト出来るので、</p>
+
+<pre><code class="language-scss">margin: 0 (- ($column * 3 + $gutter * 2));</code></pre>
+
+<p>と面倒がらずにちゃんと書く方がより良いと思う。</p>
+</section>
+
+<section>
+<h2>ミックスインにカンマを含む文字列を引数として渡せない</h2>
+
+<pre><code class="language-scss">@mixin fonts($families) {
+  font-family: $families;
+}
+
+h1 {
+  @include fonts(&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, sans-serif);
+}</code></pre>
+
+<p>だと、カンマが引数の区切りとして解釈されるので、</p>
+
+<pre>test.scss|18| in `fonts&apos;: Mixin fonts takes 1 argument but 3 were passed.</pre>
+
+<p>となりコンパイルエラー。エスケープする方法がありそうだけど調べてない。基本的にCSSのプロパティの値としてカンマを使うことはあまり無いので、はまることはあまりなさそう。よくわかっていない時になんでもミックスインにしようとして作った、こういう変で役に立たないミックスインでのみはまる。</p>
+
+<pre><code class="language-scss">$heading: &quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, &quot;Lucida Sans&quot;, sans-srif;
+
+@mixin fonts($families) {
+  font-family: $families;
+}
+
+h1 {
+  @include fonts($heading);
+}</code></pre>
+
+<p>変数経由なら問題はない。</p>
+</section>
+
+<section>
+<h2>カスケーディングを考慮したセレクタ順</h2>
+
+<pre><code class="language-scss">#nav {
+  li {
+    a {
+      color: blue;
+
+      &amp;:hover {
+        color: green;
+      }
+    }
+
+    &amp;.active {
+      a {
+        color: red;
+      }
+    }
+  }
+}</code></pre>
+
+<p>とセレクタのネストを優先させて書くと、</p>
+
+<pre><code class="language-css">#nav li a {
+  color: blue; }
+  #nav li a:hover {
+    color: green; }
+#nav li.active a {
+  color: red; }</code></pre>
+
+<p>となるので、<code>#nav li.active a</code>がオンマウスで色が変わらない。<code>a</code>と<code>&amp;.active</code>を入れ替えれば、</p>
+
+<pre><code class="language-css">#nav li.active a {
+  color: red; }
+#nav li a {
+  color: blue; }
+  #nav li a:hover {
+    color: green; }</code></pre>
+
+<p>となるので、カスケーディングの規則に従ってちゃんと意図通りになるが、カスケーディングをきちんと理解していないと生成されるCSSがわかりづらい。</p>
+
+<pre><code class="language-css">#nav li a {
+  color: blue; }
+#nav li.active a {
+  color: red; }
+#nav li a:hover {
+  color: green; }</code></pre>
+
+<p>という比較的直観的なセレクタの順序(普通にCSSを書く時のセレクタの順序)でCSSを生成するためには、</p>
+
+<pre><code class="language-scss">#nav {
+  li {
+    a {
+      color: blue;
+    }
+
+    &amp;.active {
+      a {
+        color: red;
+      }
+    }
+
+    a {
+      &amp;:hover {
+        color: green;
+      }
+    }
+  }
+}</code></pre>
+
+<p>と無理やり間に入れるしかないようだ。</p>
+</section>
+
+<section>
+<h2>追記</h2>
+
+<p>ミックスインにはカンマを含む引数を<em>絶対に</em>渡せないというわけではない。例えば以下の様なケースでは問題ない。</p>
+
+<pre><code class="language-scss">@mixin transform($func) {
+  -moz-transform: $func;
+  -webkit-transform: $func;
+  -o-transform: $func;
+  -ms-transform: $func;
+  transform: $func;
+}
+
+.flip-vertical {
+  @include transform(matrix(1, 0, 0 , -1, 0, 0));
+}</code></pre>
+
+<p>カンマを含んでいるが、これは正常にコンパイルされる。</p>
+
+<pre><code class="language-css">.flip-vertical {
+  -moz-transform: matrix(1, 0, 0, -1, 0, 0);
+  -webkit-transform: matrix(1, 0, 0, -1, 0, 0);
+  -o-transform: matrix(1, 0, 0, -1, 0, 0);
+  -ms-transform: matrix(1, 0, 0, -1, 0, 0);
+  transform: matrix(1, 0, 0, -1, 0, 0); }</code></pre>
+
+<p>さっき知った！　関係ないけど、この<code>matrix(1, 0, 0, -1, 0, 0)</code>は対象を上下に反転するもの。180度回転ではない。ショートカット関数は用意されてないので覚えておくと良いかも。CSSも数学できないともうダメっぽい……。せめて行列だけでもちゃんと思い出そう。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

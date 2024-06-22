@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>マルチカラムとその閲覧順</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/multi-column-and-its-viewing-order.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Flexible Boxを使ったブロックのマルチカラム・レイアウト(Multi-columnのそれではない)をちょくちょく見るようになった。ただ作る方も見る方も慣れていないからか、並んだ項目をどのような順序で見ていけば良いのかよくわからないことがままある。何人かに聞いたり、自分で考えてみたりし、見る順番を決めている鍵は余白であるということを推察できた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Flexible Boxを使ったブロックのマルチカラム・レイアウト(Multi-columnのそれではない)をちょくちょく見るようになった。ただ作る方も見る方も慣れていないからか、並んだ項目をどのような順序で見ていけば良いのかよくわからないことがままある。何人かに聞いたり、自分で考えてみたりし、見る順番を決めている鍵は余白であるということを推察できた。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/multi-column-and-its-viewing-order.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="マルチカラムとその閲覧順" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-09-23T08:32:33+09:00">2016年9月23日</time></p>
+
+        <h1><em>マルチカラムとその閲覧順</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="枠がある場合とない場合のイメージ図。" height="1440" src="/img/blog/multi-column-and-its-viewing-order.png" width="2560">
+</figure>
+
+<p>Flexible Boxを使ったブロックのマルチカラム・レイアウト(Multi-columnのそれではない)をちょくちょく見るようになった。ただ作る方も見る方も慣れていないからか、並んだ項目をどのような順序で見ていけば良いのかよくわからないことがままある。何人かに聞いたり、自分で考えてみたりし、見る順番を決めている鍵は<em>余白</em>であるということを推察できた。</p>
+
+<section>
+<h2>枠なし</h2>
+
+<figure>
+<img alt="枠のない画像付きの項目が上下左右に並んでいる様子。" height="1440" src="/img/blog/multi-column-and-its-viewing-order-without-frame.png" width="2560">
+<figcaption>Items without Frame</figcaption>
+</figure>
+
+<p>枠がない場合、下の項目との間に余白が少ないため、自然にそちらに誘導される。余白がある方を人はあまり見ようとはしないようだ。余白だらけのため、画像や文字への集中度が高く、近い方へ近い方へ進むと考えられる。</p>
+
+<p>雑にFlexboxを利用すると横に並んで折り返しされるが、縦に並べていくのが正解のようだ。<code>flex-flow: column wrap</code>とすると良い。同時に縦方向の項目数の制限を<code>min-height</code>をメディアクエリーで利用し行うと、スクロールで行ったり来たりさせないようにできるだろう。</p>
+</section>
+
+<section>
+<h2>枠あり</h2>
+
+<figure>
+<img alt="枠のある画像付きの項目が上下左右に並んでいる様子。" height="1440" src="/img/blog/multi-column-and-its-viewing-order-with-frame.png" width="2560">
+<figcaption>Items with Frame</figcaption>
+</figure>
+
+<p>枠がある場合、余白は上下左右で一定なものの、通常の読み順に従い、右の項目へ移動する。無意識に枠全体を目に入れていると考えられる。似た形のカード・レイアウトが主に横に並ぶことも影響がありそうだ。</p>
+
+<p>実装は<code>flex-wrap: wrap</code>だけで良いだろう。</p>
+</section>
+
+<hr>
+
+<p>横に読み進ませたい場合は縦の余白を大きく、逆なら横の余白を大きくとるようにするのが基本ではあるようだ。それにスクロール・コストやスクリーンの縦横比を考慮に加え、項目の並び方を考えることになる。</p>
+
+<p>また、実装側から考えると、描画領域に項目をうまく割り当てられるかどうかという点が重要度が高い。すると横並びに<code>min-width</code>プロパティーで最小幅を指定する形が効率的だろう。横並びが必須条件になるため、項目に枠を付けることを意識すると良いだろう。</p>
+
+<hr>
+
+<p>参考に作ったモックアップ画像だと、余白がパターン化している上に全体を把握できてしまうため、アバウトに斜めにスキャンできてしまう。また項目の縦横比も考慮に入れる必要がありそうだ。そのため考察までは可能だが、実証はできていない。現実世界の画像や文章を使って生成し、ユーザー・テストを行う必要がありそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

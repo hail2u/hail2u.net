@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Associate This (with image)!</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/associate_this_with_image.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していたAmazonの個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtではevent.srcとかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースのimg要素を全部調べ、src属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Associate This (with image)!" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2004-07-01T20:51:10+09:00">2004年7月1日</time></p>
+
+        <h1><em>Associate This (with image)!</em></h1>
+      </header>
+
+    <main>
+
+    <p>Firefoxに暫定的に移行中なので、IEのMenuExtで愛用していた<a href="https://www.amazon.co.jp/" title="Amazon.co.jp: アマゾンへようこそ！　">Amazon</a>の個別商品リンクを画像付きで作るスクリプトをBookmarkletにしてみました。IEのMenuExtでは<code>event.src</code>とかで画像のURLが簡単に拾えるので、簡単だったのですが、Bookmarkletではちっと苦労しました。が、ソースの<code>img</code>要素を全部調べ、<code>src</code>属性にMZZZZZZZが含まれるかどうかを調べれば良いことに気づいたあとはけっこう簡単でした。</p>
+<p>Amazonの個別商品ページには画像があればかならず正しいURLで画像へのリンクが張られている(と思う)ので、<code>document.images</code>で拾うことができる<code>img</code>要素でループを回してやり、正規表現でMZZZZZZZが含まれているかどうかチェックするというわけ。</p>
+<p>JavaScriptのコードは以下のような構造になってます。</p>
+<pre><code class="language-js">var aid  = &apos;hail2unet-22&apos;;
+var t    = document.title;
+var u    = document.location.href;
+var i    = u.indexOf(&apos;ASIN&apos;);
+var asin = u.substring(i+5,i+15);
+u        = &apos;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;
+var img;
+
+for (i=0; i &lt; document.images.length; i++) {
+  if (document.images[i].src.match(/MZZZZZZZ/)) {
+    img = document.images[i].src;
+    break;
+  }
+}
+
+prompt(&apos;Associate This (with image)!&apos;,
+  &apos;&lt;a href=&quot;&apos; + u + &apos;&quot; title=&quot;&apos; + t + &apos;&quot;&gt;&lt;img src=&quot;&apos; + img + &apos;&quot; alt=&quot;&apos; + t +
+  &apos;&quot; /&gt;&lt;/a&gt;&apos;);</code></pre>
+<p>Bookmarkletはこちら。</p>
+<p>Bookmarklet: <em><a href="javascript:var aid=&apos;hail2unet-22&apos;;var t=document.title;var u=document.location.href;var i=u.indexOf(&apos;ASIN&apos;);var asin=u.substring(i+5,i+15); u=&apos;https://www.amazon.co.jp/exec/obidos/ASIN/&apos;+asin+&apos;/&apos;+aid;var img;for(i=0;i&lt;document.images.length;i++){if(document.images[i].src.match(/MZZZZZZZ/)){img=document.images[i].src;break;}}prompt(&apos;Associate This (with image)!&apos;, &apos;&lt;a href=&quot;&apos;+u+&apos;&quot; title=&quot;&apos;+t+&apos;&quot;&gt;&lt;img src=&quot;&apos;+img+&apos;&quot; alt=&quot;&apos;+t+&apos;&quot; /&gt;&lt;/a&gt;&apos;);" title="Associate This (with image)!">Associate This (with image)!</a></em></p>
+<p>使い方は、上記リンクをBookmarks Toolbarにドラッグ・アンド・ドロップし、Amazonの個別商品ページを開いた状態でそれをクリックするだけ！　すると、</p>
+<pre><code class="language-html">&lt;a href=&quot;https://www.amazon.co.jp/exec/obidos/ASIN/B00028G7J8/hail2unet-22&quot; title=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot;&gt;&lt;img src=&quot;https://m.media-amazon.com/images/P/B00028G7J8.jpg&quot; alt=&quot;Amazon.co.jp： DVD: Corporate Ghost - the Videos: 1990-2002 / (Dol)&quot; /&gt;&lt;/a&gt;</code></pre>
+<p>というコードがプロンプトで出てきます。hail2unet-22となっているアソシエイトIDは自分のアソシエイトIDに書き換えましょう。</p>
+<p>コピーするのメンドイ(なんてズボラな・・・)。</p>
+<section>
+<h2>追記@2004/07/02</h2>
+<p>BookmarkletのURL内に含まれる&quot;の実体参照化をミスってまして、正常なURLになっていなかったのを修正しました。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>mdtoc - The markdown ToC generator</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/mdtoc.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製でmarkedパッケージに依存している。実行すると引数に指定したMarkdownファイルの中に書かれた&lt;!-- #toc --&gt;と&lt;!-- /toc --&gt;の間がToCになる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製でmarkedパッケージに依存している。実行すると引数に指定したMarkdownファイルの中に書かれた&lt;!-- #toc --&gt;と&lt;!-- /toc --&gt;の間がToCになる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="mdtoc - The markdown ToC generator" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-12-22T00:40:41+09:00">2014年12月22日</time></p>
+
+        <h1><em>mdtoc - The markdown ToC generator</em></h1>
+      </header>
+
+    <main>
+
+    <p>Markdownファイルの見出しからGitHub互換のToCを生成して埋め込むCLIツール、mdtocを作成した。Node.js製で<a href="https://www.npmjs.com/package/marked">markedパッケージ</a>に依存している。実行すると引数に指定したMarkdownファイルの中に書かれた<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>の間がToCになる。</p>
+
+<p>Download: <a href="/mdtoc.js">mdtoc.js</a></p>
+
+<p>例えば以下のようにMarkdownファイル、<code>foo.md</code>に<code>&lt;!-- #toc --&gt;</code>と<code>&lt;!-- /toc --&gt;</code>を書いておき、</p>
+
+<pre><code class="language-markdown">Test
+====
+
+&lt;!-- #toc --&gt;
+&lt;!-- /toc --&gt;
+
+Foo
+---
+
+### Foo Foo
+
+### Foo Bar
+
+Bar
+---
+
+### Bar Foo</code></pre>
+
+<p>ターミナルからmdtocを実行すると、</p>
+
+<pre><samp>$ <kbd>mdtoc foo.md</kbd></samp></pre>
+
+<p>以下のようにToCが挿入される。</p>
+
+<pre><code class="language-markdown">Test
+====
+
+&lt;!-- #toc --&gt;
+
+* [Foo](#foo)
+  * [Foo Foo](#foo-foo)
+  * [Foo Bar](#foo-bar)
+* [Bar](#bar)
+  * [Bar Foo](#bar-foo)
+
+&lt;!-- /toc --&gt;
+
+Foo
+---
+
+### Foo Foo
+
+### Foo Bar
+
+Bar
+---
+
+### Bar Foo</code></pre>
+
+<p>ToCの生成対象は最初の見出し以外のすべて。インデントは二番目の見出しを基準に調節されるようにした。大抵は<code>README.md</code>に対して使われると思うので、引数を省略した場合は<code>README.md</code>に対して実行するようにもなっている。改行コードは元の文書に従うようにしておいた。</p>
+
+<p>互換性はそこそこありそうだが、Redcarpetを使ったCLIツールの方が確実と思われるので、それを探すか暇な時に書き直したい。そのためnpmで公開するつもりは今のところない。</p>
+
+<hr>
+
+<p><a href="https://github.com/hail2u/html-best-practices">HTML Best Practices</a>のToCを簡単に更新できるようにするために色々探したけど良い物が見つからなかった。</p>
+
+<p><a href="https://www.npmjs.com/package/marked-toc">marked-toc</a>は記号の扱いにGitHubと互換性がなく、大体はうまくいくのだけど、たまにうまくいかない。別の名前で一から作り直してるみたいだが、今度はまったく英数字以外がまったく考慮されないものになっていて期待できない。</p>
+
+<p><a href="https://www.npmjs.com/package/doctoc">doctoc</a>はコード・ブロックに書いた<code>&lt;h1&gt;</code>タグなどを拾ってしまってめちゃくちゃなToCが生成された。他、どうでも良さそうなPRリンクや派手すぎる埋め込みコメントなど色々うっとうしかった。</p>
+
+<p>他にもたくさんあった(npmだけで15くらい見つかる)が、<code>#</code>での見出し限定のものであったり、特殊な記法で見出しを書かなくてはならなかったりと、試すまでもなく使いたくならないものばかりだった。</p>
+
+<p>mdtocでは、markedの<a href="https://github.com/chjj/marked#overriding-renderer-methods">レンダラーの差し替え</a>を利用して見出しをすべて拾い、Redcarpetのコードにあった<a href="https://github.com/vmg/redcarpet/blob/816e0933a120b66759a71284a24eacac8880f765/ext/redcarpet/html.h#L76">削除する文字</a>を削除し、空白をマイナスに置換し、最後にURLエンコードするというだけにした。余計なことをなるべくしないようにしたので、そこそこ互換性があるんじゃないかと思う。</p>
+
+<h2>追記</h2>
+
+<p>Repository: <a href="https://github.com/hail2u/node-gfmtoc">node-gfmtoc</a></p>
+
+<p>リポジトリーを作成し、<code>git clone</code>からの<code>npm install &amp;&amp; npm link</code>でサクッと利用可能になるようにしておいた。MarkdownというかGitHub flavored Markdown (正確にはHTML pipeline？)に依存するものなのでgfmtocに名前は変えた。npmレジストリーへ公開はしない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

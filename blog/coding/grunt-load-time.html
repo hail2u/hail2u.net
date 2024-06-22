@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Gruntのロード時間</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/grunt-load-time.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニックはすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。Qiitaの記事が参照しているIssueでも似たようなことが推奨されている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニックはすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。Qiitaの記事が参照しているIssueでも似たようなことが推奨されている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Gruntのロード時間" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-01-07T05:01:49+09:00">2014年1月7日</time></p>
+
+        <h1><em>Gruntのロード時間</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://qiita.com/makotot/items/bf7e8a4d704b2e977fed">必要なタスクだけを読み込むようにしてGruntタスクの実行速度を改善するというテクニック</a>はすごく良い。けど、このようにタスクを使う側が運用でカバーするよりも、本来ならタスクを書く側が高速にタスクがロードされるようにする必要があるはず。<a href="https://github.com/gruntjs/grunt/issues/975">Qiitaの記事が参照しているIssue</a>でも似たようなことが推奨されている。</p>
+
+<p>それぞれのタスクのロード時間は、そのタスクが利用しているNodeパッケージのロードにその多くが費やされている。つまり改善すべきはタスクが依存パッケージを<code>require()</code>するタイミング。Node.jsではNodeパッケージを読み込む<code>require()</code>は、自身が呼ばれたスコープでインスタンス化する(昔どこかで読んだ気がするけど見つからなかった)ので、タスクの実行まで呼ばれないスコープで<code>require()</code>すると改善する。</p>
+
+<pre><code class="language-javascript">module.exports = function (grunt) {
+  grunt.registerMultiTask(&apos;example&apos;, &apos;Grunt multi task example.&apos;, function () {
+    // Loading Node packages inside taskFunction
+    var _ = require(&apos;lodash&apos;);
+    var async = require(&apos;async&apos;);
+    var foo = require(&apos;foo&apos;);
+    var bar = require(&apos;./bar.js&apos;);
+
+    // Do whatever you want.
+  });
+};</code></pre>
+
+<p>こういう形で<code>grunt.registerMultiTask()</code>の第三引数であるタスク関数内で呼ぶなら、タスクのロード時間に影響を与えない。普通に<code>require()</code>せずにプロクシー的な関数を噛ませた方が良いかもしれないが、そこまでのこともないような気がする。仮に全てのタスクがこのように書かれていたなら、それらを全部ロードしたとしても目に見えるほどロード時間は落ちないはず。同じタスクを複数回呼ぶようなタスクの場合、タスクの実行時間に無駄ができるけど、それはマイナーなケースだと思う。</p>
+
+<p>JavaScript的にはアンチ・パターン？</p>
+
+<hr>
+
+<p>Grunt v5.0では<a href="https://github.com/gruntjs/grunt/issues/907"><code>grunt.util.async</code>や<code>grunt.async._</code>などが削除されること</a>になっており、それぞれのタスクで個別に依存パッケージをロードしなくてはならなくなる。そのこともあって今後はタスクでパッケージを読み込む機会も増えるし、それを見据えた効率的なタスクの書き方みたいなのも考えた方が良さそう。そうでないと<a href="http://gulpjs.com/">魅力的で高速な対抗勢力</a>に勝てるのはプラグインの豊富さで優っている今だけなどということになりそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

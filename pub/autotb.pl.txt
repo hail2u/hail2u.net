@@ -1,0 +1,140 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+use HTML::LinkExtor;
+use Jcode;
+use Net::TrackBack;
+
+# 各種設定 ----------------------------------------------------------- #
+
+# blogのタイトル
+my $blog_name = "blogの名前";
+
+# エントリのディレクトリ
+my $entry_dir = '/path/to/entries';
+
+# デバッグ
+my $debug = 1;
+
+# ----------------------------------------------------------- 各種設定 #
+
+# メインルーチン ----------------------------------------------------- #
+
+# 簡単に引数をチェック
+die "Usage: autotb.pl <blosxom entry file>\n" if int(@ARGV) != 1;
+
+# 引数を取得
+my $entry_path = shift;
+$entry_path =~ s!\\!/!g; # Windowsのパス区切り文字を変換する処理
+die "This file is not a blosxom entry: $entry_path\n" if $entry_path !~ /$entry_dir/;
+
+# Jcodeオブジェクト作成
+my $j = Jcode->new();
+
+# HTML::LinkExtorオブジェクト作成
+my @urls;
+my $parser = HTML::LinkExtor->new(\&callback);
+sub callback {
+	my($tag, %attr) = @_;
+	if ($tag eq 'a' and ($attr{'href'} =~ m!^http://!)) {
+		push(@urls, $attr{'href'});
+	}
+}
+
+# Net::TrackBackオブジェクト作成
+my $trackback = Net::TrackBack->new();
+
+# Trackbackで送信する内容を生成
+my %data = &make_qs($entry_path);
+if ($debug) {
+	foreach my $key (keys %data) {
+		print $key . ": " . $data{$key} . "\n";
+	}
+}
+
+# Ping送信先URLリストを生成
+my @ping_urls = &find_ping_urls($entry_path);
+
+foreach (@ping_urls) {
+	my $ping_url = $_;
+	if ($debug) {
+		print "$ping_url\n";
+	}
+	else {
+		$data{'ping_url'} = $ping_url;
+		print "Sending TrackBack ping to $ping_url\n";
+		$trackback->send_ping(\%data);
+		if ($trackback->is_error) {
+			print $trackback->message . "\n";
+		}
+	}
+}
+
+# 終了
+exit;
+
+# ----------------------------------------------------- メインルーチン #
+
+# サブルーチン ------------------------------------------------------- #
+
+
+# Trackbackで送信する内容を生成するサブルーチン
+sub make_qs {
+	my $entry_path = $_[0];
+	my %data;
+
+	# blogのタイトルを生成
+	$data{'blog_name'} = $blog_name;
+
+	# エントリのParmanent linkを生成
+	my $url = $entry_path;
+	# 要変更
+	$url =~ s!$entry_dir/!http://www.example.jp/path/to/blosxom.cgi/!g;
+	$url =~ s!txt!html!g;
+	$data{'url'} = $url;
+
+	# エントリのファイルを読み込む
+	open(FILE, "< $entry_path") || die "Cannot open entry file: $ARGV[1]\n";
+	my @lines = <FILE>;
+	close(FILE);
+
+	# エントリのタイトルを抽出
+	my $title = shift @lines;
+	$title =~ s!\x0D\x0A|\x0D|\x0A!!g;
+	$data{'title'} = $title;
+
+	# エントリの要約を生成
+	my $excerpt = join("", @lines);
+	$excerpt =~ s!\x0D\x0A|\x0D|\x0A!!g;
+	$excerpt =~ s!<.*?>!!g;
+	$excerpt = $j->set(\$excerpt, 'utf8')->euc;
+	$excerpt = substr($excerpt, 0, 253);
+	if ($excerpt =~ /\x8F$/ or $excerpt =~ tr/\x8E\xA1-\xFE// % 2) {
+		$excerpt = substr($excerpt, 0, 252);
+		if ($excerpt =~ /\x8F$/ or $excerpt =~ tr/\x8E\xA1-\xFE// % 2) {
+			$excerpt = substr($excerpt, 0, 251);
+		}
+	}
+	$excerpt .= '...';
+	$data{'excerpt'} = $j->set(\$excerpt, 'euc')->utf8;
+
+	return %data;
+}
+
+# Ping送信先URLリストを生成するサブルーチン
+sub find_ping_urls {
+	my $entry_path = $_[0];
+
+	$parser->parse_file($entry_path);
+
+	foreach my $url (@urls) {
+		foreach my $discover ($trackback->discover($url)) {
+			push(@ping_urls, $discover);
+		}
+	}
+
+	return @ping_urls;
+}
+
+# ------------------------------------------------------- サブルーチン #

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>PhantomJSからCSS Lintを使う</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/using-csslint-from-phantomjs.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSS LintのCLIはNodeやRhinoから使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこでPhantomJSからCSS Lintを使うスクリプトを書いてみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSS LintのCLIはNodeやRhinoから使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこでPhantomJSからCSS Lintを使うスクリプトを書いてみました。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="PhantomJSからCSS Lintを使う" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-10-21T15:55:22+09:00">2011年10月21日</time></p>
+
+        <h1><em>PhantomJSからCSS Lintを使う</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://csslint.net/">CSS Lint</a>のCLIは<a href="http://nodejs.org/">Node</a>や<a href="http://www.mozilla.org/rhino/">Rhino</a>から使うようになっているので、Windowsだとちゃんと動くようにするまで結構面倒です(勿論ちゃんと動かせるようにはなります)。また、僕の場合はそもそもCSS Lintしか必要としていないので、Nodeを入れるのはちょっと大げさな気もします。そこで<a href="http://www.phantomjs.org/">PhantomJS</a>からCSS Lintを使うスクリプトを書いてみました。</p>
+
+<pre><code class="language-js">var fs = require("fs"),
+  f = phantom.args[0],
+  css = fs.read(f);
+
+if (phantom.injectJs("csslint.js")) {
+  var i,
+    r = CSSLint.verify(css),
+    l = r.messages.length;
+
+  if (l &gt; 0) {
+    for (i = 0; i &lt; l; i++) {
+      var e = r.messages[i];
+
+      if (!e.rollup) {
+        console.log([f, e.line, e.col, e.message].join(":"));
+      }
+    }
+  }
+}
+
+phantom.exit();</code></pre>
+
+<p>今のPhantomJSにはfsモジュールがあり、ファイルの読み書きができるようになっています。CommonJS由来のやつですね。実装済みのfsモジュールのプロパティや関数は<a href="http://code.google.com/p/phantomjs/wiki/ReleaseNotes">ReleaseNotes</a>に載っています。</p>
+
+<p>CSS LintのJavaScriptライブラリを読み込むには<code>phantom</code>オブジェクトの<code>injectJs()</code>を使います。読み込みに成功した場合だけ<code>true</code>が返るようになっているので普通に<code>if</code>文で使ってやります。</p>
+
+<p>あとは<code>CSSLint.verify()</code>するだけ！　オプションを指定する場合はここで指定してやればいいので、引数でオプションを設定できるようにするのもそんなに難しくない……というかNode向けのCLIスクリプトからコピペするだけで動きそうです。</p>
+
+<pre><samp>$ <kbd>phantomjs /path/to/csslint-phantomjs.js style.css</kbd></samp></pre>
+
+<p>あとはこのようにCSSファイルを引数にして実行してやれば叱ってくれます。</p>
+
+<pre><samp>style.css:7:1:Don't use IDs in selectors.
+style.css:15:1:Don't use IDs in selectors.
+style.css:21:1:Don't use IDs in selectors.
+style.css:30:1:Don't use IDs in selectors.
+style.css:35:1:Don't use IDs in selectors.</samp></pre>
+
+<p>うるさいよ。</p>
+
+<p>PhantomJSは実行ファイルだけで動きますし、WindowsにおけるCSS Lintや<a href="http://www.jslint.com/">JSLint</a>の実行環境としてなかなか良いんじゃないかと思いました。</p>
+
+<section>
+<h2>追記</h2>
+
+<p><code>rollup</code>が<code>true</code>の時はまとめメッセージのようなので出力には含めないようにしました。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

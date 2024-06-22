@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>SVGO Bug</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>SVGO Bug</h1>
+
+      <p>SVGOはルート・ノードの子が<code>g</code>要素ひとつだけの場合、無条件で削除する。そのためグルーピングで指定した属性は消える。またグルーピングに依存したアニメーション要素などが機能しなくなる。<code>collapseGroups</code>を無効にすると対処できるが、当然無駄なネストも削除されなくなる。</p>
+    </header>
+
+    <section>
+      <h1>Before SVGO</h1>
+
+      <figure>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          version="1.1"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          width="480"
+          height="270"
+          viewbox="0 0 480 270">
+          <g>
+            <rect x="0" y="0" width="48" height="27" fill="#ff0000"/>
+            <rect x="0" y="27" width="48" height="27" fill="#0000ff"/>
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              dur="3s"
+              repeatCount="indefinite"
+              values="0, 0; 10, 5"
+              type="scale"/>
+          </g>
+        </svg>
+      </figure>
+
+      <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;
+  version=&quot;1.1&quot;
+  xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;
+  width=&quot;480&quot;
+  height=&quot;270&quot;
+  viewbox=&quot;0 0 480 270&quot;&gt;
+  &lt;g&gt;
+    &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;48&quot; height=&quot;27&quot; fill=&quot;#ff0000&quot;/&gt;
+    &lt;rect x=&quot;0&quot; y=&quot;27&quot; width=&quot;48&quot; height=&quot;27&quot; fill=&quot;#0000ff&quot;/&gt;
+    &lt;animateTransform
+      attributeName=&quot;transform&quot;
+      attributeType=&quot;XML&quot;
+      dur=&quot;3s&quot;
+      repeatCount=&quot;indefinite&quot;
+      values=&quot;0, 0; 10, 5&quot;
+      type=&quot;scale&quot;/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+    </section>
+
+    <section>
+      <h1>After SVGO</h1>
+
+      <figure>
+        <svg xmlns="http://www.w3.org/2000/svg" width="480" height="270"><rect width="48" height="27" fill="#f00"/><rect y="27" width="48" height="27" fill="#00f"/><animateTransform attributeName="transform" attributeType="XML" dur="3s" repeatCount="indefinite" values="0, 0; 10, 5" type="scale"/></svg>
+      </figure>
+
+      <pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;270&quot;&gt;
+  &lt;rect width=&quot;48&quot; height=&quot;27&quot; fill=&quot;#f00&quot;/&gt;
+  &lt;rect y=&quot;27&quot; width=&quot;48&quot; height=&quot;27&quot; fill=&quot;#00f&quot;/&gt;
+  &lt;animateTransform attributeName=&quot;transform&quot; attributeType=&quot;XML&quot; dur=&quot;3s&quot; repeatCount=&quot;indefinite&quot; values=&quot;0, 0; 10, 5&quot; type=&quot;scale&quot;/&gt;
+&lt;/svg&gt;</code></pre>
+    </section>
+  </body>
+</html>

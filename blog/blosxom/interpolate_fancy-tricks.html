@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>interpolate_fancyプラグインの使い方</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/interpolate_fancy-tricks.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="手軽にblosxomのflavourシステムを強化することが出来るようになるinterpolate_fancyプラグインについて今さら書いてみようかとか。本当に今さらすぎて笑えない。今さらとはいえ、blosxomのflavourシステムを強化するプラグインとしてはこれくらいしか選択肢はないので書いておいても損ではないはず。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="手軽にblosxomのflavourシステムを強化することが出来るようになるinterpolate_fancyプラグインについて今さら書いてみようかとか。本当に今さらすぎて笑えない。今さらとはいえ、blosxomのflavourシステムを強化するプラグインとしてはこれくらいしか選択肢はないので書いておいても損ではないはず。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="interpolate_fancyプラグインの使い方" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-27T13:14:25+09:00">2006年8月27日</time></p>
+
+        <h1><em>interpolate_fancyプラグインの使い方</em></h1>
+      </header>
+
+    <main>
+
+    <p>手軽に<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>のflavourシステムを強化することが出来るようになる<a href="http://www.blosxom.com/plugins/interpolate/interpolate_fancy.htm" title="blosxom :: the zen of blogging :: plugins/interpolate/interpolate_fancy.txt">interpolate_fancyプラグイン</a>について今さら書いてみようかとか。本当に今さらすぎて笑えない。今さらとはいえ、blosxomのflavourシステムを強化するプラグインとしてはこれくらいしか選択肢はないので書いておいても損ではないはず。</p>
+
+<p>少し前にもちょっとだけ使い方を書いたけど、<del>文字数稼ぎ</del><ins>興味を持てずに飛ばしてしまった人のため</ins>に簡単に使い方を説明してみる。基本は、</p>
+
+<pre>&lt;$foo /&gt; = $foo
+&lt;?$foo&gt;$fooがdefinedなら表示される&lt;/?&gt;
+&lt;!?$foo&gt;$fooがundefinedなら表示される&lt;/?&gt;</pre>
+
+<p>の3つで、これらに加えて、</p>
+
+<pre>&lt;?$foo eq=&quot;1&quot;&gt;$fooが1なら表示される。&lt;/?&gt;
+&lt;?$foo ne=&quot;1&quot;&gt;$fooが1でないなら表示される。&lt;/?&gt;
+&lt;?$foo lt=&quot;1&quot;&gt;$fooが1より小さいなら表示される。&lt;/?&gt;
+&lt;?$foo gt=&quot;1&quot;&gt;$fooが1より大きいなら表示される。&lt;/?&gt;
+&lt;?$foo like=&quot;^[a-z]$&quot;&gt;$fooが正規表現^[a-z]$にマッチするなら表示される。&lt;/?&gt;
+&lt;?$foo unlike=&quot;^[a-z]$&quot;&gt;$fooが正規表現^[a-z]$にマッチしないなら表示される。&lt;/?&gt;</pre>
+
+<p>などといった条件比較も可能。更に、他にインストールしているプラグインのサブルーチンを呼べたりとかもする。</p>
+
+<p>以下に具体的な利用例を挙げてみる。</p>
+
+<section>
+<h2>permalinkではタイトルにリンクを張らない</h2>
+
+<p>このblogのように、<code>$path/$fn.html</code>という形のpermalinkを採用している場合は、<code>$path_info</code>が<code>.html</code>で終わっているかどうかを調べることによってpermalinkかどうかを判断できる。つまり、</p>
+
+<pre><code class="language-html">&lt;h3&gt;
+&lt;?$path_info unlike=&quot;\.html$&quot;&gt;
+&lt;a href=&quot;/blog$path/$fn.$default_flavour&quot; title=&quot;&amp;quot;$title&amp;quot; への恒久的なリンク&quot;&gt;
+&lt;/?&gt;
+$title
+&lt;?$path_info unlike=&quot;\.html$&quot;&gt;
+&lt;/a&gt;
+&lt;/?&gt;
+&lt;/h3&gt;</code></pre>
+
+<p>というような書き方(見やすいように改行を入れている)をしてやれば、permalinkではタイトルにリンクが張られなくなる。else系の条件分岐が無いのでくだくだしい書き方。</p>
+</section>
+
+<section>
+<h2>文字列を保護する</h2>
+
+<p>blosxomの<code>interpolate()</code>の仕様上、<code>$yr-$mo_num-$daT$ti:00</code>とか書いた場合、意図した通りに表示されない。しかし、適当な変数名を利用して、</p>
+
+<pre>$yr-$mo_num-$da<em>&lt;?$yr&gt;T&lt;/?&gt;</em>$ti<em>&lt;?$yr&gt;:&lt;/?&gt;</em>00+09:00</pre>
+
+<p>と、書くことができる。こうすると「T」や「:」が保護されるので、きちんと意図した通りに表示される。バッド・ノウハウ。</p>
+</section>
+
+<section>
+<h2>簡単な条件分岐を利用して都合よく体裁を整える</h2>
+
+<p>このサイトのトップ・ページに表示している最近のエントリ一覧を実現しているjs flavourで利用してたりします。<a href="/blog/entries/story.js" title="story.js">story.js</a>の内容は、</p>
+
+<pre><em>&lt;?$push_if_first::is_first eq=&quot;1&quot;&gt;</em>
+document.write(&apos;&lt;h4&gt;&lt;a href=&quot;$url$path/$fn.$default_flavour&quot; title=&quot;&amp;quot;$title&amp;quot; への恒久的なリンク&quot;&gt;$title&lt;/a&gt;&lt;/h4&gt;&apos;);
+document.write(&apos;&lt;p class=&quot;date&quot;&gt;Posted at $yr-$mo_num-$da&lt;?$yr&gt;T&lt;/?&gt;$ti&lt;?$yr&gt;:&lt;/?&gt;00+09:00 in &lt;a href=&quot;/blog$path/&quot; title=&quot;&amp;quot;$categories::name&amp;quot; 関連のエントリを閲覧する&quot;&gt;$categories::name&lt;/a&gt;&lt;/p&gt;&apos;);
+document.write(&apos;&lt;p&gt;$rss::excerpt&lt;/p&gt;&apos;);
+document.write(&apos;&lt;p class=&quot;seemore&quot;&gt;&lt;a href=&quot;$url$path/$fn.$default_flavour&quot; title=&quot;&amp;quot;$title&amp;quot; の全文を読む&quot;&gt;&amp;#187; Read full entry&lt;/a&gt;&lt;/p&gt;&apos;);
+document.write(&apos;&lt;ul&gt;&apos;);
+<em>&lt;/?&gt;</em>
+
+<em>&lt;?$push_if_first::is_first ne=&quot;1&quot;&gt;</em>
+document.write(&apos;&lt;li&gt;&lt;a href=&quot;$url$path/$fn.$default_flavour&quot; title=&quot;$title Posted at $yr/$mo_num/$da ($dw) $ti in $categories::name&quot;&gt;$title&lt;/a&gt;&lt;/li&gt;&apos;);
+<em>&lt;/?&gt;</em></pre>
+
+<p>と、<a href="/archives/blugins.html#push_if_first" title="hail2u.net - Archives - blosxom plugins">push_if_firstプラグイン</a>と組み合わせることによって、最初のエントリの場合は概要まで表示しエントリ全文へのリンクを追加、それ以外の場合はタイトルをリストで並べるという形を実現している。</p>
+</section>
+
+<section>
+<h2>特定のエントリではwritebackを禁止する</h2>
+
+<p>特定のエントリということを判断させるために<a href="http://www.blosxom.com/plugins/meta/meta.htm" title="blosxom :: the zen of blogging :: plugins/meta/meta.txt">metaプラグイン</a>が必要になるが、作業的には面倒ではない。まず、writebackのフォームを表示しているstory.htmlなどで、</p>
+
+<pre>&lt;?!$meta::nowriteback&gt;
+&lt;form ...&gt;
+...
+&lt;/form&gt;
+&lt;/?&gt;</pre>
+
+<p>といったように、writebackのフォームをくくる。その上で、その特定のエントリに、</p>
+
+<pre>meta-nowriteback: 1</pre>
+
+<p>と書いておけば良い。metaプラグインはエントリに対してメタ・データを付与できるプラグインなので、こういったケースでもわかるようにinterpolate_fancyプラグインとは相性が良い。</p>
+
+<p>禁止するというかフォームを表示させないだけ。指定の日数すぎたらwritebackを禁止するとかいう場合は、プラグインを書かないとならない(と思う)。例えば、現在の時間とエントリの時間の差を秒数で取得し、変数に格納するだけのプラグインをつくり、<code>lt</code>でその指定の日数を秒に変換した数字(30日なら2592000)と比較とか。</p>
+</section>
+
+<hr>
+
+<p>基本的には他のプラグインとうまく組み合わせてやると力を発揮するプラグインだと思う。また、逆に他のプラグイン側も条件分岐をinterpolate_fancy側に任せたりすることも可能なので、プラグインが多少書きやすくなる。これがデフォルトの<code>interpolate()</code>だったらなぁ・・・とかは思っていても口に出してはいけない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

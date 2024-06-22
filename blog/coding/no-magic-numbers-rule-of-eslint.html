@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ESLintのno-magic-numbersルール</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/no-magic-numbers-rule-of-eslint.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でもno-magic-numbersにとりわけ怒られた。怒られたコードをメモしておく。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ESLintのno-magic-numbersルール" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-14T01:27:49+09:00">2016年4月14日</time></p>
+
+        <h1><em>ESLintのno-magic-numbersルール</em></h1>
+      </header>
+
+    <main>
+
+    <p>ESLintのルールが教えてもらえないという制限下で作業をしていた。pushすると怒られるという緊張感はちょっと良かった。色々なルールで怒られたが、中でも<a href="http://eslint.org/docs/rules/no-magic-numbers">no-magic-numbers</a>にとりわけ怒られた。怒られたコードをメモしておく。</p>
+
+<pre><code class="language-javascript">var d = new Date();
+var m = d.getMonth() + 1;</code></pre>
+
+<p>月を数字で取得しようとすると怒られる。</p>
+
+<pre><code class="language-javascript">var a = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;, &quot;qux&quot;];
+var firstElement = a[0];
+var lastElement = a[a.length - 1];</code></pre>
+
+<p>最初と最後の要素を参照しようとすると怒られる。<code>Array#shift()</code>や<code>Array#pop()</code>で済むものは置き換えても良いが、若干コストがかかりそうだ。</p>
+
+<pre><code class="language-javascript">var s = &quot;foobarbazqux&quot;;
+
+if (s.indexOf(&quot;foo&quot;) === 0) {
+  ...
+}</code></pre>
+
+<p>特定の文字列で始まるかどうか調べようとすると怒られる。これはちゃんと<code>Sring#startsWith()</code>で書き換えた。</p>
+
+<pre><code class="language-javascript">var s = &quot;foobarbazqux&quot;;
+
+if (s.startsWith(foo)) {
+  s = s.substr(foo - 1);
+}</code></pre>
+
+<p>特定の文字列で始まっていたら削除しようとすると怒られる。素直に正規表現を使うのが良いだろう。</p>
+
+<pre><code class="language-javascript">var minimist = require(&quot;minimist&quot;);
+var argv = minimist(process.argv.slice(2));</code></pre>
+
+<p><a href="https://github.com/substack/minimist">minimist</a>で処理するためにNode.jsの実行ファイルとスクリプトのパスを捨てようとすると怒られる。えっ、これどうしよう……。</p>
+
+<hr>
+
+<p>つまり配列へのテキトウなアクセスで怒られるということだ。配列の長さと添え字のずれを矯正する<code>1</code>と<code>0</code>が問題と言いかえることもできるだろう。代替手段はあるものはあるが、ないものはかなり苦しい対応になる。</p>
+
+<pre><code class="language-json">{
+  &quot;rules&quot;: {
+    &quot;no-magic-numbers&quot;: [
+      &quot;error&quot;,
+      {
+        &quot;ignores&quot;: [0, 1]
+      }
+    ]
+  }
+}</code></pre>
+
+<p>有効にするなら<code>0</code>と<code>1</code>を無視する、このような設定が良いかもしれない。</p>
+
+<hr>
+
+<pre><code class="language-javascript">var d = new Date();
+var m = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;][d.getMonth()];</code></pre>
+
+<p>月の数字はこうすると設定をカスタマイズせずとも通る。適切な処理だとは思うが、書きたいとはなかなか思わない。Dateオブジェクトが定数としてロケールに応じた月の名前や月の数字を持っていてくれればいいのかな。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

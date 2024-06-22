@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>はてなブックマークでつけられたコメントをblosxomにインクルード</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/blosxom/includes-comments-on-hatena-bookmark.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="はてなブックマークエントリー情報取得APIを利用して、blosxomのエントリ個別ページにはてなブックマークでそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="はてなブックマークエントリー情報取得APIを利用して、blosxomのエントリ個別ページにはてなブックマークでそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="はてなブックマークでつけられたコメントをblosxomにインクルード" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-09-20T04:02:58+09:00">2006年9月20日</time></p>
+
+        <h1><em>はてなブックマークでつけられたコメントをblosxomにインクルード</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://d.hatena.ne.jp/keyword/%a4%cf%a4%c6%a4%ca%a5%d6%a5%c3%a5%af%a5%de%a1%bc%a5%af%a5%a8%a5%f3%a5%c8%a5%ea%a1%bc%be%f0%ca%f3%bc%e8%c6%c0API?kid=184075">はてなブックマークエントリー情報取得API</a>を利用して、<a href="http://www.blosxom.com/">blosxom</a>のエントリ個別ページに<a href="http://b.hatena.ne.jp/">はてなブックマーク</a>でそのエントリに付けられたコメントを引っ張ってこようとかいうネタ。blosxomでの話ということになっているけど、実装自体はほぼPure JavaScriptなので、どんなページにも応用できるはず。</p>
+
+<p>プラグインは特に必要は無い。プラグインにする必要も無いとも言える。必要なのはflavourへのコードの追加とJavaScriptファイル。</p>
+
+<section>
+<h2>head.html</h2>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/prototype.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/scripts/hatena/bookmark.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<p><a href="http://prototype.conio.net/">prototype.js</a>が必要。インクルードするだけ。</p>
+</section>
+
+<section>
+<h2>stoy.html</h2>
+
+<pre><code class="language-html">&lt;?$path_info like=&quot;\.html$&quot;&gt;
+&lt;div class=&quot;story&quot; id=&quot;comments&quot;&gt;
+&lt;h3&gt;Comments&lt;/h3&gt;
+&lt;p&gt;JavaScriptに対応または有効な環境の場合、ここに&lt;a href=&quot;http://b.hatena.ne.jp/&quot;&gt;はてなブックマーク&lt;/a&gt;でのこのエントリに対するコメントが表示されます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/?&gt;</code></pre>
+
+<p><a href="http://www.blosxom.com/plugins/interpolate/interpolate_fancy.htm">interplate_fancy</a>が必要。<code>$path_info</code>を利用して、エントリ個別ページかどうかを判別し、そうだった場合にコメントを流し込むためのノードを作っておくという感じ。</p>
+</section>
+
+<section>
+<h2>コメント表示スクリプト</h2>
+
+<p><a href="/scripts/hatena/bookmark.js">bookmark.js</a>のみ。ソースが全てを物語る。はてなブックマークエントリー情報取得APIに対して一回リクエストすれば良いだけなので、単純な実装にした。HTMLの出力も<code>innerHTML</code>でガンガンぶっこんでいく形(今のところは)。</p>
+</section>
+
+<hr>
+
+<p>細かいことはあとで書く。かもしれない。とか書いておく時は大抵書かない。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

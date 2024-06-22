@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>calc()とvw単位を使った飛び出すpre要素</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/expand-pre-with-calc-and-vw.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="飛び出すpre要素っていうのは昔書いた描画領域一杯にpre要素の幅を拡大するテクニックと目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それをvw単位を使ってビューポートの幅を取り、それとcalc()を組み合わせることでどうにかしようという試み。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/expand-pre-with-calc-and-vw.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="calc()とvw単位を使った飛び出すpre要素" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-07-25T11:11:06+09:00">2014年7月25日</time></p>
+
+        <h1><em>calc()とvw単位を使った飛び出すpre要素</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="pre要素の背景をビューポートの幅まで拡大する。" height="627" src="/img/blog/expand-pre-with-calc-and-vw.png" width="1200">
+</figure>
+
+<p>飛び出す<code>pre</code>要素っていうのは昔書いた<a href="/blog/webdesign/expand-pre-background.html">描画領域一杯に<code>pre</code>要素の幅を拡大するテクニック</a>と目指す見た目は同じもの。以前考えたものはちょっとの間使ったもののバグが多くすぐやめた。このテクニックは大きい要素を左右に付け、はみ出した部分を隠すというものだった。それを<code>vw</code>単位を使ってビューポートの幅を取り、それと<code>calc()</code>を組み合わせることでどうにかしようという試み。</p>
+
+<p>Demo: <a href="/test/583.html">Expand pre Element #2</a></p>
+
+<p><code>pre</code>要素の左右が<code>#f0f</code>の矩形で埋められている。Chrome 35、Firefox 30、そしてInternet Explorer 11で確認できる。Mobile Safari 7ではうまく動かない(多分<code>vw</code>単位の問題のような気がする)。わかりやすいように左右に追加する擬似要素の背景の色を変えておいたけど、同じ色にすればあたかも<code>pre</code>要素が飛び出すように見えるはず。</p>
+
+<pre><code class="language-css">.test {
+  margin-right: auto;
+  margin-left: auto;
+  position: relative;
+  width: 480px;
+}
+
+.test:before,
+.test:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  width: calc((100vw - 100%) / 2);
+  height: 100%;
+  content: &quot;&quot;;
+  background-color: #f0f;
+}
+
+.test:before {
+  right: 100%;
+}
+
+.test:after {
+  left: 100%;
+}</code></pre>
+
+<p><code>vw</code>単位は<code>1vw</code>でビューポートの幅の<em>1/100</em>なので、<code>100vw</code>がビューポートの幅になる。<code>calc()</code>では<code>%</code>も使え、<code>width</code>プロパティーで<code>calc(100%)</code>とすると<em>その要素の幅</em>になる。つまり<code>calc(100vw - 100%)</code>で<em>ビューポート幅からその要素の幅を引いた余り</em>を計算できることになる。デモでは<code>pre</code>要素は真ん中寄せなので単純にこれを半分にし、左右に追加する擬似要素の幅にすれば良い。高さは<code>100%</code>で自動的に揃うので計算不要。</p>
+
+<p>左右に追加する擬似要素の位置調整は<code>position</code>プロパティーを使った相対配置内での絶対配置で行う。</p>
+
+<hr>
+
+<p>だいたい問題なくてどんな状況でも使える解だと思ったんだけど、<code>vw</code>単位にスクロールバーの幅が含まれてしまうことによって起こる問題が解決できなそう。WindowsのChrome 35やInternet Explorer 11(デスクトップ版)などスクロールバーが浮いていないブラウザーでは、その幅分ずれてしまい水平スクロールバーが出るようになる。この<code>vw</code>単位などにおけるスクロールバーの解釈については、仕様に以下のように注意書きがある。</p>
+
+<blockquote>
+<p>Note that the initial containing block&apos;s size is affected by the presence of scrollbars on the viewport.</p>
+</blockquote>
+
+<p>スクロールバーの有無に<em>影響を受ける</em>となっているので、実装バグのような気がする。この辺りの扱いが直るまではスクロールバーの幅を決め打ちである程度確保して<code>calc()</code>内で更に引く必要がありそう。</p>
+
+<p>ただしInternet Explorer 11以降では<code>-ms-overflow-style</code>独自プロパティーでオーバーレイのスクロールバーに変更できるのでなんとか解決できる。</p>
+
+<pre><code class="language-css">html {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}</code></pre>
+
+<p><code>overflow-style</code>プロパティー自体は一時期いくつかの標準仕様に存在したんだけど、今は<code>overflow</code>プロパティーへ統合された。元々<code>overflow</code>した時の内容物の扱われ方を定義するプロパティーだったようなので、スクロールバーの表示形式の変更に使うのは間違ってたりとかすることもあるので、独自プロパティーであることに目をつぶったとしても使わない方が良さそう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

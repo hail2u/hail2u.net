@@ -1,0 +1,139 @@
+#!/usr/local/bin/perl
+
+use strict;
+
+use CGI;
+use Jcode;
+use LWP::Simple;
+use URI::Escape;
+use XML::RSS;
+
+my $q = new CGI;
+my $j = new Jcode;
+
+my $target = $q->param('target');
+my $target_dec = uri_unescape($target);
+my $html = <<"_HTML_";
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TrackBack Tracer</title>
+<link rel="stylesheet" type="text/css" href="/styles/tbtrace.css">
+</head>
+<body>
+<h1><a href="./tbtrace.cgi">TrackBack Tracer</a></h1>
+<hr>
+<form method="get" action="./tbtrace.cgi">
+<dl>
+<dt><label for="target">Parmalink:</label></dt>
+<dd><input type="text" name="target" size="64" value="$target" id="target"></dd>
+</dl>
+<div>
+<input type="submit" value="Trace" id="trace">
+</div>
+</form>
+<hr>
+_HTML_
+
+if ($q->param('target')) {
+	$target = &discover_tb($target);
+	$target .= "?__mode=rss";
+	my $content = get($target);
+	$content =~ s!<response>.*?</error>!!s;
+	$content =~ s!</response>!!;
+	$content = $j->set(\$content)->utf8;
+	$content =~ s/<\?xml.*?\?>/<\?xml version="1.0" encoding="UTF-8"\?>/;
+
+	my $rss = new XML::RSS;
+	eval {
+		$rss->parse($content);
+	};
+
+	if (!$@) {
+		my $chlink = $rss->{'channel'}->{'link'};
+		my $chname = &encode($rss->{'channel'}->{'title'});
+		my $chdesc = &encode($rss->{'channel'}->{'description'});
+		$html .= <<"_HTML_";
+<ul>
+<li><a href="$chlink">$chname</a><br>$chdesc
+<ul>
+_HTML_
+
+		for my $item (@{$rss->{'items'}}) {
+			my $itemlink = $item->{'link'};
+			my $itemlink_enc = uri_escape($itemlink);
+			my $itemname = &encode($item->{'title'});
+			my $itemdesc = &encode($item->{'description'});
+
+			$html .= <<"_HTML_";
+<li><a href="$itemlink">$itemname</a><br>$itemdesc<br><a href="./tbtrace.cgi?target=$itemlink_enc">&#187; Trace further...</a></li>
+_HTML_
+		}
+
+		$html .= <<"_HTML_";
+</ul>
+</li>
+</ul>
+<hr>
+_HTML_
+	}
+	else {
+		$html .= qq!<p>Error: $@</p>\n<hr>\n!;
+	}
+}
+
+$html .= <<"_HTML_";
+<address>Copyrights &#169; 2003 Kyo Nagashima. All Rights Reserved.</address>
+</body>
+</html>
+_HTML_
+
+print <<"_HTML_";
+Content-Type: text/html; charset=UTF-8
+
+$html
+_HTML_
+
+exit;
+
+sub discover_tb {
+	my $url = $_[0];
+
+	my $c = get($url);
+	(my $url_no_anchor = $url) =~ s/#.*$//;
+	my $item;
+
+	while ($c =~ m!(<rdf:RDF.*?</rdf:RDF>)!sg) {
+		my $rdf = $1;
+		my($perm_url) = $rdf =~ m!dc:identifier="([^"]+)"!;
+		next unless $perm_url eq $url || $perm_url eq $url_no_anchor;
+
+		if ($rdf =~ m!trackback:ping="([^"]+)"!) {
+			return $1;
+		}
+		elsif ($rdf =~ m!about="([^"]+)"!) {
+			return $1;
+		}
+	}
+}
+
+sub encode {
+	my $str = $_[0];
+
+	$str =~ s/\x0D|\x0A//g;
+	$str =~ s/\t//g;
+	$str =~ s/^\s*//;
+	$str =~ s/\s*$//;
+	$str =~ s/&/&amp;/g;
+	$str =~ s/&amp;amp;/&amp;/g;
+	$str =~ s/&amp;lt;/&lt;/g;
+	$str =~ s/&amp;gt;/&gt;/g;
+	$str =~ s/&amp;quot;/&quot;/g;
+	$str =~ s/&amp;#(\d+);/&#$1;/g;
+	$str =~ s/</&lt;/g;
+	$str =~ s/>/&gt;/g;
+	$str =~ s/"/&quot;/g;
+	$str =~ s/'/&#39;/g;
+
+	return $str;
+}

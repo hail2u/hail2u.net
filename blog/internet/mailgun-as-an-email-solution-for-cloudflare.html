@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Cloudflareにおけるメール・ソリューションとしてのMailgun</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/internet/mailgun-as-an-email-solution-for-cloudflare.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Value Domainで取得したドメインをCloudflareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。Cloudflareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Value Domainで取得したドメインをCloudflareの提供するネームサーバーでGitHub Pagesに向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。Cloudflareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができるMailgunを使うのが良さそうだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Cloudflareにおけるメール・ソリューションとしてのMailgun" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-01-24T01:24:29+09:00">2015年1月24日</time></p>
+
+        <h1><em>Cloudflareにおけるメール・ソリューションとしてのMailgun</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://www.value-domain.com/">Value Domain</a>で取得したドメインを<a href="https://www.cloudflare.com/">Cloudflare</a>の提供するネームサーバーで<a href="https://pages.github.com/">GitHub Pages</a>に向けてやるのは、低コストでウェブサイトをホスティングする優れた手段だ。問題はメールだ。Cloudflareではメール関係の機能はまったく用意されていない。またValue Domainで無料で取得できるXREAのアカウントはメールだけの利用は禁止されている。本道としては別にメール・サーバーを用意するわけだが、転送だけで良いのなら無料枠内で利用することができる<a href="https://mailgun.com/">Mailgun</a>を使うのが良さそうだ。</p>
+
+<p>Mailgunではアカウントを取得後、まずドメインを追加する。すると計5つのDNSレコードが提供される。</p>
+
+<ul>
+<li>認証用のTXTレコードが2つ</li>
+<li>送信メールでのトラッキングに使われるリソースのためのCNAMEレコードが1つ</li>
+<li>受信用のMXレコードが2つ</li>
+</ul>
+
+<p>これらDNSレコードをCloudflareのコントロール・パネルから設定する。転送のみの場合はトラッキングのためのCNAMEレコードは必要ないが、素直に設定しておくべきだろう。ただしOff Cloudflareにし、トラフィックをバイパスさせておくのは忘れないようにしたい。</p>
+
+<figure>
+<img alt="Mailgunで提供される5つのDNSレコードをCloudflareのコントロールパネルから設定した様子。" height="544" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-1.png" width="960">
+<figcaption>DNS Settings on Cloudflare</figcaption>
+</figure>
+
+<p>次にMailgun側でドメインの照合を行うわけだが、その前にMailgunで設定しようとしているドメインのDomain SettingsでInbound Spam FilterをBlock Detected Spamに変更しておくと良い。こうしないとスパムメールをちょくちょく受信するようなメールアドレスをMailgunで処理しようとする場合、即座にDisabledにされてしまう。もしDisabledにされた場合は、まだメールの送信はしていないことなどを添えてサポートから連絡すれば簡単に復活させてはくれる。</p>
+
+<p>続いて改めてドメインの照合を行う。Domain Settingsと同じページにあるCheck DNS Record Nowというボタンを押して照合させる(待っていても自動で照合してはくれない)。うまくいくと各DNSレコードのアイコンが緑の四角に白でチェックマークが描かれたものに変わる。</p>
+
+<figure>
+<img alt="Mailgunでドメインの認証用TXTレコードの照合に成功した様子。" height="375" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-2.png" width="943">
+<figcaption>Domain Verification on Mailgun</figcaption>
+</figure>
+
+<p>次に受信メールの転送を設定する。これはMailgunのRoutesという機能を使って行う。</p>
+
+<figure>
+<img alt="Mailgunで独自ドメインのアドレスからGmailへのメール転送を設定している様子。" height="387" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-3.png" width="1163">
+<figcaption>Mail Forwarding Setting on Mailgun</figcaption>
+</figure>
+
+<p>Filter Expressionで<code>match_recipient()</code>を使って利用したいメールアドレスを指定し、Actionsで<code>forward()</code>を使って自分のGmailのメールアドレスを指定する。Priorityは他に何もしないのなら0のままで良い。Descriptionはわかりやすい名前を付けておくべきだろう。Filter Expressionで<code>catch_all()</code>を使うといわゆるキャッチオール的な転送も可能だ。</p>
+
+<p>ネームサーバーの切り替えが終了済みなら直ぐに転送が可能になっている。適当なメール・クライアントから実験してみると良い。うまくいっているとメールが転送された上、MailgunではLogsで転送の様子が確認できる。</p>
+
+<figure>
+<img alt="Mailgunで正常にメールが転送されていることを確認している様子。" height="156" src="/img/blog/mailgun-as-an-email-solution-for-cloudflare-4.png" width="933">
+<figcaption>Viewing Logs on Mailgun</figcaption>
+</figure>
+
+<p>Mailgunはクレジットカード情報を登録しない場合、常にFreeアカウントでの運営になる。その場合、<a href="http://documentation.mailgun.com/faqs.html#what-are-the-differences-between-free-and-paid-accounts">いくつかの制限</a>があるが、送信せず転送のみならば問題ない制限だろう。</p>
+
+<hr>
+
+<p>今のところは動いているようだが、何回かDisabledになったので継続運営にはまだかなり不安がある。サポートといろいろ話したところ、既存のメールアドレスをそのまま運用するのはなかなか難しいという話なので、僕は別の手段を探した方が良さそうだ。</p>
+
+<p>日頃からスパムが来ないように注意を払っている人達には十分に機能する手段ではあるだろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

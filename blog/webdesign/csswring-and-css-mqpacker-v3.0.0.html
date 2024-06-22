@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>CSSWring v3.0.0とCSS MQPacker v3.0.0のリリース</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/csswring-and-css-mqpacker-v3.0.0.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="CSSWringとCSS MQPackerのメジャー・バージョンをそれぞれ更新した。内容としてはPostCSSをv4.0.0に更新しただけと言って良い。PostCSS v3でしか動作しないツールやプラグインと組み合わせたい場合は引き続き古いバージョンを利用する必要がある。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="CSSWringとCSS MQPackerのメジャー・バージョンをそれぞれ更新した。内容としてはPostCSSをv4.0.0に更新しただけと言って良い。PostCSS v3でしか動作しないツールやプラグインと組み合わせたい場合は引き続き古いバージョンを利用する必要がある。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="CSSWring v3.0.0とCSS MQPacker v3.0.0のリリース" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2015-01-17T01:13:20+09:00">2015年1月17日</time></p>
+
+        <h1><em>CSSWring v3.0.0とCSS MQPacker v3.0.0のリリース</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="https://www.npmjs.org/package/csswring">CSSWring</a>と<a href="https://www.npmjs.com/package/css-mqpacker">CSS MQPacker</a>のメジャー・バージョンをそれぞれ更新した。内容としてはPostCSSをv4.0.0に更新しただけと言って良い。PostCSS v3でしか動作しないツールやプラグインと組み合わせたい場合は引き続き古いバージョンを利用する必要がある。</p>
+
+<p>実際には結構簡単に対応はできたのだけど、CSS MQPackerでの空白の取り扱いでどうしようかなという感じだった。具体的に言うと<code>@charset</code>ルールだけのような<code>between</code>プロパティー(<code>@charset</code>ルールの場合はその値と<code>;</code>の間の空白)のないCSSに普通のルールセットを突っ込むとその<code>between</code>プロパティー(ルールセットの場合はセレクターと定義群を括る<code>{</code>の間の空白)が消えてしまう問題についてだ。</p>
+
+<p>例えばこのようなCSSをCSS MQPackerで処理すると、想定外の結果になる。</p>
+
+<pre><code class="language-css">@charset &apos;UTF-8&apos;;
+
+@media (min-width: 1px) {
+  .foo {
+    display: block;
+  }
+}</code></pre>
+
+<p><code>@media</code>ルールをまとめながら退避させていくと、このCSSは<code>@charset</code>ルールのみになる。そのため改めてまとめた<code>@media</code>ルールを追加しなおすと、以下のように改行とインデント、セミコロンがPostCSSのデフォルトへと修正された上で、クエリーや<code>.foo</code>と<code>{</code>の間の空白が消えてしまう。</p>
+
+<pre><code class="language-css">@charset &apos;UTF-8&apos;;
+@media (min-width: 1px){
+    .foo{
+        display: block
+    }
+}</code></pre>
+
+<p>内部の細かい挙動を理解すれば納得できる結果ではあるが、直観的ではない。<code>between</code>プロパティーだけ<a href="https://github.com/postcss/postcss/blob/5b86e6a94de9309cb354fcadd23f23249c174854/lib/node.js#L404-L417">デフォルトのスタイル</a>が定められておらず、ところどころで<a href="https://github.com/postcss/postcss/blob/5b86e6a94de9309cb354fcadd23f23249c174854/lib/node.js#L379-L390">特別視</a>されていることから、うまくコピーできてしまってこうなるようだ。同じ<code>between</code>という名前で違うものを扱おうとしていることが原因なのではないかと想像している。</p>
+
+<p>ちょっと実装として気になるので、このあたりは今後変わりそうではある。もしこの<code>between</code>プロパティーをいじるようなツールやプラグインを作っている場合は注意した方が良さそうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

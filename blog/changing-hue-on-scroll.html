@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>スクロールで色相を変化</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/changing-hue-on-scroll.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。雑記ページやスタイル・ガイドで、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/changing-hue-on-scroll.gif" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="スクロールで色相を変化" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-07-09T14:12:43+09:00">2020年7月9日</time></p>
+
+        <h1><em>スクロールで色相を変化</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="6種類の色相でのプレビューを並べてみたもの。" height="900" src="/img/blog/changing-hue-on-scroll.gif" width="1600">
+</figure>
+
+<p>秒数ごとに変えていた背景色を、スクロールするとランダムに変わるようにした。<a href="/blog/">雑記ページ</a>や<a href="/style-guide/">スタイル・ガイド</a>で、思う存分試せる。背景色の明るさは変わらないので、そんなに目に負担はかからないと想像しているが、本当のところはわからない。</p>
+
+<p>スクロールに応じて変えるので、素直にやるなら<code>onscroll</code>イベントを使うところだが、間引いても重いことがあるだろうし、Intersection Observerを利用した。トリガーをどうしようかと悩んだが、<code>p</code>要素ほど出てこず、たまに出てくる要素を<em>すべて</em>観察させると、どのページでもいい感じになった。</p>
+
+<ul>
+<li><code>hr</code>要素</li>
+<li><code>pre</code>要素</li>
+<li><code>blockquote</code>要素</li>
+<li><code>li</code>要素直下ではない<code>ol</code>要素</li>
+<li><code>li</code>要素直下ではない<code>ul</code>要素</li>
+<li><code>figure</code>要素</li>
+<li><code>table</code>要素</li>
+<li><code>h2 + .metaline</code></li>
+</ul>
+
+<p>対象はこれらの要素だ。見出しやセクショニング要素でも良さそうだが、それだと雑記記事であまり変わらなくなってしまうので、これら挿入される何かを対象にした。つまり、このリストが画面外に消えると、色相が変わる。<code>ol</code>と<code>ul</code>要素はネストを考慮したセレクターになっている。また最後の<code>h2 + .metaline</code>は、トップページや特集ページのため、特別に追加した。</p>
+
+<pre><code class="language-javascript">const updateHueOnScroll = () =&gt; {
+  const updateOnHide = (entries) =&gt; {
+    if (entries[0].isIntersecting) {
+      return;
+    }
+
+    /* global updateHue */
+    updateHue();
+  };
+
+  const elements = document.querySelectorAll("hr, pre, blockquote, :not(li) &gt; ol, :not(li) &gt; ul, figure, table, h2 + .metaline");
+  const observer = new IntersectionObserver(updateOnHide);
+
+  for (const element of elements) {
+    observer.observe(element);
+  }
+};</code></pre>
+
+<p>色々観察している関係上、<code>entries</code>が複数あることが多いが、全部に反応する必要はないので最初だけを見ている。また、消えた時に色を変えるよう、<code>isIntersecting</code>が<code>false</code>の時に色相を変更している。消えた時にすると、スクロールしすぎて戻るというありがちな行動パターンと、うまくなじむんじゃないかと考えた。</p>
+
+<p><code>updateHue()</code>は<a href="/blog/mozoushi.html">模造紙風の背景色</a>のコードを、少しだけ手直しし、秒数ではなくランダムにした。<code>style</code>属性にカスタム・プロパティーで色相(と明度)が仕込まれるところは同じだ。そのため、背景色他への反映はCSSがやってくれるので、呼ぶだけで済む。</p>
+
+<p>あとは観察対象へ登録するだけだ。<code>observe()</code>はNodeListを受け取れないので、<code>for..of</code>でばらまいた。<code>forEach()</code>を欲しがっていた割には、<code>for...of</code>を好んで使うようになってしまった。<code>break</code>したい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

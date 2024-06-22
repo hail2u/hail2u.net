@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>コマンド・プロンプトのAutoRun</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/cmd-autorun.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Windowsの環境変数のPATHはシステム由来のものとユーザー由来のものがある。この両者はシステム由来のものの後にユーザー由来のものがくるので、ユーザー領域に放り込んだプログラムを優先的に探してもらうというようなことをする場合、パスを決め打ちでシステム由来のものに書く必要があった。.bashrc的なもので環境変数をいじることができればよいのに……と、ずっと思っていたのだが、どうやらAutoRunという機能があり、それを使うと任意のバッチファイルをコマンド・プロンプトの起動時に実行してくれるようだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Windowsの環境変数のPATHはシステム由来のものとユーザー由来のものがある。この両者はシステム由来のものの後にユーザー由来のものがくるので、ユーザー領域に放り込んだプログラムを優先的に探してもらうというようなことをする場合、パスを決め打ちでシステム由来のものに書く必要があった。.bashrc的なもので環境変数をいじることができればよいのに……と、ずっと思っていたのだが、どうやらAutoRunという機能があり、それを使うと任意のバッチファイルをコマンド・プロンプトの起動時に実行してくれるようだ。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/configure-cmd-autorun.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="コマンド・プロンプトのAutoRun" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-04-08T02:36:37+09:00">2016年4月8日</time></p>
+
+        <h1><em>コマンド・プロンプトのAutoRun</em></h1>
+      </header>
+
+    <main>
+
+    <p>Windowsの環境変数の<code>PATH</code>はシステム由来のものとユーザー由来のものがある。この両者はシステム由来のものの<em>後</em>にユーザー由来のものがくるので、ユーザー領域に放り込んだプログラムを優先的に探してもらうというようなことをする場合、パスを決め打ちでシステム由来のものに書く必要があった。<code>.bashrc</code>的なもので環境変数をいじることができればよいのに……と、ずっと思っていたのだが、どうやらAutoRunという機能があり、それを使うと任意のバッチファイルをコマンド・プロンプトの起動時に実行してくれるようだ。</p>
+
+<p>コマンド・プロンプトのAutoRunはレジストリーから有効にすることができる。ググるとシステム・レジストリーをいじらせるものが多いが、ユーザー・レジストリーで問題ない。</p>
+
+<pre>HKEY_CURRENT_USER\Software\Microsoft\Command Processor</pre>
+
+<figure>
+<img alt="レジストリー・エディターを使い、AutoRunにautoexec.batを仕込んでいる。" height="218" src="/img/blog/configure-cmd-autorun.png" width="661">
+</figure>
+
+<p>該当するキーは以上の場所だ。ここに<code>AutoRun</code>という文字列で実行したいバッチファイルのパスを指定すれば良い。ユーザー・レジストリーであることから<code>%USERPROFILE%\autoexec.bat</code>などでうまいこと指定しておくと安全だろう。即反映で、再起動などは必要ない。</p>
+
+<p>何でもできるようなので、かなり使い勝手は良い。コマンド・プロンプトからコマンド・プロンプトを開いた時にも実行されることには注意が必要だ。</p>
+
+<hr>
+
+<p>僕がやりたいことを要約すると、ユーザー領域に放り込んだプログラムをシステム他より優先して探してほしい、ということだった。つまりこのAutoRunに指定したバッチファイルで環境変数<code>PATH</code>をいじってやれば良いことになる。</p>
+
+<pre><code class="language-bat">@echo off
+
+set PATH=%USERPROFILE%\Programs;%PATH%</code></pre>
+
+<p>こういう優先をしたいことはごく稀にある。ImageMagickの<code>convert.exe</code>がWindowsに含まれる<code>convert.exe</code>と衝突するようなケースがそれで、リネームしてどうにかしようとすると、今度はそれを使うスクリプトのポータビリティーが下がってしまう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

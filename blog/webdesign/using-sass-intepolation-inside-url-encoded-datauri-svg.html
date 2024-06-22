@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/using-sass-intepolation-inside-url-encoded-datauri-svg.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Base 64ではなくURLエンコードを利用したData URIなSVGは記号類以外は普通のテキスト。なので簡単なものならばSassのインターポレーション機能(#{$foo})を使いダイナミックにデータを弄ることができる。一年半前くらいにヨモツネットで書かれてたグラデーション・ミックスインとかで使われている。それのもっと単純で即戦力な利用例。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Base 64ではなくURLエンコードを利用したData URIなSVGは記号類以外は普通のテキスト。なので簡単なものならばSassのインターポレーション機能(#{$foo})を使いダイナミックにデータを弄ることができる。一年半前くらいにヨモツネットで書かれてたグラデーション・ミックスインとかで使われている。それのもっと単純で即戦力な利用例。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-07-28T13:26:17+09:00">2013年7月28日</time></p>
+
+        <h1><em>URLエンコードを利用したData URIなSVGでSassのインターポレーションを利用する</em></h1>
+      </header>
+
+    <main>
+
+    <p>Base 64ではなくURLエンコードを利用したData URIなSVGは記号類以外は普通のテキスト。なので簡単なものならばSassのインターポレーション機能(<code>#{$foo}</code>)を使いダイナミックにデータを弄ることができる。<a href="http://www.yomotsu.net/wp/?p=598">一年半前くらいにヨモツネットで書かれてたグラデーション・ミックスイン</a>とかで使われている。それのもっと単純で即戦力な利用例。</p>
+
+<p>例えばSVGの<code>fill</code>で使う色をSassで定義したカラースキームに従ったものに変えるようにできる。通常はカラースキームからカラーコードをコピーし、それを使ってSVGを編集し保存、更にData URIに変換した後でSassにペースト、という手順を踏むことになるが、その手順のほとんどが必要なくなる。</p>
+
+<pre><code class="language-scss">$color: #369;
+$image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22112%22%20height%3D%22112%22%3E%3Cpath%20d%3D%22M63.314%2022.059l11.314%2011.314-22.627%2022.627%2022.627%2022.627-11.314%2011.314-33.941-33.941z%22%20fill%3D%22#{$color}%22%2F%3E%3C%2Fsvg%3E")
+
+.test {
+  background-image: $image;
+}</code></pre>
+
+<p>とすると、</p>
+
+<pre><code class="language-css">.test {
+  background-image: url("<a href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22112%22%20height%3D%22112%22%3E%3Cpath%20d%3D%22M63.314%2022.059l11.314%2011.314-22.627%2022.627%2022.627%2022.627-11.314%2011.314-33.941-33.941z%22%20fill%3D%22#369%22%2F%3E%3C%2Fsvg%3E">data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22112%22%20height%3D%22112%22%3E%3Cpath%20d%3D%22M63.314%2022.059l11.314%2011.314-22.627%2022.627%2022.627%2022.627-11.314%2011.314-33.941-33.941z%22%20fill%3D%22#369%22%2F%3E%3C%2Fsvg%3E</a>")
+}</code></pre>
+
+<p>とCSSが出力され、ちゃんと<code>fill</code>が<code>#369</code>に設定される。<code>#</code>がURLエンコードされないけど、それに対応するのは非常に面倒くさい。URLエンコードするCustom Functionを作るか、そうでないなら<code>#</code>抜きと有りの変数を作るか。いずれにせよ導入かメンテナンスが面倒になるのでこのままの方が良さそう。</p>
+
+<hr>
+
+<p>今はSVGの編集からData URIに変換して埋め込むまでを完全に自動化する手軽な手段がそこそこある。しかしカラースキームの管理という面でも作業の一元化という面でも、Sass内で完結するこの手法の方がローコストかつ効率的なんじゃないかなーと<a href="https://github.com/hail2u/hail2u.net-styles/commit/aa18e8194971b463a605e7500e1aeaa5bd5d5b5f">使い始めた</a>。</p>
+
+<p>SVGで使える<code>style</code>要素を単なる文字列として定義しておけば、もっと複雑なことも可能ではありそう。ただ、URLエンコードしなくてはならない文字との兼ね合いがあるので、実際にはこのような色の変更くらいにしか使えない気もする。しかしそれだけでも十二分に有用性があるので、このSassのインターポレーションの利用を考慮に入れてData URIなSVGはURLエンコードで埋め込むというのは良い選択なのではないか。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>色を扱う時に#がURLエンコードされない問題は、Sass 3.3で入る<a href="https://github.com/nex3/sass/blob/7cd47531fe6ffa4baa7e5e34426e929ac0a9f65c/lib/sass/script/functions.rb#L1297-L1336"><code>str-slice()</code>関数</a>でどうにか出来そうかなーと思ったら出来た。そのまま色は型の都合で投げられず、色から文字列への型変換は特に用意されていないけど、空文字足せば文字列になる。</p>
+
+<pre><code class="language-scss">%23#{str-slice(""+$color, 2)}</code></pre>
+
+<p><code>#</code>をURLエンコードした<code>%23</code>はハード・コーディングして、<code>str-slice()</code>で2文字目以降を切り出しインターポレーション。ただこれはこれで色で<code>black</code>とかが来ると壊れるのでまぁまぁ頑張る関数作らないと安定しなそう。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

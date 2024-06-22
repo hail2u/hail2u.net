@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>git-release.js</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/software/git-release-js.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Gitリポジトリでgit release majorなどとすると設定したターゲットのファイルの指定行にあるバージョン番号をインクリメントし、コミット、タグ付けまでやるNode.jsスクリプトを書いて使っている。汎用的でどこかに公開とかまでは面倒みないものがあればいいのになと思って、適当にNode.jsで書いて使ってる。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Gitリポジトリでgit release majorなどとすると設定したターゲットのファイルの指定行にあるバージョン番号をインクリメントし、コミット、タグ付けまでやるNode.jsスクリプトを書いて使っている。汎用的でどこかに公開とかまでは面倒みないものがあればいいのになと思って、適当にNode.jsで書いて使ってる。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="git-release.js" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2013-12-29T10:36:06+09:00">2013年12月29日</time></p>
+
+        <h1><em>git-release.js</em></h1>
+      </header>
+
+    <main>
+
+    <p>Gitリポジトリで<code>git release major</code>などとすると設定したターゲットのファイルの指定行にあるバージョン番号をインクリメントし、コミット、タグ付けまでやるNode.jsスクリプトを書いて使っている。汎用的でどこかに公開とかまでは面倒みないものがあればいいのになと思って、適当にNode.jsで書いて使ってる。</p>
+
+<p>Download: <a href="/git-release.js">git-release.js</a></p>
+
+<p>インストールはパスの通ったディレクトリにコピーしておまじないするだけ。<a href="https://npmjs.org/package/semver">semver</a>モジュールに依存しているので、それをあらかじめグローバルにインストールしておく必要がある。コミットとタグ付けがGit専用なことに加え、Gitが<code>git-*</code>で始まる実行ファイルがあるとサブコマンドとして呼んでくれるのを利用したり、設定をGitのローカル設定ファイルに書いたりして使うので、他のVCSではまったく使えない。</p>
+
+<p>設定は<code>git config</code>サブコマンドを使い、<code>release.target</code>に対して、コロン区切りで対象ファイルと行番号を指定する。Gitのローカル設定ファイルに保存されることになる。</p>
+
+<pre><samp>$ <kbd>git config release.target package.json:4</kbd></samp></pre>
+
+<p>複数のファイルを一気に書き換えたい場合は<code>--add</code>オプションを使って追加する。</p>
+
+<pre><samp>$ <kbd>git config --add release.target index.js:10</kbd>
+$ <kbd>git config --add release.target README.md:1</kbd></samp></pre>
+
+<p><code>release</code>サブコマンドになっているはずなので、インクリメントする時には以下のようにインクリメント対象をmajor/minor/patchのいずれかで指定する。プリリリースやビルドには対応していない。</p>
+
+<pre><samp>$ <kbd>git release major</kbd></samp></pre>
+
+<p>ちゃんと設定されていると、対象ファイルが書き換えられた上で、ステージングされ、簡単なメッセージが入力済みの状態でコミットのためにエディタが立ち上がる。エディタは<code>-aevm</code>というオプションで立ち上がるので、ちゃんとステージングされていること(<code>-a</code>)・実際に書き換わっているかの確認(<code>-v</code>)・コミット・メッセージの編集(<code>-e</code>)が行える安心仕様。入力済みのコミット・メッセージを削除してからエディタを閉じればそこで停止できたりもする。</p>
+
+<p>エディタを閉じるとコミットが実行され、そのコミットにタグ付けを行い終了する。タグは<code>v1.0.3</code>という形で付けられる。カスタマイズする設定必要そう。</p>
+
+<p>当初はこの後<code>git push</code>や<code>git push --tags</code>、更には設定により<code>npm publish</code>や<code>grunt deploy</code>までを行えるようにしようかと考えていたけど、怖いのでそこまではやらないことにした。</p>
+
+<hr>
+
+<p>シェル・スクリプトで書かれていた方がポータブルで便利そうだけど、そんなスキルはない。</p>
+
+<section>
+<h2>追記</h2>
+
+<p>async使って書き直した。使い方は同じ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

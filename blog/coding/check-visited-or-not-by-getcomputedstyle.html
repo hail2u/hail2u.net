@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>getComputedStyle()を利用した既読チェック</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/check-visited-or-not-by-getcomputedstyle.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="COLLECTION &amp; COPYのそのリソースを訪問済みか判定するやHatebu Addictionなどで使われている既読チェック。これらとは違う、getComputedStyle()メソッドを利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、Jeremiah Grossman: I know where you&apos;ve beenというページを見つけた。FirefoxやSafariなどではこれで既読チェックが可能。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="COLLECTION &amp; COPYのそのリソースを訪問済みか判定するやHatebu Addictionなどで使われている既読チェック。これらとは違う、getComputedStyle()メソッドを利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、Jeremiah Grossman: I know where you&apos;ve beenというページを見つけた。FirefoxやSafariなどではこれで既読チェックが可能。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="getComputedStyle()を利用した既読チェック" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2006-08-25T11:51:51+09:00">2006年8月25日</time></p>
+
+        <h1><em>getComputedStyle()を利用した既読チェック</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://d.hatena.ne.jp/brazil/20060812/1155388762" title="Collection &amp; Copy - そのリソースを訪問済みか判定する">COLLECTION &amp; COPYのそのリソースを訪問済みか判定する</a>や<a href="http://lab.rails2u.com/hatebu_addiction/" title="Hatebu Addiction">Hatebu Addiction</a>などで使われている既読チェック。これらとは違う、<a href="http://developer.mozilla.org/en/docs/DOM:window.getComputedStyle" title="DOM:window.getComputedStyle - MDC"><code>getComputedStyle()</code>メソッド</a>を利用して文字色を取得し訪問済みリンクの文字色かどうかをチェックという手法で既読チェックを実現している、<a href="http://jeremiahgrossman.blogspot.com/2006/08/i-know-where-youve-been.html" title="Jeremiah Grossman: I know where you&apos;ve been">Jeremiah Grossman: I know where you&apos;ve been</a>というページを見つけた。<a href="http://www.mozilla.com/firefox/" title="Firefox - Rediscover the Web">Firefox</a>や<a href="http://www.apple.com/jp/macosx/features/safari/" title="アップル - Mac OS X - Safari RSS">Safari</a>などではこれで既読チェックが可能。</p>
+
+<p><code>getComputedStyle()</code>メソッドは<code>style</code>属性やJavaScriptで設定されたスタイル<em>以外</em>のスタイル情報をまとめて取得するメソッドで、<code>ComputedCSSStyleDeclaration</code>オブジェクトを返す。そして、<code>ComputedCSSStyleDeclaration</code>オブジェクトの<code>getPropertyValue()</code>メソッドで各スタイル情報を文字列で取得できる。既読チェックでは<code>color</code>をチェックすれば良い。</p>
+
+<p>というわけで簡単な<a href="/test/064.html" title="既読チェック">サンプル・ページ</a>を作ってみた。リンクのリスト(<a href="http://b.hatena.ne.jp/hotentry" title="はてなブックマーク - 人気エントリー">はてなブックマークのホッテントリ</a>から拝借した)を調べて、既読の場合は「既」という文字列を前に付け、何件のリンクが既読か表示するというだけのもの。ソースを見てもらえばわかる通り、</p>
+
+<pre><code class="language-js">var links = $(&apos;linklist&apos;).getElementsByTagName(&apos;a&apos;);
+var i = 0;
+
+$A(links).each(function (link) {
+  var color = document.defaultView.getComputedStyle(link, null).getPropertyValue(&quot;color&quot;);
+
+  if (color == &quot;rgb(128, 0, 0)&quot;) {
+    new Insertion.Before(link, &apos;既 &apos;);
+    i++;
+  }
+});
+
+new Insertion.Before(&apos;linklist&apos;, &apos;&lt;p&gt;全 50 件のリンク中 &apos; + i + &apos; 件のリンクが既読です。&lt;/p&gt;&apos;);</code></pre>
+
+<p>と簡単に書ける(半分以上<a href="http://prototype.conio.net/" title="Prototype JavaScript Framework: Class-style OO, Ajax, and more">prototype.js</a>のおかげだけど)。<code>a</code>要素を動的に生成するのに比べ、拾って比較するだけなので動作自体も軽いと思う。<a href="http://greasemonkey.mozdev.org/" title="mozdev.org - greasemonkey: index">Greasemonkey</a>なんかではこっちを使った方が効率的な気がする。コード的にもわかりやすいし。</p>
+
+<p><code>getComputedStyle()</code>はいろいろと遊べそうな気がする。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

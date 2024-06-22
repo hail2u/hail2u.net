@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>aspect-ratio特性</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/aspect-ratio-feature.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ビューポートが16:9以上かどうかの判定にaspect-ratioを使って行おうとしていた。が、min-aspect-ratio: 16/9でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単にmax-aspect-ratioでやるべきなだけだった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="aspect-ratio特性" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-10-27T05:15:17+09:00">2014年10月27日</time></p>
+
+        <h1><em>aspect-ratio特性</em></h1>
+      </header>
+
+    <main>
+
+    <p>ビューポートが16:9以上かどうかの判定に<code>aspect-ratio</code>を使って行おうとしていた。が、<code>min-aspect-ratio: 16/9</code>でうまく動かず、もしや未実装かとあーでもないこーでもないと色々やってたら、単に<code>max-aspect-ratio</code>でやるべきなだけだった。</p>
+
+<p>Demo: <a href="/test/599.html">Detect viewport ratio is 16:9+ or not</a></p>
+
+<p><code>aspect-ratio</code>特性では<a href="http://www.w3.org/TR/css3-mediaqueries/#values"><code>&lt;ratio&gt;</code>という種類の値</a>で指定する。この<code>&lt;ratio&gt;</code>は<code>正の整数/正の整数</code>でしか書くことができない。しかし、<code>min-</code>か<code>max-</code>プリフィックスをつける場合、比率として少数化した値で扱われる。そのため16:9より縦の比率が大きい16:10や16:12にマッチさせたい場合は、<code>max-</code>プリフィックスを使う必要がある。</p>
+
+<p><code>aspect-ratio</code>特性を使ったメディア・クエリーの式は縦幅を分母とした分数で記述し、プリフィックスはそれを少数に変換して考える。こう覚えておくと良さそう。</p>
+
+<hr>
+
+<p>16:9<em>以上</em>という考え方自体が間違っているのかもしれない。縦横比は横幅が基準という印象を持っていて、それに従うと<em>以上</em>で良いと思っていた。けれども縦幅が分母、つまり基準になるこのようなケースもあるようだ。</p>
+
+<p>またこの調査の過程で<code>min-height: 56.25vw</code>とかでも良いんじゃないかと考え、試したのもデモに載せておいた。<code>56.25vw</code>は<code>100vw / 16 * 9</code>で計算した答えで、ビューポートの横幅が<code>100vw</code>で参照できることを利用してる。けれどもFirefox 33と35では動いたものの、Chrome 38(と40)やInternet Explorer 11(と12)では動かなかった。これら動かないブラウザーでは、どうも<code>vw</code>単位そのものがメディア・クエリーの式では扱えないみたいだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

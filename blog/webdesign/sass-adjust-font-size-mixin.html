@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Sass: adjust-font-sizeミックスイン</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/sass-adjust-font-size-mixin.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめSassのミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめSassのミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Sass: adjust-font-sizeミックスイン" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-06-22T01:31:04+09:00">2012年6月22日</time></p>
+
+        <h1><em>Sass: adjust-font-sizeミックスイン</em></h1>
+      </header>
+
+    <main>
+
+    <p>ビューポートの幅に合わせてフォントサイズを変更するCSSを、コッぺッするのをやめ<a href="http://sass-lang.com/">Sass</a>のミックスインにした。あんまり見ない感じのミックスインになったのでメモがてらエントリーに。こうなるともうCSSじゃないどころかSCSSとしてもとても読みづらいものになってきていて、ダメなミックスインの例な気がしないでもない。</p>
+
+<pre><code class="language-scss">$safe-for-content: 4.5em;
+$safe-for-full: 66em;
+
+@mixin adjust-font-size($sizes) {
+  @each $size in $sizes {
+    $ratio: $size / 16px;
+    $feature: min-width;
+    $value: $safe-for-full * $ratio * $ratio;
+
+    @if ($ratio &lt; 1) {
+      $feature: max-width;
+      $value: $safe-for-content * $ratio * $ratio;
+    }
+
+    @media screen and ($feature: $value) {
+      font-size: percentage($ratio);
+    }
+  }
+}
+
+html {
+  font-size: 100%;
+
+  @include adjust-font-size((14px, 18px, 21px, 24px, 27px, 30px));
+}</code></pre>
+
+<p>引数で使うフォントサイズを<code>px</code>単位でリスト指定し、ミックスイン側で<code>16px</code>からの比率(<code>px</code>を<code>px</code>で割るとユニットレスにちゃんとなる)を基準に切り替えていく<code>@media</code>ルールを吐くというもの。ミックスインの引数でリストを使いたい場合は括弧を使ってまとめる。リストにしておくとミックスインでは<code>@each</code>ルールでサクッと参照できるので繰り返し処理に強く、覚えておくとベンダー拡なんとかとかなんとか張プリフィックスとかフォールバック処理を書く時とかに便利だったりする。</p>
+
+<p><code>max-width</code>と<code>min-width</code>の切り替えは<code>@if</code>ルールでやる。Sassにはスコープはないけど局所変数はあるので、<code>@else</code>も使って完全に分岐してその内側で変数を定義してしまうと、その外で吐く<code>@media</code>ルールで参照できなくなる。ここをシンプルにしたいなら最小のフォント・サイズをデフォルトにするとかCSSの工夫が必要になる。そうすると適用された結果は同じでも、CSS自体が少し直観的なものではなくなるので、多少複雑でもCSSの簡明さを優先した方が良いと思う。</p>
+
+<p>Sass 3.2から<code>@media</code>ルールのクエリー部分でも変数を使えるようになったので、それを使うとこのように普通に書ける。3.2はもうそこそこ安定しているので余程の理由がない限り移行したほうがいいんじゃないかと思う。インタラクティブ・シェルも速くなって普通に使える感じになってるとか、Sassの文法の拡充以外にもいくつか利点ある。</p>
+
+<p><code>html</code>要素でやってるのは<code>rem</code>単位を見据えてなので、今のところあんまり意味は無い。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

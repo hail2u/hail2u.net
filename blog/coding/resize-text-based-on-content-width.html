@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>親要素の幅に収まるようにフォントサイズを変更する</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/resize-text-based-on-content-width.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Webフォント(@font-face)や均等割付(text-align: justify;)、日本語と英語の間のスペース調節(text-autospace)などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまりimg要素にwidth: 100%;を指定した時のようにはCSSではできない(少なくとも思いつかなかった)。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Webフォント(@font-face)や均等割付(text-align: justify;)、日本語と英語の間のスペース調節(text-autospace)などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまりimg要素にwidth: 100%;を指定した時のようにはCSSではできない(少なくとも思いつかなかった)。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/resize-text-based-on-content-width.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="親要素の幅に収まるようにフォントサイズを変更する" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2011-05-01T12:08:01+09:00">2011年5月1日</time></p>
+
+        <h1><em>親要素の幅に収まるようにフォントサイズを変更する</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="Typography is the art and technique of arranging type。" height="369" src="/img/blog/resize-text-based-on-content-width.png" width="480">
+</figure>
+
+<p>Webフォント(<code>@font-face</code>)や均等割付(<code>text-align: justify;</code>)、日本語と英語の間のスペース調節(<code>text-autospace</code>)などCSS3では文字や文章に関わる表現力も大きく向上している。とはいうもののないものはないので、親要素の幅にちょうど収まるようにフォントを拡大、つまり<code>img</code>要素に<code>width: 100%;</code>を指定した時のようにはCSSではできない(少なくとも思いつかなかった)。というわけでふんだんにjQueryを利用したJavaScriptでどうにかしてみた。</p>
+
+<p>Demo: <a href="/test/240.html">Resize Font Based on Content Width #6</a> </p>
+
+<p>フォントレンダリングの関係上、Firefoxの方が綺麗なのでスクリーンショットはFirefoxで撮影した。</p>
+
+<pre><code class="language-js">$(window).load(function () {
+  var start = $.now();
+
+  $(&quot;.line&quot;).each(function () {
+    var target = $(this);
+    var fontSize = parseInt(target.css(&quot;font-size&quot;), 10);
+
+    var temp = $(&quot;&lt;div/&gt;&quot;).css({
+      &quot;display&quot;:     &quot;none&quot;,
+      &quot;font-family&quot;: target.css(&quot;font-family&quot;),
+      &quot;font-size&quot;:   fontSize
+    }).text(target.text()).appendTo(&quot;body&quot;);
+
+    var targetWidth = target.width();
+    var tempWidth = temp.width();
+
+    while (tempWidth &lt; targetWidth) {
+      fontSize *= (targetWidth / tempWidth);
+      temp.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+      tempWidth = temp.width();
+    }
+
+    while (tempWidth &gt;= targetWidth) {
+      fontSize--;
+      temp.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+      tempWidth = temp.width();
+    }
+
+    target.css(&quot;font-size&quot;, fontSize + &quot;px&quot;);
+    temp.remove();
+  });
+
+  var time = $.now() - start;
+  $(&quot;body&quot;).append($(&quot;&lt;p/&gt;&quot;).text(&quot;Elapsed Time: &quot; + time));
+});</code></pre>
+
+<p>まず非表示の<code>div</code>要素を作成し、そこにテキストとスタイルをコピーすることによって文を複製する。<code>display: none;</code>だとその要素の幅は<code>font-size</code>に応じて変化するので、幅の割合から大まかに当たりをつけてチェックしていき、元の要素の幅を超えたところでフォントサイズを一旦決定している。その後微調整するために1pxずつ下げていき、ちょうど収まるところで決定という仕組み。2passでやらないとうまく収まらなかったり色々不具合が多かった。</p>
+
+<p>幅の割合から当たりを付けるというアイディアは<a href="http://twitter.com/ofk">@ofk</a>に貰った。それに幅のキャッシュと微調整を付けて、大体20ms以下で終了するようになった。OperaとInternet Explorerが安定して高速で、次いでFirefox、ChromeとSafariが若干遅い。</p>
+
+<p><code>window.onload</code>で発火している理由は、Webフォントを利用している場合への対策。<code>window.onload</code>前の場合はWebフォントを適用した状態で要素の幅を計算してくれない(ブラウザの実装依存？)ので、ロードが完了してから発火させるようにした。</p>
+
+<p>リサイズに追随しないので<code>img</code>要素に<code>width: 100%;</code>を指定した時と同一とはいかないが、そこそこ満足のいくものになった。</p>
+
+<hr>
+
+<p><code>display: inline-block;</code>な要素を<code>transform: scale(100%);</code>とかで親と同じ大きさに綺麗に拡大してくれないかなーと妄想して始めたら、全然そんなことはできなかったのでJavaScriptで書いた。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

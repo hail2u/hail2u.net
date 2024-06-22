@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Pure CSSな吹き出し</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/pure-css-speech-bubble.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Twitterで「CSSで吹き出し作るのブクマし忘れててどこにあったか忘れた……」とかつぶやいたらe_luckさんがImage-free CSS Tooltip Pointers - A Use for Polygonal CSS?を探してきてくれた。このエントリでは枠線をつけるために入れ子になっていたりちょっとわかりづらかったので、ものすごく単純化して解説してみようとかなんとか。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="Twitterで「CSSで吹き出し作るのブクマし忘れててどこにあったか忘れた……」とかつぶやいたらe_luckさんがImage-free CSS Tooltip Pointers - A Use for Polygonal CSS?を探してきてくれた。このエントリでは枠線をつけるために入れ子になっていたりちょっとわかりづらかったので、ものすごく単純化して解説してみようとかなんとか。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/pure-css-speech-bubble.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Pure CSSな吹き出し" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2009-11-04T00:46:12+09:00">2009年11月4日</time></p>
+
+        <h1><em>Pure CSSな吹き出し</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="Pure CSSな吹き出し。" height="102" src="/img/blog/pure-css-speech-bubble.png" width="360">
+</figure>
+
+<p>Twitterで「CSSで吹き出し作るのブクマし忘れててどこにあったか忘れた……」とかつぶやいたら<a href="http://www.lucky-bag.com/">e_luck</a>さんが<a href="http://www.filamentgroup.com/lab/image_free_css_tooltip_pointers_a_use_for_polygonal_css/">Image-free CSS Tooltip Pointers - A Use for Polygonal CSS?</a>を探してきてくれた。このエントリでは枠線をつけるために入れ子になっていたりちょっとわかりづらかったので、ものすごく単純化して解説してみようとかなんとか。</p>
+
+<ul>
+<li>Pure CSSな吹き出しのサンプル: <a href="/test/119.html">Speech Bubbles</a></li>
+</ul>
+
+<p>とりあえず、吹き出しの尻尾を左下に出すもの(サンプル内では4つめのサンプル)を例にして説明していく。HTMLコードは以下のようなもので、<code>bubble</code>というクラス名を振った<code>div</code>要素がコンテナ、<code>body</code>というクラス名を振った<code>p</code>要素が吹き出しのベース、<code>tail</code>というクラス名を振った空の<code>div</code>要素が尻尾になる。</p>
+
+<pre><code class="language-html">&lt;div class=&quot;bubble&quot;&gt;
+  &lt;p class=&quot;body&quot;&gt;Cras ultricies ultricies justo a blandit.
+  Quisque a tristique urna.
+  Nam lobortis, metus a posuere ornare, arcu lacus sodales justo, non auctor felis nunc non nisi.
+  Vestibulum risus dolor, ornare id lobortis pretium, rhoncus ac augue.&lt;/p&gt;
+  &lt;div class=&quot;tail&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<p>そして基本になるCSSコードは以下のようなものになる。</p>
+
+<pre><code class="language-css">
+.bubble {
+  position: relative;
+  width: 360px;
+}
+
+.bubble .body {
+  color: #ffffff;
+  background-color: #66aa11;
+}
+
+.bubble .tail {
+  border-top: 18px solid #66aa11;
+  border-right: 24px solid transparent;
+  position: absolute;
+  bottom: -18px;
+  left: 36px;
+  width: 0;
+  height: 0;
+}</code></pre>
+
+<p>まずコンテナである<code>.bubble</code>の<code>position</code>プロパティで<code>relative</code>を指定する。これにより尻尾になる子要素<code>.tail</code>を<code>body</code>要素ではなくコンテナである<code>.bubble</code>を基準にして絶対配置できるようになる。<code>.body</code>では吹き出しの前景色と背景色を指定する。ここでは前景色を<code>#ffffff</code>、背景色を<code>#66aa11</code>にした。そして<code>.tail</code>へのスタイル指定で尻尾を作成する。</p>
+
+<p>尻尾の形と色は<code>border</code>プロパティで決める。高さと色は<code>border-top</code>プロパティで調節でき、尻尾の三角の傾斜は<code>border-right-size</code>プロパティで調節できる。<code>border-right-color</code>プロパティで<code>transparent</code>を指定することによって、本来は四角になってしまうところを三角に削ってやるという話なので、<code>border-right-size</code>プロパティを増やすと傾斜はゆるくなり、逆に減らすと傾斜がきつくなる。</p>
+
+<p>位置は<code>position</code>プロパティで<code>absolute</code>を指定した上で、<code>bottom</code>プロパティと<code>left</code>プロパティで決める。コンテナが<code>relative</code>なので、<code>left: 36px;</code>だと<em>コンテナの左端から36px右の位置</em>になる。同じように<code>bottom: -18px;</code>だと<em>コンテナの下端から18px下の位置</em>になるので、コンテナの左下に飛び出た形できれいに配置することができる。<code>bottom</code>プロパティに指定する負の数値は、尻尾の高さ分、つまり<code>border-top-size</code>プロパティの値、を負の数値にしたもの。合わせて<code>width</code>プロパティと<code>height</code>プロパティに<code>0</code>を指定しておけば尻尾の位置がずれることはないだろう。</p>
+
+<p>これで左下に尻尾を出す吹き出しは作成できる。他の位置に尻尾を出す場合も<code>border-top</code>プロパティや<code>top</code>プロパティ・<code>right</code>プロパティなども適切に利用してやるだけで可能で、HTMLコードを変更する必要はない。例えば中央上に尻尾を出す場合は以下のようなコードになる。</p>
+
+<pre><code class="language-css">.bubble .tail {
+  margin-left: -12px;
+  border-right: 12px solid transparent;
+  border-bottom: 18px solid #66aa11;
+  border-left: 12px solid transparent;
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 0;
+  height: 0;
+}</code></pre>
+
+<p>上向きに三角を作る場合は<code>border-bottom</code>プロパティで高さと色を指定する。中央に配置する場合は<code>border-right</code>プロパティと<code>border-left</code>プロパティを指定することによって二等辺三角形を作成することができるので、それを利用した方がバランスが良いだろう。左右の位置はとりあえず<code>50%</code>で真ん中に寄せて、<code>margin-left</code>で負の値を指定することによって<code>border-left-size</code>プロパティの値分左に戻してやるのが手っ取り早い。</p>
+
+<p>ここまでが理解できたなら、その他の位置に尻尾を配置する方法はサンプルのソースを参照すれば大体わかると思う。</p>
+
+<p>最後になったが、サンプルページの最後に載っているように<code>:after</code>(<code>:before</code>)擬似要素を利用すれば、空の<code>div</code>要素を用意しないでも尻尾を作成することができる。</p>
+
+<pre><code class="language-css">.bubble .body:after {
+  content: &quot;&quot;;
+  border-top: 18px solid #66aa11;
+  border-right: 24px solid transparent;
+  position: absolute;
+  bottom: -18px;
+  left: 36px;
+  width: 0;
+  height: 0;
+}</code></pre>
+
+<p><code>content</code>プロパティに空の値を指定するだけで、特に難しいことはない。Firefox 3やSafari 4、Opera 9、Internet Explorer 8なら問題なく動く。</p>
+
+<hr>
+
+<p>この吹き出し作成テクニックを利用して、ヘッダのTwitterのアイコンにカーソルを合わせると最新のつぶやきが吹き出しでポップアップするようにした。<code>rgba()</code>カワイイ(関係ない)。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

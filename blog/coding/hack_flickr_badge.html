@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Hack Filckr badge</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/hack_flickr_badge.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ちょくちょくFlickrを使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？　みたいな。ね。それはともかく、Flickr badgeの吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいからulが良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="ちょくちょくFlickrを使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？　みたいな。ね。それはともかく、Flickr badgeの吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいからulが良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。" property="twitter:description">
+    <meta content="https://hail2u.net/img/blog/recent_photos.png" property="twitter:image">
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Hack Filckr badge" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2005-03-11T03:10:22+09:00">2005年3月11日</time></p>
+
+        <h1><em>Hack Filckr badge</em></h1>
+      </header>
+
+    <main>
+
+    <figure>
+<img alt="Recent photos in sidebar。" height="251" src="/img/blog/recent_photos.png" width="251">
+</figure>
+<p>ちょくちょく<a href="http://www.flickr.com/" title="Welcome to Flickr!">Flickr</a>を使ってたりして、しかも画像をサイドバーに表示させてみたりして、ようやく一人前のブロガーかな？　みたいな。ね。それはともかく、<a href="http://www.flickr.com/help.gne#53" title="Flickr: Help">Flickr badge</a>の吐き出すHTMLがどうも使い辛い感じ・・・というかリストっぽいから<code>ul</code>が良いなと感じてたので、適当にJavaScriptファイルを作成するPerlスクリプトをでっち上げてみたりとかしてみました。</p>
+<p>サイドバーの幅が250pxなので、FlickrのThumbnailだとちょっと大きい(幅100pxを基準にリサイズされる)ため、正方形で気持ちの良いSquareにしました。こちらだと必ず正方形なので収まりが良いという利点もある気がします。</p>
+<p>表示の制御はCSSに任せて、</p>
+<pre><code class="language-css">dl#menu dd ul#flickr {
+  line-height:1;
+  list-style-type:none;
+}
+
+dl#menu dd ul#flickr li {
+  margin:5px 5px 0 0;
+  float:left;
+  width:77px;
+  height:77px;
+}
+
+dl#menu dd ul#flickr li img {
+  border:1px solid #333333;
+  width:75px;
+  height:75px;
+}</code></pre>
+<p>と、<code>float</code>でサイドバーの幅である250pxに収まるように並べました。75px (画像の横幅)+2px (画像のボーダー)+5px (画像のマージン)=82pxが3つで246px。マージンを6pxにしなかったのはよくわからない。続くFlickrのトップ・ページへのリンクを含む<code>p</code>要素に<code>clear:both;</code>を指定して完璧(多分)。</p>
+<p>てなわけでRecent albumsの方もFlickrのSquareに合わせて75*75*9にしてみた。揃ってて気持ちが良い。CSSのコードは上と同じ(<code>id</code>が違うだけ)。</p>
+<p>こちらの方の画像が微妙に汚いのは、手抜きで画像のリサイズをブラウザに任せているので仕様です。前にも書いた気がする。</p>
+<p>Recent albumsの方はAmazon Check Listとか言う謎CGIでゴニョゴニョJavaScriptファイルを生成しています。Amazon Check Listは普通にCGIにアクセスするとHTMLでリスト表示(HTMLでのリスト表示のサンプルはNo Music, No Life.で見ることが可能)、新規アイテム追加時にはRSSファイルとJavaScriptファイルを制的に生成とかいうシロモノで、大体作り終わったんだけど新規アイテム追加のUIを作るのがメンドウで放置しているダメCGIです。なんとなく続き作りたくなってきたような気がしないでもない。</p>
+<section>
+<h2>追記@2005/03/12</h2>
+<p>でかくて邪魔なのでひとつに戻した。飽きるの早すぎ。</p>
+</section>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

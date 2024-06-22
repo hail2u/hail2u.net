@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>time要素の内容を相対日時へ変換</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/converting-time-element-content-to-relative-date.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="time要素にdatetime属性があったら、それを元に現在時刻からの相対日時を生成し、その内容を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～か月前、12で割って～年前というものをそのままコードにした。車輪だ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="time要素にdatetime属性があったら、それを元に現在時刻からの相対日時を生成し、その内容を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～か月前、12で割って～年前というものをそのままコードにした。車輪だ。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="time要素の内容を相対日時へ変換" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2016-10-16T13:41:43+09:00">2016年10月16日</time></p>
+
+        <h1><em>time要素の内容を相対日時へ変換</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>time</code>要素に<code>datetime</code>属性があったら、それを元に現在時刻からの相対日時を生成し、その内容を差し替えるスクリプトを書いていた。相対日時を得るには、ミリ秒数同士を引き算して1000で割って60以下なら～秒前、60で割って60以下なら～分前、60で割って24以下なら～時間前、24で割って30以下なら～日前、30で割って12以下なら～か月前、12で割って～年前というものをそのままコードにした。車輪だ。</p>
+
+<pre><code class="language-javascript">const now = Date.now();
+const toRelativeDate = function (then) {
+  let diff = 0;
+
+  if (!Number.isInteger(then)) {
+    return;
+  }
+
+  diff = parseInt((now - then) / 1000, 10);
+
+  if (diff &lt; 0) {
+    return;
+  }
+
+  if (diff &lt; 60) {
+    return diff + &quot;秒前&quot;;
+  }
+
+  diff = parseInt(diff / 60, 10);
+
+  if (diff &lt; 60) {
+    return diff + &quot;分前&quot;;
+  }
+
+  diff = parseInt(diff / 60, 10);
+
+  if (diff &lt; 24) {
+    return diff + &quot;時間前&quot;;
+  }
+
+  diff = parseInt(diff / 24, 10);
+
+  if (diff &lt; 30) {
+    return diff + &quot;日前&quot;;
+  }
+
+  diff = parseInt(diff / 30, 10);
+
+  if (diff &lt; 12) {
+    return diff + &quot;か月前&quot;;
+  }
+
+  return parseInt(diff / 12, 10) + &quot;年前&quot;;
+};</code></pre>
+
+<p>Demo: <a href="/test/658.html">Test Page for reldate.js</a></p>
+
+<p>日本語だと複数形のことを考えなくて良いのでシンプルなコードになった。2年前以上は日時をそのまま表示したいという場合は、最初の方でdiffが一定数以上の時に抜けるようにしてやると良い。</p>
+
+<p>タイムゾーンのことをまったく考えていない。<code>Date.now()</code>と<code>Date.parse()</code>でISO-8601をパースした時はUTCのミリ秒になるはずなので、大丈夫なんじゃないかと楽観している。また相対時刻がそもそもあやふやなので、最大24時間ずれるくらい大したこともなさそうだ。このあたりも含めて確実にしたいなら<a href="http://momentjs.com/">Moment.js</a>を使うべきだろう。そうすれば<code>moment#toNow()</code>などもあり、何も考える必要はなくなる。</p>
+
+<hr>
+
+<p>ウェブサイト上で動かすスクリプトを昔のことは忘れて書き、<a href="https://github.com/google/closure-compiler-js">Closure CompilerのJavaScriptバージョン</a>でES5への変換と最小化を同時にやるようにし始めた。もちろんgyp依存とかでもないため、Windowsで普通に動く。いくつか小さなプロジェクトでも使ってみているが、UglifyJS2を差し替えるくらいの感覚で移行できている。ちょっと処理が遅く、最小化後のサイズも大きくはなるが、それを補って余りある簡便さだ。</p>
+
+<p>規模の大きなJavaScriptコードを処理しようとするとメモリーを食い尽くすなど、パフォーマンスの点で問題がいくつかあるようだ。まだプロダクションで使うのは怖いが、小さいところではちょいちょい使っていきたい。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>Amazon検索</title>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="./114.js"></script>
+<script type="text/javascript">
+function doSearch (q) {
+  var message = $("#message").empty();
+  var result = $("#result").empty();
+
+  var url = "http://aap.hail2u.net/?" + $.param({
+    Service:        "AWSECommerceService",
+    Operation:      "ItemSearch",
+    SearchIndex:    "All",
+    ResponseGroup:  "Small,Images",
+    Version:        "2009-06-01",
+    AWSAccessKeyId: "08PWFCAAQ5TZJT30SKG2",
+    AssociateTag:   "hail2unet-22",
+    Keywords:       q
+  });
+  message.text("検索中……");
+  $.queryYQL("select * from xml where url='" + url + "'", function (data) {
+    var res = data.query.results.ItemSearchResponse;
+
+    if (res.Items.Request.Errors) {
+      message.text([
+        items.Request.Errors.Error.Code,
+        items.Request.Errors.Error.Message
+      ].join(": "));
+    } else {
+      $.each(res.Items.Item, function () {
+        var item = $("<div/>").addClass("item");
+        var title = $("<h2/>").addClass("title").append($("<a/>").attr({
+           href: this.DetailPageURL
+        }).append(this.ItemAttributes.Title)).appendTo(item);
+
+        if (this.MediumImage) {
+          var image = $("<p/>").addClass("image").append($("<img/>").attr({
+            src: this.MediumImage.URL,
+            alt: this.ItemAttributes.Title,
+            width: this.MediumImage.Width.content,
+            height: this.MediumImage.Height.content
+          })).appendTo(item);
+        }
+
+        var detail = $("<ul/>").addClass("detail");
+        if (this.ItemAttributes.Actor)
+          $("<li/>").append(this.ItemAttributes.Actor.toString()).appendTo(detail);
+        if (this.ItemAttributes.Artist)
+          $("<li/>").append(this.ItemAttributes.Artist.toString()).appendTo(detail);
+        if (this.ItemAttributes.Author)
+          $("<li/>").append(this.ItemAttributes.Author.toString()).appendTo(detail);
+        if (this.ItemAttributes.Manufacturer)
+          $("<li/>").append(this.ItemAttributes.Manufacturer.toString()).appendTo(detail);
+        $("<li/>").append(this.ItemAttributes.ProductGroup.toString()).appendTo(detail);
+        $("<li/>").append(this.ASIN.toString()).appendTo(detail);
+        item.append(detail).appendTo(result);
+      });
+
+      message.text("検索完了");
+    }
+  });
+}
+
+$(function () {
+  $("#searchForm").submit(function () {
+    q = $("#q").val();
+    location.hash = "#" + encodeURIComponent(q);
+    doSearch(q);
+    return false;
+  });
+
+  if (location.hash) {
+    var q = decodeURIComponent(location.hash.replace(/^#/,""));
+    $("#q").val(q);
+    $("#searchForm").submit();
+  }
+});
+</script>
+</head>
+<body>
+<div id="header">
+  <h1>Amazon検索</h1>
+  <p>SearchIndex=Allのテスト</p>
+</div>
+
+<div id="contents">
+  <form action="114.html" id="searchForm">
+    <p>
+      <label for="q">キーワード:</label></th>
+      <input type="text" name="q" size="40" id="q" /></td>
+      <input type="submit" value="検索" class="button" />
+    </p>
+  </form>
+
+  <div id="message">
+    <p class="status">初期化完了</p>
+  </div>
+
+  <div id="result">
+    <p>この検索フォームを利用するにはブラウザの設定でJavaScriptを有効にする必要があります。</p>
+  </div>
+</div>
+
+<div id="footer">
+  <p id="powered">Powered by <a href="http://jquery.com/">jQuery</a>, <a href="http://aws.amazon.com/">Amazon Web Services</a>, <a href="http://developer.yahoo.com/yql/">YQL</a>.</p>
+</div>
+</body>
+</html>

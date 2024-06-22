@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>ハンバーガー・ボタンのメニュー(v9.17.2)</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/hamburger-button-menu-v9.17.2.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="ロゴの右にちょこんとあるハンバーガー・ボタン(やその左の空間)を押すと、ページ・ヘッダーのウェブサイト・ナビゲーションを切り替えるようにした。details要素を使っている。HTMLにかなり手を入れた上で、ちょっとCSSを書いたくらいで、スクリプトは書いていない。キーボードでのアクセス性は悪くなさそうだし、おおむね問題なく操作できそうだ。v9.17.0からこうなったが、いろいろ直したので、すでにパッチ番号が2つ上がっている。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="ロゴの右にちょこんとあるハンバーガー・ボタン(やその左の空間)を押すと、ページ・ヘッダーのウェブサイト・ナビゲーションを切り替えるようにした。details要素を使っている。HTMLにかなり手を入れた上で、ちょっとCSSを書いたくらいで、スクリプトは書いていない。キーボードでのアクセス性は悪くなさそうだし、おおむね問題なく操作できそうだ。v9.17.0からこうなったが、いろいろ直したので、すでにパッチ番号が2つ上がっている。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="ハンバーガー・ボタンのメニュー(v9.17.2)" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2020-12-30T09:27:24+09:00">2020年12月30日</time></p>
+
+        <h1><em>ハンバーガー・ボタンのメニュー(v9.17.2)</em></h1>
+      </header>
+
+    <main>
+
+    <p>ロゴの右にちょこんとあるハンバーガー・ボタン(やその左の空間)を押すと、ページ・ヘッダーのウェブサイト・ナビゲーションを切り替えるようにした。<code>details</code>要素を使っている。HTMLにかなり手を入れた上で、ちょっとCSSを書いたくらいで、スクリプトは書いていない。キーボードでのアクセス性は悪くなさそうだし、おおむね問題なく操作できそうだ。v9.17.0からこうなったが、いろいろ直したので、すでにパッチ番号が2つ上がっている。</p>
+
+<p>このようなほぼ完結した文章があるだけのウェブサイトなので、ウェブサイト・ナビゲーションは「additional」だと考えられる。つまり<code>details</code>要素を使って、隠しておいても構わないだろう。このような理屈は成立しそうだが、ウェブページの最初にある<code>details</code>要素には前後の脈絡がなく、何に対する追加情報が出てくるのか伝わらない。<code>summary</code>要素をロゴに使っているので、なおさらだ。</p>
+
+<p>また、追加のナビゲーションを隠しておきたいので、最初は<code>nav</code>要素を<code>details</code>要素の子にした。しかし、隠れているとランドマークとして機能しない(実装にも依存する)。<code>nav</code>要素を<code>details</code>要素の親にすると解決するが、これでいいのかよくわからない。現在は<code>header</code>要素の中に<code>nav</code>要素のみ、<code>nav</code>要素の中に<code>details</code>要素のみ、という状況で、やたらとネストされている。</p>
+
+<hr>
+
+<p>この先は実装の話だ。Edge 87やChrome 87、Firefox 84では、<code>summary</code>要素をFlexboxにして、疑似要素でハンバーガー・ボタンを追加するだけだったが、<a href="/pub/test/701.html">Safari 14ではまったくうまくいかない</a>。Safari 14には<a href="https://github.com/philipwalton/flexbugs#flexbug-9"><code>summary</code>要素をFlexboxにできないというバグ</a>があり、これによって色々な不具合が起こるようだ。CSSだけではどうしようもないので、HTMLに手を入れる。</p>
+
+<pre><code class="language-html">&lt;details&gt;
+  &lt;summary class=&quot;logo&quot;&gt;
+    &lt;span&gt;
+      &lt;a href=&quot;/&quot;&gt;Logo&lt;/a&gt;
+    &lt;/span&gt;
+  &lt;/summary&gt;
+
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href=&quot;/&quot;&gt;Menuitem&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/details&gt;</code></pre>
+
+<p>具体的には<code>summary</code>要素と中身の間に何かしらの要素をネストし、それをFlexboxにすればいい。<code>summary</code>要素のcontent modelはphrasing contentとheading contentなので、<code>span</code>要素がいいだろう。</p>
+
+<pre><code class="language-css">.logo {
+  list-style-type: none;
+}
+
+.logo::-webkit-details-marker {
+  display: none;
+}
+
+.logo &gt; span {
+  display: flex;
+}
+
+.logo &gt; span::after {
+  content: &quot;≡&quot;;
+  flex-grow: 1;
+  text-align: right;
+}
+
+[open] .logo &gt; span::after {
+  content: &quot;×&quot;;
+}</code></pre>
+
+<p>CSSではFlex関係のプロパティーと疑似要素を<code>span</code>要素に対して当てていく。</p>
+
+<p>Safari 14の<code>summary</code>要素でのFlexboxのバグは、単に無視されるのではなく、何かいろいろおかしなことが起きる。Flexboxでレイアウトできないのに、<code>a</code>要素がflex-item風に解釈され、幅いっぱいになった。また、別のスタイルとの組み合わせで疑似要素がうまく追加できなくなったりもした(再現できていない)ので、一時期は<code>span</code>要素でハンバーガー・ボタンと閉じるボタンを追加したり、いろいろ間違えた。</p>
+
+<hr>
+
+<p>もうちょっと詰めるべきところがありそうだ。CSSが面倒くさくなりそうな予感があり、こういう構造(ロゴを<code>summary</code>要素に含める形)にしたが、結局は面倒な実装になってしまった。やはりロゴに続けて<code>details</code>要素にした方が無難だろうか。横長の広い領域が操作可能になっていて、どこでもメニューが出てくる状態は、操作しやすくて気に入っていおり、なかなか悩ましい。</p>
+
+<p><code>summary</code>要素に<code>a</code>要素を置いても、問題なく<em>両者が</em>操作可能であることなど、柔軟な使い方ができることがわかり、収穫はあったので、もっと様々な利用例を考えて試してみたい。今まで<code>button</code>要素でやっていた、ボタンを押してすぐ下にコンテンツが追加されるような仕組みは、半分くらいは置き換えられそうだ。ページングで分けるフォームなども、<code>details</code>要素のネストでやっても面白そうだ。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

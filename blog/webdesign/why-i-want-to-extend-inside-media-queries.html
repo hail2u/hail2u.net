@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Media Queries内で@extend使いたくなった</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/why-i-want-to-extend-inside-media-queries.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Sass 3.2では様々な機能強化が図られているけど、その一方で削除された機能もある。そのひとつが既に安定版である3.1でも警告が出るようになった@extendディレクテイブがMedia Queries内等で使えていた機能。ざっと削除に至った経緯を辿ってみたけど、実装と出力上の都合っぽい。まぁそういうもんか……とこの仕様変更を受け入れて書き直したりしてたけど、最近になってやっぱり必要なんじゃないかなーと思うようになった。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Sass 3.2では様々な機能強化が図られているけど、その一方で削除された機能もある。そのひとつが既に安定版である3.1でも警告が出るようになった@extendディレクテイブがMedia Queries内等で使えていた機能。ざっと削除に至った経緯を辿ってみたけど、実装と出力上の都合っぽい。まぁそういうもんか……とこの仕様変更を受け入れて書き直したりしてたけど、最近になってやっぱり必要なんじゃないかなーと思うようになった。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Media Queries内で@extend使いたくなった" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2012-07-24T02:26:39+09:00">2012年7月24日</time></p>
+
+        <h1><em>Media Queries内で@extend使いたくなった</em></h1>
+      </header>
+
+    <main>
+
+    <p><a href="http://sass-lang.com/">Sass</a> 3.2では様々な機能強化が図られているけど、その一方で削除された機能もある。そのひとつが既に安定版である3.1でも警告が出るようになった<code>@extend</code>ディレクテイブが<a href="http://www.w3.org/TR/css3-mediaqueries/">Media Queries</a>内等で使えていた機能。ざっと削除に至った経緯を辿ってみたけど、実装と出力上の都合っぽい。まぁそういうもんか……とこの仕様変更を受け入れて書き直したりしてたけど、最近になってやっぱり必要なんじゃないかなーと思うようになった。</p>
+
+<p>Media Queries内で<code>@extend</code>が使えない場合と使える場合で、ここの記事の情報(日付けやカテゴリを表示している部分)がどうなるかを例にしてみる。この記事の情報は狭い画面では一列でずらっとタイトルの直ぐ下に表示されるが、広い画面では本文の左にくっつくような形で表示されるもの。</p>
+
+<section>
+<h2>使えない場合</h2>
+
+<pre><code class="language-scss">%hanging-block {
+  @media screen and (min-width: 66em) {
+    margin-right: 2em;
+    position: absolute;
+    right: 100%;
+    width: 9em;
+  }
+}
+
+article {
+  position: relative;
+
+  h2 + footer {
+    @extend %hanging-block;
+
+    br {
+      display: none;
+    }
+
+    @media screen and (min-width: 66em) {
+      br {
+        display: inline;
+      }
+    }
+  }
+}</code></pre>
+
+<p>プレースホルダー・セレクターを使って書くと、だいたいこんな感じになる。本来なら<em>ブロックを左にぶら下げる</em>という<em>振る舞い</em>を設計し、<em>広い画面(<code>66em</code>)</em>という条件を満たした時にそれを呼び出すという設計にしたいにもかかわらず、「ブロックを左にぶら下げる、ただし広い画面なら」という条件が後付けされる形にならざるをえない。生成されるCSSではほとんど違いは出ないのでどっちでもそう変わらないとも言えるけど、設計としてはかなりおかしい。</p>
+
+<p>また、同じ条件分岐のMedia Queriesと混ぜることが出来ないので、同じコンテキストに属する同じ条件のMedia Queriesを場所を分けて書かなくてはならなくなる。これは生成されるCSSのサイズにも影響を与える(後述)。</p>
+</section>
+
+<section>
+<h2>使える場合</h2>
+
+<pre><code class="language-scss">%hanging-block {
+  margin-right: 2em;
+  position: absolute;
+  right: 100%;
+  width: 9em;
+}
+
+article {
+  position: relative;
+
+  h2 + footer {
+    br {
+      display: none;
+    }
+
+    @media screen and (min-width: 66em) {
+      @extend %hanging-block;
+
+      br {
+        display: inline;
+      }
+    }
+  }
+}</code></pre>
+
+<p><code>@extend</code>ディレクティブがMedia Queries内で利用できると、プレースホルダー・セレクターはその振る舞いのスタイルだけを書けば良くなり、他の同じ条件分岐のスタイルともスムーズに混ぜることが出来る。</p>
+
+<p>Media Queriesについては前述のように混ぜられないことにより増える……ということはなくなるので、この例示したコードでは生成されるCSSのサイズは減る。しかしその一方で<code>@extend</code>した同士でのMedia Queriesの条件の共有はできなくなる(できるように実装することはまず無理)ので、生成されるCSSのサイズはどっちもどっち。むしろ積極的に<code>@extend</code>を使うケースでは増える。</p>
+</section>
+
+<hr>
+
+<p>Sass 3.2で導入されるプレースホルダー・セレクターは通常のクラスよりも抽象化すべきものだと思うので、その中でMedia Queriesのようなロジックは書くべきではないはず。ロジックは実際にCSSで出力されるセレクター側で定義して、その条件にあったプレースホルダー・セレクターを<code>@extend</code>するという構成にできたらベストなんじゃないかと思う。<code>@mixin</code>でやれってことなのかなぁ……。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

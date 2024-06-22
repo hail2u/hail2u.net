@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Gruntタスクの設定をファイルで管理</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/coding/organize-grunt-task-config-by-file.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content="Gruntfile.jsの大半を占めるのはタスク設定の部分だ。そこを分割してやればGruntfile/jsを小さく出来るわけで、そういうNode.jsパッケージはいくつかある。load-grunt-configsがその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content="Gruntタスクの設定をファイルで管理" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-03-06T12:53:16+09:00">2014年3月6日</time></p>
+
+        <h1><em>Gruntタスクの設定をファイルで管理</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>Gruntfile.js</code>の大半を占めるのはタスク設定の部分だ。そこを分割してやれば<code>Gruntfile/js</code>を小さく出来るわけで、そういうNode.jsパッケージはいくつかある。<a href="http://creynders.github.io/load-grunt-configs/">load-grunt-configs</a>がその最も有名と思われるものだが、汎用化してあり、便利すぎ・パワフルすぎで、ちょっと仰々しすぎる気がした。もっとストレートにやっても良さそうなので、5行くらいで指定ディレクトリから設定を読み出すコードを書いて、少し使ってみた。</p>
+
+<p>以下のGruntプラグインをインストールして使う<code>Gruntfile.js</code>を例にする。</p>
+
+<ul>
+<li><a href="https://github.com/gruntjs/grunt-contrib-clean">grunt-contrib-clean</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-copy">grunt-contrib-copy</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-cssmin">grunt-contrib-cssmin</a></li>
+<li><a href="https://github.com/gruntjs/grunt-contrib-uglify">grunt-contrib-uglify</a></li>
+</ul>
+
+<section>
+<h2>Gruntfile.jsの書き方</h2>
+
+<p><code>grunt.file.expand()</code>を使って<code>.grunt/config/*.json</code>をグロブし、それぞれのファイル名をキーにして、ファイルの内容を値にして設定を組み立てていく。最後に<code>grunt.initConfig()</code>して読み込む。</p>
+
+<pre><code class="language-javascript">&apos;use strcit&apos;;
+
+var path = require(&apos;path&apos;);
+
+module.exports = function (grunt) {
+  var config = {
+    pkg: grunt.file.readJSON(&apos;package.json&apos;)
+  };
+
+  grunt.file.expand(&apos;.grunt/config/*.json&apos;).forEach(function (file) {
+    config[path.basename(file, &apos;.json&apos;)] = grunt.file.readJSON(file);
+  });
+
+  grunt.initConfig(config);
+
+  grunt.loadNpmTasks(&apos;grunt-contrib-clean&apos;);
+  grunt.loadNpmTasks(&apos;grunt-contrib-copy&apos;);
+  grunt.loadNpmTasks(&apos;grunt-contrib-cssmin&apos;);
+  grunt.loadNpmTasks(&apos;grunt-contrib-uglify&apos;);
+
+  grunt.registerTask(&apos;rebuild:css&apos;, [
+    &apos;clean:css&apos;,
+    &apos;copy:css&apos;,
+    &apos;cssmin&apos;
+  ]);
+
+  grunt.registerTask(&apos;rebuild:js&apos;, [
+    &apos;clean:js&apos;,
+    &apos;copy:js&apos;,
+    &apos;uglify&apos;
+  ]);
+};</code></pre>
+
+<p>プラグイン名から設定ファイルを拾えたりすると、ロードしつつ設定の組み立てというもうちょっとスマートな実装になりそうだ。しかし実際にはプラグイン名とタスク名が一致しないことは良くあるので、それは無理がある。そうできるようにするためには設定の書き方の工夫か対応表みたいなのが必須になるだろう。</p>
+
+<p>エイリアスの部分も切り離して良さそうだけど、そのエイリアスに対しての設定をまとめたりは出来ないので、切り離してもあまり意味はない。</p>
+</section>
+
+<section>
+<h2>タスク設定の書き方</h2>
+
+<p>タスク設定は<code>.grunt/config/</code>以下に<code>taskname.json</code>という形で置く。特に何もしないので<code>Gruntfile.js</code>に書く時とほぼ同じだ。ただしJSONとして読み込みパースされるので、キーと値は二重引用符で括ることと最後のカンマには気を付ける必要がある。</p>
+
+<p>例えば<code>.grunt/config/uglify.json</code>は以下のようになる。</p>
+
+<pre><code class="language-javascript">{
+  &quot;options&quot;: {
+    &quot;beautify&quot;: {
+      &quot;ascii_only&quot;: true
+    },
+    &quot;preserveComments&quot;: &quot;some&quot;
+  },
+  &quot;main&quot;: {
+    &quot;expand&quot;: true,
+    &quot;cwd&quot;: &quot;.grunt/tmp/&quot;,
+    &quot;src&quot;: [&quot;*.js&quot;],
+    &quot;dest&quot;: &quot;scripts/&quot;,
+    &quot;ext&quot;: &quot;.min.js&quot;
+  }
+}</code></pre>
+
+<p>JSONを普通に書くのは面倒なので<code>*.coffee</code>許容させたりすると良さそうではある。</p>
+</section>
+
+<hr>
+
+<p>このような形で10ほどのプラグインをインストールした状態で色々やってみたが、分割すると<code>Gruntfile.js</code>は短くなるものの、それが特に設定のしやすさ・わかりやすさにはつながらなかった。少なくとも<em>プラグイン単位での設定の分割は無意味</em>と感じる。Gruntの設定の辛さは長くなって読みづらくて辛いではなくて、あるタスクの設定をあっちで書きこっちで参照しという書く辛さと、あるタスクの設定を調べる時にあっちを見てこっちを辿ってという読む辛さの組み合わせということだと結論づけた。つまり<em>やりたいこと</em>や<em>やっていること</em>の設定を一括して管理・参照する術がないということだ。</p>
+
+<p>タスクごとまたはエイリアスごと、例えばデプロイ用の設定とかテスト用の設定とかで分割するなら、やりたいことの設定をまとめて管理でき、やっていることの設定を一気に参照できる。これなら意味がある気がするけど、そうなるとGruntに渡される引数を調べて……とか、Gruntのラッパーを作って……など、まぁまぁ大変なコードを書いてやらないと実現できないので、あまり現実的ではない。</p>
+
+<p>ただ多くの人はGruntプラグインの作るタスクを直接叩くことはなく、エイリアス単位で実行するであろうし、設定の修正もエイリアス単位でまとめて行ったりするだろう。そのため、完全にエイリアス単位で管理できるようなら、挑戦する価値はありそうとも感じる。そのようなプラグインが既にあるようだが、<a href="https://github.com/gruntjs/grunt-next">大幅な変化が模索されている現在</a>、そういったものに依存したら後が怖く、導入には二の足を踏む。</p>
+
+<hr>
+
+<p>結局普通に書くしかないことになるわけだ。その前に<a href="/blog/software/meaningless-grunt-task.html">タスクを使われるタイミングで絞ったり</a>、<a href="http://havelog.ayumusato.com/develop/others/e586-suitable_grunt.html">Gruntの使い方を考え直したり</a>して<code>Gruntfile.js</code>が破綻しないように常に意識すると良い。回り道だけど、安全で安心な道だろう。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>

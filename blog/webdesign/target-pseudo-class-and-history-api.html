@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>:target擬似クラスとHistory API</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    
+    
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/webdesign/target-pseudo-class-and-history-api.html" rel="canonical">
+    <meta content="light dark" name="color-scheme">
+    <meta content=":target擬似クラスではフラグメント識別子と一致する要素に対してスタイルを当てることができる。これを利用するとCSSだけでインタラクティブにデザインを変更することが可能になる。一方History APIではページの遷移なくフラグメント識別子を含め、アクセス中のURLを書き換えることができる。では:target擬似クラスで有効になっているスタイルは、History APIでフラグメント識別子を変更した場合に動的に切り替わってくれるだろうか。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+    <meta content="width=device-width" name="viewport">
+
+    <link href="/css/print.css?v=9.31.3" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.31.3" media="only screen" rel="stylesheet">
+
+    <meta content="summary" name="twitter:card">
+    <meta content=":target擬似クラスではフラグメント識別子と一致する要素に対してスタイルを当てることができる。これを利用するとCSSだけでインタラクティブにデザインを変更することが可能になる。一方History APIではページの遷移なくフラグメント識別子を含め、アクセス中のURLを書き換えることができる。では:target擬似クラスで有効になっているスタイルは、History APIでフラグメント識別子を変更した場合に動的に切り替わってくれるだろうか。" property="twitter:description">
+    
+    <meta content="@hail2u_" name="twitter:site">
+    <meta content=":target擬似クラスとHistory API" property="twitter:title">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><svg viewBox="0 0 16 16" role="img" aria-labelledby="logo-title"><title id="logo-title">ホームへ戻る</title><path d="m 2,7 3,7 h 7 L 14,9 13,4 9,2 Z"/></svg></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2014-12-23T15:20:52+09:00">2014年12月23日</time></p>
+
+        <h1><em>:target擬似クラスとHistory API</em></h1>
+      </header>
+
+    <main>
+
+    <p><code>:target</code>擬似クラスではフラグメント識別子と一致する要素に対してスタイルを当てることができる。これを利用するとCSSだけでインタラクティブにデザインを変更することが可能になる。一方History APIではページの遷移なくフラグメント識別子を含め、アクセス中のURLを書き換えることができる。では<code>:target</code>擬似クラスで有効になっているスタイルは、History APIでフラグメント識別子を変更した場合に動的に切り替わってくれるだろうか。</p>
+
+<p>Demo: <a href="/test/603.html">:target and history.replaceState()</a></p>
+
+<p>デモ・ページではEnable #test:targetをクリックするとURLに<code>#test</code>というフラグメント識別子が追加される。<code>#test:target</code>セレクターを通して、文字色を緑にするようにしてあるので、クリック後文章が緑になることだろう。Disable #test:target by history.replaceState()ボタンを押すと<code>history.replaceState()</code>を使ってURLからフラグメント識別子が削られる。ここで文字色が緑から黒になればCSSにも反映されることになる。</p>
+
+<p>しかし、だいたいのブラウザーで緑のままなので、<code>history.replaceState()</code>によるフラグメント識別子の変更に<code>:target</code>擬似クラスは応じてくれないようだ。もしかするとどこかでこういう挙動になるべきと決まっているのかもしれないが、残念ながら僕には見つけられなかった。</p>
+
+<hr>
+
+<p><code>:target</code>擬似クラスを使ったオーバーレイのフルスクリーン・ナビゲーションを作ろうかなという過程で、CSSだけだと消せないためどうしてやろうかと考えていて、History APIを使ってみたらダメだった、という過程で発見した。「珍」というほどではないが、直感的な動作とは思えないので<a href="http://www.adventar.org/calendars/341">CSS珍百景 Advent Calendar 2014</a>の19日目として提供しておく。</p>
+
+<p>対策はそれほど難しくはない。<code>location.hash = &apos;&apos;</code>でフラグメント識別子を空にし、<code>:target</code>擬似クラスを無効にした後、改めて<code>history.replaceState(&apos;&apos;, &apos;&apos;, location.pathname)</code>とすれば良い。</p>
+
+    </main>
+
+    <footer class="page-footer">
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a> · <a href="/blog/"><span aria-hidden="true">← </span>雑多な記録の一覧</a></p>
+
+      <p><a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> · <a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)</p>
+    </footer>
+  </body>
+</html>
