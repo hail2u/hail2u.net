@@ -81,7 +81,7 @@ export default {
     "selector-no-qualifying-type": [
       true,
       {
-        ignore: ["attribute"],
+        ignore: ["attribute", "class"],
       },
     ],
     "selector-no-vendor-prefix": true,
