@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<meta content="width=device-width" name="viewport">
+
+		<title>APCA Contrast Calculator</title>
+
+		<script>
+		</script>
+	</head>
+
+	<body>
+		<header>
+			<h1>APCA Contrast Calculator</h1>
+
+			<p>Advanced Perceptual Contrast Algorithmを使ってコントラストを算出するツールです。</p>
+		</header>
+
+		<main>
+			<p><label for="fg">前景色: </label><input id="fg" type="color" value="#888888"></p>
+			<p><label for="bg">背景色: </label><input id="bg" type="color" value="#ffffff"></p>
+			<p><button id="calc">算出</button></p>
+			<p>コントラスト: <output id="contrast">-</output></p>
+		</main>
+
+		<script>
+			const toDecimal = (hex) => parseInt(hex, 16);
+
+			const linearize = (val) => (val / 255.0) ** 2.4;
+
+			const clampLuminance = (luminance) => {
+				const blkThrs = 0.03;
+				const blkClmp = 1.45;
+
+				if (luminance > blkThrs) {
+					return luminance;
+				}
+
+				return Math.abs(blkThrs - luminance) ** blkClmp + luminance;
+			};
+
+			const getLuminance = ([red, green, blue]) => {
+				const y =
+					0.2126729 * linearize(red) +
+					0.7151522 * linearize(green) +
+					0.072175 * linearize(blue);
+				return clampLuminance(y);
+			};
+
+			const getContrast = (background, foreground) => {
+				const deltaYmin = 0.0005;
+				const scale = 1.25;
+
+				const backgroundLuminance = getLuminance(background);
+				const foregroundLuminance = getLuminance(foreground);
+
+				if (Math.abs(backgroundLuminance - foregroundLuminance) < deltaYmin) {
+					return 0.0;
+				}
+
+				if (backgroundLuminance > foregroundLuminance) {
+					return (backgroundLuminance ** 0.55 - foregroundLuminance ** 0.58) * scale;
+				}
+
+				if (backgroundLuminance < foregroundLuminance) {
+					return (backgroundLuminance ** 0.62 - foregroundLuminance ** 0.57) * scale;
+				}
+
+				return 0.0;
+			};
+
+			const scaleContrast = (contrast) => {
+				const loClip = 0.001;
+				const loConThresh = 0.078;
+				const loConFactor = 1 / loConThresh;
+				const loConOffset = 0.06;
+
+				const absContrast = Math.abs(contrast);
+
+				if (absContrast < loClip) {
+					return 0.0;
+				}
+
+				if (absContrast <= loConThresh) {
+					return contrast - contrast * loConFactor * loConOffset;
+				}
+
+				if (contrast > loConThresh) {
+					return contrast - loConOffset;
+				}
+
+				if (contrast < -loConThresh) {
+					return contrast + loConOffset;
+				}
+
+				return 0.0;
+			};
+
+			const toPercentage = (float) => (float * 100);
+
+			const calculate = () => {
+				const background = document
+					.getElementById("bg")
+					.value.match(/[0-9a-f]{2}/gi)
+					.map(toDecimal);
+				const foreground = document
+					.getElementById("fg")
+					.value.match(/[0-9a-f]{2}/gi)
+					.map(toDecimal);
+				const contrast = getContrast(background, foreground);
+				const scaled = scaleContrast(contrast);
+				document.getElementById("contrast").value = scaled * 100;
+			};
+
+			document.getElementById("calc").addEventListener("click", calculate);
+		</script>
+	</body>
+</html>

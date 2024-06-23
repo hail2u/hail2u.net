@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Tweet Bubble</title>
+
+    <style type="text/css">
+      h1 {
+        margin-bottom: 320px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      section p a {
+        text-decoration: underline;
+      }
+
+      a[href="https://twitter.com/hell2u"] {
+        position: absolute;
+      }
+
+      a[href="https://twitter.com/hell2u"] a section {
+        display: none;
+      }
+
+      a[href="https://twitter.com/hell2u"]:hover a section {
+        display: block;
+      }
+
+      .tweet {
+        margin-bottom: 1.25em;
+        padding: 16px;
+        position: absolute;
+        bottom: 16px;
+        width: 264px;
+        color: rgb(9,9,9);
+        background-color: rgba(9,9,9,0.1);
+      }
+
+      .tweet::after {
+        border: 8px solid rgba(9,9,9,0.1);
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        display: block;
+        position: absolute;
+        bottom: -16px;
+        left: 16px;
+        content: "";
+      }
+
+      .tweet p {
+        margin: 0;
+      }
+
+      .tweet h1 {
+        margin: 1em 0 0 0;
+        font-weight: normal;
+        font-size: 100%;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+$(function () {
+  var user = "twitter";
+  var t = $("a[href='https://twitter.com/hell2u']");
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from json where url='http://twitter.com/users/" + user + ".json'",
+    format: "json"
+  }, function (data) {
+    if (data.query.results && data.query.results.json) {
+      var d = data.query.results.json;
+      var tweet = $("<section/>").addClass("tweet");
+      autoLink(d.status.text, $("<p/>").appendTo(tweet));
+      $("<a/>").attr({
+        href: "https://twitter.com/" + user + "/status/" + d.status.id
+      }).append(tweet).prependTo(t);
+    }
+  });
+});
+
+var autoLink = function (input, output) {
+  var url      = "https?://\\S+";       var re_url     = new RegExp("^" + url);
+  var mention  = "@[0-9a-zA-Z_]{1,15}"; var re_mention = new RegExp("^" + mention);
+  var hashtag  = "#[0-9a-zA-Z]+";       var re_hashtag = new RegExp("^" + hashtag);
+  var re_token = new RegExp("(" + url + "|" + mention + "|" + hashtag + ")", "g");
+  var tokens = input.split(re_token);
+
+  for (var i = 0, l = tokens.length; i < l; i++) {
+    var token = tokens[i];
+
+    if (re_url.test(token)) {
+      output.append($("<a/>", {
+        href: token
+      }).append(token));
+    } else if (re_mention.test(token)) {
+      output.append($("<a/>", {
+        href: "http://twitter.com/" + encodeURIComponent(token.replace(/^@/, ""))
+      }).append(token));
+    } else if (re_hashtag.test(token)) {
+      output.append($("<a/>", {
+        href: "http://twitter.com/search?q=" + encodeURIComponent(token)
+      }).append(token));
+    } else {
+      output.append(token.replace(/[\r\n]/g, "<br>"));
+    }
+  }
+};
+    </script>
+  </head>
+  <body>
+    <h1>Tweet Bubble</h1>
+
+    <section>
+      <ul>
+        <li><a href="https://twitter.com/hell2u">Twitter</a></li>
+      </ul>
+    </section>
+  </body>
+</html>

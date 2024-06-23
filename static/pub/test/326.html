@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Quote from iine!</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Vollkorn:bolditalic">
+
+    <style>
+#quote-from-iine {
+    position: relative;
+    width: 322px;
+    height: 182px;
+    overflow: hidden;
+}
+
+#quote-from-iine h2 {
+    margin: 0;
+    padding: 0 16px;
+    position: absolute;
+    bottom: 91px;
+    left: 1px;
+    width: 288px;
+    height: 90px;
+    line-height: 90px;
+    color: #fff;
+    background-color: rgba(9, 9, 9, 0.5);
+    font-size: 100%;
+}
+
+#quote-from-iine h2 a {
+    font-family: "Vollkorn", serif;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#quote-from-iine p {
+  margin: 0;
+  line-height: 1;
+}
+
+#quote-from-iine a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#quote-from-iine p a img {
+  border: 1px solid rgba(9, 9, 9, 0.9);
+}
+
+#quote-from-iine p:nth-child(3) {
+    margin: 0;
+    padding: 0 16px;
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 288px;
+    height: 90px;
+    line-height: 90px;
+    color: #ccc;
+    background-color: rgba(9, 9, 9, 0.5);
+    font-size: 87.5%;
+    text-align: right;
+}
+
+#quote-from-iine:hover h2 {
+  -webkit-transition-duration: 0.5s;
+  left: 322px;
+}
+
+#quote-from-iine:hover p:nth-child(3) {
+  -webkit-transition-duration: 0.5s;
+  -webkit-transition-delay: 0.5s;
+  right: 322px;
+}
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Quote from iine!</h1>
+    </header>
+
+    <aside id="quote-from-iine">
+    </aside>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+$(function () {
+  "use strict";
+
+  var t = $("#quote-from-iine");
+
+  if (t === undefined) {
+    return false;
+  }
+
+  t.empty().append(
+    $("<p/>").append(
+      $("<em/>").text("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026")
+    )
+  );
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from rss where url='http://feeds.feedburner.com/hail2u/iine'",
+    format: "json"
+  }, function (data) {
+    t.empty();
+
+    if (data.query.results && data.query.results.item) {
+      var latest = data.query.results.item[0];
+      $("<h2/>").text(latest.title).prepend("<a href=\"http://iine.hail2u.net/\">iine!</a>: ").appendTo(t);
+      t.append(latest.description);
+    } else {
+      $("<p/>").text("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002").appendTo(t);
+    }
+  });
+});
+    </script>
+  </body>
+</html>

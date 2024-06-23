@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use strict;
+use utf8;
+use warnings;
+
+use Config::Pit;
+use LWP::UserAgent;
+use XML::Atom::Feed;
+
+my $config = Config::Pit::get('www.tumblr.com');
+my $email = $config->{email};
+my $password = $config->{password};
+my $ua = LWP::UserAgent->new();
+my $feed = XML::Atom::Feed->new('dump.xml');
+my $dc = XML::Atom::Namespace->new(dc => 'http://purl.org/dc/elements/1.1/');
+my $i = scalar($feed->entries);
+
+foreach my $entry ($feed->entries) {
+  my $url = $entry->link->href;
+  my $tags = join(',', $entry->getlist($dc, 'subject'));
+  my $res = $ua->post('http://www.tumblr.com/api/write', [
+    email       => $email,
+    password    => $password,
+    group       => 'bokugamirusekai.tumblr.com',
+    type        => 'link',
+    name        => $entry->title,
+    url         => $url,
+    description => $entry->summary,
+    date        => $entry->issued,
+    tags        => $tags,
+  ]);
+  my $code = $res->status_line;
+  print "$code: $url\n";
+
+  if ($code ne '201 Created') {
+    die '-- There are ' . $i . " entries left.\n";
+  }
+
+  $i--;
+}
+
+exit;

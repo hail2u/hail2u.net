@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Resize Font Based on Content Width #3</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Cabin+Sketch:bold">
+    <style>
+      #tagline {
+        font-family: "Cabin Sketch", sans-serif;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+$(window).load(function () {
+  var start = $.now();
+
+  var t = $("#tagline");
+  var text = t.text();
+  var size = parseInt(t.css("font-size"));
+
+  var temp = $("<div/>").css({
+    "display":     "none",
+    "font-family": t.css("font-family"),
+    "font-size":   size
+  }).text(text).appendTo("body");
+
+  var t_width = t.width();
+  var temp_width = temp.width();
+
+  do {
+    size *= (t_width / temp_width);
+    temp.css("font-size", size + "px");
+    temp_width = temp.width();
+  } while (temp_width < t_width);
+
+  size--;
+  t.css("font-size", size + "px");
+
+  var time = $.now() - start;
+  $("body").append($("<p/>").text("Elapsed Time: " + time));
+});
+    </script>
+  </head>
+
+  <body>
+    <h1>Resize Font Based on Content Width #3</h1>
+
+    <p id="tagline">Make Things Simple.</p>
+
+    <p>コンテンツの幅に文章が納まるようにフォントサイズを変更する。window.onloadで発火して正確にサイズが反映されるようにしバグはなくしたが、1~5 msecで終わる#2と比較するとやはり遅い。</p>
+  </body>
+</html>

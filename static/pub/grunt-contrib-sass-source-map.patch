@@ -1,0 +1,32 @@
+diff --git tasks/sass.js tasks/sass.js
+index 96ac499..85db65c 100644
+--- tasks/sass.js
++++ tasks/sass.js
+@@ -29,6 +29,7 @@ module.exports = function (grunt) {
+     var passedArgs;
+     var bundleExec;
+     var banner;
++    var sourcemap;
+
+     try {
+       which.sync('sass');
+@@ -45,7 +46,19 @@ module.exports = function (grunt) {
+       delete options.banner;
+     }
+
++    // Support new `--sourcemap=[auto|file|inline|none]` as well as old `--sourcemap` option
++    if (options.sourcemap) {
++      if (typeof options.sourcemap === 'boolean') {
++        sourcemap = '--sourcemap';
++      } else {
++        sourcemap = '--sourcemap=' + options.sourcemap;
++      }
++
++      delete options.sourcemap;
++    }
++
+     passedArgs = dargs(options, ['bundleExec']);
++    passedArgs.push(sourcemap);
+     bundleExec = options.bundleExec;
+
+     async.eachLimit(this.files, numCPUs, function (file, next) {

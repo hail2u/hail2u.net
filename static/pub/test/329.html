@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Shots from iine!</title>
+
+
+    <style>
+      #iine {
+        max-width: 736px;
+      }
+
+      #iine ol {
+        padding-left: 0;
+      }
+
+      #iine ol li {
+        display: block;
+      }
+
+      #iine a {
+        color: white;
+        text-decoration: none;
+      }
+
+      #iine figure {
+        position: relative;
+        float: left;
+        width: 33.333%;
+        line-height: 1;
+        overflow: hidden;
+      }
+
+      #iine img {
+        border: none;
+        padding: 0;
+        width: 100%;
+        vertical-align: text-bottom;
+      }
+
+      #iine figcaption {
+        margin: 0;
+        padding: 0 1em;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        line-height: 3;
+        color: gray;
+        background-color: black;
+        font-weight: normal;
+        font-size: 12px;
+        text-align: right;
+        opacity: 0.8;
+        -moz-transition-duration: 0.5s;
+        -webkit-transition-duration: 0.5s;
+        -o-transition-duration: 0.5s;
+        -ms-transition-duration: 0.5s;
+        transition-duration: 0.5s;
+      }
+
+      #iine figure:hover figcaption {
+        line-height: 0;
+        cursor: pointer;
+        -moz-transition-duration: 0.5s;
+        -webkit-transition-duration: 0.5s;
+        -o-transition-duration: 0.5s;
+        -ms-transition-duration: 0.5s;
+        transition-duration: 0.5s;
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>Shots from iine!</h1>
+    </header>
+
+    <aside id="iine"></aside>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+/**
+ * @preserve iine.js
+ *
+ * LICENSE: http://hail2u.mit-license.org/2011
+ */
+
+/*jslint indent: 2 */
+/*global jQuery, $ */
+
+$(function () {
+  "use strict";
+
+  var t = $("#iine"),
+    ol,
+    desc;
+
+  if (t === undefined) {
+    return false;
+  }
+
+  t.empty().append(
+    $("<p/>").append(
+      $("<em/>").text("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d\u2026\u2026")
+    )
+  );
+
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q:      "select * from rss where url='http://feeds.feedburner.com/hail2u/iine'",
+    format: "json"
+  }, function (data) {
+    t.empty();
+
+    if (data.query.results && data.query.results.item) {
+      $("<h2/>").text("Shots from ").append(
+        $("<a/>").attr({
+          href: "http://iine.hail2u.net"
+        }).text("iine!")
+      ).appendTo(t);
+
+      ol = $("<ol/>");
+
+      $.each(data.query.results.item, function (i) {
+        if (i > 8) {
+          return false;
+        }
+
+        desc = $("<i/>").append(this.description);
+
+        $("<li/>").append(
+          $("<figure/>").append(
+            desc.find("a")[0]
+          ).append(
+            $("<figcaption/>").append(
+              $(desc.find("p")[1]).html()
+            )
+          )
+        ).appendTo(ol);
+      });
+
+      ol.appendTo(t);
+    } else {
+      $("<p/>").text("\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002").appendTo(t);
+    }
+  });
+});
+    </script>
+  </body>
+</html>

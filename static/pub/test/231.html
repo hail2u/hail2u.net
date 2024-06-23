@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Multiple Font Logo without Additional Markup</title>
+    <style>
+      #logo {
+        font-size: 72px;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="./231.js"></script>
+    <script>
+      var sentence = "Make Things Simple.";
+      var statement = "select * from json where url='https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyApMgI8vW2EfAFAeVa4hDvaLoaW9A3WY94&subsets=latin&sort=alpha'";
+
+      $(function () {
+        $("#logo").text(sentence);
+
+        $.queryYQL(statement, function (d) {
+          var fonts  = d.query.results.json.items,
+            logo     = sentence.split(""),
+            fonts    = shuffle(fonts).slice(0, logo.length),
+            families = "sans-serif";
+
+          for (var i = 0, l = fonts.length; i < l; i++) {
+            var f  = fonts[i],
+              text = logo[i],
+              v    = $.isArray(f.variants) ? f.variants.join(",") : f.variants,
+              url  = "http://fonts.googleapis.com/css?family=" + f.family.replace(/ /g, "+") + ":" + v;
+            $("head").append($("<link/>").attr({
+              rel:  "stylesheet",
+              href: url + "&text=" + encodeURIComponent(text)
+            }));
+            families = "\"" + f.family + "\", " + families;
+          }
+
+          $("#logo").css("font-family", families);
+        });
+      });
+
+      function shuffle (list) {
+        var i = list.length;
+
+        while (--i) {
+          var j = Math.floor(Math.random() * (i + 1));
+          if (i == j) continue;
+          var k = list[i];
+          list[i] = list[j];
+          list[j] = k;
+        }
+
+        return list;
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Multiple Font Logo without Additional Markup</h1>
+
+    <p id="logo">Your Logo Here</p>
+
+    <p>Google Web Fontsの新機能textパラメーターを利用して、マークアップなしで一部分だけフォントを変更する。</p>
+  </body>
+</html>

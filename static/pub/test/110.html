@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<title>lifestream</title>
+
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("jquery", "1.3.2");
+</script>
+<script type="text/javascript">
+/**
+ * friendfeed/lifestream.js
+ *
+ * Copyright (c) 2009 Kyo Nagashima <kyo@hail2u.net>
+ * This library licensed under MIT license:
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+$(function () {
+  var ls = $("#lifestream");
+
+  ls.empty().append($("<p/>").append($("<em/>").append("データを取得中･･･")));
+
+  var entries = [];
+  var success = 0;
+  var error = 0;
+
+  for (var i = 0; i < 3; i++) {
+    $.getJSON("http://friendfeed.com/api/feed/user?callback=?", {
+      nickname: "hell2u",
+      start:    i * 100,
+      num:      100
+    }, function (data) {
+      if (data.entries) {
+        $.merge(entries, data.entries);
+        success++;
+      } else {
+        error++;
+      }
+
+      if (success === 3) {
+        $.each(entries, function () {
+          this.date = new Date(parseW3CDTF(this.published));
+          this.time = this.date.getTime();
+        });
+
+        ls.empty();
+        var ol = $("<ol/>");
+        var date = "";
+        var datecount = 7;
+        $.each(entries.sort(function (a, b) {
+          return b.time - a.time;
+        }), function () {
+          if (this.date.getDate() !== date) {
+            if (ol.children().length !== 0) {
+              ol.appendTo(ls);
+            }
+
+            if (datecount === 0) {
+              return false;
+            } else {
+              $("<h3/>").append(this.date.toLocaleDateString()).appendTo(ls);
+              ol = $("<ol/>");
+              date = this.date.getDate();
+              datecount--;
+            }
+          }
+
+          this.icon = getServiceIcon(this.service);
+
+          $("<li/>").append($("<a/>").attr({
+            href:  this.link,
+            title: "(" + this.date.toLocaleTimeString() + ") " + this.title
+          }).append($("<img/>").attr({
+            src:    this.icon,
+            alt:    this.title,
+            width:  16,
+            height: 16
+          }))).appendTo(ol);
+        });
+      } else if (success + error === 3) {
+        ls.empty().append($("<p/>").append("データを取得できませんでした。"));
+      }
+    });
+  }
+});
+
+
+function parseW3CDTF (datestring) {
+  return datestring.replace(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}:\d{2})Z$/, "$1/$2/$3 $4 UTC");
+}
+
+function getServiceIcon (s) {
+  var url;
+
+  url = s.profileUrl;
+
+  return "http://g.etfv.co/" + url;
+}
+</script>
+
+<link rel="stylesheet" type="text/css" href="../../styles/font.css">
+<style type="text/css">
+body {
+  font-family: "Verdana", sans-serif;
+}
+
+h1 {
+}
+
+#lifestream {
+}
+
+#lifestream h2 {
+}
+
+#lifestream ol {
+  list-style-type: none;
+}
+
+#lifestream ol li {
+  display: inline;
+}
+
+#lifestream ol li img {
+  border: none;
+}
+</style>
+</head>
+<body>
+<h1>lifestream</h1>
+
+<div id="lifestream"></div>
+</body>
+</html>

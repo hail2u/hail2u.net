@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>document.write()な外部JavaScriptに左右されずにページを読み込む</title>
+
+
+
+<script type="text/javascript" src="../../scripts/prototype.js"></script>
+<script type="text/javascript">
+var s = '';
+
+var dw = function () {
+  var text = arguments[0];
+  s += text;
+};
+
+document.write = dw;
+
+function outputText() {
+  alert('alert before output.')
+  $('blogroll').innerHTML = s;
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>document.write()な外部JavaScriptに左右されずにページを読み込む</h1>
+
+<p><code>document.write()</code>でHTMLなどを書き出す外部JavaScriptは、そのJavaScriptのあるサーバーのネットワーク状態が悪いとページの読み込みが止まってしまう欠点がある。<code>document.write()</code>を一時変数に格納するだけの関数で上書きすることによってその欠点を克服してみようという試み。</p>
+
+<p><code>document.write()</code>な外部JavaScriptの前にある文章。</p>
+
+<div id="blogroll">
+<script type="text/javascript" src="http://rpc.bloglines.com/blogroll?id=hail2u" defer="defer" onload="outputText()"></script>
+</div>
+
+<p><code>document.write()</code>な外部JavaScriptの後にある文章。</p>
+
+</body>
+
+</html>

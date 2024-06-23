@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>ArbitraryCounter Like Button</title>
+
+
+
+
+  </head>
+  <body>
+    <header>
+      <h1>ArbitraryCounter Like Button</h1>
+    </header>
+
+    <section>
+      <h1>カウントアップするデモ</h1>
+
+      <p><button disabled id="countup" data-count="0">Like!</button></p>
+
+      <p><a href="http://arbitrarycounter.com/">ArbitraryCounter</a> + <a href="http://jquery.com/">jQuery</a> + <a href="http://developer.yahoo.com/yql/">YQL</a> + <a href="http://www.datatables.org/">Open Data Tables</a>でPure JavaScriptなKudosやいいね！ボタンっぽいの作れる。</p>
+    </section>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+      var t = $('#countup');
+
+      $.getJSON('http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22http%3A%2F%2Farbitrarycounter.com%2Fvb%2Fnet.hail2u%2Fpub-test-477%22&format=json&callback=?').done(function (data) {
+        if (data) {
+          displayCount(data.query.results.json.count);
+        }
+
+        t.click(function () {
+          displayCount(+t.data('count') + 1);
+          t.prop('disabled', true);
+          $.getJSON('http://query.yahooapis.com/v1/public/yql?q=use%20%22http%3A%2F%2Fhail2u.net%2Fpub%2Ftest%2F477.xml%22%20as%20post%3B%20select%20*%20from%20post%20where%20url%3D%22http%3A%2F%2Farbitrarycounter.com%2Fvb%2Fnet.hail2u%2Fpub-test-477%2B%22&format=json&callback=?').done(function (data) {
+            if (data) {
+              displayCount(data.query.results.result.count);
+            }
+          });
+        });
+      });
+
+      function displayCount(count) {
+        t.attr('data-count', count);
+
+        if (count > 1) {
+          count = count + ' Likes!';
+        } else if (count === 1) {
+          count = count + ' Like!';
+        } else {
+          count = 'Like!';
+        }
+
+        t.text(count).prop('disabled', false);
+      }
+    </script>
+  </body>
+</html>

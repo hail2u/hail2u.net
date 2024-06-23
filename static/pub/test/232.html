@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Auto-linking Twitter Text</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Auto-linking Twitter Text</h1>
+
+    <p id="input">Lorem ipsum dolor sit amet. @hell2u
+http://www.example.com/ Www.Example.Com
+http://example.com/?foo=@bar#baz example.com #twitter #foo #bar
+</p>
+    <p id="output">Auto-linked texts goes here.</p>
+
+    <script>
+var input = $("#input").text(), output = $("#output").empty();
+
+var url     = "https?://\\S+";       var re_url     = new RegExp("^" + url);
+var mention = "@[0-9a-zA-Z_]{1,15}"; var re_mention = new RegExp("^" + mention);
+var hashtag = "#[0-9a-zA-Z]+";       var re_hashtag = new RegExp("^" + hashtag);
+var re_token = new RegExp("(" + url + "|" + mention + "|" + hashtag + ")", "g");
+var tokens = input.split(re_token);
+
+for (var i = 0, l = tokens.length; i < l; i++) {
+  var token = tokens[i];
+
+  if (re_url.test(token)) {
+    console.log("URL: " + token);
+    output.append($("<a/>", {
+      href: token
+    }).append(token));
+  } else if (re_mention.test(token)) {
+    console.log("Mention: " + token);
+    output.append($("<a/>", {
+      href: "http://twitter.com/" + encodeURIComponent(token.replace(/^@/, ""))
+    }).append(token));
+  } else if (re_hashtag.test(token)) {
+    console.log("Hashtag: " + token);
+    output.append($("<a/>", {
+      href: "http://twitter.com/search?q=" + encodeURIComponent(token)
+    }).append(token));
+  } else {
+    console.log("Plain: " + token);
+    output.append(token.replace(/[\r\n]/g, "<br>"));
+  }
+}
+    </script>
+  </body>
+</html>

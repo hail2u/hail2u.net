@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CCCCAPURE!</title>
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css">
+    <style>
+      html {
+        background-color: transparent;
+      }
+
+      body {
+        color: #fff;
+        background-color: #000;
+        font-family: "Baskerville", "Times New Roman", serif;
+      }
+
+      header, #list, footer {
+        border-top: 1px solid #333;
+        border-bottom: 1px solid #333;
+        width: 320px;
+        background-color: #333;
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 24px 0;
+        font-size: 24px;
+      }
+
+      #list figure {
+        margin: 8px;
+        width: 304px;
+      }
+
+      #list figure img {
+        width: 100%;
+        vertical-align: bottom;
+      }
+
+      footer address p {
+        margin: 24px 0;
+        font-size: 12px;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="./229.js"></script>
+    <script>
+      $(function () {
+        var statement = "select * from html where url='https://gist.github.com/929065/' and xpath='//span[@class=\"code\"]'";
+        var t = $("#list").empty().append($("<p/>").append("Loading ..."));
+
+        $.queryYQL(statement, function (data) {
+          if (data.query.results) {
+            t.empty();
+
+            $.each(data.query.results.span.reverse(), function () {
+              var url = "https://gist.github.com/raw/929065/" + this.content.replace(/[ \t\r\n]/g, "");
+
+              if (url.match(/\.png$/)) {
+                $("<figure/>", {
+                  id: this.a.href.replace(/^#/, "")
+                }).append($("<a/>", {
+                  href: url
+                }).append($("<img/>", {
+                  src: url
+                }))).appendTo(t);
+              }
+            });
+          } else {
+            t.empty().append($("<p/>").append("Oops, failed to fetch data."));
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>CCCCAPTURE!</h1>
+    </header>
+
+    <section id="list"></section>
+
+    <footer>
+      <address>
+        <p>&copy; 2011 Kyo Nagashima</p>
+      </address>
+    </footer>
+  </body>
+</html>

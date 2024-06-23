@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use LWP::Simple qw(get);
+use Path::Class qw();
+
+my @code = <STDIN>;
+my $idx = 0;
+my $found_metadata = 0;
+my $js_code = '';
+
+while (my $line = $code[$idx++]) {
+  if ($line =~ /^\/\/ ==ClosureCompiler==/) {
+    $found_metadata = 1;
+
+    last;
+  }
+}
+
+if ($found_metadata) {
+  while (my $line = $code[$idx++]) {
+    if ($line =~ /^\/\/ ==\/ClosureCompiler==/) {
+      last;
+    } elsif ($line =~ /^\/\/ @(\S+)\s*(.*)$/) {
+      if ($1 eq 'code_path' && -e $2) {
+        $js_code .= ';' . Path::Class::File->new($2)->slurp(iomode => '<:raw:utf8');
+      } elsif ($1 eq 'code_url' && head($2)) {
+        $js_code .= ';' . get($2);
+      }
+    }
+  }
+}
+
+binmode STDOUT, ':utf8';
+print $js_code . ';' . join('', @code);
+
+exit;

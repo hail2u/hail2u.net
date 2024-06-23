@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>SVG Arrow</title>
+
+
+    <style>
+      .test {
+        border: 4px solid rgb(134, 187, 204);
+        border-radius: 50%;
+        display: inline-block;
+        color: rgb(249, 246, 240);
+        background-color: rgb(172, 215, 230);
+        background-position: 50% 50%;
+      }
+
+      .left {
+        background-image: url("323-1.svg");
+      }
+
+      .right {
+        background-image: url("323-2.svg");
+      }
+
+      .s32 {
+        width: 32px;
+        height: 32px;
+      }
+
+      .s48 {
+        width: 48px;
+        height: 48px;
+      }
+
+      .s64 {
+        width: 64px;
+        height: 64px;
+      }
+
+      .s128 {
+        width: 128px;
+        height: 128px;
+      }
+
+      .bgsize {
+        background-image: url("323-3.svg");
+        background-size: 100% 100%;
+      }
+
+      .width100percent {
+        background-image: url("323-4.svg");
+      }
+
+      .before-magic {
+        width: 256px;
+        height: 256px;
+      }
+
+      .before-magic::before {
+        display: block;
+        width: 100%;
+        height: 100%;
+        content: url("323-2.svg");
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <header>
+      <h1>SVG Arrow</h1>
+    </header>
+
+    <p>確認に使ったWebKitベースのブラウザはChrome 15.0.874.121 mとSafari 5.1.2です。</p>
+
+    <div class="test left s32"></div>
+    <div class="test right s48"></div>
+    <div class="test left s64"></div>
+    <div class="test right s128"></div>
+
+    <p>WebKit以外ではキレイにリサイズされた矢印になる。WebKitでは<code>background-image</code>で使われたSVGを自動的にリサイズしてくれない。</p>
+
+    <h2><code>background-size</code></h2>
+
+    <div class="test s128 bgsize"></div>
+
+    <p>SVGで<code>width</code>と<code>height</code>属性を指定した上でCSSの<code>backgrond-size</code>プロパティーを使ったリサイズを行うと、サイズを合わせることは出来るが、ラスタライズされてからリサイズされるようでぼやける。</p>
+
+    <h2><code>&lt;svg width="100%"></code></h2>
+
+    <div class="test s64 width100percent"></div>
+    <div class="test s128 width100percent"></div>
+
+    <p>SVGのルート要素での<code>width</code>と<code>height</code>属性で<code>100%</code>を使うと、一見うまくいったように見えるが、同じSVG画像を更に利用した場合にリサイズ結果がコピーされる。上記デモだと最初の64pxへのリサイズがその後の128pxへのリサイズへ影響してしまう、または場合によってはその逆(挙動不審)。</dd>
+    </dl>
+
+    <h2><code>::before</code> Magic!</h2>
+
+    <div class="test before-magic"></div>
+
+    <p><code>::before</code>擬似要素と<code>content</code>プロパティーを使って画像を挿入する方法なら問題なし。</p>
+
+    <h2>SVG Code</h2>
+
+    <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg id=&quot;left-arrow&quot;
+  viewBox=&quot;0 0 64 64&quot;
+  version=&quot;1.1&quot;
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;g transform=&quot;translate(32), rotate(-45, 32, 32)&quot;&gt;
+    &lt;g fill=&quot;none&quot;
+      stroke=&quot;#fff&quot;
+      stroke-width=&quot;8&quot;&gt;
+      &lt;line x1=&quot;0&quot; y1=&quot;4&quot; x2=&quot;24&quot; y2=&quot;4&quot;/&gt;
+      &lt;line x1=&quot;4&quot; y1=&quot;0&quot; x2=&quot;4&quot; y2=&quot;24&quot;/&gt;
+    &lt;/g&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+  </body>
+</html>

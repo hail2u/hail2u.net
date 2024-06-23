@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<title>Google Ajax Search</title>
+
+
+
+<script type="text/javascript" src="../../scripts/prototype.js"></script>
+<script type="text/javascript" src="../../scripts/odj.js"></script>
+<script type="text/javascript">
+var apikey = 'ABQIAAAADruWJisdNuOIzVCLme1LtxQ4tU5HWHS81FfRqVuSdOOPdWACuhTcm1tSsMleRmGpuBd7Cun3BnMpSQ';
+
+function doSearch() {
+  $('results').innerHTML = '<div class="story"><h3>検索中･･･</h3><p>このサイト内から <em>' + $F('q') + ' を検索しています。しばらくお待ちください。</p></div>';
+  var url = 'http://www.google.com/uds/GwebSearch?' + $H({
+    lstkp:   0,
+    context: 0,
+    rsz:     'small',
+    hl:      'ja',
+    q:       $F('q') + ' site:hail2u.net',
+    key:     apikey,
+    v:       0.1
+  }).toQueryString();
+  var oOdj = new onDemandJavaScript();
+  oOdj.request(url, handleGwebSearchResults, 'callback');
+}
+
+function handleGwebSearchResults(i, r, n, m) {
+  var buf = [
+    '<div class="story"><h3>このサイト内から <em>',
+    $F('q'),
+    '</em> を検索しました</h3>'
+  ];
+  r.results.each(function (result) {
+    buf.push([
+      '<div class="story"><h4><a href="',
+      result.url,
+      '">',
+      result.titleNoFormatting,
+      '</a></h4><p class="summary">',
+      hilightSummary(result.content),
+      '</p><p class="info">',
+      result.url.replace(/^https?:\/\//, ''),
+      '</p><hr />'
+    ].join(''));
+  });
+
+  if (r.results.length >= 4) {
+    buf.push([
+      '<p class="info"><a href="http://www.google.com/search?ie=UTF-8&start=4&q=',
+      encodeURIComponent($F('q') + ' site:hail2u.net'),
+      '">&#187; Googleでさらに検索<a></p>'
+    ].join(''));
+  }
+
+  buf.push('</div>');
+  $('results').innerHTML = buf.join('');
+}
+
+function hilightSummary(summary) {
+  var words = $F('q').split(" ");
+
+  words.each(function (word) {
+    var re = new RegExp(word, 'gi');
+    var s = '<em>' + word + '</em>';
+    summary = summary.replace(re, s);
+  });
+
+  return summary;
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>Google Ajax Search</h1>
+
+<form onsubmit="doSearch(); return false;">
+<p><input type="text" name="q" size="32" value="blosxom" id="q" />
+<input type="submit" value="Submit" /></p>
+</form>
+
+<div id="results"></div>
+
+</body>
+
+</html>

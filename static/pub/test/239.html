@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Resize Font Based on Content Width #5</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Vollkorn">
+    <style>
+      html {
+        height: 100%;
+      }
+
+      body {
+        margin-bottom: 1px;
+        height: 100%;
+      }
+
+      .line {
+        margin: 0;
+        padding: 0;
+        font-family: "Vollkorn", "Baskerville", "Time New Roman", serif;
+        font-size: 16px;
+        line-height: 1;
+        text-align: justify;
+      }
+    </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+$(window).load(function () {
+  var start = $.now();
+
+  $(".line").each(function () {
+    var t = $(this);
+    var text = t.text();
+    var size = parseInt(t.css("font-size"), 10);
+
+    var temp = $("<div/>").css({
+      "display":     "none",
+      "font-family": t.css("font-family"),
+      "font-size":   size
+    }).text(text).appendTo(t.parent());
+
+    var t_width = t.width();
+    var temp_width = temp.width();
+
+    while (temp_width < t_width) {
+      size++;
+      temp.css("font-size", size + "px");
+      temp_width = temp.width();
+    }
+
+    size--;
+    t.css("font-size", size + "px");
+    temp.remove();
+  });
+
+  var time = $.now() - start;
+  $("body").append($("<p/>").text("Elapsed Time: " + time));
+});
+    </script>
+  </head>
+
+  <body>
+    <h1>Resize Font Based on Content Width #5</h1>
+
+    <p class="line">Typography</p>
+    <p class="line">is the art</p>
+    <p class="line">and technique of</p>
+    <p class="line">arranging type</p>
+  </body>
+</html>

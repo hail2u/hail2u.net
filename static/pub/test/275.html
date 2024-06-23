@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>ふぁぼったーの新着ツイートをひらがな化して表示</title>
+
+
+    <style type="text/css">
+      @import url("227.css");
+
+      #tweet h1 {
+        font-size: 100%;
+      }
+
+      #status {
+        font: 27px/1.5 "Kiloji P", sans-serif;
+      }
+    </style>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        getTopTweet();
+      });
+
+      function getTopTweet () {
+        var t = $("#tweet").empty().append($("<p/>").append("Loading..."));
+
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+          q:      "select * from rss where url='http://favotter.net/home.php?env=rss&mode=new'",
+          format: "json"
+        }, function (data) {
+          if (data.query.results && data.query.results.item) {
+            loadTweet(data.query.results.item[0].guid);
+          } else {
+            t.append($("<p/>").append("Oops, failed to fetch data from Favotter."));
+          }
+        });
+      }
+
+      function loadTweet (tweetid) {
+        var t = $("#tweet").empty().append($("<p/>").append("Loading..."));
+
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+          q:      "select * from json where url='https://api.twitter.com/1/statuses/show.json?id=" + tweetid + "'",
+          format: "json"
+        }, function (data) {
+          t.empty();
+
+          if (data.query.results && data.query.results.json) {
+            var st = data.query.results.json;
+            console.log(st);
+            var username = st.user.screen_name;
+            $("<h1/>").append("Tweet from ").append($("<a/>", {
+              href: "http://twitter.com/" + username
+            }).append(username)).appendTo(t);
+            $("<p/>", {
+              id: "status"
+            }).append(st.text).appendTo(t);
+
+            $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+              q:      "SELECT * FROM yahoojp.jlp.furigana.furigana WHERE appid='fvFniIOxg65wd_4u77dXLQUPXkLcmKb7pKjGg77IBP49oWE.TzSNdpc-' and sentence='" + st.text + "'",
+              format: "json",
+              env:    "store://datatables.org/alltableswithkeys"
+            }, function (d2) {
+              if (d2.query.results) {
+                var s = "";
+                $.each(d2.query.results.Result.WordList.Word, function () {
+                  if (this.Furigana) {
+                    s += this.Furigana;
+                  } else {
+                    s += this.Surface;
+                  }
+                });
+                $("#status").empty().append(s.replace(/(https?:\/\/.+?)( |\n|$)/g, "<a href=\"$1\">$1</a>$2").replace(/(@)(\w+)/g, "<a href=\"http://twitter.com/$2\">$1$2</a>").replace(/\n/g, "<br>"));
+              }
+            });
+          } else {
+            t.append($("<p/>").append("Oops, failed to fetch data from Twitter."));
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>ふぁぼったーの新着ツイートをひらがな化して表示</h1>
+
+    <section id="tweet">
+      <p>ふぁぼったー</p>
+    </section>
+  </body>
+</html>

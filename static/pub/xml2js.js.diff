@@ -1,0 +1,16 @@
+--- _xml2js.js	Thu Feb 19 19:14:23 2015
++++ xml2js.js	Thu Feb 19 19:14:53 2015
+@@ -185,7 +185,12 @@
+               } else if (typeof child === "object") {
+                 element = arguments.callee(element.ele(key), child).up();
+               } else {
+-                element = element.ele(key, child.toString()).up();
++                entry = child.toString();
++                if (_this.options.cdata && requiresCDATA(entry)) {
++                  element = element.ele(key).raw(wrapCDATA(entry)).up();
++                } else {
++                  element = element.ele(key, entry).up();
++                }
+               }
+             }
+           }
