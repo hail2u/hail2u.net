@@ -1,20 +1,22 @@
 import config from "../config.js";
+import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
 import { guessPath } from "./lib/guess-path.js";
-import { outputFile } from "./lib/output-file.js";
+import mustache from "mustache";
 import path from "node:path";
-import { readJSONFile } from "./lib/json-file.js";
-import { renderTemplate } from "./lib/render-template.js";
 
-const toFilesFormat = (file) => ({
-  dest: guessPath(file, config.dir.dest, "feed"),
-  metadata: guessPath(file, config.dir.metadata, "index.json"),
-  template: file,
+const toFilesFormat = (template) => ({
+  dest: guessPath(template, config.dir.dest, "feed"),
+  metadata: guessPath(template, config.dir.metadata, "index.json"),
+  template,
 });
 
 const gatherFiles = async () => {
-  const files = await fs.glob(`${config.dir.template}**/_feed.mustache`);
-  return Array.fromAsync(files, toFilesFormat);
+  const filesIterator = await fs.glob(
+    `${config.dir.template}**/_feed.mustache`,
+  );
+  const templates = await Array.fromAsync(filesIterator);
+  return Promise.all(templates.map(toFilesFormat));
 };
 
 const toAbsoluteURL = (prefix, url) => {
@@ -50,9 +52,9 @@ const extendItem = (prefix, item) => {
   };
 };
 
-const readData = async (prefix, dataFile) => {
+const readLatestData = async (prefix, dataFile) => {
   const basename = path.basename(dataFile, ".json");
-  const data = await readJSONFile(dataFile);
+  const data = await fs.readFile(dataFile).then(JSON.parse);
 
   if (!data[0].published) {
     return { [basename]: [] };
@@ -63,14 +65,17 @@ const readData = async (prefix, dataFile) => {
   return { [basename]: extended };
 };
 
-const readLatestData = async (prefix) => {
-  const dataFiles = await fs.glob(`${config.dir.data}**/*.json`);
-  const data = await Array.fromAsync(dataFiles, readData.bind(null, prefix));
+const readAllData = async (prefix) => {
+  const filesIterator = await fs.glob(`${config.dir.data}**/*.json`);
+  const dataFiles = await Array.fromAsync(filesIterator);
+  const data = await Promise.all(
+    dataFiles.map(readLatestData.bind(null, prefix)),
+  );
   return Object.assign(...data);
 };
 
 const mergeData = async (file, metadata, data) => {
-  const overrides = await readJSONFile(file.metadata);
+  const overrides = await fs.readFile(file.metadata).then(JSON.parse);
   return {
     ...metadata,
     ...data,
@@ -83,21 +88,24 @@ const build = async (metadata, data, file) => {
     mergeData(file, metadata, data),
     fs.readFile(file.template, "utf8"),
   ]);
-  const rendered = renderTemplate(template, merged);
-  await outputFile(file.dest, rendered);
+  const rendered = mustache.render(template, merged, null, {
+    escape: escapeCharacters,
+  });
+  await fs.mkdir(path.dirname(file.dest), { recursive: true });
+  await fs.writeFile(file.dest, rendered);
 };
 
 const comparePublished = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-  const metadata = await readJSONFile(
-    path.join(config.dir.metadata, "root.json"),
-  );
+  const metadata = await fs
+    .readFile(path.join(config.dir.metadata, "root.json"))
+    .then(JSON.parse);
   const prefix = `${metadata.scheme}://${metadata.domain}`;
   const [files, { articles, books, links, statuses }] = await Promise.all([
     gatherFiles(),
-    readLatestData(prefix),
+    readAllData(prefix),
   ]);
   return Promise.all(
     files.map(
@@ -105,8 +113,7 @@ const main = async () => {
         articles,
         books,
         items: [...articles, ...books, ...links, ...statuses]
-          .sort(comparePublished)
-          // .toSorted(comparePublished)
+          .toSorted(comparePublished)
           .slice(0, 10),
         links,
         statuses,

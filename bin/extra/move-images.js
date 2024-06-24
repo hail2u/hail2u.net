@@ -30,8 +30,9 @@ const main = async () => {
     throw new Error("1 argument is required. This is for an source directory.");
   }
 
-  const files = await fs.glob(`${src}*.jpg`);
-  await Array.fromAsync(files, build);
+  const filesIterator = await fs.glob(`${src}*.jpg`);
+  const images = await Array.fromAsync(filesIterator);
+  await Promise.all(images.map(build));
 };
 
 main().catch((e) => {

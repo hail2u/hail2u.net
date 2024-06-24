@@ -1,7 +1,6 @@
-import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
+import { fs } from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
-import { openTwitter } from "./lib/open-twitter.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
@@ -39,24 +38,32 @@ const main = async () => {
   }
 
   const file = path.join(config.dir.data, "links.json");
-  const links = await readJSONFile(file);
+  const links = await fs.readFile(file).then(JSON.parse);
   const published = Date.now();
   const dt = getDateDetails(published);
-  await outputJSONFile(file, [
-    {
-      description: comment,
-      link: url,
-      published,
-      ...dt,
-      shortDescription: `${comment.split("。")[0]}。`,
-      title,
-      type: "link",
-    },
-    ...links,
-  ]);
+  const formatted = JSON.stringify(
+    [
+      {
+        description: comment,
+        link: url,
+        published,
+        ...dt,
+        shortDescription: `${comment.split("。")[0]}。`,
+        title,
+        type: "link",
+      },
+      ...links,
+    ],
+    null,
+    2,
+  );
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
-  await openTwitter(`${comment} ${url}`);
+  const twitter = new URL("https://x.com/intent/tweet");
+  twitter.searchParams.append("text", `${comment} ${url}`);
+  await runCommand("open", [twitter.href]);
 };
 
 main().catch((e) => {

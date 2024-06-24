@@ -1,7 +1,7 @@
 import { escapeCharacters, unescapeReferences } from "./character-reference.js";
 import config from "../../config.js";
 import fs from "node:fs/promises";
-import { outputFile } from "./output-file.js";
+import path from "node:path";
 import readline from "node:readline/promises";
 
 const toDraft = (draft) => {
@@ -56,7 +56,8 @@ ${menulist}
   const selected = drafts[index];
   const remains = drafts.toSpliced(index, 1);
   const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
-  await outputFile(file, rebuilt.join("\n\n"));
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, rebuilt.join("\n\n"));
   return selected;
 };
 

@@ -1,10 +1,9 @@
 import config from "../config.js";
+import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
 import { guessPath } from "./lib/guess-path.js";
-import { outputFile } from "./lib/output-file.js";
+import mustache from "mustache";
 import path from "node:path";
-import { readJSONFile } from "./lib/json-file.js";
-import { renderTemplate } from "./lib/render-template.js";
 import util from "node:util";
 
 const isFirstInDate = (current, previous) => {
@@ -75,14 +74,15 @@ const markItem = (item, index, items) => {
 
 const readData = async (file) => {
   const basename = path.basename(file, ".json");
-  const data = await readJSONFile(file);
+  const data = await fs.readFile(file).then(JSON.parse);
   const marked = await Promise.all(data.map(markItem));
   return { [basename]: marked };
 };
 
 const readAllData = async () => {
-  const files = await fs.glob(`${config.dir.data}**/*.json`);
-  const data = await Array.fromAsync(files, readData);
+  const filesIterator = await fs.glob(`${config.dir.data}**/*.json`);
+  const dataFiles = await Array.fromAsync(filesIterator);
+  const data = await Promise.all(dataFiles.map(readData));
   return Object.assign(...data);
 };
 
@@ -93,8 +93,11 @@ const readPartial = async (file) => {
 };
 
 const readPartials = async () => {
-  const files = await fs.glob(`${config.dir.template}partials/*.mustache`);
-  const partials = await Array.fromAsync(files, readPartial);
+  const filesIterator = await fs.glob(
+    `${config.dir.template}partials/*.mustache`,
+  );
+  const templates = await Array.fromAsync(filesIterator);
+  const partials = await Promise.all(templates.map(readPartial));
   return Object.assign(...partials);
 };
 
@@ -103,26 +106,26 @@ const startsWithUnderscore = (file) => {
   return filename.startsWith("_");
 };
 
-const toFilesFormat = (file) => {
-  if (typeof file === "object") {
-    const template = path.join(
+const toFilesFormat = (template) => {
+  if (typeof template === "object") {
+    const articleTemplate = path.join(
       config.dir.template,
       "blog",
       "_article.mustache",
     );
     return {
-      ...file,
-      dest: path.join(config.dir.dest, file.link),
-      metadata: guessPath(template, config.dir.metadata, "article.json"),
-      template,
+      ...template,
+      dest: path.join(config.dir.dest, template.link),
+      metadata: guessPath(articleTemplate, config.dir.metadata, "article.json"),
+      template: articleTemplate,
     };
   }
 
-  const basename = path.basename(file, path.extname(file));
+  const basename = path.basename(template, path.extname(template));
   const doubleExt = path.extname(basename);
 
   if (doubleExt) {
-    const dirname = path.dirname(file);
+    const dirname = path.dirname(template);
     return {
       dest: guessPath(path.join(dirname, basename), config.dir.dest, doubleExt),
       metadata: guessPath(
@@ -130,28 +133,29 @@ const toFilesFormat = (file) => {
         config.dir.metadata,
         ".json",
       ),
-      template: file,
+      template,
     };
   }
 
   return {
-    dest: guessPath(file, config.dir.dest, ".html"),
-    metadata: guessPath(file, config.dir.metadata, ".json"),
-    template: file,
+    dest: guessPath(template, config.dir.dest, ".html"),
+    metadata: guessPath(template, config.dir.metadata, ".json"),
+    template,
   };
 };
 
 const gatherFiles = async () => {
-  const files = await fs.glob(`${config.dir.template}**/*.mustache`, {
+  const filesIterator = await fs.glob(`${config.dir.template}**/*.mustache`, {
     exclude: startsWithUnderscore,
   });
-  return Array.fromAsync(files, toFilesFormat);
+  const templates = await Array.fromAsync(filesIterator);
+  return Promise.all(templates.map(toFilesFormat));
 };
 
 const hasSameLink = (dest, article) => dest.endsWith(article.link);
 
 const mergeData = async (file, metadata, data) => {
-  const overrides = await readJSONFile(file.metadata);
+  const overrides = await fs.readFile(file.metadata).then(JSON.parse);
 
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
@@ -200,8 +204,11 @@ const build = async (metadata, data, partials, file) => {
     mergeData(file, metadata, data),
     fs.readFile(file.template, "utf8"),
   ]);
-  const rendered = renderTemplate(template, merged, partials);
-  await outputFile(file.dest, rendered);
+  const rendered = mustache.render(template, merged, partials, {
+    escape: escapeCharacters,
+  });
+  await fs.mkdir(path.dirname(file.dest), { recursive: true });
+  await fs.writeFile(file.dest, rendered);
 };
 
 const main = async () => {
@@ -214,7 +221,7 @@ const main = async () => {
     },
     files,
   ] = await Promise.all([
-    readJSONFile(path.join(config.dir.metadata, "root.json")),
+    fs.readFile(path.join(config.dir.metadata, "root.json")).then(JSON.parse),
     readAllData(),
     readPartials(),
     util.parseArgs({

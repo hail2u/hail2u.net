@@ -1,8 +1,7 @@
-import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import { escapeCharacters } from "./lib/character-reference.js";
+import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
-import { openTwitter } from "./lib/open-twitter.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import sharp from "sharp";
@@ -51,7 +50,7 @@ const main = async () => {
   }
 
   const file = path.join(config.dir.data, "books.json");
-  const books = await readJSONFile(file);
+  const books = await fs.readFile(file, "utf8").then(JSON.parse);
 
   if (books.find(isReadBook.bind(null, title))) {
     throw new Error(`${title} has already been added.`);
@@ -80,21 +79,29 @@ const main = async () => {
     const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" loading="lazy" src="${cover}" width="${metadata.width}"></a>`;
     const published = Date.now();
     const dt = getDateDetails(published);
-    await outputJSONFile(file, [
-      {
-        body,
-        description: author,
-        link,
-        published,
-        ...dt,
-        title,
-        type: "book",
-      },
-      ...books,
-    ]);
+    const formatted = JSON.stringify(
+      [
+        {
+          body,
+          description: author,
+          link,
+          published,
+          ...dt,
+          title,
+          type: "book",
+        },
+        ...books,
+      ],
+      null,
+      2,
+    );
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, `${formatted}\n`);
     await runCommand("git", ["add", "--", file]);
     await runCommand("git", ["commit", `--message=Read ${asin}`]);
-    await openTwitter(`${link}`);
+    const twitter = new URL("https://x.com/intent/tweet");
+    twitter.searchParams.append("text", link);
+    await runCommand("open", [twitter.href]);
   } catch (e) {
     if (e.name === "AbortError") {
       throw new Error("Amazon image server does not respond in 5s.");

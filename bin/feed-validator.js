@@ -5,9 +5,12 @@ import { guessPath } from "./lib/guess-path.js";
 
 const toDest = (file) => guessPath(file, config.dir.dest, "feed");
 
-const gatherFiles = async () => {
-  const files = await fs.glob(`${config.dir.template}**/_feed.mustache`);
-  return Array.fromAsync(files, toDest);
+const gatherFeeds = async () => {
+  const filesIterator = await fs.glob(
+    `${config.dir.template}**/_feed.mustache`,
+  );
+  const templates = await Array.fromAsync(filesIterator);
+  return Promise.all(templates.map(toDest));
 };
 
 const cancelFetch = (abortController) => {
@@ -85,7 +88,7 @@ const validate = async (file) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const main = async () => {
-  const feeds = await gatherFiles();
+  const feeds = await gatherFeeds();
   const results = await Promise.all(feeds.map(validate));
   const errors = results.flat();
 

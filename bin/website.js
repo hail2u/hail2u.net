@@ -1,6 +1,5 @@
-import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
-import { openTwitter } from "./lib/open-twitter.js";
+import { fs } from "node:fs/promises";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { shuffleArray } from "./lib/shuffle-array.js";
@@ -49,7 +48,7 @@ const main = async () => {
   }
 
   const file = path.join(config.dir.data, "websites.json");
-  const websites = await readJSONFile(file);
+  const websites = await fs.readFile(file).then(JSON.parse);
 
   if (websites.find(isSubscribed.bind(null, url))) {
     throw new Error(`${title} has already been subscribed.`);
@@ -64,10 +63,14 @@ const main = async () => {
     },
     ...websites,
   ]);
-  await outputJSONFile(file, shuffled);
+  const formatted = JSON.stringify(shuffled, null, 2);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
-  await openTwitter(`${author} の ${title} を購読 ${url}`);
+  const twitter = new URL("https://x.com/intent/tweet");
+  twitter.searchParams.append("text", `${author} の ${title} を購読 ${url}`);
+  await runCommand("open", [twitter.href]);
 };
 
 main().catch((e) => {

@@ -5,8 +5,7 @@
 import fs from "node:fs/promises";
 
 const file = new URL("./package.json", import.meta.url);
-const json = await fs.readFile(file, "utf8");
-const pkg = await JSON.parse(json);
+const pkg = await fs.readFile(file, "utf8").then(JSON.parse);
 
 export default {
   dir: {

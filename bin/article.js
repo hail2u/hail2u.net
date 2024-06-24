@@ -2,12 +2,9 @@ import {
   escapeCharacters,
   unescapeReferences,
 } from "./lib/character-reference.js";
-import { outputJSONFile, readJSONFile } from "./lib/json-file.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
-import { openTwitter } from "./lib/open-twitter.js";
-import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
@@ -102,7 +99,7 @@ const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
   const [selected, articles] = await Promise.all([
     selectDraft(),
-    readJSONFile(file),
+    fs.readFile(file).then(JSON.parse),
   ]);
   const body = selected.body.replace(
     /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
@@ -112,29 +109,34 @@ const main = async () => {
     ...selected,
     body,
   });
-  const dataFile = path.join(config.dir.data, article.link);
+  const articleFile = path.join(config.dir.data, article.link);
+  await fs.mkdir(path.dirname(articleFile), { recursive: true });
   const escapedTitle = escapeCharacters(article.title);
+  const formatted = JSON.stringify([article, ...articles], null, 2);
+  await fs.mkdir(path.dirname(file), { recursive: true });
   await Promise.all([
-    outputJSONFile(file, [article, ...articles]),
-    outputFile(
-      dataFile,
+    fs.writeFile(file, `${formatted}\n`),
+    fs.writeFile(
+      articleFile,
       `<h1>${escapedTitle}</h1>
 
 ${body}
 `,
     ),
   ]);
-  await runCommand("git", ["add", "--", file, dataFile]);
+  await runCommand("git", ["add", "--", file, articleFile]);
   const th = articles.length + 1;
   const [{ domain, scheme }] = await Promise.all([
-    readJSONFile(path.join(config.dir.metadata, "root.json")),
+    fs.readFile(path.join(config.dir.metadata, "root.json")).then(JSON.parse),
     runCommand("git", [
       "commit",
       `--message=Contribute ${article.link} (${th})`,
     ]),
   ]);
   const text = buildText(article, domain, scheme);
-  await openTwitter(text);
+  const twitter = new URL("https://x.com/intent/tweet");
+  twitter.searchParams.append("text", text);
+  await runCommand("open", [twitter.href]);
 };
 
 main().catch((e) => {

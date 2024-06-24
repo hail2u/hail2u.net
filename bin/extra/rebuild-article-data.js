@@ -1,4 +1,3 @@
-import { outputJSONFile, readJSONFile } from "../lib/json-file.js";
 import config from "../../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "../lib/get-date-details.js";
@@ -48,9 +47,11 @@ const rebuildArticle = async (article) => {
 
 const main = async () => {
   const file = path.join(config.dir.data, "articles.json");
-  const articles = await readJSONFile(file);
+  const articles = await fs.readFile(file, "utf8").then(JSON.parse);
   const newArticles = await Promise.all(articles.map(rebuildArticle));
-  await outputJSONFile(file, newArticles);
+  const formatted = JSON.stringify(newArticles, null, 2);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, `${formatted}\n`);
 };
 
 main().catch((e) => {

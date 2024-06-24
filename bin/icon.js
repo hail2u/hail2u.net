@@ -1,6 +1,6 @@
 import config from "../config.js";
+import fs from "node:fs/promises";
 import ico from "@fiahfy/ico";
-import { outputFile } from "./lib/output-file.js";
 import path from "node:path";
 import sharp from "sharp";
 
@@ -18,8 +18,10 @@ const appendTo = async (favicon, img) => {
 };
 
 const main = async () => {
-  const [favicon, touchIcon, ...icons] = await Promise.all([
+  const file = path.join(config.dir.dest, "favicon.ico");
+  const [favicon, , touchIcon, ...icons] = await Promise.all([
     new ico.Ico(),
+    fs.mkdir(path.dirname(file), { recursive: true }),
     generatePNG(config.file.icon, 180),
     generatePNG(config.file.icon, 16),
     generatePNG(config.file.icon, 24),
@@ -32,7 +34,7 @@ const main = async () => {
   await Promise.all(icons.map(appendTo.bind(null, favicon)));
   await Promise.all([
     touchIcon.toFile(path.join(config.dir.dest, "apple-touch-icon.png")),
-    outputFile(path.join(config.dir.dest, "favicon.ico"), favicon.data),
+    fs.writeFile(file, favicon.data),
   ]);
 };
 
