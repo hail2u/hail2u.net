@@ -98,6 +98,11 @@ const readPartials = async () => {
   return Object.assign(...partials);
 };
 
+const startsWithUnderscore = (file) => {
+  const filename = file.split("/").at(-1);
+  return filename.startsWith("_");
+};
+
 const toFilesFormat = (file) => {
   if (typeof file === "object") {
     const template = path.join(
@@ -134,11 +139,6 @@ const toFilesFormat = (file) => {
     metadata: guessPath(file, config.dir.metadata, ".json"),
     template: file,
   };
-};
-
-const startsWithUnderscore = (file) => {
-  const filename = file.split("/").at(-1);
-  return filename.startsWith("_");
 };
 
 const gatherFiles = async () => {
