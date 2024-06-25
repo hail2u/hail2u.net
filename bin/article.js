@@ -126,14 +126,11 @@ ${body}
   ]);
   await runCommand("git", ["add", "--", file, articleFile]);
   const th = articles.length + 1;
-  const [{ domain, scheme }] = await Promise.all([
-    fs.readFile(path.join(config.dir.metadata, "root.json")).then(JSON.parse),
-    runCommand("git", [
-      "commit",
-      `--message=Contribute ${article.link} (${th})`,
-    ]),
+  await runCommand("git", [
+    "commit",
+    `--message=Contribute ${article.link} (${th})`,
   ]);
-  const text = buildText(article, domain, scheme);
+  const text = buildText(article, config.domain, config.scheme);
   const twitter = new URL("https://x.com/intent/tweet");
   twitter.searchParams.append("text", text);
   await runCommand("open", [twitter.href]);

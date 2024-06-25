@@ -213,7 +213,6 @@ const build = async (metadata, data, partials, file) => {
 
 const main = async () => {
   const [
-    metadata,
     { articles, books, links, projects, statuses, websites },
     partials,
     {
@@ -221,7 +220,6 @@ const main = async () => {
     },
     files,
   ] = await Promise.all([
-    fs.readFile(path.join(config.dir.metadata, "root.json")).then(JSON.parse),
     readAllData(),
     readPartials(),
     util.parseArgs({
@@ -250,7 +248,7 @@ const main = async () => {
 
   if (latest) {
     const article = await toFilesFormat(articles[0]);
-    await build(metadata, data, partials, article);
+    await build(config, data, partials, article);
   }
 
   if (all) {
@@ -261,11 +259,11 @@ const main = async () => {
     for (let i = 0; i < repeat; i += 1) {
       const chunk = articleFiles.slice(i * thread, (i + 1) * thread);
       /* eslint-disable-next-line no-await-in-loop */
-      await Promise.all(chunk.map(build.bind(null, metadata, data, partials)));
+      await Promise.all(chunk.map(build.bind(null, config, data, partials)));
     }
   }
 
-  await Promise.all(files.map(build.bind(null, metadata, data, partials)));
+  await Promise.all(files.map(build.bind(null, config, data, partials)));
 };
 
 main().catch((e) => {

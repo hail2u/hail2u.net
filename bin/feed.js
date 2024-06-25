@@ -99,17 +99,14 @@ const comparePublished = (a, b) =>
   Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const main = async () => {
-  const metadata = await fs
-    .readFile(path.join(config.dir.metadata, "root.json"))
-    .then(JSON.parse);
-  const prefix = `${metadata.scheme}://${metadata.domain}`;
+  const prefix = `${config.scheme}://${config.domain}`;
   const [files, { articles, books, links, statuses }] = await Promise.all([
     gatherFiles(),
     readAllData(prefix),
   ]);
   return Promise.all(
     files.map(
-      build.bind(null, metadata, {
+      build.bind(null, config, {
         articles,
         books,
         items: [...articles, ...books, ...links, ...statuses]
