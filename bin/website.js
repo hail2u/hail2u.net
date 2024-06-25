@@ -2,7 +2,6 @@ import config from "../config.js";
 import { fs } from "node:fs/promises";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
-import { shuffleArray } from "./lib/shuffle-array.js";
 import util from "node:util";
 
 const isSubscribed = (url, subscription) => url === subscription.url;
@@ -54,16 +53,19 @@ const main = async () => {
     throw new Error(`${title} has already been subscribed.`);
   }
 
-  const shuffled = shuffleArray([
-    {
-      author,
-      feed,
-      link: url,
-      title,
-    },
-    ...websites,
-  ]);
-  const formatted = JSON.stringify(shuffled, null, 2);
+  const formatted = JSON.stringify(
+    [
+      {
+        author,
+        feed,
+        link: url,
+        title,
+      },
+      ...websites,
+    ],
+    null,
+    2,
+  );
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);

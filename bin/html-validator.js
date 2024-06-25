@@ -1,7 +1,6 @@
 import config from "../config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { shuffleArray } from "./lib/shuffle-array.js";
 import util from "node:util";
 
 const rewritePath = ([, relative]) => {
@@ -24,7 +23,9 @@ const listArticle = (sitemap, latest) => {
     return articles.slice(0, 1);
   }
 
-  return shuffleArray(articles).slice(0, 3);
+  return Array(3)
+    .fill(articles.length)
+    .map((max) => articles[Math.floor(Math.random() * max)]);
 };
 
 const cancelFetch = (abortController) => {
