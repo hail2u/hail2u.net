@@ -10,9 +10,13 @@ const isSubscribed = (url, subscription) => url === subscription.url;
 
 const main = async () => {
   const {
-    values: { feed, title, url },
+    values: { author, feed, title, url },
   } = util.parseArgs({
     options: {
+      author: {
+        short: "a",
+        type: "string",
+      },
       feed: {
         short: "f",
         type: "string",
@@ -27,6 +31,10 @@ const main = async () => {
       },
     },
   });
+
+  if (!author) {
+    throw new Error("--author is required.");
+  }
 
   if (!feed) {
     throw new Error("--feed is required.");
@@ -49,6 +57,7 @@ const main = async () => {
 
   const shuffled = shuffleArray([
     {
+      author,
       feed,
       link: url,
       title,
@@ -58,7 +67,7 @@ const main = async () => {
   await outputJSONFile(file, shuffled);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
-  await openTwitter(`${title} のウェブログを購読 ${url}`);
+  await openTwitter(`${author} の ${title} を購読 ${url}`);
 };
 
 main().catch((e) => {
