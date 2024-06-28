@@ -31,4 +31,3 @@ var ItemSearchResponse = {
   </xsl:template>
 
 </xsl:stylesheet>
-

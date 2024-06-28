@@ -7,20 +7,20 @@
  *
  *     Test
  *     ====
- *     
+ *
  *     <!-- #toc -->
  *     <!-- /toc -->
- *     
+ *
  *     Foo
  *     ---
- *     
+ *
  *     ### Foo Foo
- *     
+ *
  *     ### Foo Bar
- *     
+ *
  *     Bar
  *     ---
- *     
+ *
  *     ### Bar Foo
  *
  * Then run:
@@ -31,27 +31,27 @@
  *
  *     Test
  *     ====
- *     
+ *
  *     <!-- #toc -->
- *     
+ *
  *     * [Foo](#foo)
  *       * [Foo Foo](#foo-foo)
  *       * [Foo Bar](#foo-bar)
  *     * [Bar](#bar)
  *       * [Bar Foo](#bar-foo)
- *     
+ *
  *     <!-- /toc -->
- *     
+ *
  *     Foo
  *     ---
- *     
+ *
  *     ### Foo Foo
- *     
+ *
  *     ### Foo Bar
- *     
+ *
  *     Bar
  *     ---
- *     
+ *
  *     ### Bar Foo
  */
 

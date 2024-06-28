@@ -141,7 +141,7 @@ Ten.XHR = new Ten.Class({
 
         if (!opts) opts = {};
 
-        if (opts.method) 
+        if (opts.method)
             this.method = opts.method;
 
         var self = this;
@@ -215,7 +215,7 @@ Ten.XHR = new Ten.Class({
         params = params ? Ten.XHR.makePostData(params) : null;
 
         req.open(this.method, url, true);
-        if (this.method == 'POST') 
+        if (this.method == 'POST')
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         req.send(params);
     },
@@ -323,7 +323,7 @@ Ten.Event = new Ten.Class({
 Ten.EventDispatcher = new Ten.Class({
     initialize: function() {
         this._eventListeners = {};
-    }, 
+    },
     implementEventDispatcher: function(obj) {
         Ten.Class.inherit(obj, Ten.EventDispatcher.prototype);
         obj._eventListeners = {};
@@ -416,7 +416,7 @@ Ten.DOM = new Ten.Class({
         if (typeof(parent) == 'undefined') parent = document;
         if (!tagName) return Ten.DOM.getElementsByClassName(className, parent);
         var children = parent.getElementsByTagName(tagName);
-        if (className) { 
+        if (className) {
             var elements = [];
             for (var i = 0; i < children.length; i++) {
                 var child = children[i];
@@ -954,7 +954,7 @@ Ten._Selector = new Ten.Class({
             for (var i = 0; i < arr.length; i++) {
                 var o = arr[i];
                 if ((o && o instanceof Array) ||
-                    (o && typeof(o.length) === 'number' 
+                    (o && typeof(o.length) === 'number'
                        && typeof(o) != 'string'
                        && !o.tagName)){
                     arguments.callee(o);
@@ -995,7 +995,7 @@ Ten._SelectorNode = new Ten.Class({
                     var ret = [];
                     for (var i = 0, len = elems.length ; i < len ; i++ ) {
                         var children =  elems[i].parentNode.childNodes;
-                        if((index >= 0 && children[index] == elems[i]) 
+                        if((index >= 0 && children[index] == elems[i])
                             || (index < 0 && children[children.length - 1] == elems[i]))
                                  ret.push(elems[i]);
                     }
@@ -1016,7 +1016,7 @@ Ten._SelectorNode = new Ten.Class({
                     array.push(e);
                 }
                 for (var i = 0, len = elems.length ; i < len ; i++ ){
-                   checkArray(parents, elems[i].parentNode); 
+                   checkArray(parents, elems[i].parentNode);
                 }
                 var ret = [];
                 for (var j = 0, len = parents.length ; j < len ; j++) {
@@ -1281,7 +1281,7 @@ Ten.Geometry = new Ten.Class({
     },
     getElementPosition: function(e) {
         var pos = {x:0, y:0};
-        if (document.documentElement.getBoundingClientRect) { // IE 
+        if (document.documentElement.getBoundingClientRect) { // IE
             var box = e.getBoundingClientRect();
             var owner = e.ownerDocument;
             pos.x = box.left + Math.max(owner.documentElement.scrollLeft, owner.body.scrollLeft) - 2;
@@ -1439,7 +1439,7 @@ Ten.Deferred = (function () {
     Deferred.ok = function (x) { return x };
     Deferred.ng = function (x) { throw  x };
     Deferred.prototype = {
-        
+
         init : function () {
             this._next    = null;
             this.callback = {
@@ -1448,31 +1448,31 @@ Ten.Deferred = (function () {
             };
             return this;
         },
-    
-        
+
+
         next  : function (fun) { return this._post("ok", fun) },
-    
-        
+
+
         error : function (fun) { return this._post("ng", fun) },
-    
-        
+
+
         call  : function (val) { return this._fire("ok", val) },
-    
-        
+
+
         fail  : function (err) { return this._fire("ng", err) },
-    
-        
+
+
         cancel : function () {
             (this.canceller || function () {})();
             return this.init();
         },
-    
+
         _post : function (okng, fun) {
             this._next =  new Deferred();
             this._next.callback[okng] = fun;
             return this._next;
         },
-    
+
         _fire : function (okng, value) {
             var next = "ok";
             try {
@@ -1490,7 +1490,7 @@ Ten.Deferred = (function () {
             return this;
         }
     };
-    
+
     Deferred.next_default = function (fun) {
         var d = new Deferred();
         var id = setTimeout(function () { d.call() }, 0);
@@ -1555,7 +1555,7 @@ Ten.Deferred = (function () {
                     Deferred.next_faster_way_Image ||
                     Deferred.next_tick ||
                     Deferred.next_default;
-    
+
     Deferred.chain = function () {
         var chain = Deferred.next();
         for (var i = 0, len = arguments.length; i < len; i++) (function (obj) {
@@ -1580,7 +1580,7 @@ Ten.Deferred = (function () {
         })(arguments[i]);
         return chain;
     }
-    
+
     Deferred.wait = function (n) {
         var d = new Deferred(), t = new Date();
         var id = setTimeout(function () {
@@ -1589,14 +1589,14 @@ Ten.Deferred = (function () {
         d.canceller = function () { clearTimeout(id) };
         return d;
     };
-    
+
     Deferred.call = function (fun) {
         var args = Array.prototype.slice.call(arguments, 1);
         return Deferred.next(function () {
             return fun.apply(this, args);
         });
     };
-    
+
     Deferred.parallel = function (dl) {
         if (arguments.length > 1) dl = Array.prototype.slice.call(arguments);
         var ret = new Deferred(), values = {}, num = 0;
@@ -1616,7 +1616,7 @@ Ten.Deferred = (function () {
             });
             num++;
         })(dl[i], i);
-    
+
         if (!num) Deferred.next(function () { ret.call() });
         ret.canceller = function () {
             for (var i in dl) if (dl.hasOwnProperty(i)) {
@@ -1625,7 +1625,7 @@ Ten.Deferred = (function () {
         };
         return ret;
     };
-    
+
     Deferred.earlier = function (dl) {
         if (arguments.length > 1) dl = Array.prototype.slice.call(arguments);
         var ret = new Deferred(), values = {}, num = 0;
@@ -1643,7 +1643,7 @@ Ten.Deferred = (function () {
             });
             num++;
         })(dl[i], i);
-    
+
         if (!num) Deferred.next(function () { ret.call() });
         ret.canceller = function () {
             for (var i in dl) if (dl.hasOwnProperty(i)) {
@@ -1652,8 +1652,8 @@ Ten.Deferred = (function () {
         };
         return ret;
     };
-    
-    
+
+
     Deferred.loop = function (n, fun) {
         var o = {
             begin : n.begin || 0,
@@ -1687,8 +1687,8 @@ Ten.Deferred = (function () {
             return (o.begin <= o.end) ? Deferred.call(_loop, o.begin) : null;
         });
     };
-    
-    
+
+
     Deferred.repeat = function (n, fun) {
         var i = 0, end = {}, ret = null;
         return Deferred.next(function () {
@@ -1703,7 +1703,7 @@ Ten.Deferred = (function () {
             return null;
         });
     };
-    
+
     Deferred.register = function (name, fun) {
         this.prototype[name] = function () {
             var a = arguments;
@@ -1712,10 +1712,10 @@ Ten.Deferred = (function () {
             });
         };
     };
-    
+
     Deferred.register("loop", Deferred.loop);
     Deferred.register("wait", Deferred.wait);
-    
+
     Deferred.connect = function (funo, options) {
         var target, func, obj;
         if (typeof arguments[1] == "string") {
@@ -1727,11 +1727,11 @@ Ten.Deferred = (function () {
             obj    = arguments[1] || {};
             target = obj.target;
         }
-    
+
         var partialArgs       = obj.args ? Array.prototype.slice.call(obj.args, 0) : [];
         var callbackArgIndex  = isFinite(obj.ok) ? obj.ok : obj.args ? obj.args.length : undefined;
         var errorbackArgIndex = obj.ng;
-    
+
         return function () {
             var d = new Deferred().next(function (args) {
                 var next = this._next.callback.ok;
@@ -1739,7 +1739,7 @@ Ten.Deferred = (function () {
                     return next.apply(this, args.args);
                 };
             });
-    
+
             var args = partialArgs.concat(Array.prototype.slice.call(arguments, 0));
             if (!(isFinite(callbackArgIndex) && callbackArgIndex !== null)) {
                 callbackArgIndex = args.length;
@@ -1755,10 +1755,10 @@ Ten.Deferred = (function () {
         }
     }
     Deferred.Arguments = function (args) { this.args = Array.prototype.slice.call(args, 0) }
-    
+
     Deferred.retry = function (retryCount, funcDeferred, options) {
         if (!options) options = {};
-    
+
         var wait = options.wait || 0;
         var d = new Deferred();
         var retry = function () {
@@ -1778,7 +1778,7 @@ Ten.Deferred = (function () {
         setTimeout(retry, 0);
         return d;
     }
-    
+
     Deferred.methods = ["parallel", "wait", "next", "call", "loop", "repeat", "chain"];
     Deferred.define = function (obj, list) {
         if (!list) list = Deferred.methods;
@@ -1789,7 +1789,7 @@ Ten.Deferred = (function () {
         }
         return Deferred;
     };
-    
+
     this.Deferred = Deferred;
     return Deferred;
 })();
@@ -2139,7 +2139,7 @@ Ten.Highlight = new Ten.Class({
         } else {
             newNode = c.textNodes[i], oldNode = this.containers[i];
         }
-        if (newNode) Ten.DOM.replaceNode(newNode, oldNode);        
+        if (newNode) Ten.DOM.replaceNode(newNode, oldNode);
         c._lock[i] = false;
     },
     containers: null,
@@ -2745,7 +2745,7 @@ Hatena.Star.Pallet = new Ten.Class({
         var iframeStyle;
         if (Ten.Browser.isIE) iframeStyle = "width:16px;height:5px;border:1px solid #bbbbbb;";
         else iframeStyle = "width:14px;height:3px;border:1px solid #bbbbbb;";
-        this.container.innerHTML = '<iframe id="' + Hatena.Star.Pallet.SELECTED_COLOR_ELEMENT_ID + '" src="' + 
+        this.container.innerHTML = '<iframe id="' + Hatena.Star.Pallet.SELECTED_COLOR_ELEMENT_ID + '" src="' +
         Hatena.Star.BaseURL.replace(/^http:/, '') + 'colorpalette.selected_color?uri=' + encodeURIComponent(this.addButton.entry.uri) +
             '" frameborder="0" border="0" scrolling="no" style="' + iframeStyle + 'position:absolute;margin:0;padding:0;overflow:hidden;"/>';
         var clickhandlerStyle = {
@@ -2758,7 +2758,7 @@ Hatena.Star.Pallet = new Ten.Class({
             padding: "0",
             display: "block",
             cursor: "pointer"
-        }; 
+        };
         var E = Ten.Element;
         var div = E('div',{
                 title : 'select color',
@@ -2985,19 +2985,19 @@ Hatena.Star.Pallet.SmartPhone = new Ten.Class({
         if (pos) this.pallet_pos = pos;
         this.addButton.clearSelectedColorTimer();
         this.container.innerHTML =
-            '<div id="hatena-star-pallet-container">' + 
+            '<div id="hatena-star-pallet-container">' +
                 '<div id="touch-instruction" class="message">' + Hatena.Star.Text.colorstar_for_smartphone + '</div>' +
                 '<div id="sending-message" class="message" style="display: none">' + Hatena.Star.Text.sending + '</div>' +
                 '<div class="pallet-container">' +
                     '<div class="pallet">' +
-                        '<a href="#"><img src="' + Hatena.Star.BaseURL.replace(/^http:/, '') + '/images/spacer.gif" id="hatena-star-yellow" class="star yellow post" alt="Add Yellow Star" title="Add Yellow Star" /></a>' + 
-                        '<div class="star"><span class="star yellow unlimited">' + Hatena.Star.Text.unlimited + '</span></div>' + 
-                    '</div>' + 
+                        '<a href="#"><img src="' + Hatena.Star.BaseURL.replace(/^http:/, '') + '/images/spacer.gif" id="hatena-star-yellow" class="star yellow post" alt="Add Yellow Star" title="Add Yellow Star" /></a>' +
+                        '<div class="star"><span class="star yellow unlimited">' + Hatena.Star.Text.unlimited + '</span></div>' +
+                    '</div>' +
                     '<div class="iframe-loading-message">' + Hatena.Star.Text.loading + '</div>' +
                     '<iframe id="' + Hatena.Star.Pallet.PALLET_ELEMENT_ID + '" src="' + this.getPalletFrameURL() + '" frameborder="0" border="0" scrolling="no"></iframe>' +
-                '</div>' + 
+                '</div>' +
                 '<a href="' + Hatena.Star.PortalURL.replace(/http/, 'https') + '/shop/star?location=' + encodeURIComponent(location.href) + '" id="buy" target="' + (Ten.Browser.isDSi ? '_top' : '_blank' ) + '"><img src="' + Hatena.Star.BaseURL.replace(/^http:/, '') + 'images/buy_star_cart_purple.gif" class="cart">' + Hatena.Star.Text.for_colorstar_shop + '</a>' +
-            '</div>' + 
+            '</div>' +
             '<style type="text/css">' +
                 '#hatena-star-pallet-container {' +
                     'color: ' + (Hatena.Star.Pallet.SmartPhone.ColorScheme == 'dark' ? 'white' : 'black') + ';' +
@@ -3007,8 +3007,8 @@ Hatena.Star.Pallet.SmartPhone = new Ten.Class({
                     'font-size: 14px;' +
                 '}' +
                 '#hatena-star-pallet-container .pallet-container {' +
-                    'position: relative;' + 
-                    'margin: 0 5px 0 45px;' + 
+                    'position: relative;' +
+                    'margin: 0 5px 0 45px;' +
                     'height: 65px;' +
                     (Ten.Browser.isDSi ? 'margin: 0 10px 0 10px;' : '') +
                 '}' +
@@ -3019,8 +3019,8 @@ Hatena.Star.Pallet.SmartPhone = new Ten.Class({
                     'width: 39px;' +
                     'height: 60px;' +
                     'text-align: center;' +
-                    'color: #FECD69;' + 
-                    'font-weight: bold;' + 
+                    'color: #FECD69;' +
+                    'font-weight: bold;' +
                 '}' +
                 '#hatena-star-pallet-container #hatena-star-yellow {' +
                     'background: url(' + Hatena.Star.BaseURL.replace(/^http:/, '') + (Hatena.Star.Pallet.SmartPhone.ColorScheme == 'dark' ? '/images/add_star_for_smartphone_bk.gif' : '/images/add_star_for_smartphone_wh.gif') + ') 0 0;' +
@@ -3187,7 +3187,7 @@ Hatena.Star.Pallet.SmartPhone = new Ten.Class({
                 this._checkedElements[i]._checked = false;
             }
             } catch (e) { alert(e) }
-            
+
         }
 
 
@@ -3637,7 +3637,7 @@ Hatena.Star.Highlight = new Ten.Class({
 Hatena.Star.Highlight._show = Hatena.Star.Highlight.show;
 Hatena.Star.Highlight.show = function() {
     setTimeout(function() {
-        if (Hatena.Star.Highlight.asyncMakeTextNode) 
+        if (Hatena.Star.Highlight.asyncMakeTextNode)
             Hatena.Star.Highlight.asyncMakeTextNode();
         Hatena.Star.Highlight._show();
     }, 10);
@@ -3647,7 +3647,7 @@ Hatena.Star.Highlight._makeTextNodes = Hatena.Star.Highlight.makeTextNodes;
 Hatena.Star.Highlight.makeTextNodes = function(c) {
     if (c.asyncMakeTextNode || c.textNodes || c.textNodePositions || c.documentText) return;
     if (Ten.Highlight.highlighted) Ten.Highlight.highlighted.hide();
-    
+
     if (!c.loaded && !c.prototype._show) {
         c.prototype._show = c.prototype.show;
         c.prototype.show = function() {
@@ -3666,7 +3666,7 @@ Hatena.Star.Highlight.makeTextNodes = function(c) {
         var textNodes = c.textNodes = [];
         var textNodePositions = c.textNodePositions = [];
 
-        var pos = 0; 
+        var pos = 0;
 
         if (Ten.Browser.isSupportsXPath) {
             var result = document.evaluate('descendant::text()', document.body, null, 7, null);
@@ -4126,7 +4126,7 @@ Hatena.Star.CommentScreen = new Ten.Class({
     },
     receiveResult: function(args) {
         if (!args.name || !args.body) return;
-        this.commentInput.value = ''; 
+        this.commentInput.value = '';
         this.commentInput.disabled = '';
         this.commentInput.style.height = '3em';
         this.commentInput.focus();
@@ -4136,11 +4136,11 @@ Hatena.Star.CommentScreen = new Ten.Class({
         this.commentsContainer.appendChild(com.asElement());
     },
     showLoadImage: function() {
-        if (!this.loadImage) return; 
+        if (!this.loadImage) return;
         this.loadImage.style.display = 'inline';
     },
     hideLoadImage: function() {
-        if (!this.loadImage) return; 
+        if (!this.loadImage) return;
         this.loadImage.style.display = 'none';
     },
     hideCommentForm: function() {
@@ -4521,7 +4521,7 @@ Hatena.Star.Text = {};
 Hatena.Star.useSmartPhoneStar = true;
 
 
-/* Valentine's Day */ 
+/* Valentine's Day */
 try {
 (function () {
     var valentine_end = new Date('2011/02/15 00:00:00');

@@ -20,7 +20,7 @@ var suggestUrl = {
 
     // Stop WordsとサイトのURLに多い単語を削除
     words = this.removeStopWords(words);
-    
+
     // 単語が少ないなら終了
     if (words.length < 2) {
       if (suggest_urls.length > 0) {
