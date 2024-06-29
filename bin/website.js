@@ -1,5 +1,5 @@
 import config from "../config.js";
-import { fs } from "node:fs/promises";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
