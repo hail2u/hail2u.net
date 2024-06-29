@@ -48,7 +48,6 @@ const buildArticle = async (selected) => {
     checkIDConflict(id),
     checkTitleType(title),
   ]);
-  const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n");
@@ -57,42 +56,16 @@ const buildArticle = async (selected) => {
   const dt = getDateDetails(published);
   const shortDescription = `${description.split("。")[0]}。`;
   const type = "article";
-
-  if (!image) {
-    return {
-      body,
-      description: `${description}`,
-      link,
-      published,
-      ...dt,
-      shortDescription,
-      title,
-      type,
-    };
-  }
-
   return {
     body,
-    cover: image[1],
-    description,
+    description: `${description}`,
     link,
     published,
     ...dt,
     shortDescription,
     title,
-    twitterCard: "summary_large_image",
     type,
   };
-};
-
-const buildText = (article, domain, scheme) => {
-  const url = `${scheme}://${domain}${article.link}`;
-
-  if (article.twitterCard === "summary_large_image") {
-    return `${article.shortDescription} ${url}`;
-  }
-
-  return url;
 };
 
 const main = async () => {
@@ -130,9 +103,11 @@ ${body}
     "commit",
     `--message=Contribute ${article.link} (${th})`,
   ]);
-  const text = buildText(article, config.domain, config.scheme);
   const twitter = new URL("https://x.com/intent/tweet");
-  twitter.searchParams.append("text", text);
+  twitter.searchParams.append(
+    "text",
+    `${article.shortDescription} ${config.scheme}://${config.domain}${article.link}`,
+  );
   await runCommand("open", [twitter.href]);
 };
 

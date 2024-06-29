@@ -38,6 +38,5 @@ export default {
   siteTitle: "Hail2u",
   touchIcon: "/apple-touch-icon.png",
   twitter: "hail2u_",
-  twitterCard: "summary",
   version: pkg.version,
 };

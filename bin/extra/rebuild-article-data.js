@@ -10,37 +10,20 @@ const rebuildArticle = async (article) => {
   const [first, ...rest] = html.split("\n");
   const body = rest.join("\n").trim();
   const title = unescapeReferences(first.replace(/<.*?>/gu, ""));
-  const image = /<img\s.*?\bsrc="(\/img\/blog\/.*?)"/u.exec(body);
   const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n");
   const dt = getDateDetails(published);
   const shortDescription = `${description.split("。")[0]}。`;
   const type = "article";
-
-  if (!image) {
-    return {
-      body,
-      description,
-      link,
-      published,
-      shortDescription,
-      ...dt,
-      title,
-      type,
-    };
-  }
-
   return {
     body,
-    cover: image[1],
     description,
     link,
     published,
-    ...dt,
     shortDescription,
+    ...dt,
     title,
-    twitterCard: "summary_large_image",
     type,
   };
 };
