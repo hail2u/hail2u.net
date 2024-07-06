@@ -13,6 +13,9 @@ const rewritePath = ([, relative]) => {
 
 const isNormalHTML = (file) => !file.endsWith("/statuses/index.html");
 
+const selectRandomItem = (array) =>
+  array[Math.floor(Math.random() * array.length)];
+
 const listArticle = (sitemap, latest) => {
   const articles = Array.from(
     sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
@@ -23,9 +26,7 @@ const listArticle = (sitemap, latest) => {
     return articles.slice(0, 1);
   }
 
-  return Array(3)
-    .fill(articles.length)
-    .map((max) => articles[Math.floor(Math.random() * max)]);
+  return Array(3).fill(0).map(selectRandomItem.bind(null, articles));
 };
 
 const cancelFetch = (abortController) => {
