@@ -70,9 +70,6 @@ const main = async () => {
   await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Subscribe ${url}`]);
-  const twitter = new URL("https://x.com/intent/tweet");
-  twitter.searchParams.append("text", `${author} の ${title} を購読 ${url}`);
-  await runCommand("open", [twitter.href]);
 };
 
 main().catch((e) => {

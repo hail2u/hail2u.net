@@ -100,7 +100,7 @@ const main = async () => {
     await runCommand("git", ["add", "--", file]);
     await runCommand("git", ["commit", `--message=Read ${asin}`]);
     const twitter = new URL("https://x.com/intent/tweet");
-    twitter.searchParams.append("text", link);
+    twitter.searchParams.append("text", `${title} ${link}`);
     await runCommand("open", [twitter.href]);
   } catch (e) {
     if (e.name === "AbortError") {
