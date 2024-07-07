@@ -19,15 +19,12 @@ const main = async () => {
   } = util.parseArgs({
     options: {
       asin: {
-        short: "a",
         type: "string",
       },
       author: {
-        short: "u",
         type: "string",
       },
       title: {
-        short: "t",
         type: "string",
       },
     },

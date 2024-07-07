@@ -11,15 +11,12 @@ const main = async () => {
   } = util.parseArgs({
     options: {
       comment: {
-        short: "c",
         type: "string",
       },
       title: {
-        short: "t",
         type: "string",
       },
       url: {
-        short: "u",
         type: "string",
       },
     },

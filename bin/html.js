@@ -225,11 +225,9 @@ const main = async () => {
     util.parseArgs({
       options: {
         all: {
-          short: "a",
           type: "boolean",
         },
         latest: {
-          short: "l",
           type: "boolean",
         },
       },
