@@ -106,7 +106,7 @@ ${body}
   const twitter = new URL("https://x.com/intent/tweet");
   twitter.searchParams.append(
     "text",
-    `${article.shortDescription} ${config.scheme}://${config.domain}${article.link}`,
+    `${article.shortDescription} ${article.title} ${config.scheme}://${config.domain}${article.link}`,
   );
   await runCommand("open", [twitter.href]);
 };
