@@ -10,43 +10,35 @@
 
   /* Font Size */
   --font-size-default: 1rem;
-  --font-size-small: calc(var(--font-size-default) / var(--ratio-2));
-  --font-size-large: calc(var(--font-size-default) * var(--ratio-2));
-  --font-size-huge: calc(var(--font-size-large) * var(--ratio-2));
+  --font-size-small: calc(var(--font-size-default) / pow(var(--ratio), 2));
+  --font-size-large: calc(var(--font-size-default) * pow(var(--ratio), 2));
+  --font-size-huge: calc(var(--font-size-large) * pow(var(--ratio), 2));
 
   /* Line Height */
-  --line-height-default: calc(var(--ratio-4));
-  --line-height-small: calc(var(--line-height-default) / var(--ratio-2));
+  --line-height-default: calc(pow(var(--ratio), 4));
+  --line-height-small: calc(var(--line-height-default) / pow(var(--ratio), 2));
 
   /* Ratio */
-  --ratio-1: calc((3 * 3) / (2 * 2 * 2));
-  --ratio-2: calc(var(--ratio-1) * var(--ratio-1));
-  --ratio-4: calc(var(--ratio-2) * var(--ratio-2));
-  --ratio-8: calc(var(--ratio-4) * var(--ratio-4));
+  --ratio: calc(pow(3, 2) / pow(2, 3));
 
   /* Space */
-  --space-default: calc(var(--ratio-4) * 1rem);
-  --space-small: calc(var(--space-default) / var(--ratio-8));
-  --space-large: calc(var(--space-default) * var(--ratio-4));
-  --space-tiny: calc(var(--space-small) / var(--ratio-4));
-  --space-huge: calc(var(--space-large) * var(--ratio-4));
-  --space-gargantuan: calc(var(--space-huge) * var(--ratio-4));
-  --space-rect: calc(
-    var(--space-default) + (var(--line-height-default) - 1) * 1rem / 2
-  );
+  --space-default: 1rlh;
+  --space-tiny: 0.25rlh;
+  --space-small: 0.5rlh;
+  --space-large: 2rlh;
+  --space-huge: 3rlh;
+  --space-gargantuan: 4rlh;
+  --space-rect: calc(var(--space-default) + (1rlh - 1rem) / 2);
 
   /* Width */
-  --width-column: calc(
-    var(--ratio-8) * var(--ratio-8) * var(--ratio-8) * var(--ratio-8) * 1rem
-  );
-
-  /* Height */
-  --height-logo: calc(var(--line-height-default) * 1em);
+  --width-column: calc(pow(var(--ratio), 32) * 1rem);
+  --width-scrollbar: 20px;
 
   background-color: var(--color-background);
   color: var(--color-on-background);
   font-family: sans-serif;
-  font-size: calc(var(--ratio-1) * 100%);
+  font-size: calc(var(--ratio) * 100%);
+  line-height: var(--line-height-default);
   text-spacing-trim: trim-start;
 }
 
@@ -66,14 +58,13 @@ body {
     0px,
     (
         100vw - var(--padding-inline-body) - var(--width-column) -
-          var(--padding-inline-body) - 20px
+          var(--padding-inline-body) - var(--width-scrollbar)
       ) / 2,
-    var(--ratio-8) * var(--ratio-8) * var(--ratio-4) * 1vw
+    pow(var(--ratio), 20) * 1vw
   );
-  --padding-inline-body: min(5vw, var(--space-large));
+  --padding-inline-body: 5vw;
 
-  line-height: var(--line-height-default);
-  margin: var(--space-default) auto calc((1 - 3 / 16 * 9 / 4) / 2 * 100svh)
+  margin: 5svh auto calc((1 - 3 / 16 * 9 / 4) / 2 * 100svh)
     var(--margin-inline-start-body);
   max-width: var(--width-column);
   padding-inline: var(--padding-inline-body);
@@ -162,10 +153,10 @@ a:visited {
   color: inherit;
 }
 
-/* a:has(img) {
+a:has(img) {
   display: inline-block;
   width: 100%;
-} */
+}
 
 em {
   font-style: normal;
@@ -252,19 +243,11 @@ th {
   font-size: var(--font-size-small);
 }
 
-/* .date:has(+ h1) {
-  margin-block-start: var(--space-gargantuan);
-} */
-
-.page-header .date {
+.date:has(+ h1) {
   margin-block-start: var(--space-gargantuan);
 }
 
-/* .date:has(+ h3) {
-  margin-block-start: var(--space-large);
-} */
-
-.excerpt .date {
+.date:has(+ h3) {
   margin-block-start: var(--space-large);
 }
 
@@ -273,11 +256,7 @@ th {
 }
 
 /* Excerpt */
-/* a:has(.excerpt) {
-  text-decoration: none;
-} */
-
-section > a {
+a:has(.excerpt) {
   text-decoration: none;
 }
 
@@ -307,7 +286,7 @@ h1.logo {
 .logo svg {
   color: var(--color-on-background);
   max-width: none;
-  width: var(--height-logo);
+  width: 1rlh;
 }
 
 /* Page Footer */
@@ -317,7 +296,7 @@ h1.logo {
 
 .page-footer hr {
   margin-block-start: var(--space-gargantuan);
-  width: var(--height-logo);
+  width: 1rlh;
 }
 
 /* Page Header */
@@ -327,14 +306,13 @@ h1.logo {
   align-items: safe end;
   display: grid;
   gap: 0 var(--space-default);
-  /* 1px is for a difference on a rounded value */
   grid-template-columns: repeat(
     auto-fill,
     minmax(
       min(
         (
             100vw - var(--padding-inline-body) - var(--padding-inline-body) -
-              20px + var(--space-default)
+              var(--width-scrollbar) + var(--space-default)
           ) / 2 - var(--space-default) - 1px,
         (var(--width-column) + var(--space-default)) / 4 - var(--space-default) -
           1px
@@ -357,7 +335,7 @@ h1.logo {
 }
 
 .showcase.oneline li {
-  min-width: 35%;
+  min-width: calc(100% / 3);
 }
 
 .showcase p {
