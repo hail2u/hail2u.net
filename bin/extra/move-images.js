@@ -12,7 +12,8 @@ const convert = async (basename, image, ext) => {
 
 const build = (file) => {
   const formats = ["avif", "jpg"];
-  const basename = path.basename(file, ".jpg");
+  const ext = path.extname(file);
+  const basename = path.basename(file, ext);
   const image = sharp(file).resize({
     height: 1440,
     width: 2560,
@@ -30,7 +31,7 @@ const main = async () => {
     throw new Error("1 argument is required. This is for an source directory.");
   }
 
-  const filesIterator = await fs.glob(`${src}*.jpg`);
+  const filesIterator = await fs.glob(`${src}*.png`);
   const images = await Array.fromAsync(filesIterator);
   await Promise.all(images.map(build));
 };
