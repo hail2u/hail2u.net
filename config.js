@@ -24,6 +24,7 @@ export default {
   file: {
     draft: "drafts.html",
     icon: "static/favicon.svg",
+    preview: "preview.html",
   },
   fullname: "Kyo Nagashima",
   github: "hail2u",
