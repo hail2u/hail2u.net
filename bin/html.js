@@ -204,11 +204,25 @@ const build = async (metadata, data, partials, file) => {
     mergeData(file, metadata, data),
     fs.readFile(file.template, "utf8"),
   ]);
+
+  if (
+    merged.isArticle &&
+    merged.published < Date.now() - 1000 * 60 * 60 * 24 * 365
+  ) {
+    const title = escapeCharacters(merged.title);
+    const head = `<!DOCTYPE html><html lang="ja"><head><title>${title}</title><p><time>${merged.strYear}-${merged.strMonth}-${merged.strDate}</time></p>`;
+    const [body] = await Promise.all([
+      fs.readFile(path.join(config.dir.data, merged.link), "utf8"),
+      fs.mkdir(path.dirname(file.dest), { recursive: true }),
+    ]);
+    return fs.writeFile(file.dest, `${head}${body}`);
+  }
+
   const rendered = mustache.render(template, merged, partials, {
     escape: escapeCharacters,
   });
   await fs.mkdir(path.dirname(file.dest), { recursive: true });
-  await fs.writeFile(file.dest, rendered);
+  return fs.writeFile(file.dest, rendered);
 };
 
 const main = async () => {
