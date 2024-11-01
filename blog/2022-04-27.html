@@ -1,43 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta content="light dark" name="color-scheme">
-    <meta content="width=device-width" name="viewport">
+<!DOCTYPE html><html lang="ja"><head><title>node-fetchからの脱出</title><p><time>2022-04-27</time></p><h1>node-fetchからの脱出</h1>
 
-    <title>node-fetchからの脱出</title>
-
-    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
-    <link title="記事だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
-    
-    
-    
-    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
-    <link href="mailto:hail2u@gmail.com" rel="author">
-    <link href="https://hail2u.net/blog/2022-04-27.html" rel="canonical">
-    <meta content="Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体はimport文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的にはsharpパッケージにpipe()で渡していたところだ。" name="description">
-    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
-    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
-
-    <link href="/css/print.css?v=9.33.1" media="only print" rel="stylesheet">
-    <link href="/css/index.css?v=9.33.1" media="only screen" rel="stylesheet">
-  </head>
-
-  <body>
-
-      <nav id="top">
-        <p class="logo"><a href="/"><span aria-label="ホームへ戻る">←</span></a></p>
-      </nav>
-
-      <header class="page-header">
-          <p class="date"><time datetime="2022-04-27T06:17:31+09:00">2022年4月27日</time></p>
-
-        <h1><em>node-fetchからの脱出</em></h1>
-      </header>
-
-    <main>
-      <p>Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体は<code>import</code>文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的には<a href="https://sharp.pixelplumbing.com/">sharpパッケージ</a>に<code>pipe()</code>で渡していたところだ。</p>
+<p>Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体は<code>import</code>文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的には<a href="https://sharp.pixelplumbing.com/">sharpパッケージ</a>に<code>pipe()</code>で渡していたところだ。</p>
 
 <p><code>fetch()</code>の<code>response.body</code>は、node-fetchパッケージではNode.jsのstream.Readableなので、sharpパッケージでサポートされている。一方、標準Fetchでは、同じく標準StreamのReadableStreamなので、サポートされておらず、そのまま扱えない、大したことをしておらず、それほど大きな画像ではないなら、arrayBuffer経由でNode.jsのBufferに変換してしまうと簡単そうだった。</p>
 
@@ -46,14 +9,3 @@ const image = await response.arrayBuffer();
 const metadata = await sharp(Buffer.from(image)).metadata();</code></pre>
 
 <p>標準Fetchが気軽に使えるようになり、node-fetchパッケージを使う時の<a href="/blog/2022-01-28.html">ちょっと落ち着かない書き方</a>が削除できたのでうれしい。他にエラーの扱いを標準に準じたものに変えたりもした。node-fetchパッケージのREADMEによると、それなりに仕様に準拠していないものはあるので、置き換えに苦労するケースもありそうだ。</p>
-    </main>
-
-    <footer class="page-footer">
-      <hr>
-
-        <p>このウェブサイトは<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下で作成、公開、そして更新しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">記事だけのRSS</a>)または<a href="https://x.com/hail2u_">X</a>で購読できます。その他、わからないことは<a href="https://hail2u.net/about/">もう少し詳しい情報</a>を参照してください。</p>
-
-      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a></p>
-    </footer>
-  </body>
-</html>

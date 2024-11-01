@@ -1,54 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta content="light dark" name="color-scheme">
-    <meta content="width=device-width" name="viewport">
+<!DOCTYPE html><html lang="ja"><head><title>Negative Margin Trick</title><p><time>2005-03-20</time></p><h1>Negative Margin Trick</h1>
 
-    <title>Negative Margin Trick</title>
-
-    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
-    <link title="記事だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
-    
-    
-    
-    <link href="/apple-touch-icon.png" rel="apple-touch-icon">
-    <link href="mailto:hail2u@gmail.com" rel="author">
-    <link href="https://hail2u.net/blog/webdesign/negative_margin_trick.html" rel="canonical">
-    <meta content="どうしてもフッターが横幅いっぱい出ないと気持ちが悪かったので、デザイン自体はそのままでCSSをいじり倒してみました。positionでの絶対配置によるレイアウトのままで、フッターを常にページ最下段に置きかつ横幅いっぱいというのはメンドクサそう(height周りの実装がバリエーションに富んでいるので)なので、floatによるレイアウトに戻してみました。うちのサイトはHeader + (Liquid Column + Fixed Column) + Footerという構成なので、いわゆるCreating Liquid Layouts with Negative Marginsというのを利用して、レイアウト。てか1年半前から使いつづけていたモノに戻ったとも言う。" name="description">
-    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
-    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
-    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
-
-    <link href="/css/print.css?v=9.33.1" media="only print" rel="stylesheet">
-    <link href="/css/index.css?v=9.33.1" media="only screen" rel="stylesheet">
-  </head>
-
-  <body>
-
-      <nav id="top">
-        <p class="logo"><a href="/"><span aria-label="ホームへ戻る">←</span></a></p>
-      </nav>
-
-      <header class="page-header">
-          <p class="date"><time datetime="2005-03-20T22:42:52+09:00">2005年3月20日</time></p>
-
-        <h1><em>Negative Margin Trick</em></h1>
-      </header>
-
-    <main>
-      <p>どうしてもフッターが横幅いっぱい出ないと気持ちが悪かったので、デザイン自体はそのままでCSSをいじり倒してみました。<code>position</code>での絶対配置によるレイアウトのままで、フッターを常にページ最下段に置きかつ横幅いっぱいというのはメンドクサそう(<code>height</code>周りの実装がバリエーションに富んでいるので)なので、<code>float</code>によるレイアウトに戻してみました。うちのサイトはHeader + (Liquid Column + Fixed Column) + Footerという構成なので、いわゆる<a href="http://www.alistapart.com/articles/negativemargins/" title="Creating Liquid Layouts with Negative Margins: A List Apart">Creating Liquid Layouts with Negative Margins</a>というのを利用して、レイアウト。てか1年半前から使いつづけていたモノに戻ったとも言う。</p>
+<p>どうしてもフッターが横幅いっぱい出ないと気持ちが悪かったので、デザイン自体はそのままでCSSをいじり倒してみました。<code>position</code>での絶対配置によるレイアウトのままで、フッターを常にページ最下段に置きかつ横幅いっぱいというのはメンドクサそう(<code>height</code>周りの実装がバリエーションに富んでいるので)なので、<code>float</code>によるレイアウトに戻してみました。うちのサイトはHeader + (Liquid Column + Fixed Column) + Footerという構成なので、いわゆる<a href="http://www.alistapart.com/articles/negativemargins/" title="Creating Liquid Layouts with Negative Margins: A List Apart">Creating Liquid Layouts with Negative Margins</a>というのを利用して、レイアウト。てか1年半前から使いつづけていたモノに戻ったとも言う。</p>
 <p><a href="/negative_margin_trick.html" title="Negative Margin Trick">モックアップはこのようになってます</a>。<code>#header</code>と<code>#footer</code>は何も考えずに、通常のフローに従って配置するので、特に何もレイアウト的に凝る必要は無いですが、<code>#footer</code>に<code>clear: both;</code>を指定しておく必要はあります。主要な部分は<code>#contents</code>へ指定する<code>margin-right</code>で、この値に<code>#sidebar</code>の(Fixedな)幅分マイナス方向に指定してやります(つまり<code>#sidebar</code>の幅を300pxにしたいのなら、<code>#contents</code>の<code>margin-right</code>に-300pxを指定するということ)。これで大体完成ですが、このままだと<code>#contents</code>と<code>#sidebar</code>が重なり合ってしまう(まぁそういう風に指定しているわけですが)ので、<code>#contents</code>直下の全てのブロック要素に、<code>margin-right</code>で<code>#sidebar</code>の幅分プラス方向に指定してやると重ならなくなります。</p>
 <p>これでレイアウトはほぼ問題無いんですが、各カラムに<code>background</code>プロパティで背景に上から下まで色を塗る(背景画像を敷き詰める)といったことは出来ません。その場合は<code>body</code>要素に<code>background</code>を指定してうまいことやるという、<a href="http://www.alistapart.com/articles/fauxcolumns/" title="Faux Columns: A List Apart">Faux Columns</a>というテクニックを応用して利用する必要があるでしょう。</p>
 <p>何も考えずにHeader + (Liquid Column + Liquid Column) + Footerで作るならば、2つのカラムの<code>width</code>を足して100%になるようにすれば良いわけで、何気にあまり役に立たなかったりします。が、うちのサイトのようにどうしてもいわゆるサイドバーにあたるカラムを固定したい時には役に立つかも。</p>
-    </main>
-
-    <footer class="page-footer">
-      <hr>
-
-        <p>このウェブサイトは<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下で作成、公開、そして更新しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">記事だけのRSS</a>)または<a href="https://x.com/hail2u_">X</a>で購読できます。その他、わからないことは<a href="https://hail2u.net/about/">もう少し詳しい情報</a>を参照してください。</p>
-
-      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a></p>
-    </footer>
-  </body>
-</html>
