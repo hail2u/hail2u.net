@@ -106,12 +106,23 @@ const startsWithUnderscore = (file) => {
   return filename.startsWith("_");
 };
 
+const guessTemplateName = (article) => {
+  if (
+    article.type === "article" &&
+    article.published < Date.now() - 1000 * 60 * 60 * 24 * 365
+  ) {
+    return "_old.mustache";
+  }
+
+  return "_article.mustache";
+};
+
 const toFilesFormat = (template) => {
   if (typeof template === "object") {
     const articleTemplate = path.join(
       config.dir.template,
       "blog",
-      "_article.mustache",
+      guessTemplateName(template),
     );
     return {
       ...template,
@@ -204,19 +215,6 @@ const build = async (metadata, data, partials, file) => {
     mergeData(file, metadata, data),
     fs.readFile(file.template, "utf8"),
   ]);
-
-  if (
-    merged.isArticle &&
-    merged.published < Date.now() - 1000 * 60 * 60 * 24 * 365
-  ) {
-    const title = escapeCharacters(merged.title);
-    const head = `<!DOCTYPE html><html lang="ja"><head><title>${title}</title><p><time>${merged.strYear}-${merged.strMonth}-${merged.strDate}</time></p>`;
-    const [body] = await Promise.all([
-      fs.readFile(path.join(config.dir.data, merged.link), "utf8"),
-      fs.mkdir(path.dirname(file.dest), { recursive: true }),
-    ]);
-    return fs.writeFile(file.dest, `${head}${body}`);
-  }
 
   const rendered = mustache.render(template, merged, partials, {
     escape: escapeCharacters,
