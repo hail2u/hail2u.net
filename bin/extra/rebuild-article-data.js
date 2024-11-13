@@ -4,6 +4,10 @@ import { getDateDetails } from "../lib/get-date-details.js";
 import path from "node:path";
 import { unescapeReferences } from "../lib/character-reference.js";
 
+process.on("unhandledRejection", (e) => {
+  throw e;
+});
+
 const rebuildArticle = async (article) => {
   const { link, published } = article;
   const html = await fs.readFile(path.join(config.dir.data, link), "utf8");
@@ -28,15 +32,9 @@ const rebuildArticle = async (article) => {
   };
 };
 
-const main = async () => {
-  const file = path.join(config.dir.data, "articles.json");
-  const articles = await fs.readFile(file, "utf8").then(JSON.parse);
-  const newArticles = await Promise.all(articles.map(rebuildArticle));
-  const formatted = JSON.stringify(newArticles, null, 2);
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, `${formatted}\n`);
-};
-
-main().catch((e) => {
-  throw e;
-});
+const file = path.join(config.dir.data, "articles.json");
+const articles = await fs.readFile(file, "utf8").then(JSON.parse);
+const newArticles = await Promise.all(articles.map(rebuildArticle));
+const formatted = JSON.stringify(newArticles, null, 2);
+await fs.mkdir(path.dirname(file), { recursive: true });
+await fs.writeFile(file, `${formatted}\n`);

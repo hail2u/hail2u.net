@@ -9,6 +9,10 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
+process.on("unhandledRejection", (e) => {
+  throw e;
+});
+
 const checkIDFormat = (id) => {
   if (!id) {
     throw new Error("A draft must have an ID.");
@@ -68,49 +72,43 @@ const buildArticle = async (selected) => {
   };
 };
 
-const main = async () => {
-  const file = path.join(config.dir.data, "articles.json");
-  const [selected, articles] = await Promise.all([
-    selectDraft(),
-    fs.readFile(file).then(JSON.parse),
-  ]);
-  const body = selected.body.replace(
-    /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
-    "/",
-  );
-  const article = await buildArticle({
-    ...selected,
-    body,
-  });
-  const articleFile = path.join(config.dir.data, article.link);
-  await fs.mkdir(path.dirname(articleFile), { recursive: true });
-  const escapedTitle = escapeCharacters(article.title);
-  const formatted = JSON.stringify([article, ...articles], null, 2);
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await Promise.all([
-    fs.writeFile(file, `${formatted}\n`),
-    fs.writeFile(
-      articleFile,
-      `<h1>${escapedTitle}</h1>
+const file = path.join(config.dir.data, "articles.json");
+const [selected, articles] = await Promise.all([
+  selectDraft(),
+  fs.readFile(file).then(JSON.parse),
+]);
+const body = selected.body.replace(
+  /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
+  "/",
+);
+const article = await buildArticle({
+  ...selected,
+  body,
+});
+const articleFile = path.join(config.dir.data, article.link);
+await fs.mkdir(path.dirname(articleFile), { recursive: true });
+const escapedTitle = escapeCharacters(article.title);
+const formatted = JSON.stringify([article, ...articles], null, 2);
+await fs.mkdir(path.dirname(file), { recursive: true });
+await Promise.all([
+  fs.writeFile(file, `${formatted}\n`),
+  fs.writeFile(
+    articleFile,
+    `<h1>${escapedTitle}</h1>
 
 ${body}
 `,
-    ),
-  ]);
-  await runCommand("git", ["add", "--", file, articleFile]);
-  const th = articles.length + 1;
-  await runCommand("git", [
-    "commit",
-    `--message=Contribute ${article.link} (${th})`,
-  ]);
-  const twitter = new URL("https://x.com/intent/tweet");
-  twitter.searchParams.append(
-    "text",
-    `${article.shortDescription} / ${article.title} ${config.scheme}://${config.domain}${article.link}`,
-  );
-  await runCommand("open", [twitter.href]);
-};
-
-main().catch((e) => {
-  throw e;
-});
+  ),
+]);
+await runCommand("git", ["add", "--", file, articleFile]);
+const th = articles.length + 1;
+await runCommand("git", [
+  "commit",
+  `--message=Contribute ${article.link} (${th})`,
+]);
+const twitter = new URL("https://x.com/intent/tweet");
+twitter.searchParams.append(
+  "text",
+  `${article.shortDescription} / ${article.title} ${config.scheme}://${config.domain}${article.link}`,
+);
+await runCommand("open", [twitter.href]);

@@ -6,6 +6,10 @@ import mustache from "mustache";
 import path from "node:path";
 import util from "node:util";
 
+process.on("unhandledRejection", (e) => {
+  throw e;
+});
+
 const isFirstInDate = (current, previous) => {
   if (!previous || current.date !== previous.date) {
     return true;
@@ -223,59 +227,53 @@ const build = async (metadata, data, partials, file) => {
   return fs.writeFile(file.dest, rendered);
 };
 
-const main = async () => {
-  const [
-    { articles, books, links, projects, statuses, websites },
-    partials,
-    {
-      values: { all, latest },
-    },
-    files,
-  ] = await Promise.all([
-    readAllData(),
-    readPartials(),
-    util.parseArgs({
-      options: {
-        all: {
-          type: "boolean",
-        },
-        latest: {
-          type: "boolean",
-        },
+const [
+  { articles, books, links, projects, statuses, websites },
+  partials,
+  {
+    values: { all, latest },
+  },
+  files,
+] = await Promise.all([
+  readAllData(),
+  readPartials(),
+  util.parseArgs({
+    options: {
+      all: {
+        type: "boolean",
       },
-    }),
-    gatherFiles(),
-  ]);
-  const data = {
-    articles,
-    books,
-    links,
-    projects,
-    statuses,
-    version: config.version,
-    websites,
-  };
-
-  if (latest) {
-    const article = await toFilesFormat(articles[0]);
-    await build(config, data, partials, article);
-  }
-
-  if (all) {
-    const articleFiles = await Promise.all(articles.map(toFilesFormat));
-    const thread = 1024;
-    const repeat = Math.ceil(articleFiles.length / thread);
-
-    for (let i = 0; i < repeat; i += 1) {
-      const chunk = articleFiles.slice(i * thread, (i + 1) * thread);
-      /* eslint-disable-next-line no-await-in-loop */
-      await Promise.all(chunk.map(build.bind(null, config, data, partials)));
-    }
-  }
-
-  await Promise.all(files.map(build.bind(null, config, data, partials)));
+      latest: {
+        type: "boolean",
+      },
+    },
+  }),
+  gatherFiles(),
+]);
+const data = {
+  articles,
+  books,
+  links,
+  projects,
+  statuses,
+  version: config.version,
+  websites,
 };
 
-main().catch((e) => {
-  throw e;
-});
+if (latest) {
+  const article = await toFilesFormat(articles[0]);
+  await build(config, data, partials, article);
+}
+
+if (all) {
+  const articleFiles = await Promise.all(articles.map(toFilesFormat));
+  const thread = 1024;
+  const repeat = Math.ceil(articleFiles.length / thread);
+
+  for (let i = 0; i < repeat; i += 1) {
+    const chunk = articleFiles.slice(i * thread, (i + 1) * thread);
+    /* eslint-disable-next-line no-await-in-loop */
+    await Promise.all(chunk.map(build.bind(null, config, data, partials)));
+  }
+}
+
+await Promise.all(files.map(build.bind(null, config, data, partials)));

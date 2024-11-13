@@ -3,6 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import util from "node:util";
 
+process.on("unhandledRejection", (e) => {
+  throw e;
+});
+
 const rewritePath = ([, relative]) => {
   if (relative.endsWith("/")) {
     return path.join(config.dir.dest, relative, "index.html");
@@ -92,40 +96,32 @@ const validate = async (file) => {
 
 const isNotEmpty = (element) => element.length !== 0;
 
-const main = async () => {
-  const [
-    sitemap,
-    {
-      values: { latest },
-    },
-  ] = await Promise.all([
-    fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8"),
-    util.parseArgs({
-      options: {
-        latest: {
-          type: "boolean",
-        },
+const [
+  sitemap,
+  {
+    values: { latest },
+  },
+] = await Promise.all([
+  fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8"),
+  util.parseArgs({
+    options: {
+      latest: {
+        type: "boolean",
       },
-    }),
-  ]);
-  const indexes = Array.from(
-    sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
-    rewritePath,
-  ).filter(isNormalHTML);
-  const articles = listArticle(sitemap, latest);
-  const results = await Promise.all([...indexes, ...articles].map(validate));
-  const errors = results.flat();
+    },
+  }),
+]);
+const indexes = Array.from(
+  sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
+  rewritePath,
+).filter(isNormalHTML);
+const articles = listArticle(sitemap, latest);
+const results = await Promise.all([...indexes, ...articles].map(validate));
+const errors = results.flat();
 
-  if (errors.length > 0) {
-    const errorFiles = results.filter(isNotEmpty);
-    process.stdout.write(errors.join("\n"));
-    process.stdout.write("\n\n");
-    throw new Error(
-      `${errors.length} error(s) in ${errorFiles.length} file(s).`,
-    );
-  }
-};
-
-main().catch((e) => {
-  throw e;
-});
+if (errors.length > 0) {
+  const errorFiles = results.filter(isNotEmpty);
+  process.stdout.write(errors.join("\n"));
+  process.stdout.write("\n\n");
+  throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s).`);
+}
