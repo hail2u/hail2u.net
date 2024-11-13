@@ -1,11 +1,4 @@
-/*
- * ESLint v9 does not support `import .. from .. with`
- * import pkg from "./package.json" with { type: "json" };
- */
-import fs from "node:fs/promises";
-
-const file = new URL("./package.json", import.meta.url);
-const pkg = await fs.readFile(file, "utf8").then(JSON.parse);
+import pkg from "./package.json" with { type: "json" };
 
 export default {
   dir: {

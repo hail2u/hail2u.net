@@ -4,7 +4,6 @@ export default [
   {
     ignores: ["*.min.js"],
     languageOptions: {
-      ecmaVersion: 2022,
       parserOptions: {
         ecmaFeatures: {
           globalReturn: true,
