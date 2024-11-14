@@ -1,6 +1,41 @@
-<!DOCTYPE html><html lang="ja"><head><title>blosxom and feed URL</title><p><time>2004-11-24</time></p><h1>blosxom and feed URL</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p>都内某所にあるイメクラ「blosxom」ではこんな会話が繰り広げられている ----- 店員: オプションはどうなさいますか？　客: back_and_forthでお願いします！　 -----(書いてから全然面白くないことに気づいたけど、そのままにしておいてみる)。さて、紅茶飲み過ぎでは？　と思わずツッコミたくなるけーきさんのblog、<a href="http://www.cakesjun.net/mvbg/" title="チェリオメアリー">チェリオメアリー</a>で、<a href="http://www.cakesjun.net/mvbg/weblog/mypop.htm" title="チェリオメアリー :: mypop">「RSSのリクエストによりCGIが呼ばれまくりで管理会社から警告来た！」とかそんな感じのエントリ</a>を眺めてました(観察)。ここらへんのことは動的にフィードを配信している場合、避けられない事態だったりします。CGIが起動することによる負荷自体はスクリプト側でどうにか何とかなります(一応ね)が、CGIを呼ばれるということ自体には対策するのは無理なわけで。ということで、フィードだけは静的生成してやりましょう、と推奨すると共に<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>での僕のアプローチ方法をたらたら書いてみようかと。僕のエントリの公開の仕方がかなりアレなので、具体的な方法は割愛し、どんな方法でやっているかの紹介に留めます。</p>
+    <title>blosxom and feed URL</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2004-11-24</time></p>
+
+    <h1>blosxom and feed URL</h1>
+
+    <p>都内某所にあるイメクラ「blosxom」ではこんな会話が繰り広げられている ----- 店員: オプションはどうなさいますか？　客: back_and_forthでお願いします！　 -----(書いてから全然面白くないことに気づいたけど、そのままにしておいてみる)。さて、紅茶飲み過ぎでは？　と思わずツッコミたくなるけーきさんのblog、<a href="http://www.cakesjun.net/mvbg/" title="チェリオメアリー">チェリオメアリー</a>で、<a href="http://www.cakesjun.net/mvbg/weblog/mypop.htm" title="チェリオメアリー :: mypop">「RSSのリクエストによりCGIが呼ばれまくりで管理会社から警告来た！」とかそんな感じのエントリ</a>を眺めてました(観察)。ここらへんのことは動的にフィードを配信している場合、避けられない事態だったりします。CGIが起動することによる負荷自体はスクリプト側でどうにか何とかなります(一応ね)が、CGIを呼ばれるということ自体には対策するのは無理なわけで。ということで、フィードだけは静的生成してやりましょう、と推奨すると共に<a href="http://www.blosxom.com/" title="blosxom :: the zen of blogging ::">blosxom</a>での僕のアプローチ方法をたらたら書いてみようかと。僕のエントリの公開の仕方がかなりアレなので、具体的な方法は割愛し、どんな方法でやっているかの紹介に留めます。</p>
 <p>そりゃもうプラグインでやるわけですよ。僕の新規エントリを書くフローは、</p>
 <ol>
 <li>エディタでWikiっぽい文法でエントリを書く</li>
@@ -26,3 +61,5 @@ Redirect permanent /home/nagashima/public_html/blosxom/atom.xml http://example.c
 <p>余談その3ですが、TrackBackはほとんど全自動でやっています。ただ、日本語で送信する都合上、海外のblogに送信しないよう明示的に送信する時は送信するみたいな感じ(わかりづらい)でやってます。コアになるPerlのスクリプトは単純なもので、エントリ・ファイルを読み込み、URLを全部リスト・アップし、それぞれに対してTrackBack auto-discoveryをかけてやり見つかったら送信というモノです。ゆえにTrackBack auto-discovery非対応なサイトには送れません。どうしても送りたい時は手動に近い形で送信しますけどね。</p>
 <p>余談その4ですが、<a href="http://www.blosxom.com/plugins/indexing/entries_index.htm" title="blosxom :: the zen of blogging :: plugins/indexing/entries_index.htm">entries_index</a>は何かとアレなので、明示的にパラメータで再インデックスするという指令がないとデータ・ファイルを更新しないようにハックしてたりします。<a href="http://hail2u.github.io/blosxom-starter-kit/" title="hail2u.net - Archives - blosxom starter kit">blosxom starter kit</a>でもちゃんとせねばならないかもしれない気がするけど、<a href="http://www.blosxom.com/plugins/edit/wikieditish.htm" title="blosxom :: the zen of blogging :: plugins/edit/wikieditish.htm">wikieditish</a>との兼ね合いが・・・。wikieditishは使ってないプラグインなので挙動をよく把握できていないのが痛い。</p>
 <p>長いよ。の割に薄いよ。余談多すぎ。</p>
+  </body>
+</html>

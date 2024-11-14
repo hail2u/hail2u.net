@@ -1,6 +1,41 @@
-<!DOCTYPE html><html lang="ja"><head><title>バージョン更新時におけるフィードの検証</title><p><time>2021-09-19</time></p><h1>バージョン更新時におけるフィードの検証</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p><a href="https://github.com/hail2u/hail2u.net/blob/95bc9267a2b4ab65c3b6e8003a8597fae7ffd032/bin/feed-validator.js">フィードを検証するように</a>した。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、<a href="https://validator.w3.org/feed/docs/soap.html">W3C Feed ValidatorのAPI</a>を利用した。</p>
+    <title>バージョン更新時におけるフィードの検証</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2021-09-19</time></p>
+
+    <h1>バージョン更新時におけるフィードの検証</h1>
+
+    <p><a href="https://github.com/hail2u/hail2u.net/blob/95bc9267a2b4ab65c3b6e8003a8597fae7ffd032/bin/feed-validator.js">フィードを検証するように</a>した。投稿時にはめったに壊れないはずなので、バージョンを上げた時にのみ検証している。バージョンが上がった時は、生成する仕組みやテンプレートが変わり、壊れたりするかもしれない。数ファイルだけなので、<a href="https://validator.w3.org/feed/docs/soap.html">W3C Feed ValidatorのAPI</a>を利用した。</p>
 
 <p>APIはSOAPとなっているが、<code>output</code>パラメーターを<code>soap12</code>にし、普通にウェブ・フォームとして(<code>x-www-form-urlencoded</code>で)POSTするとXMLで返ってくるというもののようだ。node-soapパッケージなどを使う必要はない。</p>
 
@@ -21,3 +56,5 @@ const res = await fetch(&quot;https://validator.w3.org/feed/check.cgi&quot;, {
 <p>返ってきたXMLを扱いやすくするには、xml2jsonパッケージではなく、xml2jsパッケージでもなく、<a href="https://github.com/NaturalIntelligence/fast-xml-parser">fast-xml-parserパッケージ</a>が(現在は)いいようだ。速いし、メンテされている。</p>
 
 <p><code>parse()</code>メソッドでは、それほど厳密に扱う必要もないので、<code>ignoreNameSpace</code>オプションを有効にして、名前空間を削除すると、すらすらとドット表記法で参照できる。また<code>arrayMode</code>に<code>/^(error|warning|info)$/</code>としておくと、エラー等のみ常に配列として処理できるようになる。そうでない場合はエラーがひとつだけの場合に配列に変換するか、<code>[errors].flat().map()</code>というような謎のコードを書く必要が出てくる。便利機能はちゃんと使った方がいい。</p>
+  </body>
+</html>

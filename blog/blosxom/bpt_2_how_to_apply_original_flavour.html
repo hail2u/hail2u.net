@@ -1,6 +1,41 @@
-<!DOCTYPE html><html lang="ja"><head><title>BPT #2: 独自flavourを利用する方法</title><p><time>2004-08-26</time></p><h1>BPT #2: 独自flavourを利用する方法</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p><a href="http://www.blosxom.com/">blosxom</a>の出力に、プラグインで生成した何か(大抵の場合はHTMLとか)を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの(単なるリストとか)を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、<a href="http://search.cpan.org/search?module=HTML::Template">HTML::Template</a>なりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。</p>
+    <title>BPT #2: 独自flavourを利用する方法</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2004-08-26</time></p>
+
+    <h1>BPT #2: 独自flavourを利用する方法</h1>
+
+    <p><a href="http://www.blosxom.com/">blosxom</a>の出力に、プラグインで生成した何か(大抵の場合はHTMLとか)を追加したいことは良くあること、というか半分以上のプラグインはそういった類いの機能が目的なモノだと思います。この場合、ごく単純なもの(単なるリストとか)を生成する場合にはプラグインのコードに直接HTMLなりなんなりをガリガリ書いてしまえば良いのですが、それなりにユーザーに出力いじれるようにするためには何かしらのテンプレート・システムを採用する必要があります。そのシステムはプラグイン内で独自に作り上げてやっても、<a href="http://search.cpan.org/search?module=HTML::Template">HTML::Template</a>なりを利用しても良いのですが、blosxomにはせっかくflavourという仕組みがあるのでそれを利用しない手は無いでしょう。</p>
 <p>プラグインから独自のflavourを利用するには、blosxomの<code>template</code>というサブルーチンを呼んでやります。ここで注意するのは、プラグインで<code>template</code>サブルーチンを利用するのではないということ。<a href="http://www.blosxom.com/documentation/developers/plugins.html">プラグインのドキュメント</a>に、</p>
 <blockquote>
 <p>The <code>template</code> subroutine offers the plugin the chance to swap in a replacement for the default template subroutine (the one that brings in your flavour templates).</p>
@@ -27,3 +62,5 @@ sub start {
 <p>という感じになります。これでhead.htmlなどで<code>$foo::bar</code>と書いておくと、その場所にfoo.htmlというflavourの内容が入ることになります。blosxomの<code>template</code>サブルーチンは、blosxomの<code>interpolate</code>サブルーチンが呼ばれないので、独自flavour内のblosxomスタイルの変数は自前で処理してやる必要があります(10行目)。</p>
 <p>より実践的なコードは、<a href="http://www.blosxom.com/plugins/input/writeback.htm">writeback</a>の<code>story</code>サブルーチンや、僕の作成した<a href="/archives/blugins.html#back_and_forth">back_and_forth</a>の<code>head</code>サブルーチンあたりで見ることが出来ます。</p>
 <p>blosxomの<code>template</code>サブルーチンを利用した独自flavourを利用するようにプラグインを作成すると、ユーザーに優しいプラグインになると思います。一方で説明が面倒になることも否定はしないですが。</p>
+  </body>
+</html>

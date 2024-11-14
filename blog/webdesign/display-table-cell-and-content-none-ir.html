@@ -1,6 +1,41 @@
-<!DOCTYPE html><html lang="ja"><head><title>display: table-cellとcontent: &quot;&quot;による画像置換</title><p><time>2012-03-23</time></p><h1>display: table-cellとcontent: ""による画像置換</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p><code>display: table-cell</code>した要素の中で疑似要素を使った画像置換を<code>content: ""</code>(空文字指定)でやると、Internet Explorer 9以外の現行ブラウザーでは謎の空白が出来てしまう現象に遭遇した。説明難しい。IE9以外で同じ挙動なので多分仕様に従ったものなんじゃないかなーとは想像できるんだけど、どうしてこうなるのかよくわからないのでメモがてら書いておく。直す方法だけは一応発見した。</p>
+    <title>display: table-cellとcontent: &quot;&quot;による画像置換</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2012-03-23</time></p>
+
+    <h1>display: table-cellとcontent: &quot;&quot;による画像置換</h1>
+
+    <p><code>display: table-cell</code>した要素の中で疑似要素を使った画像置換を<code>content: ""</code>(空文字指定)でやると、Internet Explorer 9以外の現行ブラウザーでは謎の空白が出来てしまう現象に遭遇した。説明難しい。IE9以外で同じ挙動なので多分仕様に従ったものなんじゃないかなーとは想像できるんだけど、どうしてこうなるのかよくわからないのでメモがてら書いておく。直す方法だけは一応発見した。</p>
 
 <p>Demo: <a href="/test/389.html"><code>display: table-cell</code> and <code>content: ""</code> for image replacement</a></p>
 
@@ -9,3 +44,5 @@
 <p>色々試した結果、直す方法は<code>table-cell</code>をやめるか<code>content: "\00a0"</code>にするかのどちらか。<code>\00a0</code>は非改行スペース。普通のスペース(<code>\0020</code>)とかではダメだったけど、他にも垂直タブ(<code>\000b</code>)とかでもいけるみたい。<code>table-cell</code>でブロックを横に並べてかつセンタリングみたいなことをやってるところ(具体的にはページング・ナビゲーション)で起きた現象だったので、ここでは<code>\00a0</code>で逃げた。</p>
 
 <p>本当は<code>content</code>プロパティーで直接画像を指定しちゃえばいいんだけど、SVG画像だとうまくリサイズされないケースがあって頭が混乱してきたのでこういう形で逃げてる……。SVGの<code>viewbox</code>と<code>width</code>、<code>height</code>属性の指定の仕方によって微妙にブラウザー間で表示に違いが出たり、CSS経由だとまた<a href="/test/390.html">別の違い</a>が出たり、CSSで使うケースでの情報がそもそも少なすぎたり、CSSでSVGは魔窟感ある。</p>
+  </body>
+</html>

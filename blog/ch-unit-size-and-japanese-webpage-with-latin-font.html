@@ -1,9 +1,46 @@
-<!DOCTYPE html><html lang="ja"><head><title>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</title><p><time>2021-04-07</time></p><h1>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p>ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位の仕様</a>では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。<a href="/pub/test/707.html">実装もそうなっているよう</a>だった。</p>
+    <title>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2021-04-07</time></p>
+
+    <h1>ch単位の大きさと、欧文フォントを指定した日本語ウェブページ</h1>
+
+    <p>ch単位は、どのようにその大きさが計算されるのか、という疑問が起こったので調べた。<a href="https://www.w3.org/TR/css-values-3/#ch"><code>ch</code>単位の仕様</a>では「Equal to the used advance measure of the &quot;0&quot; (ZERO, U+0030) glyph found in the font used to render it.」となっており、微妙な表現だが「『0』のグリフを実際にレンダリングした幅」ということだろう。<a href="/pub/test/707.html">実装もそうなっているよう</a>だった。</p>
 
 <p>それはそうだろう、という話に聞こえる。しかし、例えば0のないフォントが先頭にあった場合、フォールバックとしての<code>0.5em</code>が使われるのかどうか、という話になる。具体的には、Emoji用にサブセットしたフォントや、ロゴ用にサブセットしたフォント、<a href="https://yakuhanjp.qranoko.jp/">約物用にサブセットしたフォント</a>など、「0」のグリフがないフォントを使う時、どうなるのだろうかという疑問だった。結論としては、「『0』のグリフを実際にレンダリングした幅」であることを確認しただけに終わった。フォールバックの<code>0.5em</code>が使われる状況は縦書きの時だけと考えてよさそうだ。</p>
 
 <p>これを踏まえると、日本語のウェブサイトで欧文フォントを指定した場合、幅が思ったような大きさ、例えば<code>60ch</code>でカタカナ30文字分前後にはならないことが理解できる。欧文フォントには間違いなく「0」のグリフがあるので、その幅で<code>ch</code>単位の大きさは決まり、カタカナはその欧文フォントではないフォントで決まるからだ。例えば、ヒラギノやメイリオではかなり幅が違うため、欧文フォントがその前で指定されている場合、同じ<code>60ch</code>でも、おさまる文字数が変わってしまう。<code>ch</code>単位は、フォントによるおさまりの違いを吸収するものであるはずなので、これではあまり意味がない。</p>
 
 <p>つまり、欧文のみではないウェブサイト独特の挙動になるが、欧文フォントの指定と<code>ch</code>単位の組み合わせは避けるべきと思われる。おさまる文字数を考慮しない幅でいいなら、<code>ch</code>単位を使う意味はまったくない。<code>(r)em</code>や、<code>px</code>、<code>vw</code>単位などを使うべきだろう。</p>
+  </body>
+</html>

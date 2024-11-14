@@ -1,9 +1,46 @@
-<!DOCTYPE html><html lang="ja"><head><title>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</title><p><time>2015-10-29</time></p><h1>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p>Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLを<code>img</code>要素で読み込ませることで、訪問済みかどうか調べるという<a href="https://github.com/diracdeltas/sniffly">Sniffly</a>という手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。</p>
+    <title>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2015-10-29</time></p>
+
+    <h1>HTTP Strict Transport SecurityとContent Security Policyを利用した履歴調査</h1>
+
+    <p>Content Security Policyを使ってHTTPからしか画像を読み込めないように制限しておき、HTTP Strict Transport Securityを使ってHTTPSへ書き換えようとするウェブサイトのURLを<code>img</code>要素で読み込ませることで、訪問済みかどうか調べるという<a href="https://github.com/diracdeltas/sniffly">Sniffly</a>という手法の実装例を見ていた。HSTSが強制的にHTTPSへ書き換えることが逆にプライバシーを漏えいさせてしまう結果になったのは皮肉だ。</p>
 
 <p>HSTSを提供している場合、そのウェブサイトへのアクセスはすべてHTTPSにブラウザー側で書き換えられる。つまりHSTSを提供しているウェブサイトへ訪問済みの場合、そのウェブサイトへHTTPで画像をリクエストしてもHTTPSに書き換わることになる。そうするとCSPでHTTPな画像に制限している場合、必ず読み込みエラーになることになる。</p>
 
 <p>それだけでは普通の読み込みエラーと判別できない。しかしHTTPSへの書き換えとCSPによる読み込みエラーはブラウザー側で高速に行われるため、<code>error</code>イベントでエラーになるまでの時間を調査することで通常の読み込みエラーと識別できる。</p>
 
 <p>だいたいこのような仕組みのようだ。HSTSの仕組みでどうにかするのは難しそうなので、CSP側で……ということになりそう。いずれにせよHTTPS化が一気に進みそうになる前になんとか解決されると良いなと思う。</p>
+  </body>
+</html>

@@ -1,6 +1,41 @@
-<!DOCTYPE html><html lang="ja"><head><title>node-fetchからの脱出</title><p><time>2022-04-27</time></p><h1>node-fetchからの脱出</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 
-<p>Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体は<code>import</code>文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的には<a href="https://sharp.pixelplumbing.com/">sharpパッケージ</a>に<code>pipe()</code>で渡していたところだ。</p>
+    <title>node-fetchからの脱出</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 112.5%;
+        margin-block-end: 25svh;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      figure {
+        margin-inline: 0;
+      }
+
+      img,
+      svg {
+        block-size: auto;
+        max-inline-size: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p><time>2022-04-27</time></p>
+
+    <h1>node-fetchからの脱出</h1>
+
+    <p>Node.js v18でfetch (やFormData)がフラグなしで使えるようになったので、このウェブサイトでnode-fetchパッケージを使っているものを書き換えていた。大体は<code>import</code>文を消せばいいだけだったが、仕様に準拠していない部分で書き換えが必要だった。具体的には<a href="https://sharp.pixelplumbing.com/">sharpパッケージ</a>に<code>pipe()</code>で渡していたところだ。</p>
 
 <p><code>fetch()</code>の<code>response.body</code>は、node-fetchパッケージではNode.jsのstream.Readableなので、sharpパッケージでサポートされている。一方、標準Fetchでは、同じく標準StreamのReadableStreamなので、サポートされておらず、そのまま扱えない、大したことをしておらず、それほど大きな画像ではないなら、arrayBuffer経由でNode.jsのBufferに変換してしまうと簡単そうだった。</p>
 
@@ -9,3 +44,5 @@ const image = await response.arrayBuffer();
 const metadata = await sharp(Buffer.from(image)).metadata();</code></pre>
 
 <p>標準Fetchが気軽に使えるようになり、node-fetchパッケージを使う時の<a href="/blog/2022-01-28.html">ちょっと落ち着かない書き方</a>が削除できたのでうれしい。他にエラーの扱いを標準に準じたものに変えたりもした。node-fetchパッケージのREADMEによると、それなりに仕様に準拠していないものはあるので、置き換えに苦労するケースもありそうだ。</p>
+  </body>
+</html>
