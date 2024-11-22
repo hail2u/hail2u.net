@@ -1,6 +1,7 @@
 import { escapeCharacters, unescapeReferences } from "./character-reference.js";
 import config from "../../config.js";
 import fs from "node:fs/promises";
+import { getDateDetails } from "./get-date-details.js";
 import path from "node:path";
 import readline from "node:readline/promises";
 
@@ -17,14 +18,19 @@ const toDraft = (draft) => {
 
 const toMenuitem = ({ title }, index) => `${String(index + 1)}. ${title}`;
 
-const rebuildDraft = ({
-  body,
-  id,
-  title,
-}) => `<h1 id="${id}">${escapeCharacters(title)}</h1>
+const rebuildDraft = ({ body, id, title }) => {
+  if (!id) {
+    return `<h1>${escapeCharacters(title)}</h1>
 
 ${body}
 `;
+  }
+
+  return `<h1 id="${id}">${escapeCharacters(title)}</h1>
+
+${body}
+`;
+};
 
 const selectDraft = async () => {
   const file = config.file.draft;
@@ -58,7 +64,17 @@ ${menulist}
   const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(file, rebuilt.join("\n\n"));
-  return selected;
+
+  if (selected.id) {
+    return selected;
+  }
+
+  const now = Date.now();
+  const dt = getDateDetails(now);
+  return {
+    ...selected,
+    id: `${dt.strYear}-${dt.strMonth}-${dt.strDate}`,
+  };
 };
 
 export { selectDraft };
