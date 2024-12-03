@@ -5,10 +5,6 @@ import { guessPath } from "./lib/guess-path.js";
 import mustache from "mustache";
 import path from "node:path";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const toFilesFormat = (template) => ({
   dest: guessPath(template, config.dir.dest, "feed"),
   metadata: guessPath(template, config.dir.metadata, "index.json"),

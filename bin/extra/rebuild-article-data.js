@@ -4,10 +4,6 @@ import { getDateDetails } from "../lib/get-date-details.js";
 import path from "node:path";
 import { unescapeReferences } from "../lib/character-reference.js";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const rebuildArticle = async (article) => {
   const { link, published } = article;
   const html = await fs.readFile(path.join(config.dir.data, link), "utf8");

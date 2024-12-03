@@ -4,10 +4,6 @@ import ico from "@fiahfy/ico";
 import path from "node:path";
 import sharp from "sharp";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const generatePNG = async (src, width) => {
   const metadata = await sharp(src).metadata();
   const density = (width * metadata.density) / metadata.width;

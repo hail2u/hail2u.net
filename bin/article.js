@@ -9,10 +9,6 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const checkIDFormat = (id) => {
   if (!id) {
     throw new Error("A draft must have an ID.");

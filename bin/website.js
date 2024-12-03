@@ -4,10 +4,6 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const isSubscribed = (url, subscription) => url === subscription.url;
 
 const {

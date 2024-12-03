@@ -7,10 +7,6 @@ import { runCommand } from "./lib/run-command.js";
 import sharp from "sharp";
 import util from "node:util";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const isReadBook = (title, book) => title === book.title;
 
 const cancelFetch = (abortController) => {

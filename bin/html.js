@@ -6,10 +6,6 @@ import mustache from "mustache";
 import path from "node:path";
 import util from "node:util";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const isFirstInDate = (current, previous) => {
   if (!previous || current.date !== previous.date) {
     return true;

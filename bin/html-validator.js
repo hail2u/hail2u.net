@@ -3,10 +3,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import util from "node:util";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const rewritePath = ([, relative]) => {
   if (relative.endsWith("/")) {
     return path.join(config.dir.dest, relative, "index.html");

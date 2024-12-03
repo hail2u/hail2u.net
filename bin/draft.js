@@ -6,10 +6,6 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const selected = await selectDraft();
 const template = await fs.readFile(
   path.join(config.dir.template, "_draft.mustache"),

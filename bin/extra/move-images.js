@@ -4,10 +4,6 @@ import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
 
-process.on("unhandledRejection", (e) => {
-  throw e;
-});
-
 const convert = async (basename, image, ext) => {
   const dest = path.join(config.dir.static, "img/blog/", `${basename}.${ext}`);
   await image.toFile(dest);
