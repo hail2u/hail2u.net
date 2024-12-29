@@ -35,7 +35,7 @@ ${body}
 const selectDraft = async () => {
   const file = config.file.draft;
   const html = await fs.readFile(file, "utf8");
-  const sections = html.split("\n\n\n");
+  const sections = html.trim().split("\n\n\n");
   const drafts = await Promise.all(sections.map(toDraft));
   const menuitems = await Promise.all(drafts.map(toMenuitem));
   const menu = readline.createInterface({
