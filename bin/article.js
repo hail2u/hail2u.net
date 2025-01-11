@@ -29,7 +29,8 @@ const checkIDConflict = async (id) => {
     .catch(() => false);
 
   if (exists) {
-    throw new Error(`“${id}” is already used.`);
+    const message = `“${id}” is already used.`;
+    throw new Error(message);
   }
 };
 
@@ -41,13 +42,17 @@ const checkTitleType = (title) => {
   }
 };
 
-const buildArticle = async (selected) => {
+const isSameTitle = (title, element) => title === element.title;
+
+const checkTitleConflict = (title, articles) => {
+  if (articles.findIndex(isSameTitle.bind(null, title)) !== -1) {
+    const message = `There has been a entry named “${title}”.`;
+    throw new Error(message);
+  }
+};
+
+const buildArticle = (selected) => {
   const { body, id, title } = selected;
-  await Promise.all([
-    checkIDFormat(id),
-    checkIDConflict(id),
-    checkTitleType(title),
-  ]);
   const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n");
@@ -77,7 +82,13 @@ const body = selected.body.replace(
   /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
   "/",
 );
-const article = await buildArticle({
+await Promise.all([
+  checkIDFormat(selected.id),
+  checkIDConflict(selected.id),
+  checkTitleType(selected.title),
+  checkTitleConflict(selected.title, articles),
+]);
+const article = buildArticle({
   ...selected,
   body,
 });
