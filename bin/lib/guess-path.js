@@ -4,13 +4,7 @@ import path from "node:path";
 const guessPath = (template, dir, filename) => {
   const filepath = template.replace(config.dir.template, dir);
   const dirname = path.dirname(filepath);
-
-  if (!filename.startsWith(".")) {
-    return path.join(dirname, filename);
-  }
-
-  const basename = path.basename(template, path.extname(template));
-  return path.join(dirname, `${basename}${filename}`);
+  return path.join(dirname, filename);
 };
 
 export { guessPath };

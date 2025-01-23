@@ -111,10 +111,10 @@ const guessTemplateName = (article) => {
     article.type === "article" &&
     article.published < Date.now() - 1000 * 60 * 60 * 24 * 365
   ) {
-    return "_old.mustache";
+    return "_old.html.mustache";
   }
 
-  return "_article.mustache";
+  return "_article.html.mustache";
 };
 
 const toFilesFormat = (template) => {
@@ -134,23 +134,13 @@ const toFilesFormat = (template) => {
 
   const basename = path.basename(template, path.extname(template));
   const doubleExt = path.extname(basename);
-
-  if (doubleExt) {
-    const dirname = path.dirname(template);
-    return {
-      dest: guessPath(path.join(dirname, basename), config.dir.dest, doubleExt),
-      metadata: guessPath(
-        path.join(dirname, basename),
-        config.dir.metadata,
-        ".json",
-      ),
-      template,
-    };
-  }
-
   return {
-    dest: guessPath(template, config.dir.dest, ".html"),
-    metadata: guessPath(template, config.dir.metadata, ".json"),
+    dest: guessPath(template, config.dir.dest, basename),
+    metadata: guessPath(
+      template,
+      config.dir.metadata,
+      basename.replace(doubleExt, ".json"),
+    ),
     template,
   };
 };

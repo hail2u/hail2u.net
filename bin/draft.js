@@ -8,7 +8,7 @@ import { selectDraft } from "./lib/select-draft.js";
 
 const selected = await selectDraft();
 const template = await fs.readFile(
-  path.join(config.dir.template, "_draft.mustache"),
+  path.join(config.dir.template, "_draft.html.mustache"),
   "utf8",
 );
 const rendered = mustache.render(template, selected, null, {

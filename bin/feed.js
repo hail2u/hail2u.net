@@ -13,7 +13,7 @@ const toFilesFormat = (template) => ({
 
 const gatherFiles = async () => {
   const filesIterator = await fs.glob(
-    `${config.dir.template}**/_feed.mustache`,
+    `${config.dir.template}**/_feed.xml.mustache`,
   );
   const templates = await Array.fromAsync(filesIterator);
   return Promise.all(templates.map(toFilesFormat));
