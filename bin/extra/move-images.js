@@ -5,9 +5,8 @@ import sharp from "sharp";
 import util from "node:util";
 
 const convert = async (basename, image, ext) => {
-  const dest = path.join(config.dir.static, "img/blog/", `${basename}.${ext}`);
+  const dest = path.join(config.dir.dest, "img/blog/", `${basename}.${ext}`);
   await image.toFile(dest);
-  fs.copyFile(dest, dest.replace(config.dir.static, config.dir.dest));
 };
 
 const build = (file) => {
