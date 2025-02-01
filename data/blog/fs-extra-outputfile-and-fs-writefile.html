@@ -1,9 +1,0 @@
-<h1>fs-extraのoutputFile()とfsのwriteFile()</h1>
-
-<p><a href="https://github.com/jprichardson/node-fs-extra">fs-extra</a>パッケージの<code>outputFile()</code>は出力先のディレクトリーがないと自動で作ってくれるのでちょくちょく使っている。fsモジュールの<code>writeFile()</code>と互換性があり考えずに使える……と思っていたが、パス文字列の代わりにファイル演算子(やBuffer)を投げたら通らなかった。このあたりに互換性がないようだ。</p>
-
-<p>fs-extraの<code>outputFile()</code>では祖先ディレクトリーを作成するためにpathモジュールを使ってディレクトリー名を取り出そうとする。ここでファイル識別子(であるInteger)やBufferをそのまま<code>dirname()</code>に投げてしまうことになり、「TypeError: Path must be a string. Recieved ...」という例外で落ちる。</p>
-
-<hr>
-
-<p>出力先ファイルの親のディレクトリーがあるか確実でなく、かつ既にファイルがあった場合は処理したくない、というような実装を雑に書いたらハマった。そういうケースでは<code>outputFile()</code>の第三引数で<code>{ flag: &quot;wx&quot; }</code>として、上書きにだけ失敗させれば良いようだ。</p>

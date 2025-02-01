@@ -1,13 +1,10 @@
-import {
-  escapeCharacters,
-  unescapeReferences,
-} from "./lib/character-reference.js";
 import config from "../config.js";
 import fs from "node:fs/promises";
 import { getDateDetails } from "./lib/get-date-details.js";
 import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import { selectDraft } from "./lib/select-draft.js";
+import { unescapeReferences } from "./lib/character-reference.js";
 
 const checkIDFormat = (id) => {
   if (!id) {
@@ -92,22 +89,9 @@ const article = buildArticle({
   ...selected,
   body,
 });
-const articleFile = path.join(config.dir.data, article.link);
-await fs.mkdir(path.dirname(articleFile), { recursive: true });
-const escapedTitle = escapeCharacters(article.title);
 const formatted = JSON.stringify([article, ...articles], null, 2);
 await fs.mkdir(path.dirname(file), { recursive: true });
-await Promise.all([
-  fs.writeFile(file, `${formatted}\n`),
-  fs.writeFile(
-    articleFile,
-    `<h1>${escapedTitle}</h1>
-
-${body}
-`,
-  ),
-]);
-await runCommand("git", ["add", "--", file, articleFile]);
+await fs.writeFile(file, `${formatted}\n`);
 const th = articles.length + 1;
 await runCommand("git", [
   "commit",

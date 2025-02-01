@@ -1,9 +1,0 @@
-<h1>pre/postで始まるnpmスクリプト</h1>
-
-<p>npmの実装上の制限から、preやpostで始まる名前のnpmスクリプトを作っても想定したようには動かないことがある。具体的な例では<code>preview</code>という名前でnpmスクリプトを作ると、それ自体は実行はできるが、<code>prepreview</code>や<code>postpreview</code>が実行されない。</p>
-
-<p><a href="https://github.com/npm/npm/blob/63468a65738547d730232196c094f19a8a383c99/lib/run-script.js#L157-L159">npmの実装</a>を見ると、<code>!cmd.match(/^(pre|post)/)</code>でチェックして、pre/postを実行するスクリプトのリストへ追加している。上記例だと<code>preview</code>はこの正規表現にマッチしないので、pre/postは追加されないわけだ。</p>
-
-<p><a href="https://github.com/yarnpkg/yarn/blob/500941778ec5ceace48ff4ae83ce9ddc7bd318f7/src/cli/commands/run.js#L64-L74">Yarnの実装</a>では見てくれる。とりあえずpre/postを付け、それらが見つかったら実行するスクリプトのリストへ追加するようになっているからだ。</p>
-
-<p>npmスクリプトのランナーにもYarnを使うことにした。</p>
