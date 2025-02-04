@@ -80,7 +80,7 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const filesIterator = await fs.glob(`${config.dir.data}**/*.json`);
+  const filesIterator = fs.glob(`${config.dir.data}**/*.json`);
   const dataFiles = await Array.fromAsync(filesIterator);
   const data = await Promise.all(dataFiles.map(readData));
   return Object.assign(...data);
@@ -93,9 +93,7 @@ const readPartial = async (file) => {
 };
 
 const readPartials = async () => {
-  const filesIterator = await fs.glob(
-    `${config.dir.template}partials/*.mustache`,
-  );
+  const filesIterator = fs.glob(`${config.dir.template}partials/*.mustache`);
   const templates = await Array.fromAsync(filesIterator);
   const partials = await Promise.all(templates.map(readPartial));
   return Object.assign(...partials);
@@ -146,7 +144,7 @@ const toFilesFormat = (template) => {
 };
 
 const gatherFiles = async () => {
-  const filesIterator = await fs.glob(`${config.dir.template}**/*.mustache`, {
+  const filesIterator = fs.glob(`${config.dir.template}**/*.mustache`, {
     exclude: startsWithUnderscore,
   });
   const templates = await Array.fromAsync(filesIterator);

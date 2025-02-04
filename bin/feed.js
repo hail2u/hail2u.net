@@ -12,7 +12,7 @@ const toFilesFormat = (template) => ({
 });
 
 const gatherFiles = async () => {
-  const filesIterator = await fs.glob(
+  const filesIterator = fs.glob(
     `${config.dir.template}**/_feed.xml.mustache`,
   );
   const templates = await Array.fromAsync(filesIterator);
@@ -66,7 +66,7 @@ const readLatestData = async (prefix, dataFile) => {
 };
 
 const readAllData = async (prefix) => {
-  const filesIterator = await fs.glob(`${config.dir.data}**/*.json`);
+  const filesIterator = fs.glob(`${config.dir.data}**/*.json`);
   const dataFiles = await Array.fromAsync(filesIterator);
   const data = await Promise.all(
     dataFiles.map(readLatestData.bind(null, prefix)),
