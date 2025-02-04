@@ -18,19 +18,6 @@ const checkIDFormat = (id) => {
   }
 };
 
-const checkIDConflict = async (id) => {
-  const file = path.join(config.dir.dest, "blog", `${id}.html`);
-  const exists = await fs
-    .access(file, fs.constants.F_OK)
-    .then(() => true)
-    .catch(() => false);
-
-  if (exists) {
-    const message = `“${id}” is already used.`;
-    throw new Error(message);
-  }
-};
-
 const checkTitleType = (title) => {
   if (typeof title !== "string") {
     throw new Error(
@@ -39,12 +26,19 @@ const checkTitleType = (title) => {
   }
 };
 
-const isSameTitle = (title, element) => title === element.title;
+const isDuplication = (id, title, element) => {
+  if (element.link.endsWith(`${id}.html`) || title === element.title) {
+    return true;
+  }
 
-const checkTitleConflict = (title, articles) => {
-  if (articles.findIndex(isSameTitle.bind(null, title)) !== -1) {
-    const message = `There has been a entry named “${title}”.`;
-    throw new Error(message);
+  return false;
+};
+
+const checkDuplication = (id, title, articles) => {
+  if (articles.findIndex(isDuplication.bind(null, id, title)) !== -1) {
+    throw new Error(
+      `There has been a entry that has same ID “${id}” or title “${title}”.`,
+    );
   }
 };
 
@@ -81,9 +75,8 @@ const body = selected.body.replace(
 );
 await Promise.all([
   checkIDFormat(selected.id),
-  checkIDConflict(selected.id),
   checkTitleType(selected.title),
-  checkTitleConflict(selected.title, articles),
+  checkDuplication(selected.id, selected.title, articles),
 ]);
 const article = buildArticle({
   ...selected,
