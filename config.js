@@ -2,7 +2,6 @@ import pkg from "./package.json" with { type: "json" };
 
 export default {
   dir: {
-    assets: "assets/",
     data: "data/",
     dest: "dist/",
     metadata: "metadata/",
@@ -30,7 +29,6 @@ export default {
   scheme: "https",
   shimei: "ながしまきょう",
   siteTitle: "Hail2u",
-  touchIcon: "/apple-touch-icon.png",
   twitter: "hail2u_",
   version: pkg.version,
 };

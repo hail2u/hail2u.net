@@ -4,34 +4,24 @@ import ico from "@fiahfy/ico";
 import path from "node:path";
 import sharp from "sharp";
 
-const generatePNG = async (src, width) => {
-  const metadata = await sharp(src).metadata();
-  const density = (width * metadata.density) / metadata.width;
-  const img = sharp(src, { density });
-  img.resize(width);
-  return img;
+const appendTo = async (icon, size) => {
+  const metadata = await sharp(config.file.icon).metadata();
+  const density = (size * metadata.density) / metadata.width;
+  const img = sharp(config.file.icon, { density });
+  const png = await img.resize(size).png().toBuffer();
+  icon.append(ico.IcoImage.fromPNG(png));
 };
 
-const appendTo = async (favicon, img) => {
-  const png = await img.png().toBuffer();
-  favicon.append(ico.IcoImage.fromPNG(png));
+const generateIcon = async () => {
+  const sizes = [16, 24, 32, 48, 64, 128, 256];
+  const icon = new ico.Ico();
+  await Promise.all(sizes.map(appendTo.bind(null, icon)));
+  return icon;
 };
 
 const file = path.join(config.dir.dest, "favicon.ico");
-const [favicon, , touchIcon, ...icons] = await Promise.all([
-  new ico.Ico(),
+const [, icon] = await Promise.all([
   fs.mkdir(path.dirname(file), { recursive: true }),
-  generatePNG(config.file.icon, 180),
-  generatePNG(config.file.icon, 16),
-  generatePNG(config.file.icon, 24),
-  generatePNG(config.file.icon, 32),
-  generatePNG(config.file.icon, 48),
-  generatePNG(config.file.icon, 64),
-  generatePNG(config.file.icon, 128),
-  generatePNG(config.file.icon, 256),
+  generateIcon(),
 ]);
-await Promise.all(icons.map(appendTo.bind(null, favicon)));
-await Promise.all([
-  touchIcon.toFile(path.join(config.dir.dest, "apple-touch-icon.png")),
-  fs.writeFile(file, favicon.data),
-]);
+await fs.writeFile(file, icon.data);
