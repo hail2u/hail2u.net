@@ -35,7 +35,7 @@ ${body}
 const selectDraft = async () => {
   const file = config.file.draft;
   const html = await fs.readFile(file, "utf8");
-  const sections = html.trim().split("\n\n\n");
+  const sections = html.trim().split("\n\n\n<hr>\n\n\n");
   const drafts = await Promise.all(sections.map(toDraft));
   const menuitems = await Promise.all(drafts.map(toMenuitem));
   const menu = readline.createInterface({
@@ -63,7 +63,7 @@ ${menulist}
   const remains = drafts.toSpliced(index, 1);
   const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
   await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, rebuilt.join("\n\n"));
+  await fs.writeFile(file, rebuilt.join("\n\n<hr>\n\n\n"));
 
   if (selected.id) {
     return selected;
