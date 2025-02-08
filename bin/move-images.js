@@ -1,4 +1,4 @@
-import config from "../../config.js";
+import config from "../config.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
