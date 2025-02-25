@@ -3,7 +3,10 @@ export default {
   rules: {
     "alpha-value-notation": null,
     "annotation-no-unknown": true,
+    "at-rule-descriptor-no-unknown": true,
+    "at-rule-descriptor-value-no-unknown": true,
     "at-rule-empty-line-before": null,
+    "at-rule-no-deprecated": true,
     "at-rule-no-unknown": true,
     "at-rule-no-vendor-prefix": true,
     "block-no-empty": true,
