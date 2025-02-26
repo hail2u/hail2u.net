@@ -48,7 +48,7 @@ ${menulist}
 `);
   const input = await menu.question("Which one? (0) ");
   menu.close();
-  const answer = parseInt(input.at(0), 10);
+  const answer = parseInt(input, 10);
 
   if (!Number.isInteger(answer) || answer > drafts.length) {
     throw new Error(`You must enter a number between 0 and ${drafts.length}.`);
