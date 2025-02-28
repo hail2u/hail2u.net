@@ -1,19 +1,19 @@
-/* Default | MIT License */
+/* For All | MIT License */
 
 /* Variable */
 :root {
   /* Color */
-  --color-background: light-dark(hsl(48 48% 93%), hsl(48 48% 6%));
-  --color-background-tone: light-dark(hsl(48 48% 90%), hsl(48 48% 9%));
-  --color-on-background: light-dark(hsl(48 12% 21%), hsl(48 12% 75%));
-  --color-link: light-dark(hsl(204 96% 36%), hsl(204 96% 69%));
+  --color-background: light-dark(hsl(48 48% 93%), hsl(48 48% 3%));
+  --color-background-tone: light-dark(hsl(48 24% 90%), hsl(48 24% 6%));
+  --color-on-background: light-dark(hsl(48 12% 21%), hsl(48 12% 72%));
+  --color-link: light-dark(hsl(204 96% 36%), hsl(204 96% 60%));
 
   /* Font Size */
   --font-size-default: 1rem;
   --font-size-small: calc(var(--font-size-default) / var(--ratio));
-  --font-size-large: calc(var(--font-size-default) * pow(var(--ratio), 2));
-  --font-size-tiny: calc(var(--font-size-default) / pow(var(--ratio), 2));
-  --font-size-huge: calc(var(--font-size-large) * pow(var(--ratio), 2));
+  --font-size-large: calc(var(--font-size-default) * pow(var(--ratio), 3));
+  --font-size-tiny: calc(var(--font-size-small) / var(--ratio));
+  --font-size-huge: calc(var(--font-size-large) * pow(var(--ratio), 3));
 
   /* Line Height */
   --line-height-default: calc(pow(var(--ratio), 4));
@@ -21,26 +21,35 @@
 
   /* Ratio */
   --ratio: calc(pow(3, 2) / pow(2, 3));
+  --ratio-column: calc(pow(var(--ratio), 32));
 
   /* Space */
   --space-default: 1rlh;
-  --space-tiny: 0.25rlh;
-  --space-small: 0.5rlh;
-  --space-large: 2rlh;
-  --space-huge: 3rlh;
-  --space-gargantuan: 4rlh;
-  --space-rect: calc(var(--space-default) + (1rlh - 1rem) / 2);
+  --space-small: calc(var(--space-default) / pow(var(--ratio), 6));
+  --space-large: calc(var(--space-default) * pow(var(--ratio), 6));
+  --space-half-leading: calc(1rlh - 1rem);
+  --space-rect: calc(var(--space-default) + var(--space-half-leading) / 2);
+  --space-tiny: calc(var(--space-small) / pow(var(--ratio), 6));
+  --space-huge: calc(var(--space-large) * pow(var(--ratio), 6));
 
   /* Width */
-  --width-column: calc(pow(var(--ratio), 32) * 1rem);
+  --width-column: calc(var(--ratio-column) * 1rem);
   --width-scrollbar: 20px;
 
   background-color: var(--color-background);
   color: var(--color-on-background);
   color-scheme: light dark;
   font-family: sans-serif;
-  font-size: clamp(100%, 100svh / 28 / var(--line-height-default), 48px);
+  font-size: max(
+    100%,
+    min(
+      100svh / (var(--line-height-default) * 28),
+      100svw / var(--ratio-column),
+      24px
+    )
+  );
   line-height: var(--line-height-default);
+  text-align: justify;
   text-spacing-trim: trim-start;
 }
 
@@ -51,7 +60,8 @@ body {
     (
         100lvw - var(--padding-inline-body) - var(--width-column) -
           var(--padding-inline-body) - var(--width-scrollbar)
-      ) / 2,
+      ) /
+      2,
     pow(var(--ratio), 20) * 1lvw
   );
   --padding-inline-body: 5lvw;
@@ -66,18 +76,17 @@ h1 {
   font-size: var(--font-size-huge);
   font-weight: normal;
   line-height: var(--line-height-small);
-  margin-block: var(--space-gargantuan);
+  margin-block: var(--space-huge);
 }
 
 h2 {
   font-size: var(--font-size-large);
   line-height: var(--line-height-small);
-  margin-block: var(--space-huge) 0;
+  margin-block: var(--space-large) 0;
 }
 
 h3 {
   font-size: var(--font-size-default);
-  line-height: var(--line-height-small);
   margin-block: var(--space-large) 0;
 }
 
@@ -96,8 +105,8 @@ hr {
   border-block-start-width: thin;
   border-inline: none;
   color: var(--color-on-background);
-  inline-size: var(--space-gargantuan);
-  margin-block: var(--space-rect);
+  inline-size: var(--space-huge);
+  margin-block: calc(var(--space-huge) + var(--space-half-leading));
   margin-inline-start: 0;
 }
 
@@ -107,23 +116,30 @@ pre {
   font-size: inherit;
   margin-block: var(--space-rect);
   overflow-x: auto;
-  padding: var(--space-small);
+  padding: var(--space-small) 1rem;
   tab-size: 4;
   text-spacing-trim: space-all;
 }
 
 blockquote {
   font-size: var(--font-size-small);
-  margin: var(--space-default) 0 0 var(--space-default);
+  margin: var(--space-default) 0 0 2rem;
 }
 
-:is(ul, ol) {
+:is(ol, ul) {
   margin-block: var(--space-default) 0;
-  padding-inline-start: var(--space-large);
 
   & & {
     margin-block-start: 0;
   }
+}
+
+ol {
+  padding-inline-start: 2.5rem;
+}
+
+ul {
+  padding-inline-start: 1.5rem;
 }
 
 li {
@@ -199,7 +215,7 @@ table {
   background-color: var(--color-background-tone);
   border-block-start-style: solid;
   border-block-start-width: thin;
-  padding: var(--space-small);
+  padding: var(--space-small) 1rem;
   vertical-align: top;
   white-space: pre;
 }
@@ -221,7 +237,7 @@ th {
     block-size: auto;
     inline-size: 100%;
     object-fit: contain;
-    padding: var(--space-default);
+    padding: var(--space-default) 1rem;
   }
 }
 
@@ -239,7 +255,7 @@ th {
   font-size: var(--font-size-tiny);
 
   &:has(+ h1) {
-    margin-block-start: var(--space-gargantuan);
+    margin-block-start: var(--space-huge);
   }
 
   & + * {
@@ -285,11 +301,11 @@ th {
 
 /* Page Footer */
 .page-footer {
-  font-size: var(--font-size-tiny);
+  font-size: var(--font-size-small);
 
   & hr {
-    margin-block-start: var(--space-gargantuan);
     inline-size: 1rlh;
+    margin-block-end: var(--space-rect);
   }
 }
 
@@ -307,9 +323,10 @@ th {
         (
             100lvw - var(--padding-inline-body) - var(--padding-inline-body) -
               var(--width-scrollbar) + var(--space-default)
-          ) / 2 - var(--space-default) - 1px,
-        (var(--width-column) + var(--space-default)) / 4 - var(--space-default) -
-          1px
+          ) /
+          2 - var(--space-default) - 1px,
+        (var(--width-column) + var(--space-default)) / 4 -
+          var(--space-default) - 1px
       ),
       1fr
     )
@@ -353,7 +370,7 @@ th {
     padding-inline-start: 0;
 
     &:first-child {
-      margin-block-start: var(--space-gargantuan);
+      margin-block-start: var(--space-huge);
     }
 
     & + ul {
@@ -361,7 +378,7 @@ th {
     }
 
     &:last-child {
-      margin-block-end: var(--space-gargantuan);
+      margin-block-end: var(--space-huge);
     }
   }
 }
