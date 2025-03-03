@@ -3,27 +3,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import util from "node:util";
 
-const rewritePath = ([, relative]) => {
-  if (relative.endsWith("/")) {
-    return path.join(config.dir.dest, relative, "index.html");
-  }
-
-  return path.join(config.dir.dest, relative);
-};
-
-const isNormalHTML = (file) => !file.endsWith("/statuses/index.html");
-
 const selectRandomItem = (array) =>
-  array[Math.floor(Math.random() * array.length)];
+  array[Math.floor(Math.random() * array.length)].link;
 
-const listArticle = (sitemap, latest) => {
-  const articles = Array.from(
-    sitemap.matchAll(/<loc>https:\/\/.*?\/(blog\/.*?\.html)<\/loc>/gu),
-    rewritePath,
-  );
-
+const listArticle = (articles, latest) => {
   if (latest) {
-    return articles.slice(0, 1);
+    return [articles.at(0).link];
   }
 
   return Array(3).fill(0).map(selectRandomItem.bind(null, articles));
@@ -73,7 +58,8 @@ const validateHTML = async (html) => {
 const formatMessage = (file, { lastColumn, lastLine, message }) =>
   `${file}:${lastLine}:${lastColumn}: ${message}`;
 
-const validate = async (file) => {
+const validate = async (link) => {
+  const file = path.join(config.dir.dest, link);
   const html = await fs.readFile(file, "utf8");
   const messages = await validateHTML(html);
 
@@ -92,27 +78,28 @@ const validate = async (file) => {
 
 const isNotEmpty = (element) => element.length !== 0;
 
+const file = path.join(config.dir.data, "articles.json");
 const [
-  sitemap,
+  articles,
   {
     values: { latest },
   },
 ] = await Promise.all([
-  fs.readFile(path.join(config.dir.dest, "sitemap.xml"), "utf8"),
-  util.parseArgs({
-    options: {
-      latest: {
-        type: "boolean",
-      },
-    },
-  }),
+  fs.readFile(file, "utf8").then(JSON.parse),
+  util.parseArgs({ options: { latest: { type: "boolean" } } }),
 ]);
-const indexes = Array.from(
-  sitemap.matchAll(/<loc>https:\/\/.*?\/(.*?\/)<\/loc>/gu),
-  rewritePath,
-).filter(isNormalHTML);
-const articles = listArticle(sitemap, latest);
-const results = await Promise.all([...indexes, ...articles].map(validate));
+const links = listArticle(articles, latest);
+const results = await Promise.all(
+  [
+    "/index.html",
+    "/blog/index.html",
+    "/bookshelf/index.html",
+    "/links/index.html",
+    "/projects/index.html",
+    "/subscriptions/index.html",
+    ...links,
+  ].map(validate),
+);
 const errors = results.flat();
 
 if (errors.length > 0) {
