@@ -3,18 +3,18 @@ import { getContrastRatio } from "../lib/wcag21.js";
 import { getContrastScore } from "../lib/apca.js";
 
 window.addEventListener("load", () => {
-  const queryColorCell = ".test-color > tbody > tr > td:nth-child(2)";
-  const colorCells = document.querySelectorAll(queryColorCell);
+  const queryColorTip = ".test-color > tbody > tr > td:nth-child(2) .test";
+  const colorTips = document.querySelectorAll(queryColorTip);
 
-  for (const colorCell of colorCells) {
-    const style = getComputedStyle(colorCell);
+  for (const colorTip of colorTips) {
+    const style = getComputedStyle(colorTip);
     const background = style.getPropertyValue("background-color");
     const foreground = style.getPropertyValue("color");
-    colorCell.textContent = background;
-    const contrastCell = colorCell.nextElementSibling;
+    colorTip.textContent = background;
+    const contrastCell = colorTip.parentElement.nextElementSibling;
     const ratio = getContrastRatio(foreground, background);
 
-    if (colorCell.classList.contains("js-test-color-flip")) {
+    if (colorTip.classList.contains("js-test-color-flip")) {
       const score = getContrastScore(foreground, background);
       contrastCell.lastChild.textContent = `${ratio} (${score})`;
     } else {
