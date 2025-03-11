@@ -83,7 +83,11 @@ const readAllData = async () => {
   const filesIterator = fs.glob(`${config.dir.data}**/*.json`);
   const dataFiles = await Array.fromAsync(filesIterator);
   const data = await Promise.all(dataFiles.map(readData));
-  return Object.assign(...data);
+  const allData = Object.assign(...data);
+  return {
+    ...allData,
+    version: config.version,
+  };
 };
 
 const readPartial = async (file) => {
@@ -212,7 +216,7 @@ const build = async (metadata, data, partials, file) => {
 };
 
 const [
-  { articles, books, links, projects, statuses, websites },
+  data,
   partials,
   {
     values: { all, latest },
@@ -233,23 +237,14 @@ const [
   }),
   gatherFiles(),
 ]);
-const data = {
-  articles,
-  books,
-  links,
-  projects,
-  statuses,
-  version: config.version,
-  websites,
-};
 
 if (latest) {
-  const article = await toFilesFormat(articles[0]);
+  const article = await toFilesFormat(data.articles.at(0));
   await build(config, data, partials, article);
 }
 
 if (all) {
-  const articleFiles = await Promise.all(articles.map(toFilesFormat));
+  const articleFiles = await Promise.all(data.articles.map(toFilesFormat));
   const thread = 1024;
   const repeat = Math.ceil(articleFiles.length / thread);
 
