@@ -50,7 +50,7 @@ const buildArticle = (selected) => {
   const link = path.posix.join("/", "blog", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
-  const shortDescription = `${description.split("。")[0]}。`;
+  const shortDescription = `${description.split("。").at(0)}。`;
   const type = "article";
   return {
     body,

@@ -59,7 +59,7 @@ ${menulist}
   }
 
   const index = answer - 1;
-  const selected = drafts[index];
+  const selected = drafts.at(index);
   const remains = drafts.toSpliced(index, 1);
   const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
   await fs.mkdir(path.dirname(file), { recursive: true });

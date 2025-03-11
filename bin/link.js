@@ -44,7 +44,7 @@ const formatted = JSON.stringify(
       link: url,
       published,
       ...dt,
-      shortDescription: `${comment.split("。")[0]}。`,
+      shortDescription: `${comment.split("。").at(0)}。`,
       title,
       type: "link",
     },

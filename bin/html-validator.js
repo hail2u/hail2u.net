@@ -4,7 +4,7 @@ import path from "node:path";
 import util from "node:util";
 
 const selectRandomItem = (array) =>
-  array[Math.floor(Math.random() * array.length)].link;
+  array.at(Math.floor(Math.random() * array.length)).link;
 
 const listArticle = (articles, latest) => {
   if (latest) {

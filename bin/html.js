@@ -59,8 +59,21 @@ const markItem = (item, index, items) => {
     return item;
   }
 
-  const nextItem = items[index + 1];
-  const previousItem = items[index - 1];
+  const nextItem = items.at(index + 1);
+
+  if (index === 0) {
+    return {
+      ...item,
+      isFirstInDate: true,
+      isFirstInMonth: true,
+      isFirstInYear: true,
+      isLastInDate: isLastInDate(item, nextItem),
+      isLastInMonth: isLastInMonth(item, nextItem),
+      isLastInYear: isLastInYear(item, nextItem),
+    };
+  }
+
+  const previousItem = items.at(index - 1);
   return {
     ...item,
     isFirstInDate: isFirstInDate(item, previousItem),
