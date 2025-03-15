@@ -6,82 +6,29 @@ import mustache from "mustache";
 import path from "node:path";
 import util from "node:util";
 
-const isFirstInDate = (current, previous) => {
-  if (!previous || current.date !== previous.date) {
-    return true;
-  }
-
-  return false;
-};
-
-const isFirstInMonth = (current, previous) => {
-  if (!previous || current.month !== previous.month) {
-    return true;
-  }
-
-  return false;
-};
-
-const isFirstInYear = (current, previous) => {
-  if (!previous || current.year !== previous.year) {
-    return true;
-  }
-
-  return false;
-};
-
-const isLastInDate = (current, next) => {
-  if (!next || current.date !== next.date) {
-    return true;
-  }
-
-  return false;
-};
-
-const isLastInMonth = (current, next) => {
-  if (!next || current.month !== next.month) {
-    return true;
-  }
-
-  return false;
-};
-
-const isLastInYear = (current, next) => {
-  if (!next || current.year !== next.year) {
-    return true;
-  }
-
-  return false;
-};
-
 const markItem = (item, index, items) => {
   if (!item.published) {
     return item;
   }
 
-  const nextItem = items.at(index + 1);
-
-  if (index === 0) {
-    return {
-      ...item,
-      isFirstInDate: true,
-      isFirstInMonth: true,
-      isFirstInYear: true,
-      isLastInDate: isLastInDate(item, nextItem),
-      isLastInMonth: isLastInMonth(item, nextItem),
-      isLastInYear: isLastInYear(item, nextItem),
-    };
-  }
-
   const previousItem = items.at(index - 1);
+  const nextItem = items.at(index + 1);
   return {
     ...item,
-    isFirstInDate: isFirstInDate(item, previousItem),
-    isFirstInMonth: isFirstInMonth(item, previousItem),
-    isFirstInYear: isFirstInYear(item, previousItem),
-    isLastInDate: isLastInDate(item, nextItem),
-    isLastInMonth: isLastInMonth(item, nextItem),
-    isLastInYear: isLastInYear(item, nextItem),
+    isFirstInDate:
+      item.year !== previousItem.year ||
+      item.month !== previousItem.month ||
+      item.date !== previousItem.date,
+    isFirstInMonth:
+      item.year !== previousItem.year || item.month !== previousItem.month,
+    isFirstInYear: item.year !== previousItem.year,
+    isLastInDate:
+      item.year !== nextItem?.year ||
+      item.month !== nextItem?.month ||
+      item.date !== nextItem?.date,
+    isLastInMonth:
+      item.year !== nextItem?.year || item.month !== nextItem?.month,
+    isLastInYear: item.year !== nextItem?.year,
   };
 };
 
