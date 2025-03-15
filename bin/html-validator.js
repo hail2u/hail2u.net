@@ -1,4 +1,5 @@
 import config from "../config.js";
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import util from "node:util";
@@ -14,69 +15,23 @@ const listArticle = (articles, latest) => {
   return Array(3).fill(0).map(selectRandomItem.bind(null, articles));
 };
 
-const cancelFetch = (abortController) => {
-  abortController.abort();
-};
+const toPath = (file) => path.join(config.dir.dest, file);
 
-const validateHTML = async (html) => {
-  const body = new FormData();
-  body.append("level", "error");
-  body.append("out", "json");
-  body.append("content", html);
-  const abortController = new AbortController();
-  const abortID = setTimeout(cancelFetch.bind(null, abortController), 10000);
+const execFileAsync = util.promisify(execFile);
 
-  try {
-    const res = await fetch("https://validator.w3.org/nu/", {
-      body,
-      method: "POST",
-      signal: abortController.signal,
-    });
+const handleError = (err) => {
+  const { messages } = JSON.parse(err.stderr);
 
-    if (!res.ok) {
-      return `Skipped. ${res.status} ${res.statusText}.`;
-    }
-
-    const json = await res.json();
-
-    if (json.messages.length === 0) {
-      return null;
-    }
-
-    return json.messages;
-  } catch (e) {
-    if (e.name === "AbortError") {
-      return "Skipped. Nu HTML Checker does not respond in 10s.";
-    }
-
-    throw e;
-  } finally {
-    clearTimeout(abortID);
-  }
-};
-
-const formatMessage = (file, { lastColumn, lastLine, message }) =>
-  `${file}:${lastLine}:${lastColumn}: ${message}`;
-
-const validate = async (link) => {
-  const file = path.join(config.dir.dest, link);
-  const html = await fs.readFile(file, "utf8");
-  const messages = await validateHTML(html);
-
-  if (!messages) {
-    return [];
+  for (const { lastColumn, lastLine, message, url } of messages) {
+    const absolute = url.replace(/file:/u, "");
+    const relative = path.relative(".", absolute);
+    process.stderr.write(`${relative}:${lastLine}:${lastColumn}: ${message}`);
+    process.stderr.write("\n");
   }
 
-  if (typeof messages === "string") {
-    process.stdout.write(`${file}:1:1: ${messages}
-`);
-    return [];
-  }
-
-  return Promise.all(messages.map(formatMessage.bind(null, file)));
+  process.stderr.write("\n");
+  throw new Error(`Validation ends with ${messages.length} error(s)`);
 };
-
-const isNotEmpty = (element) => element.length !== 0;
 
 const file = path.join(config.dir.data, "articles.json");
 const [
@@ -89,22 +44,16 @@ const [
   util.parseArgs({ options: { latest: { type: "boolean" } } }),
 ]);
 const links = listArticle(articles, latest);
-const results = await Promise.all(
-  [
-    "/index.html",
-    "/blog/index.html",
-    "/bookshelf/index.html",
-    "/links/index.html",
-    "/projects/index.html",
-    "/subscriptions/index.html",
-    ...links,
-  ].map(validate),
+const files = [
+  "/index.html",
+  "/blog/index.html",
+  "/bookshelf/index.html",
+  "/links/index.html",
+  "/projects/index.html",
+  "/subscriptions/index.html",
+  "/statuses/index.html",
+  ...links,
+].map(toPath);
+execFileAsync("vnu", ["--errors-only", "--format", "json", ...files]).catch(
+  handleError,
 );
-const errors = results.flat();
-
-if (errors.length > 0) {
-  const errorFiles = results.filter(isNotEmpty);
-  process.stdout.write(errors.join("\n"));
-  process.stdout.write("\n\n");
-  throw new Error(`${errors.length} error(s) in ${errorFiles.length} file(s).`);
-}
