@@ -25,7 +25,6 @@ export default {
   licenseURL: "https://creativecommons.org/licenses/by/4.0/",
   name: pkg.name,
   region: "JP",
-  schemaType: "WebPage",
   scheme: "https",
   shimei: "ながしまきょう",
   siteTitle: "Hail2u",
