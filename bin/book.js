@@ -45,7 +45,7 @@ if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
   throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 }
 
-const file = path.join(config.dir.data, "books.json");
+const file = path.join(config.dir.data, config.data.books);
 const books = await fs.readFile(file, "utf8").then(JSON.parse);
 
 if (books.find(isReadBook.bind(null, asin))) {

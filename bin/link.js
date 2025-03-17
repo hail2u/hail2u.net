@@ -33,7 +33,7 @@ if (!url) {
   throw new Error("--url is required.");
 }
 
-const file = path.join(config.dir.data, "links.json");
+const file = path.join(config.dir.data, config.data.links);
 const links = await fs.readFile(file).then(JSON.parse);
 const published = Date.now();
 const dt = getDateDetails(published);

@@ -64,7 +64,7 @@ const buildArticle = (selected) => {
   };
 };
 
-const file = path.join(config.dir.data, "articles.json");
+const file = path.join(config.dir.data, config.data.articles);
 const [selected, articles] = await Promise.all([
   selectDraft(),
   fs.readFile(file).then(JSON.parse),

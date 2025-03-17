@@ -13,7 +13,7 @@ if (!text) {
   throw new Error("Only 1 argument is required.");
 }
 
-const file = path.join(config.dir.data, "statuses.json");
+const file = path.join(config.dir.data, config.data.statuses);
 const statuses = await fs.readFile(file).then(JSON.parse);
 const published = Date.now();
 const dt = getDateDetails(published);

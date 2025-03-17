@@ -57,7 +57,7 @@ const readPartial = async (file) => {
 
 const readPartials = async () => {
   const files = await Array.fromAsync(
-    fs.glob(`${config.dir.template}partials/_*.mustache`),
+    fs.glob(`${config.dir.partial}/_*.mustache`),
   );
   const partials = await Promise.all(files.map(readPartial));
   return Object.assign(...partials);
@@ -71,26 +71,21 @@ const startsWithUnderscore = (file) => {
 const guessTemplateName = ({ type, published }) => {
   if (
     type === "article" &&
-    published < Date.now() - 1000 * 60 * 60 * 24 * 365
+    published > Date.now() - 1000 * 60 * 60 * 24 * 365
   ) {
-    return "_old.html.mustache";
+    return config.template.article;
   }
 
-  return "_article.html.mustache";
+  return config.template.old;
 };
 
 const toFilesFormat = (template) => {
   if (typeof template === "object") {
-    const articleTemplate = path.join(
-      config.dir.template,
-      "blog",
-      guessTemplateName(template),
-    );
     return {
       ...template,
       dest: path.join(config.dir.dest, template.link),
-      metadata: guessPath(articleTemplate, config.dir.metadata, "article.json"),
-      template: articleTemplate,
+      metadata: path.join(config.dir.metadata, config.metadata.article),
+      template: path.join(config.dir.template, guessTemplateName(template)),
     };
   }
 
@@ -146,8 +141,7 @@ const mergeData = async (file, metadata, data) => {
   }
 
   if (overrides.isStatuses) {
-    const logFile = guessPath(file.template, config.dir.data, "log.html");
-    const log = await fs.readFile(logFile, "utf8");
+    const log = await fs.readFile(config.file.statusLog, "utf8");
     return {
       ...metadata,
       ...data,

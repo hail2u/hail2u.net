@@ -33,7 +33,7 @@ const handleError = (err) => {
   throw new Error(`Validation ends with ${messages.length} error(s)`);
 };
 
-const file = path.join(config.dir.data, "articles.json");
+const file = path.join(config.dir.data, config.data.articles);
 const [
   articles,
   {
