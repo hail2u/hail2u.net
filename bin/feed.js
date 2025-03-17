@@ -59,8 +59,9 @@ const readLatestData = async (prefix, dataFile) => {
     return { [basename]: [] };
   }
 
-  const latest = data.slice(0, 10);
-  const extended = await Promise.all(latest.map(extendItem.bind(null, prefix)));
+  const extended = await Promise.all(
+    data.slice(0, 10).map(extendItem.bind(null, prefix)),
+  );
   return { [basename]: extended };
 };
 
