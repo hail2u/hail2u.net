@@ -12,9 +12,10 @@ const toFilesFormat = (template) => ({
 });
 
 const gatherFiles = async () => {
-  const filesIterator = fs.glob(`${config.dir.template}**/_feed.xml.mustache`);
-  const templates = await Array.fromAsync(filesIterator);
-  return Promise.all(templates.map(toFilesFormat));
+  const files = await Array.fromAsync(
+    fs.glob(`${config.dir.template}**/_feed.xml.mustache`),
+  );
+  return Promise.all(files.map(toFilesFormat));
 };
 
 const toAbsoluteURL = (prefix, url) => {
@@ -64,11 +65,8 @@ const readLatestData = async (prefix, dataFile) => {
 };
 
 const readAllData = async (prefix) => {
-  const filesIterator = fs.glob(`${config.dir.data}**/*.json`);
-  const dataFiles = await Array.fromAsync(filesIterator);
-  const data = await Promise.all(
-    dataFiles.map(readLatestData.bind(null, prefix)),
-  );
+  const files = await Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`));
+  const data = await Promise.all(files.map(readLatestData.bind(null, prefix)));
   return Object.assign(...data);
 };
 

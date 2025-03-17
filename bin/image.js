@@ -29,6 +29,5 @@ if (!src) {
   throw new Error("1 argument is required. This is for an source directory.");
 }
 
-const filesIterator = fs.glob(`${src}*.png`);
-const images = await Array.fromAsync(filesIterator);
+const images = await Array.fromAsync(fs.glob(`${src}*.png`));
 await Promise.all(images.map(build));
