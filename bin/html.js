@@ -6,6 +6,20 @@ import mustache from "mustache";
 import path from "node:path";
 import util from "node:util";
 
+const readMetadata = (file) => fs.readFile(file).then(JSON.parse);
+
+const hasPageOrder = ({ pageOrder }) => pageOrder;
+
+const comparePageOrder = ({ pageOrder: a }, { pageOrder: b }) => a - b;
+
+const buildPages = async () => {
+  const files = await Array.fromAsync(
+    fs.glob(`${config.dir.metadata}**/*.json`),
+  );
+  const metadata = await Promise.all(files.map(readMetadata));
+  return metadata.filter(hasPageOrder).sort(comparePageOrder);
+};
+
 const markItem = (item, index, items) => {
   if (!item.published) {
     return item;
@@ -40,11 +54,15 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const files = await Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`));
+  const [files, pages] = await Promise.all([
+    Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`)),
+    buildPages(),
+  ]);
   const data = await Promise.all(files.map(readData));
   const allData = Object.assign(...data);
   return {
     ...allData,
+    pages,
     version: config.version,
   };
 };
@@ -105,7 +123,7 @@ const toFilesFormat = (template) => {
 const gatherFiles = async () => {
   const templates = await Array.fromAsync(
     fs.glob(`${config.dir.template}**/*.mustache`, {
-    exclude: startsWithUnderscore,
+      exclude: startsWithUnderscore,
     }),
   );
   return Promise.all(templates.map(toFilesFormat));
@@ -113,17 +131,35 @@ const gatherFiles = async () => {
 
 const hasSameLink = (dest, { link }) => dest.endsWith(link);
 
+const isBlog = (link, { canonical }) => link.startsWith(canonical);
+
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
 
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
+    const blog = data.pages.find(
+      isBlog.bind(null, article.link),
+    );
+
+    if (!blog) {
+      return {
+        ...metadata,
+        ...data,
+        ...overrides,
+        ...article,
+        canonical: article.link,
+      };
+    }
+
     return {
       ...metadata,
       ...data,
       ...overrides,
       ...article,
       canonical: article.link,
+      feedTitle: blog.title,
+      feedURL: `${blog.canonical}${config.feed}`,
     };
   }
 
@@ -138,6 +174,11 @@ const mergeData = async (file, metadata, data) => {
       homeProjects: data.projects.slice(0, 3),
       homeStatuses: data.statuses.slice(0, 1),
     };
+  }
+
+  if (overrides.hasOwnFeed) {
+    overrides.feedTitle = overrides.title;
+    overrides.feedURL = `${overrides.canonical}${config.feed}`;
   }
 
   if (overrides.isStatuses) {
