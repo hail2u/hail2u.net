@@ -7,7 +7,7 @@ import { runCommand } from "./lib/run-command.js";
 import sharp from "sharp";
 import util from "node:util";
 
-const isReadBook = (title, book) => title === book.title;
+const isReadBook = (asin, { link }) => link.includes(`/${asin}/`);
 
 const cancelFetch = (abortController) => {
   abortController.abort();
@@ -48,7 +48,7 @@ if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
 const file = path.join(config.dir.data, "books.json");
 const books = await fs.readFile(file, "utf8").then(JSON.parse);
 
-if (books.find(isReadBook.bind(null, title))) {
+if (books.find(isReadBook.bind(null, asin))) {
   throw new Error(`${title} has already been added.`);
 }
 

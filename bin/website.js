@@ -4,7 +4,7 @@ import path from "node:path";
 import { runCommand } from "./lib/run-command.js";
 import util from "node:util";
 
-const isSubscribed = (url, subscription) => url === subscription.url;
+const isSubscribed = (newURL, { url }) => newURL === url;
 
 const {
   values: { author, feed, title, url },

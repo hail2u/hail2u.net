@@ -121,10 +121,10 @@ const startsWithUnderscore = (file) => {
   return filename.startsWith("_");
 };
 
-const guessTemplateName = (article) => {
+const guessTemplateName = ({ type, published }) => {
   if (
-    article.type === "article" &&
-    article.published < Date.now() - 1000 * 60 * 60 * 24 * 365
+    type === "article" &&
+    published < Date.now() - 1000 * 60 * 60 * 24 * 365
   ) {
     return "_old.html.mustache";
   }
@@ -168,7 +168,7 @@ const gatherFiles = async () => {
   return Promise.all(templates.map(toFilesFormat));
 };
 
-const hasSameLink = (dest, article) => dest.endsWith(article.link);
+const hasSameLink = (dest, { link }) => dest.endsWith(link);
 
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
@@ -220,7 +220,6 @@ const build = async (metadata, data, partials, file) => {
     mergeData(file, metadata, data),
     fs.readFile(file.template, "utf8"),
   ]);
-
   const rendered = mustache.render(template, merged, partials, {
     escape: escapeCharacters,
   });

@@ -93,8 +93,8 @@ const build = async (metadata, data, file) => {
   await fs.writeFile(file.dest, rendered);
 };
 
-const comparePublished = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+const comparePublished = ({ published: a }, { published: b }) =>
+  Number.parseInt(b, 10) - Number.parseInt(a, 10);
 
 const prefix = `${config.scheme}://${config.domain}`;
 const [files, { articles, books, links, statuses }] = await Promise.all([
