@@ -38,7 +38,7 @@ const extendItem = (prefix, item) => {
     return {
       ...item,
       body: item.body.replace(
-        /(href|src)="(\/.*?)"/gu,
+        /(href|src|srcset)="(\/.*?)"/gu,
         toAbsoluteURLAll.bind(null, prefix),
       ),
       link,
