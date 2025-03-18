@@ -47,7 +47,7 @@ const buildArticle = (selected) => {
   const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
     .trim()
     .split("\n");
-  const link = path.posix.join("/", "blog", `${id}.html`);
+  const link = path.posix.join("/blog/", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
   const shortDescription = `${description.split("。").at(0)}。`;
