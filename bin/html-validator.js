@@ -34,15 +34,10 @@ const handleError = (err) => {
 };
 
 const file = path.join(config.dir.data, config.data.articles);
-const [
-  articles,
-  {
-    values: { latest },
-  },
-] = await Promise.all([
-  fs.readFile(file, "utf8").then(JSON.parse),
-  util.parseArgs({ options: { latest: { type: "boolean" } } }),
-]);
+const articles = await fs.readFile(file, "utf8").then(JSON.parse);
+const {
+  values: { latest },
+} = util.parseArgs({ options: { latest: { type: "boolean" } } });
 const links = listArticle(articles, latest);
 const files = [
   "/index.html",

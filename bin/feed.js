@@ -65,8 +65,9 @@ const readLatestData = async (prefix, dataFile) => {
   return { [basename]: extended };
 };
 
-const readAllData = async (prefix) => {
+const readAllData = async () => {
   const files = await Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`));
+  const prefix = `${config.scheme}://${config.domain}`;
   const data = await Promise.all(files.map(readLatestData.bind(null, prefix)));
   return Object.assign(...data);
 };
@@ -81,10 +82,8 @@ const mergeData = async (file, metadata, data) => {
 };
 
 const build = async (metadata, data, file) => {
-  const [merged, template] = await Promise.all([
-    mergeData(file, metadata, data),
-    fs.readFile(file.template, "utf8"),
-  ]);
+  const template = await fs.readFile(file.template, "utf8");
+  const merged = await mergeData(file, metadata, data);
   const rendered = mustache.render(template, merged, null, {
     escape: escapeCharacters,
   });
@@ -95,21 +94,16 @@ const build = async (metadata, data, file) => {
 const comparePublished = ({ published: a }, { published: b }) =>
   Number.parseInt(b, 10) - Number.parseInt(a, 10);
 
-const prefix = `${config.scheme}://${config.domain}`;
-const [files, { articles, books, links, statuses }] = await Promise.all([
-  gatherFiles(),
-  readAllData(prefix),
-]);
-await Promise.all(
-  files.map(
-    build.bind(null, config, {
-      articles,
-      books,
-      items: [...articles, ...books, ...links, ...statuses]
-        .toSorted(comparePublished)
-        .slice(0, 10),
-      links,
-      statuses,
-    }),
-  ),
-);
+const files = await gatherFiles();
+const { articles, books, links, statuses } = await readAllData();
+const items = [...articles, ...books, ...links, ...statuses]
+  .toSorted(comparePublished)
+  .slice(0, 10);
+const data = {
+  articles,
+  books,
+  items,
+  links,
+  statuses,
+};
+await Promise.all(files.map(build.bind(null, config, data)));

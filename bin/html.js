@@ -54,12 +54,10 @@ const readData = async (file) => {
 };
 
 const readAllData = async () => {
-  const [files, pages] = await Promise.all([
-    Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`)),
-    buildPages(),
-  ]);
+  const files = await Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`));
   const data = await Promise.all(files.map(readData));
   const allData = Object.assign(...data);
+  const pages = await buildPages();
   return {
     ...allData,
     pages,
@@ -199,10 +197,8 @@ const mergeData = async (file, metadata, data) => {
 };
 
 const build = async (metadata, data, partials, file) => {
-  const [merged, template] = await Promise.all([
-    mergeData(file, metadata, data),
-    fs.readFile(file.template, "utf8"),
-  ]);
+  const template = await fs.readFile(file.template, "utf8");
+  const merged = await mergeData(file, metadata, data);
   const rendered = mustache.render(template, merged, partials, {
     escape: escapeCharacters,
   });
@@ -210,28 +206,20 @@ const build = async (metadata, data, partials, file) => {
   return fs.writeFile(file.dest, rendered);
 };
 
-const [
-  data,
-  partials,
-  {
-    values: { all, latest },
-  },
-  files,
-] = await Promise.all([
-  readAllData(),
-  readPartials(),
-  util.parseArgs({
-    options: {
-      all: {
-        type: "boolean",
-      },
-      latest: {
-        type: "boolean",
-      },
+const {
+  values: { all, latest },
+} = util.parseArgs({
+  options: {
+    all: {
+      type: "boolean",
     },
-  }),
-  gatherFiles(),
-]);
+    latest: {
+      type: "boolean",
+    },
+  },
+});
+const data = await readAllData();
+const partials = await readPartials();
 
 if (latest) {
   const article = await toFilesFormat(data.articles.at(0));
@@ -250,4 +238,5 @@ if (all) {
   }
 }
 
+const files = await gatherFiles();
 await Promise.all(files.map(build.bind(null, config, data, partials)));

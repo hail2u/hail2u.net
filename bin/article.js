@@ -64,20 +64,16 @@ const buildArticle = (selected) => {
   };
 };
 
+const selected = await selectDraft();
+checkIDFormat(selected.id);
+checkTitleType(selected.title);
 const file = path.join(config.dir.data, config.data.articles);
-const [selected, articles] = await Promise.all([
-  selectDraft(),
-  fs.readFile(file).then(JSON.parse),
-]);
+const articles = await fs.readFile(file).then(JSON.parse);
+checkDuplication(selected.id, selected.title, articles);
 const body = selected.body.replace(
   /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
   "/",
 );
-await Promise.all([
-  checkIDFormat(selected.id),
-  checkTitleType(selected.title),
-  checkDuplication(selected.id, selected.title, articles),
-]);
 const article = buildArticle({
   ...selected,
   body,

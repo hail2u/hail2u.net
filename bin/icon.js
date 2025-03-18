@@ -14,11 +14,9 @@ const toIcon = async (icon, size) => {
   icon.append(ico.IcoImage.fromPNG(png));
 };
 
-const file = path.join(config.dir.dest, "favicon.ico");
 const sizes = [16, 24, 32, 48, 64, 128, 256];
 const icon = new ico.Ico();
-await Promise.all([
-  fs.mkdir(path.dirname(file), { recursive: true }),
-  Promise.all(sizes.map(toIcon.bind(null, icon))),
-]);
+await Promise.all(sizes.map(toIcon.bind(null, icon)));
+const file = path.join(config.dir.dest, "favicon.ico");
+await fs.mkdir(path.dirname(file), { recursive: true });
 await fs.writeFile(file, icon.data);

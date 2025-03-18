@@ -9,7 +9,7 @@ const convert = async (basename, image, ext) => {
   await image.toFile(dest);
 };
 
-const build = (file) => {
+const build = async (file) => {
   const formats = ["avif", "jpg"];
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
@@ -18,7 +18,7 @@ const build = (file) => {
     width: 2560,
     withoutEnlargement: true,
   });
-  Promise.all(formats.map(convert.bind(null, basename, image)));
+  await Promise.all(formats.map(convert.bind(null, basename, image)));
 };
 
 const {
