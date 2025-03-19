@@ -2,7 +2,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["*.min.js"],
+    ignores: ["**/*.min.js"],
     languageOptions: {
       parserOptions: {
         ecmaFeatures: {
