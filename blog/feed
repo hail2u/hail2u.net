@@ -13,6 +13,24 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[WindowsのFirefoxでは、かなり前からメニュー・バーが既定で非表示になっている。ほぼ全てのメニュー項目にアクセスできるボタンはあるし、Altキーを押すと一時的に表示されるようになっているので、特には困らない。ただ、Altキーでメニュー・バーの表示を切り替えた時にlvh単位の基準も変化してしまうようだ。]]></description>
+        <guid>https://hail2u.net/blog/firefox-menu-bar-and-lvh-unit.html</guid>
+        <link>https://hail2u.net/blog/firefox-menu-bar-and-lvh-unit.html</link>
+        <pubDate>Wed, 19 Mar 2025 11:12:42 +0900</pubDate>
+        <title><![CDATA[WindowsでのFirefoxのメニュー・バーとlvh単位]]></title>
+        <content:encoded><![CDATA[<p>WindowsのFirefoxでは、かなり前からメニュー・バーが既定で非表示になっている。ほぼ全てのメニュー項目にアクセスできるボタンはあるし、<kbd>Alt</kbd>キーを押すと一時的に表示されるようになっているので、特には困らない。ただ、<kbd>Alt</kbd>キーでメニュー・バーの表示を切り替えた時に<code>lvh</code>単位の基準も変化してしまうようだ。</p>
+
+<p><a href="https://hail2u.net/pub/test/712.html">簡単なテスト・ページ</a>で試せる。比較対象はFirefox 136とMobile Safari 18だ。Firefox 136では<kbd>Alt</kbd>キーを押してメニュー・バーを表示すると、<code>lvh</code> (<code>lvi</code>)単位も含め全ての単位で基準が変化し、四角い緑の幅が減る。Mobile Safari 18ではスクロールしてブラウザーのGUI領域が変化しても、<code>dvh</code> (<code>dvi</code>)単位の基準だけしか変化せず、四角い緑の幅もそれらしか減らない。</p>
+
+<p><kbd>Alt</kbd>キーによるメニュー・バーの表示を、動的に開かれたもの(仕様で言うところの「dynamically expanded」)と捉えると、<code>lvh</code>単位の基準は変化すべきではないだろう。ただ仕様では同時に「might be hidden behind」などとも書かれており、Mobile Safariのような描画領域に被さるような操作領域を想定しているようにも読める。こういったメニュー・バーは被さらないので、描画領域そのものが変化したと捉え、ウィンドウの大きさが変化した時のように基準が変わってもおかしくない。</p>
+
+<hr>
+
+<p><kbd>Alt</kbd>キーによるメニュー・バーの表示は動的に開かれたものという印象を持っているので、感覚的にはバグのように思える。色々と考えていたら、オーバーフローのサイドバーで<code>dvw</code>単位はどうなるべきかなど、別の疑問も湧いてくる。うまく考えがまとまったらBugzillaにでも投げてみようと思う。</p>
+
+<p>現在、このウェブサイトでは<code>svmin</code>単位を使って文字サイズを決定しているので、横長のウィンドウでメニュー・バーを出すと文字が小さくなる。その結果コンテンツが大幅に動くので、かなりびっくりする。やはりこの辺りの単位はウィンドウの大きさに対して固定的であって欲しいように思う。実機で操作しないと気付けないような挙動でもあるのでなおさらだ。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[今冬も鼻血は出た。朝食後に3度、午後に1度、その他の時間に2度の計6回だ。就寝中には1度だけで、枕を汚すほどでもなく、それほど大変ではなかった。水分を多めにとるくらいしか対処法はなく、他は鼻を優しくかむだけらしい。]]></description>
         <guid>https://hail2u.net/blog/2025-03-18.html</guid>
         <link>https://hail2u.net/blog/2025-03-18.html</link>
@@ -192,16 +210,6 @@
 <p>描画領域関連の単位は、幅と高さの小さい方の最大値を参照する<code>lvmin</code>単位から、ブラウザーが動的に制御する高さと同期する<code>dvh</code>単位まで、様々な単位が定義されている。viewportを示す「v」に、「l」と「s」と「d」という接頭辞、「w (i)」と「h (b)」と「min」と「max」という接尾辞、これらの組み合わせによってどういう単位か明確になるというわけだ。接頭辞が無い場合は<a href="https://www.w3.org/TR/2024/WD-css-values-4-20240312/#viewport-variants">暗黙的にlとみなされるという定義</a>になっているが、互換性のために残されていると言って良さそうな雰囲気が仕様の文から伝わってくる。</p>
 
 <p>ゆくゆくは書字方向に依存しない<code>*vi</code>や<code>*vb</code>単位へと置き換えてゆくべきかもしれない。しかし、メンタル・モデルの更新なので、同時に行うと混乱しやすい。まずは<code>lv*</code>に置き換え、それに慣れたら次の更新を考えれば良いだろう。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[自前のスクリプトで管理していた音楽アルバムの新規リリース監視を諦め、Muspyに出戻る。自前ではMusicBrainzを週に1回くらいクロールしていた。ログインせずに使えて便利ではあるものの、フィード・リーダーで見れた方が楽かもしれないと、過去に半年くらい利用していたMuspyに出戻ることにした。]]></description>
-        <guid>https://hail2u.net/blog/back-to-muspy.html</guid>
-        <link>https://hail2u.net/blog/back-to-muspy.html</link>
-        <pubDate>Wed, 5 Mar 2025 13:33:31 +0900</pubDate>
-        <title><![CDATA[Muspyに復帰]]></title>
-        <content:encoded><![CDATA[<p>自前のスクリプトで管理していた音楽アルバムの新規リリース監視を諦め、<a href="https://muspy.com/">Muspy</a>に出戻る。自前では<a href="https://musicbrainz.org/">MusicBrainz</a>を週に1回くらいクロールしていた。ログインせずに使えて便利ではあるものの、フィード・リーダーで見れた方が楽かもしれないと、過去に<a href="https://hail2u.net/blog/muspy.html">半年くらい利用していたMuspy</a>に出戻ることにした。</p>
-
-<p>うまいこと使えているかどうかはわからないが、今もRSSやiCalの情報は正しいようだ。アーティスト名の追加が面倒そうだったが、追加するフォームにカンマ区切りで入力すれば一気にインポートできることを知る。同じ名前で複数のアーティストがいるような場合に、手作業で修正しないとならなかったが、5つくらいで済んだので、大した手間ではない。こういうやつのマンガ版が欲しいところだ。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
