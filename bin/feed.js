@@ -56,13 +56,17 @@ const readLatestData = async (prefix, dataFile) => {
   const data = await fs.readFile(dataFile).then(JSON.parse);
 
   if (!data.at(0).published) {
-    return { [basename]: [] };
+    return {
+      [basename]: [],
+    };
   }
 
   const extended = await Promise.all(
     data.slice(0, 10).map(extendItem.bind(null, prefix)),
   );
-  return { [basename]: extended };
+  return {
+    [basename]: extended,
+  };
 };
 
 const readAllData = async () => {
@@ -87,12 +91,14 @@ const build = async (metadata, data, file) => {
   const rendered = mustache.render(template, merged, null, {
     escape: escapeCharacters,
   });
-  await fs.mkdir(path.dirname(file.dest), { recursive: true });
+  await fs.mkdir(path.dirname(file.dest), {
+    recursive: true,
+  });
   await fs.writeFile(file.dest, rendered);
 };
 
-const comparePublished = ({ published: a }, { published: b }) =>
-  Number.parseInt(b, 10) - Number.parseInt(a, 10);
+const comparePublished = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const files = await gatherFiles();
 const { articles, books, links, statuses } = await readAllData();

@@ -12,6 +12,8 @@ const selected = await selectDraft();
 const rendered = mustache.render(template, selected, null, {
   escape: escapeCharacters,
 });
-await fs.mkdir(path.dirname(config.file.preview), { recursive: true });
+await fs.mkdir(path.dirname(config.file.preview), {
+  recursive: true,
+});
 await fs.writeFile(config.file.preview, rendered);
 await runCommand("open", [config.file.preview]);

@@ -10,7 +10,7 @@ const readMetadata = (file) => fs.readFile(file).then(JSON.parse);
 
 const hasPageOrder = ({ pageOrder }) => pageOrder;
 
-const comparePageOrder = ({ pageOrder: a }, { pageOrder: b }) => a - b;
+const comparePageOrder = (a, b) => a.pageOrder - b.pageOrder;
 
 const buildPages = async () => {
   const files = await Array.fromAsync(
@@ -50,7 +50,9 @@ const readData = async (file) => {
   const basename = path.basename(file, ".json");
   const data = await fs.readFile(file).then(JSON.parse);
   const marked = await Promise.all(data.map(markItem));
-  return { [basename]: marked };
+  return {
+    [basename]: marked,
+  };
 };
 
 const readAllData = async () => {
@@ -68,7 +70,9 @@ const readAllData = async () => {
 const readPartial = async (file) => {
   const basename = path.basename(file, ".mustache").substring(1);
   const partial = await fs.readFile(file, "utf8");
-  return { [basename]: partial };
+  return {
+    [basename]: partial,
+  };
 };
 
 const readPartials = async () => {
@@ -136,9 +140,7 @@ const mergeData = async (file, metadata, data) => {
 
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
-    const blog = data.pages.find(
-      isBlog.bind(null, article.link),
-    );
+    const blog = data.pages.find(isBlog.bind(null, article.link));
 
     if (!blog) {
       return {
@@ -202,7 +204,9 @@ const build = async (metadata, data, partials, file) => {
   const rendered = mustache.render(template, merged, partials, {
     escape: escapeCharacters,
   });
-  await fs.mkdir(path.dirname(file.dest), { recursive: true });
+  await fs.mkdir(path.dirname(file.dest), {
+    recursive: true,
+  });
   return fs.writeFile(file.dest, rendered);
 };
 

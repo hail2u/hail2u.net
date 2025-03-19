@@ -62,7 +62,9 @@ ${menulist}
   const selected = drafts.at(index);
   const remains = drafts.toSpliced(index, 1);
   const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
-  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.mkdir(path.dirname(file), {
+    recursive: true,
+  });
   await fs.writeFile(file, rebuilt.join("\n\n<hr>\n\n\n"));
 
   if (selected.id) {

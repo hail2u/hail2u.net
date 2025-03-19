@@ -53,7 +53,9 @@ const formatted = JSON.stringify(
   null,
   2,
 );
-await fs.mkdir(path.dirname(file), { recursive: true });
+await fs.mkdir(path.dirname(file), {
+  recursive: true,
+});
 await fs.writeFile(file, `${formatted}\n`);
 await runCommand("git", ["add", "--", file]);
 await runCommand("git", ["commit", `--message=Bookmark ${url}`]);

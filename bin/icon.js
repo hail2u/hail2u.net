@@ -6,9 +6,13 @@ import sharp from "sharp";
 
 const toIcon = async (icon, size) => {
   const density = (size * 72) / 16;
-  const png = await sharp(config.file.icon, { density })
+  const png = await sharp(config.file.icon, {
+    density,
+  })
     .resize(size)
-    .flatten({ background: "hsl(48 48% 93%)" })
+    .flatten({
+      background: "hsl(48 48% 93%)",
+    })
     .png()
     .toBuffer();
   icon.append(ico.IcoImage.fromPNG(png));
@@ -18,5 +22,7 @@ const sizes = [16, 24, 32, 48, 64, 128, 256];
 const icon = new ico.Ico();
 await Promise.all(sizes.map(toIcon.bind(null, icon)));
 const file = path.join(config.dir.dest, "favicon.ico");
-await fs.mkdir(path.dirname(file), { recursive: true });
+await fs.mkdir(path.dirname(file), {
+  recursive: true,
+});
 await fs.writeFile(file, icon.data);

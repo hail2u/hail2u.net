@@ -23,7 +23,9 @@ const build = async (file) => {
 
 const {
   positionals: [src],
-} = util.parseArgs({ allowPositionals: true });
+} = util.parseArgs({
+  allowPositionals: true,
+});
 
 if (!src) {
   throw new Error("1 argument is required. This is for an source directory.");

@@ -7,16 +7,18 @@ import util from "node:util";
 
 const {
   positionals: [text],
-} = util.parseArgs({ allowPositionals: true });
+} = util.parseArgs({
+  allowPositionals: true,
+});
 
 if (!text) {
   throw new Error("Only 1 argument is required.");
 }
 
-const file = path.join(config.dir.data, config.data.statuses);
-const statuses = await fs.readFile(file).then(JSON.parse);
 const published = Date.now();
 const dt = getDateDetails(published);
+const file = path.join(config.dir.data, config.data.statuses);
+const statuses = await fs.readFile(file).then(JSON.parse);
 const formatted = JSON.stringify(
   [
     {
@@ -32,7 +34,9 @@ const formatted = JSON.stringify(
   null,
   2,
 );
-await fs.mkdir(path.dirname(file), { recursive: true });
+await fs.mkdir(path.dirname(file), {
+  recursive: true,
+});
 await fs.writeFile(file, `${formatted}\n`);
 await runCommand("git", ["add", "--", file]);
 await runCommand("git", [

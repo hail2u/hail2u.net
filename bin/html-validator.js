@@ -37,7 +37,13 @@ const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const {
   values: { latest },
-} = util.parseArgs({ options: { latest: { type: "boolean" } } });
+} = util.parseArgs({
+  options: {
+    latest: {
+      type: "boolean",
+    },
+  },
+});
 const links = listArticle(articles, latest);
 const files = [
   "/index.html",

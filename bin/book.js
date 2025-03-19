@@ -57,7 +57,9 @@ const abortID = setTimeout(cancelFetch.bind(null, abortController), 5000);
 
 try {
   const cover = `https://m.media-amazon.com/images/P/${asin}.jpg`;
-  const res = await fetch(cover, { signal: abortController.signal });
+  const res = await fetch(cover, {
+    signal: abortController.signal,
+  });
 
   if (!res.ok) {
     throw new Error(`${res.status} ${res.statusText}`);
@@ -91,7 +93,9 @@ try {
     null,
     2,
   );
-  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.mkdir(path.dirname(file), {
+    recursive: true,
+  });
   await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Read ${asin}`]);

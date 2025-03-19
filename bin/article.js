@@ -79,7 +79,9 @@ const article = buildArticle({
   body,
 });
 const formatted = JSON.stringify([article, ...articles], null, 2);
-await fs.mkdir(path.dirname(file), { recursive: true });
+await fs.mkdir(path.dirname(file), {
+  recursive: true,
+});
 await fs.writeFile(file, `${formatted}\n`);
 await runCommand("git", ["add", "--", file]);
 const th = articles.length + 1;
