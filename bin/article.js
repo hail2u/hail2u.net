@@ -94,4 +94,4 @@ twitter.searchParams.append(
   "text",
   `${article.shortDescription} / ${article.title} ${config.scheme}://${config.domain}${article.link}`,
 );
-await runCommand("open", [twitter.href]);
+await runCommand("chrome", [twitter.href]);

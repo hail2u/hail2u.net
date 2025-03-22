@@ -46,4 +46,4 @@ await runCommand("git", [
 ]);
 const twitter = new URL("https://x.com/intent/tweet");
 twitter.searchParams.append("text", text);
-await runCommand("open", [twitter.href]);
+await runCommand("chrome", [twitter.href]);
