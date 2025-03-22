@@ -11,7 +11,7 @@ const toIcon = async (icon, size) => {
   })
     .resize(size)
     .flatten({
-      background: "hsl(48 48% 93%)",
+      background: "#fff",
     })
     .png()
     .toBuffer();
