@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="light dark" name="color-scheme">
+    <meta content="same-origin" name="view-transition">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <title>WSLからURLを既定ではないブラウザーで開く</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/opening-a-url-with-non-default-browser-from-wsl.html" rel="canonical">
+    <meta content="既定のブラウザーがFirefoxなので、ChromeでURLを開きたい場合はスクリプトを書く必要があった。wslviewは関連付けに従って開くため、Chromeが既定のブラウザーでない場合はうまくいかない。Chromeの実行ファイルのパスとURLを引数にしても起動できないという意味だ。書くのはPowerShellでStart-Processするだけのスクリプトだ。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://m.media-amazon.com/" rel="preconnect">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/print.css?v=9.34.7" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.34.7" media="only screen" rel="stylesheet">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="logo"><a href="/"><span role="img" aria-label="ホームへ戻る">←</span></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2025-03-25T08:44:36+09:00">2025年3月25日</time></p>
+
+        <h1><em>WSLからURLを既定ではないブラウザーで開く</em></h1>
+      </header>
+
+    <main>
+      <p>既定のブラウザーがFirefoxなので、ChromeでURLを開きたい場合はスクリプトを書く必要があった。wslviewは関連付けに従って開くため、Chromeが既定のブラウザーでない場合はうまくいかない。Chromeの実行ファイルのパスとURLを引数にしても起動できないという意味だ。書くのはPowerShellで<code>Start-Process</code>するだけのスクリプトだ。</p>
+
+<pre><code class="language-sh">#!/bin/sh
+
+/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Start-Process -FilePath "\$ENV:USERPROFILE/AppData/Local/Google/Chrome/Application/chrome.exe" -ArgumentList "$1"
+</code></pre>
+
+<p>WSLの設定でWindows側の環境変数PATHを追加していないので、パスをベタ書きすることになったが、既定ではPATHが通っているはずなので、省略できるだろう。PowerShellへはWSLでのパス、ChromeへはWindowsでのパスで書く。環境変数を使う場合は「$」をエスケープする。PowerShellを経由しないと、Chromeを終了するまで戻ってこない。cmd経由で<code>start</code>コマンドを使っても可能だが、作業フォルダーに関する警告メッセージが出るので面倒臭い。</p>
+    </main>
+
+    <footer class="page-footer">
+
+        <p>このウェブサイトは<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下で作成、公開、そして更新しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)または<a href="https://x.com/hail2u_">X</a>で購読できます。その他、わからないことは<a href="/#about">もう少し詳しい情報</a>を参照してください。</p>
+
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a></p>
+    </footer>
+  </body>
+</html>
