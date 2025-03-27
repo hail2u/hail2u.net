@@ -11,7 +11,7 @@ const checkIDFormat = (id) => {
     throw new Error("A draft must have an ID.");
   }
 
-  if (id && !/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
+  if (!/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
     throw new Error(
       "This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.",
     );
@@ -26,27 +26,18 @@ const checkTitleType = (title) => {
   }
 };
 
-const isDuplication = (id, title, element) => {
-  if (element.link.endsWith(`${id}.html`) || title === element.title) {
-    return true;
-  }
+const isDuplication = (id, element) => element.link.endsWith(`${id}.html`);
 
-  return false;
-};
-
-const checkDuplication = (id, title, articles) => {
-  if (articles.findIndex(isDuplication.bind(null, id, title)) !== -1) {
-    throw new Error(
-      `There has been a entry that has same ID “${id}” or title “${title}”.`,
-    );
+const checkDuplication = (id, articles) => {
+  if (articles.findIndex(isDuplication.bind(null, id)) !== -1) {
+    throw new Error(`There has been a entry that has same ID “${id}”.`);
   }
 };
 
-const buildArticle = (selected) => {
-  const { body, id, title } = selected;
-  const [description] = unescapeReferences(body.replace(/<.*?>/gu, ""))
-    .trim()
-    .split("\n");
+const buildArticle = ({ body, id, title }) => {
+  const description = unescapeReferences(
+    body.replace(/<.*?>/gu, "").trim().split("\n").at(0),
+  );
   const link = path.posix.join("/blog/", `${id}.html`);
   const published = Date.now();
   const dt = getDateDetails(published);
@@ -69,7 +60,7 @@ checkIDFormat(selected.id);
 checkTitleType(selected.title);
 const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file).then(JSON.parse);
-checkDuplication(selected.id, selected.title, articles);
+checkDuplication(selected.id, articles);
 const body = selected.body.replace(
   /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
   "/",
