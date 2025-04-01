@@ -16,8 +16,8 @@
     <link href="https://m.media-amazon.com/" rel="preconnect">
     <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
 
-    <link href="/css/print.css?v=9.34.8" media="only print" rel="stylesheet">
-    <link href="/css/index.css?v=9.34.8" media="only screen" rel="stylesheet">
+    <link href="/css/print.css?v=9.34.9" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.34.9" media="only screen" rel="stylesheet">
   </head>
 
   <body>
@@ -41,19 +41,19 @@
 
 <p>大きめの画面で大きめの文字サイズということになり、直観的には悪くなさそうな雰囲気がある。縦幅が100ピクセル増えると、文字サイズが<code>2.222px</code>大きくなる計算だ。4Kディスプレイなら縦1920ピクセルなので、<code>42.667px</code>になる。実際にはブラウザーのGUI領域などでもう少し小さいだろう。CSSでは描画領域の高さを<code>*vh</code>単位で参照できるので、以下のように書ける。最低でもこれくらい入るという観点で決めたいので、<code>svh</code>単位にしたい。</p>
 
-<pre><code>:root {
+<pre><code class="language-css">:root {
   font-size: calc(<mark>100svh / (1.5 * 30)</mark>);
 }</code></pre>
 
 <p>このままではユーザー設定の文字サイズよりも小さくなる可能性がある。スマートフォンを横向きで使う時はそうなってしまうだろう。下限はユーザーの文字サイズ設定を尊重しなければならない。上限が難しいところだが、<code>48px</code>とし、4Kディスプレイでも到達しないくらいにしておく。<code>calc</code>関数を<code>clamp</code>関数に変え、最小値で<code>%</code>を、最大値で<code>px</code>単位を使う。</p>
 
-<pre><code>:root {
+<pre><code class="language-css">:root {
   font-size: clamp(<mark>100%</mark>, 100svh / (1.5 * 30), <mark>48px</mark>);
 }</code></pre>
 
 <p>最近のスマートフォンなど、縦横比が2:1を超えるような縦長の機器では大きくなりすぎる懸念がある。縦長の機器では紙媒体と挙動が似ていると考えられるので、1行の文字数、つまり列数を固定してみたい。列数は、余白を考慮すると1行の文字数が35文字から38文字(<a href="https://en.wikipedia.org/wiki/Line_length">半角英数字で70文字から75文字</a>)くらいとなる40文字としてみる。これを<code>min</code>関数を使って、うまく切り替わるようにする。</p>
 
-<pre><code>:root {
+<pre><code class="language-css">:root {
   font-size: clamp(
     100%,
     <mark>min(
@@ -66,7 +66,7 @@
 
 <p>これで行数と列数の両方で収まりが良いと考えられる大きさになる。描画領域に対する文章の圧(表現が難しいが、埋まり具合とか密度とか、そのような感覚のこと)が一定になるだろう。行数と列数は厳密なものではないので、それらの平均を取って<code>svmin</code>単位を割ることで<code>min</code>関数の計算結果に近い値を出しても良いかもしれない。</p>
 
-<pre><code>:root {
+<pre><code class="language-css">:root {
   font-size: clamp(
     100%,
     <mark>100svmin / ((1.5 * 30 + 40) / 2)</mark>,
@@ -78,7 +78,7 @@
 
 <hr>
 
-<pre><code>:root {
+<pre><code class="language-css">:root {
   --ratio: calc(pow(3, 2) / pow(2, 3));
   --line-height-default: calc(pow(var(--ratio), 4));
   --ratio-column: calc(pow(var(--ratio), 32));
