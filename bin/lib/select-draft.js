@@ -16,7 +16,13 @@ const toDraft = (draft) => {
   };
 };
 
-const toMenuitem = ({ title }, index) => `${String(index + 1)}. ${title}`;
+const toMenuitem = ({ id, title }, index) => {
+  if (!id) {
+    return `${String(index + 1)}. ${title}`;
+  }
+
+  return `${String(index + 1)}. ${title} (${id})`;
+};
 
 const rebuildDraft = ({ body, id, title }) => {
   if (!id) {
