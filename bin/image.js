@@ -4,21 +4,17 @@ import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
 
-const convert = async (basename, image, ext) => {
-  const dest = path.join(config.dir.dest, "/img/blog/", `${basename}.${ext}`);
-  await image.toFile(dest);
-};
-
-const build = async (file) => {
-  const formats = ["avif", "jpg"];
+const build = (file) => {
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
-  const image = sharp(file).resize({
-    height: 1440,
-    width: 2560,
-    withoutEnlargement: true,
-  });
-  await Promise.all(formats.map(convert.bind(null, basename, image)));
+  const dest = path.join(config.dir.dest, "/img/blog/", `${basename}.avif`);
+  sharp(file)
+    .resize({
+      height: 1440,
+      width: 2560,
+      withoutEnlargement: true,
+    })
+    .toFile(dest);
 };
 
 const {
