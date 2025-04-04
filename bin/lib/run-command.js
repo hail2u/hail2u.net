@@ -4,7 +4,12 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 
 const runCommand = async (command, args) => {
-  const { stdout } = await execFileAsync(command, args);
+  const { stderr, stdout } = await execFileAsync(command, args);
+
+  if (stderr) {
+    process.stderr.write(stderr);
+  }
+
   return process.stdout.write(stdout);
 };
 
