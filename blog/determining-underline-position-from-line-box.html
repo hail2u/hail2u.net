@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <title>下線の位置を行ボックスから決定</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/determining-underline-position-from-line-box.html" rel="canonical">
+    <meta content="下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://m.media-amazon.com/" rel="preconnect">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/print.css?v=9.34.9" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.34.9" media="only screen" rel="stylesheet">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="back"><a href="/"><span role="img" aria-label="ホームへ戻る">←</span></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2025-04-09T07:30:52+09:00">2025年4月9日</time></p>
+
+        <h1><em>下線の位置を行ボックスから決定</em></h1>
+      </header>
+
+    <main>
+      <p>下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。</p>
+
+<p>また、ハイパーリンクであることを色やそのコントラストに頼らずさりげなく示したいものが下線だと考えると、そもそも強調に近い下線は強すぎるという問題もある。そういう意味でも少し離すという考えは納得できる。離し過ぎると次行の上線と誤解される可能性もあるので、数ピクセルくらいになるだろうが、適切な割合を文字サイズから決めることは難しいと感じる。</p>
+
+<p>適切な行送りであるという前提なら、文字から離すというよりも、行ボックスから決めると汎用的で安定的な位置になるのではないだろうか。近すぎず、遠すぎずとするためには、文字のベースラインと行ボックスの下端のそれぞれから少し離したい。両者の真ん中辺りにすると丁度良さそうだ。具体的にはhalf-leadingを計算し、更にその半分にした値を指定する。</p>
+
+<pre><code class="language-css">a {
+  text-underline-offset: calc((1lh - 1cap) / 2 / 2);
+}</code></pre>
+
+<p>行ボックスの高さ(<code>1lh</code>)から文字の高さ(<code>1cap</code>としたが<code>1em</code>でも良い)を引けば、leadingが計算できる。それを半分にするとhalf-leadingだ。更にそれを半分にしているが、行送りの大きさによっては1/3にしても良いかもしれない。</p>
+
+<hr>
+
+<p>ハイパーリンクをフォーカスした時に表示される輪郭線も、同じように行ボックスを基準にして考えると良いような気がしている。垂直方向の距離は、この記事で提案した下線の位置と丁度重なるくらいが適切だろうか。水平方向はもうちょっと狭くて良いが、調整することができない問題がある。</p>
+    </main>
+
+    <footer class="page-footer">
+
+        <p>このウェブサイトは<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下で作成、公開、そして更新しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)または<a href="https://x.com/hail2u_">X</a>で購読できます。その他、わからないことは<a href="/#about">もう少し詳しい情報</a>を参照してください。</p>
+
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a></p>
+    </footer>
+  </body>
+</html>

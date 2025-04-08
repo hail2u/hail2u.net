@@ -13,6 +13,28 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。]]></description>
+        <guid>https://hail2u.net/blog/determining-underline-position-from-line-box.html</guid>
+        <link>https://hail2u.net/blog/determining-underline-position-from-line-box.html</link>
+        <pubDate>Wed, 9 Apr 2025 07:30:52 +0900</pubDate>
+        <title><![CDATA[下線の位置を行ボックスから決定]]></title>
+        <content:encoded><![CDATA[<p>下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。</p>
+
+<p>また、ハイパーリンクであることを色やそのコントラストに頼らずさりげなく示したいものが下線だと考えると、そもそも強調に近い下線は強すぎるという問題もある。そういう意味でも少し離すという考えは納得できる。離し過ぎると次行の上線と誤解される可能性もあるので、数ピクセルくらいになるだろうが、適切な割合を文字サイズから決めることは難しいと感じる。</p>
+
+<p>適切な行送りであるという前提なら、文字から離すというよりも、行ボックスから決めると汎用的で安定的な位置になるのではないだろうか。近すぎず、遠すぎずとするためには、文字のベースラインと行ボックスの下端のそれぞれから少し離したい。両者の真ん中辺りにすると丁度良さそうだ。具体的にはhalf-leadingを計算し、更にその半分にした値を指定する。</p>
+
+<pre><code class="language-css">a {
+  text-underline-offset: calc((1lh - 1cap) / 2 / 2);
+}</code></pre>
+
+<p>行ボックスの高さ(<code>1lh</code>)から文字の高さ(<code>1cap</code>としたが<code>1em</code>でも良い)を引けば、leadingが計算できる。それを半分にするとhalf-leadingだ。更にそれを半分にしているが、行送りの大きさによっては1/3にしても良いかもしれない。</p>
+
+<hr>
+
+<p>ハイパーリンクをフォーカスした時に表示される輪郭線も、同じように行ボックスを基準にして考えると良いような気がしている。垂直方向の距離は、この記事で提案した下線の位置と丁度重なるくらいが適切だろうか。水平方向はもうちょっと狭くて良いが、調整することができない問題がある。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[重い腰を上げて、Xには常用していないChromeでログインするようにする。既定のブラウザーであるFirefoxでは、ほとんど全てのサービスをログアウトした状態で使う。日常的にログインが必要なサービス、Google Driveやら、GitHubやら、Kindle Cloud Readerやら、Xやら、これらは主にChromeでログインしっぱなしにする。支払いが必要なサービス、Amazon Payやら、ブックオフやら、ヨドバシカメラやら、えきねっとやら、これらもChromeを使うが、すぐログアウトする。]]></description>
         <guid>https://hail2u.net/blog/2025-04-08.html</guid>
         <link>https://hail2u.net/blog/2025-04-08.html</link>
@@ -143,40 +165,6 @@
         <content:encoded><![CDATA[<p>ここの所、鼻血以外は体調が良くてうれしい。口内炎ができた記憶がないくらいだ。風邪らしい風邪も引いていない。何が良いのかわからないが、口内炎については駄菓子をあまり食べなくなったことが大きい気がする。4月半ばくらいまでは体調を崩しやすい季節なので、このまま気を付けて生きていきたい。</p>
 
 <p>今年も花粉症デビューせずに済むような雰囲気だ。遠出した時に目も痒くならないし、寒くなければ鼻水も出ない。実は暖かくなった辺りで調子が悪かったが、単なる季節の変わり目頭痛だっただけらしい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[カラー・スキームへの反応を指示するcolor-schemeは、metaタグとCSSプロパティーのどちらでも定義できる。しかし、CSSプロパティーとして書いてしまうと、HTMLのレンダリング開始が速すぎる場合、FOUCのように一瞬白くなることがある。そのためmetaタグの方が安全なようだ。このウェブサイトでもCSSに書くように変えてから、ちょくちょくフラッシュしていた。今はもうmetaタグに戻している。]]></description>
-        <guid>https://hail2u.net/blog/meta-color-scheme-and-color-scheme-property.html</guid>
-        <link>https://hail2u.net/blog/meta-color-scheme-and-color-scheme-property.html</link>
-        <pubDate>Wed, 26 Mar 2025 11:28:47 +0900</pubDate>
-        <title><![CDATA[metaタグのcolor-schemeとCSSのcolor-schemeプロパティー]]></title>
-        <content:encoded><![CDATA[<p>カラー・スキームへの反応を指示する<code>color-scheme</code>は、<code>meta</code>タグとCSSプロパティーのどちらでも定義できる。しかし、CSSプロパティーとして書いてしまうと、HTMLのレンダリング開始が速すぎる場合、<a href="https://en.wikipedia.org/wiki/Flash_of_unstyled_content">FOUC</a>のように一瞬白くなることがある。そのため<code>meta</code>タグの方が安全なようだ。このウェブサイトでもCSSに書くように変えてから、ちょくちょくフラッシュしていた。今はもう<code>meta</code>タグに戻している。</p>
-
-<p>仕様をよく読むと、やや機能が違うこともわかってくる。<code>color-scheme</code>プロパティーはコンポーネントで挙動を変えたい時だけ使うことになりそうだ。他にはSVG画像で使っても良いだろう。SVGファビコンなど、単独で利用される場合は必要になる。</p>
-
-<hr>
-
-<p>まだあまり使われていない<code>color-scheme</code>プロパティーは、その機能に混乱があるように思う。たまに以下のようなコードを見る。このような書き方でも期待通りになるが、冗長だろう。</p>
-
-<pre><code class="language-css">:root {
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
-}</code></pre>
-
-<p><a href="https://www.w3.org/TR/css-color-adjust-1/#color-scheme-prop"><code>color-scheme</code>プロパティー</a>は、どのカラー・スキームでレンダリングするように設計されているかを示すものだ。両対応しているのなら以下のように書くだけで済む。</p>
-
-<pre><code class="language-css">:root {
-  color-scheme: light dark;
-}</code></pre>
-
-<hr>
-
-<p>最近になって「ダーク・モード対応を止めた」という記事をちょくちょく見るようになっている。雰囲気を維持することが難しいというような観点は頷ける。手元では消したので、来週くらいにはなくなっていることと思う。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
