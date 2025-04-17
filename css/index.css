@@ -1,6 +1,6 @@
 /* For All | MIT License */
 
-@layer variable, default, component, test;
+@layer variable, default, component, experimental, test;
 
 @layer variable {
   :root {
@@ -24,18 +24,19 @@
     --space-h-large: 2rem;
 
     /* Color */
-    --color-bg: hsl(48 48% 93%);
-    --color-link: hsl(216 96% 45%);
+    --color-bg: oklch(96% 6% 96deg);
+    --color-link: oklch(51% 51% 264deg);
 
     /* Other */
     --line-count: 26;
     --line-length: 36;
 
     /* Generated */
-    --half-leading: calc((1rlh - 1rem) / 2);
+    --half-leading: calc((1lh - 1cap) / 2);
     --space-v-rect: calc(var(--space-v-default) + var(--half-leading));
-    --color-bg-rect: color-mix(in hsl, var(--color-bg), black 3%);
-    --color-fg: color-mix(in hsl, var(--color-bg), black 72%);
+    --color-bg-rect: color-mix(in oklch, var(--color-bg), black 3%);
+    --color-fg: color-mix(in oklch, var(--color-bg), black 57%);
+    --color-lighten: color-mix(in oklch, currentcolor, white);
   }
 }
 
@@ -50,7 +51,7 @@
         100%,
         min(
           100svw / var(--line-length),
-          100svh / (var(--line-count) * var(--leading-default))
+          100svh / (var(--leading-default) * var(--line-count))
         ),
         150%
       ),
@@ -108,7 +109,7 @@
     border: none;
     color: inherit;
     margin-block: var(--space-v-large);
-    margin-inline-start: 20%;
+    text-align: center;
 
     &::before {
       content: "⁂" / "";
@@ -154,11 +155,8 @@
   /* Text-level Semantics */
   a {
     color: var(--color-link);
-    text-decoration-color: color-mix(in srgb, currentcolor, var(--color-bg));
-
-    &:visited {
-      color: color-mix(in srgb, var(--color-link), var(--color-fg) 66%);
-    }
+    text-decoration-color: var(--color-lighten);
+    text-underline-offset: calc(var(--half-leading) / 2);
 
     &:has(img) {
       display: inline-block;
@@ -177,7 +175,7 @@
   }
 
   mark {
-    background-color: color-mix(in hsl, var(--color-bg), orange 72%);
+    background-color: color-mix(in oklch, var(--color-bg), orange);
     color: inherit;
   }
 
@@ -306,7 +304,7 @@
 
     & h3 {
       text-decoration-line: underline;
-      text-decoration-color: color-mix(in srgb, currentcolor, var(--color-bg));
+      text-decoration-color: var(--color-lighten);
     }
   }
 
@@ -317,7 +315,7 @@
 
     & svg {
       color: var(--color-fg);
-      inline-size: 1rlh;
+      inline-size: 1em;
       max-inline-size: none;
     }
   }
@@ -397,3 +395,14 @@
     }
   }
 }
+
+/* stylelint-disable */
+@layer experimental {
+  /* Scroll smoothly when in-page navigation triggers */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+/* stylelint-enable */
