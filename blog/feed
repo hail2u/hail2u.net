@@ -13,6 +13,30 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[感覚を慣れさせるため、このウェブサイトの色をoklch()関数に更新する。hsl()関数からの変換は色々な方法があるが、今だとブラウザーを使うと良いと思う。ただし環境によって変換結果が変わるので、。何度かやっているとなんとなく感覚が掴めてくるだろう。]]></description>
+        <guid>https://hail2u.net/blog/from-hsl-to-oklch.html</guid>
+        <link>https://hail2u.net/blog/from-hsl-to-oklch.html</link>
+        <pubDate>Wed, 23 Apr 2025 12:25:53 +0900</pubDate>
+        <title><![CDATA[hsl()からoklch()へ]]></title>
+        <content:encoded><![CDATA[<p>感覚を慣れさせるため、このウェブサイトの色を<code>oklch()</code>関数に更新する。<code>hsl()</code>関数からの変換は色々な方法があるが、今だとブラウザーを使うと良いと思う。ただし環境によって変換結果が変わるので、。何度かやっているとなんとなく感覚が掴めてくるだろう。</p>
+
+<pre><code class="language-css">.test {
+  color: oklch(from hsl(48 48% 93%) l c h);
+  /**
+    Calculated Value:
+    Firefox 137.0.2: oklch(0.960961 0.0184797 95.2514)
+    Chrome 135.0.7049.96: oklch(0.960886 0.0184952 95.102)
+    Safari TP 213: oklch(0.960961 0.01848 95.251404)
+  */
+}</code></pre>
+
+<p>適当な要素でこのように<a href="https://www.w3.org/TR/css-color-5/#relative-colors">相対指定</a>を利用すると、開発者ツールの計算済みでは<code>oklch()</code>関数の絶対指定に変換される。相対指定はColor Module Level 5で定義されており、Firefox ESR 128にもギリギリ入ったので、かなり安全に利用できる。<code>currentcolor</code>などでうまく動かないバージョンが残っていることは頭に入れて置きたい。</p>
+
+<hr>
+
+<p><code>oklch</code>関数の相対指定では、区切りにカンマが不要だ。最近頓に増えてきたCSS関数でのカンマの要不要を特徴付けていて、メンタル・モデルの更新に役立つだろう。例えば<code>color-mix()</code>関数ではカンマが必要だということを思い合わせると、理解しやすいかもしれない。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[買おうかなと思っていたアシックスのスニーカーが欠品のようだ。他の候補もいまいちで探し疲れたため、小休止する。だが、壊れかけのスニーカーを履くわけにもいかない。とりあえずはGUの1990円スニーカーで繋ぐことにする。つま先が白くないキャンバス・スニーカーは好きだ。]]></description>
         <guid>https://hail2u.net/blog/2025-04-22.html</guid>
         <link>https://hail2u.net/blog/2025-04-22.html</link>
@@ -189,28 +213,6 @@
 <p>再設置前に回収していったが、ひとつだけ見つからない。後で色々探したところ、無事発見する。ちょっとした宝探し気分だ。今年は設置場所をメモに残しておく。</p>
 
 <p>どちらかというと外からの侵入に対策をした方が良いような気もしている。近隣の建て替えが進んだこともあるのか、最近は外にもあまりいないような気配があり、あまり気にしていない。今夏に遭遇が増えるようだったら、来年は屋外用を検討したい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。]]></description>
-        <guid>https://hail2u.net/blog/determining-underline-position-from-line-box.html</guid>
-        <link>https://hail2u.net/blog/determining-underline-position-from-line-box.html</link>
-        <pubDate>Wed, 9 Apr 2025 07:30:52 +0900</pubDate>
-        <title><![CDATA[下線の位置を行ボックスから決定]]></title>
-        <content:encoded><![CDATA[<p>下線の位置はフォントで決まるべきと考えていたが、考えを変えつつある。フォントによってかなりばらつきがあり、かつ、端末の描画品質にもばらつきがあるため、かなり違いが感じられることがわかり始めた。特にこのウェブサイトのようにフォントが不定な場合、印象にそこそこ差が出てしまう。</p>
-
-<p>また、ハイパーリンクであることを色やそのコントラストに頼らずさりげなく示したいものが下線だと考えると、そもそも強調に近い下線は強すぎるという問題もある。そういう意味でも少し離すという考えは納得できる。離し過ぎると次行の上線と誤解される可能性もあるので、数ピクセルくらいになるだろうが、適切な割合を文字サイズから決めることは難しいと感じる。</p>
-
-<p>適切な行送りであるという前提なら、文字から離すというよりも、行ボックスから決めると汎用的で安定的な位置になるのではないだろうか。近すぎず、遠すぎずとするためには、文字のベースラインと行ボックスの下端のそれぞれから少し離したい。両者の真ん中辺りにすると丁度良さそうだ。具体的にはhalf-leadingを計算し、更にその半分にした値を指定する。</p>
-
-<pre><code class="language-css">a {
-  text-underline-offset: calc((1lh - 1cap) / 2 / 2);
-}</code></pre>
-
-<p>行ボックスの高さ(<code>1lh</code>)から文字の高さ(<code>1cap</code>としたが<code>1em</code>でも良い)を引けば、leadingが計算できる。それを半分にするとhalf-leadingだ。更にそれを半分にしているが、行送りの大きさによっては1/3にしても良いかもしれない。</p>
-
-<hr>
-
-<p>ハイパーリンクをフォーカスした時に表示される輪郭線も、同じように行ボックスを基準にして考えると良いような気がしている。垂直方向の距離は、この記事で提案した下線の位置と丁度重なるくらいが適切だろうか。水平方向はもうちょっと狭くて良いが、調整することができない問題がある。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
