@@ -13,6 +13,57 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[10年以上待ち続けていたtext-autospaceプロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。]]></description>
+        <guid>https://hail2u.net/blog/best-value-for-text-autospace-property.html</guid>
+        <link>https://hail2u.net/blog/best-value-for-text-autospace-property.html</link>
+        <pubDate>Wed, 30 Apr 2025 17:51:32 +0900</pubDate>
+        <title><![CDATA[text-autospaceプロパティーの最適値]]></title>
+        <content:encoded><![CDATA[<p>10年以上待ち続けていた<code>text-autospace</code>プロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。</p>
+
+<section>
+<h2>現状の仕様</h2>
+
+<p><a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/">2024年5月29日のWD</a>では以下のような値が取れるようになっている。</p>
+
+<pre>normal |
+no-autospace |
+[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert | replace ] |
+auto</pre>
+
+<p><code>auto</code>にすると環境依存で最適化されるようだが、単に<code>no-autospace</code>になりそうだ。つまり<code>auto</code>と<code>no-autospace</code>は無指定と考えて良い。実際には<code>normal</code>と複数指定を使うことになるだろう。</p>
+
+<p><code>normal</code>は<code>ideograph-alpha ideograph-numeric</code>と見做され、英数字との間に空白が挿入される。<code>punctuation</code>は半角記号との間に<em>非改行空白</em>が挿入される。<code>ideograph-*</code>はそれぞれアルファベットのみと数字のみとの間に空白が挿入される</p>
+
+<p>挿入の制御も可能で、<code>replace</code>を追加しておくと、既に半角空白がある場合はそれを置き換えてくれる。<code>text-autospace</code>プロパティーの挿入する空白は<a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/#inter-script-spacing">1/8空白</a>とされているので、半角空白よりも印刷媒体に近くなり、可読性が向上することが期待できる。<code>insert</code>は既定の挙動で、指定しなくても良い。</p>
+</section>
+
+<section>
+<h2>Safari 18.4での実装</h2>
+
+<p><a href="https://caniuse.com/mdn-css_properties_text-autospace">Can I Use</a>では、実験的と注意書きはあるものの、実装済みとなっている。確かに<code>normal</code>や複数指定の仕組み自体は実装されているようだ。しかし、<code>punctuation</code>や<code>replace</code>は実装されていない。そのためこれらの値を指定してしまうと、自動挿入されなくなる。完全実装には遠い。</p>
+
+<p>また、丁度要素の終わりと空白の自動挿入場所が重なると、挿入されなかったりすることもあるようだ。再現不能な挿入失敗もあったり、なかなか挙動不審だ。しかし、概ね期待通りに動くようで、安心して使えると考えて良いだろう。</p>
+</section>
+
+<hr>
+
+<p>つまり現状では<code>normal</code>くらいしかやることがないように思える。問題はどこでどう指定するか、になる。雑にルート要素で指定すると、挿入して欲しくなさそうな場所でも挿入されてしまう。しかし、個々の要素それぞれで指定するのは面倒臭い。色々な要素で有効と向こうを切り替えながら見ていると、最低でも無効にするべき要素が分かってきた。</p>
+
+<pre><code class="language-css">:root {
+  text-autospace: normal;
+}
+
+:is(pre, time, input, textarea) {
+  text-autospace: no-autospace;
+}</code></pre>
+
+<p><code>pre</code>要素では、等幅フォントでずれるようになるからだ。<code>time</code>要素では、紙の本などで「<time datetime="2025">2025年</time>」のような日付表記には空白が入らないからだ。<code>input</code>要素や<code>textarea</code>要素では、入力中に自動挿入が入ると挙動不審になる恐れがあるからだ。</p>
+
+<hr>
+
+<p>実装が進むと、また挙動が変わるかもしれない。最終的には<code>ideograph-alpha ideograph-numeric punctuation replace</code>で落ち着くような気もするが、良い名前のショートカットも作られるだろうし、要素ごとに違う既定値が与えられるかもしれない。理想的な未来では、<code>auto</code>がそうなるような気もする。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[タケノコが豊作らしく、なかなか安い。500円から600円くらいで買えるため、グラグラ茹でて貰い、モリモリ食べている。「安かった」だし、「食べていた」のようで、先週末辺りから見かけなくなってきている。タケノコの横では米ぬかが売っていることが多いが、今年は80円などとなっていることもあり、昨年の倍くらいで驚く。米価の影響かと思ってしまうが、単なるぼったくりに感じる。]]></description>
         <guid>https://hail2u.net/blog/2025-04-28.html</guid>
         <link>https://hail2u.net/blog/2025-04-28.html</link>
@@ -183,30 +234,6 @@
 <hr>
 
 <p><code>text-wrap-mode</code>プロパティーは、別の短縮プロパティーである<code>text-wrap</code>プロパティーが設定したりもする珍しいプロパティーだ。他には無いんじゃないかと思う。この辺りの新たな懸念もあって、短縮プロパティーは避けたい気持ちを新たにしている。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[展覧会の帰りは原宿を目指すが、その前に丸の内と有楽町も散歩する。「普段履きの靴を買うぞ！」という強い決意の元、颯爽と歩き始める。暑いくらいの陽気だ。]]></description>
-        <guid>https://hail2u.net/blog/marunouchi-yurakuchou-harajuku-2025-04-09.html</guid>
-        <link>https://hail2u.net/blog/marunouchi-yurakuchou-harajuku-2025-04-09.html</link>
-        <pubDate>Tue, 15 Apr 2025 12:43:01 +0900</pubDate>
-        <title><![CDATA[丸の内～有楽町～原宿]]></title>
-        <content:encoded><![CDATA[<figure>
-<img alt="高架下に、飲食店のあるコンコースが設けられている。出口の飲食店はオレンジの壁に赤ちょうちんがぶら下がっている。高架を支える屋根部分には「YURAKU CONCOURS」という名称のロゴが掲げられているものの、YやK、最後のRSが欠けてしまっているようだ。" height="1440" src="https://hail2u.net/img/blog/marunouchi-yurakuchou-harajuku-2025-04-09.avif" width="2560">
-</figure>
-
-<p>展覧会の帰りは原宿を目指すが、その前に丸の内と有楽町も散歩する。「普段履きの靴を買うぞ！」という強い決意の元、颯爽と歩き始める。暑いくらいの陽気だ。</p>
-
-<p>駅に着くと、小田急線が停止している。ちょうど事故があったところのようだ。相鉄線から東海道線で行くことにする。振り替えでやや混んでいたが、座れないくらいだ。横浜駅での乗り換えは待ち時間無しで、滑らかに東京駅に到着する。</p>
-
-<hr>
-
-<p>展覧会の後は、カルダモン・ロールを買いに行くが、また売っていない。12:00少し前くらいが良いようだ。新丸ビルは改装中のようだし、外に出て仲通りを抜け有楽町へ向かう。高速の横を歩いているつもりが、JRの方だったので、間違えて日比谷まで行ってしまう。ぐるぐる戻って靴を見るが、目当てのものはサイズ欠けだ。</p>
-
-<p>日比谷駅から表参道駅に行く。昼ご飯を食べるも美味しくない。気を取り直してインテリア・ショップで小さいマグカップを探すが、平べったいものしか見つからない。スニーカー・ショップで違う靴を見る。アッパーの雰囲気は気に入ったが、底が厚すぎるかな、とやめておく。</p>
-
-<p>原宿側に渡り、別の直営店で靴を見る。サイズの在庫はあるようだが、見つからない、などと寝言を言われる。オンライン・ショップにはもう在庫がないので、どうやら買えないようだ。がっかりしたので帰ろうと電車に乗ってしまい、イケアでミートボールを買うことを忘れる。</p>
-
-<p>夏用の下着を買うため、相模大野駅で途中下車する。こちらでも扱いがないなどと言われる。直営店限定の商品なのに、どこに買いに行けばいいんだ。今日は散々だったような気がしないでもない。主役の展覧会は楽しかったので、全体的には良かったとは思えるが、すっきりしない。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>

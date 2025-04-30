@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <title>text-autospaceプロパティーの最適値</title>
+
+    <link title="ウェブサイト全体のRSS" href="/feed" rel="alternate" type="application/rss+xml">
+    <link title="雑多な記録だけのRSS" href="/blog/feed" rel="alternate" type="application/rss+xml">
+    <link href="mailto:hail2u@gmail.com" rel="author">
+    <link href="https://hail2u.net/blog/best-value-for-text-autospace-property.html" rel="canonical">
+    <meta content="10年以上待ち続けていたtext-autospaceプロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。" name="description">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="https://creativecommons.org/licenses/by/4.0/" rel="license">
+    <link href="https://m.media-amazon.com/" rel="preconnect">
+    <link href="https://duckduckgo.com/?q=site%3Ahail2u.net" rel="search">
+
+    <link href="/css/print.css?v=9.34.11" media="only print" rel="stylesheet">
+    <link href="/css/index.css?v=9.34.11" media="only screen" rel="stylesheet">
+  </head>
+
+  <body>
+
+      <nav id="top">
+        <p class="back"><a href="/"><span role="img" aria-label="ホームへ戻る">←</span></a></p>
+      </nav>
+
+      <header class="page-header">
+          <p class="date"><time datetime="2025-04-30T17:51:32+09:00">2025年4月30日</time></p>
+
+        <h1><em>text-autospaceプロパティーの最適値</em></h1>
+      </header>
+
+    <main>
+      <p>10年以上待ち続けていた<code>text-autospace</code>プロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。</p>
+
+<section>
+<h2>現状の仕様</h2>
+
+<p><a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/">2024年5月29日のWD</a>では以下のような値が取れるようになっている。</p>
+
+<pre>normal |
+no-autospace |
+[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert | replace ] |
+auto</pre>
+
+<p><code>auto</code>にすると環境依存で最適化されるようだが、単に<code>no-autospace</code>になりそうだ。つまり<code>auto</code>と<code>no-autospace</code>は無指定と考えて良い。実際には<code>normal</code>と複数指定を使うことになるだろう。</p>
+
+<p><code>normal</code>は<code>ideograph-alpha ideograph-numeric</code>と見做され、英数字との間に空白が挿入される。<code>punctuation</code>は半角記号との間に<em>非改行空白</em>が挿入される。<code>ideograph-*</code>はそれぞれアルファベットのみと数字のみとの間に空白が挿入される</p>
+
+<p>挿入の制御も可能で、<code>replace</code>を追加しておくと、既に半角空白がある場合はそれを置き換えてくれる。<code>text-autospace</code>プロパティーの挿入する空白は<a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/#inter-script-spacing">1/8空白</a>とされているので、半角空白よりも印刷媒体に近くなり、可読性が向上することが期待できる。<code>insert</code>は既定の挙動で、指定しなくても良い。</p>
+</section>
+
+<section>
+<h2>Safari 18.4での実装</h2>
+
+<p><a href="https://caniuse.com/mdn-css_properties_text-autospace">Can I Use</a>では、実験的と注意書きはあるものの、実装済みとなっている。確かに<code>normal</code>や複数指定の仕組み自体は実装されているようだ。しかし、<code>punctuation</code>や<code>replace</code>は実装されていない。そのためこれらの値を指定してしまうと、自動挿入されなくなる。完全実装には遠い。</p>
+
+<p>また、丁度要素の終わりと空白の自動挿入場所が重なると、挿入されなかったりすることもあるようだ。再現不能な挿入失敗もあったり、なかなか挙動不審だ。しかし、概ね期待通りに動くようで、安心して使えると考えて良いだろう。</p>
+</section>
+
+<hr>
+
+<p>つまり現状では<code>normal</code>くらいしかやることがないように思える。問題はどこでどう指定するか、になる。雑にルート要素で指定すると、挿入して欲しくなさそうな場所でも挿入されてしまう。しかし、個々の要素それぞれで指定するのは面倒臭い。色々な要素で有効と向こうを切り替えながら見ていると、最低でも無効にするべき要素が分かってきた。</p>
+
+<pre><code class="language-css">:root {
+  text-autospace: normal;
+}
+
+:is(pre, time, input, textarea) {
+  text-autospace: no-autospace;
+}</code></pre>
+
+<p><code>pre</code>要素では、等幅フォントでずれるようになるからだ。<code>time</code>要素では、紙の本などで「<time datetime="2025">2025年</time>」のような日付表記には空白が入らないからだ。<code>input</code>要素や<code>textarea</code>要素では、入力中に自動挿入が入ると挙動不審になる恐れがあるからだ。</p>
+
+<hr>
+
+<p>実装が進むと、また挙動が変わるかもしれない。最終的には<code>ideograph-alpha ideograph-numeric punctuation replace</code>で落ち着くような気もするが、良い名前のショートカットも作られるだろうし、要素ごとに違う既定値が与えられるかもしれない。理想的な未来では、<code>auto</code>がそうなるような気もする。</p>
+    </main>
+
+    <footer class="page-footer">
+
+        <p>このウェブサイトは<a href="mailto:hail2u@gmail.com">ながしまきょう</a>が<a title="Creative Commons (表示)" href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>の下で作成、公開、そして更新しています。更新情報は<a href="/feed" type="application/rss+xml">RSS</a> (<a href="/blog/feed" type="application/rss+xml">雑多な記録だけのRSS</a>)または<a href="https://x.com/hail2u_">X</a>で購読できます。その他、わからないことは<a href="/#about">もう少し詳しい情報</a>を参照してください。</p>
+
+      <p><a href="#top"><span aria-hidden="true">↑ </span>一番上</a></p>
+    </footer>
+  </body>
+</html>

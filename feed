@@ -13,6 +13,57 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[10年以上待ち続けていたtext-autospaceプロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。]]></description>
+        <guid>https://hail2u.net/blog/best-value-for-text-autospace-property.html</guid>
+        <link>https://hail2u.net/blog/best-value-for-text-autospace-property.html</link>
+        <pubDate>Wed, 30 Apr 2025 17:51:32 +0900</pubDate>
+        <title><![CDATA[text-autospaceプロパティーの最適値]]></title>
+        <content:encoded><![CDATA[<p>10年以上待ち続けていた<code>text-autospace</code>プロパティーの最適な値を探っている。実装がSafari 18.4にしかないので、比較的安全に遊べる。後方互換性と巷の文書を考慮した結果、意外な複雑さがある。</p>
+
+<section>
+<h2>現状の仕様</h2>
+
+<p><a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/">2024年5月29日のWD</a>では以下のような値が取れるようになっている。</p>
+
+<pre>normal |
+no-autospace |
+[ ideograph-alpha || ideograph-numeric || punctuation ] || [ insert | replace ] |
+auto</pre>
+
+<p><code>auto</code>にすると環境依存で最適化されるようだが、単に<code>no-autospace</code>になりそうだ。つまり<code>auto</code>と<code>no-autospace</code>は無指定と考えて良い。実際には<code>normal</code>と複数指定を使うことになるだろう。</p>
+
+<p><code>normal</code>は<code>ideograph-alpha ideograph-numeric</code>と見做され、英数字との間に空白が挿入される。<code>punctuation</code>は半角記号との間に<em>非改行空白</em>が挿入される。<code>ideograph-*</code>はそれぞれアルファベットのみと数字のみとの間に空白が挿入される</p>
+
+<p>挿入の制御も可能で、<code>replace</code>を追加しておくと、既に半角空白がある場合はそれを置き換えてくれる。<code>text-autospace</code>プロパティーの挿入する空白は<a href="https://www.w3.org/TR/2024/WD-css-text-4-20240529/#inter-script-spacing">1/8空白</a>とされているので、半角空白よりも印刷媒体に近くなり、可読性が向上することが期待できる。<code>insert</code>は既定の挙動で、指定しなくても良い。</p>
+</section>
+
+<section>
+<h2>Safari 18.4での実装</h2>
+
+<p><a href="https://caniuse.com/mdn-css_properties_text-autospace">Can I Use</a>では、実験的と注意書きはあるものの、実装済みとなっている。確かに<code>normal</code>や複数指定の仕組み自体は実装されているようだ。しかし、<code>punctuation</code>や<code>replace</code>は実装されていない。そのためこれらの値を指定してしまうと、自動挿入されなくなる。完全実装には遠い。</p>
+
+<p>また、丁度要素の終わりと空白の自動挿入場所が重なると、挿入されなかったりすることもあるようだ。再現不能な挿入失敗もあったり、なかなか挙動不審だ。しかし、概ね期待通りに動くようで、安心して使えると考えて良いだろう。</p>
+</section>
+
+<hr>
+
+<p>つまり現状では<code>normal</code>くらいしかやることがないように思える。問題はどこでどう指定するか、になる。雑にルート要素で指定すると、挿入して欲しくなさそうな場所でも挿入されてしまう。しかし、個々の要素それぞれで指定するのは面倒臭い。色々な要素で有効と向こうを切り替えながら見ていると、最低でも無効にするべき要素が分かってきた。</p>
+
+<pre><code class="language-css">:root {
+  text-autospace: normal;
+}
+
+:is(pre, time, input, textarea) {
+  text-autospace: no-autospace;
+}</code></pre>
+
+<p><code>pre</code>要素では、等幅フォントでずれるようになるからだ。<code>time</code>要素では、紙の本などで「<time datetime="2025">2025年</time>」のような日付表記には空白が入らないからだ。<code>input</code>要素や<code>textarea</code>要素では、入力中に自動挿入が入ると挙動不審になる恐れがあるからだ。</p>
+
+<hr>
+
+<p>実装が進むと、また挙動が変わるかもしれない。最終的には<code>ideograph-alpha ideograph-numeric punctuation replace</code>で落ち着くような気もするが、良い名前のショートカットも作られるだろうし、要素ごとに違う既定値が与えられるかもしれない。理想的な未来では、<code>auto</code>がそうなるような気もする。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[主人公が大体最後に自殺する短編集を読んでいて暗い]]></description>
         <guid>https://hail2u.net/statuses/#1745969525986</guid>
         <link>https://hail2u.net/statuses/#1745969525986</link>
@@ -85,24 +136,6 @@
         <pubDate>Sat, 26 Apr 2025 11:53:18 +0900</pubDate>
         <title><![CDATA[Googleの祝日カレンダーに母の日はあるが、父の日はないので、母の日プレゼントを見繕って買った]]></title>
         
-      </item>
-      <item>
-        <description><![CDATA[行ったことがない羽田空港の国際線のターミナルを見に行く。ついでにフラフラする。とにかく人とキャリーだらけだ。]]></description>
-        <guid>https://hail2u.net/blog/2025-04-25.html</guid>
-        <link>https://hail2u.net/blog/2025-04-25.html</link>
-        <pubDate>Fri, 25 Apr 2025 10:15:59 +0900</pubDate>
-        <title><![CDATA[羽田空港第3ターミナル散歩]]></title>
-        <content:encoded><![CDATA[<figure>
-<img alt="ターミナルの屋根は、大きな船の帆が風を張らんでいるようなゆったりとした量感を持っている。" height="1440" src="https://hail2u.net/img/blog/haneda-airport-terminal-3.avif" width="2560">
-</figure>
-
-<p>行ったことがない羽田空港の国際線のターミナルを見に行く。ついでにフラフラする。とにかく人とキャリーだらけだ。</p>
-
-<p>京急川崎駅で乗り換える。川崎と空港の間でも乗り降りが激しい。夕方でそのあたりのホテルに泊まる人たちが降りたりしているのだろうか。第3ターミナル駅はさすがにホームが広くて歩きやすい。一気に2階まで行けるエレベーターで上り、ザ・ロイヤル・パーク・ホテル東京羽田にも行く。ちょっとの距離だが、人は多いし、行列を避けながら歩くため、意外に遠い。</p>
-
-<p>エアポート・ガーデンまで行くと空いている。食べ物屋はこちらの方が多いようなそうでもないような、微妙な感じだ。コクヨの店はちょっと楽しい。裁断時の端材で作ったという、メッシュのトートバッグはちょっと欲しくなる。食べ物屋はちょうど昼と夜の切り替え時間だったらしく、あまり店が開いていない。端の方にあった親子丼の店で、焼き鳥付きの御膳を食べる。ちょっと甘めでトロトロと、好みとは違うがなかなか美味しい。焼き鳥もそこそこ美味しい。ただ売りの名古屋コーチンにすれば良かったかもしれない。</p>
-
-<p>夜の横浜をぶらつきつつ家に帰る。夜の横浜はすごい人だ。止みかけていたとはいえ、雨だったということもあるのかもしれない。最寄駅に着くとまた大雨で、少し立ち読みしつつ待つが止む気配がない。諦めてバシャバシャ帰る。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
