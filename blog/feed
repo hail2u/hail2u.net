@@ -13,6 +13,70 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[color-mix()関数をよく使うようになりつつある。ウェブ・アプリ・オア・ダイみたいな生息地なので、ネイティブ・アプリとの相互運用性に主眼を置いたデザイン・トークンが不要になり、思う存分CSSに寄せられる。カラー・パレットの管理もそうで、color-mix()関数はバリエーションを作る時に役に立つ。割合で混ぜるだけだが、仕様をしっかりと読んでおかないと思ってもみない結果になることがある。]]></description>
+        <guid>https://hail2u.net/blog/percentage-in-color-mix-function.html</guid>
+        <link>https://hail2u.net/blog/percentage-in-color-mix-function.html</link>
+        <pubDate>Wed, 7 May 2025 13:40:55 +0900</pubDate>
+        <title><![CDATA[color-mix()関数での割合]]></title>
+        <content:encoded><![CDATA[<p><code>color-mix()</code>関数をよく使うようになりつつある。ウェブ・アプリ・オア・ダイみたいな生息地なので、ネイティブ・アプリとの相互運用性に主眼を置いたデザイン・トークンが不要になり、思う存分CSSに寄せられる。カラー・パレットの管理もそうで、<code>color-mix()</code>関数はバリエーションを作る時に役に立つ。割合で混ぜるだけだが、仕様をしっかりと読んでおかないと思ってもみない結果になることがある。</p>
+
+<p><code>color-mix()</code>関数は、</p>
+
+<ul>
+  <li>指定した色空間で</li>
+  <li>2つの色を</li>
+  <li>指定した割合で</li>
+</ul>
+
+<p>混ぜる、という関数だ。例えば、HSL色空間で、<code>red</code>と<code>blue</code>を、25%と75%ずつ混ぜてみる。<code>red</code>と<code>blue</code>は、共に彩度100%、輝度50%なので、色相だけが混ざる。以下、コード例で<code>color-mix()</code>関数を使って実行結果を表示しているが、フィード・リーダーなどでは見えないかもしれないため、別に<a href="https://hail2u.net/pub/test/714.html">テスト・ページ</a>も作っておいた。</p>
+
+<pre><code class="language-css">.test1 {
+  background-color: <span style="background-color: color-mix(in hsl, red 25%, blue 75%); color: white">color-mix(in hsl, red 25%, blue 75%)</span>;
+}</code></pre>
+
+<p><code>hsl(270deg 100% 50%)</code>、つまりブドウ色になる。片方の色で割合を省略した場合、100%から引いた値に自動的に決まるので、以下のようにも書ける。</p>
+
+<pre><code class="language-css">.test2 {
+  background-color: <span style="background-color: color-mix(in hsl, red 25%, blue); color: white">color-mix(in hsl, red 25%, blue)</span>;
+}
+
+.test3 {
+  background-color: <span style="background-color: color-mix(in hsl, red, blue 75%); color: white">color-mix(in hsl, red, blue 75%)</span>;
+}</code></pre>
+
+<p>どちらも同じくブドウ色だ。割合の合計が100%を超えると、100%になるように調整されるので、以下のようにも書ける。</p>
+
+<pre><code class="language-css">.test4 {
+  background-color: <span style="background-color: color-mix(in hsl, red 30%, blue 90%); color: white">color-mix(in hsl, red 30%, blue 90%)</span>;
+}</code></pre>
+
+<p>これも同じくブドウ色だ。ただし、どちらかで100%を超える割合を指定すると無効な値になるので、以下のようには<em>書けない</em>。</p>
+
+<pre><code class="language-css">.test5 {
+  background-color: <span style="background-color: color-mix(in hsl, red 50%, blue 150%); color: black">color-mix(in hsl, red 50%, blue 150%)</span>;
+}</code></pre>
+
+<p>無効な値になり、プロパティーは無視される。割合を<code>calc()</code>関数で計算する場合に超えやすいが、安全のため<code>min()</code>関数で括るという対処方法はある。問題は割合の合計が100%に満たない場合だ。以下のように書いてみると、わかりやすいだろう。</p>
+
+<pre><code class="language-css">.test6 {
+  background-color: <span style="background-color: color-mix(in hsl, red 10%, blue 30%); color: black">color-mix(in hsl, red 10%, blue 30%)</span>;
+}</code></pre>
+
+<p>かなり薄いブドウ色になってしまう。正確にはブドウ色の透過色になっていることが開発者ツールで確認できるだろう。合計が100%に満たない場合、その合計を<em>不透明度として保持した上</em>で、合計が100%になるように調整される。つまりこの場合は<code>10% + 30% = 40%</code>が不透明度になり、結果<code>hsl(270deg 100% 50% / 40%)</code>となるわけだ。</p>
+
+<pre><code class="language-css">.test7 {
+  background-color: <span style="background-color: hsl(from color-mix(in hsl, red, blue 75%) h s l / 40%); color: black">hsl(from color-mix(in hsl, red, blue 75%) h s l / 40%);</span>
+}</code></pre>
+
+<p>不透明度もまとめて生成可能という6番目の書き方は役に立つ可能性があるが、不透明度自体は意識せざるを得ない。それならば、このように明示的に入れ子にした方がわかりやすいのではないかと思う。</p>
+
+<p><code>color-mix()</code>関数の書き方を総括すると、どちらかで割合を指定するだけで十分ということがわかる。むしろ片方は書かない方が、うっかり間違えないので無難だろう。また、2番目の色に割合を指定すると、「色Aに色Bをn%の割合で混ぜる」と解釈でき、読みやすいのではないかと思う。いずれにしても片方だけに書くという書き方に統一することが望ましいと考えている。</p>
+
+<hr>
+
+<p>色の混ざり具合そのものは色空間の指定による影響が大きい。使い始めた当初はその事ばかりを意識していたが、すぐに割合の値でも大きな違いが表れることに気付く。同じような色を様々な形で作り出す修行が欠かせない。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[小ぶりのマグ・カップを探したが、なかなか見つからない。諦めてソーサー付きのカップで探し、パン皿として欲しかった柄のカップ・アンド・ソーサーにする。イッタラというかアラビアというかのマイニオ・サラストゥスの黒だ。この柄は出た当初からかなり好きで、19cmの皿を買おうか5年くらい迷っている。割高だが、公式オンライン・ストアで定価の5500円で買う。]]></description>
         <guid>https://hail2u.net/blog/arabia-mainio-sarastus-cup-and-saucer.html</guid>
         <link>https://hail2u.net/blog/arabia-mainio-sarastus-cup-and-saucer.html</link>
@@ -208,29 +272,6 @@ auto</pre>
 <p>山手線で新宿駅へ行く。アークテリクスは旧アルタの隣だった。もう買えそうもない値段になってしまったので、店には入らす靖国通りに出る。無印良品や伊勢丹を冷やかしながら、いろいろ探す。靴はいったん諦め、今は200mLくらいのマグカップを探し始めている。容量的にはないこともないが、ソーサー付きのいわゆるコーヒー・カップしかない。ひとつ見つけたが、粉引きであまり好みではない。<a href="https://store.bluebottlecoffee.jp/products/g313">ブルー・ボトル・コーヒーの清澄ミニマグ</a>は座りも良くて気に入ったが、<a href="https://www.claskashop.com/?pid=174541711">ロゴのないやつ</a>もあるらしいので、今度見に行ってから決めたい。</p>
 
 <p>この日は忘れずにイケアに寄る。冷凍のミートボールを買ったので、すぐさま帰る。ミロードが閉まって、タルト屋もなくなってしまい、もう用は無い。帰りの小田急線では久しぶりに6両編成の急行に乗る。まだあるというか、最近になって復活したらしい。都心からは渋谷から一気に帰ることが増え、小田急線を使う機会が減っていたため気付かなかった。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[長い休館を経て、2024年に再開した畠山美術館の開館記念展に行く。11月くらいに行ったが、うっかり展示入れ替えの休業日だったため、門に足利二つ匹の家紋が大きく描かれていたところしか見ていない。主に庭が目当てだが、歩き回れるだろうか。]]></description>
-        <guid>https://hail2u.net/blog/the-flowering-of-tea-ceremony-and-garden-culture-2025-04-16.html</guid>
-        <link>https://hail2u.net/blog/the-flowering-of-tea-ceremony-and-garden-culture-2025-04-16.html</link>
-        <pubDate>Fri, 18 Apr 2025 15:19:05 +0900</pubDate>
-        <title><![CDATA[花ひらく茶と庭園文化(畠山美術館)]]></title>
-        <content:encoded><![CDATA[<figure>
-<img alt="黒い柱に囲まれた自動ドアの横に展覧会のポスターが貼られている。横には鍵付きの傘立てが並ぶ。" height="1440" src="https://hail2u.net/img/blog/the-flowering-of-tea-ceremony-and-garden-culture-2025-04-16.avif" width="2560">
-</figure>
-
-<p>長い休館を経て、2024年に再開した<a href="https://www.hatakeyama-museum.org/exhibition/000158.html">畠山美術館の開館記念展</a>に行く。11月くらいに行ったが、うっかり展示入れ替えの休業日だったため、門に足利二つ匹の家紋が大きく描かれていたところしか見ていない。主に庭が目当てだが、歩き回れるだろうか。</p>
-
-<p>展覧会は松平治郷(不昧公)の収集物や書画がほとんどだ。それなりに楽しいが、展示数が少ないこともあり、建物や窓からの景色に目を奪われてしまう。掛軸の表具について、ちょっと書かれているところは良い。赤楽茶碗や伊賀花入が出ていた展覧会の時に行くべきだったと思うくらい、あまり記憶に残らない。</p>
-
-<figure>
-<img alt="奥に向かって上がっていく丘に木々が並ぶ。飛び石で砂利川を渡る道が手前を横切り、庭の通路を形成している。" height="1440" loading="lazy" src="https://hail2u.net/img/blog/the-flowering-of-tea-ceremony-and-garden-culture-2025-04-16-garden.avif" width="2560">
-<figcaption>庭</figcaption>
-</figure>
-
-<p>一方で庭は狭いながらも高低差をうまく使ったものだ。狭いといっても<a href="https://www.prfj.or.jp/works/park/higohosokawa.html">肥後細川庭園</a>や<a href="https://www.gotoh-museum.or.jp/">五島美術館</a>と比べてなので、そこそこ歩きではある。相当手直しされているようだが、大きな木が多いこともあって狭さはあまり感じない。美術館前には樹齢300年の樹皮に迫力がある立派なクロマツがあったり、さすがは薩摩藩主の隠居場所だ。門から美術館まで少しあるので、ゆっくり歩けるところも良い。無意味に3周くらい回ってしまう。調子に乗ったのか、ごつごつして歩きづらいところで足をぐねる。</p>
-
-<p>ミュージアム・ショップでは色々な工夫を感じる。作家ものだがそれほど高価ではない陶磁器を並べていたり、茶道具もちらほら置いていたりする。買うかと言われると困る。新館にあるカフェもなかなか混んでいる。周辺が完全な住宅地で、付近に飲食店が少ないことだし、便利に利用する人も多いようだ。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
