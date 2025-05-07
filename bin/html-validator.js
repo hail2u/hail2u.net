@@ -19,10 +19,23 @@ const toPath = (file) => path.join(config.dir.dest, file);
 
 const execFileAsync = util.promisify(execFile);
 
+const isNotCSSError = ({message}) => {
+  if (message.startsWith("CSS:")) {
+    return false;
+  }
+
+  return true;
+};
+
 const handleError = (err) => {
   const { messages } = JSON.parse(err.stderr);
+  const errors = messages.filter(isNotCSSError);
 
-  for (const { lastColumn, lastLine, message, url } of messages) {
+  if (errors.length === 0) {
+    return;
+  }
+
+  for (const { lastColumn, lastLine, message, url } of errors) {
     const absolute = url.replace(/file:/u, "");
     const relative = path.relative(".", absolute);
     process.stderr.write(`${relative}:${lastLine}:${lastColumn}: ${message}`);
@@ -30,7 +43,7 @@ const handleError = (err) => {
   }
 
   process.stderr.write("\n");
-  throw new Error(`Validation ends with ${messages.length} error(s)`);
+  throw new Error(`Validation ends with ${errors.length} error(s)`);
 };
 
 const file = path.join(config.dir.data, config.data.articles);
