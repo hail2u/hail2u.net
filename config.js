@@ -23,7 +23,6 @@ export default {
   feed: "feed",
   file: {
     draft: "drafts.html",
-    icon: "static/favicon.svg",
     preview: "preview.html",
     statusLog: "data/statuses/log.html",
   },
