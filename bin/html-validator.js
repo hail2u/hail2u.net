@@ -19,7 +19,7 @@ const toPath = (file) => path.join(config.dir.dest, file);
 
 const execFileAsync = util.promisify(execFile);
 
-const isNotCSSError = ({message}) => {
+const isNotCSSError = ({ message }) => {
   if (message.startsWith("CSS:")) {
     return false;
   }
