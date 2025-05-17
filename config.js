@@ -44,6 +44,5 @@ export default {
     draft: "_draft.html.mustache",
     old: "blog/_old.html.mustache",
   },
-  twitter: "hail2u_",
   version: pkg.version,
 };
