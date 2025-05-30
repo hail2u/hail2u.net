@@ -80,9 +80,12 @@ await runCommand("git", [
   "commit",
   `--message=Contribute ${article.link} (${th})`,
 ]);
-const twitter = new URL("https://x.com/intent/tweet");
-twitter.searchParams.append(
-  "text",
-  `${article.shortDescription} / ${article.title} ${config.scheme}://${config.domain}${article.link}`,
-);
-await runCommand("chrome", [twitter.href]);
+
+if (!/^\d{4}-\d{2}-\d{2}$/u.test(article.id)) {
+  const twitter = new URL("https://x.com/intent/tweet");
+  twitter.searchParams.append(
+    "text",
+    `${article.shortDescription} / ${article.title} ${config.scheme}://${config.domain}${article.link}`,
+  );
+  await runCommand("chrome", [twitter.href]);
+}
