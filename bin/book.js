@@ -99,9 +99,6 @@ try {
   await fs.writeFile(file, `${formatted}\n`);
   await runCommand("git", ["add", "--", file]);
   await runCommand("git", ["commit", `--message=Read ${asin}`]);
-  const twitter = new URL("https://x.com/intent/tweet");
-  twitter.searchParams.append("text", `${title} / ${author} ${link}`);
-  await runCommand("chrome", [twitter.href]);
 } catch (e) {
   if (e.name === "AbortError") {
     throw new Error("Amazon image server does not respond in 5s.");
