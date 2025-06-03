@@ -65,15 +65,14 @@ try {
     throw new Error(`${res.status} ${res.statusText}`);
   }
 
-  const img = await res.arrayBuffer();
-  const metadata = await sharp(Buffer.from(img)).metadata();
-
-  if (metadata.height === 1 && metadata.width === 1) {
+  if (res.headers.get("Content-Length") === "43") {
     throw new Error(`${title} does not have a cover image.`);
   }
 
   const link = `https://www.amazon.co.jp/exec/obidos/ASIN/${asin}/hail2unet-22`;
   const titleEscaped = escapeCharacters(title);
+  const img = await res.arrayBuffer();
+  const metadata = await sharp(Buffer.from(img)).metadata();
   const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" loading="lazy" src="${cover}" width="${metadata.width}"></a>`;
   const published = Date.now();
   const dt = getDateDetails(published);
