@@ -81,7 +81,7 @@ await runCommand("git", [
   `--message=Contribute ${article.link} (${th})`,
 ]);
 
-if (!/^\d{4}-\d{2}-\d{2}$/u.test(article.id)) {
+if (!/^\d{4}-\d{2}-\d{2}$/u.test(selected.id)) {
   const twitter = new URL("https://x.com/intent/tweet");
   twitter.searchParams.append(
     "text",
