@@ -69,6 +69,9 @@ const readAllData = async () => {
   return Object.assign(...data);
 };
 
+const comparePublished = (a, b) =>
+  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
   return {
@@ -89,9 +92,6 @@ const build = async (metadata, data, file) => {
   });
   await fs.writeFile(file.dest, rendered);
 };
-
-const comparePublished = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
 
 const files = await gatherFiles();
 const { articles, books, links, statuses } = await readAllData();
