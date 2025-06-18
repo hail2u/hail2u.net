@@ -84,7 +84,7 @@ const readPartials = async () => {
 };
 
 const startsWithUnderscore = (file) => {
-  const filename = file.split("/").at(-1);
+  const filename = path.basename(file);
   return filename.startsWith("_");
 };
 
