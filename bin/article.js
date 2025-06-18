@@ -55,6 +55,8 @@ const buildArticle = ({ body, id, title }) => {
   };
 };
 
+const isNotGeneratedID = (id) => !/^\d{4}-\d{2}-\d{2}$/u.test(id);
+
 const selected = await selectDraft();
 checkIDFormat(selected.id);
 checkTitleType(selected.title);
@@ -81,7 +83,7 @@ await runCommand("git", [
   `--message=Contribute ${article.link} (${th})`,
 ]);
 
-if (!/^\d{4}-\d{2}-\d{2}$/u.test(selected.id)) {
+if (isNotGeneratedID(selected.id)) {
   const twitter = new URL("https://x.com/intent/tweet");
   twitter.searchParams.append(
     "text",

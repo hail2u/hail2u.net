@@ -13,6 +13,8 @@ const cancelFetch = (abortController) => {
   abortController.abort();
 };
 
+const isOnePixelGIF = (size) => size === "43";
+
 const {
   values: { asin, author, title },
 } = util.parseArgs({
@@ -65,7 +67,7 @@ try {
     throw new Error(`${res.status} ${res.statusText}`);
   }
 
-  if (res.headers.get("Content-Length") === "43") {
+  if (isOnePixelGIF(res.headers.get("Content-Length"))) {
     throw new Error(`${title} does not have a cover image.`);
   }
 

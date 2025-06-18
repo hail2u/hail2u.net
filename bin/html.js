@@ -89,21 +89,31 @@ const startsWithUnderscore = (file) => {
   return filename.startsWith("_");
 };
 
-const guessTemplateName = ({ type, published }) => {
-  const oneYearInMS = 1000 * 60 * 60 * 24 * 365;
+const isDocument = (type) => type === "document";
 
-  if (
-    type === "article" &&
-    published > Date.now() - oneYearInMS
-  ) {
-    return config.template.article;
+const isTooOld = (time) => {
+  const oneYearInMS = 1000 * 60 * 60 * 24 * 365;
+  const oneYearAgo = Date.now() - oneYearInMS;
+
+  if (oneYearAgo < time) {
+    return false;
   }
 
-  return config.template.old;
+  return true;
 };
 
+const guessTemplateName = ({ type, published }) => {
+  if (isDocument(type) || isTooOld(published)) {
+    return config.template.old;
+  }
+
+  return config.template.article;
+};
+
+const isArticle = (type) => type === "article";
+
 const toFilesFormat = (template) => {
-  if (typeof template === "object") {
+  if (isArticle(template.type) || isDocument(template.type)) {
     return {
       ...template,
       dest: path.join(config.dir.dest, template.link),
