@@ -18,7 +18,7 @@ const buildPages = async () => {
     fs.glob(`${config.dir.metadata}**/*.json`),
   );
   const metadata = await Promise.all(files.map(readMetadata));
-  return metadata.filter(hasPageOrder).sort(comparePageOrder);
+  return metadata.filter(hasPageOrder).toSorted(comparePageOrder);
 };
 
 const markItem = (item, index, items) => {
