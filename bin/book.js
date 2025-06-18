@@ -90,7 +90,7 @@ try {
       ...books,
     ],
     null,
-    2,
+    "  ",
   );
   await fs.mkdir(path.dirname(file), {
     recursive: true,

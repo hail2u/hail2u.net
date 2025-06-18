@@ -10,8 +10,7 @@ const build = (file) => {
   const dest = path.join(config.dir.dest, "/img/blog/", `${basename}.avif`);
   sharp(file)
     .resize({
-      height: 1440,
-      width: 2560,
+      ...config.image,
       withoutEnlargement: true,
     })
     .toFile(dest);

@@ -51,7 +51,7 @@ const formatted = JSON.stringify(
     ...links,
   ],
   null,
-  2,
+  "  ",
 );
 await fs.mkdir(path.dirname(file), {
   recursive: true,

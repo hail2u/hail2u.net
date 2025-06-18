@@ -3,6 +3,7 @@ import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
 import { guessPath } from "./lib/guess-path.js";
 import mustache from "mustache";
+import os from "node:os";
 import path from "node:path";
 import util from "node:util";
 
@@ -89,9 +90,11 @@ const startsWithUnderscore = (file) => {
 };
 
 const guessTemplateName = ({ type, published }) => {
+  const oneYearInMS = 1000 * 60 * 60 * 24 * 365;
+
   if (
     type === "article" &&
-    published > Date.now() - 1000 * 60 * 60 * 24 * 365
+    published > Date.now() - oneYearInMS
   ) {
     return config.template.article;
   }
@@ -168,11 +171,11 @@ const mergeData = async (file, metadata, data) => {
       ...metadata,
       ...data,
       ...overrides,
-      homeArticles: data.articles.slice(0, 6),
-      homeBooks: data.books.slice(0, 6),
-      homeLinks: data.links.slice(0, 6),
-      homeProjects: data.projects.slice(0, 3),
-      homeStatuses: data.statuses.slice(0, 1),
+      homeArticles: data.articles.slice(0, overrides.itemLength.articles),
+      homeBooks: data.books.slice(0, overrides.itemLength.books),
+      homeLinks: data.links.slice(0, overrides.itemLength.links),
+      homeProjects: data.projects.slice(0, overrides.itemLength.projects),
+      homeStatuses: data.statuses.slice(0, overrides.itemLength.statuses),
     };
   }
 
@@ -232,7 +235,7 @@ if (latest) {
 
 if (all) {
   const articleFiles = await Promise.all(data.articles.map(toFilesFormat));
-  const thread = 1024;
+  const thread = os.availableParallelism();
   const repeat = Math.ceil(articleFiles.length / thread);
 
   for (let i = 0; i < repeat; i += 1) {

@@ -32,7 +32,7 @@ const formatted = JSON.stringify(
     ...statuses,
   ],
   null,
-  2,
+  "  ",
 );
 await fs.mkdir(path.dirname(file), {
   recursive: true,

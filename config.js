@@ -28,6 +28,10 @@ export default {
   },
   fullname: "Kyo Nagashima",
   github: "hail2u",
+  image: {
+    height: 1440,
+    width: 2560,
+  },
   lang: "ja",
   licenseName: "Creative Commons (表示)",
   licenseURL: "https://creativecommons.org/licenses/by/4.0/",
@@ -43,6 +47,9 @@ export default {
     article: "blog/_article.html.mustache",
     draft: "_draft.html.mustache",
     old: "blog/_old.html.mustache",
+  },
+  test: {
+    articles: 3,
   },
   version: pkg.version,
 };

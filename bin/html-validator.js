@@ -12,7 +12,9 @@ const listArticle = (articles, latest) => {
     return [articles.at(0).link];
   }
 
-  return Array(3).fill(0).map(selectRandomItem.bind(null, articles));
+  return Array(config.test.articles)
+    .fill(0)
+    .map(selectRandomItem.bind(null, articles));
 };
 
 const toPath = (file) => path.join(config.dir.dest, file);

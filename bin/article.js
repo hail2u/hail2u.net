@@ -69,7 +69,7 @@ const article = buildArticle({
   ...selected,
   body,
 });
-const formatted = JSON.stringify([article, ...articles], null, 2);
+const formatted = JSON.stringify([article, ...articles], null, "  ");
 await fs.mkdir(path.dirname(file), {
   recursive: true,
 });
