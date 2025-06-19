@@ -25,7 +25,9 @@ const {
 });
 
 if (!src) {
-  throw new Error("1 argument is required. This is for an source directory.");
+  throw new Error(
+    "Only 1 argument is required. This is for a source directory.",
+  );
 }
 
 const images = await Array.fromAsync(fs.glob(`${src}*.png`));
