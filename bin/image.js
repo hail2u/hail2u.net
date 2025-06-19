@@ -4,7 +4,7 @@ import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
 
-const build = (file) => {
+const toAVIF = (file) => {
   const { height, width } = config.image.blog;
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
@@ -29,4 +29,4 @@ if (!src) {
 }
 
 const images = await Array.fromAsync(fs.glob(`${src}*.png`));
-await Promise.all(images.map(build));
+await Promise.all(images.map(toAVIF));
