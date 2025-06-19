@@ -11,6 +11,7 @@ export default {
   dir: {
     data: "data/",
     dest: "dist/",
+    image: "dist/img/",
     metadata: "metadata/",
     partial: "template/partials/",
     static: "static/",
@@ -29,8 +30,10 @@ export default {
   fullname: "Kyo Nagashima",
   github: "hail2u",
   image: {
-    height: 1440,
-    width: 2560,
+    blog: {
+      height: 1440,
+      width: 2560,
+    },
   },
   lang: "ja",
   licenseName: "Creative Commons (表示)",

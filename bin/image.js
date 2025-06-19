@@ -5,12 +5,14 @@ import sharp from "sharp";
 import util from "node:util";
 
 const build = (file) => {
+  const { height, width } = config.image.blog;
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
-  const dest = path.join(config.dir.dest, "/img/blog/", `${basename}.avif`);
+  const dest = path.join(config.dir.image, "blog", `${basename}.avif`);
   sharp(file)
     .resize({
-      ...config.image,
+      height,
+      width,
       withoutEnlargement: true,
     })
     .toFile(dest);
