@@ -7,7 +7,11 @@ import util from "node:util";
 const selectRandomItem = (array) =>
   array.at(Math.floor(Math.random() * array.length)).link;
 
-const listArticle = (articles, latest) => {
+const listArticle = (articles, latest, preview) => {
+  if (preview) {
+    return [config.file.preview];
+  }
+
   if (latest) {
     return [articles.at(0).link];
   }
@@ -18,6 +22,23 @@ const listArticle = (articles, latest) => {
 };
 
 const toPath = (file) => path.join(config.dir.dest, file);
+
+const addIndexes = (links, preview) => {
+  if (preview) {
+    return links;
+  }
+
+  return [
+    "/index.html",
+    "/blog/index.html",
+    "/bookshelf/index.html",
+    "/links/index.html",
+    "/projects/index.html",
+    "/subscriptions/index.html",
+    "/statuses/index.html",
+    ...links,
+  ].map(toPath);
+};
 
 const execFileAsync = util.promisify(execFile);
 
@@ -51,25 +72,19 @@ const handleError = (err) => {
 const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const {
-  values: { latest },
+  values: { latest, preview },
 } = util.parseArgs({
   options: {
     latest: {
       type: "boolean",
     },
+    preview: {
+      type: "boolean",
+    },
   },
 });
-const links = listArticle(articles, latest);
-const files = [
-  "/index.html",
-  "/blog/index.html",
-  "/bookshelf/index.html",
-  "/links/index.html",
-  "/projects/index.html",
-  "/subscriptions/index.html",
-  "/statuses/index.html",
-  ...links,
-].map(toPath);
+const links = listArticle(articles, latest, preview);
+const files = addIndexes(links, preview);
 execFileAsync("vnu", ["--errors-only", "--format", "json", ...files]).catch(
   handleError,
 );
