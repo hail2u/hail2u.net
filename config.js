@@ -50,6 +50,7 @@ export default {
   },
   test: {
     articles: 3,
+    timeout: 30000,
   },
   version: pkg.version,
 };
