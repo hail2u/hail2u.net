@@ -239,8 +239,8 @@ const data = await readAllData();
 const partials = await readPartials();
 
 if (latest) {
-  const article = await toFilesFormat(data.articles.at(0));
-  await build(config, data, partials, article);
+  const latestArticle = toFilesFormat(data.articles.at(0));
+  await build(config, data, partials, latestArticle);
 }
 
 if (all) {
