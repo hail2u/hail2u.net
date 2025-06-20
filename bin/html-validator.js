@@ -69,8 +69,6 @@ const handleError = (err) => {
   throw new Error(`Validation ends with ${errors.length} error(s)`);
 };
 
-const file = path.join(config.dir.data, config.data.articles);
-const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const {
   values: { latest, preview },
 } = util.parseArgs({
@@ -83,6 +81,13 @@ const {
     },
   },
 });
+
+if (latest && preview) {
+  throw new Error("--latest and --preview are not used at the same time");
+}
+
+const file = path.join(config.dir.data, config.data.articles);
+const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const links = listArticle(articles, latest, preview);
 const files = addIndexes(links, preview);
 execFileAsync("vnu", ["--errors-only", "--format", "json", ...files]).catch(

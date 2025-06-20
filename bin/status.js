@@ -12,7 +12,7 @@ const {
 });
 
 if (!text) {
-  throw new Error("Only 1 argument is required. This is for a status text.");
+  throw new Error("A status text is required.");
 }
 
 const published = Date.now();
