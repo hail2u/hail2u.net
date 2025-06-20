@@ -38,9 +38,6 @@ export default {
   lang: "ja",
   licenseName: "Creative Commons (表示)",
   licenseURL: "https://creativecommons.org/licenses/by/4.0/",
-  metadata: {
-    article: "blog/article.json",
-  },
   name: pkg.name,
   region: "JP",
   scheme: "https",

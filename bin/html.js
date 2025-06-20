@@ -89,6 +89,8 @@ const startsWithUnderscore = (file) => {
   return filename.startsWith("_");
 };
 
+const isString = (string) => typeof string === "string";
+
 const isDocument = (type) => type === "document";
 
 const isTooOld = (time) => {
@@ -102,36 +104,40 @@ const isTooOld = (time) => {
   return true;
 };
 
-const guessTemplateName = ({ type, published }) => {
-  if (isDocument(type) || isTooOld(published)) {
-    return config.template.old;
+const guessTemplate = (template) => {
+  if (isString(template)) {
+    return template;
   }
 
-  return config.template.article;
+  if (isDocument(template.type) || isTooOld(template.published)) {
+    return path.join(config.dir.template, config.template.old);
+  }
+
+  return path.join(config.dir.template, config.template.article);
 };
 
-const isArticle = (type) => type === "article";
-
-const toFilesFormat = (template) => {
-  if (isArticle(template.type) || isDocument(template.type)) {
-    return {
-      ...template,
-      dest: path.join(config.dir.dest, template.link),
-      metadata: path.join(config.dir.metadata, config.metadata.article),
-      template: path.join(config.dir.template, guessTemplateName(template)),
-    };
+const guessDest = (template, basename) => {
+  if (isString(template)) {
+    return guessPath(template, config.dir.dest, basename);
   }
 
-  const basename = path.basename(template, path.extname(template));
-  const doubleExt = path.extname(basename);
+  return path.join(config.dir.dest, template.link);
+};
+
+const toFilesFormat = (template) => {
+  const templateFile = guessTemplate(template);
+  const basename = path.basename(templateFile, path.extname(templateFile));
+  const dest = guessDest(template, basename);
+  const ext = path.extname(basename);
+  const metadata = guessPath(
+    templateFile,
+    config.dir.metadata,
+    basename.replace(ext, ".json"),
+  );
   return {
-    dest: guessPath(template, config.dir.dest, basename),
-    metadata: guessPath(
-      template,
-      config.dir.metadata,
-      basename.replace(doubleExt, ".json"),
-    ),
-    template,
+    dest,
+    metadata,
+    template: templateFile,
   };
 };
 
