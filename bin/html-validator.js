@@ -8,12 +8,12 @@ const selectRandomItem = (array) =>
   array.at(Math.floor(Math.random() * array.length)).link;
 
 const listArticle = (articles, latest, preview) => {
-  if (preview) {
-    return [config.file.preview];
-  }
-
   if (latest) {
     return [articles.at(0).link];
+  }
+
+  if (preview) {
+    return [config.file.preview];
   }
 
   return Array(config.test.articles)
