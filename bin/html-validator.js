@@ -22,8 +22,8 @@ const listArticle = (articles, latest, preview) => {
 
 const toPath = (file) => path.join(config.dir.dest, file);
 
-const addIndexes = (links, preview) => {
-  if (preview) {
+const addIndexes = (links, latest, preview) => {
+  if (latest || preview) {
     return links;
   }
 
@@ -120,7 +120,7 @@ const {
 const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const links = listArticle(articles, latest, preview);
-const files = addIndexes(links, preview);
+const files = addIndexes(links, latest, preview);
 const results = await Promise.all(files.map(validate));
 const errors = results.flat();
 
