@@ -55,7 +55,10 @@ if (books.find(isReadBook.bind(null, asin))) {
 }
 
 const abortController = new AbortController();
-const abortID = setTimeout(cancelFetch.bind(null, abortController), 5000);
+const abortID = setTimeout(
+  cancelFetch.bind(null, abortController),
+  config.image.book.timeout,
+);
 
 try {
   const cover = `https://m.media-amazon.com/images/P/${asin}.jpg`;
@@ -102,7 +105,9 @@ try {
   await runCommand("git", ["commit", `--message=Read ${asin}`]);
 } catch (e) {
   if (e.name === "AbortError") {
-    throw new Error("Amazon image server does not respond in 5s.");
+    throw new Error(
+      `Amazon image server does not respond in ${config.image.book.timeout}s.`,
+    );
   }
 
   throw e;

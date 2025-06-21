@@ -34,6 +34,9 @@ export default {
       height: 1440,
       width: 2560,
     },
+    book: {
+      timeout: 5000,
+    },
   },
   lang: "ja",
   licenseName: "Creative Commons (表示)",
