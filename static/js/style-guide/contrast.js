@@ -1,4 +1,4 @@
-/* Calculate contrast | MIT License */
+/* Test contrast | MIT License */
 import Color from "../lib/color.min.js";
 
 const toRGB = (color) => {
@@ -6,9 +6,7 @@ const toRGB = (color) => {
   return c.to("srgb");
 };
 
-const round = (decimal) => Math.round(decimal * 1000) / 1000;
-
-window.addEventListener("load", () => {
+const showContrast = () => {
   const queryColorTip = ".test-color > tbody > tr > td:nth-child(2) .test";
   const colorTips = document.querySelectorAll(queryColorTip);
 
@@ -24,14 +22,16 @@ window.addEventListener("load", () => {
       precision: 0,
     });
     const contrastCell = colorTip.parentElement.nextElementSibling;
-    const ratio = round(background.contrast(foreground, "WCAG21"));
+    const ratio = Math.round(background.contrast(foreground, "WCAG21") * 1000) / 1000;
 
     if (colorTip.classList.contains("js-test-color-flip")) {
-      const score = round(foreground.contrast(background, "APCA"));
+      const score = Math.round(foreground.contrast(background, "APCA") * 1000) / 1000;
       contrastCell.lastChild.textContent = `${ratio} (${score})`;
     } else {
-      const score = round(background.contrast(foreground, "APCA"));
+      const score = Math.round(background.contrast(foreground, "APCA") * 1000) / 1000;
       contrastCell.lastChild.textContent = `${ratio} (${score})`;
     }
   }
-});
+};
+
+window.addEventListener("load", showContrast);

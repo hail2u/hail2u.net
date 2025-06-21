@@ -8,7 +8,7 @@ const selectRandomItem = (array) => {
   return path.join(config.dir.dest, link);
 };
 
-const listArticle = (articles, latest, preview) => {
+const pickArticle = (articles, latest, preview) => {
   if (latest) {
     return [articles.at(0).link];
   }
@@ -115,7 +115,7 @@ const {
 });
 const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file, "utf8").then(JSON.parse);
-const links = listArticle(articles, latest, preview);
+const links = pickArticle(articles, latest, preview);
 const files = await addIndexes(links, latest, preview);
 const results = await Promise.all(files.map(validate));
 const errors = results.flat();

@@ -1,6 +1,8 @@
-/* Toggle monochrome CSS filter | MIT License */
+/* Toggle monochrome filter | MIT License */
+const toggleMonochromeFilter = () => {
+  document.documentElement.classList.toggle("js-test-monochrome");
+};
+
 document
   .querySelector(".js-test-monochrome-button")
-  .addEventListener("click", () => {
-    document.documentElement.classList.toggle("js-test-monochrome");
-  });
+  .addEventListener("click", toggleMonochromeFilter);

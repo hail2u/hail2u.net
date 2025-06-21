@@ -1,6 +1,8 @@
-/* Toggle layout overlays | MIT License */
+/* Toggle layout overlay | MIT License */
+const toggleLayoutOverlay = () => {
+  document.body.classList.toggle("js-test-layout");
+};
+
 document
   .querySelector(".js-test-layout-button")
-  .addEventListener("click", () => {
-    document.body.classList.toggle("js-test-layout");
-  });
+  .addEventListener("click", toggleLayoutOverlay);
