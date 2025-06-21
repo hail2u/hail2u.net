@@ -3,8 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import util from "node:util";
 
-const selectRandomItem = (array) =>
-  array.at(Math.floor(Math.random() * array.length)).link;
+const selectRandomItem = (array) => {
+  const { link } = array.at(Math.floor(Math.random() * array.length));
+  return path.join(config.dir.dest, link);
+};
 
 const listArticle = (articles, latest, preview) => {
   if (latest) {
@@ -20,23 +22,17 @@ const listArticle = (articles, latest, preview) => {
     .map(selectRandomItem.bind(null, articles));
 };
 
-const toPath = (file) => path.join(config.dir.dest, file);
-
-const addIndexes = (links, latest, preview) => {
+const addIndexes = async (links, latest, preview) => {
   if (latest || preview) {
     return links;
   }
 
-  return [
-    "/index.html",
-    "/blog/index.html",
-    "/bookshelf/index.html",
-    "/links/index.html",
-    "/projects/index.html",
-    "/subscriptions/index.html",
-    "/statuses/index.html",
-    ...links,
-  ].map(toPath);
+  const indexes = await Array.fromAsync(
+    fs.glob(`${config.dir.dest}**/index.html`, {
+      exclude: ["*/style-guide/*"],
+    }),
+  );
+  return [...indexes, ...links];
 };
 
 const cancelFetch = (abortController) => {
@@ -120,7 +116,7 @@ const {
 const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file, "utf8").then(JSON.parse);
 const links = listArticle(articles, latest, preview);
-const files = addIndexes(links, latest, preview);
+const files = await addIndexes(links, latest, preview);
 const results = await Promise.all(files.map(validate));
 const errors = results.flat();
 
