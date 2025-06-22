@@ -27,11 +27,10 @@ const addIndexes = async (links, latest, preview) => {
     return links;
   }
 
-  const indexes = await Array.fromAsync(
-    fs.glob(`${config.dir.dest}**/index.html`, {
-      exclude: ["*/style-guide/*"],
-    }),
-  );
+  const globber = fs.glob(`${config.dir.dest}**/index.html`, {
+    exclude: ["*/style-guide/*"],
+  });
+  const indexes = await Array.fromAsync(globber);
   return [...indexes, ...links];
 };
 

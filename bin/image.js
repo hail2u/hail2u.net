@@ -29,5 +29,6 @@ if (!src) {
   throw new Error("A source directory is required.");
 }
 
-const images = await Array.fromAsync(fs.glob(`${src}*.png`));
+const globber = fs.glob(`${src}*.png`);
+const images = await Array.fromAsync(globber);
 await Promise.all(images.map(toAVIF));

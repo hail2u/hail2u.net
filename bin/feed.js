@@ -12,9 +12,8 @@ const toFilesFormat = (template) => ({
 });
 
 const gatherFiles = async () => {
-  const files = await Array.fromAsync(
-    fs.glob(`${config.dir.template}**/_feed.xml.mustache`),
-  );
+  const globber = fs.glob(`${config.dir.template}**/_feed.xml.mustache`);
+  const files = await Array.fromAsync(globber);
   return Promise.all(files.map(toFilesFormat));
 };
 
@@ -63,7 +62,8 @@ const readLatestData = async (prefix, dataFile) => {
 };
 
 const readAllData = async () => {
-  const files = await Array.fromAsync(fs.glob(`${config.dir.data}**/*.json`));
+  const globber = fs.glob(`${config.dir.data}**/*.json`);
+  const files = await Array.fromAsync(globber);
   const prefix = `${config.scheme}://${config.domain}`;
   const data = await Promise.all(files.map(readLatestData.bind(null, prefix)));
   return Object.assign(...data);
