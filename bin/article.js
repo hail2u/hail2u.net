@@ -35,23 +35,19 @@ const checkDuplication = (id, articles) => {
 };
 
 const buildArticle = ({ body, id, title }) => {
-  const description = unescapeReferences(
-    body.replace(/<.*?>/gu, "").trim().split("\n").at(0),
-  );
-  const link = path.posix.join("/blog/", `${id}.html`);
+  const firstParagraph = body.replace(/<.*?>/gu, "").trim().split("\n").at(0);
+  const description = unescapeReferences(firstParagraph);
   const published = Date.now();
   const dt = getDateDetails(published);
-  const shortDescription = `${description.split("。").at(0)}。`;
-  const type = "article";
   return {
     body,
-    description: `${description}`,
-    link,
+    description,
+    link: `/blog/${id}.html`,
     published,
     ...dt,
-    shortDescription,
+    shortDescription: description.split(/(?<=。)/u).at(0),
     title,
-    type,
+    type: "article",
   };
 };
 
