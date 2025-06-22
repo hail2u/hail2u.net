@@ -11,7 +11,6 @@ export default {
   dir: {
     data: "data/",
     dest: "dist/",
-    image: "dist/img/",
     metadata: "metadata/",
     partial: "template/partials/",
     static: "static/",
@@ -31,6 +30,7 @@ export default {
   github: "hail2u",
   image: {
     blog: {
+      dir: "img/blog",
       height: 1440,
       width: 2560,
     },

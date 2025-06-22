@@ -4,18 +4,19 @@ import path from "node:path";
 import sharp from "sharp";
 import util from "node:util";
 
-const toAVIF = (file) => {
-  const { height, width } = config.image.blog;
+const toAVIF = async (file) => {
+  const { dir, height, width } = config.image.blog;
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
-  const dest = path.join(config.dir.image, "blog", `${basename}.avif`);
-  sharp(file)
+  const dest = path.join(config.dir.static, dir, `${basename}.avif`);
+  await sharp(file)
     .resize({
       height,
       width,
       withoutEnlargement: true,
     })
     .toFile(dest);
+  await fs.cp(dest, dest.replace(config.dir.static, config.dir.dest));
 };
 
 const {
