@@ -193,36 +193,43 @@ const gatherFiles = async () => {
   return Promise.all(files.map(toFilesFormat));
 };
 
-const hasSameLink = (dest, { link }) => dest.endsWith(link);
+const isBlogPage = (page) => page.isBlog;
 
-const isBlog = (link, { canonical }) => link.startsWith(canonical);
-
-const addFeedInfo = (data, blog) => {
-  if (!blog) {
-    return data;
+const getFeedInfo = ({ isBlog, title, canonical }, blogPage) => {
+  if (!isBlog) {
+    return {
+      feedTitle: title,
+      feedURL: `${canonical}${config.feed}`,
+    };
   }
 
   return {
-    ...data,
-    feedTitle: blog.title,
-    feedURL: `${blog.canonical}${config.feed}`,
+    feedTitle: blogPage.title,
+    feedURL: `${blogPage.canonical}${config.feed}`,
   };
 };
+
+const hasSameLink = (dest, { link }) => dest.endsWith(link);
 
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
 
+  if (overrides.hasOwnFeed) {
+    const blogPage = data.pages.find(isBlogPage);
+    const { feedTitle, feedURL } = getFeedInfo(overrides, blogPage);
+    overrides.feedTitle = feedTitle;
+    overrides.feedURL = feedURL;
+  }
+
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
-    const merged = {
+    return {
       ...metadata,
       ...data,
       ...overrides,
       ...article,
       canonical: article.link,
     };
-    const blog = data.pages.find(isBlog.bind(null, article.link));
-    return addFeedInfo(merged, blog);
   }
 
   if (overrides.isHome) {
@@ -236,11 +243,6 @@ const mergeData = async (file, metadata, data) => {
       homeProjects: data.projects.slice(0, overrides.itemLength.projects),
       homeStatuses: data.statuses.slice(0, overrides.itemLength.statuses),
     };
-  }
-
-  if (overrides.hasOwnFeed) {
-    overrides.feedTitle = overrides.title;
-    overrides.feedURL = `${overrides.canonical}${config.feed}`;
   }
 
   if (overrides.isStatuses) {
