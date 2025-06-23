@@ -131,10 +131,7 @@ const readPartials = async () => {
   return Object.assign(...partials);
 };
 
-const startsWithUnderscore = (file) => {
-  const filename = path.basename(file);
-  return filename.startsWith("_");
-};
+const startsWithUnderscore = (file) => path.basename(file).startsWith("_");
 
 const isString = (string) => typeof string === "string";
 
