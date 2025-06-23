@@ -7,19 +7,6 @@ import os from "node:os";
 import path from "node:path";
 import util from "node:util";
 
-const readMetadata = (file) => fs.readFile(file).then(JSON.parse);
-
-const hasPageOrder = ({ pageOrder }) => pageOrder;
-
-const comparePageOrder = (a, b) => a.pageOrder - b.pageOrder;
-
-const buildPages = async () => {
-  const globber = fs.glob(`${config.dir.metadata}**/*.json`);
-  const files = await Array.fromAsync(globber);
-  const metadata = await Promise.all(files.map(readMetadata));
-  return metadata.filter(hasPageOrder).toSorted(comparePageOrder);
-};
-
 const isFirstInDate = (item, previous) => {
   if (
     item.year !== previous.year ||
@@ -101,6 +88,19 @@ const readData = async (file) => {
   return {
     [basename]: marked,
   };
+};
+
+const readMetadata = (file) => fs.readFile(file).then(JSON.parse);
+
+const hasPageOrder = ({ pageOrder }) => pageOrder;
+
+const comparePageOrder = (a, b) => a.pageOrder - b.pageOrder;
+
+const buildPages = async () => {
+  const globber = fs.glob(`${config.dir.metadata}**/*.json`);
+  const files = await Array.fromAsync(globber);
+  const metadata = await Promise.all(files.map(readMetadata));
+  return metadata.filter(hasPageOrder).toSorted(comparePageOrder);
 };
 
 const readAllData = async () => {
