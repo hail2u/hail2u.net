@@ -113,7 +113,7 @@ const {
   },
 });
 const file = path.join(config.dir.data, config.data.articles);
-const articles = await fs.readFile(file, "utf8").then(JSON.parse);
+const articles = await fs.readFile(file).then(JSON.parse);
 const links = pickArticle(articles, latest, preview);
 const files = await addIndexes(links, latest, preview);
 const results = await Promise.all(files.map(validate));

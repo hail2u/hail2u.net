@@ -48,7 +48,7 @@ if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
 }
 
 const file = path.join(config.dir.data, config.data.books);
-const books = await fs.readFile(file, "utf8").then(JSON.parse);
+const books = await fs.readFile(file).then(JSON.parse);
 
 if (books.find(isReadBook.bind(null, asin))) {
   throw new Error(`${title} has already been added.`);
