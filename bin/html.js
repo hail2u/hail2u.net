@@ -197,32 +197,32 @@ const hasSameLink = (dest, { link }) => dest.endsWith(link);
 
 const isBlog = (link, { canonical }) => link.startsWith(canonical);
 
+const addFeedInfo = (data, blog) => {
+  if (!blog) {
+    return data;
+  }
+
+  return {
+    ...data,
+    feedTitle: blog.title,
+    feedURL: `${blog.canonical}${config.feed}`,
+  };
+};
+
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
 
   if (overrides.isArticle) {
     const article = data.articles.find(hasSameLink.bind(null, file.dest));
-    const blog = data.pages.find(isBlog.bind(null, article.link));
-
-    if (!blog) {
-      return {
-        ...metadata,
-        ...data,
-        ...overrides,
-        ...article,
-        canonical: article.link,
-      };
-    }
-
-    return {
+    const merged = {
       ...metadata,
       ...data,
       ...overrides,
       ...article,
       canonical: article.link,
-      feedTitle: blog.title,
-      feedURL: `${blog.canonical}${config.feed}`,
     };
+    const blog = data.pages.find(isBlog.bind(null, article.link));
+    return addFeedInfo(merged, blog);
   }
 
   if (overrides.isHome) {
