@@ -20,29 +20,77 @@ const buildPages = async () => {
   return metadata.filter(hasPageOrder).toSorted(comparePageOrder);
 };
 
+const isFirstInDate = (item, previous) => {
+  if (
+    item.year !== previous.year ||
+    item.month !== previous.month ||
+    item.date !== previous.date
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+const isFirstInMonth = (item, previous) => {
+  if (item.year !== previous.year || item.month !== previous.month) {
+    return true;
+  }
+
+  return false;
+};
+
+const isFirstInYear = (item, previous) => {
+  if (item.year !== previous.year) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInDate = (item, next) => {
+  if (
+    item.year !== next?.year ||
+    item.month !== next?.month ||
+    item.date !== next?.date
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInMonth = (item, next) => {
+  if (item.year !== next?.year || item.month !== next?.month) {
+    return true;
+  }
+
+  return false;
+};
+
+const isLastInYear = (item, next) => {
+  if (item.year !== next?.year) {
+    return true;
+  }
+
+  return false;
+};
+
 const markItem = (item, index, items) => {
   if (!item.published) {
     return item;
   }
 
-  const previousItem = items.at(index - 1);
-  const nextItem = items.at(index + 1);
+  const previous = items.at(index - 1);
+  const next = items.at(index + 1);
   return {
     ...item,
-    isFirstInDate:
-      item.year !== previousItem.year ||
-      item.month !== previousItem.month ||
-      item.date !== previousItem.date,
-    isFirstInMonth:
-      item.year !== previousItem.year || item.month !== previousItem.month,
-    isFirstInYear: item.year !== previousItem.year,
-    isLastInDate:
-      item.year !== nextItem?.year ||
-      item.month !== nextItem?.month ||
-      item.date !== nextItem?.date,
-    isLastInMonth:
-      item.year !== nextItem?.year || item.month !== nextItem?.month,
-    isLastInYear: item.year !== nextItem?.year,
+    isFirstInDate: isFirstInDate(item, previous),
+    isFirstInMonth: isFirstInMonth(item, previous),
+    isFirstInYear: isFirstInYear(item, previous),
+    isLastInDate: isLastInDate(item, next),
+    isLastInMonth: isLastInMonth(item, next),
+    isLastInYear: isLastInYear(item, next),
   };
 };
 
