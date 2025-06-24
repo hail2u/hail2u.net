@@ -8,11 +8,11 @@ import readline from "node:readline/promises";
 const toDraft = (draft) => {
   const [first, ...rest] = draft.split("\n");
   const body = rest.join("\n").trim();
-  const [, id, title] = first.match(/<h1(?: id="(.*?)")?>(.*?)<\/h1>/u);
+  const [, id, title] = first.match(/<h1(?: id="(.*?)")?>(.*?)<\/h1>/v);
   return {
     body,
     id,
-    title: unescapeReferences(title.replace(/<.*?>/gu, "")),
+    title: unescapeReferences(title.replace(/<.*?>/gv, "")),
   };
 };
 

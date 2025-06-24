@@ -16,11 +16,11 @@ const references = {
 const toReference = (c) => characters[c];
 
 const escapeCharacters = (text) =>
-  String(text).replace(/[<>"']|&(?!#?\w+;)/gu, toReference);
+  String(text).replace(/[<>"']|&(?!#?\w+;)/gv, toReference);
 
 const toCharacter = (r) => references[r];
 
 const unescapeReferences = (text) =>
-  String(text).replace(/&(amp|lt|gt|quot|apos);/gu, toCharacter);
+  String(text).replace(/&(amp|lt|gt|quot|apos);/gv, toCharacter);
 
 export { escapeCharacters, unescapeReferences };

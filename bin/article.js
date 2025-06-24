@@ -11,7 +11,7 @@ const checkIDFormat = (id) => {
     throw new Error("A draft must have an ID.");
   }
 
-  if (!/[0-9a-z][-.0-9a-z]*[0-9a-z]/u.test(id)) {
+  if (!/[0-9a-z][\-.0-9a-z]*[0-9a-z]/v.test(id)) {
     throw new Error(
       "This draft ID is not valid. ID must start and end with “0-9” or “a-z”, and must not contain other than “-.a-z0-9”.",
     );
@@ -35,7 +35,7 @@ const checkDuplication = (id, articles) => {
 };
 
 const buildArticle = ({ body, id, title }) => {
-  const firstParagraph = body.replace(/<.*?>/gu, "").trim().split("\n").at(0);
+  const firstParagraph = body.replace(/<.*?>/gv, "").trim().split("\n").at(0);
   const description = unescapeReferences(firstParagraph);
   const published = Date.now();
   const dt = getDateDetails(published);
@@ -45,13 +45,13 @@ const buildArticle = ({ body, id, title }) => {
     link: `/blog/${id}.html`,
     published,
     ...dt,
-    shortDescription: description.split(/(?<=。)/u).at(0),
+    shortDescription: description.split(/(?<=。)/v).at(0),
     title,
     type: "article",
   };
 };
 
-const isNotGeneratedID = (id) => !/^\d{4}-\d{2}-\d{2}$/u.test(id);
+const isNotGeneratedID = (id) => !/^\d{4}-\d{2}-\d{2}$/v.test(id);
 
 const selected = await selectDraft();
 checkIDFormat(selected.id);
@@ -60,7 +60,7 @@ const file = path.join(config.dir.data, config.data.articles);
 const articles = await fs.readFile(file).then(JSON.parse);
 checkDuplication(selected.id, articles);
 const body = selected.body.replace(
-  /(?<=\b(href|src|srcset)=")\.\/dist\//gu,
+  /(?<=\b(href|src|srcset)=")\.\/dist\//gv,
   "/",
 );
 const article = buildArticle({

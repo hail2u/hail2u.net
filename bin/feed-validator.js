@@ -8,7 +8,7 @@ const cancelFetch = (abortController) => {
 
 const parseXML = (xml) => {
   const parser = new XMLParser({
-    arrayMode: /^error$/iu,
+    arrayMode: /^error$/iv,
     removeNSPrefix: true,
   });
   const json = parser.parse(xml);

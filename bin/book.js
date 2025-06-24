@@ -43,7 +43,7 @@ if (!title) {
   throw new Error("--title is required.");
 }
 
-if (!/^[A-Z0-9]{10}$/iu.test(asin)) {
+if (!/^[0-9a-z]{10}$/iv.test(asin)) {
   throw new Error(`${asin} is not consisted of 10 alphanumeric characters.`);
 }
 
