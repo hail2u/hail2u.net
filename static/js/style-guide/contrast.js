@@ -32,4 +32,4 @@ const showContrast = () => {
   }
 };
 
-window.addEventListener("load", showContrast);
+showContrast();
