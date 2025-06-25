@@ -13,6 +13,29 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[JSONファイルを読み込むのにfsモジュールを使っているが、Dynamic Importでも書けるようなので置き換えてみている、いや、いた。実装が遅れていたFirefoxも、2025年4月末にリリースされた138でサポートしたので、試してみる気になった。短くならない上に、可読性も良くないことがわかる。import宣言ならJSONファイルを読み込む価値はあるが、かなり特別な理由がない限りDynamic ImportをJSONファイルの読み込みに使うことはやめた方が良さそうだ。]]></description>
+        <guid>https://hail2u.net/blog/using-dynamic-import-for-a-json-file.html</guid>
+        <link>https://hail2u.net/blog/using-dynamic-import-for-a-json-file.html</link>
+        <pubDate>Wed, 25 Jun 2025 10:58:33 +0900</pubDate>
+        <title><![CDATA[JSONファイルをDynamic Import]]></title>
+        <content:encoded><![CDATA[<p>JSONファイルを読み込むのにfsモジュールを使っているが、Dynamic Importでも書けるようなので置き換えてみている、いや、いた。実装が遅れていたFirefoxも、2025年4月末にリリースされた138でサポートしたので、試してみる気になった。短くならない上に、可読性も良くないことがわかる。<code>import</code>宣言ならJSONファイルを読み込む価値はあるが、かなり特別な理由がない限りDynamic ImportをJSONファイルの読み込みに使うことはやめた方が良さそうだ。</p>
+
+<pre><code class="language-javascript">import assert from &quot;node:assert&quot;;
+import fs from &quot;node:fs/promises&quot;;
+
+const obj1 = await fs.readFile(&quot;./test.json&quot;).then(JSON.parse);
+const <mark>{ default: obj2 }</mark> = await import(&quot;./test.json&quot;, <mark>{
+  with: { type: &quot;json&quot; }
+}</mark>);
+assert.deepStrictEqual(obj1, obj2);</code></pre>
+
+<p>fsモジュールではBufferとして読んで、<code>JSON.parse()</code>に流す。1行で無理やり書いた感がすごい。これを書き換えたい動機としては、<code>utf8</code>と書かずに済むくらいの感覚で、<code>then</code>と<code>JSON.parse()</code>を書きたくないということに尽きる。fs-extraパッケージを使う気はないが、あれくらい短くスパッと書きたい。</p>
+
+<p>Dynamic Importだと、<code>import()</code>の第二引数で<code>import</code>宣言と同じ<code>with</code>キーを使ってJSONファイルを読み込むことを教えれば良い。これだけだったら使いやすそうに思えるが、既定で<code>default</code>キーへJSONファイルの内容が展開されるので、分解文法を使って代入しないと使いづらい。そして<code>default</code>は予約語のため名前も変える必要がある。そんなこんなでなかなか長い。</p>
+
+<p>長いだけならまだしも、{}が3組もあってかなり読みづらい。Dynamic Importの方が速そうな気はするが、それでも使う気は起きない。またうっかり<em>ドットで始まらない相対パス</em>を投げてしまうと、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#module_specifier_resolution">Bare Specifier</a>とみなされて死ぬことも致命的な気配がある。上記例だと<code>test.json</code>と書いてしまうと、 Node.jsでは<code>test.json</code>という名前のパッケージを探しに行き、ERR_MODULE_NOT_FOUNDになるだろう。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[JavaScriptのRegExpでvフラグを有効にするとtrueになるunicodeSetsについて。文字クラスでなかなか変わる。uをvに置き換えるだけとはいかないこともある。]]></description>
         <guid>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets</guid>
         <link>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets</link>
@@ -118,14 +141,6 @@
 <p>清澄白河駅から半蔵門線で一気に表参道駅に出る。皇居の北を回るので時間がかかるが、乗り換えずに済む。南青山のパン屋でサワードウとチャバタを買い、今回はチョコレートとクルミのパンを買う。生地全体にチョコレートが練りこまれたパンで、なかなか美味しい。</p>
 
 <p>バスで渋谷に出て、スクランブルスクエアで靴下を探す。サンダルの時期に入るからか、あまり売っていない。今年も出ているミズノのWave Prophecy Strapを見ながらまた迷うも、やはり買えない。後ろ髪を引かれながら紀ノ国屋でワインとチーズを買い、帰りの電車に乗る。2000円くらいの安いカヴァだったが美味しい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[マーク・シーマン]]></description>
-        <guid>https://www.amazon.co.jp/exec/obidos/ASIN/4814400799/hail2unet-22</guid>
-        <link>https://www.amazon.co.jp/exec/obidos/ASIN/4814400799/hail2unet-22</link>
-        <pubDate>Fri, 20 Jun 2025 07:05:18 +0900</pubDate>
-        <title><![CDATA[脳に収まるコードの書き方]]></title>
-        <content:encoded><![CDATA[<a href="https://www.amazon.co.jp/exec/obidos/ASIN/4814400799/hail2unet-22"><img alt="脳に収まるコードの書き方" height="500" loading="lazy" src="https://m.media-amazon.com/images/P/4814400799.jpg" width="391"></a>]]></content:encoded>
       </item>
   </channel>
 </rss>

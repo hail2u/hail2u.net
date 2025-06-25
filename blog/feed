@@ -13,6 +13,29 @@
     <creativeCommons:license>https://creativecommons.org/licenses/by/4.0/</creativeCommons:license>
 
       <item>
+        <description><![CDATA[JSONファイルを読み込むのにfsモジュールを使っているが、Dynamic Importでも書けるようなので置き換えてみている、いや、いた。実装が遅れていたFirefoxも、2025年4月末にリリースされた138でサポートしたので、試してみる気になった。短くならない上に、可読性も良くないことがわかる。import宣言ならJSONファイルを読み込む価値はあるが、かなり特別な理由がない限りDynamic ImportをJSONファイルの読み込みに使うことはやめた方が良さそうだ。]]></description>
+        <guid>https://hail2u.net/blog/using-dynamic-import-for-a-json-file.html</guid>
+        <link>https://hail2u.net/blog/using-dynamic-import-for-a-json-file.html</link>
+        <pubDate>Wed, 25 Jun 2025 10:58:33 +0900</pubDate>
+        <title><![CDATA[JSONファイルをDynamic Import]]></title>
+        <content:encoded><![CDATA[<p>JSONファイルを読み込むのにfsモジュールを使っているが、Dynamic Importでも書けるようなので置き換えてみている、いや、いた。実装が遅れていたFirefoxも、2025年4月末にリリースされた138でサポートしたので、試してみる気になった。短くならない上に、可読性も良くないことがわかる。<code>import</code>宣言ならJSONファイルを読み込む価値はあるが、かなり特別な理由がない限りDynamic ImportをJSONファイルの読み込みに使うことはやめた方が良さそうだ。</p>
+
+<pre><code class="language-javascript">import assert from &quot;node:assert&quot;;
+import fs from &quot;node:fs/promises&quot;;
+
+const obj1 = await fs.readFile(&quot;./test.json&quot;).then(JSON.parse);
+const <mark>{ default: obj2 }</mark> = await import(&quot;./test.json&quot;, <mark>{
+  with: { type: &quot;json&quot; }
+}</mark>);
+assert.deepStrictEqual(obj1, obj2);</code></pre>
+
+<p>fsモジュールではBufferとして読んで、<code>JSON.parse()</code>に流す。1行で無理やり書いた感がすごい。これを書き換えたい動機としては、<code>utf8</code>と書かずに済むくらいの感覚で、<code>then</code>と<code>JSON.parse()</code>を書きたくないということに尽きる。fs-extraパッケージを使う気はないが、あれくらい短くスパッと書きたい。</p>
+
+<p>Dynamic Importだと、<code>import()</code>の第二引数で<code>import</code>宣言と同じ<code>with</code>キーを使ってJSONファイルを読み込むことを教えれば良い。これだけだったら使いやすそうに思えるが、既定で<code>default</code>キーへJSONファイルの内容が展開されるので、分解文法を使って代入しないと使いづらい。そして<code>default</code>は予約語のため名前も変える必要がある。そんなこんなでなかなか長い。</p>
+
+<p>長いだけならまだしも、{}が3組もあってかなり読みづらい。Dynamic Importの方が速そうな気はするが、それでも使う気は起きない。またうっかり<em>ドットで始まらない相対パス</em>を投げてしまうと、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#module_specifier_resolution">Bare Specifier</a>とみなされて死ぬことも致命的な気配がある。上記例だと<code>test.json</code>と書いてしまうと、 Node.jsでは<code>test.json</code>という名前のパッケージを探しに行き、ERR_MODULE_NOT_FOUNDになるだろう。</p>]]></content:encoded>
+      </item>
+      <item>
         <description><![CDATA[夏場にはゼリーを作っておやつに食べている。コーヒーとモヒート・シロップで作ることが多いが、たまにカシス・リキュールなどでも作ったりする。調子に乗って適当なジュースで作って失敗することも多い。湘南ゴールドのジュースでは失敗し続けており、今年はどうにか成功させたい。]]></description>
         <guid>https://hail2u.net/blog/2025-06-24.html</guid>
         <link>https://hail2u.net/blog/2025-06-24.html</link>
@@ -185,22 +208,6 @@
 <hr>
 
 <p>さすがに疲れてきたので、ご飯の後はまっすぐ帰る。帰宅ラッシュのギリギリ前くらいだったし、最速の電車がすんなり来たので、18時過ぎには帰宅できた。家を出たのが6時半くらいだったので、12時間弱の強行軍だ。金沢へ日帰りも出来ないことはなさそうという妙な自信を持ってしまう。<a href="https://www.kanazawa-museum.jp/daisetz/">鈴木大拙館</a>に行きたい。</p>]]></content:encoded>
-      </item>
-      <item>
-        <description><![CDATA[日帰りで長野県は上田市の近くにある無言館へ行く。以前から一度見てみたいと思っていたが、近くにすら行く機会がない上、最寄駅から歩ける距離でもないため、なかなか行けないでいた。北陸新幹線に乗りたかったり、帰りに東京で美味しい夕ご飯を食べたかったり、いくつか理由を見つけたので、一気に行って、一気に帰ってくることにする。往復で500kmくらいだろうか。]]></description>
-        <guid>https://hail2u.net/blog/mugonkan-2025-06-02.html</guid>
-        <link>https://hail2u.net/blog/mugonkan-2025-06-02.html</link>
-        <pubDate>Thu, 5 Jun 2025 07:51:26 +0900</pubDate>
-        <title><![CDATA[無言館]]></title>
-        <content:encoded><![CDATA[<figure>
-<img alt="鬱蒼とした森の中を舗装された坂道が走る。木々は鮮やかな緑で、木漏れ日の明るさも春らしい。自問坂と名づけられたこの坂の急な曲がり角の突き当りには、無言館とその別館への案内板が立っている。" height="1440" src="https://hail2u.net/img/blog/mugonkan-2025-06-02.avif" width="2560">
-</figure>
-
-<p>日帰りで長野県は上田市の近くにある<a href="https://mugonkan.jp/">無言館</a>へ行く。以前から一度見てみたいと思っていたが、近くにすら行く機会がない上、最寄駅から歩ける距離でもないため、なかなか行けないでいた。北陸新幹線に乗りたかったり、帰りに東京で美味しい夕ご飯を食べたかったり、いくつか理由を見つけたので、一気に行って、一気に帰ってくることにする。往復で500kmくらいだろうか。</p>
-
-<p>無言館を通って温泉地まで行くシャトル・バスが春から秋にかけて運行しているようだ。その最寄り停留所から降りると、公園や広場があり、その奥から坂を登っていくと無言館に着く。山に入る森の坂道は長い。</p>
-
-<p>いわゆる美術館やギャラリーと違って、主役は訪問者の美術館なのだと思う。周囲の環境も含めた一種のインスタレーションであり、双方向性のあるメディア体験でもあるような気がする。茶室と似ているのかもしれない。無二の体験ができるとも言えるし、何も体験できない体験ができるとも言える。季節によっても違う感覚になりそうだし、何十年か後の冬にもう一度来たい。</p>]]></content:encoded>
       </item>
   </channel>
 </rss>
