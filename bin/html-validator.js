@@ -10,7 +10,7 @@ const selectRandomItem = (array) => {
 
 const pickArticle = (articles, latest, preview) => {
   if (latest) {
-    return [articles.at(0).link];
+    return [path.join(config.dir.dest, articles.at(0).link)];
   }
 
   if (preview) {
