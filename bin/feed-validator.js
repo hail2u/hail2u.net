@@ -80,8 +80,7 @@ const validate = async (file) => {
 const isNotEmpty = (element) => element.length !== 0;
 
 const globber = fs.glob(`${config.dir.dest}**/feed`);
-const feeds = await Array.fromAsync(globber);
-const results = await Promise.all(feeds.map(validate));
+const results = await Array.fromAsync(globber, validate);
 const errors = results.flat();
 
 if (errors.length > 0) {

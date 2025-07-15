@@ -11,10 +11,9 @@ const toFilesFormat = (template) => ({
   template,
 });
 
-const gatherFiles = async () => {
+const gatherFiles = () => {
   const globber = fs.glob(`${config.dir.template}**/_feed.xml.mustache`);
-  const files = await Array.fromAsync(globber);
-  return Promise.all(files.map(toFilesFormat));
+  return Array.fromAsync(globber, toFilesFormat);
 };
 
 const toAbsoluteURL = (prefix, url) => {
@@ -63,9 +62,11 @@ const readLatestData = async (prefix, file) => {
 
 const readAllData = async () => {
   const globber = fs.glob(`${config.dir.data}**/*.json`);
-  const files = await Array.fromAsync(globber);
   const prefix = `${config.scheme}://${config.domain}`;
-  const data = await Promise.all(files.map(readLatestData.bind(null, prefix)));
+  const data = await Array.fromAsync(
+    globber,
+    readLatestData.bind(null, prefix),
+  );
   return Object.assign(...data);
 };
 

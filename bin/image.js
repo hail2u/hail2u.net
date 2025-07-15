@@ -30,5 +30,4 @@ if (!src) {
 }
 
 const globber = fs.glob(`${src}*.png`);
-const images = await Array.fromAsync(globber);
-await Promise.all(images.map(toAVIF));
+await Array.fromAsync(globber, toAVIF);

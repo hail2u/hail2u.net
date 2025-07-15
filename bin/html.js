@@ -98,15 +98,13 @@ const comparePageOrder = (a, b) => a.pageOrder - b.pageOrder;
 
 const buildPages = async () => {
   const globber = fs.glob(`${config.dir.metadata}**/*.json`);
-  const files = await Array.fromAsync(globber);
-  const metadata = await Promise.all(files.map(readMetadata));
+  const metadata = await Array.fromAsync(globber, readMetadata);
   return metadata.filter(hasPageOrder).toSorted(comparePageOrder);
 };
 
 const readAllData = async () => {
   const globber = fs.glob(`${config.dir.data}**/*.json`);
-  const files = await Array.fromAsync(globber);
-  const data = await Promise.all(files.map(readData));
+  const data = await Array.fromAsync(globber, readData);
   const allData = Object.assign(...data);
   const pages = await buildPages();
   return {
@@ -126,8 +124,7 @@ const readPartial = async (file) => {
 
 const readPartials = async () => {
   const globber = fs.glob(`${config.dir.partial}/_*.mustache`);
-  const files = await Array.fromAsync(globber);
-  const partials = await Promise.all(files.map(readPartial));
+  const partials = await Array.fromAsync(globber, readPartial);
   return Object.assign(...partials);
 };
 
@@ -185,12 +182,11 @@ const toFilesFormat = (template) => {
   };
 };
 
-const gatherFiles = async () => {
+const gatherFiles = () => {
   const globber = fs.glob(`${config.dir.template}**/*.mustache`, {
     exclude: startsWithUnderscore,
   });
-  const files = await Array.fromAsync(globber);
-  return Promise.all(files.map(toFilesFormat));
+  return Array.fromAsync(globber, toFilesFormat);
 };
 
 const isBlogPage = (page) => page.isBlog;
