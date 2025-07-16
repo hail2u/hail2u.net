@@ -29,7 +29,8 @@ const toAbsoluteURLAll = (prefix, match, attr, url) => {
   return `${attr}="${absoluteURL}"`;
 };
 
-const extendItem = (prefix, item) => {
+const extendItem = (item) => {
+  const prefix = `${config.scheme}://${config.domain}`;
   const link = toAbsoluteURL(prefix, item.link);
 
   if (item.body) {
@@ -49,12 +50,11 @@ const extendItem = (prefix, item) => {
   };
 };
 
-const readLatestData = async (prefix, file) => {
+const readLatestData = async (file) => {
   const basename = path.basename(file, ".json");
   const data = await fs.readFile(file).then(JSON.parse);
-  const extended = await Promise.all(
-    data.slice(0, 10).map(extendItem.bind(null, prefix)),
-  );
+  const latestData = data.slice(0, 10);
+  const extended = await Promise.all(latestData.map(extendItem));
   return {
     [basename]: extended,
   };
@@ -62,11 +62,7 @@ const readLatestData = async (prefix, file) => {
 
 const readAllData = async () => {
   const globber = fs.glob(`${config.dir.data}**/*.json`);
-  const prefix = `${config.scheme}://${config.domain}`;
-  const data = await Array.fromAsync(
-    globber,
-    readLatestData.bind(null, prefix),
-  );
+  const data = await Array.fromAsync(globber, readLatestData);
   return Object.assign(...data);
 };
 
