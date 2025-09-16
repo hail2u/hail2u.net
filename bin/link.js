@@ -59,6 +59,3 @@ await fs.mkdir(path.dirname(file), {
 await fs.writeFile(file, `${formatted}\n`);
 await runCommand("git", ["add", "--", file]);
 await runCommand("git", ["commit", `--message=Bookmark ${url}`]);
-const twitter = new URL("https://x.com/intent/tweet");
-twitter.searchParams.append("text", `${comment} / ${title} ${url}`);
-await runCommand("chrome", [twitter.href]);

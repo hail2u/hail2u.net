@@ -44,6 +44,3 @@ await runCommand("git", [
   "--message=Update status",
   `--message=${text}`,
 ]);
-const twitter = new URL("https://x.com/intent/tweet");
-twitter.searchParams.append("text", text);
-await runCommand("chrome", [twitter.href]);
