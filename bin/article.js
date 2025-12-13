@@ -51,7 +51,7 @@ const buildArticle = ({ body, id, title }) => {
   };
 };
 
-const selected = await selectDraft();
+const selected = await selectDraft(true);
 checkIDFormat(selected.id);
 checkTitleType(selected.title);
 const file = path.join(config.dir.data, config.data.articles);

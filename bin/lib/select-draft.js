@@ -38,7 +38,15 @@ ${body}
 `;
 };
 
-const selectDraft = async () => {
+const rebuildDrafts = (exclude, selected, others) => {
+  if (exclude) {
+    return Promise.all(others.map(rebuildDraft));
+  }
+
+  return Promise.all([selected, ...others].map(rebuildDraft));
+}
+
+const selectDraft = async (exclude = false) => {
   const file = config.file.draft;
   const html = await fs.readFile(file, "utf8");
   const sections = html.trim().split("\n\n\n<hr>\n\n\n");
@@ -66,8 +74,8 @@ ${menulist}
 
   const index = answer - 1;
   const selected = drafts.at(index);
-  const remains = drafts.toSpliced(index, 1);
-  const rebuilt = await Promise.all([selected, ...remains].map(rebuildDraft));
+  const others = drafts.toSpliced(index, 1);
+  const rebuilt = await rebuildDrafts(exclude, selected, others);
   await fs.mkdir(path.dirname(file), {
     recursive: true,
   });
