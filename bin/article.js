@@ -42,7 +42,7 @@ const buildArticle = ({ body, id, title }) => {
   return {
     body,
     description,
-    link: `/blog/${id}.html`,
+    link: `/blog/${id}`,
     published,
     ...dt,
     shortDescription: description.split(/(?<=。)/v).at(0),

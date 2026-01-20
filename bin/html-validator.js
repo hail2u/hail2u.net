@@ -5,12 +5,12 @@ import util from "node:util";
 
 const selectRandomItem = (array) => {
   const { link } = array.at(Math.floor(Math.random() * array.length));
-  return path.join(config.dir.dest, link);
+  return path.join(config.dir.dest, `${link}.html`);
 };
 
 const pickArticle = (articles, latest, preview) => {
   if (latest) {
-    const latestPath = path.join(config.dir.dest, articles.at(0).link);
+    const latestPath = path.join(config.dir.dest, `${articles.at(0).link}.html`);
     return [latestPath];
   }
 

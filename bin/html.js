@@ -162,7 +162,7 @@ const guessDest = (template, basename) => {
     return guessPath(template, config.dir.dest, basename);
   }
 
-  return path.join(config.dir.dest, template.link);
+  return path.join(config.dir.dest, `${template.link}.html`);
 };
 
 const toFilesFormat = (template) => {
@@ -205,7 +205,7 @@ const getFeedInfo = ({ isBlog, title, canonical }, blogPage) => {
   };
 };
 
-const hasSameLink = (dest, { link }) => dest.endsWith(link);
+const hasSameLink = (dest, { link }) => dest.endsWith(`${link}.html`);
 
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
