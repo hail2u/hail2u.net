@@ -44,7 +44,7 @@ const rebuildDrafts = (exclude, selected, others) => {
   }
 
   return Promise.all([selected, ...others].map(rebuildDraft));
-}
+};
 
 const selectDraft = async (exclude = false) => {
   const file = config.file.draft;
