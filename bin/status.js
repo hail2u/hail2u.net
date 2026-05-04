@@ -15,7 +15,7 @@ if (!text) {
   throw new Error("A status text is required.");
 }
 
-const published = Date.now();
+const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
 const dt = getDateDetails(published);
 const file = path.join(config.dir.data, config.data.statuses);
 const statuses = await fs.readFile(file).then(JSON.parse);

@@ -35,7 +35,7 @@ if (!url) {
 
 const file = path.join(config.dir.data, config.data.links);
 const links = await fs.readFile(file).then(JSON.parse);
-const published = Date.now();
+const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
 const dt = getDateDetails(published);
 const formatted = JSON.stringify(
   [

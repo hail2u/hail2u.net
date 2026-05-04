@@ -11,7 +11,7 @@ const isFirstInDate = (item, previous) => {
   if (
     item.year !== previous.year ||
     item.month !== previous.month ||
-    item.date !== previous.date
+    item.day !== previous.day
   ) {
     return true;
   }
@@ -39,7 +39,7 @@ const isLastInDate = (item, next) => {
   if (
     item.year !== next?.year ||
     item.month !== next?.month ||
-    item.date !== next?.date
+    item.day !== next?.day
   ) {
     return true;
   }
@@ -135,8 +135,9 @@ const isString = (string) => typeof string === "string";
 const isDocument = (type) => type === "document";
 
 const isTooOld = (time) => {
-  const oneYearInMS = 1000 * 60 * 60 * 24 * 365;
-  const oneYearAgo = Date.now() - oneYearInMS;
+  const oneYearAgo = Temporal.Now.zonedDateTimeISO().subtract({
+    years: 1,
+  }).epochMilliseconds;
 
   if (oneYearAgo < time) {
     return false;

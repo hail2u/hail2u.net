@@ -37,7 +37,7 @@ const checkDuplication = (id, articles) => {
 const buildArticle = ({ body, id, title }) => {
   const firstParagraph = body.replace(/<.*?>/gv, "").trim().split("\n").at(0);
   const description = unescapeReferences(firstParagraph);
-  const published = Date.now();
+  const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
   const dt = getDateDetails(published);
   return {
     body,

@@ -85,11 +85,11 @@ ${menulist}
     return selected;
   }
 
-  const now = Date.now();
+  const now = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
   const dt = getDateDetails(now);
   return {
     ...selected,
-    id: `${dt.strYear}-${dt.strMonth}-${dt.strDate}`,
+    id: `${dt.strYear}-${dt.strMonth}-${dt.strDay}`,
   };
 };
 
