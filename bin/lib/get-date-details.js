@@ -3,19 +3,18 @@ const getDateDetails = (timestamp) => {
   const dt = Temporal.Instant.fromEpochMilliseconds(timestamp)
     .toZonedDateTimeISO(tz)
     .toPlainDateTime();
-  const { day, hour, minute, month, second, year } = dt;
-  const dow = dt.dayOfWeek - 1;
+  const { day, dayOfWeek, hour, minute, month, second, year } = dt;
   return {
     day,
-    dow,
+    dayOfWeek,
     hour,
     minute,
     month,
     second,
-    strDOW: new Intl.DateTimeFormat("en-us", {
+    strDay: String(day).padStart(2, "0"),
+    strDayOfWeek: new Intl.DateTimeFormat("en-us", {
       weekday: "short",
     }).format(dt),
-    strDay: String(day).padStart(2, "0"),
     strHour: String(hour).padStart(2, "0"),
     strMinute: String(minute).padStart(2, "0"),
     strMonth: String(month).padStart(2, "0"),
