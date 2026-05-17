@@ -35,14 +35,12 @@ if (!url) {
 
 const file = path.join(config.dir.data, config.data.links);
 const links = await fs.readFile(file).then(JSON.parse);
-const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
-const dt = getDateDetails(published);
+const dt = getDateDetails();
 const formatted = JSON.stringify(
   [
     {
       description: comment,
       link: url,
-      published,
       ...dt,
       shortDescription: `${comment.split("。").at(0)}。`,
       title,

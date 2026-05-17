@@ -135,11 +135,7 @@ const isString = (string) => typeof string === "string";
 const isDocument = (type) => type === "document";
 
 const isTooOld = (time) => {
-  const oneYearAgo = Temporal.Now.zonedDateTimeISO().subtract({
-    years: 1,
-  }).epochMilliseconds;
-
-  if (oneYearAgo < time) {
+  if (config.oneYearAgo < time) {
     return false;
   }
 
@@ -285,6 +281,9 @@ const {
 });
 const data = await readAllData();
 const partials = await readPartials();
+config.oneYearAgo = Temporal.Now.zonedDateTimeISO().subtract({
+  years: 1,
+}).epochMilliseconds;
 
 if (latest) {
   const latestArticle = toFilesFormat(data.articles.at(0));

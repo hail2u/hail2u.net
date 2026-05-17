@@ -79,15 +79,13 @@ try {
   const img = await res.arrayBuffer();
   const metadata = await sharp(Buffer.from(img)).metadata();
   const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" loading="lazy" src="${cover}" width="${metadata.width}"></a>`;
-  const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
-  const dt = getDateDetails(published);
+  const dt = getDateDetails();
   const formatted = JSON.stringify(
     [
       {
         body,
         description: author,
         link,
-        published,
         ...dt,
         title,
         type: "book",

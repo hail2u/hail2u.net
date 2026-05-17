@@ -15,16 +15,14 @@ if (!text) {
   throw new Error("A status text is required.");
 }
 
-const published = Temporal.Now.zonedDateTimeISO().epochMilliseconds;
-const dt = getDateDetails(published);
+const dt = getDateDetails();
 const file = path.join(config.dir.data, config.data.statuses);
 const statuses = await fs.readFile(file).then(JSON.parse);
 const formatted = JSON.stringify(
   [
     {
       description: text,
-      link: `/statuses/#${published}`,
-      published,
+      link: `/statuses/#${dt.published}`,
       ...dt,
       title: text,
       type: "status",

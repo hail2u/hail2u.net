@@ -1,8 +1,6 @@
-const getDateDetails = (timestamp) => {
-  const tz = Temporal.Now.timeZoneId();
-  const dt = Temporal.Instant.fromEpochMilliseconds(timestamp)
-    .toZonedDateTimeISO(tz)
-    .toPlainDateTime();
+const getDateDetails = () => {
+  const now = Temporal.Now.zonedDateTimeISO();
+  const dt = now.toPlainDateTime();
   const { day, dayOfWeek, hour, minute, month, second, year } = dt;
   return {
     day,
@@ -10,6 +8,7 @@ const getDateDetails = (timestamp) => {
     hour,
     minute,
     month,
+    published: now.epochMilliseconds,
     second,
     strDay: String(day).padStart(2, "0"),
     strDayOfWeek: new Intl.DateTimeFormat("en-us", {
