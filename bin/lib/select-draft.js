@@ -85,7 +85,7 @@ ${menulist}
     return selected;
   }
 
-  const dt = getDateDetails();
+  const dt = getDateDetails(config.now);
   return {
     ...selected,
     id: `${dt.strYear}-${dt.strMonth}-${dt.strDay}`,

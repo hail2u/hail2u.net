@@ -37,7 +37,7 @@ const checkDuplication = (id, articles) => {
 const buildArticle = ({ body, id, title }) => {
   const firstParagraph = body.replace(/<.*?>/gv, "").trim().split("\n").at(0);
   const description = unescapeReferences(firstParagraph);
-  const dt = getDateDetails();
+  const dt = getDateDetails(config.now);
   return {
     body,
     description,

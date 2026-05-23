@@ -281,7 +281,7 @@ const {
 });
 const data = await readAllData();
 const partials = await readPartials();
-config.oneYearAgo = Temporal.Now.zonedDateTimeISO().subtract({
+config.oneYearAgo = config.now.subtract({
   years: 1,
 }).epochMilliseconds;
 

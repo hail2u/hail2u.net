@@ -79,7 +79,7 @@ try {
   const img = await res.arrayBuffer();
   const metadata = await sharp(Buffer.from(img)).metadata();
   const body = `<a href="${link}"><img alt="${titleEscaped}" height="${metadata.height}" loading="lazy" src="${cover}" width="${metadata.width}"></a>`;
-  const dt = getDateDetails();
+  const dt = getDateDetails(config.now);
   const formatted = JSON.stringify(
     [
       {

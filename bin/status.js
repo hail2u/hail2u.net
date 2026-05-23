@@ -15,7 +15,7 @@ if (!text) {
   throw new Error("A status text is required.");
 }
 
-const dt = getDateDetails();
+const dt = getDateDetails(config.now);
 const file = path.join(config.dir.data, config.data.statuses);
 const statuses = await fs.readFile(file).then(JSON.parse);
 const formatted = JSON.stringify(

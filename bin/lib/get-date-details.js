@@ -1,5 +1,4 @@
-const getDateDetails = () => {
-  const now = Temporal.Now.zonedDateTimeISO();
+const getDateDetails = (now) => {
   const dt = now.toPlainDateTime();
   const { day, dayOfWeek, hour, minute, month, second, year } = dt;
   return {

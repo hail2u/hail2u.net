@@ -35,7 +35,7 @@ if (!url) {
 
 const file = path.join(config.dir.data, config.data.links);
 const links = await fs.readFile(file).then(JSON.parse);
-const dt = getDateDetails();
+const dt = getDateDetails(config.now);
 const formatted = JSON.stringify(
   [
     {

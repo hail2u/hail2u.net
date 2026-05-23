@@ -42,6 +42,7 @@ export default {
   licenseName: "Creative Commons (表示)",
   licenseURL: "https://creativecommons.org/licenses/by/4.0/",
   name: pkg.name,
+  now: Temporal.Now.zonedDateTimeISO(),
   region: "JP",
   scheme: "https",
   shimei: "ながしまきょう",
