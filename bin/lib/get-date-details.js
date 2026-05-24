@@ -1,5 +1,4 @@
-const getDateDetails = (now) => {
-  const dt = now.toPlainDateTime();
+const getDateDetails = (dt) => {
   const { day, dayOfWeek, hour, minute, month, second, year } = dt;
   return {
     day,
@@ -7,7 +6,7 @@ const getDateDetails = (now) => {
     hour,
     minute,
     month,
-    published: now.epochMilliseconds,
+    published: dt.toZonedDateTime("Asia/Tokyo").epochMilliseconds,
     second,
     strDay: String(day).padStart(2, "0"),
     strDayOfWeek: new Intl.DateTimeFormat("en-us", {

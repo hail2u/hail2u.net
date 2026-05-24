@@ -135,7 +135,9 @@ const isString = (string) => typeof string === "string";
 const isDocument = (type) => type === "document";
 
 const isTooOld = (time) => {
-  if (config.oneYearAgo < time) {
+  const oneYearAgo = config.oneYearAgo.toZonedDateTime("Asia/Tokyo").epochMilliseconds;
+
+  if (oneYearAgo < time) {
     return false;
   }
 
@@ -283,7 +285,7 @@ const data = await readAllData();
 const partials = await readPartials();
 config.oneYearAgo = config.now.subtract({
   years: 1,
-}).epochMilliseconds;
+});
 
 if (latest) {
   const latestArticle = toFilesFormat(data.articles.at(0));
