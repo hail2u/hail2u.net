@@ -64,7 +64,7 @@ const isLastInYear = (item, next) => {
 };
 
 const markItem = (item, index, items) => {
-  if (!item.published) {
+  if (!item.day) {
     return item;
   }
 
@@ -134,22 +134,21 @@ const isString = (string) => typeof string === "string";
 
 const isDocument = (type) => type === "document";
 
-const isTooOld = (time) => {
-  const oneYearAgo = config.oneYearAgo.toZonedDateTime("Asia/Tokyo").epochMilliseconds;
-
-  if (oneYearAgo < time) {
-    return false;
-  }
-
-  return true;
-};
-
 const guessTemplate = (template) => {
   if (isString(template)) {
     return template;
   }
 
-  if (isDocument(template.type) || isTooOld(template.published)) {
+  const since = Temporal.PlainDateTime.from({
+    day: template.day,
+    hour: template.hour,
+    minute: template.minute,
+    month: template.month,
+    second: template.second,
+    year: template.year,
+  }).since(config.oneYearAgo);
+
+  if (isDocument(template.type) || since.sign < 0) {
     return path.join(config.dir.template, config.template.old);
   }
 
@@ -281,11 +280,11 @@ const {
     },
   },
 });
-const data = await readAllData();
-const partials = await readPartials();
 config.oneYearAgo = config.now.subtract({
   years: 1,
 });
+const data = await readAllData();
+const partials = await readPartials();
 
 if (latest) {
   const latestArticle = toFilesFormat(data.articles.at(0));

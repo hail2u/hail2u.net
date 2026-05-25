@@ -66,8 +66,18 @@ const readAllData = async () => {
   return Object.assign(...data);
 };
 
+const toPDT = ({ year, month, day, hour, minute, second }) =>
+  Temporal.PlainDateTime.from({
+    day,
+    hour,
+    minute,
+    month,
+    second,
+    year,
+  });
+
 const comparePublished = (a, b) =>
-  Number.parseInt(b.published, 10) - Number.parseInt(a.published, 10);
+  Temporal.PlainDateTime.compare(toPDT(b), toPDT(a));
 
 const mergeData = async (file, metadata, data) => {
   const overrides = await fs.readFile(file.metadata).then(JSON.parse);
