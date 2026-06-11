@@ -132,8 +132,6 @@ const startsWithUnderscore = (file) => path.basename(file).startsWith("_");
 
 const isString = (string) => typeof string === "string";
 
-const isDocument = (type) => type === "document";
-
 const guessTemplate = (template) => {
   if (isString(template)) {
     return template;
@@ -148,7 +146,7 @@ const guessTemplate = (template) => {
     year: template.year,
   }).since(config.oneYearAgo);
 
-  if (isDocument(template.type) || since.sign < 0) {
+  if (since.sign < 0) {
     return path.join(config.dir.template, config.template.old);
   }
 
@@ -234,18 +232,6 @@ const mergeData = async (file, metadata, data) => {
       homeArticles: data.articles.slice(0, overrides.itemLength.articles),
       homeBooks: data.books.slice(0, overrides.itemLength.books),
       homeLinks: data.links.slice(0, overrides.itemLength.links),
-      homeProjects: data.projects.slice(0, overrides.itemLength.projects),
-      homeStatuses: data.statuses.slice(0, overrides.itemLength.statuses),
-    };
-  }
-
-  if (overrides.isStatuses) {
-    const log = await fs.readFile(config.file.statusLog, "utf8");
-    return {
-      ...metadata,
-      ...data,
-      ...overrides,
-      log,
     };
   }
 

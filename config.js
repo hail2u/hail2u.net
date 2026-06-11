@@ -5,8 +5,6 @@ export default {
     articles: "articles.json",
     books: "books.json",
     links: "links.json",
-    projects: "projects.json",
-    statuses: "statuses.json",
   },
   dir: {
     data: "data/",
@@ -24,7 +22,6 @@ export default {
   file: {
     draft: "drafts.html",
     preview: "preview.html",
-    statusLog: "data/statuses/log.html",
   },
   fullname: "Kyo Nagashima",
   github: "hail2u",

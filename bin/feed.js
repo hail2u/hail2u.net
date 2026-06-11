@@ -101,8 +101,8 @@ const build = async (metadata, data, file) => {
 };
 
 const files = await gatherFiles();
-const { articles, books, links, statuses } = await readAllData();
-const items = [...articles, ...books, ...links, ...statuses]
+const { articles, books, links } = await readAllData();
+const items = [...articles, ...books, ...links]
   .toSorted(comparePublished)
   .slice(0, 10);
 const data = {
@@ -110,6 +110,5 @@ const data = {
   books,
   items,
   links,
-  statuses,
 };
 await Promise.all(files.map(build.bind(null, config, data)));
