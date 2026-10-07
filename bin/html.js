@@ -3,7 +3,6 @@ import { escapeCharacters } from "./lib/character-reference.js";
 import fs from "node:fs/promises";
 import { guessPath } from "./lib/guess-path.js";
 import mustache from "mustache";
-import os from "node:os";
 import path from "node:path";
 import util from "node:util";
 
@@ -279,14 +278,7 @@ if (latest) {
 
 if (all) {
   const articleFiles = await Promise.all(data.articles.map(toFilesFormat));
-  const thread = os.availableParallelism();
-  const repeat = Math.ceil(articleFiles.length / thread);
-
-  for (let i = 0; i < repeat; i += 1) {
-    const chunk = articleFiles.slice(i * thread, (i + 1) * thread);
-    /* eslint-disable-next-line no-await-in-loop */
-    await Promise.all(chunk.map(build.bind(null, config, data, partials)));
-  }
+  await Promise.all(articleFiles.map(build.bind(null, config, data, partials)));
 }
 
 const files = await gatherFiles();
